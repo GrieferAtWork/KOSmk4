@@ -33,14 +33,14 @@
 DECL_BEGIN
 
 /* Stop DMAing by releasing all of the specified DMA locks.
- * NOTE: The caller must ensure that `lockcnt == return(mman_startdma*())', and
+ * NOTE: The  caller  must ensure  that  `lockcnt == return(mman_startdma*())', and
  *       that the specified `lockvec' is either the exact same `lockvec' originally
  *       passed to `mman_startdma[v]()', or an identical memory copy of it. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec,
                             size_t lockcnt) {
 	size_t i;
-	/* Release all DMA locks first, and then decref everything in a second
+	/* Release all DMA locks first, and then decref everything in a  second
 	 * pass, thus improving cache-locality, as well as semantics, such that
 	 * we're invocing decref() with less locks held that we'd do otherwise. */
 	for (i = lockcnt; i--;)

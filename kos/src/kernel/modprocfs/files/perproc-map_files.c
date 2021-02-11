@@ -51,7 +51,7 @@ parse_mapfiles_filename(CHECKED USER /*utf-8*/ char const *name,
 	if (namelen < 3)
 		goto err; /* Smallest (syntax-)valid filename would be "0-0" */
 	/* Load the first part, and be on the lookout for `-' characters.
-	 * Note that we may only ignore casing for hex-characters when
+	 * Note that we  may only ignore  casing for hex-characters  when
 	 * `mode & FS_MODE_FDOSPATH' is true. */
 	for (i = 0;; ++i) {
 		char ch;
@@ -79,7 +79,7 @@ parse_mapfiles_filename(CHECKED USER /*utf-8*/ char const *name,
 		minaddr = temp;
 	}
 	/* At this point, `i' points at the `-' character in-between.
-	 * With this in mind, we must now load `maxaddr' */
+	 * With  this   in  mind,   we   must  now   load   `maxaddr' */
 	++i;
 	if (i >= namelen)
 		goto err; /* Empty maxaddr-part. */
@@ -145,11 +145,11 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 		FINALLY_DECREF_UNLIKELY(threadmm);
 		size_t nodeid = 0;
 		struct vm_node *node;
-		/* Check if `threadvm' contains a node that starts at `minaddr',
-		 * and either itself also ends at `maxaddr', or is followed by
+		/* Check if `threadvm' contains a  node that starts at  `minaddr',
+		 * and either itself  also ends  at `maxaddr', or  is followed  by
 		 * some other node that ends at `maxaddr', with no gap in-between.
-		 * Note that we could in theory also check if all nodes within
-		 * this area could be merged, but that isn't really necessary,
+		 * Note  that we  could in theory  also check if  all nodes within
+		 * this  area could  be merged,  but that  isn't really necessary,
 		 * and not doing so doesn't introduce any glaring inconsistencies. */
 		vm_treelock_read(threadmm);
 #ifdef CONFIG_USE_NEW_VM
@@ -191,10 +191,10 @@ unlock_threadvm_and_goto_err:
 		vm_treelock_endread(threadmm);
 		/* Found it! - It's the `nodeid'th node! */
 		result = directory_entry_alloc(namelen);
-		/* Re-print the proper filename to prevent duplicate access
-		 * to a (potentially) user-space string, as well as deal with
-		 * the user-space filename having been case-insensitive
-		 * Note however that we can still assume that the user-space
+		/* Re-print  the  proper  filename to  prevent  duplicate access
+		 * to a (potentially)  user-space string, as  well as deal  with
+		 * the  user-space   filename   having   been   case-insensitive
+		 * Note  however that  we can  still assume  that the user-space
 		 * filename's length was correct, since if this wasn't the case,
 		 * then the call to `parse_mapfiles_filename()' above would have
 		 * returned `false' */
@@ -223,11 +223,11 @@ struct mapfiles_enum_data {
 PRIVATE ssize_t FCALL
 vm_enum_callback_for_mapfiles_enum(void *arg, struct vm_mapinfo *__restrict info) {
 	struct mapfiles_enum_data *ctx;
-	/* Buffer for the filename of the /map_files/ file.
-	 * This has the format: '<pointer>-<pointer>\0', meaning
-	 * that we need 1 ('-') + 1 ('\0') + 2 * (<pointer>), where
+	/* Buffer   for  the  filename   of  the  /map_files/  file.
+	 * This has  the  format:  '<pointer>-<pointer>\0',  meaning
+	 * that we need 1 ('-') + 1 ('\0') + 2 * (<pointer>),  where
 	 * <pointer> has a max length of `sizeof(void *) * 2`, since
-	 * the representation used is always lower-case hex. */
+	 * the  representation  used   is  always  lower-case   hex. */
 	char filename[2 + (2 * (sizeof(void *) * 2))];
 	u16 filename_len;
 	if (!info->vmi_fspath || !info->vmi_fsname)

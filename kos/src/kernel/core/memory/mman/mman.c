@@ -81,7 +81,7 @@ PUBLIC ATTR_PERMMAN struct mexecinfo thismman_execinfo = {
 
 
 
-/* A special per-MMAN node that is used to cover the kernel core
+/* A special per-MMAN node that is  used to cover the kernel  core
  * with a reservation within user-space memory manager. Within the
  * kernel mman itself, this field is undefined. */
 PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
@@ -104,8 +104,8 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 	MNODE_INIT_mn_partoff(0),
 	/* NOTE: The next-link of this is (ab-)used for `thismman_lockops'.
 	 *       This is because that field has the attribute [valid_if(le_prev != NULL)],
-	 *       which is never the case since this node is never linked to any mem-part,
-	 *       since it's always a reserved node. As such, we can simply re-use that
+	 *       which  is never the case since this node is never linked to any mem-part,
+	 *       since it's always  a reserved node.  As such, we  can simply re-use  that
 	 *       field and not have to add yet another member to `struct mman' */
 	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
@@ -130,8 +130,8 @@ extern permman_init_t __kernel_permman_init_end[];
 extern permman_fini_t __kernel_permman_fini_start[];
 extern permman_fini_t __kernel_permman_fini_end[];
 
-/* List of callbacks that should be invoked after mman_exec()
- * These are called alongside stuff like `handle_manager_cloexec()'
+/* List  of   callbacks   that   should  be   invoked   after   mman_exec()
+ * These  are  called   alongside  stuff  like   `handle_manager_cloexec()'
  * NOTE: The passed mman is always `THIS_MMAN', and is never `&mman_kernel' */
 PUBLIC CALLBACK_LIST(void KCALL(void)) mman_onexec_callbacks = CALLBACK_LIST_INIT;
 /* Mman initialization/finalization callbacks. */
@@ -285,7 +285,7 @@ mman_new(void) THROWS(E_BADALLOC, ...) {
 /* Lock that must be held when accessing the mman of some thread. */
 #ifndef CONFIG_NO_SMP
 PRIVATE struct atomic_lock setmman_lock = ATOMIC_LOCK_INIT;
-/* Return a pointer to the mman-change-lock that must be held when
+/* Return a pointer to the  mman-change-lock that must be held  when
  * accessing the `t_mman' field of another thread, or changing one's
  * own memory manager. */
 #define task_mman_change_lock(thread) (&setmman_lock)
@@ -293,7 +293,7 @@ PRIVATE struct atomic_lock setmman_lock = ATOMIC_LOCK_INIT;
 
 
 
-/* Set the mman active within the calling thread, as well as
+/* Set  the mman active within the calling thread, as well as
  * change page directories to make use of the new mman before
  * returning. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -330,7 +330,7 @@ again:
 	oldmman = me->t_mman; /* Inherit reference */
 #ifndef CONFIG_NO_SMP
 	if unlikely(oldmman == newmman) {
-		/* No-op (but must check explicitly to prevent dead-
+		/* No-op (but must  check explicitly  to prevent  dead-
 		 * lock from acquiring `newmman->mm_threadslock' twice) */
 		PREEMPTION_POP(was);
 		return newmman;
@@ -347,9 +347,9 @@ again:
 	}
 	if unlikely(!atomic_lock_tryacquire(&oldmman->mm_threadslock)) {
 		atomic_lock_release(&newmman->mm_threadslock);
-		/* Keep a reference in case we re-enable interrupts,
-		 * and an RPC changes the mman in the mean time.
-		 * Shouldn't happen as far as control flow logic goes,
+		/* Keep a reference  in case  we re-enable  interrupts,
+		 * and an  RPC  changes  the mman  in  the  mean  time.
+		 * Shouldn't happen as far as control flow logic  goes,
 		 * but is actually something that's allowed to be done. */
 		incref(oldmman);
 		atomic_lock_release(task_mman_change_lock(me));
@@ -411,7 +411,7 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread) {
 
 /* Allocate an set a new VM for /bin/init during booting.
  * This function is used to assign a new VM for the initial user-space process,
- * so-as not to launch that process in the context of the special `kernel_vm',
+ * so-as not to launch that process in the context of the special  `kernel_vm',
  * which shouldn't contain mappings for anything user-space related. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_user_mman)(void) {

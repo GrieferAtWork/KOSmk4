@@ -187,7 +187,7 @@ clone_this_cred(struct task *__restrict new_thread, uintptr_t flags) {
 
 
 /* Check if the calling thread has a given capability
- * `capno' (one of `CAP_*' from <kos/capability.h>) */
+ * `capno' (one of  `CAP_*' from  <kos/capability.h>) */
 PUBLIC NOBLOCK ATTR_PURE __BOOL
 NOTHROW(FCALL capable)(syscall_slong_t capno) {
 	return credcap_capable(&THIS_CRED->c_cap_effective, capno);
@@ -397,7 +397,7 @@ cred_onexec(struct inode *__restrict program_inode)
 	}
 	COMPILER_READ_BARRIER();
 	/* NOTE: Because we've unshared `self', we don't have to acquire a lock,
-	 *       since we already know that no-one can modify it anymore! */
+	 *       since we  already  know  that no-one  can  modify  it  anymore! */
 	new_euid = self->c_euid;
 	if (!self->c_no_new_privs &&
 	    !(program_inode->i_super->s_flags & SUPERBLOCK_FNOSUID)) {
@@ -502,7 +502,7 @@ cred_setuid(uid_t ruid, uid_t euid,
 		            fsuid == self->c_fsuid;
 		sync_endwrite(&self->c_lock);
 		/* Only throw an insufficient-rights exception
-		 * if the call wouldn't have been a no-op */
+		 * if  the  call  wouldn't have  been  a no-op */
 		if (!is_a_noop)
 			THROW(E_INSUFFICIENT_RIGHTS, CAP_SETUID);
 		return;
@@ -568,7 +568,7 @@ cred_setgid(gid_t rgid, gid_t egid,
 		            fsgid == self->c_fsgid;
 		sync_endwrite(&self->c_lock);
 		/* Only throw an insufficient-rights exception
-		 * if the call wouldn't have been a no-op */
+		 * if  the  call  wouldn't have  been  a no-op */
 		if (!is_a_noop)
 			THROW(E_INSUFFICIENT_RIGHTS, CAP_SETGID);
 		return;
@@ -658,7 +658,7 @@ do_set_new_group:
 	}
 	/* Check if any of the groups has changed.
 	 * Since we can assume that both group lists are sorted,
-	 * as well as not contain any duplicate entires, we can
+	 * as well as not contain any duplicate entires, we  can
 	 * simply use memcmp() for this! */
 #if __SIZEOF_GID_T__ == 4
 	if (memcmpl(old_groups, new_groups, ngroups) != 0)
@@ -688,13 +688,13 @@ cred_setgroups(size_t ngroups,
 	gid_t *new_groups;
 	struct cred *self = THIS_CRED;
 	if (ngroups > ATOMIC_READ(self->c_ngroups)) {
-		/* NOTE: Technically, `groups[]' may contain duplicate entries,
-		 *       such that the effective group sets are actually identical,
-		 *       however we also have to keep in mind that `ngroups' might
-		 *       be a maliciously big value that could result in the kernel
-		 *       running out of heap memory. As such, a non-malicious user
-		 *       program that wants to rely on setting the same set of groups
-		 *       as had already been set before, should also take tare to
+		/* NOTE: Technically,   `groups[]'   may  contain   duplicate  entries,
+		 *       such that  the effective  group sets  are actually  identical,
+		 *       however we  also have  to keep  in mind  that `ngroups'  might
+		 *       be a maliciously  big value  that could result  in the  kernel
+		 *       running out  of heap  memory. As  such, a  non-malicious  user
+		 *       program that wants to rely on  setting the same set of  groups
+		 *       as  had  already been  set before,  should  also take  tare to
 		 *       ensure that their list of groups doesn't contain any duplicate
 		 *       entires! */
 		if (chk_rights)

@@ -428,7 +428,7 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 		return;
 	printk(KERN_INFO "[ps2] Detected keyboard on port #%u\n", portno + 1);
 	/* Try to configure scanset #2, but allow the keyboard to ignore
-	 * us and use whatever scanset it indicates we should be using. */
+	 * us  and use whatever scanset it indicates we should be using. */
 	ps2_probe_run_simple_ack_command(probe_data, portno, PS2_KEYBOARD_CMD_SCANSET);
 	if (ps2_keyboard_preferred_scanset < 1 || ps2_keyboard_preferred_scanset > 3)
 		ps2_keyboard_preferred_scanset = 2;

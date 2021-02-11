@@ -41,7 +41,7 @@ DECL_BEGIN
 
 #define CONFIG_GDBSERVER_REMOTE_BUFFER_SIZE (1 << 10)
 
-/* Signal that gets broadcast with whenever the
+/* Signal  that  gets  broadcast  with  whenever  the
  * connection back-end data buffer becomes non-empty. */
 INTERN struct sig GDBServer_RemoteDataAvailable = SIG_INIT;
 
@@ -67,7 +67,7 @@ NOTHROW(FCALL GDBRemote_HasPendingBytes)(void) {
 }
 
 /* Post a given byte `b' to the remote data input queue.
- * NOTE: May only be called while preemption is disabled, and
+ * NOTE: May only be called  while preemption is disabled,  and
  *       only from the designated CPU for interrupts concerning
  *       incoming remote data! */
 INTERN NOBLOCK void NOTHROW(FCALL GDBRemote_PostByte)(byte_t b) {

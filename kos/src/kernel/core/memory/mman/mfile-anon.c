@@ -85,7 +85,7 @@ struct mpart_delete_postop_builder {
 #define mpart_delete_postop_builder_asfop(self)   (&mpart_as_mpart_delete_postop((self)->mdpb_delme)->mdp_fop)
 #define mpart_delete_postop_builder_aspop(self)   (&mpart_as_mpart_delete_postop((self)->mdpb_delme)->mdp_pop)
 
-/* Enqueue a given mem-part `delme' on which to call `mpart_destroy()' from within
+/* Enqueue a given mem-part `delme' on which to call `mpart_destroy()' from  within
  * the post-op that can be constructed with `mpart_delete_postop_builder_as(f|p)op' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mpart_delete_postop_builder_enqueue)(struct mpart_delete_postop_builder *__restrict self,
@@ -106,7 +106,7 @@ NOTHROW(FCALL mpart_delete_postop_builder_enqueue)(struct mpart_delete_postop_bu
 
 
 
-/* These are the offsets and total size of the lockop-workspace area
+/* These are the offsets and  total size of the lockop-workspace  area
  * within a `struct mfile' after the DELETED and NOATIME|NOMTIME flags
  * have all been set. */
 #define MFILE_LOCKOPS_SPACE_OFFS offsetof(struct mfile, mf_atime)
@@ -135,7 +135,7 @@ STATIC_ASSERT(sizeof(union mflops) <= MFILE_LOCKOPS_SPACE_SIZE);
 #endif /* !__INTELLISENSE__ */
 
 /* Try to acquire a reference to all parts reachable from `root'.
- * Parts that had already been destroyed will be skipped. */
+ * Parts  that  had  already  been  destroyed  will  be  skipped. */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL mpart_tree_increfall)(struct mpart *__restrict root) {
 again:
@@ -153,7 +153,7 @@ again:
 }
 
 /* Drop a reference from all parts reachable from `root'. If a
- * part ends up dying because of this, add it to `deadparts'.
+ * part  ends up dying because of this, add it to `deadparts'.
  * Parts that had already been destroyed will be skipped. */
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(FCALL mpart_tree_decrefall)(struct mpart *__restrict root,
@@ -179,7 +179,7 @@ again:
 }
 
 /* Release locks to all parts reachable from `root', with the exception
- * of `skipme' (if non-NULL), from which no lock will be released.
+ * of `skipme'  (if non-NULL),  from which  no lock  will be  released.
  * Parts that had already been destroyed will be skipped. */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL mpart_tree_unlockall)(struct mpart *root,
@@ -199,10 +199,10 @@ again:
 	}
 }
 
-/* Try to acquire locks to all parts reachable from `root', with the
+/* Try  to  acquire locks  to all  parts reachable  from `root',  with the
  * exception of `skipme' (if non-NULL), to which no lock will be acquired.
- * It at least one part can't be locked immediately, release all locks
- * already acquired, and return a pointer to the blocking part.
+ * It  at least  one part can't  be locked immediately,  release all locks
+ * already  acquired,  and  return  a   pointer  to  the  blocking   part.
  * Parts that had already been destroyed will be skipped. */
 PRIVATE WUNUSED NONNULL((1)) struct mpart *
 NOTHROW(FCALL mpart_tree_trylockall)(struct mpart *root,
@@ -234,8 +234,8 @@ err_root:
 
 
 /* For all non-destroyed parts reachable from `root', mark then as anon,
- * change their file field from `file' to `mfile_anon[*]', clear their
- * `MPART_F_GLOBAL_REF' flag, and (if different from `dont_unlock_me'),
+ * change their file field from  `file' to `mfile_anon[*]', clear  their
+ * `MPART_F_GLOBAL_REF'  flag, and (if different from `dont_unlock_me'),
  * release a lock to them. */
 PRIVATE NONNULL((1, 3)) void
 NOTHROW(FCALL mpart_tree_forall_makeanon_and_unlock_decref)(struct mpart *root,
@@ -293,7 +293,7 @@ NOTHROW(FCALL mfile_delete_withpartlock)(struct mpart_lockop *__restrict self,
 		assert(pop->mfplo_func == (mfile_postlockop_callback_t)&mpart_delete_postop_cb ||
 		       pop->mfplo_func == &mfile_decref_and_destroy_deadparts_postop ||
 		       pop->mfplo_func == &mfile_decref_postop);
-		/* NOTE: None of the possible callback ever make use of the `file' argument of
+		/* NOTE: None of the possible callback ever make use of the `file' argument  of
 		 *       the post-operation callback, meaning that we can simply cast the mfile
 		 *       post-operation into an mpart post-operation! */
 		return (struct mpart_postlockop *)pop;
@@ -349,7 +349,7 @@ NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sig_completion_context *__r
 	REF struct mfile *file;
 	file = *(REF struct mfile **)buf;
 	/* Re-start async file deletion from scratch, since
-	 * we're not actually holding any locks right now! */
+	 * we're  not actually holding any locks right now! */
 	mfile_begin_async_delete(file);
 }
 
@@ -370,7 +370,7 @@ NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sig_completion *__restrict s
 
 	/* All right! - Time to do this.
 	 * Note however that we must do the actual work in a phase-2 completion
-	 * callback, since deletion of a file isn't SMP-lock-safe! */
+	 * callback,   since   deletion   of   a   file   isn't  SMP-lock-safe! */
 	if (bufsize < sizeof(REF struct mfile *))
 		return sizeof(REF struct mfile *);
 	*(REF struct mfile **)buf = file; /* Inherited by `mfile_zerotrunc_completion2_cb()' */
@@ -392,9 +392,9 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 	mpart_delete_postop_builder_init(&deadparts);
 	if (changes.slh_first != NULL &&
 	    changes.slh_first != MFILE_PARTS_ANONYMOUS) {
-		/* Clear the `MPART_F_CHANGED' flags for all changed parts,
-		 * and drop references to each of them. Note that if this
-		 * results in any of the parts being destroyed, then we'll
+		/* Clear  the  `MPART_F_CHANGED' flags  for all  changed parts,
+		 * and  drop  references to  each of  them.  Note that  if this
+		 * results in  any of  the parts  being destroyed,  then  we'll
 		 * try to enqueue them for deletion _after_ `file' is unlocked. */
 		do {
 			REF struct mpart *part;
@@ -404,16 +404,16 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 			ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
 
 			/* Drop a reference from `part'. If the part dies, then
-			 * enqueue it for later destruction via the post-lock
+			 * enqueue  it for later  destruction via the post-lock
 			 * operations mechanism. */
 			if (ATOMIC_DECFETCH(part->mp_refcnt) == 0)
 				mpart_delete_postop_builder_enqueue(&deadparts, part);
 		} while (!SLIST_EMPTY(&changes));
 	}
 
-	/* Try to acquire a lock to _all_ of the file's parts.
-	 * If this fails, then enqueue a lock-operation on the
-	 * part that is blocking, and only pass the deadparts
+	/* Try  to acquire a lock to _all_ of the file's parts.
+	 * If this fails, then enqueue a lock-operation on  the
+	 * part that is blocking,  and only pass the  deadparts
 	 * list to our caller in terms of post-lock operations. */
 	if (file->mf_parts == NULL) {
 		file->mf_parts = MFILE_PARTS_ANONYMOUS;
@@ -427,7 +427,7 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 			mpart_tree_decrefall(tree, &deadparts);
 
 			/* Found a part that's blocking...
-			 * Because of this, we must enqueue a locked operation within
+			 * Because of  this, we  must enqueue  a locked  operation  within
 			 * the context of `part' that'll try to complete the file deletion
 			 * once that lock becomes available. */
 			mfl                     = mfile_as_mflops(file);
@@ -444,10 +444,10 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 		/* Mark the part-tree as anonymous. */
 		file->mf_parts = MFILE_PARTS_ANONYMOUS;
 
-		/* Release all of the part-locks, whilst simultaneously marking
+		/* Release  all of the part-locks, whilst simultaneously marking
 		 * all of them as anonymous, altering their file-fields to point
-		 * at mfile_anon[*], clearing their MPART_F_GLOBAL_REF flags,
-		 * changing the parts themself to be considered anonymous, and
+		 * at  mfile_anon[*],  clearing their  MPART_F_GLOBAL_REF flags,
+		 * changing the parts themself  to be considered anonymous,  and
 		 * finally release a lock to each of them. */
 		mpart_tree_forall_makeanon_and_unlock_decref(tree, already_locked_part,
 		                                             file, &deadparts);
@@ -456,13 +456,13 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 	/* Success! - All that's left now is to set the file's size to zero! */
 	if unlikely(ATOMIC_READ(file->mf_trunclock) != 0) {
 		/* Use `struct sig_completion' to wait for `mf_trunclock' to
-		 * become ZERO before setting the file size down to zero. */
+		 * become ZERO before  setting the file  size down to  zero. */
 		struct sig_completion *sc;
 		sc = &mfile_as_mflops(file)->mfl_compl;
 		sig_completion_init(sc, &mfile_zerotrunc_completion_cb);
 		sig_connect_completion_for_poll(&file->mf_initdone, sc);
 
-		/* Make sure that the completion-callback is always invoked in case
+		/* Make sure that the completion-callback  is always invoked in  case
 		 * the `mf_trunclock' countered dropped to zero before our completion
 		 * callback was connected. */
 		if unlikely(ATOMIC_READ(file->mf_trunclock) == 0)
@@ -526,30 +526,30 @@ NOTHROW(FCALL mfile_begin_async_delete)(/*inherit(always)*/ REF struct mfile *__
 /* Make the given file anonymous+deleted. What this means is that (in order):
  *  - The `MFILE_F_DELETED' flag is set for the file.
  *  - The file-fields of all mem-parts are altered to point
- *    at anonymous memory files. (s.a. `mfile_anon')
+ *    at  anonymous  memory   files.  (s.a.   `mfile_anon')
  *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' fields are set to `MFILE_PARTS_ANONYMOUS'
  *  - The `mf_filesize' field is set to `0'.
  * The result of all of this is that it is no longer possible to
- * trace back mappings of parts of `self' to that file.
+ * trace  back  mappings  of  parts  of  `self'  to  that  file.
  *
  * This function is called when the given file `self' should be deleted,
- * or has become unavailable for some other reason (e.g. the backing
+ * or has become  unavailable for  some other reason  (e.g. the  backing
  * filesystem has been unmounted)
  *
- * Note that (with the exception of `MFILE_F_DELETED' being set, which is
+ * Note that  (with the  exception of  `MFILE_F_DELETED' being  set, which  is
  * always done synchronously), this function operates entirely asynchronously,
- * meaning that it uses lockops in order to wait for any locks it may need to
+ * meaning  that it uses lockops in order to wait for any locks it may need to
  * become available. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
-	/* Start by setting the DELETED flag. - If it was already set, then we
+	/* Start by setting  the DELETED  flag. -  If it  was already  set, then  we
 	 * mustn't do anything since the file has either already been fully deleted,
 	 * or another async-delete operation is already in progress!
 	 *
 	 * NOTE: We also set the NOATIME+NOMTIME flags to prevent anyone from changing
 	 *       the `mf_atime' and `mf_mtime' fields after this point. - This must be
-	 *       done since we intend on (ab-)using those fields for storing lock-op
+	 *       done since we intend on  (ab-)using those fields for storing  lock-op
 	 *       descriptors needed do delete the file asynchronously.
 	 *
 	 * For simplicity, we set all of these flags at the same time, thus allowing
@@ -583,13 +583,13 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	if (old_flags & MFILE_F_DELETED)
 		return;
 
-	/* Looks like the burden of deleting the file falls on us...
-	 * Note that by we've got quite a bit of space to work with
+	/* Looks  like the burden of deleting the file falls on us...
+	 * Note  that by we've got quite a  bit of space to work with
 	 * now, since we can (re-)use the file atime and mtime fields
 	 * for storing lockop descriptors!
 	 *
-	 * Note that in order to do what we have to, we somehow have
-	 * to manage to acquire a lock to `self', and _all_ of the
+	 * Note that in  order to do  what we have  to, we somehow  have
+	 * to  manage  to acquire  a lock  to `self',  and _all_  of the
 	 * parts still found in its part-tree, _at_ _the_ _same_ _time_! */
 
 
@@ -623,7 +623,7 @@ again:
 }
 
 /* Drop references from all parts (that haven't already
- * been destroyed) that are reachable from `root'. */
+ * been destroyed)  that  are  reachable  from  `root'. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_tree_decref)(struct mpart *__restrict root) {
 	struct mpart *lhs, *rhs;
@@ -664,7 +664,7 @@ again:
 	}
 }
 
-/* Try to acquire a lock to all parts reachable from `root'.
+/* Try  to acquire a lock to all parts reachable from `root'.
  * If one of these locks cannot be acquired without blocking,
  * release all locks already acquired and return that part. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mpart *
@@ -675,7 +675,7 @@ NOTHROW(FCALL mpart_tree_trylock)(struct mpart *__restrict root) {
 		if (!mpart_lock_tryacquire(root))
 			return root;
 	}
-	/* Recursively lock the entire tree (but keep track of our
+	/* Recursively lock the  entire tree (but  keep track of  our
 	 * current path so we're always able to release exaclty those
 	 * locks which we've already acquired previously). */
 	if (root->mp_filent.rb_lhs) {
@@ -698,7 +698,7 @@ err_lock_root:
 	return result;
 }
 
-/* Acquire a lock to all parts within the parts-tree of
+/* Acquire  a lock  to all  parts within  the parts-tree of
  * `self', or decref all parts and release a lock to `self'
  * before waiting for the blocking part to become available
  * and returning `false' */
@@ -723,9 +723,9 @@ mfile_lockparts_or_decref_and_unlock(struct mfile *__restrict self)
 }
 
 
-/* Make all parts reachable from `root' anonymous, as well as override
- * their `mp_file' field with `mfile_anon[...]', before releasing the
- * lock held to said part and dropping a reference. If this results in
+/* Make all parts reachable from  `root' anonymous, as well as  override
+ * their `mp_file' field  with `mfile_anon[...]',  before releasing  the
+ * lock  held to said part and dropping  a reference. If this results in
  * the part being destroyed, don't destroy it immediately, but add it to
  * the given `dead' list instead (linked via `_mp_dead')
  *
@@ -740,7 +740,7 @@ again:
 	rhs = root->mp_filent.rb_rhs;
 	if (!wasdestroyed(root)) {
 		/* Set the NO_GLOBAL_REF bit, thus essentially unloading the part from the
-		 * global part cache (should this mem-part still be apart of said cache) */
+		 * global part cache (should this mem-part  still be apart of said  cache) */
 		if (ATOMIC_FETCHAND(root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(root); /* The global reference... */
 		_mpart_init_asanon(root);
@@ -768,16 +768,16 @@ again:
 
 
 /* Make the given file anonymous+deleted. What this means is that:
- *  - Existing mappings of all mem-parts are altered to point
+ *  - Existing mappings of all  mem-parts are altered to  point
  *    at anonymous memory files. For this purpose, the nodes of
  *    all existing mappings are altered. (s.a. `mfile_anon')
  *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
  *  - The `mf_parts' and `mf_changed' are set to `MFILE_PARTS_ANONYMOUS'
  * The result of all of this is that it is no longer possible to
- * trace back mappings of parts of `self' to that file.
+ * trace  back  mappings  of  parts  of  `self'  to  that  file.
  *
  * This function is called when the given file `self' should be deleted,
- * or has become unavailable for some other reason (e.g. the backing
+ * or has become  unavailable for  some other reason  (e.g. the  backing
  * filesystem has been unmounted) */
 PUBLIC NONNULL((1)) void FCALL
 mfile_delete(struct mfile *__restrict self)
@@ -834,12 +834,12 @@ do_clear_changed_parts:
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 
 			/* Also clear the CHANGED bit for all of the parts.
-			 * We're allowed to do this because we've set the changed list of ANON,
+			 * We're allowed to do  this because we've set  the changed list of  ANON,
 			 * giving us special permissions to clear this bit (s.a. the documentation
 			 * of the `MPART_F_CHANGED' flag) */
 			ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
 
-			/* Drop a reference from the changed mem-part. This is the reference
+			/* Drop  a reference from the changed mem-part. This is the reference
 			 * that was originally created when the part was added to the changed
 			 * list. */
 			if (ATOMIC_DECFETCH(part->mp_refcnt) == 0)
@@ -858,7 +858,7 @@ done:
 		mpart_destroy(part);
 	}
 
-	/* Reap lockops _after_ having destroyed all of the old parts
+	/* Reap  lockops _after_  having destroyed  all of  the old parts
 	 * have been destroyed, thus raising the interlocked-ness between
 	 * those 2 operations, which may potentially increase efficiency. */
 	mfile_lockops_reap(self);
@@ -948,9 +948,9 @@ fail:
 	return iter;
 }
 
-/* Acquire a lock to all parts within the given range, or
+/* Acquire a lock to all  parts within the given range,  or
  * decref all parts within said range and release a lock to
- * `self' before waiting for the blocking part to become
+ * `self' before waiting  for the blocking  part to  become
  * available and returning `false' */
 PRIVATE WUNUSED NONNULL((1, 2, 3)) bool FCALL
 mfile_lockparts_or_decref_and_unlock_inrange(struct mfile *__restrict self,
@@ -976,9 +976,9 @@ mfile_lockparts_or_decref_and_unlock_inrange(struct mfile *__restrict self,
 
 
 
-/* Split a potential part at `minaddr' and `maxaddr', and make
+/* Split a potential part at `minaddr' and `maxaddr', and  make
  * it so that all parts between that range are removed from the
- * part-tree of `self', by essentially anonymizing them.
+ * part-tree   of  `self',  by  essentially  anonymizing  them.
  * This function can be used to implement `ftruncate(2)'
  *
  * NOTE: Unlike `mfile_delete()', this function doesn't mark
@@ -1034,14 +1034,14 @@ again_lock:
 		goto again_lock;
 
 	/* For all non-destroyed parts: do what `mpart_tree_makeanon_and_unlock_and_decref'
-	 * does, whilst removing all of the affected parts from the part-tree of `self'. */
+	 * does, whilst removing all  of the affected parts  from the part-tree of  `self'. */
 	{
 		struct mpart *part = mima.mm_min;
 		mpart_tree_removenode(&self->mf_parts, part);
 		do {
 			if (!wasdestroyed(part)) {
 				/* Set the NO_GLOBAL_REF bit, thus essentially unloading the part from the
-				 * global part cache (should this mem-part still be apart of said cache) */
+				 * global part cache (should this mem-part  still be apart of said  cache) */
 				if (ATOMIC_FETCHAND(part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 					decref_nokill(part); /* The global reference... */
 				_mpart_init_asanon(part);
@@ -1049,7 +1049,7 @@ again_lock:
 				part->mp_file = incref(&mfile_anon[self->mf_blockshift]);
 				COMPILER_WRITE_BARRIER();
 				/* Clear the CHANGED-bit now, since we can only do so while also holding
-				 * a lock to the mem-part, given that we're not actually setting the
+				 * a  lock to  the mem-part, given  that we're not  actually setting the
 				 * changed-part list of `self' to anonymous! */
 				ATOMIC_AND(part->mp_flags, ~(MPART_F_CHANGED | MPART_F_LOCKBIT));
 				mpart_lockops_reap(part);
@@ -1085,7 +1085,7 @@ again_lock:
 				DBG_memset(&chng->mp_changed, 0xcc, sizeof(chng->mp_changed));
 				assert(!(chng->mp_flags & MPART_F_CHANGED));
 
-				/* Drop a reference from the changed mem-part. This is the reference
+				/* Drop  a reference from the changed mem-part. This is the reference
 				 * that was originally created when the part was added to the changed
 				 * list. */
 				if (ATOMIC_DECFETCH(chng->mp_refcnt) == 0)
@@ -1139,7 +1139,7 @@ done:
 		mpart_destroy(part);
 	}
 
-	/* Reap lockops _after_ having destroyed all of the old parts
+	/* Reap  lockops _after_  having destroyed  all of  the old parts
 	 * have been destroyed, thus raising the interlocked-ness between
 	 * those 2 operations, which may potentially increase efficiency. */
 	mfile_lockops_reap(self);

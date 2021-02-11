@@ -1350,7 +1350,7 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 			break;
 		if (hand->h_type == (hop_command >> 16))
 			break;
-		/* If the command (may) actually exist, but simply cannot be applied to the
+		/* If the  command (may)  actually exist,  but  simply cannot  be applied  to  the
 		 * associated handle type, translate the exception to `E_INVALID_HANDLE_FILETYPE',
 		 * with the required file type set there. */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE));
@@ -1379,7 +1379,7 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 		} else {
 			uintptr_half_t wanted_type;
 			/* Do implicit handle casting based on the expected type encoded in `cmd >> 16'.
-			 * e.g.: A DATABLOCK command on a FILE object should be allowed */
+			 * e.g.: A   DATABLOCK   command   on   a   FILE   object   should   be  allowed */
 			wanted_type = (u16)(cmd >> 16);
 			if (wanted_type != hand.h_type) {
 				/* This should be a try-as!
@@ -1664,7 +1664,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 	/* Always allow polling for these conditions. */
 	what |= POLLERR | POLLHUP | POLLNVAL;
 	/* Verify that the caller has access to the
-	 * indicated data channel of the handle. */
+	 * indicated  data  channel of  the handle. */
 	if (what & POLLINMASK) {
 		if unlikely(!IO_CANREAD(hnd.h_mode))
 			return POLLERR;
@@ -1724,7 +1724,7 @@ again:
 #endif
 #ifndef __OPTIMIZE_SIZE__
 			/* No need to stay connected to a whole bunch of signals
-			 * if we already know we won't wait on any of them */
+			 * if  we  already know  we won't  wait  on any  of them */
 			if (result != 0)
 				task_disconnectall();
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1735,7 +1735,7 @@ again:
 			fds[i].revents = what;
 		} EXCEPT {
 			/* Make sure that we're disconnected
-			 * from all previous poll-signals! */
+			 * from  all  previous poll-signals! */
 			task_disconnectall();
 			decref(hnd);
 			RETHROW();
@@ -1802,14 +1802,14 @@ again:
 			TRY {
 #ifndef __OPTIMIZE_SIZE__
 				/* No need to stay connected to a whole bunch of signals
-				 * if we already know we won't wait on any of them */
+				 * if  we  already know  we won't  wait  on any  of them */
 				if (result != 0)
 					task_disconnectall();
 #endif /* !__OPTIMIZE_SIZE__ */
 				what = do_poll_handle(hnd, mode);
 			} EXCEPT {
 				/* Make sure that we're disconnected
-				 * from all previous poll-signals! */
+				 * from  all  previous poll-signals! */
 				task_disconnectall();
 				decref(hnd);
 				RETHROW();
@@ -2519,7 +2519,7 @@ DEFINE_SYSCALL0(errno_t, pause) {
 		assert(!task_wasconnected());
 		/* Wait forever (equivalent to `select(0, NULL, NULL, NULL, NULL)')
 		 * NOTE: `task_waitfor()' calls `task_serve()', which may in turn throw
-		 *       `E_INTERRUPT' when a signal gets delivered to our thread. */
+		 *       `E_INTERRUPT' when  a signal  gets  delivered to  our  thread. */
 		task_waitfor();
 	}
 	/* Can't get here... */

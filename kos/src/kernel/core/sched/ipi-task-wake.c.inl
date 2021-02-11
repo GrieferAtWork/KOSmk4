@@ -33,7 +33,7 @@ DECL_BEGIN
 /* Re-schedule the given `thread' if it was unscheduled (entered a sleeping state).
  * Using this function, a ~sporadic interrupt~ is implemented.
  * If the thread hasn't been unscheduled, this function is a no-op.
- * NOTE: This function is used in the implementation of `sig_send'
+ * NOTE: This function is used in the implementation of  `sig_send'
  * @param: flags:  Set of `TASK_WAKE_F*'
  * @return: true:  The task was woken, or wasn't sleeping.
  * @return: false: The given task has terminated. */
@@ -41,21 +41,21 @@ PUBLIC NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL task_wake)(struct task *__restrict thread,
                          unsigned int flags)
 #elif defined(DEFINE_task_wake_as)
-/* Wake `thread' while impersonating `caller', where `caller' must some
- * running thread from the calling CPU. - This function is used to wake
+/* Wake `thread' while impersonating  `caller', where `caller' must  some
+ * running  thread from the calling CPU. -  This function is used to wake
  * up waiting threads during task exit, where at the point where the exit
- * status is broadcast, the exiting thread (THIS_TASK) can no longer be
- * used to send signals (since `task_wake()' has to look at things such
- * as the prev/next thread within the scheduler ring, which would have
- * already become invalid at that point, since the true calling thread
+ * status is broadcast, the exiting  thread (THIS_TASK) can no longer  be
+ * used to send signals (since `task_wake()'  has to look at things  such
+ * as  the prev/next thread  within the scheduler  ring, which would have
+ * already  become invalid at  that point, since  the true calling thread
  * could no longer be considered apart of the scheduler ring)
  *
  * When calling this function, the caller must ensure that their current
  * CPU will no change, which can be done most easily by simply disabling
  * preemption, or setting the `TASK_FKEEPCORE' flag.
  *
- * The given `caller' is used when `thread' is running on `THIS_CPU',
- * in which case `thread' will be re-scheduled in relation to `caller',
+ * The given `caller'  is used  when `thread' is  running on  `THIS_CPU',
+ * in which case `thread' will  be re-scheduled in relation to  `caller',
  * where-as the regular `task_wake()' does this re-scheduling in relation
  * to `THIS_TASK'
  *
@@ -79,11 +79,11 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 	        "You may only impersonate other threads from your own CPU");
 #endif /* DEFINE_task_wake_as */
 	/* Now we're responsible to see to it that the thread either gets
-	 * woken, or that the `TASK_FTERMINATED' gets set before then.
+	 * woken, or that  the `TASK_FTERMINATED' gets  set before  then.
 	 * NOTE: We can't actually track the later happening on other cores,
-	 *       but that's actually OK, since the wakeup simply got lost
-	 *       while the task was already dying, which can only happen
-	 *       when the thread was already in a state where it wasn't
+	 *       but that's actually  OK, since the  wakeup simply got  lost
+	 *       while  the task  was already  dying, which  can only happen
+	 *       when the  thread was  already in  a state  where it  wasn't
 	 *       guarantied to be responsive to wakeup commands. */
 	was = PREEMPTION_PUSHOFF();
 #ifdef DEFINE_task_wake_as
@@ -118,13 +118,13 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 		IPI_DEBUG("task_wake(%p):me\n", thread);
 		COMPILER_READ_BARRIER();
 		if (thread->t_flags & TASK_FTERMINATED) {
-			/* The thread has already terminated, but the wake-up was requested at
-			 * a time when the thread wasn't. So between then and now, the thread
+			/* The thread has already terminated,  but the wake-up was requested  at
+			 * a time when the  thread wasn't. So between  then and now, the  thread
 			 * must have executed at least for a while, meaning it did get a wake-up
 			 * for one reason or another, which is good enough for us!
 			 *
-			 * On the other hand, a task that is intended to, or already was added
-			 * as a pending task within our CPU is guarantied to receive a wake-up
+			 * On  the other hand, a task that is intended to, or already was added
+			 * as a pending task within our CPU is guarantied to receive a  wake-up
 			 * once that request goes through (which may actually happen as soon as
 			 * we re-enable preemption, which may be done by the next line) */
 			IPI_DEBUG("task_wake(%p):terminated\n", thread);
@@ -137,11 +137,11 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 			                                PREEMPTION_WASENABLED(was));
 			if (thread != caller) {
 				/* Directly switch execution to the thread in question,
-				 * immediately allowing it to resume executing. */
+				 * immediately   allowing   it  to   resume  executing. */
 				FORCPU(me, thiscpu_sched_current) = thread;
 				cpu_run_current_and_remember_nopr(caller);
 				/* At this point, `thread' got to execute for a while, and we're
-				 * back in business, with preemption enabled once again. */
+				 * back   in  business,  with  preemption  enabled  once  again. */
 				return true;
 			}
 		}

@@ -58,26 +58,26 @@ DECL_BEGIN
 
 /* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'
  * may succeed when re-attempted.
- * @return: * : The # of leading bytes that this function managed to fault. For
- *              this purpose, any non-zero value means that `*(byte_t *)addr'
+ * @return: * : The # of leading bytes that this function managed to fault.  For
+ *              this purpose, any  non-zero value  means that  `*(byte_t *)addr'
  *              was made accessible for at least one moment before this function
- *              returns. Note though that memory may have already been unloaded
+ *              returns. Note though that memory may have already been  unloaded
  *              by the time this function returns (unlikely), so the caller must
  *              still be ready to deal with the possibility that another attempt
- *              at doing nopf access at `*(byte_t *)addr' might immediatly fail
+ *              at doing nopf access at `*(byte_t *)addr' might immediatly  fail
  *              again.
- *              Also note that for any memory that had already been faulted within
- *              the given address range, this function acts as though it had been
- *              the one to fault that range, meaning that the return value doesn't
+ *              Also note that for any memory  that had already been faulted  within
+ *              the  given address range,  this function acts as  though it had been
+ *              the one to fault that range,  meaning that the return value  doesn't
  *              actually represent how much memory had just been faulted, but rather
- *              how much continuous memory (starting at `addr' and limited by at
- *              most `num_bytes') was faulted simultaneously at some point before
+ *              how much continuous  memory (starting  at `addr' and  limited by  at
+ *              most `num_bytes') was  faulted simultaneously at  some point  before
  *              this function returns.
- * @return: 0 : Nothing could be faulted. This might be because `addr' doesn't
+ * @return: 0 : Nothing could be faulted. This  might be because `addr'  doesn't
  *              point into mapped memory, or the memory that is pointed-to by it
  *              is backed by VIO storage.
- *              The caller should handle this case by attempting direct memory
- *              access to the affected region (i.e. using `memcpy' rather than
+ *              The caller should handle this  case by attempting direct  memory
+ *              access to the affected region  (i.e. using `memcpy' rather  than
  *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 PUBLIC size_t FCALL
@@ -161,8 +161,8 @@ unlock_and_done:
 
 
 /* Enumerate segments from `buffer', and prefault up to `num_bytes' of pointed-to
- * memory, after skipping the first `offset' bytes. The return value is the sum
- * of successfully faulted segments, however faulting also stops on the first
+ * memory,  after skipping the first `offset' bytes.  The return value is the sum
+ * of successfully faulted  segments, however  faulting also stops  on the  first
  * segment that cannot be fully faulted.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 PUBLIC size_t FCALL
@@ -186,7 +186,7 @@ mman_prefaultv(struct aio_buffer const *__restrict buffer,
 		temp = mman_prefault(ent.ab_base, ent.ab_size, flags);
 		result += temp;
 		/* Stop upon the first partial error (iow: once reaching
-		 * the first byte that could not be faulted) */
+		 * the   first   byte   that  could   not   be  faulted) */
 		if (temp < ent.ab_size)
 			break;
 		if (ent.ab_size >= num_bytes)
@@ -198,27 +198,27 @@ mman_prefaultv(struct aio_buffer const *__restrict buffer,
 
 
 
-/* Force all bytes within the given address range to be faulted for either reading
- * or writing. If any page within the specified range isn't mapped, throw an E_SEGFAULT
+/* Force  all  bytes within  the given  address range  to be  faulted for  either reading
+ * or writing. If any page within the  specified range isn't mapped, throw an  E_SEGFAULT
  * exception. Otherwise, ensure that copy-on-write is performed when `MMAN_FAULT_F_WRITE'
- * is set, and that irregardless of `MMAN_FAULT_F_WRITE', physical memory is allocated
+ * is  set, and that  irregardless of `MMAN_FAULT_F_WRITE',  physical memory is allocated
  * for any mapping that can be made to be backed by RAM.
  *
  * NOTES:
  *  - When `MMAN_FAULT_F_WRITE' is set, this function also verifies that the mem-nodes
- *    associated with the given address range all have the `MNODE_F_PWRITE' flag set.
+ *    associated with the given address range all have the `MNODE_F_PWRITE' flag  set.
  *  - Any VIO mappings within the specified range are simply ignored (and will not
- *    count towards the returned value), unless `MMAN_FAULT_F_NOVIO' is set, in
+ *    count towards the  returned value), unless  `MMAN_FAULT_F_NOVIO' is set,  in
  *    which case such mappings will cause an exception to be thrown.
  *  - This function will automatically wide the given range to encompass whole pages.
- *  - This function will also update the page directory mappings for any mem-parts
- *    that get faulted during its invocation, meaning that use of `memcpy_nopf()'
- *    within the indicated address range (whilst still checking it for errors for
+ *  - This function will also update the page directory mappings for any  mem-parts
+ *    that get faulted during its  invocation, meaning that use of  `memcpy_nopf()'
+ *    within the indicated address range (whilst  still checking it for errors  for
  *    the even of the mapping changing, or the mapping being a VIO mapping) becomes
- *    possible immediately, without having to force any sort of additional memory
- *    access (note though that this only applies to the page directory of `self',
- *    though also note that if some mem-part within the range was already faulted,
- *    its page directory mapping in `self' will still be updated if need be, as it
+ *    possible immediately, without having to  force any sort of additional  memory
+ *    access  (note though that this only applies  to the page directory of `self',
+ *    though also note that if some mem-part within the range was already  faulted,
+ *    its  page directory mapping in `self' will still be updated if need be, as it
  *    may have been faulted as a lazy memory mapping).
  */
 PUBLIC NONNULL((1)) void FCALL
@@ -495,7 +495,7 @@ NOTHROW(FCALL copybits)(mpart_blkst_word_t *dst_bitset,
 
 
 /* (Try to) acquire locks, and load/split/unshare/... backing memory,
- * as well as mem-parts and mem-nodes in order to prepare everything
+ * as  well as mem-parts and mem-nodes in order to prepare everything
  * needed in order to map a given sub-address-range of a given mpart,
  * as accessed through a given mnode into memory.
  *
@@ -543,12 +543,12 @@ NOTHROW(FCALL copybits)(mpart_blkst_word_t *dst_bitset,
  *
  * @param: self:   mem-lock control descriptor.
  * @return: true:  Successfully faulted memory.
- * @return: false: The lock to `self->mfl_mman' was lost, but the goal
+ * @return: false: The lock to `self->mfl_mman' was lost, but the  goal
  *                 of faulting memory has gotten closer, and the caller
  *                 should re-attempt the call after re-acquiring locks.
  * @return: false: The accessed address range lies outside the bounds
  *                 of the associated mem-part.
- *                 Resolve this issue by simply trying again (this
+ *                 Resolve  this  issue  by simply  trying  again (this
  *                 inconsistency can result from someone else splitting
  *                 the associated mem-part) */
 PUBLIC NONNULL((1)) bool FCALL
@@ -574,9 +574,9 @@ mfault_or_unlock(struct mfault *__restrict self)
 	node = self->mfl_node;
 	part = self->mfl_part;
 
-	/* First off: Try to acquire a lock to the associated data-part.
+	/* First off: Try to acquire  a lock to the associated  data-part.
 	 * XXX: Maybe change the ABI so this is also done by other caller?
-	 * After all: Our function name doesn't really suggest that we
+	 * After all: Our  function name doesn't really suggest that we
 	 *            do this; only the function doc tell about this... */
 	if unlikely(!mpart_lock_tryacquire(part)) {
 		incref(part);
@@ -597,8 +597,8 @@ mfault_or_unlock(struct mfault *__restrict self)
 	acc_offs       = noderel_offset + node->mn_partoff;
 	acc_size       = self->mfl_size;
 	self->mfl_offs = acc_offs;
-	/* NOTE: No need to check that `acc_offs' is still in-bounds of `part'!
-	 *       Our caller originally acquiring a lock to their mman has since
+	/* NOTE: No  need to check that `acc_offs' is still in-bounds of `part'!
+	 *       Our  caller originally acquiring a lock to their mman has since
 	 *       guarantied that any mem-part mapped by any of its mem-nodes (of
 	 *       which the one we're supposed to fault is one of) can't have its
 	 *       min/max address be altered until said mman-lock is released! */
@@ -627,8 +627,8 @@ mfault_or_unlock(struct mfault *__restrict self)
 		if (!(self->mfl_flags & MMAN_FAULT_F_WRITE)) {
 			if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 				goto nope_reinit_scmem;
-			/* Make sure that unshare-cow data was never allocated.
-			 * Because the `mfl_flags' field is [const], we should have
+			/* Make  sure  that   unshare-cow  data   was  never   allocated.
+			 * Because the  `mfl_flags'  field  is [const],  we  should  have
 			 * never reached any of the paths that would have allocated this! */
 			assert(self->mfl_ucdat.ucd_copy == NULL);
 			assert(self->mfl_ucdat.ucd_ucmem.scd_bitset == NULL);
@@ -665,13 +665,13 @@ done_mark_changed:
 			goto nope_reinit_scmem;
 
 		/* Deal with writes to copy-on-write mappings that aren't reachable from the
-		 * outside word. This is the normal case for mmap(MAN_ANON) memory, unless
-		 * the associated process has called fork(2), at which point there would be
+		 * outside word. This is the  normal case for mmap(MAN_ANON) memory,  unless
+		 * the associated process has called fork(2), at which point there would  be
 		 * more than 1 mapping for the mem-part, and this part would fail! */
 		if (LIST_EMPTY(&part->mp_share) && LIST_FIRST(&part->mp_copy) == node &&
 		    LIST_NEXT(node, mn_link) == NULL && mpart_isanon(part)) {
 			/* Backing file is anonymous, there are no SHARED-mappings,
-			 * and we're the only copy-on-write mapping in existence.
+			 * and  we're the only  copy-on-write mapping in existence.
 			 *
 			 * -> We essentially _own_ this mem-part. */
 
@@ -691,25 +691,25 @@ done_mark_changed:
 		 * In this case, we must must essentially unshare ourselves from
 		 * the mem-part's copy-on-write list. For this purpose, we must:
 		 *
-		 *   - Split the mem-node accessed by the caller such that it
+		 *   - Split  the mem-node  accessed by  the caller  such that it
 		 *     represents the smallest possible address range which still
 		 *     contains the accessed address range.
-		 *   - The new node that now contains only the accessed address
+		 *   - The new node that now  contains only the accessed  address
 		 *     range must now have it's pointed-to part altered such that
 		 *     it points to a new, private copy of the original part.
 		 *
 		 * Further optimizations are performed to prevent this mechanism
-		 * from creating _way_ too many small node+anon-part pairs, by
+		 * from creating _way_ too  many small node+anon-part pairs,  by
 		 * simply trying to merge nodes after they've been created.
 		 *
 		 * This optimization is performed by a trailing call to `mnode_merge()' */
 
 		if unlikely(node->mn_flags & MNODE_F_NOSPLIT) {
-			/* Must unshare the mem-node as a whole (that is: fault the
+			/* Must unshare the mem-node as  a whole (that is: fault  the
 			 * entirety of the address range that is described by `node')
 			 *
 			 * Note that we don't have to check the part for `MPART_F_NOSPLIT',
-			 * since we don't actually have to split the part anywhere below! */
+			 * since we don't actually have  to split the part anywhere  below! */
 			if (self->mfl_addr != mnode_getaddr(node) ||
 			    self->mfl_size != mnode_getsize(node)) {
 				bool result;
@@ -747,7 +747,7 @@ done_mark_changed:
 
 		/* ======== Point of no return */
 
-		/* Split the given `node' within the caller's memory manager, and
+		/* Split the given `node' within the caller's memory manager,  and
 		 * make it so that `node' fits the accessed address range exactly. */
 		{
 			void *endaddr;
@@ -788,7 +788,7 @@ done_mark_changed:
 				mnode_tree_insert(&self->mfl_mman->mm_mappings, node);
 
 				/* If the original node had been marked as containing writable
-				 * mappings, then we must also mark the new node as such! */
+				 * mappings, then  we must  also mark  the new  node as  such! */
 				LIST_ENTRY_UNBOUND_INIT(&lonode->mn_writable);
 				if (LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&self->mfl_mman->mm_writable, lonode, mn_writable);
@@ -823,7 +823,7 @@ done_mark_changed:
 				mnode_tree_insert(&self->mfl_mman->mm_mappings, hinode);
 
 				/* If the original node had been marked as containing writable
-				 * mappings, then we must also mark the new node as such! */
+				 * mappings, then  we must  also mark  the new  node as  such! */
 				LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 				if (LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&self->mfl_mman->mm_writable, hinode, mn_writable);
@@ -915,19 +915,19 @@ pcopy_free_unused_block_status:
 
 			/* We don't copy mem-part meta-data, since doing so
 			 * wouldn't really make too much sense, and since I
-			 * have no idea how that would even work.
+			 * have  no  idea   how  that   would  even   work.
 			 * >> meta-data can't really be copied */
 			copy->mp_meta = NULL;
 
 			/* With that, the new mem-part has been initialized, however we must
-			 * still copy over the contents of the old part into the new one! */
+			 * still copy over the  contents of the old  part into the new  one! */
 			mpart_copyram(copy, part, acc_offs, acc_size / PAGESIZE);
 
 			/* Remove `node' from the link-list of the original mem-part. */
 			LIST_REMOVE(node, mn_link);
 
-			/* With memory copied, we no longer need our lock to `part'
-			 * But note that we've set `copy->mp_flags & MPART_F_LOCKBIT'
+			/* With  memory copied, we  no longer need  our lock to `part'
+			 * But note that we've set  `copy->mp_flags & MPART_F_LOCKBIT'
 			 * above, and it is _that_ lock which we'll eventually let our
 			 * caller inherit! */
 			mpart_lock_release(part);
@@ -935,7 +935,7 @@ pcopy_free_unused_block_status:
 			/* Set-up the copy <--> node link */
 			copy->mp_copy.lh_first = node;
 			node->mn_part          = copy; /* A reference to the original `part' is inherited here.
-			                                * That reference is destroyed further below! */
+			                                * That   reference   is   destroyed   further    below! */
 			node->mn_partoff       = 0;    /* The newly created node is a perfect fit for the accessed range! */
 			self->mfl_offs         = 0;    /* *ditto* */
 			node->mn_link.le_prev  = &copy->mp_copy.lh_first;
@@ -963,9 +963,9 @@ pcopy_free_unused_block_status:
 		} /* Scope... */
 	} EXCEPT {
 		/* Must re-initialize `mfl_scdat' on error (it was originally finalized by
-		 * our successful call to `mpart_setcore_or_unlock()' further up above).
+		 * our  successful call to  `mpart_setcore_or_unlock()' further up above).
 		 *
-		 * This is required to ensure that `self' is in a consistent state, should
+		 * This is required to ensure that `self' is in a consistent state,  should
 		 * our caller decide to use `mfault_fini()' to destroy the fault-controller
 		 * before propagating the exception that brought us here (which is the most
 		 * likely thing to happen after we re-throw the exception here) */

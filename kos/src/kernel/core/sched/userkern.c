@@ -68,7 +68,7 @@
 DECL_BEGIN
 
 /* These 2 functions must be overwritten to implement arch-specific behavior.
- * Mainly: To implement access to the register identity map structure. */
+ * Mainly: To implement  access  to  the  register  identity  map  structure. */
 INTDEF NONNULL((1)) bool KCALL userkern_get_arch_specific_field(struct vioargs *__restrict args, uintptr_t offset, uintptr_t *__restrict presult);
 INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field(struct vioargs *__restrict args, uintptr_t offset, uintptr_t value);
 #ifdef __ARCH_HAVE_COMPAT

@@ -46,19 +46,19 @@
 
 DECL_BEGIN
 
-/* `true' if `GDB_Main()' was called in non-stop mode (`false' otherwise)
- * When in non-stop mode, `GDBThread_IsStopped()' only returned true for threads that
+/* `true'   if  `GDB_Main()'   was  called   in  non-stop   mode  (`false'  otherwise)
+ * When  in non-stop mode, `GDBThread_IsStopped()' only returned true for threads that
  * have previously been suspended, and `GDBThread_Stop()' and `GDBThread_Resume()' are
  * no longer no-ops.
  * You may call `GDBThread_StopAllCpus()' to set `GDBThread_IsNonStopModeActive = false'
- * and continue in all-stop mode until the next vCont- (or similar) command. */
+ * and  continue  in  all-stop  mode  until  the  next  vCont-  (or  similar)   command. */
 INTERN bool GDBThread_IsNonStopModeActive = true;
 
 
 
 /* [0..1][lock(PRIVATE(<GDB_HOST_THREAD>))]
  * Chain of stopped threads (always includes the GDB host thread)
- * May be `NULL' if called from the GDB fallback host thread, in
+ * May be `NULL' if called from the GDB fallback host thread,  in
  * response to the GDB remote sending a command. */
 INTERN GDBThreadStopEvent *GDBThread_Stopped = NULL;
 
@@ -73,10 +73,10 @@ INTERN struct sig GDBThread_AsyncNotifStopEventsAdded = SIG_INIT;
  * The thread that is hosting the GDB server (== THIS_TASK). */
 INTERN struct task *GDBServer_Host = NULL;
 
-/* Signal broadcast when `GDBServer_Host' becomes unlocked
- * (aka. `NULL') as the result of `GDB_Main()' returning
- * Used by `GDBServer_FallbackHost' to wait for the active
- * host to go away in order to not constantly be connected
+/* Signal broadcast when `GDBServer_Host' becomes  unlocked
+ * (aka. `NULL') as  the result  of `GDB_Main()'  returning
+ * Used  by `GDBServer_FallbackHost' to wait for the active
+ * host  to go away in order to not constantly be connected
  * to `GDBServer_FallbackHostOnByte', which would slow down
  * remote data processing when each byte would re-awake the
  * fallback host thread. */
@@ -244,7 +244,7 @@ do_print_message_in_nonstop_mode:
 again_waitfor_resume:
 		/* Wait until we're supposed to resume execution. */
 		task_connect_for_poll(&stop_event.tse_sigresume);
-		/* Do an interlocked check if we can become the GDB
+		/* Do an interlocked check if  we can become the  GDB
 		 * main thread, or if we should resume our execution. */
 		{
 			uintptr_half_t resume_state;
@@ -327,7 +327,7 @@ again_gdb_main:
 	if (!(GDBServer_Features & GDB_SERVER_FEATURE_NONSTOP))
 		GDBThread_ResumeEverything();
 
-	/* Our own stop_event should have already been removed by
+	/* Our own stop_event should have already been removed  by
 	 * `GDBThread_Resume()', since our `tse_mayresume' was set
 	 * to `GDB_THREAD_MAYRESUME_RESUME' */
 #ifndef NDEBUG
@@ -354,7 +354,7 @@ done:
 INTERN void NOTHROW(KCALL GDBFallbackHost_Main)(void) {
 	for (;;) {
 		if (!GDBRemote_HasPendingBytes()) {
-			/* Prefer waiting on the HOST lock, since that one doesn't get
+			/* Prefer  waiting on the HOST lock, since that one doesn't get
 			 * triggered as often as the DATA lock, meaning that we take up
 			 * less CPU cycles if we wait for it, instead. */
 			if (ATOMIC_READ(GDBServer_Host) != NULL) {
@@ -440,8 +440,8 @@ continue_piter:
 			continue;
 		if (iter->tse_reason == NULL) {
 			/* This one was stopped manually, so no notification
-			 * XXX: Is this correct? Or should we also be sending stop notifications
-			 *      for threads that were manually stopped by GDB (I wouldn't think
+			 * XXX: Is  this correct? Or should we also be sending stop notifications
+			 *      for threads that were manually  stopped by GDB (I wouldn't  think
 			 *      so, since that would cause problems with auto stop/resume for the
 			 *      purpose of settings the registers of a running thread) */
 			continue;

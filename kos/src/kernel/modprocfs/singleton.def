@@ -34,7 +34,7 @@
  *                  `F(parent_id, name, type, id)'
  *                Terminated by `F_END'
  *                The specified `parent_id' must match the `id' argument
- *                passed to the surrounding `MKDIR()' invocation. */
+ *                passed  to  the   surrounding  `MKDIR()'   invocation. */
 #ifndef MKDIR
 #define MKDIR(id, mode, files)
 #endif /* !MKDIR */

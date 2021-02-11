@@ -37,19 +37,19 @@ DECL_BEGIN
 
 #ifndef CONFIG_NO_SMP
 /* Return the set of CPUs that are currently mapped to make use of `self'
- * Note that the returned set of CPUs is only a (possibly inconsistent)
+ * Note that the returned set of  CPUs is only a (possibly  inconsistent)
  * snapshot, with the only guaranties being that:
  *   - If a CPU is apart of the returned cpuset, that CPU has at one point
  *     made use of the given vm `self'.
- *   - If a CPU is not apart of the returned cpuset, that CPU may have since
+ *   - If  a CPU is not apart of the  returned cpuset, that CPU may have since
  *     switched its VM to the given one. Note however that during this switch,
- *     additional things may have also happened, such as the CPU invaliding
- *     its TLB cache (where is function is meant to be used to calculate the
- *     bounding set of CPUs that (may) need to have their page directories
+ *     additional  things may have  also happened, such  as the CPU invaliding
+ *     its TLB cache (where is function is  meant to be used to calculate  the
+ *     bounding  set of  CPUs that (may)  need to have  their page directories
  *     invalidated)
  * WARNING: This function does not include special handling for when `self'
- *          is the kernel VM. In this case, the caller must implement a
- *          dedicated code-path that behaves as though this function had
+ *          is  the kernel  VM. In this  case, the caller  must implement a
+ *          dedicated code-path that  behaves as though  this function  had
  *          returned a completely filled cpuset. */
 #if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
 PUBLIC NOBLOCK NONNULL((2)) void
@@ -114,14 +114,14 @@ NOTHROW(FCALL ipi_invtlb_user)(struct icpustate *__restrict state,
 
 
 /* vm syncing functions. These functions must be called when a memory mapping
- * becomes more restrictive, or has been deleted. These functions will
- * automatically send IPIs to all CPUs that are using a given VM, such that
+ * becomes more  restrictive,  or  has been  deleted.  These  functions  will
+ * automatically send IPIs to all CPUs that  are using a given VM, such  that
  * the caller may assume that upon return of these functions:
  *  - All CPUs that may have been using `self' will have either synced
- *    their page directory cache to mirror the current mapping state,
- *    or are about to do so no later than the next time such a CPU is
+ *    their page directory cache to mirror the current mapping  state,
+ *    or  are about to do so no later than the next time such a CPU is
  *    going to enable preemption.
- * Note though that all other vm_*-level APIs already perform syncing
+ * Note though that all other vm_*-level APIs already perform  syncing
  * automatically, unless otherwise documented by individual functions. */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL vm_sync)(struct vm *__restrict self,

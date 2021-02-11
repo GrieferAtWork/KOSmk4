@@ -71,12 +71,12 @@ NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
 				++result;
 		}
 	} else {
-		/* Must keep track of all CPUs where the send was successful,
-		 * so that we can double-check during a second pass that all
+		/* Must  keep track of all CPUs where the send was successful,
+		 * so that we can double-check  during a second pass that  all
 		 * CPUs that aren't in deep-sleep afterwards have received the
 		 * IPI.
 		 * if we find any CPU that isn't in deep-sleep, we try to send
-		 * the IPI once again, so-as to ensure that all CPUs */
+		 * the  IPI  once  again,  so-as  to  ensure  that  all   CPUs */
 		cpuset_t success_set;
 		bool did_find_new_cpus;
 		CPUSET_CLEAR(success_set);
@@ -88,7 +88,7 @@ NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
 				++result;
 			}
 		}
-		/* Second pass: Check for cpus not in deep-sleep mode, that
+		/* Second pass: Check  for cpus not in deep-sleep mode, that
 		 *              aren't apart of the set of CPUs successfully
 		 *              contacted. */
 		COMPILER_BARRIER();
@@ -106,7 +106,7 @@ again_check_cpu_state:
 					continue; /* CPU is in deep sleep mode. */
 				/* Try to send the IPI.
 				 * If doing so fails, re-check the CPU's state, since it
-				 * may have entered deep-sleep mode in the mean time. */
+				 * may have entered  deep-sleep mode in  the mean  time. */
 				if (!cpu_sendipi(c, func, args, flags)) {
 					assertf(c != THIS_CPU || (flags & CPU_IPI_FNOINTR) || PREEMPTION_ENABLED(),
 					        "Without `CPU_IPI_FWAKEUP' and preemption disabled, including your own "
@@ -118,7 +118,7 @@ again_check_cpu_state:
 				}
 				CPUSET_INSERT(success_set, i);
 				++result;
-				/* Force another pass after this one, since
+				/* Force another  pass after  this one,  since
 				 * we've managed to find more CPUs to contact. */
 				did_find_new_cpus = true;
 			}
@@ -147,9 +147,9 @@ NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCO
 	struct task *me = THIS_TASK;
 	CPUSET_SETFULL(set);
 	/* Prevent our own thread from being moved to a different core,
-	 * thus ensuring that we can guaranty that our own CPU doesn't
+	 * thus  ensuring that we can guaranty that our own CPU doesn't
 	 * get the IPI.
-	 * We don't want to do this by disabling preemption, since that
+	 * We don't want  to do  this by disabling  preemption, since  that
 	 * could lead to unintended race conditions, since it would prevent
 	 * our own CPU from servicing interrupts send by other CPUs. */
 	old_flags = ATOMIC_FETCHOR(me->t_flags, TASK_FKEEPCORE);
@@ -224,7 +224,7 @@ NOTHROW(FCALL trigger_clone_trap)(void *UNUSED(arg),
 /* Default task start flags. */
 PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
 
-/* Start executing the given task on the CPU it has been assigned.
+/* Start executing  the  given task  on  the  CPU it  has  been  assigned.
  * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU.
  * @return: * : Always re-returns `thread' */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
@@ -243,7 +243,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 				struct scpustate *state;
 				/* New thread.
 				 * -> In this case, we must trigger a clone()
-				 *    trap once the thread begins execution. */
+				 *    trap once the thread begins  execution. */
 				state = FORTASK(thread, this_sstate);
 				state = task_push_asynchronous_rpc(state,
 				                                   &trigger_clone_trap);
@@ -260,7 +260,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	}
 
 	/* Create the reference that is then inherited
-	 * by the target cpu's scheduler system. */
+	 * by  the  target  cpu's  scheduler   system. */
 	incref(thread);
 
 	/* Schedule on the current CPU. */
@@ -286,7 +286,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	       (unsigned int)task_getroottid_of_s(thread));
 #ifndef CONFIG_NO_SMP
 	/* NOTE: Before being started, the thread's CPU shouldn't be subject to change yet,
-	 *       so we're safe in assuming that the thread's CPU won't change before we're
+	 *       so we're safe in assuming that the thread's CPU won't change before  we're
 	 *       done here. */
 	target_cpu = thread->t_cpu;
 	if (me != target_cpu) {
@@ -303,7 +303,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		                               PREEMPTION_WASENABLED(was));
 		if (thread != caller) {
 			/* Directly switch execution to the new thread,
-			 * immediately allowing it to start executing. */
+			 * immediately allowing it to start  executing. */
 			FORCPU(me, thiscpu_sched_current) = thread;
 			cpu_run_current_and_remember_nopr(caller);
 		}

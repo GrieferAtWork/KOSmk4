@@ -35,14 +35,14 @@ DECL_BEGIN
 
 #ifdef DEFINE_task_waitfor
 /* Wait for the first signal to be delivered, unconditionally
- * disconnecting all connected signals thereafter.
+ * disconnecting   all    connected    signals    thereafter.
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `ktime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
- * @throw: * :           [task_waitfor] An error was thrown by an RPC function.
+ * @throw: * :           [task_waitfor] An   error   was  thrown   by  an   RPC  function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
- *              WARNING: In all other cases, task connections are preserved when an exception
- *                       is thrown, meaning that if some interlocked signal check might thrown
+ *              WARNING: In  all  other cases,  task connections  are  preserved when  an exception
+ *                       is thrown,  meaning that  if some  interlocked signal  check might  thrown
  *                       an exception, you are required to TRY ... EXCEPT { task_disconnectall(); }
  *                       to prevent signal connections from being leaked!
  * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
@@ -58,7 +58,7 @@ task_waitfor_norpc(ktime_t abs_timeout)
 		THROWS(E_WOULDBLOCK)
 #elif defined(DEFINE_task_waitfor_nx)
 #define HAVE_NX 1
-/* Same as `task_waitfor', but only service NX RPCs, and return `NULL' if
+/* Same  as  `task_waitfor', but  only service  NX RPCs,  and return  `NULL' if
  * there are pending RPCs that are allowed to throw exception, or if preemption
  * was disabled, and the operation would have blocked. */
 PUBLIC struct sig *
@@ -66,7 +66,7 @@ NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout)
 #elif defined(DEFINE_task_waitfor_norpc_nx)
 #define HAVE_NORPC 1
 #define HAVE_NX    1
-/* Same as `task_waitfor', but don't serve RPC functions, and return
+/* Same as  `task_waitfor',  but  don't serve  RPC  functions,  and  return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
 PUBLIC struct sig *
 NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout)

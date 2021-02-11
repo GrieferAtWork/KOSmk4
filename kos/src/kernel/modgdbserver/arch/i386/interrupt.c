@@ -103,8 +103,8 @@ PRIVATE bool GDBInterrupt_WasInitialized = false;
 INTERN ATTR_FREETEXT void FCALL GDBInterrupt_Init(void) {
 	GDBX86InterruptBackup_Override(&GDBX86Interrupt_Backup01, 0x01,
 	                               &GDBX86Interrupt_AsmInt1Handler, 0);
-	/* NOTE: We set DPL=3 for int3, so that user-space
-	 *       is allowed to trigger software breakpoints
+	/* NOTE: We  set DPL=3 for  int3, so that user-space
+	 *       is allowed to trigger software  breakpoints
 	 *       and have them be handled by the GDB driver. */
 	GDBX86InterruptBackup_Override(&GDBX86Interrupt_Backup03, 0x03,
 	                               &GDBX86Interrupt_AsmInt3Handler, 3);

@@ -263,13 +263,13 @@ do_load_large_pages_readonly:
  *   - pagedir_prepare_p(self, addr, size)     (was called)
  *
  * NOTES:
- *   - When mapping blocks not marked as `MPART_BLOCK_ST_CHNG',
+ *   - When  mapping  blocks not  marked  as `MPART_BLOCK_ST_CHNG',
  *     the `PAGEDIR_MAP_FWRITE' perm-flag is automatically cleared.
  *   - When mapping blocks marked as `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT',
- *     the `PAGEDIR_MAP_FEXEC', `PAGEDIR_MAP_FREAD' and `PAGEDIR_MAP_FWRITE' perm-
+ *     the `PAGEDIR_MAP_FEXEC', `PAGEDIR_MAP_FREAD'  and `PAGEDIR_MAP_FWRITE'  perm-
  *     flags are automatically cleared.
  *
- * @return: * : The union of permissions actually applied to all pages.
+ * @return: * : The union of permissions actually applied to all  pages.
  *              This may be used to figure out if write permissions were
  *              actually given to any of the requested pages. */
 #ifdef DEFINE_mpart_mmap_p

@@ -46,16 +46,16 @@ STATIC_ASSERT(SHARED_RWLOCK_RMASK >= (__ARCH_PAGEID_MAX + 1));
 #ifndef DMA_ENUM
 /* Start DMAing on memory within the specified address range.
  * @param: prange:     A callback that is invoked for each affected physical memory range
- *                     Should this callback return `false', all previously acquired DMA
+ *                     Should this callback return  `false', all previously acquired  DMA
  *                     locks are released, and `vm_startdma[v][_nx]()' returns `0'
- * @param: preset:     A callback this is invoked when it was impossible to acquire all
- *                     necessary DMA locks simultaneously without causing a dead-lock.
- *                     This is then resolved by releasing all pre-existing locks, before
+ * @param: preset:     A callback this is invoked when  it was impossible to acquire  all
+ *                     necessary DMA locks  simultaneously without  causing a  dead-lock.
+ *                     This is then resolved by releasing all pre-existing locks,  before
  *                     forcibly acquiring+releasing the blocking lock (thus ensuring that
  *                     it has become available), before starting over.
  *                     This callback is then invoked just after all previously acquired
- *                     DMA locks have been released, but just before the blocking lock
- *                     is forcibly acquired. - It's purpose is then to reset whatever
+ *                     DMA  locks have been released, but just before the blocking lock
+ *                     is forcibly acquired. - It's  purpose is then to reset  whatever
  *                     information was already gathered from then released ranges.
  * @param: arg:        Argument passed to `prange' and `preset' upon execution.
  * @param: lockvec:    Vector of DMA lock slots provided by the caller.
@@ -65,7 +65,7 @@ STATIC_ASSERT(SHARED_RWLOCK_RMASK >= (__ARCH_PAGEID_MAX + 1));
  * @param: vaddr_buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
  * @param: for_writing:When true, unshare copy-on-write mappings of associated memory, allowing the
  *                     caller to then write to the acquired memory ranges without accidentally having
- *                     any changes made appear in PRIVATE mappings of the associated memory region.
+ *                     any changes made appear in PRIVATE  mappings of the associated memory  region.
  * @return: 0 :       `*prange' returned `false'
  * @return: 0 :        Some portion of the specified address range(s) doesn't actually map to a VM node.
  * @return: 0 :        Some portion of the specified address range(s) maps to a VM node reservation (no associated data part).
@@ -113,8 +113,8 @@ vm_startdma(struct vm *__restrict effective_vm,
 #endif /* !DMA_NX */
 #else /* !DMA_ENUM */
 /* Similar to `vm_startdma[v][_nx]', however instead used to enumerate the DMA memory range individually.
- * @param: prange:     A callback that is invoked for each affected physical memory range
- *                     Should this callback return `false', enumeration will half and the
+ * @param: prange:     A  callback that is  invoked for each  affected physical memory range
+ *                     Should this callback  return `false', enumeration  will half and  the
  *                     function will return the number of previously successfully enumerated
  *                     DMA bytes.
  * @param: arg:        Argument passed to `prange' upon execution.
@@ -123,10 +123,10 @@ vm_startdma(struct vm *__restrict effective_vm,
  * @param: vaddr_buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
  * @param: for_writing:When true, unshare copy-on-write mappings of associated memory, allowing the
  *                     caller to then write to the acquired memory ranges without accidentally having
- *                     any changes made appear in PRIVATE mappings of the associated memory region.
+ *                     any changes made appear in PRIVATE  mappings of the associated memory  region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
- *              Upon full success, this is identical to the given `num_bytes' / `aio_buffer_size(vaddr_buf)',
+ *              Upon full success, this is identical to the given `num_bytes' /  `aio_buffer_size(vaddr_buf)',
  *              though for the same reasons that `vm_startdma[v][_nx]' can fail (s.a. its `@return: 0' cases),
  *              this may be less than that */
 #ifdef DMA_NX
@@ -227,7 +227,7 @@ again_reset:
 			goto err_unmapped;
 		if unlikely(maxpage > minmax.mm_max_max)
 			goto err_unmapped;
-		/* Enumerate all of the nodes within the associated address range.
+		/* Enumerate  all  of  the  nodes  within  the  associated  address   range.
 		 * We must ensure that all nodes are mapped consecutively, and without gaps,
 		 * as well as not be reserved, or VIO mappings. */
 		if (minmax.mm_min == minmax.mm_max) {
@@ -302,7 +302,7 @@ loadcore_part_and_try_again:
 			}
 			if (for_writing &&
 			    (node->vn_prot & VM_PROT_SHARED ? ATOMIC_READ(part->dp_crefs) != NULL : (ATOMIC_READ(part->dp_crefs) != node || node->vn_link.ln_next))) {
-				/* Check if we should split the part, so-as to allow our page
+				/* Check  if we should  split the part, so-as  to allow our page
 				 * range to better fit the requested range of parts once we have
 				 * to unshare copy-on-write references. */
 				if (minpage > minmax.mm_min_min) {
@@ -447,7 +447,7 @@ unshare_copy_on_write_for_part:
 				     ? ATOMIC_READ(part->dp_crefs) != NULL
 				     : (ATOMIC_READ(part->dp_crefs) != node ||
 				        node->vn_link.ln_next))) {
-					/* Check if we should split the part, so-as to allow our page
+					/* Check  if we should  split the part, so-as  to allow our page
 					 * range to better fit the requested range of parts once we have
 					 * to unshare copy-on-write references. */
 					if (minpage > node_minpage) {

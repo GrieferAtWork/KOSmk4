@@ -51,15 +51,15 @@ DECL_BEGIN
 #define CORE_PAGE_MALLOC_AUTO  ((void *)-1)
 #endif /* !CONFIG_USE_NEW_VM */
 /* @param: mapping_target: The target page number where memory should be mapped.
- *                         When `CORE_PAGE_MALLOC_AUTO', automatically search
+ *                         When  `CORE_PAGE_MALLOC_AUTO',  automatically  search
  *                         for a suitable location, otherwise _always_ return
  *                        `CORE_PAGE_MALLOC_AUTO' (regardless of `HEAP_NX'), if
  *                         another kernel VM mapping already exists at that location.
- *                   NOTE: When this is used to specify a fixed target, the caller
+ *                   NOTE: When this is  used to  specify a fixed  target, the  caller
  *                         should do an additional check for pre-existing nodes within
- *                         range `mapping_target ... mapping_target + num_bytes - 1',
- *                         as this function will check for an existing mapping within
- *                         that range very late, and in a way that is not optimized
+ *                         range  `mapping_target ... mapping_target + num_bytes - 1',
+ *                         as this function will check for an existing mapping  within
+ *                         that  range very late,  and in a way  that is not optimized
  *                         for this.
  * @param: num_bytes:      The number of bytes to allocate.
  * @param: min_alignment:  The minimum alignment required from automatic mapping_target
@@ -110,7 +110,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	               * thus preventing an infinite loop. */                        \
 	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion!           \
 	               * -> This flag guaranties that upon recursion, at most 1      \
-	               *    page will get allocated, in which case the               \
+	               *    page   will  get  allocated,   in  which  case  the      \
 	               *   `block0_size * PAGESIZE >= num_bytes' check above will be \
 	               *   `1 >= 1', meaning we'll never get here! */                \
 	)
@@ -126,7 +126,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 		IFELSE_NX(return CORE_PAGE_MALLOC_ERROR, THROW(E_WOULDBLOCK_PREEMPTED));
 	heap_validate_all_paranoid();
 	/* Only allocate using corebase when `GFP_SHARED|GFP_LOCKED'
-	 * Otherwise, we can allocate the region and node using
+	 * Otherwise, we  can allocate  the  region and  node  using
 	 * that same set of flags in a call to `kmalloc()'. */
 	if (self == &kernel_locked_heap || (flags & GFP_VCBASE)) {
 		/* Allocate a new corepair to describe this new mapping. */
@@ -300,7 +300,7 @@ err_blocks:
 				if unlikely(block0_addr == PHYSPAGE_INVALID)
 					goto err_blocks;
 #if 1
-				/* Insert new blocks in the front, thus optimizing to better allocate
+				/* Insert new  blocks in  the front,  thus optimizing  to better  allocate
 				 * memory in its proper order, following the assumption that page_malloc()
 				 * will prefer allocating memory in top-down priority ordering. */
 				memmoveup(&blocks[1], &blocks[0],
@@ -401,7 +401,7 @@ err_blocks:
 	TRY
 #endif /* !HEAP_NX */
 	{
-		/* Acquire a lock to the kernel VM, so we can search for a
+		/* Acquire a lock  to the kernel  VM, so we  can search for  a
 		 * location at which we can map the requested memory block at. */
 again_lock_vm:
 #ifdef HEAP_NX
@@ -563,12 +563,12 @@ again_tryhard_mapping_target:
 				}
 			}
 		}
-		/* Now insert the new node into the VM
+		/* Now  insert  the new  node into  the VM
 		 * NOTE: No need to activate the node now:
 		 *   - If we're supposed to pre-fault the pages, the above code
-		 *     has already created the mapping in the page directory.
+		 *     has already created the  mapping in the page  directory.
 		 *   - If we're not supposed to pre-fault the pages, then the mapping
-		 *     will automatically get created once the node gets accessed. */
+		 *     will automatically get  created once the  node gets  accessed. */
 		vm_node_insert(corepair.cp_node);
 		vm_kernel_treelock_endwrite();
 		heap_validate_all_paranoid();
@@ -624,8 +624,8 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
 #ifndef CONFIG_USE_NEW_VM
 	bool is_used;
 	HEAP_ASSERT(mapping_target != CORE_PAGE_MALLOC_AUTO);
-	/* Checking beforehand is much faster if the memory is already in use.
-	 * This check isn't really required, however without it, we'll have to do
+	/* Checking  beforehand  is much  faster if  the memory  is already  in use.
+	 * This  check isn't really  required, however without it,  we'll have to do
 	 * a lot more cleanup when it was already known that the operation was going
 	 * to fail from the get-go. */
 #ifdef HEAP_NX
@@ -718,7 +718,7 @@ search_heap:
 			/* Free the unused portion. */
 #ifdef CONFIG_HEAP_RANDOMIZE_OFFSETS
 			/* Randomize allocated memory by shifting the
-			 * resulting pointer somewhere up higher. */
+			 * resulting  pointer  somewhere  up  higher. */
 			uintptr_t random_offset;
 			random_offset = krand() % unused_size;
 			random_offset &= ~(HEAP_ALIGNMENT - 1);
@@ -792,25 +792,25 @@ search_heap:
 	if (ATOMIC_READ(self->h_dangle) >= result.hp_siz) {
 		sync_endwrite(&self->h_lock);
 		/* Let some other thread about to release dangling
-		 * data do so, then search the heap again. */
+		 * data   do  so,  then  search  the  heap  again. */
 		if (flags & GFP_ATOMIC)
 			IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
 		__hybrid_yield();
 		goto search_heap;
 	}
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
-	/* NOTE: Don't track page overflow from below as dangling data
+	/* NOTE: Don't track page overflow from below as dangling  data
 	 *       here, so-as not to confuse allocators that are holding
 	 *       a lock to `vm_kernel.v_treelock'.
 	 *       Otherwise, we might end up with a soft-lock:
 	 *        THREAD #1: (holding lock to `vm_kernel.v_treelock')
 	 *                   kmalloc(1234);
 	 *                   -> Sees dangling data from new allocation
-	 *                      currently being made by THREAD #2
+	 *                      currently  being  made  by  THREAD  #2
 	 *                   -> Doesn't allocate new pages, but tries
-	 *                      to yield to THREAD #2 and jumps back
+	 *                      to  yield to THREAD #2 and jumps back
 	 *        THREAD #2: In `core_page_alloc()'; tracking dangling
-	 *                   data that THREAD #1 is waiting for.
+	 *                   data  that  THREAD  #1  is  waiting  for.
 	 *                  `core_page_alloc()' doesn't return because
 	 *                   THREAD #1 is locking `vm_kernel'
 	 *                   THREAD #1 can't release that lock because
@@ -819,9 +819,9 @@ search_heap:
 	 * XXX: The above scenario can no longer happen since `vm_kernel.v_treelock'
 	 *      has now been implemented as an atomic lock:
 	 *       - A thread that is holding an atomic lock isn't allowed to
-	 *         perform a call to `task_yield()', meaning that THREAD#1
-	 *         could (and does) only allocate with GFP_ATOMIC while
-	 *         holding a lock to `vm_kernel.v_treelock', in which case
+	 *         perform  a call to `task_yield()', meaning that THREAD#1
+	 *         could  (and  does) only  allocate with  GFP_ATOMIC while
+	 *         holding  a lock to `vm_kernel.v_treelock', in which case
 	 *         the yield never happens. */
 	sync_endwrite(&self->h_lock);
 
@@ -871,16 +871,16 @@ allocate_without_overalloc:
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)unused_begin, HEAP_ALIGNMENT));
 #ifdef CONFIG_DEBUG_HEAP
 			if (!(flags & GFP_CALLOC)) {
-				/* Be smart about how much memory we fill with the debug initializer pattern.
+				/* Be smart about  how much memory  we fill with  the debug initializer  pattern.
 				 * As far as the heap validator is concerned, pages that haven't been initialized
 				 * are always valid (aka. they don't have their contents checked).
 				 * And knowing that `heap_free_raw()' will only modify up to the first `SIZEOF_MFREE'
-				 * bytes, starting at `unused_begin', all we really need to pat out markers for
-				 * no man's land memory within the last page that still has to be initialized for
+				 * bytes, starting  at `unused_begin',  all we  really need  to pat  out markers  for
+				 * no  man's land memory  within the last page  that still has  to be initialized for
 				 * `heap_free_raw()' to function properly. */
 				if (flags & GFP_PREFLT) {
 					/* If memory got pre-faulted, we still have to pat _everything_,
-					 * because it's already been allocated at this point. */
+					 * because   it's   already  been   allocated  at   this  point. */
 					mempatl(unused_begin, DEBUGHEAP_NO_MANS_LAND, unused_size);
 				} else {
 					uintptr_t page_remainder;
@@ -995,13 +995,13 @@ again:
 		size_t free_offset = (uintptr_t)ptr - MFREE_BEGIN(slot);
 		HEAP_ASSERT(IS_ALIGNED(free_offset, HEAP_ALIGNMENT));
 		if unlikely(free_offset < HEAP_MINSIZE) {
-			/* The remaining part of the slot is too small.
-			 * Ask the core if it can allocate the the previous
-			 * page for us, so we can merge this slot with that
+			/* The remaining  part  of  the  slot  is  too  small.
+			 * Ask the core  if it can  allocate the the  previous
+			 * page  for us, so  we can merge  this slot with that
 			 * page to get a chance of leaving a part large enough
 			 * for us to return to the heap.
-			 * NOTE: If the slot doesn't start at a page boundary,
-			 *       we already know that the requested part has already
+			 * NOTE: If  the  slot  doesn't  start  at  a  page   boundary,
+			 *       we already know  that the requested  part has  already
 			 *       been allocated (meaning this allocation is impossible) */
 			PAGEDIR_PAGEALIGNED void *slot_pageaddr;
 			sync_endwrite(&self->h_lock);
@@ -1152,7 +1152,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	        "Invalid min_alignment: %#" PRIxSIZ,
 	        min_alignment);
 	/* Truncate the offset, if it was a multiple of `min_alignment'
-	 * HINT: This also ensures that `offset' is positive. */
+	 * HINT: This   also   ensures  that   `offset'   is  positive. */
 	offset &= (min_alignment - 1);
 	/* Forward to the regular allocator when the constraints allow it. */
 	if (min_alignment <= HEAP_ALIGNMENT && !offset)
@@ -1174,7 +1174,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 		             COMPILER_LENOF(self->h_size));
 		if (!FUNC(heap_acquirelock)(self, flags))
 			IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
-		/* Search for existing free data that
+		/* Search for  existing  free  data  that
 		 * fit the required alignment and offset. */
 		for (; iter != end; ++iter) {
 			struct mfree *chain;
@@ -1205,10 +1205,10 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 				alignment_base += min_alignment;
 
 			/* `alignment_base' is now the effective base address which we want to use.
-			 * However, in case it doesn't match the free-node, we must advance it to
-			 * the nearest correctly aligned address (by adding `min_alignment').
-			 * This is required to ensure that the unused portion at `chain' continues
-			 * to be large enough to be re-freed (should we choose to use this node) */
+			 * However,  in case it doesn't match the  free-node, we must advance it to
+			 * the  nearest  correctly  aligned  address  (by  adding `min_alignment').
+			 * This is required to ensure that the unused portion at `chain'  continues
+			 * to be large enough to  be re-freed (should we  choose to use this  node) */
 			if (alignment_base != (byte_t *)chain) {
 				while ((size_t)(alignment_base - (byte_t *)chain) < HEAP_MINSIZE)
 					alignment_base += min_alignment;
@@ -1323,7 +1323,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	/* Fallback: Use overallocation to assert alignment. */
 
 	/* Must overallocate by at least `HEAP_MINSIZE',
-	 * so we can _always_ free unused lower memory. */
+	 * so  we can _always_ free unused lower memory. */
 	if unlikely(OVERFLOW_UADD(alloc_bytes, min_alignment, &heap_alloc_bytes))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, MAX(alloc_bytes, min_alignment)));
 	if unlikely(OVERFLOW_UADD(heap_alloc_bytes, HEAP_MINSIZE, &heap_alloc_bytes))

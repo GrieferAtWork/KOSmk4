@@ -61,7 +61,7 @@
 
 DECL_BEGIN
 
-/* Max amount of kernel heap memory that may be used by
+/* Max  amount of kernel heap memory that may be used by
  * a single instance of a `struct rtm_memory' structure. */
 INTERN size_t rtm_memory_limit = 4 * PAGESIZE;
 
@@ -93,10 +93,10 @@ NOTHROW(FCALL rtm_memory_free)(struct rtm_memory *__restrict self, void *ptr) {
 	kfree(ptr);
 }
 
-/* Try to truncate `*pheap_pointer' to point to a heap block of only `num_bytes'
- * bytes of memory, returning `true' on success (`*pheap_pointer' now points at
+/* Try to truncate `*pheap_pointer' to point to a heap block of only  `num_bytes'
+ * bytes of memory, returning `true'  on success (`*pheap_pointer' now points  at
  * a heap block that is smaller than before, but still holds at least `num_bytes'
- * bytes of memory), or `false' (`*pheap_pointer' could not be trucated and has
+ * bytes of memory), or `false' (`*pheap_pointer'  could not be trucated and  has
  * been left unmodified)
  * NOTE: When `*pheap_pointer' is equal to `protected_pointer', always return `false' */
 PRIVATE NONNULL((1)) bool
@@ -163,7 +163,7 @@ NOTHROW(FCALL rtm_pending_syscall_reclaim)(struct rtm_memory *__restrict self,
 
 
 /* Try to reclaim unused memory by truncating heap pointers reachable from `self'
- * Note however that a heap pointer `protected_pointer' will not be truncated! */
+ * Note  however that a  heap pointer `protected_pointer'  will not be truncated! */
 PRIVATE NONNULL((1)) bool
 NOTHROW(FCALL rtm_memory_reclaim)(struct rtm_memory *__restrict self,
                                   void *protected_pointer) {
@@ -312,11 +312,11 @@ again_check_missing_after_malloc:
 }
 
 
-/* Helper to resize a `struct rtm_memory_region', such that the
+/* Helper  to resize a `struct rtm_memory_region', such that the
  * `mr_data' vector of the returned region is capable of holding
  * at least `mr_data_size_in_bytes' bytes of memory.
  * Note however that this function does not update `mr_addr(lo|hi)'
- * to reflect the increased size of the `mr_data' vector! */
+ * to  reflect  the  increased   size  of  the  `mr_data'   vector! */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct rtm_memory_region *FCALL
 rtm_memory_realloc_region(struct rtm_memory *__restrict self,
                           struct rtm_memory_region *__restrict region,
@@ -393,7 +393,7 @@ rtm_memory_schedule_syscall(struct rtm_memory *__restrict self) {
 }
 
 
-/* Schedule a pending call to `sys_syslog()', to-be executed
+/* Schedule   a  pending  call  to  `sys_syslog()',  to-be  executed
  * unconditionally just before a true-return of `rtm_memory_apply()' */
 INTERN NONNULL((1)) void FCALL
 rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
@@ -426,7 +426,7 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
 }
 
 /* Execute system calls that have been scheduled as pending.
- * Called prior to a true-return of `rtm_memory_apply()' */
+ * Called  prior  to a  true-return  of `rtm_memory_apply()' */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL rtm_memory_exec_pending_syscalls)(struct rtm_memory const *__restrict self) {
 	size_t i;
@@ -469,7 +469,7 @@ NOTHROW(FCALL rtm_memory_mark_region_as_changed)(struct rtm_memory *__restrict s
 	}
 	/* The complicated case: We're dealing with a far region.
 	 * The rule that we must follow here is:
-	 *    A far region can only be marked as changed if the
+	 *    A  far  region  can  only  be  marked  as  changed  if the
 	 *    associated base region has already been marked as changed.
 	 * As such, we must first find our base region. */
 	assert(self->rm_regionc >= 2);
@@ -505,8 +505,8 @@ found_base_region:
 		return;
 	}
 	/* The last case: We are the first region from `base_region's set of
-	 *                regions that has been modified. - As such, we can
-	 *                simply handle this case by becoming the new base
+	 *                regions that has been modified. - As such, we  can
+	 *                simply handle this case  by becoming the new  base
 	 *                region! */
 	base_region->mr_part = (REF void *)((uintptr_t)mypart | RTM_MEMORY_REGION_ISFARREGION_FLAG);
 	region->mr_part      = (REF void *)((uintptr_t)mypart | RTM_MEMORY_REGION_CHANGED_FLAG);
@@ -541,7 +541,7 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 	                                                    GFP_NORMAL);
 	if unlikely(!region_lo)
 		return false; /* Merge optimization failed... */
-	/* Make sure that the newly allocated `region_lo' doesn't have too much
+	/* Make sure  that the  newly allocated  `region_lo' doesn't  have too  much
 	 * overhead that would cause it to be too large for us to be allowed to use. */
 	merged_avl = kmalloc_usable_size(region_lo);
 	effective_avail_without_merge = self->rm_mem_avl +
@@ -549,7 +549,7 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 	                                region_hi_oldavl;
 	if unlikely(merged_avl > effective_avail_without_merge) {
 		struct rtm_memory_region *downsized;
-		/* The reallocated `region_lo' is too large for us to be allowed to use it.
+		/* The  reallocated `region_lo' is too large for us to be allowed to use it.
 		 * Down-size it again (and hope that doing so frees up the illegal overhead) */
 		downsized = (struct rtm_memory_region *)krealloc_nx(region_lo,
 		                                                    offsetof(struct rtm_memory_region, mr_data) +
@@ -568,7 +568,7 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 		return false;
 	}
 	/* All right! The reallocated `region_lo' now has enough
-	 *            storage for all data from `region_hi'
+	 *            storage  for  all  data  from  `region_hi'
 	 * -> Now to copy over all of the data, as well as memory attributes. */
 	memcpy(region_lo->mr_data + losize, region_hi->mr_data, hisize);
 	region_lo->mr_addrhi = region_hi->mr_addrhi;
@@ -577,12 +577,12 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 		rtm_memory_region_setchanged(region_lo);
 	if (!rtm_memory_region_isfarregion(region_hi)) {
 		assert(rtm_memory_region_isfarregion(region_lo));
-		/* Become the base region if the deleted
+		/* Become  the  base region  if  the deleted
 		 * region used to be the base region before. */
 		region_lo->mr_part = (REF void *)((uintptr_t)region_lo->mr_part & ~RTM_MEMORY_REGION_ISFARREGION_FLAG);
 	}
 	/* Drop the one reference to the associated part that was held by the deleted region.
-	 * Since our region uses the same part, we know that at least 2 references _must_
+	 * Since  our region uses  the same part, we  know that at  least 2 references _must_
 	 * exist to said part, meaning that we can use `decref_nokill()' here! */
 	decref_nokill(rtm_memory_region_getpart(region_hi));
 
@@ -635,7 +635,7 @@ rtm_memcpy_prefault(struct vm *__restrict effective_vm,
 	}
 }
 
-/* Insert `region' into `self' at index `index', or
+/* Insert `region' into  `self' at  index `index',  or
  * free() it before re-throwing a bad-alloc exception. */
 PRIVATE void FCALL
 rtm_memory_insert_region(struct rtm_memory *__restrict self, size_t index,
@@ -774,7 +774,7 @@ again_rw_region:
 		num_bytes -= avail_bytes;
 		/* Some data is still missing.
 		 * -> Check if the next region starts where the current left off.
-		 *    If it does (start there, that is), then we can continue
+		 *    If it does  (start there,  that is), then  we can  continue
 		 *    accessing data from it. */
 		if ((i + 1) < self->rm_regionc) {
 			struct rtm_memory_region *next_region;
@@ -961,11 +961,11 @@ again_lock_effective_vm:
 		access_bytes = (size_t)((byte_t *)vm_node_getendaddr(node) - (byte_t *)addr);
 		if (access_bytes > num_bytes)
 			access_bytes = num_bytes;
-		/* Check for some additional region with which the given
+		/* Check for some additional region with which the  given
 		 * address range may overlap at some later point in time.
-		 * HINT: `i' is still left initialized by the `BSEARCHR()' above,
+		 * HINT: `i' is still left initialized by the `BSEARCHR()'  above,
 		 *       and currently points at where the region for `addr' would
-		 *       have been (if it existed), or at the region before that
+		 *       have been (if it existed),  or at the region before  that
 		 *       index. */
 		if (i >= self->rm_regionc) {
 			assertf(i == 0,
@@ -1001,14 +1001,14 @@ verify_access_range:
 					access_bytes = distance_to_next_region;
 			}
 		}
-		/* Access permissions have been confirmed, and we now know that we're
+		/* Access  permissions have been  confirmed, and we  now know that we're
 		 * really dealing with a proper memory mapping that is able to represent
 		 * actual memory. (rather than some other kind of mapping)
 		 *
 		 * At this point, we must check for some other RTM region that way already
-		 * exist for `node_part', since the RTM region list may only ever contain
+		 * exist for `node_part', since the RTM region list may only ever  contain
 		 * a single region for any given datapart, and because every data part can
-		 * be mapped an arbitrary number of times within a single VM, we have to
+		 * be mapped an arbitrary number of times  within a single VM, we have  to
 		 * make sure that no other region already describes this one! */
 		for (j = 0; j < self->rm_regionc; ++j) {
 			struct vm_node *aliasing_node;
@@ -1025,9 +1025,9 @@ verify_access_range:
 			       (byte_t *)region->mr_addrlo > (byte_t *)addr + access_bytes - 1);
 #if CONFIG_RTM_FAR_REGIONS
 			/* In order to properly deal with far regions, we must select the region
-			 * that is closest to the accessed address range, so we may then either
+			 * that is closest to the accessed address range, so we may then  either
 			 * extend it, or create yet another far region.
-			 * Right now, `j' points at the first `region' apart of a variable-sized
+			 * Right now, `j' points at the first `region' apart of a  variable-sized
 			 * far region range, so if `addr' is greater than its end, we should look
 			 * forward for a closer region. */
 			if (addr > region->mr_addrhi) {
@@ -1052,7 +1052,7 @@ verify_access_range:
 					assert((byte_t *)region->mr_addrhi < (byte_t *)addr);
 					assert((byte_t *)next_region->mr_addrlo > (byte_t *)addr + access_bytes - 1);
 					/* Figure out which one of `region' and `next_region' is closer
-					 * to the address range that is actually being accessed. */
+					 * to the  address  range  that  is  actually  being  accessed. */
 					distance_to_prev = (size_t)((byte_t *)addr - ((byte_t *)region->mr_addrhi + 1));
 					distance_to_next = (size_t)((byte_t *)next_region->mr_addrlo - ((byte_t *)addr + access_bytes));
 					if (distance_to_next < distance_to_prev) {
@@ -1064,12 +1064,12 @@ verify_access_range:
 				}
 			}
 #endif /* CONFIG_RTM_FAR_REGIONS */
-			/* Check if this region is mapped by the same VM node. - If it is, then
+			/* Check  if this region is mapped by the  same VM node. - If it is, then
 			 * we have to extend this region to also contain `addr...+=access_bytes'.
-			 * Otherwise, we have to perform an address translation so that the
-			 * access instead happens for this region's mapping. (At least we know
-			 * that if the data parts are identical, then both of the VM node
-			 * mappings will have identical sizes, since the size of a vm_node is
+			 * Otherwise,  we  have to  perform an  address  translation so  that the
+			 * access  instead happens for  this region's mapping.  (At least we know
+			 * that  if  the data  parts  are identical,  then  both of  the  VM node
+			 * mappings  will have  identical sizes, since  the size of  a vm_node is
 			 * always identical to the size of an associated vm_datapart!) */
 #if !CONFIG_RTM_USERSPACE_ONLY
 			aliasing_node_vm = &vm_kernel;
@@ -1124,9 +1124,9 @@ do_create_far_region:
 							                    missing_bytes);
 						} EXCEPT {
 							/* Failed to load region data.
-							 * -> Since we're extending downwards, `region' now contains a hole of
+							 * -> Since we're extending downwards, `region' now contains a hole  of
 							 *    uninitialized data. But since RTM regions must be continuous, the
-							 *    only thing we can do to recover is discard everything we're just
+							 *    only thing we can do to recover is discard everything we're  just
 							 *    did to extend `region' and try again from the start... */
 							memmovedown(region->mr_data,
 							            region->mr_data + missing_bytes,
@@ -1192,7 +1192,7 @@ do_create_far_region:
 							                    missing_bytes);
 						} EXCEPT {
 							/* Re-truncate the region so we can at least
-							 * account for what we were able to copy! */
+							 * account for what  we were  able to  copy! */
 							region->mr_addrhi = (byte_t *)region->mr_addrhi - missing_bytes;
 							RETHROW();
 						}
@@ -1283,7 +1283,7 @@ do_create_far_region:
 		/* Insert `region' into the vector at index `i' */
 		rtm_memory_insert_region(self, i, region); /* Inherit: region */
 		/* Populate the accessed `region' with data from the VM
-		 * NOTE: We use `memcpy_nopf()' for this to ensure that the current memory state
+		 * NOTE: We use `memcpy_nopf()' for this to  ensure that the current memory  state
 		 *       remains consistent with what was set-up by the `vm_forcefault_p()' above. */
 		{
 			size_t copy_error;
@@ -1305,7 +1305,7 @@ do_create_far_region:
 					rtm_memory_free(self, region);
 					decref(node_part);
 				} else {
-					/* At least ~something~ was copied (Update `region' to
+					/* At  least ~something~ was copied (Update `region' to
 					 * only contain the portion that was _actually_ copied) */
 					region->mr_addrhi = (byte_t *)addr + copy_ok - 1;
 				}
@@ -1333,7 +1333,7 @@ do_access_region:
 			}
 		}
 		/* Check if we're done, and if we aren't, continue
-		 * reading after what has already been read. */
+		 * reading  after  what  has  already  been  read. */
 		if (access_bytes >= num_bytes)
 			return;
 		addr = (byte_t *)addr + access_bytes;
@@ -1415,7 +1415,7 @@ NOTHROW(FCALL rtm_memory_endwrite_modified_parts)(struct rtm_memory const *__res
 
 
 /* Verify that the given address range is writable
- * without any chance of triggering a #PF */
+ * without  any   chance  of   triggering  a   #PF */
 PRIVATE ATTR_PURE NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL rtm_verify_writable_nopf)(USER CHECKED void *addr,
                                         size_t num_bytes) {
@@ -1462,7 +1462,7 @@ again_forcefault:
 	}
 
 	/* Step #2: Acquire tx-locks to all of the modified data parts, and
-	 *          verify that accessed data parts are still up-to-date */
+	 *          verify that accessed  data parts  are still  up-to-date */
 again_acquire_region_locks:
 	must_allocate_missing_futex_controllers = false;
 	for (i = 0; i < self->rm_regionc; ++i) {
@@ -1492,7 +1492,7 @@ again_acquire_region_locks:
 				goto partially_release_locks_and_retry;
 			}
 			/* Make sure that the node has sufficient memory after `region->mr_addrlo'
-			 * to account for at least `region->mr_size' bytes of memory. */
+			 * to  account   for  at   least   `region->mr_size'  bytes   of   memory. */
 			node_size_after_addr = (size_t)vm_node_getendaddr(node);
 			sync_endread(effective_vm);
 			node_size_after_addr -= (uintptr_t)region_start_addr;
@@ -1558,15 +1558,15 @@ endwrite_par_and_release_locks_and_retry:
 			if (ftx)
 				continue; /* Already allocated. */
 			/* Must allocate the missing controller.
-			 * Note that we're holding a couple of non-recursive locks
+			 * Note that we're holding  a couple of non-recursive  locks
 			 * at the moment, so we must be careful not to do a blocking
 			 * memory allocation! */
 			ftx = vm_futex_controller_allocf_nx(GFP_ATOMIC);
 			if unlikely(!ftx) {
 				/* The difficult case:
 				 * In this case, we must release all of our beautiful locks, :(
-				 * just so we can do a blocking heap allocation. And once
-				 * that's done we'll have to start over with acquiring all
+				 * just  so  we can  do a  blocking  heap allocation.  And once
+				 * that's done  we'll have  to start  over with  acquiring  all
 				 * of the necessary locks... */
 				rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
 #ifndef __OPTIMIZE_SIZE__
@@ -1590,9 +1590,9 @@ again_allocate_ftx_controller_for_part:
 					vm_futex_controller_free(ftx);
 				}
 #ifndef __OPTIMIZE_SIZE__
-				/* While we're at it, also try to look head if there are
+				/* While we're at it, also try  to look head if there  are
 				 * more modified regions with parts that are lacking their
-				 * futex controllers. Because if there are more, then we
+				 * futex controllers. Because if  there are more, then  we
 				 * can just fill in their controllers all at once, without
 				 * having to fill them in one-at-a-time. */
 				for (++i; i < self->rm_regionc; ++i) {
@@ -1612,7 +1612,7 @@ again_allocate_ftx_controller_for_part:
 		}
 	}
 
-	/* Step #3: Verify that all modified in-memory data ranges can be
+	/* Step #3: Verify that all  modified in-memory data  ranges can  be
 	 *          written to without any chance of triggering a pagefault. */
 	has_modified_user = false;
 #if !CONFIG_RTM_USERSPACE_ONLY
@@ -1659,7 +1659,7 @@ again_acquire_region_locks_for_vm_lock:
 			}
 		}
 		/* Verify that the backing memory of the accessed range is still writable.
-		 * This was originally asserted by `prefault_memory_for_writing()' above,
+		 * This  was originally asserted by `prefault_memory_for_writing()' above,
 		 * which we'd have to jump back to if memory isn't writable any more. */
 		if unlikely(!rtm_verify_writable_nopf(region->mr_addrlo,
 		                                      rtm_memory_region_getsize(region))) {
@@ -1690,8 +1690,8 @@ again_acquire_region_locks_for_vm_lock:
 		        "No lock held for part %p (used by region %p...%p)",
 		        part, region->mr_addrlo, region->mr_addrhi);
 		/* Copy modified memory.
-		 * NOTE: We've verified that all of this memory can be written without
-		 *       causing a pagefault in step #3, and we know that the associated
+		 * NOTE: We've  verified that all  of this memory  can be written without
+		 *       causing a pagefault in step #3, and we know that the  associated
 		 *       mappings won't have changed in the mean time because we're still
 		 *       holding locks to their corresponding VMs! */
 #ifdef NDEBUG
@@ -1735,7 +1735,7 @@ again_acquire_region_locks_for_vm_lock:
 	}
 #if CONFIG_RTM_FAR_REGIONS
 	/* With far regions, we must release datapart locks during a second
-	 * pass, as far regions may re-use locks of adjacent dataparts! */
+	 * pass,  as far  regions may  re-use locks  of adjacent dataparts! */
 	i = self->rm_regionc;
 	while (i) {
 		struct rtm_memory_region *region;

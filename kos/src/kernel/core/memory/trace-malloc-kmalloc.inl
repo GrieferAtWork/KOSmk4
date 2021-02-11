@@ -496,7 +496,7 @@ realloc_unchanged:
 		                                          extension_flags);
 		if (!num_allocated) {
 			/* Failed to allocate extended memory. - Either move the entire heap-block,
-			 * or (if in in-place mode), simply return `NULL', indicating that we've
+			 * or  (if in in-place  mode), simply return  `NULL', indicating that we've
 			 * failed to re-size memory. */
 #ifdef DEFINE_METHOD_kmalloc_in_place
 			goto err;
@@ -546,7 +546,7 @@ again_remove_node_for_newchunk:
 
 			/* This can fail due to other bitset nodes, and we must handle it when that happens! */
 			if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
-				/* Roll-back: We must restore the old node, then resolve the existing
+				/* Roll-back: We must restore the old node, then resolve the  existing
 				 *            (possibly-bitset) node with which our new node overlaps. */
 				node->tn_flags = extension_flags & __GFP_HEAPMASK;
 				trace_node_initlink(node, oldblock_base, oldblock_size);
@@ -622,7 +622,7 @@ again_remove_node_for_oldchunk:
 
 		/* This can fail due to other bitset nodes, and we must handle it when that happens! */
 		if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
-			/* Roll-back: We must restore the old node, then resolve the existing
+			/* Roll-back: We must restore the old node, then resolve the  existing
 			 *            (possibly-bitset) node with which our new node overlaps. */
 			node->tn_link.rb_max -= num_allocated;
 			trace_node_tree_insert(&nodes, node);

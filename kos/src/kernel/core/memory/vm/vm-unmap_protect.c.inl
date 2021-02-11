@@ -211,7 +211,7 @@ do_throw_first_unmapped:
 				} else {
 					/* Unmap a sub-segment of a reserved memory node.
 					 * For this, we need to allocate a new node to fill in the high part.
-					 * LOW:  vm_node_getminpageid(minmax.mm_min) ... minpageid - 1
+					 * LOW:  vm_node_getminpageid(minmax.mm_min)  ...   minpageid   -   1
 					 * HIGH: maxpageid + 1 ... vm_node_getminpageid(minmax.mm_min) */
 					if (!new_node) {
 						new_node = (struct vm_node *)kmalloc_nx(sizeof(struct vm_node),
@@ -269,7 +269,7 @@ do_throw_first_unmapped:
 				part = incref(minmax.mm_min->vn_part);
 				sync_endwrite(self);
 				/* Split the part, so that our memory mapping
-				 * starts when the given range begins. */
+				 * starts  when  the   given  range   begins. */
 				TRY {
 					xdecref(vm_datapart_split(part, vpage_offset));
 				} EXCEPT {
@@ -328,7 +328,7 @@ do_throw_first_unmapped:
 				part = incref(minmax.mm_max->vn_part);
 				sync_endwrite(self);
 				/* Split the part, so that our memory mapping
-				 * starts when the given range begins. */
+				 * starts  when  the   given  range   begins. */
 				TRY {
 					xdecref(vm_datapart_split(part, vpage_offset));
 				} EXCEPT {
@@ -340,7 +340,7 @@ do_throw_first_unmapped:
 			}
 		}
 		/* Update all nodes within the minmax range (we've already split partially mapped
-		 * nodes such that they the VM has been partitioned in order to allow the nodes
+		 * nodes  such that they the VM has been  partitioned in order to allow the nodes
 		 * to be unmapped fully) */
 		{
 			struct vm_node *node = minmax.mm_min;
@@ -398,15 +398,15 @@ do_throw_first_unmapped:
 								goto again_lock_vm;
 							}
 							/* Switch the associated chain.
-							 * NOTE: When switching from SHARED --> PRIVATE, and our node
-							 *       becomes the first PRIVATE mapping, we must update the
+							 * NOTE: When switching  from SHARED  -->  PRIVATE, and  our  node
+							 *       becomes the  first PRIVATE  mapping, we  must update  the
 							 *       write-access of all other SHARED nodes before proceeding. */
 							LLIST_REMOVE(node, vn_link);
 							if (new_prot & VM_PROT_SHARED) {
 								LLIST_INSERT(part->dp_srefs, node, vn_link);
 							} else {
 								if (!part->dp_crefs) {
-									/* Must update write permissions of all of the other SHARED
+									/* Must  update write  permissions of  all of  the other SHARED
 									 * mappings, since any future writes at this point will require
 									 * our (now) copy-on-write node to be unshared. */
 									struct vm_node *sibling_shared;
@@ -444,7 +444,7 @@ do_throw_first_unmapped:
 							}
 							/* Actually update the node protection.
 							 * NOTE: Do this before unlocking the part, so at no point will
-							 *       there be a node with invalid protection flags visible
+							 *       there be a node with invalid protection flags  visible
 							 *       within the part itself. */
 							node->vn_prot = new_prot;
 							COMPILER_WRITE_BARRIER();
@@ -479,7 +479,7 @@ do_update_page_directory:
 					/* Remove the node from the VM. */
 					vm_nodetree_remove(&self->v_tree, vm_node_getstartpageid(node));
 					LLIST_REMOVE(node, vn_byaddr);
-					/* Destroy the old node. NOTE: This _MUST_ be done before we `sync_endwrite(self)',
+					/* Destroy the  old  node. NOTE:  This  _MUST_  be done  before  we  `sync_endwrite(self)',
 					 * as other code will check for stale node pointers after having acquired a lock to the VMs
 					 * of all of the nodes associated with some data part. */
 					vm_node_destroy(node);

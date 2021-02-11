@@ -200,7 +200,7 @@ NOTHROW(KCALL memset_into_vm_nopf)(struct vm *__restrict self,
 
 /* read/write memory to/form the address space of a given VM
  * Note that these functions behave similar to memcpy_nopf(), in that they
- * will only ever copy _true_ RAM, and never access VIO or cause LOA/COW.
+ * will only ever copy _true_ RAM, and never access VIO or cause  LOA/COW.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
  *              The affected memory range is:
@@ -393,8 +393,8 @@ memset_into_vm(struct vm *__restrict effective_vm,
 
 #endif
 
-/* High-level read/write memory to/from the given `src_vm'.
- * These functions do all the things necessary to read/write memory
+/* High-level  read/write   memory  to/from   the  given   `src_vm'.
+ * These functions do all the things necessary to read/write  memory
  * the same way a regular memory access would, including LOA/COW, as
  * well as properly accessing VIO. */
 PUBLIC void KCALL

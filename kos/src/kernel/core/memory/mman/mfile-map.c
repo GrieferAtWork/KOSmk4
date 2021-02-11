@@ -61,11 +61,11 @@ DECL_BEGIN
 
 
 /* Finalize a given mem-node-allocator.
- * This function will free (and only free; the caller is responsible to release
+ * This function will  free (and  only free; the  caller is  responsible to  release
  * all of the locks to the individual mem-parts themselves, though for this purpose,
- * `mfile_map_release()' may also be used) all of the (still-)allocated
- * mem-nodes, as can be found apart of the `self->mfm_nodes' list. In addition
- * to freeing all of the container-nodes, this function will also drop 1 reference
+ * `mfile_map_release()'  may   also  be   used)   all  of   the   (still-)allocated
+ * mem-nodes,  as  can be  found apart  of the  `self->mfm_nodes' list.  In addition
+ * to  freeing all of the container-nodes, this  function will also drop 1 reference
  * from the mem-parts pointed-to by each of the nodes.
  * NOTE: This function doesn't necessarily have to be called if the caller was
  *       able to inherit _all_ of the nodes originally allocated (which should
@@ -130,8 +130,8 @@ NOTHROW(FCALL mpart_must_unshare_copy)(struct mpart *__restrict self,
 
 
 /* Go over all parts and make use of `mpart_load_or_unlock()' or
- * `mpart_unsharecow_or_unlock()' in order to populate+unshare
- * (if PROT_WRITE was set) the file-range that our caller is
+ * `mpart_unsharecow_or_unlock()' in  order to  populate+unshare
+ * (if  PROT_WRITE was  set) the  file-range that  our caller is
  * intending to map. */
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
@@ -143,7 +143,7 @@ mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 	unlock.mmuaei_fmap = self;
 
 	/* Make sure that all parts have been loaded into the core,
-	 * and that all accessed memory has been loaded from-disk. */
+	 * and that all accessed memory has been loaded  from-disk. */
 	SLIST_FOREACH (node, &self->mfm_nodes, _mn_alloc) {
 		struct mpart *part;
 		part                 = node->mn_part;
@@ -154,7 +154,7 @@ mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 			if (!mpart_setcore_or_unlock(part, &unlock, &self->mfm_scdat))
 				goto fail;
 			/* Re-initialize set-core data (since it became invalid after
-			 * a successful return from `mpart_setcore_or_unlock()') */
+			 * a  successful  return  from   `mpart_setcore_or_unlock()') */
 			mpart_setcore_data_init(&self->mfm_scdat);
 		}
 
@@ -169,20 +169,20 @@ mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 					                                minaddr, (maxaddr - minaddr) + 1))
 						goto fail;
 					/* Re-initialize unshare-cow data (since it became invalid after
-					 * a successful return from `mpart_unsharecow_or_unlock()') */
+					 * a  successful  return  from   `mpart_unsharecow_or_unlock()') */
 					mpart_unsharecow_data_init(&self->mfm_ucdat);
 				}
 			} else {
 				/* The caller wants to create a private mapping.
 				 * As such, we must ensure that there aren't any SHARED mappings
-				 * of `part', and that `part' belongs to an anonymous file. */
+				 * of `part',  and that  `part' belongs  to an  anonymous  file. */
 				if (!mpart_isanon(part) ||          /* `part' could be accessed via its file. */
 				    !LIST_EMPTY(&part->mp_copy) ||  /* `part' already has other copy-on-write mappings. */
 				    !LIST_EMPTY(&part->mp_share)) { /* `part' already has other shared mappings. */
 
 					/* TODO: Create our own private copy of `part'
 					 *       Essentially, we have to do the same as is also done by `mfault()',
-					 *       only that instead of faulting a node/part pair found within some
+					 *       only that instead of faulting  a node/part pair found within  some
 					 *       given memory manager, we need to fault a part that hasn't actually
 					 *       been added to its proper node, yet. */
 
@@ -196,9 +196,9 @@ mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 					/* TODO: Replace `part' from `node->mn_part' with `self->mfm_ucdat.ucd_copy' */
 
 					/* With this, `node' no longer references the original file, but rather contains
-					 * its own, private copy of the relevant portion from the original file! :) */
+					 * its own, private  copy of  the relevant portion  from the  original file!  :) */
 
-					/* TODO: Check the preceding file-mapping node (from the `self->mfm_nodes' list)
+					/* TODO: Check the preceding file-mapping  node (from the `self->mfm_nodes'  list)
 					 *       to see if it might be possible to merge those 2 node/part pairs. For this
 					 *       purpose, we can simply use:
 					 *       `!isshared(PREV->mn_part) && mpart_isanon(PREV->mn_part) && PREV->mn_part->mp_file == &mfile_anon[*]'
@@ -217,15 +217,15 @@ fail:
 
 
 
-/* Lookup/create all parts to span the given address range, as
- * well as allocate 1 mem-node for each part, such that everything
+/* Lookup/create all  parts  to  span the  given  address  range,  as
+ * well  as allocate 1  mem-node for each  part, such that everything
  * put together forms 1 continuous range of fully mappable mem-parts.
  *
- * This function is designed for use in implementing `mman_map()', such
- * that this function is called before trying to acquire a lock to all
+ * This function is designed for use in implementing `mman_map()',  such
+ * that  this function is called before trying  to acquire a lock to all
  * of the bound mem-part (s.a. `mfile_map_acquire') and the target mman.
  * As such, this API is designed to make it simple to:
- *  - Acquire locks to all of the parts, as well as making
+ *  - Acquire  locks to all of the parts, as well as making
  *    sure that all of the parts still form 1 uninterrupted
  *    mapping over the given address range in its entirety
  *  - Release locks to all of the parts */
@@ -317,7 +317,7 @@ again_getpart:
 	}
 
 	/* Failed to acquire all required parts. - Unlock our's, and re-lock everything
-	 * NOTE: This should never ~really~ happen when `file' is anonymous, though... */
+	 * NOTE: This should never ~really~ happen when `file' is anonymous,  though... */
 	mpart_lock_release(part);
 again_acquire:
 	TRY {
@@ -331,13 +331,13 @@ again_acquire:
 
 
 
-/* Unlock or re-lock a mem-node allocator (that is: release/re-acquire locks
+/* Unlock or re-lock a mem-node  allocator (that is: release/re-acquire  locks
  * to all of the individual parts pointed to by the nodes allocated by `self')
- * For this purpose, re-locking a mem-node-allocator will (once again) make
+ * For this purpose,  re-locking a mem-node-allocator  will (once again)  make
  * sure that _all_ parts and nodes form a single, continuous range of mappings
- * as specified in the original call to `mfile_map_init()', leaving no
- * holes anywhere along the way, while the the act of holding locks to all of
- * the parts then guaranties that no new holes can possibly pop up out of the
+ * as  specified  in  the  original  call  to  `mfile_map_init()',  leaving no
+ * holes  anywhere along the way, while the the act of holding locks to all of
+ * the  parts then guaranties that no new holes can possibly pop up out of the
  * blue. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self) {
@@ -348,7 +348,7 @@ NOTHROW(FCALL mfile_map_release)(struct mfile_map *__restrict self) {
 }
 
 
-/* Try to acquire locks to all already in-use parts.
+/* Try to  acquire locks  to all  already in-use  parts.
  * If this fails for one of the parts, unlock everything
  * and return a pointer to that part. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mpart *
@@ -448,7 +448,7 @@ again:
 		assert(RANGE_OVERLAPS(node_map_minaddr, node_map_maxaddr,
 		                      part_map_minaddr, part_map_maxaddr));
 
-		/* Calculate the address range that we want this node to represent.
+		/* Calculate  the address range that we want this node to represent.
 		 * This represents the upper bounds to which this node (should) grow
 		 * in order to fill in gaps to its left and right. */
 		want_map_minaddr = min_mapped_address;
@@ -459,7 +459,7 @@ again:
 			want_map_maxaddr = (min_mapped_address + (uintptr_t)next->mn_minaddr) - 1;
 
 		/* Force node mappings back in-bounds of their associated parts,
-		 * as well as (try to) widen nodes in order to fill holes. */
+		 * as  well  as (try  to) widen  nodes in  order to  fill holes. */
 		if (node_map_minaddr < part_map_minaddr) {
 			node->mn_minaddr = (byte_t *)(uintptr_t)(part_map_minaddr - min_mapped_address);
 			node_map_minaddr = part_map_minaddr;
@@ -505,7 +505,7 @@ again:
 
 
 /* Check if the nodes from the given list are complete (that is: don't
- * contain any holes), as well as map a total of `num_bytes', as well
+ * contain any holes), as well as map a total of `num_bytes', as  well
  * as that the first node has its min-addr set to `0' */
 PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) bool
 NOTHROW(FCALL mnode_slist_is_complete_range)(struct mnode_slist const *__restrict self,
@@ -559,7 +559,7 @@ continue_with_pnode:
 			}
 
 			/* There is a gap right here that spans between `gap_min_offset...gap_max_offset'
-			 * Start out by calculating the block-aligned address bounds of the gap. */
+			 * Start  out  by  calculating  the  block-aligned  address  bounds  of  the gap. */
 			gap_min_addr = self->mfm_addr + gap_min_offset;
 			gap_max_addr = self->mfm_addr + gap_max_offset;
 			gap_size     = (size_t)(gap_max_addr - gap_min_addr) + 1;
@@ -574,11 +574,11 @@ continue_with_pnode:
 
 			/* Check if we can find this part somewhere else within the list.
 			 * If we do, then we must remove all nodes between the in-between
-			 * position described by `p_node', and the duplicate (including
+			 * position  described by `p_node',  and the duplicate (including
 			 * the duplicate itself)
 			 *
 			 * Then, we must create a single, new node to split the union of
-			 * all of the removed nodes, as well as the gap we're trying to
+			 * all of the removed nodes, as well as the gap we're trying  to
 			 * fill above with a single, new node. */
 			{
 				struct mnode **p_duplicate_node;
@@ -598,9 +598,9 @@ continue_with_pnode:
 					decref_nokill(part); /* The reference returned by `mfile_getpart()' */
 
 					/* Found a duplicate of the part!
-					 * Note that we may assume that at most one duplicate can ever exist at
-					 * a time, since we always make an effort to prevent duplicates from the
-					 * get-go, meaning that inside of the already-allocated list of nodes,
+					 * Note that we may assume  that at most one  duplicate can ever exist  at
+					 * a  time, since we always make an  effort to prevent duplicates from the
+					 * get-go,  meaning that  inside of  the already-allocated  list of nodes,
 					 * there should never be any node that re-using the part from another one. */
 					if (duplicate_node_is_after_gap) {
 						removed_nodes_lo = next;
@@ -613,7 +613,7 @@ continue_with_pnode:
 						p_node = p_duplicate_node;
 					}
 
-					/* Re-initialize the duplicate node to cover the union
+					/* Re-initialize  the duplicate node to cover the union
 					 * of gap and all of the removed nodes in its entirety. */
 					new_node = duplicate_node;
 					assert(removed_nodes_lo);
@@ -626,7 +626,7 @@ continue_with_pnode:
 					new_node->mn_minaddr = (byte_t *)gap_min_offset;
 					new_node->mn_maxaddr = (byte_t *)gap_max_offset;
 
-					/* Free nodes that we've removed between p_node and the duplicate.
+					/* Free nodes that we've removed between p_node and the  duplicate.
 					 * However, exclude the duplicate node itself, since we're re-using
 					 * that one! */
 					{
@@ -646,9 +646,9 @@ continue_with_pnode:
 						}
 					}
 
-					/* Re-insert the (now widened) `new_node' (which used to be
+					/* Re-insert the  (now widened)  `new_node' (which  used to  be
 					 * `duplicate_node') into the list to take up the gap described
-					 * by the hole we've created by removing all of those nodes
+					 * by the hole  we've created  by removing all  of those  nodes
 					 * above! */
 					SLIST_P_INSERT_BEFORE(p_node, new_node, _mn_alloc);
 					prev   = new_node;
@@ -658,7 +658,7 @@ continue_with_pnode:
 			} /* Scope... */
 
 			/* Allocate and initialize the new node used to cover the gap.
-			 * For this purpose, try to take a node from the free-list */
+			 * For this purpose,  try to  take a node  from the  free-list */
 			new_node = SLIST_FIRST(&self->mfm_flist);
 			if (new_node != NULL) {
 				SLIST_REMOVE_HEAD(&self->mfm_flist, _mn_alloc);
@@ -703,9 +703,9 @@ continue_with_pnode:
 }
 
 
-/* (try to) do the same as `mfile_map_acquire()', but if doing so cannot be
+/* (try to) do  the same as  `mfile_map_acquire()', but if  doing so cannot  be
  * done without blocking on an internal lock, then release all already-acquired
- * locks, invoke the `unlock' callback (if given), wait for the necessary lock
+ * locks, invoke the `unlock' callback (if given), wait for the necessary  lock
  * to become available, and return `false'.
  * Otherwise, don't invoke `unlock' and return `true'.
  * NOTE: In the case of an exception, `unlock' is guarantied to be invoked
@@ -723,7 +723,7 @@ mfile_map_acquire_or_unlock(struct mfile_map *__restrict self,
 	block_aligned_addr = self->mfm_addr & ~file->mf_part_amask;
 	block_aligned_size = self->mfm_size + (size_t)(self->mfm_addr - block_aligned_addr);
 	block_aligned_size = (block_aligned_size + file->mf_part_amask) & ~file->mf_part_amask;
-	/* Acquire locks to all parts already loaded! (For this purpose,
+	/* Acquire locks to all parts already loaded! (For this  purpose,
 	 * we may assume that no part appears more than once, so we don't
 	 * have to take care to track which parts are already locked) */
 again:
@@ -731,39 +731,39 @@ again:
 		goto fail;
 
 	/* Now go through the list of nodes and throw out nodes who's parts
-	 * no longer overlap at all with the range that is being mapped by
+	 * no longer overlap at all with the range that is being mapped  by
 	 * the associated node. */
 	mfile_map_unlock_and_remove_non_overlapping_parts(self);
 
 	/* We now know that _all_ remaining nodes _do_ actually map at least
-	 * some part of the requested address range. As such, try to alter
+	 * some part of the requested address  range. As such, try to  alter
 	 * the addresses/offsets of nodes to enlarge/truncate them such that
-	 * they may take advantage of mem-parts that have been split/merged
+	 * they may take advantage of mem-parts that have been  split/merged
 	 * in the mean time. */
 	mnode_slist_adjusted_mapped_ranges(&self->mfm_nodes,
 	                                   self->mfm_addr,
 	                                   self->mfm_addr + self->mfm_size - 1);
 
-	/* At this point, all in-use nodes map the widest area(s) possible of
+	/* At this point, all in-use nodes map the widest area(s) possible  of
 	 * their respective parts, limited only by the overall file-range that
 	 * is supposed to get mapped.
 	 *
-	 * With this in mind, check if the current list of nodes still
+	 * With this in mind, check if the current list of nodes  still
 	 * represents continuous range of consecutive file-parts, or if
 	 * there might actually be holes between some of the nodes. */
 	if (!mnode_slist_is_complete_range(&self->mfm_nodes, self->mfm_size)) {
 
 		/* There must still be (some) holes between nodes currently being mapped.
-		 * As such, we must release all of the locks, and allocate new nodes, as
+		 * As  such, we must release all of the locks, and allocate new nodes, as
 		 * well as parts in order to fill those holes!
 		 *
 		 * NOTE: When allocating new parts, we must be extra careful to check if
-		 *       there may already be another node bound to the same part, even
+		 *       there may already be another node bound to the same part,  even
 		 *       if that other node is somewhere completely different within our
 		 *       local list of parts.
-		 *       If we do find a duplicate part, then we must delete all nodes
+		 *       If we do find a duplicate part, then we must delete all  nodes
 		 *       between where we're found the duplicate (including the node of
-		 *       the duplicate itself), and where we were intending to insert
+		 *       the duplicate itself), and where  we were intending to  insert
 		 *       the turns-out-to-be-a-duplicate part. */
 
 		/* XXX: Why not try to do this without blocking before releasing all
@@ -773,7 +773,7 @@ again:
 			goto fail;
 
 		/* With all of the whole filled, the range should once again be complete,
-		 * but then again: we're not holding the required locks right now... */
+		 * but then  again: we're  not holding  the required  locks right  now... */
 		assert(mnode_slist_is_complete_range(&self->mfm_nodes, self->mfm_size));
 		goto again;
 	}
@@ -799,8 +799,8 @@ fail:
 
 
 /* Essentially does the same as `mfile_map_acquire_or_unlock()', however the
- * caller must already be holding locks to every mem-part mapped by `self'
- * However, use of `mfile_map_acquire_or_unlock()' is still more efficient,
+ * caller must already be holding locks  to every mem-part mapped by  `self'
+ * However,  use of `mfile_map_acquire_or_unlock()' is still more efficient,
  * since that function can do some tricks which this one can't (see impl)! */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
@@ -823,10 +823,10 @@ mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
 	                                   self->mfm_addr + self->mfm_size - 1);
 
 	if (!mnode_slist_is_complete_range(&self->mfm_nodes, self->mfm_size)) {
-		/* This is where the control-flow differs from `mfile_map_acquire_or_unlock()'
-		 * Because the caller is responsible for locking the parts from our node-list,
+		/* This  is where the  control-flow differs from `mfile_map_acquire_or_unlock()'
+		 * Because the caller is responsible for  locking the parts from our  node-list,
 		 * we are unable to re-acquire those locks, also meaning we have unconditionally
-		 * unlock everything here, rather than still having the chance to do stuff w/o
+		 * unlock  everything here, rather than still having  the chance to do stuff w/o
 		 * having to unlock everything. */
 		/* XXX: Why not try to do this without blocking before releasing all
 		 *      of those pretty, tasty locks? */
@@ -858,7 +858,7 @@ fail:
 
 
 /* Fallback to-be used with `mfile_map_with_unlockinfo::mmwu_info::ui_unlock'
- * When invoked, will call `mfile_map_release()' on the contained mfile-map. */
+ * When invoked, will call `mfile_map_release()' on the contained  mfile-map. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict self) {
 	struct mfile_map_with_unlockinfo *me;

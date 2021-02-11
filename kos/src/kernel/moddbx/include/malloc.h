@@ -22,7 +22,7 @@
 
 /* DeBug eXtensions: Malloc function.
  *
- * Behaves just like the normal kmalloc, except that this one can only be used
+ * Behaves  just like the normal kmalloc, except that this one can only be used
  * from within the debugger, and all memory allocated is forcibly released when
  * the debugger is reset/exited. Additionally, none of these functions make use
  * of exceptions, but always return `NULL' if an allocation failed.
@@ -51,7 +51,7 @@ FUNDEF void NOTHROW(FCALL dbx_free)(void *ptr);
 /* Low-level heap alloc/free functions. */
 FUNDEF WUNUSED struct heapptr NOTHROW(FCALL dbx_heap_alloc)(size_t num_bytes);
 FUNDEF void NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes);
-/* Try to allocate at least `num_bytes' at `addr',
+/* Try  to allocate at least `num_bytes' at `addr',
  * and return the actual amount that was allocated. */
 FUNDEF WUNUSED size_t NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes);
 

@@ -113,7 +113,7 @@ DECL_BEGIN
 
 
 /* Resolve existing (possibly bitset-based) mappings between [umin, umax]
- * These functions must be called while already holding the lock.
+ * These  functions  must  be  called  while  already  holding  the lock.
  * NOTE: If these functions return an exception/false, the lock will have been released! */
 #ifdef DEFINE_X_except
 PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) void FCALL
@@ -132,7 +132,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 	uintptr_t overlap_min, overlap_max;
 	size_t i, minbit, maxbit;
 
-	/* Don't panic yet: We might get here because of an existing BITSET-node
+	/* Don't panic yet: We might get here because of an existing  BITSET-node
 	 *                  that already has all of the area in which it overlaps
 	 *                  with our new node set to be fully untraced. */
 	oldnode = trace_node_tree_rremove(&nodes, umin, umax);
@@ -196,7 +196,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		size_t i, src, count;
 		if unlikely(overlap_max == trace_node_umax(oldnode)) {
 			/* Special case: The entirety of the old node is being replaced.
-			 * With this in mind, simply don't re-insert the existing node,
+			 * With this in mind, simply don't re-insert the existing  node,
 			 * but rather free it while temporarily dropping the lock. */
 			lock_break();
 			trace_node_free(oldnode);
@@ -229,7 +229,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 		struct heapptr node_ptr;
 
 		/* Split `oldnode' into 2 nodes, such that we'll create
-		 * a gap that allows us to insert `node' without any
+		 * a gap that  allows us to  insert `node' without  any
 		 * problems. */
 		lo_node_min = trace_node_umin(oldnode);
 		lo_node_max = overlap_min - 1;
@@ -377,7 +377,7 @@ again_free_node_ptr:
 		trace_node_tree_insert(&nodes, hi_node);
 
 		/* At this point, there should be a gap between the lo- and hi-nodes
-		 * that we can now use to insert the caller's `node' into the tree. */
+		 * that we can now use to insert the caller's `node' into the  tree. */
 		goto success;
 	}
 	/* Re-insert `oldnode' now that it's been truncated */
@@ -425,13 +425,13 @@ NOTHROW(FCALL LOCAL_insert_trace_node)(struct trace_node *__restrict node,
 
 
 /* Trace a given address range `base...+=num_bytes' for the purposes
- * of having that range checked during GC memory leak detection.
+ * of  having that  range checked  during GC  memory leak detection.
  * @param: base:      Base-address of the range that should be traced. If not aligned
  *                    by at least `sizeof(void *)', the actual range that will end up
- *                    being traced will be truncated to start at the next properly
+ *                    being  traced will be  truncated to start  at the next properly
  *                    aligned location.
  * @param: num_bytes: The # of bytes to trace. If not aligned by at least `sizeof(void *)',
- *                    the actual range being traced will be truncated to end at the next
+ *                    the actual range being  traced will be truncated  to end at the  next
  *                    lower, and properly aligned location.
  * @param: gfp:       Set of:
  *                     - GFP_NOLEAK: Don't consider this range as a leak if it can't be reached
@@ -446,7 +446,7 @@ kmalloc_trace(void *base, size_t num_bytes,
 	THROWS(E_BADALLOC, E_WOULDBLOCK)
 #elif defined(DEFINE_X_noexcept)
 /* Same as `kmalloc_trace()', but don't throw an exception. If the operation fails,
- * rather than re-returning `base', `NULL' will be returned instead. */
+ * rather  than   re-returning   `base',   `NULL'   will   be   returned   instead. */
 PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
 NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
                                 gfp_t gfp, unsigned int tb_skip)

@@ -76,7 +76,7 @@ struct cparser {
 	char const           *c_end;      /* [1..1][const] End of text to-be parsed (NOTE: must point to a NUL-character!) */
 	dbg_autocomplete_cb_t c_autocom;  /* [0..1] Auto-completion callback: When `CTOKEN_TOK_EOF' is reached in certain
 	                                   *        positions while parsing an expression, and this callback is NULL, then
-	                                   *        this callback will be invoked with a list of possible continuation
+	                                   *        this callback will  be invoked  with a list  of possible  continuation
 	                                   *        options. */
 	void                 *c_autocom_arg;   /* [?..?] Cookie for `c_autocom' */
 	char const           *c_autocom_start; /* [1..1][valid_if(c_autocom)] Text start for auto-completion. */
@@ -96,10 +96,10 @@ NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
 
 #define cparser_toklen(self) (size_t)((self)->c_tokend - (self)->c_tokstart)
 
-/* Advance the given C-parser to the next token.
+/* Advance  the  given  C-parser  to  the  next  token.
  * Parsing starts at `self->c_tokend', and upon return,
- * the `c_tok', `c_tokstart' and `c_tokend' fields
- * will have been updated to describe the next token
+ * the  `c_tok',  `c_tokstart'  and  `c_tokend'  fields
+ * will have been  updated to describe  the next  token
  * following the initial `c_tokend' */
 FUNDEF NONNULL((1)) void
 NOTHROW(FCALL cparser_yield)(struct cparser *__restrict self);

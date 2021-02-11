@@ -98,7 +98,7 @@ again_gdb_main:
 	if (!(GDBServer_Features & GDB_SERVER_FEATURE_NONSTOP))
 		GDBThread_ResumeEverything();
 
-	/* Our own stop_event should have already been removed by
+	/* Our own stop_event should have already been removed  by
 	 * `GDBThread_Resume()', since our `tse_mayresume' was set
 	 * to `GDB_THREAD_MAYRESUME_RESUME' */
 #ifndef NDEBUG
@@ -155,7 +155,7 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 			sig_broadcast(&GDBThread_AsyncNotifStopEventsAdded);
 	} else {
 		/* NOTE: Event though `GDBThread_Stopped' is normally private to the GDB host thread,
-		 *       the host thread itself is currently waiting for us to become suspended, and
+		 *       the host thread itself is currently waiting for us to become suspended,  and
 		 *       is actually expecting us to access this field ourself. */
 		do {
 			stop_event.e.tse_next = ATOMIC_READ(GDBThread_Stopped);
@@ -392,7 +392,7 @@ NOTHROW(FCALL GDBThread_ResumeSingleStopEvent)(GDBThreadStopEvent *__restrict se
 
 
 /* Find whole-cpu stop events in `GDBThread_AsyncNotifStopEvents', and
- * change them to only affect the associated thread, rather than the
+ * change them to only affect  the associated thread, rather than  the
  * entire CPU. */
 PRIVATE void NOTHROW(FCALL GDBThread_DowngradeSuspendedAsyncCPUs)(void) {
 	GDBThreadStopEvent *chain, *last, *iter;
@@ -416,7 +416,7 @@ PRIVATE void NOTHROW(FCALL GDBThread_DowngradeSuspendedAsyncCPUs)(void) {
 }
 
 
-/* Enter non-stop mode (no-op if already in non-stop mode)
+/* Enter  non-stop  mode  (no-op  if  already  in  non-stop  mode)
  * This is done by resuming all stop events with `tse_isacpu != 0' */
 INTERN void NOTHROW(FCALL GDBThread_ResumeAllCpus)(void) {
 	GDBThreadStopEvent **piter, *iter;
@@ -446,7 +446,7 @@ INTERN void NOTHROW(FCALL GDBThread_ResumeEverything)(void) {
 	GDBThreadStopEvent *iter, *next;
 	GDB_DEBUG("[gdb] GDBThread_ResumeEverything()\n");
 	/* Resume execution of all suspended threads that
-	 * don't have pending async notifications. */
+	 * don't  have   pending   async   notifications. */
 	iter = GDBThread_Stopped;
 	GDBThread_Stopped = NULL;
 	while (iter) {
@@ -477,7 +477,7 @@ NOTHROW(FCALL GDBThread_IsStopped)(struct task const *__restrict thread) {
 }
 
 /* Same as `GDBThread_IsStopped()', but the thread doesn't count as truely
- * stopped, unless it was stopped explicitly (rather than implicitly, as
+ * stopped, unless it was stopped  explicitly (rather than implicitly,  as
  * would be the case when `GDBThread_IsAllStopModeActive == true') */
 INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task const *__restrict thread) {
@@ -535,7 +535,7 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restri
 	if (!task_schedule_asynchronous_rpc(thread,
 	                                    &GDBThread_StopWithAsyncNotificationRPC,
 	                                    caller,
-	                                    /* Very important: Set the HIGH_PRIORITY flag, thus ensuring
+	                                    /* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
 	                                     *                 that we immediately switch over to `thread',
 	                                     *                 allowing it to run as the new override. */
 	                                    TASK_RPC_FHIGHPRIO)) {
@@ -560,12 +560,12 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 	if (GDBThread_IsStoppedExplicitly(thread)) {
 		GDBThreadStopEvent *evt;
 		/* This thread has already been suspended.
-		 * Check if it was suspended by use of an async notification.
+		 * Check   if  it  was   suspended  by  use   of  an  async  notification.
 		 * if not, then simply change the existing notification into an ASYNC one. */
 		evt = GDBThread_PopStopEvent(thread);
 		if (!evt) {
 			/* The stop event isn't in the set of Stopped threads, so it has to be
-			 * somewhere within the set of pending async stop notifications. */
+			 * somewhere within  the  set  of pending  async  stop  notifications. */
 #ifndef NDEBUG
 			evt = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
 			for (;;) {
@@ -580,7 +580,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			return false;
 		}
 		/* Check if the stop event already has an associated reason.
-		 * If so, then we can't assign its initial reason here! */
+		 * If so,  then we  can't assign  its initial  reason  here! */
 		if (evt->tse_reason != NULL) {
 			evt->tse_next = GDBThread_Stopped;
 			GDBThread_Stopped = evt;
@@ -610,7 +610,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 	} else {
 		struct cpu *target_cpu;
 		/* The complicated case:
-		 * - The CPU that is hosting `thread' has been suspended while running
+		 * - The CPU  that is  hosting `thread'  has been  suspended while  running
 		 *   some other thread and has now been locked to only ever allow execution
 		 *   of that other thread.
 		 * - In this case, we have to:
@@ -626,9 +626,9 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 		 *      `GDBThread_CreateMissingAsyncStopNotification()'
 		 */
 		target_cpu = thread->t_cpu;
-		/* Special case: If the target is our own host CPU, then we ourself are the ones
+		/* Special case: If the target is our own host  CPU, then we ourself are the  ones
 		 *               holding the scheduling override, also meaning that there wouldn't
-		 *               be a whole-cpu stop event for our own CPU, and also meaning that
+		 *               be a whole-cpu stop event for our own CPU, and also meaning  that
 		 *               we shouldn't send an IPI to ourself. */
 		if (target_cpu == GDBServer_Host->t_cpu) {
 			COMPILER_BARRIER();
@@ -642,7 +642,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			if (!task_schedule_asynchronous_rpc(thread,
 			                                    &GDBThread_StopWithAsyncNotificationRPC,
 			                                    GDBServer_Host,
-			                                    /* Very important: Set the HIGH_PRIORITY flag, thus ensuring
+			                                    /* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
 			                                     *                 that we immediately switch over to `thread',
 			                                     *                 allowing it to run as the new override. */
 			                                    TASK_RPC_FHIGHPRIO)) {
@@ -686,14 +686,14 @@ done:
 
 /* Stop/Resume execution of the given thread
  * Note that when `GDBThread_IsNonStopModeActive' is false, `GDBThread_Resume()' becomes
- * a no-op, and the thread will not be resumed until the current GDB session ends.
+ * a no-op, and  the thread  will not  be resumed until  the current  GDB session  ends.
  * @return: true:  Successfully stopped the given thread, or the given thread was already stopped.
  * @return: false: The given thread has already terminated and can no longer be stopped. */
 INTERN NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
                               bool generateAsyncStopEvents) {
 	if (GDBThread_IsStopped(thread)) {
-		/* Make sure that the thread is explicitly stopped, in case
+		/* Make sure that  the thread is  explicitly stopped, in  case
 		 * it was implicitly stopped by a whole-cpu stop event before. */
 		if (GDBThread_FindStopEvent(thread))
 			ATOMIC_OR(thread->t_flags, TASK_FGDB_STOPPED);
@@ -732,7 +732,7 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 
 /* Stop/Resume execution of the given thread
  * Note that when `GDBThread_IsNonStopModeActive' is false, `GDBThread_Resume()' becomes
- * a no-op, and the thread will not be resumed until the current GDB session ends. */
+ * a no-op, and  the thread  will not  be resumed until  the current  GDB session  ends. */
 INTERN NONNULL((1)) void
 NOTHROW(FCALL GDBThread_Resume)(struct task *__restrict thread) {
 	GDBThreadStopEvent **piter, *iter;
@@ -785,7 +785,7 @@ NOTHROW(FCALL GDBThread_StopProcess)(struct task *__restrict thread,
 	}
 	proc = task_getprocess_of(thread);
 	group = &FORTASK(proc, this_taskgroup);
-	/* FIXME: Must use a timeout here, and switch to all-stop mode
+	/* FIXME: Must use a  timeout here, and  switch to all-stop  mode
 	 *        in case one of the already stopped threads is currently
 	 *        holding this lock. */
 again_threads:
@@ -856,9 +856,9 @@ again_piter:
 }
 
 
-/* Find and return the stop event for `thread'
+/* Find   and  return  the  stop  event  for  `thread'
  * If the thread hasn't been stopped, or has a pending
- * async stop notification, return NULL instead. */
+ * async  stop  notification,  return  NULL   instead. */
 INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) GDBThreadStopEvent *
 NOTHROW(FCALL GDBThread_FindStopEvent)(struct task const *__restrict thread) {
 	GDBThreadStopEvent *result;
@@ -871,9 +871,9 @@ NOTHROW(FCALL GDBThread_FindStopEvent)(struct task const *__restrict thread) {
 }
 
 
-/* Same as `GDBThread_FindStopEvent()', but unlink the event
+/* Same  as  `GDBThread_FindStopEvent()', but  unlink  the event
  * from the chain of stopped threads. (The caller is responsible
- * for re-adding the thread back to said chain at a later point
+ * for re-adding the thread back to said chain at a later  point
  * in time)
  * This can be used to exclude specific threads from calls to
  * `GDBThread_ResumeEverything()', which is something that is
@@ -893,8 +893,8 @@ NOTHROW(FCALL GDBThread_PopStopEvent)(struct task *__restrict thread) {
 
 
 
-/* Same as `GDBThread_PopStopEvent()', but return a chain of
- * stop events (with the last one being stored in `*plastevent') for
+/* Same   as  `GDBThread_PopStopEvent()',  but   return  a  chain  of
+ * stop  events (with the last one being stored in `*plastevent') for
  * all stopped threads that are apart of the same process as `thread' */
 INTERN WUNUSED NONNULL((1, 2)) GDBThreadStopEvent *
 NOTHROW(FCALL GDBThread_PopStopEventProcess)(struct task *__restrict thread,
@@ -948,7 +948,7 @@ NOTHROW(FCALL GDBThread_CreateMissingEventForThreadCallback)(void *UNUSED(arg),
 }
 
 
-/* Stop execution in all threads by sending async RPCs to every
+/* Stop  execution in all threads by sending async RPCs to every
  * running thread on the system, and having them report back via
  * the `GDBThread_AsyncNotifStopEvents' chain.
  * Essentially, this function does:

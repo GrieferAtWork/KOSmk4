@@ -27,7 +27,7 @@
  *    struct ntptimeval {
  *        ...
  *    };
- *    #ifdef __USE_TIME64
+ *    #ifdef   __USE_TIME64
  *    struct ntptimeval64 {
  *        ...
  *    };

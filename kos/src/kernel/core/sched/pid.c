@@ -163,7 +163,7 @@ PUBLIC ATTR_PERTASK struct sigqueue this_sigqueue = {
 
 
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
- * NOTE: `NULL' (though assume UNDEFINED if the choice comes up) for kernel threads. */
+ * NOTE: `NULL' (though assume  UNDEFINED if  the choice  comes up)  for kernel  threads. */
 PUBLIC ATTR_PERTASK struct taskpid *this_taskpid = NULL;
 
 
@@ -186,7 +186,7 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	struct rpc_entry *rpc;
 	int rpc_status;
 	/* Send an RPC callback to `worker' to propagate the exit status
-	 * that caused the task associated with `origin_pid' to exit. */
+	 * that caused the  task associated with  `origin_pid' to  exit. */
 	worker_group = &FORTASK(worker, this_taskgroup);
 	assert(worker_group->tg_process == origin);
 	rpc = ATOMIC_XCH(worker_group->tg_thread_exit, NULL);
@@ -199,7 +199,7 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	if (TASK_DELIVER_RPC_WASOK(rpc_status))
 		return;
 	/* Failed to deliver the RPC. The only reason this should be able to happen
-	 * is when the worker thread has/is already terminated/terminating, and is
+	 * is when the worker thread has/is already terminated/terminating, and  is
 	 * no longer able to service any RPCs. */
 	assertf(rpc_status == TASK_DELIVER_RPC_TERMINATED,
 	        "Unexpected failure reason for terminating worker thread\n"
@@ -224,7 +224,7 @@ NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent
 
 
 /* >> void KCALL func(struct task *__restrict new_thread, uintptr_t flags);
- * Invoked to initialize a given clone `new_thread' of the calling thread.
+ * Invoked  to initialize a given clone `new_thread' of the calling thread.
  * @param: flags: Set of `CLONE_*' from `<bits/sched.h>' */
 DEFINE_PERTASK_CLONE(this_taskgroup_clone);
 PRIVATE ATTR_USED void KCALL
@@ -388,7 +388,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 	else if (mygroup.tg_process != self) {
 		decref_unlikely(mygroup.tg_process);
 		/* Free up the thread-exit RPC (this happens if
-		 * a thread exits prior to the process leader) */
+		 * a  thread exits prior to the process leader) */
 		if (mygroup.tg_thread_exit)
 			task_free_rpc(mygroup.tg_thread_exit);
 	} else {
@@ -396,7 +396,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		REF struct taskpid *iter, *next;
 		iter = LIST_FIRST(&mygroup.tg_proc_threads);
 		/* Unload all remaining child thread PID descriptors that
-		 * the process itself didn't bother wait(2)-ing for. */
+		 * the process  itself  didn't  bother  wait(2)-ing  for. */
 		if (iter != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
 			while (iter) {
 				next = LIST_NEXT(iter, tp_siblings);
@@ -436,7 +436,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 				mytty = mygroup.tg_ctty.axr_obj;
 				if (mytty) {
 					/* Unbind the CTTY pointer.
-					 * Reminder: The CTTY (Controlling TTY) is
+					 * Reminder: The CTTY  (Controlling TTY)  is
 					 *           the file found under `/dev/tty' */
 					awref_cmpxch(&mytty->t_cproc, mypid, NULL);
 					decref(mytty);
@@ -490,7 +490,7 @@ PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 
 /* Initialize the `self' to be a member of the same process which `leader' is apart of.
  * NOTE: This function or `task_setprocess()' may only be called once for any given thread.
- *       Also note that these functions must _NOT_ be called for kernel threads!
+ *       Also  note  that  these  functions  must  _NOT_  be  called  for  kernel  threads!
  * NOTE: This function must be called _AFTER_ `task_setpid(self)' has already been invoked!
  * @return: true:  Successfully initialized `self' as a thread within the same process as `leader'
  * @return: false: The process that `leader' is apart of has already terminated. */
@@ -546,17 +546,17 @@ task_setthread(struct task *__restrict self,
 }
 
 /* Initialize the `self' to be the leader of a new process, using `parent' as leader.
- * When `parent' is `NULL', initialize `self' as a detached process.
+ * When   `parent'   is   `NULL',   initialize   `self'   as   a   detached  process.
  * @param: parent:  The parent of the process
- * @param: group:   A thread apart of some process group that `self' should be apart of.
+ * @param: group:   A thread  apart  of  some process  group  that  `self' should  be  apart  of.
  *                  When `NULL' or equal to `self', initialize `self' as a its own process group.
- *                  In this case, the process group will be set to be apart of the session that
- *                  the given `session' is apart of, or `self' in case `session' is `NULL' or
+ *                  In  this case, the process group will be  set to be apart of the session that
+ *                  the given `session' is  apart of, or  `self' in case  `session' is `NULL'  or
  *                  equal to `self'.
  * @param: session: Some thread apart of the a session that a new process group should be made
  *                  apart of.
  * NOTE: This function or `task_setthread()' may only be called once for any given thread.
- *       Also note that these functions must _NOT_ be called for kernel threads!
+ *       Also note  that  these  functions  must  _NOT_  be  called  for  kernel  threads!
  * NOTE: This function must be called _AFTER_ `task_setpid(self)' has already been invoked! */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) struct task *KCALL
 task_setprocess(struct task *__restrict self,
@@ -591,7 +591,7 @@ task_setprocess(struct task *__restrict self,
 		REF struct taskpid *grouppid;
 		/* Add to an existing process group. */
 		grouppid = task_getprocessgroupleaderpid_of(group);
-		/* Take special care to properly handle joining a
+		/* Take  special care to  properly handle joining a
 		 * process group where the leader has already died. */
 		group = taskpid_gettask(grouppid);
 		if (group) {
@@ -681,7 +681,7 @@ again_set_self:
 				old_group = taskpid_gettask(old_group_pid);
 				if likely(old_group) {
 					/* Figure out which session the new thread group should be apart of
-					 * (make it so that the thread keeps its effective, old session) */
+					 * (make  it so that  the thread keeps  its effective, old session) */
 					if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock)) {
 						sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
 						FINALLY_DECREF_UNLIKELY(old_group);
@@ -732,8 +732,8 @@ again_set_self:
 		REF struct taskpid *new_group_leader_pid;
 		struct taskpid *old_group_leader_pid;
 		/* Add the given thread to an existing process group.
-		 * But first: Load the leader of that group.
-		 * Also note that the identity of that leader is quite volatile,
+		 * But   first:  Load  the   leader  of  that  group.
+		 * Also note that the identity  of that leader is quite  volatile,
 		 * since processes are free to change groups as they please, which
 		 * is why we keep a reference to the intended leader
 		 */
@@ -829,7 +829,7 @@ again_set_existing:
 					new_next = FORTASK(new_group_leader, this_taskgroup).tg_pgrp_processes.lh_first;
 					FORTASK(new_group_leader, this_taskgroup).tg_pgrp_processes.lh_first = thread;
 					if (old_group_leader) {
-						/* Remove the thread from its old process group member chain, and
+						/* Remove  the thread from  its old process  group member chain, and
 						 * set up link pointers to be apart of the new group's member chain. */
 						LIST_REMOVE_P(thread, KEY__this_taskgroup__tg_proc_group_siblings);
 						sync_endwrite(&FORTASK(old_group_leader, this_taskgroup).tg_pgrp_processes_lock);
@@ -865,12 +865,12 @@ again_set_existing:
 /* Set the session leader for the process group of the given thread.
  * NOTE: If `task_getprocess_of(thread)' isn't already the leader of its own process group
  *      (`task_isprocessgroupleader_p(task_getprocess_of(thread))' is false), a call to
- *       this function also implies `task_setprocessgroupleader(thread,thread)', meaning
+ *       this  function  also implies  `task_setprocessgroupleader(thread,thread)', meaning
  *       that `task_getprocess_of(thread)' is turned into its own process group before that
  *       group is added to the session of `leader', or made to become a new session
  * @param: pold_group_leader:   When non-NULL store a reference to the old process group leader of `task_getprocess_of(thread)'.
  *                              NOTE: The new process group leader of `thread' is always `task_getprocess_of(thread)',
- *                                    since only the leader of a process group can dictate the associated session.
+ *                                    since only the  leader of a  process group can  dictate the associated  session.
  * @param: pold_session_leader: When non-NULL store a reference to the old session leader of `task_getprocess_of(thread)'.
  * @param: pnew_session_leader: When non-NULL store a reference to the new session leader of `task_getprocess_of(thread)'.
  * @return: * : One of `TASK_SETSESSIONLEADER_*' */
@@ -942,7 +942,7 @@ again_set_self:
 			old_group = taskpid_gettask(old_group_pid);
 			if (pold_session_leader) {
 				/* Figure out which session the new thread group should be apart of
-				 * (make it so that the thread keeps its effective, old session) */
+				 * (make  it so that  the thread keeps  its effective, old session) */
 				if (old_group) {
 					if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock)) {
 						sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
@@ -955,7 +955,7 @@ again_set_self:
 					sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock);
 				} else {
 					/* Fallback: A process apart of a dead process group uses
-					 *           the dead process group's PID as session PID */
+					 *           the  dead process group's PID as session PID */
 					*pold_session_leader = incref(old_group_pid);
 				}
 			}
@@ -1004,7 +1004,7 @@ again_set_self:
 
 
 
-/* When `pn_nextpid' >= this value, start recycling PIDs.
+/* When  `pn_nextpid'  >=  this value,  start  recycling PIDs.
  * This value can be controlled via `/proc/sys/kernel/pid_max' */
 PUBLIC upid_t pid_recycle_threshold = PID_RECYCLE_THRESHOLD_DEFAULT;
 
@@ -1345,7 +1345,7 @@ PUBLIC WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(KCALL pidns_trylookup_locked)(struct pidns *__restrict self, upid_t pid) {
 	REF struct taskpid *result;
 	uintptr_t i, perturb;
-	/* Cannot be asserted, since this function is called by the GDB stub, which
+	/* Cannot be asserted, since this function is called by the GDB stub,  which
 	 * doesn't have to acquire a lock if it had previously suspended everything. */
 	/*assert(sync_reading(self));*/
 	i = perturb = pid & self->pn_mask;
@@ -1416,8 +1416,8 @@ NOTHROW(KCALL pidns_install_list)(struct pidns *__restrict self,
 }
 
 /* Rehash the given pidns if necessary, so-as to prepare it
- * for allowing a new `struct taskpid' being added.
- * This function will never block, or throw an exception. - If preparation fails,
+ * for  allowing  a   new  `struct taskpid'  being   added.
+ * This function will never  block, or throw an  exception. - If preparation  fails,
  * `false' is returned, and the caller is expected to use `pidns_prepare_for_insert'
  * in order to forcibly prepare the PIDns (which the also allows for blocking) */
 PRIVATE NOBLOCK bool
@@ -1477,7 +1477,7 @@ NOTHROW(FCALL pidns_nextpid)(struct pidns *__restrict self,
 		/* Recycle PIDs */
 		result           = *pminpid;
 		self->pn_nextpid = *pminpid + 1;
-		/* This prevents us from getting stuck in an infinite loop
+		/* This prevents us  from getting stuck  in an infinite  loop
 		 * when some genius set the value in /proc/sys/kernel/pid_max
 		 * too low. */
 		++*pminpid;
@@ -1486,14 +1486,14 @@ NOTHROW(FCALL pidns_nextpid)(struct pidns *__restrict self,
 }
 
 
-/* Allocate a `struct taskpid' for `self' (which must not have been
+/* Allocate a `struct taskpid' for `self' (which must not have  been
  * started yet, or have its taskpid already allocated), and register
  * that task within the given pidns `ns'
  * This function should be called after `task_alloc()', but before `task_start()'
- * WARNING: This function may only be called _ONCE_ for each task!
- * @param: ns_pid: The PID to try to assign to `self' within the namespace.
- *                 When ZERO(0), or already in use, sequentially generate IDs
- *                 Also note that this PID is only set for `self' in `ns'.
+ * WARNING: This   function   may  only   be   called  _ONCE_   for   each  task!
+ * @param: ns_pid: The  PID  to  try to  assign  to `self'  within  the namespace.
+ *                 When ZERO(0),  or already  in  use, sequentially  generate  IDs
+ *                 Also note  that  this PID  is  only  set for  `self'  in  `ns'.
  *                 All underlying namespaces _always_ have their PIDs sequentially
  *                 generated.
  * @return: * : Always re-returns `self' */
@@ -1512,7 +1512,7 @@ task_setpid(struct task *__restrict self,
 	                                    GFP_NORMAL);
 	TRY {
 		/* Step #2: Acquire write-locks to all of the PID namespaces in which we want to allocate,
-		 *          as well as prepare all of them for the addition of a new PID entry. */
+		 *          as  well  as  prepare  all of  them  for  the  addition of  a  new  PID entry. */
 restart_acquire_locks:
 		ns_iter = ns;
 		do {
@@ -1987,7 +1987,7 @@ again:
 					goto done;
 				}
 				/* We're dealing with another process here, meaning we also have
-				 * to delete the target process's `tg_proc_parent' field. */
+				 * to   delete  the  target  process's  `tg_proc_parent'  field. */
 				if (!sync_trywrite(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock)) {
 					sync_endwrite(&procgroup->tg_proc_threads_lock);
 					sync_write(&FORTASK(tpid_thread, this_taskgroup).tg_proc_parent_lock);
@@ -2068,7 +2068,7 @@ posix_waitfor(idtype_t which,
 			    (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN &&
 			     !(hand->sh_actions[SIGCLD - 1].sa_flags & SIGACTION_SA_SIGINFO))) {
 				sync_endread(hand);
-				/* Block until all child processes have exited
+				/* Block until  all child  processes have  exited
 				 * and reap all zombies created in the mean time.
 				 * Then, fail with -ECHILD. */
 reapall_again:
@@ -2106,7 +2106,7 @@ reapall_check_already_locked:
 				if (options & WNOHANG) {
 					if (task_receiveall())
 						goto reapall_again;
-					return -ECHILD; /* I feel like this should be EAGAIN, but POSIX
+					return -ECHILD; /* I feel like this should be EAGAIN, but  POSIX
 					                 * says that wait() doesn't return that error... */
 				}
 				/* Wait for more state-change signals. */
@@ -2139,10 +2139,10 @@ again_enum_children_locked:
 				}
 				if (which == P_PGID) {
 					child_thread = awref_get(&child->tp_thread);
-					/* XXX: We're not tracking the PGID in the PID descriptor,
-					 *      but apparently POSIX wants us to remember a thread's
-					 *      process group, even after the thread has died...
-					 *      As a kind-of crappy work-around, right now we simply
+					/* XXX: We're not  tracking the  PGID in  the PID  descriptor,
+					 *      but apparently POSIX wants  us to remember a  thread's
+					 *      process  group,  even  after  the  thread  has died...
+					 *      As a kind-of crappy  work-around, right now we  simply
 					 *      ignore the child's PGID if the thread has already been
 					 *      destroyed. */
 					if (child_thread) {
@@ -2189,7 +2189,7 @@ again_read_status:
 					} else if ((options & WEXITED) &&
 					           /* NOTE: Check for fully terminated here, since the `TASK_FTERMINATING'
 					            *       flag doesn't mean that the thread has already written its exit
-					            *       status message, or broadcast its tp_changed signal for the
+					            *       status message,  or broadcast  its tp_changed  signal for  the
 					            *       final time. (s.a. `task_exit()') */
 					           is_taskpid_terminating(child)) {
 						/* we're dealing with an exit-code status */
@@ -2199,7 +2199,7 @@ again_read_status:
 							    !sync_upgrade(&mygroup.tg_proc_threads_lock))
 								goto again_enum_children_locked;
 							/* Unbind the child thread/process, thereby inheriting the
-							 * reference previously stored within the chain of child
+							 * reference  previously stored within  the chain of child
 							 * threads. */
 							LIST_UNBIND(child, tp_siblings);
 
@@ -2259,8 +2259,8 @@ next_candidate:
 			RETHROW();
 		}
 		/* All possible wait-candidates have been enumerated, however none
-		 * of them was found to have changed state or to be of relevance.
-		 * Now we must either fail (when `WNOHANG' was set), or
+		 * of them was found to have changed state or to be of  relevance.
+		 * Now  we  must  either  fail   (when  `WNOHANG'  was  set),   or
 		 * wait for the signal that we've connected to above. */
 		if ((options & WNOHANG) || !num_candidates) {
 			if (task_receiveall())

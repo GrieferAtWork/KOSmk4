@@ -36,7 +36,7 @@
 DECL_BEGIN
 
 /* Return a pseudo-random number between `0..rand_size-1' (inclusively),
- * but prefer lower numbers over larger ones, generally aiming to
+ * but prefer  lower  numbers  over larger  ones,  generally  aiming  to
  * return values around `rand_avg'
  *
  *   Value...
@@ -107,7 +107,7 @@ NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg) {
 #define VM_ASLR_DISABLED_DEFINED 1
 
 /* Get/set ASLR-disabled (defaults to `false'; can also be
- * enabled by passing `noaslr' on the kernel commandline)
+ * enabled  by passing `noaslr' on the kernel commandline)
  * When enabled, the `VM_GETFREE_ASLR' is simply ignored
  * when passed to either `vm_paged_getfree()' or `vmb_paged_getfree()'
  * @return: * : The state of ASLR_DISABLED prior to the call being made. */
@@ -128,18 +128,18 @@ PUBLIC bool NOTHROW(KCALL vm_set_aslr_disabled)(bool new_disabled) {
 
 
 /* Determine a suitable, free memory location for `num_pages'
- * aligned by a multiple of `min_alignment_in_pages' pages.
+ * aligned by a  multiple of `min_alignment_in_pages'  pages.
  * Search happens as follows:
  *   #1: Search according to `VM_GETFREE_ABOVE/VM_GETFREE_BELOW'
  *       Additionally, check for surrounding nodes which are set
  *       up as GUARD nodes. - If such a node is found, it's size
  *       is considered to have reached its maximum potential for
- *       this purpose (limited by how often `vn_guard' can be
+ *       this purpose (limited  by how often  `vn_guard' can  be
  *       decremented, as well as any other memory mapping it may
  *       run into before then)
  *       If a this process yields only a single candidate, that
  *       candidate is returned as result.
- *       If a this process yields more than 1 candidate, the one chosen
+ *       If  a this  process yields more  than 1 candidate,  the one chosen
  *       depends on `VM_GETFREE_ABOVE / VM_GETFREE_BELOW / VM_GETFREE_ASLR'
  *        - VM_GETFREE_ABOVE: The candidate with the lowest memory address is used
  *        - VM_GETFREE_BELOW: The candidate with the greatest memory address is used
@@ -168,14 +168,14 @@ NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
                                 unsigned int mode)
 #endif /* !VM_GETFREE_VMB */
 {
-	/* TODO: When `vm_getfree()' is used with a `hint' located in kernel-space, then
+	/* TODO: When `vm_getfree()' is used with  a `hint' located in kernel-space,  then
 	 *       we should never be able to return user-space addresses. Note however that
 	 *       the kernel is still allowed to:
 	 *        - Map into the (apparent) user-space of `vm_kernel' (for use by kernel-space-only threads)
 	 *        - Map data of the current user-space thread (in order to implement `sys_mmap()' and the like)
-	 * -> A good solution might be to add an extended variant of `vm_getfree()' that allows
-	 *    the caller to specify lower/upper bounds for the address ranges which may be returned
-	 *    by the function, then simply have the regular `vm_getfree()' call that function with
+	 * -> A good solution  might be to  add an  extended variant of  `vm_getfree()' that  allows
+	 *    the  caller to specify lower/upper bounds for the address ranges which may be returned
+	 *    by  the function, then simply have the  regular `vm_getfree()' call that function with
 	 *    a range depending on the address space that the original `hint' was apart of, ensuring
 	 *    that free ranges discovered always share the address space with the given hint!
 	 */

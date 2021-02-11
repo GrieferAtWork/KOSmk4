@@ -53,14 +53,14 @@
 
 /* Define the ABI for the address tree used by heaps. */
 
-/* NOTE: Use left-leaning trees so we only have to keep track of 2 pointers
+/* NOTE: Use left-leaning trees so we only have to keep track of 2  pointers
  *       relating within the tree-portion of `struct mfree', rather than the
  *       3 pointers that would be required for normal RB-Trees.
  *       This 1-pointer difference is quite significant since it affects the
- *       value of `SIZEOF_MFREE', which in turn determines `HEAP_MINSIZE',
- *       which is the smallest possible chunk of memory that can be freed.
- *       Keeping this value as small as possible makes it much easier for
- *       the heap to serve small requests without having to overallocate
+ *       value  of `SIZEOF_MFREE', which  in turn determines `HEAP_MINSIZE',
+ *       which is the smallest possible chunk  of memory that can be  freed.
+ *       Keeping  this value as  small as possible makes  it much easier for
+ *       the  heap to  serve small  requests without  having to overallocate
  *       as often! */
 #define RBTREE_LEFT_LEANING
 #define RBTREE_CC              FCALL
@@ -336,7 +336,7 @@ bad:
 INTDEF struct heap *const __kernel_validatable_heaps_start[];
 INTDEF struct heap *const __kernel_validatable_heaps_end[];
 
-/* Validate the memory of the given heap for
+/* Validate   the  memory  of  the  given  heap  for
  * consistency, checking for invalid use-after-free. */
 PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL heap_validate_all)(void) {
@@ -357,7 +357,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	unsigned int i;
 	/* If we're already poisoned, then there's no point in trying to look for more errors.
 	 * -> We're already screwed, and our caller probably knows that. But we may not be
-	 *    screwed badly enough to actually cause our caller's operation to break... */
+	 *    screwed  badly enough to  actually cause our  caller's operation to break... */
 	if (kernel_poisoned())
 		return;
 	if (!sync_tryread(&self->h_lock))
@@ -482,7 +482,7 @@ NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 	while (num_bytes >= PAGESIZE) {
 		/* Only reset pages that have been allocated.
 		 * This optimization goes hand-in-hand with `heap_validate_all()'
-		 * not checking pages that haven't been allocated. */
+		 * not   checking    pages   that    haven't   been    allocated. */
 		if (pagedir_ismapped(ptr))
 			memsetl(ptr, pattern, PAGESIZE / 4);
 		num_bytes -= PAGESIZE;
@@ -535,8 +535,8 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
                              gfp_t flags);
 
 /* Upon entry, the heap must not be locked.
- * This function then tries to acquire a lock to the heap without blocking.
- * If this succeeds, it calls forward to `heap_free_raw_and_unlock_impl()'.
+ * This function  then tries  to acquire  a lock  to the  heap without  blocking.
+ * If  this  succeeds,  it  calls  forward  to `heap_free_raw_and_unlock_impl()'.
  * If it doesn't, it will instead track the given memory block as a pending free.
  * @return: true:  The heap remains locked (the caller inherits the lock).
  * @return: false: The heap was unlocked before returning. */
@@ -555,9 +555,9 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 
 
 /* @return: true:  Successfully served all pending free operations,
- *                 following which the heap lock remains acquired.
+ *                 following  which the heap lock remains acquired.
  * @return: false: Successfully served all pending free operations,
- *                 but the heap lock was lost and could not be re-
+ *                 but  the heap lock was lost and could not be re-
  *                 acquired. */
 PRIVATE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
@@ -664,8 +664,8 @@ NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self) {
 
 
 /* Upon entry, the heap must not be locked.
- * This function then tries to acquire a lock to the heap without blocking.
- * If this succeeds, it calls forward to `heap_free_raw_and_unlock_impl()'.
+ * This function  then tries  to acquire  a lock  to the  heap without  blocking.
+ * If  this  succeeds,  it  calls  forward  to `heap_free_raw_and_unlock_impl()'.
  * If it doesn't, it will instead track the given memory block as a pending free.
  * @return: true:  The heap remains locked (the caller inherits the lock).
  * @return: false: The heap was unlocked before returning. */
@@ -676,7 +676,7 @@ NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict 
 	heap_validate_all_paranoid();
 	if (!heap_acquirelock_atomic(self)) {
 		/* Set up `ptr...num_bytes' as a pending free-block of the heap,
-		 * to-be freed by whoever will be next to acquire a lock. */
+		 * to-be  freed  by  whoever will  be  next to  acquire  a lock. */
 		struct heap_pending_free *pend, *next;
 		pend            = (struct heap_pending_free *)ptr;
 		pend->hpf_size  = num_bytes;
@@ -970,7 +970,7 @@ load_new_slot:
 			                             (byte_t *)free_minaddr),
 			                    !!(flags & GFP_CALLOC));
 
-			/* Reset the heap hint in a way that will keep our heap
+			/* Reset the heap  hint in  a way  that will  keep our  heap
 			 * around the same area of memory, preventing it from slowly
 			 * crawling across the entire address space. */
 			if (self->h_hintmode & VM_GETFREE_BELOW) {
@@ -1063,10 +1063,10 @@ return_old_size:
 
 
 
-/* Truncate the given heap, releasing unmapping free memory chunks
+/* Truncate the  given heap,  releasing  unmapping free  memory  chunks
  * that are greater than, or equal to `CEIL_ALIGN(threshold, PAGESIZE)'
- * This function is automatically invoked for kernel heaps as part of
- * the clear-cache machinery, though regular should never feel moved
+ * This function is automatically invoked  for kernel heaps as part  of
+ * the clear-cache machinery,  though regular should  never feel  moved
  * to invoke this function manually, as all it really does is slow down
  * future calls to allocating heap functions.
  * @return: * : The total number of bytes released back to the core (a multiple of PAGESIZE) */
@@ -1156,9 +1156,9 @@ again:
 
 /* Free a low/high-memory overallocation of `num_free_bytes' at `overallocation_base'.
  * This function deals with debug-initialization in the
- * event that the overallocated base location hasn't been
- * allocated yet, in a way that prevent the associated
- * pages from being allocated during `heap_free_raw()' in
+ * event that the  overallocated base  location hasn't  been
+ * allocated yet,  in  a  way that  prevent  the  associated
+ * pages from  being allocated  during `heap_free_raw()'  in
  * a way that would produce invalid (use-after-free) memory. */
 #ifdef CONFIG_DEBUG_HEAP
 #define IS_FRESH_MEMORY(p) (*(u32 *)(p) == 0 || *(u32 *)(p) == DEBUGHEAP_FRESH_MEMORY)
@@ -1174,8 +1174,8 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 	if (!(flags & GFP_CALLOC)) {
 #if 1
 		/* If the overallocation_base...+=SIZEOF_MFREE-1 contains a page boundary,
-		 * where the higher page is entirely contained within the overallocation,
-		 * then we must MEMPAT(DEBUGHEAP_NO_MANS_LAND) that high page, as it will
+		 * where the higher page is entirely contained within the  overallocation,
+		 * then we must MEMPAT(DEBUGHEAP_NO_MANS_LAND) that high page, as it  will
 		 * be initialized by `heap_free_raw()'. */
 		uintptr_t high_page_addr;
 		high_page_addr = ((uintptr_t)overallocation_base + SIZEOF_MFREE - 1) & ~PAGEMASK;
@@ -1184,10 +1184,10 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 			if ((uintptr_t)overallocation_base + num_free_bytes >=
 			    (uintptr_t)high_page_addr + PAGESIZE) {
 				/* The high-page is entirely contained in the overallocation
-				 * NOTE: Technically, we don't need to initialize the first
+				 * NOTE: Technically,  we don't need to initialize the first
 				 *      `((uintptr_t)overallocation_base + SIZEOF_MFREE - 1) & PAGEMASK'
-				 *       bytes of the high page (those will be used by `heap_free_raw'),
-				 *       but calculating that amount is more complicated at this point,
+				 *       bytes  of the high page (those will be used by `heap_free_raw'),
+				 *       but calculating that amount is  more complicated at this  point,
 				 *       and so insignificant in the end that it's simpler to always just
 				 *       initialize the whole page. */
 				if (IS_FRESH_MEMORY(high_page_addr)) { /* Check for fresh memory */
@@ -1199,10 +1199,10 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 				}
 			}
 		} else {
-			/* -> The mfree structure of the overallocation is contained within a single page.
-			 *    In this case we must check if that same page is also apart of the associated
-			 *    user-allocation (which exists at `<BASE_POINTER>...overallocation_base-1')
-			 *    This can easily be detected by `overallocation_base' not being page-aligned.
+			/* -> The  mfree structure  of the overallocation  is contained within  a single page.
+			 *    In this case we  must check if that  same page is also  apart of the  associated
+			 *    user-allocation  (which   exists  at   `<BASE_POINTER>...overallocation_base-1')
+			 *    This  can easily  be detected  by `overallocation_base'  not being page-aligned.
 			 *    If this is the case, then we must MEMPAT overallocation_base...END_OF_SAME_PAGE,
 			 *    though only if the entirety of that area is apart of the overallocation.
 			 */
@@ -1221,8 +1221,8 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 					}
 				}
 			} else {
-				/* When the overallocation starts at a page boundary, and the
-				 * total number of freed bytes is such that the entire first
+				/* When the  overallocation starts  at a  page boundary,  and  the
+				 * total  number  of freed  bytes is  such  that the  entire first
 				 * page is contained within the overallocation, we must initialize
 				 * that first page in its entirety
 				 * (If the overallocation is smaller, then some other mfree
@@ -1260,9 +1260,9 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 #if 1
 		uintptr_t underallocation_end;
 		underallocation_end = (uintptr_t)underallocation_base + num_free_bytes;
-		/* Check if the under allocation starts at a new page.
+		/* Check  if the  under allocation  starts at  a new page.
 		 * If it doesn't, then we can assume that some other mfree
-		 * exists for the area below, meaning that the first page
+		 * exists for the area below, meaning that the first  page
 		 * will have already been initialized. */
 		if (((uintptr_t)underallocation_base & PAGEMASK) == 0) {
 			/* Must initialize data at:
@@ -1275,9 +1275,9 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 				mempatl(underallocation_base, DEBUGHEAP_NO_MANS_LAND, init_size);
 			}
 		} else {
-			/* If the underallocation doesn't start at a page, check if
+			/* If  the underallocation  doesn't start  at a  page, check if
 			 * its mfree structure would cross a page boundary. If it does,
-			 * and the higher of the 2 pages is entirely contained within
+			 * and the higher of the  2 pages is entirely contained  within
 			 * the underallocation, then we must initialize the page. */
 			uintptr_t page_base;
 			page_base = ((uintptr_t)underallocation_base + SIZEOF_MFREE - 1) & ~PAGEMASK;
@@ -1295,7 +1295,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 				}
 			}
 		}
-		/* Must clear all data before the start of `underallocation_end', and
+		/* Must clear all data before the start of `underallocation_end',  and
 		 * within the same page, if `underallocation_end' isn't located at the
 		 * start of a page. */
 		if ((underallocation_end & PAGEMASK) != 0) {

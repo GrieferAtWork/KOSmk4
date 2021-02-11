@@ -116,7 +116,7 @@ NOTHROW(KCALL do_trace_external)(char const *method,
 //#define ALLOCATE_MIN_PARTS 1
 
 #ifndef NDEBUG
-/* In min-max allocations, randomize the the max-allocation to occasionally
+/* In min-max allocations,  randomize the the  max-allocation to  occasionally
  * allocate less than the maximum request in order to harden the less-traveled
  * paths used when allocating scattered memory. */
 //#define ALLOCATE_MIN_PARTS_RANDOMIZE 1
@@ -149,7 +149,7 @@ STATIC_ASSERT((BITSOF(uintptr_t) % PMEMZONE_BITSPERPAGE) == 0);
 LOCAL NOBLOCK void
 NOTHROW(KCALL pmemzone_set_fmax)(struct pmemzone *__restrict self,
                                  physpage_t new_free_max) {
-	/* Keep track of the greatest free page within
+	/* Keep  track  of  the  greatest  free  page within
 	 * the zone, to-be used as a hint for the allocator. */
 	physpage_t free_max;
 	do {
@@ -668,7 +668,7 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
 
 
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
- * WARNING: Physical memory cannot be dereferenced prior to being mapped.
+ * WARNING: Physical   memory   cannot   be   dereferenced   prior   to   being   mapped.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED physpage_t
@@ -710,9 +710,9 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
 	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot that this happens in here, and there are many places
+	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
 	if (system_clearcaches_s(&version))
@@ -721,7 +721,7 @@ again:
 }
 
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
- * WARNING: Physical memory cannot be dereferenced prior to being mapped.
+ * WARNING: Physical   memory   cannot   be   dereferenced   prior   to   being   mapped.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED physpage_t
@@ -763,9 +763,9 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
 	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot that this happens in here, and there are many places
+	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
 	if (system_clearcaches_s(&version))
@@ -773,12 +773,12 @@ again:
 	return PHYSPAGE_INVALID;
 }
 
-/* Allocate at least `min_pages', and at most `max_pages',
+/* Allocate  at  least  `min_pages', and  at  most `max_pages',
  * writing the actual number of pages allocated to `res_pages'.
- *  - This function will try to serve the request to allocate `max_pages',
- *    but will prefer to return the first block of free consecutive pages with
+ *  - This function  will try  to serve  the request  to allocate  `max_pages',
+ *    but will prefer to return the first block of free consecutive pages  with
  *    a length of at least `min_pages', thus preventing memory fragmentation by
- *    using up small memory blocks that might otherwise continue going unused.
+ *    using  up small memory blocks that might otherwise continue going unused.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED NONNULL((3)) physpage_t
@@ -865,9 +865,9 @@ again:
 			return result + zone->mz_start;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
 	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot that this happens in here, and there are many places
+	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
 	if (system_clearcaches_s(&version))
@@ -908,8 +908,8 @@ again:
 }
 
 
-/* Similar to `page_malloc()' / `page_malloc_part()', but only
- * allocate memory from between the two given page addresses, such
+/* Similar to  `page_malloc()'  /  `page_malloc_part()',  but  only
+ * allocate memory from between the two given page addresses,  such
  * that all allocated pages are located within the specified range.
  * @assume(return == PHYSPAGE_INVALID ||
  *        (return >= min_page &&
@@ -1080,9 +1080,9 @@ again:
 		}
 
 	} while ((zone = zone->mz_prev) != NULL);
-	/* TODO: Don't do this in here unconditionally, but expose a secondary
+	/* TODO: Don't do  this in  here unconditionally,  but expose  a  secondary
 	 *       interface that does the allocation while possibly clearing caches!
-	 * I totally forgot that this happens in here, and there are many places
+	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
 	if (system_clearcaches_s(&version))
@@ -1140,11 +1140,11 @@ NOTHROW(KCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
 }
 
 /* Following a call to one of the `page_malloc()' functions,
- * check if the given `page' contains only zero-bytes.
- * NOTE: This function doesn't actually look at the contents of
+ * check  if  the  given  `page'  contains  only zero-bytes.
+ * NOTE: This function doesn't actually  look at the contents  of
  *       page itself, but rather at what it known about the page.
  * NOTE: Returns `false' when `page_ismapped(page, 1)' is false.
- * HINT: This function is mainly used in order to optimize the
+ * HINT: This  function  is  mainly  used  in  order  to  optimize the
  *       mapping of zero-initialized memory, such that the initializer
  *       will do something like:
  *       >> page = page_malloc(1);

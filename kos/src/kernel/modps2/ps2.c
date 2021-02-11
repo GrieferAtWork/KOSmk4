@@ -334,10 +334,10 @@ NOTHROW(KCALL early_poll_probe)(u8 *__restrict presult) {
 PRIVATE NOBLOCK ATTR_FREETEXT bool
 NOTHROW(KCALL early_poll_outport)(u8 *__restrict presult) {
 	u8 status;
-	/* Check the status port before checking for interrupts such that the check
+	/* Check the status port before checking  for interrupts such that the  check
 	 * happens interlocked with a possible interrupt happening between us reading
 	 * the status port, and us reading the data port (where reading the data port
-	 * clears the PS2_STATUS_OUTFULL bit of the status port, which might also be
+	 * clears the PS2_STATUS_OUTFULL bit of the status port, which might also  be
 	 * done by the interrupt handler) */
 	COMPILER_BARRIER();
 	status = inb_p(PS2_STATUS);
@@ -351,12 +351,12 @@ NOTHROW(KCALL early_poll_outport)(u8 *__restrict presult) {
 		data = inb_p(PS2_DATA);
 		COMPILER_BARRIER();
 		/* Check once again for the possibility that what we've just
-		 * read into `data' may have been garbage when an interrupt
+		 * read into `data' may have been garbage when an  interrupt
 		 * could have already performed the read before we did. */
 		if (early_poll_probe(presult))
 			return true;
 		/* Nope! No interrupt has done the deed of reading the port,
-		 * so we know that `data' is the correct result value.
+		 * so  we  know that  `data'  is the  correct  result value.
 		 * FIXME: This only works when PS/2 interrupt are handled
 		 *        by the same CPU as the one that we're currently
 		 *        running under! */
@@ -378,24 +378,24 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);
 		inb_p(PS2_DATA); /* Make sure that there is no dangling data */
 
-		/* Workaround: If the controller is configured to have interrupts enabled
-		 *             for either PORT1 or PORT2, then instead of us being able to
-		 *             read command data in the following call, the response byte
-		 *             will have already been read by `ps2_probe_handle_interrupt()',
-		 *             such that the following line will cause an exception
-		 *             `E_IOERROR_TIMEOUT:E_IOERROR_SUBSYSTEM_HID' to be thrown.
-		 *             The problem here is that the bit that can tell us if the PS/2
+		/* Workaround: If the  controller is  configured  to have  interrupts  enabled
+		 *             for  either PORT1  or PORT2, then  instead of us  being able to
+		 *             read command  data in  the following  call, the  response  byte
+		 *             will  have already been read by `ps2_probe_handle_interrupt()',
+		 *             such  that  the   following  line  will   cause  an   exception
+		 *             `E_IOERROR_TIMEOUT:E_IOERROR_SUBSYSTEM_HID'   to   be   thrown.
+		 *             The problem here is that the bit  that can tell us if the  PS/2
 		 *             controller is able to trigger interrupts right now is contained
-		 *             in the very byte which we're trying to extract from the thing.
+		 *             in the very byte which we're trying to extract from the  thing.
 		 * Solution:   Configure the probe controller to accept interrupt data while
 		 *             simultaneously polling the port ourself.
 		 *             This gives us 3 different paths to success:
 		 *               #1: We manage to read the port ourself and interrupts were disabled.
 		 *               #2: We manage to read the port ourself and interrupts were enabled,
-		 *                   and the device did send an interrupt that was entered as an
+		 *                   and  the device  did send an  interrupt that was  entered as an
 		 *                   Unhandled interrupt.
 		 *               #3: We don't manage to read the port ourself, but we do notice that
-		 *                   one of the probe controllers has received a data byte. */
+		 *                   one  of  the  probe  controllers  has  received  a  data  byte. */
 		{
 			unsigned int i;
 			for (i = 0; i < PS2_PORTCOUNT; ++i)

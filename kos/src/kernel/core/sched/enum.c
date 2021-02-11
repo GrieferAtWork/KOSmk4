@@ -148,7 +148,7 @@ err:
 	return temp;
 }
 
-/* Enumerate task/taskpid objects stored within `self', and
+/* Enumerate task/taskpid  objects  stored  within  `self',  and
  * decref() _all_ of them, no matter what happens inside of `cb' */
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
 task_list_buffer_enum_and_decref(/*inherit:ref(always)*/ struct task_list_buffer *__restrict self,
@@ -345,7 +345,7 @@ NOTHROW(FCALL task_enum_cpu_ipi)(struct icpustate *__restrict state, void *args[
 #endif /* !CONFIG_NO_SMP */
 
 
-/* Enumerate all threads running, sleeping, or pending on `c'
+/* Enumerate all threads  running, sleeping, or  pending on  `c'
  * Threads that have terminated, or haven't been started are not
  * enumerated by this function. */
 PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
@@ -390,7 +390,7 @@ cpu_not_running:
 
 
 
-/* Enumerate all threads found anywhere on the system.
+/* Enumerate  all  threads  found  anywhere  on  the  system.
  * This is the same as calling `task_enum_cpu()' for all CPUs */
 PUBLIC NONNULL((1)) ssize_t KCALL
 task_enum_all_nb(task_enum_cb_t cb, void *arg)
@@ -413,8 +413,8 @@ task_enum_all_nb(task_enum_cb_t cb, void *arg)
 }
 
 /* Same as `task_enum_all_nb()', but directly access the structures of other CPUs,
- * rather than sending IPIs and letting those CPUs access their own structures.
- * Doing it this way must be done when the caller knows that no other CPU is
+ * rather  than sending IPIs  and letting those CPUs  access their own structures.
+ * Doing it this  way must  be done when  the caller  knows that no  other CPU  is
  * actively running. */
 #ifndef CONFIG_NO_SMP
 FUNDEF NONNULL((1)) ssize_t
@@ -487,7 +487,7 @@ task_enum_kernel_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK) {
 }
 
 
-/* Enumerate all threads apart of the same process as `proc'
+/* Enumerate all  threads  apart  of the  same  process  as  `proc'
  * If `proc' is a kernel-space thread, same as `task_enum_kernel()' */
 PUBLIC NONNULL((1, 3)) ssize_t KCALL
 task_enum_process_threads_nb(task_enum_cb_t cb, void *arg,
@@ -578,12 +578,12 @@ err:
 }
 
 
-/* Enumerate all children of the given `proc'. (i.e. the threads
- * that `proc' can `wait(2)' for). This also includes threads that
- * could also be enumerated using `task_enum_process_threads()'
+/* Enumerate  all children  of the  given `proc'.  (i.e. the threads
+ * that `proc' can `wait(2)' for).  This also includes threads  that
+ * could  also  be  enumerated  using  `task_enum_process_threads()'
  * Note however that this function will not enumerate `proc' itself,
- * and when `proc' is a kernel-thread, nothing will be enumerated.
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed to
+ * and when `proc' is a  kernel-thread, nothing will be  enumerated.
+ * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
  *                      allocate memory for intermediate buffers. */
 PUBLIC NONNULL((1, 3)) ssize_t KCALL
 task_enum_process_children_nb(task_enum_cb_t cb, void *arg,
@@ -659,7 +659,7 @@ err:
 }
 
 
-/* Similar to `task_enum_user()': Enumerate the leaders of running
+/* Similar  to `task_enum_user()': Enumerate the leaders of running
  * user-space processes, as visible by `ns'. These are identical to
  * what will show up under `/proc' */
 PUBLIC NONNULL((1, 3)) ssize_t KCALL
@@ -700,7 +700,7 @@ err:
 
 
 /* Similar to `task_enum_processes()', but don't just enumerate
- * threads that are process leaders, but all threads from `ns' */
+ * threads that are process leaders, but all threads from  `ns' */
 PUBLIC NONNULL((1, 3)) ssize_t KCALL
 task_enum_namespace_nb(task_enum_cb_t cb, void *arg,
                        struct pidns *__restrict ns)

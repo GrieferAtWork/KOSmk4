@@ -86,7 +86,7 @@ NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myq
 /* Check if masked, pending signals are available.
  * If so:
  *   - When `si' is NULL, simply return `true'
- *   - When `si' is non-NULL, pop the signal and
+ *   - When  `si' is non-NULL,  pop the signal and
  *     store it into `*si' before returning `true'
  * else:
  *   - return `false'
@@ -297,27 +297,27 @@ update_signalfd(unsigned int fd,
 		COMPILER_BARRIER();
 		memcpy(&newmask, sigmask, sizeof(sigset_t));
 		COMPILER_BARRIER();
-		/* Always remove SIGKILL and SIGSTOP from the new mask
-		 * before applying it, thus ensuring that at no point in
+		/* Always remove  SIGKILL and  SIGSTOP from  the new  mask
+		 * before applying it, thus ensuring  that at no point  in
 		 * time a signalfd descriptor exists that would be capable
 		 * of handling these 2 signal. */
 		sigdelset(&newmask, SIGKILL);
 		sigdelset(&newmask, SIGSTOP);
 		COMPILER_BARRIER();
 		memcpy(&sfd->sf_mask, &newmask, sizeof(sigset_t));
-		/* The online documentation does not specify if a thread
-		 * currently waiting on a signalfd should wake up when
+		/* The online documentation does not specify if a  thread
+		 * currently waiting on  a signalfd should  wake up  when
 		 * the mask changes. Especially considering that doing so
-		 * would require an additional signal to be added to the
+		 * would require an additional signal to be added to  the
 		 * `struct signalfd' just for the purpose of listening to
 		 * mask changes.
-		 * However, looking at the linux kernel source, it seems
-		 * to do something in-between of not doing it at all, and
-		 * doing it correctly, by simply waking up any thread that
-		 * is currently waiting for the signal queues of the calling
+		 * However,  looking  at  the  linux  kernel  source,  it  seems
+		 * to  do  something  in-between of  not  doing it  at  all, and
+		 * doing  it  correctly, by  simply  waking up  any  thread that
+		 * is  currently waiting  for the  signal queues  of the calling
 		 * thread, meaning that the wakeup wouldn't work if the signalfd
-		 * was shared between processes, with one process updating the
-		 * mask not actually causing the other to get the message.
+		 * was shared between processes,  with one process updating  the
+		 * mask  not  actually causing  the  other to  get  the message.
 		 * Oh well... Just mirror what linux does... */
 		{
 			struct sigqueue *pqueue, *tqueue;

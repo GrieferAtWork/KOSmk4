@@ -52,7 +52,7 @@ DECL_BEGIN
 
 
 #ifndef NDEBUG
-/* Because R/W locks need to be working (and therefor initialized)
+/* Because R/W locks need to be working (and therefor  initialized)
  * while handling an assertion failure, fixup a missing init before
  * triggering the fault. */
 #define ASSERT_VECTOR_INITIALIZED(locks)      \
@@ -99,7 +99,7 @@ NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread) {
 INTDEF struct task pertask_template ASMNAME("__kernel_pertask_start");
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_readlocks_reinit)(struct task *__restrict thread) {
-	/* Restore read-locks from the per-task initialization template.
+	/* Restore  read-locks from the per-task initialization template.
 	 * The `pertask_readlocks_init()' initialization function expects
 	 * its contents as the initial state. */
 	memcpy(&FORTASK(thread, this_read_locks),
@@ -219,7 +219,7 @@ again:
 					struct read_lock *new_vector;
 					size_t new_mask;
 					if (!locks->rls_use) {
-						/* Special case: When no locks are actually in use, then
+						/* Special case: When no locks  are actually  in use,  then
 						 *               we can simply re-hash in-place by clearing
 						 *               the memory of the hash-vector.
 						 * Also: Try to revert to the original, static hash-vector. */
@@ -229,7 +229,7 @@ again:
 					/* Must re-hash the readlock hash-vector. */
 					new_mask = locks->rls_msk;
 					/* Only increase the mask if all slots are actually in use.
-					 * Otherwise, it's sufficient to rehash to a mask equal to
+					 * Otherwise, it's sufficient to rehash to a mask equal  to
 					 * our current size, */
 					if (locks->rls_use == locks->rls_cnt)
 						new_mask = (new_mask << 1) | 1;
@@ -309,7 +309,7 @@ again:
 					struct read_lock *new_vector;
 					size_t new_mask;
 					if (!locks->rls_use) {
-						/* Special case: When no locks are actually in use, then
+						/* Special case: When no locks  are actually  in use,  then
 						 *               we can simply re-hash in-place by clearing
 						 *               the memory of the hash-vector.
 						 * Also: Try to revert to the original, static hash-vector. */
@@ -319,7 +319,7 @@ again:
 					/* Must re-hash the readlock hash-vector. */
 					new_mask = locks->rls_msk;
 					/* Only increase the mask if all slots are actually in use.
-					 * Otherwise, it's sufficient to rehash to a mask equal to
+					 * Otherwise, it's sufficient to rehash to a mask equal  to
 					 * our current size, */
 					if (locks->rls_use == locks->rls_cnt)
 						new_mask = (new_mask << 1) | 1;
@@ -476,7 +476,7 @@ NOTHROW(FCALL __os_rwlock_tryread)(struct rwlock *__restrict self) {
 		assert(self->rw_mode != RWLOCK_MODE_FWRITING);
 		assert(self->rw_scnt != 0);
 #if 0 /* Thread that already have a read-lock can still acquire \
-       * more, even if the rw-lock is in upgrade mode. */
+       * more,  even  if  the  rw-lock  is  in  upgrade   mode. */
 		if (self->rw_mode == RWLOCK_MODE_FUPGRADING)
 			return false;
 #endif
@@ -486,7 +486,7 @@ NOTHROW(FCALL __os_rwlock_tryread)(struct rwlock *__restrict self) {
 	do {
 		control_word = ATOMIC_READ(self->rw_state);
 		/* Only allow acquisition when the lock is in read-mode.
-		 * In upgrade or write-mode, we cannot allow more locks
+		 * In upgrade or write-mode, we cannot allow more  locks
 		 * to be acquired. */
 		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* This also deals with upgrade-mode. */
@@ -530,7 +530,7 @@ NOTHROW(FCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 		assert(self->rw_mode != RWLOCK_MODE_FWRITING);
 		assert(self->rw_scnt != 0);
 #if 0 /* Thread that already have a read-lock can still acquire \
-       * more, even if the rw-lock is in upgrade mode. */
+       * more,  even  if  the  rw-lock  is  in  upgrade   mode. */
 		if (self->rw_mode == RWLOCK_MODE_FUPGRADING)
 			return false;
 #endif
@@ -540,7 +540,7 @@ NOTHROW(FCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 	do {
 		control_word = ATOMIC_READ(self->rw_state);
 		/* Only allow acquisition when the lock is in read-mode.
-		 * In upgrade or write-mode, we cannot allow more locks
+		 * In upgrade or write-mode, we cannot allow more  locks
 		 * to be acquired. */
 		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* This also deals with upgrade-mode. */
@@ -580,7 +580,7 @@ PUBLIC NONNULL((1)) bool
 			assert(self->rw_mode != RWLOCK_MODE_FWRITING);
 			assert(self->rw_scnt != 0);
 #if 0 /* Thread that already have a read-lock can still acquire \
-       * more, even if the rw-lock is in upgrade mode. */
+       * more,  even  if  the  rw-lock  is  in  upgrade   mode. */
 			if (self->rw_mode == RWLOCK_MODE_FUPGRADING)
 				return false;
 #endif
@@ -593,7 +593,7 @@ acquire_read_lock:
 	do {
 		control_word = ATOMIC_READ(self->rw_state);
 		/* Only allow acquisition when the lock is in read-mode.
-		 * In upgrade or write-mode, we cannot allow more locks
+		 * In upgrade or write-mode, we cannot allow more  locks
 		 * to be acquired. */
 		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* Connect to the chmode-signal. */
@@ -656,7 +656,7 @@ NOTHROW(FCALL __os_rwlock_read_nx)(struct rwlock *__restrict self,
 			assert(self->rw_mode != RWLOCK_MODE_FWRITING);
 			assert(self->rw_scnt != 0);
 #if 0 /* Thread that already have a read-lock can still acquire \
-       * more, even if the rw-lock is in upgrade mode. */
+       * more,  even  if  the  rw-lock  is  in  upgrade   mode. */
 			if (self->rw_mode == RWLOCK_MODE_FUPGRADING)
 				return false;
 #endif
@@ -669,7 +669,7 @@ acquire_read_lock:
 	do {
 		control_word = ATOMIC_READ(self->rw_state);
 		/* Only allow acquisition when the lock is in read-mode.
-		 * In upgrade or write-mode, we cannot allow more locks
+		 * In upgrade or write-mode, we cannot allow more  locks
 		 * to be acquired. */
 		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* Connect to the chmode-signal. */
@@ -797,7 +797,7 @@ wait_for_endwrite:
 		/* Lock is in upgrade-mode. */
 
 		/* The caller is holding read-locks, that must be removed to prevent
-		 * a deadlock situation. For this purposes, the `E_RETRY_RWLOCK'
+		 * a  deadlock  situation. For  this purposes,  the `E_RETRY_RWLOCK'
 		 * exception exists. */
 		if (rwlock_find_readlock(self))
 			THROW(__E_RETRY_RWLOCK, self);
@@ -866,7 +866,7 @@ wait_for_unshare:
 			}
 			EXCEPT {
 				/* Something went wrong. - Re-acquire the read-lock
-				 * (if we had one), switch back to read-mode. */
+				 * (if  we  had  one),  switch  back  to read-mode. */
 				do {
 					control_word = ATOMIC_READ(self->rw_state);
 					assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
@@ -926,7 +926,7 @@ wait_for_endwrite:
 		/* Lock is in upgrade-mode. */
 
 		/* The caller is holding read-locks, that must be removed to prevent
-		 * a deadlock situation. For this purposes, the `E_RETRY_RWLOCK'
+		 * a  deadlock  situation. For  this purposes,  the `E_RETRY_RWLOCK'
 		 * exception exists. */
 		if (rwlock_find_readlock(self))
 			return false;
@@ -1007,11 +1007,11 @@ PRIVATE WUNUSED NONNULL((1, 2)) struct icpustate *
 	struct rwlock *lock;
 	lock = (struct rwlock *)arg;
 	/* Check if the calling thread has a read-lock on `lock',
-	 * and throw an `E_RETRY_RWLOCK' exception if it does. */
+	 * and throw an  `E_RETRY_RWLOCK' exception  if it  does. */
 	if (!rwlock_find_readlock(lock))
 		return state;
-	/* Apparently we are using that lock in particular.
-	 * So as already mentioned, to deal with this we simply throw
+	/* Apparently   we   are  using   that  lock   in  particular.
+	 * So  as already mentioned, to deal with this we simply throw
 	 * an exception that'll cause the read-lock to be re-acquired. */
 	THROW(__E_RETRY_RWLOCK, lock);
 }
@@ -1034,23 +1034,23 @@ kill_rwlock_reader(struct task *__restrict thread,
 		/* We can search the thread's static read-lock map. */
 		for (i = 0; i < COMPILER_LENOF(locks->rls_sbuf); ++i) {
 			/* Use an atomic read to reduce the chances of
-			 * reading an incomplete pointer in SMP mode. */
+			 * reading  an incomplete pointer in SMP mode. */
 			if (ATOMIC_LOAD(locks->rls_sbuf[i].rl_rwlock) == lock)
 				goto use_rpc;
 		}
 		/* Check again if the thread is still using its static buffer.
-		 * NOTE: Event if the thread temporarily used a dynamic
-		 *       buffer while we were checking its static buffer,
-		 *       we're trying to look for threads that were already
-		 *       using our R/W-lock when we changed the lock to
-		 *       upgrade-mode. So with that in mind, a thread that
-		 *       wasn't using our lock at that point won't show up
+		 * NOTE: Event  if  the  thread temporarily  used  a dynamic
+		 *       buffer while we  were checking  its static  buffer,
+		 *       we're trying to look for threads that were  already
+		 *       using our  R/W-lock when  we  changed the  lock  to
+		 *       upgrade-mode. So with that  in mind, a thread  that
+		 *       wasn't using our lock at  that point won't show  up
 		 *       here either. An those that were using it and didn't
 		 *       show up just now are of no interest to us, as those
-		 *       are the ones that already got rid of their locks
+		 *       are the ones  that already got  rid of their  locks
 		 *       to our R/W-lock.
 		 * This check is only required to ensure that the thread didn't
-		 * migrate its lock to our r/w-lock while we were checking its
+		 * migrate  its lock to our r/w-lock while we were checking its
 		 * set of used locks. */
 		if (locks->rls_vec == locks->rls_sbuf)
 			goto use_rpc;
@@ -1068,7 +1068,7 @@ done:
 
 PRIVATE NONNULL((1)) void FCALL
 rwlock_kill_readers(struct rwlock *__restrict self) {
-	/* Enumerate all running threads to find (and kill; aka.
+	/* Enumerate all running threads to find (and kill;  aka.
 	 * `rwlock_endread()') those that are using our R/W-lock. */
 	(void)kill_rwlock_reader;
 	(void)self;
@@ -1119,7 +1119,7 @@ wait_for_endwrite:
 		/* Lock is in upgrade-mode. */
 
 		/* The caller is holding read-locks, that must be removed to prevent
-		 * a deadlock situation. For this purposes, the `E_RETRY_RWLOCK'
+		 * a  deadlock  situation. For  this purposes,  the `E_RETRY_RWLOCK'
 		 * exception exists. */
 		if (rwlock_find_readlock(self))
 			THROW(__E_RETRY_RWLOCK, self);
@@ -1188,9 +1188,9 @@ wait_for_unshare:
 					task_disconnectall();
 					goto got_lock;
 				}
-				/* Wait for a while, assuming that readers behave as they should
-				 * and release their locks before entering a wait-state when trying to
-				 * reacquire them, but noticing that the lock is in UPGRADING mode.
+				/* Wait   for   a  while,   assuming  that   readers   behave  as   they  should
+				 * and  release  their  locks  before  entering  a  wait-state  when  trying  to
+				 * reacquire   them,  but  noticing   that  the  lock   is  in  UPGRADING  mode.
 				 * NOTE: We use a small timeout so we can try again in case we missed something. */
 				{
 					ktime_t tmo = ktime();
@@ -1199,7 +1199,7 @@ wait_for_unshare:
 				}
 			} EXCEPT {
 				/* Something went wrong. - Re-acquire the read-lock
-				 * (if we had one), switch back to read-mode. */
+				 * (if  we  had  one),  switch  back  to read-mode. */
 				do {
 					control_word = ATOMIC_READ(self->rw_state);
 					assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
@@ -1219,7 +1219,7 @@ wait_for_unshare:
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL __os_rwlock_tryupgrade)(struct rwlock *__restrict self) {
 	/* Special handling to upgrade a non-shared
-	 * read-lock to an exclusive write-lock. */
+	 * read-lock to  an  exclusive  write-lock. */
 	u32 control_word;
 	RWLOCK_TRACE_F("rwlock_tryupgrade");
 again:
@@ -1229,7 +1229,7 @@ again:
 	case RWLOCK_MODE_FWRITING:
 		assertf(self->rw_xowner == THIS_TASK,
 		        "You can't be holding read-locks on a write-mode R/W-lock that you don't own");
-#if 0 /* Can't be asserted. - The caller may be upgrading a write-lock caused  \
+#if 0 /* Can't be asserted. - The caller may be upgrading a write-lock  caused \
        * by `rwlock_tryread()' in actuality acquiring a write-lock when it was \
        * impossible to acquire a read-lock. */
 		assertf(self->rw_xind >= 2,
@@ -1258,8 +1258,8 @@ again:
 		/* Atomically upgraded to write-mode. */
 		self->rw_xowner = THIS_TASK;
 		/* TODO: Decrement the recursion counter of our read-lock, and delete
-		 *       it if that counter reaches ZERO(0) (it's an upgrade, so it
-		 *       replaces the last read-lock with a write-lock, meaning a
+		 *       it if that counter reaches  ZERO(0) (it's an upgrade, so  it
+		 *       replaces the  last read-lock  with a  write-lock, meaning  a
 		 *       non-recursive read-lock has to go away!) */
 		return true;
 	}
@@ -1272,7 +1272,7 @@ PUBLIC NONNULL((1)) bool
 (FCALL __os_rwlock_upgrade)(struct rwlock *__restrict self,
                             ktime_t abs_timeout) {
 	/* Special handling to upgrade a non-shared
-	 * read-lock to an exclusive write-lock. */
+	 * read-lock to  an  exclusive  write-lock. */
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_upgrade", abs_timeout);
 	assertf(!task_wasconnected(),
@@ -1284,7 +1284,7 @@ again:
 	case RWLOCK_MODE_FWRITING:
 		assertf(self->rw_xowner == THIS_TASK,
 		        "You can't be holding read-locks on a write-mode R/W-lock that you don't own");
-#if 0 /* Can't be asserted. - The caller may be upgrading a write-lock caused  \
+#if 0 /* Can't be asserted. - The caller may be upgrading a write-lock  caused \
        * by `rwlock_tryread()' in actuality acquiring a write-lock when it was \
        * impossible to acquire a read-lock. */
 		assertf(self->rw_xind >= 2,
@@ -1299,7 +1299,7 @@ again:
 		/* Lock is in upgrade-mode. */
 		assertf(rwlock_find_readlock(self), "You're not holding any read-locks");
 		/* The caller is holding read-locks, that must be removed to prevent
-		 * a deadlock situation. For this purposes, the `E_RETRY_RWLOCK'
+		 * a  deadlock  situation. For  this purposes,  the `E_RETRY_RWLOCK'
 		 * exception exists. */
 		THROW(__E_RETRY_RWLOCK, self);
 
@@ -1319,7 +1319,7 @@ got_lock:
 			/* Atomically upgraded to write-mode. */
 			self->rw_xowner = THIS_TASK;
 			/* Delete the original read-lock if this is a clean
-			 * upgrade (without any recursive read-locks). */
+			 * upgrade  (without  any  recursive   read-locks). */
 			rlock = rwlock_find_readlock(self);
 			assert(rlock);
 			if (rlock->rl_recursion == 1)
@@ -1354,7 +1354,7 @@ wait_for_unshare:
 			}
 			if (!task_waitfor(abs_timeout)) {
 				/* Our timeout expired. - Re-acquire the read-lock,
-				 * switch back to read-mode, and return `false' */
+				 * switch  back  to read-mode,  and  return `false' */
 				do {
 					control_word = ATOMIC_READ(self->rw_state);
 					assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
@@ -1384,7 +1384,7 @@ PUBLIC WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self,
                                       ktime_t abs_timeout) {
 	/* Special handling to upgrade a non-shared
-	 * read-lock to an exclusive write-lock. */
+	 * read-lock to  an  exclusive  write-lock. */
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_upgrade", abs_timeout);
 	assertf(!task_wasconnected(),
@@ -1396,7 +1396,7 @@ again:
 	case RWLOCK_MODE_FWRITING:
 		assertf(self->rw_xowner == THIS_TASK,
 		        "You can't be holding read-locks on a write-mode R/W-lock that you don't own");
-#if 0 /* Can't be asserted. - The caller may be upgrading a write-lock caused  \
+#if 0 /* Can't be asserted. - The caller may be upgrading a write-lock  caused \
        * by `rwlock_tryread()' in actuality acquiring a write-lock when it was \
        * impossible to acquire a read-lock. */
 		assertf(self->rw_xind >= 2,
@@ -1410,7 +1410,7 @@ again:
 	{
 		struct read_lock *desc;
 		/* The caller is holding read-locks, that must be removed to prevent
-		 * a deadlock situation. For this purposes, the `E_RETRY_RWLOCK'
+		 * a  deadlock  situation. For  this purposes,  the `E_RETRY_RWLOCK'
 		 * exception exists. */
 	case RWLOCK_MODE_FUPGRADING:
 		/* Lock is in upgrade-mode. */
@@ -1429,7 +1429,7 @@ again:
 		assert(desc->rl_recursion != 0);
 		if (desc->rl_recursion == 1) {
 			u32 control_word;
-			/* Last read-lock is being removed. (decrement the
+			/* Last  read-lock  is  being  removed.  (decrement  the
 			 * reader-counter of the lock and delete the descriptor) */
 			rwlock_delete_readlock(desc);
 			do {
@@ -1492,7 +1492,7 @@ wait_for_unshare:
 		}
 		if (!task_waitfor_nx(abs_timeout)) {
 			/* Our timeout expired. - Re-acquire the read-lock,
-			 * switch back to read-mode, and return `false' */
+			 * switch  back  to read-mode,  and  return `false' */
 			do {
 				control_word = ATOMIC_READ(self->rw_state);
 				assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
@@ -1590,7 +1590,7 @@ NOTHROW(FCALL __os_rwlock_endwrite)(struct rwlock *__restrict self) {
 }
 
 /* endread() and end() cannot be differenciated
- * without additional debug informations. */
+ * without   additional   debug   informations. */
 DEFINE_PUBLIC_ALIAS(rwlock_endread, rwlock_end);
 
 PUBLIC NOBLOCK NONNULL((1)) bool
@@ -1639,7 +1639,7 @@ NOTHROW(FCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 		assert(desc->rl_recursion != 0);
 		if (desc->rl_recursion == 1) {
 			u32 control_word;
-			/* Last read-lock is being removed. (decrement the
+			/* Last  read-lock  is  being  removed.  (decrement  the
 			 * reader-counter of the lock and delete the descriptor) */
 			rwlock_delete_readlock(desc);
 			do {
@@ -1659,7 +1659,7 @@ NOTHROW(FCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 			if (was_thrown(__E_RETRY_RWLOCK) &&
 			    PERTASK_GET(this_exception_args.__e_retry_rwlock._err_lock) == (uintptr_t)self) {
 				/* Try to yield to the task that is waiting for the lock to become available.
-				 * NOTE: By using `task_tryyield()' here, we can remain non-blocking! */
+				 * NOTE: By   using  `task_tryyield()'  here,  we  can  remain  non-blocking! */
 				task_tryyield();
 				/* Get the caller to re-try acquiring this lock. */
 				return true;

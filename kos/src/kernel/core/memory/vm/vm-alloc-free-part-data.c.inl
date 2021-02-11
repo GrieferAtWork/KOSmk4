@@ -142,7 +142,7 @@ vm_do_allocram(struct vm_ramblock *__restrict pblock0,
 				      (num_pages - block0_size) * PAGESIZE);
 #endif /* !ALLOC_NX */
 			}
-			/* Insert new blocks in the front, thus optimizing to better allocate
+			/* Insert new  blocks in  the front,  thus optimizing  to better  allocate
 			 * memory in its proper order, following the assumption that page_malloc()
 			 * will prefer allocating memory in top-down priority ordering. */
 			memmoveup(&blocks[1], &blocks[0],
@@ -189,7 +189,7 @@ err_blocks:
 
 
 
-/* Allocate/free ram/swap data for the given data part.
+/* Allocate/free  ram/swap  data  for  the  given  data  part.
  * NOTE: The caller must be holding a write-lock to `self', or
  *      `self' must not be shared (`isshared(self) == false')
  * @return: * : One of VM_DATAPART_ALLOC_*. */
@@ -298,7 +298,7 @@ realloc_without_locks:
 					      num_pages - block0_size * PAGESIZE);
 #endif /* !ALLOC_NX */
 					}
-					/* Insert new blocks in the front, thus optimizing to better allocate
+					/* Insert new  blocks in  the front,  thus optimizing  to better  allocate
 					 * memory in its proper order, following the assumption that page_malloc()
 					 * will prefer allocating memory in top-down priority ordering. */
 					memmoveup(&blocks[1], &blocks[0],
@@ -393,7 +393,7 @@ err_blocks:
 					      (num_pages - block0_size) * PAGESIZE);
 #endif /* !ALLOC_NX */
 				}
-				/* Insert new blocks in the front, thus optimizing to better allocate
+				/* Insert new  blocks in  the front,  thus optimizing  to better  allocate
 				 * memory in its proper order, following the assumption that page_malloc()
 				 * will prefer allocating memory in top-down priority ordering. */
 				memmoveup(&blocks[1], &blocks[0],

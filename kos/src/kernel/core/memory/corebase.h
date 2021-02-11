@@ -33,7 +33,7 @@
 
 
 #undef CONFIG_COREBASE_HAVE_FULLPAGES
-/* The debug-malloc GC checker needs a way of enumerating
+/* The debug-malloc GC checker needs a way of  enumerating
  * fully allocated corebase pages, and not just those that
  * still contain unallocated slots! */
 #ifdef CONFIG_TRACE_MALLOC
@@ -55,7 +55,7 @@ union vm_corepart {
 struct vm_corepage;
 struct vm_corepage_controller {
 	/* [0..1][lock(vm_corepage_lock)] Previous corepage.
-	 * NOTE: When `NULL', the corepage is either the initial
+	 * NOTE: When  `NULL', the corepage is either the initial
 	 *       one, or doesn't contain any free parts, and also
 	 *       isn't apart of the `vm_corepage_head' chain. */
 	struct vm_corepage *cpc_prev;
@@ -70,7 +70,7 @@ struct vm_corepage_controller {
 STATIC_ASSERT_MSG(VM_COREPAIRS_PER_PAGE >= 4,
                   "VM controller structures are too large to sustain themself");
 
-/* A single memory page containing everything required to
+/* A single memory  page containing  everything required  to
  * allocate at least 2 datapart/node pairs (or 4 of either).
  * Must fit into `PAGESIZE' bytes.
  * This way, a corepage can be used to both replicate itself, as
@@ -94,7 +94,7 @@ INTDEF struct atomic_lock  vm_corepage_lock; /* Lock for the corepage subsystem.
 INTDEF struct vm_corepage *vm_corepage_head; /* [1..1] Pointer to the first page containing free elements. */
 INTDEF size_t              vm_corepage_free; /* [>= 2] Amount of free parts.
                                               * NOTE: At all times, there must at least be 2 available
-                                              *       parts, so-as to allow for self-replication. */
+                                              *       parts,  so-as  to  allow  for  self-replication. */
 #ifdef CONFIG_COREBASE_HAVE_FULLPAGES
 INTDEF struct vm_corepage *vm_corepage_full; /* [0..1] Chain of fully allocated core pages. */
 #endif /* CONFIG_COREBASE_HAVE_FULLPAGES */
@@ -102,7 +102,7 @@ INTDEF struct vm_corepage *vm_corepage_full; /* [0..1] Chain of fully allocated 
 
 
 /* Free a `struct vm_datapart' or `struct vm_node', previously
- * allocated using the core pair allocator functions below. */
+ * allocated using the  core pair  allocator functions  below. */
 INTDEF void NOTHROW(KCALL vm_corepage_freepart)(void *__restrict part);
 
 
@@ -114,8 +114,8 @@ struct vm_corepair_ptr {
 
 /* Allocate a new core pair.
  * NOTE: When `nothrow' is true, and the function fails,
- *       the returned corepair contains NULL-pointers.
- * NOTE: Upon success, the returned core pairs are zero-initialized,
+ *       the returned  corepair contains  NULL-pointers.
+ * NOTE: Upon  success, the returned core pairs are zero-initialized,
  *       with the exception of having their respective core-part flag
  *       bits set to 1.
  * @param: flags: Set of `GFP_*' (Uses `GFP_ATOMIC') */

@@ -55,37 +55,37 @@ typedef struct {
 #define NE2K_STATE_UIO       0x0001 /* User-io lock enabled (automatic send/receive won't be done)
                                      * In this mode, the NIC can be (re-)configured without having
                                      * to worry about async I/O being performed. */
-#define NE2K_STATE_UIO_NOINT 0x0002 /* Same as `NE2K_STATE_UIO', but ignore all interrupts
-                                     * This state is required since in order to handle interrupts,
-                                     * the current register page has to be changed to PG0 (even if
-                                     * another device on the same interrupt line was responsible
-                                     * for the interrupt). In order to prevent such an interrupt
-                                     * from interfering with UIO, this state means that UIO guaranties
+#define NE2K_STATE_UIO_NOINT 0x0002 /* Same   as   `NE2K_STATE_UIO',    but   ignore   all    interrupts
+                                     * This  state  is required  since  in order  to  handle interrupts,
+                                     * the  current  register page  has to  be changed  to PG0  (even if
+                                     * another  device  on  the  same  interrupt  line  was  responsible
+                                     * for  the  interrupt).  In  order  to  prevent  such  an interrupt
+                                     * from interfering with UIO, this  state means that UIO  guaranties
                                      * that the NIC will not cause an interrupt, thus also ensuring that
                                      * the register page isn't altered unexpectedly. */
 #define NE2K_STATE_TX_UPLOAD 0x0003 /* A packet is currently being uploaded
-                                     * This is set over IDLE mode `nk_tranit' is non-NULL.
+                                     * This is set over  IDLE mode `nk_tranit' is  non-NULL.
                                      * The actual loading of the next pending TX-packet must
                                      * be performed by the async-worker, though! */
 #define NE2K_STATE_TX_PKSEND 0x0004 /* A packet is currently being sent */
 #define NE2K_STATE_RX_DNLOAD 0x0005 /* A packet is currently being downloaded */
-#define NE2K_STATE_OFF       0x0006 /* The NIC has been turned off. This mode is similar to
+#define NE2K_STATE_OFF       0x0006 /* The  NIC has been turned off. This mode is similar to
                                      * `NE2K_STATE_UIO', however corresponds to the state of
                                      * the `IFF_UP'-bit in `nd_ifflags'. */
 
 /* Ne2k NIC flags. */
 #define NE2K_FLAG_NORMAL     0x0000 /* Normal flags */
 #define NE2K_FLAG_RXLTCH     0x4000 /* RX vs. TX latch (when set: the next time IDLE is possible
-                                     * and RX is pending, service receive; else: service TX) */
-#define NE2K_FLAG_RXPEND     0x8000 /* There is a packet pending inside of the device's receive-buffer
-                                     * When this flag is set, RX-interrupt have been masked and `ENISR_RX'
+                                     * and RX  is pending,  service receive;  else: service  TX) */
+#define NE2K_FLAG_RXPEND     0x8000 /* There is  a packet  pending inside  of the  device's  receive-buffer
+                                     * When  this flag is set, RX-interrupt have been masked and `ENISR_RX'
                                      * has not been acknowledged yet, and the next switch to IDLE/TX_UPLOAD
-                                     * with REQUIO==0 is superseded by a switch to `NE2K_STATE_RX_DNLOAD' */
+                                     * with REQUIO==0 is superseded  by a switch to  `NE2K_STATE_RX_DNLOAD' */
 #define NE2K_FLAG_REQUIO     0x0fff /* Mask for the # of threads that are requesting the async-io
                                      * machinery to switch over to `IDLE' mode such that they can
                                      * then switch over into `NE2K_STATE_UIO'-mode.
                                      * When this flag is set, the next time the NIC is able to switch
-                                     * into IDLE-mode, it will do so even if the `nd_tranit' chain
+                                     * into  IDLE-mode, it will  do so even  if the `nd_tranit' chain
                                      * is non-empty, or the `NE2K_FLAG_RXPEND' bit is set. */
 #define NE2K_FLAG_REQUIO_SHIFT 0    /* Shift for REQUIO. */
 #define NE2K_FLAG_REQUIO1    (1 << NE2K_FLAG_REQUIO_SHIFT) /* A single REQUIO ticket. */

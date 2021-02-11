@@ -155,22 +155,22 @@ NOTHROW(FCALL mnode_destroy_anon_ram)(struct mnode *__restrict self) {
  * @param: hint:          s.a. `mman_getunmapped_nx'
  * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
  * @param: flags:         Set of `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED' (Other bits are silently ignored)
- *                        Additionally, the following flags may be set to customize the behavior of how
- *                        a suitable address is located (s.a. `mman_getunmapped_nx()' for more info):
+ *                        Additionally,  the   following   flags   may  be   set   to   customize  the   behavior   of   how
+ *                        a   suitable    address   is    located   (s.a.    `mman_getunmapped_nx()'   for    more    info):
  *                        `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE'
  * @param: file:          The file that is being mapped.
  * @param: file_fspath:   Optional mapping path (only used for memory->disk mapping listings)
  * @param: file_fsname:   Optional mapping name (only used for memory->disk mapping listings)
  * @param: file_pos:      Offset into the file being mapped, of where the mapping should start.
- *                        If this value isn't page-aligned, then its sub-page offset is added
- *                        to the return value eventually returned by this function.
- *                        But that that when `MAP_FIXED' flag is also set, then the sub-page
- *                        offset of `hint' will be silently ignored, meaning that in this case
+ *                        If this value isn't page-aligned,  then its sub-page offset is  added
+ *                        to  the   return  value   eventually  returned   by  this   function.
+ *                        But  that that when  `MAP_FIXED' flag is also  set, then the sub-page
+ *                        offset of `hint' will be silently ignored, meaning that in this  case
  *                        the return value may differ from `hint'!
  * @param: min_alignment: s.a. `mman_getunmapped_nx'
- * @return: * : The effective mapping base at which `file->DATA.BYTES[file_pos]' can be found,
+ * @return: * : The effective mapping  base at which  `file->DATA.BYTES[file_pos]' can be  found,
  *              unless `num_bytes' was given as `0', in which case the return value is undefined,
- *              but arguably valid (e.g. will be a user-/kernel-space location as it would have
+ *              but  arguably valid (e.g. will be a  user-/kernel-space location as it would have
  *              been when `num_bytes' was non-zero). */
 PUBLIC NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
@@ -185,11 +185,11 @@ mman_map(struct mman *__restrict self,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
 #define HAVE_FILE
 #elif defined(DEFINE_mman_map_subrange)
-/* Same as `mman_map()', but only allow pages entirely contained within
+/* Same as `mman_map()', but only allow pages entirely contained  within
  * the file-relative address range `file_map_minaddr...file_map_maxaddr'
- * to be mapped. Attempting to map file contents beyond this range will
+ * to be mapped. Attempting to map file contents beyond this range  will
  * instead result in `&mfile_zero' getting mapped instead.
- * This function is mainly used to restrict access to raw physical memory
+ * This function is mainly used to  restrict access to raw physical  memory
  * when user-space is allowed to directly mmap() device ram, but the driver
  * want's to prevent user-space from mapping more than the physical address
  * ranges actually associated with a device. */
@@ -209,10 +209,10 @@ mman_map_subrange(struct mman *__restrict self,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS)
 #define HAVE_FILE
 #elif defined(DEFINE_mman_map_res)
-/* Same as `mman_map()', but instead of actually mapping something, leave the
+/* Same  as  `mman_map()',  but  instead  of  actually  mapping  something,  leave the
  * address range as empty (but possibly prepared), making it a reserved address range.
  * @param: flags: Set of `MAP_PREPARED' (Other bits are silently ignored)
- *                Additionally, the usual bits relating to `mman_getunmapped_nx()' are accepted:
+ *                Additionally,  the  usual  bits  relating  to  `mman_getunmapped_nx()'  are   accepted:
  *                `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE' */
 PUBLIC NONNULL((1)) void *KCALL
 mman_map_res(struct mman *__restrict self,
@@ -277,7 +277,7 @@ mman_map_res(struct mman *__restrict self,
 	{
 #ifdef DEFINE_mman_map_subrange
 		/* Create anon-ram nodes are replacements for all file
-		 * regions which the caller isn't allowed to map. */
+		 * regions  which  the  caller isn't  allowed  to map. */
 		file_size        = num_bytes;
 		file_base_offset = 0;
 		if (file_pos < file_map_minaddr) {
@@ -312,7 +312,7 @@ mman_map_res(struct mman *__restrict self,
 				file_size = max_file_size;
 				node      = mnode_create_anon_ram(gap, prot, flags);
 				/* Include the relative offset from the to-be returned base-address
-				 * to after where the actual file mapping will end, so-as to place
+				 * to after where the actual file mapping will end, so-as to  place
 				 * the post-node properly. */
 				postfile_offset = file_base_offset + file_size;
 				node->mn_minaddr += postfile_offset;
@@ -373,10 +373,10 @@ again_lock_mfile_map:
 #endif /* !HAVE_FILE */
 
 			/* Figure out where the mapping should go.
-			 * NOTE: This call also deals with the case where a pre-existing
+			 * NOTE: This call also deals with  the case where a  pre-existing
 			 *       mapping partially overlaps with the target address range.
-			 *       If this happens, this call makes sure that border nodes
-			 *       are split such that we're able to overwrite whole nodes
+			 *       If this happens, this call  makes sure that border  nodes
+			 *       are split such that we're  able to overwrite whole  nodes
 			 *       below. */
 			result = mman_getunmapped_or_unlock(self, hint, num_bytes,
 			                                    flags, min_alignment,
@@ -447,17 +447,17 @@ again_lock_mfile_map:
 			node->mn_minaddr += file_base_offset + (uintptr_t)result;
 			node->mn_maxaddr += file_base_offset + (uintptr_t)result;
 
-			/* Set the MLOCK flag for the backing mem-part when MAP_LOCKED is given.
+			/* Set the MLOCK  flag for  the backing  mem-part when  MAP_LOCKED is  given.
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */
 			if ((mnode_flags & MAP_LOCKED) && !(part->mp_flags & MPART_F_MLOCK_FROZEN))
 				ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
 
-			/* Map the backing part (as far as that is possible)
-			 * Note that unless `MAP_POPULATE' was given, this
-			 * wouldn't actually need to be done right here.
-			 * However, by unconditionally doing it here, we can
+			/* Map the backing part (as far as that is  possible)
+			 * Note that  unless `MAP_POPULATE'  was given,  this
+			 * wouldn't  actually  need  to be  done  right here.
+			 * However,  by unconditionally doing it here, we can
 			 * speed up the initial memory access whenever memory
-			 * had already been loaded in some other way, too! */
+			 * had already been  loaded in some  other way,  too! */
 			map_prot = mnode_getperm(node);
 			map_prot = mpart_mmap_p(part, self->mm_pagedir_p,
 			                        mnode_getaddr(node),
@@ -466,7 +466,7 @@ again_lock_mfile_map:
 			                        map_prot);
 
 			/* If the node was mapped with write-permissions enabled,
-			 * then add it to the list of writable nodes within our
+			 * then add it to the  list of writable nodes within  our
 			 * memory manager. */
 			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 			if (map_prot & PAGEDIR_MAP_FWRITE)
@@ -514,8 +514,8 @@ again_lock_mfile_map:
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 		mnode_tree_insert(&self->mm_mappings, node);
 		/* Add the part to the list of all parts. Note that this is
-		 * when the part becomes externally visible, meaning that
-		 * up until this point we don't need (or use) any locks on
+		 * when  the part becomes  externally visible, meaning that
+		 * up until this point we don't need (or use) any locks  on
 		 * the part, esp. since we were the ones to create it! */
 		mpart_all_list_insert(part);
 	}
@@ -533,10 +533,10 @@ again_lock_mfile_map:
 		pagedir_unprepare_p(self->mm_pagedir_p, result, num_bytes);
 
 	/* If some other mapping was there before, then we must invalidate
-	 * the page directory cache so-as to prevent any stale entires.
-	 * This has to happen before we unlock the mman, and destroy the
+	 * the page directory  cache so-as to  prevent any stale  entires.
+	 * This has to happen before we  unlock the mman, and destroy  the
 	 * old mappings, though!
-	 * NOTE: We don't do this unconditionally though, because this isn't
+	 * NOTE: We don't do  this unconditionally though,  because this  isn't
 	 *       one of the fastest operations since this one has to go through
 	 *       all of the hoops of broadcasting an IPI to everyone else... */
 	if (!SLIST_EMPTY(&old_mappings))

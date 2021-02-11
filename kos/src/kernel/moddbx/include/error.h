@@ -40,13 +40,13 @@ DECL_BEGIN
 #define DBX_EINTERN  (-6) /* Internal error */
 #define DBX_EFAULT   (-7) /* Segmentation fault */
 #define DBX_EINTR    (-8) /* Operation interrupted (s.a. `dbg_awaituser()') */
-#define DBX_ENOADDR  (-9) /* Cannot take address of object (only returned for variables
-                           * that have lost their address due to compiler optimizations.
+#define DBX_ENOADDR  (-9) /* Cannot take  address of  object (only  returned for  variables
+                           * that have lost  their address due  to compiler  optimizations.
                            * Attempting to reference something that can never be referenced
                            * results in `DBX_ESYNTAX' instead) */
 typedef int dbx_errno_t;
 
-/* Returns the message associated with a given `error'
+/* Returns  the  message associated  with a  given `error'
  * The message is simply the text from the comments above. */
 FUNDEF ATTR_CONST WUNUSED char const *
 NOTHROW(FCALL dbx_strerror)(dbx_errno_t error);

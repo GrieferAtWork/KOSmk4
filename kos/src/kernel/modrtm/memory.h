@@ -50,8 +50,8 @@
 
 
 #if CONFIG_RTM_FAR_REGIONS
-/* Threshold: Create far regions if the alternative require at least
- *            this many bytes of memory to be loaded, that hadn't
+/* Threshold: Create far regions if the alternative require at  least
+ *            this  many bytes  of memory  to be  loaded, that hadn't
  *            actually been required by the user up until this point. */
 #ifndef CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD
 #define CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD 64
@@ -73,7 +73,7 @@ DECL_BEGIN
 struct rtm_memory_region {
 	void                           *mr_addrlo; /* Lowest region address. (1-byte granularity) */
 	void                           *mr_addrhi; /* Greatest region address. */
-	REF /*struct vm_datapart*/void *mr_part;   /* [1..1] The datapart used for backing this region.
+	REF /*struct vm_datapart*/void *mr_part;   /* [1..1] The datapart used  for backing this  region.
 	                                            * NOTE: The least significant 2 bits has special use. */
 	uintptr_t                       mr_vers;   /* Region RTM version before the initial read. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, mr_data);  /* [rtm_memory_region_getsize(self)] Cached RTM region data. */
@@ -85,10 +85,10 @@ struct rtm_memory_region {
 #define rtm_memory_region_setchanged(self)  (void)((self)->mr_part = (void *)((uintptr_t)(self)->mr_part | 1))
 #if CONFIG_RTM_FAR_REGIONS
 /* Far regions can be used to describe holes between RTM memory regions that don't have to
- * be loaded into memory when data from both ends has been accessed. However,
- * NOTE: Far regions can only be marked as changed when the adjacent base region has also
+ * be  loaded  into  memory  when  data  from  both  ends  has  been  accessed.   However,
+ * NOTE: Far  regions can only be marked as changed when the adjacent base region has also
  *       been marked as changed. Alternatively, when the far region is the first one to be
- *       modified, then the base region can be turned into the far region, and what would
+ *       modified,  then the base region can be turned into the far region, and what would
  *       originally have been a far region can become a base region.
  * NOTE: The `mr_vers' value of a far region must be equal to the `mr_vers' of the adjacent
  *       base region. */
@@ -122,10 +122,10 @@ struct rtm_pending_syscall {
 struct rtm_memory {
 	size_t                      rm_mem_avl; /* Amount of heap memory that is still available */
 	size_t                      rm_regionc; /* # of elements from `rm_regionv' that are currently in use. */
-	struct rtm_memory_region  **rm_regionv; /* [1..1][owned][0..rm_regionc][owned] Vector of in-use memory regions.
-	                                         * Sorted ascendingly by `mr_addrlo', meaning that an bsearch with a worst
-	                                         * case lookup time of O(log2(n)) can be used for locating specific memory
-	                                         * regions. (though in practice, most programs will only ever use 2 regions:
+	struct rtm_memory_region  **rm_regionv; /* [1..1][owned][0..rm_regionc][owned]  Vector  of  in-use  memory   regions.
+	                                         * Sorted  ascendingly by `mr_addrlo',  meaning that an  bsearch with a worst
+	                                         * case  lookup time of  O(log2(n)) can be used  for locating specific memory
+	                                         * regions. (though in practice, most programs will only ever use 2  regions:
 	                                         * one for the calling program's stack, and the other for the parts of memory
 	                                         * that the program is actually intending to modify) */
 #if CONFIG_RTM_PENDING_SYSTEM_CALLS
@@ -133,13 +133,13 @@ struct rtm_memory {
 	struct rtm_pending_syscall *rm_sysv;    /* [0..rm_sysc][owned] Vector of pending system calls. */
 #endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
 #if !CONFIG_RTM_USERSPACE_ONLY
-	bool                        rm_chkuser; /* [const] When true, verify that `addr' doesn't point into kernel-space
+	bool                        rm_chkuser; /* [const] When true, verify  that `addr' doesn't  point into  kernel-space
 	                                         * as part of the execution of `rtm_memory_read()' and `rtm_memory_write()'
-	                                         * before constructing a new, or extending an existing RTM memory region. */
+	                                         * before constructing a new, or  extending an existing RTM memory  region. */
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 };
 
-/* Max amount of kernel heap memory that may be used by
+/* Max  amount of kernel heap memory that may be used by
  * a single instance of a `struct rtm_memory' structure. */
 INTDEF size_t rtm_memory_limit;
 
@@ -220,20 +220,20 @@ rtm_memory_apply(struct rtm_memory const *__restrict self);
 
 /* A certain (small) set of system calls can actually be performed whilst in RTM mode:
  *
- *  - sys_rtm_begin: Nested RTM block (simply increments a counter, such that +1
+ *  - sys_rtm_begin: Nested RTM  block (simply  increments a  counter, such  that  +1
  *                   additional `sys_rtm_end()' are needed in order to exit RTM mode)
  *  - sys_rtm_end:   Exit RTM mode with a success status
  *  - sys_rtm_abort: Abort RTM with an error code
  *  - sys_rtm_test:  Always returns `1'
  *
  * Additionally, the following system calls can be used, though some with somewhat
- * altered behavior to prevent any possible modifications from being performed
+ * altered  behavior to  prevent any  possible modifications  from being performed
  * immediately, instead causing them to be done at a later point in time.
  *
  * #if CONFIG_RTM_PENDING_SYSTEM_CALLS
- *  - sys_syslog:      Remember arguments, and copy the to-be printed string into a
+ *  - sys_syslog:      Remember  arguments,  and copy  the  to-be printed  string  into a
  *                     buffer for pending system call operations that is stored alongside
- *                     the current `struct rtm_memory', to-be printed (in order) after a
+ *                     the current `struct rtm_memory', to-be printed (in order) after  a
  *                     successful completion of RTM emulation.
  *                     The return value always indicates success (any error is instead
  *                     handled as an RTM abort reason)
@@ -247,11 +247,11 @@ rtm_memory_apply(struct rtm_memory const *__restrict self);
  *  - sys_sigprocmask() - Allow for atomic signal mask modifications (needed by `sys_sigreturn()')
  *  - sys_sigreturn()   - Allow RTM to be entered in signal handlers,
  *                        and left after the signal handler returns.
- *                        Only allowed with a NULL-sc_info argument
+ *                        Only allowed with a NULL-sc_info  argument
  */
 #if CONFIG_RTM_PENDING_SYSTEM_CALLS
 
-/* Schedule a pending call to `sys_syslog()', to-be executed
+/* Schedule   a  pending  call  to  `sys_syslog()',  to-be  executed
  * unconditionally just before a true-return of `rtm_memory_apply()' */
 INTDEF NONNULL((1)) void FCALL
 rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
@@ -265,19 +265,19 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
 #define rtm_sys_getpid(mem)      task_getpid()
 
 
-/* This ~could~ be emulated, but that's actually not a good idea:
+/* This  ~could~  be  emulated,  but  that's  actually  not  a  good  idea:
  * If the RTM code decides to call some sub-system that makes use of atomic
  * locks, then we might end up emulating code like this:
  * >> while (!try_lock())
  * >>     sched_yield();
  * The problem here is that if try_lock() failed the first time around, then
  * it will most definitely keep on failing since during the second time, the
- * memory that is used for backing the lock's is-acquired state will have
- * been cached in the RTM memory controller, such that even if some other
- * thread ends up releasing the lock while our thread is still in RTM mode,
- * we may not necessarily to see this this when it happens since RTM is
- * designed to only read from any memory location once, in order to ensure
- * a consistent memory view (such that any modifications made to memory by
+ * memory  that is used  for backing the lock's  is-acquired state will have
+ * been cached in the  RTM memory controller, such  that even if some  other
+ * thread  ends up releasing the lock while our thread is still in RTM mode,
+ * we may not  necessarily to see  this this  when it happens  since RTM  is
+ * designed  to only read from any memory  location once, in order to ensure
+ * a consistent memory view (such that  any modifications made to memory  by
  * other threads are hidden until the very end when memory is synced)
  *
  * As such, sys_sched_yield() is actually a very important marker to indicate

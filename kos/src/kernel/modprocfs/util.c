@@ -118,10 +118,10 @@ ProcFS_PrintU64(pformatprinter printer, void *arg, u64 value) {
 }
 
 
-/* Parse a given user-space buffer from being a string `0' or `1', which
+/* Parse  a given user-space buffer from being  a string `0' or `1', which
  * may optionally be surrounded by space characters that are automatically
  * stripped prior to being parsed.
- * If the buffer contains anything other than `[SPC]0|1[SPC]', then a
+ * If the buffer  contains anything other  than `[SPC]0|1[SPC]', then  a
  * `E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER'
  * exception is thrown. */
 INTERN NONNULL((1)) bool FCALL

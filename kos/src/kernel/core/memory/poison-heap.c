@@ -60,7 +60,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 DECL_BEGIN
 
 /* To make this stuff a bit more robust, no-op out NOTHROW annotations,
- * meaning that everything in here is (theoretically) able to dea with
+ * meaning  that everything in here is (theoretically) able to dea with
  * exceptions. */
 #undef NOTHROW
 #define NOTHROW /* nothing */
@@ -108,7 +108,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	}
 	/* Find a suitable free location.
 	 * NOTE: To aid in debugging, unconditionally disable ASLR
-	 *       for memory allocated from the poison-heap! */
+	 *       for  memory  allocated   from  the   poison-heap! */
 	result = mman_findunmapped(&mman_kernel,
 	                           HINT_GETADDR(KERNEL_VMHINT_LHEAP), num_bytes,
 	                           HINT_GETMODE(KERNEL_VMHINT_LHEAP) | MAP_NOASLR);
@@ -140,7 +140,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Now just put everything together for the node/part, and
-	 * follow this up by loading them into the kernel mman. */
+	 * follow this up  by loading them  into the kernel  mman. */
 	node->mn_minaddr = (byte_t *)result;
 	node->mn_maxaddr = (byte_t *)result + num_bytes - 1;
 
@@ -173,7 +173,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	 * of all parts. However, in practice that would be a bad idea
 	 * since parts aren't required to be apart of the global list,
 	 * and not adding a part to said list reduces its connectivity
-	 * to other kernel sub-systems (thus reducing the chances of
+	 * to other kernel sub-systems  (thus reducing the chances  of
 	 * fault recursion) */
 	LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 	part->mp_minaddr          = (pos_t)(0);
@@ -189,10 +189,10 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 
 	/* Initialize resulting memory.
 	 * Note that technically, we could use `page_iszero()' to skip pages
-	 * that had already been zero-initialized, but that would introduce
+	 * that had already been zero-initialized, but that would  introduce
 	 * additional dependencies, as well as the assumption that the page-
-	 * is-zero database doesn't contain incorrect information (which it
-	 * might if the kernel panic'd as the result of calloc-memory not
+	 * is-zero  database doesn't contain incorrect information (which it
+	 * might  if the kernel  panic'd as the  result of calloc-memory not
 	 * actually being zero-initialized due to an error in said database) */
 	if (flags & GFP_CALLOC)
 		memset(result, 0, num_bytes);
@@ -208,7 +208,7 @@ err:
 	return NULL;
 #else
 	/* TODO: Can't use `mman_map_kram_nx()' because that one may allocate
-	 *       physical memory via a chunk-vector (which recursively calls
+	 *       physical  memory via a chunk-vector (which recursively calls
 	 *       kmalloc_nx(), which we're not able to deal with) */
 	void *result;
 	result = mman_map_kram_nx(NULL, num_bytes,
@@ -382,7 +382,7 @@ NOTHROW(KCALL phcore_core_alloc_nx)(size_t num_bytes, gfp_t flags,
 				unused_head = FLOOR_ALIGN(unused_head, HEAP_ALIGNMENT);
 				if (unused_head >= sizeof(struct ph_unused)) {
 					real_alloc = page_bytes - unused_head;
-					/* In order to somewhat better deal with small allocations,
+					/* In order to somewhat better deal with small  allocations,
 					 * allow the unused tail to be re-used in later allocations. */
 					phcore_unused_append(result, unused_head);
 					result = (byte_t *)result + unused_head;
@@ -412,7 +412,7 @@ NOTHROW(KCALL phcore_raw_memalign_nx)(size_t min_alignment, ptrdiff_t offset,
 	return result;
 }
 
-/* Allocate at least `num_bytes' such that
+/* Allocate  at  least  `num_bytes'  such  that
  * `IS_ALIGNED(return + offset, min_alignment)' */
 PRIVATE ATTR_NOINLINE ATTR_COLDTEXT void *
 NOTHROW(KCALL phcore_memalign_nx)(size_t min_alignment, ptrdiff_t offset,
@@ -433,7 +433,7 @@ NOTHROW(KCALL phcore_memalign_nx)(size_t min_alignment, ptrdiff_t offset,
 }
 
 /* NOTE: This function is also be able to return correct values for heap
- *       pointers allocated _before_ the poison heap got injected! */
+ *       pointers  allocated  _before_  the  poison  heap  got injected! */
 PRIVATE ATTR_NOINLINE ATTR_PURE ATTR_COLDTEXT size_t
 NOTHROW(KCALL phcore_usable_size)(void *ptr) {
 	if (!ptr)

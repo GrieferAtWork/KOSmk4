@@ -71,7 +71,7 @@ DECL_BEGIN
 #endif /* futex... */
 
 #ifdef WANT_FUTEX
-/* XXX: Check if these are all of them (you'll see if they
+/* XXX: Check  if these are all of them (you'll see if they
  *      are when you actually implement `sys_futex_impl()') */
 #define LINUX_FUTEX_USES_TIMEOUT(futex_op)    \
 	(((futex_op)&127) == FUTEX_WAIT ||        \

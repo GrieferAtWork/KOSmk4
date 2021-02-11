@@ -343,9 +343,9 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 	} EXCEPT {
 		if (rem != NULL && was_thrown(E_INTERRUPT)) {
 			/* Write back the remaining time to user-space.
-			 * NOTE: If `rem' is a faulty pointer, it is undefined what
-			 *       will happen to that E_SEGFAULT exception, however it
-			 *       is guarantied that an E_INTERRUPT caused by a user-space
+			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
+			 *       will  happen  to  that E_SEGFAULT  exception,  however it
+			 *       is guarantied that an E_INTERRUPT caused by a  user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
 			ktime_t now = ktime();
 			struct timespec tsrem;
@@ -385,9 +385,9 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 	} EXCEPT {
 		if (rem != NULL && was_thrown(E_INTERRUPT)) {
 			/* Write back the remaining time to user-space.
-			 * NOTE: If `rem' is a faulty pointer, it is undefined what
-			 *       will happen to that E_SEGFAULT exception, however it
-			 *       is guarantied that an E_INTERRUPT caused by a user-space
+			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
+			 *       will  happen  to  that E_SEGFAULT  exception,  however it
+			 *       is guarantied that an E_INTERRUPT caused by a  user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
 			ktime_t now = ktime();
 			struct timespec tsrem;
@@ -427,9 +427,9 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 	} EXCEPT {
 		if (rem != NULL && was_thrown(E_INTERRUPT)) {
 			/* Write back the remaining time to user-space.
-			 * NOTE: If `rem' is a faulty pointer, it is undefined what
-			 *       will happen to that E_SEGFAULT exception, however it
-			 *       is guarantied that an E_INTERRUPT caused by a user-space
+			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
+			 *       will  happen  to  that E_SEGFAULT  exception,  however it
+			 *       is guarantied that an E_INTERRUPT caused by a  user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
 			ktime_t now = ktime();
 			struct timespec tsrem;
@@ -469,9 +469,9 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 	} EXCEPT {
 		if (rem != NULL && was_thrown(E_INTERRUPT)) {
 			/* Write back the remaining time to user-space.
-			 * NOTE: If `rem' is a faulty pointer, it is undefined what
-			 *       will happen to that E_SEGFAULT exception, however it
-			 *       is guarantied that an E_INTERRUPT caused by a user-space
+			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
+			 *       will  happen  to  that E_SEGFAULT  exception,  however it
+			 *       is guarantied that an E_INTERRUPT caused by a  user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
 			ktime_t now = ktime();
 			struct timespec tsrem;
@@ -617,7 +617,7 @@ DEFINE_SYSCALL1(errno_t, unshare, syscall_ulong_t, what) {
 	}
 	if (what & CLONE_NEWPID) {
 		/* This one has some really weird semantics, since the
-		 * calling thread isn't moved into the new namespace. */
+		 * calling  thread isn't moved into the new namespace. */
 	}
 	if (what & CLONE_NEWNET) {
 	}

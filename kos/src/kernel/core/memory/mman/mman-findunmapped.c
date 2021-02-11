@@ -81,40 +81,40 @@ DECL_BEGIN
 
 /* The lowest (user-space) address that might ever be automatically
  * selected for mapping by `mman_getunmapped()'. Note that the user
- * may still employ `MAP_FIXED' to overrule this limit,
+ * may   still   employ   `MAP_FIXED'  to   overrule   this  limit,
  * allowing them to mmap anywhere (in user-space)
  * When `addr' is less than this value, it will be clamped to be equal
- * to this value. Furthermore, attempting to search for free memory
+ * to this value.  Furthermore, attempting to  search for free  memory
  * mappings below this address always fails.
  *
  * The value of this variable is exposed in `/proc/sys/vm/mmap_min_addr' */
 PUBLIC USER CHECKED void *mman_getunmapped_user_minaddr = HINT_GETADDR(KERNEL_VMHINT_USER_MINADDR);
 
-/* Default base address for user-space memory mappings. When trying to
- * find an unmapped area within a user-space mman, the FIXED flag isn't
+/* Default  base  address  for  user-space   memory  mappings.  When  trying   to
+ * find an  unmapped  area  within  a  user-space  mman,  the  FIXED  flag  isn't
  * given, and the given hint-address is less than `mman_getunmapped_user_minaddr'
- * then MAX(mman_getunmapped_user_minaddr, mman_getunmapped_user_defbase)
+ * then     MAX(mman_getunmapped_user_minaddr,     mman_getunmapped_user_defbase)
  * will be used as initial hint instead.
  * Afterwards, the actual address to-be returned will be calculated normally.
- * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
+ * By   default,   this   variable   is   set   to  `KERNEL_VMHINT_USER_HEAP' */
 PUBLIC USER CHECKED void *mman_getunmapped_user_defbase = HINT_GETADDR(KERNEL_VMHINT_USER_HEAP);
 
 /* Same as `mman_getunmapped_user_defbase', but used
- * instead when the `MAP_STACK' flag is given. */
+ * instead  when  the  `MAP_STACK'  flag  is  given. */
 PUBLIC USER CHECKED void *mman_getunmapped_user_stkbase = HINT_GETADDR(KERNEL_VMHINT_USER_STACK);
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_getunmapped()'
  * NOTE: _ONLY_ use this always force the `MAP_NOASLR' flag to
  *       be set, thus allowing you to force-disable ASLR system-wide. Using this
- *       for other flags does what you'd think, but the results would probably
+ *       for other flags does what you'd  think, but the results would  probably
  *       be catastrophic.
  *       Also note that modifications to this variable must be done atomically! */
 PUBLIC unsigned int mman_getunmapped_extflags = 0;
 
 
 /* Select a random integer >= minval && <= maxval, with
- * a bias towards numbers that are closer to `bias' */
+ * a bias  towards numbers  that are  closer to  `bias' */
 PRIVATE PAGEDIR_PAGEALIGNED uintptr_t KCALL
 select_random_integer_with_bias(uintptr_t minval,
                                 uintptr_t maxval,
@@ -138,12 +138,12 @@ select_random_integer_with_bias(uintptr_t minval,
 		bias -= minval;
 		offset = bias;
 
-		/* Repeatedly shrink the random range surrounding the
-		 * original bias, thus that the bias itself continues
-		 * to remain apart of the minval...maxval range.
+		/* Repeatedly shrink  the  random  range  surrounding  the
+		 * original  bias,  thus  that the  bias  itself continues
+		 * to   remain   apart  of   the   minval...maxval  range.
 		 * This way, the range of valid values repeatedly shrinks,
-		 * and could feasibly not shrink at all, though in the
-		 * average case, it will continue to narrow down on the
+		 * and  could feasibly  not shrink  at all,  though in the
+		 * average case, it  will continue to  narrow down on  the
 		 * given bias. */
 		for (i = 0; i < steps && rand_count > 0; ++i) {
 			offset = krand() % rand_count;
@@ -161,24 +161,24 @@ select_random_integer_with_bias(uintptr_t minval,
 }
 
 
-/* Try to find a suitable, unmapped address range. Note that this function never
+/* Try to find a suitable, unmapped address range. Note that this function  never
  * throws an exception, but also doesn't allow for use of `MAP_FIXED'. Attempting
- * to pass that flag is simply ignored, and the function acts as though that bit
+ * to  pass that flag is simply ignored, and the function acts as though that bit
  * hadn't actually been set.
  * @param: self:      The mman in which to create the mapping. For this purpose,
- *                    any mman other than `mman_kernel' will always cause an
- *                    error when trying to map to a kernel-space address.
- *                    NOTE: The caller must be holding a lock to this mman!
+ *                    any mman  other than  `mman_kernel' will  always cause  an
+ *                    error when  trying  to  map  to  a  kernel-space  address.
+ *                    NOTE: The caller  must be  holding a  lock to  this  mman!
  * @param: addr:      A hint for where to search for free memory.
- * @param: num_bytes: The min. number of bytes that should not already be in use,
- *                    starting at the returned address. For this purpose, you may
- *                    assume that this function actually guaranties that at least
+ * @param: num_bytes: The min. number of bytes that  should not already be in  use,
+ *                    starting at the returned address.  For this purpose, you  may
+ *                    assume that this function  actually guaranties that at  least
  *                    `CEIL_ALIGN(num_bytes, PAGESIZE)' bytes are available, unless
  *                    `MAP_FIXED' was used
  * @param: min_alignment: The minimum alignment of the return value. Note that no matter
- *                    what is passed for this value, the actual return value will always
- *                    be aligned by at least the size of a single page. If this argument
- *                    isn't a pointer-of-2, then the alignment guarantied for the return
+ *                    what is passed for this value, the actual return value will  always
+ *                    be  aligned by at least the size of a single page. If this argument
+ *                    isn't a pointer-of-2, then the alignment guarantied for the  return
  *                    value is undefined, except that it will still be at least PAGESIZE!
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Unknown flags are silently ignored.
@@ -225,7 +225,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
 	}
 
 	/* We want `addr' to always point to the lower end of the hinted
-	 * address range. - As such, try to subtract the total size of
+	 * address range. - As such, try  to subtract the total size  of
 	 * the needed range from the hinted address. */
 	if (MMAN_GETUNMAPPED_ISBELOW(flags)) {
 		if (OVERFLOW_USUB((uintptr_t)addr, num_bytes, (uintptr_t *)&addr))
@@ -278,7 +278,7 @@ again_find_good_range:
 	/* Safety check: Is the range of allowed addresses non-empty? */
 	if unlikely(allow_maxaddr < allow_minaddr) {
 err_no_space:
-		/* Try without the +1 additional page of
+		/* Try without the  +1 additional page  of
 		 * normally included in stack allocations. */
 		if (flags & MAP_STACK) {
 			num_bytes -= 2 * PAGESIZE;
@@ -323,7 +323,7 @@ do_set_automatic_userspace_hint:
 	avail_minaddr = (byte_t *)addr;
 	avail_maxaddr = (byte_t *)addr + num_bytes - 1;
 	/* Make sure that the hinted address range lies within the max result bounds.
-	 * This also makes sure that the requested address size is properly bound. */
+	 * This  also makes sure  that the requested address  size is properly bound. */
 	if (avail_maxaddr > allow_maxaddr) {
 		if unlikely(OVERFLOW_USUB((uintptr_t)allow_maxaddr, num_bytes - 1, (uintptr_t *)&addr))
 			goto err_no_space;
@@ -351,7 +351,7 @@ select_from_avail_range:
 		if unlikely(HAS_EXTENDED_MIN_ALIGNMENT)
 			alignshift = CTZ(min_alignment);
 
-		/* Figure out the outer bounds of the available range, and
+		/* Figure out the outer bounds of the available range,  and
 		 * select a biased result value based on the original hint. */
 		assert(avail_maxaddr >= ((byte_t *)avail_minaddr + num_bytes - 1));
 		assert(!mnode_tree_rlocate(self->mm_mappings, avail_minaddr, avail_maxaddr));
@@ -414,7 +414,7 @@ select_from_avail_range:
 		PAGEDIR_PAGEALIGNED void *lo_best_minaddr, *lo_best_maxaddr;
 		PAGEDIR_PAGEALIGNED void *hi_best_minaddr, *hi_best_maxaddr;
 		/* The hinted address range is already in use.
-		 * -> Find a larger range below and/or above the
+		 * -> Find a larger  range below  and/or above  the
 		 *    first (resp.) conflict with the hinted range. */
 		if (MMAN_GETUNMAPPED_ISBELOW(flags)) {
 			want_below = true;
@@ -507,7 +507,7 @@ continue_find_above:
 		/* Check for special case: we've managed to find something in both directions. */
 		if (lo_best_minaddr <= lo_best_maxaddr &&
 		    hi_best_minaddr <= hi_best_maxaddr) {
-			/* Must decide if we want to choose from below- or from
+			/* Must decide if we want  to choose from below- or  from
 			 * above the requested range. For this purpose, we choose
 			 * the range that is closer to the given hint address, or
 			 * select randomly with a bias on said close-ness. */
@@ -535,12 +535,12 @@ continue_find_above:
 				goto select_from_lo_range; /* Shouldn't happen... */
 			threshold = KRAND(size_t) % total;
 
-			/* Consider that lo_dist < hi_dist. We've got a random
-			 * number between 0..(lo_dist+hi_dist)-1. It's less likely
-			 * that the number is less than lo_dist, meaning that the
-			 * check `threshold < (size_t)lo_dist' succeeds in the less
+			/* Consider that  lo_dist  <  hi_dist. We've  got  a  random
+			 * number between 0..(lo_dist+hi_dist)-1.  It's less  likely
+			 * that the number  is less than  lo_dist, meaning that  the
+			 * check `threshold < (size_t)lo_dist' succeeds in the  less
 			 * likely case. And because `lo_dist < hi_dist', and we want
-			 * the less likely case to be choosing the range that is
+			 * the less likely  case to  be choosing the  range that  is
 			 * further away, that check must be assigned to the hi range
 			 * in this situation.
 			 * The case where lo_dist > hi_dist automagically allows for
@@ -565,7 +565,7 @@ select_from_hi_range:
 		}
 
 		/* If we didn't manage to find anything in one direction,
-		 * try to search in the other direction also. */
+		 * try   to   search   in  the   other   direction  also. */
 		if (!want_below || !want_above) {
 			want_below = true;
 			want_above = true;
@@ -575,7 +575,7 @@ select_from_hi_range:
 	}
 
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
-	/* Have the return value point past the leading guard-page.
+	/* Have the return value  point past the leading  guard-page.
 	 * We've originally (tried) to allocate +1 page of additional
 	 * space for this very purpose! (see above) */
 	if (flags & MAP_STACK) {
@@ -603,35 +603,35 @@ err:
 
 
 /* Similar to `mman_findunmapped()', but never return `MAP_FAILED', and automatically split
- * mem-nodes at the resulting min/max bounds when `MAX_FIXED' w/o `MAP_FIXED_NOREPLACE' is
- * used, and another mapping already existed at the specified location. If this cannot be
- * done without blocking, release all locks, do the split while not holding any locks, and
- * return `MAP_FAILED', indicative of the caller needing to re-acquire
+ * mem-nodes  at the resulting min/max bounds when `MAX_FIXED' w/o `MAP_FIXED_NOREPLACE' is
+ * used, and another mapping already existed at  the specified location. If this cannot  be
+ * done  without blocking, release all locks, do the split while not holding any locks, and
+ * return   `MAP_FAILED',    indicative   of    the    caller   needing    to    re-acquire
  * locks and re-attempt the call.
  * @param: self:      The mman in which to create the mapping. For this purpose,
- *                    any mman other than `mman_kernel' will always cause an
- *                    error when trying to map to a kernel-space address.
- *                    NOTE: The caller must be holding a lock to this mman!
+ *                    any mman  other than  `mman_kernel' will  always cause  an
+ *                    error when  trying  to  map  to  a  kernel-space  address.
+ *                    NOTE: The caller  must be  holding a  lock to  this  mman!
  * @param: addr:      A hint for where to search for free memory.
- * @param: num_bytes: The min. number of bytes that should not already be in use,
- *                    starting at the returned address. For this purpose, you may
- *                    assume that this function actually guaranties that at least
+ * @param: num_bytes: The min. number of bytes that  should not already be in  use,
+ *                    starting at the returned address.  For this purpose, you  may
+ *                    assume that this function  actually guaranties that at  least
  *                    `CEIL_ALIGN(num_bytes, PAGESIZE)' bytes are available, unless
  *                    `MAP_FIXED' was used
  * @param: min_alignment: The minimum alignment of the return value. Note that no matter
- *                    what is passed for this value, the actual return value will always
- *                    be aligned by at least the size of a single page. If this argument
- *                    isn't a pointer-of-2, then the alignment guarantied for the return
+ *                    what is passed for this value, the actual return value will  always
+ *                    be  aligned by at least the size of a single page. If this argument
+ *                    isn't a pointer-of-2, then the alignment guarantied for the  return
  *                    value is undefined, except that it will still be at least PAGESIZE!
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
- *                    Additionally, `MAP_FIXED' and `MAP_FIXED_NOREPLACE' are accepted.
+ *                    Additionally,   `MAP_FIXED'   and  `MAP_FIXED_NOREPLACE'   are  accepted.
  *                    Unknown flags are silently ignored.
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MAP_FAILED:             Locks had to be released, but another attempt might succeed.
- *                                  Reacquire all required locks, and re-attempt the call.
+ *                                  Reacquire  all  required  locks,  and  re-attempt  the call.
  * @throws: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to locate a suitably large address
- *                                                  range that fits the given constraints.
- * @throws: E_BADALLOC_ADDRESS_ALREADY_EXISTS:      Both `MAP_FIXED' and `MAP_FIXED_NOREPLACE'
+ *                                                  range  that  fits the  given constraints.
+ * @throws: E_BADALLOC_ADDRESS_ALREADY_EXISTS:      Both  `MAP_FIXED'  and   `MAP_FIXED_NOREPLACE'
  *                                                  were given, and a pre-existing mapping already
  *                                                  exists within the given address range. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) void *FCALL
@@ -662,8 +662,8 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 				      addr, maxaddr,
 				      node_minaddr, node_maxaddr);
 			}
-			/* Special case: Only allowed to mmap FIXED into kernel-space
-			 *               when using the kernel page directory as base,
+			/* Special case: Only  allowed  to mmap  FIXED  into kernel-space
+			 *               when using the  kernel page  directory as  base,
 			 *               which user-space isn't (normally) allowed to do. */
 			if (ADDRRANGE_ISKERN_PARTIAL((byte_t *)addr,
 			                             (byte_t *)addr + num_bytes) &&
@@ -678,8 +678,8 @@ disallow_mmap:
 			mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);
 			assert(mima.mm_min && mima.mm_max);
 			/* TODO: If we were to work together without our caller (mman_map()),
-			 *       then we could make this easier by simply truncating the
-			 *       pre-existing node, and only splitting it when the result
+			 *       then we  could make  this easier  by simply  truncating  the
+			 *       pre-existing node,  and only  splitting it  when the  result
 			 *       range is fully contained within a single, pre-existing node! */
 			if (mnode_getminaddr(mima.mm_min) != result) {
 				/* Must split this node! */

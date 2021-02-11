@@ -42,15 +42,15 @@
 
 DECL_BEGIN
 
-/* Load an executable binary into a temporary, emulated mman.
+/* Load  an  executable   binary  into  a   temporary,  emulated   mman.
  * If this succeeds, clear all of the mappings from the given `ea_mman',
- * and replace them with the contents of the temporary, emulated mman
- * (such that the entire process of mapping the new contents is always
- * able to either seamlessly restore the old memory mappings, or not
+ * and  replace them with  the contents of  the temporary, emulated mman
+ * (such that the entire process of  mapping the new contents is  always
+ * able to either  seamlessly restore  the old memory  mappings, or  not
  * even touch them at all upon error)
  * -> This function is used to implement the exec() family of system calls
- *    in such that exec() is always able to allow the calling program to
- *    handle load errors (at least so long as those errors aren't caused
+ *    in  such that exec() is always able  to allow the calling program to
+ *    handle load errors (at least so  long as those errors aren't  caused
  *    by the executable's initialization, such as missing libraries)
  * NOTE: Upon successful return, all threads using `ea_mman' (excluding
  *       the caller themself if they are using the mman, too) will have
@@ -108,11 +108,11 @@ again_loadheader:
 		/* If requested to, restart the exec process.
 		 * This is used to implement interpreter redirection, as used by #!-scripts. */
 		if (status == EXECABI_EXEC_RESTART) {
-			/* Make sure to service RPC functions before restarting.
-			 * A malicious user may have set-up #!-files in a loop, and
-			 * we must ensure that some other user remains the ability
+			/* Make  sure  to service  RPC functions  before restarting.
+			 * A  malicious user may have set-up #!-files in a loop, and
+			 * we must ensure that some  other user remains the  ability
 			 * to kill(2) or CTRL+C our process (in order words: we must
-			 * guaranty to be able to service RPCs when looping back) */
+			 * guaranty to be  able to service  RPCs when looping  back) */
 			task_serve();
 			goto again_loadheader;
 		}
@@ -151,7 +151,7 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_init_binary,
 
 
 /* Update the given cpu state to start executing /bin/init, or whatever
- * was passed as argument in a `init=...' kernel commandline option. */
+ * was passed as  argument in a  `init=...' kernel commandline  option. */
 INTERN ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	struct execargs args;
@@ -189,7 +189,7 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 		struct debugtrap_reason r;
 		r.dtr_signo  = SIGTRAP;
 		r.dtr_reason = DEBUGTRAP_REASON_EXEC;
-		/* FIXME: Should re-print the path using `path_sprintent()', since the path
+		/* FIXME: Should re-print the path using `path_sprintent()', since the  path
 		 *        given by the bootloader may be ambiguous (or contain/be a symlink) */
 		r.dtr_strarg = kernel_init_binary;
 		state = kernel_debugtrap_r(state, &r);

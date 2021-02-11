@@ -132,10 +132,10 @@ Fat32_VReadFromINode(struct inode *__restrict self,
 			diskpos = FAT_CLUSTERADDR(fat, cluster);
 			diskpos += cluster_offset;
 			max_io = fat->f_clustersize - cluster_offset;
-			/* Optimization: When reading large amounts of data, check if the
+			/* Optimization: When reading  large amounts  of data,  check if  the
 			 *               underlying disk chunks were allocated consecutively.
-			 *               If they were, then we can simply do one continuous
-			 *               read, processing more than one cluster at a time. */
+			 *               If they were, then we  can simply do one  continuous
+			 *               read, processing more  than one cluster  at a  time. */
 			while (max_io < bufsize &&
 			       Fat_GetFileCluster(self, cluster_number + 1,
 			                          FAT_GETCLUSTER_MODE_FNORMAL) ==
@@ -181,10 +181,10 @@ Fat32_VTryReadFromINode(struct inode *__restrict self,
 			diskpos = FAT_CLUSTERADDR(fat, cluster);
 			diskpos += cluster_offset;
 			max_io = fat->f_clustersize - cluster_offset;
-			/* Optimization: When reading large amounts of data, check if the
+			/* Optimization: When reading  large amounts  of data,  check if  the
 			 *               underlying disk chunks were allocated consecutively.
-			 *               If they were, then we can simply do one continuous
-			 *               read, processing more than one cluster at a time. */
+			 *               If they were, then we  can simply do one  continuous
+			 *               read, processing more  than one cluster  at a  time. */
 			while (max_io < bufsize &&
 			       Fat_GetFileCluster(self, cluster_number + 1,
 			                          FAT_GETCLUSTER_MODE_FNORMAL) ==
@@ -228,10 +228,10 @@ Fat32_VWriteToINode(struct inode *__restrict self,
 			diskpos = FAT_CLUSTERADDR(fat, cluster);
 			diskpos += cluster_offset;
 			max_io = fat->f_clustersize - cluster_offset;
-			/* Optimization: When reading large amounts of data, check if the
+			/* Optimization: When reading  large amounts  of data,  check if  the
 			 *               underlying disk chunks were allocated consecutively.
-			 *               If they were, then we can simply do one continuous
-			 *               read, processing more than one cluster at a time. */
+			 *               If they were, then we  can simply do one  continuous
+			 *               read, processing more  than one cluster  at a  time. */
 			while (max_io < bufsize &&
 			       Fat_GetFileCluster(self, cluster_number + 1,
 			                          FAT_GETCLUSTER_MODE_FCREATE) ==
@@ -446,7 +446,7 @@ zero_initialize_cluster(FatSuperblock *__restrict fat,
 }
 
 
-/* Lookup (and potentially allocate the associated
+/* Lookup (and potentially allocate the  associated
  * chain for) the `nth_cluster' of the given `node' */
 INTERN NONNULL((1)) FatClusterIndex KCALL
 Fat_GetFileCluster(struct inode *__restrict node,
@@ -545,7 +545,7 @@ create_more_clusters_already_locked:
 				++data->i_clusterc;
 				TRY {
 					if (data->i_clusterc == 2) {
-						/* The pointer to the first cluster is stored in the INode.
+						/* The pointer  to  the  first  cluster is  stored  in  the  INode.
 						 * Since we've just written that pointer, mark the node as changed. */
 						if (!(mode & FAT_GETCLUSTER_MODE_FNCHNGE))
 							inode_changedattr(node);
@@ -615,7 +615,7 @@ FatDirectory_AllocateFreeRange(struct directory_node *__restrict self,
                                bool *__restrict pis_directory_end)
 		THROWS(...) {
 	/* XXX: Search through available free ranges and return the first
-	 *      one with at least `entry_count' free slots and set
+	 *      one with  at  least  `entry_count'  free  slots  and  set
 	 *     `*pis_directory_end' to `false'.  Otherwise return the
 	 *      index where the directory currently ends and set
 	 *     `*pis_directory_end' to `true'. */
@@ -664,8 +664,8 @@ NOTHROW(KCALL FatDirectory_CheckTruncation)(struct directory_node *__restrict se
 	if (self == self->i_super && ((FatSuperblock *)self)->f_type != FAT32)
 		return; /* Fixed-length directory (cannot be truncated) */
 	/* XXX: Check if the directory can be truncated.
-	 *   -> A directory can be truncated whereever a free-entry
-	 *      range is larger than one FAT-sector, in which case the
+	 *   -> A  directory  can   be  truncated   whereever  a   free-entry
+	 *      range is  larger  than  one FAT-sector,  in  which  case  the
 	 *      associated sector can simply be unlinked from the directory's
 	 *      linked sector chain. */
 }
@@ -715,7 +715,7 @@ typedef struct ATTR_PACKED {
 } FatFileStorage;
 
 /* Even though the problem was fixed by `FatFileStorage' and forcing 2-byte alignment,
- * GCC still bickers about unaligned use of the LFN filename, even though that can't
+ * GCC still bickers about unaligned use of  the LFN filename, even though that  can't
  * happen anymore (just ignore the warning, maybe they'll fix this at some point...) */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
@@ -808,11 +808,11 @@ continue_reading:
 			}
 		} while (FILE_IS_LFN(fatfile));
 		if unlikely(lfn_valid & (lfn_valid + 1)) {
-			/* `lfn_valid' isn't a complete mask. (some part of the
+			/* `lfn_valid' isn't  a complete  mask.  (some part  of  the
 			 * name might have been corrupted, or accidentally deleted?)
-			 * Anyways: don't raise hell about this one and just delete
+			 * Anyways: don't raise hell about this one and just  delete
 			 *          the string portions that were affected (that way
-			 *          we at least preserve whatever portion of the
+			 *          we  at  least preserve  whatever portion  of the
 			 *          filename can still be recovered) */
 			unsigned int index = 0;
 			u32 mask;
@@ -925,7 +925,7 @@ dos_8dot3:
 			}
 			if (entry_name[0] == '.') {
 				/* The kernel implements these itself, so
-				 * we don't actually want to emit them! */
+				 * we don't actually  want to emit  them! */
 				if (name_length == 1)
 					goto continue_reading; /* Directory-self-reference. */
 				if (entry_name[1] == '.')
@@ -957,8 +957,8 @@ dos_8dot3:
 		result->de_type = DT_REG;
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 		if (fatfile.f_attr & FAT_ATTR_SYSTEM) {
-			/* Check if this might actually be a symbolic link.
-			 * For this purpose, verify that the file is large
+			/* Check if this might actually be a symbolic  link.
+			 * For this purpose, verify  that the file is  large
 			 * enough (symlinks must have at least 1 character),
 			 * and that magic markers are present. */
 			u32 filsiz = LETOH32(fatfile.f_size);
@@ -969,7 +969,7 @@ dos_8dot3:
 				if (!(super->f_features & FAT_FEATURE_NO_CYGWIN_SYMLINK)) {
 					FatClusterIndex cluster;
 					/* Try to read the first couple of bytes from the file,
-					 * and check if they match the expected header. */
+					 * and   check  if  they  match  the  expected  header. */
 					cluster = LETOH16(fatfile.f_clusterlo);
 					if (!(super->f_features & FAT_FEATURE_ARB))
 						cluster |= (u32)LETOH16(fatfile.f_clusterhi) << 16;
@@ -1109,7 +1109,7 @@ NOTHROW(KCALL Fat_MaskINodeAttributes)(struct inode *__restrict self) {
 			self->i_fileuid = (uid_t)0;
 		if (self->i_filegid > (gid_t)0xff)
 			self->i_filegid = (gid_t)0;
-		/* Without atime support, the last-access
+		/* Without atime  support, the  last-access
 		 * timestamp is always set to last-modified */
 		self->i_fileatime = self->i_filemtime;
 	} else {
@@ -1266,7 +1266,7 @@ NOTHROW(KCALL Fat_SaveINodeToFatFile)(struct inode const *__restrict self,
 		if (!(unix_perm & S_IROTH))
 			arb |= FAT_ARB_NO_WR; /* Disable: Read by world */
 		if (!(unix_perm & 0222)) {
-			/* Preserve ARB flags for write permissions if those can
+			/* Preserve ARB flags  for write permissions  if those  can
 			 * already be represented through use of the READONLY flag. */
 			arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
 			arb |= data->i_file.f_arb & (FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
@@ -1342,9 +1342,9 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 	case FAT_IOCTL_GET_ATTRIBUTES:
 		validate_writable(arg, sizeof(u32));
 		inode_loadattr(self);
-		/* XXX: Technically, should should instead check for
-		 *      `inode_access(R_OK)' on the directory that is
-		 *      containing `self'. However, at this point we
+		/* XXX: Technically,  should  should instead  check for
+		 *      `inode_access(R_OK)' on the  directory that  is
+		 *      containing `self'.  However, at  this point  we
 		 *      have no easy way of determining that directory. */
 		require(CAP_FOWNER);
 		*(u32 *)arg = self->i_fsdata->i_file.f_attr;
@@ -1357,9 +1357,9 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 		COMPILER_READ_BARRIER();
 		value = *(u32 *)arg;
 		COMPILER_READ_BARRIER();
-		/* XXX: Technically, should should instead check for
-		 *      `inode_access(W_OK)' on the directory that is
-		 *      containing `self'. However, at this point we
+		/* XXX: Technically,  should  should instead  check for
+		 *      `inode_access(W_OK)' on the  directory that  is
+		 *      containing `self'.  However, at  this point  we
 		 *      have no easy way of determining that directory. */
 		require(CAP_FOWNER);
 		if unlikely(value & ~0xff)
@@ -1412,9 +1412,9 @@ Fat_DoTruncateINode(struct inode *__restrict self,
 		                      fat->f_cluster_eof_marker);
 	} else {
 		/* Upon success, the caller will mark the file as having changed.
-		 * Unless what'll happen next is the file being removed from its
-		 * containing directory, the updated index-0 cluster will be
-		 * written to disk the next time `Fat_SaveINodeToFatFile()' is
+		 * Unless  what'll happen next is the file being removed from its
+		 * containing  directory,  the  updated index-0  cluster  will be
+		 * written to disk  the next  time `Fat_SaveINodeToFatFile()'  is
 		 * called, which is then invoked from `inode_sync()' */
 	}
 	/* Now delete the chain of clusters that just got truncated. */
@@ -1481,11 +1481,11 @@ Fat_RemoveDirectoryFromParentDirectory(struct directory_node *__restrict contain
 	assert(node_to_unlink->d_parent == containing_directory);
 	/* Make sure that all data clusters of the directory to remove have been deleted.
 	 * NOTE: The caller already guaranties that it won't contain any ~actual~ entries,
-	 *       however we know that it does actually still contain its self-entry, as
+	 *       however  we know that  it does actually still  contain its self-entry, as
 	 *       well as the parent-entry, meaning that we do actually have to ensure that
 	 *       those get deallocated as well.
 	 *       And even if it wasn't for them, the directory may still contain some unused
-	 *       file entries that were left behind from when it was still in use. */
+	 *       file entries  that  were  left  behind  from when  it  was  still  in  use. */
 	Fat_DoTruncateINode(node_to_unlink, 0);
 	/* The rest is the same as for regular files... */
 	Fat_UnlinkFileFromParentDirectory(containing_directory,
@@ -1508,20 +1508,20 @@ NOTHROW(KCALL lfn_checksum)(char const *__restrict dos83_name) {
 
 /* Generate the sequence of FAT file-entries required to represent the
  * given `new_node', using `target_dirent' as name in a FAT directory.
- * When LFN entires are required, those are generated as-needed, with
+ * When LFN entires are required, those are generated as-needed,  with
  * the final entry then describing a regular DOS 8.3 filename.
  * NOTE: Of the trailing 8.3 file entry, the caller must still initialize
- *       the `f_clusterhi', `f_clusterlo' and `f_size' fields!
- * @param: pbuffer_length: [in|out] The amount of allocated space for `FatFile'
- *                                  structures in `buffer' (bytes / sizeof(FatFile))
+ *       the   `f_clusterhi',   `f_clusterlo'   and   `f_size'    fields!
+ * @param: pbuffer_length: [in|out] The    amount   of   allocated   space   for   `FatFile'
+ *                                  structures   in   `buffer'  (bytes   /  sizeof(FatFile))
  *                                  Upon success, the amount of used entires is stored here.
  *                                  NOTE: Must be non-zero on entry!
  * @param: cookie: A cookie used to disambiguate the 8.3 filename
  * @param: inhert_heap_buffer: When true, inherit `buffer' as a kmalloc() pointer
  *                             that will be inherited upon success.
- * @return: * : A pointer to the first of `*pbuffer_length' FAT file-entries.
+ * @return: * : A pointer to the first of `*pbuffer_length' FAT  file-entries.
  *              When `buffer' is re-returned, `inhert_heap_buffer' is ignored.
- *              Otherwise, the returned buffer is allocated on the heap using
+ *              Otherwise, the returned buffer is allocated on the heap  using
  *              kmalloc(), and must be freed by the caller. */
 PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) FatFile *KCALL
 Fat_GenerateFileEntries(FatFile *__restrict buffer,
@@ -1664,15 +1664,15 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 		unsigned int retry_hex, retry_dig;
 		char *dst, *iter, *end;
 		dos83.f_ntflags = NTFLAG_NONE;
-		/* Must generate a long filename, also taking
-		 * the value of 'retry' into consideration.
+		/* Must generate  a long  filename, also  taking
+		 * the  value  of  'retry'  into  consideration.
 		 * Now for the hard part: The filename itself... */
 		retry_hex = (cookie / 9);
 		retry_dig = (cookie % 9);
 
-		/* The first 2 short characters always match the
+		/* The  first  2   short  characters   always  match   the
 		 * first 2 characters of the original base (in uppercase).
-		 * If no hex-range retries are needed, the first 6 match. */
+		 * If no hex-range retries are needed, the first 6  match. */
 		matchsize = retry_hex ? 2 : 6;
 		if (matchsize > basesize)
 			matchsize = basesize;
@@ -1693,7 +1693,7 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 			PRIVATE char const xch[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
 				                           '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 			/* Following the matching characters are 4 hex-chars
-			 * whenever more than 9 retry attempts have failed
+			 * whenever  more than 9  retry attempts have failed
 			 * >> This multiplies the amount of available names by 0xffff */
 			*dst++ = xch[(retry_hex & 0xf000) >> 12];
 			*dst++ = xch[(retry_hex & 0x0f00) >> 8];
@@ -1905,7 +1905,7 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 			if (!(unix_perm & S_IROTH))
 				arb |= FAT_ARB_NO_WR; /* Disable: Read by world */
 			if (!(unix_perm & 0222)) {
-				/* Preserve ARB flags for write permissions if those can
+				/* Preserve ARB flags  for write permissions  if those  can
 				 * already be represented through use of the READONLY flag. */
 				arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
 				arb |= data->i_file.f_arb & (FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
@@ -1926,7 +1926,7 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 			if (is_directory_end) {
 				/* Write a new end-of-directory entry.
 				 * NOTE: Do this before we write the actual new file to prevent
-				 *       corrupting the end-of-directory marker if an error
+				 *       corrupting  the  end-of-directory marker  if  an error
 				 *       occurs while we're writing the new files. */
 				Fat_VWriteToINode(target_directory,
 				                  (byte_t *)&sential_fatfile,
@@ -2058,7 +2058,7 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 			pattern[1].f_clusterhi = HTOLE16((u16)(index >> 16));
 		} else {
 			/* 0x0000 -- Free Cluster; also used by DOS to refer to the parent directory starting cluster
-			 *           in ".." entries of subdirectories of the root directory on FAT12/FAT16 volumes
+			 *           in ".." entries of subdirectories of  the root directory on FAT12/FAT16  volumes
 			 *           https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system */
 		}
 		/* Allocate the first cluster for the new directory, so
@@ -2104,16 +2104,16 @@ Fat_RenameFileInDirectory(struct directory_node *__restrict source_directory,
 		       E_IOERROR, ...) {
 	/* Add the file to its new directory first.
 	 * This way, even if we fail to unlink the file from its own directory,
-	 * at no point will we run the risk of ending up with no file at all! */
+	 * at  no point will we run the risk  of ending up with no file at all! */
 	Fat_AddFileToDirectory(target_directory, target_dirent, source_node);
 	TRY {
 		/* With the file now apart of the target directory,
-		 * we can now remove it from the source directory. */
+		 * we can now remove it from the source  directory. */
 		Fat_UnlinkFileFromParentDirectoryImpl(source_directory, source_dirent);
 	} EXCEPT {
 		/* If we couldn't remove the node from the source directory, try to
 		 * remove it from the target directory, so we don't end up with the
-		 * same file in 2 different locations, which could end _real_ bad,
+		 * same  file in 2 different locations, which could end _real_ bad,
 		 * especially since FAT doesn't support hard links. */
 		source_node->i_fileino = source_dirent->de_ino;
 		Fat_UnlinkFileFromParentDirectoryImpl(target_directory, target_dirent);
@@ -2726,7 +2726,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		self->f_root.i16_root.f16_rootsiz = (u32)LETOH16(disk_header.bpb.bpb_maxrootsize);
 		self->f_root.i16_root.f16_rootsiz *= sizeof(FatFile);
 		self->f_cluster_eof = (self->f_sec4fat << self->f_sectorshift) / 2;
-		/* It is possible to create a FAT16 filesystem with 0x10000 sectors.
+		/* It is possible  to create  a FAT16 filesystem  with 0x10000  sectors.
 		 * This is a special case since sector 0xffff still needs to be reserved
 		 * as the special sector used for marking file EOF.
 		 * Because of this, make sure not to allocate sectors above the EOF marker */

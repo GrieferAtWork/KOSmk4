@@ -35,7 +35,7 @@
 DECL_BEGIN
 
 /* Unmap a kernel-space memory mapping (that was created using `VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED')
- * from kernel-space, where the caller must be holding a lock to `vm_kernel_treelock_write()'
+ * from   kernel-space,   where  the   caller  must   be  holding   a  lock   to  `vm_kernel_treelock_write()'
  * HINT: In order to do this entirely non-blocking, you should make use
  *       of `vm_kernel_pending_operations'! */
 PUBLIC NOBLOCK void

@@ -188,13 +188,13 @@ struct ctype {
 	uintptr_half_t ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
 	struct ctype  *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
 	union {
-		struct cmoduledip ct_enum; /* [valid_if(CTYPE_KIND_ISENUM)] Enum information. Points just
+		struct cmoduledip ct_enum; /* [valid_if(CTYPE_KIND_ISENUM)] Enum    information.    Points    just
 		                            * past the `DW_TAG_enumeration_type' tag of the surrounding enumerator
 		                            * (scan this region for `DW_TAG_enumerator' child elements). */
 
 		struct {
 			struct cmoduledip ct_info;   /* Struct information. Points just past the `DW_TAG_structure_type'
-			                              * (or similar) tag of the surrounding structure (scan
+			                              * (or   similar)   tag   of   the   surrounding   structure  (scan
 			                              * this region for `DW_TAG_member' child elements). */
 			size_t            ct_sizeof; /* Sizeof() this struct. */
 		} ct_struct; /* [valid_if(CTYPE_KIND_ISSTRUCT)] */
@@ -242,7 +242,7 @@ FUNDEF NONNULL((1)) REF struct ctype *
 NOTHROW(FCALL ctype_ptr)(struct ctyperef const *__restrict self,
                          size_t sizeof_pointer);
 
-/* Return the array-version of the given C-type
+/* Return  the   array-version  of   the  given   C-type
  * NOTE: The returned type must inherit `self->ct_flags'
  * @param: flags: Type-reference-flags (set of `CTYPEREF_FLAG_*') */
 FUNDEF NONNULL((1)) REF struct ctype *
@@ -263,9 +263,9 @@ FUNDEF ATTR_PURE NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL ctype_equal)(struct ctype const *a,
                            struct ctype const *b);
 
-/* Return the common type which can be used to represent both `a' and `b'.
+/* Return the common type which  can be used to  represent both `a' and  `b'.
  * This common type is the promotion of `a' and `b' if those types are equal,
- * and otherwise is the larger integer type of the two. If neither types are
+ * and  otherwise is the larger integer type of the two. If neither types are
  * integers, then a common type doesn't exist and `NULL' is returned. */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct ctype *
 NOTHROW(FCALL ctype_common)(struct ctype *a,
@@ -601,8 +601,8 @@ FUNDEF WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self);
 
 
-/* Load a C-type from a given `type_debug_info' which should be
- * loaded with the help of an internal copy made from `cu_parser'.
+/* Load   a   C-type   from   a   given   `type_debug_info'   which   should  be
+ * loaded  with  the   help  of   an  internal  copy   made  from   `cu_parser'.
  * The given `type_debug_info' is a pointer like `di_debuginfo_member_t::m_type'
  * @param: ptyperef_flags: When non-NULL, store type-reference flags here (`CTYPEREF_FLAG_*')
  * @return: DBX_EOK:     A reference to the associated type.
@@ -616,7 +616,7 @@ NOTHROW(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
                             /*out*/ struct ctyperef *__restrict presult);
 
 /* Same as `ctype_fromdw()', but when `type_debug_info'
- * is NULL, fill `*presult' with `ctype_void'. */
+ * is  NULL,   fill   `*presult'   with   `ctype_void'. */
 FUNDEF WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
 NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
                                 struct cmodunit const *__restrict cunit,

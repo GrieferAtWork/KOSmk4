@@ -55,7 +55,7 @@ PRIVATE ATTR_READMOSTLY WEAK
 struct pending_unmap_ram *vm_pending_unmap_kernel_ram = NULL;
 
 /* [0..1][lock(ATOMIC)] Chain of pending operations to-be performed
- * the next time a lock to the kernel VM could be acquired. */
+ * the next  time  a lock  to  the  kernel VM  could  be  acquired. */
 PUBLIC ATTR_READMOSTLY WEAK struct vm_kernel_pending_operation *
 vm_kernel_pending_operations = NULL;
 
@@ -107,8 +107,8 @@ NOTHROW(KCALL vm_do_pdir_unmap)(PAGEDIR_PAGEALIGNED void *addr,
 	vm_supersync(addr, num_bytes);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	/* NOTE: Only unprepare the range after all CPUs were notified about the unmap.
-	 *       If we were to free any descriptor pages before then, the pages may
-	 *       be allocated again, and become corrupt while other cores are still
+	 *       If we were  to free any  descriptor pages before  then, the pages  may
+	 *       be allocated again,  and become  corrupt while other  cores are  still
 	 *       believing them to contain paging data. */
 	pagedir_unprepare(addr, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -410,27 +410,27 @@ NOTHROW(KCALL vm_do_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
 	 *  - Because hinted VM nodes cannot be split (only truncated),
 	 *    we must first see how many pages reside on the upper end
 	 *    of the sub-segment to-be unmapped.
-	 *  - We must always chose the upper end because we must eventually
+	 *  - We must always chose the  upper end because we must  eventually
 	 *    truncate the associated data part's `dp_pprop_p' vector, though
 	 *    we cannot modify its base-pointer, or move around its elements.
 	 *    NOTE: The same goes for the `rd_blockv' vector.
-	 *    This restriction must be in place, since the page-fault handler
+	 *    This  restriction must  be in  place, since  the page-fault handler
 	 *    doesn't acquire any sort of lock before accessing such a component,
-	 *    relying purely on the assumption that the kernel won't try to
+	 *    relying  purely  on the  assumption that  the  kernel won't  try to
 	 *    unmap its own private memory, whilst still using that memory.
 	 *  - We then ensure that all pages above the unmapped segment have been
-	 *    initialized in kernel memory (this is guarantied to be NOEXCEPT
-	 *    because hinted memory in kernel-space is always pre-allocated,
-	 *    and always has initializers that don't throw any exceptions)
-	 *    A type of initializer like this would usually only `memset()'
+	 *    initialized in kernel  memory (this is  guarantied to be  NOEXCEPT
+	 *    because  hinted  memory in  kernel-space is  always pre-allocated,
+	 *    and always  has  initializers  that don't  throw  any  exceptions)
+	 *    A type  of initializer  like this  would usually  only  `memset()'
 	 *    or `mempat()' new memory for either debugging or `calloc()'
 	 *  - Once that is done, we know that everything above the sub-segment
-	 *    to-be unmapped has been allocated, and consequently no longer
+	 *    to-be unmapped has  been allocated, and  consequently no  longer
 	 *    represents hinted memory (the page directory contains the actual
-	 *    memory mapping, rather than a hint as to how to initialize it).
+	 *    memory mapping, rather than a hint as to how to initialize  it).
 	 *    Because of this, we can proceed to replace the upper sub-segment
-	 *    with a new VM node/data part pair, before moving on to truncate
-	 *    the original (and still hinted base node) to end where the
+	 *    with a new VM node/data part pair, before moving on to  truncate
+	 *    the  original  (and still  hinted base  node)  to end  where the
 	 *    unmapped sub-segment ends.
 	 *
 	 *
@@ -444,7 +444,7 @@ NOTHROW(KCALL vm_do_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
 	 * [HINTEDHINTED]                      [USABLEUSABLEUSABLEUSABLEUSABLE]
 	 *              |-- Unmap this part ---|
 	 *
-	 * Note that the upper part is entirely new, and no longer represents
+	 * Note that the upper part is entirely new, and no longer  represents
 	 * hinted memory, while the lower part still is the same datapart, but
 	 * has been truncated!
 	 *
@@ -467,7 +467,7 @@ again:
 	assert(unmap_max >= unmap_min);
 	assert(unmap_max <= __ARCH_PAGEID_MAX);
 	/* With the caller having acquired a write-lock to the kernel
-	 * VM for us, now it's time to actually perform the unmap! */
+	 * VM  for us, now  it's time to  actually perform the unmap! */
 	node = vm_paged_node_remove(&vm_kernel, unmap_min);
 	assertf(node, "Nothing mapped at %p...%p\n",
 	        (byte_t *)addr, (byte_t *)addr + num_bytes - 1);
@@ -549,21 +549,21 @@ again:
 		}
 	} else {
 		if (node->vn_flags & VM_NODE_FLAG_HINTED) {
-			/* The node is being hinted towards, and the unmap will either
+			/* The node is  being hinted  towards, and the  unmap will  either
 			 * only remove a sub-region of the node, or a small piece standing
 			 * near its end.
-			 * In either case, we must make sure to initialize all trailing
-			 * hinted pages such that no trailing pages are still being hinted
+			 * In  either  case, we  must make  sure  to initialize  all trailing
+			 * hinted  pages such that  no trailing pages  are still being hinted
 			 * to. Otherwise, the page-fault handler may run into race conditions
-			 * arising from the node changing while it is in the processes of
-			 * operating with that node (which we subvert by doing it's work
+			 * arising  from the  node changing while  it is in  the processes of
+			 * operating with  that node  (which we  subvert by  doing it's  work
 			 * ahead of time for all of the nodes that could possibly be affected
 			 * by this) */
 			void *tail_start;
 			size_t tail_size;
 			assert(part->dp_state == VM_DATAPART_STATE_LOCKED);
 			/* Simply touch (thus initialize) all affected trailing pages,
-			 * thus forcing the page fault handler to initialize them. */
+			 * thus forcing  the page  fault handler  to initialize  them. */
 			tail_start = PAGEID_DECODE(unmap_max + 1);
 			tail_size  = (size_t)(vm_node_getmaxpageid(node) - unmap_max);
 			assert(tail_size >= 1);
@@ -690,9 +690,9 @@ page_properties_updated:
 					part->dp_ramdata.rd_block0.rb_size = sizeof_leading;
 				} else {
 					/* Figure out how many ram blocks are required to represent
-					 * the last `sizeof_trailing' pages of the part.
+					 * the  last   `sizeof_trailing'   pages   of   the   part.
 					 * If it's more than 1, we must allocate the associated vector
-					 * first, so we can safely handle that allocation failing by
+					 * first, so we can safely  handle that allocation failing  by
 					 * jumping to `restore_node_after_corepair_failure' */
 					size_t i, req_block_trailing = 1;
 					size_t covered_pages;
@@ -722,7 +722,7 @@ page_properties_updated:
 						}
 					} else {
 						/* We need more than 1 RAM block to represent the Z-node,
-						 * so we must allocate a vector of them on the heap. */
+						 * so we  must allocate  a vector  of them  on the  heap. */
 						struct vm_ramblock *hi_blocks;
 						size_t num_pages_from_first;
 						hi_blocks = (struct vm_ramblock *)kmalloc_nx(req_block_trailing *
@@ -774,9 +774,9 @@ page_properties_updated:
 					part->dp_swpdata.sd_block0.sb_size = sizeof_leading;
 				} else {
 					/* Figure out how many swp blocks are required to represent
-					 * the last `sizeof_trailing' pages of the part.
+					 * the  last   `sizeof_trailing'   pages   of   the   part.
 					 * If it's more than 1, we must allocate the associated vector
-					 * first, so we can safely handle that allocation failing by
+					 * first, so we can safely  handle that allocation failing  by
 					 * jump to `restore_node_after_corepair_failure' */
 					size_t i, req_block_trailing = 1;
 					size_t covered_pages;
@@ -806,7 +806,7 @@ page_properties_updated:
 						}
 					} else {
 						/* We need more than 1 RAM block to represent the Z-node,
-						 * so we must allocate a vector of them on the heap. */
+						 * so we  must allocate  a vector  of them  on the  heap. */
 						struct vm_swpblock *hi_blocks;
 						size_t num_pages_from_first;
 						hi_blocks = (struct vm_swpblock *)kmalloc_nx(req_block_trailing *
@@ -908,7 +908,7 @@ NOTHROW(KCALL pending_unmap_sort)(struct pending_unmap_ram *__restrict self) {
 again:
 	/* Really cheap and bad sorting. - Don't look
 	 * -> But in actuality, this sorting function should only ever
-	 *    be called with no more than a single element, and even
+	 *    be called with no more  than a single element, and  even
 	 *    that is a very rare case on its own. */
 	changed = false;
 	piter   = (struct pending_unmap_ram **)&self;
@@ -963,8 +963,8 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags) {
 		pend = ATOMIC_XCH(vm_pending_unmap_kernel_ram, NULL);
 		if (pend) {
 			/* Search the pending chain and merge adjacent free operations.
-			 * That way we can prevent a failure loop that can otherwise
-			 * happen when `vm_do_unmap_kernel_ram()' keeps on failing to
+			 * That  way we can  prevent a failure  loop that can otherwise
+			 * happen when `vm_do_unmap_kernel_ram()'  keeps on failing  to
 			 * split a larger node into 2 smaller ones, when in fact one of
 			 * the smaller ones may be about to get freed as well! */
 			pend = pending_unmap_sort(pend);
@@ -1046,7 +1046,7 @@ NOTHROW(FCALL vm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 }
 
 
-/* Acquire a write-lock to the kernel VM, automatically serving any pending
+/* Acquire a  write-lock to  the kernel  VM, automatically  serving any  pending
  * requests for unmapping kernel memory, as scheduled by `vm_unmap_kernel_ram()' */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) bool KCALL
 vm_kernel_treelock_writef(gfp_t flags) THROWS(E_WOULDBLOCK) {

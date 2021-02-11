@@ -37,9 +37,9 @@
 DECL_BEGIN
 
 #ifdef DEFINE_mman_read_nopf
-/* Read/write memory to/form the address space of a given mman
+/* Read/write  memory  to/form   the  address  space   of  a  given   mman
  * Note that these functions behave similar to memcpy_nopf(), in that they
- * will only ever copy _true_ RAM, and never access VIO or cause LOA/COW.
+ * will only ever copy _true_ RAM, and never access VIO or cause  LOA/COW.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
  *              The affected memory range is:
@@ -63,8 +63,8 @@ NOTHROW(KCALL mman_memset_nopf)(struct mman *__restrict self, UNCHECKED void *ad
 #define LOCAL_IS_WRITING
 #define LOCAL_IS_MEMSET
 #elif defined(DEFINE_mman_read)
-/* High-level read/write memory to/from the given `self'.
- * These functions do all the things necessary to read/write memory
+/* High-level  read/write   memory   to/from   the   given   `self'.
+ * These functions do all the things necessary to read/write  memory
  * the same way a regular memory access would, including LOA/COW, as
  * well as properly accessing VIO.
  * @param: force_readable_source:      When true, force `addr' to be readable, ignoring `MNODE_F_PREAD'

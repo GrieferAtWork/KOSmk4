@@ -250,7 +250,7 @@ NOTHROW(FCALL AtaBus_HW_CancelDma)(AtaBus *__restrict self) {
 	} while (inb(self->ab_dmaio + DMA_PRIMARY_STATUS) & DMA_STATUS_FDMARUNNING);
 
 	/* If the ATA already asserted an interrupt, clear that interrupt now, so
-	 * our interrupt handler won't get confused and possibly think that our
+	 * our interrupt handler won't get  confused and possibly think that  our
 	 * interrupt was related to the follow-up DMA descriptor.
 	 * If we detect an interrupt here, clearing it immediately will still leave
 	 * a sporadic interrupt to be fired, but that's OK. */
@@ -262,7 +262,7 @@ NOTHROW(FCALL AtaBus_HW_CancelDma)(AtaBus *__restrict self) {
 	}
 
 	/* Also read from the normal status port, which is something one can
-	 * do to (sometimes) prevent the ATA bus from firing an interrupt. */
+	 * do to (sometimes) prevent the  ATA bus from firing an  interrupt. */
 	inb(self->ab_dmaio + ATA_STATUS);
 }
 
@@ -272,7 +272,7 @@ NOTHROW(FCALL AtaBus_HW_CancelDma)(AtaBus *__restrict self) {
  * is currently in progress, the return value is weakly undefined. */
 INTERN NOBLOCK size_t
 NOTHROW(FCALL AtaBus_HW_GetDmaProgress)(AtaBus *__restrict self) {
-	/* TODO: Research if there some way of determining
+	/* TODO: Research if there  some way of  determining
 	 *       how much of a DMA operation is already done */
 	COMPILER_IMPURE();
 	(void)self;

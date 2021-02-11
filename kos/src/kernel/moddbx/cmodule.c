@@ -57,9 +57,9 @@ DECL_BEGIN
 
 
 /* Initialize a debug information CU parser from a given CModule CompilationUnit
- * @param: dip: A pointer to the first component to load, or `NULL' to simply load
+ * @param: dip: A pointer  to the  first component  to load,  or `NULL'  to simply  load
  *              the first component following the start of the associated CU descriptor.
- *              When non-NULL, this pointer must be located somewhere between
+ *              When  non-NULL,  this   pointer  must  be   located  somewhere   between
  *              `cmodunit_di_start(self)' and `cmodunit_di_maxend(self)'.
  *              If it isn't, then the parser will be initialized to always indicate EOF. */
 PUBLIC NONNULL((1, 2, 3)) void
@@ -365,12 +365,12 @@ INTERN struct cmodule *cmodule_list = NULL;
 INTERN REF struct cmodule *cmodule_cache = NULL;
 
 /* Clear the internal cache of pre-loaded DW modules (called
- * from `dbx_heap_alloc()' in an attempt to free memory).
- * @param: keep_loaded: When true, keep modules descriptors loaded if they
+ * from `dbx_heap_alloc()' in  an attempt  to free  memory).
+ * @param: keep_loaded: When true, keep  modules descriptors  loaded if  they
  *                      are apart of the kernel, or the `dbg_current->t_mman'
  *                      Otherwise, clear all modules from the cache.
  * @return: * : The # of modules that actually got destroyed (i.e. removing
- *              them from the cache caused their refcnt to drop to `0') */
+ *              them from the  cache caused  their refcnt to  drop to  `0') */
 PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 	size_t result = 0;
 	struct cmodule **piter, *iter;
@@ -408,11 +408,11 @@ NOTHROW(FCALL cmodule_reloc_units)(struct cmodule *new_addr,
 	if (new_addr == old_addr)
 		return;
 	/* When relocating a cmodule causes its base-address to change,
-	 * then we must fix-up the abbreviation cache list pointers of
+	 * then we must fix-up the abbreviation cache list pointers  of
 	 * already-initialized compilation units.
-	 * Otherwise, (if those pointers referenced the static abbreviation
+	 * Otherwise,  (if those pointers  referenced the static abbreviation
 	 * cache), those points would still point to the old object position,
-	 * which is no longer valid, as the static cache will have been
+	 * which  is  no longer  valid, as  the static  cache will  have been
 	 * moved as well. */
 	for (i = 0; i < cuc; ++i) {
 		struct cmodunit *new_cu, *old_cu;
@@ -447,7 +447,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 	                    &result->cm_sectrefs
 	                    module_type__arg(modtype));
 	/* Special handling to ensure that .symtab is loaded as intended
-	 * when accessing debug information for the kernel core. */
+	 * when   accessing  debug  information  for  the  kernel  core. */
 	if (mod == (module_t *)&kernel_driver) {
 		result->cm_sections.ds_symtab_start = (byte_t const *)&kernel_symbol_table;
 		result->cm_sections.ds_symtab_end   = NULL;
@@ -456,10 +456,10 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 		result->cm_sections.ds_strtab_end   = NULL;
 	}
 	/* Now walk through .debug_info and count the total # of CUs, as
-	 * well as initialize the PER-CU fields from `struct cmodunit'.
-	 * The per-CU ordering of offsets into the .debug_info section
-	 * are gained automatically since we're traversing .debug_info
-	 * linearly, and always appending to the end of the list of CUs */
+	 * well  as initialize the PER-CU fields from `struct cmodunit'.
+	 * The per-CU ordering of  offsets into the .debug_info  section
+	 * are gained automatically  since we're traversing  .debug_info
+	 * linearly, and always appending to the end of the list of  CUs */
 	{
 		byte_t const *reader, *end, *next_cu;
 		reader = result->cm_sections.ds_debug_info_start;
@@ -548,13 +548,13 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 				goto done_cucs;
 			}
 			reader += 1;
-			/* At this point, `reader' would be used to initialize `dup_cu_info_pos' of a
+			/* At  this point,  `reader' would be  used to initialize  `dup_cu_info_pos' of a
 			 * parser, which in all likelihood would yield a `DW_TAG_compile_unit' component. */
 
-			/* If what follows is a `DW_TAG_compile_unit', which itself is then
+			/* If what follows is a  `DW_TAG_compile_unit', which itself is  then
 			 * followed by EOF, then we can skip this CU. When this happens, then
-			 * the associated CU originates from an assembly file, which in turn
-			 * doesn't contain any additional debug info, so we can just ignore
+			 * the  associated CU originates from an assembly file, which in turn
+			 * doesn't contain any additional debug  info, so we can just  ignore
 			 * and discard it here! */
 			parser.dup_sections    = di_debug_sections_as_di_debuginfo_cu_parser_sections(&result->cm_sections);
 			parser.dup_cu_abbrev   = &cu->cu_abbrev;
@@ -614,9 +614,9 @@ err_r:
 	goto done;
 }
 
-/* Lookup or create the CModule for the given `mod:modtype'
- * If the module has already been loaded, return a reference to
- * the pre-loaded CModule. Otherwise, create and remember a new
+/* Lookup or  create the  CModule  for the  given  `mod:modtype'
+ * If  the module has already been loaded, return a reference to
+ * the pre-loaded CModule. Otherwise, create and remember a  new
  * module which is then kept in-cache. If this step fails due to
  * lack of memory, `NULL' is returned instead. */
 PUBLIC WUNUSED NONNULL((1)) REF struct cmodule *
@@ -644,7 +644,7 @@ NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod
 }
 
 /* Return the CModule descriptor for a given `addr', which should be a program counter, or data-pointer.
- * If no such module exists, or its descriptor could not be allocated, return `NULL' instead.
+ * If  no  such  module  exists, or  its  descriptor  could  not be  allocated,  return  `NULL' instead.
  * This function is a thin wrapper around `module_ataddr_nx()' + `cmodule_locate()' */
 PUBLIC WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_ataddr)(void const *addr) {
@@ -660,7 +660,7 @@ NOTHROW(FCALL cmodule_ataddr)(void const *addr) {
 	return result;
 }
 
-/* Return the CModule for `dbg_getpcreg(DBG_REGLEVEL_VIEW)'
+/* Return the CModule for  `dbg_getpcreg(DBG_REGLEVEL_VIEW)'
  * Same as `cmodule_ataddr(dbg_getpcreg(DBG_REGLEVEL_VIEW))' */
 PUBLIC WUNUSED REF struct cmodule *
 NOTHROW(FCALL cmodule_current)(void) {
@@ -698,7 +698,7 @@ NOTHROW(FCALL want_symbol)(struct cmodsym const *__restrict self, uintptr_t ns) 
 	return symbol_ns == ns;
 }
 
-/* Return the preferred symbol of the given 2 based on `ns'
+/* Return  the  preferred symbol  of the  given  2 based  on `ns'
  * If neither is preferred over the other, return `NULL' instead. */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct cmodsym *
 NOTHROW(FCALL prefer_symbol)(struct cmodsym *__restrict a,
@@ -765,7 +765,7 @@ NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 			/* Found it! */
 
 			/* Deal with multiple symbols of the same name by looking at `ns'!
-			 * Note that right now, other symbols with the same name may both
+			 * Note that right now, other symbols with the same name may  both
 			 * be located before and after `result'! */
 			struct cmodsym *match_min, *match_max, *iter;
 			/* Walk forward/backwards until we find a symbol of a different name. */
@@ -886,9 +886,9 @@ again:
 	}
 }
 
-/* Parse the currently pointed-to component's attributes in an attempt
- * to figure out if it has a name that should appear in symbol tables.
- * If it does, then that name is returned. Otherwise, NULL is returned,
+/* Parse the currently pointed-to  component's attributes in an  attempt
+ * to figure out if it has a  name that should appear in symbol  tables.
+ * If it does, then that name is returned. Otherwise, NULL is  returned,
  * but attributes for the current component will have still been parsed. */
 PRIVATE NONNULL((1, 2, 4)) char const *
 NOTHROW(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict self,
@@ -1044,24 +1044,24 @@ again:
 		/* Type definitions. Requires:
 		 *  - One of: DW_AT_name
 		 * TODO: Also require some further identification that we
-		 *       can make use of know that the type is complete.
-		 *       e.g. In the case of a struct, require that there
-		 *            be a `DW_AT_byte_size' field. (or better yet:
+		 *       can make use of know that the type is  complete.
+		 *       e.g. In  the  case  of  a  struct,  require  that  there
+		 *            be  a  `DW_AT_byte_size'  field.  (or  better  yet:
 		 *            simply ensure that `self->dup_comp.dic_haschildren'
-		 *            is true, meaning that the struct has at least
-		 *            some members defined, though in that case, we
-		 *            must also allow a struct without members, that
+		 *            is true,  meaning  that  the struct  has  at  least
+		 *            some  members  defined,  though  in  that  case, we
+		 *            must  also  allow  a struct  without  members, that
 		 *            is derived (c++-style) from another struct)
 		 * Another example would be that `DW_TAG_pointer_type' must
 		 * have a tag `DW_AT_type', which represents the pointed-to
 		 * type.
 		 * NOTE: The DWARF standard specifies that `DW_AT_declaration'
-		 *       should appear in any forward-declaration, however I
-		 *       really don't want to rely on something like that,
-		 *       because I don't like the idea of the compiler having
-		 *       to specify _more_ information to tell me that there
+		 *       should appear in  any forward-declaration, however  I
+		 *       really don't  want to  rely on  something like  that,
+		 *       because I don't like the idea of the compiler  having
+		 *       to specify _more_ information  to tell me that  there
 		 *       is _less_ information, when I can just check if there
-		 *       is the information I'm looking for from the get-go.
+		 *       is the information I'm  looking for from the  get-go.
 		 */
 		DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
 			switch (attr.dica_name) {
@@ -1124,7 +1124,7 @@ do_abstract_origin:
 
 
 /* Check if the 2 given encoded DIP pointer `dip_a'
- * and `dip_b' reference the same namespace. */
+ * and  `dip_b'  reference   the  same   namespace. */
 PRIVATE ATTR_CONST WUNUSED bool
 NOTHROW(FCALL same_namespace)(uintptr_t dip_a, uintptr_t dip_b) {
 	uintptr_t ns_a, ns_b;
@@ -1134,7 +1134,7 @@ NOTHROW(FCALL same_namespace)(uintptr_t dip_a, uintptr_t dip_b) {
 	if (ns_a == ns_b)
 		return true;
 	/* The typedef namespace overlaps the normal namespace, and is
-	 * only there to allow one to quickly determine if a symbol
+	 * only  there to allow  one to quickly  determine if a symbol
 	 * encodes a type, as opposed to a variable/const/etc. */
 	if (CMODSYM_DIP_NS_ISGLOBAL(ns_a))
 		ns_a = CMODSYM_DIP_NS_NORMAL;
@@ -1165,7 +1165,7 @@ NOTHROW(FCALL cmodsymtab_insert_symbol)(struct cmodsymtab *__restrict self,
 		                                           sizeof(struct cmodsym));
 		if unlikely(!new_symtab) {
 			/* Try again, but this time try to allocate
-			 * the least amount of additional memory. */
+			 * the least amount  of additional  memory. */
 			new_alloc  = self->mst_symc + 1;
 			new_symtab = (struct cmodsym *)dbx_realloc(self->mst_symv,
 			                                           new_alloc *
@@ -1193,9 +1193,9 @@ NOTHROW(FCALL cmodsymtab_insert_symbol)(struct cmodsymtab *__restrict self,
 	return DBX_EOK;
 }
 
-/* Add a new symbol with the given name to the given symbol table.
+/* Add a new symbol  with the given name  to the given symbol  table.
  * If another symbol with the same name and namespace already exists,
- * the operation silently succeeds without adding the new symbol,
+ * the operation  silently succeeds  without adding  the new  symbol,
  * alongside writing an error message to the system log.
  * However, this should only happen when there's something wrong with
  * how debug information is parsed.
@@ -1232,7 +1232,7 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 		} else if (cmp > 0) {
 			lo = index + 1;
 		} else {
-			/* Found a possible conflict. For this purpose,
+			/* Found  a  possible conflict.  For  this purpose,
 			 * determine the range of symbols that share `name' */
 			lo = hi = index;
 			while (lo > 0 &&
@@ -1253,7 +1253,7 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 #endif
 				return DBX_EOK;
 			}
-			/* No collision (we're dealing with differing namespace)
+			/* No   collision  (we're  dealing  with  differing  namespace)
 			 * As such, simply insert the new symbol at the end of the list
 			 * of other symbols that share the same name. */
 			index = hi + 1;
@@ -1266,7 +1266,7 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 
 
 /* Add an addend of `sizeof(struct cmodmixsym)' to every symbol's data-offset
- * from the given symbol table that has `CMODSYM_DIP_NS_MIXED' typing, and
+ * from the given  symbol table that  has `CMODSYM_DIP_NS_MIXED' typing,  and
  * uses an (old) symbol offset that is `>= offset_of_index' */
 PRIVATE WUNUSED NONNULL((1)) void
 NOTHROW(FCALL cmodule_relocate_mip_symbols_below)(struct cmodsymtab *__restrict self,
@@ -1286,7 +1286,7 @@ NOTHROW(FCALL cmodule_relocate_mip_symbols_below)(struct cmodsymtab *__restrict 
 
 
 /* Turn `sym' into a mixed .debug_info/.symtab symbol
- * encoding `dip' and `sip' as information pointers.
+ * encoding  `dip' and `sip' as information pointers.
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory. */
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
@@ -1296,16 +1296,16 @@ NOTHROW(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
                                          CLinkerSymbol const *__restrict sip) {
 	size_t index, alloc;
 	struct cmodmixsym *mixed;
-	/* First up: Because we may have been re-started, we must check
-	 *           if the mixed symbol table may already contain our
+	/* First up: Because we may have  been re-started, we must  check
+	 *           if the mixed  symbol table may  already contain  our
 	 *           entry. Doing so is normally fairly straight forward,
-	 *           since our caller usually scans .debug_info from the
+	 *           since  our caller usually scans .debug_info from the
 	 *           front to the back, meaning that usually we're always
-	 *           given `dip' values greater than any previous ones.
-	 * Technically, not even the act of interrupting and re-starting
-	 * symbol loading should change anything about this fact, since
-	 * our function only gets called once for any symbol (so-long as
-	 * we eventually indicate success to our caller), but just to be
+	 *           given  `dip' values greater  than any previous ones.
+	 * Technically, not even the act of interrupting and  re-starting
+	 * symbol loading should change  anything about this fact,  since
+	 * our  function only gets called once for any symbol (so-long as
+	 * we  eventually indicate success to our caller), but just to be
 	 * save about everything, also include handling for when `dip' is
 	 * greater than any pre-existing MIP's DIP-field. */
 	index = self->cm_mixed.mss_symc;
@@ -1313,7 +1313,7 @@ NOTHROW(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
 		mixed = &self->cm_mixed.mss_symv[index - 1];
 		if unlikely(dip <= mixed->ms_dip) {
 			/* Very unlikely: Must either insert somewhere in the middle,
-			 * or there already is another MIP with the same DIP. */
+			 * or  there  already  is  another  MIP  with  the  same DIP. */
 			size_t lo, hi;
 			lo = 0;
 			hi = index;
@@ -1369,7 +1369,7 @@ NOTHROW(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
 		          self->cm_mixed.mss_symc - index,
 		          sizeof(struct cmodmixsym));
 		/* Relocate already-in-use MIP pointers from
-		 * the module's global symbol table. */
+		 * the   module's   global   symbol   table. */
 		cmodule_relocate_mip_symbols_below(&self->cm_symbols,
 		                                   index *
 		                                   sizeof(struct cmodmixsym));
@@ -1392,15 +1392,15 @@ NOTHROW(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
 
 /* Try to evaluate the address of the symbol pointed-to by `dip'.
  *
- * Address information is taken from `.debug_info', as pointed-to by `dip'.
- * Returns `false' is no address information is available (which may be the
- * case when the associated symbol is actually a constant), or the address
+ * Address information  is taken  from `.debug_info',  as pointed-to  by  `dip'.
+ * Returns `false' is  no address  information is  available (which  may be  the
+ * case  when  the associated  symbol is  actually a  constant), or  the address
  * cannot be calculated right now (i.e. the associated symbol is a TLS variable)
  * @return: * : One of `CMODULE_EVALUATE_SYMBOL_ADDRESS_*' */
 #define CMODULE_EVALUATE_SYMBOL_ADDRESS_SUCCESS 0 /* Success (address was stored in `*pmodule_relative_addr') */
 #define CMODULE_EVALUATE_SYMBOL_ADDRESS_NOADDR  1 /* Object doesn't have an address, or address calculation is too complex */
 #define CMODULE_EVALUATE_SYMBOL_ADDRESS_EXTERN  2 /* Object doesn't have an address (according to .debug_info), but
-                                                   * is declared as externally visible, meaning that its address
+                                                   * is declared as  externally visible, meaning  that its  address
                                                    * should be taken from some other source (such as .symtab) */
 PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW(FCALL cmodule_evaluate_symbol_address)(struct cmodule const *__restrict self,
@@ -1416,7 +1416,7 @@ NOTHROW(FCALL cmodule_evaluate_symbol_address)(struct cmodule const *__restrict 
 again:
 	cmodunit_parser_from_dip(cu, self, &parser, dip);
 
-	/* Scan debug information attributes for something
+	/* Scan debug information attributes for  something
 	 * that can tell us where the symbol is located at. */
 	referenced_component = NULL;
 	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
@@ -1444,16 +1444,16 @@ again:
 			return CMODULE_EVALUATE_SYMBOL_ADDRESS_NOADDR;
 
 		case DW_AT_location: {
-			/* Alright, so here we have an actual location expression. However, as complicated
+			/* Alright,  so here we  have an actual location  expression. However, as complicated
 			 * at that may appear at first glance, it all essentially boils down to only a single
-			 * instruction, as we're not allowed to have address evaluation rely on any outside
+			 * instruction,  as we're not allowed to have  address evaluation rely on any outside
 			 * factors, such as register states.
 			 * With this in mind, only 1-instruction expressions like the following are accepted:
 			 *   >> DW_OP_addr 0x12345678
-			 * Since this is the only way by which the module's load-address would normally end
-			 * up being added to the calculated address. Furthermore, the DWARF specs explicitly
-			 * mention that only location expression in this form can appear in its version of
-			 * a symbol name table (DWARF5 .debug_names, which we don't support because DWARF5
+			 * Since this is the only way by  which the module's load-address would normally  end
+			 * up being added to the calculated address. Furthermore, the DWARF specs  explicitly
+			 * mention that only location expression  in this form can  appear in its version  of
+			 * a  symbol name table  (DWARF5 .debug_names, which we  don't support because DWARF5
 			 * is a mess of wastefully encoded debug information, and gcc still likes to generate
 			 * DWARF4 by default)
 			 *
@@ -1535,7 +1535,7 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 		} else if (cmp > 0) {
 			lo = index + 1;
 		} else {
-			/* Found a possible conflict. For this purpose,
+			/* Found  a  possible conflict.  For  this purpose,
 			 * determine the range of symbols that share `name' */
 			lo = hi = index;
 			while (lo > 0 && strcmp(cmodsym_name(&self->cm_symbols.mst_symv[lo - 1], self), name) == 0)
@@ -1548,17 +1548,17 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 				sym = &self->cm_symbols.mst_symv[index];
 				if (!same_namespace(sym->cms_dip, symbol_dip))
 					continue; /* Different namespace. */
-				/* This is either a collision, or a re-definition.
+				/* This  is  either a  collision, or  a re-definition.
 				 * We can determine the later by comparing DIP values. */
 				if (sym->cms_dip == symbol_dip)
 					return DBX_EOK; /* Same dip -> Redefinition (ignore silently) */
 				if (ns == CMODSYM_DIP_NS_NORMAL) {
 					if (cmodsym_ismip(sym)) {
-						/* Already a mixed symbol... In this case, check if the debug
+						/* Already a mixed symbol... In  this case, check if the  debug
 						 * information pointer of the pre-existing mixed symbol matches
 						 * the pointer given to us by our caller.
 						 *
-						 * This can happen due to the symbol loading process getting
+						 * This can happen due to the symbol loading process  getting
 						 * interrupted, and being restarted at a later point in time. */
 						struct cmodmixsym const *mip;
 						mip = cmodsym_getmip(sym, self);
@@ -1572,7 +1572,7 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 
 						/* This is where it gets complicated, because we must decide on how
 						 * we want to merge .debug_info with .symtab for a specific symbol:
-						 *   - if we don't have location info (!has_location_information)
+						 *   - if  we don't have location info (!has_location_information)
 						 *     then behavior is fairly straight-forward, as we simply have
 						 *     to convert the symbol into `CMODSYM_DIP_NS_MIXED', at which
 						 *     point it will pull type info from .debug_info, and location
@@ -1580,11 +1580,11 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 						 *   - If we do have location information, then we must try to calculate
 						 *     the exact location:
 						 *       - If we fail to calculate it, the location isn't an address, or
-						 *         the location's address differs from what .symtab is saying,
-						 *         then we must add the symbol as a per-CU override, and mark
-						 *         the global symbol as standing in conflict (i.e. just do what
+						 *         the location's address differs  from what .symtab is  saying,
+						 *         then  we must add  the symbol as a  per-CU override, and mark
+						 *         the  global symbol as standing in conflict (i.e. just do what
 						 *         we'd normally do at this point)
-						 *       - If location informations match up, then we know that the 2
+						 *       - If  location informations match up, then we know that the 2
 						 *         symbols reference the same entity, and we must forget about
 						 *         ever having seen the symbol in .symtab */
 
@@ -1605,7 +1605,7 @@ create_mixed_symbol:
 							goto fallback_insert_possible_collision;
 						}
 
-						/* Must deal with special case: gcc generates debug information that appears
+						/* Must deal with special case: gcc generates debug  information that  appears
 						 *                              somewhat inconsistent with it self for `libc'.
 						 *  - On the one hand, the following can be found in libc's .debug_info:
 						 *    ```
@@ -1619,7 +1619,7 @@ create_mixed_symbol:
 						 *       <74395>   DW_AT_declaration : 1
 						 *       <74395>   DW_AT_const_value : 48 byte block: 0 0 0 0 0 0 f0 3f f4 10 11 11 11 11 a1 bf 85 55 fe 19 a0 1 5a 3f b7 db aa 9e 19 ce 14 bf 39 52 e6 86 ca cf d0 3e 2d c3 9 6e b7 fd 8a be
 						 *    ```
-						 *    That's fine and all. It's `__libm_tiny' is a constant without any
+						 *    That's  fine and all.  It's `__libm_tiny' is  a constant without any
 						 *    address, and our parser is able to correctly load it and everything.
 						 *
 						 *  - However, there's also this entry from `.symtab':
@@ -1630,9 +1630,9 @@ create_mixed_symbol:
 						 *    has an address ????
 						 *
 						 * -> This in turn causes the below code to consider the .debug_info version of __libm_Q
-						 *    as a per-CU override for the initial declaration taken from .symtab, which then
-						 *    results in the per-module global version of __libm_Q to remain loaded without any
-						 *    type information, also causing any reference to the symbol to first go to the
+						 *    as a per-CU override  for the initial declaration  taken from .symtab, which  then
+						 *    results in the per-module global version of __libm_Q to remain loaded without  any
+						 *    type information, also  causing any reference  to the  symbol to first  go to  the
 						 *    global version, which then results in:
 						 *    ```
 						 *    !> eval __libm_Q
@@ -1644,9 +1644,9 @@ create_mixed_symbol:
 						 *    ```
 						 *
 						 * The solution chosen here is to interpret the combination of the `DW_AT_external'
-						 * tag with `DW_AT_const_value' as special behavior to construct a mixed symbol.
-						 * After all: `DW_AT_external' means that the symbol (should) be visible in other CUs,
-						 *            also meaning that such a symbol could never be considered as per-CU, also
+						 * tag  with `DW_AT_const_value' as  special behavior to  construct a mixed symbol.
+						 * After all: `DW_AT_external' means that the symbol  (should) be visible in other  CUs,
+						 *            also meaning that such a symbol could never be considered as per-CU,  also
 						 *            meaning that the symbol _must_ represent the symbol of the same name found
 						 *            inside of the .symtab section.
 						 */
@@ -1667,10 +1667,10 @@ create_mixed_symbol:
 						if (sip_modrel_symaddr != dip_modrel_symaddr)
 							goto fallback_insert_possible_collision;
 
-						/* We've found the .debug_info entry for a symbol which we've previously
+						/* We've  found the .debug_info entry for a symbol which we've previously
 						 * only found inside of .symtab! Since the .debug_info entry contains the
 						 * same location information as the info from .symtab, but in addition to
-						 * this also contains type information, simply replace the SYMTAB-symbol
+						 * this also contains type information, simply replace the  SYMTAB-symbol
 						 * with its DEBUG_INFO-equivalent. */
 						sym->cms_dip = symbol_dip;
 						return DBX_EOK;
@@ -1679,22 +1679,22 @@ create_mixed_symbol:
 fallback_insert_possible_collision:
 				if (!has_location_information) {
 					return DBX_EOK; /* Without any location info, don't add this symbol!
-					                 * HINT: Type symbols are cheaty and claim to have location
+					                 * HINT: Type symbols are cheaty  and claim to have  location
 					                 *       info, so we don't need a special them for them here. */
 				}
-				/* TODO: If the new symbol has the `DW_AT_external' flag set, then
+				/* TODO: If the new symbol has  the `DW_AT_external' flag set,  then
 				 *       _it_ must become the globally visible symbol, replacing the
-				 *       existing symbol, which must be moved into _its_ associated
+				 *       existing symbol, which must be moved into _its_  associated
 				 *       CU, instead. */
 
 				/* It's a collision!
 				 * Mark the global symbol as such, and add
-				 * the new symbol to the per-CU table. */
+				 * the  new  symbol to  the  per-CU table. */
 				sym->cms_dip |= CMODSYM_DIP_NS_FCONFLICT;
 				/* Add the symbol to the per-CU table. */
 				return cmodsymtab_addsymbol(cu_symtab, self, name, symbol_dip);
 			}
-			/* No collision (we're dealing with differing namespace)
+			/* No   collision  (we're  dealing  with  differing  namespace)
 			 * As such, simply insert the new symbol at the end of the list
 			 * of other symbols that share the same name. */
 			index = hi + 1;
@@ -1781,10 +1781,10 @@ NOTHROW(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 
 				case DW_TAG_enumeration_type:
 				case DW_TAG_namespace:
-					/* Allow looking inside of these tags for other global names.
-					 * This special distinction is required since these types of
+					/* Allow looking inside of these tags for other global  names.
+					 * This special distinction is  required since these types  of
 					 * variables _are_ actually loaded as globals. (unlike symbols
-					 * defined within the bounds of other components, which we
+					 * defined within  the bounds  of other  components, which  we
 					 * consider to have local scoping) */
 					if (!debuginfo_cu_parser_next_with_dip(&parser, &dip))
 						goto done;
@@ -1792,7 +1792,7 @@ NOTHROW(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 
 				default: {
 					/* Scan ahead to the next component at our current level.
-					 * This way, we don't accidentally load local variables
+					 * This  way, we don't  accidentally load local variables
 					 * as though they were globals. */
 					size_t wanted_depth;
 					wanted_depth = parser.dup_child_depth;
@@ -1859,7 +1859,7 @@ NOTHROW(FCALL cmodule_append_symtab_symbol)(struct cmodule const *__restrict sel
 		goto done;
 	/* All right! Let's add this symbol!
 	 * Note that for this purpose, we use the `CMODSYM_DIP_NS_SYMTAB'
-	 * namespace, thus indicating that the symbol data offset points
+	 * namespace, thus indicating that the symbol data offset  points
 	 * into the module's .symtab. */
 	result = cmodsymtab_addsymbol(symtab, self, name,
 	                              CMODSYM_DIP_NS_SYMTAB |
@@ -1935,35 +1935,35 @@ NOTHROW(FCALL cmodule_load_symtab_kern)(struct cmodsymtab *__restrict symtab,
 
 
 
-/* Load symbols from the module's .dynsym section, where associated
+/* Load symbols from the  module's .dynsym section, where  associated
  * debug information is then generated by cross-referencing addresses
  * of dynamic symbols with addresses of symbols loaded above.
  *
  * This is required to properly deal with symbols exported by DEFINE_PUBLIC_ALIAS(),
- * since those symbols have PUBLIC names different from INTERNal names.
- * Also: Any symbol we find that doesn't have any associated debug information
+ * since   those  symbols   have  PUBLIC   names  different   from  INTERNal  names.
+ * Also: Any symbol we find that  doesn't have any associated debug  information
  *       should still be exposed as though it had void-typing (which is normally
  *       impossible)
  *
  * As such, debug information for dynamic symbols can be loaded lazily as
- * needed, so the initial loading of these symbols would still be rather
+ * needed, so the initial loading of these symbols would still be  rather
  * quick.
  *
- * NOTE: As far as encoding of these symbols goes, we could make use of a
- *       separate namespace ID `CMODSYM_DIP_NS_DYNSYM' that overlaps with
+ * NOTE: As far as encoding of these symbols  goes, we could make use of  a
+ *       separate namespace ID  `CMODSYM_DIP_NS_DYNSYM' that overlaps  with
  *       `CMODSYM_DIP_NS_NORMAL', similar to `CMODSYM_DIP_NS_TYPEDEF', thus
  *       making it possible to identify these modules.
  *       The remainder of the DIP pointer could then be an offset into the
- *       module's `.dynsym' section, towards the correct `Elf[32|64]_Sym'
+ *       module's  `.dynsym' section, towards the correct `Elf[32|64]_Sym'
  *       structure, and the name field would be a pointer into the .dynstr
  *       section.
- * NOTE: .symtab and .strtab is loaded/scanned similarly, and is actually
+ * NOTE: .symtab and .strtab is loaded/scanned similarly, and is  actually
  *       preferred over .dynsym (though only the later may be available if
  *       the module had been stripped of debug information)
  *
  * NOTE: This kind of symbol scanning must be done before loading .debug_info
- *       symbol data, such that references to symbols without any location
- *       information can automatically have their location substituted by
+ *       symbol data, such  that references to  symbols without any  location
+ *       information  can  automatically have  their location  substituted by
  *       info from .dynsym and .symtab! */
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cmodule_load_symtab_symbols)(struct cmodule *__restrict self) {
@@ -1984,7 +1984,7 @@ NOTHROW(FCALL cmodule_load_symtab_symbols)(struct cmodule *__restrict self) {
 		}
 	} else {
 		/* Quick check: Do we even have a .symtab / .strtab section?, and
-		 *              if so: do we recognize the .symtab entity size? */
+		 *              if so: do we  recognize the .symtab entity  size? */
 		if (self->cm_sections.ds_symtab_start >= self->cm_sections.ds_symtab_end)
 			goto done; /* No .symtab / .dynsym */
 		if (self->cm_sections.ds_strtab_start >= self->cm_sections.ds_strtab_end)
@@ -2013,8 +2013,8 @@ NOTHROW(FCALL cmodule_load_symtab_symbols)(struct cmodule *__restrict self) {
 			}
 		}
 	}
-	/* Write-back the initial symbol table of .symtab symbols.
-	 * NOTE: We do this after having fully loaded .symtab for symbols,
+	/* Write-back   the  initial  symbol   table  of  .symtab  symbols.
+	 * NOTE: We do this after having fully loaded .symtab for  symbols,
 	 * so-as to allow `dbg_awaituser()' to interrupt the process before
 	 * it would be finished. */
 	self->cm_symbols.mst_symc = symtab.mst_symc;
@@ -2029,13 +2029,13 @@ err:
 }
 
 
-/* Load debug symbols for the give CModule. Since doing this may
- * take quite a while, this function is equipped to make use of
- * `dbg_awaituser()' to allow it to be interrupted prior to being
+/* Load  debug  symbols for  the give  CModule.  Since doing  this may
+ * take  quite  a while,  this  function is  equipped  to make  use of
+ * `dbg_awaituser()' to  allow it  to be  interrupted prior  to  being
  * completed. If this happens, then this function returns `DBX_EINTR',
- * and the caller must assume that not all symbols have been loaded.
- * In this case, the caller is allowed to continue as through that
- * the symbol they were looking for doesn't exist, or no symbols
+ * and the caller must assume that  not all symbols have been  loaded.
+ * In  this case,  the caller is  allowed to continue  as through that
+ * the  symbol  they were  looking for  doesn't  exist, or  no symbols
  * exist at all.
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
@@ -2051,7 +2051,7 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self) {
 		size_t i;
 		if (!self->cm_symbols.mst_symc) {
 			/* No symbols have been loaded, yet.
-			 * With this in mind, try to load typeless symbol data from .symtab
+			 * With this in mind, try to load typeless symbol data from  .symtab
 			 * first, so we can unify that information with additional data from
 			 * .debug_info down below. */
 			result = cmodule_load_symtab_symbols(self);
@@ -2102,26 +2102,26 @@ done:
 	return result;
 }
 
-/* Lookup the a symbol within `self', given its `name'. If debug
- * symbols had yet to be loaded, then this function will make a
+/* Lookup the a symbol within  `self', given its `name'. If  debug
+ * symbols  had yet to  be loaded, then this  function will make a
  * call to `cmodule_loadsyms()'. If that call fails, this function
  * will simply return `NULL'.
- * To do its job, this function will first look at the per-module
- * symbol table of `self' (iow: `self->cm_symbols').
- * If this table contains a symbol matching `name', that symbol
- * is then returned, unless it has the `CMODSYM_DIP_NS_FCONFLICT'
- * flag set, in which case `dbg_getpcreg(DBG_REGLEVEL_VIEW)' is
- * check for being apart of `self'. If it is, try to find the CU
- * associated with that address. If such a CU exists, check that
+ * To do its job, this function will first look at the  per-module
+ * symbol   table    of    `self'    (iow:    `self->cm_symbols').
+ * If this table  contains a symbol  matching `name', that  symbol
+ * is  then returned, unless it has the `CMODSYM_DIP_NS_FCONFLICT'
+ * flag set,  in which  case `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is
+ * check for being apart of `self'. If  it is, try to find the  CU
+ * associated with that address. If  such a CU exists, check  that
  * CU's symbol table for `name' once again. If that table contains
- * the given `name' also, return that symbol. Otherwise (if any
- * of the above failed), simply return the symbol already found
+ * the given `name'  also, return that  symbol. Otherwise (if  any
+ * of the above  failed), simply return  the symbol already  found
  * within the module's global symbol table.
- * @param: ns: When different from `CMODSYM_DIP_NS_NORMAL', restrict
- *             the search to only return symbols from the indicated
+ * @param: ns: When different from `CMODSYM_DIP_NS_NORMAL',  restrict
+ *             the search to only  return symbols from the  indicated
  *             namespace. Otherwise, ~try~ to return symbols from the
  *             given namespace, but when (at least 1) symbol is found
- *             that is apart of a different namespace, return that
+ *             that is apart  of a different  namespace, return  that
  *             symbol instead. */
 PUBLIC WUNUSED NONNULL((1, 2)) struct cmodsym const *
 NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
@@ -2136,7 +2136,7 @@ NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 	/* Now check the per-module (global) symbol table for `name' */
 	result = cmodsymtab_lookup(&self->cm_symbols, self, name, namelen, ns);
 
-	/* Check if the symbol we've found is in conflict with other,
+	/* Check  if  the  symbol  we've  found  is  in  conflict  with other,
 	 * per-CU symbols. If this is the case, then we must lookup the symbol
 	 * once again within the table associated with the currently viewed PC
 	 * pointer, as returned by `dbg_getpcreg(DBG_REGLEVEL_VIEW)' */
@@ -2211,9 +2211,9 @@ NOTHROW(FCALL cmodule_getsym_global)(char const *__restrict name, size_t namelen
 }
 
 
-/* Same as `cmodule_getsym_global()', but search for symbols starting with
+/* Same as `cmodule_getsym_global()',  but search for  symbols starting  with
  * `start_module', and continuing the search within related modules. For this
- * purpose, start by searching `start_module' itself, and moving on to other
+ * purpose,  start by searching `start_module' itself, and moving on to other
  * modules within its address space, before finally search through modules in
  * different address spaces. */
 PUBLIC WUNUSED NONNULL((2, 4)) struct cmodsym const *
@@ -2235,10 +2235,10 @@ NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
 
 
 /* Initialize a debug information CU parser to load debug information for a component
- * located at `dip' within the `.debug_info' mapping of `self'. For this
- * purpose, this function will locate the CU that contains `dip', and proceed
- * to call `cmodunit_parser()' to initialize `result'. If the given `dip'
- * is not apart of any of the CUs of `self', then `result' will be initialized
+ * located   at  `dip'  within   the  `.debug_info'  mapping   of  `self'.  For  this
+ * purpose, this  function  will locate  the  CU  that contains  `dip',  and  proceed
+ * to  call  `cmodunit_parser()'   to  initialize  `result'.   If  the  given   `dip'
+ * is not  apart of  any of  the CUs  of `self',  then `result'  will be  initialized
  * to always indicate EOF.
  * @param: dip: DebugInfoPointer. (s.a. `cmodunit_parser_from_dip()') */
 PUBLIC NONNULL((1, 2, 3)) void
@@ -2262,7 +2262,7 @@ PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) struct cmodunit *
 NOTHROW(FCALL cmodule_findunit_from_pc_fallback)(struct cmodule const *__restrict self,
                                                  uintptr_t module_relative_pc) {
 	size_t i;
-	/* Fallback: Manually search through all CUs and find one that
+	/* Fallback: Manually search through all  CUs and find one  that
 	 *           has a `DW_TAG_compile_unit' with a range-list which
 	 *           in turn contains `module_relative_pc' */
 	for (i = 0; i < self->cm_cuc; ++i) {
@@ -2293,7 +2293,7 @@ next_cu:
 }
 
 /* Try to find the compilation unit that contains `module_relative_pc'
- * If no such unit can be located, `NULL' will be returned instead. */
+ * If  no such unit  can be located, `NULL'  will be returned instead. */
 PUBLIC WUNUSED NONNULL((1)) struct cmodunit *
 NOTHROW(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict self,
                                         uintptr_t module_relative_pc) {
@@ -2321,7 +2321,7 @@ done:
 }
 
 
-/* Try to find the compilation unit that contains `dip'
+/* Try  to   find  the   compilation  unit   that  contains   `dip'
  * If no such unit can be located, `NULL' will be returned instead. */
 PUBLIC WUNUSED ATTR_PURE NONNULL((1)) struct cmodunit *
 NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
@@ -2406,11 +2406,11 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
 	/* Set the default DBX error code. */
 	data.error   = DBX_ENOENT;
 	data.namelen = namelen;
-	/* Enumerate symbols with the help enumeration function. Note
-	 * that we pass the given `name' as startswith-request, such
+	/* Enumerate  symbols  with  the  help  enumeration  function. Note
+	 * that we  pass  the  given  `name'  as  startswith-request,  such
 	 * that only strings that being with the given name are enumerated.
-	 * We then further restrict enumeration within our callback by
-	 * requiring that the name of the symbol we actually end up using
+	 * We then  further restrict  enumeration  within our  callback  by
+	 * requiring that the name of the  symbol we actually end up  using
 	 * has a length that is identical to `namelen' */
 	error = cmod_symenum(&data.info, &cmodsyminfo_lookup_cb,
 	                     name, namelen,
@@ -2423,7 +2423,7 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
 		 * caller) */
 		memcpy(info, &data.info, sizeof(struct cmodsyminfo));
 	} else if (error < 0 && error != -0xffff) {
-		/* Custom error code override (e.g. DBX_EINTR or DBX_ENOMEM).
+		/* Custom  error  code  override  (e.g.  DBX_EINTR  or DBX_ENOMEM).
 		 * In general, these errors all originate from `cmodule_loadsyms()' */
 		data.error = error;
 	}
@@ -2433,7 +2433,7 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
 /* Same as `cmod_syminfo()', but the caller is not required to fill in information
  * about any symbol at all, which are automatically loaded based on `dbg_current',
  * as well as `dbg_getpcreg(DBG_REGLEVEL_VIEW)'. However, upon success, the caller
- * is required to call `cmod_syminfo_local_fini(info)' once returned information
+ * is  required to call  `cmod_syminfo_local_fini(info)' once returned information
  * is no longer being used.
  * @param: ns: Symbol namespace (one of `CMODSYM_DIP_NS_*')
  * @return: DBX_EOK:    Success
@@ -2553,7 +2553,7 @@ again:
 
 
 /* Parse attributes of the currently selected component to figure out
- * if that object is located at the given `module_relative_addr'. If
+ * if that object is located at the given `module_relative_addr'.  If
  * it is, then immediately stop parsing and return `true'. Otherwise,
  * parse all attributes and eventually return `false' */
 PRIVATE NONNULL((1)) bool
@@ -2589,16 +2589,16 @@ again:
 		}	break;
 
 		case DW_AT_location: {
-			/* Alright, so here we have an actual location expression. However, as complicated
+			/* Alright,  so here we  have an actual location  expression. However, as complicated
 			 * at that may appear at first glance, it all essentially boils down to only a single
-			 * instruction, as we're not allowed to have address evaluation rely on any outside
+			 * instruction,  as we're not allowed to have  address evaluation rely on any outside
 			 * factors, such as register states.
 			 * With this in mind, only 1-instruction expressions like the following are accepted:
 			 *   >> DW_OP_addr 0x12345678
-			 * Since this is the only way by which the module's load-address would normally end
-			 * up being added to the calculated address. Furthermore, the DWARF specs explicitly
-			 * mention that only location expression in this form can appear in its version of
-			 * a symbol name table (DWARF5 .debug_names, which we don't support because DWARF5
+			 * Since this is the only way by  which the module's load-address would normally  end
+			 * up being added to the calculated address. Furthermore, the DWARF specs  explicitly
+			 * mention that only location expression  in this form can  appear in its version  of
+			 * a  symbol name table  (DWARF5 .debug_names, which we  don't support because DWARF5
 			 * is a mess of wastefully encoded debug information, and gcc still likes to generate
 			 * DWARF4 by default)
 			 *
@@ -2650,9 +2650,9 @@ done:
 }
 
 
-/* Scan (using the already-initialized parser of `info') the current CU
+/* Scan  (using the  already-initialized parser  of `info')  the current CU
  * for a symbol that has a starting address equal to `module_relative_addr'
- * Once found, store information about that symbol in `info->clv_data'
+ * Once found,  store information  about  that symbol  in  `info->clv_data'
  * If found, return the DIP for that object. Otherwise, return `NULL' */
 PRIVATE NONNULL((1)) byte_t const *
 NOTHROW(FCALL cmod_symenum_search_for_address)(struct cmodsyminfo *__restrict info,
@@ -2674,7 +2674,7 @@ NOTHROW(FCALL cmod_symenum_search_for_address)(struct cmodsyminfo *__restrict in
 				    info->clv_parser.dup_comp.dic_tag == DW_TAG_variable ||
 				    info->clv_parser.dup_comp.dic_tag == DW_TAG_constant ||
 				    info->clv_parser.dup_comp.dic_tag == DW_TAG_enumerator) {
-					/* Parse attributes of the current component to check if this
+					/* Parse attributes of  the current component  to check if  this
 					 * component points at an object that matches the given address. */
 					if (parser_check_object_has_address(&info->clv_parser, module_relative_addr))
 						return dip; /* Found it! */
@@ -2685,10 +2685,10 @@ NOTHROW(FCALL cmod_symenum_search_for_address)(struct cmodsyminfo *__restrict in
 
 				case DW_TAG_enumeration_type:
 				case DW_TAG_namespace:
-					/* Allow looking inside of these tags for other global names.
-					 * This special distinction is required since these types of
+					/* Allow looking inside of these tags for other global  names.
+					 * This special distinction is  required since these types  of
 					 * variables _are_ actually loaded as globals. (unlike symbols
-					 * defined within the bounds of other components, which we
+					 * defined within  the bounds  of other  components, which  we
 					 * consider to have local scoping) */
 					if (!debuginfo_cu_parser_next_with_dip(&info->clv_parser, &dip))
 						goto done;
@@ -2696,7 +2696,7 @@ NOTHROW(FCALL cmod_symenum_search_for_address)(struct cmodsyminfo *__restrict in
 
 				default: {
 					/* Scan ahead to the next component at our current level.
-					 * This way, we don't accidentally load local variables
+					 * This  way, we don't  accidentally load local variables
 					 * as though they were globals. */
 					size_t wanted_depth;
 					wanted_depth = info->clv_parser.dup_child_depth;
@@ -2805,32 +2805,32 @@ no_unit:
 
 	if (!info->clv_dip && has_object_address) {
 		/* The symbol being pushed originates from some module's .symtab,
-		 * but we were unable to find any debug information relating to
+		 * but we were unable to  find any debug information relating  to
 		 * this symbol while parsing .debug_info.
 		 *
-		 * However, that doesn't mean that the module doesn't have some
+		 * However, that doesn't  mean that the  module doesn't have  some
 		 * other name by which `csym' can be addressed. After all: we _do_
 		 * have the address of the symbol (csym.clv_data.s_var.v_objaddr),
 		 * so we know that it exists.
 		 *
-		 * This can happen if we're supposed to push a library symbol that
-		 * had been defined via something like `DEFINE_PUBLIC_ALIAS()', in
-		 * which case no dedicated debug information for that symbol would
-		 * have been created, and, so-long as the library didn't end up
-		 * directly using its own exported symbol (and only ever used its
+		 * This can happen if we're supposed to push a library symbol  that
+		 * had  been defined via something like `DEFINE_PUBLIC_ALIAS()', in
+		 * which case no dedicated debug information for that symbol  would
+		 * have been created,  and, so-long  as the library  didn't end  up
+		 * directly using its own exported  symbol (and only ever used  its
 		 * private name for the same symbol), we wouldn't know what kind of
 		 * object we're dealing with.
 		 *
 		 * However, that isn't to say that we can't find out. After all:
-		 * we do have an address which we can use to perform a reverse
+		 * we  do have an address which we  can use to perform a reverse
 		 * symbol lookup (akin to addr2line, only this time we use it to
 		 * do an `addr2typeinfo')
 		 *
-		 * This special case is required to load proper type information for
-		 * pretty much all symbols exposed by the user-space `libc.so', which
-		 * makes extensive use of `DEFINE_PUBLIC_ALIAS(symbol, libc_symbol)'
-		 * to expose `libc_symbol' as `symbol', where we would know about both
-		 * symbols at this point, though the caller originally made a request
+		 * This  special case is  required to load  proper type information for
+		 * pretty much all symbols exposed  by the user-space `libc.so',  which
+		 * makes extensive  use  of  `DEFINE_PUBLIC_ALIAS(symbol, libc_symbol)'
+		 * to  expose `libc_symbol' as `symbol', where we would know about both
+		 * symbols at this point, though  the caller originally made a  request
 		 * to `symbol', and .debug_info only contains mentions of `libc_symbol' */
 		uintptr_t module_relative_addr;
 		module_relative_addr = (uintptr_t)info->clv_data.s_var.v_objaddr -
@@ -2909,9 +2909,9 @@ done_attributes:
 #define cmodsym_name_startswith(sym, mod, startswith_name, startswith_namelen) \
 	(strstartcmpz(cmodsym_name(sym, mod), startswith_name, startswith_namelen) == 0)
 
-/* Enumerate symbols from `self'. When a symbol is encountered that stands in
- * conflict with some other symbol, try to resolve the conflict by looking at
- * the secondary symbol table `fallback_cu->cu_symbols'. If that table contains
+/* Enumerate  symbols  from `self'.  When a  symbol is  encountered that  stands in
+ * conflict with  some other  symbol, try  to resolve  the conflict  by looking  at
+ * the secondary  symbol table  `fallback_cu->cu_symbols'. If  that table  contains
  * another symbol with the same name, then that symbol will be enumerated, instead. */
 PRIVATE NONNULL((1, 2, 3)) ssize_t
 NOTHROW(FCALL cmod_symenum_symtab)(struct cmodule const *__restrict self,
@@ -2953,7 +2953,7 @@ NOTHROW(FCALL cmod_symenum_symtab)(struct cmodule const *__restrict self,
 	                               mod, startswith_name, startswith_namelen))
 		++enum_hi;
 	/* At this point, we've narrowed down the range of symbols to enumerate
-	 * to those found at indices [enum_lo, enum_hi] (inclusively)
+	 * to   those   found  at   indices   [enum_lo, enum_hi]  (inclusively)
 	 * Now to actually enumerate them! */
 	for (index = enum_lo; index <= enum_hi; ++index) {
 		struct cmodsym *sym;
@@ -3053,11 +3053,11 @@ NOTHROW(FCALL cmod_symenum_foreign_globals_cb)(void *cookie, struct cmodule *__r
 		                              arg->startswith_namelen,
 		                              arg->ns,
 		                              &arg->did_encounter_nomem,
-		                              /* Indicate that we don't want to enumerate symbols
-		                               * from some specific CU, but only those that are
+		                              /* Indicate  that  we  don't want  to  enumerate symbols
+		                               * from some  specific  CU,  but  only  those  that  are
 		                               * globally visible, and don't conflict with each other.
-		                               * If this was non-NULL, the pointed-to CU would be
-		                               * used when trying to resolve conflicting symbols. */
+		                               * If this  was non-NULL,  the  pointed-to CU  would  be
+		                               * used when  trying  to  resolve  conflicting  symbols. */
 		                              NULL);
 	}
 	return result;
@@ -3066,8 +3066,8 @@ NOTHROW(FCALL cmod_symenum_foreign_globals_cb)(void *cookie, struct cmodule *__r
 
 /* Enumerate local variables from the currently loaded CU
  * @return: DBX_EOK:     Success (local were enumerated)
- * @return: DBX_ENOENT:  Function containing `info->clv_modrel_pc' not found.
- *                       In this case, a component has been selected (without
+ * @return: DBX_ENOENT:  Function containing `info->clv_modrel_pc' not  found.
+ *                       In this case, a component has been selected  (without
  *                       it's attributes being parsed) that is located outside
  *                       the depth-scope set when this function was originally
  *                       called.
@@ -3133,7 +3133,7 @@ again_subprogram_component:
 					if (debuginfo_cu_parser_loadattr_variable(&info->clv_parser, &var)) {
 						if (!var.v_rawname)
 							var.v_rawname = var.v_name;
-						/* Only enumerate symbols that actually have a name, and only those
+						/* Only  enumerate symbols that actually have a name, and only those
 						 * where the selected variable name matches our starts-with pattern. */
 						if (var.v_rawname &&
 						    strstartcmpz(var.v_rawname, startswith_name, startswith_namelen) == 0) {
@@ -3264,21 +3264,21 @@ skip_attributes_and_parse_next:
 }
 
 
-/* From the point of view of `cmod_syminfo()', enumerate all symbols who's names
+/* From the point  of view  of `cmod_syminfo()',  enumerate all  symbols who's  names
  * start with `startswith_name...+=startswith_namelen'. When `startswith_namelen==0',
  * all symbols are enumerated.
  * Also note that this function may sporadically stop enumeration before being finished,
  * even when `cb' didn't indicate a negative return value when `dbg_awaituser()' returns
  * true, which is handled the same as enumeration completing normally.
- * NOTE: The `out(undef)' that all non-[const] fields are undefined upon return,
+ * NOTE: The `out(undef)' that all non-[const]  fields are undefined upon  return,
  *       with the exception of out-of-band fields (if any), who's contents depends
  *       on what `cb' may or may not have done.
- * @param: info:  Specifications for where to look for symbols, as well as a cookie-pointer
- *                that is passed to `cb' during invocation (the caller may embed the symbol
+ * @param: info:  Specifications for where to look for symbols, as well as a  cookie-pointer
+ *                that is passed to `cb' during invocation (the caller may embed the  symbol
  *                info descriptor inside of a larger structure which can then be re-accessed
  *                via `container_of' from inside of `cb', thus allowing additional arguments
  *                to be passed to the callback function)
- *                The caller must fill in `clv_mod', `clv_unit' and `clv_modrel_pc' before
+ *                The  caller  must fill  in  `clv_mod', `clv_unit'  and  `clv_modrel_pc' before
  *                calling this function. If not available, you may fill `clv_mod' and `clv_unit'
  *                with `NULL', and leave `clv_modrel_pc' undefined.
  * @param: cb:    Callback to invoke for every symbol found.
@@ -3305,7 +3305,7 @@ NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict inf
 		if (info->clv_mod) {
 			/* Enumerate globals from this module.
 			 * NOTE: When `info->clv_unit' is non-NULL, then the pointed-to CU
-			 *       is used by this function to resolve conflicting symbols. */
+			 *       is used by this function to resolve conflicting  symbols. */
 			temp = cmod_symenum_globals(info, cb,
 			                            startswith_name,
 			                            startswith_namelen,
@@ -3327,7 +3327,7 @@ NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict inf
 		data.ns                  = ns;
 		data.did_encounter_nomem = did_encounter_nomem;
 		/* Enumerate all CModules currently visible,
-		 * and recursively enumerate their symbols. */
+		 * and recursively enumerate their  symbols. */
 		temp = cmodule_enum(&cmod_symenum_foreign_globals_cb, &data);
 		xdecref(data.excluded_module);
 		if unlikely(temp < 0)
@@ -3335,7 +3335,7 @@ NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict inf
 		result += temp;
 		did_encounter_nomem = data.did_encounter_nomem;
 	}
-	/* If (seemingly) nothing was enumerated, and we did
+	/* If  (seemingly) nothing was  enumerated, and we did
 	 * encounter an out-of-memory error at one point, then
 	 * propagate that error to the caller. */
 	if (result == 0 && did_encounter_nomem)
@@ -3345,14 +3345,14 @@ err:
 	return temp;
 }
 
-/* Same as `cmod_symenum()', except this function automatically manages the
+/* Same as `cmod_symenum()', except  this function automatically manages  the
  * input fields of `info' which must normally be filled in by the caller, and
  * will instead fill them in itself, as well as clean them up afterwards.
  * NOTE: _DONT_ call `cmod_syminfo_local_fini(info)' after this function returns!
- *       Any cleanup will have already been done internally by this function!
+ *       Any cleanup will  have already  been done internally  by this  function!
  * NOTE: The `in(oob_only)' means that only out-of-band data that is used by `cb'
- *       must be initialized prior to this function being called.
- * NOTE: The `out(undef)' that all non-[const] fields are undefined upon return,
+ *       must   be   initialized   prior   to   this   function   being   called.
+ * NOTE: The `out(undef)' that all non-[const]  fields are undefined upon  return,
  *       with the exception of out-of-band fields (if any), who's contents depends
  *       on what `cb' may or may not have done.
  * @return: * :        pformatprinter-compatible accumulation of return values from `cb'

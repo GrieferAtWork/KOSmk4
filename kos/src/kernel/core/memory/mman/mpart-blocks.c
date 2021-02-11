@@ -46,23 +46,23 @@ DECL_BEGIN
 
 /* Load the bounds of the longest consecutive physical memory address range
  * that starts at `partrel_offset', has been populated with meaningful data
- * and contains at least 1 byte (and at most `num_bytes' bytes).
- * Note that `result->mppl_size < num_bytes' for multiple reasons:
+ * and   contains  at  least  1  byte  (and  at  most  `num_bytes'  bytes).
+ * Note  that   `result->mppl_size < num_bytes'   for   multiple   reasons:
  *   - The end of the given mem-part `self' is reached
  *   - Backing physical memory of `self' is scattered, and the next
- *     byte is apart of the next (discontinuous) chunk of memory.
+ *     byte is apart of the  next (discontinuous) chunk of  memory.
  *   - The next block located at the end of the returned range isn't
- *     already loaded in-core. (that is: doesn't have a state that
+ *     already loaded in-core. (that is:  doesn't have a state  that
  *     was set to `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG')
  *
  * NOTE: The caller must be holding a lock to `self'
  * NOTE: The caller is responsible to ensure that `MPART_ST_INMEM(self->mp_state)'
  *       before calling this function.
- * NOTE: If necessary, the length of the returned range may be truncated in
+ * NOTE: If necessary, the  length of  the returned  range may  be truncated  in
  *       order to accommodate the requirements on the state of contained blocks.
  *
  * @return: true:  Success
- * @return: false: Error: At least one accessed block has a state that
+ * @return: false: Error: At least  one accessed  block  has a  state  that
  *                        is `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
@@ -86,7 +86,7 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
 		size_t i, min, max;
 		min = (partrel_offset) >> file->mf_blockshift;
 		max = (partrel_offset + result->mppl_size - 1) >> file->mf_blockshift;
-		/* Iterate over blocks within the result range,
+		/* Iterate  over blocks within the result range,
 		 * and ensure that they've all been initialized. */
 		for (i = min; i <= max; ++i) {
 			unsigned int st;
@@ -115,18 +115,18 @@ err_not_loaded:
  * the current state of blocks that are entirely contained within the to-
  * be returned address range.
  *
- * While `mpart_memaddr_for_read()' requires that all blocks that overlap
+ * While  `mpart_memaddr_for_read()' requires that  all blocks that overlap
  * with the returned range have a state of are either `MPART_BLOCK_ST_LOAD'
- * or `MPART_BLOCK_ST_CHNG', this function only requires this for the 0-2
+ * or `MPART_BLOCK_ST_CHNG', this function only  requires this for the  0-2
  * blocks that only partially overlap with the returned range.
  *
  * All of the blocks that fully overlap with the returned range are only
- * required to not have a state set to `MPART_BLOCK_ST_INIT'.
+ * required  to  not   have  a  state   set  to   `MPART_BLOCK_ST_INIT'.
  *
  * @return: true:  Success
- * @return: false: Error: At least one fully accessed block has a state
- *                        that is `MPART_BLOCK_ST_INIT', or at least one
- *                        of the 0-2 border blocks has a state that is one
+ * @return: false: Error: At least  one fully  accessed  block has  a  state
+ *                        that  is  `MPART_BLOCK_ST_INIT', or  at  least one
+ *                        of the 0-2 border blocks  has a state that is  one
  *                        of `MPART_BLOCK_ST_INIT', or `MPART_BLOCK_ST_NDEF' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
@@ -181,7 +181,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 			if (st == MPART_BLOCK_ST_NDEF || st == MPART_BLOCK_ST_INIT) {
 				if (min == max) {
 					/* Start address may be aligned, but end address
-					 * is apart of the same, not-loaded block! */
+					 * is  apart  of  the  same,  not-loaded  block! */
 					goto err_not_loaded;
 				}
 				/* For now, stop writing at the start of the last (NDEF/INIT) block. */
@@ -194,9 +194,9 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 			--max;
 		}
 		/* Iterate over whole blocks within the result range,
-		 * and ensure that they don't use INIT states.
+		 * and  ensure  that  they  don't  use  INIT  states.
 		 *
-		 * Note though that we _do_ allow them to still be
+		 * Note though that we _do_  allow them to still  be
 		 * undefined, since they'll just get be overwritten. */
 		for (i = min; i <= max; ++i) {
 			st = mpart_getblockstate(self, i);
@@ -221,7 +221,7 @@ err_not_loaded:
 
 
 
-/* Try to add the given `part' to the list of changed parts of `self'
+/* Try  to add the given `part' to the list of changed parts of `self'
  * Does nothing when `part' was already marked as changed, or the list
  * of changed parts of `self' has previously been set to ANON. */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
@@ -240,10 +240,10 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 			next = ATOMIC_READ(self->mf_changed.slh_first);
 
 			/* Deal with special case: The file is currently being made
-			 * anonymous. This is quite unlikely, since a fully anon
-			 * file will sooner or later also mark all of its parts as
-			 * anonymous, meaning that `mpart_isanon()' would have
-			 * already failed had `self' been anonymous for a while
+			 * anonymous. This is  quite unlikely, since  a fully  anon
+			 * file will sooner or later also mark all of its parts  as
+			 * anonymous,  meaning  that  `mpart_isanon()'  would  have
+			 * already failed  had `self'  been anonymous  for a  while
 			 * longer. */
 			if unlikely(next == MFILE_PARTS_ANONYMOUS) {
 				ATOMIC_AND(part->mp_flags, ~MPART_F_CHANGED);
@@ -276,28 +276,28 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 /* Commit modifications made to the given backing address range.
  * For this purpose, this function:
  *   - Set the state of all blocks that fully overlap with the given
- *     address range to `MPART_BLOCK_ST_CHNG', (after internally
- *     asserting that their old state wasn't `MPART_BLOCK_ST_INIT')
+ *     address range  to  `MPART_BLOCK_ST_CHNG',  (after  internally
+ *     asserting  that their old state wasn't `MPART_BLOCK_ST_INIT')
  *   - Of the 0-2 blocks that only overlap partially with the given
- *     address range, make the following state transitions:
+ *     address  range,  make   the  following  state   transitions:
  *      - MPART_BLOCK_ST_LOAD -> MPART_BLOCK_ST_CHNG
  *      - MPART_BLOCK_ST_CHNG -> MPART_BLOCK_ST_CHNG  (i.e. no-op)
  *      - MPART_BLOCK_ST_INIT: Internal assertion failure
  *      - MPART_BLOCK_ST_NDEF:
  *        - If the partially overlapped block isn't the last (iow: right-most)
- *          block (meaning that the given address range partially overlaps
+ *          block (meaning  that the  given address  range partially  overlaps
  *          with its beginning), then an internal assertion fails.
- *        - If the partially overlapped block _is_ the last block, then
+ *        - If the partially overlapped block _is_ the last block,  then
  *          it's state also remains unaltered, and this function returns
  *          the offset from `partrel_offset' to that block's start.
  *
  * If this function manages change any at least 1 block to `MPART_BLOCK_ST_CHNG'
- * when that block wasn't already marked as such, and if the associated file
- * implements the `mo_saveblocks' operator, then set the MPART_F_CHANGED flag.
- * If that flag wasn't set before, then add a new reference to `self' to the
+ * when that block  wasn't already marked  as such, and  if the associated  file
+ * implements the `mo_saveblocks' operator,  then set the MPART_F_CHANGED  flag.
+ * If  that flag wasn't  set before, then add  a new reference  to `self' to the
  * list of changed parts of the associated file.
  *
- * @return: * : The # of successfully committed bytes.
+ * @return: * : The   #   of  successfully   committed  bytes.
  *              Usually the same as `num_bytes', but see above */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
@@ -338,10 +338,10 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 			       st == MPART_BLOCK_ST_CHNG);
 			if (st == MPART_BLOCK_ST_NDEF) {
 				size_t new_size;
-				/* This can happen if there was a partial write error.
-				 * In this case, we must return the # of bytes leading
+				/* This  can  happen if  there  was a  partial  write error.
+				 * In  this  case, we  must return  the  # of  bytes leading
 				 * up to the final block that couldn't be fully written, but
-				 * continue to leave that last (now partially initialized)
+				 * continue  to leave that  last (now partially initialized)
 				 * trailing block as undefined within the bitset. */
 				new_size = (max << file->mf_blockshift) - partrel_offset;
 				assertf(new_size < num_bytes,
@@ -360,7 +360,7 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 		}
 
 		/* Iterate over whole blocks within the result range,
-		 * and ensure that they don't use INIT states.
+		 * and  ensure  that  they  don't  use  INIT  states.
 		 *
 		 * Note though that we _do_ allow them to still be
 		 * undefined, since they've been fully written to. */
@@ -376,9 +376,9 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
 		}
 after_intermediate_blocks:
 
-		/* If we did manage to set at least 1 block to changed that
+		/* If  we did manage to set at  least 1 block to changed that
 		 * wasn't set as such before, then we must mark this mem-part
-		 * as having changed, and possibly add it to the associated
+		 * as having changed, and possibly  add it to the  associated
 		 * file's list of changed parts. */
 		if (did_change)
 			mfile_add_changed_part(file, self);
@@ -394,7 +394,7 @@ after_intermediate_blocks:
  * the containing block has transitioned to one of `MPART_BLOCK_ST_LOAD'
  * or `MPART_BLOCK_ST_CHNG')
  * The given `loc->mppl_size' is a hint as to how many consecutive blocks
- * this function should attempt to load, though it will only ever load a
+ * this function should attempt to load, though it will only ever load  a
  * single cluster of consecutive blocks that starts with an uninitialized
  * block containing `partrel_offset' */
 PUBLIC NONNULL((1, 3)) void FCALL
@@ -417,7 +417,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	st = mpart_getblockstate(self, min);
 	if unlikely(st != MPART_BLOCK_ST_INIT && st != MPART_BLOCK_ST_NDEF) {
 		/* Data _is_ available! (this can happen if the caller read
-		 * INIT before, but the block was loaded in the mean time) */
+		 * INIT  before, but the block was loaded in the mean time) */
 		return;
 	}
 	if (st == MPART_BLOCK_ST_INIT) {
@@ -468,7 +468,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	assert(max >= min);
 	assert(max <= limit);
 
-	/* With INIT now set for all of the parts in min...max,
+	/* With  INIT now set for all of the parts in min...max,
 	 * we can proceed to actually do the initialization now! */
 	incref(file);
 #ifdef CONFIG_USE_NEW_FS
@@ -500,26 +500,26 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 
 			/* NOTE: The file size may increase in the mean time, but that's actually
 			 *       ok: We're currently holding exclusive locks to all of the blocks
-			 *       that we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
-			 *       As such, if the file's size increases, _has_ to include to a
-			 *       point above the region which we're trying to initialize here.
-			 * e.g.: Someone else is allowed to write data, say, +0x12000 bytes further
+			 *       that  we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
+			 *       As  such, if  the file's size  increases, _has_ to  include to a
+			 *       point above the  region which we're  trying to initialize  here.
+			 * e.g.: Someone else is allowed to  write data, say, +0x12000 bytes  further
 			 *       into the file, and that would never affect us here. If this happens,
 			 *       there are 2 race conditions that can happen:
 			 *   - We've read the file's old size, and it has since increased.
-			 *     -> In this case, we'll be zero-initializing some data that has already
+			 *     -> In  this case, we'll be zero-initializing some data that has already
 			 *        come to be considered as part of the live file, but that's OK, since
-			 *        that data has never been accessed before, and would have been zero-
+			 *        that data has never been accessed before, and would have been  zero-
 			 *        filled in either case.
-			 *     -> Even if the `mo_loadblocks' calls fails, we'll just set those blocks
+			 *     -> Even if the  `mo_loadblocks' calls  fails, we'll just  set those  blocks
 			 *        back to ST_NDEF, which will effectively look like we didn't do anything.
-			 *   - We've read the file's new size. - that's even simpler, since then we
-			 *     won't do any that `bzerophyscc' call at all. - In this case, the call
+			 *   - We've read  the file's  new size.  - that's  even simpler,  since then  we
+			 *     won't do any  that `bzerophyscc' call  at all.  - In this  case, the  call
 			 *     to `mo_loadblocks' will load in data from disk that (may have been) loaded
-			 *     when the write that increased the file's size was done. And since this
-			 *     writing somewhere further into a file automatically implies that all
-			 *     uninitialized data up until that point should be considered as ZERO,
-			 *     we'll end with the same result, where the fs-driver will just write
+			 *     when the write  that increased the  file's size was  done. And since  this
+			 *     writing  somewhere  further into  a  file automatically  implies  that all
+			 *     uninitialized  data  up until  that point  should  be considered  as ZERO,
+			 *     we'll  end  with the  same  result, where  the  fs-driver will  just write
 			 *     zeroes to the buffer, the same way we would have! */
 			if unlikely(addr + num_bytes > filesize) {
 				/* Limit the load-range by the size of the file, and zero-initialize
@@ -572,12 +572,12 @@ initdone:
 
 
 
-/* Directly return physical backing memory containing the byte `partrel_offset',
- * without looking at the associated block-state at all. The caller is responsible
- * to ensure that `MPART_ST_INMEM(self->mp_state)' before calling this function.
+/* Directly  return  physical  backing  memory  containing  the  byte  `partrel_offset',
+ * without  looking  at the  associated block-state  at all.  The caller  is responsible
+ * to   ensure  that  `MPART_ST_INMEM(self->mp_state)'  before  calling  this  function.
  * NOTE: The caller must be holding a lock to `self' (which is allowed to be a DMA lock)
  * NOTE: This function may also assume that at least the first byte (that
- *       is: the byte described by `partrel_offset') is in-bounds of the
+ *       is: the byte described by `partrel_offset') is in-bounds of  the
  *       given mem-part `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
@@ -610,10 +610,10 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
 /* Mark all blocks that overlap with the given address range as CHNG.
  * For this purpose, the caller must ensure that:
  * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
- * If any of the blocks within the given range had yet to be marked as CHNG,
- * and the associated file is not anonymous, and implements the `mo_saveblocks'
- * operator, and the `MPART_F_CHANGED' flag had yet to be set for the given part,
- * then set the `MPART_F_CHANGED' flag and add `self' to the list of changed
+ * If  any  of  the  blocks  within  the  given  range  had  yet  to  be  marked  as  CHNG,
+ * and  the  associated  file  is   not  anonymous,  and  implements  the   `mo_saveblocks'
+ * operator, and  the  `MPART_F_CHANGED'  flag had  yet  to  be set  for  the  given  part,
+ * then  set  the  `MPART_F_CHANGED'   flag  and  add  `self'   to  the  list  of   changed
  * parts of its associated file.
  * NOTE: The caller must be holding a lock to `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -643,9 +643,9 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 		}
 	}
 
-	/* If we did manage to set at least 1 block to changed that
+	/* If  we did manage to set at  least 1 block to changed that
 	 * wasn't set as such before, then we must mark this mem-part
-	 * as having changed, and possibly add it to the associated
+	 * as having changed, and possibly  add it to the  associated
 	 * file's list of changed parts. */
 	if (did_change)
 		mfile_add_changed_part(file, self);
@@ -688,9 +688,9 @@ NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
  *    has been marked as `MPART_BLOCK_ST_CHNG', invoking the
  *    block loader from the associated file if necessary.
  *  - Afterwards, map the associated page to `addr' within
- *    the current page directory, using `perm'.
+ *    the   current   page   directory,   using    `perm'.
  * This function is used to implement handling of hinted
- * mem-nodes when encountered by the #PF handler. */
+ * mem-nodes   when  encountered  by  the  #PF  handler. */
 PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *addr,
@@ -701,7 +701,7 @@ NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
 	size_t block_index;
 
 	/* Some hinted-node-related assertions that we can make
-	 * without the need of knowing the accessing mem-node. */
+	 * without  the need of knowing the accessing mem-node. */
 	assert(!PREEMPTION_ENABLED());
 	assert(self->mp_file != NULL);
 	assert(ADDR_ISKERN(self->mp_file));
@@ -710,7 +710,7 @@ NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
 	assert(MPART_ST_INMEM(self->mp_state));
 
 	/* Index of the block (aka. page) that is being accessed.
-	 * Note the `self->mp_file->mf_blockshift == PAGESHIFT'
+	 * Note  the  `self->mp_file->mf_blockshift == PAGESHIFT'
 	 * assert above, so we know that 1 block equals 1 page! */
 	block_index = offset >> PAGESHIFT;
 
@@ -727,7 +727,7 @@ again_read_st:
 		assert(st != MPART_BLOCK_ST_INIT);
 #else /* CONFIG_NO_SMP */
 		/* When another CPU is currently initializing this same page,
-		 * then we must wait for it to finish doing so before we can
+		 * then we must wait for it to finish doing so before we  can
 		 * proceed. */
 		if (st == MPART_BLOCK_ST_INIT) {
 			/* Another CPU is currently doing the INIT */
@@ -736,10 +736,10 @@ again_read_st:
 		}
 
 		/* Must lazily initialize this block!
-		 * For this purpose, we must disable preemption, since being
+		 * For this purpose, we  must disable preemption, since  being
 		 * interrupted during the init, and having another thread then
-		 * attempt to access the same page that we're trying to init
-		 * would result in a dead-lock, where it will just keep on
+		 * attempt to access the same  page that we're trying to  init
+		 * would result in  a dead-lock,  where it will  just keep  on
 		 * seeing `MPART_BLOCK_ST_INIT' for all of eternity... */
 		if (!mpart_atomic_cmpxch_blockstate(self, block_index, st,
 		                                    MPART_BLOCK_ST_INIT)) {
@@ -752,7 +752,7 @@ again_read_st:
 			auto mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
 			if likely(mo_loadblocks != NULL) {
 				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW!
-				 *       We also don't have to call `mfile_trunclock_inc()', since
+				 *       We  also don't have to call `mfile_trunclock_inc()', since
 				 *       doing so wouldn't make any sense for any of the valid use-
 				 *       cases of hinted memory mappings. */
 				(*mo_loadblocks)(self->mp_file,
@@ -761,22 +761,22 @@ again_read_st:
 			}
 		}
 
-		/* And with that, the init is done. -> Mark the block as CHNG.
+		/* And with  that, the  init is  done.  -> Mark  the block  as  CHNG.
 		 * Also note that we don't have to deal with `MPART_F_MAYBE_BLK_INIT'
 		 * or `self->mp_file->mf_initdone'. - None of those matter for hinted
 		 * memory nodes! */
 		mpart_setblockstate(self, block_index, MPART_BLOCK_ST_CHNG);
 	}
 
-	/* At this point, we know that the accessed page has surely been
+	/* At this  point,  we  know  that the  accessed  page  has  surely  been
 	 * initialized, so we are safe to map it into the current page directory.
 	 * Also: We don't have to worry about preparing the page directory here.
-	 *       Hinted nodes require that the `MNODE_F_MPREPARED' flag be set,
-	 *       meaning that we're allowed to assume that the page directory
+	 *       Hinted nodes require that the `MNODE_F_MPREPARED' flag be  set,
+	 *       meaning that we're  allowed to assume  that the page  directory
 	 *       is, and always has been, prepared. */
 	pagedir_mapone(addr, pl.mppl_addr, perm);
 
-	/* Because we got here as the result of a #PF, we don't even have to
+	/* Because  we got here as the result of a #PF, we don't even have to
 	 * sync anything since all that our mapone() call did, was expand the
 	 * set of available permissions, which the MMU will lazily pick up on
 	 * all by itself. */

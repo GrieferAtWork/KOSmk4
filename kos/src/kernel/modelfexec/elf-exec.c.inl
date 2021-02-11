@@ -135,9 +135,9 @@ err_overlap:
 						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
 					}
 					if (mem_bytes > fil_bytes) {
-						/* LD sometimes produces really weird .bss sections that are neither whole
-						 * pages, nor are placed such that they exist at the end of some given file.
-						 * Because of this, we must manually check for segments that end in a
+						/* LD  sometimes produces really  weird .bss sections  that are neither whole
+						 * pages,  nor are placed such that they exist at the end of some given file.
+						 * Because  of  this, we  must  manually check  for  segments that  end  in a
 						 * small (< PAGESIZE) section of bss memory when that segment doesn't hug the
 						 * end of the actual file, and memset() it to all ZEROes.
 						 *
@@ -147,13 +147,13 @@ err_overlap:
 						 *     LOAD           0x00e224 0x0000f224 0x0000f224 0x000ec 0x000fc RW  0x1000
 						 *     DYNAMIC        0x00e228 0x0000f228 0x0000f228 0x000a8 0x000a8 RW  0x4
 						 *
-						 * The second segment contains a BSS area of 0xfc-0xec == 0x10 bytes at 0xf310...0xf31f
+						 * The second segment contains  a BSS area  of 0xfc-0xec ==  0x10 bytes at  0xf310...0xf31f
 						 * Since this range is still part of the page that gets loaded from disk as a file mapping,
-						 * the associated file mapping at 0xf224...0xf30f is extended to the end of the associated
+						 * the  associated file mapping at 0xf224...0xf30f is extended to the end of the associated
 						 * page at 0xffff (which includes (in this case) the entire .bss section).
 						 *
-						 * In a case like this where the .bss area overlaps with the extended file mapping, the first
-						 * page of the .bss area must be re-mapped as writable (if not already), followed by the area
+						 * In a case like this where the .bss  area overlaps with the extended file mapping, the  first
+						 * page of the .bss area must be re-mapped  as writable (if not already), followed by the  area
 						 * `START_OF_BSS ... MIN(MAX_BSS_BYTE, MAX_BYTE_OF_PAGE(PAGE_OF(START_OF_BSS)))' being forcibly
 						 * initialized to all ZEROes, causing the page to be faulted and become initialized properly.
 						 */
@@ -299,7 +299,7 @@ err_overlap:
 			                                     (LOCAL_STRINGARRAY_TYPE)args->ea_envp);
 #endif /* !LOCAL_EXEC_ARGV_SIZE */
 
-			/* Apply the newly loaded binary to the given VM and
+			/* Apply  the newly  loaded binary  to the  given VM and
 			 * terminate all threads using it except for the caller. */
 			{
 				struct vm_execinfo_struct ei;

@@ -72,9 +72,9 @@ NOTHROW(KCALL kernel_uvio_request_randuid)(struct kernel_uvio_request *__restric
 
 /* Perform a UVIO request using slow `reqid'
  * NOTE: The caller already acquired a lock to `slot->kur_lock',
- *       and made sure that `slot->kur_args' was `NULL'!
+ *       and  made  sure   that  `slot->kur_args'  was   `NULL'!
  * NOTE: The caller is responsible to free the slot once this
- *       function returns, even if it returns by throwing an
+ *       function returns, even if it returns by throwing  an
  *       exception! */
 PRIVATE NONNULL((1, 2, 3, 6)) void KCALL
 uvio_request_impl(struct uvio *__restrict self,
@@ -142,14 +142,14 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
 	struct kernel_uvio_request *slot;
 	slot = &self->uv_req[reqid];
 	/* Acquire a write-lock to the request so-as to ensure that no
-	 * other thread is still trying to make use of `kur_args', or
+	 * other  thread is still trying to make use of `kur_args', or
 	 * any of the other pointers within the request descriptor.
-	 * NOTE: By having `uvio_request()' require that preemption be
-	 *       enabled (which it needs to be anyways, because if the
+	 * NOTE: By having  `uvio_request()' require  that preemption  be
+	 *       enabled (which it  needs to be  anyways, because if  the
 	 *       request handling server is running in user-space we need
 	 *       to have preemption enabled in order to be able to switch
 	 *       execute to the server thread), we can safely make use of
-	 *       `task_tryyield_or_pause()' here to wait for the lock to
+	 *       `task_tryyield_or_pause()'  here to wait for the lock to
 	 *       become available. */
 	assert(PREEMPTION_ENABLED());
 	while unlikely(!sync_trywrite(&slot->kur_lock))
@@ -176,7 +176,7 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
  *                      [out] First item contains the request result.
  *                            WARNING: copied from user-space; unused bits/bytes
  *                                     must be ignored in this value.
- * @throws: ...:        If user-space returned with `UVIO_OPCODE_EXCEPT',
+ * @throws: ...:        If  user-space  returned  with  `UVIO_OPCODE_EXCEPT',
  *                      that is exception will be re-thrown by this function. */
 PUBLIC NONNULL((1, 4)) void KCALL
 uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 command,
@@ -190,7 +190,7 @@ uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 co
 	assert(self->mf_vio == &uvio_operators);
 
 	/* UVIO request have a _mandatory_ dependency on preemption being enabled.
-	 * If preemption were disabled, `uvio_freerequest()' could deadlock... */
+	 * If  preemption  were disabled,  `uvio_freerequest()'  could deadlock... */
 	if unlikely(!PREEMPTION_ENABLED())
 		THROW(E_WOULDBLOCK_PREEMPTED);
 again:
@@ -492,9 +492,9 @@ NOTHROW(KCALL uvio_server_has_request_with_status)(struct uvio const *__restrict
 		 *       Between the previous line and this one, the request may have
 		 *       gotten freed, at which point its `kur_status' field would no
 		 *       longer be valid.
-		 * However, this case can be handled as weak undefined behavior, with
+		 * However, this case can be  handled as weak undefined behavior,  with
 		 * the worst case being that ppoll(2) arbitrarily returns for a request
-		 * that has completed in the mean time, or has been canceled, all of
+		 * that has completed in  the mean time, or  has been canceled, all  of
 		 * which ppoll(2) is permitted to do! */
 		slot_status = ATOMIC_READ(slot->kur_status);
 		if (slot_status == status)
@@ -588,9 +588,9 @@ uvio_server_read(struct vm_datablock *__restrict self,
 	USER CHECKED struct uvio_request *req;
 	assert(!task_wasconnected());
 	me = (struct uvio *)self;
-	/* Have the caller check for (IO_NONBLOCK), or wait (!IO_NONBLOCK) until
+	/* Have the caller check for (IO_NONBLOCK), or wait (!IO_NONBLOCK)  until
 	 * a UVIO request has become available, at which point the request should
-	 * be copied into `dst', and be marked as delivered-but-not-completed in
+	 * be copied into `dst', and be marked as delivered-but-not-completed  in
 	 * the UVIO controller.
 	 * s.a. `struct uvio_request' */
 	if unlikely(num_bytes < sizeof(struct uvio_request)) {
@@ -958,7 +958,7 @@ PUBLIC_CONST struct mfile_ops const uvio_datablock_type = {
 };
 
 /* Construct a new UVIO object.
- * Note that UVIO is derived from `struct mfile', so the returned
+ * Note that UVIO is derived  from `struct mfile', so the  returned
  * object can be stored in a handle slot as `HANDLE_TYPE_DATABLOCK' */
 PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	REF struct uvio *result;
@@ -998,7 +998,7 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 	REF struct uvio *result_object;
 
 	/* TODO: Currently ignored (all userviofd objects are unlimited in size right now)
-	 *       This should be changed in the future, at which point ftruncate() should
+	 *       This should be changed in the  future, at which point ftruncate()  should
 	 *       be usable to change the size, too! */
 	(void)initial_size;
 
@@ -1012,7 +1012,7 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 
 	hand.h_type = HANDLE_TYPE_DATABLOCK;
 	/* Need to be able to read & write to implement the server/client
-	 * architecture that is used to drive the UVIO sub-system. */
+	 * architecture that  is  used  to  drive  the  UVIO  sub-system. */
 	hand.h_mode = IO_RDWR | (IO_FROM_OPENFLAG(flags) & ~IO_ACCMODE);
 	hand.h_data = result_object;
 

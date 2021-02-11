@@ -45,7 +45,7 @@ DECL_BEGIN
 
 struct sw_brk {
 	struct vm *sb_vm;   /* [0..1] The VM inside of which this breakpoint exists.
-	                     * When NULL, then this entry is not being used. */
+	                     * When  NULL,  then  this  entry  is  not  being  used. */
 	byte_t    *sb_addr; /* [1..1][valid_if(sb_vm != NULL)] The breakpointa address. */
 	byte_t     sb_prev; /* The breakpoint's previous value. */
 	byte_t     sb_pad[sizeof(void *) - 1];
@@ -61,8 +61,8 @@ PRIVATE struct sw_brk GDBBreak_SwList[CONFIG_GDBSERVER_SWBREAK_MAX_COUNT];
 PRIVATE size_t GDBBreak_SwMinFree = 0;
 
 /* [lock(PRIVATE(GDB_HOST_THREAD))]
- * Index of the greatest sw-breakpoint slot which may be in use
- * Note however that the slot itself, as well as any number of
+ * Index  of the greatest sw-breakpoint slot which may be in use
+ * Note however that the slot itself,  as well as any number  of
  * its predecessors may actually not be in use, however any slot
  * above this value is guarantied to not be in use. */
 PRIVATE size_t GDBBreak_SwMaxUsed = 0;
@@ -79,7 +79,7 @@ NOTHROW(FCALL GDBBreak_SwMinFree_SetLower)(size_t newval) {
 	}
 }
 
-/* Check if a given Sw breakpoint exists.
+/* Check   if  a  given  Sw  breakpoint  exists.
  * NOTE: The caller must be the GDB host thread.
  * @return: true:  An entry already exists.
  * @return: false: No matching entry exists. */
@@ -98,7 +98,7 @@ NOTHROW(FCALL GDBBreak_SwExists)(struct vm const *effective_vm,
 }
 
 /* Push a given software breakpoint onto the SW stack.
- * NOTE: The caller must be the GDB host thread.
+ * NOTE: The  caller  must  be  the  GDB  host thread.
  * @return: true:  Successfully create the new SW break entry.
  * @return: false: All slots are already in use. */
 PRIVATE NOBLOCK bool
@@ -129,7 +129,7 @@ again:
 }
 
 /* Pop a given software breakpoint from the SW stack.
- * NOTE: The caller must be the GDB host thread.
+ * NOTE: The  caller  must  be the  GDB  host thread.
  * @return: true:  Successfully removed the new SW break entry.
  * @return: false: No slot matching the given VM and ADDR exists. */
 PRIVATE NOBLOCK bool
@@ -261,7 +261,7 @@ NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void) {
 }
 
 /* Delete all internal knowledge of breakpoints concerning `effective_vm'.
- * Note that this function may be called from threads other than the GDB
+ * Note  that this function may be called  from threads other than the GDB
  * host thread, as it is invoked as part of `vm_onfini_callbacks()'! */
 INTERN void
 NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm) {
@@ -299,20 +299,20 @@ NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm,
 }
 
 
-/* Include (insert) or exclude (remove) SwBreak instruction overrides
- * defined within the range `addr...+=bufsize' with the given `buf'
- * This is used to hide/expose software breakpoint bytes from GDB, since
+/* Include  (insert)  or exclude  (remove) SwBreak  instruction overrides
+ * defined within  the  range  `addr...+=bufsize' with  the  given  `buf'
+ * This  is used to hide/expose software breakpoint bytes from GDB, since
  * I have seen cases where GDB will first set a breakpoint, then read the
- * memory location, reading back `0xcc', then remove the breakpoint, and
+ * memory location, reading back `0xcc', then remove the breakpoint,  and
  * finally trick itself into thinking that the target memory location was
- * actually an 0xcc byte all along (causing it to adjust PC=ADDR+1 when
- * resuming from the memory location, thus breaking execution by placing
- * the instruction pointer in the middle of the overwritten instruction)
- * NOTE: When calling `GDB_IncludeSwBreak()', saved restore memory for
+ * actually an 0xcc byte all along  (causing it to adjust PC=ADDR+1  when
+ * resuming from the memory location, thus breaking execution by  placing
+ * the instruction pointer in the middle of the overwritten  instruction)
+ * NOTE: When  calling  `GDB_IncludeSwBreak()', saved  restore  memory for
  *       software breakpoints is overwritten with memory taken from `buf',
- *       meaning that when using these functions along side read/write,
+ *       meaning that when  using these functions  along side  read/write,
  *       writing overtop of a software breakpoint will actually write into
- *       the restore buffer and only into main memory once the breakpoint
+ *       the  restore buffer and only into main memory once the breakpoint
  *       is removed. */
 INTERN NONNULL((1, 3)) void
 NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,

@@ -114,7 +114,7 @@ NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback,
 	GDBThread_Enumerate_Data data;
 #ifndef CONFIG_NO_SMP
 	bool mustStopAll;
-	/* If our CPU is the only one online, then
+	/* If our CPU  is the only  one online,  then
 	 * there's no need to stop the entire system! */
 again_check_must_stop:
 	mustStopAll = GDBThread_IsNonStopModeActive &&
@@ -122,7 +122,7 @@ again_check_must_stop:
 	if (mustStopAll)
 		GDBThread_StopAllCpus();
 	else {
-		/* In non-stop mode, must also disable preemption in order
+		/* In non-stop  mode, must  also disable  preemption in  order
 		 * to prevent other threads from running on our own CPU, which
 		 * could break thread enumeration. */
 		if (GDBThread_IsNonStopModeActive) {
@@ -135,7 +135,7 @@ again_check_must_stop:
 	}
 #else /* !CONFIG_NO_SMP */
 	/* In non-stop mode, must also disable preemption in order
-	 * to prevent other threads from running on our own CPU */
+	 * to prevent other  threads from running  on our own  CPU */
 	if (GDBThread_IsNonStopModeActive)
 		PREEMPTION_DISABLE();
 #endif /* !CONFIG_NO_SMP */

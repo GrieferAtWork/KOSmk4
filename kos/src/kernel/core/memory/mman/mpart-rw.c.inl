@@ -135,7 +135,7 @@ DECL_BEGIN
 #endif /* !... */
 
 #ifdef LOCAL__mpart_buffered_rw
-/* Same as the above, but these use an intermediate (stack) buffer for transfer.
+/* Same as the above, but these use an intermediate (stack) buffer for  transfer.
  * As such, these functions are called by the above when `memcpy_nopf()' produces
  * transfer errors that cannot be resolved by `mman_prefault()' */
 PUBLIC ATTR_NOINLINE NONNULL((1)) size_t KCALL
@@ -200,7 +200,7 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 
 /* Read/write raw data to/from a given mem-part.
  * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
- *              is too small, or if the given `filepos' lies outside of the part's bounds. */
+ *              is too small, or if  the given `filepos' lies  outside of the part's  bounds. */
 PUBLIC NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw(struct mpart *__restrict self,
                LOCAL_buffer_t buffer,
@@ -223,11 +223,11 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 		/* Directly read to/from VIO */
 		FINALLY_DECREF_UNLIKELY(file);
 		/* The file may have been changed to something that doesn't support VIO
-		 * This is unlikely, but can happen if the file has been anonymized! */
+		 * This  is unlikely, but  can happen if the  file has been anonymized! */
 		if unlikely(mfile_getvio(file) == NULL)
 			return 0;
 		/* Technically, we're supposed to check that `filepos' is still in-bounds
-		 * of our mem-part, but doing so is kind-of redundant, which is why we
+		 * of our mem-part, but  doing so is kind-of  redundant, which is why  we
 		 * don't actually do that check! */
 		LOCAL_mfile_vio_rw(file, buffer,
 #ifdef LOCAL_BUFFER_IS_AIO
@@ -266,8 +266,8 @@ again_memaddr:
 	{
 		/* Must initialize more backing memory.
 		 * NOTE: When writing, we only initialize a single block,
-		 *       so-as to take advantage of the possibility of
-		 *       write whole blocks without having to load them
+		 *       so-as to take  advantage of  the possibility  of
+		 *       write  whole blocks without  having to load them
 		 *       first! */
 #ifdef LOCAL_WRITING
 		physloc.mppl_size = 1;
@@ -296,7 +296,7 @@ again_memaddr:
 				size_t ok = physloc.mppl_size - copy_error;
 #ifdef LOCAL_WRITING
 				/* Commit the partial write success (and limit the # of
-				 * successfully written bytes to what we were actually
+				 * successfully  written bytes to what we were actually
 				 * able to commit). */
 				ok = mpart_memaddr_for_write_commit(self, part_offs, ok);
 #endif /* LOCAL_WRITING */
@@ -329,7 +329,7 @@ again_memaddr:
 			/* If we've managed to prefault memory, then re-attempt the direct transfer. */
 			if (copy_error != 0)
 				goto again;
-			/* If pre-faulting memory didn't work, then we
+			/* If  pre-faulting memory didn't work, then we
 			 * must use an intermediate buffer for transfer */
 #ifdef LOCAL_BUFFER_IS_AIO
 			result += LOCAL__mpart_buffered_rw(self, buffer, buf_offset + result,
@@ -345,7 +345,7 @@ again_memaddr:
 
 #ifdef LOCAL_WRITING
 	/* Commit written data.
-	 * NOTE: In this case, `mpart_memaddr_for_write_commit()' should always
+	 * NOTE: In this case,  `mpart_memaddr_for_write_commit()' should  always
 	 *       re-return `physloc.mppl_size', but we don't actually assert this
 	 *       here! */
 	physloc.mppl_size = mpart_memaddr_for_write_commit(self, part_offs,
@@ -369,11 +369,11 @@ done:
 
 
 
-/* Perform I/O while holding a lock to `self'. If this isn't possible, then
- * unlock all locks, try to work towards that goal, and return `0'. If a
- * virtual buffer is given, and that buffer cannot be faulted (e.g.: it may
+/* Perform I/O while holding  a lock to `self'.  If this isn't possible,  then
+ * unlock all locks,  try to  work towards  that goal,  and return  `0'. If  a
+ * virtual buffer is given,  and that buffer cannot  be faulted (e.g.: it  may
  * be backed by VIO, or may even be faulty), return `(size_t)-1', after having
- * released all locks, which is indicative that the caller should re-attempt
+ * released all locks, which is  indicative that the caller should  re-attempt
  * the operation with buffered I/O.
  * Locking logic:
  *    IN:                   mpart_lock_acquired(self);
@@ -414,8 +414,8 @@ again_memaddr:
 	{
 		/* Must initialize more backing memory.
 		 * NOTE: When writing, we only initialize a single block,
-		 *       so-as to take advantage of the possibility of
-		 *       write whole blocks without having to load them
+		 *       so-as to take  advantage of  the possibility  of
+		 *       write  whole blocks without  having to load them
 		 *       first! */
 #ifdef LOCAL_WRITING
 		physloc.mppl_size = 1;
@@ -444,7 +444,7 @@ again_memaddr:
 				size_t ok = physloc.mppl_size - copy_error;
 #ifdef LOCAL_WRITING
 				/* Commit the partial write success (and limit the # of
-				 * successfully written bytes to what we were actually
+				 * successfully  written bytes to what we were actually
 				 * able to commit). */
 				ok = mpart_memaddr_for_write_commit(self, offset, ok);
 #endif /* LOCAL_WRITING */
@@ -487,7 +487,7 @@ again_memaddr:
 
 #ifdef LOCAL_WRITING
 	/* Commit written data.
-	 * NOTE: In this case, `mpart_memaddr_for_write_commit()' should always
+	 * NOTE: In this case,  `mpart_memaddr_for_write_commit()' should  always
 	 *       re-return `physloc.mppl_size', but we don't actually assert this
 	 *       here! */
 	physloc.mppl_size = mpart_memaddr_for_write_commit(self, offset,

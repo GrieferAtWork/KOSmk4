@@ -49,7 +49,7 @@ PRIVATE char const error_messages[] =
 ;
 
 
-/* Returns the message associated with a given `error'
+/* Returns  the  message associated  with a  given `error'
  * The message is simply the text from the comments above. */
 PUBLIC ATTR_CONST WUNUSED char const *
 NOTHROW(FCALL dbx_strerror)(dbx_errno_t error) {

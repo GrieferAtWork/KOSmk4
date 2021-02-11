@@ -65,20 +65,20 @@ PUBLIC ATTR_PERMMAN struct vm_execinfo_struct thisvm_execinfo = {
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-/* List of callbacks that should be invoked after vm_exec()
- * These are called alongside stuff like `handle_manager_cloexec()'
+/* List  of   callbacks  that   should  be   invoked  after   vm_exec()
+ * These  are  called alongside  stuff  like `handle_manager_cloexec()'
  * NOTE: The passed vm is always `THIS_MMAN', and is never `&vm_kernel' */
 PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
 
 /* Load an executable binary `exec_node' into a temporary, emulated VM.
  * If this succeeds, clear all of the mappings from `effective_vm', and
- * replace them with the contents of the temporary, emulated VM (such
- * that the entire process of mapping the new contents is always able
- * to either seamlessly restore the old memory mappings, or not even
+ * replace them with the contents  of the temporary, emulated VM  (such
+ * that the entire process of mapping  the new contents is always  able
+ * to  either seamlessly restore  the old memory  mappings, or not even
  * touch them at all upon error)
  * -> This function is used to implement the exec() family of system calls
- *    in such that exec() is always able to allow the calling program to
- *    handle load errors (at least so long as those errors aren't caused
+ *    in  such that exec() is always able  to allow the calling program to
+ *    handle load errors (at least so  long as those errors aren't  caused
  *    by the executable's initialization, such as missing libraries)
  * NOTE: Upon successful return, all threads using the given `effective_vm' (excluding
  *       the caller themself if they are using the VM, too) will have been terminated.
@@ -134,11 +134,11 @@ again_loadheader:
 		/* If requested to, restart the exec process.
 		 * This is used to implement interpreter redirection, as used by #!-scripts. */
 		if (status == EXECABI_EXEC_RESTART) {
-			/* Make sure to service RPC functions before restarting.
-			 * A malicious user may have set-up #!-files in a loop, and
-			 * we must ensure that some other user remains the ability
+			/* Make  sure  to service  RPC functions  before restarting.
+			 * A  malicious user may have set-up #!-files in a loop, and
+			 * we must ensure that some  other user remains the  ability
 			 * to kill(2) or CTRL+C our process (in order words: we must
-			 * guaranty to be able to service RPCs when looping back) */
+			 * guaranty to be  able to service  RPCs when looping  back) */
 			task_serve();
 			goto again_loadheader;
 		}
@@ -154,7 +154,7 @@ again_loadheader:
 
 
 
-/* Assert that `self' is a regular node for the purpose of being used as the
+/* Assert that `self'  is a regular  node for the  purpose of being  used as  the
  * file to-be executed in an exec() system call, by throwing one of the annotated
  * exceptions if this isn't the case. */
 PUBLIC NONNULL((1)) void KCALL
@@ -184,7 +184,7 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_init_binary,
 
 
 /* Update the given cpu state to start executing /bin/init, or whatever
- * was passed as argument in a `init=...' kernel commandline option. */
+ * was passed as  argument in a  `init=...' kernel commandline  option. */
 INTERN ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	struct execargs args;
@@ -222,7 +222,7 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 		struct debugtrap_reason r;
 		r.dtr_signo  = SIGTRAP;
 		r.dtr_reason = DEBUGTRAP_REASON_EXEC;
-		/* FIXME: Should re-print the path using `path_sprintent()', since the path
+		/* FIXME: Should re-print the path using `path_sprintent()', since the  path
 		 *        given by the bootloader may be ambiguous (or contain/be a symlink) */
 		r.dtr_strarg = kernel_init_binary;
 		state = kernel_debugtrap_r(state, &r);

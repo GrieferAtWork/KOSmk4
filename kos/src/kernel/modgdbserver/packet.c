@@ -54,10 +54,10 @@ INTERN ATTR_CONST char *NOTHROW(FCALL GDBPacket_Start)(void) {
  * @return: -1:  Error (timed out) */
 LOCAL int NOTHROW(FCALL GDBPacket_WaitForResponse)(size_t previous_packet_length_with_frame) {
 	/* Deal with the repeated packet sending done by GDB when it gets nervous
-	 * This happens when we don't immediately respond after QEMU connects to
-	 * gdb early on, but we need some time to initialize before we can start
-	 * to respond to the packets that will have already been send...
-	 * We need a smart way of waiting for +/- responses that automatically
+	 * This  happens when we don't immediately respond after QEMU connects to
+	 * gdb  early on, but we need some time to initialize before we can start
+	 * to  respond  to  the  packets  that  will  have  already  been send...
+	 * We  need a smart  way of waiting for  +/- responses that automatically
 	 * skips unexpected command packets as a whole */
 	int result;
 	for (;;) {
@@ -171,13 +171,13 @@ wait_for_response:
 INTERN void
 NOTHROW(FCALL GDBPacket_TransmitNotification)(char *endptr) {
 	/* NOTE: We don't ever wait for ACK, since GDB's doc says that
-	 *       notification events don't ever produce + or - */
+	 *       notification   events  don't  ever  produce  +  or  - */
 	GDBPacket_TransmitAsync(endptr, '%');
 }
 
 
 /* Escaping work by taking any `ch' for which `ESC_MUST(ch)' is true,
- * then transmitting that character as { ESC_BYTE, ch ^ ESC_XMSK } */
+ * then  transmitting that character  as { ESC_BYTE,  ch ^ ESC_XMSK } */
 #define ESC_BYTE     '}' /* Prefix for escape bytes */
 #define ESC_XMSK     0x20 /* XOR Escaped bytes with this mask */
 #define ESC_MUST(ch) ((ch) == '#' || (ch) == '$' || (ch) == '}' || (ch) == '*')

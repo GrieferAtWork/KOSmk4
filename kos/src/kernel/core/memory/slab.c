@@ -178,10 +178,10 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
  * one past the greatest (CONFIG_SLAB_GROWS_UPWARDS) address that was
  * ever allocated for slab memory.
  * Since slab allocations don't carry any meta-data, they are actually
- * identified by their address, meaning that we need to keep track of
+ * identified by their address, meaning that we need to keep track  of
  * the max range of pointers associated with the slab allocator.
  * NOTE: This value starts out as `KERNEL_SLAB_INITIAL', and is only
- *       ever extended in one direction, based on the slab growth
+ *       ever extended in  one direction, based  on the slab  growth
  *       direction. */
 PUBLIC void *kernel_slab_break = KERNEL_SLAB_INITIAL;
 

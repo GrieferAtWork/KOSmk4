@@ -43,10 +43,10 @@ INTDEF ATTR_WEAK struct branch_prediction kernel_profile_branch_annotated_end[];
 
 
 /* Invoke `cb()' for all traced branches from all drivers, as well as the kernel core.
- * NOTE: Branch enumeration is sorted by individual drivers, in that all branches of
+ * NOTE: Branch  enumeration is sorted  by individual drivers, in  that all branches of
  *       one driver are enumerated before any branch from another driver is enumerated.
  *       The order in which branches of individual drivers are enumerated is undefined,
- *       however any branch will only ever be enumerated once. Similarly, the order in
+ *       however any branch will only ever be enumerated once. Similarly, the order  in
  *       which individual drivers are enumerated is also undefined.
  * @param: cb:    The callback to-be invoked.
  * @param: arg:   Argument passed to `cb()'
@@ -92,7 +92,7 @@ branchstat_listone(branchstat_callback_t cb, void *arg,
 	struct branch_prediction used_pred;
 	memcpy(&used_pred, pred, sizeof(used_pred));
 	/* In drivers, branch predictions contain driver-relative addresses.
-	 * Hide this detail from `cb()' and pass a relocated copy of `pred' */
+	 * Hide this detail from `cb()' and pass a relocated copy of  `pred' */
 	if (is_driver) {
 		used_pred.bp_addr = (__BRANCH_PREDITION_ADDRESS_TYPE)((uintptr_t)used_pred.bp_addr +
 		                                                      mod->d_loadaddr);

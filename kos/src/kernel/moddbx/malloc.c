@@ -197,7 +197,7 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	}
 
 	/* Reserve the associated address range to prevent the kernel
-	 * from re-assigning its address range for other purposes. */
+	 * from re-assigning its  address range  for other  purposes. */
 #ifdef CONFIG_USE_NEW_VM
 	last_heap->sh_node.mn_minaddr = (byte_t *)new_heap;
 	last_heap->sh_node.mn_maxaddr = (byte_t *)new_heap + min_size - 1;
@@ -281,7 +281,7 @@ again:
 	return resptr;
 nomem:
 	/* Try to allocate a heap extension, but don't
-	 * do so if the kernel's been poisoned. */
+	 * do   so  if  the  kernel's  been  poisoned. */
 	if (kernel_poisoned())
 		goto nope;
 	if (extend_heap(num_bytes))
@@ -297,7 +297,7 @@ nope:
 	return resptr;
 }
 
-/* Try to allocate at least `num_bytes' at `addr',
+/* Try  to allocate at least `num_bytes' at `addr',
  * and return the actual amount that was allocated. */
 PUBLIC WUNUSED size_t
 NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
@@ -320,7 +320,7 @@ NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
 	avail = (size_t)(freerange_end(result) - (byte_t *)addr);
 	if (avail < num_bytes)
 		goto nope;
-	/* If not allocating at the front, make sure that the gap
+	/* If not allocating at the  front, make sure that the  gap
 	 * that would get created is large enough for a free-range. */
 	if ((byte_t *)addr > (byte_t *)result) {
 		size_t gap_size;
@@ -558,7 +558,7 @@ NOTHROW(FCALL dbx_realloc)(void *ptr, size_t num_bytes) {
 		return ptr;
 	}
 	/* Failed. - Try to allocate an entirely new block,
-	 * and copy over the contents from the old one. */
+	 * and copy  over the  contents from  the old  one. */
 	new_ptr = dbx_malloc(num_bytes);
 	if likely(new_ptr) {
 		memcpy(new_ptr, ptr, old_size);

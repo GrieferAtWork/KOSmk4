@@ -50,7 +50,7 @@ DECL_BEGIN
 
 
 /* While holding a read- or write-lock to `self', try to extend an
- * existing mem-part that borders against the given address range
+ * existing mem-part that borders against the given address  range
  * in order to fill the specified gap.
  * This function assumes that:
  *  - @assume(mfile_lock_reading(self) || mfile_lock_writing(self));
@@ -70,16 +70,16 @@ DECL_BEGIN
  *   return == MFILE_EXTENDPART_OR_UNLOCK_AGAIN: mfile_lock_end(self) && unlock()
  *   EXCEPT:                                     mfile_lock_end(self) && unlock()
  * @return: * : Success: A pointer to an extended mem-part that contains the entirety
- *                       of the address range originally specified in `data'. Note
- *                       that in this case, you're inheriting a lock to that part.
- *                       Note: In this case, this function also guaranties that the
- *                       returned part doesn't exist in SWAP, though it may still
+ *                       of the address  range originally specified  in `data'.  Note
+ *                       that  in this case,  you're inheriting a  lock to that part.
+ *                       Note: In this case, this  function also guaranties that  the
+ *                       returned  part doesn't  exist in  SWAP, though  it may still
  *                       not be allowed (i.e. it's state may be MPART_ST_VOID)
  * @return: MFILE_EXTENDPART_OR_UNLOCK_NOSIB: (kind-of) success; the function was unable
  *                       to extend a pre-existing mem-part, but this is because there was
  *                       no such part to begin with: No existing part was neighboring, or
  *                       was even remotely close to the given address range, meaning that
- *                       extending such a part (if one even exists at all) would be less
+ *                       extending such a part (if one even exists at all) would be  less
  *                       efficient than just creating a new, separate part.
  * @return: MFILE_EXTENDPART_OR_UNLOCK_AGAIN: The lock to `self' (and `unlock') was lost.
  *                       Simply re-acquire those locks and try again. Note that in this
@@ -108,20 +108,20 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
 	return MFILE_EXTENDPART_OR_UNLOCK_NOSIB;
 }
 
-/* Look at the neighbors of `part' and try to merge them with `part'. If
- * no neighbors exist, or if those neighbors are so far away that merging
- * with them wouldn't be efficient, then simply insert `part' as-is into
- * the given mem-file `self', before adding `part' to the global list of
- * parts (but only if it has the `MPART_F_GLOBAL_REF' flag set), and finally
- * releasing a lock to `self', as well as re-returning a pointer to the
- * given part. - For this purpose, the caller must initialize the `part'
- * reference counter of `part' as `MPART_F_GLOBAL_REF ? 2 : 1'
- * If the `MPART_F_CHANGED' flag is set, the given part, or the combination
- * of it and the to-be returned part will be added to the changed-part list.
+/* Look at the  neighbors of `part'  and try  to merge them  with `part'.  If
+ * no neighbors exist,  or if those  neighbors are so  far away that  merging
+ * with them  wouldn't be  efficient, then  simply insert  `part' as-is  into
+ * the given mem-file  `self', before  adding `part'  to the  global list  of
+ * parts (but only if it has the `MPART_F_GLOBAL_REF' flag set), and  finally
+ * releasing a  lock to  `self', as  well as  re-returning a  pointer to  the
+ * given part. -  For this  purpose, the  caller must  initialize the  `part'
+ * reference    counter    of    `part'    as    `MPART_F_GLOBAL_REF ? 2 : 1'
+ * If the `MPART_F_CHANGED' flag is set,  the given part, or the  combination
+ * of  it and the to-be returned part will be added to the changed-part list.
  * However, if this is done, the caller is responsible for updating the file,
- * such that `MFILE_F_CHANGED' is set, and `mo_changed()' is invoked.
- * If merging was done, returning a reference to the new part against within
- * the given `part' was merged (i.e. the one that was left apart of the
+ * such  that  `MFILE_F_CHANGED'  is  set,  and  `mo_changed()'  is  invoked.
+ * If merging was done, returning a reference to the new part against  within
+ * the given `part'  was merged  (i.e. the  one that  was left  apart of  the
  * mem-part tree of `self')
  * This function assumes that:
  *  - @assume(mfile_lock_writing(self));
@@ -137,7 +137,7 @@ mfile_extendpart_or_unlock(struct mfile *__restrict self,
  * @return: NULL: A pre-existing part overlaps with the address range of `part':
  *                mpart_tree_rlocate(self->mf_parts, part->mp_minaddr, part->mp_maxaddr) != NULL
  * @return: * :   A reference to a part that (at one point) contained a super-set
- *                of the address range described by the given `part'. */
+ *                of  the   address  range   described  by   the  given   `part'. */
 PUBLIC WUNUSED NONNULL((1)) REF struct mpart *FCALL
 mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
                                        /*inherit(on_success)*/ struct mpart *__restrict part)
@@ -174,9 +174,9 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
 		                             next_changed, part));
 	}
 
-	/* This is when the part will actually become visible!
+	/* This is when  the part will  actually become  visible!
 	 * With that in mind, we have to be certain that the part
-	 * is fully initialized and ready for every sub-system. */
+	 * is  fully initialized and  ready for every sub-system. */
 	COMPILER_BARRIER();
 
 	if (part->mp_flags & MPART_F_GLOBAL_REF)
@@ -191,8 +191,8 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
 
 
 /* High-level wrapper for `mf_ops->mo_newpart' that automatically does
- * the right things when `mf_ops->mo_newpart' hasn't been defined.
- * This function doesn't do any further initialization that what is
+ * the  right  things when  `mf_ops->mo_newpart' hasn't  been defined.
+ * This function doesn't  do any further  initialization that what  is
  * already described by `mf_ops->mo_newpart' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *FCALL
 _mfile_newpart(struct mfile *__restrict self,
@@ -245,7 +245,7 @@ _mfile_newpart(struct mfile *__restrict self,
 }
 
 /* Same as `mfile_getpart()', but may _only_ be used when `self' is an
- * anonymous file! As such, this function is mainly used to allocate
+ * anonymous file! As such, this  function is mainly used to  allocate
  * parts for `mfile_ndef' and `mfile_zero' */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_makepart(struct mfile *__restrict self,
@@ -282,15 +282,15 @@ mfile_makepart(struct mfile *__restrict self,
 
 /* Check `self' for a known mem-part that contains `addr', and (if
  * found), return that part. Otherwise, construct a new part start
- * starts at `addr' and spans around `hint_bytes' bytes (less may
- * be returned if another part already exists that describes the
- * mapping above the requested location, and more may be returned
- * if a pre-existing part was spans beyond `addr +hint_bytes -1')
+ * starts at `addr' and spans around `hint_bytes' bytes (less  may
+ * be returned if another part  already exists that describes  the
+ * mapping above the requested location, and more may be  returned
+ * if  a pre-existing part was spans beyond `addr +hint_bytes -1')
  *
  * Note that the caller must ensure that:
  * >> mfile_addr_aligned(addr) && mfile_addr_aligned(hint_bytes)
  * @return: * : A reference to a part that (at some point in the past) contained
- *              the given `addr'. It may no longer contain that address now as
+ *              the given `addr'. It may no  longer contain that address now  as
  *              the result of being truncated since.
  * @throw: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE: ... */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
@@ -335,7 +335,7 @@ makeanon:
 	}
 
 #ifdef CONFIG_USE_NEW_FS
-	/* Check if `addr' lies in-bounds of the file, and limit the max #
+	/* Check if `addr'  lies in-bounds of  the file, and  limit the max  #
 	 * of bytes for the new mem-part to always stop just shy of the block-
 	 * aligned ceil-size of the underlying mem-part. */
 	{
@@ -361,7 +361,7 @@ makeanon:
 #endif /* CONFIG_USE_NEW_FS */
 
 	/* Limit the given `num_bytes' by the distance
-	 * until the next already-present mem-part. */
+	 * until the  next  already-present  mem-part. */
 	{
 		struct mpart_tree_minmax mima;
 		struct mfile_extendpart_data extdat;
@@ -374,7 +374,7 @@ makeanon:
 		}
 
 		/* Try to extend a successor/predecessor mem-part to include
-		 * the address range which we're supposed to return to our
+		 * the address range which we're  supposed to return to  our
 		 * caller! */
 		mfile_extendpart_data_init(&extdat);
 		extdat.mep_minaddr = addr;
@@ -413,7 +413,7 @@ again_extend_part:
 				loadmax   = (pos_t)-1;
 			}
 #ifdef CONFIG_USE_NEW_FS
-			/* Check if `addr' lies in-bounds of the file, and limit the max #
+			/* Check if `addr'  lies in-bounds of  the file, and  limit the max  #
 			 * of bytes for the new mem-part to always stop just shy of the block-
 			 * aligned ceil-size of the underlying mem-part. */
 			{
@@ -512,7 +512,7 @@ again_extend_part:
 #ifdef LIBVIO_CONFIG_ENABLED
 	if unlikely(result->mp_state == MPART_ST_VIO) {
 		/* Don't insert VIO-parts into the global list. Note that getting here
-		 * is highly unlikely, since VIO files are usually also anonymous, or
+		 * is  highly unlikely, since VIO files are usually also anonymous, or
 		 * have their backing mem-parts be pre-allocated... */
 		result->mp_flags &= ~MPART_F_GLOBAL_REF;
 		result->mp_refcnt = 1;

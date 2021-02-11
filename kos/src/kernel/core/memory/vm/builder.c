@@ -161,7 +161,7 @@ again:
 		RETHROW();
 	}
 	/* Weakly read out how may pages we've managed to load with this part.
-	 * Any reduction of this amount after this point will be handled once
+	 * Any reduction of this amount after this point will be handled  once
 	 * the VMB gets applied (s.a. `vmb_apply()') */
 	num_vpages = vm_datapart_numvpages_atomic(part);
 	assertf(num_vpages != 0,
@@ -230,7 +230,7 @@ again:
  * @param: flag:   Set of `VM_NODE_FLAG_*'.
  * @param: data_start_vpage: The memory page index where mapping of `data' starts.
  * @param: guard:  If non-zero, repetition limit for a guard mapping.
- *                 Set to 0 if the mapping should include a guard.
+ *                 Set to 0  if the mapping  should include a  guard.
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 PUBLIC WUNUSED NONNULL((1, 4)) bool KCALL
@@ -245,7 +245,7 @@ vmb_paged_mapat(struct vmb *__restrict self,
                 uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	pageid_t endpage;
-	/* Use an overflow-addition, so we can indicate failure if the
+	/* Use an  overflow-addition, so  we can  indicate failure  if  the
 	 * mapping range overflows (in which case we must indicate failure) */
 	if unlikely(OVERFLOW_UADD(page_index, num_pages, &endpage))
 		goto err;
@@ -486,14 +486,14 @@ vmb_apply_terminate_thread(void *UNUSED(arg),
 }
 
 
-/* Apply all of the mappings from `self' onto `target', whilst simultaneously deleting
+/* Apply all of the mappings from  `self' onto `target', whilst simultaneously  deleting
  * any memory mapping still present within `target' (except for the kernel-reserve node)
- * This function is guarantied to operate atomically in a way that allows the caller
- * to assume that no memory mappings (or anything else for that matter) changes if the
- * function fails and returns by throwing an error, and that everything happens exactly
+ * This function is guarantied  to operate atomically  in a way  that allows the  caller
+ * to  assume that no memory mappings (or anything  else for that matter) changes if the
+ * function fails and returns by throwing an error, and that everything happens  exactly
  * as intended if it returns normally.
  * @param: self:   The VM Builder object from which to take mappings to-be applied to `target'
- *                 Upon success, the contents of `self' are left undefined and must either be
+ *                 Upon success, the contents of `self' are left undefined and must either  be
  *                 re-initialized, or not be attempted to be finalized.
  * @param: target: The target VM to which to apply the new memory mappings.
  *                 Upon success, this VM will only contain the mappings from `self', with all
@@ -553,7 +553,7 @@ again_lock_parts:
 			/* This one's a new data part. -> Must lock it the first time around! */
 			if (!sync_trywrite(node->vn_part)) {
 				/* Failed to acquire a lock. -> Unlock all already locked parts, and
-				 * acquire a blocking lock to this one. Then, try again. */
+				 * acquire  a  blocking   lock  to  this   one.  Then,  try   again. */
 				pointer_set_unlock_vm_dataparts_and_clear_except(&locked_parts,
 				                                                 node->vn_part);
 				TRY {
@@ -569,10 +569,10 @@ again_lock_parts:
 		}
 		/* Successfully acquired a lock to this part.
 		 * Now we must check if the part has been split since it was originally mapped
-		 * into the VMB. - If it has, we must create more mappings to accommodate for
+		 * into  the VMB. - If it has, we must create more mappings to accommodate for
 		 * the portions that had been lost in the mean time.
 		 * NOTE: Then only way to prevent a data part from being split is to be the one
-		 *       holding a read- or write-lock to it (which we are at this point) */
+		 *       holding a  read- or  write-lock to  it (which  we are  at this  point) */
 		{
 			size_t part_vpages;
 			part_vpages = vm_datapart_numvpages(node->vn_part);
@@ -581,21 +581,21 @@ again_lock_parts:
 			        "vm_node_getpagecount(node) = %" PRIuSIZ "\n",
 			        part_vpages, vm_node_getpagecount(node));
 			if unlikely(part_vpages < vm_node_getpagecount(node)) {
-				/* Must create an additional node in order to map the missing portion.
-				 * Note however that since there isn't a non-blocking `vm_datablock_locatepart_nx()'
+				/* Must   create   an  additional   node   in  order   to   map  the   missing  portion.
+				 * Note however  that since  there isn't  a non-blocking  `vm_datablock_locatepart_nx()'
 				 * function, we must always do this while not holding locks to any of the aforementioned
-				 * parts. This, however, isn't a problem since a part can only ever be split down to a
-				 * 1-page granularity, meaning that at one point we're guarantied to no longer have to
+				 * parts. This, however, isn't a problem since a  part can only ever be split down to  a
+				 * 1-page granularity, meaning that at one point  we're guarantied to no longer have  to
 				 * keep on splitting parts, since they can no longer be split at all! */
 				REF struct vm_datablock *part_block;
 				size_t num_missing_vpages;
 				pageid64_t off_missing_vpages;
 
-				/* NOTE: Use the BLOCK-pointer of the part itself, rather than the BLOCK-pointer of our
-				 *       associated node, just in case the part has since been unshared, in which case
+				/* NOTE: Use the BLOCK-pointer of the part itself, rather than the BLOCK-pointer of  our
+				 *       associated node, just in case the part  has since been unshared, in which  case
 				 *       we don't want to re-introduce the shared mappings after the data-block had been
 				 *       explicitly unshared.
-				 * HINT: If the block was unshared, `dp_block' will have been set to
+				 * HINT: If  the block was unshared, `dp_block' will have been set to
 				 *       one of the `vm_datablock_anonymous_zero_vec[*]' descriptors. */
 				part_block         = incref(node->vn_part->dp_block);
 				num_missing_vpages = vm_node_getpagecount(node) - part_vpages;
@@ -630,7 +630,7 @@ again_lock_parts:
 						node->vn_flags &= ~VM_NODE_FLAG_GROWSUP;
 					}
 					/* Re-insert the node (NOTE: No need to update the by-addr list, since
-					 * the node's order in relation to other nodes didn't get changed at
+					 * the node's order in relation to  other nodes didn't get changed  at
 					 * any point during this) */
 					vm_nodetree_insert(&self->v_tree, node);
 					/* Map the missing upper portion of the node. */
@@ -677,10 +677,10 @@ again_lock_parts:
 			assert(part);
 			if (part->dp_crefs == NULL) {
 				struct vm_node *iter;
-				/* The addition of the first copy-on-write mapping requires
-				 * that all existing SHARED memory mappings be updated to
-				 * not include write permissions in their page directories.
-				 * That way, a #PF will be triggered which will then unshare
+				/* The  addition of the  first copy-on-write mapping requires
+				 * that all  existing SHARED  memory mappings  be updated  to
+				 * not  include write permissions  in their page directories.
+				 * That  way, a #PF will be triggered which will then unshare
 				 * our own data part, preventing writes to the shared mapping
 				 * from leaking into private mappings. */
 				for (iter = part->dp_srefs; iter;
@@ -727,12 +727,12 @@ handle_remove_write_error:
 		}
 	} /* FOREACH(node: self) */
 
-	/* At this point we have locks to all unique parts of the given `vmb'
+	/* At this point we have locks to  all unique parts of the given  `vmb'
 	 * Now it's time to mode on to acquiring a lock to the given target VM,
-	 * as well as see if we need to terminate all of the threads that are
+	 * as  well as see if we need to  terminate all of the threads that are
 	 * using it. (besides ourself) */
 
-	/* Start out this part by locking the target VM normally
+	/* Start out this part by  locking the target VM  normally
 	 * (so we gain the rights to start modifying its contents) */
 	if (!sync_trywrite(target)) {
 		/* Block until we can acquire a write-lock to the target VM, then start over */
@@ -749,7 +749,7 @@ handle_remove_write_error:
 	}
 
 	/* Always acquire a lock to the tasklist of the target VM, since we
-	 * also need that lock for when we'll be syncing it further below. */
+	 * also need that lock for when we'll be syncing it further  below. */
 	if (!vm_tasklock_trywrite(target)) {
 		sync_endwrite(target);
 		pointer_set_unlock_vm_dataparts_and_clear(&locked_parts);
@@ -767,7 +767,7 @@ handle_remove_write_error:
 		struct task *thread;
 		/* At this point, we're holding each and every one of the required locks!
 		 * Now it's time to get to meat (which in this case means that we need to
-		 * start allocating a sufficient number of synchronous RPC descriptors,
+		 * start allocating a sufficient  number of synchronous RPC  descriptors,
 		 * so we can terminate all of the threads) */
 		{
 			size_t alloc_count;
@@ -816,7 +816,7 @@ handle_remove_write_error:
 			}
 		}
 
-		/* At this point we've got everything we need, so now it's time to start
+		/* At  this point we've got everything we need, so now it's time to start
 		 * delivering RPCs to all of the affected threads, thus terminating them.
 		 * |----- Point of no return */
 		LIST_FOREACH (thread, &target->v_tasks, t_mman_tasks) {
@@ -831,9 +831,9 @@ handle_remove_write_error:
 			COMPILER_READ_BARRIER();
 			error = task_deliver_rpc(thread,
 			                         task_terminate_rpcs,
-			                         /* Wait for IPI: If the thread is hosted by a different CPU, we need to wait
-			                          *               for that CPU to acknowledge the IPI before we can commence.
-			                          *               Otherwise, we end up with a race condition where some other
+			                         /* Wait for IPI: If  the thread is hosted by a  different CPU, we need to wait
+			                          *               for that CPU to acknowledge  the IPI before we can  commence.
+			                          *               Otherwise, we end up with  a race condition where some  other
 			                          *               CPU is still hosting threads that are actively running within
 			                          *               our VM, simply because their CPU hasn't gotten the memo about
 			                          *               their termination request.
@@ -841,11 +841,11 @@ handle_remove_write_error:
 			                          *       core than the caller, where it is currently the thread with the active
 			                          *       quantum, spending its time in user-space. */
 			                         TASK_RPC_FWAITFOR);
-			/* If the delivery was successfully (it might fail if `thread' had already been terminated before
+			/* If  the delivery was successfully (it might fail  if `thread' had already been terminated before
 			 * we managed to get here), deal with the fact that `task_deliver_rpc()' will have consumed the RPC
 			 * descriptor.
 			 * Also: If there are any kernel-threads that are using `target', `task_deliver_rpc()' will have
-			 *       failed as well, though this isn't something that should normally happen... */
+			 *       failed   as  well,  though   this  isn't  something   that  should  normally  happen... */
 			if (TASK_DELIVER_RPC_WASOK(error))
 				task_terminate_rpcs = next;
 		}
@@ -914,10 +914,10 @@ handle_remove_write_error:
 		assert(target->v_kernreserve.vn_vm == target);
 		/* In compatibility-mode, there is a chance that `v_kernreserve' was
 		 * resized to span a larger region of memory in order to simulate an
-		 * address space that may be found on the emulated architecture.
-		 * This happens mainly as the result of attempting to access ukern
-		 * at an address that should have been apart of kernel-space, but
-		 * wasn't because kernel-space was actually allocated elsewhere:
+		 * address  space that  may be  found on  the emulated architecture.
+		 * This happens mainly as the  result of attempting to access  ukern
+		 * at  an address that  should have been  apart of kernel-space, but
+		 * wasn't  because  kernel-space was  actually  allocated elsewhere:
 		 * >> PF_HANDLER:
 		 * >>     if (ATTEMTED_TO_ACCESS_UNMAPPED_ADDRESS) {
 		 * >> #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__ARCH_HAVE_COMPAT)
@@ -966,7 +966,7 @@ handle_remove_write_error:
 		 * All of the newly created mappings are simply going to be bound
 		 * lazily, as they get accessed.
 		 * NOTE: Outside of SMP, or when `VMB_APPLY_AA_TERMTHREADS' is given, we
-		 *       can unmap user-space without having to keep on syncing the VM! */
+		 *       can  unmap user-space without having to keep on syncing the VM! */
 #ifndef CONFIG_NO_SMP
 		if (!(additional_actions & VMB_APPLY_AA_TERMTHREADS)) {
 			if (target == THIS_MMAN)
@@ -991,8 +991,8 @@ handle_remove_write_error:
 		} else
 #endif /* !CONFIG_NO_SMP */
 		{
-			/* Simple case: we know we're the only thread using this VM (meaning we're also
-			 * the only CPU using it). - Because of this, we don't even need to go down the
+			/* Simple  case: we know we're the only thread using this VM (meaning we're also
+			 * the only CPU using it). - Because of this, we don't even need to go down  the
 			 * rabbit hole of proper VM syncing since everything is now contained to our own
 			 * thread. */
 			if (THIS_MMAN == target)
@@ -1028,9 +1028,9 @@ handle_remove_write_error:
 
 /* Overlay mappings from `self' onto `target'
  * This operation is performed atomically, though will fail if `target'
- * already contains mappings at addressed described by `self'.
+ * already   contains  mappings  at   addressed  described  by  `self'.
  * @return: true:  The overlay was successful.
- * @return: false: The given `target' already contains
+ * @return: false: The  given   `target'  already   contains
  *                 mappings with conflicting address ranges. */
 PUBLIC NONNULL((1, 2)) bool KCALL
 vmb_overlay(struct vmb *__restrict self,

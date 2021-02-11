@@ -46,7 +46,7 @@ DECL_BEGIN
 #ifdef DEFINE_mman_startdma
 /* Start DMAing on memory within the specified address range.
  * @param: prange:      A callback that is invoked for each affected physical memory range
- *                      Should this callback return `false', all previously acquired DMA
+ *                      Should this callback return  `false', all previously acquired  DMA
  *                      locks are released, and `mman_startdma[v]()' returns `0'
  * @param: cookie:      Cookie-argument passed to `prange' upon execution.
  * @param: lockvec:     Vector of DMA lock slots provided by the caller.
@@ -54,7 +54,7 @@ DECL_BEGIN
  * @param: addr:        [mman_startdma] The base address where locking should start.
  * @param: num_bytes:   [mman_startdma] The number of continuous bytes that should be locked.
  * @param: addr_v:      [mman_startdmav] The scatter-gather list of virtual memory ranges to lock.
- * @param: for_writing: When true, unshare copy-on-write mappings of associated memory, allowing the
+ * @param: for_writing: When true, unshare copy-on-write mappings  of associated memory, allowing  the
  *                      caller to then write to the acquired memory ranges without accidentally having
  *                      any changes made appear in PRIVATE mappings of the associated memory region.
  * @return: 0 :         `*prange' returned `false'
@@ -78,15 +78,15 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
 #define LOCAL_IS_VECTOR
 #elif defined(DEFINE_mman_enumdma)
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
- * @param: prange:      A callback that is invoked for each affected physical memory range
- *                      Should this callback return `false', enumeration will halt and the
+ * @param: prange:      A  callback that is  invoked for each  affected physical memory range
+ *                      Should this callback  return `false', enumeration  will halt and  the
  *                      function will return the number of previously successfully enumerated
  *                      DMA bytes.
  * @param: cookie:      Cookie-argument passed to `prange' upon execution.
  * @param: addr:        [mman_startdma] The base address where locking should start.
  * @param: num_bytes:   [mman_startdma] The number of continuous bytes that should be locked.
  * @param: addr_v:      [mman_startdmav] The scatter-gather list of virtual memory ranges to lock.
- * @param: for_writing: When true, unshare copy-on-write mappings of associated memory, allowing the
+ * @param: for_writing: When true, unshare copy-on-write mappings  of associated memory, allowing  the
  *                      caller to then write to the acquired memory ranges without accidentally having
  *                      any changes made appear in PRIVATE mappings of the associated memory region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
@@ -182,21 +182,21 @@ again_lookup_part_locked:
 
 			TRY {
 				/* Ensure that all blocks that overlap with the given address
-				 * range have their state set to `MPART_BLOCK_ST_LOAD' for
+				 * range have their  state set  to `MPART_BLOCK_ST_LOAD'  for
 				 * reads, and `MPART_BLOCK_ST_CHNG' for writes.
 				 *
 				 * XXX: It would be cool to have optimization for writes, such that
 				 *      DMA operations which target whole, previously uninitialized
-				 *      blocks (MPART_BLOCK_ST_NDEF), didn't have to load those
-				 *      blocks prior to the DMA operation being performed.
-				 *      For one, this would require a differentiation between a
-				 *      successful and a failed write-related DMA operation.
-				 *      The problem with this is that this would also require
-				 *      the extension of `struct mdmalock', but that would then
-				 *      require a re-write of `AtaAIOHandleData' or an increase
+				 *      blocks  (MPART_BLOCK_ST_NDEF),  didn't have  to  load those
+				 *      blocks   prior  to  the   DMA  operation  being  performed.
+				 *      For one,  this would  require a  differentiation between  a
+				 *      successful   and  a  failed  write-related  DMA  operation.
+				 *      The  problem  with this  is  that this  would  also require
+				 *      the  extension  of `struct mdmalock',  but that  would then
+				 *      require  a  re-write of  `AtaAIOHandleData' or  an increase
 				 *      of `AIO_HANDLE_DRIVER_POINTER_COUNT'...
 				 *
-				 * For reference: `mpart_write()' uses `mpart_lock_acquire_and_setcore_unsharecow()',
+				 * For reference: `mpart_write()'    uses     `mpart_lock_acquire_and_setcore_unsharecow()',
 				 *                which doesn't ensure that accessed blocks have been loaded, whilst our use
 				 *                of `mfault_or_unlock()' (rightfully) does do so. */
 
@@ -212,7 +212,7 @@ again_lookup_part_locked:
 			incref(mf.mfl_part);
 			mman_lock_release(mf.mfl_mman);
 
-			/* We're now only holding a lock to `mf.mfl_part', which has been unshared
+			/* We're now only holding a lock  to `mf.mfl_part', which has been  unshared
 			 * in the context of the backing node from `mf.mfl_mman' (although that node
 			 * may have been unmapped since, as we're no longer locking the mman) */
 
@@ -226,7 +226,7 @@ again_lookup_part_locked:
 			}
 
 			/* Adjust the faulted address range to not include the unaligned page-offset
-			 * of the actually DMA location. (we had to subtract this originally, since
+			 * of the actually DMA location. (we had to subtract this originally,  since
 			 * mfault_or_unlock() requires that it be given page-aligned addresses) */
 			mf.mfl_offs += page_offset;
 			mf.mfl_size -= page_offset;

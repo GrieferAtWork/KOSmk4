@@ -74,7 +74,7 @@ typedef struct ATTR_PACKED {
 	le32    e_nonreserved_inode; /* First non-reserved inode in file system.
 	                              * e_version_major < 1 --> == 11 */
 	le16    e_inode_size;        /* Size of each inode structure in bytes.
-	                              * e_version_major < 1 --> == 128 */
+	                              * e_version_major   <   1  -->   ==  128 */
 	le16    e_super_blockgrp;    /* Block group that this superblock is part of (if backup copy) */
 #define EXT2_FEAT_OPT_FPREALLOC_DIR 0x0001 /* Preallocate a number of blocks for newly created directories. (s.a. `e_prealloc_dir') */
 #define EXT2_FEAT_OPT_FASF          0x0002 /* AFS server inodes exist. */
@@ -232,11 +232,11 @@ struct block_group {
 	struct rwlock bg_lock;
 	ext2_block_t  bg_busage_addr;  /* [valid_if(BLOCK_GROUP_FLOADED)][const]
 	                                * Block address of a block-usage bitset with `:sd_blk_per_bgrp' elements.
-	                                * 1-bits are currently in use (allocated), and ZERO-bits are free.
+	                                * 1-bits are  currently  in  use (allocated),  and  ZERO-bits  are  free.
 	                                * The blocks referred to are calculated as `INDEX_OF(:sd_groups,self) * sd_blk_per_bgrp' */
 	ext2_block_t  bg_iusage_addr;  /* [valid_if(BLOCK_GROUP_FLOADED)][const]
 	                                * Block address of an inode-usage bitset with `:sd_ino_per_bgrp' elements.
-	                                * 1-bits are currently in use (allocated), and ZERO-bits are free. * */
+	                                * 1-bits  are  currently in  use (allocated),  and  ZERO-bits are  free. * */
 	ext2_block_t  bg_inodes;       /* [valid_if(BLOCK_GROUP_FLOADED)][const]
 	                                * Block address of an `Ext2INode[:sd_ino_per_bgrp]' array. */
 	u16           bg_free_blocks;  /* [valid_if(BLOCK_GROUP_FLOADED)] Number of unallocated blocks in group */
@@ -251,11 +251,11 @@ struct block_group {
 #if __SIZEOF_POINTER__ > 4
 	u32         __bg_pad2;         /* ... */
 #endif
-	byte_t       *bg_busage;       /* [0..:sd_blk_per_bgrp/8][owned] Bitset of allocated blocks in this group.
-	                                * This vector is lazily allocated and read from disk upon first access.
-	                                * Note however that it does not follow WRITE_ONCE rules, so you need to
+	byte_t       *bg_busage;       /* [0..:sd_blk_per_bgrp/8][owned] Bitset of  allocated blocks  in this  group.
+	                                * This  vector  is lazily  allocated and  read from  disk upon  first access.
+	                                * Note however  that it  does not  follow WRITE_ONCE  rules, so  you need  to
 	                                * be holding a read-lock on `bg_lock' if you wish to dereference this vector.
-	                                * (Anything else would make sense either, considering that the bitset
+	                                * (Anything  else  would  make  sense  either,  considering  that  the bitset
 	                                * contained could change at any time if you aren't holding that lock)
 	                                * When `BLOCK_GROUP_FBCHANG' flag has been set, this vector differs from its on-disk shadow. */
 	byte_t       *bg_iusage;       /* [0..:sd_ino_per_bgrp/8][owned] Bitset of allocated Inodes in this group.
@@ -273,7 +273,7 @@ struct ext2_superblock: public superblock {
 	size_t              sd_inode_size;    /* [>= 128][const] Size of a single INode (in bytes). */
 	ext2_ino_t          sd_total_inodes;  /* [!0][const] Total number of INodes.
 	                                       * NOTE: Since the first valid INode number is ONE(1), this
-	                                       *       field doubles as the greatest valid INode number. */
+	                                       *       field  doubles as the greatest valid INode number. */
 #define EXT2_VERSION_0  0x00000000        /* Ext2 version 0 */
 #define EXT2_VERSION_1  0x00010000        /* Ext2 version 1.0 */
 	u32                 sd_version;       /* [const] EXT2 version number (major << 16 | minor) */
@@ -292,7 +292,7 @@ struct ext2_superblock: public superblock {
 
 
 /* Convert block addresses to on-disk locations, as well as the opposite.
- * Also used to convert in-file addresses to their block indices. */
+ * Also  used  to  convert  in-file  addresses  to  their  block indices. */
 #define EXT2_BLOCK2ADDR(super,block)     ((pos_t)(block) << (super)->sd_block_shift)
 #define EXT2_ADDR2BLOCK(super,block)     ((ext2_block_t)(block) >> (super)->sd_block_shift)
 
@@ -312,7 +312,7 @@ struct block_table {
 	u16        __bt_pad;       /* ... */
 	ext2_block_t bt_blocks[1]; /* [:sd_ind_blocksize] Vector of indicate blocks.
 	                            * This vector is initially read from disk when the table is allocated.
-	                            * Making modifications to this vector requires a write-lock on the
+	                            * Making  modifications to  this vector  requires a  write-lock on the
 	                            * associated INode. */
 };
 
@@ -320,12 +320,12 @@ struct block_table_x2 {
 	u16                     b2_flags;     /* Set of `BLOCK_TABLE_F*' */
 	u16                   __b2_pad[(sizeof(void *)-2)/2]; /* ... */
 	struct block_table    **b2_tables;    /* [0..1][owned][1..:sd_ind_blocksize][owned] Vector of indirection blocks.
-	                                       * NOTE: Both this vector, as well as its contents are lazily allocated:
+	                                       * NOTE: Both  this vector, as  well as its  contents are lazily allocated:
 	                                       *  - LAZLY_ALLOC(WRITE_ONCE,lock(READ(::i_lock)))
 	                                       *    - Meaning you can use WRITE_ONCE semantics while
-	                                       *      holding a read-lock in the associated INode.
+	                                       *      holding a read-lock  in the associated  INode.
 	                                       *  - DELETE(lock(WRITE(::i_lock)))
-	                                       *    - Meaning you have full access (including deletion)
+	                                       *    - Meaning you have  full access (including  deletion)
 	                                       *      while holding a write-lock in the associated INode. */
 	ext2_block_t            b2_blocks[1]; /* [:sd_ind_blocksize] Vector of indirection blocks. */
 };
@@ -333,7 +333,7 @@ struct block_table_x2 {
 struct block_table_x3 {
 	u16                     b3_flags;     /* Set of `BLOCK_TABLE_F*' */
 	u16                   __b3_pad[(sizeof(void *)-2)/2]; /* ... */
-	struct block_table_x2 **b3_tables;    /* [0..1][owned][1..:sd_ind_blocksize][owned] Vector of indirection blocks.
+	struct block_table_x2 **b3_tables;    /* [0..1][owned][1..:sd_ind_blocksize][owned]   Vector    of   indirection    blocks.
 	                                       * Same as `struct block_table_x2::b2_tables' (including the same locking semantics),
 	                                       * but used for triple indirection, rather than single indirection. */
 	ext2_block_t            b3_blocks[1]; /* [:sd_ind_blocksize] Vector of indirection blocks. */
@@ -347,13 +347,13 @@ struct inode_data {
 	 *    #4: i_tiblock->*->*->*data   (12 + sd_ind_blocksize + sd_ind_blocksize^2 ... 12 + sd_ind_blocksize + sd_ind_blocksize^3 - 1)
 	 */
 	struct block_table    *i_siblock; /* [0..1][MIRROR(lock,struct block_table_x2::b2_tables)]
-	                                   * Lazily allocated pointer to the single indirection block table.
-	                                   * Synchronization required to access this field is the same as
+	                                   * Lazily allocated  pointer to  the single  indirection block  table.
+	                                   * Synchronization required  to  access  this field  is  the  same  as
 	                                   * is required to access tables apart of the double-indirection table. */
 	struct block_table_x2 *i_diblock; /* [0..1][MIRROR(lock,struct block_table_x2::b2_tables)]
-	                                   * Same as `i_siblock', but for doubly indirect blocks. */
+	                                   * Same  as `i_siblock', but for doubly indirect blocks. */
 	struct block_table_x3 *i_tiblock; /* [0..1][MIRROR(lock,struct block_table_x2::b2_tables)]
-	                                   * Same as `i_siblock', but for triply indirect blocks. */
+	                                   * Same  as `i_siblock', but for triply indirect blocks. */
 	/* Caches values of all the fields found in `Ext2INode', but not in `struct inode' */
 	ext2_block_t i_dblock[EXT2_DIRECT_BLOCK_COUNT]; /* Direct block pointers for file data. */
 	ext2_block_t i_siblock_addr; /* Pointer to a block filled with `ext2_block_t[EXT2_BLOCKSIZE(:)]'. */
@@ -368,9 +368,9 @@ struct inode_data {
 	le32         i_acl;          /* [valid_if(:->sd_version >= EXT2_VERSION_1)] File ACL. */
 	le32         i_fragment;     /* Block address of fragment??? */
 	le32         i_os2[3];       /* Operating System Specific Value #2
-	                              * NOTE: depending on the OS, KOS makes use of
-	                              *       the high-16-bit UID and GID fields,
-	                              *       however since not everything uses those,
+	                              * NOTE: depending  on  the OS,  KOS makes  use of
+	                              *       the  high-16-bit  UID  and  GID   fields,
+	                              *       however since not everything uses  those,
 	                              *       this field caches all OS-specific values. */
 };
 
@@ -391,7 +391,7 @@ INTDEF ATTR_RETNONNULL WUNUSED Ext2BlockGroup *KCALL
 Ext2_Group(Ext2Superblock *__restrict self, ext2_bgroup_t index)
 		THROWS(E_IOERROR, E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT);
 
-/* Return the absolute on-disk position of the `Ext2DiskINode'
+/* Return  the absolute on-disk position of the `Ext2DiskINode'
  * structure used to store descriptor data for the given `ino'. */
 INTDEF WUNUSED pos_t KCALL
 Ext2_InoAddr(Ext2Superblock *__restrict self, ext2_ino_t ino)

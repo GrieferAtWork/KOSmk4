@@ -131,7 +131,7 @@ INTERN void FCALL GDBSerial_Init(char *args) {
 	{
 		/* Check if data is already available (which is likely to be the case). */
 		u8 avail = inb(SERIAL_IOADDR_LSR(GDBSerial_IO_PortBase));
-		/* Enable interrupts before we read data, since once we do that read,
+		/* Enable  interrupts before we  read data, since once  we do that read,
 		 * any additional data which may arrive from then on can trigger an IRQ! */
 		outb(SERIAL_IOADDR_IER(GDBSerial_IO_PortBase), SERIAL_EIR_RDA);
 		if (avail & SERIAL_LSR_DA) {

@@ -55,9 +55,9 @@ DECL_BEGIN
 
 
 /* Directly copy memory to/from the given buffer and `self'
- * NOTE: These functions automatically deal with page properties, such
+ * NOTE: These  functions  automatically  deal with  page  properties, such
  *       that `vm_datapart_do_read()' will ensure INITIALIZED pages, whilst
- *       `vm_datapart_do_write()' ensures HASCHANGED pages (so-long as the
+ *       `vm_datapart_do_write()'  ensures HASCHANGED pages (so-long as the
  *       TRACKCHANGES bit is set)
  * NOTE: The caller must be holding a read-lock to `self', as well as ensure
  *       that `self' is either INCORE or LOCKED */
@@ -146,22 +146,22 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
  * to access made to the given `dst'/`src' buffers (s.a. `memcpy_nopf()').
  * @assume(num_bytes <= SSIZE_MAX);
  * @return: >= 0:
- *     Successfully transferred all possible data in regards to the actual size
+ *     Successfully  transferred all possible data in regards to the actual size
  *     of `self' encountered when the lock associated with it was held. This may
  *     be less than num_bytes' in case the data part ended up being smaller that
  *     the given buffer, where it should be noted that a data part can shrink at
- *     any time that its lock isn't being held due to possibly getting split by
+ *     any  time that its lock isn't being held due to possibly getting split by
  *     another thread.
  * @return: < 0:
  *     Failed to read/write the last `-return' bytes of the given buffer,
  *     as accessing them triggers a #PF for the range:
  *         `(dst|src) + (num_bytes - (size_t)(-return)) ... (dst|src) + num_bytes - 1'
- *     As such, the first `num_bytes - (size_t)(-return)' bytes were successfully
+ *     As such, the  first `num_bytes - (size_t)(-return)'  bytes were  successfully
  *     read/written, and the caller should not attempt to read/write them again, but
  *     should instead manually read/write at least 1 byte starting at:
  *         `((byte_t *)(dst|src))[num_bytes - (size_t)(-return)]'
- *     using a temporary buffer, in order to allow the associated memory mapping to
- *     be faulted while not holding any locks to VM control structures, also allowing
+ *     using a temporary  buffer, in order  to allow the  associated memory mapping  to
+ *     be  faulted while not holding any locks  to VM control structures, also allowing
  *     for the proper handling in case the memory associated with `dst'/`src' is backed
  *     by a VIO memory mapping. */
 PUBLIC NONNULL((1, 2)) ssize_t KCALL
@@ -180,19 +180,19 @@ vm_datapart_write_nopf(struct vm_datapart *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #elif defined(DEFINE_IO_PHYS)
 /* Read/write data to/from the given data part.
- * NOTE: When given a virtual memory buffer, these functions automatically
- *       check if the memory backing that buffer could potentially overlap
+ * NOTE: When given  a virtual  memory buffer,  these functions  automatically
+ *       check  if the  memory backing  that buffer  could potentially overlap
  *       with `self', in which case reading is performed using an intermediate
- *       buffer, so-as to prevent a possible dead-lock when `self' is already
- *       locked, whilst a #PF caused by writing to the target buffer attempts
+ *       buffer,  so-as to prevent a possible dead-lock when `self' is already
+ *       locked, whilst a #PF caused by writing to the target buffer  attempts
  *       to acquire another lock to `self'
  * NOTE: The caller must _NOT_ be holding any lock to `self', the associated
  *       block, or any VM-tree when calling this function.
- * @param: split_bytes: The number of bytes after which to split the part in
+ * @param: split_bytes: The  number of bytes after which to split the part in
  *                      order to minimize the memory impact of copy-on-write.
  *                      Usually the same as `num_bytes'
  * @return: * : The number of read/written bytes (limited by `num_bytes',
- *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
+ *              and     `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 PUBLIC NONNULL((1)) size_t KCALL
 FUNC0(vm_datapart_)(struct vm_datapart *__restrict self,
                     physaddr_t buf,
@@ -204,9 +204,9 @@ FUNC0(vm_datapart_)(struct vm_datapart *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #else /* ... */
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
- * memory backing is `safe' (i.e. access could never cause a #PF attempting to
- * acquire a lock to `self' when doing so is impossible; i.e. `dst'/`src' are
- * guarantied to not be apart of a mapping of `self', or be otherwise accessed
+ * memory backing is `safe' (i.e. access could never cause a #PF attempting  to
+ * acquire  a lock to `self' when doing  so is impossible; i.e. `dst'/`src' are
+ * guarantied  to not be apart of a mapping of `self', or be otherwise accessed
  * by code called from a page-fault handler) */
 PUBLIC NONNULL((1, 2)) size_t KCALL
 #ifdef DEFINE_IO_READ

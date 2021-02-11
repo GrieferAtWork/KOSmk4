@@ -64,7 +64,7 @@ NOTHROW(KCALL free_partilly_initialized_datapart)(struct vm_datapart *__restrict
 }
 
 /* Truncate `vector' to only encompass a total
- * of `num_pages' pages of physical memory. */
+ * of  `num_pages'  pages of  physical memory. */
 PRIVATE NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL vm_ramblock_vector_truncate)(struct vm_ramblock *__restrict vector,
                                            size_t count, size_t num_pages) {
@@ -100,25 +100,25 @@ NOTHROW(KCALL vm_ramblock_vector_truncate)(struct vm_ramblock *__restrict vector
 
 
 /* Lock and (possibly) unshare some given datapart for the purpose of performing
- * writes to its backing memory in the context of the given vm `self'.
+ * writes to  its  backing  memory  in  the context  of  the  given  vm  `self'.
  * This funciton is used by the #PF handler, `vm_write()', `vm_prefault()' and `vm_forcefault()'
- * whenever memory is accessed in a way that it is necessary to perform a write.
+ * whenever   memory  is  accessed  in  a  way  that   it  is  necessary  to  perform  a  write.
  * @param: self:              The VM inside of which `node' is mapped.
  * @param: ppart:             [in|out] A reference to the effective part being accessed (may be modified during unsharing)
  * @param: addr:              The access that is being accessed.
- * @param: node:              A pointer to the node that is being accessed. Note that since no lock is held to
+ * @param: node:              A pointer to the node that is being accessed. Note that since no lock is held  to
  *                            `self' when this function is called, this pointer may already no longer be valid!
  * @param: node_prot:         The original value of `node->vn_prot'
  * @param: node_vpage_offset: Page-offset into `node' to the first page to which write-access is actually required.
- *                            This must be equal to `PAGEID_ENCODE(addr) - vm_node_getstartpageid(node)'
- * @param: node_vpage_count:  The max number of consecutive pages for which write-access is required. For most
+ *                            This   must   be   equal   to    `PAGEID_ENCODE(addr) - vm_node_getstartpageid(node)'
+ * @param: node_vpage_count:  The  max number of consecutive pages for  which write-access is required. For most
  *                            kinds of memory accesses (including #PF-related ones), this argument is simply `1'
  * @param: pdid_unshare:      When non-NULL, set to `true' if the caller should try to merge `part' during decref(),
- *                            as the result of this function having actually performed an unshare.
- * @return: * : The number of consecutive pages loaded for write-access.
+ *                            as  the   result   of   this   function  having   actually   performed   an   unshare.
+ * @return: * : The  number  of consecutive  pages loaded  for write-access.
  *              In this case, a read-lock on `part' is passed to the caller.
  *              This is always at most `node_vpage_count'
- * @return: 0 : `node' is no longer valid (must re-attempt its lookup)
+ * @return: 0 : `node' is no longer  valid (must re-attempt its  lookup)
  *              In this case, no lock on `part' is passed to the caller. */
 PUBLIC size_t KCALL
 vm_lock_and_unshare_datapart_for_writing(struct vm *__restrict self,
@@ -133,13 +133,13 @@ vm_lock_and_unshare_datapart_for_writing(struct vm *__restrict self,
 	size_t part_num_vpages;
 	if (node_prot & VM_PROT_SHARED) {
 		/* Changes made by the caller should be shared.
-		 * -> Simply unshare copy-on-write mappings, and
+		 * -> Simply  unshare  copy-on-write  mappings,  and
 		 *    ensure that the part is loaded in-core, before
-		 *    proceeding to initialize the associated page. */
+		 *    proceeding to initialize the associated  page. */
 		if (ATOMIC_READ(part->dp_crefs)) {
-			/* If there are copy-on-write mappings, first
-			 * minimize the data part to only contain a single
-			 * page of physical memory. - That way, we only need
+			/* If   there   are  copy-on-write   mappings,  first
+			 * minimize the data  part to only  contain a  single
+			 * page of physical memory. - That way, we only  need
 			 * to copy a single page, too, minimizing memory use. */
 do_unshare_cow:
 			if (node_vpage_offset != 0) {
@@ -182,7 +182,7 @@ do_unshare_cow:
 			PAGEDIR_PAGEALIGNED void *pageaddr;
 			size_t missing_part_num_vpages;
 
-			/* We have to split the part such that we can
+			/* We have to  split the part  such that we  can
 			 * manipulate the accessed page(s) individually. */
 			if (node_vpage_offset != 0) {
 				sync_endread(part);
@@ -242,11 +242,11 @@ do_unshare_cow:
 			pageaddr    = (PAGEDIR_PAGEALIGNED void *)((uintptr_t)addr & ~PAGEMASK);
 
 			/* At this point, we need to allocate a new vm_datapart, which we
-			 * then have to set up as a mirror copy of the affected part.
+			 * then have to  set up as  a mirror copy  of the affected  part.
 			 * HINT: By this point, we can already assume that `part' is INCORE/LOCKED,
-			 *       since we used `vm_datapart_lockread_setcore()' to acquire a read
+			 *       since  we used `vm_datapart_lockread_setcore()'  to acquire a read
 			 *       lock to it above.
-			 * HINT: We don't need to allocate a new node, because we can simply re-use
+			 * HINT: We  don't need to allocate a new  node, because we can simply re-use
 			 *       the old node, as it doesn't even need to change its memory location! */
 			new_part = (struct vm_datapart *)kmalloc_nx(sizeof(struct vm_datapart),
 			                                            GFP_LOCKED | GFP_ATOMIC | GFP_VCBASE);
@@ -426,7 +426,7 @@ did_alloc_ramdata_in_new_part:
 			}
 
 			/* Fill in the datablock of the new datapart as being derived
-			 * from the appropriate anonymous-zero set of datablocks. */
+			 * from  the  appropriate anonymous-zero  set  of datablocks. */
 			new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
 
 			/* Copy the contents of the page(s) being unshared. */
@@ -434,7 +434,7 @@ did_alloc_ramdata_in_new_part:
 			vm_datapart_do_copyram(new_part, part);
 
 			/* Must update the page directory mapping _before_ calling `sync_endwrite(self)'
-			 * Otherwise, `part' may be destroyed while `self' still contains the mapping
+			 * Otherwise,  `part' may be  destroyed while `self'  still contains the mapping
 			 * of the already destroyed (and potentially re-purposed) part. */
 			pagedir_prot = node_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 			if (self != &vm_kernel)
@@ -482,10 +482,10 @@ did_alloc_ramdata_in_new_part:
 			goto done;
 		}
 	}
-	/* Check if the part still includes the accessed page(s).
-	 * This is required to ensure that `vm_datapart_loadpage()'
+	/* Check if  the part  still includes  the accessed  page(s).
+	 * This is required  to ensure that  `vm_datapart_loadpage()'
 	 * can be called safely (the part may have been split between
-	 * the time of us acquiring a read-lock to it, and the point
+	 * the time of us acquiring a read-lock to it, and the  point
 	 * when we released our write-lock to the effected VM) */
 	part_num_vpages = vm_datapart_numvpages(part);
 	assert(part_num_vpages != 0);
@@ -506,13 +506,13 @@ done:
 /* Try to prefault memory for the given address range within the current VM.
  * This function is intended to be used in conjunction with `memcpy_nopf()',
  * as well as functions using it in order to speed up the lock-copy-unlock-do_buffered_io-repeat
- * cycle by potentially allowing the caller to skip having to perform buffered I/O
- * in cases where the backing memory can be made to be backed by real, physical memory,
+ * cycle   by  potentially  allowing  the  caller  to   skip  having  to  perform  buffered  I/O
+ * in  cases  where the  backing memory  can  be made  to be  backed  by real,  physical memory,
  * as opposed to not being mapped at all, or being mapped by VIO memory.
- * NOTE: This function should only be used as a hint for figuring out how buffered I/O should
- *       be performed in face of a memory range that cannot be accessed by `memcpy_nopf()'.
+ * NOTE: This  function should only be used as a  hint for figuring out how buffered I/O should
+ *       be performed in face  of a memory  range that cannot  be accessed by  `memcpy_nopf()'.
  *       In practice, this means that code using it should be aware that as far as the reliable
- *       semantics of this function go, one valid implementation could simply look like this:
+ *       semantics  of this function go, one valid  implementation could simply look like this:
  *       >> PUBLIC size_t FCALL
  *       >> vm_prefault(USER CHECKED void const *addr, size_t num_bytes, bool for_writing)
  *       >>         THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -525,23 +525,23 @@ done:
  *       >>     // as well as handle the case of VIO memory being accessed.
  *       >>     return 1;
  *       >> }
- * NOTE: For a valid usage example of this function, you may look at the implementation of
- *       the `vm_datapart_(read|write)()' function pair, which uses it in order to determine
+ * NOTE: For a valid  usage example of  this function, you  may look at  the implementation  of
+ *       the  `vm_datapart_(read|write)()' function pair,  which uses it  in order to determine
  *       the number of bytes that must be processed using `vm_datapart_(read|write)_buffered()'
- * @param: for_writing: When true, make sure that memory within the associated gets
- *                      faulted such that copy-on-write operations are carried out.
- *                      Otherwise, only make sure that memory from the given range
+ * @param: for_writing: When true, make sure that  memory within the associated  gets
+ *                      faulted  such that copy-on-write  operations are carried out.
+ *                      Otherwise, only make  sure that memory  from the given  range
  *                      can be read from (though again: even this is only to be taken
- *                      as a hint. - This function is allowed to just do nothing if
+ *                      as  a hint. - This function is  allowed to just do nothing if
  *                      it wants to)
  * @assume(num_bytes != 0);
  * @return: 0 :
- *     At least 1 page of memory (the one containing `addr') was faulted.
- *     In this case, the caller can immediately go back to performing direct I/O,
+ *     At least  1  page  of  memory  (the  one  containing  `addr')  was  faulted.
+ *     In  this case, the caller can immediately  go back to performing direct I/O,
  *     though the possibility exists that either due to the backing physical memory
  *     for the given address range being swapped out, or this function choosing not
- *     to prefault the given range in its entirety, more transfer errors may still
- *     occur as memory from the given range is accessed using `memcpy_nopf()'.
+ *     to prefault the given range in its entirety, more transfer errors may  still
+ *     occur as  memory from  the given  range is  accessed using  `memcpy_nopf()'.
  *     Another possible reason for more transfer errors could be a VIO, or unmapped
  *     segment of memory starting further into the given range.
  * @return: >= 1 && <= num_bytes:
@@ -556,17 +556,17 @@ vm_prefault(USER CHECKED void const *addr,
 	 * the contents of memory don't actually get modified.
 	 * In practice, try to prefault the entirety of the indicated address range, but stop
 	 * at the first gap within the VM where either no mapping exists for some part of the
-	 * indicated range, or the part that does exist is a VIO mapping.
+	 * indicated  range,   or   the   part   that  does   exist   is   a   VIO   mapping.
 	 * If the indicated range starts with...
-	 *     ... an unmapped memory segment (i.e. no `vm_node' exists for `addr'), then
+	 *     ... an unmapped memory segment (i.e.  no `vm_node' exists for `addr'),  then
 	 *         immediately return some non-zero value < num_bytes. (for simplicitly, we
-	 *         we can just always return `1', thus forgoing the need of additional
+	 *         we can just  always return  `1', thus  forgoing the  need of  additional
 	 *         calculations needing to be done)
-	 *     ... a memory segment that is backed by VIO, then return the number of bytes
-	 *         within a span starting at `addr', and ending at either the end of the
-	 *         indicate ranged, or at the first byte that is either not mapped any more,
+	 *     ... a memory segment  that is backed  by VIO,  then return the  number of  bytes
+	 *         within  a  span starting  at `addr',  and ending  at either  the end  of the
+	 *         indicate ranged, or at the  first byte that is  either not mapped any  more,
 	 *         or is no longer part of a memory block backed by VIO, whichever comes first:
-	 *      >> return (MIN(addr + num_bytes, END_ADDRESS_OF_LAST_CONSECUTIVE_VIO_MAPPING_STARTING_AT(addr)) - addr);
+	 *      >> return  (MIN(addr + num_bytes, END_ADDRESS_OF_LAST_CONSECUTIVE_VIO_MAPPING_STARTING_AT(addr)) - addr);
 	 *         Additionally, when `END_ADDRESS_OF_LAST_CONSECUTIVE_VIO_MAPPING_STARTING_AT(addr) > addr + num_bytes',
 	 *         recursively call ourself:
 	 *         >> void *p = END_ADDRESS_OF_LAST_CONSECUTIVE_VIO_MAPPING_STARTING_AT(addr);
@@ -580,25 +580,25 @@ vm_prefault(USER CHECKED void const *addr,
 	 *         >>     }
 	 *         >> }
 	 *         >> return (MIN(addr + num_bytes, p) - addr);;
-	 *         Thus allowing the caller to write code that immediately accesses memory
+	 *         Thus  allowing the caller  to write code  that immediately accesses memory
 	 *         past a block of data for which buffered I/O is necessary using direct I/O,
 	 *         without having to consult `vm_prefault()' yet again.
 	 * Otherwise, slowly work through all consecutively mapped `vm_node's, starting with
-	 * the node used for backing `addr' itself, and look at each of their data parts.
+	 * the node used for backing  `addr' itself, and look at  each of their data  parts.
 	 *   - If `addr + num_bytes' is reached, then stop iteration
 	 *   - If at any point a gap between two consecutive is found, also stop
-	 *   - Otherwise, with respect to `for_writing', as well as `VM_PROT_SHARED',
-	 *     and also `VM_PROT_WRITE' when `for_writing' is `true', make use of
-	 *     `vm_datapart_lockread_setcore_unsharecow()' and `vm_datapart_lockread_setcore()'
-	 *     in order to lock mapped data parts, before potentially updating memory mappings
+	 *   - Otherwise,  with   respect  to   `for_writing',   as  well   as   `VM_PROT_SHARED',
+	 *     and   also   `VM_PROT_WRITE'   when   `for_writing'   is   `true',   make   use  of
+	 *     `vm_datapart_lockread_setcore_unsharecow()'  and   `vm_datapart_lockread_setcore()'
+	 *     in  order to  lock mapped data  parts, before potentially  updating memory mappings
 	 *     within the VM associated with the current address, and finally updating the backing
-	 *     page directory mapping. Note that this last part is _mandatory_, since the only
+	 *     page directory mapping.  Note that this  last part is  _mandatory_, since the  only
 	 *     real requirement for `vm_prefault()' in terms of semantics is:
-	 *         When `vm_prefault()' returns `0', it is guarantied that at some point in
+	 *         When `vm_prefault()' returns `0', it is guarantied that at some point  in
 	 *         the past, presence, or future, virtual memory located at `addr' has/is/or
 	 *         will be backed by true, physical memory.
-	 *   - If at least a single byte of memory was already successfully faulted using this
-	 *     memory, any `E_BADALLOC' or `E_WOULDBLOCK' exceptions thrown whilst attempting
+	 *   - If at least a single byte of  memory was already successfully faulted using  this
+	 *     memory, any `E_BADALLOC'  or `E_WOULDBLOCK' exceptions  thrown whilst  attempting
 	 *     to fault additional memory are caught, and will also cause the iteration to stop.
 	 *     In practice this simply means:
 	 *     >> if (ITER_ADDR == addr)
@@ -609,7 +609,7 @@ vm_prefault(USER CHECKED void const *addr,
 	 *     Where ITER_ADDR is initialized to `addr', and during `continue' is updated to
 	 *     instead refer to `vm_node_getendaddr(CURRENT_NODE)'.
 	 * Regardless of why iteration stops, always return `0' at this point, indicating that
-	 * at least some part of the given range can be accessed using direct I/O.
+	 * at least  some  part  of  the  given  range  can  be  accessed  using  direct  I/O.
 	 */
 
 	/* TODO: Implement me! :) */
@@ -622,22 +622,22 @@ vm_prefault(USER CHECKED void const *addr,
 
 
 
-/* Force all bytes within the given address range to be faulted for either reading
- * or writing. If any page within the specified range isn't mapped, throw an E_SEGFAULT
+/* Force all  bytes  within  the  given  address range  to  be  faulted  for  either  reading
+ * or writing. If  any page  within the  specified range  isn't mapped,  throw an  E_SEGFAULT
  * exception. Otherwise, ensure that copy-on-write is invoked when `VM_FORCEFAULT_FLAG_WRITE'
- * is set, and that irregardless of `VM_FORCEFAULT_FLAG_WRITE', physical memory is allocated
+ * is  set, and that irregardless of `VM_FORCEFAULT_FLAG_WRITE', physical memory is allocated
  * for any mapping that can be made to be backed by RAM.
  * Any VIO mappings within the specified range are simply ignored (and will not count
- * towards the returned value), unless `VM_FORCEFAULT_FLAG_NOVIO' is set
+ * towards   the   returned   value),   unless   `VM_FORCEFAULT_FLAG_NOVIO'   is  set
  * @return: * : The total number of bytes that had their mappings updated.
- * NOTE: This function will also update the page directory mappings for any dataparts
- *       that get faulted during its invocation, meaning that use of `memcpy_nopf()'
- *       within the indicated address range (whilst still checking it for errors for
+ * NOTE: This function will also update the page directory mappings for any  dataparts
+ *       that get faulted during its  invocation, meaning that use of  `memcpy_nopf()'
+ *       within the indicated address range (whilst  still checking it for errors  for
  *       the even of the mapping changing, or the mapping being a VIO mapping) becomes
- *       possible immediately, without having to force any sort of additional memory
- *       access (note though that this only applies to the page directory of `self',
- *       though also note that if some datapart within the range was already faulted,
- *       its page directory mapping in `self' will still be updated, as it may have
+ *       possible immediately, without having to  force any sort of additional  memory
+ *       access  (note though that this only applies  to the page directory of `self',
+ *       though also note that if some datapart within the range was already  faulted,
+ *       its page directory mapping in  `self' will still be  updated, as it may  have
  *       been faulted as a lazy memory mapping). */
 FUNDEF size_t FCALL
 vm_forcefault(struct vm *__restrict self,
@@ -678,7 +678,7 @@ unlock_treelock_and_throw_segfault:
 		      ((flags & VM_FORCEFAULT_FLAG_WRITE) ? E_SEGFAULT_CONTEXT_WRITING : 0));
 	}
 	/* Check if the node must be faulted, or if we can
-	 * update its page directory mapping directly. */
+	 * update its  page  directory  mapping  directly. */
 	part = node->vn_part;
 #ifdef LIBVIO_CONFIG_ENABLED
 	if unlikely(part->dp_state == VM_DATAPART_STATE_VIOPRT) {
@@ -728,7 +728,7 @@ again_acquire_part_lock:
 				decref_unlikely(part);
 				goto again_acquire_treelock_no_done_check;
 			}
-			/* In case an unshare did actually happen, `vm_lock_and_unshare_datapart_for_writing()'
+			/* In  case an unshare did actually happen, `vm_lock_and_unshare_datapart_for_writing()'
 			 * will have already performed the necessary page directory re-mapping, so we're already
 			 * done. */
 			if (did_unshare) {
@@ -746,10 +746,10 @@ again_acquire_part_lock:
 				      E_SEGFAULT_CONTEXT_FAULT);
 			}
 			vm_datapart_lockread_setcore(part);
-			/* Check if the part still includes the accessed page.
-			 * This is required to ensure that `vm_datapart_loadpage()'
+			/* Check if  the  part  still  includes  the  accessed  page.
+			 * This is required  to ensure that  `vm_datapart_loadpage()'
 			 * can be called safely (the part may have been split between
-			 * the time of us acquiring a read-lock to it, and the point
+			 * the time of us acquiring a read-lock to it, and the  point
 			 * when we released our write-lock to the effected VM) */
 			fault_count = vm_datapart_numvpages(part);
 			if unlikely(node_prefault_vpage_offset >= fault_count) {
@@ -766,7 +766,7 @@ again_acquire_part_lock:
 		assert(part->dp_state != VM_DATAPART_STATE_ABSENT);
 		assert(node_prefault_vpage_offset + fault_count <= vm_datapart_numvpages(part));
 		COMPILER_BARRIER();
-		/* At this point, we update the page directory mappings for all of the pages
+		/* At this point, we  update the page  directory mappings for  all of the  pages
 		 * within the range specified by `node_prefault_vpage_offset ... += fault_count' */
 		for (fault_index = 0; fault_index < fault_count; ++fault_index) {
 			physpage_t ppage;
@@ -822,8 +822,8 @@ again_acquire_part_lock:
 				pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
 			else if ((pagedir_prot & PAGEDIR_MAP_FWRITE) && !(flags & VM_FORCEFAULT_FLAG_WRITE)) {
 				/* When `VM_FORCEFAULT_FLAG_WRITE' wasn't set, we didn't actually unshare the part, so if
-				 * we're mapping it with write permissions, we must delete those in case of a PRIVATE
-				 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
+				 * we're  mapping it with  write permissions, we must  delete those in  case of a PRIVATE
+				 * memory mapping when the  part isn't anonymous,  or mapped by  other SHARED or  PRIVATE
 				 * mappings. */
 				if (!(node_prot & VM_PROT_SHARED) &&
 				    (ATOMIC_READ(part->dp_block->db_parts) != MFILE_PARTS_ANONYMOUS ||
@@ -884,7 +884,7 @@ again_acquire_part_lock:
 
 
 /* Same as `vm_forcefault()', but automatically extend the faulted range
- * to all pages that are touched by the given `addr...+=num_bytes' */
+ * to  all  pages that  are  touched by  the  given `addr...+=num_bytes' */
 PUBLIC size_t FCALL
 vm_forcefault_p(struct vm *__restrict self,
                 UNCHECKED void *addr, size_t num_bytes,

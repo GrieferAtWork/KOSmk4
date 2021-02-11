@@ -240,12 +240,12 @@ NOTHROW(KCALL try_delete_async_worker)(struct awork_vector *__restrict old_worke
 AXREF(aworker_axref, aworker);
 #endif /* !__aworker_axref_defined */
 
-/* [lock(PRIVATE(_asyncwork))] The timeout argument
+/* [lock(PRIVATE(_asyncwork))] The  timeout   argument
  * for the async worker main `task_waitfor()' function */
 PRIVATE ktime_t asyncmain_timeout_p = KTIME_INFINITE;
 
 /* [0..1] The worker who's timeout callback should
- * be invoked when `asyncmain_timeout_p' expires. */
+ * be invoked when `asyncmain_timeout_p'  expires. */
 PRIVATE struct aworker_axref asyncmain_timeout_worker = AXREF_INIT(NULL);
 
 /* [lock(PRIVATE(_asyncwork))][1..1]
@@ -254,9 +254,9 @@ PRIVATE struct aworker_axref asyncmain_timeout_worker = AXREF_INIT(NULL);
 PRIVATE async_worker_timeout_t asyncmain_timeout_cb = NULL;
 
 
-/* This function may be called by `awc_poll()'-callbacks to
+/* This  function may be called by `awc_poll()'-callbacks to
  * specify the realtime() timestamp when `awc_time()' should
- * be invoked. The given `cookie' must be the same argument
+ * be invoked. The given `cookie' must be the same  argument
  * prviously passed to `awc_poll()' */
 PUBLIC NOBLOCK NONNULL((2, 3)) void
 NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(ktime_t abs_timeout,
@@ -424,20 +424,20 @@ again:
 
 
 /* Register an async worker callback.
- * NOTE: All callbacks should be non-blocking in that they mustn't wait for
+ * NOTE: All callbacks should be non-blocking  in that they mustn't wait  for
  *       work to become available themself (that's what `poll()' is for, such
  *       that a single thread can wait for async work to become available for
  *       _all_ async workers)
  * @param: cb:         Callbacks for the async worker being registered.
  *                     NOTE: The backing storage of the `cb' container itself
- *                           doesn't need to be persistent! It only needs to
+ *                           doesn't need to be persistent! It only needs  to
  *                           remain valid until this function returns!
- * @param: ob_pointer: A pointer to a handle data object. The destructor of this
+ * @param: ob_pointer: A pointer  to a  handle data  object. The  destructor of  this
  *                     object is responsible for invoking `unregister_async_worker()'
- *                     Callbacks will no longer be invoked if this object's
- *                     reference counter has reached 0, however the object's
- *                     destructor must still unregister the callbacks before
- *                     the memory used to back its reference counter is free()d!
+ *                     Callbacks  will  no  longer   be  invoked  if  this   object's
+ *                     reference   counter  has  reached   0,  however  the  object's
+ *                     destructor  must   still  unregister   the  callbacks   before
+ *                     the memory  used to  back its  reference counter  is  free()d!
  * @param: ob_type:    The object type for `ob_pointer' (one of `HANDLE_TYPE_*')
  * @return: true:      Successfully registered a new async worker.
  * @return: false:     An async worker for the given object/callback combination
@@ -538,14 +538,14 @@ again:
 }
 
 /* Delete a previously defined async worker, using the same arguments as those
- * previously passed to `register_async_worker()'. This function should be
+ * previously  passed  to `register_async_worker()'.  This function  should be
  * called from the destructor of `ob_pointer'
  * @param: cb:     Callbacks for the async worker being unregistered.
  *                 NOTE: The backing storage of the `cb' container itself
- *                       doesn't need to be persistent! It only needs to
+ *                       doesn't need to be persistent! It only needs  to
  *                       remain valid until this function returns!
  * @return: true:  Successfully deleted an async worker for the
- *                 given object/callback combination.
+ *                 given      object/callback      combination.
  * @return: false: No async worker for the given object/callback
  *                 combination had been registered. */
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
@@ -576,7 +576,7 @@ NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__re
 			result = aworker_clearobj(w);
 
 			/* If this worker is currently set as the timeout
-			 * receiver, then remove it from that position. */
+			 * receiver, then remove  it from that  position. */
 			axref_cmpxch_inherit_new(&asyncmain_timeout_worker, w, NULL);
 
 			/* Always try to remove the worker. */
@@ -628,7 +628,7 @@ struct async_job {
 	WEAK struct aio_handle           *aj_aio;    /* [0..1][lock(CLEAR_ONCE)] Attached AIO and job cancellation indicator. */
 	WEAK refcnt_t                     aj_refcnt; /* Reference counter.
 	                                              * WARNING: This function _must_ always be located at the end of this structure!
-	                                              *          This placement is part of the ABI (s.a. `async_job_refcnt()') */
+	                                              *          This placement  is  part  of  the  ABI  (s.a.  `async_job_refcnt()') */
 };
 
 /* [0..1][lock(INSERT(ATOMIC), REMOVE(PRIVATE(ASYNC_WORKER)))]
@@ -689,7 +689,7 @@ do_delete_job:
 			job  = *pjob;
 		}
 		if unlikely(!ATOMIC_CMPXCH(*pjob, job, job->aj_next)) {
-			/* This can happen when `pjob == &async_jobs',
+			/* This can  happen  when  `pjob == &async_jobs',
 			 * and new jobs have been added in the mean time. */
 			struct async_job *prev;
 			assert(pjob == &async_jobs);
@@ -831,7 +831,7 @@ do_delete_job:
 					next = job->aj_next;
 					COMPILER_READ_BARRIER();
 					if unlikely(!ATOMIC_CMPXCH(*pjob, job, next)) {
-						/* This can happen when `pjob == &async_jobs',
+						/* This can  happen  when  `pjob == &async_jobs',
 						 * and new jobs have been added in the mean time. */
 						struct async_job *prev;
 						assert(pjob == &async_jobs);
@@ -856,16 +856,16 @@ do_delete_job:
 				        "poll returned `ASYNC_JOB_POLL_WAITFOR', but "
 				        "the job does not define a timeout callback!");
 				/* Use the async-worker timeout mechanism to set-up
-				 * a custom callback for when the timeout expires. */
+				 * a  custom callback for when the timeout expires. */
 				if (asyncjob_main_timeout >= asyncmain_timeout_p)
 					break;
 				/* Set the used timeout and callback routing. */
 				asyncmain_timeout_p  = asyncjob_main_timeout;
 				asyncmain_timeout_cb = &asyncjob_timeout_worker_timeout;
-				/* NOTE: Because only the async worker (i.e. us) is allowed to
+				/* NOTE: Because only  the async  worker (i.e.  us) is  allowed  to
 				 *       remove async jobs, we don't even have to store a reference
-				 *       to the job within `async_job_current_timeout', since the
-				 *       job will always be kept alive by its entry with the
+				 *       to the job  within `async_job_current_timeout', since  the
+				 *       job  will  always  be kept  alive  by its  entry  with the
 				 *       `async_jobs' chain. */
 				async_job_current_timeout = job;
 				/* Set the associated worker as the one that will receive the timeout. */
@@ -902,13 +902,13 @@ NOTHROW(FCALL async_job_destroy)(async_job_t self) {
 }
 
 
-/* Allocate and return a new async-job with the given callbacks.
- * Note that this job hasn't been started yet, which is something
+/* Allocate and  return a  new async-job  with the  given  callbacks.
+ * Note that this  job hasn't  been started yet,  which is  something
  * that will only be done once the caller invokes `async_job_start()'
  * If the job should be free()'d before that point, `async_job_free()' should be used.
- * Afterwards, the job should be considered as reference-counted, with the caller
+ * Afterwards, the  job should  be considered  as reference-counted,  with the  caller
  * of `async_job_start()' being responsible to inherit a reference to the job.
- * NOTE: The returned pointer itself points at a user-defined structure of
+ * NOTE: The  returned pointer  itself points  at a  user-defined structure of
  *       `cb->jc_jobsize' bytes aligned on some `cb->jc_jobalign'-byte border.
  * >> struct my_job_desc *desc;
  * >> async_job_t job;
@@ -964,7 +964,7 @@ NOTHROW(FCALL async_job_free)(async_job_t self) {
 
 
 struct async_job_aio_data {
-	REF async_job_t ajad_job; /* [1..1] A reference to the associated job.
+	REF async_job_t ajad_job; /* [1..1] A reference to  the associated  job.
 	                           * NOTE: This points to the user-data portion! */
 };
 STATIC_ASSERT(sizeof(struct async_job_aio_data) <=
@@ -1037,10 +1037,10 @@ PRIVATE struct aio_handle_type const async_job_aio_noretsize = {
 
 
 
-/* Start the given async job, and optionally connect a given AIO handle
+/* Start the given async job, and  optionally connect a given AIO  handle
  * for process monitoring, job completion notification, and cancellation:
  *   - `aio_handle_cancel()' can be used to the same effect as `async_job_cancel()'
- *   - `aio->ah_func' will be invoked under the following conditions
+ *   - `aio->ah_func'  will  be invoked  under the  following conditions
  *     after `async_job_start()' had been called to start the async job,
  *     just after the job has been deleted:
  *     - AIO_COMPLETION_SUCCESS:
@@ -1097,8 +1097,8 @@ NOTHROW(FCALL async_job_start)(async_job_t self,
 
 /* Cancel a given job.
  * This function can be used to prevent future invocation of the given job's functions.
- * WARNING: Job cancellation also happens asynchronously (except for in regards to
- *          the `AIO_COMPLETION_CANCEL' completion status of a possibly connected AIO
+ * WARNING: Job  cancellation  also happens  asynchronously  (except for  in  regards to
+ *          the `AIO_COMPLETION_CANCEL' completion  status of a  possibly connected  AIO
  *          handle), meaning that even after this function returns, the job may continue
  *          to exist for a while longer before eventually being deleted! */
 PUBLIC NOBLOCK NONNULL((1)) void

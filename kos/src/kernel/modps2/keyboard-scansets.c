@@ -37,7 +37,7 @@ gcc_opt.append("-fexceptions");
 
 #include <kos/keyboard.h>
 
-/* Keycodes for scanset #2 and #3 are derived from the tables near the
+/* Keycodes for scanset #2  and #3 are derived  from the tables near  the
  * top of the linux kernel source file: `/drivers/input/keyboard/atkbd.c' */
 
 DECL_BEGIN

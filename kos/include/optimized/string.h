@@ -3625,27 +3625,27 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __
 	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
 		return 0;
 	/* memcmp() behaves differently from strcmp(), in that memcmp is allowed to
-	 * assume both input data blocks contain at least `N_BYTES' of valid data,
-	 * which an implementation is allowed to access in any order it wishes.
-	 * With that in mind, we are allowed to optimize something like:
+	 * assume both input data blocks contain at least `N_BYTES' of valid  data,
+	 * which  an implementation  is allowed to  access in any  order it wishes.
+	 * With   that  in  mind,  we  are  allowed  to  optimize  something  like:
 	 * >> memcmp(a, b, 4) == 0;
 	 * Into:
 	 * >> *(u32 *)a == *(u32 *)b
 	 * For `strcmp()' we can't actually do this, because we must not attempt to access
 	 * any bytes of either string following a \0-character.
 	 *
-	 * Proof of this behavior is hard to come by, but I managed to find this (somewhat
+	 * Proof  of this behavior is hard to come  by, but I managed to find this (somewhat
 	 * unrelated) stackoverflow question, where all the answers unquestioningly indicate
-	 * that using memcmp() to access out-of-bounds data causes undefined behavior, even
+	 * that  using memcmp() to access out-of-bounds data causes undefined behavior, even
 	 * if memory leading up to the undefined portion is guarantied to compare non-equal,
 	 * thus allowing us to perform this optimization for memcmp()!
 	 * https://stackoverflow.com/questions/37782671/comparing-two-strings-using-memcmp-in-c
 	 */
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* NOTE: The `__DO_COMPARE()' macro is designed to best allow GCC
-		 *       to determine which path is used by which comparison.
+		 *       to determine  which path  is used  by which  comparison.
 		 * For example, `if __untraced(memcmp(a, b, 4) < 0) { ... }' can get fully
-		 * optimized to `if __untraced(*(u32 *)a < *(u32 *)b) { ... }' */
+		 * optimized       to       `if __untraced(*(u32 *)a < *(u32 *)b) { ... }' */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __DO_COMPARE(T, off)         \
 	{                                \
@@ -7334,7 +7334,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveq))(/*aligned(8)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedownq))(__dst, __src, __n_qwords);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_qwords)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_qwords) {
 		case 0:
@@ -7360,7 +7360,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveq))(/*aligned(8)*/ void *__dst,
 		}	break;
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 3: {
@@ -7428,7 +7428,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovel))(/*aligned(4)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedownl))(__dst, __src, __n_dwords);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_dwords)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_dwords) {
 		case 0:
@@ -7498,7 +7498,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovel))(/*aligned(4)*/ void *__dst,
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 5: {
@@ -7619,7 +7619,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedownw))(__dst, __src, __n_words);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_words)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_words) {
 		case 0:
@@ -7707,7 +7707,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 9: {
@@ -7920,7 +7920,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedown))(__dst, __src, __n_bytes);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_bytes)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_bytes) {
 		case 0:
@@ -8037,7 +8037,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 		case 7: {
 			__UINT16_TYPE__ __temp1;
@@ -8437,7 +8437,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveq))(/*aligned(8)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedownq))(__dst, __src, __n_qwords);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_qwords)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_qwords) {
 		case 0:
@@ -8464,7 +8464,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveq))(/*aligned(8)*/ void *__dst,
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 3: {
@@ -8532,7 +8532,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovel))(/*aligned(4)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedownl))(__dst, __src, __n_dwords);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_dwords)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_dwords) {
 		case 0:
@@ -8602,7 +8602,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovel))(/*aligned(4)*/ void *__dst,
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 5: {
@@ -8724,7 +8724,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedownw))(__dst, __src, __n_words);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_words)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_words) {
 		case 0:
@@ -8812,7 +8812,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst,
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 9: {
@@ -9024,7 +9024,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 		return (__LIBC_FAST_NAME(memmovedown))(__dst, __src, __n_bytes);
 #endif /* __OPTIMIZE_STRING_MEMOVE_DIRECTION */
 	if __untraced(__builtin_constant_p(__n_bytes)) {
-		/* Optimizations when the move can be done using
+		/* Optimizations  when the move  can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
 		switch __untraced(__n_bytes) {
 		case 0:
@@ -9139,7 +9139,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 #endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
-		 * at most 4 read/writes, and at most 3 temporaries. */
+		 * at most 4 read/writes, and at most 3  temporaries. */
 #ifndef __OPTIMIZE_SIZE__
 		case 7: {
 			__UINT16_TYPE__ __temp1;

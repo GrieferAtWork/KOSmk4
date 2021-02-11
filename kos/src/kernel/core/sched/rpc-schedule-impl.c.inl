@@ -45,14 +45,14 @@ DECL_BEGIN
 
 #ifdef RPC_USER
 /* Schedule a synchronous RPC to be serviced by `target'
- * WARNING: When `target' is the calling thread, `func'
+ * WARNING: When `target'  is the  calling thread,  `func'
  *          will be executed before this function returns.
  * @param: mode:   Set of `TASK_RPC_F* | TASK_USER_RPC_F*'
  * @return: true:  The RPC has been scheduled.
  * @return: false: The RPC could not be scheduled, because
  *                `target' has terminated, or is terminating.
  * @return: false: The target thread has the `TASK_FKERNTHREAD' flag
- *                 set, meaning it can never return to user-space,
+ *                 set,  meaning it can  never return to user-space,
  *                 since it only exists in kernel-space. */
 #ifdef RPC_NOEXCEPT
 PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
@@ -197,9 +197,9 @@ PUBLIC NONNULL((1, 2)) bool
 #endif /* !RPC_USER */
 
 	/* At this point our RPC has been scheduled and
-	 * can potentially be executed at any moment. */
+	 * can potentially be  executed at any  moment. */
 
-	/* Always re-direct user-space, since any kind of synchronous
+	/* Always  re-direct  user-space, since  any kind  of synchronous
 	 * interrupt must be handled immediately if `target' is currently
 	 * running from user-space! */
 	task_redirect_usercode_rpc(target, mode & (TASK_RPC_FWAITFOR | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO));
@@ -214,22 +214,22 @@ PUBLIC NONNULL((1, 2)) bool
 	}
 
 	/* Always return SUCCESS at this point, as a failed `task_redirect_usercode_rpc()'
-	 * still means that the RPC will be serviced, since we managed to schedule it as
+	 * still  means that the RPC will be serviced,  since we managed to schedule it as
 	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
 	return SUCCESS_RETURN_VALUE;
 }
 
 
-/* Allocate an RPC entry for later delivery without having to deal with the possibility
- * of a bad allocation at that later point in time. (s.a. `task_deliver_rpc()')
+/* Allocate an  RPC entry  for  later delivery  without having  to  deal with  the  possibility
+ * of  a  bad   allocation  at   that  later   point  in   time.  (s.a.   `task_deliver_rpc()')
  * These functions behave identical to their `task_schedule_*' counterparts from <sched/rpc.h>,
- * except that the caller is not required to specify the eventual target thread just yet.
+ * except that the  caller is  not required  to specify the  eventual target  thread just  yet.
  * NOTE: Prior to commiting an RPC allocation by one of these functions through `task_deliver_rpc()',
- *       the caller is free to make use of the returned RPC's `re_next' field for whatever purpose
- *       they deem useful, allowing the caller to allocate a number of RPCs at once, without
+ *       the caller is free to  make use of the returned  RPC's `re_next' field for whatever  purpose
+ *       they deem  useful, allowing  the  caller to  allocate  a number  of  RPCs at  once,  without
  *       having to set up a secondary vector for storing them before using them.
- *    -> The main purpose of these APIs is to provide a means of pre-allocating synchronous
- *       RPC descriptors beforehand, allowing them to later be used in a scenario where code
+ *    -> The main purpose of  these APIs is  to provide a  means of pre-allocating  synchronous
+ *       RPC descriptors beforehand, allowing them  to later be used  in a scenario where  code
  *       would no longer be capable of dealing with a bad allocation error that should normally
  *       arise if the regular `task_schedule_*' functions were to be used.
  * NOTE: The *_nx variants return `NULL' if the allocation failed. */

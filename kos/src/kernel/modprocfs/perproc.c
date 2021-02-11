@@ -142,7 +142,7 @@ ProcFS_PerProc_CustomTypes[PROCFS_PERPROC_COUNT - PROCFS_PERPROC_START_CUSTOM] =
 INTERN NONNULL((1)) void KCALL
 ProcFS_PerProc_LoadAttr(struct inode *__restrict self)
 		THROWS(E_IOERROR, ...) {
-	/* XXX: Load attributes from dynamically allocated thread-local storage?
+	/* XXX: Load   attributes    from   dynamically    allocated   thread-local    storage?
 	 *      NOTE: PID can be accessed by `self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK' */
 	(void)self;
 }

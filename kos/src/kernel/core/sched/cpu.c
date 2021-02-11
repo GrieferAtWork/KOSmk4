@@ -106,13 +106,13 @@ NOTHROW(FCALL panic_critical_thread_exited)(void) {
 
 /* Terminate the calling thread immediately.
  * WARNING: Do not call this function to terminate a thread.
- *          It would work, but exception handlers would not
- *          get unwound and resources would be leaked.
- *          If you wish to exit your current thread, just
+ *          It  would work, but exception handlers would not
+ *          get  unwound  and  resources  would  be  leaked.
+ *          If you wish  to exit your  current thread,  just
  *          throw an `E_EXIT_THREAD' error instead.
- * This function is called by the unhandled exception handler
- * when it encounters an `E_EXIT_THREAD' error, or when exception
- * data cannot be propagated to userspace in the event of an
+ * This  function  is  called  by  the  unhandled  exception  handler
+ * when it  encounters an  `E_EXIT_THREAD' error,  or when  exception
+ * data  cannot  be  propagated  to  userspace  in  the  event  of an
  * interrupt throwing some error, whilst originating from user-space.
  * @param: w_status: The task's exit status (mustn't be `WIFSTOPPED()' or `WIFCONTINUED()').
  *                   This argument is ignored for kernel-threads.
@@ -141,10 +141,10 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		pertask_onexit_t *iter;
 		printk(KERN_TRACE "[sched] Exiting thread %p\n", caller);
 
-		/* Trigger the appropriate debug trap associated with thread/process exits.
-		 * This is required because otherwise GDB will sooner or later hang itself
+		/* Trigger the appropriate debug trap associated with thread/process  exits.
+		 * This is required because otherwise GDB  will sooner or later hang  itself
 		 * when waiting for the exited-notification of a terminated thread once it's
-		 * no longer able to find the thread apart of thread listings.
+		 * no  longer  able   to  find   the  thread  apart   of  thread   listings.
 		 * s.a. /kos/misc/gdbridge/gdbride.dee
 		 */
 		if (kernel_debugtrap_enabled() && pid) {
@@ -174,7 +174,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	FORCPU(me, thiscpu_sched_current) = next;
 
 	/* Hi-jack the execution stack of the next thread to have it do the decref()
-	 * of our own thread, thus preventing the undefined behavior that would be
+	 * of our own thread, thus preventing  the undefined behavior that would  be
 	 * caused if we tried to decref (and possibly destroy) ourself.
 	 *
 	 * NOTE: The reference destroyed here was gifted to us by `sched_intern_yield_onexit()' */
@@ -194,7 +194,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		do {
 			/* Set the flag to indicate that we've been fully terminated.
 			 * NOTE: Also ensure that a couple of other flags are set/cleared correctly,
-			 *       though most of these flags should already have the proper status */
+			 *       though  most of these  flags should already  have the proper status */
 			enum {
 				set = (/* Set the terminated flags */
 				       TASK_FTERMINATING | TASK_FTERMINATED |
@@ -205,7 +205,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 				       0),
 				del = (/* We're no longer running */
 				       TASK_FRUNNING |
-				       /* If we were running in vfork()-mode, clear the
+				       /* If we were  running in  vfork()-mode, clear  the
 				        * VFORK flag to wake up our waiting parent thread. */
 				       TASK_FVFORK |
 				       /* This flag really shouldn't be set, so clearing simply ensures
@@ -218,10 +218,10 @@ NOTHROW(FCALL task_exit)(int w_status) {
 			old_flags = ATOMIC_READ(caller->t_flags);
 			new_flags = old_flags;
 			/* While this was already checked for above, some other thread may have set this
-			 * flag in the mean time (though doing something like that would be really bad
+			 * flag in the mean time (though doing  something like that would be really  bad
 			 * practice). In any case: properly handle the CRITICAL-flag until the very end,
-			 * so that other code can guaranty that setting the flag at any point when the
-			 * TERMINATED flag hasn't also been set will cause an intentional kernel panic. */
+			 * so  that other code can guaranty that setting  the flag at any point when the
+			 * TERMINATED flag hasn't also been set will cause an intentional kernel  panic. */
 			if unlikely(new_flags & TASK_FCRITICAL)
 				panic_critical_thread_exited();
 			new_flags |= set;
@@ -231,24 +231,24 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		                             new_flags));
 	}
 
-	/* Broadcast the status-changed signal _after_ setting `TASK_FTERMINATED'
-	 * That way, other thread can use `tp_changed' alongside `TASK_FTERMINATED'
-	 * in order to wait for the thread to fully terminate. If we were to broadcast
-	 * `tp_changed' before setting the flag, then even though we've got interrupts
-	 * disabled, another CPU may receive the `tp_changed' signal and read the flags
+	/* Broadcast  the  status-changed   signal  _after_  setting   `TASK_FTERMINATED'
+	 * That way,  other  thread  can use  `tp_changed'  alongside  `TASK_FTERMINATED'
+	 * in order to wait for  the thread to fully terminate.  If we were to  broadcast
+	 * `tp_changed'  before setting the  flag, then even  though we've got interrupts
+	 * disabled, another CPU may receive the  `tp_changed' signal and read the  flags
 	 * field not containing `TASK_FTERMINATED' yet before we've set the flag, causing
-	 * it to end up soft-locked (as in: CTRL+C would still work), waiting for the
+	 * it to end up  soft-locked (as in:  CTRL+C would still  work), waiting for  the
 	 * thread to terminate when in fact it already has terminated.
-	 * However, we must fill in the exit status _before_ setting `TASK_FTERMINATED',
+	 * However,  we  must  fill  in  the  exit  status  _before_  setting  `TASK_FTERMINATED',
 	 * such that another thread waiting for us to terminate knows that once `TASK_FTERMINATED'
-	 * has been set, the thread's pid's `tp_status' field contains its final exit status.
-	 * Thus, the terminate-flag acts as an interlocked check for the exit status and
+	 * has been set,  the thread's  pid's `tp_status' field  contains its  final exit  status.
+	 * Thus, the  terminate-flag  acts  as  an  interlocked check  for  the  exit  status  and
 	 * waiting for the status to change during thread exit. */
 	if (pid) {
 		/* Important! Must broadcast the change while impersonating `next'!
 		 *
 		 * Our current thread context is already too broken to allow us to
-		 * re-schedule others threads that may be waiting for us to exit. */
+		 * re-schedule  others threads that may be waiting for us to exit. */
 		sig_broadcast_as_nopr(&pid->tp_changed, next);
 	}
 
@@ -277,15 +277,15 @@ NOTHROW(FCALL cpu_idlemain)(void) {
 
 
 
-/* Optional functions to schedule / delete jobs that should be executed
+/* Optional functions to schedule /  delete jobs that should be  executed
  * by the current CPU's IDLE thread the next time there is nothing to do.
  * NOTE: These functions should be used for the purposes of _HINTS_ _ONLY_!
- *       The kernel is not actually required to implement them, and when
- *       defined as no-ops that simply return `false', kernel operations
+ *       The  kernel is not  actually required to  implement them, and when
+ *       defined as no-ops  that simply return  `false', kernel  operations
  *       must be the same as otherwise!
- * `cpu_schedule_idle_job_and_incref' is the same as `cpu_schedule_idle_job()',
+ * `cpu_schedule_idle_job_and_incref'  is  the same  as `cpu_schedule_idle_job()',
  * but if the request succeeds (return == true), atomically increment a `refcnt_t'
- * field found at `arg + refcnt_offset', thus allowing the job-function to take
+ * field found at  `arg + refcnt_offset', thus allowing  the job-function to  take
  * a reference to some object with which to work.
  * @param: job:    The job to perform.
  * @param: arg:    The argument to pass to `job' when it should be executed.
@@ -317,7 +317,7 @@ NOTHROW(FCALL cpu_schedule_idle_job_and_incref)(idle_job_t job, void *arg,
 /* Delete a previously schedule IDLE job before it can be serviced.
  * @return: true:  The job was unscheduled, and invoked with `IDLE_JOB_MODE_CANCEL'
  * @return: false: Either the job was never scheduled, or has already been serviced
- *                 when the CPU had some down-time between now and a prior call to
+ *                 when the CPU had some down-time between now and a prior call  to
  *                `cpu_schedule_idle_job*()' */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL cpu_delete_idle_job)(idle_job_t job, void *arg) {

@@ -463,9 +463,9 @@ unmap_check_overlap_and_find_new_candidate:
 				                       VM_NODE_FLAG_NORMAL,
 				                       0))
 					goto unmap_check_overlap_and_find_new_candidate;
-				/* LD sometimes produces really weird .bss sections that are neither whole
-				 * pages, nor are placed such that they exist at the end of some given file.
-				 * Because of this, we must manually check for segments that end in a
+				/* LD  sometimes produces really  weird .bss sections  that are neither whole
+				 * pages,  nor are placed such that they exist at the end of some given file.
+				 * Because  of  this, we  must  manually check  for  segments that  end  in a
 				 * small (< PAGESIZE) section of bss memory when that segment doesn't hug the
 				 * end of the actual file, and memset() it to all ZEROes.
 				 *
@@ -475,13 +475,13 @@ unmap_check_overlap_and_find_new_candidate:
 				 *     LOAD           0x00e224 0x0000f224 0x0000f224 0x000ec 0x000fc RW  0x1000
 				 *     DYNAMIC        0x00e228 0x0000f228 0x0000f228 0x000a8 0x000a8 RW  0x4
 				 *
-				 * The second segment contains a BSS area of 0xfc-0xec == 0x10 bytes at 0xf310...0xf31f
+				 * The second segment contains  a BSS area  of 0xfc-0xec ==  0x10 bytes at  0xf310...0xf31f
 				 * Since this range is still part of the page that gets loaded from disk as a file mapping,
-				 * the associated file mapping at 0xf224...0xf30f is extended to the end of the associated
+				 * the  associated file mapping at 0xf224...0xf30f is extended to the end of the associated
 				 * page at 0xffff (which includes (in this case) the entire .bss section).
 				 *
-				 * In a case like this where the .bss area overlaps with the extended file mapping, the first
-				 * page of the .bss area must be re-mapped as writable (if not already), followed by the area
+				 * In a case like this where the .bss  area overlaps with the extended file mapping, the  first
+				 * page of the .bss area must be re-mapped  as writable (if not already), followed by the  area
 				 * `START_OF_BSS ... MIN(MAX_BSS_BYTE, MAX_BYTE_OF_PAGE(PAGE_OF(START_OF_BSS)))' being forcibly
 				 * initialized to all ZEROes, causing the page to be faulted and become initialized properly.
 				 */
@@ -501,11 +501,11 @@ unmap_check_overlap_and_find_new_candidate:
 						if (prot & VM_PROT_WRITE) {
 							memset(bss_start, 0, bss_overlap);
 						} else {
-							/* Complicated case: Must write to memory mapped as read-only...
+							/* Complicated case:  Must  write  to memory  mapped  as  read-only...
 							 * Note that this really shouldn't be something that happens normally,
-							 * since I don't see any reason why one would map .bss as read-only.
+							 * since  I don't see any reason why  one would map .bss as read-only.
 							 * But still: It is something that is technically allowed by ELF, and
-							 *            maybe someone needed a really large section of 0-bytes
+							 *            maybe someone needed a really large section of  0-bytes
 							 *            for some kind of stub-implementation... */
 							vm_memset(v, bss_start, 0, bss_overlap, true);
 						}

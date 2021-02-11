@@ -41,21 +41,21 @@ DECL_BEGIN
 #endif /* !CONFIG_VM_DATABLOCK_BUFFEREDIO_MAXBUFSIZE */
 
 
-/* Perform I/O using an intermediate buffer, thus solving the deadlock
- * scenario possible when using `vm_datapart_(read|write)_unsafe', as
- * well as to perform the faulting/vio-interaction needed when a call
- * to `vm_datapart_(read|write)_nopf()' returned a negative value.
+/* Perform I/O using  an intermediate buffer,  thus solving the  deadlock
+ * scenario possible  when  using  `vm_datapart_(read|write)_unsafe',  as
+ * well  as to  perform the  faulting/vio-interaction needed  when a call
+ * to  `vm_datapart_(read|write)_nopf()'  returned   a  negative   value.
  * Even though they can, these functions should _not_ be used to transfer
- * a data part in its entirety, since they rely on a limited-size buffer
- * allocated on the kernel stack, meaning that their use requires the
+ * a data part in its entirety, since they rely on a limited-size  buffer
+ * allocated on the  kernel stack,  meaning that their  use requires  the
  * indirection of an intermediate memory location.
- * In general, raw I/O on data parts should always be performed with the
- * help of `vm_datapart_(read|write)()', which will automatically try to
- * call the `*_nopf()' function, and fall back for a limited number of
+ * In general, raw  I/O on data  parts should always  be performed with  the
+ * help  of  `vm_datapart_(read|write)()', which  will automatically  try to
+ * call  the  `*_nopf()' function,  and fall  back for  a limited  number of
  * bytes to making use of `vm_datapart_(read|write)_buffered()' for handling
  * VIO, as well as faulting memory mappings. (s.a. `vm_prefault()')
  * @return: * : The number of read/written bytes (limited by `num_bytes',
- *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
+ *              and     `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 PUBLIC NONNULL((1)) size_t KCALL
 #ifdef DEFINE_IO_READ
 vm_datapart_read_buffered(struct vm_datapart *__restrict self,
@@ -89,8 +89,8 @@ vm_datapart_write_buffered(struct vm_datapart *__restrict self,
 		COMPILER_BARRIER();
 #endif /* DEFINE_IO_WRITE */
 
-		/* Do perform unsafe I/O using the kernel-space buffer (meaning that
-		 * it's actually safe because the buffer is locked into memory, meaning
+		/* Do  perform unsafe  I/O using  the kernel-space  buffer (meaning that
+		 * it's  actually safe because the buffer is locked into memory, meaning
 		 * that accessing it not only cannot cause a #PF that may try to re-lock
 		 * the given data part `self', but cannot cause a #PF at all) */
 		temp = IFELSE_RW(vm_datapart_read_unsafe(self, temp_buf, bufsize,

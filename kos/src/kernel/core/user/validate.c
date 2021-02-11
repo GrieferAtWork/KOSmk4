@@ -32,9 +32,9 @@
 DECL_BEGIN
 
 /* Validate user-pointers for being allowed to be used for the specified operations.
- * Since the kernel is allowed to access memory that is marked as `PROT_NOUSER',
- * user-pointers passed from user-space must be checked for the same restrictions.
- * In order words: If the user passes a pointer that is part of kernel-space,
+ * Since the kernel  is allowed to  access memory that  is marked as  `PROT_NOUSER',
+ * user-pointers passed from user-space must  be checked for the same  restrictions.
+ * In order words: If  the  user passes  a pointer  that  is part  of kernel-space,
  *                 these functions are used to deny the user access to such memory.
  * @throw E_SEGFAULT: User-space has not been granted access to the given address range. */
 PUBLIC void KCALL

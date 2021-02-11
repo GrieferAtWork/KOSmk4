@@ -29,7 +29,7 @@
 #error "Architecture doesn't have RTM support (please don't compile this driver for this architecture)"
 #endif /* !ARCH_HAVE_RTM */
 
-/* Config option: CONFIG_RTM_USERSPACE_ONLY
+/* Config     option:      CONFIG_RTM_USERSPACE_ONLY
  * When enabled, RTM can only be used in user-space.
  * This is enforced by making all conditional is-user checks mandatory,
  * as well as simplifying a lot of code by removing is-kernel branches. */
@@ -48,7 +48,7 @@
 
 
 /* Config option: CONFIG_RTM_PENDING_SYSTEM_CALLS
- * When enabled, certain system calls will be tracked as pending,
+ * When enabled, certain system calls will be tracked as  pending,
  * such that they will be executed only upon successful completion
  * of RTM emulation. */
 #ifdef CONFIG_NO_RTM_PENDING_SYSTEM_CALLS
@@ -126,7 +126,7 @@ DECL_BEGIN
  */
 
 
-/* TODO: With the new mman, RTM shouldn't lock the actual mem-parts,
+/* TODO: With the new mman, RTM shouldn't lock the actual  mem-parts,
  *       but rather acquire DMA-locks to ensure that backing physical
  *       memory can be accessed without any issues! */
 

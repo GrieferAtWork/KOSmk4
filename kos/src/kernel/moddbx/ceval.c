@@ -32,8 +32,8 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include <__crt.h>
 
 #ifndef __CRT_HAVE_strtold
-/* strtold() uses format_scanf() to implement itself. However the kernel
- * version of that function doesn't include floating-point support. As
+/* strtold() uses  format_scanf() to  implement  itself. However  the  kernel
+ * version of  that  function  doesn't  include  floating-point  support.  As
  * such, as the headers to provide us with our own version of format_scanf(),
  * which _does_ include floating-point support.
  * (A bit wasteful, since we don't actually use its other features, but
@@ -87,11 +87,11 @@ DECL_BEGIN
 
 
 
-/* Set to true if the `,'-operator should be interpreted as it is in
+/* Set to  true if  the `,'-operator  should be  interpreted as  it is  in
  * regular C, meaning that it is used to simply select the second operand.
  *
  * When set to `false' (which is the default) then the `,'-operator is used
- * to implement a cast-to-array behavior, where the LHS-operator is then
+ * to implement a  cast-to-array behavior, where  the LHS-operator is  then
  * expected to be a pointer:
  * >> &foo, 12
  *
@@ -467,7 +467,7 @@ err:
 }
 
 /* Parse optional parenthesis, followed by either a type, or regular expression.
- * Afterwards, return the type of that expression in `*presult'. */
+ * Afterwards,   return   the   type   of   that   expression   in   `*presult'. */
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL parse_typeof)(struct cparser *__restrict self,
                             struct ctyperef *__restrict presult) {
@@ -610,7 +610,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		if (result == DBX_EOK) {
 			if (self->c_tok != ')' && self->c_tok != CTOKEN_TOK_EOF) {
 				/* Look ahead if this really is a cast expression, because
-				 * if it isn't, then we mustn't try to parse a type here.
+				 * if it isn't, then we mustn't try to parse a type  here.
 				 *
 				 * Consider this:
 				 *       "(stat + 5)"
@@ -620,8 +620,8 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 				 * be used.
 				 *
 				 * We handle this by simply checking if the type-expression
-				 * is followed by a ')'. - If it isn't, then we simply re-
-				 * parse the (thought-to-be) type-expression as a regular
+				 * is followed by a ')'. - If it isn't, then we simply  re-
+				 * parse the (thought-to-be)  type-expression as a  regular
 				 * expression. */
 				cparser_yieldat(self, afterparen);
 				ctyperef_fini(&cast_type);
@@ -685,15 +685,15 @@ doparen_expr:
 		char *endp;
 		__IEEE854_LONG_DOUBLE_TYPE__ value;
 		/* FIXME: Because of how libc/local functions are linked (using c++ `inline'),
-		 *        our attempt at using a custom version of format_scanf() doesn't end
-		 *        up working, since the c++ standard requires that functions declared
-		 *        as inline share the same address throughout a program.
-		 *        As such, relocations are generated that will end up bypassing our
-		 *        custom format_scanf() in favor of the one exported from the kernel
+		 *        our  attempt at using a custom version of format_scanf() doesn't end
+		 *        up working, since the c++ standard requires that functions  declared
+		 *        as  inline   share   the   same  address   throughout   a   program.
+		 *        As  such, relocations are  generated that will  end up bypassing our
+		 *        custom format_scanf() in favor of  the one exported from the  kernel
 		 *        core, which doesn't include floating-point support....
-		 * I feel like there's no point in trying to make this work. - That would end
-		 * up being _way_ too hacky, so I feel like the best solution would be to just
-		 * copy the relevant code from the implementation of format_scanf() that is
+		 * I feel like there's no  point in trying to make  this work. - That would  end
+		 * up  being _way_ too hacky, so I feel  like the best solution would be to just
+		 * copy the  relevant code  from the  implementation of  format_scanf() that  is
 		 * used for parsing floating-point numbers, paste it here, and call it directly.
 		 */
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
@@ -869,7 +869,7 @@ doparen_expr:
 			decref(t_ptr);
 			if unlikely(result != DBX_EOK)
 				goto done;
-			/* NOTE: Also accept '.' and '::' instead of the ',' before the
+			/* NOTE: Also  accept '.' and '::' instead of the ',' before the
 			 * member expression, but don't tell auto-completion about this. */
 			if (self->c_tok != '.' && self->c_tok != CTOKEN_TOK_COLON_COLON) {
 				result = cparser_require(self, ',');
@@ -877,7 +877,7 @@ doparen_expr:
 					goto done;
 			}
 			/* Simply parse any valid integer suffix expression,
-			 * but act as though the ',' was actually a '->' */
+			 * but  act as  though the  ',' was  actually a '->' */
 			self->c_tok = CTOKEN_TOK_MINUS_RANGLE;
 			result      = parse_unary_suffix(self);
 			if unlikely(result != DBX_EOK)
@@ -932,7 +932,7 @@ done_container_of_t_ptr:
 				decref(t_ptr);
 				goto done;
 			}
-			/* NOTE: Also accept '.' and '::' instead of the ',' before the
+			/* NOTE: Also  accept '.' and '::' instead of the ',' before the
 			 * member expression, but don't tell auto-completion about this. */
 			if (self->c_tok != '.' && self->c_tok != CTOKEN_TOK_COLON_COLON) {
 				result = cparser_require(self, ',');
@@ -940,7 +940,7 @@ done_container_of_t_ptr:
 					goto done_container_of_t_ptr;
 			}
 			/* Simply parse any valid integer suffix expression,
-			 * but act as though the ',' was actually a '->' */
+			 * but  act as  though the  ',' was  actually a '->' */
 			self->c_tok = CTOKEN_TOK_MINUS_RANGLE;
 			result      = parse_unary_suffix(self);
 			if unlikely(result != DBX_EOK)
@@ -986,15 +986,15 @@ done_container_of_t_ptr:
 			 *           ...
 			 *       }
 			 * Only when the '*' is the last token, or is followed by one of ) ] } , ; :
-			 * When used, take all variables as they would be enumerated by the
-			 * below `autocomplete_nontype_symbols' and push them on to the expression
-			 * stack. Then, pack all of them together within a pseudo-struct object
-			 * that contains all of them alongside their values, allowing the user
-			 * to quickly list the values of a collection of variables, based on the
-			 * common trait of all of the variables having the same, common prefix:
+			 * When used,  take  all  variables  as they  would  be  enumerated  by  the
+			 * below `autocomplete_nontype_symbols' and push  them on to the  expression
+			 * stack. Then,  pack all  of them  together within  a pseudo-struct  object
+			 * that  contains  all of  them alongside  their  values, allowing  the user
+			 * to quickly list  the values of  a collection of  variables, based on  the
+			 * common trait of  all of  the variables  having the  same, common  prefix:
 			 * >> eval thiscpu_x86_apic_emutsc_*
 			 *
-			 * This would then print the values of all global variables
+			 * This  would then  print the  values of  all global variables
 			 * `thiscpu_x86_apic_emutsc_*', which would look somthing like:
 			 * >> {
 			 * >>   thiscpu_x86_apic_emutsc_tscbase: 0x14afd85306,
@@ -1008,13 +1008,13 @@ done_container_of_t_ptr:
 			 * >>   thiscpu_x86_apic_emutsc_cmpxch_delay: 200,
 			 * >> }
 			 *
-			 * The list of variables used should match those enumerated by auto-completion
+			 * The list of variables used  should match those enumerated by  auto-completion
 			 * exactly, so it should be obvious to the user which variables would be printed
 			 * by using this trick!
 			 */
 
 
-			/* NOTE: Only add automatic symbol offsets when this symbol isn't
+			/* NOTE: Only add  automatic  symbol  offsets  when  this  symbol  isn't
 			 *       already being used within an explicit symbol-offset expression.
 			 * As such:
 			 * >> this_cred          (evaluate to this_cred@dbg_current)
@@ -1034,7 +1034,7 @@ done_container_of_t_ptr:
 		}
 	}	break;
 
-		/* TODO: CTOKEN_TOK_STRING can be implemented by pushing
+		/* TODO: CTOKEN_TOK_STRING  can  be  implemented  by  pushing
 		 *       the associated string-value using `CVALUE_KIND_DATA'
 		 *       or `CVALUE_KIND_IDATA', and using `char const[N]' as
 		 *       the type. */
@@ -1107,18 +1107,18 @@ again:
 	case '@': {
 		struct ctyperef lhs_ptr_type;
 		/* >> foo@bar
-		 * Same as:
+		 * Same   as:
 		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar)
 		 *
 		 * Intended for ATTR_PERxxx variables within the kernel:
 		 * >> this_connections@caller
 		 * Where `caller' is presumably a local variable `struct task *caller'.
-		 * This will then resolve to print information about the pet-task
+		 * This  will  then resolve  to  print information  about  the pet-task
 		 * variable `this_connections', as viewed by `caller'
 		 *
-		 * TODO: The 2 operands should be interchangeable, so-long as
+		 * TODO: The 2 operands  should be  interchangeable, so-long  as
 		 *       at most one of them is a pointer. When both, or neither
-		 *       is a pointer, only then should this operator result in
+		 *       is a pointer, only then should this operator result  in
 		 *       a DBX_ESYNTAX error. */
 		if (CTYPE_KIND_ISARRAY(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
 			result = cexpr_promote();
@@ -1177,9 +1177,9 @@ err_lhs_ptr_type:
 		}
 #endif
 		if (self->c_tok != CTOKEN_TOK_KEYWORD) {
-			/* Special case: If we've reached EOF, then still
+			/* Special case: If we've reached EOF, then  still
 			 *               try to auto-complete field names,
-			 *               even if the user hasn't written
+			 *               even if the  user hasn't  written
 			 *               any part of the name, yet. */
 			if (self->c_tok == CTOKEN_TOK_EOF && self->c_autocom) {
 				result = autocomplete_struct_fields(self, NULL, 0);
@@ -1781,9 +1781,9 @@ done:
 }
 
 
-/* TODO: Add another top-level operator ":" that comes even before "=", and can
- *       be used as a sort-of with-statement, where the left-hand-side can be
- *       used to specify a struct- or pointer-to-struct expression, where members
+/* TODO: Add  another top-level operator  ":" that comes even  before "=", and can
+ *       be used  as a  sort-of with-statement,  where the  left-hand-side can  be
+ *       used to specify a struct- or pointer-to-struct expression, where  members
  *       of that struct can be used directly, as though they were local variables:
  * >> eval current_driver_state.m_pointer:ds_drivers,ds_count
  * Same as:
@@ -1791,11 +1791,11 @@ done:
  *
  * As far as semantics go, this would simply be parsed as
  *     <parse_assign> ':' <parse_collon>
- * where the <parse_assign> has to result in the aforementioned struct,
- * or pointer-to-struct typing, and <parse_collon> is the recursive part,
+ * where  the <parse_assign>  has to  result in  the aforementioned struct,
+ * or pointer-to-struct typing, and  <parse_collon> is the recursive  part,
  * meaning that an expression `foo:bar:baz' is parsed as `foo:(bar:(baz))'.
  *
- * The members of the left-hand-side are only visible for the duration of the
+ * The members of the left-hand-side are only visible for the duration of  the
  * evaluation of the right-hand-side, and would supersede even local variables
  * as far as scoping goes. If the left-hand-side expression is another collon-
  * expression, struct fields are made available recursively:
@@ -1803,11 +1803,11 @@ done:
  * Evaluate to the first match from (in this order):
  *     #1: HAS_FIELD($GLOBALS["foo"], "bar")
  *            ? $GLOBALS["foo"].bar.baz
- *            : $GLOBALS["bar"].baz
+ *            :     $GLOBALS["bar"].baz
  *     #2: $GLOBALS["foo"].baz
  *     #3: $GLOBALS["baz"]
  *
- * Additionally, multiple such statements can be chained, where symbols from
+ * Additionally, multiple such statements can be chained, where symbols  from
  * those that are further to the right supersede symbols exposed by ones from
  * earlier.
  *
@@ -1887,11 +1887,11 @@ done:
 
 
 
-/* Parse a C-expression from `self' and push its value
- * onto the C-expression stack, return DBX_EOK on success,
- * and a potential error otherwise (in the later case, the
- * effective size of the C-expression stack will remain
- * unaltered). NOTE: The given `self' is expected to already
+/* Parse a  C-expression  from  `self'  and  push  its  value
+ * onto the C-expression  stack, return  DBX_EOK on  success,
+ * and a potential  error otherwise (in  the later case,  the
+ * effective  size  of  the  C-expression  stack  will remain
+ * unaltered). NOTE: The given `self' is expected to  already
  * point to the first token apart of the expression on entry. */
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushparse)(struct cparser *__restrict self) {
@@ -2891,7 +2891,7 @@ NOTHROW(FCALL ctype_eval_inner)(struct cparser *__restrict self,
 		/* Recursive type declaration:
 		 * >> int (*foo)[42];
 		 * In this case, we must first parse the trailing `[42]'
-		 * before we can move on to the inner `(*foo)'! */
+		 * before  we  can  move  on  to  the  inner   `(*foo)'! */
 		struct cparser inner_parser;
 		struct ctype_attributes inner_attrib;
 		unsigned int recursion;
@@ -2949,7 +2949,7 @@ syn:
 }
 
 
-/* Parse a named type from `self'. This function expects that
+/* Parse a named type from  `self'. This function expects  that
  * `self' points at the first token of the named type on entry.
  * @return: presult:      Filled with the name type that was parsed (token from
  *                        `self' were yielded, and not point to the first token
@@ -2959,7 +2959,7 @@ syn:
  *                        but this argument is non-NULL, then NULL will be written
  *                        here. When `NULL', a potential variable name will not be
  *                        parsed, and if present, will result in `DBX_ESYNTAX'.
- * @param: p_varname_len: When non-NULL, store the length of `*p_varname' here, but
+ * @param: p_varname_len: When non-NULL, store  the length of  `*p_varname' here,  but
  *                        only do so if `p_varname != NULL'. When `p_varname' is given
  *                        as `NULL', then this argument is simply ignored.
  * @return: DBX_EOK:     Success.

@@ -108,19 +108,19 @@ DECL_BEGIN
 
 #define TRACE_NODE_KIND_MALL   0x00 /* Normal kmalloc() memory */
 #define TRACE_NODE_KIND_USER   0x01 /* Custom, mall_trace()'d memory */
-#define TRACE_NODE_KIND_BITSET 0x02 /* Custom, mall_trace()'d memory, but instead of having a vector
-                                     * of traceback locations, this node has a bitset describing which
-                                     * of its pointed-to memory is still being traced. This kind of
-                                     * node is needed to represent the result of mall_trace(), followed
-                                     * by mall_untrace_n(), where the range being untraced doesn't span
-                                     * or touch any node borders, in which case a node would have to be
-                                     * split into 2 parts. If at that point the system fails to allocate
+#define TRACE_NODE_KIND_BITSET 0x02 /* Custom, mall_trace()'d  memory, but  instead  of having  a  vector
+                                     * of traceback locations,  this node has  a bitset describing  which
+                                     * of  its  pointed-to memory  is still  being  traced. This  kind of
+                                     * node is needed to represent  the result of mall_trace(),  followed
+                                     * by mall_untrace_n(), where the  range being untraced doesn't  span
+                                     * or touch any node borders, in which  case a node would have to  be
+                                     * split into 2 parts. If at that point the system fails to  allocate
                                      * a secondary node, the original node it transformed into this kind,
-                                     * and given a bitset of POINTER-aligned memory locations that are
+                                     * and given a  bitset of POINTER-aligned  memory locations that  are
                                      * still considered as traced. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 #define TRACE_NODE_KIND_SLAB   0x03 /* Does not actually appear in the nodes tree.
-                                     * Only used when dumping/discarding leaks. */
+                                     * Only used  when  dumping/discarding  leaks. */
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 #define TRACE_NODE_KIND_HAS_PADDING(kind)   ((kind) == TRACE_NODE_KIND_MALL)
@@ -193,7 +193,7 @@ struct trace_node {
 /* Return the base address of a `void **'-vector of PC-locations. */
 #define trace_node_traceback_vector(self) ((self)->tn_trace)
 /* Return the upper limit of how many elements are in the traceback vector.
- * The vector may terminate prematurely when a NULL-entry is encountered. */
+ * The vector may terminate prematurely  when a NULL-entry is  encountered. */
 #define trace_node_traceback_count(self) (((self)->tn_size - offsetof(struct trace_node, tn_trace)) / sizeof(void *))
 
 
@@ -271,11 +271,11 @@ NOTHROW(KCALL copy_trace_node_for_tb)(struct trace_node *__restrict copy,
 DECL_END
 
 /* Define the ABI for the address tree used by trace nodes. */
-#if 0 /* Don't use left-leaning RB-trees (for now). Technically we could do this,
-       * and the only thing stopping this from happening is this `#if 0', which
-       * you are free to change to `#if 1'. But since normal RB-trees are just
+#if 0 /* Don't  use left-leaning RB-trees  (for now). Technically  we could do this,
+       * and the only  thing stopping  this from  happening is  this `#if 0',  which
+       * you are  free to  change to  `#if 1'. But  since normal  RB-trees are  just
        * that tiny bit faster than left-leaning ones when it comes to insert/remove,
-       * we always just use the normal ones, just so we can slightly reduce the
+       * we always just  use the normal  ones, just  so we can  slightly reduce  the
        * performance impact caused by the trace-malloc sub-system. */
 #define RBTREE_LEFT_LEANING
 #endif
@@ -382,9 +382,9 @@ err:
 
 
 /* Find the trace-block that `ptr' is apart of and remove it.
- * If no such block exists, the kernel will panic.
- * For this purpose, `CEIL_ALIGN(ptr, sizeof(void *))' must
- * point somewhere into an address range that has previously
+ * If  no  such   block  exists,  the   kernel  will   panic.
+ * For this  purpose, `CEIL_ALIGN(ptr, sizeof(void *))'  must
+ * point somewhere into an address range that has  previously
  * been registered by `kmalloc_trace()'.
  * NOTE: When `ptr' is `NULL', then this function does nothing. */
 PUBLIC NOBLOCK ATTR_NOINLINE void
@@ -456,7 +456,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 	}
 
 	/* Since we're supposed to get rid of the whole node, we can simply
-	 * release the trace-lock, and free the node, since we've already
+	 * release the trace-lock, and free  the node, since we've  already
 	 * removed it from the tree. */
 	lock_release();
 	trace_node_free(node);
@@ -588,8 +588,8 @@ again_while_num_bytes:
 		}
 		/* Must split the node (the caller wants us to cut a hole into the middle) */
 		if (node->tn_kind == TRACE_NODE_KIND_BITSET) {
-			/* Special case: This already is a bitset node, (and code above already
-			 *               asserted that our range is still traced), so all we have
+			/* Special case: This already is  a bitset node,  (and code above  already
+			 *               asserted  that our range is still traced), so all we have
 			 *               to do is clear some more bits corresponding to our range. */
 			size_t i, minbit, maxbit;
 			minbit = ((uintptr_t)base - trace_node_umin(node)) / sizeof(void *);
@@ -609,8 +609,8 @@ again_while_num_bytes:
 #endif
 
 		/* Fallback: We've failed to allocate a secondary node, and so we have to convert the
-		 *           node that we've already got into a `TRACE_NODE_KIND_BITSET'-kind node,
-		 *           who's bitset is all ones, except for the bits from the range that our
+		 *           node that we've already  got into a `TRACE_NODE_KIND_BITSET'-kind  node,
+		 *           who's bitset is all ones,  except for the bits  from the range that  our
 		 *           caller wants us to mark as untraced.
 		 * The only down-side is that in doing this, we loose the node's traceback */
 		node->tn_kind = TRACE_NODE_KIND_BITSET;
@@ -631,34 +631,34 @@ again_while_num_bytes:
 }
 
 /* Similar to `kmalloc_untrace()', but explicitly untrace only the given address range.
- * Just like `kmalloc_trace()', this function will truncate the given address range
+ * Just like `kmalloc_trace()',  this function  will truncate the  given address  range
  * to have it start/end at a pointer-aligned byte boundary.
- * This function will then try to truncate the internal descriptor(s) used for the given
+ * This function will then try  to truncate the internal  descriptor(s) used for the  given
  * address range (which is allowed to span multiple prior invocations of `kmalloc_trace()',
- * so-long as no gaps exist between individually traced ranges), and if this fails (which
- * can happen when this function would have to carve out a chunk from the middle of some
- * pre-existing trace-node), that node will be changed such that the given range is marked
- * as untraced, which will prevent the kernel from accessing its contents during GC scans.
+ * so-long as no gaps exist between individually  traced ranges), and if this fails  (which
+ * can happen when this function would  have to carve out a  chunk from the middle of  some
+ * pre-existing  trace-node), that node will be changed such that the given range is marked
+ * as  untraced, which will prevent the kernel from accessing its contents during GC scans.
  * In practice though, you shouldn't need to concern yourself with this behavior. */
 PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_untrace_n)(void *base, size_t num_bytes) {
 	kmalloc_untrace_n_impl(base, num_bytes, 1);
 }
 
-/* Return the traceback stored inside of the debug descriptor of `ptr'.
- * When `ptr' is `NULL', or debug-malloc is disabled, then this function
+/* Return the  traceback stored  inside of  the debug  descriptor of  `ptr'.
+ * When `ptr' is  `NULL', or  debug-malloc is disabled,  then this  function
  * will simply return with `0'. Otherwise, `CEIL_ALIGN(ptr, sizeof(void *))'
- * must point into a currently traced data-block, and if it doesn't, then
+ * must  point into a  currently traced data-block, and  if it doesn't, then
  * this function will trigger a kernel panic. (unless the kernel has already
  * been poisoned, in which case it'll simply return `0')
  * When `ptr' is a SLAB-pointer, this function will also always return `0'
  * @param: tb:     Buffer to-be filled with traceback PC-locations pointer.
  * @param: buflen: Available buffer length in `tb' (# of allocated entries; not bytes)
- * @param: p_alloc_roottid: When non-NULL, store the root-namespace TID of the thread
+ * @param: p_alloc_roottid: When non-NULL, store  the root-namespace TID  of the  thread
  *                          that originally allocated the block of `ptr' (when allocated
  *                          by a kernel thread, TID=0 will be returned)
  * @return: * :    The total number of traceback PC-locations available for `ptr'
- *                 When `> buflen', not all locations were written to `*tb', and
+ *                 When `> buflen', not all locations were written to `*tb',  and
  *                 the caller should re-attempt the call with more space. */
 PUBLIC NOBLOCK ATTR_NOINLINE size_t
 NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
@@ -779,7 +779,7 @@ again:
  * been modified (which can accidentally happen as the result of programming
  * errors, such as array over-/under-runs)
  * If inconsistencies are found, the kernel will panic.
- * s.a. `heap_validate()' and `heap_validate_all()' */
+ * s.a.  `heap_validate()'  and   `heap_validate_all()' */
 PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_validate)(void) {
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
@@ -797,7 +797,7 @@ NOTHROW(KCALL kmalloc_validate)(void) {
 /* GC MEMORY LEAK DETECTOR                                              */
 /************************************************************************/
 
-/* The current version number used when searching for memory leaks.
+/* The   current  version   number  used   when  searching   for  memory  leaks.
  * This value is used to identity pointers that haven't been reached/search yet. */
 PRIVATE ATTR_MALL_UNTRACKED u8 gc_version = 0;
 
@@ -901,11 +901,11 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
-	/* Do a number of checks to filter out often-found pointers
+	/* Do a number  of checks to  filter out often-found  pointers
 	 * for which we know that they don't point to heap structures.
 	 *
 	 * By doing this here, we can cut down on a lot of boiler-plate
-	 * code that's needed to verify heap pointers proper. */
+	 * code  that's  needed   to  verify   heap  pointers   proper. */
 	struct trace_node *node;
 
 	/* Check if NULL is part of kernel-space. */
@@ -947,7 +947,7 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 		return 0; /* Already reached. */
 	if (node->tn_kind == TRACE_NODE_KIND_BITSET) {
 		/* When node is `TRACE_NODE_KIND_BITSET', then only mark it
-		 * as reachable when `ptr' points into its traced portion. */
+		 * as reachable when `ptr' points into its traced  portion. */
 		size_t index;
 		/* HINT: We already know that `ptr' is POINTER-aligned (see the other check above) */
 		index = ((uintptr_t)ptr - trace_node_umin(node)) / sizeof(void *);
@@ -977,12 +977,12 @@ NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes) {
 		/* Only scan writable pages. */
 		if (!pagedir_iswritable((void *)base)) {
 			/* FIXME: What if `base' isn't writable because it was written to SWAP?
-			 *        In this case we'd have to abort GC detection, release our
-			 *        scheduler super-lock, force load `base' into the core, and
-			 *        finally: try again (though we should probably all pages to
+			 *        In this case  we'd have  to abort GC  detection, release  our
+			 *        scheduler super-lock, force  load `base' into  the core,  and
+			 *        finally: try again (though  we should probably  all pages  to
 			 *        which this applies, and load them all at once)
-			 * NOTE:  We can only load them when not holding a super-lock, since
-			 *        the act of loading memory from SWAP might require the use
+			 * NOTE:  We  can only load them when not holding a super-lock, since
+			 *        the act of loading memory  from SWAP might require the  use
 			 *        of an async worker, which don't work while holding a super-
 			 *        lock. */
 			if (page_bytes >= num_bytes)
@@ -1035,7 +1035,7 @@ NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
 			                            (size_t)((byte_t *)stack_end -
 			                                     (byte_t *)sp));
 		} else {
-			/* Stack pointer is out-of-bounds (no idea what this is
+			/* Stack pointer  is  out-of-bounds  (no  idea  what  this  is
 			 * about, but let's just assume the entire stack is allocated) */
 			result += gc_reachable_data((byte_t *)stack_min,
 			                            (size_t)((byte_t *)stack_end -
@@ -1070,7 +1070,7 @@ NOTHROW(KCALL gc_reachable_this_thread)(void) {
 		if (stack_end != (byte_t *)vm_node_getendaddr(my_stack))
 			goto do_search_kernel_stack;
 	} else {
-		/* Stack pointer is out-of-bounds (no idea what this is
+		/* Stack pointer  is  out-of-bounds  (no  idea  what  this  is
 		 * about, but let's just assume the entire stack is allocated) */
 do_search_kernel_stack:
 		stack_min = vm_node_getminaddr(my_stack);
@@ -1197,7 +1197,7 @@ PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_find_reachable)(void) {
 	/* Search for memory leaks.
 	 * The idea here is not to be able to find all memory blocks that were
-	 * leaked, but rather to find anything that ~might~ be referenced.
+	 * leaked,  but rather  to find  anything that  ~might~ be referenced.
 	 * To do this, we search all places we can think of:
 	 *    - Kernel .data & .bss
 	 *    - Driver .data & .bss
@@ -1206,7 +1206,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	 * For  this purpose, any properly aligned data word is considered a
 	 * possible pointer and if directed at a known VM node, that node is
 	 * saved as reachable.
-	 * Following this first pass, we recursively analyze the user-data
+	 * Following this  first pass,  we recursively  analyze the  user-data
 	 * blocks of all heap pointers that were reached thus far, until we're
 	 * no longer encountering any new ones.
 	 * Anything that still hasn't been reached is then considered a leak. */
@@ -1221,12 +1221,12 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	gc_reachable_this_thread();
 
-	/* Scan all allocated COREBASE pointers from the kernel VM.
+	/* Scan all allocated  COREBASE pointers from  the kernel  VM.
 	 * Since those are randomly sprinkled into the kernel VM tree,
-	 * they normally wouldn't be able to forward contained data
-	 * pointers, which would then result in us not realizing that
-	 * any dynamic node pointed to by them is actually reachable.
-	 * NOTE: COREBASE couldn't use `mall_trace()' because that
+	 * they normally wouldn't  be able to  forward contained  data
+	 * pointers, which would then result in us not realizing  that
+	 * any dynamic node pointed to by them is actually  reachable.
+	 * NOTE: COREBASE couldn't use `mall_trace()' because  that
 	 *       could cause infinite recursion when `mall_trace()'
 	 *       tried to allocate a new recursion descriptor.
 	 */
@@ -1237,10 +1237,10 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	gc_reachable_corepage_chain(vm_corepage_head);
 #endif /* !CONFIG_USE_NEW_VM */
 
-	/* `vm_corepage_head' only chains core-base pages
+	/* `vm_corepage_head'  only  chains  core-base  pages
 	 * that contain at least one non-allocated page-slot!
 	 *
-	 * As such, we must also search a secondary chain of
+	 * As such, we must also  search a secondary chain  of
 	 * pages that is used to represent ones that are fully
 	 * allocated. */
 #ifdef CONFIG_USE_NEW_VM
@@ -1260,7 +1260,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 			struct driver *drv = drivers->ds_drivers[i];
 			if unlikely(wasdestroyed(drv))
 				continue;
-			/* Since we're in single-core mode, we know that when `drv' isn't
+			/* Since  we're in single-core  mode, we know  that when `drv' isn't
 			 * destroyed at this point, it wont get destroyed before we're done! */
 			for (j = 0; j < drv->d_phnum; ++j) {
 				uintptr_t progaddr;
@@ -1283,7 +1283,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	if (nodes) {
 		size_t num_found;
 		/* With all data collected, recursively scan the data blocks of all reachable nodes.
-		 * The recursion takes place because we keep scanning until nothing new shows up. */
+		 * The recursion takes place  because we keep scanning  until nothing new shows  up. */
 		do {
 			num_found = gc_reachable_recursion(nodes);
 			PRINT_LEAKS_SEARCH_PHASE("Phase #5: Reached %" PRIuSIZ " pointers\n", num_found);
@@ -1416,11 +1416,11 @@ kmalloc_leaks_gather(void) {
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 		/* Gather leaks from trace nodes. */
-		/* Because of how removing nodes from an RB-tree works, the act
+		/* Because of how removing nodes  from an RB-tree works, the  act
 		 * of removing a node may cause the tree structure to be altered,
-		 * such that we'll be unable to hit all (potentially leaked)
-		 * nodes during a single pass. As such, we must keep on scanning
-		 * the tree until it's become empty (unlikely) or until we no
+		 * such that  we'll be  unable to  hit all  (potentially  leaked)
+		 * nodes during a single pass. As such, we must keep on  scanning
+		 * the tree until  it's become  empty (unlikely) or  until we  no
 		 * longer find any more leaks. */
 		while (nodes && gc_gather_unreachable_nodes(nodes, &result))
 			;
@@ -1432,7 +1432,7 @@ kmalloc_leaks_gather(void) {
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
-	/* Clear the is-reachable bits from all of
+	/* Clear the  is-reachable bits  from all  of
 	 * the different slabs that could be reached. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	gc_slab_reset_reach();
@@ -1506,8 +1506,8 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 	/* Step #1: Calculate the xref total for every node. */
 	for (leak = leaks; leak; leak = trace_node_leak_next(leak)) {
 		/* XXX: Only use this slow O(N^2) approach when there are only a couple of leaks,
-		 *      (say: less than 64), and try to re-construct an RBTREE for faster lookup
-		 *      of addr->node which can then be used to only have to enumerate memory of
+		 *      (say: less than 64), and try to re-construct an RBTREE for faster  lookup
+		 *      of  addr->node which can then be used to only have to enumerate memory of
 		 *      nodes once. */
 		struct trace_node *leak2;
 		uintptr_t leak_min, leak_max;
@@ -1519,7 +1519,7 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 				continue;
 			trace_node_leak_getscan_uminmax(leak2, leak2_min, leak2_max);
 			/* TODO: If `leak' or `leak2' is `TRACE_NODE_KIND_BITSET', then
-			 *       we must ensure to only check traced areas for xrefs! */
+			 *       we must ensure to only  check traced areas for  xrefs! */
 			FOREACH_XREF_BEGIN(ptr, pptr,
 			                   leak2_min, leak2_max,
 			                   leak_min, leak_max) {
@@ -1551,29 +1551,29 @@ kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
 	struct trace_node *result;
 again:
 	/* Acquire a scheduler super-override, thus ensuring that we're
-	 * the only thread running anywhere on the entire system.
+	 * the only  thread  running  anywhere on  the  entire  system.
 	 *
-	 * NOTE: We do this first, since a super-override should only
+	 * NOTE: We do this first,  since a super-override should  only
 	 *       be acquired when not already holding any atomic locks,
 	 *       since when holding such locks, there is a small chance
-	 *       that other CPUs are currently trying to acquire them,
+	 *       that other CPUs are currently trying to acquire  them,
 	 *       preventing us from reaching them.
-	 * Technically, this shouldn't happen, since you shouldn't do a
-	 * `while (!trylock()) task_pause();' loop (meaning that a cpu
-	 * that is blocking-waiting for an atomic lock should also have
+	 * Technically, this shouldn't happen,  since you shouldn't do  a
+	 * `while (!trylock()) task_pause();'  loop  (meaning that  a cpu
+	 * that is blocking-waiting for an  atomic lock should also  have
 	 * preemption enabled), and where you are allowed to do this kind
-	 * of loop, you're actually dealing with an SMP-lock, which also
-	 * requires that preemption be disabled, where becoming a super
-	 * override will implicitly cause one to acquire all SMP-locks,
-	 * since a CPU that hold an SMP-lock must release it before re-
-	 * enabling preemption, meaning that being able to send an IPI
-	 * to every CPU, and having every cpu ACK that IPI also implies
-	 * that all CPUs had preemption enabled, which then implies that
+	 * of loop, you're actually dealing with an SMP-lock, which  also
+	 * requires that preemption be  disabled, where becoming a  super
+	 * override will implicitly cause  one to acquire all  SMP-locks,
+	 * since a CPU that hold an  SMP-lock must release it before  re-
+	 * enabling preemption, meaning  that being able  to send an  IPI
+	 * to every CPU, and having every  cpu ACK that IPI also  implies
+	 * that all CPUs had preemption enabled, which then implies  that
 	 * no CPU was holding onto an SMP-lock.
 	 *
 	 * But despite all of that, it's better to be safe than sorry.
 	 *
-	 * HINT: `smplock' (see above) is (like the name says) an SMP-lock,
+	 * HINT: `smplock' (see above) is (like the name says) an  SMP-lock,
 	 *       so we implicitly acquire it by being the super-override, so
 	 *       we don't actually have to deal with that one at all! */
 	sched_super_override_start();
@@ -1586,7 +1586,7 @@ again:
 	}
 
 #ifndef CONFIG_USE_NEW_VM
-	/* Acquire a lock to the corepage system, thus
+	/* Acquire a lock  to the  corepage system,  thus
 	 * ensuring that it's in a consistent state, too. */
 	if (!sync_canwrite(&vm_corepage_lock)) {
 		vm_kernel_treelock_endwrite();
@@ -1615,7 +1615,7 @@ again:
 
 	/* At this point we're the only running thread, so there's really no
 	 * point in still holding on to our lock to the kernel VM. - At this
-	 * point we can do pretty much anything while disregarding any sort
+	 * point  we can do pretty much anything while disregarding any sort
 	 * of locking! */
 	vm_kernel_treelock_endwrite();
 
@@ -1695,22 +1695,22 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 		case TRACE_NODE_KIND_SLAB:
 			/* Slab allocations are way too light-weight to be able to support tracebacks.
-			 * As such, we _are_ able to detect slab memory leaks, but we aren't able to
-			 * tell the user where/how the leaking memory was allocated.
-			 * However, since slab allocators are always allowed to either:
+			 * As  such, we _are_ able to detect slab  memory leaks, but we aren't able to
+			 * tell   the   user   where/how    the   leaking   memory   was    allocated.
+			 * However,  since   slab   allocators   are   always   allowed   to   either:
 			 *
 			 *   - Allocate regular kmalloc()-style memory (as a matter of fact, most calls
-			 *     to slab allocators actually use compile-time dispatching from inside of
+			 *     to slab allocators actually use compile-time dispatching from inside  of
 			 *     a FORCELOCAL kmalloc() wrapper)
-			 *     Booting with `noslab' will modify the text of these functions to directly
+			 *     Booting with `noslab' will modify the  text of these functions to  directly
 			 *     call forward to the regular heap functions, which are then able to generate
 			 *     proper tracebacks.
 			 *
-			 *   - Simply return `NULL'. This might come as a surprise, but because all kernel
-			 *     slab memory _must_ be continuous, there is a chance that some conflicting
+			 *   - Simply return `NULL'. This might come as a surprise, but because all  kernel
+			 *     slab  memory _must_ be  continuous, there is a  chance that some conflicting
 			 *     memory mapping will simply prevent us from expanding slab space any further.
-			 *     Due to this case, pure slab allocators (i.e. slab allocator function that
-			 *     will never return conventional heap memory) are always allowed to simply
+			 *     Due  to this case,  pure slab allocators (i.e.  slab allocator function that
+			 *     will never return  conventional heap  memory) are always  allowed to  simply
 			 *     return `NULL', which is indicative of their inability to allocate additional
 			 *     slab memory.
 			 */
@@ -1739,7 +1739,7 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 				continue;
 			trace_node_leak_getscan_uminmax(xref_leak, xref_umin, xref_umax);
 			/* TODO: If `iter' or `xref_leak' is `TRACE_NODE_KIND_BITSET', then
-			 *       we must ensure to only check traced areas for xrefs! */
+			 *       we  must  ensure to  only  check traced  areas  for xrefs! */
 			FOREACH_XREF_BEGIN(ptr, pptr, xref_umin, xref_umax, umin, umax) {
 				PRINTF("\tReferenced at *%p=%p", pptr, ptr);
 				if ((uintptr_t)ptr > umin)
@@ -1784,12 +1784,12 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
 	node = (struct trace_node *)leaks;
 	while (node) {
 		next = trace_node_leak_next(node);
-#if 0 /* Don't free pointed-to data! The user way wish to break into the
-       * debugger and inspect leaked memory, but if we free it now, then
+#if 0 /* Don't free pointed-to data! The user  way wish to break into  the
+       * debugger and inspect leaked memory, but  if we free it now,  then
        * it'll be gone. After all: we're not trying to implement an actual
-       * gc here (one that would free unreachable heap block); we're only
+       * gc  here (one that would free unreachable heap block); we're only
        * trying to discover and log memory leaks! */
-		/* Try to release the memory pointed to by the memory leaks.
+		/* Try  to release the memory pointed to by the memory leaks.
 		 * However, we can only do this for kmalloc() and slab-leaks.
 		 * Custom traced regions cannot be blindly free'd! */
 		switch (node->tn_kind) {
@@ -1823,7 +1823,7 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
 /* Search for leaked heap memory, dump them to the system log, and return the
  * total number of leaked blocks.
  * Note that to do what it does, this function has to temporarily elevate the
- * calling thread to super-override status (s.a. <sched/scheduler.h>)
+ * calling  thread  to   super-override  status  (s.a.   <sched/scheduler.h>)
  * This function is the combination of:
  *     kmalloc_leaks_collect() +
  *     kmalloc_leaks_print(printer: &syslog_printer, arg: SYSLOG_LEVEL_RAW) +
@@ -1849,7 +1849,7 @@ kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 
 
 INTERN void /* Must be INTERN, because this function gets overwritten
-             * when `nomall' is passed on the commandline */
+             * when   `nomall'   is   passed   on   the   commandline */
 NOTHROW(KCALL trace_malloc_generate_traceback)(void **__restrict buffer, size_t buflen,
                                                struct lcpustate *__restrict state,
                                                unsigned int n_skip) {
@@ -1857,13 +1857,13 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void **__restrict buffer, size_t 
 	TRY {
 		struct lcpustate oldstate;
 		/* NOTE: Despite this being for debugging purposes, _DONT_ use `unwind_for_debug()' here!
-		 *       That one has to make use of the kernel heap (and consequently us) in order
-		 *       to be able to construct user-space program/section descriptors, etc, where-as
-		 *       the normal unwind() function is specifically designed to _not_ make use of any
-		 *       heap memory (which is also the reason why drivers pre-load their .eh_frame
+		 *       That one has  to make  use of  the kernel heap  (and consequently  us) in  order
+		 *       to be able  to construct user-space  program/section descriptors, etc,  where-as
+		 *       the  normal unwind() function is specifically designed  to _not_ make use of any
+		 *       heap  memory  (which is  also the  reason why  drivers pre-load  their .eh_frame
 		 *       sections during initialization, rather than loading it lazily)
 		 * But the reason this is done isn't only for this, but rather to ensure that throwing
-		 * exceptions and the like don't just randomly fail because the kernel couldn't find
+		 * exceptions  and the like don't just randomly  fail because the kernel couldn't find
 		 * enough memory... */
 		do {
 			if (n_skip == 0) {
@@ -1897,7 +1897,7 @@ NOTHROW(FCALL insert_trace_node_nx)(struct trace_node *__restrict node,
                                     gfp_t gfp, unsigned int n_skip);
 
 /* Resolve existing (possibly bitset-based) mappings between [umin, umax]
- * These functions must be called while already holding the lock.
+ * These  functions  must  be  called  while  already  holding  the lock.
  * NOTE: If these functions return an exception/false, the lock will have been released! */
 PRIVATE ATTR_NOINLINE NOBLOCK_IF(gfp & GFP_ATOMIC) void FCALL
 insert_trace_node_resolve(uintptr_t umin, uintptr_t umax,
@@ -2061,7 +2061,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		return;
 	}
 
-	/* Validate the padding for a node before freeing it, thus ensuring
+	/* Validate  the padding for  a node before  freeing it, thus ensuring
 	 * that the user hasn't done anything to corrupt the heap block during
 	 * the block's life-time. */
 #ifdef HAVE_kmalloc_validate_node
@@ -2074,7 +2074,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	lock_release();
 
 	/* All right! everything checks out, so we can actually move on to
-	 * freeing the associated node, as well as the user-data block. */
+	 * freeing the associated  node, as well  as the user-data  block. */
 	user_area.hp_ptr = trace_node_uaddr(node);
 	user_area.hp_siz = trace_node_usize(node);
 
@@ -2084,7 +2084,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	       MAX(HEAP_MINSIZE, CONFIG_MALL_HEAD_SIZE +
 	                         CONFIG_MALL_TAIL_SIZE));
 
-	/* When freeing zero-initialized memory,
+	/* When freeing zero-initialized  memory,
 	 * clean up the head & tail blocks first! */
 	if (flags & GFP_CALLOC) {
 		bzero(user_area.hp_ptr, CONFIG_MALL_HEAD_SIZE);
@@ -2150,7 +2150,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		return;
 	}
 
-	/* Validate the padding for a node before freeing it, thus ensuring
+	/* Validate  the padding for  a node before  freeing it, thus ensuring
 	 * that the user hasn't done anything to corrupt the heap block during
 	 * the block's life-time. */
 #ifdef HAVE_kmalloc_validate_node
@@ -2163,7 +2163,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	lock_release();
 
 	/* All right! everything checks out, so we can actually move on to
-	 * freeing the associated node, as well as the user-data block. */
+	 * freeing the associated  node, as well  as the user-data  block. */
 	user_area.hp_ptr = trace_node_uaddr(node);
 	user_area.hp_siz = trace_node_usize(node);
 

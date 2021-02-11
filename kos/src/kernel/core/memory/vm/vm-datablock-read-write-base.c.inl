@@ -112,7 +112,7 @@ KCALL FUNC_RW(v)
 KCALL FUNC_RW(p)
 #elif defined(DEFINE_IO_UNSAFE)
 /* Same as the `vm_datablock_(read|write)', however make the assumption that the
- * memory backing is `safe' (i.e. access could never cause a #PF attempting to
+ * memory  backing is `safe' (i.e. access could  never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
 KCALL FUNC_RW(_unsafe)
 #elif defined(DEFINE_IO_READ)
@@ -331,7 +331,7 @@ KCALL vm_datablock_vio_write
 			                       src_offset);
 		} EXCEPT {
 			/* Try-catch is required, because `dst' may be a user-buffer,
-			 * in which case access may cause an exception to be thrown. */
+			 * in  which case access may cause an exception to be thrown. */
 			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}

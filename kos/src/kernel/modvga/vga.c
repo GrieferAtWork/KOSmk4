@@ -48,7 +48,7 @@
 #include <string.h>
 
 /* TODO: Split all of the stuff that's required by both this driver, and the builtin debugger
- *       into a separate file that is then included by both components to reduce redundancy. */
+ *       into  a separate file that is then included by both components to reduce redundancy. */
 
 DECL_BEGIN
 
@@ -1211,8 +1211,8 @@ again_dotab:
 					cur_x  = ((size_t)(oldptr - me->v_textbase) % size_x);
 #ifdef CONFIG_VGA_LESS_LINE_FEEDS
 					if (cur_x == 0 && cp437_encode(me->v_lastch) != 0) {
-						/* Special case: The previous line was filled entirely, and the cursor had to be wrapped
-						 *               to the next line, however the first character then printed was also a
+						/* Special case: The previous line was filled entirely, and the cursor had to be  wrapped
+						 *               to the next line,  however the first character  then printed was also  a
 						 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
 						 *               by the caller already happened implicitly, thus not creating an entirely
 						 *               empty line and wasting what little screen space we only have. */
@@ -1246,7 +1246,7 @@ again_dotab:
 			break;
 
 		default:
-			/* Unicode says we should use `U+FFFD', however that character doesn't
+			/* Unicode  says we  should use  `U+FFFD', however  that character doesn't
 			 * exist in CP437, however we've got this one that looks somewhat similar. */
 			vga_putcp437(me, 4); /* U+2666 */
 			break;

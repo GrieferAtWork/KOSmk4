@@ -1498,12 +1498,12 @@ __err_vinfo:
 			__val = (__USED_FLOAT_TYPE)__builtin_va_arg(__FORMAT_ARGS, double);
 		}
 		/* TODO: Don't use builtins directly. - Add a hybrid API for this!
-		 * TODO: When enabling this code, GCC generates code to load the special INF
+		 * TODO: When  enabling this  code, GCC generates  code to load  the special INF
 		 *       floating point constants at the start of the function. Unconditionally!
-		 *       I can't have that! - Switching FPU context is expensive, and I don't
+		 *       I can't have that!  - Switching FPU context  is expensive, and I  don't
 		 *       want it to happen _every_ _time_ user-code makes use of a printf()-like
 		 *       function. That's just wasteful!
-		 *    -> I hope that by using dedicated functions instead of builtins, that
+		 *    -> I hope  that by  using dedicated  functions instead  of builtins,  that
 		 *       problem can be solved, but until then, let's just keep this disabled... */
 #if (__has_builtin(__builtin_isinf) && __has_builtin(__builtin_isnan)) && 0
 		if (__builtin_isinf(__val)) {
@@ -1614,7 +1614,7 @@ __do_special_float:
 				break;
 		}
 		/* Trim unused fraction digits. (should precision or
-		 * width require them, they'll be re-added later) */
+		 * width require  them, they'll  be re-added  later) */
 		while (__frac && (__frac % 10) == 0)
 			__frac /= 10;
 		__total_len = __COMPILER_LENOF(__buf) - __len;

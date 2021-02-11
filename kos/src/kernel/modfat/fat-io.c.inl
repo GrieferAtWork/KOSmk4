@@ -105,9 +105,9 @@ DECL_BEGIN
 
 
 /* Read/Write to/from a given INode at the specified offset.
- * NOTE: These functions do not truncate/update the size value
+ * NOTE: These  functions  do not  truncate/update the  size value
  *       of the associated INode. However allocating an additional
- *       sector will cause `Fat32_WriteToINode()' to update the
+ *       sector will  cause `Fat32_WriteToINode()'  to update  the
  *       the `a_blocks' attribute of `self'.
  * NOTE: Attempting to read data from beyond the allocated end
  *       of an INode will yield all ZEROes.
@@ -153,10 +153,10 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 		diskpos = FAT_CLUSTERADDR(fat, cluster);
 		diskpos += cluster_offset;
 		max_io = fat->f_clustersize - cluster_offset;
-		/* Optimization: When reading large amounts of data, check if the
+		/* Optimization: When reading  large amounts  of data,  check if  the
 		 *               underlying disk chunks were allocated consecutively.
-		 *               If they were, then we can simply do one continuous
-		 *               read, processing more than one cluster at a time. */
+		 *               If they were, then we  can simply do one  continuous
+		 *               read, processing more  than one cluster  at a  time. */
 		while (max_io < bufsize &&
 		       Fat_GetFileCluster(self, cluster_number + 1,
 #ifdef DEFINE_IO_READ
@@ -207,7 +207,7 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 	}
 }
 
-/* Same as the functions above, but used for
+/* Same  as the functions  above, but used for
  * operating with the FAT12/16 root directory.
  * @throw: E_FILESYSTEM_ERROR.ERROR_FS_DISK_FULL:
  *         The given `pos + bufsize' extends beyond

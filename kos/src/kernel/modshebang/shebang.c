@@ -38,7 +38,7 @@
 DECL_BEGIN
 
 /* Find the end of the given line (that is: a pointer to the first \r or \n)
- * If no such character exists before `len' bytes have been scanned, return
+ * If no such character exists before `len' bytes have been scanned,  return
  * NULL instead. */
 LOCAL ATTR_PURE NONNULL((1)) char *KCALL
 find_eol(char *line, size_t len) {
@@ -139,8 +139,8 @@ shebang_exec(struct execargs *__restrict args) {
 				search_root = incref(myfs->f_root);
 				sync_endread(&myfs->f_pathlock);
 				FINALLY_DECREF_UNLIKELY(search_root);
-				/* NOTE: Relative paths are interpreted relative to the directory
-				 *       containing the script file itself. I feel like that makes
+				/* NOTE: Relative paths are  interpreted relative  to the  directory
+				 *       containing the script file itself.  I feel like that  makes
 				 *       more sense that using the calling process's current working
 				 *       directory. */
 				interp_node = (REF struct regular_node *)path_traversefull_ex(myfs,
@@ -197,7 +197,7 @@ shebang_exec(struct execargs *__restrict args) {
 				}
 
 				/* Keep arguments that were already supposed to be
-				 * injected, however inject those after the ones
+				 * injected, however inject  those after the  ones
 				 * that we're supposed to inject. */
 				memmoveup(args->ea_argv_inject + more_argc,
 				          args->ea_argv_inject,

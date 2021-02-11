@@ -114,12 +114,12 @@ NOTHROW(KCALL AtaBus_RestorePendingAioHandles)(AtaBus *__restrict self,
 #endif
 }
 
-/* Select a pending AIO handle and try to start it.
+/* Select a  pending  AIO  handle and  try  to  start  it.
  * For this purpose, the handle's `hd_prd' field is zeroed
- * out after being copied to `*prd'. This must be done in
- * order to atomically write-back the fact that the AIO
- * operation has been started, changing the behavior of
- * the AIO handle's cancel operation to account for this
+ * out  after being copied to `*prd'. This must be done in
+ * order to atomically  write-back the fact  that the  AIO
+ * operation has been  started, changing  the behavior  of
+ * the AIO handle's cancel  operation to account for  this
  * fact.
  * When no AIO handles are available at the moment, this
  * function simply returns `NULL' */
@@ -131,7 +131,7 @@ NOTHROW(KCALL AtaBus_ActivateAioHandle_NoPR)(AtaBus *__restrict self,
 	if (!chain)
 		return NULL;
 	/* Find an AIO handle for which we can steal the command
-	 * descriptor, which we implement as the handle's PRD
+	 * descriptor, which we  implement as  the handle's  PRD
 	 * pointer field. */
 	piter = &chain;
 	for (;;) {
@@ -140,12 +140,12 @@ NOTHROW(KCALL AtaBus_ActivateAioHandle_NoPR)(AtaBus *__restrict self,
 		iter = *piter;
 		/* Try to activate this handle. */
 		data = (AtaAIOHandleData *)iter->ah_data;
-		/* Must set `ab_aio_current' _before_ we tell the handle that we've
-		 * started it, since the AIO-CANCEL operation assumes that a NULL
+		/* Must set `ab_aio_current' _before_ we  tell the handle that  we've
+		 * started  it, since  the AIO-CANCEL  operation assumes  that a NULL
 		 * command descriptor means that `ab_aio_current == handle' indicates
 		 * that the handle's operation is currently in service, with breaking
-		 * that link being the first step in canceling the operation, while
-		 * equality not holding true means that the operation has already
+		 * that link being the first  step in canceling the operation,  while
+		 * equality  not holding  true means  that the  operation has already
 		 * completed. */
 		ATOMIC_WRITE(self->ab_aio_current, iter);
 		iter_prd = ATOMIC_XCH(data->hd_prd.hd_prd_vector, NULL);
@@ -219,7 +219,7 @@ again:
 no_handles:
 #endif /* !__OPTIMIZE_SIZE__ */
 		/* No available handles. -> Switch to READY
-		 * and check for pending AIO once again. */
+		 * and check  for pending  AIO once  again. */
 #if ATA_BUS_STATE_READY == 0
 		ATOMIC_AND(self->ab_state, ~ATA_BUS_STATE_MASK);
 #else /* ATA_BUS_STATE_READY == 0 */
@@ -253,7 +253,7 @@ no_handles:
 
 
 /* Same as `AtaBus_StartNextDmaOperation()', but only do so if the bus's
- * state can be switched ATA_BUS_STATE_READY -> ATA_BUS_STATE_INDMA */
+ * state can  be  switched  ATA_BUS_STATE_READY  ->  ATA_BUS_STATE_INDMA */
 PRIVATE NOBLOCK void
 NOTHROW(KCALL AtaBus_TryStartNextDmaOperation)(AtaBus *__restrict self) {
 	uintptr_t state;
@@ -293,7 +293,7 @@ NOTHROW(KCALL AioHandleChain_RemoveSpecific)(/*in|out*/ struct aio_handle **__re
 				iter = iter->ah_next;
 				*piter = iter;
 				if (!iter) {
-					/* last element was removed. The new last element is it's predecessor,
+					/* last  element was removed. The new last element is it's predecessor,
 					 * or a NULL-pointer if the removed element was also the first element. */
 					if (piter == pchain) {
 						assert(*pchain == NULL);
@@ -355,7 +355,7 @@ again:
 
 
 /* Acquire/release a PIO lock for the given ata bus, allowing
- * the caller to perform bus I/O using PIO data channels. */
+ * the  caller to  perform bus  I/O using  PIO data channels. */
 INTERN NONNULL((1)) void FCALL
 AtaBus_LockPIO(AtaBus *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	uintptr_t state;
@@ -425,7 +425,7 @@ again:
 	state = ATOMIC_READ(self->ab_state);
 	assert((state & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_INPIO);
 	/* If there are more PIO requests, switch back to ready,
-	 * rather than resuming by trying to service more DMA
+	 * rather than resuming  by trying to  service more  DMA
 	 * operations. */
 	if ((state & ATA_BUS_STATE_WANTPIO) != 0) {
 		if (!ATOMIC_CMPXCH_WEAK(self->ab_state,
@@ -437,7 +437,7 @@ again:
 		sig_send(&self->ab_ready);
 		return;
 	}
-	/* Check if there are pending AIO operations that can be
+	/* Check if there are pending AIO operations that can  be
 	 * completed using DMA. If there are, then switch the bus
 	 * into DMA-mode, and service them. */
 	if (ATOMIC_READ(self->ab_aio_pending) != NULL) {
@@ -451,7 +451,7 @@ do_start_dma:
 		return;
 	}
 	/* Nothing to do. - Switch to READY and re-check for pending
-	 * AIO operations that may have appeared in the mean time. */
+	 * AIO operations that may have  appeared in the mean  time. */
 	new_state = (state & ~ATA_BUS_STATE_MASK) | ATA_BUS_STATE_READY;
 	if (!ATOMIC_CMPXCH_WEAK(self->ab_state, state, new_state))
 		goto again;
@@ -462,7 +462,7 @@ do_start_dma:
 		                  ATA_BUS_STATE_INDMA))
 			goto do_start_dma;
 	} else {
-		/* Nothing else to do. - Broadcast to everyone that may
+		/* Nothing  else to  do. -  Broadcast to  everyone that may
 		 * still be listening that the bus is ready for whatever... */
 		sig_broadcast(&self->ab_ready);
 	}
@@ -514,25 +514,25 @@ NOTHROW(KCALL AtaDrive_DmaAioHandle_Cancel)(struct aio_handle *__restrict self) 
 		/* Cancelled before started */
 		if (!(data->hd_flags & ATA_AIO_HANDLE_FONEPRD))
 			kfree(prd.hd_prd_vector);
-		/* Remove the entry from pending AIO. Having successfully
+		/* Remove  the entry from  pending AIO. Having successfully
 		 * cleared the command-pointer, we know that our AIO handle
-		 * hasn't been, and no longer can be started (though it's
-		 * still apart of the pending chain, from which we need to
+		 * hasn't been, and no longer  can be started (though  it's
+		 * still  apart of the pending chain, from which we need to
 		 * remove it now) */
 		AtaBus_RemoveSpecificPendingAioHandle_NoPR(bus, self);
 		goto do_cancel;
 	}
 
 	/* If the cmd-pointer was already cleared, then the AIO operation
-	 * is either current in progress, or has already completed. */
+	 * is either  current  in  progress, or  has  already  completed. */
 	if (ATOMIC_CMPXCH(bus->ab_aio_current, self, NULL)) {
 
 		/* Cancel the currently in-progress AIO operation on a hardware-level. */
 		AtaBus_HW_CancelDma(bus);
 
 		/* At this point, the DMA operation has been canceled, but our software bus
-		 * controller is still in cancel mode (state == INDMA && current == NULL),
-		 * so we have to resume execution by trying to load the next pending AIO
+		 * controller is still in cancel mode (state == INDMA && current ==  NULL),
+		 * so we have to resume  execution by trying to  load the next pending  AIO
 		 * handle, or switching to READY when no other pending handles exist.
 		 *
 		 * Luckily, all of this can be done for us by `AtaBus_StartNextDmaOperation()' */
@@ -576,7 +576,7 @@ hw_progress:
 		if (ATOMIC_READ(bus->ab_aio_current) == self)
 			goto hw_progress;
 		/* We're not the current handle, but we were started at one point.
-		 * This means that we've either been completed or canceled. */
+		 * This means  that  we've  either  been  completed  or  canceled. */
 		stat->hs_completed = stat->hs_total;
 		return AIO_PROGRESS_STATUS_COMPLETED;
 	}

@@ -66,16 +66,16 @@ DECL_BEGIN
  *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
  *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
  *   - GFP_VCBASE:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
- *                       This also causes the `MNODE_F_COREPART' / `MPART_F_COREPART'
- *                       flags to be set for each resp. This flag is used internally
- *                       to resolve the dependency loop between this function needing
- *                       to call kmalloc() and kmalloc() needing to call this function.
+ *                       This also  causes  the  `MNODE_F_COREPART'  /  `MPART_F_COREPART'
+ *                       flags  to  be set  for each  resp. This  flag is  used internally
+ *                       to resolve  the dependency  loop  between this  function  needing
+ *                       to call kmalloc()  and kmalloc() needing  to call this  function.
  *   - GFP_MAP_FIXED:    Map memory at the given address `hint' exactly.
  *                       If memory has already been mapped at that address, then simply
  *                       return `MAP_INUSE' unconditionally.
- *   - GFP_MAP_32BIT:    Allocate 32-bit physical memory addresses. This flag
+ *   - GFP_MAP_32BIT:    Allocate   32-bit  physical  memory  addresses.  This  flag
  *                       should be combined with `GFP_LOCKED' to prevent the backing
- *                       physical memory from being altered (and thus having its
+ *                       physical memory  from being  altered (and  thus having  its
  *                       physical location altered).
  *   - GFP_MAP_PREPARED: Ensure that all mapped pages are prepared, and left as such
  *   - GFP_MAP_BELOW:    s.a. `MAP_GROWSDOWN'
@@ -86,29 +86,29 @@ DECL_BEGIN
  *                       to extend an existing node.
  *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
- *   - Other flags are silently ignored, but will be forwarded onto
+ *   - Other flags are silently ignored, but will be forwarded  onto
  *     other calls to kmalloc() that may need to be made internally.
  * Returned memory will be initialized as:
  *   - GFP_CALLOC: All zero-initialized
  *   - else:       #ifdef CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
  *                 #ifndef CONFIG_DEBUG_HEAP: Undefined
  *
- * @param: hint:          Hint for where the mapping should go. This argument is
- *                        passed onto `mman_findunmapped()', alongside certain bits
+ * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
+ *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits
  *                        from `flags': `GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR'
- *                        You may pass `NULL' to use either `KERNEL_VMHINT_HEAP' or
- *                        `KERNEL_VMHINT_LHEAP' (based on `GFP_LOCKED') instead.
- *                        When `GFP_MAP_FIXED' is set, this is the (possibly unaligned)
- *                        address of where the mapping should go. If not page-aligned,
- *                        then the sub-page-misalignment will be carried over into the
- *                        return value. If another mapping already exists at the given
+ *                        You may  pass `NULL'  to  use either  `KERNEL_VMHINT_HEAP'  or
+ *                        `KERNEL_VMHINT_LHEAP'   (based   on   `GFP_LOCKED')   instead.
+ *                        When `GFP_MAP_FIXED' is set, this is the (possibly  unaligned)
+ *                        address of where the mapping  should go. If not  page-aligned,
+ *                        then the sub-page-misalignment will  be carried over into  the
+ *                        return value. If another mapping  already exists at the  given
  *                        location, then unconditionally return `MAP_INUSE'
- * @param: num_bytes:     The # of bytes to allocate. The actual amount is ceil-
- *                        aligned to multiples of pages (after also including a
+ * @param: num_bytes:     The  # of bytes to allocate. The actual amount is ceil-
+ *                        aligned to multiples of  pages (after also including  a
  *                        possibly sub-page-misalignment from GFP_MAP_FIXED+hint)
  * @param: flags:         Allocation option flags (see above)
- * @param: min_alignment: The minimum alignment for the returned pointer. Ignored when
- *                        the `GFP_MAP_FIXED' flag was given. Otherwise, a value greater
+ * @param: min_alignment: The minimum alignment  for the returned  pointer. Ignored  when
+ *                        the `GFP_MAP_FIXED' flag was given. Otherwise, a value  greater
  *                        than `PAGESIZE' can be used to ensure that the returned pointer
  *                        is aligned by multiple pages. s.a. `mman_findunmapped()' */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *FCALL
@@ -149,26 +149,26 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 		goto err_preempt;
 
 	/* These are the flags that will be used for dynamic
-	 * allocations made within this function:
-	 *  - GFP_LOCKED: All components must be locked, since we're
+	 * allocations   made    within    this    function:
+	 *  - GFP_LOCKED: All   components  must  be  locked,  since  we're
 	 *                allocating stuff such as mem-nodes and mem-parts!
 	 *  - GFP_PREFLT: Slightly improve through-put for locked memory
-	 *  - GFP_VCBASE: If we end up calling ourself recursively, don't
+	 *  - GFP_VCBASE: If  we end up  calling ourself recursively, don't
 	 *                allocate mem-nodes/parts using kmalloc(), but use
-	 *                the mcoreheap system instead, thus resolving the
-	 *                dependency loop between us calling kmalloc, and
+	 *                the  mcoreheap system instead, thus resolving the
+	 *                dependency loop between  us calling kmalloc,  and
 	 *                kmalloc calling us.
-	 *  - GFP_NOOVER: Don't over-allocate. This is required so that a
+	 *  - GFP_NOOVER: Don't  over-allocate.  This is  required so  that a
 	 *                recursive call with the `GFP_VCBASE' flag set won't
-	 *                try to allocate more memory than the ceil-aligned
+	 *                try  to allocate more  memory than the ceil-aligned
 	 *                size of the requested data-blob.
-	 *                This is required to ensure that a truly recursive
-	 *                call with the `GFP_VCBASE' should never try to
-	 *                allocate more than a single page, thus guarantying
-	 *                that we'll never be needing to make use of further
+	 *                This is required to  ensure that a truly  recursive
+	 *                call  with  the  `GFP_VCBASE' should  never  try to
+	 *                allocate  more than a single page, thus guarantying
+	 *                that we'll never be needing to make use of  further
 	 *                dynamic memory allocations during a recursive call.
-	 *                Otherwise, we may need to allocate additional heap
-	 *                memory for use by a block-status-bitset, or a mem-
+	 *                Otherwise,  we may need to allocate additional heap
+	 *                memory for use by a block-status-bitset, or a  mem-
 	 *                chunk-vector.
 	 *
 	 * Clear the following flags:
@@ -492,11 +492,11 @@ do_prefault:
 			}
 
 			/* After prefaulting, we can simply set the block-status
-			 * bitset to NULL, thus marking all blocks as CHNG. */
+			 * bitset to  NULL, thus  marking  all blocks  as  CHNG. */
 			part->mp_blkst_ptr = NULL;
 		} else {
 			/* Allocate the block-status bitset (if we have to)
-			 * Note that if this allocation fails, then we can just pre-fault
+			 * Note  that if this allocation fails, then we can just pre-fault
 			 * the mem-part, thus not having to re-trying the allocation after
 			 * dropping our mman-lock and having to do _so_ much once again. */
 			if (num_pages <= MPART_BLKST_BLOCKS_PER_WORD) {
@@ -532,7 +532,7 @@ do_prefault:
 #endif /* !CONFIG_DEBUG_HEAP */
 			}
 			/* To ensure atomic initialization without prefaulting, we must
-			 * set-up the new node/part pair as a page directory hint. */
+			 * set-up the  new node/part  pair as  a page  directory  hint. */
 			node->mn_flags |= MNODE_F_MHINT;
 			pagedir_maphint(result, num_bytes, node);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE

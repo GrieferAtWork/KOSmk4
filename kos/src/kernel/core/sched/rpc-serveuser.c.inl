@@ -25,7 +25,7 @@
 DECL_BEGIN
 
 /* Serve RPC functions as the result of user-space being re-directed asynchronously.
- * This function is called from an arch-specific assembly function that is used to
+ * This  function is called from an arch-specific  assembly function that is used to
  * redirect where a system call or interrupt would return to, if the previous return
  * location was somewhere in user-space.
  * On x86, that is `x86_rpc_user_redirection()', found in `/arch/i386/sched32.S' */
@@ -87,9 +87,9 @@ restore_rpc:
 				consume_rpc_interrupt = true;
 				goto again_chain;
 			}
-			/* Check if the RPC only allows for SYSCALL as reason.
+			/* Check  if  the  RPC  only   allows  for  SYSCALL  as   reason.
 			 * If so, unset its current serviceability status and re-schedule
-			 * it as pending (this can happen if we got here during a #PF)
+			 * it as pending (this  can happen if we  got here during a  #PF)
 			 * Also: Don't service in the case of a system call that isn't
 			 *       a cancellation point. */
 #ifdef RPC_SERVE_ALL
@@ -115,7 +115,7 @@ restore_rpc:
 		{
 			struct rpc_entry *more, *last;
 			/* Restore all additional RPC functions so that the RPC counters remain consistent
-			 * when invoking the RPC callbacks (this is required in case one of the callbacks
+			 * when  invoking the RPC callbacks (this is required in case one of the callbacks
 			 * does something that might block, in which case task_serve() would be called, at
 			 * which point it would break if the RPC counters are out-of-sync) */
 			more = chain->re_next;

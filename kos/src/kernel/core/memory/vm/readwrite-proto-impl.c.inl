@@ -97,7 +97,7 @@ again:
 		uintptr_half_t node_prot;
 		pageid = PAGEID_ENCODE(addr);
 		/* Must manually copy data by explicitly locking the user-space VM and
-		 * looking at what kind of VM node is mapped at the target location. */
+		 * looking  at what kind of VM node  is mapped at the target location. */
 again_lookup_node:
 		sync_read(self);
 #ifdef IS_WRITING
@@ -213,10 +213,10 @@ throw_segfault:
 #else /* IS_WRITING */
 			vm_datapart_lockread_setcore(part);
 			COMPILER_READ_BARRIER();
-			/* Check if the part still includes the accessed page.
-			 * This is required to ensure that `vm_datapart_loadpage()'
+			/* Check if  the  part  still  includes  the  accessed  page.
+			 * This is required  to ensure that  `vm_datapart_loadpage()'
 			 * can be called safely (the part may have been split between
-			 * the time of us acquiring a read-lock to it, and the point
+			 * the time of us acquiring a read-lock to it, and the  point
 			 * when we released our write-lock to the effected VM) */
 			if unlikely(node_vpage_offset >= vm_datapart_numvpages(part)) {
 				sync_endread(part);

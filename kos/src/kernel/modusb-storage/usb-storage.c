@@ -46,8 +46,8 @@ usb_storage_probe(struct usb_controller *__restrict self,
 	if (intf->ui_intf_desc->ui_intf_subclass == USB_SUBCLASS_MASS_STORAGE_SCSI) {
 		size_t i;
 		struct usb_endpoint *in, *out;
-		/* There should be at least 2 endpoints, both using
-		 * `USB_ENDPOINT_ATTRIB_TRANSFERTYPE_BULK', with one
+		/* There should be at  least 2 endpoints, both  using
+		 * `USB_ENDPOINT_ATTRIB_TRANSFERTYPE_BULK', with  one
 		 * being used for input, and the other being used for
 		 * output. */
 		if unlikely(endpc < 2) {

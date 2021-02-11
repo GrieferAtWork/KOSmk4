@@ -79,9 +79,9 @@ DECL_BEGIN
  * === Bad ideas (and why they're bad) ===
  *
  * pagedir_fork:
- *    Use the `v_unused*_ign' bits of the entries of all of the
- *    dynamically allocated vectors within the page directory
- *    as a data-stream to encode a reference counter for the
+ *    Use  the `v_unused*_ign' bits of the entries of all of the
+ *    dynamically allocated  vectors within  the page  directory
+ *    as  a data-stream  to encode  a reference  counter for the
  *    surrounding page-vector. (s.a. `p32_pagedir_refe2_incref')
  *
  * >> // Initialize `self' as a fork-copy of the current page directory:
@@ -103,10 +103,10 @@ DECL_BEGIN
  * >> INTDEF NOBLOCK __BOOL NOTHROW(FCALL p32_pagedir_refe2_isshrd)(unsigned int vec2); // true: At least 2 references; false: 1 reference
  *
  * BAD: Is this really something that would make sense? After all:
- *      all of the page directory initialization on `newmm' will
- *      already happen completely lazily, and the intended use of
- *      fork() is to-be followed by an exec(), meaning that it
- *      doesn't actually make that much sense to not just do what
+ *      all of the page  directory initialization on `newmm'  will
+ *      already happen completely lazily, and the intended use  of
+ *      fork()  is to-be  followed by  an exec(),  meaning that it
+ *      doesn't  actually make that much sense to not just do what
  *      the old VM system did; even in regards to how to implement
  *      exec... (i.e. don't create a new mman on exec, but use the
  *      `struct mbuilder' system and `mbuilder_apply()')
@@ -158,7 +158,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			weakincref(node->mn_mman); /* A weak reference here is required by the ABI */
 			DBG_memset(&node->mn_part, 0xcc, sizeof(node->mn_part));
 
-			/* Insert into the lock-operations list of `part'
+			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part' */
 			lop = (struct mpart_lockop *)node;
@@ -215,8 +215,8 @@ again:
 	}
 }
 
-/* Ensure that `self->ft_newmm->mm_mappings' is a valid tree of mem-nodes
- * by inserting all nodes from the incomplete tree `ft_newtree' into the
+/* Ensure that  `self->ft_newmm->mm_mappings' is  a valid  tree of  mem-nodes
+ * by inserting  all nodes  from the  incomplete tree  `ft_newtree' into  the
  * actual mappings tree of that mman. Where an overlap is found, the existing
  * node is removed from `self->ft_newmm' will be destroyed. */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -248,28 +248,28 @@ NOTHROW(FCALL forktree_unlock_newmm)(struct forktree *__restrict self) {
 
 /* Helper functions to replicate a tree of memory mappings for the purpose
  * of forking a memory manager:
- *  - While holding a lock to both `ft_newmm', as well as `ft_oldmm',
+ *  - While  holding a lock  to both `ft_newmm',  as well as `ft_oldmm',
  *    try to fork the given `oldtree' of mem-nodes into a copy that will
  *    be stored in `*p_newtree'.
  *  - When `oldtree' is `NULL', simply set `*p_newtree' to `NULL'.
- *  - Otherwise, use `mnode_tree_rremove()' on `ft_newmm->mm_mappings'
- *    to try to remove a mem-node already duplicated during a prior call, in
- *    which case check that attributes (flags, min/max-addr, part, partoff,
+ *  - Otherwise,   use   `mnode_tree_rremove()'   on    `ft_newmm->mm_mappings'
+ *    to try to remove  a mem-node already duplicated  during a prior call,  in
+ *    which case  check that  attributes (flags,  min/max-addr, part,  partoff,
  *    fsname, fspath) are still up to date. If so, then simply set `*p_newtree'
- *    to that previously duplicated node, and continue replicating the child-
+ *    to that previously duplicated node,  and continue replicating the  child-
  *    nodes of `oldtree'
  *  - Otherwise, a new mem-node will be allocated (preferably via `ft_freelist')
- *    and initialized to replicate `oldtree' (for this purpose, a lock to the
- *    backing part of `oldtree' will also be acquired, so that the new mem-node
- *    can be added to the part's list of copy- or share-nodes).
- *    Afterwards, all sub-trees of `oldtree' will be forked recursively:
+ *    and  initialized to replicate  `oldtree' (for this purpose,  a lock to the
+ *    backing part of `oldtree' will also be acquired, so that the new  mem-node
+ *    can   be   added   to  the   part's   list  of   copy-   or  share-nodes).
+ *    Afterwards,  all  sub-trees  of  `oldtree'  will  be  forked  recursively:
  *    >> forktree_or_unlock(self, &(*p_newtree)->mn_mement.rb_lhs, oldtree->mn_mement.rb_lhs);
  *    >> forktree_or_unlock(self, &(*p_newtree)->mn_mement.rb_rhs, oldtree->mn_mement.rb_rhs);
  * @return: true:  Success
- * @return: false: Failure: A mem-node could not be allocated atomically, or a lock to
- *                 a mem-part could not be acquired immediately. - A lock to `ft_oldmm'
+ * @return: false: Failure: A mem-node could  not be  allocated atomically, or  a lock  to
+ *                 a  mem-part could not  be acquired immediately. -  A lock to `ft_oldmm'
  *                 and `ft_newmm' is released (the later by using `forktree_unlock_newmm',
- *                 which will merge all nodes from `self->ft_newtree' into `ft_newmm's
+ *                 which will  merge all  nodes from  `self->ft_newtree' into  `ft_newmm's
  *                 tree of mappings), and:
  *                   - A new mem-node is allocated w/ blocking, and added to `ft_freelist'
  *                   - Keep on yielding until the locked part becomes available
@@ -302,7 +302,7 @@ again:
 		    (newtree->mn_flags & ~(~MNODE_FLAGS_FORKMASK | MNODE_F__RBRED)) ==
 		    (oldtree->mn_flags & ~(~MNODE_FLAGS_FORKMASK | MNODE_F__RBRED))) {
 			/* Always inherit the _RBRED flag (since we're trying to re-
-			 * construct the old mman's R/B-tree of memory mappings). */
+			 * construct the old  mman's R/B-tree  of memory  mappings). */
 			newtree->mn_flags &= ~MNODE_F__RBRED;
 			newtree->mn_flags |= oldtree->mn_flags & MNODE_F__RBRED;
 			goto continue_after_fork_newtree; /* Can re-use this node! */
@@ -329,7 +329,7 @@ again:
 	        "This should have been handled by the `mnode_tree_rremove()' above!");
 
 	/* Must actually create a new copy of `oldtree'. For this purpose,
-	 * start by trying to allocate a new node from the free-list. */
+	 * start by  trying to  allocate a  new node  from the  free-list. */
 	newtree = SLIST_FIRST(&self->ft_freelist);
 	if (newtree) {
 		SLIST_REMOVE_HEAD(&self->ft_freelist, _mn_alloc);
@@ -345,7 +345,7 @@ again:
 			newtree = (struct mnode *)kmalloc(sizeof(struct mnode),
 			                                  GFP_LOCKED | GFP_PREFLT);
 			/* Add to the free list so we've got the node
-			 * pre-allocated the next time around! */
+			 * pre-allocated  the   next   time   around! */
 			SLIST_INSERT(&self->ft_freelist, newtree, _mn_alloc);
 			return false;
 		}
@@ -507,16 +507,16 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 	}
 done:
 	/* After clearing all of those write-permissions, we must sync the
-	 * current (i.e. copied) mman to ensure that no-one is writing to
+	 * current  (i.e. copied) mman to ensure that no-one is writing to
 	 * any of the (now shared) pages.
 	 * Following this call, any further modifications made to the memory
-	 * of the old mman will be unshared from the new mman (i.e. will no
+	 * of  the old mman will be unshared from the new mman (i.e. will no
 	 * longer appear in both page directories) */
 	mman_syncall();
 }
 
 
-/* Memory manager construction functions.
+/* Memory   manager   construction    functions.
  * NOTE: mman_fork() will fork the current mman. */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct mman *FCALL
 mman_fork(void) THROWS(E_BADALLOC, ...) {
@@ -526,10 +526,10 @@ mman_fork(void) THROWS(E_BADALLOC, ...) {
 	ft.ft_newmm = mman_new();
 
 	/* REMINDER: When not able to acquire a lock, we must call `task_serve()' after
-	 *           releasing all other already-acquired locks. This is necessary to
+	 *           releasing all other already-acquired  locks. This is necessary  to
 	 *           deal with another thread within our current mman calling exec().
-	 * Otherwise, we might get a situation with a process w/ 2 threads, where one
-	 * thread calls exec() while another calls fork(), which could then result in
+	 * Otherwise,  we might get a situation with a process w/ 2 threads, where one
+	 * thread calls exec() while another calls fork(), which could then result  in
 	 * both to exec(), as well as the fork() succeeding, but the fork() succeeding
 	 * in the context of the program being exec'd by the first thread (which would
 	 * be no good), rather than the program that contained the fork() call. */
@@ -537,11 +537,11 @@ mman_fork(void) THROWS(E_BADALLOC, ...) {
 	SLIST_INIT(&ft.ft_freelist);
 	ft.ft_didulock = false;
 	TRY {
-		/* Because everything relating to low-level page directories can be made
+		/* Because everything relating to low-level page directories can be  made
 		 * to happen lazily, forking a memory manager is as simply as replicating
 		 * its tree of memory nodes.
 		 *
-		 * For this purpose, try to keep the total # of simultaneous locks low, so
+		 * For  this purpose, try to keep the total # of simultaneous locks low, so
 		 * that the overall impact (in regards to lock contention) is kept minimal. */
 
 again:
@@ -551,7 +551,7 @@ again:
 #ifndef __OPTIMIZE_SIZE__
 		/* TODO: The first time we get here, try to count exactly how many mem-nodes
 		 *       we'll be needing to do the fork, and pre-allocate exactly that many
-		 *       to begin with (that way, we won't need to allocate so much while
+		 *       to begin with (that  way, we won't need  to allocate so much  while
 		 *       holding all too many locks)
 		 * XXX: That's a bad idea because it would slow down what's currently the
 		 *      fastest path to get through mman_fork() (that path being that all
@@ -562,11 +562,11 @@ again:
 
 		if unlikely(!mman_lock_tryacquire(ft.ft_newmm)) {
 			/* Super unlikely, but can happen because `ft.ft_newmm' becomes globally
-			 * visible even before we're done here, starting with the first
+			 * visible  even  before  we're  done  here,  starting  with  the  first
 			 * replicated mem-part via `SOME_GLOBAL_PART->[mp_copy|mp_share]->[...]->mn_mman'
 			 *
 			 * As such, it is possible that someone else (e.g. someone calling
-			 * mpart_split()) has acquired a lock to the mman. - So just wait
+			 * mpart_split()) has acquired a lock to the mman. - So just  wait
 			 * for them to release said lock! */
 			mman_lock_release(ft.ft_oldmm);
 			do {
@@ -577,7 +577,7 @@ again:
 		}
 
 		/* We're now holding a lock to both the old, as well as the new mman.
-		 * That's everything we need to start forking the tree of mappings. */
+		 * That's everything we need to  start forking the tree of  mappings. */
 		ft.ft_newtree = NULL;
 		if (!forktree_or_unlock(&ft, &ft.ft_newtree, NULL,
 		                        ft.ft_oldmm->mm_mappings)) {
@@ -586,8 +586,8 @@ again:
 			goto again;
 		}
 
-		/* Successfully forked the entire tree of memory nodes, but must still
-		 * delete write permissions for all writable nodes of the old mman, so
+		/* Successfully forked the entire tree  of memory nodes, but must  still
+		 * delete write permissions for all writable  nodes of the old mman,  so
 		 * that we can ensure that anything written to by either the old, or the
 		 * new mman will be handled via copy-on-write going forward. */
 		forktree_clearwrite(ft.ft_oldmm);
@@ -596,14 +596,14 @@ again:
 		mman_lock_release(ft.ft_oldmm);
 
 		if (ft.ft_didulock) {
-			/* Write-back the tree of mappings into `ft.ft_newmm'.
+			/* Write-back  the  tree   of  mappings  into   `ft.ft_newmm'.
 			 * For this purpose, make sure that there aren't any left-over
 			 * nodes from any previous fork-attempts... */
 			if unlikely(ft.ft_newmm->mm_mappings != NULL)
 				forktree_freeall(&ft, ft.ft_newmm->mm_mappings);
 
 			/* Because we had to release our lock from the new mman at
-			 * one point, there is a chance that someone else added a
+			 * one  point, there is a chance that someone else added a
 			 * mapping to our page directory.
 			 * To make sure that this didn't happen, clear the page
 			 * directory once again at this point. */
@@ -615,7 +615,7 @@ again:
 			assert(ft.ft_newmm->mm_mappings == NULL);
 		}
 
-		/* Because `ft.ft_newtree' is a mirror copy of the tree of mappings
+		/* Because `ft.ft_newtree' is  a mirror  copy of the  tree of  mappings
 		 * from the old mman, we can simply assign it as-is as a valid R/B-tree
 		 * of mem-nodes to-be used by the new mman. */
 		ft.ft_newmm->mm_mappings = ft.ft_newtree;
@@ -624,8 +624,8 @@ again:
 		mman_lock_release(ft.ft_newmm);
 
 		/* NOTE: No further initialization of the underlying page directory of `ft.ft_newmm'
-		 *       is needed, since everything will happen lazily on first access. This
-		 *       way, we don't even have to create a single mapping with the new mman's
+		 *       is  needed,  since  everything will  happen  lazily on  first  access. This
+		 *       way, we don't  even have to  create a  single mapping with  the new  mman's
 		 *       page directory! */
 	} EXCEPT {
 		mnode_slist_freeall(&ft.ft_freelist);

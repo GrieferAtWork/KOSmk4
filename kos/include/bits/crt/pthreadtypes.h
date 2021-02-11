@@ -74,9 +74,9 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
 
 #define PTHREAD_FNORMAL    0x0000 /* Normal pthread flags. */
 #define PTHREAD_FUSERSTACK 0x0001 /* The thread's stack was provided by the user
-                                   * and should not be unmapped automatically. */
+                                   * and should not  be unmapped  automatically. */
 #define PTHREAD_FNOSTACK   0x0002 /* The thread's stack area is unknown (this is the case for
-                                   * the main thread, and any thread created by `clone()'). */
+                                   * the main thread, and  any thread created by  `clone()'). */
 
 /* The different kinds of errno codes known to libc */
 #define LIBC_ERRNO_KIND_KOS 0 /* E* */
@@ -99,7 +99,7 @@ struct pthread {
 	struct libc_userprocmask pt_pmask;       /* User-space sigprocmask address */
 #else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 #define _pthread_tid(self) (self)->pt_tid
-	__pid_t                  pt_tid;         /* Thread TID (filled in by the kernel as the PTID and CTID)
+	__pid_t                  pt_tid;         /* Thread TID (filled  in by  the kernel  as the  PTID and  CTID)
 	                                          * Cleared to ZERO(0) (by the kernel) when the thread terminates.
 	                                          * s.a. `set_tid_address(2)' */
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
@@ -163,10 +163,10 @@ typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __pthread_t;
 #ifdef __CC__
 struct __cpu_set_struct;
 typedef struct __pthread_attr_s {
-	/* NOTE: This structure shares binary compatibility with GLibc (for the most part)
-	 *       The only difference is that we allow the re-use of `pa_cpusetsize' as an
+	/* NOTE: This  structure shares binary compatibility with GLibc (for the most part)
+	 *       The  only difference is that we allow  the re-use of `pa_cpusetsize' as an
 	 *       in-line 32/64-bit cpuset, thus preventing the need to dynamically allocate
-	 *       small cpu sets on the heap when most of the time those structures would
+	 *       small cpu sets on the  heap when most of  the time those structures  would
 	 *       only be a couple of bytes large. */
 	struct sched_param       pa_schedparam;  /* [valid_if(PTHREAD_ATTR_FLAG_SCHED_SET)] Scheduler parameters and priority. */
 	__INT32_TYPE__           pa_schedpolicy; /* [valid_if(PTHREAD_ATTR_FLAG_POLICY_SET)] Scheduler policy */

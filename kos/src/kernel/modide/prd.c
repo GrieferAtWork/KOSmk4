@@ -40,21 +40,21 @@
 DECL_BEGIN
 
 /* Initialize a given PRD from various sources.
- * NOTE: Upon successful completion of `AtaPRD_InitFromVirt' or `AtaPRD_InitFromVirtVector',
- *       either `ATA_AIO_HANDLE_FUNLOCK_USER_DMA' or `ATA_AIO_HANDLE_FUNLOCK_KERNEL_DMA' is
+ * NOTE: Upon  successful  completion of  `AtaPRD_InitFromVirt'  or `AtaPRD_InitFromVirtVector',
+ *       either  `ATA_AIO_HANDLE_FUNLOCK_USER_DMA'  or  `ATA_AIO_HANDLE_FUNLOCK_KERNEL_DMA'   is
  *       added to `*pflags', and the caller is required to unlock the DMA lock of the associated
  *       VM upon completion of the operation.
  * @return: <= prd_siz: SUCCESS. In this case, the return value specifies the number of encoded
- *                     PRD entries, starting at `prd_buf'. Also note that in this case, the caller
- *                     will be required to eventually unlock VM DMA locks in accordance to the
+ *                     PRD entries, starting at `prd_buf'. Also note that in this case, the  caller
+ *                     will be required  to eventually  unlock VM DMA  locks in  accordance to  the
  *                     bits set in `*pflags' if `AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector'
  *                     was called.
  * @return: > prd_siz: ERROR: More than `prd_siz' PRD entires would be required for the encoding
- *                     to succeed. - In this case, the caller should re-attempt the call after
+ *                     to  succeed. - In this case, the  caller should re-attempt the call after
  *                     re-allocating to match a total of at least `return' AtaPRD entries passed
  *                     to `prd_buf', and update `prd_siz' accordingly.
  * @return: 0 : ERROR: The given address range cannot be encoded as a valid PRD
- *                     This can happen for any of the following reasons:
+ *                     This can  happen  for  any  of  the  following  reasons:
  *                   - An `E_WOULDBLOCK' error was thrown internally (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
  *                   - Some portion of the given address range(s) isn't mapped (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
  *                   - Some portion of the given address range(s) maps to VIO memory (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
@@ -145,7 +145,7 @@ NOTHROW(KCALL ata_dma_acquire_func)(void *arg, physaddr_t paddr, size_t num_byte
 
 /* Same as the Phys functions above, however also initialize `handle->hd_dmalock' / `handle->hd_dmalockvec',
  * as well as setting the `ATA_AIO_HANDLE_FONEDMA' bit should this be required.
- * @param: for_writing: When true, the target buffer is intended to be
+ * @param: for_writing: When true, the target buffer is intended to  be
  *                      written to, else only intended to be read from. */
 INTERN WUNUSED size_t KCALL
 AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *base,

@@ -128,7 +128,7 @@ NOTHROW(FCALL ctype_ptr)(struct ctyperef const *__restrict self,
 }
 
 
-/* Return the array-version of the given C-type
+/* Return  the   array-version  of   the  given   C-type
  * NOTE: The returned type must inherit `self->ct_flags'
  * @param: flags: Type-reference-flags (set of `CTYPEREF_FLAG_*') */
 PUBLIC NONNULL((1)) REF struct ctype *
@@ -299,9 +299,9 @@ nope:
 	return false;
 }
 
-/* Return the common type which can be used to represent both `a' and `b'.
+/* Return the common type which  can be used to  represent both `a' and  `b'.
  * This common type is the promotion of `a' and `b' if those types are equal,
- * and otherwise is the larger integer type of the two. If neither types are
+ * and  otherwise is the larger integer type of the two. If neither types are
  * integers, then a common type doesn't exist and `NULL' is returned. */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct ctype *
 NOTHROW(FCALL ctype_common)(struct ctype *a,
@@ -643,7 +643,7 @@ NOTHROW(FCALL dw_enumerate_fields)(struct cmodule *__restrict mod,
 					break;
 				if (member.m_type) {
 					/* Special case: When the offset is unknown, but we're working on a union,
-					 *               then we know that the offset should actually be `0' */
+					 *               then  we  know that  the  offset should  actually  be `0' */
 					if (member.m_offset == (uintptr_t)-1 && is_union)
 						member.m_offset = 0;
 					member.m_offset += base_offset;
@@ -667,7 +667,7 @@ NOTHROW(FCALL dw_enumerate_fields)(struct cmodule *__restrict mod,
 				uintptr_t data_member_location = 0;
 				di_debuginfo_component_attrib_t attr;
 				/* Enumerate members from base-structures (in case of a c++-style derived type)
-				 * NOTE: Dwarf uses `DW_TAG_inheritance' for this purpose, which in turn
+				 * NOTE: Dwarf uses `DW_TAG_inheritance' for this purpose, which in  turn
 				 *       contains 2 attributes DW_AT_type and DW_AT_data_member_location! */
 				DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
 					switch (attr.dica_name) {
@@ -818,9 +818,9 @@ again:
 	                             self->ct_struct.ct_info.cd_dip,
 	                             cb, cookie, 0, &struct_has_children);
 	if (!struct_has_children && !result && !self->ct_struct.ct_sizeof) {
-		/* If the struct is anonymous in the context of the CU that `self'
+		/* If  the struct is anonymous in the  context of the CU that `self'
 		 * got loaded from, then we'll be unable to load its fields. In this
-		 * case, we should instead search for a struct with the same name
+		 * case,  we should instead  search for a struct  with the same name
 		 * in a number of different places:
 		 *  - All other CUs of the current module.
 		 *  - All CUs of all other modules from the current address space.
@@ -896,7 +896,7 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 
 
 /* Same as `ctype_fromdw()', but when `type_debug_info'
- * is NULL, fill `*presult' with `ctype_void'. */
+ * is  NULL,   fill   `*presult'   with   `ctype_void'. */
 PUBLIC WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
 NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
                                 struct cmodunit const *__restrict cunit,
@@ -985,8 +985,8 @@ done_fuction_argv:
 }
 
 
-/* Load a C-type from a given `type_debug_info' which should be
- * loaded with the help of an internal copy made from `cu_parser'.
+/* Load   a   C-type   from   a   given   `type_debug_info'   which   should  be
+ * loaded  with  the   help  of   an  internal  copy   made  from   `cu_parser'.
  * The given `type_debug_info' is a pointer like `di_debuginfo_member_t::m_type'
  * @param: ptyperef_flags: When non-NULL, store type-reference flags here (`CTYPEREF_FLAG_*')
  * @return: DBX_EOK:     A reference to the associated type.
@@ -1054,9 +1054,9 @@ again:
 		case DW_ATE_boolean:
 			if (!typinfo.t_sizeof || typinfo.t_sizeof == sizeof(bool)) {
 				presult->ct_typ = incref(&ctype_bool);
-				/* Keep a bit of consistency, and discard boolean types
-				 * that have been named as `_Bool'. This happens when a
-				 * program written in C uses <stdbool.h>, and we filter
+				/* Keep a bit  of consistency, and  discard boolean  types
+				 * that have been  named as `_Bool'.  This happens when  a
+				 * program written in  C uses <stdbool.h>,  and we  filter
 				 * out this kind of thing, so that `cprinter.c' will print
 				 * all conforming boolean types as `bool' */
 				if (presult->ct_info.ci_name &&
@@ -1159,8 +1159,8 @@ do_unsigned:
 				typinfo.t_name = typinfo.t_rawname;
 			/* The only way to differentiate between `signed char' and `char'
 			 * in debug information (which we need to do, since we only allow
-			 * `char *' to be printed as strings, but leave `signed char *'
-			 * alone), is to look at the name field of the type:
+			 * `char *' to be printed  as strings, but leave  `signed char *'
+			 * alone),   is  to  look   at  the  name   field  of  the  type:
 			 * ```
 			 * <1><xxx>: Abbrev Number: xxx (DW_TAG_base_type)
 			 *    <xxx>   DW_AT_byte_size   : 1
@@ -1320,7 +1320,7 @@ again_opt:
 		presult->ct_flags |= CTYPEREF_FLAG_RESTRICT;
 		type_debug_info = typinfo.t_type;
 		goto again; /* `restrict' must reference a pointer type, so the type field can't be optional,
-		             * since its absene would mean `void restrict', which doesn't make any sense. */
+		             * since its absene  would mean  `void restrict', which doesn't  make any  sense. */
 
 	case DW_TAG_atomic_type:
 		presult->ct_flags |= CTYPEREF_FLAG_ATOMIC;

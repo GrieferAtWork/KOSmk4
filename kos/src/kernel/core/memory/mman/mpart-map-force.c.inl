@@ -39,7 +39,7 @@ DECL_BEGIN
 
 #ifdef DEFINE_mpart_mmap_force_p
 /* Similar to `mpart_mmap_p()', but force the given `perm' for all pages, no
- * matter what the block-status bitset of `self' might say of the matter. */
+ * matter  what the block-status  bitset of `self' might  say of the matter. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
                                   PAGEDIR_PAGEALIGNED void *addr,

@@ -144,8 +144,8 @@ NOTHROW(KCALL usb_unknowns_appendall)(/*inherit*/ REF struct usb_unknown_interfa
 }
 
 /* [0..1] The thread currently probing for unknown interfaces.
- *        To prevent a single interface from being more than once,
- *        only a single thread can ever probe unknown interfaces,
+ *        To prevent a  single interface from  being more than  once,
+ *        only a  single thread  can ever  probe unknown  interfaces,
  *        and even then, recursion mustn't be allowed, with recursive
  *        calls simply ending up as no-ops. */
 PRIVATE WEAK struct task *usb_probe_unknown_lock = NULL;
@@ -174,7 +174,7 @@ PRIVATE NOBLOCK void NOTHROW(KCALL usb_probe_unknown_release)(void) {
 	assert(usb_probe_unknown_lock == THIS_TASK);
 	ATOMIC_WRITE(usb_probe_unknown_lock, NULL);
 	/* Only one thread can be holding `usb_probe_unknown_lock',
-	 * so only wake up a single thread by using `sig_send()' */
+	 * so only wake  up a single  thread by using  `sig_send()' */
 	sig_send(&usb_probe_unknown_unlock);
 }
 
@@ -193,7 +193,7 @@ ok:
 
 
 /* Probe all unknown interfaces using the given `func', removing
- * interfaces that have been identified following this.
+ * interfaces  that   have  been   identified  following   this.
  * Additionally, `func' may be NULL to use all global callback probes
  * for probing unknown interfaces. */
 PRIVATE void KCALL usb_probe_identify_unknown(PUSB_INTERFACE_PROBE func) {
@@ -376,7 +376,7 @@ found_index:
 
 /* Register/unregister USB device/interface probe callbacks that get invoked
  * when a new device is discovered.
- * Note that device probes are only invoked for multi-function devices (i.e. ones
+ * Note that device  probes are  only invoked  for multi-function  devices (i.e.  ones
  * with multiple configurations), and have the purpose to allow drivers to be provided
  * for combinations of certain devices.
  * NOTE: After registering a new interface probe function, any USB interface that had
@@ -394,7 +394,7 @@ usb_register_interface_probe(PUSB_INTERFACE_PROBE func)
 	bool result;
 	result = probe_add(&probe_interface, (void *)func);
 	if (result) {
-		/* Got through all strange interfaces we've encountered thus far,
+		/* Got through all  strange interfaces we've  encountered thus  far,
 		 * and try to identify them using this newly added probing function. */
 		usb_probe_identify_unknown(func);
 	}
@@ -527,8 +527,8 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 		decref_unlikely(probes);
 		RETHROW();
 	}
-	/* Check if new probes may have been added in the mean time.
-	 * If so, try once again to identify unknown devices, thus
+	/* Check if new probes may have been added in the mean  time.
+	 * If so, try  once again to  identify unknown devices,  thus
 	 * ensuring that every probe has had a chance to identify our
 	 * new unknown interface. */
 	for (;;) {
@@ -577,7 +577,7 @@ NOTHROW(KCALL usb_endpoint_destroy)(struct usb_endpoint *__restrict self) {
 }
 
 
-/* Same as `usb_controller_transfer()', but wait for the transfer to
+/* Same as  `usb_controller_transfer()',  but  wait for  the  transfer  to
  * complete (essentially just a wrapper using `struct aio_handle_generic')
  * @return: * : The total number of transferred bytes. */
 PUBLIC NONNULL((1, 2)) size_t KCALL
@@ -603,15 +603,15 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
 
 
 /* Perform a USB control request.
- * This causes a sequence of at least 3 packets to be sent
- * out to the specified endpoint, starting with a token
- * command packet containing the given `request', followed
+ * This  causes a sequence  of at least 3  packets to be sent
+ * out to  the  specified  endpoint, starting  with  a  token
+ * command packet  containing the  given `request',  followed
  * by as many in/out data packets for interfacing with `buf',
  * and finally followed by a handshake packet
  * @param: buf: A buffer of `request->ur_length' bytes used for
  *              request input/output data.
  *              The flag `request->ur_reqtype & USB_REQUEST_RETYPE_DIR_D2H'
- *              determines the direction in which data is send to/from
+ *              determines the  direction in  which  data is  send  to/from
  *              the device. */
 PUBLIC NONNULL((1, 2, 3, 5)) void KCALL
 usb_controller_request(struct usb_controller *__restrict self,
@@ -658,7 +658,7 @@ usb_controller_request(struct usb_controller *__restrict self,
 }
 
 /* Same as `usb_controller_request()', but wait for the operation to complete.
- * Additionally, return the number of bytes written to, or read from `buf' */
+ * Additionally,  return the  number of bytes  written to, or  read from `buf' */
 PUBLIC NONNULL((1, 2, 3)) size_t KCALL
 usb_controller_request_sync(struct usb_controller *__restrict self,
                             struct usb_endpoint *__restrict endp,
@@ -722,7 +722,7 @@ usb_controller_assign_device_address(struct usb_controller *__restrict self,
 
 
 /* Print the device string associated with `index' to the given `printer'.
- * If `index' is invalid, or the given `dev' didn't return a string, then
+ * If `index' is invalid, or the given `dev' didn't return a string,  then
  * return 0 without doing anything. */
 PUBLIC ssize_t KCALL
 usb_controller_printstring(struct usb_controller *__restrict self,
@@ -807,7 +807,7 @@ heap_printer(/*struct heap_printer_data **/ void *arg,
 
 /* Helper wrapper for `usb_controller_printstring()'
  * This function returns a heap-allocated string, or NULL under the same
- * circumstances where `usb_controller_printstring()' would return `0' */
+ * circumstances where `usb_controller_printstring()'  would return  `0' */
 PUBLIC ATTR_MALLOC WUNUSED NONNULL((1, 2)) /*utf-8*/ char *KCALL
 usb_controller_allocstring(struct usb_controller *__restrict self,
                            struct usb_device *__restrict dev, u8 index) {
@@ -929,10 +929,10 @@ NOTHROW(FCALL sleep_milli)(unsigned int n) {
 
 
 /* Function called when a new USB endpoint is discovered.
- * NOTE: This function also releases a lock to `self->uc_disclock'
+ * NOTE: This  function also releases a lock to `self->uc_disclock'
  *       once the device has been assigned an address. In the event
- *       that an exception occurs before then, this lock will also
- *       be released, meaning that this function _always_ releases
+ *       that an exception occurs before then, this lock will  also
+ *       be  released, meaning that this function _always_ releases
  *       such a lock.
  * @param: endpoint_flags: Set of `USB_ENDPOINT_FLAG_*' */
 PUBLIC void KCALL
@@ -947,7 +947,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	u16 device_max_packet_size;
 	assert((endpoint_flags & ~USB_ENDPOINT_MASK_SPEED) == 0);
 	{
-		/* Always release the device-discover-lock as
+		/* Always  release  the  device-discover-lock  as
 		 * soon as we've assigned the device its address. */
 		FINALLY_ENDWRITE(&self->uc_disclock);
 
@@ -969,7 +969,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 			req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE;
 			req.ur_index   = 0;
 			/* NOTE: offsetafter(struct usb_device_descriptor, ud_maxpacketsize) == 8,
-			 *       which is the minimum packet size supported by all devices */
+			 *       which  is  the  minimum  packet  size  supported  by  all devices */
 			req.ur_length = offsetafter(struct usb_device_descriptor, ud_maxpacketsize);
 			transfer_size = usb_controller_request_sync(self, dev, &req, &desc);
 
@@ -1003,15 +1003,15 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	FINALLY_DECREF_UNLIKELY(dev);
 
 	/* With the address assigned to the device, from now on make use of
-	 * that address for the purposes of communications with the device */
+	 * that address for the purposes of communications with the  device */
 	dev->ue_dev = dev->ud_dev;
 
-	/* Allow the device to transition to the addressable state.
+	/* Allow the  device to  transition to  the addressable  state.
 	 * The specs state that we should wait 2 milliseconds for this. */
 	sleep_milli(2);
 
 	/* Check if we got less data than expected during the initial
-	 * `USB_REQUEST_GET_DESCRIPTOR' call above. If so, then this
+	 * `USB_REQUEST_GET_DESCRIPTOR'  call above. If so, then this
 	 * is considered to be a ~strange~ device. */
 	if unlikely(transfer_size < offsetafter(struct usb_device_descriptor, ud_maxpacketsize) ||
 	            desc.ud_type != (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
@@ -1099,7 +1099,7 @@ strange_device_without_configs:
 	{
 		u8 i, j;
 		/* Must set the max config count beforehand, so that `usb_endpoint_destroy()'
-		 * can easily clean up successfully loaded configurations on error. */
+		 * can  easily  clean  up   successfully  loaded  configurations  on   error. */
 		dev->ud_configc = desc.ud_confcount;
 		for (i = j = 0; i < desc.ud_confcount; ++i) {
 			struct usb_configuration_descriptor *conf;
@@ -1129,7 +1129,7 @@ strange_device_without_configs:
 			probes = arref_get(&probe_device);
 			FINALLY_DECREF_UNLIKELY(probes);
 			/* Pass the device as a whole to loaded drivers and see if they can
-			 * identify what's the deal with it, and select the configuration
+			 * identify what's the deal with  it, and select the  configuration
 			 * for us. */
 			for (i = 0; i < probes->upv_count; ++i) {
 				DBG_memset(&dev->ud_config, 0xcc, sizeof(dev->ud_config));
@@ -1151,7 +1151,7 @@ did_find_correct_config:
 			}
 		}
 		/* XXX: Change the API to allow for simultaneous use of multi-function
-		 *      USB devices, by switching between configurations on-the-fly? */
+		 *      USB devices, by  switching between configurations  on-the-fly? */
 		used_conf = 0; /* ??? (Maybe prioritize certain options over others?) */
 		printk(KERN_WARNING "[usb] Multi-function device %q:%q:%q not "
 		                    "recognized. Available configurations are:\n",
@@ -1179,9 +1179,9 @@ did_find_correct_config:
 	       dev->ud_config->uc_desc, used_conf);
 	usb_controller_request_sync(self, dev, &req, NULL);
 
-	/* Create endpoints for every interface:endpoint pair that we can find
-	 * within the selected configuration. Then, pass those endpoints to loaded
-	 * drivers in order to try and figure out an appropriate driver.
+	/* Create  endpoints  for  every  interface:endpoint  pair  that  we  can find
+	 * within  the selected  configuration. Then,  pass those  endpoints to loaded
+	 * drivers  in  order   to  try   and  figure  out   an  appropriate   driver.
 	 * And if that doesn't work, just turn all of them into strange USB endpoints. */
 	{
 		size_t interface_count = 0;
@@ -1270,7 +1270,7 @@ again_scanconfig:
 							if likely(size >= offsetafter(struct usb_endpoint_descriptor, ue_maxpacketsize))
 								endp->ue_maxpck = endp_desc->ue_maxpacketsize;
 							else {
-								/* Don't run any risks, and use the size limit from the control channel.
+								/* Don't run any risks, and use the size limit from the control  channel.
 								 * However, for properly functioning devices, we shouldn't even get here. */
 								endp->ue_maxpck = intf->ue_maxpck;
 							}
@@ -1294,7 +1294,7 @@ search_for_next_endp:
 						       intf->ui_intf_name, dev->ud_str_vendor, dev->ud_str_product,
 						       dev->ud_str_serial, dev->ud_config->uc_desc);
 					}
-					/* Notify the system of the discovery of this
+					/* Notify  the system of the discovery of this
 					 * interface, as well as associated endpoints. */
 					usb_interface_discovered(self, intf,
 					                         interface_endpoint_count,
@@ -1325,7 +1325,7 @@ search_for_next_intf:
 
 		/* If we didn't manage to find any interface, then just consider
 		 * this to be a strange device altogether.
-		 * Note that this has nothing to do with us not finding a driver
+		 * Note that this has nothing to do with us not finding a  driver
 		 * for the endpoint, but just not being able to figure out what's
 		 * the deal with the thing. */
 		if unlikely(!interface_count) {
@@ -1339,7 +1339,7 @@ search_for_next_intf:
 done:
 	return;
 strange_device:
-	/* Register the device as a generic character device,
+	/* Register the device  as a  generic character  device,
 	 * but don't pass the device for the purpose of endpoint
 	 * detection to loaded drivers. */
 	dev->ue_flags |= USB_ENDPOINT_FLAG_STRANGE;
@@ -1348,8 +1348,8 @@ strange_device:
 
 
 /* Register mappings between USB devices and device files, such that
- * the USB system can attempt to unregister and remove device files
- * bound to some USB device when it is detected that the usb device
+ * the  USB system can attempt to unregister and remove device files
+ * bound to some USB device when it is detected that the usb  device
  * was unplugged from the system.
  * Note that these functions should be called like this:
  * >> struct (character|block)_device *mydev;
@@ -1361,8 +1361,8 @@ strange_device:
  * >>     (character|block)_device_unregister(mydev);
  * >>     RETHROW();
  * >> }
- * Note that it is possible to register any number of devices for any
- * single given USB device, however it is not possible to delete such
+ * Note that it is  possible to register any  number of devices for  any
+ * single  given USB device,  however it is not  possible to delete such
  * a registration, other than physically removing the associated device.
  */
 PUBLIC void KCALL

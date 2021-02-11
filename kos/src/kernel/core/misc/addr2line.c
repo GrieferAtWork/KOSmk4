@@ -125,14 +125,14 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
 /* Print addr2line information for the given source address:
  * @param: printer:  The printer to which to output data.
  * @param: arg:      Argument to-be passed to `printer'
- * @param: start_pc: Starting program counter position (the one to pass to `addr2line')
+ * @param: start_pc: Starting program counter position (the one to pass to  `addr2line')
  *                   This should be the address of the instruction who's source location
  *                   should be displayed.
  * @param: end_pc:   Ending program counter position.
  *                   This should be the address of the instruction following the one who's
  *                   source location should be displayed.
  *                   Note that the PC found in tracebacks, or exception information always
- *                   points to the _FOLLOWING_ PC, meaning that this argument should THAT
+ *                   points  to the _FOLLOWING_ PC, meaning that this argument should THAT
  *                   PC, whilst `start_pc' should be `arch_instruction_tryprev(end_pc)'
  * @param: message_format: printf-format of a message to print on each line
  * Example (of an inlined function):
@@ -147,8 +147,8 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
  *   (message_format ? (" : " + message_format % args) : "");
  * Or in other words:
  * >> filename(line[,col]) : name+offset_of_start_pc_from_name : instr_start+instr_length[ : message]
- * Where `instr_start' and `instr_length' refer to the inlined function for levels > 0
- * Additionally, when no addr2line information is available, the following is printed:
+ * Where  `instr_start'  and  `instr_length'   refer  to  the  inlined   function  for  levels  >   0
+ * Additionally,  when   no  addr2line   information  is   available,  the   following  is   printed:
  * >> start_pc+end_pc_minus_start_pc[ : message] */
 PUBLIC ATTR_COLDTEXT NONNULL((1)) ssize_t VCALL
 addr2line_printf(pformatprinter printer, void *arg, void const *start_pc,

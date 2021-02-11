@@ -74,10 +74,10 @@ NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
 }
 
 
-/* Advance the given C-parser to the next token.
+/* Advance  the  given  C-parser  to  the  next  token.
  * Parsing starts at `self->c_tokend', and upon return,
- * the `c_tok', `c_tokstart' and `c_tokend' fields
- * will have been updated to describe the next token
+ * the  `c_tok',  `c_tokstart'  and  `c_tokend'  fields
+ * will have been  updated to describe  the next  token
  * following the initial `c_tokend' */
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL cparser_yield)(struct cparser *__restrict self) {

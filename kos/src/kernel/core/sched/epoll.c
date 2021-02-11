@@ -123,7 +123,7 @@ NOTHROW(FCALL epoll_controller_add_to_raised)(struct epoll_controller *__restric
 
 
 /* Remove the given `monitor' from the raised-queue of `self'
- * The caller must be holding the lock of `self' */
+ * The  caller   must  be   holding   the  lock   of   `self' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL epoll_controller_remove_from_raised)(struct epoll_controller *__restrict self,
                                                    struct epoll_handle_monitor *__restrict monitor) {
@@ -132,7 +132,7 @@ NOTHROW(FCALL epoll_controller_remove_from_raised)(struct epoll_controller *__re
 again:
 	rq = ATOMIC_READ(self->ec_raised);
 	if (rq == monitor) {
-		/* Special case: `monitor' is the most recently raised handle.
+		/* Special case: `monitor'  is the most  recently raised  handle.
 		 * In this case, we must use ATOMIC_CMPXCH because other monitors
 		 * may have already changed `ec_raised' in the mean time. */
 		if (!ATOMIC_CMPXCH_WEAK(self->ec_raised, rq, rq->ehm_rnext))
@@ -169,8 +169,8 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 	/*sig_multicompletion_trydisconnect(self);*/ /* TODO: Optimization */
 
 	/* Figure out our monitor. Note that we're safe to access the monitor, as
-	 * well as its controller because the monitor owns `self', and right now
-	 * our caller is preventing `self' from being destroyed by holding onto
+	 * well as its controller because the monitor owns `self', and right  now
+	 * our caller is preventing `self'  from being destroyed by holding  onto
 	 * an internal SMP-lock that will block:
 	 *  - `sig_completion_disconnect()', as called by
 	 *  - `sig_multicompletion_disconnectall()', as called by
@@ -186,10 +186,10 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 			return sizeof(void *);
 	} while (!ATOMIC_CMPXCH_WEAK(monitor->ehm_raised,
 	                             oldraise, oldraise + 1));
-	/* If this is the first time that our monitor has been raised, then
-	 * we must acquire a reference to the associated controller, as well
-	 * as insert our own monitor into the controller's chain of raised
-	 * monitors, before enqueuing a post-completion callback that will
+	/* If  this is the first time that  our monitor has been raised, then
+	 * we  must acquire a reference to the associated controller, as well
+	 * as  insert our own  monitor into the  controller's chain of raised
+	 * monitors, before enqueuing  a post-completion  callback that  will
 	 * inherit that reference, and signal 1 waiting thread via `ec_avail' */
 	if (oldraise == 0) {
 		struct epoll_controller *ctrl;
@@ -197,15 +197,15 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 		ctrl = monitor->ehm_ctrl;
 		/* NOTE: Must tryincref(), because the controller's reference counter
 		 *       may have already dropped to `0'. - After all: epoll monitors
-		 *       aren't holding actual references to their controllers, but
-		 *       controllers will wait for monitors to disconnect during
-		 *       destruction (though that happens _after_ the monitor's
+		 *       aren't  holding actual references  to their controllers, but
+		 *       controllers  will  wait  for monitors  to  disconnect during
+		 *       destruction  (though  that  happens  _after_  the  monitor's
 		 *       reference counter has already dropped to 0...) */
 		if likely(tryincref(ctrl)) {
 			/* Enqueue our monitor as raised for the associated controller. */
 			epoll_controller_add_to_raised(ctrl, monitor);
 			/* Setup the post-completion function, and pass it
-			 * our reference to the attached monitor. */
+			 * our  reference   to   the   attached   monitor. */
 			*(void **)buf     = ctrl; /* Inherit reference */
 			context->scc_post = &epoll_postcompletion;
 			return sizeof(void *);
@@ -224,7 +224,7 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_handle_monitor_destroy)(struct epoll_handle_monitor *__restrict self) {
 	/* NOTE: The caller must ensure that `&self->ehm_comp'
-	 *       has been disconnected before we get here! */
+	 *       has  been  disconnected before  we  get here! */
 	sig_multicompletion_fini(&self->ehm_comp);
 	/* Drop our weak reference from the associated handle. */
 	(*handle_type_db.h_weakdecref[self->ehm_handtyp])(self->ehm_handptr);
@@ -266,7 +266,7 @@ again:
 	}
 	if unlikely(task_receiveall() != NULL) {
 		/* Signals were delivered in the mean time, and we have not have been able
-		 * to transfer all of them over to `self->ehm_comp'. -> Try again. */
+		 * to transfer  all  of  them  over to  `self->ehm_comp'.  ->  Try  again. */
 		sig_multicompletion_disconnectall(&self->ehm_comp);
 		task_disconnectall();
 		goto again;
@@ -287,10 +287,10 @@ NOTHROW(FCALL epoll_controller_add_to_pending)(struct epoll_controller *__restri
 }
 
 /* Prime the given epoll monitor by polling its handle and setting up
- * signal completion callbacks. The caller is required to be holding
+ * signal completion callbacks. The caller is required to be  holding
  * a lock to the associated epoll controller.
  * @param: test_before_connect: When `true', do an initial is-raised
- *                              test prior to the first connect. */
+ *                              test prior  to  the  first  connect. */
 PRIVATE void KCALL
 epoll_handle_monitor_prime(struct epoll_handle_monitor *__restrict self,
                            void *handptr, bool test_before_connect) {
@@ -325,7 +325,7 @@ was_asserted:
 		}
 	} EXCEPT {
 		sig_multicompletion_disconnectall(&self->ehm_comp);
-		/* Deal with the case where the handle was already raised.
+		/* Deal with the case where the handle was already  raised.
 		 * In this case, we must remove it from the queue of raised
 		 * monitors in order to ensure consistency. */
 		if (self->ehm_raised != 0) {
@@ -383,7 +383,7 @@ NOTHROW(FCALL epoll_controller_destroy)(struct epoll_controller *__restrict self
 #define CONFIG_EPOLL_CONTROLLER_INITIAL_MASK 7
 #endif /* !CONFIG_EPOLL_CONTROLLER_INITIAL_MASK */
 
-/* Create a new epoll controller and return a reference to it.
+/* Create  a new epoll  controller and return  a reference to it.
  * This function is used by the `epoll_create(2)' syscall family. */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct epoll_controller *KCALL
 epoll_controller_create(void) THROWS(E_BADALLOC) {
@@ -417,9 +417,9 @@ epoll_controller_create(void) THROWS(E_BADALLOC) {
 /* Check if `findme' is already being monitored by `self'.
  * @return: NULL:       Everything's OK. - No loop here.
  * @return: EPOLL_LOOP: Loop detected (or recursion too deep)
- * @return: * :         A reference to a controller who's lock
- *                      couldn't be acquired immediately. The
- *                      caller should release all of their locks
+ * @return: * :         A reference  to a  controller who's  lock
+ *                      couldn't  be  acquired  immediately.  The
+ *                      caller  should release all of their locks
  *                      and wait until this specific lock becomes
  *                      available. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) REF struct epoll_controller *FCALL
@@ -473,7 +473,7 @@ done:
 }
 
 
-/* Acquire a lock to `self' with the intend of adding `hand' as a monitor.
+/* Acquire  a lock to `self' with the intend of adding `hand' as a monitor.
  * This function asserts that when `hand' is another EPOLL controller, then
  * it must differ from `self' and not already be monitoring `self', either.
  *
@@ -498,7 +498,7 @@ again:
 epoll_loop:
 				mutex_release(&self->ec_lock);
 				/* TODO: Linux returns -EINVAL when `hand_epoll == self',
-				 *       and -ELOOP in all other cases. This right here
+				 *       and -ELOOP in all  other cases. This right  here
 				 *       causes -ELOOP for all cases! */
 				THROW(E_ILLEGAL_REFERENCE_LOOP);
 			}
@@ -516,13 +516,13 @@ epoll_loop:
 			decref_unlikely(error);
 			goto again;
 		}
-		/* At this point we know that `self' isn't already being monitored by
+		/* At  this point  we know that  `self' isn't already  being monitored by
 		 * the given `hand', and we also know that it won't start being monitored
-		 * until we release `self->ec_lock' once again, since a similar call
-		 * to `epoll_controller_addmonitor()' trying to add `self' to the set
-		 * of the monitors of `hand' would have to acquire the lock of `self',
-		 * which we're already holding at this point, thus ensuring that no
-		 * other thread can add `self' to any monitor listings before we're
+		 * until we  release `self->ec_lock'  once again,  since a  similar  call
+		 * to `epoll_controller_addmonitor()'  trying to  add `self'  to the  set
+		 * of the monitors of  `hand' would have to  acquire the lock of  `self',
+		 * which  we're  already holding  at this  point,  thus ensuring  that no
+		 * other  thread  can add  `self' to  any  monitor listings  before we're
 		 * done! */
 	}
 }
@@ -697,7 +697,7 @@ NOTHROW(FCALL epoll_controller_intern_pop)(struct epoll_controller *__restrict s
 }
 
 /* Lookup the monitor for a given handle/fd-key pair.
- * If no such monitor exists, return NULL instead. */
+ * If no such  monitor exists,  return NULL  instead. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct epoll_handle_monitor *
 NOTHROW(FCALL epoll_controller_intern_lookup)(struct epoll_controller *__restrict self,
                                               void *handptr, uint32_t fd_key) {
@@ -759,16 +759,16 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 		COMPILER_READ_BARRIER();
 
 		/* Make sure that these 2 events are always polled for.
-		 * By setting them here, this simplifies other code. */
+		 * By setting them  here, this  simplifies other  code. */
 		newmon->ehm_events |= EPOLLERR | EPOLLHUP;
 
-		/* Acquire a lock to `self' and assert that adding `hand' won't
+		/* Acquire  a lock to `self' and assert that adding `hand' won't
 		 * cause any reference loops (or rather: signal loops, where one
-		 * signal would try to broadcast itself from within a signal
+		 * signal  would try  to broadcast  itself from  within a signal
 		 * completion callback)
-		 * Note however that KOS's signal completion callback system
+		 * Note however that  KOS's signal  completion callback  system
 		 * should be strong enough to correctly deal with a signal that
-		 * is sending itself, so-long as the associated completion
+		 * is  sending  itself,  so-long as  the  associated completion
 		 * function didn't attempt to re-prime itself. */
 		epoll_controller_acquire_for_monitor_add(self, hand);
 		TRY {
@@ -845,7 +845,7 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 	memcpy(&new_events, info, sizeof(struct epoll_event));
 	COMPILER_READ_BARRIER();
 	/* Make sure that these 2 events are always polled for.
-	 * By setting them here, this simplifies other code. */
+	 * By setting them  here, this  simplifies other  code. */
 	new_events.events |= EPOLLERR | EPOLLHUP;
 
 	mutex_acquire(&self->ec_lock);
@@ -860,14 +860,14 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 		}
 		if (((monitor->ehm_events & EPOLL_WHATMASK) != (new_events.events & EPOLL_WHATMASK)) ||
 		    /* Special case: Re-arm a ONESHOT monitor after that monitor has been left
-		     *               dangling and disconnected. This behavior is required for
+		     *               dangling  and disconnected. This behavior is required for
 		     *               linux compatibility (but s.a. `KP_EPOLL_DELETE_ONESHOT') */
 			((monitor->ehm_events & EPOLLONESHOT) && !sig_multicompletion_wasconnected(&monitor->ehm_comp))) {
 			/* Change monitored events. */
 			sig_multicompletion_disconnectall(&monitor->ehm_comp);
 			COMPILER_BARRIER();
 			/* If the monitor has already been raised, then we
-			 * must remove it from the raised-monitor queue. */
+			 * must remove it  from the raised-monitor  queue. */
 			if (monitor->ehm_raised != 0)
 				epoll_controller_remove_from_raised_or_pending(self, monitor);
 			COMPILER_BARRIER();
@@ -881,7 +881,7 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 				epoll_handle_monitor_prime(monitor, hand->h_data, true);
 			} EXCEPT {
 				/* If priming failed, then we must manually mark the monitor as raised,
-				 * even though it isn't, just so we can once again achieve internal
+				 * even  though it  isn't, just so  we can once  again achieve internal
 				 * consistency, since only a monitor that's currently raised is allowed
 				 * not to be connected to any signals.
 				 *
@@ -929,7 +929,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 	/* Note that we've just inherited `monitor', so now we have to destroy it! */
 	sig_multicompletion_disconnectall(&monitor->ehm_comp);
 	/* With signal completion callbacks all diconnected (by `sig_multicompletion_disconnectall()'),
-	 * we must also ensure that `monitor' isn't apart of the raised monitor chain.
+	 * we  must  also   ensure  that   `monitor'  isn't  apart   of  the   raised  monitor   chain.
 	 * If it is, then we must remove it prior to releasing our lock from `ec_lock' */
 	if (monitor->ehm_raised != 0)
 		epoll_controller_remove_from_raised_or_pending(self, monitor);
@@ -976,18 +976,18 @@ NOTHROW(FCALL epoll_handle_monitor_dc_chain)(struct epoll_handle_monitor *chain)
 #endif /* __SIZEOF_POINTER__ == ... */
 #endif /* !NDEBUG */
 
-/* Try to consume pending events from `self'. Note that this
- * function can throw E_BADALLOC because in the event that a
- * monitor has to be re-primed, there is a chance that doing
- * so might require more signal connection descriptors to be
+/* Try  to consume  pending events  from `self'.  Note that this
+ * function  can throw  E_BADALLOC because  in the  event that a
+ * monitor has to  be re-primed,  there is a  chance that  doing
+ * so might  require more  signal connection  descriptors to  be
  * allocated, which in turn might cause that allocation to fail.
  * When this happens, all already-consumed events will be marked
- * as raised once again, and be back onto the queue of pending
- * events. The same thing also happens when writing to `events'
+ * as raised once again, and be  back onto the queue of  pending
+ * events. The same thing also happens when writing to  `events'
  * would result in a SEGFAULT.
  * @param: maxevents: The max number of events to consume (asserted to be >= 1)
  * @return: * : The actual number of consumed events.
- * @return: 0 : No monitors have been raised at this time. Once any
+ * @return: 0 : No monitors have  been raised at  this time. Once  any
  *              monitor becomes raised, `self->ec_avail' will be send. */
 PUBLIC NOCONNECT NONNULL((1)) size_t KCALL
 epoll_controller_trywait(struct epoll_controller *__restrict self,
@@ -999,7 +999,7 @@ epoll_controller_trywait(struct epoll_controller *__restrict self,
 
 	/* [0..1] Chain of monitors for which rising-edge events could be confirmed.
 	 * Ordered by least-recently-raised to most-recently-raised, and chained via
-	 * the `ehm_rnext' field. The actual raised events can be retrieved through
+	 * the  `ehm_rnext' field. The actual raised events can be retrieved through
 	 * use of `epoll_handle_monitor_getwtest()' */
 	struct epoll_handle_monitor *result_events;
 
@@ -1008,7 +1008,7 @@ epoll_controller_trywait(struct epoll_controller *__restrict self,
 	if (!epoll_controller_canwait(self))
 		goto done;
 	/* Acquire a lock to the controller, but make sure not to clobber
-	 * the calling thread's current set of active connections. */
+	 * the  calling  thread's  current  set  of  active  connections. */
 	mutex_acquire(&self->ec_lock);
 	result_events = self->ec_pending;
 #ifdef EC_PENDING_INUSE
@@ -1030,13 +1030,13 @@ scan_monitors:
 					/* First of all: Ensure that `monitor' isn't connected. */
 					sig_multicompletion_disconnectall(&monitor->ehm_comp);
 
-					/* Now acquire a reference to the monitor's handle.
+					/* Now   acquire  a  reference   to  the  monitor's  handle.
 					 * If this fails, silently destroy the monitor and move one. */
 					monitor_handptr = epoll_handle_monitor_weaklckref(monitor);
 
 					if unlikely(!monitor_handptr) {
 						/* Object was destroyed (this is why we're using weak references)
-						 * In this case, just get rid of the monitor and carry on like
+						 * In this case, just  get rid of the  monitor and carry on  like
 						 * nothing ever happened. */
 						epoll_controller_intern_delmon(self, monitor);
 						epoll_handle_monitor_destroy(monitor);
@@ -1047,7 +1047,7 @@ scan_monitors:
 						/* Now figure out what (if anything) about `monitor' is pending. */
 						what = epoll_handle_monitor_polltest(monitor, monitor_handptr);
 						if (!what) {
-							/* Monitor isn't actually raised (spurious
+							/* Monitor isn't  actually  raised  (spurious
 							 * signal, or edge has already fallen again).
 							 * -> Handle this case by prime `monitor' once again. */
 							DBG_memset(&monitor->ehm_rnext, 0xcc, sizeof(monitor->ehm_rnext));
@@ -1070,15 +1070,15 @@ scan_monitors:
 									more_raised_last->ehm_rnext = next;
 									if (more_raised_last != monitor)
 										goto scan_monitors; /* Scan the chains in order. */
-									/* We've got lucky, and `monitor' was the last to have
+									/* We've  got lucky,  and `monitor'  was the  last to have
 									 * been raised in the mean time. In this case, our current
-									 * state is identical to what we need to handle `monitor'
+									 * state is identical to what we need to handle  `monitor'
 									 * immediately, without having to re-calculate `what' */
 								}
 								goto got_monitor_what;
 							}
 							/* Now that the monitor has been re-connected,
-							 * it's time to leave it running once again */
+							 * it's time to  leave it  running once  again */
 							epoll_handle_monitor_handle_decref(monitor, monitor_handptr);
 							goto next_monitor;
 						}
@@ -1105,7 +1105,7 @@ next_monitor:
 			}
 		} /* Scope */
 		/* With the set of raised monitors confirmed as `result_events', write
-		 * back the results about their events to the user-supplied `events'. */
+		 * back the results about their events to the user-supplied  `events'. */
 		if (result_events != NULL) {
 			/* [0..1] The first monitor that is pending, but
 			 *        hasn't been written to user-space, yet. */
@@ -1123,13 +1123,13 @@ next_monitor:
 				if (!next_monitor || result >= maxevents)
 					break;
 			} /* for (;;) */
-			/* Now that all requested monitors have been written back to user-space,
+			/* Now  that all requested  monitors have been  written back to user-space,
 			 * it's time to cleanup/reprime all of the monitors between `result_events'
 			 * and `next_monitor' */
 			assert(result_events != next_monitor);
 			{
 				/* A chain of monitors that must be re-appended at
-				 * the end of the chain of raised monitors. */
+				 * the  end  of  the  chain  of  raised  monitors. */
 				struct epoll_handle_monitor *reraise_monitors = NULL;
 				TRY {
 					do {
@@ -1138,20 +1138,20 @@ next_monitor:
 						/* Do one of the following:
 						 * >> if (EPOLLONESHOT) {
 						 *     - Do nothing. The monitor should still remain, but should
-						 *       not actually be active. Linux docs state that the user
+						 *       not actually be active. Linux docs state that the  user
 						 *       must use EPOLL_CTL_MOD to re-arm the monitor.
 						 * >> } else if (EPOLLET) {
 						 *   - Blindly re-connect `result_events' to its associated handle in
-						 *     order to wait for the next rising-edge event, even though the
+						 *     order  to wait for the next rising-edge event, even though the
 						 *     handle itself (should) still be raised right now.
 						 * >> } else {
 						 *   - Append `result_events' at the end of the `ec_raised' queue, such
 						 *     that it gets re-checked for raised channels during the next call
 						 *     to `epoll_controller_trywait()'
-						 *   - The `ec_raised' should still be relatively small/entirely empty,
-						 *     since we've just cleared it further above (of course: unrelated
+						 *   - The  `ec_raised' should still  be relatively small/entirely empty,
+						 *     since we've just  cleared it further  above (of course:  unrelated
 						 *     monitors may have been raised in the mean time, but this re-insert
-						 *     should still be a relatively fast operation, especially if we
+						 *     should still  be a  relatively fast  operation, especially  if  we
 						 *     combine the set of )
 						 * >> } */
 						assert(!sig_multicompletion_wasconnected(&result_events->ehm_comp));
@@ -1167,8 +1167,8 @@ do_destroy_result_event:
 							}
 						} else if (result_events->ehm_events & EPOLLET) {
 							/* For this to work, we have to re-acquire a (strong) reference
-							 * to the associated handle. Note however that this can still
-							 * fail at this point, but we can easily handle that case by
+							 * to the associated handle. Note  however that this can  still
+							 * fail  at this point,  but we can easily  handle that case by
 							 * jumping to the `EPOLLONESHOT' handler. */
 							REF void *monitor_handptr;
 							monitor_handptr = epoll_handle_monitor_weaklckref(result_events);
@@ -1183,11 +1183,11 @@ do_destroy_result_event:
 							}
 							epoll_handle_monitor_handle_decref(result_events, monitor_handptr);
 						} else {
-							/* Re-raise this monitor, so it gets checked for pending channels
+							/* Re-raise this monitor, so it gets checked for pending  channels
 							 * once again the next time around (this is done for monitors that
 							 * continuously produce events for as long as they remain raised),
 							 * which is the default unless `EPOLLONESHOT' or `EPOLLET' is set. */
-							/* NOTE: This insert once again reverses the monitor order from
+							/* NOTE: This insert once again reverses the monitor order  from
 							 *       least-recently-raised to most-recently-raised, which is
 							 *       intended, as the raised-chain is sorted in that manner! */
 							result_events->ehm_rnext = reraise_monitors;
@@ -1209,7 +1209,7 @@ do_destroy_result_event:
 		}     /* if (result_events != NULL) */
 	} EXCEPT {
 		/* Re-insert all result-events into the raised-list on error.
-		 * That way, they can be received once again by the next one
+		 * That way, they can be received once again by the next  one
 		 * to call `epoll_controller_trywait()' */
 #ifdef EC_PENDING_INUSE
 		assert(self->ec_pending == EC_PENDING_INUSE);
@@ -1236,12 +1236,12 @@ done:
 	return result;
 }
 
-/* Same as `epoll_controller_trywait()', but blocking wait until
- * at least 1 event could be consumed. If `abs_timeout' is finite,
- * and expires while waiting for the first event to appear, then
+/* Same  as  `epoll_controller_trywait()',   but  blocking  wait   until
+ * at  least  1 event  could be  consumed.  If `abs_timeout'  is finite,
+ * and expires  while  waiting  for  the first  event  to  appear,  then
  * this function will return `0' (note that if `abs_timeout' was already
- * expired from the get-go, this function will still try to consume
- * already-pending events, thus behaving identical to a call to
+ * expired from  the get-go,  this function  will still  try to  consume
+ * already-pending  events,  thus  behaving  identical  to  a  call   to
  * `epoll_controller_trywait()') */
 PUBLIC NONNULL((1)) size_t KCALL
 epoll_controller_wait(struct epoll_controller *__restrict self,

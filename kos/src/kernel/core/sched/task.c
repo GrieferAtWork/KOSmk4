@@ -237,8 +237,8 @@ NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
 }
 
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-/* Prepare 2 consecutive (and 2-page aligned) pages of virtual
- * memory for the purpose of doing the initial prepare required
+/* Prepare 2 consecutive  (and 2-page aligned)  pages of  virtual
+ * memory for the purpose of  doing the initial prepare  required
  * for `THIS_TRAMPOLINE_PAGE' of `_boottask' and also `_bootidle' */
 INTDEF NOBLOCK FREE void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
@@ -582,7 +582,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 
 #ifdef CONFIG_USE_NEW_VM
 	/* TODO: Use 2-step cleanup and free the task structure _after_ releasing
-	 *       the lock to the kernel mman (through use of a mpostlockop) */
+	 *       the  lock  to the  kernel mman  (through  use of  a mpostlockop) */
 	{
 		REF struct mman *mm;
 		mm = self->t_mman;
@@ -606,7 +606,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 				vm_tasklock_endwrite(myvm);
 				goto do_free_self;
 			}
-			/* Truncate the task structure so that it will only still
+			/* Truncate the task structure so  that it will only  still
 			 * contain the per-vm task chain, as well as the next link. */
 			self->t_heapsz = heap_truncate(&kernel_locked_heap,
 			                               self,
@@ -616,7 +616,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 			                                   COMPILER_OFFSETAFTER(struct task, t_heapsz)),
 			                               GFP_NORMAL);
 			/* Schedule our task for pending removal within its associated VM.
-			 * The next time someone acquires a lock to the VM's task-chain,
+			 * The next time someone acquires  a lock to the VM's  task-chain,
 			 * we will be removed automatically, and finally freed. */
 			do {
 				next = ATOMIC_READ(myvm->v_deltasks);

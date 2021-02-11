@@ -61,7 +61,7 @@ struct partnode_pair_vector {
 	struct partnode_pair  pv_buf[2]; /* A small, statically allocated buffer of pairs. */
 };
 
-/* Try to acquire write-locks to all of th parts contained within `self'
+/* Try  to acquire  write-locks to all  of th parts  contained within `self'
  * If this fails for one of these parts, unlock all parts previously locked,
  * and return a pointer to the blocking part. */
 PRIVATE NOBLOCK struct vm_datapart *
@@ -151,7 +151,7 @@ partnode_pair_vector_insertpart(struct partnode_pair_vector *__restrict self, si
 }
 
 /* Finalize the given pair vector under the assumption
- * that the caller has inherited all nodes, data part
+ * that the caller has inherited all nodes, data  part
  * references, and data part locks. */
 PRIVATE NOBLOCK void
 NOTHROW(KCALL partnode_pair_vector_fini_caller_inherited_parts)(struct partnode_pair_vector *__restrict self) {
@@ -160,7 +160,7 @@ NOTHROW(KCALL partnode_pair_vector_fini_caller_inherited_parts)(struct partnode_
 		kfree(self->pv_vec);
 }
 
-/* Finalize the given pair vector, as well as release write-locks
+/* Finalize the given pair vector, as well as release  write-locks
  * from all data parts, drop all held references from each of them
  * before freeing all allocated vm nodes. */
 PRIVATE NOBLOCK void
@@ -184,17 +184,17 @@ NOTHROW(KCALL partnode_pair_vector_fini_and_unlock_parts)(struct partnode_pair_v
 		kfree(self->pv_vec);
 }
 
-/* Collect and lock all parts required to span the given range of memory
- * within the specified data block, before acquiring a write-lock to all
- * of those parts and re-check that they still span the entirety of the
- * given memory range within `data'. Afterwards, acquire a write-lock to
+/* Collect and lock all  parts required to span  the given range of  memory
+ * within  the specified data  block, before acquiring  a write-lock to all
+ * of those parts  and re-check that  they still span  the entirety of  the
+ * given memory range  within `data'. Afterwards,  acquire a write-lock  to
  * the given `effective_vm', before returning to the caller with locks held
- * to all of the indicated data parts, as well as the given VM, allowing
+ * to all of the indicated  data parts, as well  as the given VM,  allowing
  * them to then use those parts in order to create a mapping of them within
  * the given VM.
  * NOTE: For every part that is acquired, this function also allocates 1
  *      `struct vm_node' object which must also be inherited by the caller,
- *       essentially off-loading all of the hard preparation work required
+ *       essentially off-loading  all of  the hard  preparation work  required
  *       to map some region of a datablock into memory, as well as thread-safe
  *       acquisition of all of the required locks. */
 PRIVATE void KCALL
@@ -214,7 +214,7 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 		TRY {
 			/* Create the associated part.
 			 * NOTE: Because we're the ones creating it, we don't have to look
-			 *       out for splitting parts, or anything in that manner. */
+			 *       out for  splitting parts,  or  anything in  that  manner. */
 			info->pv_buf[0].pn_part = vm_paged_datablock_createpart(data,
 			                                                        data_start_vpage,
 			                                                        num_pages);
@@ -264,8 +264,8 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 			total_pages += vm_datapart_numvpages_atomic(part);
 		}
 		assert(total_pages == num_pages);
-		/* We've now (presumably) gathered all of the necessary pages
-		 * Now it's time to lock all of them and check to make sure that
+		/* We've now  (presumably) gathered  all  of the  necessary  pages
+		 * Now it's time to lock all of  them and check to make sure  that
 		 * no gaps have formed prior to us acquiring locks to all of them. */
 again_lock_all_parts:
 		for (;;) {
@@ -276,7 +276,7 @@ again_lock_all_parts:
 			sync_endwrite(part);
 		}
 		/* With all of the necessary locks no held, check if they still form
-		 * a continuous range of parts that span the entirety of requested
+		 * a continuous range of parts  that span the entirety of  requested
 		 * address range. */
 		{
 			size_t i;
@@ -305,7 +305,7 @@ again_lock_all_parts:
 			}
 			if (!(prot & VM_PROT_SHARED)) {
 				/* When the caller is mapping with write-permissions, must
-				 * delete write permissions for other mappings:
+				 * delete   write   permissions   for   other    mappings:
 				 * >> if (prot & VM_PROT_SHARED) {
 				 * >>  LLIST_INSERT(part->dp_srefs,node,vn_link);
 				 * >> } else {
@@ -333,10 +333,10 @@ again_lock_all_parts:
 					vecpart = info->pv_vec[i].pn_part;
 					if (vecpart->dp_crefs == NULL) {
 						struct vm_node *iter;
-						/* The addition of the first copy-on-write mapping requires
-						 * that all existing SHARED memory mappings be updated to
-						 * not include write permissions in their page directories.
-						 * That way, a #PF will be triggered which will then unshare
+						/* The  addition of the  first copy-on-write mapping requires
+						 * that all  existing SHARED  memory mappings  be updated  to
+						 * not  include write permissions  in their page directories.
+						 * That  way, a #PF will be triggered which will then unshare
 						 * our own data part, preventing writes to the shared mapping
 						 * from leaking into private mappings. */
 						for (iter = vecpart->dp_srefs; iter;
@@ -349,7 +349,7 @@ again_lock_all_parts:
 						}
 					} else if (vecpart->dp_crefs->vn_link.ln_next == NULL &&
 					           /* If this is the second copy-on-write mapping of an anonymous data part,
-					            * then the first one may have had write permissions which must now be
+					            * then the first one  may have had write  permissions which must now  be
 					            * unshared (this is the case for general purpose RAM during fork()) */
 					           ATOMIC_READ(vecpart->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS) {
 						error = vm_node_update_write_access(vecpart->dp_crefs);
@@ -375,8 +375,8 @@ handle_remove_write_error:
 				}
 			}
 		}
-		/* And we're done! - We've got a lock to a continuous range of data parts,
-		 * so now all that's still missing is getting a lock on the given `effective_vm'
+		/* And we're  done! -  We've got  a lock  to a  continuous range  of data  parts,
+		 * so  now all that's still missing is getting a lock on the given `effective_vm'
 		 * If this fails, we simply have to do some more lock juggling, before re-locking
 		 * all of the associated data parts and re-checking for gaps. */
 		if (!sync_trywrite(effective_vm)) {
@@ -432,7 +432,7 @@ vm_mapat(struct vm *__restrict self,
 	                                 (pageid64_t)(data_start_offset / PAGESIZE),
 	                                 num_pages,
 	                                 prot);
-	/* The rest of this function is already NOEXCEPT at this point.
+	/* The rest of this function  is already NOEXCEPT at this  point.
 	 * However, we still need to check that the indicated range isn't
 	 * already being used by some other mapping! */
 	if unlikely(vm_nodetree_rlocate(self->v_tree,
@@ -615,7 +615,7 @@ again:
 		assert(!part->dp_futex || ADDR_ISKERN(part->dp_futex));
 	}
 #endif /* !NDEBUG */
-	/* The rest of this function is already NOEXCEPT at this point.
+	/* The rest of this function  is already NOEXCEPT at this  point.
 	 * However, we still need to check that the indicated range isn't
 	 * already being used by some other mapping! */
 	result = vm_getfree(self, hint, num_bytes, min_alignment, getfree_mode);
@@ -801,9 +801,9 @@ again_lock_vm:
 
 struct vm_map_subrange_descriptors {
 	REF struct vm_datapart     *sd_zeropart;  /* [1..1] The data part bound to `sd_zeronode'
-	                                           * NOTE: No lock is held on this datapart! */
+	                                           * NOTE: No  lock  is held  on  this datapart! */
 	struct vm_node             *sd_zeronode;  /* [1..1][owned] The VM node used to map trailing ZERO-memory. */
-	struct partnode_pair_vector sd_dataparts; /* Data parts and nodes for mapping the data-portion.
+	struct partnode_pair_vector sd_dataparts; /* Data  parts  and   nodes  for   mapping  the   data-portion.
 	                                           * NOTE: Write-locks are held on all data parts in this vector. */
 };
 
@@ -828,8 +828,8 @@ NOTHROW(KCALL vm_map_subrange_descriptors_fini_caller_inherited_parts)(struct vm
 	partnode_pair_vector_fini_caller_inherited_parts(&self->sd_dataparts);
 }
 
-/* Initialize all vm nodes/parts required for mapping a two-fold data+oob=zero memory
- * mapping, with the data-portion starting at `data_minmappage' in `data', and spanning
+/* Initialize  all  vm  nodes/parts required  for  mapping a  two-fold  data+oob=zero memory
+ * mapping, with  the data-portion  starting at  `data_minmappage' in  `data', and  spanning
  * a total of `num_datavpages' pages, followed by a mapping of `vm_datablock_anonymous_zero'
  * that spans a total of `num_zerovpages' pages.
  * NOTE: This function also acquires a write-lock to `effective_vm'! */
@@ -876,8 +876,8 @@ vm_map_subrange_descriptors_init_and_lock_parts_and_vm(struct vm_map_subrange_de
 }
 
 /* Insert all data mappings, as well as the zero-mapping into the given `effective_vm'.
- * During this operation, write-locks held on each data-part, and have `effective_vm'
- * inherit all data parts, and nodes such that `self' must be finalized by a call to
+ * During this operation, write-locks held  on each data-part, and have  `effective_vm'
+ * inherit all data parts, and  nodes such that `self' must  be finalized by a call  to
  * `vm_map_subrange_descriptors_fini_caller_inherited_parts()' */
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange_descriptors *__restrict self,
@@ -986,7 +986,7 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 
 
 /* Same as `vm_paged_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
- * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
+ * to be  mapped  from `data'.  -  Any attempted  to  map  data from  outside  that range  will  instead  cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
  * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
@@ -1014,7 +1014,7 @@ vm_paged_map_subrange(struct vm *__restrict effective_vm,
 	if (OVERFLOW_UADD(data_subrange_minvpage, data_start_vpage, &data_minmappage) ||
 		data_minmappage > data_subrange_maxvpage) {
 		/* The entire range is out-of-bounds.
-		 * Map everything as ANON+ZERO */
+		 * Map   everything   as    ANON+ZERO */
 		result = vm_paged_map(effective_vm,
 		                      hint,
 		                      num_pages,
@@ -1041,8 +1041,8 @@ vm_paged_map_subrange(struct vm *__restrict effective_vm,
 		if (num_datavpages > num_pages)
 			num_datavpages = num_pages; /* This can happen due to the presence of a guard. */
 		/* Must map as 2 parts:
-		 * A total of `num_datavpages' from data+data_minmappage, followed by
-		 * a total of `num_zerovpages' from `&vm_datablock_anonymous_zero'.
+		 * A  total  of  `num_datavpages' from  data+data_minmappage,  followed by
+		 * a  total  of   `num_zerovpages'  from   `&vm_datablock_anonymous_zero'.
 		 * To prevent race conditions, we must map both of these at the same time! */
 again_create_sr:
 		vm_map_subrange_descriptors_init_and_lock_parts_and_vm(&sr,
@@ -1107,7 +1107,7 @@ done:
 
 
 /* Same as `vm_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
- * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
+ * to  be mapped  from `data'.  - Any  attempted to  map data  from outside  that range  will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
  * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
@@ -1136,7 +1136,7 @@ vm_paged_mapat_subrange(struct vm *__restrict self,
 	if (OVERFLOW_UADD(data_subrange_minvpage, data_start_vpage, &data_minmappage) ||
 		data_minmappage > data_subrange_maxvpage) {
 		/* The entire range is out-of-bounds.
-		 * Map everything as ANON+ZERO */
+		 * Map   everything   as    ANON+ZERO */
 		return vm_paged_mapat(self,
 		                      page_index,
 		                      num_pages,
@@ -1159,8 +1159,8 @@ vm_paged_mapat_subrange(struct vm *__restrict self,
 		if (num_datavpages > num_pages)
 			num_datavpages = num_pages; /* This can happen due to the presence of a guard. */
 		/* Must map as 2 parts:
-		 * A total of `num_datavpages' from data+data_minmappage, followed by
-		 * a total of `num_zerovpages' from `&vm_datablock_anonymous_zero'.
+		 * A  total  of  `num_datavpages' from  data+data_minmappage,  followed by
+		 * a  total  of   `num_zerovpages'  from   `&vm_datablock_anonymous_zero'.
 		 * To prevent race conditions, we must map both of these at the same time! */
 		vm_map_subrange_descriptors_init_and_lock_parts_and_vm(&sr,
 		                                                       self,

@@ -67,7 +67,7 @@ struct gdb_thread_stop_event {
 
 /* [0..1][lock(PRIVATE(<GDB_HOST_THREAD>))]
  * Chain of stopped threads (always includes the GDB host thread)
- * May be `NULL' if called from the GDB fallback host thread, in
+ * May be `NULL' if called from the GDB fallback host thread,  in
  * response to the GDB remote sending a command.
  * All threads in this chain are `GDB_THREAD_MAYRESUME_NASYNC' */
 INTDEF GDBThreadStopEvent *GDBThread_Stopped;
@@ -84,10 +84,10 @@ INTDEF struct sig GDBThread_AsyncNotifStopEventsAdded;
  * The thread that is hosting the GDB server (== THIS_TASK). */
 INTDEF struct task *GDBServer_Host;
 
-/* Signal broadcast when `GDBServer_Host' becomes unlocked
- * (aka. `NULL') as the result of `GDB_Main()' returning
- * Used by `GDBServer_FallbackHost' to wait for the active
- * host to go away in order to not constantly be connected
+/* Signal broadcast when `GDBServer_Host' becomes  unlocked
+ * (aka. `NULL') as  the result  of `GDB_Main()'  returning
+ * Used  by `GDBServer_FallbackHost' to wait for the active
+ * host  to go away in order to not constantly be connected
  * to `GDBServer_FallbackHostOnByte', which would slow down
  * remote data processing when each byte would re-awake the
  * fallback host thread. */
@@ -95,19 +95,19 @@ INTDEF struct sig GDBServer_HostUnlocked;
 
 /* [1..1][const]
  * The fallback host thread used to drive the GDB server in the event
- * of the GDB remote being the one to instigate an exchange (such as
+ * of the GDB remote being the one to instigate an exchange (such  as
  * sending a \3-byte to stop system-wide execution) */
 INTDEF REF struct task *GDBServer_FallbackHost;
 
 /* Main function for the GDB fallback host thread */
 INTDEF void NOTHROW(KCALL GDBFallbackHost_Main)(void);
 
-/* `true' if `GDB_Main()' was called in non-stop mode (`false' otherwise)
- * When in non-stop mode, `GDBThread_IsStopped()' only returned true for threads that
+/* `true'   if  `GDB_Main()'   was  called   in  non-stop   mode  (`false'  otherwise)
+ * When  in non-stop mode, `GDBThread_IsStopped()' only returned true for threads that
  * have previously been suspended, and `GDBThread_Stop()' and `GDBThread_Resume()' are
  * no longer no-ops.
  * You may call `GDBThread_StopAllCpus()' to set `GDBThread_IsNonStopModeActive = false'
- * and continue in all-stop mode until the next vCont- (or similar) command. */
+ * and  continue  in  all-stop  mode  until  the  next  vCont-  (or  similar)   command. */
 INTDEF bool GDBThread_IsNonStopModeActive;
 #define GDBThread_IsAllStopModeActive   (!GDBThread_IsNonStopModeActive)
 
@@ -118,7 +118,7 @@ INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsStopped)(struct task const *__restrict thread);
 
 /* Same as `GDBThread_IsStopped()', but the thread doesn't count as truely
- * stopped, unless it was stopped explicitly (rather than implicitly, as
+ * stopped, unless it was stopped  explicitly (rather than implicitly,  as
  * would be the case when `GDBThread_IsAllStopModeActive == true') */
 INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task const *__restrict thread);
@@ -133,7 +133,7 @@ NOTHROW(FCALL GDBThread_IsKernelThread)(struct task const *__restrict thread);
 
 /* Stop/Resume execution of the given thread
  * Note that when `GDBThread_IsNonStopModeActive' is false, `GDBThread_Resume()' becomes
- * a no-op, and the thread will not be resumed until the current GDB session ends.
+ * a no-op, and  the thread  will not  be resumed until  the current  GDB session  ends.
  * @param: generateAsyncStopEvents: When true, the thread is stopped with an async notification of SIG=0
  * @return: true:  Successfully stopped the given thread, or the given thread was already stopped.
  * @return: false: The given thread has already terminated and can no longer be stopped. */
@@ -144,23 +144,23 @@ INTDEF NONNULL((1)) void NOTHROW(FCALL GDBThread_Resume)(struct task *__restrict
 INTDEF NONNULL((1)) void NOTHROW(FCALL GDBThread_StopProcess)(struct task *__restrict thread, bool generateAsyncStopEvents DFL(false));
 INTDEF NONNULL((1)) void NOTHROW(FCALL GDBThread_ResumeProcess)(struct task *__restrict thread);
 
-/* When already in all-stop mode (after `GDBThread_StopAllCpus()' was called),
- * create a missing async stop notification for `thread', meaning that `thread'
+/* When already  in all-stop  mode (after  `GDBThread_StopAllCpus()' was  called),
+ * create  a missing async  stop notification for  `thread', meaning that `thread'
  * will continue to remain suspended, even after `GDBThread_ResumeEverything()' is
  * called. */
 INTDEF NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restrict thread);
 
 
-/* Find and return the stop event for `thread'
+/* Find   and  return  the  stop  event  for  `thread'
  * If the thread hasn't been stopped, or has a pending
- * async stop notification, return NULL instead. */
+ * async  stop  notification,  return  NULL   instead. */
 INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) GDBThreadStopEvent *
 NOTHROW(FCALL GDBThread_FindStopEvent)(struct task const *__restrict thread);
 
-/* Same as `GDBThread_FindStopEvent()', but unlink the event
+/* Same  as  `GDBThread_FindStopEvent()', but  unlink  the event
  * from the chain of stopped threads. (The caller is responsible
- * for re-adding the thread back to said chain at a later point
+ * for re-adding the thread back to said chain at a later  point
  * in time)
  * This can be used to exclude specific threads from calls to
  * `GDBThread_ResumeEverything()', which is something that is
@@ -168,8 +168,8 @@ NOTHROW(FCALL GDBThread_FindStopEvent)(struct task const *__restrict thread);
 INTDEF WUNUSED NONNULL((1)) GDBThreadStopEvent *
 NOTHROW(FCALL GDBThread_PopStopEvent)(struct task *__restrict thread);
 
-/* Same as `GDBThread_PopStopEvent()', but return a chain of
- * stop events (with the last one being stored in `*plastevent') for
+/* Same   as  `GDBThread_PopStopEvent()',  but   return  a  chain  of
+ * stop  events (with the last one being stored in `*plastevent') for
  * all stopped threads that are apart of the same process as `thread' */
 INTDEF WUNUSED NONNULL((1, 2)) GDBThreadStopEvent *
 NOTHROW(FCALL GDBThread_PopStopEventProcess)(struct task *__restrict thread,
@@ -178,11 +178,11 @@ NOTHROW(FCALL GDBThread_PopStopEventProcess)(struct task *__restrict thread,
 /* Enter all-stop mode (no-op if already in all-stop mode) */
 INTDEF void NOTHROW(FCALL GDBThread_StopAllCpus)(void);
 
-/* Enter non-stop mode (no-op if already in non-stop mode)
+/* Enter  non-stop  mode  (no-op  if  already  in  non-stop  mode)
  * This is done by resuming all stop events with `tse_isacpu != 0' */
 INTDEF void NOTHROW(FCALL GDBThread_ResumeAllCpus)(void);
 
-/* Stop execution in all threads by sending async RPCs to every
+/* Stop  execution in all threads by sending async RPCs to every
  * running thread on the system, and having them report back via
  * the `GDBThread_AsyncNotifStopEvents' chain.
  * Essentially, this function does:
@@ -211,8 +211,8 @@ NOTHROW(FCALL GDBThread_ConsumeAsyncNotifEvent)(void);
 INTDEF ATTR_NORETURN void NOTHROW(FCALL GDBThread_KillKernel)(void);
 
 /* Set a hint to the GDB backend to ignore single-step events
- * for instruction pointers `>= start_pc && < end_pc'.
- * Only a single such hint can exist at any point in time. */
+ * for   instruction   pointers    `>= start_pc && < end_pc'.
+ * Only  a single such  hint can exist at  any point in time. */
 INTDEF void
 NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task const *thread,
                                              VIRT void const *start_pc,
@@ -227,7 +227,7 @@ INTERN void FCALL GDBInterrupt_Fini(void);
 /* Get/Set a register for the current thread.
  * @param: regno: One of `GDB_REGISTER_<ARCH>_*'
  * @return: * : The required buffer size.
- *              NOTE: In the case of `GDB_SetRegister()', `bufsize' has to match
+ *              NOTE: In the case of  `GDB_SetRegister()', `bufsize' has to  match
  *                    this value exactly (it's not allowed to be larger), else the
  *                    set operation will not have written the register value.
  * @return: 0 : Invalid `regno', or `thread' has terminated. */
@@ -295,7 +295,7 @@ INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effe
 INTDEF void NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void);
 
 /* Delete all internal knowledge of breakpoints concerning `effective_vm'.
- * Note that this function may be called from threads other than the GDB
+ * Note  that this function may be called  from threads other than the GDB
  * host thread, as it is invoked as part of `vm_onfini_callbacks()'! */
 INTDEF void NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm);
 
@@ -328,28 +328,28 @@ NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
                               void const *needle, size_t needle_length,
                               VIRT void const **__restrict presult);
 
-/* Calculate the CRC32 checksum for the given region of memory.
+/* Calculate  the CRC32  checksum for  the given  region of memory.
  * If access to anything with the given range fail, return `false'.
- * Otherwise, return `true' and store the CRC value in `*presult' */
+ * Otherwise, return `true' and store  the CRC value in  `*presult' */
 INTDEF NONNULL((1, 4)) bool
 NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
                                   VIRT void const *addr, size_t length,
                                   u32 *__restrict presult);
 
-/* Include (insert) or exclude (remove) SwBreak instruction overrides
- * defined within the range `addr...+=bufsize' with the given `buf'
- * This is used to hide/expose software breakpoint bytes from GDB, since
+/* Include  (insert)  or exclude  (remove) SwBreak  instruction overrides
+ * defined within  the  range  `addr...+=bufsize' with  the  given  `buf'
+ * This  is used to hide/expose software breakpoint bytes from GDB, since
  * I have seen cases where GDB will first set a breakpoint, then read the
- * memory location, reading back `0xcc', then remove the breakpoint, and
+ * memory location, reading back `0xcc', then remove the breakpoint,  and
  * finally trick itself into thinking that the target memory location was
- * actually an 0xcc byte all along (causing it to adjust PC=ADDR+1 when
- * resuming from the memory location, thus breaking execution by placing
- * the instruction pointer in the middle of the overwritten instruction)
- * NOTE: When calling `GDB_IncludeSwBreak()', saved restore memory for
+ * actually an 0xcc byte all along  (causing it to adjust PC=ADDR+1  when
+ * resuming from the memory location, thus breaking execution by  placing
+ * the instruction pointer in the middle of the overwritten  instruction)
+ * NOTE: When  calling  `GDB_IncludeSwBreak()', saved  restore  memory for
  *       software breakpoints is overwritten with memory taken from `buf',
- *       meaning that when using these functions along side read/write,
+ *       meaning that when  using these functions  along side  read/write,
  *       writing overtop of a software breakpoint will actually write into
- *       the restore buffer and only into main memory once the breakpoint
+ *       the  restore buffer and only into main memory once the breakpoint
  *       is removed. */
 INTDEF NONNULL((1, 3)) void
 NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
@@ -408,7 +408,7 @@ GDBServer_TrapFCpuState(struct fcpustate *__restrict state,
 
 /* Remote communications back-end API */
 
-/* Signal that gets broadcast with whenever the
+/* Signal  that  gets  broadcast  with  whenever  the
  * connection back-end data buffer becomes non-empty. */
 INTDEF struct sig GDBServer_RemoteDataAvailable;
 
@@ -416,7 +416,7 @@ INTDEF struct sig GDBServer_RemoteDataAvailable;
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL GDBRemote_HasPendingBytes)(void);
 
 /* Post a given byte `b' to the remote data input queue.
- * NOTE: May only be called while preemption is disabled, and
+ * NOTE: May only be called  while preemption is disabled,  and
  *       only from the designated CPU for interrupts concerning
  *       incoming remote data! */
 INTDEF NOBLOCK void NOTHROW(FCALL GDBRemote_PostByte)(byte_t b);

@@ -40,7 +40,7 @@ NOTHROW(KCALL vm_futextree_prlocate_at_at_not_destroyed)(struct vm_futex **__res
 	struct vm_futex *root;
 	uintptr_t addr_semi = *paddr_semi;
 	unsigned int addr_level = *paddr_level;
-	/* addr_semi is the center point splitting the max
+	/* addr_semi  is the center point splitting the max
 	 * ranges of the underlying sb_min/sb_max branches. */
 	while ((root = *proot) != NULL) {
 		/* Check if the given key lies within this branch. */
@@ -104,7 +104,7 @@ NOTHROW(KCALL vm_futextree_rremove_at_not_destroyed)(struct vm_futex **__restric
 	       : NULL;
 }
 
-/* Try to increment the reference counters of all futex objects and
+/* Try to increment  the reference  counters of all  futex objects  and
  * keep track of those with the lowest and greatest addresses, updating
  * the given `p(min|max)addr' pointers as needed.
  * @return: true:  No destroyed futex objects exist.
@@ -158,7 +158,7 @@ again:
 
 
 /* Subtract `bytes_to_subtract' from all futex objects,
- * then insert them into the given `*pnew_tree' */
+ * then  insert  them   into  the  given   `*pnew_tree' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_futextree_subtract_addr_and_reform_tree)(struct vm_futex *__restrict tree,
                                                           struct vm_futex **__restrict pnew_tree,
@@ -196,7 +196,7 @@ again:
 
 
 /* Decrement the reference counter of each futex object
- * that hasn't been destroyed within the tree. */
+ * that  hasn't   been  destroyed   within  the   tree. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_futextree_decref_all_if_not_destroyed)(struct vm_futex *__restrict tree
 #ifndef NDEBUG
@@ -206,7 +206,7 @@ NOTHROW(KCALL vm_futextree_decref_all_if_not_destroyed)(struct vm_futex *__restr
                                                         ) {
 	/* Note that even when a futex object gets destroyed due to this, we can
 	 * assume that the tree pointers will not affected because the caller is
-	 * still holding a lock to the associated `expected_part', meaning that
+	 * still holding a lock to the associated `expected_part', meaning  that
 	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
 again:
 #ifndef NDEBUG
@@ -242,7 +242,7 @@ NOTHROW(KCALL vm_futextree_set_part_pointer_and_decref_all)(struct vm_futex *__r
                                                             ) {
 	/* Note that even when a futex object gets destroyed due to this, we can
 	 * assume that the tree pointers will not affected because the caller is
-	 * still holding a lock to the associated `expected_part', meaning that
+	 * still holding a lock to the associated `expected_part', meaning  that
 	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
 again:
 #ifndef NDEBUG
@@ -275,17 +275,17 @@ again:
 
 
 #ifdef SPLIT_NX
-/* Same as `vm_datapart_split()', but don't block or throw an exception if something
+/* Same as `vm_datapart_split()', but don't block  or throw an exception if  something
  * goes wrong. - Instead, return `VM_DATAPART_SPLIT_NX_FAILED', though `NULL' is still
  * returned in the event that `vpage_offset' is too large. */
 PUBLIC NONNULL((1)) REF struct vm_datapart *
 NOTHROW(KCALL vm_datapart_split_nx)(struct vm_datapart *__restrict self, size_t vpage_offset)
 #else /* SPLIT_NX */
-/* Split the given datapart after `vpage_offset' pages of virtual memory.
- * Additionally, map new nodes within all VMs in with `self' is mapped as part of.
+/* Split   the    given    datapart    after   `vpage_offset'    pages    of    virtual    memory.
+ * Additionally,   map  new  nodes  within  all  VMs  in   with  `self'  is  mapped  as  part  of.
  * NOTE: The caller must not be holding locks to _any_ of those VMs or the given data part itself.
  * @return: * :   A reference to the new upper-half of `self', starting
- *                after `vpage_offset' pages at the end of `self'
+ *                after  `vpage_offset'  pages  at  the  end  of `self'
  * @return: NULL: The given `vpage_offset >= vm_datapart_numvpages(self)' */
 PUBLIC NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datapart_split(struct vm_datapart *__restrict self, size_t vpage_offset)
@@ -487,9 +487,9 @@ again_lock_datapart:
 		}
 
 		/* At this point, we've got locks to all VMs, as well as the data part itself,
-		 * and have also allocated all of the node descriptors required for splitting
+		 * and have also allocated all of the node descriptors required for  splitting
 		 * the data part in every VM in which it appears.
-		 * However, we still need to acquire a lock to the associated data block, in case
+		 * However,  we still need to acquire a lock to the associated data block, in case
 		 * that block isn't anonymous, we must also acquire a lock to it, so-as to be able
 		 * to update its part tree with the upper half we intend on constructing. */
 		if (self->dp_block->db_parts != MFILE_PARTS_ANONYMOUS) {
@@ -520,9 +520,9 @@ again_lock_datapart:
 		}
 
 		/* At this point, we've got all the locks we could possibly need.
-		 * Now to move on to setup the higher half data part! */
+		 * Now  to  move  on  to   setup  the  higher  half  data   part! */
 		result->dp_refcnt = 1; /* The reference that's going to be returned */
-		/* NOTE: Initialize with read-access, since we need that to update the data-part
+		/* NOTE: Initialize with read-access, since we  need that to update the  data-part
 		 *       pointers of transferred futex objects once everything else has been done. */
 		shared_rwlock_init_read(&result->dp_lock);
 		result->dp_tree.a_vmin = self->dp_tree.a_vmin + (vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block));
@@ -633,8 +633,8 @@ again_lock_datapart:
 		}
 
 		/* Check if we must allocate a secondary futex controller for the upper-half datapart.
-		 * For this purpose, we do a simplified check that is guarantied to catch all cases
-		 * where a controller will be required, by simply checking if there is at least one
+		 * For this purpose, we do  a simplified check that is  guarantied to catch all  cases
+		 * where a controller will be  required, by simply checking if  there is at least  one
 		 * futex allocated within the address range of the upper-half datapart. */
 		if (self->dp_futex && !result->dp_futex &&
 		    vm_futextree_rlocate_at(self->dp_futex->fc_tree,
@@ -690,7 +690,7 @@ again_lock_datapart:
 				struct vm_ramblock *blocks;
 				blocks = self->dp_ramdata.rd_blockv;
 				/* Figure out where and how we need to split the ram-block-vector in
-				 * order to be able to individually store in 2 different parts. */
+				 * order to  be able  to individually  store in  2 different  parts. */
 				for (i = 0;; ++i) {
 					assert(i < self->dp_ramdata.rd_blockc);
 					assert(total <= vpage_offset);
@@ -790,7 +790,7 @@ again_lock_datapart:
 				        result->dp_ramdata.rd_blockv[0].rb_size,
 				        vpage_offset, total);
 				/* Figure out how many blocks the lower part should be left with.
-				 *  -> If the split happened somewhere into the lower part's block,
+				 *  -> If the split happened somewhere into the lower part's  block,
 				 *     the first half of that block must still be kept. - Otherwise,
 				 *     that block must be removed alongside all that followed it. */
 				if (blocks[i].rb_size != 0)
@@ -855,33 +855,33 @@ set_result_no_futex:
 	} else {
 		/* Splitting a futex controller has multiple steps:
 		 *     #1: Enumerate all existing futex objects and use `tryincref()' to
-		 *         acquire references to all of them. Once this is done, we can
+		 *         acquire references to all of them. Once this is done, we  can
 		 *         assume that all futex objects that are `!wasdestroyed(FUTEX)'
 		 *         are those that can qualify for being part of the transfer:
-		 *           - Because we're holding a reference to each of them, it is
+		 *           - Because we're holding a reference  to each of them, it  is
 		 *             guarantied that none of them will end up getting destroyed
 		 *             before we are done
 		 *           - Because we are holding a lock to `self->dp_lock', we are
-		 *             guarantied that no additional futex objects can appear.
+		 *             guarantied  that no additional futex objects can appear.
 		 *         The combination of these 2 (valid) assumptions then allows us
-		 *         to assume that the set of qualifying futex objects will be
+		 *         to  assume that the  set of qualifying  futex objects will be
 		 *         consistent until we're done.
 		 *     #2: Figure out the lowest and greatest address to which a futex
 		 *         that isn't destroyed has been bound.
 		 *         If all these addresses...
-		 *            ... lie within the lower-half data part (i.e. `self'), then nothing
-		 *                else is left to be done, and the references acquired by step #1
+		 *            ... lie  within  the  lower-half  data  part  (i.e.  `self'),  then   nothing
+		 *                else is  left  to  be  done,  and the  references  acquired  by  step  #1
 		 *                will automatically be released by the call to `vm_futextree_decref_all()'
 		 *                further down below.
 		 *            ... lie within the upper-half data part (i.e. `result'), and no futex
-		 *                object exists that had already been destroyed, then simply
+		 *                object exists  that  had  already  been  destroyed,  then  simply
 		 *                assign the controller pointer to `result', and set the controller
 		 *                pointer of `self' to `NULL'.
-		 *                Afterwards, subtract the new size of the lower-half data part from
+		 *                Afterwards, subtract the new size  of the lower-half data part  from
 		 *                all futex objects and re-create the atree from scratch (also: update
 		 *                the `fc_(semi|level)0' fields)
 		 *                Then jump to the end of futex splitting code.
-		 *         Otherwise, if futex objects exist for both the lower-half and upper-half data
+		 *         Otherwise,  if futex objects  exist for both the  lower-half and upper-half data
 		 *         parts, or futex objects exist that have already been destroyed, then a secondary
 		 *         futex controller needs to be allocated for `result'. Note that this third option
 		 *         is the only one that leads to step #4
@@ -907,10 +907,10 @@ again_incref_futexes:
 		                                                                  self
 #endif /* !NDEBUG */
 		                                                                  );
-		/* Integrity check: When all futex objects are alive, then the dead-pointer
-		 *                  has to be NULL. Note though that the opposite doesn't
-		 *                  hold true, since a futex may be dead, but the thread that
-		 *                  initiated the decref() may not yet have gotten around to
+		/* Integrity check: When all  futex objects  are alive,  then the  dead-pointer
+		 *                  has  to  be NULL.  Note  though that  the  opposite doesn't
+		 *                  hold true, since a futex may  be dead, but the thread  that
+		 *                  initiated the decref()  may not yet  have gotten around  to
 		 *                  actually appending the futex to the associated controller's
 		 *                  chain of dead futex objects. */
 		assert(all_futexes_alive ? lofc->fc_dead == NULL
@@ -920,12 +920,12 @@ again_incref_futexes:
 		/* Figure out the greatest address that should be
 		 * kept apart of the lower-half futex controller.
 		 * We choose to use the greatest address for this, since this
-		 * prevents the possibly of an overflow when the the split
+		 * prevents the possibly  of an overflow  when the the  split
 		 * happens at an offset of `SIZE_MAX' */
 		lofc_maxaddr = (uintptr_t)vpage_offset * PAGESIZE - 1;
 		if (maxaddr <= lofc_maxaddr) {
 			/* Simple case: The futex with the greatest address will still be apart of
-			 *              the lower-half (i.e. old; i.e. `self') datapart, meaning
+			 *              the  lower-half (i.e. old;  i.e. `self') datapart, meaning
 			 *              that we don't actually have to do anything! */
 			/* TODO: Re-Calculate best-fit semi/level values for the tree (since it's
 			 *       max-size is now lower than before).
@@ -935,7 +935,7 @@ again_incref_futexes:
 		}
 		if (minaddr > lofc_maxaddr) {
 			if (!all_futexes_alive) {
-				/* Check if we can maybe service the futex controller so
+				/* Check if we can maybe  service the futex controller  so
 				 * that all futexes that are dead now end up going away... */
 				struct vm_futex *dead;
 				dead = ATOMIC_XCH(lofc->fc_dead, NULL);
@@ -969,20 +969,20 @@ again_incref_futexes:
 					 * Maybe this time around, they'll all end up being alive... */
 					goto again_incref_futexes;
 				} else {
-					/* Some futex objects are dead, but none of them appear in the
-					 * chain of dead futex objects. This can happen when the thread
-					 * that did the final decref() hasn't gotten around to adding
+					/* Some  futex  objects are  dead, but  none of  them appear  in the
+					 * chain of  dead futex  objects. This  can happen  when the  thread
+					 * that did  the  final  decref() hasn't  gotten  around  to  adding
 					 * the futex to the chain of dead ones of the associated controller.
 					 * In this case, we also mustn't let the upper-half datapart inherit
-					 * the futex controller, since we must uphold the assumption that
-					 * any data parts futex controller is [1..1][const] so-long as it
-					 * contains at least one futex with a reference counter of ZERO(0),
-					 * and that futex has yet to be added to the controller's chain
+					 * the futex controller,  since we must  uphold the assumption  that
+					 * any data parts  futex controller is  [1..1][const] so-long as  it
+					 * contains  at least one futex with a reference counter of ZERO(0),
+					 * and that futex  has yet  to be  added to  the controller's  chain
 					 * of dead futex objects. */
 				}
 			} else {
-				/* Another (fairly) simple case: All futex objects ended up belonging onto
-				 * the upper-half (i.e. `new'; i.e. `result') datapart, and there are no
+				/* Another  (fairly) simple case: All futex objects ended up belonging onto
+				 * the  upper-half (i.e. `new';  i.e. `result') datapart,  and there are no
 				 * futex objects that dead. In this case, we can simply have the upper-half
 				 * datapart inherit the futex controller of the lower-half one. */
 				assert(result->dp_futex != lofc);
@@ -1004,12 +1004,12 @@ again_incref_futexes:
 			}
 		}
 		/* Both the lower-half and upper-half data parts will end up containing
-		 * futex objects. - In this case, we must allocate a secondary futex
-		 * controller which we can then assign to `result', before filling it
-		 * with only those futexes that are aren't destroyed, and have an
+		 * futex  objects. - In  this case, we must  allocate a secondary futex
+		 * controller which we can then  assign to `result', before filling  it
+		 * with  only  those futexes  that are  aren't  destroyed, and  have an
 		 * address that is `> lofc_maxaddr'
 		 * NOTE: Because we're already past the point of no return at this point,
-		 *       we _have_ to make sure that earlier code has already allocated
+		 *       we _have_ to make sure  that earlier code has already  allocated
 		 *       the secondary futex controller by this point! */
 		hifc = result->dp_futex;
 		assertf(hifc != NULL,
@@ -1049,7 +1049,7 @@ done_futex:
 	}
 
 	/* With the new data part all set up, move on to initializing and fill in
-	 * all of the new VM nodes which we have to map to their respective VMs */
+	 * all  of the new VM nodes which we  have to map to their respective VMs */
 	{
 		unsigned int i;
 		size_t node_index;
@@ -1070,11 +1070,11 @@ done_futex:
 				high->vn_node.a_vmin = iter->vn_node.a_vmin + vpage_offset;
 				high->vn_node.a_vmax = iter->vn_node.a_vmax;
 				high->vn_prot        = iter->vn_prot;
-				/* Unset the prepared flag for the node: because the node got split, it is no
-				 * longer prepared in its entirety, meaning that when being modified, it must
-				 * be prepared once again (see documentation of `pagedir_prepareone()',
+				/* Unset  the prepared flag for the node: because  the node got split, it is no
+				 * longer prepared in its entirety, meaning  that when being modified, it  must
+				 * be   prepared  once  again  (see  documentation  of  `pagedir_prepareone()',
 				 * specifically the part about having to re-prepare a sub-region before unmap()
-				 * following a map() operation, when only a part of that original region must
+				 * following  a map() operation, when only a  part of that original region must
 				 * be unmapped, as opposed to it in its entirety) */
 				high->vn_flags  = iter->vn_flags & ~(VM_NODE_FLAG_COREPRT);
 				high->vn_vm     = iter->vn_vm;
@@ -1082,8 +1082,8 @@ done_futex:
 				high->vn_block  = incref(iter->vn_block);
 				high->vn_fspath = xincref(iter->vn_fspath);
 				high->vn_fsname = xincref(iter->vn_fsname);
-				/* Set the partitioned flag for both node parts, so-as to prevent race conditions
-				 * when one of them gets unmapped (and its region becomes unprepared) at a later
+				/* Set the partitioned  flag for both  node parts, so-as  to prevent race  conditions
+				 * when one of  them gets unmapped  (and its  region becomes unprepared)  at a  later
 				 * point in time (required so each node can safely be unprepared, without interfering
 				 * with a mapping made by the other node). */
 				high->vn_flags |= VM_NODE_FLAG_PARTITIONED;
@@ -1110,7 +1110,7 @@ done_futex:
 				                   iter->vn_node.a_vmin);
 				LLIST_REMOVE(iter, vn_byaddr);
 				iter->vn_node.a_vmax = high->vn_node.a_vmin - 1;
-				/* Re-insert both of the nodes (no need to re-map anything, since
+				/* Re-insert  both of the  nodes (no need  to re-map anything, since
 				 * nothing was actually changed about the underlying physical memory
 				 * mapping) */
 				assert(iter->vn_part == self);
@@ -1186,7 +1186,7 @@ done_futex:
 	/* Deal with the aftermath of splitting a futex controller. */
 	if (result->dp_futex && result->dp_futex->fc_tree) {
 		/* Update the data-block pointers of all futex objects that were moved.
-		 * Then, decrement the reference counters of all futex objects by one,
+		 * Then,  decrement the reference counters of all futex objects by one,
 		 * thus undoing the incref() that was done prior to the transfer. */
 		vm_futextree_set_part_pointer_and_decref_all(result->dp_futex->fc_tree,
 		                                             result

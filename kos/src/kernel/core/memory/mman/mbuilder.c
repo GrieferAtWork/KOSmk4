@@ -253,7 +253,7 @@ mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
 	((dst) = (src), SLIST_INIT(&(src)))
 
 /* Map a given file into the specified mbuilder.
- * Behaves exactly the same as `mman_map()' */
+ * Behaves  exactly  the  same  as  `mman_map()' */
 PUBLIC NONNULL((1, 6)) void *KCALL
 mbuilder_map(struct mbuilder *__restrict self,
              UNCHECKED void *hint, size_t num_bytes,
@@ -338,9 +338,9 @@ done:
 
 
 /* Same as `mbuilder_map()', but only allow pages entirely contained within
- * the file-relative address range `file_map_minaddr...file_map_maxaddr'
- * to be mapped. Attempting to map file contents beyond this range will
- * instead result in `&mfile_zero' getting mapped instead.
+ * the file-relative  address  range  `file_map_minaddr...file_map_maxaddr'
+ * to  be mapped.  Attempting to map  file contents beyond  this range will
+ * instead   result    in    `&mfile_zero'    getting    mapped    instead.
  * Behaves exactly the same as `mman_map_subrange()' */
 PUBLIC NONNULL((1, 6)) void *KCALL
 mbuilder_map_subrange(struct mbuilder *__restrict self,
@@ -470,7 +470,7 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 	}
 
 	/* If they'd been created, insert and link-in nodes for
-	 * the gap below and/or above the actual file mapping. */
+	 * the gap below and/or above the actual file  mapping. */
 	if (lonode != NULL)
 		mbuilder_insert_anon_file_node(self, lonode);
 	if (hinode != NULL)
@@ -483,7 +483,7 @@ done:
 
 
 
-/* Same as `mbuilder_map()', but instead of actually mapping something, leave the
+/* Same as  `mbuilder_map()', but  instead of  actually mapping  something, leave  the
  * address range as empty (but possibly prepared), making it a reserved address range.
  * Behaves exactly the same as `mman_map_res()' */
 PUBLIC NONNULL((1)) void *KCALL
@@ -508,7 +508,7 @@ mbuilder_map_res(struct mbuilder *__restrict self,
 
 		/* Insert the node into the mem-builder.
 		 * Note that we don't add the part to the files- or uparts lists,
-		 * but only to the mappings tree, since the node doesn't contain
+		 * but  only to the mappings tree, since the node doesn't contain
 		 * a mem-file or mem-part. */
 		mbnode_tree_insert(&self->mb_mappings, fmnode); /* Inherit */
 	}
@@ -517,10 +517,10 @@ mbuilder_map_res(struct mbuilder *__restrict self,
 
 
 /* MBuilder-version of `mman_getunmapped_or_unlock()' (without the unlock-part)
- * But note that unlike `mman_getunmapped_or_unlock()', this version always
- * acts as though `MAP_FIXED_NOREPLACE' was given when `MAP_FIXED' is used.
- * After all: there is no functionality for removing nodes from an mbuilder
- * once they've been added. Not because this would be impossible, but because
+ * But  note  that unlike  `mman_getunmapped_or_unlock()', this  version always
+ * acts  as though  `MAP_FIXED_NOREPLACE' was  given when  `MAP_FIXED' is used.
+ * After  all: there  is no functionality  for removing nodes  from an mbuilder
+ * once they've been added. Not because  this would be impossible, but  because
  * such functionality is never required.
  * Also: This function never returns `MAP_FAILED'! */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
@@ -562,8 +562,8 @@ mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
  * This function does:
  *  - assert(fmnode->mbn_part != NULL);
  *  - assert(fmnode->mbn_file != NULL);
- *  - fmnode->mbn_filnxt = NULL;       // Only single-nde initial mappings are supported.
- *                                     // Additional required nodes are added lazily if necessary
+ *  - fmnode->mbn_filnxt = NULL;       // Only  single-nde   initial   mappings   are   supported.
+ *                                     // Additional  required nodes are added lazily if necessary
  *                                     // via the re-flow mechanism that is done as part of a call
  *                                     // to `mbuilder_partlocks_acquire_or_unlock()'
  *  - SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
@@ -595,7 +595,7 @@ NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder *__restrict self,
 
 /* Remove `fmnode' from `self'. - Asserts that no secondary nodes have
  * been allocated for use with `fmnode' (as could happen if the caller
- * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior call
+ * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior  call
  * to `mbuilder_insert_fmnode()' and the call to this function) */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,

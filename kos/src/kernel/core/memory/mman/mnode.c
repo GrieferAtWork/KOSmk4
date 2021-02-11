@@ -71,7 +71,7 @@ NOTHROW(FCALL mnode_free)(struct mnode *__restrict self) {
 
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
-	/* Check if there are any nodes mapping our part that use LOCK flags.
+	/* Check if  there are  any nodes  mapping our  part that  use LOCK  flags.
 	 * For this purpose, both copy-on-write and shared nodes can lock the part. */
 	struct mnode *node;
 	LIST_FOREACH (node, &self->mp_copy, mn_link) {
@@ -83,7 +83,7 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 			return;
 	}
 	/* Clear the lock-flag for our part, since there are no
-	 * more nodes that could keep our part locked in-core! */
+	 * more nodes that could keep our part locked  in-core! */
 	ATOMIC_AND(self->mp_flags, ~MPART_F_MLOCK);
 }
 
@@ -150,7 +150,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
 			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
 
-			/* Insert into the lock-operations list of `part'
+			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part' */
 			lop = (struct mpart_lockop *)self;
@@ -170,9 +170,9 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 
 
 
-/* Clear page-directory-level write-access to `self'. This function must be
+/* Clear page-directory-level  write-access to  `self'. This  function must  be
  * called for all writable memory mappings of a MMAN when the MMAN is cloned or
- * a copy-on-write mapping is created for an already-shared `mn_part':
+ * a  copy-on-write  mapping  is  created  for  an  already-shared   `mn_part':
  * >> mmap() {
  * >>     ...
  * >>     if (flags & MNODE_F_SHARED) {
@@ -198,11 +198,11 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
 	struct mman *mm = self->mn_mman;
 	if (!LIST_ISBOUND(self, mn_writable)) {
 		/* Simple case: this node isn't writable.
-		 * This is thread-safe, since our caller is currently holding a
+		 * This is thread-safe,  since our caller  is currently holding  a
 		 * lock to the associated mem-part, and for this node to (re-)gain
 		 * write access, it would first have to acquire that same lock.
 		 *
-		 * As such, if it's not writable now, then it can't become so
+		 * As  such, if it's  not writable now, then  it can't become so
 		 * before our caller releases their lock to the associated part. */
 		return MNODE_CLEAR_WRITE_SUCCESS;
 	}
@@ -231,7 +231,7 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
 
 
 /* Same as `mnode_clear_write', but the caller is already holding a lock to `mm',
- * and this function will never return with `MNODE_CLEAR_WRITE_WOULDBLOCK'.
+ * and  this  function  will  never  return  with `MNODE_CLEAR_WRITE_WOULDBLOCK'.
  * NOTE: Unlike with `mnode_clear_write', when calling this function,
  *       the caller must ensure that:
  *        - !wasdestroyed(mm)
@@ -278,7 +278,7 @@ NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
 
 
 /* Same as `mnode_clear_write_locked_p()', but directory operate
- * on the current page directory / memory manager. */
+ * on   the   current   page   directory   /   memory   manager. */
 PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 	void *addr;
@@ -311,7 +311,7 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 }
 
 
-/* Split `lonode' (which contains `addr_where_to_split') at that address.
+/* Split  `lonode'  (which  contains  `addr_where_to_split')  at  that  address.
  * If this cannot be done without blocking, unlock and eventually return `false' */
 PUBLIC WUNUSED NONNULL((1, 2)) bool FCALL
 mnode_split_or_unlock(struct mman *__restrict self,
@@ -373,9 +373,9 @@ reload_lonode_after_mman_lock:
 	hinode->mn_mman    = self;
 	hinode->mn_partoff = lonode->mn_partoff + (size_t)((byte_t *)addr_where_to_split - lonode->mn_minaddr);
 
-	/* At this point, we've managed to allocate the missing hi-node.
+	/* At this point, we've managed to allocate the missing  hi-node.
 	 * Deal with the simple case where the original node doesn't have
-	 * a backing mem-part (since in that case, we don't even need to
+	 * a backing mem-part (since in that case, we don't even need  to
 	 * acquire any additional locks) */
 	if (part == NULL)
 		goto done_nopart; /* Simple case */
@@ -423,7 +423,7 @@ done_nopart:
 	mnode_tree_insert(&self->mm_mappings, lonode);
 	mnode_tree_insert(&self->mm_mappings, hinode);
 
-	/* If we had to unlock stuff above, release our lock to the mman to
+	/* If we had  to unlock  stuff above,  release our  lock to  the mman  to
 	 * keep things consistent with the false-result-means-no-locks invariant. */
 	if (!result)
 		mman_lock_release(self);
@@ -435,9 +435,9 @@ err_changed_free_hinode:
 
 
 /* Load the bounding set of page directory permissions with which
- * a given mem-nodes should have its backing memory be mapped.
+ * a given mem-nodes  should have its  backing memory be  mapped.
  * NOTE: The caller must ensure that `self->mn_part' is non-NULL,
- *       and that they are holding a lock to said part!
+ *       and  that  they  are  holding  a  lock  to  said   part!
  *
  * Write permissions which may have been requested by the node
  * are automatically removed for the purpose of copy-on-write:
@@ -461,7 +461,7 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self) {
 		struct mpart *part = self->mn_part;
 		if (self->mn_flags & MNODE_F_SHARED) {
 			/* Disallow write to a shared mapping if there are other copy-on-write nodes.
-			 * This way, copy-on-write nodes can be unshared lazily once the first write
+			 * This way, copy-on-write nodes can be unshared lazily once the first  write
 			 * happens. */
 			if (!LIST_EMPTY(&part->mp_copy)) {
 				/* Only deny write if a copy-on-write mapping overlaps with our SHARED mapping. */
@@ -480,14 +480,14 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self) {
 			}
 		} else {
 			/* Disallow write if there are any other memory mappings of the backing part,
-			 * or if the part isn't anonymous (in which case someone may open(2)+read(2)
-			 * from backing file, which mustn't include any modifications made by this
+			 * or if the part isn't anonymous (in which case someone may  open(2)+read(2)
+			 * from  backing file, which  mustn't include any  modifications made by this
 			 * mapping) */
-			/* NOTE: Technically, we'd only need to deny write if the part isn't anon, or
+			/* NOTE: Technically, we'd only need  to deny write if  the part isn't anon,  or
 			 *       one of the other mem-nodes's part-rel mapped range overlaps with our's.
-			 *       However, this isn't something that could easily happen (you'd have to
-			 *       do a very specific sequence of mmap()+fork()+munmap() calls). As such,
-			 *       and given that even without this, `mfault' still does copy-on-write
+			 *       However, this isn't something that  could easily happen (you'd have  to
+			 *       do a very specific sequence of mmap()+fork()+munmap() calls). As  such,
+			 *       and  given that  even without  this, `mfault'  still does copy-on-write
 			 *       properly, we don't actually do this! */
 			if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
 			    LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))

@@ -86,9 +86,9 @@ DECL_BEGIN
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR          1 /* Default: Any instruction not explicitly configured defaults to `#define EMU86_EMULATE_CONFIG_WANT_... 0' */
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 1 /* Don't include code-paths for basic instructions that are assumed to always be available */
 #define EMU86_EMULATE_CONFIG_CHECKLOCK                1 /* We don't actually care about lock prefixes, but we must still
-                                                         * assert that they're only used on white-listed instructions. */
-#define EMU86_EMULATE_CONFIG_IGNORE_LOCK              1 /* Lock prefixes don't mean anything in RTM mode, since all modifications
-                                                         * that may possible be made to memory will instead appear in thread-local
+                                                         * assert  that they're only  used on white-listed instructions. */
+#define EMU86_EMULATE_CONFIG_IGNORE_LOCK              1 /* Lock prefixes  don't mean  anything in  RTM mode,  since all  modifications
+                                                         * that  may possible  be made to  memory will instead  appear in thread-local
                                                          * caches, meaning that having special handling for atomic instruction doesn't
                                                          * make any sense. */
 #define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC     1 /* Allow user-space to make use of stac/clac */
@@ -705,10 +705,10 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self
 
 	case SYS_rtm_test:
 		self->r_pax = 1; /* System call return value */
-		/* This system call is special, in that it has 2 return values when
+		/* This system  call  is  special, in  that  it  has 2  return  values  when
 		 * called in the context of an `int80', `sysenter' or `syscall' instruction.
 		 *
-		 * The non-emulated counterpart to this can be found in
+		 * The non-emulated  counterpart to  this can  be found  in
 		 * `/kos/src/kernel/core/arch/i386/syscall/fastpass-impl.S'
 		 */
 		self->r_pflags &= ~EFLAGS_ZF;
@@ -888,7 +888,7 @@ LOCAL WUNUSED NONNULL((1)) u64 KCALL
 emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 	u64 tsc;
 	pflag_t was;
-	/* To guaranty that the hosting CPU doesn't change during
+	/* To guaranty that the hosting CPU doesn't change  during
 	 * execution here, temporarily disable preemption, so that
 	 * the TSC and CPU-ID are consistent with each other! */
 	was = PREEMPTION_PUSHOFF();
@@ -1370,7 +1370,7 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 #define EMU86_VALIDATE_READWRITE_IS_NOOP 1
 
 /* Verify that we only ever run user-space code in user-space
- * TODO: When the PC-pointer is part of kernel-space, we should
+ * TODO: When the  PC-pointer is  part  of kernel-space,  we  should
  *       instead dispatch to UKERN and emulate `userkern_syscall()'! */
 #if CONFIG_RTM_USERSPACE_ONLY
 #define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(start_pc) \
@@ -1489,8 +1489,8 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 		/* Check the instruction status code. */
 		if (status != X86_RTM_STATUS_CONTINUE)
 			break;
-		/* Serve user-level interrupts between instructions.
-		 * This is necessary to ensure that stuff like CRTL+C
+		/* Serve user-level  interrupts between  instructions.
+		 * This is necessary to ensure that stuff like  CRTL+C
 		 * still works properly when the user-program contains
 		 * an infinite loop. */
 		task_serve();

@@ -87,7 +87,7 @@ usb_scsi_io(struct usb_controller *__restrict self,
 	resp.ut_next   = &status;
 
 	/* Receive the status result.
-	 * NOTE: This _has_ to be requested as a separate packet.
+	 * NOTE: This _has_ to be requested as a separate  packet.
 	 *       It will not work if you just plug this at the end
 	 *       of the `buf + buflen' */
 	status.ut_endp   = in;
@@ -131,7 +131,7 @@ NOTHROW(KCALL ms_scsi_device_fini)(struct block_device *__restrict self) {
  *  - tx->ut_buflen
  *  - tx->ut_[v]buf[p]  (According to `ut_buftyp')
  * This function is allowed to modify `tx' however
- * it pleases, without having to restore it. */
+ * it  pleases,  without  having  to  restore  it. */
 PRIVATE NONNULL((1, 2, 6)) void KCALL
 ms_scsi_doio(struct ms_scsi_device *__restrict self,
              struct usb_transfer *__restrict tx, bool is_write, size_t num_sectors,
@@ -179,7 +179,7 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	tx->ut_next   = &status;
 
 	/* Receive the status result.
-	 * NOTE: This _has_ to be requested as a separate packet.
+	 * NOTE: This _has_ to be requested as a separate  packet.
 	 *       It will not work if you just plug this at the end
 	 *       of the `buf + buflen' */
 	status.ut_endp   = self->msd_endp_in;
@@ -194,18 +194,18 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	 *       querying errors via the sense command */
 
 	{
-		/* With all of the data structures set up, acquire a
+		/* With all of the data  structures set up, acquire  a
 		 * lock to the SCSI device and initiate the operation. */
 		SCOPED_WRITELOCK(&self->msd_lock);
 		cbw.cbw_tag = self->msd_tag++;
 
-		/* TODO: Actually make this part have ASYNC support by creating
-		 *       a custom AIO protocol that wraps around the AIO used by
+		/* TODO: Actually make this part  have ASYNC support by  creating
+		 *       a  custom AIO protocol that wraps around the AIO used by
 		 *       USB, containing the `csw' block, as well as allowing for
-		 *       handling of whatever kind of error may be returned by
+		 *       handling of whatever  kind of error  may be returned  by
 		 *       the device.
 		 *       Also note that if we do this, we should have the command
-		 *       be followed by a secondary command that calls to SENSE
+		 *       be followed by a secondary  command that calls to  SENSE
 		 *       function in order to determine if errors occurred during
 		 *       the transfer. */
 		usb_controller_transfer_sync(self->msd_ctrl, &req);
@@ -344,7 +344,7 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 	struct scsi_capacity cap;
 	size_t num_read;
 
-	/* TODO: Keep on issuing `SCSI_CMD_TEST_UNIT_READY' (with some timeout)
+	/* TODO: Keep  on issuing `SCSI_CMD_TEST_UNIT_READY' (with some timeout)
 	 *       until the device indicates success, meaning that it is ready to
 	 *       be used.
 	 *       Before it does this, we're technically not allowed to issue any

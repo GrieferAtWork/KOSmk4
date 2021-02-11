@@ -71,7 +71,7 @@ PUBLIC ATTR_PERTASK struct task_connections this_root_connections = {
 	/* .tcs_static = */ { }
 };
 
-/* [1..1][lock(PRIVATE(THIS_TASK))] Current set of in-use connections.
+/* [1..1][lock(PRIVATE(THIS_TASK))]  Current   set   of   in-use   connections.
  * Most of the time, this will simply point to `PERTASK(this_root_connections)' */
 PUBLIC ATTR_PERTASK struct task_connections *
 this_connections = NULL; /* Fill in by `pertask_init_task_connections()' */
@@ -236,7 +236,7 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
 
 
 /* Connect the calling thread to a given signal.
- * @throw: E_BADALLOC: Insufficient memory (only when there are at least
+ * @throw: E_BADALLOC: Insufficient  memory  (only  when there  are  at least
  *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 PUBLIC NONNULL((1)) void FCALL
 task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
@@ -260,11 +260,11 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 	con->tc_cons    = cons;
 
 	/* Now insert the connection onto the stack used by `target'
-	 * NOTE: `sig_send()' will always traverse the chain to the last
+	 * NOTE: `sig_send()' will always  traverse the chain  to the  last
 	 *       thread, meaning that we can (and have to) insert ourselves
 	 *       at the front of the chain.
 	 * Also note that inserting a new connection can be done without
-	 * having to tinker with the signal's SMP-lock, so this part is
+	 * having  to tinker with the signal's SMP-lock, so this part is
 	 * actually surprisingly simple. */
 	do {
 		next = ATOMIC_READ(target->s_con);
@@ -276,36 +276,36 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 
 
 /* Exactly the same as `task_connect()', however must be used when the connection
- * is made for a poll-based operation that only wishes to wait for some event to
- * be triggered, but does not wish to act upon this event by acquiring some kind
- * of lock with the intend to release it eventually, where the act of releasing
+ * is  made for a poll-based operation that only wishes to wait for some event to
+ * be  triggered, but does not wish to act upon this event by acquiring some kind
+ * of lock with the intend to release  it eventually, where the act of  releasing
  * said lock includes a call to `sig_send()'.
  *
- * This connect() function is only required for signals that may be delivered via
- * `sig_send()', meaning that only a single thread would be informed of the signal
- * event having taken place. If in this scenario, the recipient thread (i.e the
- * thread that called `task_connect()') then decides not to act upon the signal
+ * This connect() function is  only required for signals  that may be delivered  via
+ * `sig_send()',  meaning that only a single thread  would be informed of the signal
+ * event having taken  place. If  in this scenario,  the recipient  thread (i.e  the
+ * thread that called  `task_connect()') then  decides not  to act  upon the  signal
  * in question, but rather to do something else, the original intend of `sig_send()'
- * will become lost, that intend being for some (single) thread to try to acquire
- * an accompanying lock (for an example of this, see kernel header <sched/mutex.h>)
+ * will become lost, that intend  being for some (single)  thread to try to  acquire
+ * an accompanying lock (for an example of this, see kernel header  <sched/mutex.h>)
  *
- * As far as semantics go, a signal connection established with this function will
+ * As far as semantics go, a signal connection established with this function  will
  * never satisfy a call to `sig_send()', and will instead be skipped if encountered
- * during its search for a recipient (such that by default, poll-connections will
- * only be acted upon when `sig_broadcast()' is used). However, if a call to
- * `sig_send()' is unable to find any non-poll-based connections, it will proceed
+ * during its search for a recipient  (such that by default, poll-connections  will
+ * only be  acted upon  when `sig_broadcast()'  is  used). However,  if a  call  to
+ * `sig_send()' is unable to find  any non-poll-based connections, it will  proceed
  * to act like a call to `sig_broadcast()' and wake all polling thread, though will
- * still end up returning `false', indicative of not having woken any (properly)
+ * still  end up returning  `false', indicative of not  having woken any (properly)
  * waiting thread.
  *
- * With all of this in mind, this function can also be though of as a sort-of
+ * With all of  this in  mind, this  function can  also be  though of  as a  sort-of
  * low-priority task connection, that will only be triggered after other connections
- * have already been served, and will only be woken by `sig_send()', when no other
+ * have already been served, and will only  be woken by `sig_send()', when no  other
  * connections exist.
  *
  * In practice, this function must be used whenever it is unknown what will eventually
- * happen after `task_waitfor()', or if what happens afterwards doesn't include the
- * acquisition of some kind of lock, whose release includes the sending of `target'.
+ * happen  after `task_waitfor()', or  if what happens  afterwards doesn't include the
+ * acquisition  of some kind of lock, whose  release includes the sending of `target'.
  *
  * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
 PUBLIC NONNULL((1)) void FCALL
@@ -330,11 +330,11 @@ task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 	con->tc_cons    = (struct task_connections *)((uintptr_t)cons | TASK_CONNECTION_STAT_FPOLL);
 
 	/* Now insert the connection onto the stack used by `target'
-	 * NOTE: `sig_send()' will always traverse the chain to the last
+	 * NOTE: `sig_send()' will always  traverse the chain  to the  last
 	 *       thread, meaning that we can (and have to) insert ourselves
 	 *       at the front of the chain.
 	 * Also note that inserting a new connection can be done without
-	 * having to tinker with the signal's SMP-lock, so this part is
+	 * having  to tinker with the signal's SMP-lock, so this part is
 	 * actually surprisingly simple. */
 	do {
 		next = ATOMIC_READ(target->s_con);
@@ -364,7 +364,7 @@ again:
 	} else {
 		struct task_connection **pchain;
 		/* Since the caller has acquired the SMP-lock of `self' for us,
-		 * we are able to access all of the attached connections! */
+		 * we  are  able to  access  all of  the  attached connections! */
 		chain  = sig_smplock_clr(chain);
 		pchain = &chain->tc_signext;
 		assert(chain->tc_sig == self);
@@ -384,7 +384,7 @@ again:
 }
 
 
-/* Same as `task_connection_unlink_from_sig()', but also release the SMP-lock. The caller
+/* Same as `task_connection_unlink_from_sig()', but also release the SMP-lock. The  caller
  * must then release the preemption lock through use of `sig_smp_lock_release_nosmp(self)' */
 #if SIG_CONTROL_SMPLOCK == 0
 #define TASK_CONNECTION_UNLINK_FROM_SIG_AND_UNLOCK_IS_TASK_CONNECTION_UNLINK_FROM_SIG 1
@@ -411,7 +411,7 @@ again:
 	} else {
 		struct task_connection **pchain;
 		/* Since the caller has acquired the SMP-lock of `self' for us,
-		 * we are able to access all of the attached connections! */
+		 * we  are  able to  access  all of  the  attached connections! */
 		chain  = sig_smplock_clr(chain);
 		pchain = &chain->tc_signext;
 		assert(chain->tc_sig == self);
@@ -500,7 +500,7 @@ struct sig_post_completion {
 
 /* Trigger phase #2 for pending signal-completion functions.
  * NOTE: During this, the completion callback will clear the
- *       SMP lock bit of its own completion controller. */
+ *       SMP  lock  bit  of its  own  completion controller. */
 #define sig_run_phase_2(chain, context)                \
 	do {                                               \
 		for (; chain; chain = chain->spc_next)         \
@@ -531,26 +531,26 @@ NOTHROW(FCALL sig_unlock_pending)(struct sig_completion *sc_pending) {
  *   #2: Release all internal SMP-locks
  *   #3: Invoke `cleanup' (if non-NULL)
  *   #4: Restore the preemption behavior according to `was'
- *   #5: Destroy all threads who's reference counters dropped to 0 in the mean time
+ *   #5: Destroy all  threads  who's  reference  counters  dropped to  0  in  the  mean  time
  *   #6: Invoke phase-2 completion callbacks, as have been registered by completion functions
  *   #7: Return the # of non-polling connections to which the signal was delivered
  * @param: self:            [1..1] The signal to broadcast
  * @param: sender:          [1..1] The sending signal (s.a. `sig_altbroadcast()')
  * @param: caller:          [1..1] The sending thread (s.a. `sig_broadcast_as()')
  * @param: sc_pending:      [0..1] When non-NULL, invoke this completion function,
- *                                 and remember it as having been invoked.
+ *                                 and  remember  it   as  having  been   invoked.
  * @param: destroy_later:   [0..1] A chain of threads that must be destroyed during step #5
- *                                 This chain uses `sig_destroylater_next()' for links.
+ *                                 This chain  uses  `sig_destroylater_next()'  for  links.
  * @param: cleanup:         [0..1] When non-NULL, invoke this callback during step #3
- * @param: phase_one_state:        The state that must be written to sig_completion descriptors
+ * @param: phase_one_state:        The state  that must  be written  to sig_completion  descriptors
  *                                 prior to invocation of their phase-1 callback. Should be one of:
  *                                  - TASK_CONNECTION_STAT_BROADCAST | TASK_CONNECTION_STAT_FLOCK_OPT | TASK_CONNECTION_STAT_FFINI
  *                                  - TASK_CONNECTION_STAT_BROADCAST | TASK_CONNECTION_STAT_FLOCK_OPT
- *                                 When `TASK_CONNECTION_STAT_FFINI' is set, this will prevent the
+ *                                 When   `TASK_CONNECTION_STAT_FFINI'   is   set,  this   will   prevent  the
  *                                 completion function from repriming itself (s.a. `sig_broadcast_for_fini()')
  * @param: was:                    The preemption-enabled state to restore during step #4
  * @return: * :                    The # of (additional, non-poll) connections that received the signal.
- *                                 Does not include `sc_pending' when that one is non-NULL. */
+ *                                 Does  not   include  `sc_pending'   when   that  one   is   non-NULL. */
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL sig_intern_broadcast)(struct sig *self,
                                     struct sig *sender,
@@ -582,9 +582,9 @@ again:
 	if unlikely(!con) {
 no_cons:
 		/* No one else here! (and nothing for us to do...)
-		 * This is an undefined situation, since the original call to
+		 * This  is an  undefined situation,  since the  original call to
 		 * `sig_send()' that caused the signal which we ended up ignoring
-		 * to be delivered returned `true', even though now, in the end,
+		 * to  be delivered returned `true', even though now, in the end,
 		 * no one actually ended up getting the signal... */
 #if SIG_CONTROL_SMPLOCK != 0
 		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, 0))
@@ -592,7 +592,7 @@ no_cons:
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 		/* Trigger phase #2 for pending signal-completion functions.
 		 * NOTE: During this, the completion callback will clear the
-		 *       SMP lock bit of its own completion controller. */
+		 *       SMP  lock  bit  of its  own  completion controller. */
 		sig_unlock_pending(sc_pending);
 		if (cleanup)
 			(*cleanup->scc_cb)(cleanup);
@@ -629,11 +629,11 @@ no_cons:
 again_read_target_cons:
 	target_cons = ATOMIC_READ(receiver->tc_cons);
 	/* NOTE: Waiting until we can lock the connection here is allowed, since
-	 *       you're allowed to (and required to) acquire connection locks
+	 *       you're allowed to  (and required to)  acquire connection  locks
 	 *       without having to release the associated signal-lock.
-	 * Doing this doesn't result in a race condition, since the other end
+	 * Doing  this doesn't result  in a race condition,  since the other end
 	 * of this syncing mechanism (which is `task_disconnect()') will release
-	 * its initial connection-lock if it fails to acquire the signal lock,
+	 * its initial connection-lock if it  fails to acquire the signal  lock,
 	 * which it will because we're already holding that one! */
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
@@ -661,8 +661,8 @@ again_read_target_cons:
 		sc_pending     = sc;
 	} else {
 		target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
-		/* Try to set our signal as the one delivered to `target_cons'.
-		 * If that part fails, change signal state to BROADCAST (even though
+		/* Try  to  set our  signal as  the  one delivered  to `target_cons'.
+		 * If  that part fails, change signal state to BROADCAST (even though
 		 * that's not entirely correct), so we can get rid of the connection. */
 		if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, sender)) {
 			/* Unlink the signal, and mark it as broadcast. */
@@ -712,9 +712,9 @@ again:
 	con = sig_smplock_clr(ctl);
 	if unlikely(!con) {
 		/* No one else here! (and nothing for us to do...)
-		 * This is an undefined situation, since the original call to
+		 * This  is an  undefined situation,  since the  original call to
 		 * `sig_send()' that caused the signal which we ended up ignoring
-		 * to be delivered returned `true', even though now, in the end,
+		 * to  be delivered returned `true', even though now, in the end,
 		 * no one actually ended up getting the signal... */
 #if SIG_CONTROL_SMPLOCK != 0
 		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, 0))
@@ -722,7 +722,7 @@ again:
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 		/* Trigger phase #2 for pending signal-completion functions.
 		 * NOTE: During this, the completion callback will clear the
-		 *       SMP lock bit of its own completion controller. */
+		 *       SMP  lock  bit  of its  own  completion controller. */
 		result = false;
 		goto done;
 	}
@@ -759,11 +759,11 @@ again_read_target_cons:
 	target_cons = ATOMIC_READ(receiver->tc_cons);
 #ifndef CONFIG_NO_SMP
 	/* NOTE: Waiting until we can lock the connection here is allowed, since
-	 *       you're allowed to (and required to) acquire connection locks
+	 *       you're allowed to  (and required to)  acquire connection  locks
 	 *       without having to release the associated signal-lock.
-	 * Doing this doesn't result in a race condition, since the other end
+	 * Doing  this doesn't result  in a race condition,  since the other end
 	 * of this syncing mechanism (which is `task_disconnect()') will release
-	 * its initial connection-lock if it fails to acquire the signal lock,
+	 * its initial connection-lock if it  fails to acquire the signal  lock,
 	 * which it will because we're already holding that one! */
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
@@ -819,7 +819,7 @@ again_read_target_cons:
 		target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
 		thread = NULL;
 		/* Set the delivered signal, and capture
-		 * the thread thread, if there is one */
+		 * the thread  thread, if  there is  one */
 		if (ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, sender))
 			thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
 		/* Unlock the connection. */
@@ -907,7 +907,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
 
 
 /* Try to send the signal to a single, other thread, for the purpose
- * of forwarding. Additionally, release the SMP-lock of `self' */
+ * of  forwarding.  Additionally,  release  the  SMP-lock  of `self' */
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
                                                      struct sig *sender,
@@ -928,9 +928,9 @@ again:
 	if unlikely(!con) {
 no_cons:
 		/* No one else here! (and nothing for us to do...)
-		 * This is an undefined situation, since the original call to
+		 * This  is an  undefined situation,  since the  original call to
 		 * `sig_send()' that caused the signal which we ended up ignoring
-		 * to be delivered returned `true', even though now, in the end,
+		 * to  be delivered returned `true', even though now, in the end,
 		 * no one actually ended up getting the signal... */
 #if SIG_CONTROL_SMPLOCK != 0
 		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, 0))
@@ -940,7 +940,7 @@ no_cons:
 		PREEMPTION_POP(was);
 		goto done;
 	}
-	/* Non-broadcast signals are sent to the oldest connection of `self'.
+	/* Non-broadcast signals are sent to the oldest connection of  `self'.
 	 * As such, walk the chain of known connections until we find the last
 	 * one of them all.
 	 * NOTE: Since we're holding the SMP-lock at the moment, we are safe to
@@ -953,7 +953,7 @@ no_cons:
 		assert(status != TASK_CONNECTION_STAT_BROADCAST);
 		if (!TASK_CONNECTION_STAT_ISDONE(status)) {
 			if (is_broadcasting_poll || !TASK_CONNECTION_STAT_ISPOLL(status)) {
-				/* Make sure that `con' isn't a phase-2-pending completion callback.
+				/* Make sure that  `con' isn't a  phase-2-pending completion  callback.
 				 * If it is, then the callback of `con' used `sig_completion_reprime()'
 				 * during phase-1 in order to re-queue itself. */
 				if (!is_connection_is_chain(sc_pending, con))
@@ -975,11 +975,11 @@ no_cons:
 	target_cons = ATOMIC_READ(receiver->tc_cons);
 #ifndef CONFIG_NO_SMP
 	/* NOTE: Waiting until we can lock the connection here is allowed, since
-	 *       you're allowed to (and required to) acquire connection locks
+	 *       you're allowed to  (and required to)  acquire connection  locks
 	 *       without having to release the associated signal-lock.
-	 * Doing this doesn't result in a race condition, since the other end
+	 * Doing  this doesn't result  in a race condition,  since the other end
 	 * of this syncing mechanism (which is `task_disconnect()') will release
-	 * its initial connection-lock if it fails to acquire the signal lock,
+	 * its initial connection-lock if it  fails to acquire the signal  lock,
 	 * which it will because we're already holding that one! */
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
@@ -1026,8 +1026,8 @@ no_cons:
 			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 			goto again;
 		}
-		/* Try to set our signal as the one delivered to `target_cons'.
-		 * If that part fails, change signal state to BROADCAST (even though
+		/* Try  to  set our  signal as  the  one delivered  to `target_cons'.
+		 * If  that part fails, change signal state to BROADCAST (even though
 		 * that's not entirely correct), so we can get rid of the connection. */
 		if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, sender)) {
 			/* Unlink the signal, and mark it as broadcast. */
@@ -1053,7 +1053,7 @@ no_cons:
 done:
 	/* Trigger phase #2 for pending signal-completion functions.
 	 * NOTE: During this, the completion callback will clear the
-	 *       SMP lock bit of its own completion controller. */
+	 *       SMP  lock  bit  of its  own  completion controller. */
 	sig_unlock_pending(sc_pending);
 	PREEMPTION_POP(was);
 	/* Invoke phase-2 callbacks. */
@@ -1066,7 +1066,7 @@ done:
 
 
 
-/* Re-prime the completion callback to be invoked once again the next time that the
+/* Re-prime the completion callback to be invoked  once again the next time that  the
  * attached signal is delivered. In this case, the completion function is responsible
  * to ensure that no-one is currently trying to destroy the associated signal. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
@@ -1104,7 +1104,7 @@ NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
 }
 
 /* Connect the given signal completion controller to the specified signal.
- * The caller must ensure that `completion' hasn't been connected, yet. */
+ * The caller must  ensure that `completion'  hasn't been connected,  yet. */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL sig_connect_completion)(struct sig *__restrict self,
                                       struct sig_completion *__restrict completion) {
@@ -1213,13 +1213,13 @@ done:
 	DBG_memset(&self->tc_sig, 0xcc, sizeof(self->tc_sig));
 }
 
-/* NOTE: When this function returns, the caller can be certain that the callback
+/* NOTE: When  this  function returns,  the caller  can be  certain that  the callback
  *       of `self' is/won't be executed anymore, unless `self' is once again connected
  *       to some signal through use of `sig_connect_completion[_for_poll]()'
- * @return: true:  Completion function was disconnected before it could be triggered,
+ * @return: true:  Completion function was disconnected before it could be  triggered,
  *                 or the last time the completion function was triggered, it made use
  *                 of `sig_completion_reprime()' to re-prime itself.
- * @return: false: Completion function was already triggered, but not re-primed.
+ * @return: false: Completion  function was already triggered, but not re-primed.
  *                 Alternatively, the signal completion function had already been
  *                 disconnected, or had never been connected to begin with. */
 PUBLIC NOBLOCK NONNULL((1)) bool
@@ -1311,10 +1311,10 @@ NOTHROW(FCALL task_disconnectall)(void) {
 }
 
 /* Same as `task_disconnectall()', but don't forward signals with a
- * `TASK_CONNECTION_STAT_SENT'-state, but rather return the sender
+ * `TASK_CONNECTION_STAT_SENT'-state, but rather return the  sender
  * of of the signal that was received.
  * As such, the caller must properly pass on information about the
- * fact that a signal may have been received, as well as act upon
+ * fact that a signal may have been received, as well as act  upon
  * this fact. */
 PUBLIC NOBLOCK WUNUSED struct sig *
 NOTHROW(FCALL task_receiveall)(void) {
@@ -1328,12 +1328,12 @@ NOTHROW(FCALL task_receiveall)(void) {
 	return result;
 }
 
-/* Check if the calling thread was connected to any signal.
- * For this purpose, it doesn't matter if a connected signal
- * has already been sent or not (iow: both alive and dead
- * connections will cause this function to return `true')
+/* Check  if  the  calling  thread  was  connected  to  any signal.
+ * For this  purpose,  it  doesn't matter  if  a  connected  signal
+ * has  already  been  sent  or  not  (iow:  both  alive  and  dead
+ * connections  will  cause   this  function   to  return   `true')
  * As far as this function is concerned, a connection is only fully
- * released once the calling thread has done one of the following:
+ * released  once the calling thread has done one of the following:
  *  - Called `task_disconnect()' on every connected signal
  *  - Called `task_disconnectall()'
  *  - Called `task_receiveall()'
@@ -1366,7 +1366,7 @@ NOTHROW(FCALL task_wasconnected_to)(struct sig const *__restrict target) {
 }
 
 /* Check if there is a signal to was delivered, disconnecting
- * all other connected signals if this was the case.
+ * all  other  connected  signals  if  this  was  the   case.
  * @return: NULL: No signal is available
  * @return: * :   The signal that was delivered. */
 PUBLIC NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void) {
@@ -1385,7 +1385,7 @@ PUBLIC NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void) {
 
 
 /* Check if the given signal has viable recipients.
- * This includes poll-based connections. */
+ * This     includes     poll-based    connections. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self) {
 	bool result = false;
@@ -1445,8 +1445,8 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 /************************************************************************/
 
 /* Finalize a given signal multi-completion controller.
- * WARNING: This function will _not_ disconnect any remaining signals.
- *          If active connections could possibly remain, it is up to
+ * WARNING: This  function  will  _not_ disconnect  any  remaining signals.
+ *          If active  connections  could  possibly remain,  it  is  up  to
  *          the caller to call `sig_multicompletion_disconnectall()' first! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self) {
@@ -1468,7 +1468,7 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
 
 /* Sever all (still-alive) connections that are active for `self'. Note that this function may
  * not be called from inside of signal-completion-callbacks, or any other callback that may be
- * executed in the context of holding an SMP-lock. (though you area allowed to call this
+ * executed in the  context of  holding an  SMP-lock. (though you  area allowed  to call  this
  * function from a `sig_postcompletion_t' calback) */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__restrict self) {
@@ -1503,15 +1503,15 @@ NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion const
 }
 
 
-/* Allocate and return a new signal completion descriptor that is attached to the
- * signal multi-completion controller `self', and will invoke `cb' when triggered.
- * The returned pointer is owned by `self', meaning that the caller doesn't have
- * to bother with ownership themself. Also note that this these functions will keep
- * on returning the same completion until that completion has been connected, and
+/* Allocate and return a  new signal completion descriptor  that is attached to  the
+ * signal multi-completion controller `self', and  will invoke `cb' when  triggered.
+ * The returned pointer  is owned by  `self', meaning that  the caller doesn't  have
+ * to bother with ownership themself. Also note that this these functions will  keep
+ * on  returning the same  completion until that completion  has been connected, and
  * will re-use older completions if those got tripped, but didn't re-prime themself.
  *
  * If all of that sounds too complicated for you, then just use `sig_connect_multicompletion',
- * which encapsulates the job of allocating+connecting to a signal for you. */
+ * which   encapsulates   the   job   of   allocating+connecting   to   a   signal   for  you. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sig_completion *FCALL
 sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
                           sig_completion_t cb)
@@ -1529,7 +1529,7 @@ sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
 	} while ((set = set->sms_next) != NULL);
 	/* Must allocate a new set of completion descriptors.
 	 * NOTE: These descriptors must be allocated as LOCKED, since they're made
-	 *       use of by code that may be running with preemption disabled. */
+	 *       use of  by code  that may  be running  with preemption  disabled. */
 	set = (struct _sig_multicompletion_set *)kmalloc(sizeof(struct _sig_multicompletion_set),
 	                                                 GFP_LOCKED | GFP_PREFLT);
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
@@ -1561,7 +1561,7 @@ NOTHROW(FCALL sig_multicompletion_alloc_nx)(struct sig_multicompletion *__restri
 	} while ((set = set->sms_next) != NULL);
 	/* Must allocate a new set of completion descriptors.
 	 * NOTE: These descriptors must be allocated as LOCKED, since they're made
-	 *       use of by code that may be running with preemption disabled. */
+	 *       use of  by code  that may  be running  with preemption  disabled. */
 	set = (struct _sig_multicompletion_set *)kmalloc_nx(sizeof(struct _sig_multicompletion_set),
 	                                                    GFP_LOCKED | GFP_PREFLT);
 	if unlikely(!set)
@@ -1592,7 +1592,7 @@ sig_connect_multicompletion(struct sig *__restrict self,
 
 /* No-except version of `sig_connect_multicompletion()'. Returns `false' if no
  * completion descriptor could be allocated from the pool of `completion', and
- * `true' if a completion descriptor could be allocated and was subsequently
+ * `true' if a completion descriptor  could be allocated and was  subsequently
  * connected. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
@@ -1607,17 +1607,17 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
 }
 
 
-/* Connect `completion' to all signals currently connected to by the calling thread.
- * In other words: all signals the caller is connected to via `task_connect()'
- * Note that for this purpose, only signals from the currently active set of task
- * connections will be connected. Connections established outside the bounds of
- * the current `task_pushconnections()...task_popconnections()' pair will _NOT_
- * be connected. If one of the signals which the calling thread is connected to
- * has already been sent (i.e. `task_waitfor()' wouldn't block), then this function
+/* Connect  `completion' to  all signals currently  connected to by  the calling thread.
+ * In other  words:  all  signals  the  caller  is  connected  to  via  `task_connect()'
+ * Note  that  for this  purpose, only  signals from  the currently  active set  of task
+ * connections  will  be  connected.  Connections  established  outside  the  bounds  of
+ * the  current   `task_pushconnections()...task_popconnections()'   pair   will   _NOT_
+ * be  connected.  If  one of  the  signals which  the  calling thread  is  connected to
+ * has already  been sent  (i.e. `task_waitfor()'  wouldn't block),  then this  function
  * will return early, and the exact (if any) signals that were connected to `completion'
- * are left undefined (meaning that the caller can really only handle this happening
- * by using `sig_multicompletion_disconnectall()', but also meaning that `cb' may still
- * get invoked in case the caller was connected to more than one signal, and more
+ * are left undefined  (meaning that the  caller can really  only handle this  happening
+ * by using `sig_multicompletion_disconnectall()', but also meaning that `cb' may  still
+ * get invoked  in case  the caller  was connected  to more  than one  signal, and  more
  * than one of those gets triggered before connections of `completion' get disconnected)
  * As such, the safe way to use this function is as
  * follows (exception handling not displayed for brevity):
@@ -1637,7 +1637,7 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
  * >>     // Success: Connections established
  * >> }
  * This function is used to implement epoll objects using the regular,
- * old poll-api already exposed via `handle_poll()', without the need
+ * old poll-api already exposed via `handle_poll()', without the  need
  * of complicating that existing ABI. */
 PUBLIC NOBLOCK NONNULL((1)) void FCALL
 sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict completion,
@@ -1668,8 +1668,8 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 
 		/* This is where it gets complicated, because we must:
 		 *    #1: Disable preemption
-		 *    #2: Acquire the SMP-lock of `con', and make sure that `con'
-		 *        wasn't been delivered, yet. This way we know that the
+		 *    #2: Acquire the SMP-lock of `con',  and make sure that  `con'
+		 *        wasn't  been delivered,  yet. This  way we  know that the
 		 *        signal pointed to by `con->tc_sig' hasn't been destroyed,
 		 *        yet.
 		 *    #3: While holding the SMP-lock of `con', insert our new connection
@@ -1677,10 +1677,10 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 		 *    #4: Release our SMP-lock on `con'
 		 *    #5: Re-enable preemption (if it was enabled before)
 		 *
-		 * Note that in order to append a connection onto the wait-queue
-		 * of some signal, one normally doesn't need to acquire any SMP-
+		 * Note  that in order to append a connection onto the wait-queue
+		 * of  some signal, one normally doesn't need to acquire any SMP-
 		 * locks. In this case however, we still need to acquire the SMP-
-		 * lock of `con', with which we can prevent any other CPU from
+		 * lock  of `con', with  which we can prevent  any other CPU from
 		 * (fully) broadcasting the attached signal as part of finalizing
 		 * that signal (~ala `sig_broadcast_for_fini()') */
 		/* Step #1 */
@@ -1699,21 +1699,21 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 				        "status = %#" PRIxPTR,
 				        status);
 				/* Connection is already dead.
-				 * Abort everything and make sure that our thread's
-				 * delivered-connection field is non-NULL (since that
+				 * Abort everything and  make sure  that our  thread's
+				 * delivered-connection field is non-NULL (since  that
 				 * field may not have been set yet by whoever had sent
 				 * the signal) */
 				PREEMPTION_POP(was);
 
-				/* Mark `route' as unused (since it was never fully connected)
-				 * This must be done to ensure that `self' remains in a consistent
+				/* Mark  `route'  as  unused  (since  it  was  never  fully connected)
+				 * This  must be  done to ensure  that `self' remains  in a consistent
 				 * state in regards to finalization (or rather: disconnect in general) */
 				route->tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 
 #ifdef CONFIG_NO_SMP
 				assert(ATOMIC_READ(cons->tcs_dlvr) != NULL);
 #else /* CONFIG_NO_SMP */
-				/* If the signal was send by some other CPU, our thread's
+				/* If  the signal was  send by some  other CPU, our thread's
 				 * delivered-signal field may not have become non-NULL, yet.
 				 * In this case, simply pause until that happens. */
 				while (ATOMIC_READ(cons->tcs_dlvr) == NULL)
@@ -1725,7 +1725,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 #ifndef CONFIG_NO_SMP
 			/* Make sure that `con' isn't already locked. */
 			if unlikely(status & TASK_CONNECTION_STAT_FLOCK) {
-				/* Pausing w/ preemption may do better than pausing w/o
+				/* Pausing w/ preemption may  do better than pausing  w/o
 				 * As such, try to re-enable preemption while we do this. */
 				PREEMPTION_POP(was);
 				task_pause();
@@ -1827,8 +1827,8 @@ NOTHROW(FCALL sig_altsendmany_nopr)(struct sig *self,
 
 
 
-/* Send a signal to the oldest (and preferably non-poll-based) connection of
- * `self' for which `selector' returns non-NULL. Connections are enumerated
+/* Send  a signal to the oldest (and preferably non-poll-based) connection of
+ * `self' for which `selector'  returns non-NULL. Connections are  enumerated
  * twice from oldest to most recent, only including non-poll-based during the
  * first pass, and only including poll-based ones during the second pass.
  * @param: self:     The signal which should be sent.
@@ -1894,11 +1894,11 @@ again_read_cons:
 		    (!!TASK_CONNECTION_STAT_ISPOLL(target_cons)) == select_poll) {
 #ifndef CONFIG_NO_SMP
 			/* NOTE: Waiting until we can lock the connection here is allowed, since
-			 *       you're allowed to (and required to) acquire connection locks
+			 *       you're allowed to  (and required to)  acquire connection  locks
 			 *       without having to release the associated signal-lock.
-			 * Doing this doesn't result in a race condition, since the other end
+			 * Doing  this doesn't result  in a race condition,  since the other end
 			 * of this syncing mechanism (which is `task_disconnect()') will release
-			 * its initial connection-lock if it fails to acquire the signal lock,
+			 * its initial connection-lock if it  fails to acquire the signal  lock,
 			 * which it will because we're already holding that one! */
 			if unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK) {
 				task_pause();
@@ -1925,7 +1925,7 @@ again_read_cons:
 					}
 					if (!chain->tsc_prev) {
 						/* Assume that `chain' is `this_root_connections' of the
-						 * target thread, which we can use to reverse-engineer
+						 * target  thread, which we  can use to reverse-engineer
 						 * the actual thread */
 						context.ssc_thread = (struct task *)((uintptr_t)chain -
 						                                     (uintptr_t)&this_root_connections);

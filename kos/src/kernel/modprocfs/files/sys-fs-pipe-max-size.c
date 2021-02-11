@@ -43,7 +43,7 @@ ProcFS_Sys_Fs_PipeMaxSize_Write(struct regular_node *__restrict UNUSED(self),
                                 USER CHECKED void const *buf,
                                 size_t bufsize) {
 	size_t newsize;
-	/* Setting it lower than the default limit can't be done, since the default
+	/* Setting  it lower than the default limit  can't be done, since the default
 	 * limit is set regardless of what `pipe_max_bufsize_unprivileged' is set to. */
 	newsize = ProcFS_ParseSize(buf, bufsize, RINGBUFFER_DEFAULT_LIMIT, (size_t)-1);
 	ATOMIC_WRITE(pipe_max_bufsize_unprivileged, newsize);

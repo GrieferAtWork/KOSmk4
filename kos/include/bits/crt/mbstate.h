@@ -30,7 +30,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 struct __ATTR_PACKED __mbstate {
-	/* This structure must not exceed 4 bytes, so we
+	/* This structure  must not  exceed  4 bytes,  so  we
 	 * can conform to DOS's 4-byte `mbstate_t' structure. */
 	__UINT32_TYPE__  __word;
 };
@@ -57,7 +57,7 @@ struct __ATTR_PACKED __mbstate {
 #define __MBSTATE_TYPE_UTF8_6_6 0x3c000000 /* expect 6th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 /* NOTE: mbstate is too small to support 7-character and 8-character utf-8 sequences.
  *       But that's OK, since officially UTF-8 only goes up to 4-character sequences,
- *       so even just supporting 5-character and 6-character sequences is already an
+ *       so  even just supporting 5-character and 6-character sequences is already an
  *       extension! */
 #define __MBSTATE_TYPE_UTF16_LO    0x40000000 /* expect the low-surrogate value of a 2-uint16_t utf-16 sequence. `RESULT_CHAR = ((WORD & 0x000003ff) << 10) + 0x10000 + (SECOND_U16 - 0xdc00);' */
 #define __MBSTATE_TYPE_WR_UTF16_LO 0xc0000000 /* Write the low-surrogate value of a 2-uint16_t utf-16 sequence. `OUT_CHAR = 0xdc00 + (WORD & 0x000003ff)' */

@@ -179,12 +179,12 @@ PUBLIC bool cexpr_readonly = false;
 
 /* Don't calculate/keep track of c expression values, but
  * only simulate the effective expression type. - Used to
- * implement `typeof()' in C expressions, as well as for
- * the purpose of auto-completion of struct member names
+ * implement `typeof()' in C expressions, as well as  for
+ * the  purpose of auto-completion of struct member names
  * and the like. */
 PUBLIC bool cexpr_typeonly = false;
 
-/* Set to true if memory writes should be forced.
+/* Set  to  true  if  memory  writes  should  be   forced.
  * This is the 4'th argument is calls to dbg_writememory()
  * Defaults to `false' */
 PUBLIC bool cexpr_forcewrite = false;
@@ -324,7 +324,7 @@ struct libdl_tls_segment;
 struct libdl_dtls_extension;
 
 /* Read out a user-space pointer who's size is defined by `self',
- * and store the resulting pointer in `*presult'. The original
+ * and store the  resulting pointer in  `*presult'. The  original
  * pointer may be zero-extended if necessary. */
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL usermod_getpointer)(struct usermod *__restrict self,
@@ -576,7 +576,7 @@ nope:
 	return false;
 }
 
-/* Calculate the TLS-base address of `self' for
+/* Calculate   the  TLS-base  address  of  `self'  for
  * `dbg_current', and store the result in `*ptls_base' */
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL usermod_get_user_tls_base)(struct usermod *__restrict self,
@@ -589,36 +589,36 @@ NOTHROW(FCALL usermod_get_user_tls_base)(struct usermod *__restrict self,
 		goto nope;
 
 	/* Don't do all of this trickery when the kernel's been poisoned.
-	 * The below code may call-back to (possibly) faulty kernel code
+	 * The below code may call-back to (possibly) faulty kernel  code
 	 * due to the dependency on `inode_readallk()' */
 	if (kernel_poisoned())
 		goto nope;
 
-	/* This is where it gets really hacky, since we rely on internals
+	/* This is where it gets really hacky, since we rely on  internals
 	 * from `libdl.so' that aren't normally exposed to any other APIs:
 	 *
 	 *  #1: We need to figure out the address of the user-space `DlModule *'
-	 *      that is associated with `self'. Luckily, we can do this fairly
-	 *      easily by searching the module's relocations table for an entry
+	 *      that is associated with `self'.  Luckily, we can do this  fairly
+	 *      easily by searching the module's relocations table for an  entry
 	 *      that uses `R_386_TLS_DTPMOD32' (or the equivalent for the target
 	 *      architecture of `self')
 	 *
 	 *  #2: Since KOS's system libdl.so (re-)uses the `DlModule *' pointer
-	 *      as TLS index, we can take the offset contained within the
+	 *      as TLS  index, we  can take  the offset  contained within  the
 	 *      `R_386_TLS_DTPMOD32' relocation and add it to the load address
-	 *      taken from `self' to get a user-space memory location that
-	 *      should contain the `DlModule *' pointer we're looking for.
+	 *      taken  from `self'  to get  a user-space  memory location that
+	 *      should  contain  the `DlModule *'  pointer we're  looking for.
 	 *
-	 *  #3: With the `DlModule *' pointer at hand, we can proceed to
+	 *  #3: With the  `DlModule *'  pointer  at hand,  we  can  proceed  to
 	 *      essentially re-implement `dltlsaddr2(tls_handle, tls_segment)',
 	 *      using the `DlModule *' we've discovered above for `tls_handle',
 	 *      and simply using `utls_base' for `tls_segment'
 	 *
-	 * TODO: Check if this way of calculating TLS locations would also
-	 *       work for TLS variables from modules using the static TLS
+	 * TODO: Check  if this  way of  calculating TLS  locations would also
+	 *       work for  TLS variables  from modules  using the  static  TLS
 	 *       model. - The above only works when tls offsets are calculated
-	 *       at runtime (as is the case in shared libraries), but would
-	 *       break when the `R_386_TLS_DTPMOD32' relocation is missing... */
+	 *       at  runtime (as is  the case in  shared libraries), but would
+	 *       break  when the `R_386_TLS_DTPMOD32' relocation is missing... */
 
 	/* Start by calculating the user-space `DlModule *' pointer. */
 	if (!usermod_get_libdl_DlModule_address(self, &dlmod))
@@ -627,7 +627,7 @@ NOTHROW(FCALL usermod_get_user_tls_base)(struct usermod *__restrict self,
 		goto nope;
 
 	/* Calculate the TLS-base register as (presumably) used
-	 * by user-space in order to implement TLS variables. */
+	 * by  user-space in order  to implement TLS variables. */
 	utls = (struct libdl_tls_segment *)get_user_tls_base_register();
 	if (!ADDR_ISUSER(utls))
 		goto nope;
@@ -647,14 +647,14 @@ NOTHROW(FCALL usermod_get_user_tls_base)(struct usermod *__restrict self,
 		}
 	}
 
-	/* The module uses the dynamic TLS model. As such, we must
-	 * scan the TLS extension table for a matching module.
+	/* The module uses the dynamic  TLS model. As such, we  must
+	 * scan the  TLS  extension  table for  a  matching  module.
 	 * Note that user-space uses a binary tree for this purpose,
-	 * so we can use that to find the module that we're looking
+	 * so we can use that to find the module that we're  looking
 	 * for.
 	 * Also note that we set a max indirection limit of `BITSOF(void *)'
-	 * before we error out, thus preventing infinite recursion when
-	 * user-space has set-up their TLS extension table to form an
+	 * before we  error out,  thus  preventing infinite  recursion  when
+	 * user-space has  set-up  their  TLS extension  table  to  form  an
 	 * infinite loop. */
 	{
 		struct libdl_dtls_extension *ext;
@@ -724,11 +724,11 @@ nope:
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) dbx_errno_t FCALL
 cexpr_cfi_set_address(struct cvalue *__restrict self,
                       USER void *__restrict addr) {
-	/* Always include the expression address addend in the calculation!
+	/* Always include the expression  address addend in the  calculation!
 	 * Without this, you'd be unable to access (e.g.) members of a struct
 	 * who's address must be calculated via a CFI expression. */
 	addr = (byte_t *)addr + self->cv_expr.v_bufoff;
-	/* We must still write-back any unwritten modifications,
+	/* We must  still write-back  any unwritten  modifications,
 	 * even though there really shouldn't be any at this point. */
 	if (self->cv_kind == CVALUE_KIND_EXPR) {
 		if (self->cv_expr.v_buffer) {
@@ -753,7 +753,7 @@ err_fault:
 }
 
 /* Try to convert a `CVALUE_KIND_EXPR' or `CVALUE_KIND_IEXPR'
- * expression into a `CVALUE_KIND_ADDR' object, such that
+ * expression  into  a `CVALUE_KIND_ADDR'  object,  such that
  * its address may be taken, and data can be accessed without
  * having to use an intermediate buffer.
  * @return: DBX_EOK:    Success (`self' has become `CVALUE_KIND_ADDR')
@@ -823,11 +823,11 @@ do_second_pass:
 	if unlikely(emulator.ue_piecebits != 0)
 		goto done; /* The value isn't continuous (and so its address cannot be taken) */
 	/* Switch on what was left in the stack-top entry to
-	 * determine if we can extract an absolute address. */
+	 * determine  if we can extract an absolute address. */
 	switch (ste_top.s_type) {
 
-		/* NOTE: The reason why specifically these 4 types of stack-values
-		 *       can be dereferenced can be traced back to the documentation
+		/* NOTE: The reason  why specifically  these 4  types of  stack-values
+		 *       can be dereferenced can be  traced back to the  documentation
 		 *       of these constants in "<libunwind/cfi.h>", following the line
 		 *       """Effective return values (after indirection) are:""""
 		 * If you compare this list with it, you will see that this is the list
@@ -908,7 +908,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 		result = cexpr_cfi_to_address_impl(self, mod);
 	} EXCEPT {
 		/* Exceptions thrown in this function currently crash the kernel.
-		 * Instead, they should be handled by returning DBX_EFAULT! */
+		 * Instead,  they  should  be  handled  by  returning DBX_EFAULT! */
 		result = DBX_EFAULT;
 	}
 	if (old_pdir != req_pdir)
@@ -955,9 +955,9 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 				}
 				TRY {
 #ifdef CONFIG_HAVE_USERMOD
-					/* TODO: Proper user-space support for `unwind_emulator_t::ue_tlsbase'
+					/* TODO: Proper user-space  support for  `unwind_emulator_t::ue_tlsbase'
 					 *       When used by the expression, then we mustn't rely on the native
-					 *       TLS-base calculation function from libunwind, but must instead
+					 *       TLS-base  calculation function from libunwind, but must instead
 					 *       make use of `usermod_get_user_tls_base()' from above. */
 #endif /* CONFIG_HAVE_USERMOD */
 					if (write) {
@@ -1491,7 +1491,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_swap)(void) {
 }
 
 /* Rotate the top n c expression stack elements left/right.
- * When `n <= 1', these calls are a no-op in regards to
+ * When  `n <= 1', these  calls are  a no-op  in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n) {
@@ -1524,10 +1524,10 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n) {
 
 
 
-/* Return a pointer to the data associated with the top expression stack element.
+/* Return a pointer to the data associated with the top expression stack  element.
  * If the stack is empty or `cexpr_typeonly' is `true', write-back a NULL pointer.
  * WARNING: The pointer written back to `*presult' may point to arbitrary
- *          user- or out-of-vm memory, meaning that it must be accessed
+ *          user- or out-of-vm memory, meaning  that it must be  accessed
  *          through use of `dbg_(read|write)memory'!
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.
@@ -1575,7 +1575,7 @@ again:
 				goto again;
 			return error;
 		}
-		/* Assert that sufficient space is available for the type in use.
+		/* Assert  that sufficient space is available for the type in use.
 		 * If less space is available, return NULL to prevent writing past
 		 * the end of the internal buffer for expressions.
 		 * Note though, that this really shouldn't happen... */
@@ -1583,7 +1583,7 @@ again:
 			return DBX_EINTERN;
 		if (bufavail < ctype_sizeof(top->cv_type.ct_typ))
 			return DBX_EINTERN;
-		/* Adjust the buffer pointer for the expression-base-offset.
+		/* Adjust the  buffer pointer  for the  expression-base-offset.
 		 * This is used (e.g.) for accessing struct-through-CFI fields. */
 		*presult += top->cv_expr.v_bufoff;
 	}	break;
@@ -1603,7 +1603,7 @@ again:
 }
 
 /* Return the actual size of the top element of the C expression stack.
- * If the stack is empty, return `0' instead. (s.a. `ctype_sizeof()') */
+ * If the stack is empty,  return `0' instead. (s.a.  `ctype_sizeof()') */
 PUBLIC ATTR_PURE WUNUSED size_t
 NOTHROW(FCALL cexpr_getsize)(void) {
 	if unlikely(!cexpr_stacksize)
@@ -1778,7 +1778,7 @@ again:
 		}
 		goto set_new_type;
 	}
-	/* All right! With floating-point out of the way, move on to integer casts.
+	/* All right! With  floating-point out of  the way, move  on to integer  casts.
 	 * For this purpose, allow any sort of cast to/from integer/bool/pointer types. */
 	if (CTYPE_KIND_ISINT_OR_BOOL_OR_POINTER(old_typ->ct_kind) &&
 	    CTYPE_KIND_ISINT_OR_BOOL_OR_POINTER(new_typ->ct_kind))
@@ -1832,9 +1832,9 @@ NOTHROW(FCALL cexpr_cast_simple)(struct ctype *__restrict typ) {
 
 
 
-/* Convert the top C expression stack element into an R-value,
+/* Convert  the  top C  expression  stack element  into  an R-value,
  * such that if a potentially pointed-to memory location is changed,
- * then the stack element retains the original value. This function
+ * then the stack element retains the original value. This  function
  * also promotes array->pointer types.
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
@@ -2116,7 +2116,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 	/* Make sure that the top-element is located in-memory. */
 	if (top->cv_kind != CVALUE_KIND_ADDR &&
 	    top->cv_kind != CVALUE_KIND_VOID) {
-		/* Return a special error when we can't
+		/* Return  a special error when we can't
 		 * take the address of a CFI expression. */
 		if (top->cv_kind == CVALUE_KIND_EXPR ||
 		    top->cv_kind == CVALUE_KIND_IEXPR)
@@ -2149,7 +2149,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 		return DBX_EINTERN;
 	top = &cexpr_stacktop;
 	/* Make sure that `top' has pointer typing.
-	 * Note that we need to check for arrays here, since those will
+	 * Note  that we need  to check for arrays  here, since those will
 	 * have already been promoted to base-pointers by `cexpr_rvalue()' */
 	typ = top->cv_type.ct_typ;
 	if unlikely(!CTYPE_KIND_ISPOINTER(typ->ct_kind))
@@ -2219,12 +2219,12 @@ NOTHROW(FCALL cvalue_setptrdiff_t)(struct cvalue *__restrict self,
 
 
 /* Perform a unary operation `op' on the top C expression stack element.
- * NOTE: This function automatically performs type promotions.
+ * NOTE: This   function   automatically   performs   type   promotions.
  * @param: op: One of:
  *             '+': Assert integer type / cast enum to integer.
  *             '-': Negate a value.
  *             '~': Bit-wise not.
- *             '!': Logical not.
+ *             '!': Logical  not.
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: The stack is empty or invalid `op'.
@@ -2327,7 +2327,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 }
 
 /* Perform a binary operation `op' on the top 2 C expression stack elements.
- * As far as operands go, STACK.TOP is RHS and STACK.TOP-1 is LHS (meaning
+ * As  far as operands go, STACK.TOP is  RHS and STACK.TOP-1 is LHS (meaning
  * that LHS must be pushed first, and RHS second)
  * NOTE: This function automatically performs type promotions.
  * @param: op: One of:
@@ -2336,9 +2336,9 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
  *             '*':                      Multiply.
  *             '/':                      Divide.
  *             '%':                      Remainder (modulo).
- *             '&':                      Bit-wise and
- *             '|':                      Bit-wise or
- *             '^':                      Bit-wise xor
+ *             '&':                      Bit-wise        and
+ *             '|':                      Bit-wise         or
+ *             '^':                      Bit-wise        xor
  *             CTOKEN_TOK_LANGLE_LANGLE: Shift-left
  *             CTOKEN_TOK_RANGLE_RANGLE: Shift-right
  *             CTOKEN_TOK_EQUALS_EQUALS: Equals
@@ -2630,9 +2630,9 @@ do_pointer_pointer_op:
 			case CTOKEN_TOK_LANGLE_EQUALS:
 			case '>':
 			case CTOKEN_TOK_RANGLE_EQUALS:
-				/* Handle PTR <=> INT the same as PTR <=> PTR.
+				/* Handle  PTR  <=>  INT  the  same  as  PTR  <=> PTR.
 				 * Normally, C only allows this when INT is a constant
-				 * literal equal to `0', but for convenience, and
+				 * literal  equal  to  `0', but  for  convenience, and
 				 * simplicity, we always allow such a comparison to be
 				 * made. */
 				goto do_pointer_pointer_op;
@@ -2661,8 +2661,8 @@ do_pointer_pointer_op:
 			goto swap_operands_and_again;
 
 			/* We now that `lhs_typ' isn't a pointer, but `rhs_typ' is.
-			 * For the comparison operators, simply flip the operands,
-			 * as well as the operation so we can re-use the special
+			 * For  the comparison operators, simply flip the operands,
+			 * as  well as the  operation so we  can re-use the special
 			 * handling already done when the LHS-operand is a pointer. */
 		case CTOKEN_TOK_EQUALS_EQUALS:
 		case CTOKEN_TOK_XCLAIM_EQUALS: goto swap_operands_and_again;
@@ -2856,7 +2856,7 @@ done:
 
 
 
-/* Perform an assignment operation between the top 2 stack elements,
+/* Perform an assignment operation between the top 2 stack  elements,
  * where TOP is RHS, and the one before is LHS. When `cexpr_readonly'
  * is set to `true', then this function fails with `DBX_ERDONLY' */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
@@ -2866,7 +2866,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
 }
 
 /* Pop `argc' operands, followed by popping the function to call.
- * Then, invoke the function and push its return value.
+ * Then,  invoke  the  function   and  push  its  return   value.
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: The stack does not contain enough elements. */
@@ -2878,9 +2878,9 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
 }
 
 
-/* Push a currently visible symbol, as selected by the code location from
+/* Push  a currently visible  symbol, as selected by  the code location from
  * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
- * given that symbol's `name'. For this purpose, `name' can be (in order):
+ * given that symbol's `name'. For this  purpose, `name' can be (in  order):
  *   - A function-to-compilation-unit-scoped variable/argument/enum
  *   - A PUBLIC/INTERN variable from the module containing the current PC
  * if (ADDR_ISUSER(CURRENT_PC)) {
@@ -2890,10 +2890,10 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
  *   - A PUBLIC/INTERN variable from any loaded kernel-space module
  *   - A PUBLIC/INTERN variable from any loaded user-space module
  * }
- * Note that special handling is done for kernel-space PERxxx variables, which are
- * automatically linked to the associated address space for `dbg_current', such as
+ * Note that special handling is done for kernel-space PERxxx variables, which  are
+ * automatically  linked to the associated address space for `dbg_current', such as
  * `this_task' automatically being loaded as the equivalent of `this_task@%fs_base'
- * This detection is done for all PUBLIC/INTERN+KERNEL_CORE symbols starting with
+ * This detection is done for  all PUBLIC/INTERN+KERNEL_CORE symbols starting  with
  * one of the following prefixes:
  *   - this_*      Addend is `(uintptr_t)dbg_current'
  *   - thiscpu_*   Addend is `(uintptr_t)dbg_current->t_cpu'
@@ -2909,29 +2909,29 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 	if (cmodsyminfo_istype(sym))
 		return DBX_ENOENT;
 	if (!sym->clv_data.s_var.v_typeinfo && cmodsyminfo_issip(sym)) {
-		/* XXX: This right here can happen if a symbol appears in a module's
-		 *      symbol table, but doesn't actually end up appearing within
+		/* XXX: This  right here  can happen if  a symbol appears  in a module's
+		 *      symbol table,  but  doesn't  actually end  up  appearing  within
 		 *      the module's .debug_info, not even as some kind of alias created
 		 *      by something like `DEFINE_PUBLIC_ALIAS()'.
-		 * In this case, check if `sym' is part of the _public_ symbol table
+		 * In this case, check  if `sym' is part  of the _public_ symbol  table
 		 * of its associated module (i.e. `.dynsym'), and if so: search through
-		 * loaded modules that claim dependencies on that module. Then, look
+		 * loaded modules that  claim dependencies on  that module. Then,  look
 		 * through the debug information of those modules in search of one that
-		 * makes a reference to an external symbol of the same name, and if we
-		 * manage to find such a reference, then we can make use of its type
+		 * makes  a reference to an external symbol of the same name, and if we
+		 * manage to find such a  reference, then we can  make use of its  type
 		 * information to complete what we couldn't find earlier! */
 	}
 
 	if (!sym->clv_data.s_var.v_typeinfo && cmodsyminfo_issip(sym)) {
-		/* If we weren't able to figure out the proper typing for
+		/* If we weren't able to  figure out the proper typing  for
 		 * the symbol (and it may not even have any proper typing),
-		 * then try to induce its type from information taken from
+		 * then try to induce its type from information taken  from
 		 * the symbol's Elf(32|64)_Sym entry.
 		 *
 		 * Using that entry, we can:
-		 *   - Determine if it's a function, and if it is:
+		 *   - Determine if  it's  a  function,  and  if  it  is:
 		 *     Use `void(...)' as type (i.e. void-return+varargs)
-		 *   - Figure out the symbol's size, and select an
+		 *   - Figure  out  the  symbol's  size,  and  select an
 		 *     appropriate integer type based on that knowledge:
 		 *      - If the size is the same as that of a pointer, assume that it's a pointer
 		 *      - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
@@ -3033,7 +3033,7 @@ got_symbol_type:
 			 * in relation to dbg_current, such that the user can directly reference
 			 * these objects without having to manually sym@object them.
 			 *
-			 * Note however that this is in normal code, this is only done when the
+			 * Note  however that this is in normal code, this is only done when the
 			 * symbol doesn't already appear in an @-expression (i.e. isn't followed
 			 * by an @-token) or within __identifier, meaning that:
 			 *   - `&__identifier(this_cred)' == `&__identifier(this_cred)'

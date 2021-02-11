@@ -66,7 +66,7 @@ NOTHROW(KCALL vm_datapart_maybe_delete_futex_controller)(struct vm_datapart *__r
 		return; /* Custom RTM version has been set -> Can't destroy. */
 #endif /* ARCH_HAVE_RTM */
 	/* XXX: This right here doesn't ~need~ to be done.
-	 *      We could also just keep the futex controller alive, so that it
+	 *      We could also just keep the  futex controller alive, so that  it
 	 *      may be re-used by future futex operations. In essence, we'd need
 	 *      a heuristic on the likelihood of further futex allocations being
 	 *      done within this data part. */
@@ -84,8 +84,8 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	struct vm_futex_controller *fc;
 	assert(wasdestroyed(self));
 
-	/* As a precaution, broadcast the futex's signal to wake up any thread
-	 * that may still be listening, thus ensuring that futex objects comply
+	/* As  a precaution,  broadcast the futex's  signal to wake  up any thread
+	 * that  may still be  listening, thus ensuring  that futex objects comply
 	 * with the extension of `struct sig's behavior of allowing task_waitfor()
 	 * on signal objects that may have already been destroyed by the time that
 	 * task_waitfor() gets called. */
@@ -95,39 +95,39 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	part = awref_get(&self->vmf_part);
 	if (!part) {
 		/* No associated part
-		 * -> Our atree-leaf was already invalid to begin with,
+		 * -> Our atree-leaf was  already invalid  to begin  with,
 		 *    so there is no need to unlink ourself from anywhere. */
 		vm_futex_free(self);
 		return;
 	}
 
 	/* NOTE: Normally, one would not be allowed to access `dp_futex' without first
-	 *       acquiring a lock to the data parts `dp_lock' lock. However due to a
-	 *       special ruling concerning the translocation of dead futex objects in
-	 *       the event of a data part being split, as well as the fact that right
-	 *       now _we_ _are_ a dead futex that is still contained within the
-	 *       controller's futex tree, we _can_ actually dereference this field,
-	 *       which is also something that we have to do in order to add ourself
-	 *       to the set of dead futex objects in case we can't acquire a lock
+	 *       acquiring  a lock to the data parts  `dp_lock' lock. However due to a
+	 *       special ruling concerning the translocation of dead futex objects  in
+	 *       the  event of a data part being split, as well as the fact that right
+	 *       now  _we_  _are_ a  dead  futex that  is  still contained  within the
+	 *       controller's futex tree,  we _can_ actually  dereference this  field,
+	 *       which is also something that  we have to do  in order to add  ourself
+	 *       to the set  of dead futex  objects in  case we can't  acquire a  lock
 	 *       to the datapart below. */
 	fc = part->dp_futex;
 	assert(fc);
 
 	/* Since the data part still exists, we must manually attempt to
-	 * remove ourself from the tree of existing futex objects. */
+	 * remove ourself  from  the  tree of  existing  futex  objects. */
 	if (!sync_trywrite(part)) {
 		/* Failed to acquire a lock to the associated part.
 		 * In this case, make use of the chain of dead futex objects (`fc_dead'),
-		 * and have whoever is holding the lock perform the actual cleanup. */
+		 * and  have  whoever is  holding the  lock  perform the  actual cleanup. */
 		struct vm_futex *next;
 		do {
 			next = ATOMIC_READ(fc->fc_dead);
 			self->vmf_ndead = next;
 			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(fc->fc_dead, next, self));
-		/* Try to service the datapart in case it became available in the mean time,
-		 * thus ensuring that us being added to the chain of dead futex objects is
-		 * done in an interlocked manner in regards to holding a lock to the data
+		/* Try to service the datapart in case  it became available in the mean  time,
+		 * thus ensuring that us  being added to  the chain of  dead futex objects  is
+		 * done in an  interlocked manner in  regards to  holding a lock  to the  data
 		 * part. (Reminding: acquiring a lock to a datapart will automatically service
 		 * dead futex objects, which at this point includes us) */
 		if (sync_trywrite(part))
@@ -175,14 +175,14 @@ NOTHROW(KCALL vm_futex_controller_init)(struct vm_futex_controller *__restrict s
 
 
 /* Return a reference to the futex associated with `datapart_offset' bytes into the given data part.
- * If no such futex already exists, use this chance to allocate it, as well as a potentially
- * missing `vm_futex_controller' when `self->dp_futex' was `NULL' when this function was called.
+ * If no  such futex  already exists,  use this  chance to  allocate it,  as well  as a  potentially
+ * missing `vm_futex_controller' when  `self->dp_futex' was  `NULL' when this  function was  called.
  * @return: * : A reference to the futex associated with `datapart_offset'
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
  *              The given `datapart_offset' is greater than `vm_datapart_numbytes(self)', which
- *              may be the case even if you checked before that it wasn't (or simply
+ *              may be  the  case  even  if  you checked  before  that  it  wasn't  (or  simply
  *              used `vm_paged_datablock_locatepart()' in order to lookup the associated part),
- *              because there always exists the possibility that any data part gets split
+ *              because  there  always exists  the possibility  that any  data part  gets split
  *              into multiple smaller parts. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_datapart_getfutex)(struct vm_datapart *__restrict self, uintptr_t datapart_offset)
@@ -210,10 +210,10 @@ do_alloc_fc:
 #if 1
 		/* We can't use the normal `sync_downgrade(self)' here, since that may
 		 * call into `vm_datapart_service_stale()', which is allowed to invoke
-		 * `vm_datapart_maybe_delete_futex_controller()', which in turn could
-		 * think that given the fact that `fc' is currently empty, it may as
+		 * `vm_datapart_maybe_delete_futex_controller()', which in turn  could
+		 * think  that given the fact that `fc'  is currently empty, it may as
 		 * well get rid of it for that reason.
-		 * In other words: `sync_downgrade(self)' would be allowed to `kfree(fc)',
+		 * In other words: `sync_downgrade(self)'  would  be  allowed  to   `kfree(fc)',
 		 *                 which would end up with a fault in `vm_futextree_locate_at()'
 		 *                 caused by the attempt to access kfree()'d memory. */
 		sync_downgrade(&self->dp_lock);
@@ -345,7 +345,7 @@ do_recheck_existing_futex_and_controller:
 	/* At this point, we...
 	 *  ... have got a freshly allocated futex in `result'
 	 *  ... know that there is no pre-existing futex for `datapart_offset'
-	 *  ... know that a futex controller has been allocated
+	 *  ... know    that   a   futex   controller   has   been   allocated
 	 *  ... are holding a lock to `self'
 	 * In other words, this is the part where we initialize a new futex. */
 	result->vmf_refcnt = 1; /* The reference we'll eventually return */
@@ -364,7 +364,7 @@ do_recheck_existing_futex_and_controller:
 }
 
 
-/* Same as `vm_datapart_getfutex()', but don't allocate a new
+/* Same   as  `vm_datapart_getfutex()',  but   don't  allocate  a  new
  * futex object if none already exists for the given `datapart_offset'
  * @return: * :   A reference to the futex bound to the given `datapart_offset'
  * @return: NULL: No futex exists for the given `datapart_offset', even though `datapart_offset'
@@ -404,21 +404,21 @@ done_check_oob:
 	return result;
 }
 
-/* Lookup a futex at a given address that is offset from the start of a given
+/* Lookup  a futex at a given address that is offset from the start of a given
  * data block. Note though the possibly unintended behavior which applies when
  * the given `vm_datablock' is anonymous at the time of the call being made.
- * WARNING: Using this function when `self' has been, or always was anonymous, will
+ * WARNING: Using this function  when `self'  has been,  or always  was anonymous,  will
  *          cause the data part associated with the returned futex to also be anonymous,
- *          meaning that the part would get freshly allocated, and repeated calls with
+ *          meaning that the part would get  freshly allocated, and repeated calls  with
  *          the same arguments would not yield the same futex object!
- *       -> As such, in the most common case of a futex lookup where you wish to find
- *          the futex associated with some given address, the process would be to
- *          determine the `vm_node' of the address, and using that node then determine
+ *       -> As such, in  the most  common case of  a futex  lookup where you  wish to  find
+ *          the futex  associated  with  some  given  address,  the  process  would  be  to
+ *          determine the `vm_node'  of the  address, and  using that  node then  determine
  *          the associated vm_datapart, and relative offset into that datapart. If a lookup
- *          of the futex then returns `VM_DATAPART_GETFUTEX_OUTOFRANGE', loop back around
+ *          of the futex then  returns `VM_DATAPART_GETFUTEX_OUTOFRANGE', loop back  around
  *          and once again lookup the `vm_node'.
- *       -> In the end, there exists no API also found on linux that would make use of this
- *          function, however on KOS it is possible to access this function through use of
+ *       -> In the  end, there  exists no  API also  found on  linux that  would make  use of  this
+ *          function,  however  on  KOS it  is  possible to  access  this function  through  use of
  *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `offset' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
@@ -433,7 +433,7 @@ again:
 	partrel_addr = (pos_t)(offset - vm_datapart_minbyte(part));
 #if __SIZEOF_POINTER__ < __FS_SIZEOF(OFF)
 	/* Make sure that the part-relative address offset
-	 * doesn't overflow. If it does, force a split! */
+	 * doesn't overflow. If  it does,  force a  split! */
 	if (partrel_addr > (pos_t)(uintptr_t)-1) {
 		REF struct vm_datapart *used_part;
 		TRY {
@@ -455,7 +455,7 @@ again:
 		/* Using the datapart, lookup the futex. */
 		result = vm_datapart_getfutex(part, (uintptr_t)partrel_addr);
 		/* Handle the special case of the data part being split and truncated before
-		 * we were able to acquire a reference to the associated futex (if any) */
+		 * we were able  to acquire  a reference to  the associated  futex (if  any) */
 		if unlikely(result == VM_DATAPART_GETFUTEX_OUTOFRANGE)
 			goto again;
 	}
@@ -463,7 +463,7 @@ again:
 }
 
 /* Same as `vm_datablock_getfutex()', but don't allocate a new
- * futex object if none already exists for the given `offset'
+ * futex object if none already exists for the given  `offset'
  * @return: * : The futex associated with the given `offset'
  * @return: NULL: No futex exists for the given address. */
 PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
@@ -471,7 +471,7 @@ PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
 		THROWS(E_WOULDBLOCK) {
 	REF struct vm_futex *result;
 	REF struct vm_datapart *part;
-	/* An anonymous data-block can't refer to any existing
+	/* An  anonymous  data-block  can't  refer  to  any existing
 	 * data parts, so there can't be any existing futex objects! */
 again:
 	if unlikely(ATOMIC_READ(self->db_parts) == MFILE_PARTS_ANONYMOUS)
@@ -508,7 +508,7 @@ again:
 		}
 	}
 	/* Handle the special case of the data part being split and truncated before
-	 * we were able to acquire a reference to the associated futex (if any) */
+	 * we were able  to acquire  a reference to  the associated  futex (if  any) */
 	if unlikely(result == VM_DATAPART_GETFUTEX_OUTOFRANGE)
 		goto again;
 	return result;
@@ -543,13 +543,13 @@ again:
 		result = vm_datapart_getfutex(part, partrel_addr);
 	}
 	/* Handle the special case of the data part being split and truncated before
-	 * we were able to acquire a reference to the associated futex (if any) */
+	 * we were able  to acquire  a reference to  the associated  futex (if  any) */
 	if unlikely(result == VM_DATAPART_GETFUTEX_OUTOFRANGE)
 		goto again;
 	return result;
 }
 
-/* Same as `vm_getfutex()', but don't allocate a new
+/* Same  as  `vm_getfutex()',  but  don't  allocate  a  new
  * futex object if none already exists for the given `addr'
  * @return: * : The futex associated with the given `addr'
  * @return: NULL: No futex exists for the given address. */
@@ -580,7 +580,7 @@ again:
 		result = vm_datapart_getfutex_existing(part, partrel_addr);
 	}
 	/* Handle the special case of the data part being split and truncated before
-	 * we were able to acquire a reference to the associated futex (if any) */
+	 * we were able  to acquire  a reference to  the associated  futex (if  any) */
 	if unlikely(result == VM_DATAPART_GETFUTEX_OUTOFRANGE)
 		goto again;
 	return result;

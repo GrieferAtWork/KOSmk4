@@ -66,7 +66,7 @@ DECL_BEGIN
 /* Send signal `self' to exactly 1 connected thread
  *  - The receiver is the thread who's connection has been pending the longest.
  *  - Note the special interaction of this function with poll-based connections.
- *    For more information on this subject, see `task_connect_for_poll()'.
+ *    For  more  information  on  this  subject,  see `task_connect_for_poll()'.
  * @return: true:  A waiting thread was signaled.
  * @return: false: The given signal didn't have any active connections. */
 PUBLIC NOBLOCK NONNULL((1)) __BOOL
@@ -90,7 +90,7 @@ NOTHROW(FCALL sig_altsend_nopr)(struct sig *self,
 #define HAVE_BROADCAST
 /* Send signal to all connected threads.
  * @return: * : The actual number of threads notified,
- *              not counting poll-based connections. */
+ *              not  counting  poll-based connections. */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast)
@@ -115,10 +115,10 @@ NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
 #define HAVE_BROADCAST
 #define HAVE_SENDER_THREAD
 #define HAVE_NOPREEMPT
-/* Same as `sig_broadcast()', but impersonate `caller', and
+/* Same  as  `sig_broadcast()',  but  impersonate  `caller',  and
  * wake up thread through use of `task_wake_as()'. The same rules
- * apply, meaning that the (true) caller must ensure that their
- * CPU won't change, and that `caller' is also running as
+ * apply, meaning that the (true)  caller must ensure that  their
+ * CPU  won't  change,  and  that  `caller'  is  also  running as
  * part of their CPU. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
@@ -127,10 +127,10 @@ NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
 #define HAVE_BROADCAST
 #define HAVE_CLEANUP
 #define HAVE_NOPREEMPT
-/* Same as `sig_broadcast()', but invoke a given `cleanup' prior to doing any other
+/* Same as `sig_broadcast()', but invoke a given `cleanup' prior to doing any  other
  * kind of cleanup, but after having released all internal SMP-locks. May be used to
- * release further SMP-locks which may have been used to guard `self' from being
- * destroyed (such as calling `aio_handle_release()' when sending a signal from
+ * release further SMP-locks  which may have  been used to  guard `self' from  being
+ * destroyed (such  as calling  `aio_handle_release()' when  sending a  signal  from
  * inside of an AIO completion function)
  * Note that all of these functions guaranty that `callback' is invoked exactly once. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
@@ -148,13 +148,13 @@ NOTHROW(FCALL sig_broadcast_as_cleanup_nopr)(struct sig *__restrict self,
 #elif defined(DEFINE_sig_broadcast_for_fini)
 #define HAVE_BROADCAST
 #define HAVE_FOR_FINI
-/* Same as the regular `sig_broadcast' function, but must be used of
- * `self' is being broadcast one last time prior to being destroyed.
+/* Same  as the regular `sig_broadcast' function, but must be used of
+ * `self'  is being broadcast one last time prior to being destroyed.
  * When these functions are used, signal completion callbacks are not
- * allowed to make use of `sig_completion_reprime()', but instead,
+ * allowed to make  use of  `sig_completion_reprime()', but  instead,
  * that function will return `false' and do nothing.
  * @return: * : The actual number of threads notified,
- *              not counting poll-based connections. */
+ *              not  counting  poll-based connections. */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast_for_fini)
@@ -211,11 +211,11 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 	struct task_connections *target_cons;
 #ifdef HAVE_BROADCAST
 	/* FIXME: Broadcasting to a large number other threads running on another CPU
-	 *        can lead to a (not-really?) soft-lock scenario that can randomly
+	 *        can lead to  a (not-really?) soft-lock  scenario that can  randomly
 	 *        resolve itself after an arbitrary amount of time.
-	 * The problem is that the condition which our caller is broadcasting may have
-	 * gone away before we've finished broadcasting to all listening threads. When
-	 * this happens, it can be that other threads which we've already send a signal
+	 * The problem is that  the condition which our  caller is broadcasting may  have
+	 * gone  away before we've  finished broadcasting to  all listening threads. When
+	 * this happens, it can be that other  threads which we've already send a  signal
 	 * to re-add themself to the signal queue before we're done, at which point we'll
 	 * end up broadcasting to them once again.
 	 * Solution: Instead of implementing sig_broadcast() as
@@ -315,7 +315,7 @@ again_select_receiver:
 	receiver = sig_smplock_clr(con);
 	assert(receiver);
 	/* Unlink `receiver' from the connection chain, but keep ahold of the signal lock.
-	 * The later must be done to ensure that the signal isn't broadcast again until
+	 * The later must be done  to ensure that the  signal isn't broadcast again  until
 	 * we're done, so-as to ensure that auto-re-prime completion callbacks are invoked
 	 * for every time they are selected as signal targets. */
 	if (!ATOMIC_CMPXCH_WEAK(self->s_con, con,
@@ -330,11 +330,11 @@ again_select_receiver:
 again_read_target_cons:
 	target_cons = ATOMIC_READ(receiver->tc_cons);
 	/* NOTE: Waiting until we can lock the connection here is allowed, since
-	 *       you're allowed to (and required to) acquire connection locks
+	 *       you're allowed to  (and required to)  acquire connection  locks
 	 *       without having to release the associated signal-lock.
-	 * Doing this doesn't result in a race condition, since the other end
+	 * Doing  this doesn't result  in a race condition,  since the other end
 	 * of this syncing mechanism (which is `task_disconnect()') will release
-	 * its initial connection-lock if it fails to acquire the signal lock,
+	 * its initial connection-lock if it  fails to acquire the signal  lock,
 	 * which it will because we're already holding that one! */
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
@@ -396,11 +396,11 @@ again_read_target_cons:
 			if (!next && ATOMIC_CMPXCH(self->s_ctl, SIG_CONTROL_SMPLOCK, 0))
 #endif /* !CONFIG_NO_SMP */
 			{
-				/* Special case: No other remaining signals. - In this case, do the
-				 * wake-up of `thread' while no longer holding the SMP-lock to `self'
+				/* Special  case: No other  remaining signals. - In  this case, do the
+				 * wake-up  of `thread' while no longer holding the SMP-lock to `self'
 				 * We do this because `task_wake()' can be a bit smarter when it comes
-				 * to scheduling if preemption is enabled (since in that case, it can
-				 * do direct context switches, possibly even over to `thread' itself) */
+				 * to scheduling if preemption is enabled (since in that case, it  can
+				 * do direct context switches, possibly even over to `thread'  itself) */
 				LOCAL_exec_cleanup();
 				LOCAL_PREEMPTION_POP();
 				LOCAL_task_wake(thread);
@@ -463,11 +463,11 @@ again_read_target_cons:
 	target_cons = ATOMIC_READ(receiver->tc_cons);
 #ifndef CONFIG_NO_SMP
 	/* NOTE: Waiting until we can lock the connection here is allowed, since
-	 *       you're allowed to (and required to) acquire connection locks
+	 *       you're allowed to  (and required to)  acquire connection  locks
 	 *       without having to release the associated signal-lock.
-	 * Doing this doesn't result in a race condition, since the other end
+	 * Doing  this doesn't result  in a race condition,  since the other end
 	 * of this syncing mechanism (which is `task_disconnect()') will release
-	 * its initial connection-lock if it fails to acquire the signal lock,
+	 * its initial connection-lock if it  fails to acquire the signal  lock,
 	 * which it will because we're already holding that one! */
 	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 		task_pause();
@@ -529,7 +529,7 @@ again_read_target_cons:
 		target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
 		thread = NULL;
 		/* Set the delivered signal, and capture
-		 * the thread thread, if there is one */
+		 * the thread  thread, if  there is  one */
 		if (ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender))
 			thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
 		/* Unlock the connection. */

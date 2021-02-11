@@ -70,7 +70,7 @@ NOTHROW(FCALL mnode_tree_init_mman_and_module)(struct mnode *__restrict root,
                                                struct mman *__restrict mm) {
 again:
 	/* We must also delete a couple of flags that may still be left in the node,
-	 * and that might otherwise interfere with other mman system components. */
+	 * and  that might  otherwise interfere  with other  mman system components. */
 	root->mn_flags &= ~(MBNODE_F_POPULATE | MBNODE_F_NONBLOCK);
 	assertf(!(root->mn_flags & MNODE_F_UNMAPPED), "Why is this node marked as UNMAPPED?");
 	assertf(!(root->mn_flags & MNODE_F_MPREPARED), "You can't set the PREPARED flag for user-space nodes!");
@@ -90,20 +90,20 @@ again:
 }
 
 
-/* Apply all of the mappings from `self' onto `target', whilst simultaneously deleting
+/* Apply all of the mappings from  `self' onto `target', whilst simultaneously  deleting
  * any memory mapping still present within `target' (except for the kernel-reserve node)
  * NOTES:
  *  - When calling this function, the caller must ensure that:
  *     - mbuilder_partlocks_acquire(self)    (was called)
  *     - mman_lock_acquired(target)
  *  - Upon return, this function will have released all of the part-locks originally
- *    acquired by `mbuilder_partlocks_acquire()', however the mman-lock to `target'
- *    will _not_ have been released yet, and the caller must release that lock once
+ *    acquired  by `mbuilder_partlocks_acquire()', however the mman-lock to `target'
+ *    will  _not_ have been released yet, and the caller must release that lock once
  *    they've finished doing other additional builder-apply operations.
- *  - This function doesn't actually modify the page directory of `target'.
+ *  - This  function  doesn't  actually  modify  the  page  directory  of   `target'.
  *    The caller is responsible for doing this by calling `pagedir_unmap_userspace()'
  * @param: self:   The mman Builder object from which to take mappings to-be applied to `target'
- *                 Upon success, the contents of `self' are left undefined and must either be
+ *                 Upon success, the contents  of `self' are left  undefined and must either  be
  *                 re-initialized, or not be attempted to be finalized.
  * @param: target: The target mman to which to apply the new memory mappings.
  *                 Upon success, this mman will only contain the mappings from `self', with all
@@ -124,7 +124,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	LIST_CLEAR(&target->mm_writable);
 
 	/* Step #3: Go over all nodes currently mapped in `target', and
-	 *          set the `MNODE_F_UNMAPPED' flag for all of them. */
+	 *          set the `MNODE_F_UNMAPPED'  flag for  all of  them. */
 	if ((self->mb_oldmap = target->mm_mappings) != NULL)
 		mnode_tree_foreach_set_unmapped(self->mb_oldmap);
 
@@ -166,15 +166,15 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	target->mm_mappings = (struct mnode *)self->mb_mappings;
 	self->mb_mappings   = NULL; /* Got inherited! */
 
-	/* Step #7: Go over all of the nodes from `mb_uparts' and release our
-	 *          locks to the associated mem-parts. Note that the address
-	 *          of the `mbn_nxtuprt' field (which is used to link all of
-	 *          the nodes pointing to parts who's locks we're holding) is
+	/* Step #7: Go over all  of the  nodes from `mb_uparts'  and release  our
+	 *          locks to  the associated  mem-parts.  Note that  the  address
+	 *          of the  `mbn_nxtuprt' field  (which is  used to  link all  of
+	 *          the  nodes pointing  to parts  who's locks  we're holding) is
 	 *          set-up such that it shares its address with the `mn_writable'
-	 *          field. As such, all nodes with non-unique mem-parts already
-	 *          have `mn_writable' initialized correctly, and all nodes
-	 *          with unique ones can still be enumerated since the writable
-	 *          link field wasn't already overwritten by any of the above! */
+	 *          field. As such, all  nodes with non-unique mem-parts  already
+	 *          have  `mn_writable'  initialized  correctly,  and  all  nodes
+	 *          with unique ones can still  be enumerated since the  writable
+	 *          link field wasn't  already overwritten by  any of the  above! */
 	for (i = 0; i < MBNODE_PARTSET_NUMBUCKETS; ++i) {
 		struct mbnode *iter;
 		for (iter = LIST_FIRST(&self->mb_uparts.mbps_set[i]); iter;) {
@@ -191,11 +191,11 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	}
 
 	/* In compatibility-mode, there is a chance that `thismman_kernel_reservation'
-	 * was resized to span a larger region of memory in order to simulate an
-	 * address space that may be found on the emulated architecture.
-	 * This happens mainly as the result of attempting to access ukern
-	 * at an address that should have been apart of kernel-space, but
-	 * wasn't because kernel-space was actually allocated elsewhere:
+	 * was resized to  span a  larger region  of memory  in order  to simulate  an
+	 * address  space   that  may   be  found   on  the   emulated   architecture.
+	 * This  happens  mainly  as  the   result  of  attempting  to  access   ukern
+	 * at   an  address  that   should  have  been   apart  of  kernel-space,  but
+	 * wasn't   because   kernel-space    was   actually   allocated    elsewhere:
 	 * >> PF_HANDLER:
 	 * >>     if (ATTEMTED_TO_ACCESS_UNMAPPED_ADDRESS) {
 	 * >> #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__ARCH_HAVE_COMPAT)
@@ -238,12 +238,12 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	mnode_tree_insert(&target->mm_mappings,
 	                  &FORMMAN(target, thismman_kernel_reservation));
 
-	/* And with that, the newly constructed mem-node-tree has been
-	 * fully assigned to the given target-mman. Assuming that our
+	/* And with  that, the  newly constructed  mem-node-tree has  been
+	 * fully assigned  to the  given  target-mman. Assuming  that  our
 	 * caller dutifully did their call to `pagedir_unmap_userspace()',
-	 * any future memory access to a user-space address made in the
-	 * context of the `target' mman will walk the new node tree,
-	 * where it will find the correct node/part, thus allow for
+	 * any  future memory access  to a user-space  address made in the
+	 * context  of  the `target'  mman will  walk  the new  node tree,
+	 * where it  will  find  the correct  node/part,  thus  allow  for
 	 * lazy initialization of the actually mapped locations. */
 }
 
@@ -260,11 +260,11 @@ killthread_for_exec(void *UNUSED(arg), struct icpustate *__restrict state,
 /* Terminate all threads bound to `target', other than the calling
  * thread by sending an RPC that throws an E_EXIT_THREAD exception
  * to each of them.
- * For this purpose, first pre-allocate a set of RPC descriptors
- * for every target thread, before sending them all at once.
- * If the allocation cannot be done without blocking, do the usual
+ * For this  purpose, first  pre-allocate a  set of  RPC  descriptors
+ * for  every  target  thread,  before  sending  them  all  at  once.
+ * If  the allocation cannot  be done without  blocking, do the usual
  * unlock+return_false. Otherwise, when this function returns `true',
- * then you know that no thread other than yourself is still making
+ * then you know that no thread  other than yourself is still  making
  * any use of the given `target' mman.
  *
  * NOTE: This function is used to implement `MBUILDER_APPLY_AA_TERMTHREADS'
@@ -284,9 +284,9 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
                                struct unlockinfo *unlock)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	/* Make sure that there are enough RPC descriptors
-	 * in order to kill all threads using this mman.
+	 * in order to kill  all threads using this  mman.
 	 *
-	 * If some are missing, then allocate more _before_
+	 * If  some are missing, then allocate more _before_
 	 * doing anything, since once we start kill threads,
 	 * we've already reached the point of no return! */
 	bool result = true;
@@ -346,9 +346,9 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		COMPILER_BARRIER();
 		/* Send the RPC to `thread' */
 		error = task_deliver_rpc(thread, rpc,
-		                         /* Wait for IPI: If the thread is hosted by a different CPU, we need to wait
-		                          *               for that CPU to acknowledge the IPI before we can commence.
-		                          *               Otherwise, we end up with a race condition where some other
+		                         /* Wait for IPI: If  the thread is hosted by a  different CPU, we need to wait
+		                          *               for that CPU to acknowledge  the IPI before we can  commence.
+		                          *               Otherwise, we end up with  a race condition where some  other
 		                          *               CPU is still hosting threads that are actively running within
 		                          *               our VM, simply because their CPU hasn't gotten the memo about
 		                          *               their termination request.
@@ -360,7 +360,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		/* If the delivery was successfully (it might fail if `thread' had already
 		 * been terminated before we managed to get here), deal with the fact that
 		 * `task_deliver_rpc()' will have consumed the RPC descriptor.
-		 * Also: If there are any kernel-threads that are using `target',
+		 * Also: If there are any  kernel-threads that are using  `target',
 		 *       `task_deliver_rpc()' will have failed as well, though this
 		 *       isn't something that should normally happen... */
 		if (TASK_DELIVER_RPC_WASOK(error))
@@ -378,12 +378,12 @@ done:
 
 
 
-/* Slightly simplified version of `mbuilder_apply_or_unlock()'
+/* Slightly   simplified   version   of   `mbuilder_apply_or_unlock()'
  * that should be called while not already holding any locks, and will
- * automatically acquire necessary locks, do the requested calls, and
- * finally release all locks acquired, and still held at that point.
+ * automatically acquire necessary locks, do the requested calls,  and
+ * finally release all locks acquired,  and still held at that  point.
  * @param: additional_actions: Additional actions to be atomically performed
- *                             alongside the setting of the new mem-node
+ *                             alongside  the  setting of  the  new mem-node
  *                             mappings (set of `MBUILDER_APPLY_AA_*') */
 PUBLIC NONNULL((1, 2)) void KCALL
 mbuilder_apply(/*inherit(on_success)*/ struct mbuilder *__restrict self,
@@ -409,10 +409,10 @@ again:
 	/* === Point of no return */
 
 	/* Delete all user-space mappings within the specified target mman.
-	 * All of the newly created mappings are simply going to be bound
+	 * All of the newly created mappings  are simply going to be  bound
 	 * lazily, as they get accessed.
 	 * NOTE: Outside of SMP, or when `MBUILDER_APPLY_AA_TERMTHREADS' is given, we
-	 *       can unmap user-space without having to keep on syncing the mman! */
+	 *       can unmap user-space  without having  to keep on  syncing the  mman! */
 #ifndef CONFIG_NO_SMP
 	if (!(additional_actions & MBUILDER_APPLY_AA_TERMTHREADS)) {
 		if (target == THIS_MMAN)
@@ -431,7 +431,7 @@ again:
 	}
 
 	/* Do the actual job of applying the new node-tree, as
-	 * well as clearing the mman's page directory of all
+	 * well as clearing the  mman's page directory of  all
 	 * remaining user-space mappings. */
 	mbuilder_apply_impl(self, target);
 

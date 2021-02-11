@@ -65,7 +65,7 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct vm *KCALL
 vm_alloc(void) THROWS(E_BADALLOC) {
 	REF struct vm *result;
 	struct heapptr resptr;
-	/* TODO: On i386 (even with PAE), we mustn't allocate
+	/* TODO: On  i386 (even with PAE), we mustn't allocate
 	 *       physical memory above 4GiB for the VM itself! */
 	resptr = heap_align(&kernel_locked_heap,
 	                    PAGEDIR_ALIGN,
@@ -77,8 +77,8 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	/* Copy the PER-VM initialization template. */
 	memcpy((byte_t *)result + PAGEDIR_SIZE, __kernel_pervm_start,
 	       (size_t)__kernel_pervm_size);
-	/* Force an access of the first page of the resulting VM to
-	 * ensure that the page gets faulted (This is a work-around
+	/* Force  an access  of the first  page of the  resulting VM to
+	 * ensure  that the  page gets  faulted (This  is a work-around
 	 * for `GFP_PREFLT' because that flag doesn't actually guaranty
 	 * to always fault the resulting memory...) */
 	*(u8 *)result = 0;
@@ -115,10 +115,10 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 	/* NOTE: Don't chain the `v_kernreserve' node, or incref() the part/block,
 	 *       since doing so is unnecessary.
-	 *    -> The node must never be altered by regular functions, and already
-	 *       has special handling associated with it during destruction, so
+	 *    -> The node must  never be  altered by regular  functions, and  already
+	 *       has special  handling  associated  with it  during  destruction,  so
 	 *       none of the functions that would normally rely on proper integration
-	 *       should ever get to the point they could be bothered by the missing
+	 *       should  ever get to the point they  could be bothered by the missing
 	 *       integrity. */
 	assert(result->v_kernreserve.vn_part  == &userkern_segment_part);
 	assert(result->v_kernreserve.vn_block == &userkern_segment_file);
@@ -219,7 +219,7 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 PRIVATE struct atomic_rwlock change_vm_lock = ATOMIC_RWLOCK_INIT;
 
 
-/* Set the VM active within the calling thread, as well as
+/* Set  the VM active within the calling thread, as well as
  * change page directories to make use of the new VM before
  * returning.
  * NOTE: The caller must NOT be holding a lock to either
@@ -227,10 +227,10 @@ PRIVATE struct atomic_rwlock change_vm_lock = ATOMIC_RWLOCK_INIT;
 PUBLIC NONNULL((1)) void KCALL
 task_setvm(struct vm *__restrict newvm)
 		THROWS(E_WOULDBLOCK) {
-	/* TODO: This function needs to become NOBLOCK+NOTHROW!
-	 *       There are certain places where kernel threads need
-	 *       to access memory from specific user-space VMs and
-	 *       need the ability to NOEXCEPT-switch back to their
+	/* TODO: This  function  needs  to  become  NOBLOCK+NOTHROW!
+	 *       There  are certain places where kernel threads need
+	 *       to  access memory from  specific user-space VMs and
+	 *       need  the ability to  NOEXCEPT-switch back to their
 	 *       original VM if something goes wrong while accessing
 	 *       user-space. */
 	pflag_t was;
@@ -310,10 +310,10 @@ again:
 #ifndef NDEBUG
 /* Assert that 128-bit integer arithmetic works.
  *
- * This kind of functionality is required by the scheduler, but the
- * only portable on-time initializer related to the scheduler, which
+ * This kind of functionality is  required by the scheduler, but  the
+ * only portable on-time initializer related to the scheduler,  which
  * is `kernel_initialize_scheduler()' can't safely be used to perform
- * assertions, since that would be too early for assertion handling
+ * assertions, since that would be  too early for assertion  handling
  * to function correctly.
  *
  * Note though that even the debugger assumes that 128-bit integers
@@ -382,7 +382,7 @@ PRIVATE ATTR_FREETEXT void KCALL assert_int128(void) {
 
 /* Allocate an set a new VM for /bin/init during booting.
  * This function is used to assign a new VM for the initial user-space process,
- * so-as not to launch that process in the context of the special `kernel_vm',
+ * so-as not to launch that process in the context of the special  `kernel_vm',
  * which shouldn't contain mappings for anything user-space related. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_user_mman)(void) {

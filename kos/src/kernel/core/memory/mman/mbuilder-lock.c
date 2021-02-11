@@ -54,9 +54,9 @@ DECL_BEGIN
 	((inner_min) >= (outer_min) && (inner_max) <= (outer_max))
 
 /* Acquire a lock to every unique mem-part mapped by `self'.
- * If this fails for at least one of the parts, unlock all
- * parts already locked at that point, invoke `unlock' if
- * given, wait until the blocking part becomes available,
+ * If this fails for at least  one of the parts, unlock  all
+ * parts already locked  at that point,  invoke `unlock'  if
+ * given, wait until  the blocking  part becomes  available,
  * and return `false'
  * Otherwise, return `true' */
 PRIVATE NONNULL((1)) bool FCALL
@@ -91,7 +91,7 @@ done_unlock_all:
 }
 
 /* Release locks to all of the mapped mem-parts, as should have previously
- * been acquired during a call to `mbuilder_partlocks_acquire()' */
+ * been   acquired   during  a   call   to  `mbuilder_partlocks_acquire()' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self) {
 	size_t bucket;
@@ -105,7 +105,7 @@ NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self) {
 
 
 /* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
- * will keep on attempting the operation until it succeeds. */
+ * will  keep  on  attempting  the  operation  until  it  succeeds. */
 PUBLIC NONNULL((1)) void FCALL
 mbuilder_partlocks_acquire(struct mbuilder *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
@@ -129,7 +129,7 @@ NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder *__restrict self,
 }
 
 /* Find the mb-node currently registered as part of the `mb_uparts'
- * set, as the owner of the lock that is being held on `part' */
+ * set, as  the owner  of the  lock that  is being  held on  `part' */
 PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) struct mbnode *
 NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder const *__restrict self,
                                             struct mpart const *__restrict part) {
@@ -154,7 +154,7 @@ struct mfile_map_for_reflow: mfile_map {
 
 
 /* Convert a file-map-base node `*p_fmnode' into the associated `mfile_map',
- * as well as remove all nodes associated with the mapping from `self', and
+ * as well as remove all nodes associated with the mapping from `self',  and
  * the file-map base-node from `*p_fmnode' */
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict self,
@@ -194,7 +194,7 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict s
 		/*iter->_mbn_partoff = ...;*/
 
 		/* Remove whatever node is mapping this one's part from list of
-		 * node that map unqiue parts, since we have to gift `fm' our
+		 * node that map unqiue parts, since  we have to gift `fm'  our
 		 * lock to that part. */
 		if likely(LIST_ISBOUND(iter, mbn_nxtuprt)) {
 			/* Simple case: Our node is the only (or currently registered)
@@ -203,7 +203,7 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict s
 		} else {
 			struct mbnode *owner_node;
 			/* Slightly difficult case: Must find+remove the actual node
-			 * that is registered as owner of the lock associated with
+			 * that is registered as owner  of the lock associated  with
 			 * the relevant mem-part. */
 			owner_node = mbuilder_find_node_for_mpart(self, iter->mbn_part);
 			assertf(owner_node != NULL,
@@ -222,7 +222,7 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict s
 		}
 
 		/* NOTE: Skip decref on the initial part, because those
-		 *       2 references have been inherited by `fm' */
+		 *       2  references  have  been  inherited  by  `fm' */
 		xdecref_nokill(next->mbn_fspath);
 		xdecref_nokill(next->mbn_fsname);
 		iter = next;
@@ -261,17 +261,17 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder *__restrict se
 		 * the list of unique mem-parts used by our mem-builder. */
 		LIST_ENTRY_UNBOUND_INIT(&iter->mbn_nxtuprt);
 
-		/* Insert the node as the holder of the associated unique part.
-		 * Note that upon success (i.e. `mfile_map_reflow_or_unlock()'
-		 * didn't return `false'), we may assume that the reflow was
-		 * successful, which also means that we've inherited locks to
+		/* Insert  the node as the holder of the associated unique part.
+		 * Note that upon  success (i.e.  `mfile_map_reflow_or_unlock()'
+		 * didn't  return `false'),  we may  assume that  the reflow was
+		 * successful, which also  means that we've  inherited locks  to
 		 * to all of the parts, which also means that all of those locks
-		 * are unique, since `mfile_map_reflow_or_unlock()' will have
+		 * are  unique,  since `mfile_map_reflow_or_unlock()'  will have
 		 * ensured that all locks are exclusive.
 		 *
-		 * Upon failure, it is possible that one of the parts we've been
+		 * Upon  failure, it is  possible that one of  the parts we've been
 		 * given by `mfile_map_reflow_or_unlock()' already exists somewhere
-		 * else within our node-tree, meaning if that has happened, then
+		 * else within our  node-tree, meaning if  that has happened,  then
 		 * we must manually check if the part is actually unique! */
 #ifdef NDEBUG
 		if likely(success || !mbuilder_uparts_contains(self, iter->mbn_part))
@@ -308,7 +308,7 @@ struct mb_unlock_all_parts_info: unlockinfo {
 	struct mbuilder   *mualpi_builder; /* [1..1] The builder for on which we must invoke
 	                                    *        `mbuilder_partlocks_release()' */
 	struct unlockinfo *mualpi_uunlock; /* [0..1] User-defined unlock-info callback.
-	                                    * Will also be invoked, if given. */
+	                                    * Will   also   be   invoked,   if   given. */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -321,8 +321,8 @@ NOTHROW(FCALL mb_unlock_all_parts_info_unlock)(struct unlockinfo *__restrict sel
 
 
 /* Check if the mapping of parts bound to individual nodes apart of
- * the given `fmnode' mapping is continuous (that is: the address
- * ranges described by mapped nodes are entirely contained within
+ * the given `fmnode' mapping is  continuous (that is: the  address
+ * ranges described by mapped  nodes are entirely contained  within
  * those ranges for which an attempt at mapping is made) */
 PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
@@ -337,18 +337,18 @@ NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
 		struct mpart *part;
 
 		/* Calculate the effective file-map address range
-		 * that's supposed to be mapped by this node. */
+		 * that's  supposed  to be  mapped by  this node. */
 		iter_fm_minaddr = fm_base + (size_t)(iter->mbn_minaddr - mm_base);
 		iter_fm_maxaddr = fm_base + (size_t)(iter->mbn_maxaddr - mm_base);
 
 		/* Check if the requested address range is entirely contained
-		 * by what is being provided by the associated mem-part. */
+		 * by what  is being  provided  by the  associated  mem-part. */
 		part = iter->mbn_part;
 		if unlikely(!RANGE_CONTAINS(part->mp_minaddr, part->mp_maxaddr,
 		                            iter_fm_minaddr, iter_fm_maxaddr)) {
 			/* Found a hole in the mapping...
 			 * That can happen when `part' was recently split, and
-			 * must be resolved by re-flowing this file mapping. */
+			 * must  be resolved by  re-flowing this file mapping. */
 			return false;
 		}
 	} while ((iter = iter->mbn_filnxt) != NULL);
@@ -356,10 +356,10 @@ NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
 }
 
 
-/* Reflow a file mapping that starts with `*p_fmnode' (i.e.
- * the given `fmnode IN self->mb_files'), such that file
- * parts are added/removed as necessary to form a coherent,
- * and continuous mapping of the requested address range.
+/* Reflow a file mapping that starts with `*p_fmnode'  (i.e.
+ * the given  `fmnode IN self->mb_files'),  such  that  file
+ * parts are added/removed as necessary to form a  coherent,
+ * and continuous mapping  of the  requested address  range.
  * If nothing needed to be done, or the reflow could be done
  * without needing to release any locks, return `true'.
  *
@@ -374,20 +374,20 @@ mbuilder_reflow_filemap_or_unlock(struct mbuilder *__restrict self,
 	if (mbnode_is_continuous(fmnode)) {
 		/* TODO: Must check whatever'll eventually end up being done by
 		 *       `mfile_map_reflow_or_unlock()' when the `MAP_POPULATE'
-		 *       (here: `fmnode->mbn_flags & MBNODE_F_POPULATE') flag
+		 *       (here: `fmnode->mbn_flags & MBNODE_F_POPULATE')   flag
 		 *       was set. */
 		return true;
 	}
 
 	/* Incomplete mapping. - Make use of `mfile_map_reflow_or_unlock()'
-	 * to (try to) re-flow the mapping. For this purpose, convert the
+	 * to (try to) re-flow the  mapping. For this purpose, convert  the
 	 * mapping within the builder into a conventional `mfile_map' */
 	mbuilder_extract_filemap(self, p_fmnode, &fm);
 	TRY {
 		struct mb_unlock_all_parts_info inner_unlock;
-		/* the unlock-callback of this must invoke the `unlock'
-		 * that we've been given, in addition to also calling
-		 * `mbuilder_partlocks_release()'. Note that the couple
+		/* the  unlock-callback of this  must invoke the `unlock'
+		 * that we've  been given,  in addition  to also  calling
+		 * `mbuilder_partlocks_release()'. Note  that the  couple
 		 * of parts that we've let `fm' inherit will have already
 		 * been unlocked by `mfile_map_reflow_or_unlock()' */
 		inner_unlock.ui_unlock      = &mb_unlock_all_parts_info_unlock;
@@ -405,9 +405,9 @@ mbuilder_reflow_filemap_or_unlock(struct mbuilder *__restrict self,
 
 
 
-/* Acquire locks to all of the parts being mapped by `self', and
- * ensure that all mappings within `self' are fully continuous.
- * If this cannot be done without blocking, invoke `unlock' (if
+/* Acquire  locks to all  of the parts being  mapped by `self', and
+ * ensure that  all mappings  within `self'  are fully  continuous.
+ * If  this cannot  be done  without blocking,  invoke `unlock' (if
  * given), try to make it so that a repeated call will (eventually)
  * succeed, and return `false'.
  * Otherwise (if all locks have been acquired, and all mappings are
@@ -432,8 +432,8 @@ mbuilder_partlocks_acquire_or_unlock(struct mbuilder *__restrict self,
 	}
 
 	/* At this point, we know that all mappings are continuous,
-	 * and will stay that way (for the time being) since we're
-	 * still holding a lock to every unique part that is being
+	 * and  will stay that way (for the time being) since we're
+	 * still  holding a lock to every unique part that is being
 	 * mapped! */
 	return true;
 fail:

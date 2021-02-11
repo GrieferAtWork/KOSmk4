@@ -37,7 +37,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadName)(pformatprinter printer, void *arg,
                                        struct task *__restrict thread);
 
 /* `qXfer:exec-file:read': Print the absolute filename for the original
- * binary passed to exec() when the process of `thread' was started.
+ * binary  passed to exec()  when the process  of `thread' was started.
  * (`/proc/${PID_OF(thread)}/exe') */
 INTDEF NONNULL((1, 3)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,

@@ -24,7 +24,7 @@
 #define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
 
 /* NOTE: Don't add any assertion checks to this file!
- *       The syslog is used excessively by all kernel panic/assert/check
+ *       The  syslog  is  used  excessively  by  all  kernel  panic/assert/check
  *       mechanisms, everything in here that may be called by `syslog_printer()'
  *       must be fully re-entrant and non-blocking! */
 
@@ -77,10 +77,10 @@ PUBLIC_CONST char const syslog_level_names[SYSLOG_LEVEL_COUNT][8] = {
 /* Destroy the given syslog sink */
 PUBLIC ATTR_COLDTEXT NOBLOCK void
 NOTHROW(KCALL syslog_sink_destroy)(struct syslog_sink *__restrict self) {
-	/* Check for kernel poisoning, since the syslog must
+	/* Check   for  kernel  poisoning,  since  the  syslog  must
 	 * continue working normally even after panic() or assert().
-	 * HINT: This is also the reason why you shouldn't add any
-	 *       assertion checks to functions that may be called by
+	 * HINT: This  is also  the reason  why you  shouldn't add any
+	 *       assertion checks to functions  that may be called  by
 	 *       printk() (as this function ~can~ be called by printk) */
 	if likely(!kernel_poisoned()) {
 		if (self->ss_fini)
@@ -198,7 +198,7 @@ syslog_sink_array_without(struct syslog_sink_array *__restrict self,
  * By default after boot, either 1 or 2 sinks are registered:
  *  - An arch-specific default logging sink
  *  - The kernel's dmesg buffer (usually 16384 (0x4000) bytes large)
- *    that contains a backlog of the last N written packets. */
+ *    that  contains  a  backlog  of  the  last  N  written packets. */
 PUBLIC ATTR_COLDTEXT bool KCALL
 syslog_sink_register(struct syslog_sink *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BAD_ARGUMENT) {
@@ -243,9 +243,9 @@ NOTHROW(FCALL dmesg_post)(struct syslog_packet const *__restrict packet,
 
 
 /* Same as the `ss_levels' field found in individual syslog sinks,
- * however this one affect system logging on a global level.
- * Be careful when tinkering with this, and don't accidentally
- * disable logging of some of the more important message types! */
+ * however  this  one affect  system  logging on  a  global level.
+ * Be careful  when tinkering  with this,  and don't  accidentally
+ * disable logging of  some of the  more important message  types! */
 PUBLIC WEAK uintptr_t syslog_levels = SYSLOG_SINK_DEFAULT_LEVELS;
 /* TODO: Add a file to /proc to control `syslog_levels' */
 
@@ -395,16 +395,16 @@ DBG_COMMAND_AUTO(loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 
 
 /* Broadcast a given system log packet for all registered sinks to handle
- * Note that this function can be called from any context! */
+ * Note   that   this  function   can   be  called   from   any  context! */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict self,
                                        unsigned int level) {
 	uintptr_t mask;
 	/* Mask the given `level' with the global log mask.
-	 * We don't do another explicit check for `mask == 0' after this
-	 * because levels are once again checked on a per-sink basis, and
+	 * We don't do  another explicit check  for `mask == 0' after  this
+	 * because levels are once again  checked on a per-sink basis,  and
 	 * the most common case of logging with a disabled level is writing
-	 * to `syslog_printer()', which already checks for the level being
+	 * to `syslog_printer()', which already checks for the level  being
 	 * enabled. */
 	mask = syslog_levels & ((uintptr_t)1 << level);
 #ifndef __OPTIMIZE_SIZE__
@@ -503,7 +503,7 @@ success:
 		/* Recursive lock */
 		return;
 	}
-	/* Syslog printing must remain functional, even if some other CPU
+	/* Syslog  printing must  remain functional,  even if  some other CPU
 	 * crashed fatally during CPU initialization while holding this lock. */
 	if unlikely(!is_a_valid_cpu(oldcpu)) {
 		struct cpu *real_oldcpu;
@@ -675,7 +675,7 @@ do_handle_linefeed:
 			break;
 
 #if 0 /* These control characters are allowed, and may be
-       * used for custom syslog packet encapsulations */
+       * used for  custom  syslog  packet  encapsulations */
 		case 0x01: /* SOH */
 		case 0x02: /* STX */
 		case 0x03: /* ETX */
@@ -717,15 +717,15 @@ syslog_packet_append(struct syslog_packet *__restrict self,
 }
 
 
-/* pformatprinter-compatible syslog printer, where `level' is `SYSLOG_LEVEL_*'
- * Writing text using this function will append to an internal buffer for the
- * given `level'. If this buffer overflows, it will be broadcast and reset the
+/* pformatprinter-compatible  syslog  printer, where  `level'  is `SYSLOG_LEVEL_*'
+ * Writing text using  this function  will append to  an internal  buffer for  the
+ * given `level'. If  this buffer overflows,  it will be  broadcast and reset  the
  * same way it would be when being committed (using `\n'). The size of said buffer
- * is an implementation detail and should be sufficiently large such that users
+ * is  an implementation detail  and should be sufficiently  large such that users
  * of this function need not worry about its actual value.
  * Additionally the following control characters are recognized:
  *   - `\r': Clear the internal buffer for `level' (if not immediately followed by `\n')
- *   - `\n': Broadcast the contents of the internal buffer as a syslog
+ *   - `\n': Broadcast  the  contents of  the  internal buffer  as  a syslog
  *           packet (s.a. `syslog_packet_broadcast()') and clear the buffer.
  * @except: May only throw exceptions as the result of accessing memory in `*data'
  * @return: * : Always re-returns `datalen' */

@@ -97,7 +97,7 @@ ProcFS_PerProc_Task_Lookup(struct directory_node *__restrict self,
 	}
 #endif /* !NDEBUG */
 	/* NOTE: We can't actually trust user-space that `hash' is valid, since
-	 *       the user may have changed the string in the mean time... */
+	 *       the  user  may have  changed the  string  in the  mean time... */
 	result->de_hash = directory_entry_hash(result->de_name, namelen);
 	result->de_ino  = PROCFS_INOMAKE_PERPROC(pidno, PROCFS_PERPROC_ROOT);
 	result->de_type = DT_DIR;
@@ -124,8 +124,8 @@ ProcFS_PerProc_Task_Enum(struct directory_node *__restrict self,
 		data.epc_cb     = callback;
 		data.epc_arg    = arg;
 		data.epc_ns_ind = ns->pn_indirection;
-		/* NOTE: Only enumerate worker threads (aka. anything but `leader' itself)
-		 *       This is required to prevent recursive directory scanners from ending
+		/* NOTE: Only enumerate  worker threads  (aka. anything  but `leader'  itself)
+		 *       This is required to prevent recursive directory scanners from  ending
 		 *       up in an infinite loop `/proc/1/task/1/task/1/task/1/task/1/task/...'
 		 *
 		 * Note though that you can still lookup `/proc/1/task/1' (similar to how you
@@ -133,7 +133,7 @@ ProcFS_PerProc_Task_Enum(struct directory_node *__restrict self,
 		 * is hidden, and you'll have to guess, or know a valid tid).
 		 *
 		 * Linux solves this a bit differently, in that `/proc/1/task/1' simply doesn't
-		 * contain another `task' sub-directory, but I feel like this is just as valid
+		 * contain another `task' sub-directory, but I feel like this is just as  valid
 		 * a solution. */
 		task_enum_process_worker_threads(&ProcFS_EnumProcessCallback,
 		                                 &data, leader);

@@ -105,7 +105,7 @@ struct procfs_singleton_data {
 	/* Pointed to by the `struct inode_data *i_fsdata' of singleton INodes.
 	 * These are the saved, non-volatile values of various file attributes,
 	 * thus allowing user-space to (e.g.) change the access permissions, or
-	 * ownership of some given file under /proc, so-long as that file is a
+	 * ownership of some given file under /proc, so-long as that file is  a
 	 * singleton inside of the filesystem */
 	PROCFS_SINGLETON_DATA_FIELDS
 };
@@ -244,7 +244,7 @@ enum {
 
 
 /* [1..1][*] Fs-specific data pointers for singleton nodes.
- * The index to this array is one of `PROCFS_SINGLETON_*' */
+ * The index to this  array is one of  `PROCFS_SINGLETON_*' */
 INTDEF struct procfs_singleton_data *const ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT];
 #ifndef PROCFS_NO_CUSTOM
 INTDEF struct inode_type *const ProcFS_Singleton_CustomTypes[PROCFS_SINGLETON_COUNT - PROCFS_SINGLETON_START_CUSTOM];

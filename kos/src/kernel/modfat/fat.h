@@ -28,10 +28,10 @@
 
 
 /* Configuration option: Support cygwin-style symbolic links.
- * NOTE: Those weird wide-character symlinks referenced by the
+ * NOTE: Those weird  wide-character  symlinks  referenced  by  the
  *       cygwin source code aren't supported. Only regular symlinks
  *       are, and those are always assumed to represent UTF-8 text.
- *       But also note that I've never seen cygwin actually create
+ *       But also note that I've never seen cygwin actually  create
  *       one of those wide-character symlinks... */
 #ifdef CONFIG_NO_FAT_CYGWIN_SYMLINKS
 #undef CONFIG_FAT_CYGWIN_SYMLINKS
@@ -45,9 +45,9 @@
 
 DECL_BEGIN
 
-/* NOTE: This implementation uses the absolute on-disk location of a
- *       FAT directory entry (The `FatFile' structure) as `ino_t'
- *       Here, the `FatFile' that is actually describing the file is
+/* NOTE: This implementation uses the absolute on-disk location of  a
+ *       FAT  directory  entry (The  `FatFile' structure)  as `ino_t'
+ *       Here, the `FatFile' that is actually describing the file  is
  *       meant, meaning that LFN-entries are _NOT_ used as index, but
  *       the actual file entry following thereafter! */
 
@@ -209,14 +209,14 @@ typedef struct ATTR_PACKED {
 typedef struct ATTR_PACKED {
 	FatBiosParameterBlock f16_bpb;           /* BIOS Parameter Block. */
 	u8                    f16_driveno;       /* Drive number. The value here should be identical to the value returned by BIOS interrupt 0x13,
-	                                          * or passed in the DL register; i.e. 0x00 for a floppy disk and 0x80 for hard disks.
-	                                          * This number is useless because the media is likely to be moved to another
+	                                          * or passed  in  the  DL register;  i.e.  0x00  for a  floppy  disk  and 0x80  for  hard  disks.
+	                                          * This  number   is  useless   because   the  media   is  likely   to   be  moved   to   another
 	                                          * machine and inserted in a drive with a different drive number. */
 	u8                    f16_ntflags;       /* Windows NT Flags. (Set to 0) */
 	u8                    f16_signature;     /* Signature (Must be 0x28 or 0x29). */
 	le32                  f16_volid;         /* VolumeID ~Serial~ number. Used for tracking volumes between computers. */
 	char                  f16_label[11];     /* Volume label string. This field is padded with spaces. */
-	char                  f16_sysname[8];    /* System identifier string. This field is a string representation of the FAT file system type.
+	char                  f16_sysname[8];    /* System identifier string. This field  is a string representation of  the FAT file system  type.
 	                                          * It is padded with spaces. The spec says never to trust the contents of this string for any use. */
 	u8                    f16_bootcode[448]; /* Boot code. */
 	u8                    f16_bootsig[2];    /* Bootable partition signature (0x55, 0xAA). */
@@ -233,14 +233,14 @@ typedef struct ATTR_PACKED {
 	le16                  f32_backup_cluster;  /* The sector number of the backup boot sector. */
 	u8                    f32_set2zero[12];    /* Reserved. When the volume is formated these bytes should be zero. */
 	u8                    f32_driveno;         /* Drive number. The value here should be identical to the value returned by BIOS interrupt 0x13,
-	                                            * or passed in the DL register; i.e. 0x00 for a floppy disk and 0x80 for hard disks.
-	                                            * This number is useless because the media is likely to be moved to another
+	                                            * or passed  in  the  DL register;  i.e.  0x00  for a  floppy  disk  and 0x80  for  hard  disks.
+	                                            * This  number   is  useless   because   the  media   is  likely   to   be  moved   to   another
 	                                            * machine and inserted in a drive with a different drive number. */
 	u8                    f32_ntflags;         /* Windows NT Flags. (Set to 0) */
 	u8                    f32_signature;       /* Signature (Must be 0x28 or 0x29). */
 	le32                  f32_volid;           /* VolumeID ~Serial~ number. Used for tracking volumes between computers. */
 	char                  f32_label[11];       /* Volume label string. This field is padded with spaces. */
-	char                  f32_sysname[8];      /* System identifier string. This field is a string representation of the FAT file system type.
+	char                  f32_sysname[8];      /* System identifier string. This field  is a string representation of  the FAT file system  type.
 	                                            * It is padded with spaces. The spec says never to trust the contents of this string for any use. */
 	u8                    f32_bootcode[420];   /* Boot code. */
 	u8                    f32_bootsig[2];      /* Bootable partition signature (0x55, 0xAA). */
@@ -284,10 +284,10 @@ struct inode_data {
 			FatClusterIndex   *i_clusterv;   /* [lock(:db_lock)]
 			                                  * [if(:f_type != FAT32 && :self == :s_root,[== NULL])]
 			                                  * [if(:f_type == FAT32 || :self != :s_root,[1..i_clusterc|alloc(i_clustera)][owned])]
-			                                  * Vector of file cluster starting indices.
-			                                  * Indices are passed to `FAT_CLUSTERADDR()' to
-			                                  * convert them into absolute on-disk locations.
-			                                  * Each cluster has a length of `:f_clustersize' bytes.
+			                                  * Vector    of    file   cluster    starting   indices.
+			                                  * Indices  are   passed   to   `FAT_CLUSTERADDR()'   to
+			                                  * convert   them   into  absolute   on-disk  locations.
+			                                  * Each  cluster has a length of `:f_clustersize' bytes.
 			                                  * If `i_clusterv[i_clusterc-1] >= :f_cluster_eof', then
 			                                  * all clusters have been loaded. */
 		};
@@ -313,7 +313,7 @@ INTDEF NONNULL((1)) FatClusterIndex KCALL
 Fat_GetFileCluster(struct inode *__restrict node,
                    size_t nth_cluster,
                    unsigned int mode);
-#define FAT_GETCLUSTER_MODE_FNORMAL 0x0000 /* If that cluster hasn't been loaded yet, load it now.
+#define FAT_GETCLUSTER_MODE_FNORMAL 0x0000 /* If  that  cluster  hasn't  been  loaded  yet,  load  it now.
                                             * If the cluster doesn't exist, return `f_cluster_eof_marker'. */
 #define FAT_GETCLUSTER_MODE_FCREATE 0x0001 /* Allocate missing clusters. */
 #define FAT_GETCLUSTER_MODE_FNOZERO 0x0002 /* Do not ZERO-initialize newly allocated clusters.
@@ -325,7 +325,7 @@ typedef FatClusterIndex (KCALL *PFatGetFatIndirection)(FatSuperblock const *__re
 typedef void (KCALL *PFatSetFatIndirection)(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
 
 /* Returns a sector number offset from `f_fat_start', within
- * which the data associated with the given `id' is stored. */
+ * which the data associated with the given `id' is  stored. */
 typedef FatSectorIndex (KCALL *PFatGetTableSector)(FatSuperblock const *__restrict self, FatClusterIndex id);
 
 #define FAT_METALOAD  0x1 /* When set, the associated sector has been loaded. */
@@ -400,17 +400,17 @@ struct fat_superblock
 	struct rwlock           f_fat_lock;    /* Lock for accessing the FileAllocationTable cache. */
 	void                   *f_fat_table;   /* [lock(f_fat_lock)][1..f_fat_size|LOGICAL_LENGTH(f_fat_length)][owned][const]
 	                                        * Memory-cached version of the FileAllocationTable.
-	                                        * NOTE: The way that entries within this table are read/written depends
+	                                        * NOTE: The way  that entries  within this  table are  read/written  depends
 	                                        *       on the type of FAT, but `f_fat_(g|s)et' can be used for convenience.
 	                                        * NOTE: The amount of entries can be read from `f_fat_length'.
-	                                        * NOTE: The amount of bytes can be read from `f_fat_size'. */
+	                                        * NOTE: The amount  of bytes  can be  read from  `f_fat_size'. */
 	uintptr_t              *f_fat_meta;    /* [lock(f_fat_lock)][1..CEILDIV(f_sec4fat,BITS_PER_POINTER/FAT_METABITS)|LOCIAL_LENGTH(f_sec4fat)]
 	                                        * [BITSET(FAT_METABITS)][owned][const]
 	                                        * A bitset used to track the load/change status of `f_fat_table'.
-	                                        * Stored inside this, one can find information about what FAT
+	                                        * Stored  inside this,  one can  find information  about what FAT
 	                                        * sectors have already been loaded, and which have changed.
 	                                        * NOTE: This bitset contains one entry of `FAT_METABITS'
-	                                        *       for each sector within the FAT lookup table.
+	                                        *       for  each  sector within  the FAT  lookup table.
 	                                        * NOTE: `f_fat_changed' must be set to `true' while changed fat entries exist. */
 	FatClusterIndex         f_free_pos;    /* [lock(f_fat_lock)] Next cluster index that should be considered when search for free clusters. */
 };
@@ -435,7 +435,7 @@ struct fat_superblock
 	 ~((uintptr_t)FAT_METACHNG << (((fat_sector_index) % (BITS_PER_POINTER / FAT_METABITS)) * FAT_METABITS)))
 
 
-/* Get/Set FAT indirection, automatically loading missing parts
+/* Get/Set   FAT   indirection,  automatically   loading   missing  parts
  * of the FileAllocationTable, as well as mark modified parts as changed.
  * NOTE: When calling `Fat_SetFatIndirection()', the
  *       caller must be holding a lock on `f_fat_lock' */
@@ -455,15 +455,15 @@ INTDEF WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat_FindFreeCluster(FatSuperblock *__restrict self);
 
 /* Delete a chain of free clusters, starting with `first_delete_index'
- * NOTE: The caller must be holding a lock on `f_fat_lock' */
+ * NOTE: The  caller   must  be   holding  a   lock  on   `f_fat_lock' */
 INTDEF NONNULL((1)) void KCALL
 Fat_DeleteClusterChain(FatSuperblock *__restrict self,
                        FatClusterIndex first_delete_index);
 
 /* Read/Write to/from a given INode at the specified offset.
- * NOTE: These functions do not truncate/update the size value
+ * NOTE: These  functions  do not  truncate/update the  size value
  *       of the associated INode. However allocating an additional
- *       sector will cause `Fat32_WriteToINode()' to update the
+ *       sector will  cause `Fat32_WriteToINode()'  to update  the
  *       the `a_blocks' attribute of `self'.
  * NOTE: Attempting to read data from beyond the allocated end
  *       of an INode will yield all ZEROes.
@@ -482,7 +482,7 @@ INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINodeVector(struct inode *__restr
 INTDEF NONNULL((1, 5)) void KCALL Fat32_ReadFromINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 
-/* Same as the functions above, but used for
+/* Same  as the functions  above, but used for
  * operating with the FAT12/16 root directory.
  * @throw: E_FILESYSTEM_ERROR.ERROR_FS_DISK_FULL:
  *         The given `pos + bufsize' extends beyond

@@ -368,7 +368,7 @@ switch_state_after_rx:
 			Ne2kState new_state;
 			new_state.ns_word = state.ns_word;
 			new_state.ns_flags |= NE2K_FLAG_RXPEND;
-			/* if the NIC is currently in IDLE-mode, switch to RX_DNLOAD
+			/* if the NIC  is currently in  IDLE-mode, switch to  RX_DNLOAD
 			 * mode in order to have the async-worker download packet data. */
 			if (state.ns_state == NE2K_STATE_IDLE)
 				new_state.ns_state = NE2K_STATE_RX_DNLOAD;
@@ -405,7 +405,7 @@ warn_tx_bad_state:
 			printk(KERN_WARNING "[ne2k] TX-interrupt when not sending a packet\n");
 			goto done_tx;
 		}
-		/* If the send operation got canceled at any point before now, `nk_current'
+		/* If the send operation got canceled  at any point before now,  `nk_current'
 		 * would have been set to `NULL'. By clearing it to NULL here, we essentially
 		 * force `aio_cancel()' to wait until we've signaled the exit status. */
 		aio = ATOMIC_XCH(me->nk_current, NULL);
@@ -561,16 +561,16 @@ Ne2k_HandleSendTimeout(void *__restrict arg) {
 	if (ktime() < me->nk_cursendtmo)
 		return;
 	printk(KERN_ERR "[ne2k] Watchdog send timeout (TODO)\n");
-	/* TODO: Do the equivalent of aio_cancel() for Ne2k,
+	/* TODO: Do   the  equivalent  of  aio_cancel()  for  Ne2k,
 	 *       however indicate a TIMEOUT-error as the reason for
 	 *       completion.
-	 * NOTE: To facilitate TX_PKSEND timeouts, we need a new NIC
-	 *       state `NE2K_STATE_TX_PKSEND_TIMEOUT' that we can set
-	 *       here in order to perform the necessary cleanup before
+	 * NOTE: To facilitate  TX_PKSEND  timeouts,  we  need  a  new  NIC
+	 *       state  `NE2K_STATE_TX_PKSEND_TIMEOUT'  that  we  can   set
+	 *       here in  order to  perform  the necessary  cleanup  before
 	 *       resetting the device and calling `Ne2k_SwitchToIdleMode()'
-	 *       This is required to handle the race condition where the
-	 *       send might complete after timing out, in which case the
-	 *       interrupt handler can't be responsible for signaling
+	 *       This is required  to handle the  race condition where  the
+	 *       send might complete  after timing out,  in which case  the
+	 *       interrupt  handler  can't  be  responsible  for  signaling
 	 *       transmit completion. */
 }
 
@@ -635,17 +635,17 @@ again:
 		size_t aligned_size;
 		NE2K_DEBUG("[ne2k:async] Begin TX_UPLOAD\n");
 		assert(PREEMPTION_ENABLED());
-		/* Remove one handle from `nk_tranit' and make sure that that handle's
-		 * `pd_packet' field is non-NULL (by clearing that field ourself).
-		 * This has to be done in this manner to ensure proper interaction with
-		 * aio_cancel(), and also has to be done with preemption disabled,
-		 * since aio_cancel() will wait for us to re-add just-canceled handles
+		/* Remove one handle  from `nk_tranit'  and make sure  that that  handle's
+		 * `pd_packet'  field  is  non-NULL  (by  clearing  that  field  ourself).
+		 * This has to be  done in this manner  to ensure proper interaction  with
+		 * aio_cancel(),  and  also  has  to  be  done  with  preemption disabled,
+		 * since  aio_cancel() will  wait for  us to  re-add just-canceled handles
 		 * to the pending chain (so that it can remove them from that chain itself
-		 * to prevent any race conditions related to accessing dead handles) */
+		 * to  prevent  any race  conditions  related to  accessing  dead handles) */
 		PREEMPTION_DISABLE();
 		aio = ATOMIC_XCH(me->nk_tranit, NULL);
 		if unlikely(!aio) {
-			/* No more pending packets. -> Try to switch to IDLE
+			/* No more pending packets. ->  Try to switch to  IDLE
 			 * mode, but loop back to handle the case of RX_DNLOAD */
 tx_switch_to_idle:
 			PREEMPTION_ENABLE();
@@ -743,7 +743,7 @@ tx_switch_to_idle:
 			decref_likely(packet);
 			decref_unlikely(packet_vm);
 			/* Change NIC states to mirror what would have happened on success.
-			 * Doing this simplifies what has to be done within aio_cancel() */
+			 * Doing this simplifies  what has to  be done within  aio_cancel() */
 			Ne2k_SwitchToTxPkSendMode(me);
 			PREEMPTION_DISABLE();
 			aio = ATOMIC_XCH(me->nk_current, NULL);
@@ -765,7 +765,7 @@ tx_switch_to_idle:
 		/* Check once again if the operation was canceled.
 		 * This must be done in case there was a cancel during the upload
 		 * process, in which case we wouldn't want to send a packet after
-		 * it has been canceled at a point in time when that cancel was
+		 * it  has been canceled at a point  in time when that cancel was
 		 * still possible. */
 		if (ATOMIC_READ(me->nk_current) == NULL) {
 			while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
@@ -967,7 +967,7 @@ NOTHROW(KCALL Ne2k_SwitchToTxUploadMode)(Ne2kDevice *__restrict self) {
 	                             new_state.ns_word));
 	NE2K_DEBUG("[ne2k] Switch to TX_UPLOAD\n");
 	/* Since we were responsible for switching the NIC into TX_UPLOAD-mode,
-	 * we must also broadcast `nk_stpkld' in order to get the async-worker
+	 * we  must also broadcast `nk_stpkld' in order to get the async-worker
 	 * to service our outbound packet. */
 	sig_broadcast(&self->nk_stpkld);
 	return true;
@@ -1004,13 +1004,13 @@ NOTHROW(KCALL Ne2k_TxAioCancel)(struct aio_handle *__restrict self) {
 		decref_likely(packet);
 		decref_unlikely(aio_data->pd_payloadmm);
 again_poll_transit:
-		/* In this case, we've already stopped the AIO before it could even start.
-		 * However, we must still account for the possibility that the async-worker
-		 * may have already removed our AIO handle from `nk_tranit', in which case
-		 * it will put it back as soon as possible. Also note that precisely for
+		/* In this case, we've  already stopped the AIO  before it could even  start.
+		 * However, we must still account  for the possibility that the  async-worker
+		 * may  have already removed  our AIO handle from  `nk_tranit', in which case
+		 * it will put  it back as  soon as  possible. Also note  that precisely  for
 		 * this case, the async-worker takes the AIO handle with preemption disabled,
-		 * thus ensuring that we can't get here from inside of that piece of code,
-		 * meaning that from our perspective, we are allowed to poll-wait for our
+		 * thus ensuring that we can't  get here from inside  of that piece of  code,
+		 * meaning  that from  our perspective, we  are allowed to  poll-wait for our
 		 * packet to re-appear.
 		 * Also note that we must also account of new packets having appeared after
 		 * the async-worker (temporarily) removed ours, so a non-NULL chain doesn't
@@ -1021,9 +1021,9 @@ again_poll_transit:
 			task_tryyield_or_pause();
 			goto again_poll_transit;
 		}
-		/* Check if our packet can be found within the `transit' chain we've just stolen.
-		 * If it's not in there, then `transit' is a chain of packets that were scheduled
-		 * for sending _after_ the async-worker did its ATOMIC_XCH() of AIO handles which
+		/* Check if our packet can be found  within the `transit' chain we've just  stolen.
+		 * If  it's not in there, then `transit' is  a chain of packets that were scheduled
+		 * for sending _after_ the async-worker did  its ATOMIC_XCH() of AIO handles  which
 		 * includes our's, such that we have to wait for it to put our handle back into the
 		 * chain of those that are pending. */
 		piter    = &transit;
@@ -1052,65 +1052,65 @@ again_poll_transit:
 			goto done_unschedule;
 		goto again_poll_transit;
 	}
-	/* With aio_cancel() prior to packet uploading having started now
+	/* With aio_cancel() prior to packet uploading having started  now
 	 * handled, move on to handling it for the case where uploading or
 	 * sending is currently in progress. */
 	if (ATOMIC_CMPXCH(me->nk_current, self, NULL)) {
-		/* XXX: If the async-worker is currently in the process of uploading packet data
-		 *      to the NIC, then we have to get it to stop doing so. Technically, we can
+		/* XXX: If the async-worker is currently in  the process of uploading packet  data
+		 *      to  the NIC, then we have to get  it to stop doing so. Technically, we can
 		 *      just let it do whatever in this scenario, since kernel-space packet header
-		 *      memory is reference counted, meaning that the async-worker won't access
-		 *      arbitrary kernel-space memory. However, it may access user-space memory
-		 *      at a point in time when doing so may cause a SEGFAULT (i.e. if the async-
+		 *      memory is reference  counted, meaning that  the async-worker won't  access
+		 *      arbitrary kernel-space memory.  However, it may  access user-space  memory
+		 *      at  a point in time when doing so may cause a SEGFAULT (i.e. if the async-
 		 *      worker is currently uploading, and we return to user-space, at which point
-		 *      user-space munmap()s the memory from which the async-worker is reading)
-		 *      The same also applies to the case of kernel-space memory appearing within
-		 *      the payload, in which case we may upload arbitrary data to the NIC, or
-		 *      SEGFAULT prior to upload completion. However since we check for cancel
-		 *      once again before starting the SEND-process, such arbitrary data would
+		 *      user-space munmap()s the  memory from which  the async-worker is  reading)
+		 *      The same also applies to the case of kernel-space memory appearing  within
+		 *      the payload, in which  case we may  upload arbitrary data  to the NIC,  or
+		 *      SEGFAULT prior to  upload completion.  However since we  check for  cancel
+		 *      once  again before  starting the  SEND-process, such  arbitrary data would
 		 *      never actually leave the NIC's internal buffer...
-		 * Now this may seem like a problem, but it really isn't because if this were to
-		 * happen, then yes: the async-worker would experience a SEGFAULT, and would stop
-		 * uploading data. However, the exception will be propagated, and immediately
+		 * Now this may  seem like  a problem, but  it really  isn't because if  this were  to
+		 * happen, then yes:  the async-worker  would experience  a SEGFAULT,  and would  stop
+		 * uploading  data.  However,  the  exception  will  be  propagated,  and  immediately
 		 * handled inside of `Ne2k_AsyncWork()', where it will be discarded since `nk_current'
 		 * would already be NULL at that point.
-		 * In other words: In the specific case of NIC-device-related AIO, this is a problem
+		 * In other words: In the  specific case  of NIC-device-related  AIO, this  is a  problem
 		 *                 that solves itself, meaning that this would _only_ be an optimization,
 		 *                 rather than a bug-fix!
 		 * The only kind-of questionable corner-case is VIO, where this situation could result
-		 * in arbitrary VIO memory reads being performed, so I'd call that a maybe-look-
+		 * in arbitrary  VIO memory  reads being  performed, so  I'd call  that a  maybe-look-
 		 * into-fixing-this-at-some-point? */
 
-		/* The simple case: If we've managed to clear the current-field with our AIO handle,
+		/* The simple case: If we've managed to clear  the current-field with our AIO  handle,
 		 *                  then that means that our AIO operation is (or was) being performed
 		 *                  at this (or that) very moment.
 		 * By having exchanged the current-handle with our own, the completion-interrupt will
-		 * not invoke our completion function, and we also know that it hadn't invoked it at
+		 * not  invoke our completion function, and we also know that it hadn't invoked it at
 		 * any point in the past! */
 		goto done_unschedule;
 	}
 	/* The last possible 2 cases:
 	 *   #1: Our AIO handle has already been completed, as in:
-	 *       the Ne2k interrupt handler has already invoked `ah_func' with
+	 *       the Ne2k interrupt handler  has already invoked `ah_func'  with
 	 *       either a SUCCESS or FAILURE condition. In this case, we mustn't
 	 *       do anything and return.
 	 *   #2: The Ne2k interrupt handler has already captured our AIO handle
-	 *       via `ATOMIC_XCH(me->nk_current, NULL)', but has yet to invoke
+	 *       via  `ATOMIC_XCH(me->nk_current, NULL)', but has yet to invoke
 	 *       our AIO handle's completion function.
 	 * In either case, we know:
-	 *   - Our completion function has either already been invoked, or is going
+	 *   - Our completion function has either  already been invoked, or is  going
 	 *     to be invoked from a NOPREEMPT context that has already begun, meaning
-	 *     that if it hasn't already been invoked at this point, it will be in
+	 *     that if it hasn't already  been invoked at this  point, it will be  in
 	 *     such a manner that we can safely wait for this to happen.
 	 *   - The AIO handle will not complete with a CANCEL status, and we aren't
-	 *     even the ones responsible for setting that completion status.
+	 *     even the  ones  responsible  for  setting  that  completion  status.
 	 *
-	 * With all of this in mind, we don't actually have to do anything!
-	 * Once the caller invokes `aio_handle_fini()', they will implicitly be
-	 * waiting for the AIO handle to be completed, and us getting to this point
-	 * implicitly means that this wait will be non-blocking since (like stated
+	 * With all  of  this  in  mind,  we don't  actually  have  to  do  anything!
+	 * Once the  caller  invokes  `aio_handle_fini()', they  will  implicitly  be
+	 * waiting for the AIO handle to be  completed, and us getting to this  point
+	 * implicitly  means that this  wait will be  non-blocking since (like stated
 	 * above), the only path where the handle hasn't already completed is the one
-	 * where another CPU is completing it _right_ _now_ with interrupts already
+	 * where another CPU is completing  it _right_ _now_ with interrupts  already
 	 * disabled! */
 
 	return;
@@ -1242,7 +1242,7 @@ Ne2k_SetFlags(struct nic_device *__restrict self,
 	COMPILER_WRITE_BARRIER();
 	self->nd_ifflags = new_flags;
 	COMPILER_WRITE_BARRIER();
-	/* XXX: Register/delete HISR and ASYNC_WORKER callbacks
+	/* XXX: Register/delete HISR  and ASYNC_WORKER  callbacks
 	 *      on-the-fly based on the state of the `IFF_UP'-bit
 	 *      When the NIC is turned off, then */
 	Ne2k_ReleaseUIO(me);
@@ -1375,7 +1375,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	character_device_register_auto(self);
 
 	/* XXX: Collect a list of devices, then use some kind of config
-	 *      to determine which one should be used as the default! */
+	 *      to determine which one should  be used as the  default! */
 	nic_device_setdefault(self);
 
 #if 1 /* XXX: Remove me (only here for testing) */

@@ -182,7 +182,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		if (!f) {
 			APPLY_MASK();
 			/* Do a second check for the futex, thus ensuring
-			 * that we're interlocked with `APPLY_MASK()' */
+			 * that  we're  interlocked  with  `APPLY_MASK()' */
 			f = vm_getfutex_existing(THIS_MMAN, uaddr);
 			if unlikely(f) {
 				result = sig_broadcast(&f->vmf_signal);
@@ -194,7 +194,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			FINALLY_DECREF_UNLIKELY(f);
 			if (count == (size_t)-1) {
 				/* Since we're doing a broadcast, no need to wait
-				 * with the signal application until later! */
+				 * with  the  signal  application  until   later! */
 				APPLY_MASK();
 				result = sig_broadcast(&f->vmf_signal);
 			} else {
@@ -220,8 +220,8 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 
 	case LFUTEX_NOP:
 		/* NOTE: Intentionally don't validate `futex_op & LFUTEX_FLAGMASK',
-		 *       since this command's purpose is to literally do nothing,
-		 *       meaning that also doing nothing for unknown flags is the
+		 *       since this command's purpose  is to literally do  nothing,
+		 *       meaning that also doing nothing  for unknown flags is  the
 		 *       correct thing to do in terms of forward-compatibility. */
 		result = 0;
 		break;
@@ -232,12 +232,12 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		FINALLY_DECREF(f);
 		task_connect(&f->vmf_signal);
 		TRY {
-			/* NOTE: The futex `f' must be kept alive during the wait,
-			 *       since even though semantics would allow it to be
-			 *       destroyed before being waited upon, doing so in
-			 *       practice would immediately trigger its signal, and
+			/* NOTE: The  futex `f'  must be  kept alive  during the wait,
+			 *       since even  though semantics  would  allow it  to  be
+			 *       destroyed  before  being  waited  upon,  doing  so in
+			 *       practice would  immediately trigger  its signal,  and
 			 *       any sender thread to not broadcast to the same futex,
-			 *       meaning that we wouldn't sleep at all, but instead
+			 *       meaning that we  wouldn't sleep at  all, but  instead
 			 *       instantly wake up once again! */
 			result = FUNC(task_waitfor_futex)(futex_op, timeout);
 		} EXCEPT {
@@ -260,7 +260,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 					continue;
 				return 1;
 			}
-			/* Lock isn't available (connect to it, then set the
+			/* Lock isn't available  (connect to it,  then set  the
 			 * is-waiting bit and sleep until it becomes available) */
 			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
 			f = vm_getfutex(THIS_MMAN, uaddr);
@@ -285,7 +285,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 #define DEFINE_WAIT_WHILE_OPERATOR(id, validate, should_wait)         \
 	case id: {                                                        \
 		validate(uaddr, sizeof(*uaddr));                              \
-		/* Connect to the futex first, thus performing the            \
+		/* Connect  to  the  futex first,  thus  performing the       \
 		 * should-wait checked in a manner that is interlocked. */    \
 		f = vm_getfutex(THIS_MMAN, uaddr);                              \
 		FINALLY_DECREF(f);                                            \

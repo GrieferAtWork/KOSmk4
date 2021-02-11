@@ -200,17 +200,17 @@ PP_CAT5(AtaDrive_, _ATA_IOMETHOD_Name, Drive, _ATA_RW_Name, _ATA_DATA_Name)(_ATA
 #if 0
 	if unlikely(!PREEMPTION_ENABLED()) {
 		/* TODO: Perform I/O without use of interrupts
-		 *       If we managed to get this working, that would be huge, because
+		 *       If  we  managed to  get this  working, that  would be  huge, because
 		 *       it would mean that we could just disable preemption in single-thread
 		 *       situations such as the debugger or GDBstub driver in order to access
 		 *       the disk.
 		 *       I know that it's possible to do this (you can poll-wait for disk access),
-		 *       but it might be complicated to implement given the fact that our ATA
-		 *       driver is designed around the idea of asynchronous DMA transfer with
-		 *       interrupt-driven PIO as fallback (so we'd need a fall-fall-back for
+		 *       but it might  be complicated  to implement given  the fact  that our  ATA
+		 *       driver is  designed around  the idea  of asynchronous  DMA transfer  with
+		 *       interrupt-driven  PIO  as fallback  (so  we'd need  a  fall-fall-back for
 		 *       poll-driven PIO access)
 		 * TODO: Check to see if we can perform the PREEMPTION_ENABLED() check later,
-		 *       since testing this is one of the more expensive operations since we
+		 *       since testing this is one of the more expensive operations since  we
 		 *       can only access EFLAGS.IF by pushing it onto the stack... */
 	}
 #endif
@@ -230,12 +230,12 @@ PP_CAT5(AtaDrive_, _ATA_IOMETHOD_Name, Drive, _ATA_RW_Name, _ATA_DATA_Name)(_ATA
 			continue;
 		assert(bus->ab_aio_current == NULL);
 
-		/* NOTE: The `ATA_AIO_HANDLE_FONEPRD' flag doesn't matter in this
+		/* NOTE: The `ATA_AIO_HANDLE_FONEPRD'  flag doesn't  matter in  this
 		 *       case, since we completely by-pass the in-handle PRD buffer,
 		 *       and directly fill in the bus's PRD buffer! */
 		data->hd_flags = _ATA_RW_HANDLE_FLAGS;
 
-		/* Directly fill in the bus's PRD buffer, rather than creating
+		/* Directly fill in  the bus's PRD  buffer, rather than  creating
 		 * our own buffer that would later get copied ontop of the bus's. */
 		prd_count = _ATA_INITIALIZE_PRD_FROM_BUF(bus->ab_prdt,
 		                                         ATA_PRD_MAXCOUNT,
@@ -261,7 +261,7 @@ PP_CAT5(AtaDrive_, _ATA_IOMETHOD_Name, Drive, _ATA_RW_Name, _ATA_DATA_Name)(_ATA
 		/* Indicate that AIO has already been activated. */
 		data->hd_prd.hd_prd_vector = NULL;
 
-		/* Start the DMA operation, and handle any potential initialization failure.
+		/* Start  the DMA  operation, and  handle any  potential initialization failure.
 		 * NOTE: Do a direct start, since we've already initialized the PRD as in-place. */
 		bus->ab_aio_current = aio;
 		if (!AtaBus_HW_StartDirectDma(bus, aio)) {
@@ -270,7 +270,7 @@ PP_CAT5(AtaDrive_, _ATA_IOMETHOD_Name, Drive, _ATA_RW_Name, _ATA_DATA_Name)(_ATA
 		}
 		return;
 	}
-	/* The bus isn't in a ready state. - Setup `aio' as a pending DMA
+	/* The bus isn't in  a ready state.  - Setup `aio'  as a pending  DMA
 	 * operation, and schedule it for execution at a later point in time. */
 	data->hd_flags = _ATA_RW_HANDLE_FLAGS_ONEPRD;
 	prd_count = _ATA_INITIALIZE_PRD_FROM_BUF(&prd0, 1, buf,

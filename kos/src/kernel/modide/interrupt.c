@@ -71,7 +71,7 @@ NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self) {
 		/* A DMA operation has been completed. */
 		handle = ATOMIC_XCH(self->ab_aio_current, NULL);
 		if unlikely(!handle) {
-			/* This can happen if the handle is currently being canceled,
+			/* This can happen if the handle is currently being  canceled,
 			 * but the cancel request itself was made before we could tell
 			 * hardware that DMA should be stopped. */
 			break;

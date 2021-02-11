@@ -134,10 +134,10 @@ INTERN uintptr_t GDBServer_Features = 0;
 /* Set to true after an async stop notification is send
  * Set to false after vStopped was called when no more stop notifications were pending.
  * -> When `false', GDB_Main() is allowed to send out stop notifications
- *    when waiting for the first byte of some new packet. */
+ *    when   waiting   for  the   first   byte  of   some   new  packet. */
 PRIVATE bool GDBServer_DidSendAsyncStopNotification = false;
 
-/* Set to true when a detach command was issued that implies detach-from-everything
+/* Set to  true  when a  detach  command  was issued  that  implies  detach-from-everything
  * Set to false when a command other than detach-something or select-thread is encountered. */
 PRIVATE bool GDBServer_DidDetachFromEverything = false;
 
@@ -456,7 +456,7 @@ NOTHROW(FCALL GDBThread_DoLookupPID)(intptr_t pid) {
 		return incref(&_bootidle);
 	if (GDBThread_IsAllStopModeActive)
 		return pidns_trylookup_task_locked(&pidns_root, (upid_t)pid);
-	/* FIXME: What if one of the suspended threads is holding the PIDNS lock?
+	/* FIXME: What if one of the suspended threads is holding the PIDNS  lock?
 	 *        We should have some kind of timeout here, and switch to all-stop
 	 *        mode if the timeout expires. */
 	return pidns_trylookup_task(&pidns_root, (upid_t)pid);
@@ -468,7 +468,7 @@ NOTHROW(FCALL GDBThread_DoLookupTID)(intptr_t tid) {
 		return incref(GDB_CurrentThread_general.ts_thread);
 	if (GDBThread_IsAllStopModeActive)
 		return pidns_trylookup_task_locked(&pidns_root, (upid_t)tid);
-	/* FIXME: What if one of the suspended threads is holding the PIDNS lock?
+	/* FIXME: What if one of the suspended threads is holding the PIDNS  lock?
 	 *        We should have some kind of timeout here, and switch to all-stop
 	 *        mode if the timeout expires. */
 	return pidns_trylookup_task(&pidns_root, (upid_t)tid);
@@ -587,7 +587,7 @@ NOTHROW(FCALL GDBThreadSel_Stop)(GDBThreadSel *__restrict thread,
 }
 
 /* Pop all stop events for threads described by `thread'.
- * As far as call-semantics go, this function behaves
+ * As  far  as call-semantics  go, this  function behaves
  * identical to `GDBThread_PopStopEventProcess()' */
 LOCAL NONNULL((1)) GDBThreadStopEvent *
 NOTHROW(FCALL GDBThreadSel_PopStopEvents)(GDBThreadSel *__restrict thread,
@@ -839,7 +839,7 @@ do_wbreak:
 
 	} else {
 		/* Shouldn't actually get here, since stop events without reason should
-		 * never cause stop replies to be constructed in the first place! */
+		 * never  cause  stop replies  to be  constructed  in the  first place! */
 		ptr = STPCAT(ptr, "T02"); /* SIGINT */
 	}
 
@@ -1101,9 +1101,9 @@ return_zero:
 		                                    &used_count);
 		if unlikely(used_count != count) {
 			/* Because of byte escaping, not all read data could be encoded.
-			 * In this case, re-write the byte-count (i.e. return) field to
-			 * reflect the actual number of encoded bytes. (if the hex-repr
-			 * of the new count is shorter than the old one, pad the return
+			 * In this case, re-write the byte-count (i.e. return) field  to
+			 * reflect the actual number of encoded bytes. (if the  hex-repr
+			 * of the new count is shorter than the old one, pad the  return
 			 * value with leading `0'-characters so we don't have to memmove
 			 * the entire outgoing packet buffer!) */
 			char temp[PACKETLEN_MAX_HEXLEN + 1];
@@ -1272,9 +1272,9 @@ NOTHROW(FCALL GDB_HandleCommand)(char *endptr) {
 	switch (*i++) {
 
 	case '!':
-		/* Extended mode (would allow GDB to restart the application being debugged)
+		/* Extended  mode (would allow GDB to restart the application being debugged)
 		 * However, since we can't very well restart the kernel, don't do anything to
-		 * let GDB think that this function isn't supported (but don't log a warning
+		 * let GDB think that this function isn't supported (but don't log a  warning
 		 * about this) */
 		goto send_ok;
 
@@ -1299,7 +1299,7 @@ again_handle_questionmark:
 			if (GDBServer_CreateMissingAsyncStopNotificationForSomeThread())
 				goto again_handle_questionmark;
 			/* Shouldn't really get here, but tell GDB
-			 * that there are no running threads. */
+			 * that  there  are  no  running  threads. */
 			*o++ = 'W';
 			*o++ = '0';
 			*o++ = '0';
@@ -1388,7 +1388,7 @@ send_ok_and_detach:
 			goto send_ok_and_detach; /* Detach from anything */
 		if (pid == GDB_KERNEL_PID)
 			goto send_ok_and_detach; /* Detach from the kernel (also implies detach-from-everything) */
-		/* For anything else, we handle detach as a
+		/* For  anything  else, we  handle detach  as a
 		 * command to resume execution of that process. */
 		{
 			REF struct task *proc;
@@ -1756,7 +1756,7 @@ set_single_step_all_threads:
 						if likely(newThread.ts_thread) {
 							/* Stop threads, and generate async stop notifications */
 							GDBThreadSel_Stop(&newThread, true);
-							/* Capture all fully stopped threads, such that they don't
+							/* Capture all  fully stopped  threads, such  that they  don't
 							 * get resumed by additional commands which may be found later
 							 * on the commandline. */
 							first = GDBThreadSel_PopStopEvents(&newThread, &last);
@@ -1797,7 +1797,7 @@ set_single_step_all_threads:
 						}
 					} else {
 						/* Technically, we'd have to accept any thread at this point,
-						 * but this feature is optional anyways, so using a specific
+						 * but this feature is optional anyways, so using a  specific
 						 * thread for this purpose is also OK. */
 						GDB_SetSingleStepIgnoredRange(GDB_CurrentThread_continue.ts_thread,
 						                              start, end);
@@ -2138,7 +2138,7 @@ do_return_attached_everything:
 			pcount[1] = GDB_ToHex(count & 0xf);
 			pcount[2] = hasNext ? '0' : '1'; /* done-flag */
 		} else if (i[0] == 'P' && i + 9 > endptr) {
-			/* These macros are taken from the GDB source.
+			/* These  macros  are taken  from the  GDB source.
 			 * `remote.c:remote_unpack_thread_info_response()' */
 #define TAG_THREADID    0x01 /* Echo the thread identifier.  */
 #define TAG_EXISTS      0x02 /* Is this process defined enough to fetch registers and its stack?  */
@@ -2164,7 +2164,7 @@ do_return_attached_everything:
 			if (mode & TAG_THREADID) {
 				o += sprintf(o, "%.8" PRIx32, TAG_THREADID);
 				/* The GDB source asserts 16 for length this for some
-				 * reason (even though only 8 bytes are processed) */
+				 * reason (even though  only 8  bytes are  processed) */
 				o += sprintf(o, "%.8" PRIx32, 16);
 				o += sprintf(o, "%.8" PRIx32, GDBThread_GetTID(newThread.ts_thread));
 			}
@@ -2224,7 +2224,7 @@ do_return_attached_everything:
 			o += sprintf(o, "PacketSize=%" PRIxSIZ, (size_t)(CONFIG_GDBSERVER_PACKET_MAXLEN/* + 4*/));
 			o = STPCAT(o, ";QNonStop+");
 			/* Always indicate that we support NoAck mode.
-			 * Another option would be to only indicate so when hosted by an emulator (which
+			 * Another  option would be to only indicate so when hosted by an emulator (which
 			 * would indicate that our serial connection is reliable), but also indicating it
 			 * allows the GDB remote (and the human sitting infront of it) to decide themself
 			 * if noack mode should be used.
@@ -2302,18 +2302,18 @@ do_return_attached_everything:
 			/* Not supported (and not required) */
 		} else if (ISNAME("Symbol")) {
 			/* Not supported (and not required)
-			 * This packet simply informs us that the GDB remote is able to service
+			 * This  packet simply informs us that the  GDB remote is able to service
 			 * symbol lookup requests (something like name2addr("memcpy") == &memcpy)
-			 * Some other implementation may need this in order to inject code into
-			 * specific functions (such as `pthread_create()') in order to allow for
-			 * tracing of special events such as the creation of a thread.
-			 * However, we won't need to so something like that, so we can just
+			 * Some other implementation may need this  in order to inject code  into
+			 * specific functions (such as `pthread_create()') in order to allow  for
+			 * tracing   of  special  events  such  as  the  creation  of  a  thread.
+			 * However, we  won't need  to so  something like  that, so  we can  just
 			 * ignore this packet. */
 		} else if (ISNAME("TStatus")) {
 			if (nameEnd != endptr)
 				ERROR(err_syntax);
-			/* This packet is used by GDB to probe support for tracepoint packets.
-			 * Since we don't support something like this (yet?), just ignore the
+			/* This packet is used by GDB  to probe support for tracepoint  packets.
+			 * Since  we don't support  something like this  (yet?), just ignore the
 			 * packet to prevent it from showing up as an `Unknown command' warning. */
 		} else if (ISNAME("NoAckMode")) {
 			if (nameEnd != endptr)
@@ -2365,7 +2365,7 @@ do_return_attached_everything:
 			GDB_SetThreadEventsEnabled(mode != 0);
 			goto send_ok;
 		} else if (ISNAME("StartNoAckMode") && nameEnd == endptr) {
-			/* Send the response while still in ack-mode
+			/* Send the response  while still in  ack-mode
 			 * GDB still responds with a `+' for this one! */
 			if (!GDBPacket_Send("OK"))
 				return GDB_HANDLECOMMAND_DTCH;
@@ -2466,7 +2466,7 @@ err_unknown_register_get:
 	printk(KERN_WARNING "[gdb] Unknown register read by packet: %$q\n",
 	       (size_t)(endptr - GDBRemote_CommandBuffer), GDBRemote_CommandBuffer);
 	/* The docs specify that we should send an empty packet for an invalid query
-	 * I'm just going to assume that this means: unrecognized-register... */
+	 * I'm just  going  to  assume  that  this  means:  unrecognized-register... */
 	goto send_empty;
 err_unknown_register_set:
 	printk(KERN_WARNING "[gdb] Unknown register set by packet: %$q\n",
@@ -2573,7 +2573,7 @@ again:
 	incref(GDB_CurrentThread_continue.ts_thread);
 	if (GDBServer_Features & GDB_SERVER_FEATURE_ATTACHED) {
 		/* Transmit the initial stop notification/stop reason, if the exchange
-		 * was instigated by the kernel (or, in the case of non-stop mode: if
+		 * was instigated by the kernel (or, in the case of non-stop mode:  if
 		 * there are any pending stop notifications, send the next one) */
 do_capture_notif:
 		notif = GDBThread_ConsumeAsyncNotifEvent();
@@ -2619,7 +2619,7 @@ check_for_notif_or_remote_byte:
 			 * For more information, see `https://sourceware.org/gdb/onlinedocs/gdb/Notification-Packets.html#Notification-Packets'
 			 * But as TLDR: we can send async notifications whenever we want, but:
 			 *   - We can only send 1 notification at a time (though are allowed to re-send that one multiple times)
-			 *   - GDB can acknowledge having received that notification with `vStopped', until the point
+			 *   - GDB can acknowledge having received that  notification with `vStopped', until the  point
 			 *     when `vStopped' will return `OK', which then re-enables us to send future notifications.
 			 */
 			notif = GDBThread_ConsumeAsyncNotifEvent();
@@ -2650,7 +2650,7 @@ check_for_notif_or_remote_byte:
 			b = (byte_t)bi;
 		} else {
 			/* In all-stop mode, there are no async notifications, so we only
-			 * ever have to wait for the GDB remote to send over commands. */
+			 * ever  have to wait  for the GDB remote  to send over commands. */
 			b = GDBRemote_GetByte();
 		}
 		if (b == 3) {
@@ -2711,11 +2711,11 @@ send_nack_and_wait_for_next_packet:
 					if (!GDBThread_IsStoppedExplicitly(GDBServer_Host))
 						goto done;
 					/* If we are the fallback host, also exit the active GDB loop, so-as
-					 * to give future async threads a chance to become hosts themself. */
+					 * to give future async threads  a chance to become hosts  themself. */
 					if (GDBServer_Host == GDBServer_FallbackHost)
 						goto done;
-					/* We ourself are one of the async-suspended threads,
-					 * however GDB doesn't actually want us to resume execution.
+					/* We   ourself   are   one   of   the   async-suspended  threads,
+					 * however GDB  doesn't  actually  want us  to  resume  execution.
 					 * With this in mind, keep on being the host, and wait for either:
 					 *  - New stop notifications (which we can then tell GDB about)
 					 *  - GDB to send more data (which we can then immediately process to process)
@@ -2803,7 +2803,7 @@ do_detach:
 	/* Discard all pending async notifications. */
 	GDBThread_DiscardAllAsyncNotifEvents();
 	/* Resume execution of all stopped threads (including
-	 * those that had pending stop notifications). */
+	 * those  that  had   pending  stop   notifications). */
 	GDBThread_ResumeEverything();
 	goto done;
 }

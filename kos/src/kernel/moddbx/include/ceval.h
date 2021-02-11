@@ -37,11 +37,11 @@ DECL_BEGIN
 struct ctype;
 struct cparser;
 
-/* Set to true if the `,'-operator should be interpreted as it is in
+/* Set to  true if  the `,'-operator  should be  interpreted as  it is  in
  * regular C, meaning that it is used to simply select the second operand.
  *
  * When set to `false' (which is the default) then the `,'-operator is used
- * to implement a cast-to-array behavior, where the LHS-operator is then
+ * to implement a  cast-to-array behavior, where  the LHS-operator is  then
  * expected to be a pointer:
  * >> &foo, 12
  *
@@ -57,11 +57,11 @@ struct cparser;
 DATDEF __BOOL ceval_comma_is_select2nd;
 
 
-/* Parse a C-expression from `self' and push its value
- * onto the C-expression stack, return DBX_EOK on success,
- * and a potential error otherwise (in the later case, the
- * effective size of the C-expression stack will remain
- * unaltered). NOTE: The given `self' is expected to already
+/* Parse a  C-expression  from  `self'  and  push  its  value
+ * onto the C-expression  stack, return  DBX_EOK on  success,
+ * and a potential  error otherwise (in  the later case,  the
+ * effective  size  of  the  C-expression  stack  will remain
+ * unaltered). NOTE: The given `self' is expected to  already
  * point to the first token apart of the expression on entry. */
 FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushparse)(struct cparser *__restrict self);
@@ -76,7 +76,7 @@ FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
                               size_t maxlen DFL((size_t)-1));
 
-/* Parse a named type from `self'. This function expects that
+/* Parse a named type from  `self'. This function expects  that
  * `self' points at the first token of the named type on entry.
  * @return: presult:      Filled with the name type that was parsed (token from
  *                        `self' were yielded, and not point to the first token
@@ -86,7 +86,7 @@ NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
  *                        but this argument is non-NULL, then NULL will be written
  *                        here. When `NULL', a potential variable name will not be
  *                        parsed, and if present, will result in `DBX_ESYNTAX'.
- * @param: p_varname_len: When non-NULL, store the length of `*p_varname' here, but
+ * @param: p_varname_len: When non-NULL, store  the length of  `*p_varname' here,  but
  *                        only do so if `p_varname != NULL'. When `p_varname' is given
  *                        as `NULL', then this argument is simply ignored.
  * @return: DBX_EOK:     Success.

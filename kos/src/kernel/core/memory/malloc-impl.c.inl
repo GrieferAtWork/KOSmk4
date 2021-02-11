@@ -164,7 +164,7 @@ NOTHROW_NX(KCALL FUNC(krealloc_in_place))(VIRT void *ptr,
 		/* Truncate the pointer. */
 		hptr.hp_siz = mptr_size(result) - n_bytes;
 		if (hptr.hp_siz >= HEAP_MINSIZE) {
-			/* Only do the truncation if the memory
+			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			hptr.hp_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
 			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
@@ -234,7 +234,7 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 		/* Truncate the pointer. */
 		hptr.hp_siz = mptr_size(result) - n_bytes;
 		if (hptr.hp_siz >= HEAP_MINSIZE) {
-			/* Only do the truncation if the memory
+			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			hptr.hp_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
 			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
@@ -308,7 +308,7 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
 		/* Truncate the pointer. */
 		hptr.hp_siz = mptr_size(result) - n_bytes;
 		if (hptr.hp_siz >= HEAP_MINSIZE) {
-			/* Only do the truncation if the memory
+			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			hptr.hp_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
 			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
@@ -388,7 +388,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 		/* Truncate the pointer. */
 		hptr.hp_siz = mptr_size(result) - n_bytes;
 		if (hptr.hp_siz >= HEAP_MINSIZE) {
-			/* Only do the truncation if the memory
+			/* Only  do  the truncation  if  the memory
 			 * that gets freed by this is large enough. */
 			hptr.hp_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
 			heap_free_untraced(&kernel_heaps[mptr_heap(result)],

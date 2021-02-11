@@ -104,7 +104,7 @@ DEFINE_SYSCALL3(fd_t, pidfd_getfd,
 	}
 	{
 		FINALLY_DECREF_UNLIKELY(handman);
-		/* XXX: Support for symbolic handles? It'd be kind-of
+		/* XXX: Support  for symbolic handles? It'd be kind-of
 		 *      neat to access, say, PWD of a process by doing
 		 *      `pidfd_getfd(pidfd_open(PID), AT_FDCWD)' as an
 		 *      alias for `open("/proc/[PID]/cwd")'... */

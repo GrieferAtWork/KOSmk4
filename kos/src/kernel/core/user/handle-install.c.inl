@@ -27,14 +27,14 @@
 DECL_BEGIN
 
 #ifdef INSTALL_IN
-/* Same as `handle_installinto()', but return the old handle
+/* Same  as `handle_installinto()', but  return the old handle
  * (or a HANDLE_TYPE_UNDEFINED) previously bound to that slot. */
 PUBLIC WUNUSED NONNULL((1, 3)) REF struct handle FCALL
 handle_installxchg(struct handle_manager *__restrict self,
                    unsigned int dst_fd,
                    struct handle const *__restrict hnd)
 #elif defined(INSTALL_AT)
-/* Similar to `handle_put()', but place the handle in a
+/* Similar to  `handle_put()', but  place  the handle  in  a
  * descriptor slot that is greater than, or equal to `hint'.
  * @throw: E_BADALLOC: Insufficient kernel memory to allocate more handle slots
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
@@ -45,7 +45,7 @@ handle_installat(struct handle_manager *__restrict self,
                  unsigned int hint,
                  struct handle const *__restrict hnd)
 #else /* INSTALL_AT */
-/* Add the given handle to the handle manager and
+/* Add the given handle  to the handle manager  and
  * return the handle number of where it was placed.
  * @throw: E_BADALLOC: Insufficient kernel memory to allocate more handle slots
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
@@ -190,7 +190,7 @@ got_result_slot:
 		THROW(E_BADALLOC_INSUFFICIENT_HANDLE_RANGE, dst_fd, cnt, lim);
 	}
 
-	/* Now that we've got an appropriate handle
+	/* Now that we've  got an appropriate  handle
 	 * number, install the handle into that slot! */
 	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
 #if defined(INSTALL_AT) || defined(INSTALL_IN)

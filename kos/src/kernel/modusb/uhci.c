@@ -244,7 +244,7 @@ NOTHROW(FCALL uhci_controller_egsm_enter)(struct uhci_controller *__restrict sel
 		cmd = uhci_rdw(self, UHCI_USBCMD);
 		cmd |= UHCI_USBCMD_EGSM;
 		uhci_wrw(self, UHCI_USBCMD, cmd);
-		/* If the connected status of any port has changed, then we mustn't
+		/* If the connected status of any  port has changed, then we  mustn't
 		 * allow the controller to remain in EGSM mode, but rather handle the
 		 * change in connectivity down below! */
 		if unlikely(uhci_controller_have_csc_port(self)) {
@@ -309,13 +309,13 @@ NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
 			self->uc_qhlast = prev != &self->uc_qhstart ? prev : NULL;
 		} else if (prev != &self->uc_qhstart) {
 			/* We may have been the last queue entry in line,
-			 * but there are still other entires before us.
-			 * As such, point back to the first queue entry. */
+			 * but  there are still  other entires before us.
+			 * As such, point back to the first queue  entry. */
 			assert(self->uc_qhstart.qh_next != NULL);
 			hw_pointer = self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
 			self->uc_qhlast = prev;
 		} else {
-			/* We ere the last queue entry, and there aren't
+			/* We ere the last queue entry, and there  aren't
 			 * even any interrupts handler left to-be called.
 			 * As such, we can safely terminate the list. */
 			hw_pointer = UHCI_QHHP_TERM;
@@ -362,7 +362,7 @@ LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
                                   /*in_ref*/ REF struct uhci_interrupt *__restrict ui) {
 	/* Insert interrupts sorted by their number of hits, such that interrupts
-	 * that get hit more often than others get triggered more often. */
+	 * that  get  hit  more  often  than  others  get  triggered  more often. */
 	struct uhci_interrupt **pself, *next;
 	size_t my_hitcount = ui->ui_hits;
 	assert(sync_writing(&self->uc_lock));
@@ -384,11 +384,11 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 		                                         : next->ui_reg.ife_tdsf->td_self));
 		*ui->ui_td1_next = next->ui_td0_phys;
 	}
-	/* Special case: This is the first interrupt that will get executed
-	 * In this case, we must have all ~empty~ frame lists entries point to it
-	 * instead of pointing to `uc_qhstart'. Frame list entires that already
+	/* Special  case:  This  is the  first  interrupt that  will  get executed
+	 * In  this case, we must have all ~empty~ frame lists entries point to it
+	 * instead of pointing  to `uc_qhstart'. Frame  list entires that  already
 	 * contain pointers to isochronous interrupt handlers must be updated such
-	 * that the last TD of the last isochronous interrupt handler points to
+	 * that  the last TD  of the last isochronous  interrupt handler points to
 	 * the first TD of our interrupt */
 	if (pself == &self->uc_intreg) {
 		unsigned int i;
@@ -415,7 +415,7 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 	} else {
 		struct uhci_interrupt *prev;
 		/* Simple case: we've been inserted after an existing interrupt.
-		 * In this case, we only have to update the next-pointer of the
+		 * In this case, we only have to update the next-pointer of  the
 		 * last TD of that preceding interrupt handler to point to us. */
 		prev = container_of(pself, struct uhci_interrupt, ui_reg.ife_next);
 		HW_WRITE(*prev->ui_td1_next, ui->ui_td0_phys);
@@ -437,14 +437,14 @@ NOTHROW(FCALL uhci_intreg_unlink)(struct uhci_controller *__restrict self,
 	if (next) {
 		hw_next_pointer = next->ui_td0_phys;
 	} else {
-		/* Without a next-pointer, we're the last regular interrupt handler.
+		/* Without a next-pointer, we're the last regular interrupt  handler.
 		 * As such, we must have the previous interrupt point to `uc_qhstart' */
 		hw_next_pointer = self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
 	}
 	if (pui == &self->uc_intreg) {
 		unsigned int i;
 		/* Special case: Must update the pointers from all of the frame lists,
-		 *               as well as all isochronous interrupt handlers. */
+		 *               as   well  as  all  isochronous  interrupt  handlers. */
 		uhci_controller_stop(self);
 		COMPILER_WRITE_BARRIER();
 		for (i = 0; i < 1024; ++i) {
@@ -512,7 +512,7 @@ NOTHROW(FCALL uhci_intiso_insert)(struct uhci_controller *__restrict self,
 		assert(self->uc_iisocount == 0 ||
 		       pself != &self->uc_intiso[frameno]);
 		/* Must have our last TD point to either the
-		 * first regular interrupt, or `uc_qhstart' */
+		 * first regular interrupt, or  `uc_qhstart' */
 		if (self->uc_intreg) {
 			hw_next_pointer = self->uc_intreg->ui_td0_phys;
 		} else {
@@ -559,7 +559,7 @@ NOTHROW(FCALL uhci_intiso_unlink)(struct uhci_controller *__restrict self,
 	*pself = next;
 	if (next) {
 		/* If we have a successor ISO interrupt, our
-		 * hardware self-pointer must be updated to
+		 * hardware self-pointer must be updated  to
 		 * point to its first TD. */
 		struct uhci_interrupt_frameentry *nent;
 		nent = next->ui_iso[frameno];
@@ -568,8 +568,8 @@ NOTHROW(FCALL uhci_intiso_unlink)(struct uhci_controller *__restrict self,
 		assert(nent->ife_tdsl);
 		hw_next_pointer = nent->ife_tdsf->td_self;
 	} else {
-		/* Without a succeeding ISO interrupt, our
-		 * hardware self-pointer must be updated to
+		/* Without  a  succeeding  ISO  interrupt,  our
+		 * hardware self-pointer  must  be  updated  to
 		 * either point to the first regular interrupt,
 		 * or simply point at `uc_qhstart'. */
 		if (self->uc_intreg) {
@@ -652,7 +652,7 @@ again:
 	ctrl = data->ud_ctrl;
 
 	/* Acquire a lock to the controller to prevent it from completing
-	 * our AIO, and setting `UHCI_AIO_FSERVED' before we can. */
+	 * our   AIO,  and  setting  `UHCI_AIO_FSERVED'  before  we  can. */
 	if unlikely(!sync_trywrite(&ctrl->uc_lock)) {
 		task_tryyield_or_pause();
 		goto again;
@@ -682,7 +682,7 @@ again:
 		                       : UHCI_QHHP_TERM;
 		if (ATOMIC_READ(osqh->qh_ep) & UHCI_QHEP_TERM) {
 			/* The canceled operation was already completed.
-			 * In this case, we don't need to stop the controller, since
+			 * In this case, we don't  need to stop the controller,  since
 			 * the unlinking process simply requires a cache invalidation. */
 			HW_WRITE(prev->qh_hp, hw_next_pointer);
 			uhci_invcache(ctrl, prev->qh_self + offsetof(struct uhci_osqh, qh_hp));
@@ -723,7 +723,7 @@ NOTHROW(KCALL uhci_aio_progress)(struct aio_handle *__restrict self,
 		}
 	} else {
 		/* If the first TD is still the next one to-be processed,
-		 * then we indicate that the operation is still pending. */
+		 * then we indicate that the operation is still  pending. */
 		if (td->td_self == current_ep)
 			result = AIO_PROGRESS_STATUS_PENDING;
 		for (; td; td = td->td_next) {
@@ -827,7 +827,7 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 		if (actlen < maxlen) {
 			if unlikely(cs & UHCI_TDCS_SPD) {
 				/* Shouldn't actually get here... From what I can tell, on working
-				 * hardware, this should be handled in `uhci_finish_completed()'. */
+				 * hardware,  this should be handled in `uhci_finish_completed()'. */
 				uhci_osqh_completed_ioerror(self, osqh,
 				                            ERROR_CODEOF(E_IOERROR_NODATA),
 				                            E_IOERROR_REASON_USB_SHORTPACKET);
@@ -850,12 +850,12 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 				                    "by non-empty packets of the same type (pid=%#I8x)\n",
 				       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
 				       actlen, maxlen, mypid);
-				/* XXX: What now? Should we be trying to shift around buffer memory
-				 *      in order to fill the gap? - When does this even happen? Or
-				 *      is this even allowed to happen, because if not, then I can
-				 *      just have the transmission be completed with an error.
-				 *      If we were to blindly re-merge data buffers, we might end
-				 *      up causing problems in case there is some endpoint function
+				/* XXX: What now? Should we be  trying to shift around buffer  memory
+				 *      in order to fill  the gap? - When  does this even happen?  Or
+				 *      is  this even allowed  to happen, because if  not, then I can
+				 *      just have  the  transmission  be  completed  with  an  error.
+				 *      If we were  to blindly  re-merge data buffers,  we might  end
+				 *      up causing problems in case  there is some endpoint  function
 				 *      that results in multiple chunks of dynamically sized packets. */
 			}
 		}
@@ -985,12 +985,12 @@ NOTHROW(FCALL uhci_int_completed)(struct uhci_controller *__restrict self,
 				                    "by non-empty packets of the same type (pid=%#I8x)\n",
 				       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
 				       actlen, maxlen, mypid);
-				/* XXX: What now? Should we be trying to shift around buffer memory
-				 *      in order to fill the gap? - When does this even happen? Or
-				 *      is this even allowed to happen, because if not, then I can
-				 *      just have the transmission be completed with an error.
-				 *      If we were to blindly re-merge data buffers, we might end
-				 *      up causing problems in case there is some endpoint function
+				/* XXX: What now? Should we be  trying to shift around buffer  memory
+				 *      in order to fill  the gap? - When  does this even happen?  Or
+				 *      is  this even allowed  to happen, because if  not, then I can
+				 *      just have  the  transmission  be  completed  with  an  error.
+				 *      If we were  to blindly  re-merge data buffers,  we might  end
+				 *      up causing problems in case  there is some endpoint  function
 				 *      that results in multiple chunks of dynamically sized packets. */
 			}
 		}
@@ -1116,18 +1116,18 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 			goto done_qh;
 		}
 		/* Incomplete transmission (can happen when an operation is split between multiple
-		 * frames because of its size, or because it was sharing bandwidth by not having
+		 * frames because of its size, or because  it was sharing bandwidth by not  having
 		 * the `UHCI_TDLP_DBS' flag set) */
 		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x,tok=%#I32x]\n",
 		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
 		           ep, cs, ATOMIC_READ(td->td_tok));
 
-		/* In the case of depth-first, we can assume that there are no
+		/* In  the case of  depth-first, we can assume  that there are no
 		 * more completed queues to be found, since that would imply that
 		 * our current queue would have also been completed! */
 		if (td->td_lp & UHCI_TDLP_DBS) {
 			/* Depth-first -> Later QHs havn't been touched, yet
-			 * As such, skip all the way to the very end. */
+			 * As such,  skip  all  the way  to  the  very  end. */
 			while (ui->ui_reg.ife_next)
 				ui = ui->ui_reg.ife_next;
 		}
@@ -1351,13 +1351,13 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			continue;
 		}
 		/* Incomplete transmission (can happen when an operation is split between multiple
-		 * frames because of its size, or because it was sharing bandwidth by not having
+		 * frames because of its size, or because  it was sharing bandwidth by not  having
 		 * the `UHCI_TDLP_DBS' flag set) */
 		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x,tok=%#I32x]\n",
 		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
 		           ep, cs, ATOMIC_READ(td->td_tok));
 
-		/* In the case of depth-first, we can assume that there are no
+		/* In  the case of  depth-first, we can assume  that there are no
 		 * more completed queues to be found, since that would imply that
 		 * our current queue would have also been completed! */
 		if (td->td_lp & UHCI_TDLP_DBS)
@@ -1467,8 +1467,8 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 		}
 		uhci_finish_completed(self);
 		/* No need to use `uhci_controller_unlock()' here. - We're the only place
-		 * that could ever set the `UHCI_CONTROLLER_FLAG_INTERRUPTED' bit, so we
-		 * know that no additional interrupt could happen after we release this
+		 * that could ever set the `UHCI_CONTROLLER_FLAG_INTERRUPTED' bit, so  we
+		 * know that no additional interrupt  could happen after we release  this
 		 * lock! */
 		sync_endwrite(&self->uc_lock);
 	}
@@ -1610,7 +1610,7 @@ uhci_construct_tds(struct uhci_ostd ***__restrict ppnexttd,
 			} else {
 				/* Status packets are used to terminate the sequence and are required
 				 * to have the data toggle bit set. However, if the device is the one
-				 * to send the next data packet, then that page should come with the
+				 * to send the next data packet, then that page should come with  the
 				 * data toggle bit set to 0, so remember that fact now. */
 				td->td_tok |= UHCI_TDTOK_DTOGGM;
 				endp->ue_flags &= ~USB_ENDPOINT_FLAG_DATATOGGLE;
@@ -1667,8 +1667,8 @@ NOTHROW(KCALL uhci_syncheap_fini)(struct uhci_syncheap *__restrict self) {
 
 #define UHCI_SYNCHEAP_ALLOC_FAILED ((u32)-1)
 /* Allocate physical memory (or return `UHCI_SYNCHEAP_ALLOC_FAILED' on failure)
- * Note that even on failure, when `num_bytes > PAGESIZE', there is a
- * possibility that the re-attempting the allocation with a smaller size could
+ * Note  that  even  on  failure,  when  `num_bytes > PAGESIZE',  there  is   a
+ * possibility  that the re-attempting the allocation with a smaller size could
  * succeed. */
 PRIVATE NOBLOCK u32
 NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
@@ -1759,7 +1759,7 @@ usb_transfer_allocate_physbuf(struct usb_transfer *__restrict tx,
 
 /* This function performs a synchronous transfer operation by going
  * through real physical memory in order to allow USB transfers to/
- * from buffers located in VIO memory regions, as well as physical
+ * from  buffers located in VIO memory regions, as well as physical
  * memory locations above 4GiB
  * @return: * : The total number of transferred bytes. */
 PRIVATE NONNULL((1, 2)) size_t KCALL
@@ -1770,9 +1770,9 @@ uhci_transfer_sync_with_phys(struct uhci_controller *__restrict self,
 	struct usb_transfer **ptx_copy, *tx_copy;
 	struct usb_transfer const *tx_iter;
 	struct uhci_syncheap heap = UHCI_SYNCHEAP_INIT;
-	/* Allocate physical memory buffers for all TX packets
+	/* Allocate  physical memory buffers  for all TX packets
 	 * and copy data from input packets inside, then perform
-	 * the operation synchronously before copying data from
+	 * the  operation synchronously before copying data from
 	 * output packets into the original buffers, and freeing
 	 * the temporary buffers. */
 	TRY {
@@ -2024,21 +2024,21 @@ PRIVATE struct aio_handle_type uhci_aio_sync_type = {
 
 
 
-/* Perform a one-time transfer of a sequence of packets.
+/* Perform  a  one-time  transfer  of  a  sequence  of  packets.
  * This is the primary functions for OS-initiated communications
  * with connected USB devices.
  * For communications initiated by the device, see the interface
  * for doing this below.
  * @param: self: The controller which will be used for the transfer
- * @param: tx:   A chain of USB packets that must be transmitted to
+ * @param: tx:   A chain of USB packets  that must be transmitted  to
  *               the given `endp' in the same order in which they are
  *               given here (the chain is described by `->ut_next->')
  * @param: aio:  The AIO handle allowing the caller to perform the transfer
  *               asynchronously.
- *               Note that the caller is free to invalidate `tx', as well as
- *               any of the pointed-to buffer controller structures (though
+ *               Note  that the caller  is free to invalidate  `tx', as well as
+ *               any  of  the pointed-to  buffer controller  structures (though
  *               obviously not the buffers themself), as well as later transfer
- *               descriptors even before the given `aio' handle is invoked to
+ *               descriptors even before the given  `aio' handle is invoked  to
  *               indicate completion. */
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 uhci_transfer(struct usb_controller *__restrict self,
@@ -2179,9 +2179,9 @@ cleanup_configured_and_do_syncio:
 		}
 		uhci_osqh_free(qh);
 	}
-	/* Allocate physical memory buffers for all TX packets
+	/* Allocate  physical memory buffers  for all TX packets
 	 * and copy data from input packets inside, then perform
-	 * the operation synchronously before copying data from
+	 * the  operation synchronously before copying data from
 	 * output packets into the original buffers, and freeing
 	 * the temporary buffers. */
 	{
@@ -2312,7 +2312,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 		size_t num_pages;
 		void *buf;
 		num_pages = CEILDIV(buflen, PAGESIZE);
-		/* NOTE: Unlink the heap allocation functions, vpage_alloc() is guarantied to
+		/* NOTE: Unlink the heap  allocation functions, vpage_alloc()  is guarantied  to
 		 *       respect the `GFP_PREFLT' flag, so we don't even have to touch allocated
 		 *       page in order to ensure that it got faulted. */
 		buf = vpage_alloc_untraced(num_pages, 1,
@@ -2416,16 +2416,16 @@ NOTHROW(FCALL uhci_count_isotds_for_interval_and_offset)(struct uhci_controller 
  * @param: endp:                          The endpoint from which to poll data.
  * @param: handler:                       The handler to-be invoked.
  * @param: character_or_block_device:     Either a `struct character_device' or `struct block_device',
- *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
+ *                                        depending  on  the  setting  of  `USB_INTERRUPT_FLAG_ISABLK'
  * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
  *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
- *                                        mandatory buffer size, with it being an error if the device
- *                                        produces less data that this, meaning that unless said flag is
+ *                                        mandatory buffer size,  with it  being an error  if the  device
+ *                                        produces  less data that this, meaning that unless said flag is
  *                                        set, your handler is allowed to completely ignore its `datalen'
- *                                        argument and simply assume that the buffer's size is equal to
- *                                        the `buflen' value passed when the interrupt was registered.
+ *                                        argument and simply assume that  the buffer's size is equal  to
+ *                                        the `buflen' value  passed when the  interrupt was  registered.
  * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
- * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
+ * @param: poll_interval_in_milliseconds: A   hint  for  how  often  the  USB  device  should  be  polled.
  *                                        When set to `0', the device will be polled as often as possible. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
 uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
@@ -2539,7 +2539,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 			if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
 				unsigned int i, n, louse, hiuse, totuse;
 				struct uhci_ostd *hitd, *lotd;
-				/* In the case of frame-specific transfers, it would be too much work
+				/* In the case of frame-specific transfers,  it would be too much  work
 				 * to update all of those TD descriptors. - So instead, cheat a bit and
 				 * Append one more TD at the very end. */
 				hitd = uhci_ostd_alloc();
@@ -2570,20 +2570,20 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 				hitd->td_buf = lotd->td_buf + louse;
 				lotd->td_cs &= ~UHCI_TDCS_IOC;
 				/* And with that, the D-bit even itself out over
-				 * the course of the entire frame looping once. */
+				 * the  course of the entire frame looping once. */
 			} else {
 				result->ui_flags |= UHCI_INTERRUPT_FLAG_FLIPDBIT;
 			}
 		}
 
 		/* At this point, everything that we could possibly already know about the
-		 * new interrupt handler has already been filled in. - Now it's time to
+		 * new interrupt handler has  already been filled in.  - Now it's time  to
 		 * actually register the thing! */
 		sync_write(&me->uc_lock);
 		if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
 			unsigned int n, i, winner_offset = 0;
 			size_t winner_score = (size_t)-1;
-			/* Figure out a suitable inter-frame shift with which we can balance
+			/* Figure out a suitable inter-frame  shift with which we can  balance
 			 * out the number of isochronous data transfers within the same frame. */
 			for (i = 0; i < interval; ++i) {
 				size_t score;
@@ -2604,7 +2604,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 				result->ui_iso[0] = NULL;
 			}
 
-			/* With that, we've finalized our ISO frame vector, and we can
+			/* With that, we've finalized our  ISO frame vector, and we  can
 			 * insert the interrupt descriptor into all of the proper slots. */
 			for (n = 0, i = winner_offset; n < frame_hits; ++n, i += interval) {
 				assert(result->ui_iso[i] == &result->ui_isobuf[n]);
@@ -2654,7 +2654,7 @@ NOTHROW(FCALL uhci_controller_reset_port)(struct uhci_controller *__restrict sel
 		if (!(st & UHCI_PORTSC_CCS))
 			break;
 		/* ACK the status change
-		 * Note that PEDC and CSC are r/wc, so
+		 * Note that PEDC  and CSC  are r/wc,  so
 		 * writing them will actually clear them! */
 		if (st & (UHCI_PORTSC_PEDC | UHCI_PORTSC_CSC)) {
 			uhci_wrw(self, UHCI_PORTSC(portno), st);
@@ -2818,7 +2818,7 @@ do_resdect:
 	}
 	/* Try to enter EGSM mode.
 	 * Note that this function returns `false' if there are
-	 * any ports with changed connectivity indicators! */
+	 * any  ports  with  changed  connectivity  indicators! */
 	egsm_ok = uhci_controller_egsm_enter(uc);
 	uhci_controller_endwrite(uc);
 
@@ -2871,17 +2871,17 @@ uhci_powerctl_poll(void *__restrict arg,
 		goto no;
 	}
 	if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
-		/* When the bus has already been suspended, then we can
+		/* When the bus has already  been suspended, then we  can
 		 * just wait until it gets resumed before doing anything! */
 		goto no;
 	}
 
-	/* There doesn't seem to be any traffic, so we wait for traffic
-	 * to appear with a custom timeout that specifies how long to
-	 * wait before the bus should automatically be suspended.
+	/* There  doesn't seem  to be any  traffic, so we  wait for traffic
+	 * to  appear  with a  custom timeout  that  specifies how  long to
+	 * wait  before  the   bus  should   automatically  be   suspended.
 	 * Note that this is a relatively short delay, because for whatever
-	 * reason, USB attach/detach events only generate interrupts when
-	 * the entire bus has been suspended (so we need to do this to be
+	 * reason,  USB attach/detach events  only generate interrupts when
+	 * the entire bus has been suspended (so  we need to do this to  be
 	 * able to handle attach/detach events!) */
 	{
 		ktime_t timeout;
@@ -2989,7 +2989,7 @@ uhci_find_pci_bar(struct pci_device const *__restrict dev) {
 	 *    of said BAR, as well as check if the BAR is even allocated.
 	 * #1: If only 1 BAR is allocated, that's the one
 	 * #2: If only 1 BAR has the expected I/O size, that's the one
-	 *     FIXME: Looking at the I/O sizes, I have a feeling that the PCI
+	 *     FIXME: Looking  at the I/O  sizes, I have a  feeling that the PCI
 	 *            driver loads these incorrectly... (I'm reading 0xffff3fc0,
 	 *            which is 0-BASE...)
 	 * #3: If only 1 BAR has `PCI_RESOURCE_FIO' set, that's the one

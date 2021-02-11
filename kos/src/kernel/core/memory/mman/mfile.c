@@ -53,9 +53,9 @@ DECL_BEGIN
 
 /* Allocate physical memory for use with mem-parts created for `self'
  * This function is a more restrictive version of `page_malloc_part(1, max_pages, res_pages)',
- * in that it will also ensure that returned pages are properly aligned, as well
- * as that the given `max_pages' is also properly aligned. Note however that so-long
- * as the size of a single file-block is <= PAGESIZE, this function behaves 100%
+ * in   that  it  will  also  ensure  that  returned  pages  are  properly  aligned,  as  well
+ * as that  the  given  `max_pages'  is  also properly  aligned.  Note  however  that  so-long
+ * as   the  size  of  a  single  file-block  is  <=  PAGESIZE,  this  function  behaves  100%
  * identical to the above call to `page_malloc_part()' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 3)) physpage_t
 NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
@@ -64,7 +64,7 @@ NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
 	physpage_t result, real_result;
 	size_t page_alignment;
 	/* Check for the simple case where natural page alignment
-	 * is enough to satisfy file-block alignment. */
+	 * is   enough   to    satisfy   file-block    alignment. */
 	if likely(self->mf_blockshift <= PAGESHIFT)
 		return page_malloc_part(1, max_pages, res_pages);
 	page_alignment = (size_t)1 << (self->mf_blockshift - PAGESHIFT);
@@ -239,9 +239,9 @@ mfile_sync(struct mfile *__restrict self)
 	REF struct mpart *changes;
 #ifdef CONFIG_USE_NEW_FS
 	/* Clear the changed flag.
-	 * This has to be happen _before_ we read out the changed-part
+	 * This  has to be happen _before_ we read out the changed-part
 	 * list, such that changed parts added after we've consumed all
-	 * currently changed parts will cause the CHANGED flag to be
+	 * currently changed parts  will cause the  CHANGED flag to  be
 	 * set once again, without it ever being cleared when there are
 	 * no changed parts at all. */
 	ATOMIC_AND(self->mf_flags, ~MFILE_F_CHANGED);
@@ -284,7 +284,7 @@ mfile_phys_newpart(struct mfile *__restrict UNUSED(self),
 	result->mp_flags        = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN | MPART_F_NOFREE;
 	result->mp_state        = MPART_ST_MEM;
 	result->mp_blkst_ptr    = NULL; /* Disable block status (thus having the system act like all
-	                                 * blocks were using `MPART_BLOCK_ST_CHNG' as their status) */
+	                                 * blocks  were using `MPART_BLOCK_ST_CHNG' as their status) */
 	result->mp_mem.mc_start = (physpage_t)minaddr >> PAGESHIFT;
 	result->mp_mem.mc_size  = num_bytes >> PAGESHIFT;
 	result->mp_meta         = NULL;
@@ -308,7 +308,7 @@ PUBLIC_CONST struct mfile_ops const mfile_ndef_ops = {
 
 
 
-/* Fallback files for anonymous memory. These behave the same as `mfile_zero',
+/* Fallback  files for anonymous memory. These behave the same as `mfile_zero',
  * but one exists for every possible `mf_blockshift' (where the index into this
  * array is equal to that file's `mf_blockshift' value)
  * As such, these files are used by `mfile_delete()' as replacement mappings

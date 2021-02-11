@@ -74,7 +74,7 @@ STATIC_ASSERT_MSG(sizeof(struct mman_unmap_kram_job) <= PAGESIZE,
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
  * This counter behaves similar to the in-use counter found in <kos/aref.h>, and is needed in order
- * to allow for syncing of internal re-trace operations in `mman_unmap_kram_locked()' with
+ * to  allow  for  syncing  of  internal  re-trace  operations  in  `mman_unmap_kram_locked()' with
  * other CPUs having previously started initializing hinted pages.
  *
  * For more information on the data race solved by this counter, see the detailed explanation
@@ -223,12 +223,12 @@ NOTHROW(FCALL unmap_and_unprepare_and_sync_memory)(void *addr, size_t num_bytes)
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 #if !defined(NDEBUG) && !defined(CONFIG_NO_SMP)
-	/* This check right here only serves to turn fully undefined behavior
-	 * when another CPU is currently initializing a page which we've just
+	/* This check right here only  serves to turn fully undefined  behavior
+	 * when another CPU is currently  initializing a page which we've  just
 	 * unmapped (which would indicate an error elsewhere within the kernel)
 	 * into something that's a bit easier to narrow down:
 	 * Instead of (possibly) failing anywhere within the hinted-page-mapping
-	 * function, fail with a normal #PF upon access to bad memory. */
+	 * function,  fail  with  a  normal  #PF  upon  access  to  bad  memory. */
 	while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
 		task_pause();
 #endif /* !NDEBUG && !CONFIG_NO_SMP */
@@ -265,8 +265,8 @@ NOTHROW(FCALL movedown_bits)(mpart_blkst_word_t *dst_bitset,
 
 
 /* Trim off the trailing data from the given mem-part to make
- * its effective new size be equal to `part_size'.
- * The caller must ensure all the proper locking, and the
+ * its   effective   new  size   be  equal   to  `part_size'.
+ * The  caller must  ensure all  the proper  locking, and the
  * non-shared-ness of the given mem-part. */
 PRIVATE NOBLOCK NONNULL((1, 3)) void
 NOTHROW(FCALL mpart_truncate_trailing)(struct mpart *__restrict self,
@@ -321,7 +321,7 @@ NOTHROW(FCALL mpart_truncate_trailing)(struct mpart *__restrict self,
 }
 
 /* Trim off the leading `remove_size' bytes from the given mem-part.
- * The caller must ensure all the proper locking, and the
+ * The  caller  must  ensure  all   the  proper  locking,  and   the
  * non-shared-ness of the given mem-part. */
 PRIVATE NOBLOCK NONNULL((1, 3)) void
 NOTHROW(FCALL mpart_truncate_leading)(struct mpart *__restrict self,
@@ -431,7 +431,7 @@ NOTHROW(FCALL try_truncate_mchunk_vector)(struct mchunk **__restrict p_vec,
 
 
 
-/* (try to) unmap the given sub-range of virtual (kernel)
+/* (try to)  unmap the  given  sub-range of  virtual  (kernel)
  * memory that is mapped by `node', which is backed by `part'.
  *
  * This function is called while holding a lock to both `part',
@@ -464,9 +464,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 	/* TODO: None of the following should be a requirement!
 	 *       However, right now the below codes assumes all of this stuff.
-	 * The only solution here is having a proper mpart-split function which
+	 * The  only solution here is having a proper mpart-split function which
 	 * we can use to do all of the necessary unsharing, etc... when deleting
-	 * a kernel ram sub-region that was backed by a part that's also mapped
+	 * a kernel ram sub-region that was backed by a part that's also  mapped
 	 * somewhere else... */
 	assert(mpart_isanon(part));
 	assert(node->mn_flags & MNODE_F_SHARED
@@ -501,18 +501,18 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		return true;
 	}
 
-	/* Either truncate a node at the front, or cut out a chunk in the middle.
-	 * In either case, we have to make sure that (in case of a hinted node),
-	 * all pages above the to-be unmapped area have been fully initialized,
-	 * thus ensuring that no other CPU (or thread) might possibly try to load
+	/* Either  truncate a node at the front, or cut out a chunk in the middle.
+	 * In  either case, we have to make sure  that (in case of a hinted node),
+	 * all  pages above the  to-be unmapped area  have been fully initialized,
+	 * thus ensuring that no other CPU (or thread) might possibly try to  load
 	 * pages from that upper area when we need to change its backing pointers. */
 	if (node->mn_flags & MNODE_F_MHINT) {
 		byte_t *tail_minaddr, *tail_endaddr;
 		tail_minaddr = unmap_maxaddr + 1;
 		tail_endaddr = (byte_t *)mnode_getendaddr(node);
-		/* We keep the lazy initialization of hinted nodes simple, and let
+		/* We  keep the lazy initialization of hinted nodes simple, and let
 		 * the #PF handler to most of the work. As such, all we really have
-		 * to do is ensure that every page from the tail-range has been
+		 * to  do is  ensure that every  page from the  tail-range has been
 		 * accessed at least once. */
 		do {
 			peekb(tail_minaddr);
@@ -521,7 +521,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 #ifndef CONFIG_NO_SMP
 		/* Make sure that any other CPU is still initializing hinted pages,
-		 * which may overlap with the address range we've just loaded. */
+		 * which may  overlap with  the address  range we've  just  loaded. */
 		while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
 			task_pause();
 #endif /* !CONFIG_NO_SMP */
@@ -529,7 +529,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 	if unlikely(node->mn_partoff != 0) {
 		/* Truncate the leading address range that was never even mapped...
-		 * All of the below code assumes that it is operating on a zero
+		 * All of the  below code assumes  that it is  operating on a  zero
 		 * offset mnode->mpart mapping. */
 		mpart_truncate_leading(part, node->mn_partoff, freefun, flags);
 		node->mn_partoff = 0;
@@ -540,7 +540,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		mpart_size = mpart_getsize(part);
 		assert(mpart_size >= mnode_getsize(node));
 		if unlikely(mpart_size > mnode_getsize(node)) {
-			/* Truncate the trailing address range that was never even mapped.
+			/* Truncate the trailing address range  that was never even  mapped.
 			 * All of the below code assumes that the original part isn't larger
 			 * than the associated node. */
 			mpart_truncate_trailing(part, mpart_size, freefun, flags, 0);
@@ -611,7 +611,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	assert(IS_ALIGNED(hisize, PAGESIZE));
 
 	/* Check if we also need to allocate an additional
-	 * block-status bitset for use with `hipart' */
+	 * block-status  bitset  for  use  with   `hipart' */
 	hipart->mp_blkst_ptr = NULL;
 	if (!(lopart->mp_flags & MPART_F_BLKST_INL) && lopart->mp_blkst_ptr != NULL) {
 		size_t bitset_bytes_per_word;
@@ -646,10 +646,10 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		size_t lo_chunks, hi_chunks;
 		struct mchunkvec vec;
 
-		/* We may have to allocate a new dynamic mem/swap vector.
-		 * First of all: Figure out where exactly the split needs
+		/* We may have to allocate a new dynamic mem/swap  vector.
+		 * First of all: Figure out where exactly the split  needs
 		 * to happen, in terms of CHUNK_INDEX and CHUNK_OFFSET for
-		 * both where the lo-part will end, and where the hi-part
+		 * both where the lo-part will end, and where the  hi-part
 		 * will start at. */
 		vec = lopart->mp_mem_sc;
 		lo_split_chunk_offset = losize >> PAGESHIFT;
@@ -676,7 +676,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		/* We now have to adjust the backing storage, such that:
 		 * >> lopart->mp_mem_sc = { [0...<lo_split_chunk_index:lo_split_chunk_offset>) }
 		 * >> hipart->mp_mem_sc = { [<hi_split_chunk_index:hi_split_chunk_offset>...n) }
-		 * For this, start out by figuring out exactly how many chunks we'll be needing
+		 * For  this, start out by figuring out exactly how many chunks we'll be needing
 		 * for the lo- and hi-part's chunk-vectors. */
 		lo_chunks = lo_split_chunk_index;
 		if (lo_split_chunk_offset != 0) {
@@ -687,7 +687,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		assert(lo_chunks >= 1);
 		assert(hi_chunks >= 1);
 		/* Handle the simple cases where one of the 2 parts can
-		 * be implemented without the need of a chunk-vector. */
+		 * be  implemented without the  need of a chunk-vector. */
 		if (lo_chunks == 1 && hi_chunks == 1) {
 			/* Both parts only need a single chunk. */
 			assert(lo_split_chunk_index == 0);
@@ -795,7 +795,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				lopart->mp_mem_sc.ms_c = lo_chunks;
 			} else {
 				/* Use `newvec' for `lopart', and re-purpose the
-				 * old vector from `lopart' for use in `hipart' */
+				 * old  vector from `lopart' for use in `hipart' */
 				memcpy(&newvec[0], &vec.ms_v[0], lo_chunks, sizeof(struct mchunk));
 				if (lo_split_chunk_offset != 0) {
 					assert(lo_split_chunk_index == lo_chunks - 1);
@@ -888,7 +888,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			}
 		} else if (hisize > bitset_bytes_per_word) {
 			mpart_blkst_word_t *hiset, *smaller_bitset;
-			/* Re-use the bitset from `lopart' in `hipart', and
+			/* Re-use  the bitset from `lopart' in `hipart', and
 			 * change `lopart' to make use of the inline bitset. */
 			hiset = lopart->mp_blkst_ptr;
 			lopart->mp_blkst_inl = hiset[0];
@@ -1081,7 +1081,7 @@ NOTHROW(FCALL mpartlockop_kram_cb)(struct mpart_lockop *__restrict self,
 }
 
 
-/* Insert `lop' into the lock-operations list of `self', and
+/* Insert `lop' into the lock-operations list of `self',  and
  * return `true', or don't insert it into the list, acquire a
  * lock to `self', and return `false' */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
@@ -1120,14 +1120,14 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
 
 
 /* Try to unmap kernel memory while the caller is holding a lock to the kernel mman.
- * NOTE: This function can be used to delete any kind of kernel-space memory mapping,
+ * NOTE: This function can be used to delete any kind of kernel-space memory  mapping,
  *       but special case must be taken when it comes to read-only, or shared copy-on-
  *       write memory mappings (see the documentation of `struct mman_unmap_kram_job')
  * @param: locked_part: If non-NULL, a part which may be assumed as locked by the caller.
  * @return: MMAN_UNMAP_KRAM_LOCKED_EX_DONE:  Success (you must invoke the done-callback)
- * @return: MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC: Success (memory will be free'd asynchronously)
+ * @return: MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC: Success (memory will  be free'd  asynchronously)
  *                                           In this case, so-long as the job isn't allocated
- *                                           in-line with the memory being free'd, the given
+ *                                           in-line  with the memory being free'd, the given
  *                                           done-callback is responsible to free `job'
  * @return: * : Insufficient memory (re-queue the returned job for later execution) */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct mman_unmap_kram_job *
@@ -1188,29 +1188,29 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 
 		/* In order to unmap a sub-segment of a hinted mem-node, the following must be done:
 		 *  - Because hinted mem-nodes cannot be split (only truncated),
-		 *    we must first see how many pages reside on the upper end
+		 *    we must first see how many  pages reside on the upper  end
 		 *    of the sub-segment to-be unmapped.
-		 *  - We must always chose the upper end because we must eventually
-		 *    truncate the associated mem-part's `mp_blkst_ptr' vector, though
-		 *    we cannot modify its base-pointer, or move around its elements.
-		 *    NOTE: The same goes for the `mp_mem_sc.ms_v' vector.
-		 *    This restriction must be in place, since the page-fault handler
+		 *  - We  must  always chose  the upper  end  because we  must eventually
+		 *    truncate the  associated mem-part's  `mp_blkst_ptr' vector,  though
+		 *    we  cannot modify  its base-pointer,  or move  around its elements.
+		 *    NOTE: The   same    goes   for    the   `mp_mem_sc.ms_v'    vector.
+		 *    This  restriction must  be in  place, since  the page-fault handler
 		 *    doesn't acquire any sort of lock before accessing such a component,
-		 *    relying purely on the assumption that the kernel won't try to
-		 *    unmap its own private memory, whilst still using said memory.
+		 *    relying  purely  on the  assumption that  the  kernel won't  try to
+		 *    unmap  its  own private  memory,  whilst still  using  said memory.
 		 *  - We then ensure that all pages above the unmapped segment have been
-		 *    initialized in kernel memory (this is guarantied to be NOEXCEPT
-		 *    because hinted memory in kernel-space is always pre-allocated,
-		 *    and always has initializers that don't throw any exceptions)
-		 *    A type of initializer like this would usually only `memset()'
+		 *    initialized in kernel  memory (this is  guarantied to be  NOEXCEPT
+		 *    because  hinted  memory in  kernel-space is  always pre-allocated,
+		 *    and always  has  initializers  that don't  throw  any  exceptions)
+		 *    A type  of initializer  like this  would usually  only  `memset()'
 		 *    or `mempat()' new memory for either debugging or `calloc()'
 		 *  - Once that is done, we know that everything above the sub-segment
-		 *    to-be unmapped has been allocated, and consequently no longer
+		 *    to-be unmapped has  been allocated, and  consequently no  longer
 		 *    represents hinted memory (the page directory contains the actual
-		 *    memory mapping, rather than a hint as to how to initialize it).
+		 *    memory mapping, rather than a hint as to how to initialize  it).
 		 *    Because of this, we can proceed to replace the upper sub-segment
-		 *    with a new mman node/part pair, before moving on to truncate
-		 *    the original (and still hinted) base node to end where the
+		 *    with a new  mman node/part  pair, before moving  on to  truncate
+		 *    the  original  (and still  hinted) base  node  to end  where the
 		 *    unmapped sub-segment ends.
 		 *
 		 * Before:
@@ -1220,15 +1220,15 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 		 *
 		 * NOTE:     There would normally be a race condition right here:
 		 *           Before we're allowed to truncate the `Before' node, we must still
-		 *           ensure that no other CPU is currently inside of the #PF handler,
-		 *           an in the progress of mapping the same high-region which we've
-		 *           already faulted at that point. (though since that other CPU may
-		 *           have started its #PF before we already did it's job for it, it
+		 *           ensure that no other CPU is currently inside of the #PF  handler,
+		 *           an  in the progress  of mapping the  same high-region which we've
+		 *           already faulted at that point.  (though since that other CPU  may
+		 *           have started its #PF  before we already did  it's job for it,  it
 		 *           may still be trying to access `node')
-		 * Solution: We need a global in-use counter `mman_kernel_hintinit_inuse' that
-		 *           tracks how many CPUs are currently initializing HINTED nodes.
+		 * Solution: We  need a global in-use counter `mman_kernel_hintinit_inuse' that
+		 *           tracks how  many CPUs  are  currently initializing  HINTED  nodes.
 		 *           The counter is incremented before the first access to the actually
-		 *           hinted node, and decremented once initialization has completed.
+		 *           hinted node, and  decremented once  initialization has  completed.
 		 *
 		 * After:
 		 * /--mpart at 0xc1234567              /--mpart at 0xc7654321
@@ -1236,7 +1236,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 		 *              |-- Unmap this part ---|
 		 *
 		 * Note that the upper part is entirely new, and no longer represents
-		 * hinted memory, while the lower part still is the same mpart, but
+		 * hinted memory, while the lower part  still is the same mpart,  but
 		 * has been truncated!
 		 *
 		 * HINTED: Allocated, but initialized memory (initialize on first access)
@@ -1279,8 +1279,8 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 		if unlikely((node->mn_flags & MNODE_F_NOSPLIT) ||
 		            (part->mp_flags & MPART_F_NOSPLIT)) {
 			/* Not allowed... (keep on re-attempting the unmap in hopes
-			 * that `_mman_lockops_reap()' will join us together with
-			 * another unmap request, which then allows the node as a
+			 * that `_mman_lockops_reap()' will  join us together  with
+			 * another unmap request, which then  allows the node as  a
 			 * whole to be unmapped). */
 			goto failed;
 		}
@@ -1324,7 +1324,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			decref_unlikely(part);
 			if (!unmap_ok) {
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				/* If we've manually prepared the affected address range above,
+				/* If we've manually prepared the affected address range  above,
 				 * then we must still undo this upon failure, so-as not to leave
 				 * memory prepared when it shouldn't be. */
 				if (!(node->mn_flags & MNODE_F_MPREPARED))
@@ -1333,7 +1333,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 				goto failed;
 			}
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			/* Upon success, `mman_unmap_mpart_subregion()' will have already
+			/* Upon success, `mman_unmap_mpart_subregion()'  will have  already
 			 * unmapped+unprepared the affected address range, meaning we don't
 			 * have to unprepare it anymore. */
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -1428,7 +1428,7 @@ again_service_lops:
 		struct mpostlockop *later;
 		next = SLIST_NEXT(iter, mlo_link);
 		/* Special handling for unmap-kram jobs with inline-memory.
-		 * For efficiency, these get merged with each other. */
+		 * For  efficiency,  these  get  merged  with  each  other. */
 		if (iter->mlo_func == &mlockop_kram_cb) {
 			struct mman_unmap_kram_job *job;
 			job = container_of(iter, struct mman_unmap_kram_job, mukj_lop_mm);
@@ -1447,7 +1447,7 @@ continue_with_next:
 		iter = next;
 	}
 	/* At this point, all remaining elements in `krlist' are requests
-	 * for unmapping kernel RAM, which have already been sorted by
+	 * for unmapping kernel  RAM, which have  already been sorted  by
 	 * their base address. */
 	if (!SLIST_EMPTY(&krlist)) {
 		/* Merge adjacent krlist operations */
@@ -1537,7 +1537,7 @@ NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
 }
 
 /* Same as `mman_unmap_kram()', but may be used to improve efficiency
- * when the caller is already holding a lock to `mman_kernel' */
+ * when  the  caller  is  already  holding  a  lock  to `mman_kernel' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                       size_t num_bytes, gfp_t flags) {
@@ -1589,7 +1589,7 @@ NOTHROW(FCALL kfree_for_done)(struct mman_unmap_kram_job *__restrict self) {
 }
 
 
-/* Helper function that can be used to unmap anything by re-using `freeme', which must be
+/* Helper  function that can  be used to unmap  anything by re-using  `freeme', which must be
  * a kmalloc-pointer with `kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job)'
  * in order to represent intermediate storage for */
 PUBLIC NOBLOCK void

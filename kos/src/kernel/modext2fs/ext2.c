@@ -206,7 +206,7 @@ Ext2_Group(Ext2Superblock *__restrict self, ext2_bgroup_t index)
 	return result;
 }
 
-/* Return the absolute on-disk position of the `Ext2DiskINode'
+/* Return  the absolute on-disk position of the `Ext2DiskINode'
  * structure used to store descriptor data for the given `ino'. */
 INTERN WUNUSED pos_t KCALL
 Ext2_InoAddr(Ext2Superblock *__restrict self, ext2_ino_t ino)
@@ -288,13 +288,13 @@ ExtINode_LoadAttr(struct inode *__restrict self) {
 	 *                 created in the mean time.
 	 *                 Handle this case by acting as though the file
 	 *                 had been deleted.
-	 * (XXX: This really shouldn't have happened though, unless user-space
-	 *       has manually been writing to the underlying partitions, because
-	 *       otherwise the file should still be of the same type, as an
-	 *       API call going through the kernel would have marked our INode
-	 *       as deleted, meaning that there'd be no situation where its
-	 *       attributes could still be loadable... At least I think there
-	 *       isn't a way, although this behavior might be allowed?)
+	 * (XXX: This really shouldn't  have happened  though, unless  user-space
+	 *       has manually been writing to the underlying partitions,  because
+	 *       otherwise  the  file should  still be  of the  same type,  as an
+	 *       API  call going through  the kernel would  have marked our INode
+	 *       as  deleted,  meaning that  there'd  be no  situation  where its
+	 *       attributes  could still  be loadable...  At least  I think there
+	 *       isn't  a  way,  although   this  behavior  might  be   allowed?)
 	 *       Anyways: Just handle miss-matching INode types as missing files. */
 	if ((self->i_filemode & S_IFMT) != (real_mode & S_IFMT))
 		THROW(E_FSERROR_FILE_NOT_FOUND);
@@ -452,10 +452,10 @@ again:
 		entry_type = entry.d_type;
 		namlen     = entry.d_namlen_low;
 		if ((entsize - sizeof(Ext2DiskDirent)) > 0xff) {
-			/* The filename is longer than 255 characters, and
+			/* The  filename is longer than 255 characters, and
 			 * we only have the least significant 8 bits of its
 			 * actual length.
-			 * To deal with this, we must scan ahead and read a byte at every
+			 * To  deal with this, we must scan ahead and read a byte at every
 			 * `entry_pos + sizeof(Ext2Dirent) + entry.d_namlen_low + N * 256'
 			 * that is still located below `entry_pos + entsize' until we find
 			 * a NUL-character. */
@@ -531,13 +531,13 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
 		struct inode_data *node;
 		node = self->i_fsdata;
 #if 0 /* XXX: ASCII data is usually written in a way that causes this check to succeed, \
-       *      but what about 1 or 2-character links? This is little endian after all,   \
-       *      so that would end up with a really small number that might be lower       \
+       *      but  what about 1 or 2-character links?  This is little endian after all, \
+       *      so that would  end up  with a  really small  number that  might be  lower \
        *      that the actual number block blocks...                                    \
        * LATER: From what little I can gather, at some point Ext2 just started placing  \
-       *        symlink data that was small enough within the INode itself.             \
-       *        Although sources state that prior to this data was written in actual    \
-       *        blocks, what isn't stated is anything about how to differentiate        \
+       *        symlink  data  that  was  small   enough  within  the  INode   itself.  \
+       *        Although sources state that prior to  this data was written in  actual  \
+       *        blocks,  what  isn't stated  is  anything about  how  to differentiate  \
        *        these two cases other than the link size (which is ambiguous for small  \
        *        links). */
 		if (textlen * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4 &&
@@ -547,7 +547,7 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
 #endif
 		{
 			/* XXX: Is this really how we discern between the 2 methods?
-			 *      Shouldn't there be some kind of flag somewhere? */
+			 *      Shouldn't  there  be  some kind  of  flag somewhere? */
 			memcpy(text, &node->i_dblock, textlen, sizeof(char));
 		} else {
 			/* Read the symlink text. */
@@ -696,7 +696,7 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	self->sd_ind_blocksize = ((size_t)1 << self->sd_block_shift) / 4;
 
 
-#if 1 /* I'm guessing this is the right answer, but the wiki really isn't clear...                \
+#if 1 /* I'm guessing this is  the right answer, but  the wiki really isn't  clear...             \
        * [...] The table is located in the block immediately following the Superblock             \
        *    -> That would mean a fixed partition offset of `2048'                                 \
        * [...] the Block Group Descriptor Table will begin at block 2 [for 1024 bytes per block]. \

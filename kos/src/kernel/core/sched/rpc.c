@@ -72,7 +72,7 @@ DEFINE_PREALLOCATION_CACHE_ALLOC_NX(INTERN, rpcentry, struct rpc_entry)
  * [lock(INSERT_FRONT(ATOMIC),CLEAR(THIS_TASK),INSERT_BACK(THIS_TASK))]
  * Chain of pending RPC functions.
  * When set to `RPC_PENDING_TERMINATED', no further RPC functions
- * may be scheduled (this is done during task cleanup) */
+ * may  be  scheduled   (this  is  done   during  task   cleanup) */
 INTERN ATTR_PERTASK WEAK struct rpc_entry *this_rpcs_pending = NULL;
 /* Amount of pending, synchronous RPCs (not counting non-interrupting user-RPCs) */
 INTERN ATTR_PERTASK WEAK size_t this_rpc_pending_sync_count = 0;
@@ -162,12 +162,12 @@ task_serve_one_impl(struct icpustate *__restrict state) {
 		assertf(iter != NULL, "Then why was the sync-RPC counter non-zero?");
 		if ((iter->re_kind & RPC_KIND_MASK) == RPC_KIND_SYNC)
 			break; /* Got a synchronous RPC which we must handle now. */
-#if 0 /* Technically, we'd need to do this to prevent an IDLE-loop when a           \
+#if 0 /* Technically,  we'd need to  do this to prevent  an IDLE-loop when a        \
        * system call that isn't a cancelation point calls task_serve() while        \
        * a non-syscall user-space RPC has been scheduled.                           \
        * I say ~technically~, because (in theory) this isn't actually required:     \
        *  #1: By not being defined as cancellation point, the system call shouldn't \
-       *      really have the ability to block indefinitely (XXX: what about VIO?)  \
+       *      really  have the ability to block indefinitely (XXX: what about VIO?) \
        *  #2: By looping back to have the call be re-started, the component that is \
        *      blocking should eventually resolve itself.                            \
        */
@@ -180,7 +180,7 @@ task_serve_one_impl(struct icpustate *__restrict state) {
 		{
 			/* Set the `RPC_KIND_CANSERVE' flag for all user-sync RPCs.
 			 * -> These types of RPCs can only be handled when returning to
-			 *    user-space _after_ their associated thread has called
+			 *    user-space  _after_  their associated  thread  has called
 			 *    task_serve() at least once whilst in kernel-space. */
 			iter = chain;
 			for (;;) {
@@ -204,7 +204,7 @@ task_serve_one_impl(struct icpustate *__restrict state) {
 	my_entry = iter;
 	while (iter->re_next)
 		iter = iter->re_next;
-	/* Re-schedule all other pending RPCs, so they
+	/* Re-schedule all other  pending RPCs, so  they
 	 * are visible in nested calls to `task_serve()' */
 	reinsert_pending_rpcs(chain, iter);
 	if (my_entry->re_kind & RPC_KIND_NOTHROW)
@@ -246,7 +246,7 @@ NOTHROW(FCALL task_serve_one_nx_impl)(struct icpustate *__restrict state) {
 	my_entry = iter;
 	while (iter->re_next)
 		iter = iter->re_next;
-	/* Re-schedule all other pending RPCs, so they
+	/* Re-schedule all other  pending RPCs, so  they
 	 * are visible in nested calls to `task_serve()' */
 	reinsert_pending_rpcs(chain, iter);
 	ATOMIC_DEC(PERTASK(this_rpc_pending_sync_count_nx));
@@ -266,7 +266,7 @@ NOTHROW(FCALL task_serve_one_nx_impl)(struct icpustate *__restrict state) {
 
 
 /* Free a previously allocated RPC that hasn't been (successfully) delivered.
- * This function should be called as an alternative to `task_deliver_rpc()',
+ * This function should be called as an alternative to  `task_deliver_rpc()',
  * as well as in the event that `task_deliver_rpc()' returned an error code. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc) {
@@ -283,9 +283,9 @@ NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc) {
  * @return: TASK_DELIVER_RPC_TERMINATED:  Failed to deliver the RPC: The given `target' has already terminated.
  * @return: TASK_DELIVER_RPC_SUCCESS:     Successfully delivered RPC
  * @return: TASK_DELIVER_RPC_INTERRUPTED: Successfully delivered RPC (but `target' is the caller, and `rpc' is an interrupting
- *                                        USER-level RPC, and the caller should return to user-space as soon as possible)
- *                                        NOTE: Only returned when `task_alloc_user_[s]rpc[_nx]()' was used to create `rpc'
- *                                        NOTE: Propagation may be performed by throwing an `E_INTERRUPT_USER_RPC' exception. */
+ *                                        USER-level RPC, and  the caller  should return to  user-space as  soon as  possible)
+ *                                        NOTE: Only returned when  `task_alloc_user_[s]rpc[_nx]()' was used  to create  `rpc'
+ *                                        NOTE: Propagation may be performed by throwing an `E_INTERRUPT_USER_RPC'  exception. */
 PUBLIC NOBLOCK NONNULL((1, 2)) int
 NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
                                 /*inherit(on_success)*/ struct rpc_entry *__restrict rpc,
@@ -316,7 +316,7 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 	} while (!ATOMIC_CMPXCH_WEAK(FORTASK(target, this_rpcs_pending),
 	                             next, rpc));
 
-	/* Increment the target thread's counter for pending, synchronous RPCs
+	/* Increment the target thread's counter for pending, synchronous  RPCs
 	 * NOTE: Do this for synchronous RPC, and interrupting USER-level RPCs. */
 	if ((rpc_mode & RPC_KIND_MASK) != RPC_KIND_USER) {
 		/* `RPC_KIND_SYNC', `RPC_KIND_USER_INTR' or `RPC_KIND_USER_INTR_SYNC' */
@@ -325,9 +325,9 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 		ATOMIC_INC(FORTASK(target, this_rpc_pending_sync_count));
 	}
 	/* At this point our RPC has been scheduled and
-	 * can potentially be executed at any moment. */
+	 * can potentially be  executed at any  moment. */
 
-	/* Always re-direct user-space, since any kind of synchronous
+	/* Always  re-direct  user-space, since  any kind  of synchronous
 	 * interrupt must be handled immediately if `target' is currently
 	 * running from user-space! */
 	task_redirect_usercode_rpc(target, priority);
@@ -337,7 +337,7 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 		return TASK_DELIVER_RPC_INTERRUPTED;
 
 	/* Always return SUCCESS at this point, as a failed `task_redirect_usercode_rpc()'
-	 * still means that the RPC will be serviced, since we managed to schedule it as
+	 * still  means that the RPC will be serviced,  since we managed to schedule it as
 	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
 	return TASK_DELIVER_RPC_SUCCESS;
 }
@@ -346,10 +346,10 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 
 
 
-/* Chain of blocking cleanup functions (serviced every
- * time `task_serve()' or `task_serve_nx()' is called)
+/* Chain  of blocking cleanup functions (serviced every
+ * time `task_serve()' or `task_serve_nx()' is  called)
  * Additionally, functions from this chain will also be
- * serviced by the IDLE thread, the same way any other
+ * serviced by the IDLE thread, the same way any  other
  * IDLE job would be. */
 PUBLIC ATTR_READMOSTLY WEAK void *blocking_cleanup_chain = NULL;
 
@@ -406,16 +406,16 @@ did_service_none:
 
 
 /* Try to find some thread that can be used to service blocking cleanup
- * operations, potentially waking it up so it will service them.
+ * operations, potentially  waking  it  up so  it  will  service  them.
  * If no such that can be found, return without doing anything.
- * -> This function is merely used to prevent blocking cleanup
- *    operations from blocking indefinitely, by explicitly going
+ * -> This function  is merely  used to  prevent blocking  cleanup
+ *    operations from blocking  indefinitely, by explicitly  going
  *    out of our way to get some other thread to do the dirty work
  *    for us. */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL blocking_cleanup_prioritize)(void) {
 	/* TODO: Wake up random threads until none are left, one of them woke
-	 *       up, or `blocking_cleanup_chain' has been set to `NULL' */
+	 *       up,  or  `blocking_cleanup_chain'  has  been  set  to `NULL' */
 }
 
 
@@ -424,7 +424,7 @@ NOTHROW(FCALL blocking_cleanup_prioritize)(void) {
     defined(__ARCH_WANT_COMPAT_SYSCALL_RPC_SCHEDULE)
 
 /* The task has terminated in the mean time.
- * may be send through `rpc_completed' */
+ * may  be   send  through   `rpc_completed' */
 #define USER_RPC_SIGALT_TERMINATED (__CCAST(struct sig *)(-1))
 
 struct user_rpc_data {
@@ -454,7 +454,7 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 		uintptr_t *futex_pointer = UNUSED_FUTEX_POINTER;
 		/* Make sure that the arguments pointer is located in user-space.
 		 * NOTE: The pointer isn't required to be loaded in user-space
-		 *       if the program doesn't make use of any arguments. */
+		 *       if the  program doesn't  make use  of any  arguments. */
 		if unlikely(!ADDR_ISUSER(data->rpc_arguments)) {
 #ifdef KERNELSPACE_HIGHMEM
 			data->rpc_arguments = NULL;
@@ -1033,10 +1033,10 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 				decref(args_packet);
 				RETHROW();
 			}
-			/* Check if the RPC was able to execute its transformation-program.
-			 * If the RPC was invoked because the target was terminating, it will
-			 * have broadcast a status message of `USER_RPC_SIGALT_TERMINATED'
-			 * to us, which we can then re-interpret to inform the user that the
+			/* Check if the  RPC was able  to execute its  transformation-program.
+			 * If the RPC was invoked because the target was terminating, it  will
+			 * have  broadcast  a status  message  of `USER_RPC_SIGALT_TERMINATED'
+			 * to  us, which we can then re-interpret  to inform the user that the
 			 * target thread has terminated before it could service the given RPC. */
 			if (status == USER_RPC_SIGALT_TERMINATED) {
 				decref(args_packet);

@@ -81,7 +81,7 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 	mfutex_free(self);
 }
 
-/* Mem-futex tree API. All of these functions require that the caller
+/* Mem-futex tree API. All of  these functions require that the  caller
  * be holding a lock to the associated `struct mpartmeta::mpm_ftxlock'. */
 DECL_END
 
@@ -179,7 +179,7 @@ again:
 /* Futex access/creation API                                            */
 /************************************************************************/
 
-/* Return a pointer to the meta-data controller of `self', allocating it
+/* Return  a pointer to  the meta-data controller  of `self', allocating it
  * if not already allocated in the past. This function should not be called
  * when already holding a lock to `self'. - Use `mpart_hasmeta_or_unlock()'
  * for that purpose instead! */
@@ -199,8 +199,8 @@ mpart_getmeta(struct mpart *__restrict self) THROWS(E_BADALLOC) {
 	return result;
 }
 
-/* Return a reference to the futex associated with `file_position' within the given part.
- * If no such futex already exists, use this chance to allocate it, as well as a potentially
+/* Return a reference  to the futex  associated with `file_position'  within the given  part.
+ * If no such futex already exists, use this chance to allocate it, as well as a  potentially
  * missing `mfutex_controller' when `self->mp_meta' was `NULL' when this function was called.
  * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
  *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
@@ -235,7 +235,7 @@ again:
 
 	/* Must create a new futex object.
 	 * But note that we're currently holding a lock to `meta',
-	 * so only non-blocking operations before releasing it! */
+	 * so only  non-blocking operations  before releasing  it! */
 	result = (REF struct mfutex *)kmalloc_nx(sizeof(struct mfutex),
 	                                         GFP_ATOMIC);
 	if unlikely(!result) {
@@ -271,7 +271,7 @@ check_old_futex:
 			if likely(refok)
 				return old_futex;
 			/* Try again (the dead futex should have been
-			 * reaped by `mpartmeta_ftxlock_endwrite()') */
+			 * reaped by  `mpartmeta_ftxlock_endwrite()') */
 			goto again;
 		}
 	} else {
@@ -337,22 +337,22 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
 
 
 /* Lookup a futex at a given address that is offset from the start of a given
- * mem-file. Note though the possibly unintended behavior which applies when
+ * mem-file. Note though the possibly unintended behavior which applies  when
  * the given `mfile' is anonymous at the time of the call being made.
  * @param: addr: Absolute file-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally)
- * WARNING: Using this function when `self' has been, or always was anonymous, will
+ * WARNING: Using  this function  when `self' has  been, or always  was anonymous, will
  *          cause the mem-part associated with the returned futex to also be anonymous,
- *          meaning that the part would get freshly allocated, and repeated calls with
+ *          meaning that the part would get freshly allocated, and repeated calls  with
  *          the same arguments would not yield the same futex object!
- *       -> As such, in the most common case of a futex lookup where you wish to find
- *          the futex associated with some given `uintptr_t', the process would be to
+ *       -> As  such, in the most common case of  a futex lookup where you wish to find
+ *          the futex associated with some given  `uintptr_t', the process would be  to
  *          to determine the `mnode' of the address, and using that node then determine
- *          the associated mpart, and relative offset into that mem-part. If a lookup
- *          of the futex then returns `MPART_FUTEX_OOB', loop back around
+ *          the associated mpart, and relative offset  into that mem-part. If a  lookup
+ *          of  the   futex   then   returns  `MPART_FUTEX_OOB',   loop   back   around
  *          and once again lookup the `mnode'.
- *       -> In the end, there exists no API also found on linux that would make use of this
- *          function, however on KOS it is possible to access this function through use of
+ *       -> In the  end, there  exists no  API also  found on  linux that  would make  use of  this
+ *          function,  however  on  KOS it  is  possible to  access  this function  through  use of
  *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `addr' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutex *FCALL
@@ -372,7 +372,7 @@ again:
 }
 
 
-/* Same as `mfile_createfutex()', but don't allocate a new
+/* Same  as `mfile_createfutex()', but don't allocate a new
  * futex object if none already exists for the given `addr'
  * @param: addr:  Absolute file-address of the futex (will be floor-aligned by
  *                `MFUTEX_ADDR_ALIGNMENT' internally)
@@ -434,7 +434,7 @@ done:
 }
 
 /* Return the futex object that is associated with the given virtual memory address.
- * In the event that `addr' isn't mapped to anything (or is mapped to a reserved
+ * In  the event that  `addr' isn't mapped to  anything (or is  mapped to a reserved
  * node), then throw an `E_SEGFAULT' exception.
  * @param: addr: Absolute memory-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally) */
@@ -518,12 +518,12 @@ unlock_mman_and_return_null:
 		mman_lock_endread(self);
 		FINALLY_DECREF_UNLIKELY(part);
 		mpartmeta_ftxlock_read(meta);
-		/* We may assume that the backing mem-node didn't get
+		/* We may assume that  the backing mem-node didn't  get
 		 * unmapped in the mean time, since that would indicate
 		 * an error within the behavior of the calling program.
-		 * With this in mind, we're allowed to invoke weakly
-		 * undefined behavior, which essentially means that we
-		 * don't have to re-check that `node' is still there!
+		 * With this in  mind, we're allowed  to invoke  weakly
+		 * undefined  behavior, which essentially means that we
+		 * don't have to re-check  that `node' is still  there!
 		 *
 		 * However, what we _do_ need to check is `part' having
 		 * gotten split in the mean time. */
@@ -542,7 +542,7 @@ unlock_mman_and_return_null:
 }
 
 /* Broadcast to all thread waiting for a futex at `addr' within the current mman.
- * If `addr' isn't mapped, or no pre-existing node is bound to that address,
+ * If `addr' isn't  mapped, or  no pre-existing node  is bound  to that  address,
  * simply do nothing and return immediately.
  * @param: addr: Absolute memory-address of the futex (will be floor-aligned by
  *               `MFUTEX_ADDR_ALIGNMENT' internally) */

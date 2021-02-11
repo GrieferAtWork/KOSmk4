@@ -93,7 +93,7 @@ STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
 
 
 /* The memory-file to which internal self-replication parts belong.
- * This file must be (and is assumed to be) anonymous! */
+ * This   file  must   be  (and   is  assumed   to  be)  anonymous! */
 #define mcore_file mfile_zero
 
 
@@ -110,10 +110,10 @@ PUBLIC struct mcorepage_list mcoreheap_usedlist = LIST_HEAD_INITIALIZER(&mcorehe
 
 /* [1..n][lock(mman_kernel.mm_lock)]
  * List of mcoreheap pages that still contain available parts.
- * NOTE: This list must _always_ be non-empty, and there must
- *       _always_ be at least 2 additional core parts ready
+ * NOTE: This list must _always_ be non-empty, and there  must
+ *       _always_ be at  least 2 additional  core parts  ready
  *       for allocation at any time. This is required, because
- *       in order to allocate additional pages, the mcoreheap
+ *       in  order to allocate additional pages, the mcoreheap
  *       allocator itself already requires 2 parts in order to
  *       do the actual allocation! */
 PUBLIC struct mcorepage_list mcoreheap_freelist = { &_mcore_initpage };
@@ -235,7 +235,7 @@ got_word:
 
 
 /* Unconditionally allocate a mem-core-part from `mcoreheap_freelist'.
- * The caller must ensure that parts are available, and that the 2
+ * The  caller must  ensure that parts  are available, and  that the 2
  * reserved parts aren't used inappropriately. */
 PRIVATE NOBLOCK WUNUSED ATTR_RETNONNULL ATTR_MALLOC union mcorepart *
 NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
@@ -277,7 +277,7 @@ NOTHROW(FCALL mcoreheap_provide_page)(struct mcorepage *__restrict page) {
 }
 
 
-/* Check if the given `node' has all of the
+/* Check if  the given  `node' has  all of  the
  * required properties of a core-heap mem-node. */
 PRIVATE NOBLOCK bool
 NOTHROW(FCALL is_coreheap_node)(struct mnode *__restrict node) {
@@ -287,8 +287,8 @@ NOTHROW(FCALL is_coreheap_node)(struct mnode *__restrict node) {
 
 	/* Make sure that `part' isn't externally visible.
 	 * This is requried since we don't intend on locking the part,
-	 * meaning that we have to be certain that holding a lock to
-	 * the kernel mman will be enough to keep anyone else from
+	 * meaning that we have to be  certain that holding a lock  to
+	 * the kernel mman  will be  enough to keep  anyone else  from
 	 * seeing the part in question. */
 	if (isshared(part))
 		goto nope;
@@ -405,7 +405,7 @@ fail:
 }
 
 /* Try to merge the 2 given nodes.
- * The caller has already ensured that the 2 nodes are adjacent, and that
+ * The caller has already ensured that the 2 nodes are adjacent, and  that
  * both of them fulfill the conditions checked for by `is_coreheap_node()' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
@@ -418,8 +418,8 @@ NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
 		/* Simple (but rather unlikely) case: the lo- and hi-parts are physically consecutive */
 		lopart->mp_mem.mc_size += hipart->mp_mem.mc_size;
 	} else {
-		/* Cannot merge (attempting to realloc physical memory would be
-		 * prone to race conditions, since we'd have to make sure that
+		/* Cannot merge (attempting to realloc physical memory would  be
+		 * prone to race conditions, since  we'd have to make sure  that
 		 * no-one is writing to the region we're trying to modify in the
 		 * mean time, which we can't safely do) */
 		return;
@@ -487,13 +487,13 @@ ok:
 
 
 /* Self-replicate the mem-core-heap to expand into yet another page.
- * For this purpose, _always_ inherit the given `node' and `part',
- * even if they don't end up being used for the replication (as is
- * the case when this function is able to extend an older mem-core-
+ * For this purpose, _always_ inherit  the given `node' and  `part',
+ * even  if they don't end up being  used for the replication (as is
+ * the case when this function is able to extend an older  mem-core-
  * heap page)
  * NOTE: The given `node' and `part' are assumed to be allocated by `mcoreheap_alloc_impl()'!
- * @return: true:  Successfully replicated the core heap. In this case, the
- *                 caller may assume that at least `MCOREPAGE_PARTCOUNT'
+ * @return: true:  Successfully replicated the  core heap. In  this case,  the
+ *                 caller  may  assume  that  at  least  `MCOREPAGE_PARTCOUNT'
  *                 additional core parts have become available for allocation.
  * @return: false: Insufficient physical memory (`page_malloc()' failed, or
  *                 failed to find a free spot within the kernel-space mman) */
@@ -582,17 +582,17 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 }
 
 /* Allocate an additional core part from the core heap.
- * The caller must be holding a lock to the kernel mman, but should also
- * be aware that a call to this function may result in additional nodes
- * to be mapped into the kernel mman (meaning that the caller must be
+ * The  caller must be holding a lock to the kernel mman, but should also
+ * be  aware that a call to this  function may result in additional nodes
+ * to be mapped  into the kernel  mman (meaning that  the caller must  be
  * able to deal with the kernel mman's mappings-tree changing as a result
  * of a call to this function)
  * @return: * :   The base-address of the newly allocated mem-core-part.
  * @return: NULL: Insufficient physical/virtual memory. This is only ever
- *                returned when memory has actually run out, since this
- *                function doesn't actually need to do any locking.
+ *                returned when memory has  actually run out, since  this
+ *                function  doesn't  actually  need  to  do  any locking.
  *                As such, a NULL-return-value here means that the system
- *                has run out of memory on the lowest, possible level.
+ *                has run out  of memory on  the lowest, possible  level.
  *                That is: `page_malloc()' failed. */
 PUBLIC NOBLOCK WUNUSED ATTR_MALLOC union mcorepart *
 NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
@@ -607,7 +607,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 		return result;
 
 	/* We're down to the last couple of (for this purpose reserved) nodes.
-	 * As such, use the last 2 of them to replicate the core-heap. */
+	 * As such,  use  the last  2  of  them to  replicate  the  core-heap. */
 	if unlikely(!mcoreheap_replicate(&result->mcp_part,
 	                                 &mcoreheap_alloc_impl()->mcp_node))
 		return NULL;
@@ -621,7 +621,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 
 
 
-/* Do all of the necessary locking and throw an exception if the allocation failed.
+/* Do all of the  necessary locking and  throw an exception  if the allocation  failed.
  * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
 PUBLIC ATTR_RETNONNULL ATTR_MALLOC union mcorepart *FCALL
 mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
@@ -655,9 +655,9 @@ NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
 }
 
 
-/* Same as `mcoreheap_free()', but no need to just through all of the hoops
+/* Same as `mcoreheap_free()', but no need to just through all of the  hoops
  * of enqueuing the free of `part' as a mlockop when no lock can be acquired
- * to the kernel mman, since the caller allows us to assume that they've
+ * to the kernel  mman, since the  caller allows us  to assume that  they've
  * already acquired a lock to the kernel mman. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
@@ -682,7 +682,7 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 
 	if (was_all_used) {
 		/* Move the page from the `mcoreheap_usedlist'
-		 * list into the `mcoreheap_freelist' list */
+		 * list  into  the  `mcoreheap_freelist'  list */
 		LIST_REMOVE(page, mcp_link);
 		LIST_INSERT_HEAD(&mcoreheap_freelist, page, mcp_link);
 	} else if (mcoreheap_freecount > (MCOREPAGE_PARTCOUNT + 2)) {
@@ -690,7 +690,7 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 		 * from the kernel mman.
 		 *
 		 * Note that (with the exception of `_mcore_initpage'), we can
-		 * just use `mman_unmap_kram_locked()' to free the page! */
+		 * just  use  `mman_unmap_kram_locked()'  to  free  the  page! */
 		if (page != &_mcore_initpage && mcorepage_allfree(page)) {
 			LIST_REMOVE(page, mcp_link);
 			mcoreheap_freecount -= MCOREPAGE_PARTCOUNT;

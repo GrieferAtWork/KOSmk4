@@ -77,14 +77,14 @@ DECL_BEGIN
 
 
 /* (manually) check if one the blocks of the given
- * mem-part was marked as having changed, without
+ * mem-part  was marked as having changed, without
  * looking at the part's CHANGED flag. */
 PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(FCALL mpart_really_changed)(struct mpart const *__restrict self) {
 	size_t i, count;
 	if unlikely(!mpart_hasblockstate(self)) {
 		/* Special case: Without a block-status bitset, all
-		 *               blocks are implicitly changed. */
+		 *               blocks  are  implicitly   changed. */
 		return true;
 	}
 	count = mpart_getblockcount(self, self->mp_file);
@@ -178,12 +178,12 @@ NOTHROW(FCALL mnode_list_contains_mman)(struct mnode const *__restrict start_nod
  * mman that can be found apart of the copy- and share-lists
  * of `self'.
  *
- * The caller must ensure that they are holding references
+ * The caller  must ensure  that they  are holding  references
  * to all of those mmans (s.a. `mpart_foreach_mmans_incref()')
  *
  * @return: * : When non-NULL, a pointer to an mman who's lock
- *              could not be acquired immediately (the caller
- *              should unlock everything else and wait until
+ *              could  not be acquired immediately (the caller
+ *              should unlock everything  else and wait  until
  *              the lock of that mman becomes available) */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mman *
 NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
@@ -275,7 +275,7 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart *__restrict self) {
 	}
 }
 
-/* Call `mpart_lock_all_mmans()', and upon release the following
+/* Call  `mpart_lock_all_mmans()',  and upon  release  the following
  * locks before waiting on the blocking mman, and returning `false':
  *    - mpart_foreach_mmans_decref(self);
  *    - mpart_lock_release(self);
@@ -297,7 +297,7 @@ NOTHROW(FCALL mpart_lock_all_mmans_or_unlock_and_decref)(struct mpart *__restric
 	return true;
 }
 
-/* If present, acquire a lock to `&self->mp_meta->mpm_ftxlock', and upon release
+/* If present, acquire a lock  to `&self->mp_meta->mpm_ftxlock', and upon  release
  * the following locks before waiting on the blocking mman, and returning `false':
  *    - mpart_unlock_all_mmans(self);
  *    - mpart_foreach_mmans_decref(self);
@@ -392,7 +392,7 @@ NOTHROW(FCALL mpart_count_needed_nodes_in_list)(struct mpart_split_data const *_
 		assert(min <= max);
 		assert(max < mpart_getsize(self->msd_lopart));
 		/* NOTE: We _only_ have to create new nodes for those cases where
-		 *       the split position lies _inside_ of the range that is
+		 *       the split position  lies _inside_ of  the range that  is
 		 *       actually being mapped by some node!
 		 * s.a. `mnode_getmapminaddr() ... mnode_getmapmaxaddr()' */
 		if (min < self->msd_offset && self->msd_offset <= max)
@@ -438,10 +438,10 @@ NOTHROW(FCALL mpart_get_swp_offset_after_split)(struct mpart const *__restrict s
 
 
 
-/* Allocate copies of nodes needed to describe
+/* Allocate  copies of nodes needed to describe
  * all of the new mappings following the split.
  *
- * If this cannot be done without blocking, release all locks
+ * If this cannot  be done without  blocking, release all  locks
  * (using `unlockall(self->msd_lopart)'), perform the allocation
  * while blocking, and return `false'.
  *
@@ -463,7 +463,7 @@ mpart_split_data_alloc_mnodes(struct mpart_split_data *__restrict self) {
 		                                      GFP_LOCKED | GFP_PREFLT);
 		if unlikely(!new_node) {
 			/* Allocate the remainder without holding any
-			 * locks, and while blocking is allowed. */
+			 * locks,  and  while  blocking  is  allowed. */
 			unlockall(self->msd_lopart);
 			do {
 				new_node = (struct mnode *)kmalloc(sizeof(struct mnode),
@@ -557,7 +557,7 @@ done:
 
 
 /* Calculate the index of the chunk, and the offset into that
- * chunk after skipping the first `lo_pages' of `self'. */
+ * chunk  after  skipping  the  first  `lo_pages'  of `self'. */
 PRIVATE NOBLOCK NONNULL((1, 3, 4)) void
 NOTHROW(FCALL mchunkvec_split_after)(struct mchunkvec const *__restrict self,
                                      physpagecnt_t lo_pages,
@@ -640,9 +640,9 @@ do_split_many_chunks_after_lo_pages:
 			 *
 			 * - Imagine a part for a file with 1-byte block-size.
 			 * - Our part now contains 8192 bytes in total, with
-			 *   the bytes at 0 and 4096 being marked as CHNG,
-			 *   and were thus written to swap (into a single
-			 *   page, of which only for the first 2 bytes are
+			 *   the bytes at 0 and  4096 being marked as  CHNG,
+			 *   and were thus  written to swap  (into a  single
+			 *   page, of which only for  the first 2 bytes  are
 			 *   actually in-use)
 			 *
 			 * - We now want to split this part at offset 4096
@@ -652,23 +652,23 @@ do_split_many_chunks_after_lo_pages:
 			 *  #2:  Allocate a new swap-page
 			 *  #3:  Allocate a temporary physical memory page
 			 *  #4:  Read the single, modified byte from offset=1
-			 *       in the swap-page of lo-part (we can do this
-			 *       because we've marked the associated page as
+			 *       in the swap-page of lo-part (we can do  this
+			 *       because  we've marked the associated page as
 			 *       INIT)
 			 *  #5:  Change the 2nd changed block back to CHNG,
-			 *       and broadcast the INIT-done signal
+			 *       and   broadcast   the   INIT-done   signal
 			 *  #6:  Write the data read into the temporary physical
 			 *       memory page to the new swap-page
 			 *  #7:  Free the temporary physical memory page
-			 *  #8:  Acquire a new lock to lo-part
-			 *  #9:  Check that nothing's changed in the mean time
+			 *  #8:  Acquire   a   new   lock   to   lo-part
+			 *  #9:  Check  that  nothing's changed  in the  mean time
 			 *  #10: Use the now-initialized swap-page for the hi-part
 			 *
 			 * ooof...
 			 *
 			 * NOTE: The above isn't safe: We can't re-verify that the
-			 *       swap-contents of the lo-part haven't changed in
-			 *       step #9, then compared to what we've read during
+			 *       swap-contents of the  lo-part haven't changed  in
+			 *       step #9, then compared to what we've read  during
 			 *       step #4!
 			 *       So there's even an unfixable design flaw in the above...
 			 */
@@ -724,13 +724,13 @@ again:
 
 
 
-/* Split the given mem-part `self' (which should be a member of `file')
- * after `offset' bytes from the start of backing file. For this purpose,
+/* Split  the given mem-part  `self' (which should be  a member of `file')
+ * after `offset' bytes from the start of backing file. For this  purpose,
  * the given `offset' should be `> mpart_getminaddr(self)', and both page-
  * and block-aligned.
- * @return: NULL: The given `offset' is greater than the size of the part
+ * @return: NULL: The  given `offset' is  greater than the  size of the part
  *                at the time the request was made. The caller should handle
- *                this case by re-checking for a missing part, and creating
+ *                this case by re-checking for a missing part, and  creating
  *                that part if it cannot be found.
  * @return: * :   A reference to a part that begins at `self->mp_minaddr + offset' */
 PUBLIC NONNULL((1)) REF struct mpart *FCALL
@@ -768,7 +768,7 @@ release_and_return_null:
 			goto again;
 
 		/* Ensure that no-one is holding any DMA-locks onto `self',
-		 * which may be used to prevent a part from being split */
+		 * which may be  used to  prevent a part  from being  split */
 		if (!mpart_nodma_or_unlock(self, NULL))
 			goto again;
 
@@ -782,11 +782,11 @@ release_and_return_null:
 		assertf(!(self->mp_flags & MPART_F_NOSPLIT),
 		        "You're not allowed to split this part!");
 
-		/* Step #1: Acquire references to all affected mmans. This way,
+		/* Step #1: Acquire  references to all  affected mmans. This way,
 		 *          we can prevent any of them from dying under our noses
-		 *          while we're still trying to fiddle with them, which
-		 *          also gives us a consistent base-line when it comes
-		 *          to which nodes are still alive (those with a non-
+		 *          while we're still trying  to fiddle with them,  which
+		 *          also gives us  a consistent base-line  when it  comes
+		 *          to  which nodes  are still  alive (those  with a non-
 		 *          destroyed memory manager). */
 		mpart_foreach_mmans_incref(self);
 
@@ -843,7 +843,7 @@ relock_with_data:
 	}
 
 	/* At this point, we've made all of the necessary allocations, and acquired
-	 * all of the mandatory locks. With this in mind: This is the point of no
+	 * all  of the mandatory locks. With this in  mind: This is the point of no
 	 * return, after which all we really have to do is put everything together. */
 
 	/* The initial reference that we'll end up returning */
@@ -886,7 +886,7 @@ relock_with_data:
 			assert(min <= max);
 			assert(max < mpart_getsize(lopart));
 			/* NOTE: We _only_ have to create new nodes for those cases where
-			 *       the split position lies _inside_ of the range that is
+			 *       the split position  lies _inside_ of  the range that  is
 			 *       actually being mapped by some node!
 			 * s.a. `mnode_getmapminaddr() ... mnode_getmapmaxaddr()' */
 			if (min < data.msd_offset && data.msd_offset <= max) {
@@ -1088,7 +1088,7 @@ maybe_free_unused_mvec:
 	/* Fill in the block-status bitset for `hipart' */
 	if (lopart->mp_flags & MPART_F_BLKST_INL) {
 		/* If everything already managed to fit into a single word in the lo-part,
-		 * then we can just re-use the old status-word, but simply shift it over
+		 * then  we can just re-use the old  status-word, but simply shift it over
 		 * some. */
 		size_t lo_block_count;
 		lo_block_count = data.msd_offset >> file->mf_blockshift;
@@ -1142,8 +1142,8 @@ maybe_free_unused_hibitset:
 		}
 	}
 
-	/* If the new (hi-part) has the CHANGED flag set (as inherited from the original part),
-	 * then check if (some of) the actually changed blocks can be found in the hi-part.
+	/* If  the new (hi-part) has the CHANGED flag set (as inherited from the original part),
+	 * then check if  (some of) the  actually changed blocks  can be found  in the  hi-part.
 	 * If so, then we must immediately add the hi-part to the changed list of the associated
 	 * mem-file. */
 	DBG_memset(&hipart->mp_changed, 0xcc, sizeof(hipart->mp_changed));
@@ -1156,8 +1156,8 @@ maybe_free_unused_hibitset:
 			/* Must add the new `hipart' to the file's list of changed parts.
 			 *
 			 * NOTE: Special case must be taken to deal with the case where
-			 *       backing the file's changed-part list has been marked
-			 *       as anonymous, or simply doesn't wish to keep track of
+			 *       backing  the file's changed-part  list has been marked
+			 *       as anonymous, or simply doesn't wish to keep track  of
 			 *       changed parts. */
 			incref(hipart);
 			do {
@@ -1181,7 +1181,7 @@ clear_hipart_changed_bit:
 	/* Fill in the MLOCK flags for the new part. */
 	if (lopart->mp_flags & MPART_F_MLOCK_FROZEN) {
 		/* If the original part's mlock-status is frozen, then just
-		 * inherit the status and that fact for the new part. */
+		 * inherit  the  status and  that  fact for  the  new part. */
 		hipart->mp_flags |= lopart->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN);
 	} else if (lopart->mp_flags & MPART_F_MLOCK) {
 		/* Must update the MLOCK status of both the lo- and hi-parts */
@@ -1195,7 +1195,7 @@ clear_hipart_changed_bit:
 	}
 
 	/* Initialize the meta-data controller for the hi-part by stealing
-	 * all futex objects above the split-mark from the lo-part. */
+	 * all futex  objects  above  the  split-mark  from  the  lo-part. */
 	if (lopart->mp_meta != NULL) {
 		struct mfutex *ftx;
 		struct mpartmeta *lometa = lopart->mp_meta;
@@ -1224,7 +1224,7 @@ clear_hipart_changed_bit:
 			}
 		}
 		/* Must re-insert dead futex objects into the old tree, such that
-		 * they can be reap the normal way once we unlock the old tree. */
+		 * they  can be reap the normal way  once we unlock the old tree. */
 		if unlikely(!SLIST_EMPTY(&dead_mfutex)) {
 			do {
 				ftx = SLIST_FIRST(&dead_mfutex);
@@ -1235,7 +1235,7 @@ clear_hipart_changed_bit:
 
 		atomic_rwlock_endwrite(&lometa->mpm_ftxlock); /* Acquired above (in `Step #3') */
 
-		/* We're still holding references to _all_ of the futex objects that
+		/* We're still holding references to  _all_ of the futex objects  that
 		 * we managed to transfer over into the himeta-tree. As such, we still
 		 * have to drop all of those references */
 		if (himeta->mpm_ftx != NULL)
@@ -1243,7 +1243,7 @@ clear_hipart_changed_bit:
 		atomic_rwlock_endwrite(&himeta->mpm_ftxlock);
 
 		/* Must reap dead futex objects once again, but this time only have to
-		 * do so because we've just released our locks to the meta-data futex
+		 * do so because we've just released our locks to the meta-data  futex
 		 * trees! */
 		mpartmeta_deadftx_reap(himeta);
 		mpartmeta_deadftx_reap(lometa);
@@ -1257,7 +1257,7 @@ clear_hipart_changed_bit:
 
 	/* Insert the new `hipart' into the global list of know parts.
 	 * NOTE: On this has been done, `hipart' may be considered finalized,
-	 *       meaning that we can no longer go around normal limitations
+	 *       meaning that we can no  longer go around normal  limitations
 	 *       when it comes to writing to its fields. */
 #ifdef LIBVIO_CONFIG_ENABLED
 	if (hipart->mp_state == MPART_ST_VIO) {
@@ -1287,15 +1287,15 @@ clear_hipart_changed_bit:
 
 	/* Also release the lock to the (new) `hipart'
 	 * This lock was originally acquired (so-to-say) by initializing the new
-	 * part's `mp_flags' field with the `MPART_F_LOCKBIT' flag already set. */
+	 * part's `mp_flags' field with the `MPART_F_LOCKBIT' flag already  set. */
 	mpart_lock_release(hipart);
 
 	/* Truncate dynamically allocated parts of `self'
-	 * NOTE: We're allowed to realloc/free a dynamically allocated block-status
-	 *       bitset, even though there are cases where a thread can write to that
-	 *       vector without first acquiring a lock to the associated part, because
-	 *       the only case where this can happen is when one had previously written
-	 *       INIT values to its elements, which is something that we've already
+	 * NOTE: We're  allowed  to   realloc/free  a   dynamically  allocated   block-status
+	 *       bitset,  even  though there  are  cases where  a  thread can  write  to that
+	 *       vector  without  first  acquiring a  lock  to the  associated  part, because
+	 *       the only  case where  this can  happen is  when one  had previously  written
+	 *       INIT  values  to  its  elements,  which  is  something  that  we've  already
 	 *       asserted to not be the case (s.a. `mpart_lock_acquire_and_initdone_nodma()') */
 	if (!(self->mp_flags & MPART_F_BLKST_INL)) {
 		size_t block_count;

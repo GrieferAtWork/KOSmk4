@@ -38,7 +38,7 @@ NOTHROW(FCALL GDBThread_FindAnyStopEvent)(struct task *__restrict thread) {
 	GDBThreadStopEvent *result;
 	result = GDBThread_FindStopEvent(thread);
 	if (!result) {
-		/* Also search async stop notifications (in case GDB hasn't
+		/* Also search async stop notifications (in case GDB  hasn't
 		 * been informed about this thread having been stopped, yet) */
 		result = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
 		for (; result; result = result->tse_next) {
@@ -53,7 +53,7 @@ NOTHROW(FCALL GDBThread_FindAnyStopEvent)(struct task *__restrict thread) {
 /* Get/Set a register for the current thread.
  * @param: regno: One of `GDB_REGISTER_<ARCH>_*'
  * @return: * : The required buffer size.
- *              NOTE: In the case of `GDB_SetRegister()', `bufsize' has to match
+ *              NOTE: In the case of  `GDB_SetRegister()', `bufsize' has to  match
  *                    this value exactly (it's not allowed to be larger), else the
  *                    set operation will not have written the register value.
  * @return: 0 : Invalid `regno', or `thread' has terminated. */

@@ -317,7 +317,7 @@ NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, b_phys))(port_t port,
 			                        page_bytes));
 		} EXCEPT {
 			/* Try-catch is required, because `dst' may be a user-buffer,
-			 * in which case access may cause an exception to be thrown. */
+			 * in  which case access may cause an exception to be thrown. */
 			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
@@ -369,7 +369,7 @@ NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, w_phys))(port_t port,
 			                        page_words));
 		} EXCEPT {
 			/* Try-catch is required, because `dst' may be a user-buffer,
-			 * in which case access may cause an exception to be thrown. */
+			 * in  which case access may cause an exception to be thrown. */
 			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
@@ -433,7 +433,7 @@ NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, l_phys))(port_t port,
 			                        page_dwords));
 		} EXCEPT {
 			/* Try-catch is required, because `dst' may be a user-buffer,
-			 * in which case access may cause an exception to be thrown. */
+			 * in  which case access may cause an exception to be thrown. */
 			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}

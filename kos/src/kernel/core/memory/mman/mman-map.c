@@ -44,9 +44,9 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
-/* Sync all changes made to file mappings within the given
+/* Sync  all  changes made  to  file mappings  within  the given
  * address range with on-disk file images. (s.a. `mfile_sync()')
- * NOTE: Memory ranges that aren't actually mapped, aren't mapped
+ * NOTE: Memory ranges that  aren't actually  mapped, aren't  mapped
  *       with WRITE and SHARED, or aren't mapped to write-back files
  *       are simply ignored. */
 PUBLIC void FCALL

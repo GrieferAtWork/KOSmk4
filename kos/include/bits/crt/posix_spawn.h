@@ -54,7 +54,7 @@ struct __posix_spawnattr {
 #endif /* !... */
 };
 
-/* Data structure to contain information about the actions to be
+/* Data structure to contain information about the actions to  be
  * performed in the new process with respect to file descriptors. */
 #ifdef __POSIX_SPAWN_USE_KOS
 #define __POSIX_SPAWN_ACTION_CLOSE 0 /* Close a file handle */

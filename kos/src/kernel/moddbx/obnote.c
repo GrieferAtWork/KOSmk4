@@ -358,8 +358,8 @@ NOTHROW(KCALL note_directory_entry)(pformatprinter printer, void *arg,
 		dent_type    = me->de_type;
 		if (me->de_hash != directory_entry_hash(dent_name, dent_namelen))
 			goto badobj;
-		/* TODO: Verify `dent_type', and print its name.
-		 *       as `reg' for `DT_REG', etc..., such that
+		/* TODO: Verify  `dent_type',  and  print  its  name.
+		 *       as  `reg'  for `DT_REG',  etc...,  such that
 		 *       the actual string printed is something like:
 		 *       `reg:init' */
 		(void)dent_type;
@@ -1008,7 +1008,7 @@ PRIVATE struct obnote_entry const notes[] = {
 
 
 /* Print extended information (if available)
- * that related to the given `name'.
+ * that   related   to  the   given  `name'.
  * @param: pstatus: [out] Set to one of `OBNOTE_PRINT_STATUS_*'.
  * @return: * :     The usual pformatprinter return value. */
 PUBLIC NONNULL((1, 3, 4, 5)) ssize_t

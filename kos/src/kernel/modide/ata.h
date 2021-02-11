@@ -124,13 +124,13 @@ typedef struct {
                                        *   - ATA_BUS_STATE_READY: All available tasks have been completed.
                                        *   - ATA_BUS_STATE_READY | ATA_BUS_STATE_WANTPIO: PIO was requested. */
 #define ATA_BUS_STATE_INPIO    0x0002 /* Currently in PIO-mode: DMA is disabled, and the bus is free
-                                       * to be manually used/configured. Interrupts that may happen
+                                       * to  be manually used/configured. Interrupts that may happen
                                        * while doing PIO will cause `ab_piointr' to be broadcast. */
 #define ATA_BUS_STATE_MASK     0x000f /* Mask for the actual state. */
 #define ATA_BUS_STATE_WANTPIO (~0xf)  /* MASK: PIO mode is requested. When this mask is non-zero, the bus will change
-                                       *       its state to `ATA_BUS_STATE_READY | ATA_BUS_STATE_WANTPIO' at
-                                       *       the next opportune time. When this happens, a single thread waiting
-                                       *       for `ab_ready' will be woken, which may then try to switch the bus
+                                       *       its   state   to   `ATA_BUS_STATE_READY | ATA_BUS_STATE_WANTPIO'    at
+                                       *       the  next opportune time.  When this happens,  a single thread waiting
+                                       *       for `ab_ready' will  be woken, which  may then try  to switch the  bus
                                        *       state to `ATA_BUS_STATE_INPIO'. */
 #define ATA_BUS_STATE_ONEPIO   0x0010 /* A single want-pio ticket. */
 
@@ -145,7 +145,7 @@ struct ata_bus_struct: character_device {
 #define ATA_PIOINTR_ALT_DECODE(resp)   ((u8)((uintptr_t)(resp) & 0xff))
 	AtaPRD                 *ab_prdt;        /* [1..ATA_PRD_MAXCOUNT][valid_if(b_dmaio != (port_t)-1)][owned]
 	                                         * NOTE: This pointer is allocated using `vpage_alloc_untraced()',
-	                                         *       and spans a single page of physical memory. */
+	                                         *       and   spans   a   single   page   of   physical   memory. */
 	port_t                  ab_busio;       /* [const] ATA_DEFAULT_PRIMARY_BUS:  I/O port for the ATA bus. */
 	port_t                  ab_ctrlio;      /* [const] ATA_DEFAULT_PRIMARY_CTRL: Device control register/Alternate status ports. */
 	port_t                  ab_dmaio;       /* [const] DMA controller port (or (port_t)-1 if unsupported) (s.a. `DMA_PRIMARY_COMMAND', ...). */
@@ -232,7 +232,7 @@ AtaDrive_Ioctl(AtaDrive *__restrict self,
                iomode_t mode) THROWS(...);
 
 /* Acquire/release a PIO lock for the given ata bus, allowing
- * the caller to perform bus I/O using PIO data channels. */
+ * the  caller to  perform bus  I/O using  PIO data channels. */
 INTDEF NONNULL((1)) void FCALL AtaBus_LockPIO(AtaBus *__restrict self) THROWS(E_WOULDBLOCK, ...);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL AtaBus_UnlockPIO)(AtaBus *__restrict self);
 
@@ -286,11 +286,11 @@ NOTHROW(FCALL AtaBus_StartNextDmaOperation)(AtaBus *__restrict self);
  * @return: <= prd_siz: SUCCESS. In this case, the return value specifies the number of encoded
  *                      PRD entries, starting at `prd_buf'.
  * @return: > prd_siz: ERROR: More than `prd_siz' PRD entires would be required for the encoding
- *                     to succeed. - In this case, the caller should re-attempt the call after
+ *                     to  succeed. - In this case, the  caller should re-attempt the call after
  *                     re-allocating to match a total of at least `return' AtaPRD entries passed
  *                     to `prd_buf', and update `prd_siz' accordingly.
  * @return: 0 : ERROR: The given address range cannot be encoded as a valid PRD
- *                     This can happen for any of the following reasons:
+ *                     This can  happen  for  any  of  the  following  reasons:
  *                   - An `E_WOULDBLOCK' error was thrown internally (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
  *                   - Some portion of the given address range(s) isn't mapped (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
  *                   - Some portion of the given address range(s) maps to VIO memory (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
@@ -304,7 +304,7 @@ NOTHROW(KCALL AtaPRD_InitFromPhysVector)(AtaPRD *__restrict prd_buf, size_t prd_
 
 /* Same as the Phys functions above, however also initialize `handle->hd_dmalock' / `handle->hd_dmalockvec',
  * as well as setting the `ATA_AIO_HANDLE_FONEDMA' bit should this be required.
- * @param: for_writing: When true, the target buffer is intended to be
+ * @param: for_writing: When true, the target buffer is intended to  be
  *                      written to, else only intended to be read from. */
 INTDEF WUNUSED size_t KCALL
 AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *base,
@@ -342,7 +342,7 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_Complete_NoPR)(struct aio_handle *__restrict
 /* ATA specifies a 400ns delay after drive switching,
  * often implemented as 4 Alternative Status queries.
  * XXX: This can probably be optimized away in certain
- *      cases where we don't have to wait, possibly
+ *      cases where we  don't have  to wait,  possibly
  *      by detecting modern hardware... */
 #define AtaBus_HW_SelectDelay_P(ctrlio) \
 	(inb(ctrlio), inb(ctrlio), inb(ctrlio), inb(ctrlio))

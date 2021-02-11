@@ -42,9 +42,9 @@ DECL_BEGIN
 #endif /* NDEBUG */
 
 
-/* Initialize `self->mp_state' and `self->mp_mem' or `self->mp_mem_sc', such
- * that `self' points to exactly `total_pages' pages of physical memory.
- * This function is init-only and doesn't care about locks or the whatever
+/* Initialize  `self->mp_state' and `self->mp_mem' or `self->mp_mem_sc', such
+ * that `self'  points to  exactly `total_pages'  pages of  physical  memory.
+ * This  function is init-only  and doesn't care about  locks or the whatever
  * the given `self' may point to, meaning it should not be called when `self'
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
@@ -151,7 +151,7 @@ err_nophys:
 
 
 
-/* Free backing memory using `page_free()'. When an mchunkvec was used,
+/* Free backing memory using `page_free()'.  When an mchunkvec was  used,
  * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mpart_ll_freemem)(struct mpart *__restrict self) {

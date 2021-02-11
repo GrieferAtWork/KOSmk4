@@ -180,7 +180,7 @@ NOTHROW(FCALL mpart_destroy_lop_rmfile)(struct mfile_lockop *__restrict self,
 	DBG_memset(&me->mp_filent, 0xcc, sizeof(me->mp_filent));
 	post = (struct mfile_postlockop *)self;
 	/* Remove from the all-parts list and free _after_ the
-	 * lock to the backing mem-file has been released. */
+	 * lock  to  the backing  mem-file has  been released. */
 	post->mfplo_func = &mpart_destroy_lop_rmall;
 	return post;
 }
@@ -317,18 +317,18 @@ DECL_BEGIN
 /* Get/Set the state of the index'd block `partrel_block_index' from the part's block-state bitset.
  * NOTE: The caller is responsible to ensure that mem-part is in a state
  *       where the bitset is valid (iow: `MPART_ST_HASST(self->mp_state)'),
- *       and that `partrel_block_index' is located in-bounds.
+ *       and   that    `partrel_block_index'    is    located    in-bounds.
  * NOTE: The caller must be holding a lock to `self', unless the intend is to
- *       change the state of a block that used to be `MPART_BLOCK_ST_INIT',
- *       in which case `mpart_setblockstate()' may be called without holding
+ *       change the state of a  block that used to be  `MPART_BLOCK_ST_INIT',
+ *       in which case `mpart_setblockstate()' may be called without  holding
  *       a lock to `self'
  *       But also note that after transitioning away from `MPART_BLOCK_ST_INIT',
- *       the caller must broadcast the `mf_initdone' signal of the file that
+ *       the caller must  broadcast the  `mf_initdone' signal of  the file  that
  *       was used to initialize the part.
- * NOTE: When calling `mpart_setblockstate()' to set `MPART_BLOCK_ST_INIT',
+ * NOTE: When  calling  `mpart_setblockstate()'  to  set  `MPART_BLOCK_ST_INIT',
  *       then the caller is also responsible to set the `MPART_F_MAYBE_BLK_INIT'
- *       flag! But note that that flag should _NOT_ be cleared by the one
- *       who originally set it, since other (unrelated) blocks may exist
+ *       flag! But  note that  that flag  should  _NOT_ be  cleared by  the  one
+ *       who  originally  set  it,  since  other  (unrelated)  blocks  may exist
  *       that still make use of the `MPART_BLOCK_ST_CHNG' state!
  * @param: at:  One of `MPART_BLOCK_ST_*'
  * @return: * : *ditto* */
@@ -378,11 +378,11 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 
 
 /* Check if the given mem-part contains blocks with `MPART_BLOCK_ST_INIT'.
- * For this purpose, if the `MPART_F_MAYBE_BLK_INIT' flag isn't set, then
+ * For this purpose, if the `MPART_F_MAYBE_BLK_INIT' flag isn't set,  then
  * this function immediately returns `false'.
  * Otherwise, all blocks of the part are searched, and if one is found that
- * uses the `MPART_BLOCK_ST_INIT' state, return `true'. Otherwise, clear
- * the `MPART_F_MAYBE_BLK_INIT' flag and return `false'.
+ * uses the `MPART_BLOCK_ST_INIT'  state, return  `true'. Otherwise,  clear
+ * the    `MPART_F_MAYBE_BLK_INIT'     flag     and     return     `false'.
  * NOTE: The caller must be holding a lock to `self' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self) {
@@ -427,20 +427,20 @@ mpart_sync_impl(struct mpart *__restrict self, bool keep_lock)
 again:
 	if (!(self->mp_flags & MPART_F_CHANGED) && !keep_lock)
 		goto done_noop_nolock;
-	/* Lock the part, load it into the core, make sure that anyone
-	 * that might have write-access right now has this permission
+	/* Lock the part, load it into the core, make sure that  anyone
+	 * that might have write-access  right now has this  permission
 	 * revoked, and that there aren't any DMA operation in-process. */
 	/* TODO: It would be nice if we could differentiate between read-
-	 *       and write- DMA operations, and only wait for write DMA
-	 *       operations here. - In practice, we don't have to worry
+	 *       and write- DMA operations, and  only wait for write  DMA
+	 *       operations here. - In practice,  we don't have to  worry
 	 *       about anyone reading memory in the mean time... */
 	mpart_lock_acquire_and_setcore_unwrite_nodma(self);
 
 	if (!(self->mp_flags & MPART_F_CHANGED))
 		goto done_noop;
 
-	/* Note: For our purposes, we can assume that no-one else will
-	 *       be able to make modifications to our mem-part, or set
+	/* Note: For our purposes, we can assume that no-one else  will
+	 *       be able to make modifications to our mem-part, or  set
 	 *       the CHANGED flag once again until we release our lock!
 	 * The case of the 1 remaining copy-on-write mapping with write
 	 * access may be ignored for our purpose! */
@@ -457,7 +457,7 @@ again:
 	/* Make sure that the block-state-bitset is writable. */
 	if unlikely(!mpart_hasblockstate(self)) {
 		/* Not writable means that the mem-part uses HEAP-based+NULL-alloc, which
-		 * means that currently all blocks are considered `MPART_BLOCK_ST_CHNG'
+		 * means  that currently all  blocks are considered `MPART_BLOCK_ST_CHNG'
 		 *
 		 * This is unlikely to happen, but is a well-defined scenario. */
 		if (block_count <= MPART_BLKST_BLOCKS_PER_WORD) {
@@ -509,7 +509,7 @@ again:
 	}
 
 	/* At this point, we know that there are changes, and we've made sure that
-	 * the block-state bitset is writable (in case it wasn't writable before) */
+	 * the  block-state bitset is writable (in case it wasn't writable before) */
 	assert(self->mp_state == MPART_ST_MEM ||
 	       self->mp_state == MPART_ST_MEM_SC);
 
@@ -527,19 +527,19 @@ again:
 			continue;
 		}
 
-		/* Figure out the max continuous physical memory range that
+		/* Figure out the  max continuous physical  memory range  that
 		 * can be used to describe memory starting at the lo'th block. */
 		mpart_memaddr_direct(self, start << file->mf_blockshift, &loc);
 		assert(loc.mppl_size >= (size_t)1 << file->mf_blockshift);
 
 		/* Figure out the max hi-block that is still contained with
-		 * the physical memory range described by `loc' */
+		 * the   physical   memory   range   described   by   `loc' */
 		block_count = start + (loc.mppl_size >> file->mf_blockshift);
 		assert(block_count >= start);
 		assert(block_count <= mpart_getblockcount(self, file));
 
 		/* Alter the state of changed parts to INIT, thus essentially
-		 * locking them in-memory until we're down writing them back
+		 * locking them in-memory until we're down writing them  back
 		 * to disk, or wherever else they should go. */
 		for (end = start + 1;;) {
 			mpart_setblockstate(self, end - 1, MPART_BLOCK_ST_INIT);
@@ -653,7 +653,7 @@ done_writeback:
 	}
 
 	/* Clear the LOCK-bit and CHANGED-flag at the same time! :)
-	 * Also clear the the `MPART_F_MAYBE_BLK_INIT' flag, since
+	 * Also  clear the the `MPART_F_MAYBE_BLK_INIT' flag, since
 	 * we're handling that case as well (see above) */
 	if (keep_lock) {
 		ATOMIC_AND(self->mp_flags, ~(MPART_F_CHANGED | MPART_F_MAYBE_BLK_INIT));
@@ -700,21 +700,21 @@ PUBLIC struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
  * NOTE: This list holds a reference to every contain part that wasn't already
- *       destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
+ *       destroyed,    and    has   the    `MPART_F_GLOBAL_REF'    flag   set. */
 PUBLIC struct mpart_list mpart_all_list = LIST_HEAD_INITIALIZER(mpart_all_list);
 
 /* [0..n][CHAIN(_mp_dead)][lock(ATOMIC)]
- * List of dead parts that have yet to be removed from lists in `mpart_all_list'.
+ * List of  dead parts  that  have yet  to be  removed  from lists  in  `mpart_all_list'.
  * This list must be cleared whenever the caller has released a lock to `mpart_all_lock'.
  * For this purpose, you may simply use `mpart_all_reap()' */
 PUBLIC struct mpart_slist mpart_all_dead = SLIST_HEAD_INITIALIZER(mpart_all_dead);
 
 /* [0..n][CHAIN(_mp_newglobl)][lock(ATOMIC)]
- * Similar to `mpart_all_dead', but this is a list of references to parts
+ * Similar  to `mpart_all_dead', but  this is a list  of references to parts
  * that should be added to `mpart_all_list' once the lock becomes available.
  *
- * Because these are references, mpart_destroy() remains NOBLOCK, because
- * by the time a mem-part is destroyed, it is know that it can't be pending
+ * Because  these  are references,  mpart_destroy() remains  NOBLOCK, because
+ * by  the time a mem-part is destroyed, it  is know that it can't be pending
  * to-be added to the global list of parts anymore. (because it being pending
  * would have otherwise prevented it from being destroyed) */
 PUBLIC struct REF mpart_slist mpart_all_pending = SLIST_HEAD_INITIALIZER(mpart_all_pending);
@@ -753,7 +753,7 @@ again:
 
 
 /* Add the given mpart `self' to the global list of parts.
- * This function will initialize `self->mp_allparts' */
+ * This  function   will  initialize   `self->mp_allparts' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {
 	if (mpart_all_lock_tryacquire()) {

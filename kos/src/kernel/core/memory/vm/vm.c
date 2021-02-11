@@ -129,7 +129,7 @@ again:
 }
 
 /* Delete the `vmf_part' pointers of all `struct vm_futex' objects
- * that can still be reached from the given address tree. */
+ * that  can  still  be  reached  from  the  given  address  tree. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_futex_controller_destroy)(struct vm_futex_controller *__restrict self) {
 	/* Clear part pointers */
@@ -434,16 +434,16 @@ NOTHROW(KCALL vm_set_clear)(struct pointer_set *__restrict self) {
 
 
 
-/* Collect all of the VMs that have mappings for `self'.
+/* Collect all of the VMs that have mappings for  `self'.
  * NOTE: The caller must be holding a read-lock on `self'
  * NOTE: Upon entry, `vms->ps_size == 0'
  * @return: == vms->ps_size: Successfully collected all VMs.
  * @return: > vms->ps_size:  Failed to allocate sufficient memory within
- *                           the pointer set to house all vm pointers.
+ *                           the  pointer set to  house all vm pointers.
  *                           The caller should unlock `self', then
  *                          `pointer_set_clear_and_rehash(vms,return)' to
  *                           allocate sufficient memory with the given
- *                           buffer, before re-attempting the call. */
+ *                           buffer, before  re-attempting  the  call. */
 PRIVATE NOBLOCK size_t
 NOTHROW(KCALL vm_set_collect_from_datapart)(struct pointer_set *__restrict vms,
                                             struct vm_datapart *__restrict self) {
@@ -633,14 +633,14 @@ NOTHROW(KCALL pprop_memcpy)(uintptr_t *__restrict dst_base,
 
 
 
-/* Map the given data part (which must be INCORE or LOCKED) into the current
+/* Map  the given data part (which must be INCORE or LOCKED) into the current
  * page directory at the specified location, using the specified permissions.
- * NOTE: The caller is responsible to ensure that `self' doesn't change state
+ * NOTE: The caller is  responsible to  ensure that `self'  doesn't change  state
  *       or size, as well as to ensure that the given address range isn't already
- *       in use. - This function is merely a thin wrapper around `pagedir_map',
+ *       in use. - This function is  merely a thin wrapper around  `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `pagedir_prepare'
+ *       has  been   prepared   in   a  prior   call   to   `pagedir_prepare'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
@@ -733,8 +733,8 @@ NOTHROW(KCALL vm_datapart_get_page_permissions)(struct vm_datapart const *__rest
 
 /* Same as `vm_datapart_map_ram()', but automatically restrict permissions:
  *  - Pages not fully marked as changed are mapped as read-only, unless
- *    the `VM_DATAPART_FLAG_TRKCHNG' bit isn't set in `self'
- *  - Pages not fully initialized are mapped as invalid-access, meaning
+ *    the  `VM_DATAPART_FLAG_TRKCHNG'   bit   isn't   set   in   `self'
+ *  - Pages not fully initialized are mapped as invalid-access,  meaning
  *    that a page-fault will be triggered upon first use of that memory.
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -847,7 +847,7 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
 
 /* Enumerate physical memory of `self' within the given address range.
  * NOTE: The caller must be holding a read-lock on `self', as well as ensure
- *       that the given address range is in-bounds, that `self' is either
+ *       that  the given address  range is in-bounds,  that `self' is either
  *       INCORE or LOCKED, and that `num_bytes' is non-zero. */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
@@ -1005,7 +1005,7 @@ vm_datapart_do_allocram(struct vm_datapart *__restrict self)
 
 /* Copy the physical memory backing of `src' into `dst'.
  * The caller is responsible to ensure that both parts are INCORE or LOCKED,
- * as well as to provide for both parts to be properly locked. */
+ * as   well  as  to   provide  for  both  parts   to  be  properly  locked. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
                                       struct vm_datapart *__restrict src) {
@@ -1147,7 +1147,7 @@ vm_datapart_lockwrite_setcore(struct vm_datapart *__restrict self)
 }
 
 /* A combination of `vm_datapart_lockwrite_unsharecow()' and `vm_datapart_lockwrite_setcore()'
- * Ensure that no copy-on-write mappings exist, and that `self' is to be in-core. */
+ * Ensure  that  no  copy-on-write  mappings  exist,  and  that  `self'  is  to  be   in-core. */
 PUBLIC NONNULL((1)) void FCALL
 vm_datapart_lockwrite_setcore_unsharecow(struct vm_datapart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -1398,8 +1398,8 @@ do_unshare_cow:
 
 
 /* Return the address of a physical page at the given `vpage_offset'
- * The caller must be holding a read- or write-lock on `self',
- * as well as guaranty that the part is either INCORE or LOCKED. */
+ * The  caller  must be  holding a  read-  or write-lock  on `self',
+ * as  well as  guaranty that the  part is either  INCORE or LOCKED. */
 PUBLIC NOBLOCK NONNULL((1)) physpage_t
 NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
                                     size_t vpage_offset) {
@@ -1429,17 +1429,17 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
 }
 
 
-/* Ensure that the page at `vpage_offset' has been initialized
- * The caller must be holding a read- or write-lock on `self',
+/* Ensure that the page  at `vpage_offset' has been  initialized
+ * The caller must be holding  a read- or write-lock on  `self',
  * as well as guaranty that the part is either INCORE or LOCKED.
  * HINT: The easiest way to ensure this is through
- *       use of `vm_datapart_lockread_setcore()'
+ *       use  of  `vm_datapart_lockread_setcore()'
  * @param: vpage_offset: The offset of the page to load.
  *                       The caller must ensure that this is `< vm_datapart_numvpages(self)'
  * @param: pchanged: [IN]  If `true', mark the associated page as changed, instead of initialized.
  * @param: pchanged: [OUT] Set to true if all associated data-pages are marked as changed.
  * @throw: * : Only throws whatever exception may get thrown by `dt_loadpart', meaning that
- *             when the loadpart function is NOEXCEPT, then so is this function! */
+ *             when   the  loadpart  function  is  NOEXCEPT,  then  so  is  this  function! */
 PUBLIC NONNULL((1, 3)) physpage_t KCALL
 vm_datapart_loadpage(struct vm_datapart *__restrict self,
                      size_t vpage_offset,
@@ -1659,7 +1659,7 @@ done_init:
 }
 
 
-/* Similar to `vm_datapart_loadpage()', however instead used for accessing only a single data
+/* Similar to  `vm_datapart_loadpage()',  however  instead  used for  accessing  only  a  single  data
  * page, rather than a whole virtual memory page. (used to implement `vm_datapart_do_(read|write)[p]') */
 PUBLIC NONNULL((1)) physaddr_t KCALL
 vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
@@ -1789,7 +1789,7 @@ DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
 /* Stop DMAing by releasing all of the specified DMA locks.
- * NOTE: The caller must ensure that `lockcnt == return(vm_startdma*())', and
+ * NOTE: The  caller  must  ensure  that  `lockcnt == return(vm_startdma*())',  and
  *       that the specified `lockvec' is either the exact same `lockvec' originally
  *       passed to `vm_startdma*()', or an identical memory copy of it. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -1857,8 +1857,8 @@ again:
 }
 
 
-/* Try to acquire a write-lock to `self' and all parts reachable from
- * it. - If this acquisition fails for any of the parts, return a pointer
+/* Try to acquire  a write-lock  to `self'  and all  parts reachable  from
+ * it.  - If this acquisition fails for any of the parts, return a pointer
  * to that part. - Else return `NULL', which is indicative of a successful
  * acquisition of locks to all parts. */
 PUBLIC NOBLOCK NONNULL((1)) struct vm_datapart *
@@ -1915,12 +1915,12 @@ again:
 }
 
 
-/* Anonymize the given data block `self' (tearing down its part tree,
- * and changing all of the nodes to be bound to `vm_datablock_anonymous')
- * This in turn will resolve all of the reference loops between every
- * part reachable from `db_parts', which then point back via their `dp_block'
+/* Anonymize  the  given  data  block  `self'  (tearing  down  its  part  tree,
+ * and  changing  all of  the nodes  to  be bound  to `vm_datablock_anonymous')
+ * This in  turn  will  resolve  all  of  the  reference  loops  between  every
+ * part reachable from `db_parts', which  then point back via their  `dp_block'
  * pointer, essentially getting rid of all of the data block's self-references.
- * NOTE: The caller should _NOT_ already be holding a lock to `self'!
+ * NOTE: The caller  should  _NOT_  already  be holding  a  lock  to  `self'!
  *       Doing so may cause this function to dead-lock, as it would be unable
  *       to perform a single-lock wait operation in case some other thread is
  *       already holding a lock to one of the parts, whilst trying to acquire
@@ -1945,8 +1945,8 @@ again:
 		/* Simple case: There aren't any parts which would have to be anonymized. */
 		goto done;
 	}
-	/* Here comes the part part: We need to acquire a write-lock
-	 * to _each_ _and_ _every_ _one_ of our parts before we can
+	/* Here comes the part part:  We need to acquire a  write-lock
+	 * to  _each_ _and_ _every_  _one_ of our  parts before we can
 	 * proceed. - If doing this fails for any one of them, we must
 	 * get rid of all locks already acquired, and manually acquire
 	 * a blocking lock on that part, so-as to ensure that the lock
@@ -1954,7 +1954,7 @@ again:
 	 * that we'll get better luck that run around. */
 	chain = vm_datablock_lock_trywrite_parts(chain);
 	if (chain) {
-		/* Well. - This didn't go exactly as planned. - Time to
+		/* Well.  - This didn't  go exactly as  planned. - Time to
 		 * wait for this part to become available, then try again. */
 		incref(chain); /* Keep the part alive while not holding a lock to `self' */
 		sync_endwrite(self);
@@ -1969,7 +1969,7 @@ again:
 		goto again;
 	}
 	chain = self->db_parts;
-	/* All right! we're holding a lock to each and every one of
+	/* All  right! we're holding  a lock to each  and every one of
 	 * the parts. - Now we can actually move on to anonymize them! */
 	vm_datapart_anonymize_tree(chain, self);
 	vm_datablock_lock_endwrite_parts(chain);
@@ -1983,10 +1983,10 @@ done:
 
 
 /* Check if the given datapart `self' has modified
- * data pages within the specified address range.
- * NOTE: The caller must be holding any kind of lock that prevents `self'
- *       from having its length changed (aka. a VM-tree read-lock of a VM
- *       that is mapping `self', a read-lock to `self', or a read-lock to
+ * data  pages within the specified address range.
+ * NOTE: The  caller must  be holding any  kind of lock  that prevents `self'
+ *       from  having its  length changed (aka.  a VM-tree read-lock  of a VM
+ *       that  is mapping  `self', a read-lock  to `self', or  a read-lock to
  *       the associated data-block, so-long as `self' hasn't been anonymized) */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
@@ -2129,32 +2129,32 @@ vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock
 }
 
 
-/* Synchronize all modified pages within the given part-relative address range.
- * If the given part-relative address range is out-size of the bounds of `self'
- * after a lock to `self' has been acquired, then that range is truncated first.
+/* Synchronize   all   modified  pages   within   the  given   part-relative   address  range.
+ * If  the  given  part-relative   address  range  is  out-size   of  the  bounds  of   `self'
+ * after   a  lock  to  `self'  has  been  acquired,  then  that  range  is  truncated  first.
  * NOTE: The caller should not be holding any kind of lock to either `self' or its data block.
- * NOTE: If the data block associated with `self' does not implement a `dt_savepart'
+ * NOTE: If  the  data block  associated  with `self'  does  not implement  a `dt_savepart'
  *       function, or if `self' doesn't have the CHANGED flag set, the function immediately
  *       returns `0'.
  * NOTE: Once done, this function will transition the state of all saved data pages
- *       from `VM_DATAPART_PPP_HASCHANGED' back to `VM_DATAPART_PPP_INITIALIZED'
+ *       from `VM_DATAPART_PPP_HASCHANGED'  back  to  `VM_DATAPART_PPP_INITIALIZED'
  *       Also note that during this process, any memory mapping of `self' which may
- *       have previously become writable due to the associated part having been
- *       changed to be HASCHANGED will be re-mapped as read-only, so-as to allow
- *       it to transition back to `VM_DATAPART_PPP_HASCHANGED' the next time a
+ *       have previously become  writable due  to the associated  part having  been
+ *       changed  to be HASCHANGED  will be re-mapped as  read-only, so-as to allow
+ *       it to  transition back  to `VM_DATAPART_PPP_HASCHANGED'  the next  time  a
  *       write is performed to such a region of memory.
  * NOTE: If the saved address range spans the entirety of `self', then this function
  *       will also unset the CHANGED bit of `self'
- * @param: recheck_modifications_before_remap: When true and `self' has some SHARED memory
- *                                             mappings, re-check that there are actually
+ * @param: recheck_modifications_before_remap: When  true and `self' has some SHARED memory
+ *                                             mappings, re-check that  there are  actually
  *                                             changed pages within the given address range
  *                                             before doing all of the work associated with
  *                                             re-mapping all shared mappings as read-only.
- *                                       NOTE: This is merely a hint, and only affects the
- *                                             performance of this function. - It is ignored
- *                                             when no SHARED memory mappings exist, and should
+ *                                       NOTE: This is  merely  a  hint,  and  only  affects  the
+ *                                             performance  of  this  function. -  It  is ignored
+ *                                             when  no SHARED memory  mappings exist, and should
  *                                             only be set to TRUE when the caller hasn't already
- *                                             been told in one way or another that there
+ *                                             been  told  in  one  way  or  another  that  there
  *                                             probably are changed pages within the given range.
  * @return: * : The number of saved data pages. */
 PUBLIC NONNULL((1)) size_t KCALL
@@ -2195,9 +2195,9 @@ again_lock_datapart:
 		    self->dp_srefs != NULL) {
 			if (partrel_min_dpage == 0 &&
 			    partrel_max_dpage >= vm_datapart_numdpages(self))
-				; /* The request spans the entirety of `self', meaning that due to the presence
-				   * of the CHANGED flag (which is checked above), we must assume that at least
-				   * some pages do have actually been modified (though it still is possible that
+				; /* The  request spans the entirety of `self',  meaning that due to the presence
+				   * of the CHANGED flag (which is checked  above), we must assume that at  least
+				   * some pages do have actually been modified (though it still is possible  that
 				   * those pages have since already been synced individually, leaving the CHANGED
 				   * flag dangling without any actual modified pages) */
 			else {
@@ -2208,10 +2208,10 @@ again_lock_datapart:
 					goto done_unlock;
 			}
 		}
-		/* Step #1: Go through all SHARED mappings of `self', and re-map
-		 *          all of them to become read-only, so-as to prevent
-		 *          further modifications to the backing data before we
-		 *          actually start syncing that data (we don't want any
+		/* Step #1: Go through all  SHARED mappings of  `self', and  re-map
+		 *          all of  them  to  become read-only,  so-as  to  prevent
+		 *          further  modifications  to the  backing data  before we
+		 *          actually start  syncing that  data (we  don't want  any
 		 *          modifications to get lost during the time of us writing
 		 *          existing changes, and us re-mapping as read-only, which
 		 *          is why we must re-map as read-only first) */
@@ -2278,7 +2278,7 @@ again_lock_datapart:
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 				}
 				/* Don't propagate write permissions (those are lazily re-added during the next write-
-				 * attempt, which will once again mark our part as changed once we're all set & done) */
+				 * attempt,  which will once again mark our part as changed once we're all set & done) */
 				perm = node->vn_prot & (VM_PROT_EXEC | VM_PROT_READ);
 				if (v != &vm_kernel)
 					perm |= PAGEDIR_MAP_FUSER;
@@ -2301,7 +2301,7 @@ again_lock_datapart:
 		/* Unlock all of the affected VMs */
 		vm_set_lockendwrite_all(&vms);
 
-		/* At this point, we can finally go through the range given to us by
+		/* At this point, we can finally go  through the range given to us  by
 		 * the caller, searching for any page that has been marked as CHANGED. */
 		TRY {
 			size_t i, count;
@@ -2322,7 +2322,7 @@ again_lock_datapart:
 				                        i,
 				                        count);
 				/* Go through and change all of the associated pages from CHANGED to INITIALIZED.
-				 * NOTE: Some of them may have already changed in this manner, in case some other
+				 * NOTE: Some  of them may have already changed in this manner, in case some other
 				 *       thread is/has also synced our part. (after all: we only have a read-lock) */
 				for (; count--; ++i) {
 					if (vm_datapart_cmpxchstate(self, i,
@@ -2339,7 +2339,7 @@ again_lock_datapart:
 		if (partrel_min_dpage == 0 &&
 		    partrel_max_dpage >= vm_datapart_numdpages(self) - 1) {
 			/* Upgrade to a write-lock so we can re-check if all pages are
-			 * still marked as INITIALIZED, rather than CHANGED. */
+			 * still   marked   as  INITIALIZED,   rather   than  CHANGED. */
 			if likely(sync_upgrade(self) ||
 			          !(ATOMIC_READ(self->dp_flags) & VM_DATAPART_FLAG_CHANGED)) {
 				size_t i;
@@ -2371,7 +2371,7 @@ done_return_now:
 
 
 
-/* Synchronize all modified data pages within the specified address range.
+/* Synchronize all modified data pages within the specified address  range.
  * When called, this function will go through all data parts of `self', and
  * save any changed data pages using `self->db_type->dt_savepart'
  * @return: * : The number of saved data pages. */
@@ -2428,7 +2428,7 @@ done:
 
 
 /* Check if there are changed parts within the specified address range.
- * NOTE: The caller must be holding a read-lock on `self' */
+ * NOTE: The  caller   must   be   holding  a   read-lock   on   `self' */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
                                        datapage_t minpage, datapage_t maxpage) {
@@ -2454,11 +2454,11 @@ NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
 /* Construct a new datapart for the given address range.
  * NOTES:
  *  - The data part is _not_ inserted into the part-tree of `self',
- *    and it is the caller's task to do so, or to ensure that the
+ *    and it is the caller's task to  do so, or to ensure that  the
  *    given datablock is anonymous.
  *  - The data part is created as `VM_DATAPART_STATE_ABSENT', or
  *    `VM_DATAPART_STATE_VIOPRT' in the event that the data part
- *    refers to a VIO mapping. Additionally, all data pages are
+ *    refers to a VIO mapping. Additionally, all data pages  are
  *    initialized as `VM_DATAPART_PPP_UNINITIALIZED'. */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_createpart(struct vm_datablock *__restrict self,
@@ -2474,7 +2474,7 @@ vm_datablock_createpart(struct vm_datablock *__restrict self,
 	assert(start_offset + num_bytes > start_offset);
 	data_pageno = VM_DATABLOCK_DADDR2DPAGE(self, start_offset);
 	num_dpages  = num_bytes >> VM_DATABLOCK_ADDRSHIFT(self);
-	/* This one's considerably simpler, because we don't have to juggle around
+	/* This  one's considerably simpler, because we don't have to juggle around
 	 * holding a lock to `self', since there are no other parts which our's may
 	 * potentially collide with! */
 	result = (REF struct vm_datapart *)kmalloc(sizeof(struct vm_datapart),
@@ -2565,12 +2565,12 @@ vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
 			return minmax.mm_min;
 		}
 		/* Step #2: Since there is no part there, check if there is some other part
-		 *          above that may be limiting how large we can make our new part. */
+		 *          above that may be limiting how large we can make our new  part. */
 		assert(minmax.mm_max);
 		assert(vm_datapart_mindpage(minmax.mm_max) >= data_pageno);
 		assert(vm_datapart_mindpage(minmax.mm_max) <= data_pageno + num_dpages - 1);
 		/* Limit the size of the new part, so-as not to overlap
-		 * with another part that might follow after */
+		 * with  another   part   that   might   follow   after */
 		num_dpages = (size_t)(vm_datapart_mindpage(minmax.mm_max) - data_pageno);
 	} else {
 		assert(!minmax.mm_max);
@@ -2593,12 +2593,12 @@ vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
 				return minmax.mm_min;
 			}
 			/* Step #2: Since there is no part there, check if there is some other part
-			 *          above that may be limiting how large we can make our new part. */
+			 *          above that may be limiting how large we can make our new  part. */
 			assert(minmax.mm_max);
 			assert(vm_datapart_mindpage(minmax.mm_max) >= data_pageno);
 			assert(vm_datapart_mindpage(minmax.mm_max) <= data_pageno + num_dpages - 1);
 			/* Limit the size of the new part, so-as not to overlap
-			 * with another part that might follow after */
+			 * with  another   part   that   might   follow   after */
 			num_dpages = (size_t)(vm_datapart_mindpage(minmax.mm_max) - data_pageno);
 		} else {
 			assert(!minmax.mm_max);
@@ -2639,12 +2639,12 @@ vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
 				return minmax.mm_min;
 			}
 			/* Step #2: Since there is no part there, check if there is some other part
-			 *          above that may be limiting how large we can make our new part. */
+			 *          above that may be limiting how large we can make our new  part. */
 			assert(minmax.mm_max);
 			assert(vm_datapart_mindpage(minmax.mm_max) >= data_pageno);
 			assert(vm_datapart_mindpage(minmax.mm_max) <= data_pageno + num_dpages - 1);
 			/* Limit the size of the new part, so-as not to overlap
-			 * with another part that might follow after */
+			 * with  another   part   that   might   follow   after */
 			num_dpages = (size_t)(vm_datapart_mindpage(minmax.mm_max) - data_pageno);
 		} else {
 			assert(!minmax.mm_max);
@@ -2706,12 +2706,12 @@ set_inline_ppp:
 					return minmax.mm_min;
 				}
 				/* Step #2: Since there is no part there, check if there is some other part
-				 *          above that may be limiting how large we can make our new part. */
+				 *          above that may be limiting how large we can make our new  part. */
 				assert(minmax.mm_max);
 				assert(vm_datapart_mindpage(minmax.mm_max) >= data_pageno);
 				assert(vm_datapart_mindpage(minmax.mm_max) <= data_pageno + num_dpages - 1);
 				/* Limit the size of the new part, so-as not to overlap
-				 * with another part that might follow after */
+				 * with  another   part   that   might   follow   after */
 				num_dpages = (size_t)(vm_datapart_mindpage(minmax.mm_max) - data_pageno);
 				if (num_dpages <= BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) {
 					kffree(ppp, GFP_CALLOC);
@@ -2773,8 +2773,8 @@ create_anon_endread:
 
 /* Lookup and return a reference the data part containing the given `start_offset'
  * NOTE: When `self' is an anonymous data block (`self->db_parts == MFILE_PARTS_ANONYMOUS'),
- *       the the returned data part will be allocated anonymously as well, meaning that
- *       it will not be shared (`!isshared(return)'), and not be re-returned when the
+ *       the the returned  data part  will be allocated  anonymously as  well, meaning  that
+ *       it  will  not be  shared  (`!isshared(return)'), and  not  be re-returned  when the
  *       call is repeated with the same arguments passed once again. */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart(struct vm_datablock *__restrict self,
@@ -2799,8 +2799,8 @@ vm_datablock_locatepart(struct vm_datablock *__restrict self,
 	return result;
 }
 
-/* Same as `vm_paged_datablock_locatepart()', but ensure that the returned datapart
- * starts at exactly at `start_offset', and that it doesn't have span more than
+/* Same as `vm_paged_datablock_locatepart()', but ensure that the returned  datapart
+ * starts at exactly  at `start_offset',  and that it  doesn't have  span more  than
  * `max_num_bytes' pages of virtual memory (though it may still span less than that) */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
@@ -2848,10 +2848,10 @@ again:
 	}
 	assert(vm_datapart_minvpage(result) == start_page);
 	max_pages = max_num_bytes / PAGESIZE;
-	/* Make sure that the returned data part isn't larger than `max_pages'
+	/* Make  sure that the  returned data part  isn't larger than `max_pages'
 	 * This is once again achieved by splitting the part if it is larger, but
 	 * discarding the high part and keeping the low one, instead of using the
-	 * high part as we did above when ensuring that the part starts where we
+	 * high  part as we did above when ensuring that the part starts where we
 	 * need it to. */
 	{
 		size_t num_vpages;
@@ -3002,7 +3002,7 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 				} while (!ATOMIC_CMPXCH_WEAK(part->dp_stale, next, self));
 				COMPILER_WRITE_BARRIER();
 				/* Make sure that stale data has been serviced, in case the lock became
-				 * available while we were scheduling ourself as being stale. */
+				 * available  while  we  were   scheduling  ourself  as  being   stale. */
 				if unlikely(sync_trywrite(&part->dp_lock)) {
 					vm_datapart_service_stale(part);
 					sync_endwrite(&part->dp_lock);
@@ -3031,17 +3031,17 @@ LOCAL void KCALL log_updating_access_rights(struct vm_node *__restrict self) {
 
 
 /* Delete the mapping `self' for the purpose of re-loading
- * write permissions in on the following scenarios:
+ * write   permissions  in  on  the  following  scenarios:
  *  - mmap(MAP_PRIVATE):
- *    The first mapping of a data part that is already being SHARED by
+ *    The first mapping of a data part that is already being SHARED  by
  *    any number of other mappings. - In this case, all existing SHARED
- *    mappings need to have their write-access updated, so-as to allow
+ *    mappings need to have their write-access updated, so-as to  allow
  *    the copy-on-write mapping to be unshared after the next write.
  *    -> `vm_node_update_write_access()' needs to be called for every
  *       pre-existing SHARED memory mapping.
  *  - mmap(MAP_PRIVATE):
  *    The second mapping of an anonymous datapart (aka. the first datapart
- *    had been granted write-access since it was the sole owner owner of
+ *    had been granted write-access since it  was the sole owner owner  of
  *    the underlying anonymous memory)
  *    -> `vm_node_update_write_access()' needs to be called for the
  *        pre-existing PRIVATE memory mapping.
@@ -3055,7 +3055,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 	if (!sync_trywrite(self->vn_vm))
 		return VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK;
 	/* Just delete the mapping, so it has to be re-created, at which
-	 * point all of the intended copy-on-write mechanics will take
+	 * point all of the  intended copy-on-write mechanics will  take
 	 * place. */
 	addr = vm_node_getaddr(self);
 	size = vm_node_getsize(self);
@@ -3068,7 +3068,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 			}
 		}
 		/* By simply deleting the write-permission bit when it is set,
-		 * we can drastically reduce the number of required #PFs */
+		 * we can  drastically  reduce  the number  of  required  #PFs */
 #ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 		pagedir_denywrite(addr, size);
 #else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
@@ -3085,7 +3085,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 			}
 		}
 		/* By simply deleting the write-permission bit when it is set,
-		 * we can drastically reduce the number of required #PFs */
+		 * we can  drastically  reduce  the number  of  required  #PFs */
 #ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 		pagedir_denywrite_p(pdir, addr, size);
 #else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
@@ -3100,7 +3100,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 }
 
 /* Same as `vm_node_update_write_access()', but the caller
- * is already holding a write-lock to `locked_vm' */
+ * is  already   holding  a   write-lock  to   `locked_vm' */
 PUBLIC NOBLOCK unsigned int
 NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict self,
                                                      struct vm *__restrict locked_vm) {
@@ -3112,7 +3112,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		return VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK;
 
 	/* Just delete the mapping, so it has to be re-created, at which
-	 * point all of the intended copy-on-write mechanics will take
+	 * point all of the  intended copy-on-write mechanics will  take
 	 * place. */
 	addr = vm_node_getaddr(self);
 	size = vm_node_getsize(self);
@@ -3126,7 +3126,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 			}
 		}
 		/* By simply deleting the write-permission bit when it is set,
-		 * we can drastically reduce the number of required #PFs */
+		 * we can  drastically  reduce  the number  of  required  #PFs */
 #ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 		pagedir_denywrite(addr, size);
 #else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
@@ -3144,7 +3144,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 			}
 		}
 		/* By simply deleting the write-permission bit when it is set,
-		 * we can drastically reduce the number of required #PFs */
+		 * we can  drastically  reduce  the number  of  required  #PFs */
 #ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 		pagedir_denywrite_p(pdir, addr, size);
 #else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
@@ -3160,7 +3160,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 }
 
 
-/* Insert the given node into its associated VM (self->vn_vm)
+/* Insert  the  given  node  into  its  associated  VM   (self->vn_vm)
  * NOTE: The caller must be holding a write-lock to the associated VM. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
@@ -3340,7 +3340,7 @@ INTERN void KCALL vm_assert(void) {
 #endif
 
 
-/* Get the node associated with the given `page'
+/* Get  the  node   associated  with   the  given   `page'
  * NOTE: The caller must be holding a read-lock on `self'. */
 PUBLIC NOBLOCK struct vm_node *
 NOTHROW(FCALL vm_getnodeofpageid)(struct vm *__restrict self, pageid_t page) {
@@ -3353,7 +3353,7 @@ NOTHROW(FCALL vm_getnodeofpageid)(struct vm *__restrict self, pageid_t page) {
 
 
 /* Check if some part of the given address range is currently in use.
- * NOTE: The caller must be holding a read-lock on `self'. */
+ * NOTE: The  caller  must   be  holding  a   read-lock  on   `self'. */
 PUBLIC NOBLOCK WUNUSED bool
 NOTHROW(FCALL vm_paged_isused)(struct vm *__restrict self,
                                pageid_t min_page,
@@ -3426,8 +3426,8 @@ DECL_BEGIN
 
 
 
-/* Sync changes made to file mappings within the given address
- * range with on-disk file images. (s.a. `vm_datablock_sync()')
+/* Sync  changes  made  to  file  mappings  within  the  given address
+ * range   with  on-disk  file  images.  (s.a.  `vm_datablock_sync()')
  * NOTE: Memory ranges that aren't actually mapped are simply ignored.
  * @return: * : The number of sychronozed bytes. (yes: those are bytes and not pages) */
 PUBLIC u64 FCALL
@@ -3476,7 +3476,7 @@ again:
 			partrel_maxpageid   = (size_t)(used_maxpageid - node_minpageid);
 			partrel_mindatapage = partrel_minpageid << VM_DATABLOCK_PAGESHIFT(iter->vn_block);
 			partrel_maxdatapage = ((partrel_maxpageid + 1) << VM_DATABLOCK_PAGESHIFT(iter->vn_block)) - 1;
-			/* Do a full check for any changes within the given range.
+			/* Do a full  check for  any changes within  the given  range.
 			 * If there are none, don't unlock the VM, but simply continue
 			 * searching for any changes that may need to be synced. */
 			if (!vm_datapart_haschanged(part, partrel_mindatapage, partrel_maxdatapage))
@@ -3492,14 +3492,14 @@ again:
 				                                        partrel_mindatapage,
 				                                        partrel_maxdatapage);
 			}
-			/* Keep track of the number of actually synced bytes.
+			/* Keep track  of  the  number  of  actually  synced  bytes.
 			 * We use bytes for this as it represents a common base-line
-			 * in terms of `VM_DATABLOCK_PAGESHIFT()' vs. `PAGESIZE' */
+			 * in terms  of  `VM_DATABLOCK_PAGESHIFT()'  vs.  `PAGESIZE' */
 			result += (u64)num_synced_datapages << addrshift;
 			/* NOTE: We don't do a check `if (used_maxpage >= maxpage) break;', because
-			 *       the associated data part may have been truncated or replaced with
-			 *       a different mapping since we've unlocked the VM, meaning that in
-			 *       order to safely sync everything, we can only really truncate the
+			 *       the  associated data part may have been truncated or replaced with
+			 *       a different mapping since we've  unlocked the VM, meaning that  in
+			 *       order to safely sync everything,  we can only really truncate  the
 			 *       start of the search area. */
 			if (minpage < used_minpageid)
 				minpage = used_minpageid;

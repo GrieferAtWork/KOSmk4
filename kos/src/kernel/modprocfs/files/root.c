@@ -71,7 +71,7 @@ ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
 				}
 #endif /* !NDEBUG */
 				/* NOTE: We can't actually trust user-space that `hash' is valid, since
-				 *       the user may have changed the string in the mean time... */
+				 *       the  user  may have  changed the  string  in the  mean time... */
 				result->de_hash = directory_entry_hash(result->de_name, namelen);
 				result->de_ino  = PROCFS_INOMAKE_PERPROC(pidno, PROCFS_PERPROC_ROOT);
 				result->de_type = DT_DIR;

@@ -110,8 +110,8 @@ PUBLIC CALLBACK_LIST(void FCALL(struct vm * /*newvm*/, struct vm * /*oldvm*/))
 vm_onclone_callbacks = CALLBACK_LIST_INIT;
 
 /* Clone the given VM `self'
- * NOTE: The clone operation is performed atomically, meaning that
- *       this function guaranties that at one point both `self' and
+ * NOTE: The clone operation  is performed  atomically, meaning  that
+ *       this function guaranties that at  one point both `self'  and
  *       the returned VM contained perfectly identical mappings, even
  *       if during the course of this function operating the mappings
  *       contained within `self' are being changed.
@@ -160,7 +160,7 @@ again_lock_vm:
 			if (node_part) {
 				pointer_set_assert_writing_vm_dataparts(&locked_parts);
 				/* Acquire a lock to the associated data part (if this is
-				 * the first time that the associated part has come up). */
+				 * the first time that the associated part has come  up). */
 				error = pointer_set_insert_nx(&locked_parts,
 				                              node_part,
 				                              GFP_ATOMIC);
@@ -194,7 +194,7 @@ again_lock_vm:
 					/* This one's a new data part. -> Must lock it the first time around! */
 					if (!sync_trywrite(node_part)) {
 						/* Failed to acquire a lock. -> Unlock all already locked parts, and
-						 * acquire a blocking lock to this one. Then, try again. */
+						 * acquire  a  blocking   lock  to  this   one.  Then,  try   again. */
 						incref(node_part);
 						pointer_set_unlock_vm_dataparts_and_clear_except(&locked_parts,
 						                                                 node_part);
@@ -215,10 +215,10 @@ again_lock_vm:
 					struct vm *blocking_vm;
 					if (node_part->dp_crefs == NULL) {
 						struct vm_node *iter;
-						/* The addition of the first copy-on-write mapping requires
-						 * that all existing SHARED memory mappings be updated to
-						 * not include write permissions in their page directories.
-						 * That way, a #PF will be triggered which will then unshare
+						/* The  addition of the  first copy-on-write mapping requires
+						 * that all  existing SHARED  memory mappings  be updated  to
+						 * not  include write permissions  in their page directories.
+						 * That  way, a #PF will be triggered which will then unshare
 						 * our own data part, preventing writes to the shared mapping
 						 * from leaking into private mappings. */
 						for (iter = node_part->dp_srefs; iter;
@@ -231,7 +231,7 @@ again_lock_vm:
 						}
 					} else if (node_part->dp_crefs->vn_link.ln_next == NULL &&
 					           /* If this is the second copy-on-write mapping of an anonymous data part,
-					            * then the first one may have had write permissions which must now be
+					            * then the first one  may have had write  permissions which must now  be
 					            * unshared (this is the case for general purpose RAM during fork()) */
 					           ATOMIC_READ(node_part->dp_block->db_parts) == MFILE_PARTS_ANONYMOUS) {
 						error = vm_node_update_write_access_locked_vm(node_part->dp_crefs, self);
@@ -286,7 +286,7 @@ handle_remove_write_error:
 
 		assert(node_alloc_count >= node_req_count);
 		/* At this point we've got locks to all of the mapped data parts,
-		 * as well as having allocated a sufficient number of nodes.
+		 * as well  as having  allocated a  sufficient number  of  nodes.
 		 * -> Now to duplicate everything all at once. */
 		/* |------ Pointer of no return */
 
@@ -330,7 +330,7 @@ handle_remove_write_error:
 			        (uintptr_t)vm_node_getstartpageid(resnode),
 			        (uintptr_t)vm_node_getendpageid(resnode));
 			if (resnode->vn_flags & VM_NODE_FLAG_PREPARED) {
-				/* Try to keep already prepared nodes also prepared within the VM clone.
+				/* Try  to keep  already prepared nodes  also prepared within  the VM clone.
 				 * However, if this fails, just ignore the error and unset the PREPARED bit. */
 				if (!pagedir_prepare_p(result->v_pdir_phys,
 				                       vm_node_getaddr(resnode),

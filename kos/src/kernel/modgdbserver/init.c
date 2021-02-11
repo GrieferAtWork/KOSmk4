@@ -44,7 +44,7 @@ DECL_BEGIN
 
 /* [1..1][const]
  * The fallback host thread used to drive the GDB server in the event
- * of the GDB remote being the one to instigate an exchange (such as
+ * of the GDB remote being the one to instigate an exchange (such  as
  * sending a \3-byte to stop system-wide execution) */
 INTERN REF struct task *GDBServer_FallbackHost = NULL;
 
@@ -84,9 +84,9 @@ PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 	if (!vfs_kernel.p_inode) {
-		/* TODO: If `modgdbserver' is loaded as a boot module, delay initialization
+		/* TODO: If `modgdbserver' is  loaded as a  boot module, delay  initialization
 		 *       until after the root partition has been mounted. - That way, a remote
-		 *       gdb driver will be able to immediately access the file system, once
+		 *       gdb driver will be able to  immediately access the file system,  once
 		 *       becoming attached. */
 	}
 	TRY {
@@ -124,11 +124,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		printk(FREESTR(KERN_INFO "[gdb] Client attached (unlock kernel access & simulate fork())\n"));
 		/* Expose the kernel core to the GDB remote, and simulate a fork()
 		 * -> As far as GDB is concerned, the kernel core is a child of /bin/init
-		 * NOTE: This hacky work-around is required because GDB will $h1t itself during
+		 * NOTE: This  hacky work-around is  required because GDB  will $h1t itself during
 		 *       initialization if it sees more than one process (in this case `/bin/init'
 		 *       and `kernel') already attached when starting
 		 *
-		 * With this in mind, loading the GDB driver produces the
+		 * With this  in mind,  loading the  GDB driver  produces  the
 		 * following sequence of events (as seen from the GDB remote):
 		 * #1:attach: [1:kernel]
 		 * #2:fork(): [1:kernel] -> [1:kernel,7fffffff:kernel]

@@ -160,18 +160,18 @@ clear_unused_but_allocated_handle_vector_tail(struct handle *__restrict vector,
 	used_size  = alloc * sizeof(struct handle);
 	alloc_size = kmalloc_usable_size(vector);
 	assert(used_size <= alloc_size);
-	/* The handle manager relies on the fact that trailing memory within
-	 * the handle vector is zero-initialized, so that future realloc()
-	 * calls are able to extend the vector, and already have the new
-	 * area pre-initialized by passing GFP_CALLOC to krealloc()
-	 * However, if GFP_CALLOC wasn't passed during the original allocation
+	/* The  handle manager relies  on the fact  that trailing memory within
+	 * the handle  vector is  zero-initialized,  so that  future  realloc()
+	 * calls  are  able to  extend  the vector,  and  already have  the new
+	 * area   pre-initialized   by   passing   GFP_CALLOC   to   krealloc()
+	 * However, if GFP_CALLOC wasn't passed during the original  allocation
 	 * of the vector, then there might be some hidden portion of the vector
-	 * that still contains undefined memory when kmalloc() overallocated
+	 * that still contains  undefined memory  when kmalloc()  overallocated
 	 * by a tiny amount.
 	 * In this case, manually zero-initialize that portion of memory during
 	 * the initial init.
 	 * NOTE: This is only required when GFP_CALLOC wasn't used to allocate
-	 *       the original handle vector, as is the case within CLONE() */
+	 *       the  original handle  vector, as  is the  case within CLONE() */
 	memset((byte_t *)vector + used_size, 0, alloc_size - used_size);
 }
 #else /* HANDLE_TYPE_UNDEFINED == 0 */
@@ -369,7 +369,7 @@ check_new_alloc_linear:
 			result->hm_minfree               = self->hm_minfree;
 			if (self->hm_clofork_count) {
 				/* Delete all entries referring to handles
-				 * that were closed due to forking. */
+				 * that  were  closed   due  to   forking. */
 				for (i = 0; i <= count; ++i) {
 					unsigned int vecid;
 					if (map[i].hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
@@ -562,7 +562,7 @@ handle_manager_cloexec(struct handle_manager *__restrict self)
 		return;
 	}
 
-	/* NOTE: It's OK if this allocation fails. - decref() must be NOBLOCK, so we
+	/* NOTE: It's OK if this allocation fails. - decref() must be NOBLOCK, so  we
 	 *       can theoretically even invoke it whilst holding a lock to `hm_lock'.
 	 *       However, it may be less efficient to do so, so we try not to... */
 	delete_vector = (struct handle *)kmalloc_nx(cloexec_count * sizeof(struct handle),
@@ -706,7 +706,7 @@ NOTHROW(FCALL handle_manager_try_downhash)(struct handle_manager *__restrict sel
 		if (!new_hashvec)
 			goto check_truncate_hashvec;
 		/* Fill the new hash-vector with all 0xff (which causes all handle ids
-		 * to become `HANDLE_HASHENT_SENTINEL_ID', indicating availability) */
+		 * to become  `HANDLE_HASHENT_SENTINEL_ID',  indicating  availability) */
 		memset(new_hashvec, 0xff, (new_mask + 1) * sizeof(struct handle_hashent));
 
 		/* Re-hash the current handle vector. */
@@ -719,7 +719,7 @@ NOTHROW(FCALL handle_manager_try_downhash)(struct handle_manager *__restrict sel
 			if (ent.hh_vector_index == (unsigned int)-1)
 				continue; /* Deleted entry. */
 			/* Keep track of the max FD number, so we can decide
-			 * if we wish to switch over to linear mode. */
+			 * if  we  wish  to  switch  over  to  linear  mode. */
 			if (max_fd_number < ent.hh_vector_index)
 				max_fd_number = ent.hh_vector_index;
 			j = perturb = ent.hh_vector_index & new_mask;
@@ -774,7 +774,7 @@ NOTHROW(FCALL handle_manager_try_downhash)(struct handle_manager *__restrict sel
 		kfree(self->hm_hashvector.hm_hashvec);
 		self->hm_hashvector.hm_hashvec = new_hashvec;
 		self->hm_hashvector.hm_hashmsk = new_mask;
-		/* All of the deleted handles have been removed, meaning that
+		/* All of the deleted handles have been removed, meaning  that
 		 * the amount of used entires now matches the amount of mapped
 		 * handles. */
 		self->hm_hashvector.hm_hashuse = self->hm_count;
@@ -1100,8 +1100,8 @@ do_delete_handle:
 }
 
 /* Close all open file handles `>= startfd' and return how many were actually closed.
- * If nothing was closed at all (i.e. what would be `return == 0'), then this
- * function returns by throwing an `E_INVALID_HANDLE_FILE' (-EBADF) exception. */
+ * If  nothing  was closed  at  all (i.e.  what  would be  `return == 0'),  then this
+ * function  returns  by  throwing  an  `E_INVALID_HANDLE_FILE'  (-EBADF)  exception. */
 PUBLIC NONNULL((2)) unsigned int FCALL
 handle_closefrom_nosym(unsigned int startfd,
                        struct handle_manager *__restrict self)
@@ -1157,10 +1157,10 @@ again_scan:
 					if (!was_thrown(E_INVALID_HANDLE)) {
 						if (fd == startfd)
 							goto done; /* No more handles >= startfd */
-						/* Check again if we're missed something, or
-						 * if another thread created a new handle in
+						/* Check again  if we're  missed something,  or
+						 * if another thread  created a  new handle  in
 						 * the mean time (this is the part I don't like
-						 * about the current implementation: it's non-
+						 * about the current implementation: it's  non-
 						 * atomic when it could actually be atomic) */
 						goto again_scan;
 					}
@@ -1214,11 +1214,11 @@ throw_f_next_unallocated:
 			++result;
 		}
 	} else if (handle_manager_hashvector_isvalid(self, startfd)) {
-		/* Simple (and pretty likely) case: the given FD exists.
-		 * Given the use case of this fcntl to iterate over one's
-		 * file descriptor table to find open files, and given the
+		/* Simple (and  pretty likely)  case: the  given FD  exists.
+		 * Given  the use case  of this fcntl  to iterate over one's
+		 * file descriptor table to find  open files, and given  the
 		 * possibility that `fd - 1' had already been tested before,
-		 * then it stands to reason that some cluster of allocated
+		 * then it stands to reason  that some cluster of  allocated
 		 * files has a size that is greater than 1:
 		 * >> int fd = -1;
 		 * >> while ((fd = fcntl(fd + 1, F_NEXT)) >= 0) {
@@ -1279,7 +1279,7 @@ throw_f_next_unallocated:
 
 /* Switch operations mode to hash-vector for `self'
  * The caller is required to be holding a write-lock before calling this function.
- * The given `handle_number' is the handle which caused the question of change to
+ * The given `handle_number' is the handle which caused the question of change  to
  * be brought up, and it is this function's decision if the change should happen.
  * @return: * : One of `HANDLE_MANAGE_SWITCH_TO_HASHMODE_FOR_HANDLE_*'
  * NOTE: When this function returns by throwing an exception, the caller's lock
@@ -1338,7 +1338,7 @@ handle_manage_switch_to_hashmode_for_handle(struct handle_manager *__restrict se
 			}
 			/* Initially, all existing linear handles map onto themself 1-to-1
 			 * This is only distorted later when by `handle_manager_flatten_handle_vector()',
-			 * or by future use of the handle manager for the purpose of allocating more
+			 * or by future  use of the  handle manager  for the purpose  of allocating  more
 			 * handles. */
 			map[i].hh_handle_id    = i;
 			map[i].hh_vector_index = i;
@@ -1379,7 +1379,7 @@ handle_manage_rehash(struct handle_manager *__restrict self)
 	assert(sync_writing(&self->hm_lock));
 	assert(self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR);
 	/* Check if rehashing is even required, as opposed to the hash-table
-	 * already being large enough to easily house an additional handle. */
+	 * already being large enough to easily house an additional  handle. */
 	if (!(self->hm_hashvector.hm_hashmsk <= ((self->hm_hashvector.hm_hashuse + 1) * 3) / 2))
 		return HANDLE_MANAGE_REHASH_UNCHANGED_LOCKED;
 	result = HANDLE_MANAGE_REHASH_REHASHED_LOCKED;
@@ -1459,7 +1459,7 @@ handle_installinto(struct handle_manager *__restrict self,
 
 /* Lookup a given fd-number and return the associated handle.
  * NOTE: When `fd' doesn't refer to a valid handle, the returned
- *       handle has its type set to `HANDLE_TYPE_UNDEFINED'.
+ *       handle  has  its type  set  to `HANDLE_TYPE_UNDEFINED'.
  * NOTE: This function also handles symbolic file descriptors!
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
 PUBLIC WUNUSED REF struct handle FCALL
@@ -1645,7 +1645,7 @@ handle_lookup_nosym(unsigned int fd)
 }
 
 /* Lookup the pointer to a given handle.
- * NOTE: The caller required to acquire a read/write-lock before
+ * NOTE: The  caller required to acquire a read/write-lock before
  *       calling this function. When an exception is thrown, that
  *       lock will have already been released.
  * NOTE: Upon success, that lock is kept. */
@@ -2316,8 +2316,8 @@ handle_fcntl(struct handle_manager *__restrict self,
 
 	case F_CLOSEM:
 		/* Close all handles `>= fd'
-		 * KOS returns the actual number of closed files, however given
-		 * that this fcntl doesn't have very large support, this behavior
+		 * KOS returns the  actual number of  closed files, however  given
+		 * that this fcntl doesn't have very large support, this  behavior
 		 * may differ on those few other platforms that actually implement
 		 * this command. */
 		result = handle_closefrom_nosym(fd, self);
@@ -2360,7 +2360,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 
 
 /* Do everything required to install a handle via a open openfd
- * command data packet that has been passed via user-space. */
+ * command data  packet that  has been  passed via  user-space. */
 PUBLIC NONNULL((2)) unsigned int FCALL
 handle_installhop(USER UNCHECKED struct hop_openfd *data,
                   struct handle const *__restrict hnd)

@@ -56,7 +56,7 @@ typedef __CRT_PRIVATE_UINT(__SIZEOF_SUSECONDS_T__) unsigned_suseconds_t;
 PUBLIC ATTR_PERTASK ktime_t this_starttime = 0;
 
 /* [lock(PRIVATE(THIS_CPU))]
- * Timestamp of the last time this thread was last preempted.
+ * Timestamp of the last time  this thread was last  preempted.
  * Used to implement thread priorities, where a thread with the
  * lowest `this_stoptime' will be the one to get executed next.
  *
@@ -118,11 +118,11 @@ do128:
 
 
 
-/* Interrupt handler for implementing realtime() re-syncing.
- * This function should call `tsc_resync_realtime()' to retrieve the
+/* Interrupt  handler   for   implementing   realtime()   re-syncing.
+ * This  function should call `tsc_resync_realtime()' to retrieve the
  * current realtime, as read from some external clock-source that can
- * be relied upon, at which point it should calculate the delta and
- * relative error with the kernel's TSC-based idea of what realtime
+ * be relied upon, at which point  it should calculate the delta  and
+ * relative error with the kernel's  TSC-based idea of what  realtime
  * should be.
  * @param: new_ktime: The new RTC time (as returned by `tsc_resync_realtime()') */
 PUBLIC NOBLOCK NOPREEMPT void
@@ -140,7 +140,7 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	for (;;) {
 		ktime_t temp;
 		/* Get a TSC value, and ensure it corresponds to a consistent `curr_ktime'
-		 * Ensure this by getting one that points to the same RTC time slice. */
+		 * Ensure this by  getting one  that points to  the same  RTC time  slice. */
 		now.ts_tsc = tsc_get(me);
 		temp       = tsc_resync_realtime();
 		if (temp == now.ts_kt)
@@ -237,8 +237,8 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	/* Our currently used HZ value wasn't correct.
 	 * We must clamp it to the nearest valid HZ value, and re-calculate `thiscpu_basetime'
 	 * to point to the nearest valid location on a line with an angle of the new HZ value,
-	 * and drawn through some point within the `thiscpu_startup' range.
-	 * This can easily be done by clamping `thiscpu_basetime' to some value within the
+	 * and   drawn   through    some   point   within    the   `thiscpu_startup'    range.
+	 * This can easily  be done by  clamping `thiscpu_basetime' to  some value within  the
 	 * range described by now...+=tsc_realtime_err
 	 *
 	 * TSC
@@ -284,9 +284,9 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 		}
 	}
 
-	/* Set the baseline CPU timestamp to follow the linear vector from the
+	/* Set the baseline CPU timestamp to follow the linear vector from  the
 	 * CPU startup timestamp, all the way to the current point in time that
-	 * still falls into the margin of error, and is closest to what we've
+	 * still  falls into the margin of error,  and is closest to what we've
 	 * assumed to be the case until this point. */
 	FORCPU(me, thiscpu_basetime.ts_kt)  = cpu_now;
 	FORCPU(me, thiscpu_basetime.ts_tsc) = now.ts_tsc;
@@ -307,11 +307,11 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 			       hz,
 			       increase ? "fast" : "slow");
 		}
-		/* TODO: When TSC_HZ changes, we should probably re-calculate the
-		 *       current TSC deadline by re-doing the deadline calculation
+		/* TODO: When  TSC_HZ  changes,  we  should  probably  re-calculate the
+		 *       current  TSC  deadline  by re-doing  the  deadline calculation
 		 *       code as documented at the top of <sched/scheduler.h>, starting
 		 *       at `TSC_DEAD = KTIME_TO_TSC(DEADLINE);'
-		 * NOTE: For this case, we also need the ability to immediately
+		 * NOTE: For this case,  we also need  the ability to  immediately
 		 *       perform a thread switch, which is something that we can't
 		 *       do right here, since our caller may need to do additional
 		 *       hardware cleanup related to this function being called as
@@ -405,25 +405,25 @@ NOTHROW(FCALL tsc_to_ktime)(struct cpu const *__restrict me,
 	return result;
 }
 
-/* Fix a TSC HZ calculation overflow by advancing both
+/* Fix a  TSC  HZ  calculation overflow  by  advancing  both
  * `thiscpu_basetime.ts_kt' and `thiscpu_basetime.ts_tsc' in
  * order to shrink offsets.
  *
- * When running under QEMU, this function needs to be
- * about every 16 seconds, as the result of the value of
+ * When running  under QEMU,  this  function needs  to  be
+ * about every 16 seconds, as  the result of the value  of
  * `tsc_elapsed * 1000000000' (1000000000 == NSEC_PER_SEC)
  * overflowing a 64-bit value.
  *
- * Also note that on QEMU, it appears as though the 100%
- * perfect HZ counter is also `1000000000' (at least for
- * me), so by doing `1000000000**2', you get the result of
- * `0x0de0b6b3a7640000', which you can multiply by 16 to
- * get `0xde0b6b3a76400000'. But trying to add yet another
- * instance of `1000000000**2' will result in an overflow,
+ * Also note that  on QEMU,  it appears as  though the  100%
+ * perfect HZ  counter is  also `1000000000'  (at least  for
+ * me), so by doing `1000000000**2',  you get the result  of
+ * `0x0de0b6b3a7640000',  which  you can  multiply by  16 to
+ * get  `0xde0b6b3a76400000'. But trying  to add yet another
+ * instance  of `1000000000**2' will  result in an overflow,
  * thus resulting in the 16-second interval mentioned above.
  *
  * WARNING: Don't add any printk() to this function. Doing so
- *          will result in an infinite loop caused by printk
+ *          will result in an infinite loop caused by  printk
  *          calling realtime()->ktime()->tsc_now_to_ktime()->tsc_fix_overflow()
  */
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
@@ -439,7 +439,7 @@ NOTHROW(FCALL tsc_fix_overflow)(struct cpu *__restrict me,
 	FORCPU(me, thiscpu_basetime.ts_kt) += seconds * NSEC_PER_SEC;
 	FORCPU(me, thiscpu_basetime.ts_tsc) += tsc_seconds;
 	if unlikely(!seconds) {
-		/* The value of `thiscpu_tsc_hz' is so great that we can't adjust
+		/* The value of `thiscpu_tsc_hz' is  so great that we can't  adjust
 		 * whole seconds. - Instead, we must sacrifice precision and adjust
 		 * by nanoseconds. */
 		ktime_t nanoseconds;
@@ -459,9 +459,9 @@ NOTHROW(FCALL tsc_fix_overflow)(struct cpu *__restrict me,
 	}
 }
 
-/* Same as `tsc_to_ktime()', but the caller guaranties that `now' is an actual
- * timestamp that elapsed in the near past. Unlike `tsc_to_ktime()', this function
- * is allowed to assume that `now >=' any previously passed value for `now', since
+/* Same as `tsc_to_ktime()',  but the  caller guaranties  that `now'  is an  actual
+ * timestamp  that elapsed in the near past. Unlike `tsc_to_ktime()', this function
+ * is allowed to assume that `now >=' any previously passed value for `now',  since
  * the CPU was last initialized, also allowing it to move the internal TSC-to-KTIME
  * baseline forwards in order to account for offset overflows. */
 PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) ktime_t
@@ -487,7 +487,7 @@ hz_overflow:
 
 /* Convert a given `kt' timestamp into its TSC equivalent.
  * When `kt' lies so far into the future that TSC would overflow, return `TSC_MAX' instead.
- * NOTE: It is assumed that return >= <any `now' ever passed to `tsc_now_to_ktime'> */
+ * NOTE: It is  assumed  that return  >=  <any  `now' ever  passed  to  `tsc_now_to_ktime'> */
 PUBLIC NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) tsc_t
 NOTHROW(FCALL ktime_future_to_tsc)(struct cpu const *__restrict me,
                                    ktime_t kt) {
@@ -591,10 +591,10 @@ NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
 
 
 /* Return the current kernel time (in nano seconds since `boottime')
- * WARNING: The results of this function may be inconsistent when called
+ * WARNING: The results of  this function may  be inconsistent when  called
  *          from different CPUs (CPU#2 may return a lower value after CPU#1
  *          already returned a greater value)
- *          If this is a problem, you should instead use `ktime_stable()',
+ *          If  this  is a  problem,  you should  instead  use `ktime_stable()',
  *          but not that for timeouts and the like, the scheduler uses `ktime()'
  * NOTE: This function is the same as doing `tsc_now_to_ktime(tsc_now())' while
  *       having preemption disabled. */
@@ -625,7 +625,7 @@ NOTHROW(KCALL ktime_stable)(void) {
 	 *   #1: The clock was changed externally
 	 *   #2: The TSC counter was suspended via external means (e.g. an attached debugger)
 	 *   #3: A minor discrepancy between the timestamps of different CPUs
-	 *       XXX: Research how an OS can minimize these discrepancies!
+	 *       XXX: Research how an  OS can  minimize these  discrepancies!
 	 */
 	for (;;) {
 		u64 oldval;
@@ -648,7 +648,7 @@ DATDEF struct timespec boottime_ ASMNAME("boottime");
 PUBLIC struct timespec boottime_ = { 0, 0 };
 
 /* Convert a given ktime timestamp into a `struct timespec'.
- * This is done by adding `boottime' to the given value. */
+ * This  is done  by adding  `boottime' to  the given value. */
 PUBLIC NOBLOCK WUNUSED ATTR_PURE struct timespec
 NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
 	struct timespec result;
@@ -658,14 +658,14 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
 	return result;
 }
 
-/* Convert a given `struct timespec' into a ktime timestamp.
+/* Convert a given  `struct timespec' into  a ktime  timestamp.
  * This is done by subtracting `boottime' from the given value.
- * NOTE: When the given timestamp `abs_timestamp' points at, or before
+ * NOTE: When the  given  timestamp  `abs_timestamp' points  at,  or  before
  *       `boottime', then this function will return `0', as it is impossible
- *       to represent a ktime-timestamp that happened before the system
+ *       to represent  a ktime-timestamp  that  happened before  the  system
  *       goto booted.
  * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
- *       that the return value would overflow, the value is clamed to the
+ *       that  the return  value would overflow,  the value is  clamed to the
  *       maximum possible value of `KTIME_INFINITE' */
 PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp) {
@@ -682,12 +682,12 @@ NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp
 	 *
 	 * This is required for situations where an absolute
 	 * timeout value is specified as a 0-timespec, which
-	 * should then be handled as a request to time-out
+	 * should then be handled  as a request to  time-out
 	 * immediately. */
 	if unlikely(diff.tv_sec < 0)
 		return 0;
 
-	/* If the ktime timestamp value overflows, clamp it to its max
+	/* If the  ktime timestamp  value overflows,  clamp it  to its  max
 	 * possible value, which other scheduling components will interpret
 	 * as an infinite timeout. */
 	if (OVERFLOW_UMUL((ktime_t)diff.tv_sec, NSEC_PER_SEC, &result))
@@ -702,13 +702,13 @@ infinite:
 
 /* Returns the current real time derived from the current CPU time.
  * WARNING: KOS only gives a best-effort guaranty for this function
- *          in terms of consistency when it comes to the calling
+ *          in terms of  consistency when it  comes to the  calling
  *          thread being moved to a different CPU.
  *          There is a chance that minor inconsistencies in terms
  *          of exact nano-second values returned by this function
  *          when the calling thread is moved.
- * However, it is guarantied that (so long as `settimeofday()' isn't
- * called), calling this function repeatedly from the threads hosted
+ * However, it is guarantied that (so long as `settimeofday()'  isn't
+ * called), calling this function repeatedly from the threads  hosted
  * by the same CPU will _always_ return values such that later values
  * are >= earlier values. */
 PUBLIC NOBLOCK WUNUSED struct timespec
@@ -717,17 +717,17 @@ NOTHROW(KCALL realtime)(void) {
 }
 
 
-/* Similar to the functions above, but return a relative time.
- * e.g. When `rel_time->tv_sec = 1, rel_time->tv_nsec = 7',
- * then this function simply return `1 * USEC_PER_SEC + 7'.
- * Note however that if `rel_time->tv_sec < 0', or the result
- * of the multiplication+addition above would overflow, then
+/* Similar to the  functions above, but  return a relative  time.
+ * e.g.    When    `rel_time->tv_sec = 1, rel_time->tv_nsec = 7',
+ * then  this  function  simply  return   `1 * USEC_PER_SEC + 7'.
+ * Note  however  that if  `rel_time->tv_sec < 0', or  the result
+ * of the  multiplication+addition  above  would  overflow,  then
  * this function will clamp the return value to `KTIME_INFINITE'. */
 PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time) {
 	ktime_t result;
-	/* NOTE: No need to check for negative `rel_time->tv_sec'. If that
-	 *       is the case, then we can be sure that an unsigned multiply
+	/* NOTE: No need  to check  for negative  `rel_time->tv_sec'. If  that
+	 *       is  the case, then  we can be sure  that an unsigned multiply
 	 *       with a value as large as `NSEC_PER_SEC' will always overflow. */
 	if (OVERFLOW_UMUL((unsigned_time_t)rel_time->tv_sec,
 	                  NSEC_PER_SEC, &result))

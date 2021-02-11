@@ -60,7 +60,7 @@ struct in_addr {
    <http://www.gnu.org/licenses/>.  */
 
 /* Options for use with `getsockopt' and `setsockopt' at the IP level.
- * The first word in the comment at the right is the data type used;
+ * The first word in the comment at  the right is the data type  used;
  * "bool" means a boolean value stored in an `int'. */
 #define IP_OPTIONS                4  /* ip_opts; IP per-packet options. */
 #define IP_HDRINCL                3  /* int; Header is included with data. */
@@ -124,7 +124,7 @@ struct in_addr {
 #define IP_PMTUDISC_DO        2 /* Always DF. */
 #define IP_PMTUDISC_PROBE     3 /* Ignore dst pmtu. */
 #define IP_PMTUDISC_INTERFACE 4 /* Always use interface mtu (ignores dst pmtu) but don't set DF flag.
-                                 * Also incoming ICMP frag_needed notifications will be ignored on
+                                 * Also incoming ICMP  frag_needed notifications will  be ignored  on
                                  * this socket to prevent accepting spoofed ones. */
 #define IP_PMTUDISC_OMIT      5 /* Like IP_PMTUDISC_INTERFACE but allow packets to be fragmented. */
 
@@ -137,7 +137,7 @@ struct in_addr {
 #ifdef __CC__
 #ifdef __USE_MISC
 /* Structure used to describe IP options for IP_OPTIONS and IP_RETOPTS.
- * The `ip_dst' field is used for the first-hop gateway when using a
+ * The  `ip_dst' field is  used for the first-hop  gateway when using a
  * source route (this gets put into the header proper). */
 struct ip_opts {
 	struct in_addr ip_dst;      /* First hop; zero without source route. */
@@ -161,7 +161,7 @@ struct in_pktinfo {
 #endif /* __CC__ */
 
 /* Options for use with `getsockopt' and `setsockopt' at the IPv6 level.
- * The first word in the comment at the right is the data type used;
+ * The first word in  the comment at  the right is  the data type  used;
  * "bool" means a boolean value stored in an `int'. */
 #define IPV6_ADDRFORM       1
 #define IPV6_2292PKTINFO    2

@@ -100,7 +100,7 @@ vm_copyfromphys(USER CHECKED void *dst,
 			       page_bytes);
 		} EXCEPT {
 			/* Try-catch is required, because `dst' may be a user-buffer,
-			 * in which case access may cause an exception to be thrown. */
+			 * in  which case access may cause an exception to be thrown. */
 			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
@@ -154,7 +154,7 @@ vm_copytophys(PHYS physaddr_t dst,
 			       page_bytes);
 		} EXCEPT {
 			/* Try-catch is required, because `src' may be a user-buffer,
-			 * in which case access may cause an exception to be thrown. */
+			 * in  which case access may cause an exception to be thrown. */
 			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
@@ -309,9 +309,9 @@ NOTHROW(KCALL vm_copyinphys)(PHYS physaddr_t dst,
 	if unlikely(!num_bytes)
 		return;
 	bufsize = get_stack_avail();
-	/* `512*(4|8)' bytes is more than enough of a reservation to
+	/* `512*(4|8)' bytes is more than  enough of a reservation  to
 	 * be made, considering that the #PF handler for is guarantied
-	 * to never actually be called because of us, since `buf' is
+	 * to never actually be called  because of us, since `buf'  is
 	 * allocated on a kernel stack, where kernel stacks are always
 	 * LOCKED into memory. */
 	if (bufsize <= 512 * sizeof(void *)) {
@@ -425,7 +425,7 @@ vm_copyfromphys_onepage(USER CHECKED void *dst,
 		       num_bytes);
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
-		 * in which case access may cause an exception to be thrown. */
+		 * in  which case access may cause an exception to be thrown. */
 		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
@@ -458,7 +458,7 @@ vm_copytophys_onepage(PHYS physaddr_t dst,
 		       num_bytes);
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
-		 * in which case access may cause an exception to be thrown. */
+		 * in  which case access may cause an exception to be thrown. */
 		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
@@ -495,9 +495,9 @@ NOTHROW(KCALL vm_copyinphys_onepage)(PHYS physaddr_t dst,
 #endif /* !NO_PHYS_IDENTITY */
 	/* Copy data using a temporary buffer. */
 	bufsize = get_stack_avail();
-	/* `512*(4|8)' bytes is more than enough of a reservation to
+	/* `512*(4|8)' bytes is more than  enough of a reservation  to
 	 * be made, considering that the #PF handler for is guarantied
-	 * to never actually be called because of us, since `buf' is
+	 * to never actually be called  because of us, since `buf'  is
 	 * allocated on a kernel stack, where kernel stacks are always
 	 * LOCKED into memory. */
 	if (bufsize <= 512 * sizeof(void *)) {
@@ -626,7 +626,7 @@ vm_copypagefromphys(USER CHECKED void *dst,
 		memcpy(dst, tramp, PAGESIZE);
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
-		 * in which case access may cause an exception to be thrown. */
+		 * in  which case access may cause an exception to be thrown. */
 		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
@@ -656,7 +656,7 @@ vm_copypagetophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 		memcpy(tramp, src, PAGESIZE);
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
-		 * in which case access may cause an exception to be thrown. */
+		 * in  which case access may cause an exception to be thrown. */
 		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
@@ -692,9 +692,9 @@ NOTHROW(KCALL vm_copypageinphys)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 #endif /* !NO_PHYS_IDENTITY */
 	/* Copy data using a temporary buffer. */
 	bufsize = get_stack_avail();
-	/* `512*(4|8)' bytes is more than enough of a reservation to
+	/* `512*(4|8)' bytes is more than  enough of a reservation  to
 	 * be made, considering that the #PF handler for is guarantied
-	 * to never actually be called because of us, since `buf' is
+	 * to never actually be called  because of us, since `buf'  is
 	 * allocated on a kernel stack, where kernel stacks are always
 	 * LOCKED into memory. */
 	if (bufsize <= 512 * sizeof(void *)) {

@@ -62,7 +62,7 @@ INTERN struct vm_corepage *vm_corepage_head = &vm_corepage_start;
 
 /* [>= 2] Amount of free parts.
  * NOTE: At all times, there must at least be 2 available
- *       parts, so-as to allow for self-replication. */
+ *       parts,  so-as  to  allow  for  self-replication. */
 INTERN size_t vm_corepage_free = VM_COREPAIRS_PER_PAGE;
 
 #ifdef CONFIG_COREBASE_HAVE_FULLPAGES
@@ -74,7 +74,7 @@ PRIVATE ATTR_READMOSTLY struct pending_free_part *pending_free = NULL;
 /************************************************************************/
 
 
-/* The mask of the last word of the is-used bitset that must be
+/* The  mask  of the  last  word of  the  is-used bitset  that  must be
  * matched for that word to be considered to only represent FREE parts. */
 #define LAST_ALL_USED_MASK                                                                \
 	(((uintptr_t)1 << (BITSOF(uintptr_t) -                                                \
@@ -171,13 +171,13 @@ NOTHROW(KCALL do_free_part)(void *__restrict part) {
 	        "COREPART %p (page %p, index %u) is not marked as used",
 	        part, page, index);
 	/* Special case: If the corepage doesn't have any free parts, then we must
-	 *               re-enter it into the chain to the core pages containing
+	 *               re-enter it into the chain  to the core pages  containing
 	 *               free core parts. */
 	if (!corepage_hasfree(page)) {
 #ifdef CONFIG_COREBASE_HAVE_FULLPAGES
 		pflag_t was;
 		/* Must disable preemption to prevent the page from becoming
-		 * invisible at any point, in case another CPU/thread tries
+		 * invisible at any point, in case another CPU/thread  tries
 		 * to call `mall_search_leaks_impl()' */
 		was = PREEMPTION_PUSHOFF();
 		corepage_remfull(page);
@@ -192,7 +192,7 @@ NOTHROW(KCALL do_free_part)(void *__restrict part) {
 	page->cp_ctrl.cpc_used[i] &= ~mask;
 	++vm_corepage_free;
 	if (vm_corepage_free >= (VM_COREPAIRS_PER_PAGE + 4)) {
-		/* Check if the associated page has become fully
+		/* Check  if the associated page has become fully
 		 * unused, in which case we're able to unload it.
 		 * Also: Never unmap the initial start-page! */
 		if (page != &vm_corepage_start && !corepage_hasused(page)) {
@@ -254,7 +254,7 @@ NOTHROW(KCALL vm_corepage_pophead)(void) {
 	pflag_t was;
 	struct vm_corepage *fullpage;
 	/* Must disable preemption to prevent the page from becoming
-	 * invisible at any point, in case another CPU/thread tries
+	 * invisible at any point, in case another CPU/thread  tries
 	 * to call `mall_search_leaks_impl()' */
 	was = PREEMPTION_PUSHOFF();
 	fullpage         = vm_corepage_head;
@@ -395,7 +395,7 @@ again_tryhard_mapping_target:
 			result.cp_part = NULL;
 			goto done;
 		}
-		/* All right! We've got a virtual memory location, where we can map our new
+		/* All  right! We've got a virtual memory location, where we can map our new
 		 * data block. Now all that we still need is 1 page of physical memory which
 		 * we can then use to map at that location! */
 		mapping_backend = page_mallocone();
@@ -426,12 +426,12 @@ again_tryhard_mapping_target:
 		               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 
 		/* Allocate (reserve) 2 of the remaining corebase components,
-		 * which will then be used to describe the new corebase page
+		 * which  will then be used to describe the new corebase page
 		 * within the kernel VM. */
 		result = vm_corepair_alloc_impl();
 
 		/* With everything now allocated, fill in node data
-		 * and register the node in the kernel VM. */
+		 * and   register  the  node   in  the  kernel  VM. */
 		result.cp_node->vn_node.a_vmin = PAGEID_ENCODE(mapping_target);
 		result.cp_node->vn_node.a_vmax = result.cp_node->vn_node.a_vmin;
 		result.cp_part->dp_block       = incref(&vm_datablock_anonymous);
@@ -475,13 +475,13 @@ done:
 
 
 /* Free a `struct vm_datapart' or `struct vm_node', previously
- * allocated using the core pair allocator functions below. */
+ * allocated using the  core pair  allocator functions  below. */
 INTERN NOBLOCK void
 NOTHROW(KCALL vm_corepage_freepart)(void *__restrict part) {
 	if (!sync_trywrite(&vm_corepage_lock)) {
 		struct pending_free_part *pend, *next;
 		/* Remember the given `part' as a pending free-part,
-		 * thus ensuring that this function can't block, as
+		 * thus  ensuring that this function can't block, as
 		 * `sync_write()' could potentially do a call
 		 * to `SCHED_YIELD()', which may be illegal if preemption
 		 * is currently disabled. */

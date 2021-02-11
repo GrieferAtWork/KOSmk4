@@ -389,7 +389,7 @@ again_scan_nodes:
 			                       self);
 
 			/* Update the node bindings of all of the affected
-			 * VMs to point to `copy', rather than `self' */
+			 * VMs  to  point  to `copy',  rather  than `self' */
 			assert(node);
 			assert(node == self->dp_crefs);
 			assert(node == copy->dp_crefs);
@@ -404,7 +404,7 @@ again_scan_nodes:
 			do {
 				if unlikely(wasdestroyed(node->vn_vm))
 					continue;
-				/* Must re-prepare the address range before we
+				/* Must  re-prepare the address range before we
 				 * can safely load new physical memory targets. */
 				if unlikely(!(node->vn_vm == v || node->vn_vm == &vm_kernel
 				              ? pagedir_prepare(vm_node_getaddr(node), vm_node_getsize(node))
@@ -431,7 +431,7 @@ again_scan_nodes:
 					continue;
 				decref_nokill(self); /* node->vn_part */
 				node->vn_part = incref(copy);
-				/* Must update the page directory mapping targets to instead map to the copy
+				/* Must update the  page directory  mapping targets to  instead map  to the  copy
 				 * that we've just created, rather than keep on referring to the shared instance. */
 				perm = node->vn_prot & perm_mask;
 				if (node->vn_vm != &vm_kernel)

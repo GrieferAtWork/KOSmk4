@@ -28,8 +28,8 @@
 
 #include "gdb.h"
 
-/* To function properly with this driver (and the way it is designed to
- * debug an entire operating system in a way that makes GDB think it is
+/* To function properly with this driver (and the way it is designed  to
+ * debug  an entire operating system in a way that makes GDB think it is
  * debugging a process that has fork()+exec()'ed itself a whole bunch of
  * times), GDB must be initialized as:
  * >> set schedule-multiple on     # Allow multiple processes to run at the same time
@@ -64,11 +64,11 @@ DECL_BEGIN
 INTDEF uintptr_t GDBRemote_Features; /* Set of `GDB_REMOTE_FEATURE_*' */
 
 #define GDB_SERVER_FEATURE_MULTIPROCESS 0x0001 /* Enable (and use) multiprocess extensions. */
-#define GDB_SERVER_FEATURE_NONSTOP      0x0002 /* GDB_Main() should be invoked in non-stop mode.
+#define GDB_SERVER_FEATURE_NONSTOP      0x0002 /* GDB_Main() should  be invoked  in non-stop  mode.
                                                 * (`GDBThread_IsNonStopModeActive' is set to `true'
                                                 * at the start of a session)
                                                 * FIXME: Somewhere, QNonStop:1 is leaking references to `struct task's
-                                                * When it's enabled, processes no longer disappear from /proc! */
+                                                * When  it's  enabled,  processes  no  longer  disappear  from  /proc! */
 #define GDB_SERVER_FEATURE_ATTACHED     0x0004 /* A GDB remote has been attached. */
 #define GDB_SERVER_FEATURE_NOACK        0x0008 /* No-ack mode is enabled */
 #define GDB_SERVER_FEATURE_SHOWKERNEL   0x0010 /* Show the kernel core process to the GDB remote */
@@ -81,7 +81,7 @@ INTDEF uintptr_t GDBServer_Features; /* Set of `GDB_SERVER_FEATURE_*' */
 INTDEF void NOTHROW(FCALL GDB_Main)(void);
 
 /* Wrapper for `GDB_Main()' that will invoke said function
- * using an alternate, statically allocated stack. */
+ * using   an   alternate,  statically   allocated  stack. */
 INTDEF void NOTHROW(FCALL GDB_MainWithAlternateStack)(void);
 
 

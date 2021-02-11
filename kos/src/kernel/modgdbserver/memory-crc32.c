@@ -29,9 +29,9 @@
 
 DECL_BEGIN
 
-/* Taken from `libiberty' (which is the same library also used by `gdbserver')
+/* Taken from `libiberty' (which is the  same library also used by  `gdbserver')
  * Note that even though `libiberty' is the origin of the contents of this file,
- * heavy changes have been made to better incorporate the system into KOS.
+ * heavy  changes  have been  made to  better incorporate  the system  into KOS.
  * Find the origin of information here:
  *   https://code.woboq.org/gcc/libiberty/crc32.c.html
  * And see the (unmodified) copyright notice taken form the start of that file below.

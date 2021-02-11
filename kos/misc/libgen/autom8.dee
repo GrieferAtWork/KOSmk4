@@ -19,10 +19,10 @@
  */
 
 /* Combination of various utilities that parse [[[foo]]]-tags from source files
- * and will automatically generate code accordingly. Additionally, this script
+ * and will automatically generate code accordingly. Additionally, this  script
  * will re-flow block comments to form them into paragraphs.
  *
- *  - [[[enum]]] Automatically generate assembly-compatible enum macro
+ *  - [[[enum]]] Automatically generate  assembly-compatible  enum  macro
  *               definitions. You may look for usage examples in headers!
  *
  */
@@ -576,7 +576,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			}
 		}
 		/* Check if the new line is may shorter than the previous.
-		 * If so, then this line marks the end of a paragraph */
+		 * If so,  then this  line marks  the end  of a  paragraph */
 		local lineLen = shortestPossibleLightLength(l);
 		local prevLineLen = shortestPossibleLightLength(currentBlock.last);
 		if (lineLen <= (prevLineLen * 3) / 4) {
@@ -591,7 +591,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 		}
 		if (prevIndent == nspc) {
 			/* If the next line is much longer than the
-			 * previous, then begin another paragraph. */
+			 * previous, then begin another  paragraph. */
 			if (lineLen >= (prevLineLen * 5) / 4)
 				goto reflow_normal_block;
 			currentBlock.append(l);
@@ -670,7 +670,7 @@ reflow_normal_block:
 	}
 	/* Actually reflow simple text. */
 	if (currentBlock) {
-		/* Don't reflow if the text contains uneven space locations.
+		/* Don't reflow if the  text contains uneven space  locations.
 		 * e.g. "foo   bar baz" is uneven, but "foo   bar  baz" isn't! */
 		if (currentBlock != lines) {
 			result.extend(reflowBlockComment(currentBlock, lineLength));
@@ -822,7 +822,7 @@ normal_reflow:
 				parser.newText << "\n" << leadingTabs << leadingSpaces;
 				parser.newText << " ";
 			} else if (!commentBody.endswith(" ") && !commentBody.endswith("***")) {
-				/* Append a trailing space if there isn't one already, and
+				/* Append a trailing space if there isn't one already,  and
 				 * if the comment body doesn't end with one of those fancy:
 				 ************************************************************/
 				parser.newText << " ";

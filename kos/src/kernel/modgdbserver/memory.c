@@ -131,7 +131,7 @@ NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_v
 	if (result) {
 		TRY {
 			/* TODO: vm_read() may invoke RPC callbacks, which may in
-			 *       turn throw exceptions such as `E_EXIT_THREAD' */
+			 *       turn  throw  exceptions such  as `E_EXIT_THREAD' */
 			vm_read(effective_vm, (void const *)addr, buf, num_bytes, true);
 			result = 0;
 		} EXCEPT {
@@ -148,7 +148,7 @@ NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_
 	if (result) {
 		TRY {
 			/* TODO: vm_write() may invoke RPC callbacks, which may in
-			 *       turn throw exceptions such as `E_EXIT_THREAD' */
+			 *       turn throw  exceptions  such  as  `E_EXIT_THREAD' */
 			vm_write(effective_vm, (void *)addr, buf, num_bytes, true);
 			result = 0;
 		} EXCEPT {
@@ -168,9 +168,9 @@ NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
                               VIRT void const *haystack, size_t haystack_length,
                               void const *needle, size_t needle_length,
                               VIRT void const **__restrict presult) {
-	/* Since the length of `needle' is restricted by the max length of a packet,
+	/* Since the length of `needle' is restricted  by the max length of a  packet,
 	 * we can assume that `needle_length < CONFIG_GDBSERVER_PACKET_MAXLEN / 2', as
-	 * well as that we are free to use `GDBPacket_Start()' as a temporary buffer. */
+	 * well as that we are free to use `GDBPacket_Start()' as a temporary  buffer. */
 	byte_t *buf;
 	byte_t firstbyte;
 	assert(needle_length < CONFIG_GDBSERVER_PACKET_MAXLEN / 2);
@@ -216,20 +216,20 @@ found_it_at_pos:
 				} else {
 					size_t missing_bytes;
 					/* We may still have a partial match that may
-					 * cross over into the next block of memory. */
+					 * cross  over into the next block of memory. */
 					if (memcmp(pos + 1, (byte_t *)needle + 1, avail - 1) != 0) {
 						/* Not this one... */
 						++pos;
 						--avail;
 						continue;
 					}
-					/* All the data we have right now indicate that this
-					 * can still be the match we're looking for, since
+					/* All the data we have right now indicate that  this
+					 * can still be  the match we're  looking for,  since
 					 * the following (but incomplete) range _does_ match:
 					 * >> haystack + (size_t)(pos - buf)...+=avail
 					 * Same as:
 					 * >> needle...+=avail
-					 * Since we're allowed to assume that our buffer is always
+					 * Since  we're allowed  to assume  that our  buffer is always
 					 * at least as large as a max-sized needle, we can also assume
 					 * that reading the next block of memory will yield all of the
 					 * remaining data left to-be matched. */
@@ -267,9 +267,9 @@ not_found:
 /* See `memory-crc32.c' for the implementation. */
 INTDEF u32 FCALL libiberty_xcrc32(byte_t const *buf, size_t len, u32 crc);
 
-/* Calculate the CRC32 checksum for the given region of memory.
+/* Calculate  the CRC32  checksum for  the given  region of memory.
  * If access to anything with the given range fail, return `false'.
- * Otherwise, return `true' and store the CRC value in `*presult' */
+ * Otherwise, return `true' and store  the CRC value in  `*presult' */
 INTERN NONNULL((1, 4)) bool
 NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
                                   VIRT void const *addr, size_t length,

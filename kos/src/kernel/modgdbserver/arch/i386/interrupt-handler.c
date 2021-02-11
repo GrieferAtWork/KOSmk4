@@ -44,8 +44,8 @@ PRIVATE VIRT void const *GDB_SingleStep_IngoreStart     = 0;
 PRIVATE VIRT void const *GDB_SingleStep_IngoreEnd       = 0;
 
 /* Set a hint to the GDB backend to ignore single-step events
- * for instruction pointers `>= start_pc && < end_pc'.
- * Only a single such hint can exist at any point in time. */
+ * for   instruction   pointers    `>= start_pc && < end_pc'.
+ * Only  a single such  hint can exist at  any point in time. */
 INTERN void
 NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task const *thread,
                                              VIRT void const *start_pc,

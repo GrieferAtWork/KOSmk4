@@ -152,8 +152,8 @@ DECL_BEGIN
 
 
 /* Define system call properties for compatibility mode (should such a mode exists on the target arch)
- * -> Use `KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS' the same way
- *    `platformSuffix' is used in `generate_syscall.dee' in order to define
+ * -> Use     `KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS'     the     same      way
+ *    `platformSuffix' is  used in  `generate_syscall.dee'  in order  to  define
  *    `kernel_syscall##id##_restartmode##KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS' */
 #ifdef KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS
 #define CN3(x, y)   x##y

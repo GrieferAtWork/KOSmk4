@@ -115,7 +115,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadCommandline)(pformatprinter printer, void *arg,
 
 
 /* `qXfer:exec-file:read': Print the absolute filename for the original
- * binary passed to exec() when the process of `thread' was started.
+ * binary  passed to exec()  when the process  of `thread' was started.
  * (`/proc/${PID_OF(thread)}/exe') */
 INTERN NONNULL((1, 3)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
@@ -136,7 +136,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 			dent = xincref(FORMMAN(v, thismman_execinfo).mei_dent);
 			path = xincref(FORMMAN(v, thismman_execinfo).mei_path);
 		} else {
-			/* FIXME: What if one of the suspended threads is holding the VM lock?
+			/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
 			 *        We should have some kind of timeout here, and switch to all-stop
 			 *        mode if the timeout expires. */
 			sync_read(v);
@@ -261,10 +261,10 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 		if unlikely(!tryincref(drv))
 			continue; /* Dead driver... */
 		FINALLY_DECREF_UNLIKELY(drv);
-		/* One would expect that GDB wants `d_loadaddr', but that is incorrect.
-		 * One might also thing that GDB wants `d_loadstart', and that is ~mostly~ correct.
+		/* One   would  expect  that   GDB  wants  `d_loadaddr',   but  that  is  incorrect.
+		 * One might also thing that GDB wants `d_loadstart', and that is ~mostly~  correct.
 		 * But what GDB actually wants is the absolute address of the first segment, meaning
-		 * we need to adjust the driver load address for the sub-page offset of the segment
+		 * we  need to adjust the driver load address for the sub-page offset of the segment
 		 * with the lowest vaddr offset. */
 		alignment_offset      = 0;
 		lowest_segment_offset = (ElfW(Addr))-1;
@@ -378,10 +378,10 @@ NOTHROW(FCALL GDBInfo_PrintThreadList_Callback)(void *closure,
 	char id_buf[GDBTHREAD_ENCODETHREADID_MAXCHARS], *id_end;
 	char const *description;
 	uintptr_t flags;
-	/* Skip dead threads: If this check wasn't here, then GDB would think
-	 *                    that following a thread/process-exited stop event,
+	/* Skip dead threads: If this  check wasn't  here, then  GDB would  think
+	 *                    that following a thread/process-exited stop  event,
 	 *                    the thread's/process's TID/PID had been re-assigned
-	 *                    immediately, and that the still-terminating thread
+	 *                    immediately, and that the still-terminating  thread
 	 *                    was actually an entirely different thread. */
 	if (ATOMIC_READ(thread->t_flags) & (TASK_FTERMINATED | TASK_FTERMINATING))
 		return 0;
@@ -601,7 +601,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	pid     = task_getrootpid_of_s(thread);
 	hman    = task_gethandlemanager(thread);
 	if (!GDBThread_IsAllStopModeActive) {
-		/* FIXME: What if one of the suspended threads is holding the VM lock?
+		/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
 		 *        We should have some kind of timeout here, and switch to all-stop
 		 *        mode if the timeout expires. */
 		sync_read(&hman->hm_lock);

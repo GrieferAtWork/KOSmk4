@@ -132,8 +132,8 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
 	target_flags = ATOMIC_READ(target->t_flags);
 	if unlikely(target_flags & TASK_FTERMINATED) {
 		/* TODO: What now?
-		 *       Our caller is `task_redirect_usercode_rpc()', which may return `false'
-		 *       to indicate this error condition. However since this IPI is serviced
+		 *       Our  caller is `task_redirect_usercode_rpc()',  which may return `false'
+		 *       to indicate this  error condition.  However since this  IPI is  serviced
 		 *       asynchronously, we only get here when that function has already returned
 		 *       to its caller, indicating success... */
 		decref(target);
@@ -174,7 +174,7 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
 
 /* High-level variant of `task_enable_redirect_usercode_rpc':
  * This function automatically performs all of the necessary locking, checks and IPIs
- * in order to execute `task_enable_redirect_usercode_rpc()' for `target' within the
+ * in order to execute `task_enable_redirect_usercode_rpc()' for `target' within  the
  * proper context.
  * NOTE: This function also causes a sporadic wakeup for `target', irregardless of
  *       usercode already having been redirected, having the same effect as a call
@@ -183,7 +183,7 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
  *                 already been redirected before).
  * @return: false: The RPC could not be scheduled because `target' has terminated.
  *        WARNING: The target may still terminate before the RPC can be serviced,
- *                 though this has to be detected in some different manner. */
+ *                 though  this  has to  be  detected in  some  different manner. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintptr_t mode) {
 	pflag_t was;

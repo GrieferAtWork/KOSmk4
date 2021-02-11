@@ -502,7 +502,7 @@ err:
 
 
 /* Print the correct representation of the given type, including
- * an optional, contained variable name that is also printed at
+ * an optional, contained variable name that is also printed  at
  * the proper location. */
 PUBLIC NONNULL((1, 2)) ssize_t KCALL
 ctyperef_printname(struct ctyperef const *__restrict self,
@@ -596,7 +596,7 @@ NOTHROW(FCALL count_characters)(char const *str, size_t len, char ch) {
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL use_decimal_representation)(char const *decimal_repr, size_t len) {
 	/* Check if more than 3/5th of `decimal_repr' use the same digit.
-	 * If so, then the decimal representation should be used. */
+	 * If  so,  then  the  decimal  representation  should  be  used. */
 	size_t threshold = (len * 5) / 3;
 	char ch;
 	for (ch = '0'; ch <= '9'; ++ch) {
@@ -636,10 +636,10 @@ vprinter_callback(/*size_t **/ void *arg,
 }
 
 
-/* Check if it would be possible to print `buf' in-line,
+/* Check if it would be  possible to print `buf'  in-line,
  * such that `indent+INLINE_LENGTH <= maxlinelen'. If this
- * cannot be done, then return -1. Otherwise, return the
- * result of `indent+INLINE_LENGTH', that is: the new
+ * cannot be done, then  return -1. Otherwise, return  the
+ * result of  `indent+INLINE_LENGTH',  that  is:  the  new
  * indent of the inline-printed value. */
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
 ctype_printvalue_inline(struct ctyperef const *__restrict self,
@@ -873,7 +873,7 @@ ctype_printstruct_callback(void *cookie,
 			 * >>     struct elem my_elemv[];
 			 * >> };
 			 * In this case, we can guess the length of `my_elemv' to be equal
-			 * to `my_elemc', which can could access by-name at this point.
+			 * to `my_elemc', which  can could access  by-name at this  point.
 			 * As such, special handling should be done here in order to print
 			 * the correct # of elements for `my_elemv' */
 		}
@@ -925,10 +925,10 @@ ctype_printstruct_callback(void *cookie,
 	if (arg->out_field_count == 0) {
 		/* Never print an additional linefeed before the first element. */
 	} else
-#if 1 /* Technically, this version should only be used when there are more
+#if 1 /* Technically, this version should only  be used when there are  more
        * members within the struct after this one (since we'll end up having
-       * to print another trailing "," after our member). However we don't
-       * have an easy way of knowing this ahead of time, so to keep stuff
+       * to print another trailing ","  after our member). However we  don't
+       * have an easy way of  knowing this ahead of  time, so to keep  stuff
        * a bit simpler, we just always check for this case. */
 	if ((!contains_newline && (next_indent + 1) <= arg->maxlinelen) || !arg->do_multiline)
 #else
@@ -947,7 +947,7 @@ do_print_space_and_field:
 		REPEAT(' ', arg->newline_indent); /* Print leading spaces. */
 		elem_indent = arg->newline_indent + prefix_length;
 		/* With the lowered indent, check if we can now print the member without
-		 * any line-feeds, and if so, use that new indent for the rest of the
+		 * any line-feeds, and if so,  use that new indent  for the rest of  the
 		 * struct. */
 		contains_newline = false;
 		maybe_next_indent = ctype_printvalue_nextindent(&member_type, member_addr,
@@ -1137,7 +1137,7 @@ is_nonempty_printer(void *UNUSED(arg),
 
 
 /* Try to determine the name of the section that `module_relative_addr'
- * is apart of, and return that name, whilst storing the offset into
+ * is  apart of, and  return that name, whilst  storing the offset into
  * that section in `*psection_relative_addr'
  * If the section cannot be determined, return `NULL' instead. */
 PRIVATE NONNULL((2, 3)) char const *
@@ -1266,7 +1266,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 				if (cmodule_iskern(mod)) {
 					if (mod->cm_module != (REF module_t *)&kernel_driver) {
 						/* If the type was declared by a driver, it may actually
-						 * originate from the kernel core. In this case, try to
+						 * originate from the kernel core. In this case, try  to
 						 * load the pointed-to type. */
 						ctype_struct_enumfields(mytype, &ctype_struct_is_nonempty_callback, NULL);
 						mod = mytype->ct_struct.ct_info.cd_mod;
@@ -1320,7 +1320,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 			di_addr2line_sections_t sections;
 			di_addr2line_dl_sections_t dl_sections;
 			module_relative_ptr = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
-			/* Try to lookup the name/base-address of a symbol
+			/* Try to lookup  the name/base-address  of a  symbol
 			 * that contains the given `ptr' and is part of `mod' */
 			if (debug_addr2line_sections_lock(mod, &sections, &dl_sections
 			                                  module_type__arg(modtyp)) == DEBUG_INFO_ERROR_SUCCESS) {
@@ -1347,7 +1347,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 				}
 				debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
 			}
-			/* We know that the pointer (should) be located in one of the module's
+			/* We know that the pointer (should) be located in one of the  module's
 			 * sections. As such, try to check if we can determine the section that
 			 * the point points into, so we can print a hint:
 			 * >> 0x12345678 (libc.so!.text+54321) */
@@ -1372,8 +1372,8 @@ print_named_pointer(struct ctyperef const *__restrict self,
 		}
 	}
 
-	/* Check if `ptr' is apart of a file mapping. If it is,
-	 * print the absolute path the mapped file, as well as
+	/* Check if `ptr'  is apart  of a  file mapping.  If it  is,
+	 * print  the  absolute path  the  mapped file,  as  well as
 	 * the offset into the file, alongside the original pointer:
 	 * `0x12345678 ("/path/to/file"+offset_into_file)' */
 	{
@@ -1419,9 +1419,9 @@ print_named_pointer(struct ctyperef const *__restrict self,
 	}
 
 	/* TODO: Check if `ptr' points into kernel heap memory. If it
-	 *       is, then print it as `0x12345678 (heap)' */
+	 *       is,   then   print    it   as    `0x12345678 (heap)' */
 
-	/* If nothing is mapped where `ptr' points to, then we
+	/* If  nothing is  mapped where  `ptr' points  to, then we
 	 * should print it in a different color (iow: use a custom
 	 * prefix/suffix pair for unmapped pointers)
 	 *
@@ -1443,10 +1443,10 @@ err:
 
 
 
-/* Print a dereferenced function at `ptr'. Printing is first
- * attempted to be performed by loading the name of the function
+/* Print a  dereferenced function  at  `ptr'. Printing  is  first
+ * attempted  to be performed by loading the name of the function
  * at the specified `ptr', and if that fails, or if `ptr' doesn't
- * point at the exact start of a function, printing will instead
+ * point  at the exact start of a function, printing will instead
  * be done as though a function pointer had been given. */
 PRIVATE ATTR_NOINLINE NONNULL((1)) ssize_t KCALL
 print_function(struct ctyperef const *__restrict self,
@@ -1464,7 +1464,7 @@ print_function(struct ctyperef const *__restrict self,
 			di_addr2line_sections_t sections;
 			di_addr2line_dl_sections_t dl_sections;
 			module_relative_ptr = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
-			/* Try to lookup the name/base-address of a symbol
+			/* Try to lookup  the name/base-address  of a  symbol
 			 * that contains the given `ptr' and is part of `mod' */
 			if (debug_addr2line_sections_lock(mod, &sections, &dl_sections
 			                                  module_type__arg(modtyp)) == DEBUG_INFO_ERROR_SUCCESS) {
@@ -1549,7 +1549,7 @@ err:
 
 
 
-/* Print a human-readable representation of the contents of a given data-buffer,
+/* Print a human-readable  representation of  the contents of  a given  data-buffer,
  * based on the C-typing of that buffer, which was likely extracted from debug info.
  * @param: self:             The typing of `buf'
  * @param: printer:          The printer used to output data.
@@ -1558,11 +1558,11 @@ err:
  * @param: flags:            Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
  * @param: firstline_indent: # of SPC (' ') characters already printed on the current line.
  * @param: newline_indent:   # of SPC (' ') characters to print after every \n-character.
- *                           Ignored when `CTYPE_PRINTVALUE_FLAG_ONELINE' is given.
+ *                           Ignored  when   `CTYPE_PRINTVALUE_FLAG_ONELINE'  is   given.
  * @param: newline_tab:      Amount by which to increase `newline_indent' after a line-
- *                           feed following an open-brace '{' or open-bracket '['.
- * @param: maxlinelen:       The max line length that should not be exceeded by when
- *                           placing short struct initializers on the same line.
+ *                           feed  following  an  open-brace '{'  or  open-bracket '['.
+ * @param: maxlinelen:       The max line  length that  should not be  exceeded by  when
+ *                           placing   short  struct  initializers  on  the  same  line.
  *                           Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
  *                           If sufficient space is available, do this:
  *                           >> {foo: {x: 10, y: 20}}
@@ -1585,19 +1585,19 @@ ctype_printvalue(struct ctyperef const *__restrict self,
                  size_t firstline_indent, size_t newline_indent,
                  size_t newline_tab, size_t maxlinelen) {
 	/* TODO: This function is insanely inefficient for deeply nested
-	 *       structures such as printing libc's `current' (the main
+	 *       structures  such as printing libc's `current' (the main
 	 *       problem being its `struct exception_info')
 	 * Solution:
-	 *       Use a virtual printer that is limited by the number of characters
-	 *       it is is allowed to print. If one tries to print more than that
+	 *       Use  a virtual printer  that is limited by  the number of characters
+	 *       it is is  allowed to print.  If one  tries to print  more than  that
 	 *       amount, it will simply error out. On error, we know that a line-feed
-	 *       needs to be inserted, and on success, we can just use its return
-	 *       value as the additional indentation that will be active after the
+	 *       needs to be  inserted, and on  success, we can  just use its  return
+	 *       value  as the additional  indentation that will  be active after the
 	 *       associated component is printed in-line.
-	 *       Additionally, when doing these checks we can always just pass the
+	 *       Additionally,  when doing these checks we can always just pass the
 	 *       `CTYPE_PRINTVALUE_FLAG_ONELINE' flag during the recursive calls to
-	 *       `ctype_printvalue()', since we only care if the next element can
-	 *       be printed without any line-feeds, and without overflowing the
+	 *       `ctype_printvalue()', since we only care  if the next element  can
+	 *       be printed  without any  line-feeds, and  without overflowing  the
 	 *       horizontal display area.
 	 */
 	ssize_t temp, result = 0;
@@ -1697,8 +1697,8 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM): {
 		/* Enum or integer */
 		/* TODO: Certain integer types should be printed alongside custom
-		 *       object hints, such as `fd_t', which should include the
-		 *       associated text from `readlink /proc/self/fd/$FD`, if
+		 *       object hints, such as  `fd_t', which should include  the
+		 *       associated  text  from `readlink  /proc/self/fd/$FD`, if
 		 *       any. */
 		if (CTYPE_KIND_SIZEOF(kind) <= sizeof(intmax_t)) {
 			union {
@@ -1771,7 +1771,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 					size_t max_digits;
 print_integer_value_as_hex:
 					/* Figure out the max number of digits.
-					 * Without this, negative numbers would always be
+					 * Without  this, negative numbers would always be
 					 * printed with all digits that would be needed to
 					 * represent a uintmax_t with the most significant
 					 * bit set. */
@@ -1789,7 +1789,7 @@ print_integer_value_as_hex:
 				}
 			}
 		} else {
-			/* Value too large to load directly. - Instead, write
+			/* Value too large to  load directly. - Instead,  write
 			 * out its contents in HEX, using the native byteorder. */
 			size_t i;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
@@ -1856,7 +1856,7 @@ print_integer_value_as_hex:
 		if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
 			do_multiline = false;
 		} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
-			/* Check if the struct has 0 fields. It this is the
+			/* Check  if the struct has 0 fields. It this is the
 			 * case, then don't print anything and continue with
 			 * the closing '}' */
 			if (ctype_struct_enumfields(me, &ctype_struct_is_nonempty_callback, NULL) == 0)
@@ -1888,7 +1888,7 @@ print_integer_value_as_hex:
 					    !(flags & (CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS |
 					               CTYPE_PRINTVALUE_FLAG_NOOMITSHORTFIELDS))) {
 						/* We're allowed to omit field names, so try to do that
-						 * in order to fit everything onto a single line. */
+						 * in order  to  fit  everything onto  a  single  line. */
 						data.im.flags = flags | CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
 						data.im.firstline_indent = firstline_indent;
 						data.im.out_field_count  = 0;
@@ -1896,7 +1896,7 @@ print_integer_value_as_hex:
 						ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
 						/* NOTE: +1 for the trailing '}' that is always required. */
 						if (!data.im.out_contains_lf && (data.im.firstline_indent + 1) <= maxlinelen) {
-							/* Omit struct field names to save on space, which in
+							/* Omit struct field names to save on space, which  in
 							 * turn allows us to keep everything on a single line. */
 							flags |= CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
 							do_multiline = false;
@@ -2013,8 +2013,8 @@ do_print_no_recursion_dots_and_rbrace:
 						if (!(flags & CTYPE_PRINTVALUE_FLAG_NOARRAYRANGE)) {
 							/* Check ahead if upcoming elements are equal to our
 							 * current element, and if they are, check if we can
-							 * save some screen space by compressing output via
-							 * use of `[lo ... hi] = value', instead of having
+							 * save  some screen space by compressing output via
+							 * use of `[lo ... hi] = value',  instead of  having
 							 * to use `value, value, value, ..., value, value' */
 							while (index_hi + 1 < used_length) {
 								byte_t const *next_addr;
@@ -2077,8 +2077,8 @@ do_print_no_recursion_dots_and_rbrace:
 					if (!(flags & CTYPE_PRINTVALUE_FLAG_NOARRAYRANGE)) {
 						/* Check ahead if upcoming elements are equal to our
 						 * current element, and if they are, check if we can
-						 * save some screen space by compressing output via
-						 * use of `[lo ... hi] = value', instead of having
+						 * save  some screen space by compressing output via
+						 * use of `[lo ... hi] = value',  instead of  having
 						 * to use `value, value, value, ..., value, value' */
 						while (index_hi + 1 < used_length) {
 							byte_t const *next_addr;

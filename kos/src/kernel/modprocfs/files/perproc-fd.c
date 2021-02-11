@@ -91,7 +91,7 @@ ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
 					}
 #endif /* !NDEBUG */
 					/* NOTE: We can't actually trust user-space that `hash' is valid, since
-					 *       the user may have changed the string in the mean time... */
+					 *       the  user  may have  changed the  string  in the  mean time... */
 					result->de_hash = directory_entry_hash(result->de_name, namelen);
 					result->de_ino  = PROCFS_INOMAKE_FD(pid, fdno);
 					result->de_type = DT_LNK;
@@ -210,7 +210,7 @@ INTERN struct inode_type ProcFS_PerProc_Fd_Type = {
 				/* .o_enum   = */ &ProcFS_PerProc_Fd_Enum,
 			}
 			/* TODO: The unlink operator should be usable to
-			 *       implement a remote close() operation:
+			 *       implement a  remote close()  operation:
 			 * >> unlink("/proc/self/fd/8");
 			 * >> close(8);  // Same thing!
 			 */

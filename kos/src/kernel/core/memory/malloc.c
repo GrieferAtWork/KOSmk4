@@ -63,7 +63,7 @@ struct ATTR_PACKED mptr {
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
 			size_t mp_size; /* Size of the block, including this header
-			                 * (in bytes; aligned by `HEAP_ALIGNMENT') */
+			                 * (in bytes; aligned by  `HEAP_ALIGNMENT') */
 			u8     mp_heap; /* [<= __GFP_HEAPCOUNT] The originating heap id */
 		};
 		byte_t     mp_align[HEAP_ALIGNMENT]; /* ... */

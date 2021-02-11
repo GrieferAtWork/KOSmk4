@@ -23,12 +23,12 @@
 /* DeBug eXtensions: OBjectNOTEs.
  *
  * Using these functions, you can print extended, yet still compact information
- * about certain objects, given the (struct-)name of those objects.
+ * about  certain   objects,  given   the  (struct-)name   of  those   objects.
  *
  * For example: "task" will give extended information for `struct task'
  *
  * These functions are used by `ctype_printvalue()' when printing pointers
- * to kernel objects, and the `CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER' flag
+ * to  kernel objects, and the `CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER' flag
  * hasn't been given.
  */
 
@@ -49,10 +49,10 @@ DECL_BEGIN
 #define OBNOTE_PRINT_STATUS_BADOBJ  2 /* Corrupt/invalid/bad object */
 
 /* Callback for object note printers.
- * @param: pstatus: Already set to `OBNOTE_PRINT_STATUS_SUCCESS' before
+ * @param: pstatus: Already set to `OBNOTE_PRINT_STATUS_SUCCESS'  before
  *                  this function is called. May be changed to something
- *                  like `OBNOTE_PRINT_STATUS_BADOBJ' to indicate that
- *                  the given `pointer' isn't a valid instance of the
+ *                  like `OBNOTE_PRINT_STATUS_BADOBJ'  to indicate  that
+ *                  the given `pointer'  isn't a valid  instance of  the
  *                  expected object.
  * @return: * :     The usual pformatprinter return value. */
 typedef NONNULL((1, 3, 4)) ssize_t
@@ -66,7 +66,7 @@ struct obnote_entry {
 };
 
 /* Print extended information (if available)
- * that related to the given `name'.
+ * that   related   to  the   given  `name'.
  * @param: pstatus: [out] Set to one of `OBNOTE_PRINT_STATUS_*'.
  * @return: * :     The usual pformatprinter return value. */
 FUNDEF NONNULL((1, 3, 4, 5)) ssize_t

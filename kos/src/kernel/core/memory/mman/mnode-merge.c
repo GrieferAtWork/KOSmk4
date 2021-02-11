@@ -33,15 +33,15 @@
 
 DECL_BEGIN
 
-/* While holding a lock to `self->mn_mman' and `self->mn_part', try
+/* While holding  a lock  to `self->mn_mman'  and `self->mn_part',  try
  * to merge the given node with its successor/predecessor node, without
  * releasing any of the locks still held.
  * @return: * : The new, merged node (which may have a different min-addr
- *              that the original node `self'). Also note that this node
+ *              that the original node `self'). Also note that this  node
  *              may or may not be equal to `self', and that it's min- and
- *              max-addr fields may be different from those that `self'
+ *              max-addr fields may be  different from those that  `self'
  *              had upon entry, irregardless of `self' being re-returned.
- *              As a matter of fact `*self' becomes invalid after a call
+ *              As  a matter of fact `*self' becomes invalid after a call
  *              to this function! */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self) {

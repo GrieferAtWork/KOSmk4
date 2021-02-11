@@ -322,9 +322,9 @@ do_io_with_part:
 		newpart_maxaddr = mfile_addr_ceilalign(self, newpart_maxaddr + 1) - 1;
 		assert(newpart_minaddr <= newpart_maxaddr);
 		assert(!mpart_tree_locate(self->mf_parts, newpart_minaddr));
-		/* We know that no part exists at `newpart_minaddr', but an existing part
+		/* We know that no part exists at `newpart_minaddr', but an existing  part
 		 * may still exist somewhere else within the requested address range. When
-		 * this is the case, we must limit ourselves to only do I/O up until the
+		 * this  is the case, we must limit ourselves  to only do I/O up until the
 		 * start of that later part. */
 		{
 			struct mpart_tree_minmax mima;
@@ -381,7 +381,7 @@ restart_after_extendpart:
 			}
 			if (part != MFILE_EXTENDPART_OR_UNLOCK_NOSIB) {
 				/* Successfully managed to extend an existing part!
-				 * As such, use this part to do more I/O! */
+				 * As  such,  use  this   part  to  do  more   I/O! */
 				incref(part);
 				mpart_lock_release(part);
 				mfile_trunclock_inc(self); /* Prevent `ftruncate(2)' until we're done */
@@ -478,19 +478,19 @@ destroy_new_part_and_try_again:
 	newpart_maxaddr = mfile_addr_ceilalign(self, newpart_maxaddr + 1) - 1;
 	assert(newpart_minaddr <= newpart_maxaddr);
 
-	/* Because the max-valid end address of the last allocated mem-part
-	 * of any file is that file's size `mfile_addr_ceilalign()'d, there
+	/* Because the max-valid end address  of the last allocated  mem-part
+	 * of any file is  that file's size `mfile_addr_ceilalign()'d,  there
 	 * is the possibility that there is a pre-existing part that includes
-	 * storage for those last, few bytes that have already been loaded,
+	 * storage for those last, few  bytes that have already been  loaded,
 	 * even though they're not considered to be apart of the file itself.
 	 *
-	 * For reference, read up on linux's (and KOS's) behavior regarding
+	 * For reference, read  up on linux's  (and KOS's) behavior  regarding
 	 * reads/writes to the last part of a file-mapping, when the effective
 	 * file-address of those reads/writes would be located past the end of
 	 * said file.
 	 *
 	 * Essentially, we must write to those bytes here, and try to increase
-	 * the file's size to include all bytes from such a trailing page. */
+	 * the  file's size  to include all  bytes from such  a trailing page. */
 	part = mpart_tree_locate(self->mf_parts, newpart_minaddr);
 	if (part != NULL && tryincref(part)) {
 		io_bytes = (size_t)(mpart_getendaddr(part) - offset);
@@ -503,10 +503,10 @@ destroy_new_part_and_try_again:
 			io_bytes = num_bytes;
 
 		/* In order to later increase the file's size, we must firstly
-		 * acquire a write-lock to the file, and be holding this lock
+		 * acquire  a write-lock to the file, and be holding this lock
 		 * when calling `mfile_trunclock_inc()'
 		 * This way, another thread can also acquire a write-lock, and
-		 * wait for `mf_trunclock' to become zero in order to ensure
+		 * wait for `mf_trunclock' to become  zero in order to  ensure
 		 * that a file's size doesn't change for a period of this.
 		 *
 		 * This kind of functionality is required for O_APPEND support! */
@@ -519,8 +519,8 @@ destroy_new_part_and_try_again:
 		}
 
 #ifdef LOCAL_TAILIO
-		/* In order to atomically append data at the end of the file, we
-		 * must ensure that no-one else might possibly be increasing the
+		/* In order to atomically append data at the end of the file,  we
+		 * must ensure that no-one else might possibly be increasing  the
 		 * file's size in the mean time. - This can be ensured by holding
 		 * a lock to the file's `mf_lock', and waiting for `mf_trunclock'
 		 * to become ZERO. */
@@ -537,7 +537,7 @@ destroy_new_part_and_try_again:
 		}
 
 		/* We can now be certain that `mf_filesize' won't increase
-		 * before we're done writing data into the given `part'! */
+		 * before we're done writing  data into the given  `part'! */
 		if (!mpart_lock_tryacquire(part)) {
 			mfile_lock_endwrite(self);
 waitfor_part_and_try_again:
@@ -617,7 +617,7 @@ part_setcore:
 			}
 
 			/* Now that the part has been forced into the expected state,
-			 * do the actual write via `LOCAL_mpart_rw_or_unlock()' */
+			 * do  the  actual  write  via   `LOCAL_mpart_rw_or_unlock()' */
 #ifdef LOCAL_BUFFER_IS_IOVEC
 			io_bytes = LOCAL_mpart_rw_or_unlock(part, buffer, buf_offset, io_bytes, reladdr, &unlock);
 #else /* LOCAL_BUFFER_IS_IOVEC */
@@ -653,8 +653,8 @@ part_setcore:
 			goto again;
 		}
 
-		/* Seeing how we're still holding a write-lock to `self', we know
-		 * that no-one else (should) have altered the file's size in the
+		/* Seeing how we're still holding  a write-lock to `self', we  know
+		 * that  no-one else (should)  have altered the  file's size in the
 		 * mean time, meaning that the append-write above truly was atomic! */
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
 		mfile_lock_endwrite(self);
@@ -676,7 +676,7 @@ part_setcore:
 		}
 		decref_unlikely(part);
 
-		/* Atomically increase the file size to `offset + io_bytes', but do
+		/* Atomically increase the file  size to `offset + io_bytes', but  do
 		 * nothing if the file's size had already been increased to somewhere
 		 * beyond that point. */
 		{
@@ -712,13 +712,13 @@ part_setcore:
 	}
 
 	/* Try to extend an existing (preceding) part by using `mfile_extendpart_or_unlock()'
-	 * Note that if we later end up failing to write all of the relevant data to that
-	 * part, then we're entirely within out rights to simply truncate block-status, and
-	 * any backing data we like to get rid of, since we know that no-one can possibly
-	 * be mapping any part the range that was added to the existing part.
-	 * For this purpose, we can also assume that the existing part was extended above,
-	 * since we know that no part (should) have existed anywhere above the accessed
-	 * address range (since we know that the accessed range lies above the file's size) */
+	 * Note that if we  later end up failing  to write all of  the relevant data to  that
+	 * part, then we're entirely within out  rights to simply truncate block-status,  and
+	 * any backing data we  like to get rid  of, since we know  that no-one can  possibly
+	 * be  mapping  any   part  the  range   that  was  added   to  the  existing   part.
+	 * For this purpose, we can  also assume that the  existing part was extended  above,
+	 * since we  know that  no part  (should) have  existed anywhere  above the  accessed
+	 * address range (since we know that the  accessed range lies above the file's  size) */
 #ifndef __OPTIMIZE_SIZE__
 	{
 		mpart_reladdr_t old_part_size, reladdr;
@@ -770,8 +770,8 @@ restart_after_extendpart_tail:
 			io_bytes = num_bytes;
 
 #ifdef LOCAL_TAILIO
-		/* In order to atomically append data at the end of the file, we
-		 * must ensure that no-one else might possibly be increasing the
+		/* In order to atomically append data at the end of the file,  we
+		 * must ensure that no-one else might possibly be increasing  the
 		 * file's size in the mean time. - This can be ensured by holding
 		 * a lock to the file's `mf_lock', and waiting for `mf_trunclock'
 		 * to become ZERO. */
@@ -813,13 +813,13 @@ restart_after_extendpart_tail:
 				}
 			}
 
-			/* No need to fiddle with unsharing copy-on-write! The area we're
+			/* No need to  fiddle with unsharing  copy-on-write! The area  we're
 			 * trying to write to has only been added by us right now, and since
 			 * we've yet to release our lock to the part, we also know that said
 			 * area can't possibly */
 
 			/* Now that the part has been forced into the expected state,
-			 * do the actual write via `LOCAL_mpart_rw_or_unlock()' */
+			 * do  the  actual  write  via   `LOCAL_mpart_rw_or_unlock()' */
 #ifdef LOCAL_BUFFER_IS_IOVEC
 			io_bytes = LOCAL_mpart_rw_or_unlock(part, buffer, buf_offset, io_bytes, reladdr, &unlock);
 #else /* LOCAL_BUFFER_IS_IOVEC */
@@ -853,8 +853,8 @@ restart_after_extendpart_tail:
 		/* Release our lock to the part, now that we no longer need it! */
 		mpart_lock_release(part);
 
-		/* Seeing how we're still holding a write-lock to `self', we know
-		 * that no-one else (should) have altered the file's size in the
+		/* Seeing how we're still holding  a write-lock to `self', we  know
+		 * that  no-one else (should)  have altered the  file's size in the
 		 * mean time, meaning that the append-write above truly was atomic! */
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
 		mfile_lock_endwrite(self);
@@ -874,13 +874,13 @@ extend_undo:
 extend_failed:
 #endif /* !__OPTIMIZE_SIZE__ */
 
-	/* Must create a new part for the accessed address range, and directly write to said
-	 * part. Afterwards, try to insert this new part into the file, and increase the
-	 * file's size. (do this using `mfile_insert_and_merge_part_and_unlock()').
-	 * However, if this part fails (i.e. `NULL' is returned), then we must not immediately
-	 * discard the part if the caller-given buffer is located in virtual memory, but must
+	/* Must create a new part  for the accessed address range,  and directly write to  said
+	 * part.  Afterwards,  try to  insert this  new part  into the  file, and  increase the
+	 * file's   size.   (do    this   using    `mfile_insert_and_merge_part_and_unlock()').
+	 * However,  if this part fails (i.e. `NULL' is returned), then we must not immediately
+	 * discard the part if the caller-given buffer  is located in virtual memory, but  must
 	 * instead using its backing physical memory as a new physical source buffer from which
-	 * to copy data to-be written to the file. (this way, we can prevent duplicate reads
+	 * to copy data to-be written  to the file. (this way,  we can prevent duplicate  reads
 	 * from VIO memory when this kind of memory was used as origin buffer) */
 	mfile_lock_end(self);
 	/*io_bytes = num_bytes;*/
@@ -904,7 +904,7 @@ extend_failed:
 	DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
 	_mpart_init_asanon(part);
 	/* NOTE: Setting `MPART_F_CHANGED' here will cause `mfile_insert_and_merge_part_and_unlock()'
-	 *       to add automatically add the part to the list of changed parts of `self' */
+	 *       to add  automatically  add  the  part  to  the  list  of  changed  parts  of  `self' */
 	part->mp_flags |= MPART_F_GLOBAL_REF | MPART_F_CHANGED;
 
 	/* Mark the part as persistent if our file is, too. */
@@ -918,7 +918,7 @@ extend_failed:
 #endif /* CONFIG_USE_NEW_FS */
 
 	/* Make sure that the part has been allocated. Afterwards, copy the
-	 * caller-provided buffer into the correct offset within the part.
+	 * caller-provided buffer into the correct offset within the  part.
 	 *
 	 * Note that since we're not holding any locks while doing this, we
 	 * don't even have to take any care of prefaulting and/or VIO. - We
@@ -1024,7 +1024,7 @@ extend_failed:
 handle_part_insert_failure:
 			mfile_lock_endwrite(self);
 #ifndef LOCAL_BUFFER_IS_PHYS
-			/* To prevent repeated reads from memory that may be backed by VIO,
+			/* To prevent repeated reads from memory that may be backed by  VIO,
 			 * handle this case by simply (ab-)using `part' as the source buffer
 			 * from which to take memory to-be written to the file. */
 			TRY {
@@ -1052,14 +1052,14 @@ handle_part_insert_failure:
 		}
 
 		/* Have the file's `mf_changed' list inherit a reference to `inserted_part',
-		 * With the inclusion of the new changed part, we must always mark the file
-		 * as (possibly) containing modified parts. We're allowed to set this flag
-		 * even if `mfile_insert_and_merge_part_and_unlock()' didn't add anything
-		 * to the changed part list (because the file may have become anonymous in
+		 * With  the inclusion of the new changed part, we must always mark the file
+		 * as (possibly) containing modified parts.  We're allowed to set this  flag
+		 * even  if  `mfile_insert_and_merge_part_and_unlock()' didn't  add anything
+		 * to  the changed part list (because the  file may have become anonymous in
 		 * the mean time), since this flag only means: There _may_ be changed parts. */
 		changes = MFILE_F_CHANGED;
 
-		/* Atomically increase the file size to `offset + num_bytes', but do
+		/* Atomically increase the file size to `offset + num_bytes', but  do
 		 * nothing if the file's size had already been increased to somewhere
 		 * beyond that point. */
 		newsize = offset + num_bytes;
@@ -1081,7 +1081,7 @@ handle_part_insert_failure:
 		if (changes != 0) {
 			uintptr_t old_flags, new_flags;
 			/* Atomically mark `self' as changed, and check which (if
-			 * any) of the changed-bits hadn't already been set. */
+			 * any)  of  the  changed-bits hadn't  already  been set. */
 			old_flags = ATOMIC_FETCHOR(self->mf_flags, changes);
 			new_flags = old_flags | changes;
 			if (old_flags != new_flags && self->mf_ops->mo_changed)
@@ -1090,7 +1090,7 @@ handle_part_insert_failure:
 	} /* Scope.... */
 
 	/* Since we've just written _all_ of the trailing data, we're
-	 * finally done and don't have to loop back to write more! */
+	 * finally  done and don't  have to loop  back to write more! */
 #endif /* !LOCAL_READING */
 
 done:

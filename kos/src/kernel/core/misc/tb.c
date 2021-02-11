@@ -193,7 +193,7 @@ err:
 }
 
 
-/* Dump a traceback for the given cpu state.
+/* Dump   a  traceback  for  the  given  cpu  state.
  * Tracebacks are printed using `addr2line_printf()' */
 PUBLIC ATTR_NOINLINE ATTR_WEAK ATTR_SECTION(".text.kernel.print_traceback")
 ssize_t FCALL print_traceback(pformatprinter printer, void *arg,

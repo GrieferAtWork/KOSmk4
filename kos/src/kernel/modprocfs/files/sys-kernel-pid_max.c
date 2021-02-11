@@ -46,8 +46,8 @@ ProcFS_Sys_Kernel_PidMax_Write(struct regular_node *__restrict UNUSED(self),
 	upid_t newvalue;
 	/* Don't allow the value to become larger than the max possible
 	 * positive, signed PID. While the kernel could deal with going
-	 * up to the max unsigned PID internally, various system calls
-	 * that accept pid values have special behavior when the given
+	 * up to the max unsigned PID internally, various system  calls
+	 * that accept pid values have special behavior when the  given
 	 * pid becomes negative, such as for example `kill(2)'
 	 *
 	 * As such, don't raise the limit such that we'd end up with

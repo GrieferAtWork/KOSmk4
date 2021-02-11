@@ -62,8 +62,8 @@
 #endif /* !CONFIG_USE_NEW_VM */
 
 /* TODO: Add support for libdl.so to usermod objects.
- *    -> Because libdl is loaded as a static binary into user-space,
- *       and is hard-coded into the kernel, it's not backed by a regular
+ *    -> Because libdl  is loaded  as a  static binary  into  user-space,
+ *       and is hard-coded into the kernel, it's not backed by a  regular
  *       INode, and the usermod scanner won't recognize it as a potential
  *       user-space library! */
 
@@ -168,7 +168,7 @@ NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) 
 		return;
 	}
 	/* Must unmap sections data.
-	 * NOTE: Must write `us_data' elsewhere, since the first 2 pointers of the
+	 * NOTE: Must  write `us_data' elsewhere, since the first 2 pointers of the
 	 *       section object will be clobbered by `vm_kernel_locked_operation()' */
 #ifdef CONFIG_USE_NEW_VM
 	{
@@ -205,7 +205,7 @@ NOTHROW(KCALL driver_section_cdata_nx_impl)(struct driver_section *__restrict se
  * NOTE: The caller must ensure that raw section data of `self' has been loaded,
  *       as in `self->us_data != (void *)-1'!
  * @return: * : A blob of `self->us_csize' (after the caller) bytes of memory,
- *              representing the section's decompressed memory contents. */
+ *              representing  the  section's  decompressed  memory   contents. */
 PUBLIC ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
 usermod_section_cdata(struct usermod_section *__restrict self, gfp_t gfp)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT) {
@@ -371,7 +371,7 @@ usermod_section_map_into_kernel(struct usermod_section *__restrict self,
 }
 
 
-/* Lock a named section of a given usermod into
+/* Lock a  named section  of a  given usermod  into
  * memory and return a descriptor for that section.
  * @throws: E_SEGFAULT: Only here because `name' is USER
  * @return: * :   Reference to the section descriptor.
@@ -420,7 +420,7 @@ got_section_index:
 			if (result) {
 return_existing_result:
 				/* Make sure that the section is mapped into
-				 * the kernel, if the caller wants this. */
+				 * the  kernel,  if the  caller  wants this. */
 				if (!(flags & USERMOD_SECTION_LOCK_FNODATA))
 					usermod_section_map_into_kernel(result, self);
 				incref(result);
@@ -844,12 +844,12 @@ struct vm_usermod_cache {
 PRIVATE ATTR_PERMMAN struct vm_usermod_cache usermod_cache = { AXREF_INIT(NULL) };
 
 /* Clear out all unused usermod objects from `self' and
- * return non-zero if the cache wasn't already empty. */
+ * return  non-zero if the  cache wasn't already empty. */
 PUBLIC NOBLOCK size_t
 NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 	REF struct usermod *chain;
 	/* TODO: Run this function for every VM in existence
-	 *       when `system_clearcaches()' is called. */
+	 *       when   `system_clearcaches()'   is  called. */
 	chain = axref_steal(&FORMMAN(self, usermod_cache).uc_first);
 	if (!chain)
 		return 0;
@@ -873,11 +873,11 @@ NOTHROW(KCALL usermod_fini)(struct vm *__restrict self) {
 }
 
 
-/* Insert the given `um' into the usermod cache of `self'
+/* Insert  the  given  `um'  into  the  usermod  cache  of  `self'
  * If another usermod object already exists in `self' that has the
- * same `um_loadstart', then this function will decref(um), and
- * return a reference to the pre-existing usermod object instead.
- * Otherwise, `um' will be inserted at an appropriate location,
+ * same `um_loadstart', then  this function  will decref(um),  and
+ * return a reference to the pre-existing usermod object  instead.
+ * Otherwise, `um' will  be inserted at  an appropriate  location,
  * and this function will simply re-return it.
  * In every case, this function will also `sync_endwrite(self)'
  * before returning. */
@@ -940,13 +940,13 @@ duplicate_with_prev:
 
 
 /* Find the user-space module that resides at the given address.
- * NOTE: After the kernel has been poisoned, this function can no longer be used
+ * NOTE: After the kernel has been poisoned, this function can no longer be  used
  *       to load new user-space modules, but can only be used to access ones that
  *       were already in-cache.
- *       This is done as a safety measure, since loading additional user-space
- *       module descriptors requires the use of filesystem and disk I/O, which
+ *       This is  done as  a safety  measure, since  loading additional  user-space
+ *       module descriptors  requires the  use of  filesystem and  disk I/O,  which
  *       is something that simply goes too far when the system is already unstable.
- * @param: addr_must_be_executable: Unless a know module already exists for the given
+ * @param: addr_must_be_executable: Unless a  know  module  already exists  for  the  given
  *                                  address, fail unless the backing VM node is executable.
  *                                  Should be set to true if you believe that `addr' should
  *                                  be a program counter position.
@@ -996,7 +996,7 @@ vm_getusermod(struct vm *__restrict self,
 	                           addr_must_be_executable);
 	if (result) {
 		/* Add `result' to the cache of `self'.
-		 * Also: If the cache now contains an overlapping entry
+		 * Also: If  the cache now  contains an overlapping entry
 		 *       for `addr', return that one instead, and destroy
 		 *       the newly created descriptor. */
 		TRY {
@@ -1067,7 +1067,7 @@ again:
 		if (chain) {
 			result = chain;
 			do {
-				/* NOTE: Search for overlapping, rather than located-above,
+				/* NOTE: Search  for  overlapping, rather  than located-above,
 				 *       so that we can still check for more libraries between
 				 *       `addr' and the next already-known library. */
 				uintptr_t load_startaddr;
@@ -1155,7 +1155,7 @@ again:
 }
 
 /* Return the first usermod object that has a starting load start address greater than `prev'
- * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (USER void *)0)'.
+ * When `prev'  is  NULL,  behave the  same  as  `vm_getusermod_above(self, (USER void *)0)'.
  * If no module exists that matches this criteria, return `NULL' instead. */
 PUBLIC REF struct usermod *FCALL
 vm_getusermod_next(struct vm *__restrict self,
@@ -1180,8 +1180,8 @@ vm_getusermod_next(struct vm *__restrict self,
 
 
 
-/* Enumerate all user-space modules that may be mapped within `self'
- * Modules are (generally) enumerated in ascending order, based on
+/* Enumerate all user-space  modules that may  be mapped within  `self'
+ * Modules are  (generally) enumerated  in  ascending order,  based  on
  * their `um_loadstart' values. Note though that while you may optimize
  * for this case, do not rely on this actually being the case!
  * @param: cb:     Callback to-be invoked for every user-module found.
@@ -1265,24 +1265,24 @@ unwind_userspace_with_section(struct usermod *__restrict um, void const *absolut
 	unsigned int result;
 	REF struct mman *oldmm;
 	/* Must switch VM to the one of `um' in order to get user-space memory
-	 * into the expected state for the unwind handler to do its thing. */
+	 * into  the expected  state for the  unwind handler to  do its thing. */
 	oldmm = task_xchmman(um->um_vm);
 	TRY {
 		unwind_fde_t fde;
-		/* NOTE: We use the user-space's mapping of the .eh_frame section here,
-		 *       since `.eh_frame' often uses pointer encodings that are relative
+		/* NOTE: We  use the  user-space's mapping  of the  .eh_frame section here,
+		 *       since `.eh_frame' often uses  pointer encodings that are  relative
 		 *       to the .eh_frame-section itself, meaning that in order to properly
-		 *       decode the contained information, its mapping must be placed at
+		 *       decode the contained  information, its mapping  must be placed  at
 		 *       the correct location.
 		 * Another alternative to fixing this would be to add a load-offset argument
-		 * to `dwarf_decode_pointer()', as well as recursively all of the eh_frame-
-		 * related functions that somehow make use of it, where this argument then
-		 * describes the offset from the .eh_frame that was loaded, towards the one
+		 * to `dwarf_decode_pointer()', as well as recursively all of the  eh_frame-
+		 * related functions that somehow make use  of it, where this argument  then
+		 * describes the offset from the .eh_frame that was loaded, towards the  one
 		 * that would actually exist for user-space.
 		 * However the added complexity it's worth it for this one special case, and
-		 * since we already have to switch VM to the user-space's one in order to
+		 * since we already have to  switch VM to the  user-space's one in order  to
 		 * restore registers that were spilled onto the stack, we might as well also
-		 * make use of the actual `.eh_frame' section (assuming that it is where it
+		 * make use of the actual `.eh_frame' section (assuming that it is where  it
 		 * should be) */
 		if (is_debug_frame) {
 			result = unwind_fde_scan_df((byte_t *)eh_frame_data,
@@ -1329,7 +1329,7 @@ unwind_userspace(void const *absolute_pc,
 		if (!um)
 			goto done;
 		/* In order to properly unwind memory, we'd have to switch our VM to
-		 * match `um->um_vm'. An operation like that would be too dangerous
+		 * match `um->um_vm'. An operation like that would be too  dangerous
 		 * to perform after the kernel's already been poisoned. */
 		if (kernel_poisoned() && um->um_vm != THIS_MMAN) {
 			decref_unlikely(um);
@@ -1351,7 +1351,7 @@ unwind_userspace(void const *absolute_pc,
 	/* Make sure that the `.eh_frame' section is allocated in the user-program. */
 	if unlikely(!(eh_frame->us_flags & SHF_ALLOC))
 		goto done_um_eh_frame;
-	/* Now that everything's been loaded, any further exceptions (like
+	/* Now that  everything's been  loaded, any  further exceptions  (like
 	 * those thrown by the callback's we've been given) must be propagated
 	 * normally. */
 	TRY {
@@ -1370,11 +1370,11 @@ done_um_eh_frame:
 	decref_unlikely(eh_frame);
 done_um:
 	if (result == UNWIND_NO_FRAME) {
-		/* If the program doesn't have a .eh_frame section, then we
+		/* If the program  doesn't have a  .eh_frame section, then  we
 		 * must check for a `.debug_frame' section that should contain
 		 * the same kind of information.
 		 *
-		 * Also do this if .eh_frame wasn't enough. - Some programs can
+		 * Also do this if .eh_frame  wasn't enough. - Some programs  can
 		 * end up having both an .eh_frame, _and_ a .debug_frame section,
 		 * but only .debug_frame actually contains what we need! */
 		NESTED_TRY {

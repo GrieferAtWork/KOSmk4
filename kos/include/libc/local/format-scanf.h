@@ -677,7 +677,7 @@ __read_temp_for_ignored_format_c:
 				if (!__has_temp)
 					goto __read_temp_for_format_c;
 				/* TODO: If given, limit the max # of bytes written to `__dest'
-				 *       when `__type_size != 0' to at most `__bufsize' bytes!
+				 *       when  `__type_size != 0' to at most `__bufsize' bytes!
 				 *       Stop scanning if the buffer size would be exceeded. */
 				for (;;) {
 					/* Truncate read characters */

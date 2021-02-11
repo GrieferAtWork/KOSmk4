@@ -141,7 +141,7 @@ ProcFS_OpenNode(struct superblock *__restrict UNUSED(self),
 
 	case PROCFS_INOTYPE_FD_LO ... PROCFS_INOTYPE_FD_HI: {
 		/* Very important: Must set the `INODE_FLNK_DONT_FOLLOW_FINAL_LINK' flag
-		 * to ensure proper semantics when files from /proc/[pid]/fd/ are used
+		 * to ensure proper semantics when  files from /proc/[pid]/fd/ are  used
 		 * in calls to `open(2)'. */
 		node->i_flags    |= INODE_FATTRLOADED | INODE_FLNK_DONT_FOLLOW_FINAL_LINK;
 		node->i_filemode  = S_IFLNK | 0777;

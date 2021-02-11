@@ -32,7 +32,7 @@ END(GDB_Main_alternate_stack)
 
 .section .text
 /* Wrapper for `GDB_Main()' that will invoke said function
- * using an alternate, statically allocated stack. */
+ * using   an   alternate,  statically   allocated  stack. */
 /* INTDEF void NOTHROW(FCALL GDB_MainWithAlternateStack)(void); */
 INTERN_FUNCTION(GDB_MainWithAlternateStack)
 	.cfi_startproc

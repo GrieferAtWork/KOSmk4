@@ -108,7 +108,7 @@ again_acquire_lock:
 	/* Deal with `MMAN_UNMAP_FAULTIFUNUSED' */
 	if (flags & MMAN_UNMAP_FAULTIFUNUSED) {
 		/* Make sure that the entirety of the given address range is mapped.
-		 * If it isn't, then don't do anything at all, and immediately fail
+		 * If it isn't, then don't do anything at all, and immediately  fail
 		 * with an exception. */
 		byte_t *addr_iter, *endaddr;
 		addr_iter = (byte_t *)addr;
@@ -137,7 +137,7 @@ again_acquire_lock:
 		if unlikely(!IS_ALIGNED(num_bytes, PAGESIZE))
 			num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 
-		/* Unless `MMAN_UNMAP_NOSPLIT' has been given, or in the case of mprotect,
+		/* Unless  `MMAN_UNMAP_NOSPLIT'  has  been given,  or  in the  case  of mprotect,
 		 * nothing would change about border-nodes, make use of `mnode_split_or_unlock()'
 		 * to split nodes not fully contained within the given address range. */
 		node = mnode_tree_locate(self->mm_mappings, addr);
@@ -230,7 +230,7 @@ again_acquire_lock:
 		/* Remove the node from the mappings tree. */
 		mnode_tree_removenode(&self->mm_mappings, node);
 
-		/* Make sure to set the UNMAPPED bit, so that other kernel
+		/* Make  sure to set  the UNMAPPED bit,  so that other kernel
 		 * components can identify this node as having been unmapped!
 		 * This mainly effects `mpart_split()' */
 		ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
@@ -288,7 +288,7 @@ again_acquire_lock:
 					/* Sync the affected address range within the given mman. */
 					mman_sync_p(self, node_addr, node_size);
 
-					/* If write-permissions went away, remove the node from the
+					/* If write-permissions went away, remove the node from  the
 					 * list of writable nodes stored within the associated mman. */
 					if (LIST_ISBOUND(node, mn_writable) && !(newperm & PAGEDIR_MAP_FWRITE))
 						LIST_UNBIND(node, mn_writable);

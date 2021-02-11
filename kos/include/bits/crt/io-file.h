@@ -55,9 +55,9 @@
 #ifdef __CRT_KOS_PRIMARY
 #ifdef __BUILDING_LIBC
 /* This structure is only defined internally, because
- * that's how private data should be encapsulated.
+ * that's how  private data  should be  encapsulated.
  * NOTE: The first byte of this structure is always the NUL character,
- *       thus allowing library users to interpret a pointer to it as
+ *       thus allowing library users to  interpret a pointer to it  as
  *       a C-string of 0 length. */
 struct iofile_data;
 #endif /* __BUILDING_LIBC */
@@ -108,12 +108,12 @@ struct __IO_FILE {
 	__UINT32_TYPE__     if_flag;       /* Set of `IO_*' (aka. `__IO_FILE_IO*') */
 	__INT32_TYPE__      if_fd;         /* [valid_if(!IO_HASVTAB)] Underlying file descriptor.
 	                                    * NOTE: When available, this stream's file pointer is assumed
-	                                    *       to be located at the end of the loaded buffer. */
+	                                    *       to be  located  at  the end  of  the  loaded  buffer. */
 	__BYTE_TYPE__       if_charbuf[4]; /* A very small inline-allocated buffer used as fallback for 'if_base' */
 	__UINT32_TYPE__     if_bufsiz;     /* [lock(if_exdata->io_lock)] Total allocated / available buffer size.
-	                                    * NOTE: This pointer must not be modified when `IO_READING' is set. */
+	                                    * NOTE: This pointer must not be  modified when `IO_READING' is  set. */
 	struct iofile_data *if_exdata;     /* [1..1][owned][const] Pointer to some internal data.
-	                                    * HINT: To fix binary compatibility with DOS, the first byte of
+	                                    * HINT: To fix binary compatibility with  DOS, the first byte  of
 	                                    *       this structure is a NUL-character, allowing library users
 	                                    *       to interpret this member as a C-string of 0 length. */
 #define __f_ptr      if_ptr

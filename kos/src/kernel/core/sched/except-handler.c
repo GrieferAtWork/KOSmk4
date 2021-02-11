@@ -75,8 +75,8 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  *     >>             error_printf("...");
  *     >>     }
  *     >> }
- * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will cause
- * the given `ctid' to be used as the initial value for `this_tid_address', while the
+ * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will  cause
+ * the given `ctid' to be used as  the initial value for `this_tid_address', while  the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
 PUBLIC ATTR_PERTASK USER CHECKED pid_t *this_tid_address = NULL;
@@ -94,12 +94,12 @@ INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
 					USER CHECKED struct userprocmask *um;
 					um = (USER CHECKED struct userprocmask *)addr;
 					/* Handle the special case of a vfork()'d thread having
-					 * initialized their parent thread's userprocmask data
+					 * initialized their parent thread's userprocmask  data
 					 * structure.
-					 * This is needed because userprocmask is part of a
-					 * thread's user-space TLS state, which itself is part
-					 * of that process's VM, which is the very thing that gets
-					 * shared during a call to vfork(), meaning that we must
+					 * This  is  needed  because  userprocmask  is  part  of   a
+					 * thread's  user-space  TLS  state,  which  itself  is part
+					 * of that process's VM, which  is the very thing that  gets
+					 * shared  during a  call to  vfork(), meaning  that we must
 					 * uninitialize it if it wasn't the parent who did the init! */
 					ATOMIC_WRITE(um->pm_sigmask, NULL);
 				}
@@ -112,7 +112,7 @@ INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
 			/* Explicitly handle E_SEGFAULT:addr as a no-op */
 			if (!was_thrown(E_SEGFAULT) ||
 			    (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr)) {
-				/* We can't RETHROW() the exception since our function
+				/* We  can't RETHROW() the  exception since our function
 				 * has to be NOTHROW() (especially so since we're called
 				 * as part of thread cleanup)
 				 * Because of this, dump all other errors that happen here. */
@@ -145,7 +145,7 @@ NOTHROW(KCALL reset_user_except_handler)(void) {
 #ifdef CONFIG_HAVE_USERPROCMASK
 	/* Clear the userprocmask flag for our thread.
 	 * Note that our caller will have already loaded userspace's
-	 * final process mask into our kernel-space sigmask buffer.
+	 * final  process mask into our kernel-space sigmask buffer.
 	 *
 	 * s.a. `kernel_do_execveat_impl()' */
 	ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FUSERPROCMASK);
@@ -409,10 +409,10 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 	TRY {
 		memcpy(&kernel_mask->sm_mask, old_sigset, sizeof(sigset_t));
 	} EXCEPT {
-		/* Make sure that SIGKILL and SIGSTOP are never masked
-		 * Note however that we don't need to check for them to be
+		/* Make sure  that  SIGKILL  and  SIGSTOP  are  never  masked
+		 * Note  however that we  don't need to check  for them to be
 		 * pending, since our thread is still in `TASK_FUSERPROCMASK'
-		 * mode, meaning that the is-pending check isn't actually
+		 * mode,  meaning  that the  is-pending check  isn't actually
 		 * using our thread's kernel signal mask! */
 		sigdelset(&kernel_mask->sm_mask, SIGKILL);
 		sigdelset(&kernel_mask->sm_mask, SIGSTOP);
@@ -442,7 +442,7 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 		old_ctl = PERTASK_GET(this_userprocmask_address);
 		/* Load the final userprocmask into kernelspace */
 		load_userprocmask_into_kernelspace(old_ctl);
-		/* Clear the userprocmask flag(s), the same way a
+		/* Clear  the userprocmask flag(s), the same way a
 		 * call `sys_set_userprocmask_address(NULL)' would
 		 * have. */
 		ATOMIC_AND(THIS_TASK->t_flags,
@@ -579,16 +579,16 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 			old_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FUSERPROCMASK);
 			/* If USERPROCMASK wasn't enabled before, and we're a VFORK thread,
 			 * then we must also set the `TASK_FUSERPROCMASK_AFTER_VFORK' flag,
-			 * such that the process of clearing the `TASK_FVFORK' flag during
+			 * such that the process of clearing the `TASK_FVFORK' flag  during
 			 * exec() or exit() will also write NULL to `ctl->pm_sigmask' */
 			if ((old_flags & (TASK_FUSERPROCMASK | TASK_FVFORK)) == TASK_FVFORK)
 				ATOMIC_OR(THIS_TASK->t_flags, TASK_FUSERPROCMASK_AFTER_VFORK);
 		}
 
-		/* NOTE: ___Don't___ call `sigmask_check()' here! Assuming that the user
+		/* NOTE: ___Don't___  call `sigmask_check()' here!  Assuming that the user
 		 *       calls that function when appropriate, none of the pending signals
-		 *       would currently be unmasked, and even if they were, we mustn't
-		 *       check for them here, since this system call isn't a cancellation
+		 *       would  currently be unmasked,  and even if  they were, we mustn't
+		 *       check  for them here, since this system call isn't a cancellation
 		 *       point! */
 	}
 done:

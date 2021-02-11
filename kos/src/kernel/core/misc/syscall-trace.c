@@ -135,11 +135,11 @@ sct_table = ARREF_INIT(&empty_sct_table);
 
 
 
-/* Start/stop the tracing of system calls by installing/deleting callbacks
+/* Start/stop the  tracing of  system  calls by  installing/deleting  callbacks
  * that are invoked for every system call invoked after `syscall_trace_start()'
  * returns, and before `syscall_trace_stop()' returns.
  * NOTE: The internal structures related to these functions don't keep a permanent
- *       reference to the given `ob_pointer' object, meaning that so-long as you
+ *       reference to the given `ob_pointer'  object, meaning that so-long as  you
  *       make sure to call `syscall_trace_stop()' from the object's finalizer, you
  *       can safely use these functions with arbitrary kernel objects.
  * @param: cb:         The callback to-be invoked when a system call is performed.
@@ -241,13 +241,13 @@ again_insert:
 		RETHROW();
 	}
 	/* Handle special case: if the old table was empty, then we
-	 *                      must enable system call tracing. */
+	 *                      must enable  system  call  tracing. */
 	if (old_table_was_empty) {
 		TRY {
 			/* Enable system call tracing */
 			arch_syscall_tracing_setenabled(true, false);
 		} EXCEPT {
-			/* Handle an exception during arch-level tracing enable
+			/* Handle  an exception during arch-level tracing enable
 			 * by deleting the freshly installed tracing hook before
 			 * re-throwing the exception. */
 			syscall_trace_stop(cb, ob_pointer, ob_type);
@@ -317,7 +317,7 @@ set_new_table:
 		goto again;
 	}
 	assert(new_table->tt_count < old_table->tt_count);
-	/* Check for special case: The new table is empty.
+	/* Check for special  case: The new  table is  empty.
 	 * In this case, we must disable system call tracing. */
 	if (new_table->tt_count == 0)
 		arch_syscall_tracing_setenabled(false, true);
@@ -364,11 +364,11 @@ again:
 
 
 /* Trace a given system call.
- * This function is called at the start of any user-level system
- * call so-long as `arch_syscall_tracing_getenabled() == true'
+ * This  function is called  at the start  of any user-level system
+ * call   so-long   as  `arch_syscall_tracing_getenabled() == true'
  * Custom system call invocation mechanisms that directly call into
  * the underlying system call tables, rather than going through the
- * provided `syscall_emulate()' family of functions must manually
+ * provided `syscall_emulate()' family  of functions must  manually
  * invoke this callback */
 PUBLIC void FCALL
 syscall_trace(struct rpc_syscall_info const *__restrict info) {
@@ -379,7 +379,7 @@ syscall_trace(struct rpc_syscall_info const *__restrict info) {
 	if unlikely(!table->tt_count) {
 		/* Try to disable system call tracing.
 		 * This may have failed before, since we only ever try
-		 * to disable tracing in NX-mode, meaning that it may
+		 * to disable tracing in NX-mode, meaning that it  may
 		 * fail arbitrarily! */
 		if (arch_syscall_tracing_getenabled())
 			arch_syscall_tracing_setenabled(false, true);

@@ -105,25 +105,25 @@ NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 #endif /* __x86_64__ || __i386__ */
 
 /* Poison the kernel.
- * This operation cannot be undone and may (under rare circumstances)
+ * This operation cannot be undone and may (under rare  circumstances)
  * itself cause the kernel to crash (due to race conditions with other
- * CPUs). Use with caution, or better yet: Don't use at all!
- * Additionally, this function will attempt to fix some common system
- * integrity violations in order to allow other kernel panic code to
- * at least somewhat function correctly. (as far as that may still be
- * possible, given that this function is meant to be used when the
+ * CPUs).  Use  with  caution,  or  better  yet:  Don't  use  at  all!
+ * Additionally, this function will attempt to fix some common  system
+ * integrity violations in order to  allow other kernel panic code  to
+ * at least somewhat function correctly. (as far as that may still  be
+ * possible,  given that  this function is  meant to be  used when the
  * kernel has become unstable) */
 PUBLIC NOBLOCK ATTR_COLD void
 NOTHROW(KCALL _kernel_poison)(void) {
-	/* Fix some potential system inconsistencies that may
-	 * otherwise cause infinite loops when an assertion gets
+	/* Fix some  potential  system  inconsistencies  that  may
+	 * otherwise  cause infinite loops  when an assertion gets
 	 * triggered (after all: there is code that can get called
 	 * from within an assertion handler, which in turn is able
 	 * to cause other assertions) */
 	struct task *mythread;
 	pflag_t was = PREEMPTION_PUSHOFF();
 
-	/* Try to repair a broken TLS state, since we'll need
+	/* Try  to repair  a broken  TLS state,  since we'll need
 	 * a (somewhat) working one in order to even do anything! */
 #if defined(__x86_64__) || defined(__i386__)
 	mythread = x86_repair_broken_tls_state();
@@ -138,7 +138,7 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	    mythread != &_asyncwork &&
 	    mythread != &_bootidle)
 		fixup_uninitialized_thread(mythread);
-	/* Poison the kernel (indicating that the kernel has become
+	/* Poison the kernel (indicating  that the kernel has  become
 	 * inconsistent, and can no longer be trusted to sporadically
 	 * crash and burn) */
 	COMPILER_WRITE_BARRIER();
@@ -149,12 +149,12 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	ph_install();
 	/* TODO: Turn system_clearcache() into a no-op.
 	 *       With the poison-heap, kfree() also becomes a no-op,
-	 *       so system_clearcache() won't actually do anything.
-	 * However, that function has an insanely large range of
+	 *       so system_clearcache() won't actually do  anything.
+	 * However, that function  has an insanely  large range  of
 	 * call-sites, any of whom may have been compromised by the
-	 * kernel panic, so in trying to maintain system integrity
-	 * for a little while longer, it's in our test interest to
-	 * prevent any unnecessary callbacks to sub-systems that
+	 * kernel panic, so in trying to maintain system  integrity
+	 * for  a little while longer, it's in our test interest to
+	 * prevent any  unnecessary callbacks  to sub-systems  that
 	 * depend on too many other sub-systems, or contain dynamic
 	 * callbacks (both of which are the case for this function) */
 #endif /* CONFIG_HAVE_POISON_HEAP */
@@ -555,7 +555,7 @@ panic_genfail_dbg_main(/*char const **/ void *message) {
 
 
 /* The `__stack_chk_guard' global is read _very_ often,
- * so place in in the COMPACT_DATA segment. */
+ * so   place   in   in   the   COMPACT_DATA   segment. */
 #ifndef NDEBUG
 PUBLIC ATTR_READMOSTLY uintptr_t __stack_chk_guard = 0x123baf37;
 #else /* !NDEBUG */

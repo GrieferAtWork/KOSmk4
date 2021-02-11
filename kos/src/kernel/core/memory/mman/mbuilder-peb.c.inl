@@ -103,8 +103,8 @@ DECL_BEGIN
 #endif /* OU_POINTERSIZE == !.. */
 
 
-/* Allocate a PEB (Process Environment Block) within the given MBuilder,
- * initializing its contents with the strings from the given argv+envp pair.
+/* Allocate  a  PEB  (Process  Environment   Block)  within  the  given   MBuilder,
+ * initializing  its  contents  with the  strings  from the  given  argv+envp pair.
  * This function is called from `vm_exec()' after the remainder of the application,
  * as well as the dynamic linker have already been loaded into memory.
  * @param: argc_inject: The number of arguments from `argv_inject' to inject
@@ -287,7 +287,7 @@ string_size_changed:
 		LIST_REMOVE((struct mnode *)stolen_node, mn_writable);
 
 	/* Delete the temporary PEB mapping, and sync the address range.
-	 * NOTE: Since the mapping was strictly private to us,
+	 * NOTE: Since  the mapping was  strictly private to us,
 	 *       there is no need to sync this with another CPU! */
 	pagedir_unmap(peb_temp_base, peb_total_size);
 	pagedir_sync(peb_temp_base, peb_total_size);

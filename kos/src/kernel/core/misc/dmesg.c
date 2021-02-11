@@ -45,7 +45,7 @@
 DECL_BEGIN
 
 
-/* The dmesg buffer is a wrap-around buffer of tightly packed, consecutive packets
+/* The dmesg buffer is a wrap-around buffer of tightly packed, consecutive  packets
  * written as a continuous stream to the `dmesg_buffer' buffer, with any index that
  * would go beyond the buffer's end simply wrapping around.
  * Any given packet has the following layout.
@@ -79,9 +79,9 @@ DECL_BEGIN
  * >>        ((level_nano4 & 0x3) << 28);
  * >> // 5-bit log level index
  * >> level = (level_nano4 & 0x7c) >> 2;
- * Note that nowhere inside of a packet NUL-bytes can appear, meaning that
+ * Note that nowhere inside of a  packet NUL-bytes can appear, meaning  that
  * the prev/next packet can be found by searching for the prev/next NUL-byte
- * within this buffer. However, be aware that the buffer can change at any
+ * within  this buffer. However, be aware that  the buffer can change at any
  * time, meaning that any packet decoding errors must be considered the same
  * as having fully wrapped around the buffer. */
 PUBLIC ATTR_BSS ATTR_ALIGNED(1) byte_t dmesg_buffer[CONFIG_DMESG_BUFFER_SIZE] = {};
@@ -92,7 +92,7 @@ PUBLIC ATTR_BSS time_t dmesg_secondsbase = 0;
 /* Non-zero if `dmesg_buffer' may be in an inconsistent state. */
 PUBLIC ATTR_BSS WEAK unsigned int dmesg_consistent = 0;
 
-/* Total number of bytes ever written to `dmesg_buffer' in the past.
+/* Total number  of bytes  ever written  to `dmesg_buffer'  in the  past.
  * A pointer to the end of the last-written packet can thus be calculated
  * as `&dmesg_buffer[dmesg_size % CONFIG_DMESG_BUFFER_SIZE]' */
 PUBLIC ATTR_BSS size_t dmesg_size = 0;
@@ -280,7 +280,7 @@ NOTHROW(FCALL dmesg_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 
 /* The syslog sink for writing to the dmesg buffer.
  * This sink is part of the default set of syslog sinks, alongside
- * the optional, arch-specific `ARCH_DEFAULT_SYSLOG_SINK' */
+ * the    optional,    arch-specific    `ARCH_DEFAULT_SYSLOG_SINK' */
 PUBLIC struct syslog_sink dmesg_sink = {
 	/* .ss_refcnt = */ 2, /* +1: dmesg_sink, +1: default_syslog_sink_array */
 	/* .ss_levels = */ (uintptr_t)-1,
@@ -288,10 +288,10 @@ PUBLIC struct syslog_sink dmesg_sink = {
 	/* .ss_fini   = */ NULL
 };
 
-/* While running the builtin debugger, don't write log messages to dmesg.
+/* While running  the builtin  debugger, don't  write log  messages to  dmesg.
  * This way, dmesg doesn't get flooded with messages from within the debugger,
- * which could otherwise pose problems when attempting to inspect dmesg logs
- * from within the debugger: more messages get added, maybe even override the
+ * which could otherwise pose problems  when attempting to inspect dmesg  logs
+ * from within the debugger: more messages get added, maybe even override  the
  * ones you were trying to look at. */
 DEFINE_DBG_BZERO_OBJECT(dmesg_sink.ss_levels);
 /* While inside of the debugger, don't make dmesg appear inconsistent. */
@@ -299,23 +299,23 @@ DEFINE_DBG_BZERO_OBJECT(dmesg_consistent);
 
 
 /* Try to load a system log message into `buffer' and
- * validate that the message's checksum is in-tact.
- * WARNING: Even with the checksum check in place, there is a 1/256
+ * validate that the  message's checksum is  in-tact.
+ * WARNING: Even with the checksum check  in place, there is a  1/256
  *          chance that a corrupted system log message could be read.
- *          And even beyond this, there is a chance that a corrupted
- *          message had previously been written to the dmesg buffer.
+ *          And  even beyond this, there is a chance that a corrupted
+ *          message had previously been written to the dmesg  buffer.
  *          These chances are extremely slim, however still non-zero,
  *          so be aware that the produced message may not be what was
  *          originally written!
- * HINT: Please note that while this function technically allows you
- *       to extract messages that are longer than `CONFIG_SYSLOG_LINEMAX'
+ * HINT: Please note  that  while  this function  technically  allows  you
+ *       to  extract messages that are longer than `CONFIG_SYSLOG_LINEMAX'
  *       bytes of raw text, it is impossible to write messages longer than
  *       this to the dmesg buffer
  * @param: buffer:         The target buffer (with enough space for at least `message_length' bytes)
  * @param: message_offset: Offset into the dmesg buffer where the message starts.
  * @param: message_length: The length of the written message.
  * @return: true:  Successfully extracted the message.
- * @return: false: The message's checksum did not match (this likely means that
+ * @return: false: The message's checksum did not match (this likely means  that
  *                 the end of the dmesg backlog was reached, since another entry
  *                 was probably responsible for overwriting this one's message) */
 PUBLIC bool KCALL
@@ -345,7 +345,7 @@ dmesg_getmessage(USER CHECKED char *buffer,
 
 
 /* Enumerate up to `limit' recently written system log entries.
- * s.a. The simplified variant of this function `dmesg_enum()' with automatically
+ * s.a. The simplified  variant of  this  function `dmesg_enum()'  with  automatically
  *      handles message extraction and checksum verification, as well as automatically
  *      stopping enumeration once a bad checksum is encountered.
  * NOTE: Log messages are enumerated from most-recent to least-recent
@@ -355,7 +355,7 @@ dmesg_getmessage(USER CHECKED char *buffer,
  * @param: offset:   The number of leading messages to skip
  * @return: >= 0:    The sum of all invocations of `*callback'
  *                   If `*callback' was never invoked, or always returned
- *                   `0', `0' will also be returned by this function.
+ *                   `0', `0'  will also  be returned  by this  function.
  * @return: < 0:     The propagation of the first negative return value of `*callback'. */
 PUBLIC NONNULL((1)) ssize_t KCALL
 dmesg_enum(dmesg_enum_t callback, void *arg,

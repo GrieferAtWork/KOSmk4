@@ -74,21 +74,21 @@ typedef union {
 /************************************************************************/
 /* Helper functions for accessing very small segments of physical memory.
  * WARNING: DON'T SPAM THESE FUNCTIONS! If you want to access consecutive physical memory,
- *          either make use of `copy(from|to)phys()' or `THIS_TRAMPOLINE'.
+ *          either    make    use   of    `copy(from|to)phys()'    or   `THIS_TRAMPOLINE'.
  *          These functions will try to make use arch-specific physical identity mappings,
- *          like can be found on `x86_64' for the first 1Gib of physical memory.
- *          However any memory outside that region (or any memory at all if no such
- *          region is defined by the arch (as is the case for `i386'), will need to
+ *          like can  be  found  on  `x86_64'  for the  first  1Gib  of  physical  memory.
+ *          However  any  memory outside  that region  (or any  memory at  all if  no such
+ *          region is  defined by  the arch  (as is  the case  for `i386'),  will need  to
  *          be accessed through use of `THIS_TRAMPOLINE'!) */
 PUBLIC NOBLOCK WUNUSED u8
 NOTHROW(FCALL peekphysb)(PHYS physaddr_t addr) {
 	PHYS_VARS;
 	u8 result;
-	/* A single page of virtual memory in the kernel mman, that is always
+	/* A single page of virtual memory in the kernel mman, that is  always
 	 * prepared for being used for whatever purposes a thread has in mind.
-	 * NOTE: This page is also used by PAGEFAULTS, though it will
+	 * NOTE: This page is also used  by PAGEFAULTS, though it  will
 	 *       restore a previous mapping, if such a mapping existed.
-	 * NOTE: Because this page is unique for each thread, the user is not
+	 * NOTE: Because this page is unique for each thread, the user is  not
 	 *       required to acquire a lock to the kernel mman when wishing to
 	 *       map something at this location! */
 	DEFINE_PUBLIC_SYMBOL(this_trampoline, &this_trampoline_node.mn_minaddr, sizeof(this_trampoline));

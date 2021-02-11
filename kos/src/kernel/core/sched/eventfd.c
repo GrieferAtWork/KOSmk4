@@ -235,7 +235,7 @@ DEFINE_SYSCALL2(fd_t, eventfd2,
 	TRY {
 		struct handle hnd;
 		/* Setup the handle.
-		 * Note that under KOS, the fence vs. semaphore
+		 * Note   that  under  KOS,   the  fence  vs.  semaphore
 		 * differentiation is made using the handle's type code. */
 		hnd.h_type = HANDLE_TYPE_EVENTFD_FENCE;
 		if (flags & EFD_SEMAPHORE)

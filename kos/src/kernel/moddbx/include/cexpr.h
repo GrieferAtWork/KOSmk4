@@ -139,7 +139,7 @@ DATDEF struct cvalue cexpr_stack_stub[1]; /* Stub-stack */
 DATDEF size_t cexpr_stacksize;
 
 /* Return the current stack-top element. If the stack is otherwise empty,
- * then this will instead return a stub-void expression, ala `(void)0' */
+ * then this will  instead return a  stub-void expression, ala  `(void)0' */
 #define cexpr_stacktop cexpr_stack[cexpr_stacksize - 1]
 
 /* When true, only allow read-only C expression operations.
@@ -148,12 +148,12 @@ DATDEF __BOOL cexpr_readonly;
 
 /* Don't calculate/keep track of c expression values, but
  * only simulate the effective expression type. - Used to
- * implement `typeof()' in C expressions, as well as for
- * the purpose of auto-completion of struct member names
+ * implement `typeof()' in C expressions, as well as  for
+ * the  purpose of auto-completion of struct member names
  * and the like. */
 DATDEF __BOOL cexpr_typeonly;
 
-/* Set to true if memory writes should be forced.
+/* Set  to  true  if  memory  writes  should  be   forced.
  * This is the 4'th argument is calls to dbg_writememory()
  * Defaults to `false' */
 DATDEF __BOOL cexpr_forcewrite;
@@ -215,16 +215,16 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_dup)(void);
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_swap)(void);
 
 /* Rotate the top n c expression stack elements left/right.
- * When `n <= 1', these calls are a no-op in regards to
+ * When  `n <= 1', these  calls are  a no-op  in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n);
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n);
 
-/* Return a pointer to the data associated with the top expression stack element.
+/* Return a pointer to the data associated with the top expression stack  element.
  * If the stack is empty or `cexpr_typeonly' is `true', write-back a NULL pointer.
  * WARNING: The pointer written back to `*presult' may point to arbitrary
- *          user- or out-of-vm memory, meaning that it must be accessed
+ *          user- or out-of-vm memory, meaning  that it must be  accessed
  *          through use of `dbg_(read|write)memory'!
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.
@@ -234,7 +234,7 @@ FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_getdata)(byte_t **__restrict presult);
 
 /* Return the actual size of the top element of the C expression stack.
- * If the stack is empty, return `0' instead. (s.a. `ctype_sizeof()') */
+ * If the stack is empty,  return `0' instead. (s.a.  `ctype_sizeof()') */
 FUNDEF ATTR_PURE WUNUSED size_t NOTHROW(FCALL cexpr_getsize)(void);
 
 /* Return the boolean value of the top stack element.
@@ -256,9 +256,9 @@ NOTHROW(FCALL cexpr_cast)(struct ctyperef const *__restrict typ);
 FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_cast_simple)(struct ctype *__restrict typ);
 
-/* Convert the top C expression stack element into an R-value,
+/* Convert  the  top C  expression  stack element  into  an R-value,
  * such that if a potentially pointed-to memory location is changed,
- * then the stack element retains the original value. This function
+ * then the stack element retains the original value. This  function
  * also promotes array->pointer types.
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
@@ -298,12 +298,12 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_ref)(void);   /* Implements `&' */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_deref)(void); /* Implements `*' */
 
 /* Perform a unary operation `op' on the top C expression stack element.
- * NOTE: This function automatically performs type promotions.
+ * NOTE: This   function   automatically   performs   type   promotions.
  * @param: op: One of:
  *             '+': Assert integer type / cast enum to integer.
  *             '-': Negate a value.
  *             '~': Bit-wise not.
- *             '!': Logical not.
+ *             '!': Logical  not.
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: The stack is empty or invalid `op'.
@@ -312,7 +312,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_deref)(void); /* Implements `*' */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op);
 
 /* Perform a binary operation `op' on the top 2 C expression stack elements.
- * As far as operands go, STACK.TOP is RHS and STACK.TOP-1 is LHS (meaning
+ * As  far as operands go, STACK.TOP is  RHS and STACK.TOP-1 is LHS (meaning
  * that LHS must be pushed first, and RHS second)
  * NOTE: This function automatically performs type promotions.
  * @param: op: One of:
@@ -321,9 +321,9 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op);
  *             '*':                      Multiply.
  *             '/':                      Divide.
  *             '%':                      Remainder (modulo).
- *             '&':                      Bit-wise and
- *             '|':                      Bit-wise or
- *             '^':                      Bit-wise xor
+ *             '&':                      Bit-wise        and
+ *             '|':                      Bit-wise         or
+ *             '^':                      Bit-wise        xor
  *             CTOKEN_TOK_LANGLE_LANGLE: Shift-left
  *             CTOKEN_TOK_RANGLE_RANGLE: Shift-right
  *             CTOKEN_TOK_EQUALS_EQUALS: Equals
@@ -340,21 +340,21 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op);
  * @return: DBX_ESYNTAX:  `op' not allowed for its operands. */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_op2)(unsigned int op);
 
-/* Perform an assignment operation between the top 2 stack elements,
+/* Perform an assignment operation between the top 2 stack  elements,
  * where TOP is RHS, and the one before is LHS. When `cexpr_readonly'
  * is set to `true', then this function fails with `DBX_ERDONLY' */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_store)(void);
 
 /* Pop `argc' operands, followed by popping the function to call.
- * Then, invoke the function and push its return value.
+ * Then,  invoke  the  function   and  push  its  return   value.
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: The stack does not contain enough elements. */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc);
 
-/* Push a currently visible symbol, as selected by the code location from
+/* Push  a currently visible  symbol, as selected by  the code location from
  * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
- * given that symbol's `name'. For this purpose, `name' can be (in order):
+ * given that symbol's `name'. For this  purpose, `name' can be (in  order):
  *   - A function-to-compilation-unit-scoped variable/argument/enum
  *   - A PUBLIC/INTERN variable from the module containing the current PC
  * if (ADDR_ISUSER(CURRENT_PC)) {
@@ -364,15 +364,15 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc);
  *   - A PUBLIC/INTERN variable from any loaded kernel-space module
  *   - A PUBLIC/INTERN variable from any loaded user-space module
  * }
- * Note that special handling is done for kernel-space PERxxx variables, which are
- * automatically linked to the associated address space for `dbg_current', such as
+ * Note that special handling is done for kernel-space PERxxx variables, which  are
+ * automatically  linked to the associated address space for `dbg_current', such as
  * `this_task' automatically being loaded as the equivalent of `this_task@%fs_base'
- * This detection is done for all PUBLIC/INTERN+KERNEL_CORE symbols starting with
+ * This detection is done for  all PUBLIC/INTERN+KERNEL_CORE symbols starting  with
  * one of the following prefixes:
  *   - this_*      Addend is `(uintptr_t)dbg_current'
  *   - thiscpu_*   Addend is `(uintptr_t)dbg_current->t_cpu'
  *   - thisvm_*    Addend is `(uintptr_t)dbg_current->t_mman'
- * @param: automatic_symbol_addend: When set to `false', do include automatic symbol
+ * @param: automatic_symbol_addend: When  set to `false', do include automatic symbol
  *                                  addend for special this_* namespaces (s.a. above)
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.

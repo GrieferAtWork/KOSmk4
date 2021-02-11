@@ -317,10 +317,10 @@ again:
 		if unlikely(bank_alloc_page < PMEMBANK_STARTPAGE(kernel_membanks_initial[i]))
 			continue; /* Too small with alignment */
 #if defined(__i386__) || defined(__x86_64__)
-		/* Try not to allocate beneath the kernel, so-as not to use up low memory,
-		 * which is already in short supply, and which we'll still be needing for
+		/* Try not to allocate  beneath the kernel,  so-as not to  use up low  memory,
+		 * which is already  in short  supply, and which  we'll still  be needing  for
 		 * initialization of APIC/SMP trampoline code, or other real-mode/BIOS related
-		 * stuff that can only exist below the physical 1MiB (16-bit 0xffff) mark. */
+		 * stuff  that can  only exist below  the physical 1MiB  (16-bit 0xffff) mark. */
 		if unlikely(bank_alloc_page <= physaddr2page((uintptr_t)__kernel_start - KERNEL_CORE_BASE) &&
 		            !allow_beneath_kernel)
 			continue;
@@ -346,7 +346,7 @@ again:
 #if 0
 			{
 				/* Subtract the number of bytes used by this, that would otherwise go unused from `waste'
-				 * (i.e. `NUMBER_OF_BYTES_UNSED_OF(PAGE_ALIGNED_BANK_END ... BYTE_ALIGNED_BANK_END)') */
+				 * (i.e.     `NUMBER_OF_BYTES_UNSED_OF(PAGE_ALIGNED_BANK_END ... BYTE_ALIGNED_BANK_END)') */
 				physaddr_t gain_min;
 				physaddr_t gain_end;
 				gain_end = PMEMBANK_ENDADDR(kernel_membanks_initial[i]);
@@ -440,14 +440,14 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* This function is quite the nuisance, and doing it right is quite difficult.
 	 *  - We need to (dynamically) create some very large bitsets to hold information
 	 *    about what physical memory has been allocated.
-	 *  - Information about this currently stems from temporary data vectors that are
+	 *  - Information about this currently stems  from temporary data vectors that  are
 	 *    hacked to overlap with the far end of the boot task's stack, with information
 	 *    about where to allocate these bitsets also originating from that same vector.
-	 *  - We must allocate all of this memory in physically linear pages, as we can't
-	 *    afford to have this information split across different parts of memory, as
+	 *  - We must allocate  all of  this memory  in physically  linear pages,  as we  can't
+	 *    afford  to  have this  information  split across  different  parts of  memory, as
 	 *    we only got 1 VM node/datapart (kernel_vm_(part|node)_pagedata) to describe this.
 	 *  - We can't just willy-nilly start using available ram, as it may contain important
-	 *    data structures left by the BIOS or BOOT loader! (so we must also look out for
+	 *    data  structures left by the BIOS or BOOT  loader! (so we must also look out for
 	 *    memory preservations, aka. `PMEMBANK_TYPE_PRESERVE') */
 	size_t i, zone_count = 0, req_bytes = 0;
 	size_t req_pages;
@@ -456,8 +456,8 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* First off: figure out exactly how many bytes we need for everything! */
 	assert(minfo.mb_banks == kernel_membanks_initial);
 	/* NOTE: Allocate memory for +3 banks because the necessary allocation
-	 *       below may add up to +2 additional banks, with the 3rd bank
-	 *       being required as a trailing sentinel bank to terminate the
+	 *       below  may add up  to +2 additional banks,  with the 3rd bank
+	 *       being required as a trailing  sentinel bank to terminate  the
 	 *       known address space. */
 	req_bytes = (minfo.mb_bankc + 3) * sizeof(struct pmembank);
 	for (i = 0; i < minfo.mb_bankc; ++i) {
@@ -483,12 +483,12 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* Also include the vector of memory zone pointers later found in `mzones.pm_zones' */
 	req_bytes += zone_count * sizeof(struct pmemzone *);
 
-	/* Now that we now exactly how much memory will be required for physical
-	 * memory management, as well as relocating the meminfo vector, we must
+	/* Now that we now exactly how much memory will be required for  physical
+	 * memory management, as well as  relocating the meminfo vector, we  must
 	 * search for a piece of available ram that is large enough to accomplish
 	 * this for us.
 	 * For this, we prefer using banked memory that is not aligned by whole
-	 * pages, as it would otherwise go unused forever, since page_malloc()
+	 * pages, as it would otherwise go unused forever, since  page_malloc()
 	 * is not capable of allocating sub-page memory. */
 	req_pages = CEILDIV(req_bytes, PAGESIZE);
 	kernel_meminfo_mpart.mp_mem.mc_start = minfo_allocate_part_pagedata(req_bytes);
@@ -511,8 +511,8 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 
 	/* With the required buffer now allocated, we can move on to populating it with data.
 	 * NOTE: Since `minfo_allocate_part_pagedata()' only changed pages marked as `PMEMBANK_TYPE_RAM'
-	 *       to become `PMEMBANK_TYPE_ALLOCATED', both of which have the same properties when it
-	 *       comes to `PMEMBANK_TYPE_SHOULD_ZONE()', there should not be any change to how many
+	 *       to  become `PMEMBANK_TYPE_ALLOCATED',  both of which  have the same  properties when it
+	 *       comes to `PMEMBANK_TYPE_SHOULD_ZONE()',  there should  not be  any change  to how  many
 	 *       zones will be required, or where those zones will be located at! */
 	/* Start by allocating the zone vector. */
 	mzones.pm_zonec = zone_count;
@@ -570,10 +570,10 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 				 * [output] MEMORY 0000000000BC5000-0000000000BC5033 (ram)
 				 * [output] MEMORY 0000000000BC5034-0000000000BC5052 (preserve)
 				 * [output] MEMORY 0000000000BC5053-0000000007FDFFFF (ram)
-				 * In this case, we can assume that at least some portion of the page is
-				 * considered to not be ~normal~ RAM. - So because of this, we do pretty
+				 * In  this case, we can assume that at  least some portion of the page is
+				 * considered to not be ~normal~ RAM. -  So because of this, we do  pretty
 				 * much assume that all pages (at least partially) touched by this mapping
-				 * are entirely undefined (which may not necessarily be so, but is the
+				 * are  entirely undefined  (which may not  necessarily be so,  but is the
 				 * safest thing which we can do). */
 				startpage = (physpage_t)FLOORDIV(PMEMBANK_MINADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
 				endpage   = (physpage_t)CEILDIV(PMEMBANK_MAXADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
@@ -663,15 +663,15 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-/* Relocate `minfo', as well as `mzones' data to a more appropriate location
+/* Relocate `minfo', as well as `mzones'  data to a more appropriate  location
  * after `kernel_initialize_minfo_makezones()' has been called, and the kernel
  * VM has been cleaned from unused memory mappings.
  * Before this function is called, all memory information still resides at a
  * location where its physical address is relative to its virtual, just like
- * any other kernel data. However, since that can literally be anywhere in
- * virtual memory, it can easily (and accidentally) interfere with memory
+ * any other kernel data. However, since  that can literally be anywhere  in
+ * virtual memory, it  can easily (and  accidentally) interfere with  memory
  * layout expectancies of other early-boot systems.
- * Because of this, we try to relocate memory information into higher memory
+ * Because of this, we try to relocate memory information into higher  memory
  * as soon as this becomes possible, thus keeping it from randomly showing up
  * and causing problems for other code. */
 INTERN ATTR_FREETEXT void
@@ -730,7 +730,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 		}
 	}
 	/* Reset the pointers for the first/last zone in
-	 * order to terminate the chain at both ends. */
+	 * order to terminate  the chain  at both  ends. */
 	mzones.pm_zones[0]->mz_prev = NULL;
 	mzones.pm_last->mz_next     = NULL;
 #undef REL
@@ -739,11 +739,11 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 
 
 /* Release all memory previously marked as `PMEMBANK_TYPE_PRESERVE' or
- * `PMEMBANK_TYPE_ALLOCATED', and page_free() all whole pages touched
- * by mappings of type `PMEMBANK_TYPE_PRESERVE' (unless the same page
- * also contains another mapping of type `PMEMBANK_TYPE_ALLOCATED').
- * Afterwards, transform memory information for either type of memory
- * bank into `PMEMBANK_TYPE_RAM', and (when possible) merge adjacent
+ * `PMEMBANK_TYPE_ALLOCATED',  and page_free() all whole pages touched
+ * by mappings of type `PMEMBANK_TYPE_PRESERVE' (unless the same  page
+ * also contains another  mapping of type  `PMEMBANK_TYPE_ALLOCATED').
+ * Afterwards, transform memory information for either type of  memory
+ * bank  into `PMEMBANK_TYPE_RAM', and  (when possible) merge adjacent
  * banks of identical typing. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL minfo_release_preservations)(void) {
@@ -816,7 +816,7 @@ use_floordiv_maxpage:
 			continue;
 		}
 		/* Delete the bank at `minfo.mb_banks[i]',
-		 * thus merging it with its predecessor. */
+		 * thus merging it  with its  predecessor. */
 		--minfo.mb_bankc;
 		memmovedown(&minfo.mb_banks[i],
 		            &minfo.mb_banks[i + 1],
