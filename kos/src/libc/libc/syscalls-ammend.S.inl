@@ -32,8 +32,8 @@
 	DEFINE_PUBLIC_ALIAS(name, libc_##sys_Xname)
 
 
-/* Directly alias exception-enabled variants of system functions
- * to the exception-enabled variants of system calls from the
+/* Directly  alias exception-enabled variants of system functions
+ * to the  exception-enabled variants  of system  calls from  the
  * system call export table, since they don't need a libc wrapper
  * for handling errno conversion or anything similar */
 DEFINE_XSYSCALL_EXPORT(Pipe, sys_Xpipe)

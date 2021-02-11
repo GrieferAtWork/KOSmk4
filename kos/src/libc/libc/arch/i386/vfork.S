@@ -57,14 +57,14 @@ INTERN_FUNCTION(libc_vfork)
 
 	/* Return to our caller.
 	 * HINT: If something went wrong in the child thread _after_ vfork()
-	 *       already succeeded, there's a good chance that information
+	 *       already  succeeded, there's a  good chance that information
 	 *       about that error is stored in our `errno' _right_ _now_! */
 	ret
 
 .Lvfork_error:
 	/* Vfork error (within the parent)
 	 * Note that we only get here when the vfork() _itself_ fails.
-	 * We _dont_ get here if something within the child after the
+	 * We  _dont_ get here if something within the child after the
 	 * vfork() fails. */
 	negP   %Pax
 	movP   %Pax, %R_fcall0P

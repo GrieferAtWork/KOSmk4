@@ -48,8 +48,8 @@ INTERN_FUNCTION(libc_handle)
 	 * with a module handle pointer by libdl.
 	 * Note that this is a KOS-specific implementation detail. As far
 	 * as the standard is concerned, libdl is allowed to make up some
-	 * arbitrary module index for those 4 bytes, however KOS's libdl
-	 * simply re-uses the regular module handle for this purpose,
+	 * arbitrary module index for those 4 bytes, however KOS's  libdl
+	 * simply re-uses  the regular  module handle  for this  purpose,
 	 * meaning that we can simply (ab-)use that fact to quickly get a
 	 * handle for libc itself. */
 	INTERN(current)
@@ -60,7 +60,7 @@ END(libc_handle)
 
 
 /* Assembly-side for the process of cloning a thread.
- * This function simply clones the calling thread before invoking
+ * This function  simply  clones  the  calling  thread  before  invoking
  * `libc_pthread_main()' within the context of the newly spawned thread.
  * NOTE: This function also fills in `thread->pt_tid' */
 /* INTDEF errno_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
@@ -69,7 +69,7 @@ END(libc_handle)
 INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc
 
-	/* Perform the system call with `lcall', since `int $0x80' would clobber all registers
+	/* Perform the system call with `lcall',  since `int $0x80' would clobber all  registers
 	 * except for %ebp, however we need 2 registers to pass both `start' and `thread' to the
 	 * child thread. */
 #if __OFFSET_PTHREAD_TID == 0
@@ -90,10 +90,10 @@ INTERN_FUNCTION(libc_pthread_clone)
 	            CLONE_IO | CLONE_PARENT_SETTID | CLONE_CRED)
 	lcall  $(7), $(SYS_clone)
 
-	/* Check if we're inside of the child thread.
+	/* Check  if we're inside  of the child thread.
 	 * If so, jump to pthread's thread entry point.
 	 * Note that `%ecx' and `%edx' weren't clobbered, so the new
-	 * thread will have automatically inherited them from us! */
+	 * thread will have  automatically inherited  them from  us! */
 	testl  %eax, %eax
 	INTERN(libc_pthread_main)
 	jz     libc_pthread_main
@@ -109,10 +109,10 @@ END(libc_pthread_clone)
 /* INTDEF ATTR_NORETURN void __FCALL
  * libc_pthread_unmap_stack_and_exit(void *stackaddr,
  *                                   size_t stacksize,
- *                                   int exitcode); */
+ *                                   int    exitcode); */
 .section .text.crt.sched.pthread.pthread_unmap_stack_and_exit
 INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
-	/* NOTE: We must use `int 80h' for syscalls here, since the (more efficient)
+	/* NOTE: We  must use `int 80h' for syscalls here, since the (more efficient)
 	 *       method of using `__i386_syscall()' would require use of stack memory
 	 *       _after_ we've already unmapped the stack. */
 	movl   4(%esp), %esp       /* int exitcode */

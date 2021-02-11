@@ -42,7 +42,7 @@ DECL_BEGIN
 
 
 /* Helper functions for converting wide-character strings
- * into UTF-8, so they may be used by the kernel. */
+ * into  UTF-8,  so  they  may  be  used  by  the kernel. */
 INTERN UCHAR_TEXT("uchar_freev") void LIBCCALL
 libc_uchar_freev(/*utf-8*/ char **ptr) {
 	char **iter, *temp;

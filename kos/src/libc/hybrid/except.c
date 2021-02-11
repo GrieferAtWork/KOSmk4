@@ -101,7 +101,7 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 
 INTERN SECTION_EXCEPT_TEXT void CXA_CC
 libc_cxa_end_catch(void) {
-	/* This function is called at the end of any user-defined catch-block
+	/* This  function is called  at the end  of any user-defined catch-block
 	 * (that isn't noexcept), similar to how `__cxa_begin_catch()' is always
 	 * called at the start:
 	 * >> try {
@@ -116,12 +116,12 @@ libc_cxa_end_catch(void) {
 	 * >> }
 	 * Looking at this, you should realize that it is therefor guarantied that
 	 * every call to `__cxa_begin_catch()' is followed by `__cxa_end_catch()'.
-	 * The book recommends that these functions should be used for reference
+	 * The book recommends that these  functions should be used for  reference
 	 * counting of the number of recursive location where the exception object
 	 * is being used. */
 
 	/* For our purposes, we only get here when an EXCEPT block reaches
-	 * its end, and we delete the exception if it wasn't re-thrown. */
+	 * its  end, and we  delete the exception  if it wasn't re-thrown. */
 	struct exception_info *info;
 	info = error_info();
 #if defined(__KERNEL__) && 0
@@ -143,7 +143,7 @@ libc_cxa_end_catch(void) {
 	assertf(info->ei_flags & EXCEPT_FINCATCH,
 	        "Call to `__cxa_end_catch' when `EXCEPT_FINCATCH' wasn't set");
 	if (!(info->ei_flags & EXCEPT_FRETHROW)) {
-		/* TODO: If `this_exception_code' is an RT-level exception, then we
+		/* TODO: If  `this_exception_code'  is  an RT-level  exception,  then we
 		 *       must set some kind of thread-local flag to have it be re-thrown
 		 *       the next time the a call to `task_serve()' is made! */
 		info->ei_code = ERROR_CODEOF(E_OK);
@@ -176,7 +176,7 @@ NOTHROW(FCALL libc_except_badusage_rethrow_outside_catch)(error_register_state_t
 	assert_failf_at(state, "RETHROW()", "RETHROW() outside of catch-block");
 }
 
-/* Bad usage: Attempted to call `THROW()' from inside of a catch-block,
+/* Bad usage: Attempted to  call `THROW()'  from inside  of a  catch-block,
  *            without wrapping the throwing code location inside of another
  *            NESTED_TRY-block. */
 INTERN ATTR_COLD ATTR_NORETURN NONNULL((1)) void
@@ -234,7 +234,7 @@ NOTHROW(FCALL libc_except_badusage_throw_current)(error_register_state_t const *
 #endif /* !NDEBUG */
 
 
-/* Only export __cxa_* functions as weak in user-space, such that
+/* Only export  __cxa_* functions  as weak  in user-space,  such  that
  * libstdc++ can override them, should that library end up being used. */
 #ifdef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);

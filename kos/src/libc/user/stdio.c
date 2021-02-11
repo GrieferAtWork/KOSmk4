@@ -359,7 +359,7 @@ WUNUSED NONNULL((1)) int LIBCCALL file_setmode(FILE *__restrict self,
 		bufoff = (size_t)(self->if_ptr - self->if_base);
 		if (bufoff >= size) {
 			/* Clear the available-buffer now that
-			 * it has been truncated to ZERO(0). */
+			 * it has been  truncated to  ZERO(0). */
 			self->if_cnt = 0;
 		} else {
 			size_t minsiz = (size_t)((self->if_base + size) - self->if_ptr);
@@ -387,7 +387,7 @@ WUNUSED NONNULL((1)) int LIBCCALL file_setmode(FILE *__restrict self,
 		bufoff = (size_t)(self->if_ptr - self->if_base);
 		if (bufoff >= size) {
 			/* Clear the available-buffer now that
-			 * it has been truncated to ZERO(0). */
+			 * it has been  truncated to  ZERO(0). */
 			self->if_cnt = 0;
 		} else {
 			size_t minsiz = (size_t)((self->if_base + size) - self->if_ptr);
@@ -728,7 +728,7 @@ read_from_buffer:
 		num_bytes -= bufavail;
 		if (!num_bytes)
 			goto done_noeof;
-		/* Make sure that we only invoke read() on the underlying
+		/* Make sure that we only invoke read() on the  underlying
 		 * file once, so-as to ensure that we don't start blocking
 		 * because the underlying file is pipe-like and now empty,
 		 * before the caller got a chance to process the data that
@@ -813,7 +813,7 @@ read_through:
 		size_t new_bufsize;
 		uint8_t *new_buffer;
 		/* The caller wants at least as much as this buf could even handle.
-		 * Upscale the buf, or use load data using read-through mode. */
+		 * Upscale  the  buf, or  use  load data  using  read-through mode. */
 		if (self->if_flag & (IO_NODYNSCALE | IO_READING))
 			goto read_through;
 		if (num_bytes > IOBUF_MAX)
@@ -833,9 +833,9 @@ read_through:
 		self->if_flag  |= IO_MALLBUF;
 	} else {
 		size_t new_bufsize;
-		/* Make use of the current file-offset to dynamically increase the
-		 * max buffer size, such that we try to keep said max buffer size
-		 * capped around `ftell() / IOBUF_FACTOR'  (though still cap it with its limit) */
+		/* Make  use  of   the  current  file-offset   to  dynamically  increase   the
+		 * max  buffer  size,  such  that  we  try  to  keep  said  max  buffer   size
+		 * capped around `ftell() / IOBUF_FACTOR' (though still cap it with its limit) */
 		if (next_data >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR)
 			new_bufsize = IOBUF_MAX;
 		else {
@@ -954,7 +954,7 @@ again:
 		else {
 			self->if_cnt = 0;
 		}
-		/* When operating in line-buffered mode, check
+		/* When  operating  in line-buffered  mode, check
 		 * if there was a linefeed in what we just wrote. */
 		if ((self->if_flag & IO_LNBUF) &&
 		    (memchr(buf, '\n', num_bytes) ||
@@ -982,7 +982,7 @@ again:
 	 * Either we must flush the buf, or we must extend it. */
 	if (self->if_bufsiz >= IOBUF_MAX ||
 	    (self->if_flag & (IO_NODYNSCALE | IO_READING))) {
-		/* Buffer is too large or cannot be relocated.
+		/* Buffer is too  large or  cannot be  relocated.
 		 * >> Therefor, we must flush it, then try again. */
 		if (self->if_flag & IO_LNBUF)
 			file_sync_lnfiles();
@@ -1006,7 +1006,7 @@ do_writethrough:
 			num_bytes -= (size_t)temp;
 			goto done;
 		}
-		/* If there is no more available buf to-be read,
+		/* If there  is  no  more  available  buf  to-be  read,
 		 * reset the file pointer and change to the next chunk. */
 		if (!self->if_cnt) {
 			ex->io_fblk += (size_t)(self->if_ptr - self->if_base);
@@ -1064,7 +1064,7 @@ NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self,
 		pos64_t old_abspos;
 		pos64_t new_abspos;
 		uint8_t *new_pos;
-		/* For these modes, we can calculate the new position,
+		/* For these modes, we  can calculate the new  position,
 		 * allowing for in-buffer seek, as well as delayed seek. */
 		old_abspos = ex->io_fblk;
 		old_abspos += (self->if_ptr - self->if_base);
@@ -1094,7 +1094,7 @@ NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self,
 #endif /* __SIZEOF_POINTER__ < 8 */
 		/* Truncate the read buffer */
 		if (new_pos < self->if_ptr) {
-			/* Seek below the current pointer (but we don't
+			/* Seek  below the current pointer (but we don't
 			 * remember how much was actually read there, so
 			 * we simply truncate the buffer fully) */
 			self->if_cnt = 0;
@@ -1324,7 +1324,7 @@ WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned ch
 	if (self->if_flag & IO_READING)
 		goto eof;
 	if (self->if_flag & IO_NODYNSCALE) {
-		/* Check for special case: Even when dynscale is disabled,
+		/* Check for special  case: Even when  dynscale is  disabled,
 		 * still allow for an unget buffer of at least a single byte. */
 		if (self->if_bufsiz != 0)
 			goto eof;
@@ -1566,7 +1566,7 @@ WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self,
 		/* Truncate the current buffer. */
 		self->if_cnt = (size_t)(new_size - abs_pos);
 	}
-	/* With data flushed and the loaded buffer
+	/* With  data flushed and the loaded buffer
 	 * truncated, truncate the underlying file. */
 	COMPILER_BARRIER();
 	if (file_system_trunc(self, new_size))
@@ -1669,7 +1669,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_evalmodes")
 WUNUSED uint32_t LIBCCALL file_evalmodes(char const *modes,
                                          oflag_t *poflags) {
 	/* IO_LNIFTYY: Check if the stream handle is a tty
-	 *             the first time it is read from. */
+	 *             the  first  time it  is  read from. */
 	uint32_t result = IO_LNIFTYY;
 	oflag_t oflags = O_RDONLY;
 	if (modes) {
@@ -2795,7 +2795,7 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 /*[[[body:libc_fopen]]]*/
 {
 	/* TODO: (re-)add extension functions `fopenat()' and `fopenat64()'
-	 *       that allow for the specification of `dfd' and `atflags' */
+	 *       that allow for  the specification of  `dfd' and  `atflags' */
 	fd_t fd;
 	FILE *result;
 	uint32_t flags;
@@ -2984,7 +2984,7 @@ again:
 		atomic_rwlock_endwrite(&all_files_lock);
 		/* !!!WARNING!!!
 		 * This is entirely unsafe, but if you think about it:
-		 * This function could only ever be entirely unsafe! */
+		 * This  function could only  ever be entirely unsafe! */
 		ATOMIC_WRITE(fp->if_exdata->io_refcnt, 1);
 		file_decref(fp);
 		++result;

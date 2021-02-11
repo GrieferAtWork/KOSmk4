@@ -72,9 +72,9 @@ typedef __ssize_t (__LIBKCALL __io_write_fn)(void *__cookie, const char *__buf, 
 /* User-defined seek function:
  * @param: cookie:   Pointer to custom user-data.
  * @param: pos:      [in] The position/offset by which to move the R/W pointer:
- *                        whence == SEEK_SET: Let R/W be BASE + POS
- *                        whence == SEEK_CUR: Let R/W be R/W + POS
- *                        whence == SEEK_END: Let R/W be END + POS
+ *                        `whence == SEEK_SET': Let R/W be BASE + POS
+ *                        `whence == SEEK_CUR': Let R/W be R/W + POS
+ *                        `whence == SEEK_END': Let R/W be END + POS
  *                   [out] The new R/W pointer position (offset from BASE)
  * @param: num_byts: The max # of bytes to write.
  * @return: == 0:    Success.

@@ -36,8 +36,8 @@ DECL_BEGIN
 #define DOS_O_CREAT      0x00100 /* Same as `O_CREAT' */
 #define DOS_O_TRUNC      0x00200 /* Same as `O_TRUNC' */
 #define DOS_O_EXCL       0x00400 /* Same as `O_EXCL' */
-#define DOS_O_OBTAIN_DIR 0x02000 /* Similar to `O_DIRECTORY' (while `O_DIRECTORY' requires that the
-                                  * named file be a directory, this flag will _allow_ it to be one)
+#define DOS_O_OBTAIN_DIR 0x02000 /* Similar to `O_DIRECTORY'  (while `O_DIRECTORY'  requires that  the
+                                  * named file be a  directory, this flag will  _allow_ it to be  one)
                                   * However, when it comes to the use-cases, this flag usually ends up
                                   * being used in the same places. */
 
@@ -58,11 +58,11 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 		result |= O_TRUNC;
 	if (dos_oflags & DOS_O_EXCL)
 		result |= O_EXCL;
-#if 0 /* This flag ~allows~ the named file to be a directory.
+#if 0 /* This flag ~allows~ the named file to be a  directory.
        * With this in mind, it still isn't required to be one,
-       * so for full compatibility, we'll have to ensure that
-       * we _didn't_ open a directory when this flag _isn't_
-       * given.  */
+       * so for full compatibility, we'll have to ensure  that
+       * we _didn't_ open a  directory when this flag  _isn't_
+       * given. */
 	if (dos_oflags & DOS_O_OBTAIN_DIR)
 		result |= O_DIRECTORY;
 #endif

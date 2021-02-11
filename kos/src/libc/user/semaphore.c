@@ -63,8 +63,8 @@ DECL_BEGIN
 #endif /* SEM_VALUE_MAX != ... */
 
 /* <=, because `__SIZEOF_SEM_T' is the public ABI buffer size, while,
- * us being libc, sizeof(sem_t) is the actually used/needed buffer
- * size, meaning that libc users are allowed to provide more buffer
+ * us being libc,  sizeof(sem_t) is the  actually used/needed  buffer
+ * size, meaning that libc users  are allowed to provide more  buffer
  * space than we actually need. */
 STATIC_ASSERT(sizeof(sem_t) <= __SIZEOF_SEM_T);
 
@@ -187,7 +187,7 @@ NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
 	if ((oflags & O_CREAT) != 0 && (value != 0)) {
 again_open_or_create:
 		/* Special case: We need to know when the semaphore gets created, so we
-		 *               can set the initial counter value only in that case.
+		 *               can set the initial counter  value only in that  case.
 		 * To prevent the semaphore from becoming visible to other processes before
 		 * then, we create it under a different name, which we then refactor to the
 		 * proper name once it's been initialized. */
@@ -221,12 +221,12 @@ err_tempname_filename:
 					freea(tempname);
 					goto err_filename;
 				}
-				/* Another process may currently be creating the same semaphore
-				 * in the same way as we are trying to. On the other hand, that
-				 * other process may have terminated/crashed before it finished,
+				/* Another process may  currently be creating  the same  semaphore
+				 * in the same way as  we are trying to.  On the other hand,  that
+				 * other  process may have  terminated/crashed before it finished,
 				 * and the remaining file that we're seeing is just a left-over...
 				 *
-				 * Handle this case by giving that potential other process some
+				 * Handle this case by giving  that potential other process  some
 				 * time to finish, and if the file still exists after this delay,
 				 * forcibly remove it to deal with problematic processes. */
 				ts.tv_sec  = 0;
@@ -252,7 +252,7 @@ err_tempname_filename:
 			result->s_count = value;
 			COMPILER_BARRIER();
 			/* Try to rename the temporary file to its proper name, thus making
-			 * the (now initialized) semaphore visible to other processes. */
+			 * the  (now  initialized)  semaphore visible  to  other processes. */
 			if (rename(tempname, filename) != 0) {
 				errno_t error;
 				sys_unlink(tempname);
@@ -268,7 +268,7 @@ err_tempname_filename:
 				}
 				if (error == ENOENT) {
 					/* Race condition: We took too long to create the semaphore, and another thread
-					 * got bored while waiting for us. Wait (a bit longer than they did) for them
+					 * got  bored while waiting for us. Wait (a  bit longer than they did) for them
 					 * to create the semaphore, and try again. */
 					struct timespec ts;
 					ts.tv_sec  = 0;

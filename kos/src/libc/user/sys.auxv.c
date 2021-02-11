@@ -164,8 +164,8 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 
 	case AT_NOTELF: {
 		/* Check if the main executable image is an ELF image.
-		 * If so, the we don't know the `AT_NOTELF' key.
-		 * Otherwise, the `AT_NOTELF' key has a value of `1' */
+		 * If so,  the  we  don't know  the  `AT_NOTELF'  key.
+		 * Otherwise, the `AT_NOTELF' key  has a value of  `1' */
 		if (dlauxctrl(dlopen(NULL, 0), DLAUXCTRL_ELF_CHECK))
 			goto not_found;
 		result = 1;

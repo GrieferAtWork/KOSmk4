@@ -27,10 +27,10 @@ DECL_BEGIN
 
 
 
-/* TODO: On startup, `current_locale' should be "C"
- *       Once `setlocale(LC_ALL, "");' is called, it
+/* TODO: On  startup,  `current_locale'   should  be   "C"
+ *       Once  `setlocale(LC_ALL, "");'   is  called,   it
  *       should become some string that contains ".UTF-8".
- *       The later is checked for by libncursesw and must
+ *       The later is checked for by libncursesw and  must
  *       be present for full unicode support. */
 PRIVATE ATTR_SECTION(".data.crt.unsorted.current_locale")
 char current_locale[] = "C.UTF-8";

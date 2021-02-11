@@ -234,7 +234,7 @@ INTERN_FUNCTION(libc_getcontext)
 
 	/* Now all that's left to save is the FPU context.
 	 * For this, we first have to figure out which format we should use for it.
-	 * This can be done with `get_fpu_flags', which returns the value that we
+	 * This can be done with `get_fpu_flags',  which returns the value that  we
 	 * should use for the `mc_flags' field. */
 	call   get_fpu_flags
 	movl   %eax, MC(__OFFSET_MCONTEXTX32_FLAGS)
@@ -325,7 +325,7 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 #endif /* REG_UESP != REG_ESP */
 	.cfi_rel_offset %ss, R_(REG_SS)
 	/* Load the correct value into %esp so we can use the target's
-	 * stack as temporary storage during the transition. */
+	 * stack   as   temporary  storage   during   the  transition. */
 	movl   R(REG_ESP), %esp
 
 	/* Load the FPU context. (if there is one) */
@@ -434,7 +434,7 @@ INTERN_FUNCTION(libc_swapcontext)
 #endif /* REG_UESP != REG_ESP */
 
 	/* And with that, the old CPU context has been filled.
-	 * Now we just have to load the new context! */
+	 * Now  we  just  have   to  load  the  new   context! */
 	movl   8(%esp), %edi   /* ucp */
 	jmp    libc_x86_setcontext_edi /* Load context from %edi */
 	.cfi_endproc

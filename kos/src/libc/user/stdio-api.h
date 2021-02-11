@@ -60,16 +60,16 @@ typedef struct __mbstate mbstate_t;
 #define IO_FSYNC        __IO_FILE_IOCOMMIT  /* Also synchronize the underlying file after flushing the buffer. */
 #define IO_NODYNSCALE   __IO_FILE_IOUSERBUF /* The buffer is not allowed to dynamically change its buffer size. */
 #define IO_LNBUF        __IO_FILE_IOLNBUF   /* The buffer is line-buffered, meaning that it will
-                                             * flush its data whenever a line-feed is printed.
+                                             * flush  its data whenever  a line-feed is printed.
                                              * Additionally if the `IO_ISATTY' flag is set,
-                                             * attempting to read from a line-buffered file will cause
+                                             * attempting to read from  a line-buffered file will  cause
                                              * all other existing line-buffered files to be synchronized
-                                             * first. This is done to ensure that interactive files are
+                                             * first. This is done to ensure that interactive files  are
                                              * always up-to-date before data is read from one of them. */
-#define IO_LNIFTYY      __IO_FILE_IOLNIFTYY /* Automatically set/delete the `IO_LNBUF' and
+#define IO_LNIFTYY      __IO_FILE_IOLNIFTYY /* Automatically  set/delete  the  `IO_LNBUF'  and
                                              * `IO_ISATTY' flags, and add/remove the file from
                                              * `fb_ttys' the next time this comes into question. To determine
-                                             * this, the pointed-to file is tested for being a TTY device
+                                             * this, the pointed-to  file is  tested for being  a TTY  device
                                              * using `DeeFile_IsAtty(fb_file)'.
                                              * HINT: This flag is set for all newly created buffers by default. */
 #define IO_ISATTY       __IO_FILE_IOISATTY  /* This buffer refers to a TTY device. */
@@ -97,19 +97,19 @@ typedef struct __mbstate mbstate_t;
  *          FILE_BUFFER_FISATTY         <---> IO_ISATTY
  *          FILE_BUFFER_FNOTATTY        <---> IO_NOTATTY
  *       Members re-appear using the following map:
- *          fb_lock  <---> if_exdata->io_lock
- *          fb_file  <---> IO_HASVTAB: if_exdata->io_vtab + if_exdata->io_magi
- *                        !IO_HASVTAB: if_fd
- *          fb_ptr   <---> if_ptr
- *          fb_cnt   <---> if_cnt
- *          fb_chng  <---> if_exdata->io_chng
- *          fb_chsz  <---> if_exdata->io_chsz
- *          fb_base  <---> if_base
- *          fb_size  <---> if_bufsiz
- *          fb_ttych <---> if_exdata->io_lnch
- *          fb_fblk  <---> if_exdata->io_fblk
- *          fb_fpos  <---> if_exdata->io_fpos
- *          fb_flag  <---> if_flag
+ *          fb_lock        <---> if_exdata->io_lock
+ *          fb_file        <---> IO_HASVTAB:  if_exdata->io_vtab + if_exdata->io_magi
+ *                               !IO_HASVTAB: if_fd
+ *          fb_ptr         <---> if_ptr
+ *          fb_cnt         <---> if_cnt
+ *          fb_chng        <---> if_exdata->io_chng
+ *          fb_chsz        <---> if_exdata->io_chsz
+ *          fb_base        <---> if_base
+ *          fb_size        <---> if_bufsiz
+ *          fb_ttych       <---> if_exdata->io_lnch
+ *          fb_fblk        <---> if_exdata->io_fblk
+ *          fb_fpos        <---> if_exdata->io_fpos
+ *          fb_flag        <---> if_flag
  */
 
 struct iofile_data_novtab {
@@ -118,13 +118,13 @@ struct iofile_data_novtab {
 	struct atomic_owner_rwlock io_lock;   /* Lock for the file. */
 	byte_t                    *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
 	                                       * [valid_if(io_chsz != 0)][lock(fb_lock)]
-	                                       * Pointer to the first character that was
+	                                       * Pointer to the  first character that  was
 	                                       * changed since the buffer had been loaded. */
 	size_t                     io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
 	LIST_ENTRY(FILE)           io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that
-	                                       * have changed and must be flushed before another line-buffered file is read. */
+	                                       * have  changed and must  be flushed before another  line-buffered file is read. */
 	LIST_ENTRY(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry in the global chain of open files. (Used
-	                                       * by `fcloseall()', as well as flushing all open files during `exit()') */
+	                                       * by  `fcloseall()',  as well  as flushing  all  open files  during `exit()') */
 	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a
 	                                       * global flush. */
 	pos64_t                    io_fblk;   /* The starting address of the data block currently stored in `if_base'. */

@@ -70,7 +70,7 @@ INTERN_FUNCTION(libc_clone)
 	/* Check for errors. */
 	cmpq   $(-ELIMIT), %rax
 	ja     .Lthread_clone_error
-	
+
 	ret
 .Lthread_clone_error:
 	negq   %rax

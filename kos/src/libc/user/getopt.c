@@ -64,13 +64,13 @@ DECL_BEGIN
 #define RETURN_IN_ORDER 1
 #define REQUIRE_ORDER   2
 
-#define GETOPT_DATA(name)   ATTR_SECTION(".data.crt.application.options." name) 
+#define GETOPT_DATA(name)   ATTR_SECTION(".data.crt.application.options." name)
 /* NOTE: We put everything into .data, even though some of it could go into .bss
- *       This is done so that we keep related data more closely together and
- *       possibly reduce the number of required #PFs to load this sub-system. */
-#define GETOPT_BSS(name)    ATTR_SECTION(".data.crt.application.options." name) 
-#define GETOPT_TEXT(name)   ATTR_SECTION(".text.crt.application.options." name) 
-#define GETOPT_RODATA(name) ATTR_SECTION(".rodata.crt.application.options." name) 
+ *       This is done  so that we  keep related data  more closely together  and
+ *       possibly  reduce the number  of required #PFs  to load this sub-system. */
+#define GETOPT_BSS(name)    ATTR_SECTION(".data.crt.application.options." name)
+#define GETOPT_TEXT(name)   ATTR_SECTION(".text.crt.application.options." name)
+#define GETOPT_RODATA(name) ATTR_SECTION(".rodata.crt.application.options." name)
 
 DATDEF /**/ char *g_optarg ASMNAME("optarg");
 DATDEF /*  */ int g_optind ASMNAME("optind");

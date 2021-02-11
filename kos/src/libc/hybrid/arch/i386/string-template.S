@@ -143,7 +143,7 @@
 #endif /* !__x86_64__ */
 
 /* The location of the original num_Twords argument after the
- * caller made use of `ENTER_Pdi_Nax_Pcx' and `BEGIN_CLD' */
+ * caller  made  use of  `ENTER_Pdi_Nax_Pcx'  and `BEGIN_CLD' */
 #ifdef __x86_64__
 #define RM_numTwords_after_ENTER_Pdi_Nax_Pcx__BEGIN_CLD %rdx
 #else /* __x86_64__ */
@@ -154,16 +154,16 @@
 
 
 #ifndef REQUIRE_ZF0_if_Pcxz
-/* Require that `(%Pcx = 0) ==> (PFLAGS.ZF = 0)', in that
+/* Require that `(%Pcx = 0) ==> (PFLAGS.ZF = 0)', in  that
  * a zero-value in %Pcx requires that the ZF flag _NOT_ be
  * set.
- * This is a pre-requirement for `repne'-style loops where
- * an empty haystack (%Pcx = 0) should lead to the assumption
+ * This  is  a  pre-requirement for  `repne'-style  loops where
+ * an empty haystack (%Pcx =  0) should lead to the  assumption
  * that a needle wasn't found (ZF=0), and since `repne' doesn't
- * modify %Pflags when %Pcx = 0, the user must ensure that the
- * case of an empty haystack is handled _before_ making use
+ * modify %Pflags when %Pcx = 0, the user must ensure that  the
+ * case  of an  empty haystack  is handled  _before_ making use
  * of said instruction.
- * This macro expands to an instruction that will ensure that
+ * This macro expands  to an instruction  that will ensure  that
  * the above implication holds true immediately after returning.
  *
  * Current implementation:
@@ -186,7 +186,7 @@ BEGIN_MEMFUNC(memcmp)
 	ENTER_Pdi_Psi_Pcx
 	BEGIN_CLD
 	/* Compare DS:PSI (rhs) with ES:PDI (lhs) */
-	xorP   %Pax, %Pax  /* result = 0; // HINT: This also forces %eflags into a je=1 state to
+	xorP   %Pax, %Pax  /* result = 0; // HINT: This also forces  %eflags into a  je=1 state  to
 	                    *             //       handle %Pcx==0 (where cmps won't update %eflags) */
 	repe   I(cmps)     /* Do the actual compare */
 	/* jb -> return 1;  */
@@ -340,9 +340,9 @@ BEGIN_MEMFUNC(memlen)
 	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
 	repne  I(scas)        /* Find the first match */
 	/* %Pcx is the # of words not searched if a match was found.
-	 * For our purposes, the value of %Pcx is undefined if no match
+	 * For our purposes, the value of %Pcx is undefined if no  match
 	 * was found (though in reality it's `0', though we'd need it to
-	 * be `-1' if we wanted to make use of indirect optimizations)
+	 * be `-1' if we wanted  to make use of indirect  optimizations)
 	 * >> return WAS_FOUND ? num_Tword - (%Pcx + 1) : num_Tword;
 	 * With `WAS_FOUND = (ZF=1)'
 	 *
@@ -380,9 +380,9 @@ BEGIN_MEMFUNC(memrlen)
 	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
 	repne  I(scas)        /* Find the first match */
 	/* %Pcx is the # of words not searched if a match was found.
-	 * For our purposes, the value of %Pcx is undefined if no match
+	 * For our purposes, the value of %Pcx is undefined if no  match
 	 * was found (though in reality it's `0', though we'd need it to
-	 * be `-1' if we wanted to make use of indirect optimizations)
+	 * be `-1' if we wanted  to make use of indirect  optimizations)
 	 * >> return WAS_FOUND ? %Pcx : (size_t)-1;
 	 * With `WAS_FOUND = (ZF=1)' */
 	movP   $(-1), %Pax
@@ -476,4 +476,3 @@ END_MEMFUNC(memrxchr)
 /* TODO: rawmemxlen[b|w|l|q]()  (scas) */
 /* TODO: rawmemrxlen[b|w|l|q]() (scas) */
 #endif /* !__KERNEL__ */
-

@@ -48,7 +48,7 @@ INTERN_FUNCTION(libc_sig_restore)
 	 *    >>     SOME_FPU_REGISTER = SAME_VALUE;
 	 *    >> }
 	 * TODO: Add some way for user-code to select the type of FPU context
-	 *       that will get loaded by the sigreturn() system call.
+	 *       that  will  get  loaded  by  the  sigreturn()  system  call.
 	 */
 
 	movl  $(SYS_sigreturn), %eax

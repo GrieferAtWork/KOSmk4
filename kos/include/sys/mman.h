@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x205f0102 */
+/* HASH CRC-32:0xa5d439e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@
 
 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
  * NOTE: Same as the `MAP_SHARED' map flag, but
- *       can be set like any other protection. */
+ *       can  be set like any other protection. */
 #if !defined(PROT_SHARED) && defined(__PROT_SHARED)
 #define PROT_SHARED __PROT_SHARED
 #endif /* !PROT_SHARED && __PROT_SHARED */

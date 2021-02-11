@@ -202,7 +202,7 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 }
 
 
-/* Attributes used by `pthread_create()' when the given `ATTR' is NULL
+/* Attributes  used  by  `pthread_create()'  when  the  given  `ATTR'  is  NULL
  * NOTE: When `pa_stacksize' is zero, `PTHREAD_STACK_MIN' will be used instead! */
 ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.attr")
 PRIVATE pthread_attr_t pthread_default_attr = {};
@@ -212,14 +212,14 @@ PRIVATE struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
 
 
 /* Called just before a thread exits (used to destroy() the thread's
- * `pthread_self' structure in case the thread was detached) */
+ * `pthread_self'   structure  in  case  the  thread  was  detached) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread.pthread_onexit") void
 NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 	if (ATOMIC_FETCHDEC(me->pt_refcnt) == 1) {
-		/* At some point, our thread got detached from its creator,
-		 * so it is left up to us to destroy() our own descriptor.
+		/* At some point,  our thread got  detached from its  creator,
+		 * so  it is  left up to  us to destroy()  our own descriptor.
 		 * Because of this, we must prevent the kernel from attempting
-		 * to write into our TID address field (since we're freeing
+		 * to write into  our TID address  field (since we're  freeing
 		 * the associated structure right now). */
 		sys_set_tid_address(NULL);
 		/* Destroy our thread. */
@@ -237,12 +237,12 @@ PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_exit_thread"
 NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
 	/* TODO: Mask _all_ posix signals for our thread.
 	 *
-	 * We don't want to accidentally invoke signal handlers
-	 * once our TLS-state is broken, or once we've unmapped
-	 * our stack. Note that in regards to the former, POSIX
-	 * requires that access to `errno' be async-signal-safe,
+	 * We  don't  want  to accidentally  invoke  signal handlers
+	 * once our  TLS-state is  broken,  or once  we've  unmapped
+	 * our stack.  Note that  in regards  to the  former,  POSIX
+	 * requires  that  access to  `errno'  be async-signal-safe,
 	 * meaning that since we use ATTR_THREAD-memory to implement
-	 * errno, we mustn't run any more signal handlers once TLS
+	 * errno, we mustn't run any  more signal handlers once  TLS
 	 * has been torn down! */
 	/* TODO: Use `setsigmaskptr()' here, once that function's
 	 *       been added. */
@@ -291,11 +291,11 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 	} EXCEPT {
 		/* Always invoke the on-exit callback, no matter what happens! */
 		if (!was_thrown(E_EXIT_THREAD)) {
-			/* Anything else can just be propagated directly,
+			/* Anything else  can just  be propagated  directly,
 			 * since it's considered an unhandled exception that
 			 * will cause the process to terminate.
 			 * However, E_EXIT_THREAD must be handled explicitly
-			 * in case we have to unmap our own stack. */
+			 * in  case  we  have   to  unmap  our  own   stack. */
 			RETHROW();
 		}
 		exitcode = error_data()->e_args.e_exit_thread.et_exit_code;
@@ -306,7 +306,7 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 }
 
 /* Assembly-side for the process of cloning a thread.
- * This function simply clones the calling thread before invoking
+ * This function  simply  clones  the  calling  thread  before  invoking
  * `libc_pthread_main()' within the context of the newly spawned thread.
  * NOTE: This function also fills in `thread->pt_tid' */
 INTDEF pid_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
@@ -334,7 +334,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		goto err_nomem_tls;
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	/* Initialize the new thread's initial userprocmask structure,
-	 * such that it will lazily initialize it the first time it
+	 * such  that it will  lazily initialize it  the first time it
 	 * performs a call to `sigprocmask(2)'. */
 	memset(&pt->pt_pmask, 0, offsetof(struct userprocmask, pm_pending));
 	pt->pt_pmask.lpm_pmask.pm_sigsize = sizeof(sigset_t);
@@ -591,19 +591,19 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 		refcnt = ATOMIC_READ(pthread->pt_refcnt);
 		assert(refcnt >= 1);
 		if (refcnt == 1) {
-			/* Special handling requiring for when this is the last reference!
-			 * In this case, the thread will have already invoked `libc_pthread_onexit()',
+			/* Special  handling   requiring   for   when  this   is   the   last   reference!
+			 * In  this case,  the thread  will have  already invoked `libc_pthread_onexit()',
 			 * however did not destroy() its own structure, or deleted its kernel tid-address.
-			 * There is a chance that the thread is still running, and that the kernel is
+			 * There is a  chance that the  thread is still  running, and that  the kernel  is
 			 * still going to write 0 to the TID address.
-			 * In this case, we must wait for it to do so, since we mustn't destroy()
+			 * In  this case, we must wait for it to do so, since we mustn't destroy()
 			 * the pthread structure before then, else the kernel might possibly write
 			 * to free'd memory. */
 			if (ATOMIC_READ(pthread->pt_tid) != 0) {
 				sys_sched_yield();
 				continue;
 			}
-			/* The TID field was already set to ZERO. -> Set the reference
+			/* The TID field was already set to ZERO. -> Set the  reference
 			 * counter to zero and destroy() the pthread structure ourself. */
 			if (!ATOMIC_CMPXCH_WEAK(pthread->pt_refcnt, 1, 0))
 				continue;
@@ -631,7 +631,7 @@ NOTHROW(LIBCCALL libc_pthread_self)(void)
 		/* Lazily initialize the thread descriptor's TID field.
 		 *
 		 * We get here if the calling thread was created by some API other
-		 * than pthread that still made proper use of dltlsallocseg(), or
+		 * than pthread that still made proper use of dltlsallocseg(),  or
 		 * if the caller is the program's main() thread. */
 		result->pt_tid = sys_set_tid_address(&result->pt_tid);
 	}
@@ -1015,8 +1015,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *attr,
 	while (cpusetsize && ((byte_t *)cpuset)[cpusetsize - 1] == 0)
 		--cpusetsize;
 	if (!cpusetsize || !cpuset) {
-		/* NOTE: Glibc also accepts a zero-value in either argument as indicator
-		 *       to clear out a previously set affinity, even though it would make
+		/* NOTE: Glibc also accepts  a zero-value in  either argument as  indicator
+		 *       to clear out a previously set affinity, even though it would  make
 		 *       more sense to only allow `cpusetsize == 0', and require a non-NULL
 		 *       `cpuset' when `cpusetsize != 0'... */
 		if (attr->pa_cpuset != (cpu_set_t *)&attr->pa_cpusetsize)
@@ -1024,7 +1024,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *attr,
 		attr->pa_cpuset     = NULL;
 		attr->pa_cpusetsize = 0;
 	} else if (cpusetsize <= sizeof(attr->pa_cpusetsize)) {
-		/* Optimization: Don't use the heap for small cpu sets.
+		/* Optimization: Don't  use  the heap  for small  cpu sets.
 		 * In practice, this means that we usually always get here,
 		 * since most machines don't have more than 32 cpus... */
 		if (attr->pa_cpuset != (cpu_set_t *)&attr->pa_cpusetsize) {
@@ -1279,9 +1279,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t target_thread,
 		return -result;
 	if unlikely(ATOMIC_READ(target_thread->pt_tid) == 0) {
 		/* The thread has terminated in the mean time, and we've accidentally
-		 * modified the scheduler parameters of some unrelated thread.
+		 * modified  the  scheduler  parameters  of  some  unrelated  thread.
 		 * Try to undo the damage we've caused...
-		 * Note: This is a race condition that Glibc
+		 * Note: This is  a race  condition that  Glibc
 		 *       doesn't even check and simply ignores! */
 		sys_sched_setscheduler(tid, old_policy, &old_param);
 		return ESRCH;
@@ -1316,7 +1316,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t target_thread,
 		return (errno_t)-result;
 	if unlikely(ATOMIC_READ(target_thread->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
-		 * Note: This is a race condition that Glibc
+		 * Note: This is  a race  condition that  Glibc
 		 *       doesn't even check and simply ignores! */
 		return ESRCH;
 	}
@@ -1350,7 +1350,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
 		return (errno_t)-error;
 	if unlikely(ATOMIC_READ(target_thread->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
-		 * Note: This is a race condition that Glibc
+		 * Note: This is  a race  condition that  Glibc
 		 *       doesn't even check and simply ignores! */
 		sys_setpriority(PRIO_PROCESS, tid, old_prio);
 		return ESRCH;
@@ -1492,7 +1492,7 @@ got_old_affinity:
 	if (E_ISOK(error)) {
 		if unlikely(ATOMIC_READ(pthread->pt_tid) == 0) {
 			/* The thread has terminated in the mean time.
-			 * Note: This is a race condition that Glibc
+			 * Note: This is  a race  condition that  Glibc
 			 *       doesn't even check and simply ignores! */
 			sys_sched_setaffinity(tid, old_cpusetsize, old_cpuset);
 			error = -ESRCH;
@@ -1524,7 +1524,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t pthread,
 	if (E_ISOK(error)) {
 		if unlikely(ATOMIC_READ(pthread->pt_tid) == 0) {
 			/* The thread has terminated in the mean time.
-			 * Note: This is a race condition that Glibc
+			 * Note: This is  a race  condition that  Glibc
 			 *       doesn't even check and simply ignores! */
 			error = -ESRCH;
 		}
@@ -1592,14 +1592,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* Schedule an RPC in the target thread that will cause the thread to terminate itself. */
-	/* In this case, we sadly cannot handle the race condition of `tid'
+	/* In  this case, we  sadly cannot handle the  race condition of `tid'
 	 * terminating at this point (causing the id to become invalid), since
 	 * we cannot undo the RPC schedule operation in that case...
-	 * NOTE: This is _NOT_ unsafe, even when the target thread has already
-	 *       unmapped its stack within `libc_pthread_unmap_stack_and_exit()'
+	 * NOTE: This  is _NOT_ unsafe,  even when the  target thread has already
+	 *       unmapped its stack within  `libc_pthread_unmap_stack_and_exit()'
 	 *       The reason for this is the `RPC_SCHEDULE_SYNC' which only allows
-	 *       the RPC to be executed as the result of a blocking operation,
-	 *       none of which happen anymore once the stack has gone away in
+	 *       the  RPC to be  executed as the result  of a blocking operation,
+	 *       none  of which  happen anymore once  the stack has  gone away in
 	 *       said function! */
 	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC,
 	                         (void (*)())&pthread_cancel_self,
@@ -1618,7 +1618,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
 /*[[[body:libc_pthread_testcancel]]]*/
 {
 	/* Load librpc and use it to service RPCs
-	 * Technically, we could just directly invoke `sys_rpc_service()', however
+	 * Technically,  we could just  directly invoke `sys_rpc_service()', however
 	 * this method allows librpc to perform additional functions, and also makes
 	 * it more clear that it is actually librpc that implements this behavior! */
 	if (librpc_init())
@@ -2448,7 +2448,7 @@ again:
 	if (result != EBUSY)
 		return result;
 	/* Wait until the mutex is unlocked.
-	 * NOTE: Need to use `FUTEX_WAIT_BITSET', since only that one takes
+	 * NOTE: Need to use `FUTEX_WAIT_BITSET', since only that one  takes
 	 *       an absolute timeout, rather than the relative timeout taken
 	 *       by the regular `FUTEX_WAIT' */
 	result = (errno_t)sys_futex((uint32_t *)&mutex->m_lock,
@@ -2461,12 +2461,12 @@ again:
 }
 /*[[[end:libc_pthread_mutex_timedlock]]]*/
 
-/* With a 64-bit timeout, wait while a 32-bit control word matches
+/* With a 64-bit timeout, wait  while a 32-bit control word  matches
  * the given value. Note that this function may access up to 8 bytes
- * starting at the base of the futex control word, through only the
+ * starting at the base of the futex control word, through only  the
  * first 4 bytes are actually inspected.
  * HINT: Waiting for 32-bit control words on 64-bit platforms is
- *       done by making use of `LFUTEX_WAIT_WHILE_BITMASK' */
+ *       done  by  making  use  of   `LFUTEX_WAIT_WHILE_BITMASK' */
 #if __SIZEOF_POINTER__ == 4
 #define sys_lfutex32_waitwhile64(uaddr, val, timeout) \
 	sys_lfutex(uaddr, LFUTEX_WAIT_WHILE, val, timeout, 0)
@@ -2891,26 +2891,26 @@ again:
 		                      how_many, NULL, NULL, 0);
 		if (num_woken == 0 && (newctl & FUTEX_WAITERS)) {
 			/* Failed to wake up anyone, but the new control word
-			 * still contained the `FUTEX_WAITERS' bit set.
+			 * still  contained  the  `FUTEX_WAITERS'  bit   set.
 			 *
 			 * This can happen when the caller only ever uses
 			 * `pthread_cond_signal()', which would result in
 			 * the `FUTEX_WAITERS' bit never getting unset.
 			 *
 			 * However, we do actually want to make use of that
-			 * bit, so we don't have to do an expensive system
+			 * bit, so we don't have to do an expensive  system
 			 * call all too often.
 			 *
-			 * So if we notice that we couldn't wake up anyone,
-			 * but the futex control word still indicates that
+			 * So if we notice that  we couldn't wake up  anyone,
+			 * but the futex  control word  still indicates  that
 			 * there are waiting threads, then we do another wake
 			 * in which we wake up _all_ waiting threads.
 			 *
-			 * In all likelihood, there won't be any of them now,
+			 * In all likelihood, there won't be any of them  now,
 			 * since just a moment ago, no-one was waiting for the
-			 * futex, but on the off-chance that more waiters
-			 * appeared between then and now, those threads will
-			 * simply receive a sporadic, but harmless wake-up.
+			 * futex,  but  on  the off-chance  that  more waiters
+			 * appeared  between then and  now, those threads will
+			 * simply receive  a sporadic,  but harmless  wake-up.
 			 */
 			assert(how_many != (uint32_t)-1);
 			how_many = (uint32_t)-1;
@@ -2961,7 +2961,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex', else there'd be a race condition! */
+		 *       we're released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
@@ -2996,7 +2996,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict con
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex', else there'd be a race condition! */
+		 *       we're released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
@@ -3038,7 +3038,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex', else there'd be a race condition! */
+		 *       we're released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
@@ -3151,26 +3151,26 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
 /* Lock for accessing `tls_dtors' and `tls_count' */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock tls_lock = ATOMIC_RWLOCK_INIT;
 
-/* [0..1][lock(WRITE_ONCE)] TLS segment (from libdl's `dltlsalloc()')
- * that is used for representing and storing TLS values on a per-thread basis.
- * Technically, we could get rid of this right here, and put all of the TLS
- * stuff into `current', but since KOS already supports static TLS declaration,
- * aka `ATTR_THREAD' (which is actually the _very_ _much_ preferred method of
+/* [0..1][lock(WRITE_ONCE)]   TLS   segment   (from   libdl's    `dltlsalloc()')
+ * that  is used for representing and storing  TLS values on a per-thread basis.
+ * Technically, we could  get rid of  this right here,  and put all  of the  TLS
+ * stuff  into `current', but since KOS already supports static TLS declaration,
+ * aka  `ATTR_THREAD' (which is  actually the _very_  _much_ preferred method of
  * allocating TLS memory), anything that is written to be more or less optimized
- * for a platform like KOS shouldn't even have to make use of this.
+ * for  a  platform  like  KOS  shouldn't  even  have  to  make  use  of   this.
  * As such, don't put more stuff into `current', and use dynamic TLS allocations
  * for implementing pthread-based TLS variables. */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") void *tls_handle = NULL;
 
 struct pthread_tls_segment {
 	/* This is the structure that is pointed-to by instance of `tls_handle'
-	 * Note that this structure exists on a per-thread basis! */
+	 * Note  that   this   structure   exists  on   a   per-thread   basis! */
 	size_t  pts_alloc;      /* Allocated TLS value-vector size. */
 	void  **pts_values;     /* [?..?][0..pts_alloc] Vector of TLS values. */
 	void   *pts_static[32]; /* Initial (static) vector for holding the first N keys.
-	                         * This vector gets allocated by libdl and is here so
-	                         * we don't waste too much memory (since TLS segments
-	                         * allocated by `dltlsalloc()' have quite a lot of
+	                         * This vector gets  allocated by libdl  and is here  so
+	                         * we don't waste  too much memory  (since TLS  segments
+	                         * allocated  by  `dltlsalloc()'  have  quite  a  lot of
 	                         * overhead) */
 };
 
@@ -3217,7 +3217,7 @@ pthread_tls_segment_fini(void *UNUSED(arg), void *base) {
 }
 
 /* Return the pthread TLS-segment for the calling thread,
- * allocating it, as well as `tls_handle' if necessary.
+ * allocating  it, as well  as `tls_handle' if necessary.
  * @return: NULL: Insufficient memory. */
 PRIVATE WUNUSED struct pthread_tls_segment *
 NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
@@ -3249,14 +3249,14 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
 }
 
 /* Return a pointer to the TLS slot described by `id'
- * within the calling thread's pthread-tls-segment.
+ * within the  calling thread's  pthread-tls-segment.
  * If TLS descriptors, or the associated slot had yet
  * to be allocated, try allocate them now, but return
  * `NULL' if doing so failed due to lack of memory.
- * NOTE: It is up to the caller to ensure that `id' is
- *       a valid id before calling this function. Because
+ * NOTE: It is up  to the  caller to ensure  that `id'  is
+ *       a  valid id before calling this function. Because
  *       if it wasn't a valid id beforehand, it will kind-
- *       of become one (at least for the calling thread)
+ *       of become one (at  least for the calling  thread)
  *       once this function returns! */
 PRIVATE WUNUSED void **
 NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
@@ -3326,12 +3326,12 @@ again:
 		__pthread_destr_function_t *new_destructors;
 		atomic_rwlock_endwrite(&tls_lock);
 
-		/* Allocate a new (slightly larger) TLS destructor vector.
+		/* Allocate  a new (slightly larger) TLS destructor vector.
 		 * Note that we mustn't hold `tls_lock' in here, since that
-		 * could lead to a dead-lock depending on how malloc() is
+		 * could lead to a dead-lock  depending on how malloc()  is
 		 * implemented.
 		 * After all: `tls_lock' is an _atomic_ lock, so we have to
-		 *            make a real effort to always hold it for the
+		 *            make a real effort to always hold it for  the
 		 *            least amount of time possible. */
 		new_destructors = (__pthread_destr_function_t *)malloc(count + 1,
 		                                                       sizeof(__pthread_destr_function_t));
@@ -3362,7 +3362,7 @@ again:
 		goto again;
 	}
 	/* Simply append the new TLS slot at the end.
-	 * Note that i == count from above! */
+	 * Note   that   i  ==   count   from  above! */
 use_ith_slot:
 	tls_dtors[i] = destr_function;
 	atomic_rwlock_endwrite(&tls_lock);

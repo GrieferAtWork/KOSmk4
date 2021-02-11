@@ -2101,7 +2101,7 @@ __LIBC int (signgam);
 
 #ifdef __USE_ISOC99
 /*
- * float_t:    float-type at least as wide as `float'; used to eval `float'-expressions
+ * float_t:    float-type at least as wide  as `float'; used to eval  `float'-expressions
  * double_t:   float-type at least as wide as `double'; used to eval `double'-expressions
  *
  * FLT_EVAL_METHOD:

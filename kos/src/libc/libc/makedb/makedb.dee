@@ -37,7 +37,7 @@ function ctypeof(x) {
 
 #if __DEEMON__ < 200
 /* Workaround for the 32-bit, unsigned integers
- * not being unsigned in the old deemon */
+ * not  being  unsigned   in  the  old   deemon */
 #define UNSIGNED(x) (unsigned int)x
 #else
 #define UNSIGNED(x) x
@@ -56,11 +56,11 @@ function elem_size(x) {
 	return 1;
 }
 /* Split a sequence of ints into two smaller ones + a shift (int)
- * that can be used to store the original values more compactly,
- * while accessing the original values as follows:
+ * that  can be used to store the original values more compactly,
+ * while   accessing    the   original    values   as    follows:
  * >> local a,b,shift = return...;
  * >> tab[i] == b[(a[(unsigned)i >> shift] << shift) + (i & ((1 << shift)-1))];
- * HINT: If no mapping exists to optimize for this, shift will equal `0'. */
+ * HINT: If  no  mapping exists  to optimize  for this,  shift will  equal `0'. */
 function split_tables(tab) {
 	local max_shift = 0;
 	tab = tuple(tab);
@@ -226,8 +226,8 @@ function force_symbol_character(ord, traits) {
 }
 
 /* Force some characters to be recognized in symbols.
- * -> We use this system to detect what can be considered a
- *    valid name, and unlike in ~real~ language, we acceept
+ * -> We use  this system  to detect  what can  be considered  a
+ *    valid name,  and unlike  in  ~real~ language,  we  acceept
  *    symbol names that follow C-semantics, meaning underscores,
  *    dollar and digits! */
 force_symbol_character("_".ord(), ["XID_Start", "XID_Continue"]);
@@ -404,5 +404,3 @@ for (local x: util::range(256)) {
 	}
 }
 print out: "};";
-
-

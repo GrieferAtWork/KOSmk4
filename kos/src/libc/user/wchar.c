@@ -41,9 +41,9 @@
 DECL_BEGIN
 
 /* The DOS version of wcstok() doesn't take the 3rd safe-ptr argument,
- * but rather only takes 2 arguments (under DOS, the 3-argument form
+ * but rather only takes 2  arguments (under DOS, the 3-argument  form
  * carries the name `wcstok_s')
- * Define this special variant manually, since magic wouldn't understand
+ * Define this special variant manually, since magic wouldn't  understand
  * some weird function that only exists in DOS-mode, but uses a name that
  * is bound to a different function in KOS-mode... */
 PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.string.memory.wcstok_safe_ptr")

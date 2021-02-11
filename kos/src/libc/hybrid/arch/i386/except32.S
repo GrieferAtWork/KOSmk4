@@ -122,10 +122,10 @@ IU(	call   libc_error_info)
 	.cfi_same_value %ebp
 	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX(%eax), %ebx
 	.cfi_same_value %ebx
-	/* Push registers that we're going to restore later!
-	 * This must be done before we write to the target ESP in case
-	 * that target ESP overlaps with the kcpustate structure (in which
-	 * case we'll be overwriting the kcpustate during the stack setup,
+	/* Push    registers    that   we're    going   to    restore   later!
+	 * This  must  be done  before  we write  to  the target  ESP  in case
+	 * that  target ESP  overlaps with  the kcpustate  structure (in which
+	 * case  we'll be  overwriting the  kcpustate during  the stack setup,
 	 * meaning that any read from the structure has to happen before then) */
 	pushl  OFFSET_KCPUSTATE_EFLAGS(%eax)
 	pushl  OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%eax)
@@ -134,7 +134,7 @@ IU(	call   libc_error_info)
 	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%eax), %ecx
 	subl   $(8), %ecx
 	/* NOTE: Push EIP first, since that one is stored closer to the bottom
-	 *       of the kcpustate structure, meaning it would get overwritten
+	 *       of the kcpustate structure, meaning it would get  overwritten
 	 *       first! */
 	movl   OFFSET_KCPUSTATE_EIP(%eax), %edx
 	movl   %edx, 4(%ecx)
@@ -347,7 +347,7 @@ IK(	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 IK(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
 IK(	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 	/* The call to `libc_error_info()' (may) have clobbered eax, ecx, edx
-	 * So instead, we must copy these registers from the stack. */
+	 * So  instead,  we  must  copy  these  registers  from  the   stack. */
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx)
 IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx)
@@ -464,7 +464,7 @@ IK(	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 IK(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
 IK(	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 	/* The call to `libc_error_info()' (may) have clobbered eax, ecx, edx
-	 * So instead, we must copy these registers from the stack. */
+	 * So  instead,  we  must  copy  these  registers  from  the   stack. */
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx)
 IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx)
@@ -578,13 +578,13 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 	ttest  mask=EFLAGS_VM, loc=(OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS)(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
-	/* Another special case: If the interrupt state was re-directed, then we must
+	/* Another special case: If the  interrupt state  was re-directed,  then we  must
 	 *                       load it immediately (and have `x86_rpc_user_redirection'
-	 *                       take care of propagating the exception), since it still
+	 *                       take care of propagating the exception), since it  still
 	 *                       actually points into user-space.
 	 * This is necessrary because otherwise we'd not be restoring the original user-space
-	 * register that aren't also found in `struct kcpustate' (because the kernel-space
-	 * variant uses `.Ldo_unwind_esp', which work with that cpu state variant)
+	 * register that aren't  also found in  `struct kcpustate' (because the  kernel-space
+	 * variant  uses  `.Ldo_unwind_esp',  which  work   with  that  cpu  state   variant)
 	 * These registers are:
 	 *   - %fs: Would be 0 during `iret', since it used to contain SEGMENT_KERNEL_FSBASE,
 	 *          which cannot be accessed by ring#3 code, causing the CPU to clear it as a
@@ -599,7 +599,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 
 
 	/* The interrupt points into kernel-space (or possibly towards
-	 * `x86_rpc_user_redirection', which is also kernel-space). */
+	 * `x86_rpc_user_redirection', which  is  also  kernel-space). */
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %esp, OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL
@@ -617,7 +617,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 	/* NOTE: RPC guaranties never to modify a kernel-target iret tail, meaning
-	 *       we're entirely safe to modify the tail without having to worry
+	 *       we're  entirely safe to  modify the tail  without having to worry
 	 *       about intervention of RPC callbacks! */
 #if EXCEPT_BACKTRACE_SIZE != 0
 	.Lindex = 0

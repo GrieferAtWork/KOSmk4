@@ -92,7 +92,7 @@
 #endif /* __KERNEL__ */
 
 /* Delete CRT features for stuff that we don't implement (yet)
- * TODO: Once we  do implement this  stuff, delete this  part! */
+ * TODO: Once we do  implement this stuff,  delete this  part! */
 #undef __CRT_HAVE___ctype_b_loc
 #undef __CRT_HAVE___ctype_tolower_loc
 #undef __CRT_HAVE___ctype_toupper_loc

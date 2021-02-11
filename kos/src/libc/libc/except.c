@@ -228,11 +228,11 @@ libc_get_kos_unwind_exception(void) {
 /* NOTE: These functions _have_ to be exported weakly!
  *       Otherwise, they might accidentally override the same functions
  *       exported from `libstdc++.so'
- *       The idea in exporting these from libc.so as well is that libc.so
+ *       The idea in  exporting these  from libc.so  as well  is that  libc.so
  *       should provide a minimal, self-contained implementation of everything
- *       that is required to get the KOS-specific exception handling provided
+ *       that is required to get the KOS-specific exception handling  provided
  *       by the <kos/except.h> header working.
- *       Additionally, then libstdc++.so is loaded, we must remain compatible
+ *       Additionally, then  libstdc++.so is  loaded,  we must  remain  compatible
  *       with its API, in that kos exceptions should show up as foreign exceptions
  *       when interfaced with the standard c++ API (which they do) */
 DEFINE_PUBLIC_WEAK_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
@@ -275,7 +275,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 		action  = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_action */
 		start += landingpad;
 
-#if 1 /* Compare pointers like this, as `pc' is the _RETURN_ address \
+#if 1 /* Compare  pointers  like  this,  as  `pc'  is  the  _RETURN_  address\
        * (i.e. the address after the piece of code that caused the exception) */
 		if (pc > start && pc <= start + size)
 #else
@@ -440,7 +440,7 @@ trigger_coredump(error_register_state_t *curr_state,
 	error_register_state_to_ucpustate(curr_state, &curr_ust);
 	error_register_state_to_ucpustate(orig_state, &orig_ust);
 
-	/* Try to trigger a coredump including all of the information needed
+	/* Try  to trigger a  coredump including all  of the information needed
 	 * to re-construct (up to `EXCEPT_BACKTRACE_SIZE' frames) of the unwind
 	 * path, as well as the remainder of the stack that didn't get unwound. */
 	sys_coredump(&curr_ust,
@@ -452,7 +452,7 @@ trigger_coredump(error_register_state_t *curr_state,
 	/* There really shouldn't be a reason to get here, but just in case... */
 
 	/* Shouldn't get here, but if something went wrong,
-	 * also try to trigger a legacy debug trap. */
+	 * also   try  to  trigger  a  legacy  debug  trap. */
 	error_register_state_to_ucpustate(curr_state, &curr_ust);
 	trigger_debugtrap(&curr_ust, exc);
 
@@ -495,11 +495,11 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restr
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&orig_state, state, sizeof(*state));
 search_fde:
-	/* unwind `state' until the nearest exception handler, or until the end of the stack.
+	/* unwind `state' until the nearest exception handler,  or until the end of the  stack.
 	 * If the later happens, then we check for an exit-thread exception, but will terminate
 	 * the process due to an unhandled exception if something else went wrong.
 	 * NOTE: PC-1 because the state we're being given has its PC pointer
-	 *       set to be directed after the faulting instruction. */
+	 *       set   to  be  directed   after  the  faulting  instruction. */
 	memcpy(&oldstate, state, sizeof(*state));
 	pc = (void *)((uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1);
 	unwind_error = unwind_fde_find(pc, &context.uc_fde);
@@ -574,7 +574,7 @@ err:
 			       unwind_error);
 		}
 		/* Use the original state that the caller of `libc_error_unwind()' provided
-		 * in order to minimize the stack portion which can only be re-constructed
+		 * in order to minimize the stack portion which can only be  re-constructed
 		 * by walking the stack trace stored in `&current.pt_except->ei_trace' */
 #if EXCEPT_BACKTRACE_SIZE != 0
 		if (orig_tracecount < EXCEPT_BACKTRACE_SIZE) {
@@ -982,7 +982,7 @@ libc_except_handler3_impl(error_register_state_t *__restrict state,
 	/* Perform exception unwinding */
 	state = libc_error_unwind(state);
 	/* Unset the in-except flag once we've successfully
-	 * unwound the stack up until a valid handler. */
+	 * unwound  the  stack  up until  a  valid handler. */
 	COMPILER_BARRIER();
 	info->ei_flags &= ~recursion_flag;
 	COMPILER_BARRIER();
@@ -1111,7 +1111,7 @@ raise_signal:
 	memcpy(info, &saved_info, sizeof(*info));
 	/* raise the exception as a signal. */
 	try_raise_signal_from_exception(state, error);
-	/* Fallthrough to a regular coredump if the
+	/* Fallthrough  to  a regular  coredump  if the
 	 * exception cannot be translated into a signal */
 do_coredump_with_unwind_error:
 	memcpy(info, &saved_info, sizeof(*info));

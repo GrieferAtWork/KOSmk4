@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeffbb537 */
+/* HASH CRC-32:0xb7aa34ac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ __SYSDECL_BEGIN
  *   - This  flag  is  completely  DISCONNECTED  from  `CLONE_THREAD'
  *     and must be  passed explicitly  to make use  of its  behavior.
  *     Note that on linux, its behavior is implied by `CLONE_THREAD'.
- *     - `CLONE_DETACHED' will prevent the thread from
+ *     - `CLONE_DETACHED'  will  prevent  the  thread  from
  *       turning into a zombie once it terminates, allowing
  *       it to reap itself.
  *     - Passing this flag has the safe effect as calling `detach(2)'
@@ -170,7 +170,7 @@ __SYSDECL_BEGIN
 #endif /* !CLONE_SIGHAND && __CLONE_SIGHAND */
 #if !defined(CLONE_CRED) && defined(__CLONE_CRED)
 #define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
-                                                     * Note that  during an  exec()  credentials are  unshared  unconditionally. */
+                                                     * Note that during  an exec() credentials  are unshared  unconditionally. */
 #endif /* !CLONE_CRED && __CLONE_CRED */
 #if !defined(CLONE_PTRACE) && defined(__CLONE_PTRACE)
 #define CLONE_PTRACE         __CLONE_PTRACE         /* Set if tracing continues on the child. */

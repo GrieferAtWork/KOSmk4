@@ -55,21 +55,21 @@ DECL_BEGIN
 
 INTDEF struct atomic_rwlock libc_environ_lock;
 
-/* Since `environ' can easily contain strings that weren't allocated
- * using `malloc()' and friends, and since `putenv()' is a thing that
- * exists to directly inject user-provided strings into the environ
+/* Since `environ' can easily  contain strings that weren't  allocated
+ * using  `malloc()' and friends, and since `putenv()' is a thing that
+ * exists to directly  inject user-provided strings  into the  environ
  * map, we run into a problem when it comes to preventing memory leaks
- * in regards of strings that _were_ injected dynamically through use
+ * in regards of strings that _were_ injected dynamically through  use
  * of functions such as `setenv()'
  * The solution is to keep track of a singly-linked list of all environ
- * strings that _were_ allocated through use of `malloc()', and simply
- * `free()' only strings apart of this list when functions such as
+ * strings that _were_ allocated through use of `malloc()', and  simply
+ * `free()' only  strings apart  of this  list when  functions such  as
  * `unsetenv()' or `clearenv()' are called.
- * Lastly, in order to check if the `environ' vector itself was dynamically
- * allocated on the heap, we keep a secondary, environ-like variable
+ * Lastly,  in order  to check if  the `environ' vector  itself was dynamically
+ * allocated  on  the  heap,  we   keep  a  secondary,  environ-like   variable
  * `libc_environ_heap' that is set to `NULL' initially (or after `clearenv()'),
- * and when non-NULL is then compared against the real `environ' to determine
- * is changes were made, including the hosted application overwriting the
+ * and when non-NULL is then compared  against the real `environ' to  determine
+ * is  changes  were made,  including  the hosted  application  overwriting the
  * value of `environ' itself. */
 
 struct environ_heapstr {
@@ -98,11 +98,11 @@ bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 
 
 /* Provide wrappers for `qsort()', `bsearch()', `atexit()' and `at_quick_exit()'
- * for DOS-mode, that take function pointers to LIBDCALL functions, rather than
+ * for  DOS-mode, that take function pointers to LIBDCALL functions, rather than
  * `LIBKCALL' ones.
  * All other functions that take functions pointers (such as `bsearch_r()') always
  * take these pointers in the form of `LIBKCALL' prototypes, since these functions
- * don't normally exist under DOS. (if I'm wrong about this, we might have to add
+ * don't  normally exist under DOS. (if I'm wrong about this, we might have to add
  * those functions to this list at some point...) */
 #ifndef __LIBDCALL_IS_LIBKCALL
 typedef void (__LIBDCALL *__dos_atexit_func_t)(void);
@@ -121,7 +121,7 @@ NOTHROW_NCX(LIBCCALL libd_atexit)(__dos_atexit_func_t func) {
 }
 
 /* Not really correct, but prevents having to re-design
- * the KOS-mode `at_quick_exit()' function... */
+ * the    KOS-mode    `at_quick_exit()'     function... */
 DEFINE_PUBLIC_ALIAS(DOS$at_quick_exit, libd_atexit);
 
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
@@ -161,20 +161,20 @@ INTERN ATTR_SECTION(".text.crt.sched.process.__cxa_atexit") int
 NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
                                         void *arg, void *dso_handle) {
 	void *dl_handle, *error;
-	/* NOTE: I don't really understand why this function is even necessary...
-	 *       I mean sure: it allows c++ to register destructor callbacks lazily
-	 *       for local statics, however the same effect could be achieved by using
+	/* NOTE: I  don't  really understand  why  this function  is  even necessary...
+	 *       I mean sure:  it allows  c++ to register  destructor callbacks  lazily
+	 *       for local statics, however the same effect could be achieved by  using
 	 *       an __attribute__((destructor)), where its callback checks some kind of
-	 *       was-initialized flag and invokes that callback when this is true. */
+	 *       was-initialized flag  and invokes  that callback  when this  is  true. */
 	if (dso_handle == NULL) {
-		/* Special case: When `dso_handle' is `NULL', register the callback for the
+		/* Special case: When  `dso_handle'  is  `NULL',   register  the  callback  for   the
 		 *               primary module, in which case the registered function must be called
 		 *               alongside atexit() */
 		dl_handle = NULL;
 	} else {
 		/* `dso_handle' is actually a pointer somewhere inside of the static memory segment
-		 * of some module (either dynamically allocated, or part of the primary module)
-		 * As such, we can make use of `dlgethandle()' in order to look-up the associated
+		 * of  some module  (either dynamically allocated,  or part of  the primary module)
+		 * As such, we can make use of  `dlgethandle()' in order to look-up the  associated
 		 * shared object, which which we can then register the given callback. */
 		dl_handle = dlgethandle(dso_handle, DLGETHANDLE_FINCREF);
 		if unlikely(!dl_handle)
@@ -323,8 +323,8 @@ NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
 	if unlikely(!varname || !*varname || strchr(varname, '='))
 		return libc_seterrno(EINVAL);
 	/* Quick check: if we're not supported to replace variables, and if
-	 *              the variable already exists, then there is no need
-	 *              to allocate a new environment line for it, only to
+	 *              the variable already exists, then there is no  need
+	 *              to allocate a new environment line for it, only  to
 	 *              free that line if it does already exist. */
 	if (!replace) {
 		if (getenv(varname) != NULL)
@@ -355,7 +355,7 @@ again_searchenv:
 				continue;
 			if (!replace) {
 				/* Even though we've already checked this above, another thread
-				 * may have added the environment variable in the mean time. */
+				 * may have added  the environment variable  in the mean  time. */
 				atomic_rwlock_endwrite(&libc_environ_lock);
 				free(line);
 				return 0;
@@ -470,7 +470,7 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 			}
 			/* Continue searching for more matching lines.
 			 * Since `environ' is exposed as-is to the hosted application,
-			 * there is the possibility that the user manually added the
+			 * there is the possibility that  the user manually added  the
 			 * same variable more than once... */
 		}
 		atomic_rwlock_endwrite(&libc_environ_lock);
@@ -503,7 +503,7 @@ NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
 	libc_environ_strings = NULL;
 	atomic_rwlock_endwrite(&libc_environ_lock);
 	/* Free all dynamically allocated strings, as
-	 * well a dynamically allocated environ map. */
+	 * well a dynamically allocated environ  map. */
 	while (heap_strings) {
 		next = heap_strings->ehs_next;
 		free(heap_strings);
@@ -744,7 +744,7 @@ NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
 /*[[[body:libc_atexit]]]*/
 {
 	/* TODO: Instead of this right here, we should register `func'
-	 *       for invocation when `dlgethandle(func)' is closed!
+	 *       for  invocation  when `dlgethandle(func)'  is closed!
 	 *       s.a. `DLAUXCTRL_ADD_FINALIZER' */
 	return on_exit(&libc_atexit_wrapper, (void *)func);
 }
@@ -820,7 +820,7 @@ INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 	/* Run functions registered with `atexit()' or `on_exit()'. */
 	libc_run_atexit(status);
 	/* Run library finalizers (NOTE: This will also call back to invoke
-	 * `libc_fini()' because libc is compiled with `-fini=libc_fini') */
+	 * `libc_fini()' because libc  is compiled with  `-fini=libc_fini') */
 	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
 	_Exit(status);
 }
@@ -833,9 +833,9 @@ INTERN ATTR_SECTION(".text.crt.sched.process") ATTR_NORETURN void
 {
 	/* Run at_quick_exit() functions */
 	libc_run_at_quick_exit(status);
-	/* Don't run library finalizers, but still run libc_fini() to
-	 * at least flush open file streams, ensuring that no open
-	 * file is left in an undefined state, and any potential error
+	/* Don't run library finalizers,  but still run libc_fini()  to
+	 * at least  flush open  file streams,  ensuring that  no  open
+	 * file  is left in an undefined state, and any potential error
 	 * message written prior to quick_exit() being called will also
 	 * be printed on-screen. */
 	libc_fini();
@@ -1528,7 +1528,7 @@ char **NOTHROW(libc_get_initenv)(void) {
 	char **result;
 	peb = &__peb;
 	/* Construct a pointer to what (presumably) is `pp_envp_vector'
-	 * NOTE: If the hosted application modified `pp_argc' (who's address
+	 * NOTE: If  the hosted application modified `pp_argc' (who's address
 	 *       by the way is aliased by `__argc' and `*__p___argc()'), then
 	 *       this calculation may not necessarily be correct! */
 	result = (char **)(peb + 1) + peb->pp_argc + 1;

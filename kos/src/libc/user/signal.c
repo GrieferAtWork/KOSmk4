@@ -387,7 +387,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, new_set);
 
 	/* Optimization: If we know that no signal became unmasked, we don't
-	 *               have to search for any pending, unmasked signals! */
+	 *               have  to search for  any pending, unmasked signals! */
 	if (how == SIG_BLOCK)
 		return 0;
 
@@ -404,9 +404,9 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 			/* Check if any of the pending signals are currently unmasked. */
 			if ((pending_word & ~newmask_word) != 0) {
 				/* Clear the set of pending signals (because the kernel won't do this)
-				 * Also note that there is no guaranty that the signal that became
+				 * Also  note that  there is no  guaranty that the  signal that became
 				 * available in the mean time is still available now. - The signal may
-				 * have been directed at our process as a whole, and another thread
+				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 				/* Calls the kernel's `sigmask_check()' function */
@@ -532,9 +532,9 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 			/* Check if any of the pending signals are currently unmasked. */
 			if ((pending_word & ~newmask_word) != 0) {
 				/* Clear the set of pending signals (because the kernel won't do this)
-				 * Also note that there is no guaranty that the signal that became
+				 * Also  note that  there is no  guaranty that the  signal that became
 				 * available in the mean time is still available now. - The signal may
-				 * have been directed at our process as a whole, and another thread
+				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 				/* Calls the kernel's `sigmask_check()' function */
@@ -905,7 +905,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t pthread,
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set
-	 * to zero, and `tid' got re-used. - Sorry... */
+	 * to  zero,  and  `tid'  got  re-used.  - Sorry... */
 	result = sys_tkill(tid, signo);
 	return -result;
 }
@@ -941,7 +941,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t pthread,
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set
-	 * to zero, and `tid' got re-used. - Sorry... */
+	 * to  zero,  and  `tid'  got  re-used.  - Sorry... */
 	/* XXX: Do this without having to call `getpid()' ??? */
 	result = sys_rt_tgsigqueueinfo(getpid(), tid, signo, &info);
 	return -result;

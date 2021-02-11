@@ -65,7 +65,7 @@ INTERN_FUNCTION(libc_x86_syscall_check_sysenter)
 .Lis_supported:
 	.cfi_remember_state
 	/* Override call to this function:
-	 * ORIGNAL (8 bytes of code):
+	 * ORIGNAL  (8  bytes  of   code):
 	 *    E8    ?? ?? ?? ??    # call  libc_x86_syscall_check_sysenter
 	 * %ebx:
 	 *    74    ??             # jz    1f
@@ -95,7 +95,7 @@ INTERN_FUNCTION(libc_x86_syscall_check_sysenter)
 .Lnot_supported:
 	.cfi_restore_state
 	/* Override call to this function:
-	 * ORIGNAL (8 bytes of code):
+	 * ORIGNAL  (8  bytes  of   code):
 	 *    E8    ?? ?? ?? ??    # call  libc_x86_syscall_check_sysenter
 	 * %ebx:
 	 *    74    ??             # jz    1f
@@ -145,7 +145,7 @@ INTERN(libc_x86_syscall_check_sysenter)
 .section .xdata.crt.syscall.__i386_syscall, "awx"
 INTERN_FUNCTION(libc___i386_syscall)
 	.cfi_startproc
-	/* Check if host supports the `sysenter' instruction,
+	/* Check  if host supports the `sysenter' instruction,
 	 * and re-write this code during the first invocation. */
 	call   libc_x86_syscall_check_sysenter
 	.byte  0x74
@@ -170,7 +170,7 @@ END(libc___i386_syscall)
 .section .xdata.crt.syscall.__i386_Xsyscall, "awx"
 INTERN_FUNCTION(libc___i386_Xsyscall)
 	.cfi_startproc
-	/* Check if host supports the `sysenter' instruction,
+	/* Check  if host supports the `sysenter' instruction,
 	 * and re-write this code during the first invocation. */
 	call   libc_x86_syscall_check_sysenter
 	.byte  0x74
@@ -270,11 +270,11 @@ DEFINE_PUBLIC_ALIAS(Syscall64, libc_Syscall)
 
 /* Provide CRT support for inline system calls
  * These functions behave identical to invoking a system call
- * using `int 80h', in that arguments are passed through the
+ * using `int 80h', in that arguments are passed through  the
  * same registers.
  * The number of registers taken by a system call can be determined
- * by loading `__WANT_SYSCALL_REGISTER_COUNT' information, and
- * expanding the `__NRRC_*' macro associated with some given
+ * by  loading  `__WANT_SYSCALL_REGISTER_COUNT'  information,   and
+ * expanding  the  `__NRRC_*'  macro  associated  with  some  given
  * system call. */
 DEFINE_PUBLIC_ALIAS(__i386_syscall, libc___i386_syscall)
 DEFINE_PUBLIC_ALIAS(__i386_Xsyscall, libc___i386_Xsyscall)

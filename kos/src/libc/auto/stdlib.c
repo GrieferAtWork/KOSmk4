@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29f0a873 */
+/* HASH CRC-32:0x32364ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
                         void *arg) THROWS(...) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
 	 * source referenced (see the comment below), but this code is the first  thing
-	 * that    comes   up   when   you   search   for   `libc qsort public domain'.
+	 * that comes up when you search for `libc qsort public domain'.
 	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
 	 *
 	 * Note that I made some modifications, and you should see the linked source for

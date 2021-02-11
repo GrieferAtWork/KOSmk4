@@ -1806,10 +1806,10 @@ NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir,
 		fd_t i, nul = open(dev_null, O_RDWR);
 		if (nul < 0)
 			return -1;
-		/* NOTE: Glibc does an additional check to ensure that `nul' really
-		 *       is a character-device with the correct dev_t. We could do
+		/* NOTE: Glibc does an additional check to ensure that `nul'  really
+		 *       is a character-device with the  correct dev_t. We could  do
 		 *       that as well, however I'd consider a system where /dev/null
-		 *       isn't actually /dev/null to already be broken... (and the
+		 *       isn't actually /dev/null to  already be broken... (and  the
 		 *       check only adds unnecessary overhead if you ask me) */
 		for (i = 0; i < 3; ++i) {
 			if (nul != i)
@@ -2003,7 +2003,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] =
 	[_PC_PIPE_BUF]           = PIPE_BUF,
 	[_PC_CHOWN_RESTRICTED]   = _POSIX_CHOWN_RESTRICTED,
 	[_PC_NO_TRUNC]           = _POSIX_NO_TRUNC,
-	[_PC_VDISABLE]           = 1, /* All KOS terminals support disabling control characters. All
+	[_PC_VDISABLE]           = 1, /* All   KOS  terminals  support  disabling  control  characters.  All
 	                               * related functionality is implemented in `/kos/src/libterm/termio.c' */
 #ifdef _POSIX_SYNC_IO
 	[_PC_SYNC_IO]            = _POSIX_SYNC_IO,
@@ -3125,8 +3125,8 @@ NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name)
 	}
 	switch (name) {
 
-	/* Special handling to deal with names where the actual config value
-	 * overlaps with the `SYSCONF_ENTRY_UNDEFINED' marker. Note that for
+	/* Special  handling to deal with names where the actual config value
+	 * overlaps  with the `SYSCONF_ENTRY_UNDEFINED' marker. Note that for
 	 * this purpose, `SYSCONF_ENTRY_UNDEFINED' has a value of `INT32_MIN' */
 
 /*[[[deemon
@@ -3161,7 +3161,7 @@ for (local name: SYSCONF_VALUES_LO_INT32) {
 #endif /* NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP */
 
 
-	/* Special handling for conf values outside of the
+	/* Special  handling for conf values outside of the
 	 * 32-bit range required by the config table above. */
 /*[[[deemon
 for (local name: SYSCONF_VALUES_HI_INT32) {
@@ -3514,7 +3514,7 @@ NOTHROW(LIBCCALL libc_gettid)(void)
 {
 	struct pthread *me;
 	/* Use pthread_self(), since that one will already
-	 * do all of the lazy TID initialization for us! */
+	 * do all of the  lazy TID initialization for  us! */
 	me = libc_pthread_self();
 	return _pthread_tid(me);
 }

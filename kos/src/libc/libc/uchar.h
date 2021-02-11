@@ -31,7 +31,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* Helper functions for converting wide-character strings
- * into UTF-8, so they may be used by the kernel. */
+ * into  UTF-8,  so  they  may  be  used  by  the kernel. */
 INTDEF void LIBCCALL libc_uchar_freev(/*utf-8*/ char **ptr);
 INTDEF void LIBCCALL libc_uchar_freevn(/*utf-8*/ char **ptr, size_t count);
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char *LIBDCALL libc_uchar_c16tombs(char16_t const *__restrict str);

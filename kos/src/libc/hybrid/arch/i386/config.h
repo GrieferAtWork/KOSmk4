@@ -22,7 +22,7 @@
 
 #include <hybrid/host.h>
 
-/* Libc functions implemented by arch-specific, optimized functions.
+/* Libc functions implemented  by arch-specific, optimized  functions.
  * Defining these macros causes libc's auto/user-system to not provide
  * the associated functions. */
 
@@ -200,7 +200,7 @@
 #define LIBC_ARCH_HAVE_LIBC_HANDLE 1
 
 /* Arch-specific RTM optimizations do exist on x86
- * (in the form of a dedicated instruction set) */
+ * (in the form  of a  dedicated instruction  set) */
 #define LIBC_ARCH_HAVE_RTM_BEGIN 1
 #define LIBC_ARCH_HAVE_RTM_END   1
 #define LIBC_ARCH_HAVE_RTM_ABORT 1

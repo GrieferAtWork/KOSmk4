@@ -433,10 +433,13 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			innerText = List(for (local l: lines) l[commonPrefixLen:]);
 		}
 		if (lineLength >= 0) {
-			innerText = reflowBlockComment(innerText, lineLength);
+			local usedLineLength = lineLength - (commonPrefixLen + commonTailLen);
+			if (usedLineLength < 0)
+				usedLineLength = 0;
+			innerText = reflowBlockComment(innerText, usedLineLength);
 			if (commonTail)
-				innerText = for (local l: innerText) l.ljust(lineLength);
-		} else if (commonLineLength !is none) {
+				innerText = for (local l: innerText) l.ljust(usedLineLength);
+		} else if (commonLineLength !is none && commonTail) {
 			local adjCommonLength = commonLineLength - (commonPrefixLen + commonTailLen);
 			innerText = reflowBlockComment(innerText, adjCommonLength);
 			if (commonTail)
@@ -531,7 +534,19 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 				result.append(l);
 			}
 		} else {
-			paragraphBlock.append(l);
+			local colpos = l.find(":");
+			/* Special case for 1: foo\n2: bar-style listings.
+			 * When one of these is encountered, then manually start a new paragraph.
+			 * For this purpose, everything that comes before the ':' must consist of
+			 * only a single word (though stuff like `a b c' will only be  recognized
+			 * as a single word) */
+			if (colpos >= 1 && (!l.isanyspace(0, colpos) || #splitWords(l[:colpos]) == 1)) {
+				if (paragraphBlock)
+					result.extend(reflowBlockComment(paragraphBlock, lineLength));
+				paragraphBlock = [l];
+			} else {
+				paragraphBlock.append(l);
+			}
 		}
 	}
 	/* Check for sub-paragraphs */
@@ -872,8 +887,14 @@ function trimTrailingSpaces(text: string): string {
 
 function autom8File(filename: string) {
 	local parser = Autom8Parser();
-	local oldBytes = File.open(filename, "r").read();
-	parser.text = trimTrailingSpaces(oldBytes.decode("utf-8"));
+	local oldBytes;
+	try {
+		oldBytes = File.open(filename, "r").read();
+		parser.text = trimTrailingSpaces(oldBytes.decode("utf-8"));
+	} catch (...) {
+		print File.stderr: ("Error while loading file:", repr filename);
+		throw;
+	}
 	parser.newText = File.Writer();
 	parser.flushStart = 0;
 	parser.len = #parser.text;
@@ -900,14 +921,36 @@ function autom8File(filename: string) {
 	}
 }
 
+global final SHOULD_FORMAT_FILE_EXTENSIONS: {string...} = HashSet.Frozen({
+	"h", "hh", "c", "inl", "dee", "sh", "S",
+});
+
 function autom8FileWithWildcard(filename: string) {
 	if ("*" !in filename)
 		return autom8File(filename);
 	local head = fs.headof(filename);
+	if (filename.endswith("**")) {
+		local tail = fs.tailof(filename);
+		if (tail == "**") {
+			for (local e: fs.dir(head)) {
+				e = fs.joinpath(head, e);
+				local st = fs.stat(e);
+				if (st.isreg) {
+					if (fs.extof(e) in SHOULD_FORMAT_FILE_EXTENSIONS)
+						autom8File(e);
+				} else if (st.isdir) {
+					autom8FileWithWildcard(e + "/**");
+				}
+			}
+			return;
+		}
+	}
 	for (local e: fs.query(filename)) {
 		e = fs.joinpath(head, e);
-		if (!fs.stat.isdir(e))
-			autom8File(e);
+		if (fs.stat.isreg(e)) {
+			if (fs.extof(e) in SHOULD_FORMAT_FILE_EXTENSIONS)
+				autom8File(e);
+		}
 	}
 }
 

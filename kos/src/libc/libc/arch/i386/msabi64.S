@@ -72,7 +72,7 @@
 
 
 /* Floating point argument passing is identical between msabi and sysvabi,
- * with the exception that msabi requires a buch of fpu registers to stay
+ * with the exception that msabi requires a buch of fpu registers to  stay
  * preserved upon return. */
 #define libd_msabi64_F      libd_msabi64_R
 #define libd_msabi64_FF     libd_msabi64_R
@@ -93,8 +93,8 @@
 
 
 /* Calculate the address of the libc_* variant from data set-up by the libd_* wrapper.
- * Upon return, the absolute address of the libc_* function is stored in %rax
- * s.a. The `#define DFUN()' macro below, which fills in the data used by this macro! */
+ * Upon return,  the  absolute  address of  the  libc_*  function is  stored  in  %rax
+ * s.a.  The `#define DFUN()' macro below, which fills in the data used by this macro! */
 #define MSABI_LOAD_RETURN_ADDRESS()       \
 	popq   %r11;      /* offset-addent */ \
 	addq   %r11, %rax /* calculate absolute address */
@@ -131,7 +131,7 @@
  *  ARG#5    %r8        8(%rsp)
  *  ARG#6    %r9        16(%rsp)
  *  ARG#7    8(%rsp)    24(%rsp)
- *  ARG#8    16(%rsp)   32(%rsp)
+ *  ARG#8    16(%rsp) 32(%rsp)
  *           ...        ...
  *
  *  [Preserve]

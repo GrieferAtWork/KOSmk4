@@ -71,9 +71,9 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlock_impl)(lfutex_t *ulockaddr,
                                            lfutex_t val2) {
 	ssize_t result;
 	/* Special handling for futex operation that wouldn't be understood
-	 * when they appear in the `fe_condition' of a futex expression.
-	 * These are essentially all operations that don't take a timeout,
-	 * since only wait-like operations can be used, any only wait-like
+	 * when they appear  in the `fe_condition'  of a futex  expression.
+	 * These are essentially all operations that don't take a  timeout,
+	 * since only wait-like operations can be used, any only  wait-like
 	 * operations that the ones that actually make use of a timeout. */
 	if (!LFUTEX_USES_TIMEOUT(futex_op & LFUTEX_CMDMASK)) {
 		result = sys_lfutex(ulockaddr, futex_op,

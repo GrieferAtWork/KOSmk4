@@ -330,7 +330,7 @@ __SYSDECL_BEGIN
 #if !defined(SA_RESTORER) && defined(__SA_RESTORER)
 #define SA_RESTORER __SA_RESTORER /* A custom signal restore function (`sa_restorer') was given.
                                    * This flag is set by libc, after having filled in the `sa_restorer' field.
-                                   * NOTE: On  x86,  the  kernel  assumes that  this  points  to  a  function:
+                                   * NOTE: On x86, the kernel assumes that this points to a function:
                                    * >> sa_restorer:
                                    * >>     movl   $SYS_sigreturn, %eax
                                    * >>     int    $0x80 */

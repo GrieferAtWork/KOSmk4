@@ -39,7 +39,7 @@ DECL_BEGIN
 #define __UNICODE_FUPPER   0x0020 /* Upper-case. */
 #define __UNICODE_FTITLE   0x0040 /* Title-case. */
 #define __UNICODE_FCNTRL   0x0080 /* Control character. */
-#define __UNICODE_FDIGIT   0x0100 /* The character is a digit. e.g.: `²' (sqare; `ut_digit' is `2') */
+#define __UNICODE_FDIGIT   0x0100 /* The character is a digit. e.g.: `Â²' (sqare; `ut_digit' is `2') */
 #define __UNICODE_FDECIMAL 0x0200 /* The character is a decimal. e.g: `5' (ascii; `ut_digit' is `5') */
 #define __UNICODE_FSYMSTRT 0x0400 /* The character can be used as the start of an identifier. */
 #define __UNICODE_FSYMCONT 0x0800 /* The character can be used to continue an identifier. */

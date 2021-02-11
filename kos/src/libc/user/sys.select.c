@@ -31,7 +31,7 @@
 
 #ifndef SYS__newselect
 /* Pull in information to figure out what kind of
- * select() function is exported by the kernel. */
+ * select() function is  exported by the  kernel. */
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
 #define __WANT_SYSCALL_ARGUMENT_COUNT 1
 #include <asm/syscalls-proto.h>

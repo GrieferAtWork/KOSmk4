@@ -186,7 +186,7 @@ NOTHROW(LIBDCALL libd_strerrorname_s)(errno_t errnum)
 /*[[[body:libd_strerrorname_s]]]*/
 {
 	/* Special handling for a hand full of errno
-	 * values that don't have KOS equivalents. */
+	 * values that don't  have KOS  equivalents. */
 	switch (errnum) {
 	case DOS_STRUNCATE:
 		return "STRUNCATE\0" "Truncated";

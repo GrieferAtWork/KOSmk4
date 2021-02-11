@@ -85,7 +85,7 @@ trap_application(struct kcpustate *__restrict state,
 	sys_debugtrap(&ustate, &r);
 	/* If the debugger trap failed, try to do a coredump */
 	sys_coredump(&ustate, NULL, NULL, 0, NULL, unwind_error);
-	/* If even the coredump failed (which it shouldn't have,
+	/* If even the coredump  failed (which it shouldn't  have,
 	 * consequently meaning that shouldn't actually get here),
 	 * simply terminate the process. */
 	sys_exit_group(EXIT_FAILURE);

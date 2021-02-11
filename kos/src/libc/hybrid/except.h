@@ -55,7 +55,7 @@ INTDEF void CXA_CC libc_cxa_end_catch(void);
 INTDEF ATTR_COLD ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL libc_except_badusage_rethrow_outside_catch)(error_register_state_t const *state);
 
-/* Bad usage: Attempted to call `THROW()' from inside of a catch-block,
+/* Bad usage: Attempted to  call `THROW()'  from inside  of a  catch-block,
  *            without wrapping the throwing code location inside of another
  *            NESTED_TRY-block. */
 INTDEF ATTR_COLD ATTR_NORETURN NONNULL((1)) void

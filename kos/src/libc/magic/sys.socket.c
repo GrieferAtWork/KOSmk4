@@ -545,9 +545,9 @@
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
 #define MSG_CMSG_COMPAT __MSG_CMSG_COMPAT /* [in] Write ancillary data as `struct compat_cmsghdr'   \
-                                           * WARNING: No user-space interface accepts this flag!    \
+                                           * WARNING: No user-space interface accepts this  flag!   \
                                            * WARNING: The KOS kernel only uses this flag internally \
-                                           *          when    compiled    with     __ARCH_HAVE_COMPAT */
+                                           *          when    compiled    with   __ARCH_HAVE_COMPAT */
 #else /* __ARCH_HAVE_COMPAT */
 #define MSG_CMSG_COMPAT 0
 #endif /* !__ARCH_HAVE_COMPAT */

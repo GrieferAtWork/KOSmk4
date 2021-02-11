@@ -128,10 +128,10 @@ IU(	call   libc_error_info)
 	.cfi_same_value %rbp
 	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBX)(%rax), %rbx
 	.cfi_same_value %rbx
-	/* Push registers that we're going to restore later!
-	 * This must be done before we write to the target ESP in case
-	 * that target ESP overlaps with the kcpustate structure (in which
-	 * case we'll be overwriting the kcpustate during the stack setup,
+	/* Push    registers    that   we're    going   to    restore   later!
+	 * This  must  be done  before  we write  to  the target  ESP  in case
+	 * that  target ESP  overlaps with  the kcpustate  structure (in which
+	 * case  we'll be  overwriting the  kcpustate during  the stack setup,
 	 * meaning that any read from the structure has to happen before then) */
 	pushq  OFFSET_KCPUSTATE_RFLAGS(%rax)
 	pushq  (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX)(%rax)
@@ -140,7 +140,7 @@ IU(	call   libc_error_info)
 	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP)(%rax), %rcx
 	subq   $(16), %rcx
 	/* NOTE: Push EIP first, since that one is stored closer to the bottom
-	 *       of the kcpustate structure, meaning it would get overwritten
+	 *       of the kcpustate structure, meaning it would get  overwritten
 	 *       first! */
 	movq   OFFSET_KCPUSTATE_RIP(%rax), %rdx
 	movq   %rdx, 8(%rcx)
@@ -347,7 +347,7 @@ IK(	movq   %r11, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 	/* Always save %rbx now, since we're using it as a temporary register next. */
 	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBX)
 	/* The call to `libc_error_info()' (may) have clobbered rax, rcx, rdx
-	 * So instead, we must copy these registers from the stack. */
+	 * So  instead,  we  must  copy  these  registers  from  the   stack. */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX(%rsp), %rbx)
 IU(	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX))
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX(%rsp), %rbx)
@@ -388,8 +388,8 @@ IU(	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 	 * %rcx:                          ptr1
 	 * %r8:                           ptr2
 	 * %r9:                           ptr3
-	 * (SIZEOF_KCPUSTATE +  0)(%rsp): ptr4
-	 * (SIZEOF_KCPUSTATE +  8)(%rsp): ptr5
+	 * (SIZEOF_KCPUSTATE + 0)(%rsp):  ptr4
+	 * (SIZEOF_KCPUSTATE + 8)(%rsp):  ptr5
 	 * (SIZEOF_KCPUSTATE + 16)(%rsp): ptr6
 	 * (SIZEOF_KCPUSTATE + 24)(%rsp): ptr7
 	 * (SIZEOF_KCPUSTATE + 32)(%rsp): ptr8 */
@@ -427,7 +427,7 @@ IU(	leaq   (OFFSET_EXCEPTION_INFO_POINTERS + (4 * 8))(%rax), %rdi /* %rdi = &lib
 #endif /* EXCEPTION_DATA_POINTERS >= 5 */
 .Lclear_unused_exception_pointers:
 	/* Check if `%rdx < EXCEPTION_DATA_POINTERS', and fill
-	 * any pointers that weren't given with all zeroes. */
+	 * any pointers that  weren't given  with all  zeroes. */
 	cmpq   $(EXCEPTION_DATA_POINTERS), %rsi
 	jae    .Ldo_unwind_rsp_maybe_fill_trace
 
@@ -513,7 +513,7 @@ IK(	movq   %rax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 IK(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX))
 IK(	movq   %rdx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX))
 	/* The call to `libc_error_info()' (may) have clobbered rax, rcx, rdx
-	 * So instead, we must copy these registers from the stack. */
+	 * So  instead,  we  must  copy  these  registers  from  the   stack. */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX(%rsp), %rcx)
 IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX))
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX(%rsp), %rcx)
@@ -590,13 +590,13 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 
 #if 0 /* Not required, since icpustate64 (excluding the iret tail portion) doesn't
-       * contain any registers that can't also be found in kcpustate64 */
-	/* Another special case: If the interrupt state was re-directed, then we must
+       * contain  any  registers   that  can't  also   be  found  in   kcpustate64 */
+	/* Another special case: If the  interrupt state  was re-directed,  then we  must
 	 *                       load it immediately (and have `x86_rpc_user_redirection'
-	 *                       take care of propagating the exception), since it still
+	 *                       take care of propagating the exception), since it  still
 	 *                       actually points into user-space.
 	 * This is necessrary because otherwise we'd not be restoring the original user-space
-	 * register that aren't also found in `struct kcpustate' (because the kernel-space
+	 * register that aren't  also found in  `struct kcpustate' (because the  kernel-space
 	 * variant uses `.Ldo_unwind_rsp', which work with that cpu state variant) */
 	cmpq   $(x86_rpc_user_redirection), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP(%rsp)
 	EXTERN(cpu_apply_icpustate_rsp)
@@ -604,7 +604,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)
 #endif
 
 	/* The interrupt points into kernel-space (or possibly towards
-	 * `x86_rpc_user_redirection', which is also kernel-space). */
+	 * `x86_rpc_user_redirection', which  is  also  kernel-space). */
 	.cfi_same_value %cs
 	.cfi_same_value %ss
 
@@ -617,7 +617,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_rsp)
 #endif /* !NDEBUG */
 
 	/* NOTE: RPC guaranties never to modify a kernel-target iret tail, meaning
-	 *       we're entirely safe to modify the tail without having to worry
+	 *       we're  entirely safe to  modify the tail  without having to worry
 	 *       about intervention of RPC callbacks! */
 #if EXCEPT_BACKTRACE_SIZE != 0
 	.Lindex = 0
@@ -655,7 +655,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_rsp)
 #error "This code assumes that kcpustate:%rip shares its offset with icpustate:%rflags"
 #endif /* OFFSET_KCPUSTATE_RIP != OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RFLAGS */
 	COPYSTATE(%rip, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP, OFFSET_KCPUSTATE_RIP)
-	/* Copy unaligned GP registers from the back to the first, thus not
+	/* Copy unaligned  GP  registers  from  the  back  to  the  first,  thus  not
 	 * overwriting anything in regards to the gap that has to be created for %rsp */
 	COPYSTATE(%rax, OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX)
 	COPYSTATE(%rcx, OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX)

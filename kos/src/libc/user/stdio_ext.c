@@ -83,7 +83,7 @@ NOTHROW_NCX(LIBCCALL libc___freadable)(FILE *fp)
 	assert(fp);
 	assert(fp->if_exdata);
 	(void)fp;
-	/* KOS's stdio itself always allows reads.
+	/* KOS's   stdio   itself  always   allows  reads.
 	 * It's up to the kernel to stop us from doing so. */
 	return 1;
 }

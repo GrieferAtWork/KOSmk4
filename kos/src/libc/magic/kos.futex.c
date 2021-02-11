@@ -68,7 +68,7 @@ typedef __uintptr_t lfutex_t;
  *   (using any of  the `LFUTEX_WAIT_*' operators  that are  available))
  *   When targeting KOS specifically, this is the preferred way of going
  *   about passively  waiting for  a futex,  as it  doesn't require  the
- *   creation     of     any     additional     kernel-space     object.
+ *   creation of any additional kernel-space object.
  *   TODO: Implement the `kpoll()' system call
  *
  * - Using the regular `poll()' / `select()' family of system calls, after

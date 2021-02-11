@@ -48,15 +48,15 @@
 PRIVATE_LABEL(rtm_selfmod_start):
 #endif /* CONFIG_SUPPORT_HARDWARE_RTM */
 
-/* Begin an RTM operation. Note that if the arch-specific RTM driver
+/* Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
+ * Note  that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
+ * system calls, or attempting to access too much system memory in  general
  * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
+ * than  succeeding.  The following  is a  list of  system calls  which are
  * whitelisted for use during a transaction:
  *   - rtm_begin:  Nested RTM operation
  *   - rtm_end:    End an RTM operation
@@ -75,7 +75,7 @@ INTERN_FUNCTION(libc_rtm_begin)
 .Lrtm_begin_maybe_syscall:
 	.long 0xffffffff
 	/* The following 2 bytes will get overwritten with `xbegin' if
-	 * hardware RTM support is found to be available. */
+	 * hardware   RTM   support   is   found   to   be  available. */
 .Lrtm_begin_maybe_xbegin:
 	.byte  0x90 /* nop */
 	.byte  0xe9 /* jmp (with 32-bit operand) */
@@ -95,9 +95,9 @@ DEFINE_PUBLIC_ALIAS(rtm_begin, libc_rtm_begin)
 
 
 
-/* Abort the current transaction by having `rtm_begin()' return with
+/* Abort  the   current  transaction   by   having  `rtm_begin()'   return   with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op. Otherwise, this
+ * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
 INTERN_FUNCTION(libc_rtm_abort)
 	.cfi_startproc
@@ -136,8 +136,8 @@ INTERN_FUNCTION(libc___x86_rtm_xtest)
 	movq   $(SYS_rtm_test), %rax
 	syscall
 	/* NOTE: The `SYS_rtm_test' system call has some special handling in how
-	 *       it returns its result, in that in addition to setting %eax, it
-	 *       also fills in EFLAGS.ZF in the same way that the `xtest'
+	 *       it returns its result, in that in addition to setting %eax,  it
+	 *       also  fills  in  EFLAGS.ZF in  the  same way  that  the `xtest'
 	 *       instruction does! */
 	ret
 	.cfi_endproc
@@ -223,7 +223,7 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	syscall
 	testq  %rax, %rax
 	jnz    rtm_begin_emulated_after_mprotect_fail /* Fallback: Use RTM emulation (so the initial function state matches) */
-	
+
 
 	/* Check if hardware RTM is supported */
 	pushq_cfi_r %rbx
@@ -298,8 +298,8 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	 *   0x05    ...                         -> 0xc0   ...
 	 *   0xc3    ret
 	 * This byte sequence has been painstaikingly engineered to only
-	 * require 8 bytes of text to be modified, so-as to prevent any
-	 * problems related with race conditions (meaning that updating
+	 * require 8 bytes of text to be modified, so-as to prevent  any
+	 * problems  related with race conditions (meaning that updating
 	 * code happens entirely atomic)
 	 */
 	movabs $(ENCODE_INT64(0x31, /* ... (xorq %rax, %rax) */ \
@@ -313,9 +313,9 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	       )), %rax
 	movq   %rax, .Lrtm_test_redirection(%rip)
 
-	/* Re-write the first 2 bytes at `.Lrtm_begin_maybe_xbegin'
+	/* Re-write   the   first   2   bytes   at   `.Lrtm_begin_maybe_xbegin'
 	 * with {0xc7, 0xf8} (which are the bytes corresponding to the `xbegin'
-	 * instruction), and in a second step, write all zeroes to the next 4
+	 * instruction),  and in a second step, write  all zeroes to the next 4
 	 * bytes in order to modify the failure-branch to point to `ret' above. */
 
 	/* `movl $.Lrtm_begin_maybe_xbegin, %rax' */
@@ -353,7 +353,7 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	 * [6] = 0xc3   // retq
 	 * [7] = 0x90   // nop
 	 *
-	 * By doing this, the function `rtm_begin()' gets re-written
+	 * By  doing this, the  function `rtm_begin()' gets re-written
 	 * such that it will invoke the system call used for emulation
 	 * of RTM operations. */
 	movabs $(ENCODE_INT64(/* [0] = */ (SYS_rtm_begin & 0x000000ff),       \
@@ -386,11 +386,11 @@ END(libc_rtm_begin_init)
 INTERN_FUNCTION(libc_rtm_end)
 	.cfi_startproc
 	/* Since we can assume that we're already inside of an RTM operation,
-	 * we know that we can only get here in 2 circumstances:
+	 * we   know  that  we   can  only  get   here  in  2  circumstances:
 	 *   - The real hardware has support for RTM, in which case it should
-	 *     also be able to recognize the `xend' instruction.
-	 *   - We're being emulated by the `rtm' driver, in which case its
-	 *     instruction decoder is able to detect the `xend' instruction,
+	 *     also   be   able   to   recognize   the   `xend'  instruction.
+	 *   - We're  being emulated by  the `rtm' driver,  in which case its
+	 *     instruction decoder is able to detect the `xend'  instruction,
 	 *     and handle it as an alias for the `sys_rtm_end()' system call. */
 	xend
 	/* RTM operation successfully completed! */

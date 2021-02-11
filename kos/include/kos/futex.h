@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63eb641d */
+/* HASH CRC-32:0x1f2553ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ typedef __uintptr_t lfutex_t;
  *   (using any of  the `LFUTEX_WAIT_*' operators  that are  available))
  *   When targeting KOS specifically, this is the preferred way of going
  *   about passively  waiting for  a futex,  as it  doesn't require  the
- *   creation     of     any     additional     kernel-space     object.
+ *   creation of any additional kernel-space object.
  *   TODO: Implement the `kpoll()' system call
  *
  * - Using the regular `poll()' / `select()' family of system calls, after

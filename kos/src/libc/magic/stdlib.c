@@ -258,7 +258,7 @@ void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_d_fn_t cmp, void *arg) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
 	 * source referenced (see the comment below), but this code is the first  thing
-	 * that    comes   up   when   you   search   for   `libc qsort public domain'.
+	 * that comes up when you search for `libc qsort public domain'.
 	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
 	 *
 	 * Note that I made some modifications, and you should see the linked source for

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54776aa4 */
+/* HASH CRC-32:0x1976569e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@
  *     without the user explicitly  making use of exception-enabled  functions,
  *     or marking their binary as `dlexceptaware(3)'
  *     -> This is the default when a standard-linked application's main()
- *        function is reached, and is further described by mode #4
+ *        function is  reached,  and  is further  described  by  mode  #4
  *   - By   propagating  the  underlying   kernel  exception  into  user-space.
  *     In  this  mode,  user-space  gains  the  greatest  amount  of  knowledge
  *     about  the  exception in  question, but  will  be required  to implement
@@ -167,7 +167,7 @@
  *                    When anything else is returned:
  *                        Move on to step #SIG
  *         #7:    If no handler apart of a dlexceptaware-module was found in step #6, move on to step #SIG
- *         #8:    Make sure that both `EXCEPT_FINEXCEPT' and `EXCEPT_FMAYSIGNAL' are set.
+ *         #8:    Make   sure   that   both   `EXCEPT_FINEXCEPT'   and   `EXCEPT_FMAYSIGNAL'   are    set.
  *         #9:    Unwind to the closest found exception handler and resume execution there.
  *                Note that this unwinding will invoke personality functions a second time,
  *                which  differs from the usual single-pass unwinding used for handling all

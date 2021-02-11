@@ -83,7 +83,7 @@
 
 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
  * NOTE: Same as the `MAP_SHARED' map flag, but
- *       can be set like any other protection. */
+ *       can  be set like any other protection. */
 #if !defined(PROT_SHARED) && defined(__PROT_SHARED)
 #define PROT_SHARED __PROT_SHARED
 #endif /* !PROT_SHARED && __PROT_SHARED */

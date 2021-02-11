@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf80b1082 */
+/* HASH CRC-32:0xa1747f20 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10641,7 +10641,7 @@ __LIBC int (signgam);
 
 #ifdef __USE_ISOC99
 /*
- * float_t:    float-type at least as wide as `float'; used to eval `float'-expressions
+ * float_t:    float-type at least as wide  as `float'; used to eval  `float'-expressions
  * double_t:   float-type at least as wide as `double'; used to eval `double'-expressions
  *
  * FLT_EVAL_METHOD:

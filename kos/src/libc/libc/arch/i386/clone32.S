@@ -30,21 +30,21 @@
 #include <errno.h> /* ELIMIT */
 
 /* INTERN NONNULL((1))
- * ATTR_WEAK ATTR_SECTION(".text.crt.sched.access.clone") pid_t
+ * ATTR_WEAK      ATTR_SECTION(".text.crt.sched.access.clone")       pid_t
  * NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, void *child_stack,
  *                                   int flags, void *arg, pid_t *ptid,
- *                                   void *newtls, pid_t *ctid) */
+ *                                   void    *newtls,    pid_t   *ctid) */
 .section .text.crt.sched.access.clone
 INTERN_FUNCTION(libc_clone)
 	.cfi_startproc
 
-	/* NOTE: Don't use %eax for argument passing! That register
+	/* NOTE: Don't  use %eax for  argument passing! That register
 	 *       is the only one that gets clobbered by lcall7, since
 	 *       it will be set to 0 for the child thread. */
 	movl   4(%esp),  %ecx /* __clone_func_t fn */
 	movl   16(%esp), %edx /* void *arg */
 
-	/* Perform the system call with `lcall', since `int $0x80' would clobber all registers
+	/* Perform the system call with `lcall',  since `int $0x80' would clobber all  registers
 	 * except for %ebp, however we need 2 registers to pass both `fn' and `arg' to the child
 	 * thread. */
 	pushl_cfi  32(%esp) /* pid_t *ctid */
@@ -64,7 +64,7 @@ INTERN_FUNCTION(libc_clone)
 	/* Check for errors. */
 	cmpl   $(-ELIMIT), %eax
 	ja     .Lthread_clone_error
-	
+
 	ret
 .Lthread_clone_error:
 	negl   %eax

@@ -91,10 +91,10 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endpwent)(void)
 	if (stream)
 		fclose(stream);
 	/* Also free up the buffer used to describe the strings
-	 * from statically allocated passwd structures.
+	 * from   statically   allocated   passwd   structures.
 	 *
-	 * Note that this part is entirely thread-unsafe: If some
-	 * other thread is currently using these buffers, then they
+	 * Note that  this  part  is  entirely  thread-unsafe:  If  some
+	 * other thread  is currently  using  these buffers,  then  they
 	 * will end up accessing free()d (and possible unmapped) memory! */
 	{
 		char *buffer;

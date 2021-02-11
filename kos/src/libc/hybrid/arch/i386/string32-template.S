@@ -419,7 +419,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmoveup),
 
 PRIVATE_LABEL(IFELSE_PCPY(F(libc_x86_mempmoveup_start),
                           F(libc_x86_memmoveup_start))):
-	/* Make sure that the direction bit is set,
+	/* Make  sure that the  direction bit is set,
 	 * thus causing `movs' to do a top->down copy */
 	BEGIN_STD
 	NIF_PCPY(movl %edi, %eax)
@@ -692,4 +692,3 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend), F_STRING(nend))
 #undef END_STD
 #undef RET
 #endif /* !__INTELLISENSE__ */
-

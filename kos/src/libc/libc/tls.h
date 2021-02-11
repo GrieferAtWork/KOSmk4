@@ -33,16 +33,16 @@
 DECL_BEGIN
 
 /* LIBC per-thread data instance.
- * NOTE: This _must_ be the _only_ ATTR_THREAD variable in all of libc!
- *       If this assumption is violated, then `current_from_tls()' will
+ * NOTE: This _must_ be the _only_  ATTR_THREAD variable in all of  libc!
+ *       If  this assumption is  violated, then `current_from_tls()' will
  *       break, as it assumes that the in-library TLS offset of `current'
  *       is equal to `0'!
  * Also: By making this be the only TLS variable, we can further minimize
- *       the number of relocations within the resulting libc.so! */
+ *       the   number  of  relocations   within  the  resulting  libc.so! */
 INTDEF ATTR_THREAD struct pthread current;
 
 /* Return a handle for libc.so, as would also be returned by `dlopen("libc.so")'
- * Note however that this function doesn't return a new reference to libc's
+ * Note however that  this function  doesn't return  a new  reference to  libc's
  * shared library handle, but rather simply returns the raw handle pointer. */
 #ifdef LIBC_ARCH_HAVE_LIBC_HANDLE
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(void);
@@ -51,7 +51,7 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(vo
 #endif /* !LIBC_ARCH_HAVE_LIBC_HANDLE */
 
 /* Return a pointer to `current', given a tls_segment
- * pointer, as allocated by `dltlsallocseg()' */
+ * pointer,   as   allocated   by   `dltlsallocseg()' */
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1))
 struct pthread *LIBCCALL current_from_tls(void *tls_segment) {
 	return (struct pthread *)dltlsaddr2(libc_handle(), tls_segment);

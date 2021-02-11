@@ -52,7 +52,7 @@ DEFINE_NOREL_GLOBAL_META(char **, environ, ".crt.fs.environ.environ");
 DEFINE_NOREL_GLOBAL_META(FILE *, stdin, ".crt.FILE.locked.read.read.stdin");
 DEFINE_NOREL_GLOBAL_META(FILE *, stdout, ".crt.FILE.locked.write.write.stdout");
 DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write.stderr");
-/* HINT: The actual std* symbols are exported from "user/stdio.c", since they
+/* HINT: The actual std* symbols are  exported from "user/stdio.c", since  they
  *       require special initialization based on symbols that only exist within
  *       that specific source file */
 
@@ -103,7 +103,7 @@ DEFINE_NOREL_GLOBAL_META(int, optind, ".crt.application.options");
 DEFINE_NOREL_GLOBAL_META(int, opterr, ".crt.application.options");
 DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.options");
 /* HINT: The getopt global variables are defined in "user/getopt.c"
- *       to prevent redundancy of section information meta-data. */
+ *       to prevent  redundancy of  section information  meta-data. */
 
 
 

@@ -31,7 +31,7 @@
 
 #ifdef CONFIG_SUPPORT_HARDWARE_RTM
 /* environ variable:
- * The first time that `rtm_begin()' is called, this
+ * The  first  time  that `rtm_begin()'  is  called, this
  * variable is searched for via `getenv(ENVIRON_HW_RTM)'.
  *  - If the variable isn't defined, check `cpuid' for RTM support
  *  - If the variable is defined as "0", disable hardware RTM

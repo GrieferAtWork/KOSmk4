@@ -49,18 +49,18 @@ DECL_BEGIN
  * use a custom, lazily initialized function table against functions
  * from libdl (though excluding the function we need to fill in that
  * table, which is `dlsym()')
- * The reason we do this because on most architectures, each jump
- * relocation will require some form of initialization to be done
- * by libdl during _every_ _single_ _initialization_ of the library
- * in question. And while glibc and the like couldn't give less of
- * a ra7'5 a$$ about the performance impact this has on the startup
- * time of practically any application on the system (since pretty
+ * The  reason we do  this because on  most architectures, each jump
+ * relocation will require  some form of  initialization to be  done
+ * by libdl during _every_ _single_ _initialization_ of the  library
+ * in question. And while glibc and  the like couldn't give less  of
+ * a ra7'5 a$$ about the performance impact this has on the  startup
+ * time of practically any application  on the system (since  pretty
  * much all applications are linked against libc), I personally _do_
  * care.
- * So any lazy relocation against functions from libdl is replaced
+ * So any lazy relocation against  functions from libdl is  replaced
  * by a lazily initialized indirection call that truly doesn't cause
  * any additional relocations.
- * Using this, all relocations to libdl symbols can (and are) removed
+ * Using  this, all relocations to libdl symbols can (and are) removed
  * this way (except for `dlsym()', as that one is actually required to
  * do the symbol lookups themself, meaning we'd had to do
  * `dlsym(RTLD_DEFAULT, "dlsym")' to get dlsym itself, which obviously
