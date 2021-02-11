@@ -25,7 +25,9 @@
 #include <asm/pagesize.h>
 
 #if defined(__CC__) && defined(__ARCH_PAGESIZE) && !defined(__fast_getpagesize_defined)
+#include <__crt.h>
 #include <features.h>
+
 #define __fast_getpagesize_defined 1
 __DECL_BEGIN __NAMESPACE_FAST_BEGIN
 
@@ -35,6 +37,6 @@ __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBC_FAST_NAME(getpagesize))(void) {
 }
 
 __NAMESPACE_FAST_END __DECL_END
-#endif /* __CC__ */
+#endif /* __CC__ && __ARCH_PAGESIZE && !__fast_getpagesize_defined */
 
 #endif /* !_OPTIMIZED_UNISTD_H */

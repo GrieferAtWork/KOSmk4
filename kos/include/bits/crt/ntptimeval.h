@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/crt/ntptimeval.h>
- * 
+ *
  * Definitions:
  *    struct ntptimeval {
  *        ...

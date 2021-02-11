@@ -52,4 +52,3 @@ INTERN_FUNCTION(GDB_MainWithAlternateStack)
 	ret
 	.cfi_endproc
 END(GDB_MainWithAlternateStack)
-

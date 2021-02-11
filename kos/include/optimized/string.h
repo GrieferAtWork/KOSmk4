@@ -3624,9 +3624,9 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __
                                         __SIZE_TYPE__ __n_bytes) {
 	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
 		return 0;
-	/* memcmp() behaves differently from strcmp(), in that memcmp is allowed to assume
-	 * both input data blocks contain at least `N_BYTES' of valid data, which
-	 * an implementation is allowed to access in any order it wishes.
+	/* memcmp() behaves differently from strcmp(), in that memcmp is allowed to
+	 * assume both input data blocks contain at least `N_BYTES' of valid data,
+	 * which an implementation is allowed to access in any order it wishes.
 	 * With that in mind, we are allowed to optimize something like:
 	 * >> memcmp(a, b, 4) == 0;
 	 * Into:

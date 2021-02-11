@@ -278,7 +278,7 @@ again_find_good_range:
 	/* Safety check: Is the range of allowed addresses non-empty? */
 	if unlikely(allow_maxaddr < allow_minaddr) {
 err_no_space:
-		/* Try without the +1 additional page of 
+		/* Try without the +1 additional page of
 		 * normally included in stack allocations. */
 		if (flags & MAP_STACK) {
 			num_bytes -= 2 * PAGESIZE;

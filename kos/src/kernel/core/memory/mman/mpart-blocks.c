@@ -57,7 +57,7 @@ DECL_BEGIN
  *
  * NOTE: The caller must be holding a lock to `self'
  * NOTE: The caller is responsible to ensure that `MPART_ST_INMEM(self->mp_state)'
- *       before calling this function. 
+ *       before calling this function.
  * NOTE: If necessary, the length of the returned range may be truncated in
  *       order to accommodate the requirements on the state of contained blocks.
  *

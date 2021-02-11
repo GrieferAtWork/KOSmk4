@@ -165,7 +165,7 @@ NOTHROW(FCALL mpart_truncate_undo_unlockinfo_cb)(struct unlockinfo *__restrict s
 }
 
 /* Write the physical memory contents
- * of   `sec[start_offset...+=num_bytes]'
+ * of `sec[start_offset...+=num_bytes]'
  * into `self[dst_offset...+=num_bytes]' */
 PRIVATE NOBLOCK NONNULL((1)) void FCALL
 mfile_write_from_mempart_buffer(struct mfile *__restrict self,

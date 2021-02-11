@@ -46,12 +46,12 @@ enum {
 #define FE_UNDERFLOW FE_UNDERFLOW
 #define FE_INEXACT   FE_INEXACT
 #else /* __COMPILER_PREFERR_ENUMS */
-#define FE_INVALID   0x01
-#define __FE_DENORM  0x02
-#define FE_DIVBYZERO 0x04
-#define FE_OVERFLOW  0x08
-#define FE_UNDERFLOW 0x10
-#define FE_INEXACT   0x20
+#define FE_INVALID   1
+#define __FE_DENORM  2
+#define FE_DIVBYZERO 4
+#define FE_OVERFLOW  8
+#define FE_UNDERFLOW 16
+#define FE_INEXACT   32
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -75,10 +75,10 @@ enum {
 #define FE_UPWARD     FE_UPWARD     /* ceil() */
 #define FE_TOWARDZERO FE_TOWARDZERO /* trunc() */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define FE_TONEAREST  0x0000 /* round() */
-#define FE_DOWNWARD   0x0001 /* floor() */
-#define FE_UPWARD     0x0002 /* ceil() */
-#define FE_TOWARDZERO 0x0003 /* trunc() */
+#define FE_TONEAREST  0 /* round() */
+#define FE_DOWNWARD   1 /* floor() */
+#define FE_UPWARD     2 /* ceil() */
+#define FE_TOWARDZERO 3 /* trunc() */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

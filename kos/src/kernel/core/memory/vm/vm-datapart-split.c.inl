@@ -1222,4 +1222,3 @@ err:
 DECL_END
 
 #undef SPLIT_NX
-

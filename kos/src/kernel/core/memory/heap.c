@@ -538,16 +538,16 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
  * This function then tries to acquire a lock to the heap without blocking.
  * If this succeeds, it calls forward to `heap_free_raw_and_unlock_impl()'.
  * If it doesn't, it will instead track the given memory block as a pending free.
- * @return: true:  The heap remains locked (the caller inherits the lock). 
- * @return: false: The heap was unlocked before returning.*/
+ * @return: true:  The heap remains locked (the caller inherits the lock).
+ * @return: false: The heap was unlocked before returning. */
 LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict self,
                                                         VIRT void *ptr, size_t num_bytes,
                                                         gfp_t flags);
 
 /* Upon entry, the heap must be locked.
- * @return: true:  The heap remains locked. 
- * @return: false: The heap was unlocked.*/
+ * @return: true:  The heap remains locked.
+ * @return: false: The heap was unlocked. */
 PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
                                              VIRT void *ptr, size_t num_bytes,
@@ -667,8 +667,8 @@ NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self) {
  * This function then tries to acquire a lock to the heap without blocking.
  * If this succeeds, it calls forward to `heap_free_raw_and_unlock_impl()'.
  * If it doesn't, it will instead track the given memory block as a pending free.
- * @return: true:  The heap remains locked (the caller inherits the lock). 
- * @return: false: The heap was unlocked before returning.*/
+ * @return: true:  The heap remains locked (the caller inherits the lock).
+ * @return: false: The heap was unlocked before returning. */
 LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict self,
                                                         VIRT void *ptr, size_t num_bytes,
@@ -707,8 +707,8 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
 
 
 /* Upon entry, the heap must be locked.
- * @return: true:  The heap remains locked. 
- * @return: false: The heap was unlocked.*/
+ * @return: true:  The heap remains locked.
+ * @return: false: The heap was unlocked. */
 PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
                                              VIRT void *ptr, size_t num_bytes,

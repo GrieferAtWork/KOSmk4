@@ -729,7 +729,7 @@ cexpr_cfi_set_address(struct cvalue *__restrict self,
 	 * who's address must be calculated via a CFI expression. */
 	addr = (byte_t *)addr + self->cv_expr.v_bufoff;
 	/* We must still write-back any unwritten modifications,
-	 * even though there really shouldn't be any at this point.  */
+	 * even though there really shouldn't be any at this point. */
 	if (self->cv_kind == CVALUE_KIND_EXPR) {
 		if (self->cv_expr.v_buffer) {
 			if (dbg_writememory(addr, self->cv_expr.v_buffer,
@@ -1211,7 +1211,7 @@ NOTHROW(FCALL cvalue_initcopy)(struct cvalue *__restrict self,
                                struct cvalue const *__restrict src) {
 	memcpy(self, src, sizeof(struct cvalue));
 	switch (self->cv_kind) {
-	
+
 	case CVALUE_KIND_DATA:
 		if (src->cv_data != NULL) {
 			size_t buflen;
@@ -1224,7 +1224,7 @@ NOTHROW(FCALL cvalue_initcopy)(struct cvalue *__restrict self,
 			self->cv_expr.v_buffer = buffer;
 		}
 		break;
-	
+
 	case CVALUE_KIND_EXPR:
 		if (self->cv_expr.v_buffer) {
 			void *buffer;
@@ -1239,7 +1239,7 @@ NOTHROW(FCALL cvalue_initcopy)(struct cvalue *__restrict self,
 	case CVALUE_KIND_IEXPR:
 		incref(self->cv_expr.v_expr.v_module);
 		break;
-	
+
 	default:
 		break;
 	}
@@ -1491,7 +1491,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_swap)(void) {
 }
 
 /* Rotate the top n c expression stack elements left/right.
- * When `n <= 1', these calls are a no-op in regards to 
+ * When `n <= 1', these calls are a no-op in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n) {
@@ -1646,7 +1646,7 @@ do_check_for_non_zero_byte:
 
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_IEEE754_FLOAT):
 		switch (ct->ct_kind) {
-	
+
 		case CTYPE_KIND_IEEE754_FLOAT: {
 			float f;
 			if (dbg_readmemory(data, &f, sizeof(f)) != 0)
@@ -1654,7 +1654,7 @@ do_check_for_non_zero_byte:
 			if (f != 0.0f)
 				return 1;
 		}	break;
-	
+
 		case CTYPE_KIND_IEEE754_DOUBLE: {
 			double d;
 			if (dbg_readmemory(data, &d, sizeof(d)) != 0)
@@ -1662,7 +1662,7 @@ do_check_for_non_zero_byte:
 			if (d != 0.0)
 				return 1;
 		}	break;
-	
+
 		case CTYPE_KIND_IEEE854_LONG_DOUBLE: {
 			__LONGDOUBLE ld;
 			if (dbg_readmemory(data, &ld, sizeof(ld)) != 0)
@@ -1670,7 +1670,7 @@ do_check_for_non_zero_byte:
 			if (ld != 0.0l)
 				return 1;
 		}	break;
-	
+
 		default:
 			goto do_check_for_non_zero_byte;
 		}

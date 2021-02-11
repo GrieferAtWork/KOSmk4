@@ -398,7 +398,7 @@ struct _pointer_ctype {
 
 #define DEFINE_CTYPE(T, name)        \
 	DATDEF T _##name ASMNAME(#name); \
-	PUBLIC T _##name 
+	PUBLIC T _##name
 #ifdef __ARCH_HAVE_COMPAT
 #define DEFINE_CTYPE_TRIPLE(kind, name)                                                                                                                                      \
 	DEFINE_CTYPE(struct _basic_ctype, ctype_##name)                      = _BASIC_CTYPE_INIT(kind, &ctype_##name##_ptr);                                                     \

@@ -1064,7 +1064,7 @@ verify_access_range:
 				}
 			}
 #endif /* CONFIG_RTM_FAR_REGIONS */
-			/* Check if this region is mapped by the same VM node. - If it is, then 
+			/* Check if this region is mapped by the same VM node. - If it is, then
 			 * we have to extend this region to also contain `addr...+=access_bytes'.
 			 * Otherwise, we have to perform an address translation so that the
 			 * access instead happens for this region's mapping. (At least we know

@@ -159,7 +159,7 @@ do_integer_or_float:
 			}
 		}
 	}	break;
-	
+
 	case '.':
 		ch = unicode_readutf8_n(&iter, end);
 		if (ch == '.') {

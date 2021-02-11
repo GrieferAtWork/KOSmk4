@@ -244,7 +244,7 @@ again:
 						/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
 						 *   #1: #PF
 						 *   #2: EXCEPTION
-						 *   #3: EXCEPTION: tryread(VM)  (To find the associated FDE)
+						 *   #3: EXCEPTION: tryread(VM) (To find the associated FDE)
 						 *   #4: FIND_READLOCK(VM)
 						 *   #5: #PF
 						 */
@@ -332,7 +332,7 @@ again:
 						/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
 						 *   #1: #PF
 						 *   #2: EXCEPTION
-						 *   #3: EXCEPTION: tryread(VM)  (To find the associated FDE)
+						 *   #3: EXCEPTION: tryread(VM) (To find the associated FDE)
 						 *   #4: FIND_READLOCK(VM)
 						 *   #5: #PF
 						 */

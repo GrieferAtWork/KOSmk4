@@ -1034,7 +1034,7 @@ NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self) {
 	if (res == MMAN_UNMAP_KRAM_LOCKED_EX_DONE) {
 		if likely(job->mukj_done != NULL) {
 			/* Set-up a post-lock callback to exec the done-callback.
-			 *  */
+			 * */
 			job->mukj_post_lop_mm.mplo_func = &mlockop_kram_cb_post;
 			return &job->mukj_post_lop_mm;
 		}
@@ -1591,7 +1591,7 @@ NOTHROW(FCALL kfree_for_done)(struct mman_unmap_kram_job *__restrict self) {
 
 /* Helper function that can be used to unmap anything by re-using `freeme', which must be
  * a kmalloc-pointer with `kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job)'
- * in order to represent intermediate storage for  */
+ * in order to represent intermediate storage for */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
                                          PAGEDIR_PAGEALIGNED size_t num_bytes,

@@ -57,8 +57,9 @@ DECL_BEGIN
 struct aworker {
 	WEAK refcnt_t                 aw_refcnt; /* Reference counter */
 	struct async_worker_callbacks aw_cb;     /* [const] Worker callbacks */
-	WEAK void                    *aw_obj;    /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
-	                                          * When set to NULL, this worker may be removed */
+	WEAK void                    *aw_obj;    /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))]
+	                                          * Object pointer. When set to NULL, this worker
+	                                          * may be removed */
 	uintptr_half_t                aw_typ;    /* [const] Object type (one of `HANDLE_TYPE_*'). */
 	uintptr_half_t               _aw_pad;    /* ... */
 #ifndef CONFIG_NO_SMP

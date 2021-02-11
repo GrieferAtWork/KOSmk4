@@ -90,7 +90,7 @@ DECL_BEGIN
  *     other calls to kmalloc() that may need to be made internally.
  * Returned memory will be initialized as:
  *   - GFP_CALLOC: All zero-initialized
- *   - else:       #ifdef  CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
+ *   - else:       #ifdef CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
  *                 #ifndef CONFIG_DEBUG_HEAP: Undefined
  *
  * @param: hint:          Hint for where the mapping should go. This argument is
@@ -444,7 +444,7 @@ LOCAL_IFNX(err_physmem:)
 				part->mp_mem_sc = vec;
 				if unlikely(did_unlock)
 					goto again_lock_mman;
-			} /* if unlikely(part->mp_mem.mc_size < num_pages) */ 
+			} /* if unlikely(part->mp_mem.mc_size < num_pages) */
 #undef MY_PAGE_MALLOC
 		} /* if likely(part->mp_state == MPART_ST_VOID) */
 

@@ -1298,7 +1298,7 @@ again_handle_questionmark:
 			/* Nothing was stopped in particular, but GDB still wants ~something~ to be stopped. */
 			if (GDBServer_CreateMissingAsyncStopNotificationForSomeThread())
 				goto again_handle_questionmark;
-			/* Shouldn't really get here, but tell GDB 
+			/* Shouldn't really get here, but tell GDB
 			 * that there are no running threads. */
 			*o++ = 'W';
 			*o++ = '0';

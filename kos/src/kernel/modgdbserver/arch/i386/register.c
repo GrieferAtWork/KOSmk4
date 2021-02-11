@@ -51,7 +51,7 @@ DECL_BEGIN
 #endif /* !__x86_64__ */
 
 /* Get/Set the single-step mode that is active when execution of the current thread resumes. */
-INTERN bool 
+INTERN bool
 NOTHROW(FCALL GDB_GetSingleStep)(struct task *__restrict thread,
                                  bool *__restrict penabled) {
 	uintptr_t flags;

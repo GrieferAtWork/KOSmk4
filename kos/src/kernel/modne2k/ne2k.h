@@ -104,7 +104,7 @@ typedef union {
 
 typedef struct ne2k_device: nic_device {
 	/* NOTE: Ne2k uses an async worker to:
-	 *  TX_UPLOAD: 
+	 *  TX_UPLOAD:
 	 *    - Load the first AIO handle from `nk_tranit' into `nk_current'
 	 *    - Upload packet data to the NIC
 	 *    - Set the send-timeout (s.a. `nk_cursendtmo')

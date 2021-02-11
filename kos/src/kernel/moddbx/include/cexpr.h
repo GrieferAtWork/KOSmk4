@@ -215,7 +215,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_dup)(void);
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_swap)(void);
 
 /* Rotate the top n c expression stack elements left/right.
- * When `n <= 1', these calls are a no-op in regards to 
+ * When `n <= 1', these calls are a no-op in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n);

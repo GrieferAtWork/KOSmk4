@@ -19,7 +19,7 @@
  */
 
 /* Combination of various utilities that parse [[[foo]]]-tags from source files
- * and will automatically generate code accordingly. Additionally, this  script
+ * and will automatically generate code accordingly. Additionally, this script
  * will re-flow block comments to form them into paragraphs.
  *
  *  - [[[enum]]] Automatically generate  assembly-compatible  enum  macro
@@ -247,6 +247,13 @@ function splitWords(l: string): {string...} {
 }
 
 function shortestPossibleLightLength(l: string): int {
+	if (l && l.isspace(0)) {
+		local numLeadingSpaces = 1;
+		while (numLeadingSpaces < #l && l.isspace(numLeadingSpaces))
+			++numLeadingSpaces;
+		return numLeadingSpaces +
+			shortestPossibleLightLength(l[numLeadingSpaces:]);
+	}
 	local result = -1;
 	for (local w: splitWords(l))
 		result += 1 + #w;
@@ -256,7 +263,18 @@ function shortestPossibleLightLength(l: string): int {
 global final NOREFLOW_LINE_START_MARKERS = ">$&%[]{}";
 
 function reflowTextLine(l: string, width: int): string {
-	l = l.strip();
+	l = l.rstrip();
+	if (l && l.isspace(0)) {
+		local numLeadingSpaces = 1;
+		while (numLeadingSpaces < #l && l.isspace(numLeadingSpaces))
+			++numLeadingSpaces;
+		local head = l[:numLeadingSpaces];
+		local tail = l[numLeadingSpaces:];
+		local newWidth = width - numLeadingSpaces;
+		if (newWidth < 0)
+			newWidth = 0;
+		return head + reflowTextLine(tail, newWidth);
+	}
 	if (#l == width && !containsUnevenSpaces(l) && !OPT_UNDO_REFLOW)
 		return l;
 	if (l && l.first in NOREFLOW_LINE_START_MARKERS)
@@ -332,8 +350,19 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			}
 		}
 	}
+	if (commonTail) {
+		local i = #commonTail;
+		while (i) {
+			--i;
+			local ch = commonTail[i];
+			if (ch !in "\t *") {
+				commonTail = commonTail[i+1:];
+				break;
+			}
+		}
+	}
 	if (commonLineLength !is none && commonLineLength >= 0) {
-		if (!OPT_UNDO_REFLOW || commonTail)
+		if (commonTail)
 			return lines;
 	}
 	if (commonPrefix == commonTail && commonPrefix) {
@@ -344,8 +373,6 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 	}
 	if (commonLineLength is none)
 		commonTail = "";
-	if ("'" in commonTail)
-		commonTail = commonTail[commonTail.rindex("'")+1:];
 	for (local c: "@-*`'\"") {
 		local p = commonPrefix.find(c);
 		if (p >= 0)
@@ -474,24 +501,25 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 	for (local i = 0; i < numLines;) {
 		local l = paragraphBlock[i];
 		local nspc;
-		if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
-			local j = 2;
-			while (j < #l && l.issymcont(j))
-				++j;
-			while (j < #l && l.isspace(j))
-				++j;
-			if (j < #l && l[j] in ":") {
-				/* Element-tag annotation */
-				++j;
-				while (j < #l && l.isspace(j))
-					++j;
-				nspc = j;
-				if (currentBlock) {
-					result.extend(reflowBlockComment(currentBlock, lineLength));
-					currentBlock = none;
-				}
-			}
-		} else {
+//		if (l.startswith("@") && #l >= 3 && l.issymstrt(1)) {
+//			local j = 2;
+//			while (j < #l && l.issymcont(j))
+//				++j;
+//			while (j < #l && l.isspace(j))
+//				++j;
+//			if (j < #l && l[j] in ":") {
+//				/* Element-tag annotation */
+//				++j;
+//				while (j < #l && l.isspace(j))
+//					++j;
+//				nspc = j;
+//				if (currentBlock) {
+//					result.extend(reflowBlockComment(currentBlock, lineLength));
+//					currentBlock = none;
+//				}
+//			}
+//		} else
+		{
 			nspc = countLeadingSpaces(l);
 		}
 		if (currentBlock is none) {
@@ -501,7 +529,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			continue;
 		}
 		/* Check if the new line is may shorter than the previous.
-		 * If so,  then this  line marks  the end  of a  paragraph */
+		 * If so, then this line marks the end of a paragraph */
 		local lineLen = shortestPossibleLightLength(l);
 		local prevLineLen = shortestPossibleLightLength(currentBlock.last);
 		if (lineLen <= (prevLineLen * 3) / 4) {
@@ -516,7 +544,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 		}
 		if (prevIndent == nspc) {
 			/* If the next line is much longer than the
-			 * previous, then begin another  paragraph. */
+			 * previous, then begin another paragraph. */
 			if (lineLen >= (prevLineLen * 5) / 4)
 				goto reflow_normal_block;
 			currentBlock.append(l);
@@ -539,6 +567,8 @@ reflow_normal_block:
 		if ((nspc - 1) >= #prevLine)
 			goto reflow_normal_block;
 		if (!prevLine.isspace(nspc - 1))
+			goto reflow_normal_block;
+		if (prevLine.isspace(nspc))
 			goto reflow_normal_block;
 		/* Yes: It's a NOTE:-style sub-paragraph */
 		local subParagraphIndent = nspc;
@@ -593,7 +623,7 @@ reflow_normal_block:
 	}
 	/* Actually reflow simple text. */
 	if (currentBlock) {
-		/* Don't reflow if the  text contains uneven space  locations.
+		/* Don't reflow if the text contains uneven space locations.
 		 * e.g. "foo   bar baz" is uneven, but "foo   bar  baz" isn't! */
 		if ((for (local l: currentBlock) containsUnevenSpaces(l)) || ...) {
 			result.extend(currentBlock);
@@ -617,7 +647,7 @@ reflow_normal_block:
 			if (lineLength < 0)
 				lineLength = lineLenMax;
 			local lastLine = currentBlock.last;
-			local lastLineLen = #lastLine;
+			local lastLineLen = shortestPossibleLightLength(lastLine);
 			if ((lastLineLen == lineLenMin && #currentBlock > 2) ||
 			   (lastLineLen <= (lineLength * 3) / 4)) {
 				/* Don't reflow the last line. */
@@ -702,7 +732,29 @@ function autom8Worker(parser: Autom8Parser,
 					commentLines.append(l);
 				}
 			}
-			commentLines = reflowBlockComment(commentLines);
+			if (#commentLines >= 2) {
+				/* Check if all lines except for the last end with a trailing "\\" */
+				local linesExceptLast = commentLines[:-1];
+				for (local l: linesExceptLast) {
+					if (!l.endswith("\\"))
+						goto normal_reflow;
+				}
+				local longestLineLength = (linesExceptLast.each.length > ...) - 1;
+				commentLines = List([]{
+					for (local l: linesExceptLast)
+						yield l[:-1].rstrip();
+					yield commentLines.last;
+				}());
+				commentLines = List(reflowBlockComment(commentLines));
+				commentLines = List([]{
+					for (local l: commentLines[:-1])
+						yield l.ljust(longestLineLength) + "\\";
+					yield commentLines.last;
+				}());
+			} else {
+normal_reflow:
+				commentLines = reflowBlockComment(commentLines);
+			}
 			commentBody = ("\n" + leadingTabs + leadingSpaces + " *").join(commentLines);
 			parser.newText << commentBody;
 			if (hasTrailingNewline) {
@@ -832,6 +884,9 @@ while (argv && argv.first.startswith("-")) {
 	}
 }
 done_args:
+for (local l: File.open("E:\\c\\kls\\changed.txt"))
+	autom8File(l.decode("utf-8").strip());
+return 0;
 if (!argv) {
 	usage();
 	return 1;

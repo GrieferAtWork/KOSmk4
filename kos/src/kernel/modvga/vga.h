@@ -142,9 +142,9 @@ typedef struct
 	struct vga_font        *v_savedfont; /* [0..1][owned][lock(v_lock)] Saved text-mode font while in graphics-mode */
 	struct atomic_rwlock    v_textlock;  /* Lock for accessing the text pointers. */
 	u16                    *v_textbase_real; /* [1..1][const] The real base pointer for the VGA text-mode buffer. */
-	WEAK u16               *v_textbase;  /* [1..1][owned_if(VGA_STATE_FGRAPHICS)][lock(v_textlock)] Base pointer for the VGA text-mode buffer.
-	                                      * When in graphics-mode, this is a heap-allocated memory block to still allow for
-	                                      * display rendering when that rendering should simply be invisible. */
+	WEAK u16               *v_textbase;  /* [1..1][owned_if(VGA_STATE_FGRAPHICS)][lock(v_textlock)] Base pointer for the VGA
+	                                      * text-mode buffer. When in graphics-mode, this is a heap-allocated memory block to
+	                                      * still allow for display rendering when that rendering should simply be invisible. */
 	WEAK u16               *v_text2line; /* [1..1][lock(v_textlock)] Pointer to the start of the second text-mode line. */
 	WEAK u16               *v_textlline; /* [1..1][lock(v_textlock)] Pointer to the start of the last text-mode line. */
 	WEAK u16               *v_textend;   /* [1..1][lock(v_textlock)] Pointer to the end of the VGA text-mode buffer. */

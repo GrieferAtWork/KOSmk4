@@ -33,18 +33,18 @@
 #include <sys/cdefs.h>
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define _QUAD_HIGHWORD  1
-#define _QUAD_LOWWORD   0
-#else
-#define _QUAD_HIGHWORD  0
-#define _QUAD_LOWWORD   1
-#endif
+#define _QUAD_HIGHWORD 1
+#define _QUAD_LOWWORD  0
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define _QUAD_HIGHWORD 0
+#define _QUAD_LOWWORD  1
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 #ifdef __USE_MISC
-#define LITTLE_ENDIAN  __ORDER_LITTLE_ENDIAN__
-#define BIG_ENDIAN     __ORDER_BIG_ENDIAN__
-#define PDP_ENDIAN     __ORDER_PDP_ENDIAN__
-#define BYTE_ORDER     __BYTE_ORDER__
+#define LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
+#define BIG_ENDIAN    __ORDER_BIG_ENDIAN__
+#define PDP_ENDIAN    __ORDER_PDP_ENDIAN__
+#define BYTE_ORDER    __BYTE_ORDER__
 #endif /* __USE_MISC */
 
 #define __bswap16(x) __hybrid_bswap16(x)

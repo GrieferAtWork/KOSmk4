@@ -77,7 +77,7 @@ DECL_BEGIN
  *              point into mapped memory, or the memory that is pointed-to by it
  *              is backed by VIO storage.
  *              The caller should handle this case by attempting direct memory
- *              access to the affected region (i.e. using `memcpy' rather than 
+ *              access to the affected region (i.e. using `memcpy' rather than
  *              `memcpy_nopf'), and dealing with any potential E_SEGFAULT error.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 PUBLIC size_t FCALL
@@ -685,7 +685,7 @@ done_mark_changed:
 			}
 			goto done_mark_changed;
 		}
-	
+
 		/* Copy-on-write mapping that is being shared with someone else.
 		 *
 		 * In this case, we must must essentially unshare ourselves from

@@ -645,8 +645,8 @@ again:
 		PREEMPTION_DISABLE();
 		aio = ATOMIC_XCH(me->nk_tranit, NULL);
 		if unlikely(!aio) {
-			/* No more pending packets. -> Try to switch to IDLE mode,
-			 * but loop back to handle the case of RX_DNLOAD */
+			/* No more pending packets. -> Try to switch to IDLE
+			 * mode, but loop back to handle the case of RX_DNLOAD */
 tx_switch_to_idle:
 			PREEMPTION_ENABLE();
 			NE2K_DEBUG("[ne2k:async] No in-transit packets (try switching to IDLE)\n");
@@ -692,7 +692,7 @@ tx_switch_to_idle:
 		DBG_memset(&aio_data->pd_payloadmm, 0xcc, sizeof(aio_data->pd_payloadmm));
 		COMPILER_WRITE_BARRIER();
 		/* This field gets cleared by aio_cancel() if the operation should get canceled
-		 * at any point after  */
+		 * at any point after */
 		me->nk_current = aio;
 		COMPILER_WRITE_BARRIER();
 
@@ -1244,7 +1244,7 @@ Ne2k_SetFlags(struct nic_device *__restrict self,
 	COMPILER_WRITE_BARRIER();
 	/* XXX: Register/delete HISR and ASYNC_WORKER callbacks
 	 *      on-the-fly based on the state of the `IFF_UP'-bit
-	 *      When the NIC is turned off, then  */
+	 *      When the NIC is turned off, then */
 	Ne2k_ReleaseUIO(me);
 	return true;
 }
@@ -1373,7 +1373,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	}
 
 	character_device_register_auto(self);
-	
+
 	/* XXX: Collect a list of devices, then use some kind of config
 	 *      to determine which one should be used as the default! */
 	nic_device_setdefault(self);

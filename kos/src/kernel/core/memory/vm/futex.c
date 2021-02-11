@@ -515,7 +515,7 @@ again:
 }
 
 /* Return the futex object that is associated with the given virtual memory address.
- * In the event that `addr' isn't  */
+ * In the event that `addr' isn't */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_getfutex)(struct vm *__restrict effective_vm, UNCHECKED void *addr)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {

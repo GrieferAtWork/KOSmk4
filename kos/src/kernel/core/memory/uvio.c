@@ -79,7 +79,7 @@ NOTHROW(KCALL kernel_uvio_request_randuid)(struct kernel_uvio_request *__restric
 PRIVATE NONNULL((1, 2, 3, 6)) void KCALL
 uvio_request_impl(struct uvio *__restrict self,
                   struct kernel_uvio_request *__restrict slot,
-                  /*in|out*/ struct vioargs *__restrict args, 
+                  /*in|out*/ struct vioargs *__restrict args,
                   vio_addr_t addr, u16 command,
                   /*in|out*/ union kernel_uvio_argument argv_result[2]) THROWS(...) {
 	u8 status;

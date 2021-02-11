@@ -285,7 +285,7 @@ NOTHROW(KCALL task_enum_list_taskonly_cb)(void *arg,
 /************************************************************************/
 /* These functions are the same as those above, however these may only be used
  * when `cb' is NOBLOCK+NOEXCEPT, as these may invoke said function while non-
- * reentrant, internal locks are held.                                  */
+ * reentrant, internal locks are held. */
 /************************************************************************/
 
 #define DO(expr)            do { if ((temp = (expr)) < 0) goto err; result += temp; } __WHILE0

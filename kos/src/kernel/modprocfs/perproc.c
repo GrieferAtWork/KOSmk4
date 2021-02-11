@@ -55,7 +55,7 @@ DECL_BEGIN
 	}
 
 /************************************************************************/
-/* PerProc Runtime Data                                               */
+/* PerProc Runtime Data                                                 */
 /************************************************************************/
 #define PERPROC_DIRECTORY_ENTRY(name, type, id)                                       \
 	PRIVATE DEFINE_DIRECTORY_ENTRY(prd_perprocent_##id,                               \

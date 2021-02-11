@@ -691,7 +691,7 @@ again_set_self:
 					}
 					session_pid = incref(FORTASK(old_group, this_taskgroup).tg_pgrp_session);
 					sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock);
-	
+
 					/* Remove the thread from its old process group. */
 					if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock)) {
 						sync_endwrite(&thread_taskgroup.tg_proc_group_lock);

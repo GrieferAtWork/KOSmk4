@@ -66,7 +66,7 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 		} else {
 			/* Enqueue the futex for lazy removal. */
 			SLIST_ATOMIC_INSERT(&meta->mpm_ftx_dead, self, _mfu_dead);
-	
+
 			/* Reap dead futex objects associated with the meta-controller. */
 			mpartmeta_deadftx_reap(meta);
 			decref_unlikely(part);

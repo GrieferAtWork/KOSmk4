@@ -193,7 +193,7 @@ ok:
 
 
 /* Probe all unknown interfaces using the given `func', removing
- * interfaces  that have been identified following this.
+ * interfaces that have been identified following this.
  * Additionally, `func' may be NULL to use all global callback probes
  * for probing unknown interfaces. */
 PRIVATE void KCALL usb_probe_identify_unknown(PUSB_INTERFACE_PROBE func) {
@@ -485,7 +485,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 		/* Create a descriptor to keep track of the unknown interface. */
 		if unlikely(ATOMIC_READ(usb_unknowns) == USB_UNKNOWNS_CLOSED)
 			return; /* No-op after USB has been finalized. */
-	
+
 		unknown = (REF struct usb_unknown_interface *)kmalloc(offsetof(struct usb_unknown_interface, uui_endpv) +
 		                                                      (endpc * sizeof(REF struct usb_endpoint *)),
 		                                                      GFP_NORMAL);
@@ -497,7 +497,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 		       endpc, sizeof(REF struct usb_endpoint *));
 		for (i = 0; i < endpc; ++i)
 			incref(unknown->uui_endpv[i]);
-	
+
 		/* Register the unknown interface. */
 		for (;;) {
 			REF struct usb_unknown_interface *next_unknown;
@@ -512,7 +512,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 			if (ATOMIC_CMPXCH_WEAK(usb_unknowns, next_unknown, unknown))
 				break;
 		}
-	
+
 		printk(KERN_NOTICE "[usb] Failed to identify device %q:%q:%q "
 		                   "with interface %q(%#x.%#x.%#x) (config %q)\n",
 		       intf->ui_device->ud_str_vendor,
@@ -972,7 +972,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 			 *       which is the minimum packet size supported by all devices */
 			req.ur_length = offsetafter(struct usb_device_descriptor, ud_maxpacketsize);
 			transfer_size = usb_controller_request_sync(self, dev, &req, &desc);
-		
+
 			/* Remember the max packet size supported by the device. */
 			device_max_packet_size = dev->ue_maxpck;
 			if likely(transfer_size >= offsetafter(struct usb_device_descriptor, ud_maxpacketsize) &&
@@ -981,7 +981,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 
 			/* Assign an address to the device. */
 			usb_controller_assign_device_address(self, dev);
-		
+
 			/* Tell the device about the address we've assigned it. */
 			req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
 			                 USB_REQUEST_RETYPE_TYPE_STD |

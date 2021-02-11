@@ -517,6 +517,3 @@ done:
 #undef VM_DEFINE_UNMAP
 
 DECL_END
-
-
-

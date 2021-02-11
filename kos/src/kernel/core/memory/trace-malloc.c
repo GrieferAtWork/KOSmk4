@@ -1026,7 +1026,7 @@ NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
 		stack_end = vm_node_getendaddr(&FORTASK(thread, this_kernel_stacknode));
 #ifdef scpustate_getkernelpsp
 		sp = (void *)scpustate_getkernelpsp(context);
-#else /* scpustate_getkernelpsp */ 
+#else /* scpustate_getkernelpsp */
 		sp = (void *)scpustate_getsp(context);
 #endif /* !scpustate_getkernelpsp */
 		if (sp > stack_min && sp <= stack_end) {
@@ -1203,7 +1203,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	 *    - Driver .data & .bss
 	 *    - Stacks and general purpose registers of all other threads
 	 *    - VMs reachable from those threads (XXX: maybe use kmalloc() for VMs in debug mode?)
-	 * For this purpose, any properly aligned data word is considered a
+	 * For  this purpose, any properly aligned data word is considered a
 	 * possible pointer and if directed at a known VM node, that node is
 	 * saved as reachable.
 	 * Following this first pass, we recursively analyze the user-data
@@ -1248,7 +1248,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 #else /* CONFIG_USE_NEW_VM */
 	gc_reachable_corepage_chain(vm_corepage_full);
 #endif /* !CONFIG_USE_NEW_VM */
-	
+
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
 	{
@@ -1414,7 +1414,7 @@ kmalloc_leaks_gather(void) {
 		 * NOTE: This right here may cause new memory to be allocated. */
 		gc_gather_unreachable_slabs(&result);
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
-	
+
 		/* Gather leaks from trace nodes. */
 		/* Because of how removing nodes from an RB-tree works, the act
 		 * of removing a node may cause the tree structure to be altered,

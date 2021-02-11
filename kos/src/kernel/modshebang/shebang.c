@@ -38,7 +38,8 @@
 DECL_BEGIN
 
 /* Find the end of the given line (that is: a pointer to the first \r or \n)
- * If no such character exists before `len' bytes have been scanned, return NULL instead. */
+ * If no such character exists before `len' bytes have been scanned, return
+ * NULL instead. */
 LOCAL ATTR_PURE NONNULL((1)) char *KCALL
 find_eol(char *line, size_t len) {
 	while (len) {
@@ -160,10 +161,10 @@ shebang_exec(struct execargs *__restrict args) {
 #ifndef CONFIG_USE_NEW_VM /* TODO */
 				vm_exec_assert_regular(interp_node);
 #endif /* !CONFIG_USE_NEW_VM */
-	
+
 				/* Check for execute permissions? */
 				inode_access(interp_node, R_OK | X_OK);
-	
+
 				/* Construct a new set to arguments to-be injected. */
 				more_argc = 1;
 				if (HAS_OPTIONAL_ARGUMENT())

@@ -111,7 +111,7 @@ sctrace(struct driver *__restrict UNUSED(self),
 	} else {
 		printk(KERN_TRACE "%#" PRIxPTR "(", info->rsi_sysno);
 	}
-	/* Go through, and print  */
+	/* Go through, and print arguments. */
 	for (i = 0; i < desc.sc_argc; ++i) {
 		if (i != 0)
 			printk(KERN_TRACE ", ");

@@ -38,4 +38,3 @@ MKDIR(sys_x86_keepiopl, 0555,
 MKREG_RW(sys_x86_keepiopl_clone, 0622, ProcFS_Sys_X86_KeepIopl_Clone_Print, ProcFS_Sys_X86_KeepIopl_Clone_Write)
 MKREG_RW(sys_x86_keepiopl_exec, 0622, ProcFS_Sys_X86_KeepIopl_Exec_Print, ProcFS_Sys_X86_KeepIopl_Exec_Write)
 MKREG_RW(sys_x86_keepiopl_fork, 0622, ProcFS_Sys_X86_KeepIopl_Fork_Print, ProcFS_Sys_X86_KeepIopl_Fork_Write)
-

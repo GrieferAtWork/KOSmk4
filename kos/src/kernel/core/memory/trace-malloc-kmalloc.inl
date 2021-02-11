@@ -265,7 +265,7 @@ do_normal_malloc:
 #endif /* DEFINE_X_noexcept */
 		INITIALIZE_USER_POINTER(result.hp_ptr,
 		                        result.hp_siz);
-	
+
 #ifdef DEFINE_X_except
 		TRY
 #endif /* DEFINE_X_noexcept */

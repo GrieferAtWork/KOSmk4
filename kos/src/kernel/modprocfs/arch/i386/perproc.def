@@ -25,4 +25,3 @@ MKDIR(x86, 0555,
       F_END)
 
 MKREG_RW(x86_iopl, 0622, ProcFS_PerProc_X86_Iopl_Print, ProcFS_PerProc_X86_Iopl_Write)
-

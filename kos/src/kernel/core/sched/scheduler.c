@@ -1531,7 +1531,7 @@ disable_custom_deadline_and_start_over:
 						sched_pself(next) = pself;
 					continue;
 				}
-				
+
 				/* Thread wasn't transfered.
 				 * This means that we won't be able to shut down, so
 				 * we might as well stop trying and just get back to

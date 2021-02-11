@@ -76,7 +76,7 @@ NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
 		 * CPUs that aren't in deep-sleep afterwards have received the
 		 * IPI.
 		 * if we find any CPU that isn't in deep-sleep, we try to send
-		 * the IPI once again, so-as to ensure that all CPUs  */
+		 * the IPI once again, so-as to ensure that all CPUs */
 		cpuset_t success_set;
 		bool did_find_new_cpus;
 		CPUSET_CLEAR(success_set);

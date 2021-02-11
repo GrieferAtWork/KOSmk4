@@ -1391,7 +1391,8 @@ NOTHROW(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
 
 
 /* Try to evaluate the address of the symbol pointed-to by `dip'.
- * Address information is taken from `.debug_info', as pointed-to by `dip'
+ *
+ * Address information is taken from `.debug_info', as pointed-to by `dip'.
  * Returns `false' is no address information is available (which may be the
  * case when the associated symbol is actually a constant), or the address
  * cannot be calculated right now (i.e. the associated symbol is a TLS variable)
@@ -1616,10 +1617,10 @@ create_mixed_symbol:
 						 *       <74391>   DW_AT_type        : <0x75bed>
 						 *       <74395>   DW_AT_external    : 1
 						 *       <74395>   DW_AT_declaration : 1
-						 *       <74395>   DW_AT_const_value : 48 byte block: 0 0 0 0 0 0 f0 3f f4 10 11 11 11 11 a1 bf 85 55 fe 19 a0 1 5a 3f b7 db aa 9e 19 ce 14 bf 39 52 e6 86 ca cf d0 3e 2d c3 9 6e b7 fd 8a be 
+						 *       <74395>   DW_AT_const_value : 48 byte block: 0 0 0 0 0 0 f0 3f f4 10 11 11 11 11 a1 bf 85 55 fe 19 a0 1 5a 3f b7 db aa 9e 19 ce 14 bf 39 52 e6 86 ca cf d0 3e 2d c3 9 6e b7 fd 8a be
 						 *    ```
-						 *    That's fine and all. It's `__libm_tiny' is a constant without any address,
-						 *    and our parser is able to correctly load it and everything.
+						 *    That's fine and all. It's `__libm_tiny' is a constant without any
+						 *    address, and our parser is able to correctly load it and everything.
 						 *
 						 *  - However, there's also this entry from `.symtab':
 						 *    ```
@@ -2405,12 +2406,12 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
 	/* Set the default DBX error code. */
 	data.error   = DBX_ENOENT;
 	data.namelen = namelen;
-	/* Enumerate symbols with the help enumeration function.
-	 * Note that we pass the given `name' as startswith-request, such
+	/* Enumerate symbols with the help enumeration function. Note
+	 * that we pass the given `name' as startswith-request, such
 	 * that only strings that being with the given name are enumerated.
-	 * We then further restrict enumeration within our callback by requiring
-	 * that the name of the symbol we actually end up using has a length
-	 * that is identical to `namelen' */
+	 * We then further restrict enumeration within our callback by
+	 * requiring that the name of the symbol we actually end up using
+	 * has a length that is identical to `namelen' */
 	error = cmod_symenum(&data.info, &cmodsyminfo_lookup_cb,
 	                     name, namelen,
 	                     ns, CMOD_SYMENUM_SCOPE_FNORMAL);
@@ -3143,7 +3144,7 @@ again_subprogram_component:
 							info->clv_data.s_var.v_location  = var.v_location;
 							info->clv_data.s_var.v_typeinfo  = var.v_type;
 							info->clv_data.s_var.v_objaddr   = NULL;
-	
+
 							/* Actually enumerate this variable. */
 							temp = (*cb)(info, true);
 							if unlikely(temp < 0)
@@ -3227,7 +3228,7 @@ do_set_interrupted:
 		result = DBX_EINTR;
 	} else {
 		switch (info->clv_parser.dup_comp.dic_tag) {
-	
+
 		case DW_TAG_compile_unit: {
 			dbx_errno_t error;
 			/* Load attributes for this CU. */
@@ -3249,7 +3250,7 @@ do_set_interrupted:
 				goto skip_attributes_and_parse_next;
 			}
 		}	break;
-	
+
 		default:
 			/* Skip unexpected components. */
 skip_attributes_and_parse_next:

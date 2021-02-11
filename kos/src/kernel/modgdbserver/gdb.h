@@ -303,7 +303,7 @@ INTDEF void NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict eff
 INTDEF void NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm, struct vm *__restrict oldvm);
 
 /* Read/Write memory
- * WARNING: `GDB_WriteMemory()' and `GDB_VM_WriteMemory()' may modify the contents of the given `buf'! 
+ * WARNING: `GDB_WriteMemory()' and `GDB_VM_WriteMemory()' may modify the contents of the given `buf'!
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
  *              The affected memory ranges are:

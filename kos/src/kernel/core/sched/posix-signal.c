@@ -2103,7 +2103,7 @@ task_raisesignalthread(struct task *__restrict target,
 			                                NULL,
 			                                TASK_USER_RPC_FINTR);
 			return result;
-			
+
 		}
 		/* The target thread will handle the signal as soon as it gets unmasked! */
 		return true;
@@ -2913,7 +2913,7 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 		case SIG_UNBLOCK:
 			/* No need to check for mandatory masks being clear, since
 			 * this command is only able to clear masks from the get-go. */
-			signandset(mymask, mymask, set); 
+			signandset(mymask, mymask, set);
 			/* Since signals (may) have just gotten unmasked, check if we're
 			 * now able to handle any of the pending signals. */
 			sigmask_check_after_syscall(-EOK);
@@ -3728,7 +3728,7 @@ sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
 	/* Make sure that we don't steal these signals */
 	sigdelset(&these, SIGKILL);
 	sigdelset(&these, SIGSTOP);
-	
+
 	/* Mask everything, so we don't get any
 	 * posix-signal-related RPCs screwing with us.
 	 *

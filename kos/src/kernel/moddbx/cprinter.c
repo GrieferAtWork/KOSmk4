@@ -1577,7 +1577,7 @@ err:
  *                           >>         y: 20
  *                           >>     }
  *                           >> }
- *                           Note that this limit isn't a guaranty, but only a hint.*/
+ *                           Note that this limit isn't a guaranty, but only a hint. */
 PUBLIC NONNULL((1, 2)) ssize_t KCALL
 ctype_printvalue(struct ctyperef const *__restrict self,
                  struct cprinter const *__restrict printer,

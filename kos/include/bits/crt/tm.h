@@ -40,15 +40,15 @@ __DECL_BEGIN
 #define __std_tm_defined 1
 __NAMESPACE_STD_BEGIN
 struct tm {
-	int         tm_sec;      /* seconds [0, 61]. */
-	int         tm_min;      /* minutes [0, 59]. */
-	int         tm_hour;     /* hour [0, 23]. */
-	int         tm_mday;     /* day of month [1, 31]. */
-	int         tm_mon;      /* month of year [0, 11]. */
-	int         tm_year;     /* years since 1900. */
-	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
-	int         tm_yday;     /* day of year [0, 365]. */
-	int         tm_isdst;    /* daylight savings flag. */
+	int              tm_sec;      /* seconds [0, 61]. */
+	int              tm_min;      /* minutes [0, 59]. */
+	int              tm_hour;     /* hour [0, 23]. */
+	int              tm_mday;     /* day of month [1, 31]. */
+	int              tm_mon;      /* month of year [0, 11]. */
+	int              tm_year;     /* years since 1900. */
+	int              tm_wday;     /* day of week [0, 6] (Sunday = 0). */
+	int              tm_yday;     /* day of year [0, 365]. */
+	int              tm_isdst;    /* daylight savings flag. */
 #if defined(__CRT_KOS) || defined(__CRT_GLC)
 #ifdef __USE_MISC
 	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */

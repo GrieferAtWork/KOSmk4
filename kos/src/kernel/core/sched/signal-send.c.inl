@@ -281,7 +281,7 @@ done_exec_cleanup:
 		return false;
 #endif /* !HAVE_BROADCAST */
 	}
-	
+
 #ifndef CONFIG_NO_SMP
 	/* Wait if the SMP lock isn't available at the moment. */
 	if unlikely((uintptr_t)con & SIG_CONTROL_SMPLOCK) {
@@ -622,4 +622,3 @@ DECL_END
 #undef DEFINE_sig_broadcast_as_for_fini_nopr
 #undef DEFINE_sig_broadcast_for_fini_cleanup_nopr
 #undef DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
-

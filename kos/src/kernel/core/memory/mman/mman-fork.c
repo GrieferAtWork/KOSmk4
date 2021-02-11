@@ -94,7 +94,7 @@ DECL_BEGIN
  * >> INTDEF NOBLOCK NONNULL((1)) void
  * >> NOTHROW(FCALL p32_pagedir_fork)(VIRT struct p32_pdir *__restrict self,
  * >>                                 PHYS struct p32_pdir *phys_self);
- * >> 
+ * >>
  * >> // Reference counter control for `P32_PDIR_E2_IDENTITY[vec2]'
  * >> // NOTE: Reference counting is implemented by combining the `d_unused1_ign'
  * >> //       fields of all of the E1-entires pointed to by the indexed E2-vector.
@@ -350,7 +350,7 @@ again:
 			return false;
 		}
 	}
-	
+
 	/* Initialize fields of `newtree' as a copy of `oldtree'. */
 	part                 = oldtree->mn_part;
 	newtree->mn_minaddr  = oldtree->mn_minaddr;

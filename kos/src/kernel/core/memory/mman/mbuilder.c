@@ -565,7 +565,7 @@ mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
  *  - fmnode->mbn_filnxt = NULL;       // Only single-nde initial mappings are supported.
  *                                     // Additional required nodes are added lazily if necessary
  *                                     // via the re-flow mechanism that is done as part of a call
- *                                     // to `mbuilder_partlocks_acquire_or_unlock()'
+ *                                     // to              `mbuilder_partlocks_acquire_or_unlock()'
  *  - SLIST_INSERT(&self->mb_files, fmnode, mbn_nxtfile);
  *  - LIST_INSERT_HEAD(mbnode_partset_listof(&self->mb_uparts,
  *                                           fmnode->mbn_part),

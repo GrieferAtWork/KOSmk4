@@ -816,7 +816,7 @@ restart_after_extendpart_tail:
 			/* No need to fiddle with unsharing copy-on-write! The area we're
 			 * trying to write to has only been added by us right now, and since
 			 * we've yet to release our lock to the part, we also know that said
-			 * area can't possibly  */
+			 * area can't possibly */
 
 			/* Now that the part has been forced into the expected state,
 			 * do the actual write via `LOCAL_mpart_rw_or_unlock()' */

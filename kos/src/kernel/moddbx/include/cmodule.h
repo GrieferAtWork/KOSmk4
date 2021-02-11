@@ -148,7 +148,7 @@ struct cmodsym {
 	                         * it to `cmodunit_parser_from_dip()' or `cmodule_parser_from_dip()'
 	                         * The resulting parser's `dup_comp.dic_tag' will then be one of:
 	                         *   - DW_TAG_structure_type
-	                         *      - Namespace collisions with 
+	                         *      - Namespace collisions with
 	                         *   - DW_TAG_namespace   // TODO: Handling of namespace members
 	                         *   - DW_TAG_subprogram
 	                         *      - Only if a `DW_AT_entry_pc' or `DW_AT_low_pc' tag is contained (which in

@@ -1662,7 +1662,7 @@ NOTHROW(KCALL uhci_syncheap_fini)(struct uhci_syncheap *__restrict self) {
 		page_free(page, next.shp_count);
 		page = next.shp_next;
 	}
-	
+
 }
 
 #define UHCI_SYNCHEAP_ALLOC_FAILED ((u32)-1)
@@ -2031,8 +2031,8 @@ PRIVATE struct aio_handle_type uhci_aio_sync_type = {
  * for doing this below.
  * @param: self: The controller which will be used for the transfer
  * @param: tx:   A chain of USB packets that must be transmitted to
- *               the given `endp' in the same order in which they
- *               are given here (the chain is described by `->ut_next->')
+ *               the given `endp' in the same order in which they are
+ *               given here (the chain is described by `->ut_next->')
  * @param: aio:  The AIO handle allowing the caller to perform the transfer
  *               asynchronously.
  *               Note that the caller is free to invalidate `tx', as well as

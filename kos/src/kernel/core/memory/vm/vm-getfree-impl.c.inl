@@ -486,4 +486,3 @@ DECL_END
 
 #undef VM_GETFREE_VMB
 #undef VM_GETFREE_VM
-

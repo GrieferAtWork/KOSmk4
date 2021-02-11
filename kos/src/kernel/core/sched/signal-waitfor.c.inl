@@ -156,4 +156,3 @@ DECL_END
 #undef DEFINE_task_waitfor_nx
 #undef DEFINE_task_waitfor_norpc
 #undef DEFINE_task_waitfor
-

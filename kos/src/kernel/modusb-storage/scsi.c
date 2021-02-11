@@ -194,11 +194,11 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	 *       querying errors via the sense command */
 
 	{
-		/* With all of the data structures set up, acquire a lock to
-		 * the SCSI device and initiate the operation. */
+		/* With all of the data structures set up, acquire a
+		 * lock to the SCSI device and initiate the operation. */
 		SCOPED_WRITELOCK(&self->msd_lock);
 		cbw.cbw_tag = self->msd_tag++;
-	
+
 		/* TODO: Actually make this part have ASYNC support by creating
 		 *       a custom AIO protocol that wraps around the AIO used by
 		 *       USB, containing the `csw' block, as well as allowing for

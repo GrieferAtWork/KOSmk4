@@ -786,7 +786,7 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 					kfree(newmon);
 					return false;
 				}
-	
+
 				/* Prime the monitor for the first time. */
 				TRY {
 					epoll_handle_monitor_prime(newmon, hand->h_data, true);
@@ -1026,14 +1026,14 @@ scan_monitors:
 					REF void *monitor_handptr;
 					next = monitor->ehm_rnext;
 					assert(monitor->ehm_raised != 0);
-	
+
 					/* First of all: Ensure that `monitor' isn't connected. */
 					sig_multicompletion_disconnectall(&monitor->ehm_comp);
-	
+
 					/* Now acquire a reference to the monitor's handle.
 					 * If this fails, silently destroy the monitor and move one. */
 					monitor_handptr = epoll_handle_monitor_weaklckref(monitor);
-	
+
 					if unlikely(!monitor_handptr) {
 						/* Object was destroyed (this is why we're using weak references)
 						 * In this case, just get rid of the monitor and carry on like
@@ -1042,7 +1042,7 @@ scan_monitors:
 						epoll_handle_monitor_destroy(monitor);
 						goto next_monitor;
 					}
-	
+
 					TRY {
 						/* Now figure out what (if anything) about `monitor' is pending. */
 						what = epoll_handle_monitor_polltest(monitor, monitor_handptr);
@@ -1129,22 +1129,22 @@ next_monitor:
 			assert(result_events != next_monitor);
 			{
 				/* A chain of monitors that must be re-appended at
-				 * the end of the  chain of raised monitors. */
+				 * the end of the chain of raised monitors. */
 				struct epoll_handle_monitor *reraise_monitors = NULL;
 				TRY {
 					do {
 						struct epoll_handle_monitor *next;
 						next = result_events->ehm_rnext;
 						/* Do one of the following:
-						 * if (EPOLLONESHOT) {
+						 * >> if (EPOLLONESHOT) {
 						 *     - Do nothing. The monitor should still remain, but should
 						 *       not actually be active. Linux docs state that the user
 						 *       must use EPOLL_CTL_MOD to re-arm the monitor.
-						 * } else if (EPOLLET) {
+						 * >> } else if (EPOLLET) {
 						 *   - Blindly re-connect `result_events' to its associated handle in
 						 *     order to wait for the next rising-edge event, even though the
 						 *     handle itself (should) still be raised right now.
-						 * } else {
+						 * >> } else {
 						 *   - Append `result_events' at the end of the `ec_raised' queue, such
 						 *     that it gets re-checked for raised channels during the next call
 						 *     to `epoll_controller_trywait()'
@@ -1153,7 +1153,7 @@ next_monitor:
 						 *     monitors may have been raised in the mean time, but this re-insert
 						 *     should still be a relatively fast operation, especially if we
 						 *     combine the set of )
-						 * } */
+						 * >> } */
 						assert(!sig_multicompletion_wasconnected(&result_events->ehm_comp));
 						assert(result_events->ehm_raised != 0);
 						if (result_events->ehm_events & EPOLLONESHOT) {
@@ -1325,24 +1325,24 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 	fd_handle = handle_lookup(fd);
 	TRY {
 		switch (op) {
-	
+
 		case EPOLL_CTL_ADD:
 			validate_readable(info, sizeof(*info));
 			if (!epoll_controller_addmonitor(self, &fd_handle, (uint32_t)fd, info))
 				result = -EEXIST;
 			break;
-	
+
 		case EPOLL_CTL_MOD:
 			validate_readable(info, sizeof(*info));
 			if (!epoll_controller_modmonitor(self, &fd_handle, (uint32_t)fd, info))
 				result = -ENOENT;
 			break;
-	
+
 		case EPOLL_CTL_DEL:
 			if (!epoll_controller_delmonitor(self, &fd_handle, (uint32_t)fd))
 				result = -ENOENT;
 			break;
-	
+
 		default:
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP,

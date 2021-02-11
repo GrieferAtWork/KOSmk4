@@ -557,7 +557,7 @@ done:
 
 
 /* Calculate the index of the chunk, and the offset into that
- * chunk after  skipping the first `lo_pages' of `self'. */
+ * chunk after skipping the first `lo_pages' of `self'. */
 PRIVATE NOBLOCK NONNULL((1, 3, 4)) void
 NOTHROW(FCALL mchunkvec_split_after)(struct mchunkvec const *__restrict self,
                                      physpagecnt_t lo_pages,
@@ -781,7 +781,7 @@ release_and_return_null:
 		        "Badly aligned offset %#" PRIxSIZ, data.msd_offset);
 		assertf(!(self->mp_flags & MPART_F_NOSPLIT),
 		        "You're not allowed to split this part!");
-	
+
 		/* Step #1: Acquire references to all affected mmans. This way,
 		 *          we can prevent any of them from dying under our noses
 		 *          while we're still trying to fiddle with them, which

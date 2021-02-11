@@ -363,7 +363,7 @@ do_realloc_in_extend_after_unlock:
 				if (done >= total_pages)
 					break;
 			}
-		
+
 			/* Try to truncate unused memory. */
 			vec = (struct mchunk *)krealloc_nx(data->scd_copy_mem_sc.ms_v,
 			                                   data->scd_copy_mem_sc.ms_c *
