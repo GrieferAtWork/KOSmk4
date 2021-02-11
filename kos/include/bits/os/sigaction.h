@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sigaction.h>
- * 
+ *
  * Definitions:
  *    - struct sigaction { ... };
  */

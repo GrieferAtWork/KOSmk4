@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sigval.h>
- * 
+ *
  * Definitions:
  *    - union sigval { ... };
  */

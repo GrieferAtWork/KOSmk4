@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/siginfo.h>
- * 
+ *
  * Definitions:
  *    - struct __siginfo_struct { ... };
  */

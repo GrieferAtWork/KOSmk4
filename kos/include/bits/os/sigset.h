@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sigset.h>
- * 
+ *
  * Definitions:
  *    - struct __sigset_struct { ... };
  *    - ulongptr_t __sigset_mask(signo_t signo);

@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sockaddr_storage.h>
- * 
+ *
  * Definitions:
  *    - struct sockaddr_storage { ... };
  */

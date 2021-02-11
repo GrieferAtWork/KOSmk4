@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sem.h>
- * 
+ *
  * Definitions:
  *    - struct semid_ds { ... };
  * #ifdef __USE_MISC

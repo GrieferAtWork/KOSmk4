@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/ptrace.h>
- * 
+ *
  * Definitions:
  *    - ...
  */

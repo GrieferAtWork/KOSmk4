@@ -29,7 +29,7 @@
  *  - __ARCH_PAGESHIFT
  * Where   `__ARCH_PAGEMASK == __ARCH_PAGESIZE - 1'
  * Where `__ARCH_PAGESIZE == 1 << __ARCH_PAGESHIFT'
- * and   `__ARCH_PAGESHIFT == CTZ(__ARCH_PAGESIZE)'
+ * and `__ARCH_PAGESHIFT == CTZ(__ARCH_PAGESIZE)'
  *
  * These  macros _must_ be  defined in kernel-mode  (#ifdef __KERNEL__), but are
  * entirely optional in user-space (user-space  should instead use the  portable

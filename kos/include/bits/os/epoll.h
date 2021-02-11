@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/epoll.h>
- * 
+ *
  * Definitions:
  *    - union epoll_data { ... };
  *    - struct epoll_event { ... };

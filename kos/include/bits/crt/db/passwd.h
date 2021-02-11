@@ -37,12 +37,12 @@ __DECL_BEGIN
  *    pw_name:pw_passwd:pw_uid:pw_gid:pw_dir:pw_shell
  *    pw_name:pw_passwd:pw_uid:pw_gid
  *
- * NOTE: The `pw_passwd' field (used to be) the encrypted password for
- *       the user, though because /etc/passwd is readable by everyone,
- *       this was changed to make it harder to dump password hashes of
- *       user accounts. Nowadays, the actual password hashes are stored
- *       in /etc/shadow (which is only readable by the superuser), and
- *       in order to communicate this fact, `pw_passwd' is set to "x"
+ * NOTE: The  `pw_passwd' field  (used to  be) the  encrypted password for
+ *       the user,  though because  /etc/passwd is  readable by  everyone,
+ *       this  was changed  to make it  harder to dump  password hashes of
+ *       user accounts. Nowadays,  the actual password  hashes are  stored
+ *       in  /etc/shadow (which  is only  readable by  the superuser), and
+ *       in order  to communicate  this fact,  `pw_passwd' is  set to  "x"
  *       Additionally, the following special values for `pw_passwd' exist:
  *  - "*":    No password has yet to be set (assign one with `passwd(1)')
  *  - "*NP*": A shadow record may be obtained from a NIS+ server.

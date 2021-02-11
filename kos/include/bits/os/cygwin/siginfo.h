@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/cygwin/siginfo.h>
- * 
+ *
  * Definitions:
  *    - struct __siginfo_cygwin_struct { ... };
  *    - #define __SI_CYGWIN_MAX_SIZE ...

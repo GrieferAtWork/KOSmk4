@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/cygwin/sigevent.h>
- * 
+ *
  * Definitions:
  *    - struct __sigevent_cygwin { ... };
  * #ifdef __CRT_CYG_PRIMARY

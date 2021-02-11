@@ -99,7 +99,7 @@ struct utmpx {
 	char                 ut_host[__UT_HOSTSIZE]; /* Hostname for remote login. */
 	struct __exit_status ut_exit;                /* Exit status of a process marked as DEAD_PROCESS. */
 	/* The fields ut_session and ut_tv must be the same size when compiled
-	 * 32- and 64-bit.  This allows files and shared memory to be shared
+	 * 32- and  64-bit. This allows  files and shared  memory to be shared
 	 * between 32- and 64-bit applications. */
 	__LONG32_TYPE__      ut_session;             /* Session ID, used for windowing. */
 	struct __timeval32   ut_tv;                  /* Time entry was made. */

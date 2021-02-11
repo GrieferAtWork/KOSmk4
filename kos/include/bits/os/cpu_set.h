@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/cpu_set.h>
- * 
+ *
  * Definitions:
  *    - struct __cpu_set_struct { ... };
  */

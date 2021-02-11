@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/utsname.h>
- * 
+ *
  * Definitions:
  *    struct utsname { ... };
  */

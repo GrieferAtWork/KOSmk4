@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/acct.h>
- * 
+ *
  * Definitions:
  *    struct acct {
  *        ...

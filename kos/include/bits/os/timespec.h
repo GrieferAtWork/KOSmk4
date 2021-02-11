@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/timespec.h>
- * 
+ *
  * Definitions:
  *    struct timespec {
  *        time_t          tv_sec;

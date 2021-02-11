@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/msgbuf.h>
- * 
+ *
  * Definitions:
  *    - struct msgbuf { ... };
  */

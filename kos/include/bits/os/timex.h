@@ -22,13 +22,13 @@
 
 /* File:
  *    <bits/os/timex.h>
- * 
+ *
  * Definitions:
  *    struct timex {
  *        ...
  *    };
  *    #ifdef __USE_TIME64
- *    struct timex64 {
+ *    struct  timex64   {
  *        ...
  *    };
  *    #endif // __USE_TIME64

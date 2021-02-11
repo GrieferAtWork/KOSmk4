@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sembuf.h>
- * 
+ *
  * Definitions:
  *    - struct sembuf { ... };
  */

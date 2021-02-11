@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/kos/siginfo.h>
- * 
+ *
  * Definitions:
  *    - struct __siginfo_struct { ... };
  *    - #define __SI_MAX_SIZE ...

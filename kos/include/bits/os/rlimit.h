@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/rlimit.h>
- * 
+ *
  * Definitions:
  *    - struct rlimit { ... };
  * #ifdef __USE_LARGEFILE64

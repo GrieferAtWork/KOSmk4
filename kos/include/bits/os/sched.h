@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sched.h>
- * 
+ *
  * Definitions:
  *    - struct sched { ... };
  */

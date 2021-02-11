@@ -27,7 +27,7 @@ __DECL_BEGIN
 
 /*
  * C structure for describing a mounted filesystem
- * entry from /etc/fstab or /proc/self/mounts.
+ * entry  from  /etc/fstab  or  /proc/self/mounts.
  *
  * Every line that isn't empty, or a comment will match:
  *

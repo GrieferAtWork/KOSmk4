@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/termio.h>
- * 
+ *
  * Definitions:
  *    - struct winsize { ... };
  *    - struct termio { ... };

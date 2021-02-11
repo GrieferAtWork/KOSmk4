@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/rusage.h>
- * 
+ *
  * Definitions:
  *    - struct rusage { ... };
  * #ifdef __USE_TIME64

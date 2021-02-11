@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/statfs.h>
- * 
+ *
  * Definitions:
  *    - struct statfs { ... };
  * #ifdef __USE_LARGEFILE64

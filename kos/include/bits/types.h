@@ -227,14 +227,14 @@ typedef struct { __UINT32_TYPE__ __lo,__hi; } __uint64_t;
 #ifndef ____s8_defined
 #define ____s8_defined 1
 /* These need to be typedefs, since 3rd party headers like
- * <drm.h> will try to re-define these through additional
+ * <drm.h>  will try to re-define these through additional
  * typedefs that would cause compiler errors if we defined
  * them as pure macros here.
  * Think: `typedef int8_t __s8;', which would break if
  *        it expanded to `typedef int8_t signed char;'
  * NOTE: STDC allows for re-typedef-ing a declaration, so
- *       long as nothing changes, so as long as these
- *       typedefs match what is found in said 3rd party
+ *       long as  nothing changes,  so as  long as  these
+ *       typedefs match what is  found in said 3rd  party
  *       headers, there'll be no problem. */
 typedef __INT8_TYPE__ __s8;
 #define __s8 __s8

@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/file_handle.h>
- * 
+ *
  * Definitions:
  *    - struct file_handle { ... };
  */

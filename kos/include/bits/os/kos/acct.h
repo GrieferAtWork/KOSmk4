@@ -53,10 +53,10 @@ enum {
 #define ACORE ACORE /* ??? */
 #define AXSIG AXSIG /* ??? */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define AFORK 0x01 /* ??? */
-#define ASU   0x02 /* ??? */
-#define ACORE 0x08 /* ??? */
-#define AXSIG 0x10 /* ??? */
+#define AFORK 1  /* ??? */
+#define ASU   2  /* ??? */
+#define ACORE 8  /* ??? */
+#define AXSIG 16 /* ??? */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

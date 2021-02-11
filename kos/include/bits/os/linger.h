@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/linger.h>
- * 
+ *
  * Definitions:
  *    - struct linger { ... };
  */

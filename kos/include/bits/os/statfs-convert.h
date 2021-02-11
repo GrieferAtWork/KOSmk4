@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/statfs-convert.h>
- * 
+ *
  * Definitions:
  *    - ...
  */

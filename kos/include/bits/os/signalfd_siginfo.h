@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/signalfd_siginfo.h>
- * 
+ *
  * Definitions:
  *    - struct signalfd_siginfo { ... };
  */

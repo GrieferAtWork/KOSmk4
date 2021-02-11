@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/cmsghdr.h>
- * 
+ *
  * Definitions:
  *    struct cmsghdr {
  *        ...

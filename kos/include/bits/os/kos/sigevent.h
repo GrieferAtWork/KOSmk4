@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/kos/sigevent.h>
- * 
+ *
  * Definitions:
  *    - struct sigevent { ... };
  *    - #define __SIGEV_MAX_SIZE ...

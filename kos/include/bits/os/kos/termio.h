@@ -77,7 +77,7 @@ enum {
 #define N_PPP          N_PPP          /* ... */
 #define N_STRIP        N_STRIP        /* ... */
 #define N_AX25         N_AX25         /* ... */
-#define N_X25          N_X25          /* X.25 async  */
+#define N_X25          N_X25          /* X.25 async */
 #define N_6PACK        N_6PACK        /* ... */
 #define N_MASC         N_MASC         /* Mobitex module */
 #define N_R3964        N_R3964        /* Simatic R3964 module */
@@ -94,7 +94,7 @@ enum {
 #define N_PPP          3  /* ... */
 #define N_STRIP        4  /* ... */
 #define N_AX25         5  /* ... */
-#define N_X25          6  /* X.25 async  */
+#define N_X25          6  /* X.25 async */
 #define N_6PACK        7  /* ... */
 #define N_MASC         8  /* Mobitex module */
 #define N_R3964        9  /* Simatic R3964 module */

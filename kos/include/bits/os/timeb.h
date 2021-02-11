@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/timev.h>
- * 
+ *
  * Definitions:
  *    struct timeval { ... };
  * #ifdef __USE_TIME64

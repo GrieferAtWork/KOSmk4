@@ -45,6 +45,7 @@
 #endif
 
 import * from deemon;
+import isFileGitIgnored from .gitignore;
 import fs;
 
 global Autom8Parser;
@@ -69,6 +70,7 @@ global final BUILTIN_COMMANDS: {string: none | Callable with (Autom8Parser, stri
 	"skip" : none,             /* Skip implementation (in libc/user/ *.c) */
 	"impl" : none,             /* Custom implementation (in libc/user/ *.c) */
 	"virtual" : none,          /* Seen in "x86-db.h" */
+	"struct" : none,           /* TODO: Planned extension for automation of __OFFSET_* macros... */
 
 	/* Disable comment reflow inside of auto-generated prototypes (in libc/user/ *.c) */
 	"head" : builtinReflowOff, /* Prototype header (in libc/user/ *.c) */
@@ -803,30 +805,34 @@ function autom8Worker(parser: Autom8Parser,
 			}
 			if (#commentLines >= 2) {
 				/* Check if all lines except for the last end with a trailing "\\" */
-				local linesExceptLast = commentLines;
-				if (!hasTrailingNewline)
-					linesExceptLast = commentLines[:-1];
-				for (local l: linesExceptLast) {
-					if (!l.endswith("\\"))
-						goto normal_reflow;
+				if (hasTrailingNewline) {
+					for (local l: commentLines) {
+						if (!l.endswith("\\"))
+							goto normal_reflow;
+					}
+					local longestLineLength = (commentLines.each.length > ...) - 1;
+					commentLines = List([]{
+						for (local l: commentLines)
+							yield l[:-1].rstrip();
+					}());
+					commentLines = List(reflowBlockComment(commentLines));
+					commentLines = List([]{
+						for (local l: commentLines)
+							yield l.ljust(longestLineLength) + "\\";
+					}());
+				} else {
+					local linesExceptLast = commentLines[:-1];
+					for (local l: linesExceptLast) {
+						if (!l.endswith("\\"))
+							goto normal_reflow;
+					}
+					local lastLine = commentLines.last;
+					local longestLineLength = (linesExceptLast.each.length > ...) - 1;
+					commentLines = List(for (local l: linesExceptLast) l[:-1].rstrip());
+					commentLines = reflowBlockComment(commentLines);
+					commentLines = List(for (local l: commentLines) l.ljust(longestLineLength) + "\\");
+					commentLines.append(lastLine);
 				}
-				local longestLineLength = (linesExceptLast.each.length > ...) - 1;
-				commentLines = List([]{
-					for (local l: linesExceptLast)
-						yield l[:-1].rstrip();
-					if (!hasTrailingNewline)
-						yield commentLines.last;
-				}());
-				commentLines = List(reflowBlockComment(commentLines));
-				local linesExceptLast = commentLines;
-				if (!hasTrailingNewline)
-					linesExceptLast = commentLines[:-1];
-				commentLines = List([]{
-					for (local l: linesExceptLast)
-						yield l.ljust(longestLineLength) + "\\";
-					if (!hasTrailingNewline)
-						yield commentLines.last;
-				}());
 			} else {
 normal_reflow:
 				commentLines = reflowBlockComment(commentLines);
@@ -922,7 +928,7 @@ function autom8File(filename: string) {
 }
 
 global final SHOULD_FORMAT_FILE_EXTENSIONS: {string...} = HashSet.Frozen({
-	"h", "hh", "c", "inl", "dee", "sh", "S",
+	"h", "hh", "c", "inl", "dee", "sh", "S", "def"
 });
 
 function autom8FileWithWildcard(filename: string) {
@@ -936,7 +942,7 @@ function autom8FileWithWildcard(filename: string) {
 				e = fs.joinpath(head, e);
 				local st = fs.stat(e);
 				if (st.isreg) {
-					if (fs.extof(e) in SHOULD_FORMAT_FILE_EXTENSIONS)
+					if (fs.extof(e) in SHOULD_FORMAT_FILE_EXTENSIONS && !isFileGitIgnored(e))
 						autom8File(e);
 				} else if (st.isdir) {
 					autom8FileWithWildcard(e + "/**");
@@ -948,7 +954,7 @@ function autom8FileWithWildcard(filename: string) {
 	for (local e: fs.query(filename)) {
 		e = fs.joinpath(head, e);
 		if (fs.stat.isreg(e)) {
-			if (fs.extof(e) in SHOULD_FORMAT_FILE_EXTENSIONS)
+			if (fs.extof(e) in SHOULD_FORMAT_FILE_EXTENSIONS && !isFileGitIgnored(e))
 				autom8File(e);
 		}
 	}

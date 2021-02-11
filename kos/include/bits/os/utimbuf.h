@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/utimbuf.h>
- * 
+ *
  * Definitions:
  *    struct utimbuf {
  *        ...

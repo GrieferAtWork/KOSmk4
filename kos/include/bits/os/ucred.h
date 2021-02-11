@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/ucred.h>
- * 
+ *
  * Definitions:
  *    - struct ucred { ... };
  */

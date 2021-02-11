@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/kos/ustat.h>
- * 
+ *
  * Definitions:
  *    struct ustat {
  *        ...

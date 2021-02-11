@@ -78,34 +78,34 @@ typedef struct __ATTR_PACKED {
  *   - CURRENT_KEYMOD Set of keyboard modifiers currently active.
  */
 #define KMP_OP_STOP       0x00 /* OPCODE: Stop execution */
-#define KMP_OP_INCCOL     0x01 /* OPCODE: %key += KEY(0, 1); */
-#define KMP_OP_DECCOL     0x02 /* OPCODE: %key -= KEY(0, 1); */
-#define KMP_OP_SETENC     0x03 /* OPCODE: %enc  = *%pc; %pc += 1; */
-#define KMP_OP_SETKEY     0x04 /* OPCODE: %key  = *%pc; %pc += 1; */
-#define KMP_OP_DEFENC     0x05 /* OPCODE: %enc  = DEFAULT_ENCODING; (DEFAULT_ENCODING == `d_encoding') */
-#define KMP_OP_SETKEY2    0x06 /* OPCODE: %key  = UNALIGNED_GETLE16(%pc); %pc += 2; */
+#define KMP_OP_INCCOL     0x01 /* OPCODE: >> %key += KEY(0, 1); */
+#define KMP_OP_DECCOL     0x02 /* OPCODE: >> %key -= KEY(0, 1); */
+#define KMP_OP_SETENC     0x03 /* OPCODE: >> %enc  = *%pc; %pc += 1; */
+#define KMP_OP_SETKEY     0x04 /* OPCODE: >> %key  = *%pc; %pc += 1; */
+#define KMP_OP_DEFENC     0x05 /* OPCODE: >> %enc  = DEFAULT_ENCODING; (DEFAULT_ENCODING == `d_encoding') */
+#define KMP_OP_SETKEY2    0x06 /* OPCODE: >> %key  = UNALIGNED_GETLE16(%pc); %pc += 2; */
 /*      KMP_OP_           0x07  * ... */
 /*      KMP_OP_           ...   * ... */
 /*      KMP_OP_           0x19  * ... */
-#define KMP_OP_SETKEYMOD2 0x1a /* OPCODE: mask = UNALIGNED_GETLE16(%pc); %pc += 2;
-                                *         kchr = READ_CHARACTER(%pc, %enc);
-                                *         if (CURRENT_KEYMOD == mask)
-                                *             return kchr; */
-#define KMP_OP_SETKEYMOD  0x1b /* OPCODE: mask = *(u8 *)%pc; %pc += 1;
-                                *         kchr = READ_CHARACTER(%pc, %enc);
-                                *         if (CURRENT_KEYMOD == mask)
-                                *             return kchr; */
-#define KMP_OP_SETPRESS   0x1c /* OPCODE: kchr = READ_CHARACTER(%pc, %enc);
-                                *         if (CURRENT_KEY == %key && KEYMOD_ISNORMAL(CURRENT_KEYMOD))
-                                *             return kchr;
-                                *         %key += KEY(0,1); */
-#define KMP_OP_SETSHIFT   0x1d /* OPCODE: kchr = READ_CHARACTER(%pc, %enc);
-                                *         if (CURRENT_KEY == %key && KEYMOD_ISSHIFT(CURRENT_KEYMOD))
-                                *             return kchr; */
-#define KMP_OP_SETALTGR   0x1e /* OPCODE: kchr = READ_CHARACTER(%pc, %enc);
-                                *         if (CURRENT_KEY == %key && KEYMOD_ISALTGR(CURRENT_KEYMOD))
-                                *             return kchr; */
-#define KMP_OP_NOP        0x1f /* OPCODE: // no-op */
+#define KMP_OP_SETKEYMOD2 0x1a /* OPCODE: >> mask = UNALIGNED_GETLE16(%pc); %pc += 2;
+                                *         >> kchr = READ_CHARACTER(%pc, %enc);
+                                *         >> if (CURRENT_KEYMOD == mask)
+                                *         >>     return kchr; */
+#define KMP_OP_SETKEYMOD  0x1b /* OPCODE: >> mask = *(u8 *)%pc; %pc += 1;
+                                *         >> kchr = READ_CHARACTER(%pc, %enc);
+                                *         >> if (CURRENT_KEYMOD == mask)
+                                *         >>     return kchr; */
+#define KMP_OP_SETPRESS   0x1c /* OPCODE: >> kchr = READ_CHARACTER(%pc, %enc);
+                                *         >> if (CURRENT_KEY == %key && KEYMOD_ISNORMAL(CURRENT_KEYMOD))
+                                *         >>     return kchr;
+                                *         >> %key += KEY(0,1); */
+#define KMP_OP_SETSHIFT   0x1d /* OPCODE: >> kchr = READ_CHARACTER(%pc, %enc);
+                                *         >> if (CURRENT_KEY == %key && KEYMOD_ISSHIFT(CURRENT_KEYMOD))
+                                *         >>     return kchr; */
+#define KMP_OP_SETALTGR   0x1e /* OPCODE: >> kchr = READ_CHARACTER(%pc, %enc);
+                                *         >> if (CURRENT_KEY == %key && KEYMOD_ISALTGR(CURRENT_KEYMOD))
+                                *         >>     return kchr; */
+#define KMP_OP_NOP        0x1f /* OPCODE: >> // no-op */
 
 /* Special opcodes that encode their operand as part of the instruction. */
 #define KMP_OP_MEXTENDED 0xe0 /* Mask for merged operand instructions.
@@ -122,8 +122,8 @@ typedef struct __ATTR_PACKED {
 /*      KMP_OP_F         0x60  * ... */
 /*      KMP_OP_F         0x80  * ... */
 /*      KMP_OP_F         0xa0  * ... */
-#define KMP_OP_FSETROW   0xc0 /* `%key = KEY(op & 0x1f, 0);' */
-#define KMP_OP_FSETCOL   0xe0 /* `%key = KEY(KEY_GETROW(%key), op & 0x1f);' */
+#define KMP_OP_FSETROW   0xc0 /* >> %key = KEY(op & 0x1f, 0); */
+#define KMP_OP_FSETCOL   0xe0 /* >> %key = KEY(KEY_GETROW(%key), op & 0x1f); */
 
 
 

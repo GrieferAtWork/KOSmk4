@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sigstack.h>
- * 
+ *
  * Definitions:
  *    - struct sigstack { ... };
  *    - struct sigaltstack { ... };

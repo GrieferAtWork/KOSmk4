@@ -22,14 +22,14 @@
 
 /* File:
  *    <bits/os/timeval.h>
- * 
+ *
  * Definitions:
  *    struct timeval {
  *        time_t      tv_sec;
  *        suseconds_t tv_usec;   // unsigned with __USE_KOS_ALTERATIONS
  *    };
  *    #ifdef __USE_TIME64
- *    struct timeval64 {
+ *    struct timeval64  {
  *        time64_t    tv_sec;
  *        suseconds_t tv_usec;   // unsigned with __USE_KOS_ALTERATIONS
  *    };

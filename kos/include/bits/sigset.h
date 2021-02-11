@@ -46,7 +46,7 @@ __DECL_END
 #endif /* !_SIGSET_H_types */
 
 /* NOTE: The Glibc counterpart of this file also declares some function,
- *       but only does so when <signal.h> was already included. However
+ *       but only does so when <signal.h> was already included.  However
  *       the function that it declares already get defined by <signal.h>
  *       on KOS, so no need to define anything else here :) */
 

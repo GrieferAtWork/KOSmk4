@@ -24,9 +24,9 @@
 #include "__overflow.h"
 
 /* @return: true:  Overflow occurred (unlikely; `*res' remains unmodified)
- *                 Overflow here  means  that  the  finite  result  stored
- *                 in `*res'  doesn't match  a  value that  would  have
- *                 been produced when infinite precision was available.
+ *                 Overflow  here  means  that  the  finite  result stored
+ *                 in  `*res'  doesn't  match  a  value  that  would  have
+ *                 been produced  when infinite  precision was  available.
  *                 e.g.: `UINT_MAX + 42u' and `11u - 19u' overflow,
  *                       but   `32u + 42u'   or   `11 - 19'   don't
  * @return: false: `*res' contains the correct result. */

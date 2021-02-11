@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/msq.h>
- * 
+ *
  * Definitions:
  *    - struct msqid_ds { ... };
  * #ifdef __USE_MISC

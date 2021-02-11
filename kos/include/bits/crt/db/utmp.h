@@ -80,7 +80,7 @@ struct utmp {
 	char               ut_host[UT_HOSTSIZE];  /* Hostname for remote login. */
 	struct exit_status ut_exit;        /* Exit status of a process marked as DEAD_PROCESS. */
 	/* The ut_session and ut_tv fields must be the same size when compiled
-	 * 32- and 64-bit.  This allows data files and shared memory to be
+	 * 32- and 64-bit.  This allows  data files  and shared  memory to  be
 	 * shared between 32- and 64-bit applications. */
 	__LONG32_TYPE__        ut_session; /* Session ID, used for windowing. */
 	union {
@@ -113,7 +113,7 @@ __DECL_END
 /* Old Linux name for the EMPTY type. */
 #define UT_UNKNOWN      EMPTY
 
-/* Tell the user that we have a modern system with
+/* Tell the user that we  have a modern system  with
  * UT_HOST, UT_PID, UT_TYPE, UT_ID and UT_TV fields. */
 #define _HAVE_UT_TYPE   1
 #define _HAVE_UT_PID    1

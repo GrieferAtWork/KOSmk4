@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/mcontext.h>
- * 
+ *
  * Definitions:
  *    - struct mcontext { ... };
  *

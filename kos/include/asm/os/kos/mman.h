@@ -44,7 +44,7 @@
 #endif /* __KOS_VERSION__ < 300 */
 #define __PROT_SHARED    0x20 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
                                * NOTE: Same as the `MAP_SHARED' map flag, but
-                               *       can be set like any other protection. */
+                               *       can  be set like any other protection. */
 #undef __PROT_MASK
 #define __PROT_MASK      0x3f /* Mask of flags accessible from user-space. */
 #if __KOS_VERSION__ < 400

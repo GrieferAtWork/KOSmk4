@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sigcontext.h>
- * 
+ *
  * Definitions:
  *    - struct sigcontext { ... };
  */

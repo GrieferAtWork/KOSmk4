@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/ucontext.h>
- * 
+ *
  * Definitions:
  *    - struct ucontext { ... };
  */

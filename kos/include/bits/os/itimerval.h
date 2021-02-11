@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/itimerval.h>
- * 
+ *
  * Definitions:
  *    - struct itimerval { ... };
  * #ifdef __USE_TIME64

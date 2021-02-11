@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/ipc.h>
- * 
+ *
  * Definitions:
  *    - struct ipc_perm { ... };
  */

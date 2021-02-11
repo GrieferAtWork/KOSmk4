@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/tms.h>
- * 
+ *
  * Definitions:
  *    struct tms {
  *        ...

@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/cygwin/sigaction.h>
- * 
+ *
  * Definitions:
  *    - struct __sigaction_cygwin { ... };
  *    - typedef ... __sighandler_cygwin_t;

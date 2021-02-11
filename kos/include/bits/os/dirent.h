@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/dirent.h>
- * 
+ *
  * Definitions:
  *    struct dirent {
  *        ...

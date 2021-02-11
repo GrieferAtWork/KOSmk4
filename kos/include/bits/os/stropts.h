@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/stropts.h>
- * 
+ *
  * Definitions:
  *    - ... (dependent on what gets defined in <asm/os/stropts.h>)
  */

@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/f_owner_ex.h>
- * 
+ *
  * Definitions:
  *    - struct f_owner_ex { ... };
  */

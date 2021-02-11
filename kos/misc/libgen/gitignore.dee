@@ -1,0 +1,111 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import fs;
+import util;
+import * from deemon;
+
+/* Helper library for checking if some given file is apart of any ".gitignore" file */
+
+global final _kosRoot =
+	fs.expand(fs.abspath(fs.headof(__FILE__) + "../../.."), "pc")
+		.replace("\\", "/").rstrip("/") + "/";
+
+@@Mapping for PATHNAME -> GITIGNORE_FILE_LINES
+@@Files known not to exist are bound to 
+global final _knownGitIgnoreFiles: {string: {string...}} = Dict();
+
+function _listGitIgnoreInPath(absPath: string): {string...} {
+	local result = _knownGitIgnoreFiles.get(absPath);
+	if (result !is none)
+		return result;
+	local giFilename = fs.joinpath(absPath, ".gitignore");
+	local lines = try File.open(giFilename, "r") catch (...) none;
+	if (lines !is none) {
+		lines = lines.read().decode("utf-8").splitlines(false);
+		lines = List(for (local l: lines.each.strip().strip("/"))
+			if (l && !l.startswith("#"))
+				l);
+	} else {
+		lines = {};
+	}
+	_knownGitIgnoreFiles[absPath] = lines;
+	return lines;
+}
+
+@@Enumerate the absolute containing folders, as well as
+@@relevant .gitignore lines from all .gitignore files that
+@@may affect files in the given directory @path
+function enumerateRelevantGitIgnoreFiles(path: string): {(string, {string...})...} {
+	path = fs.expand(fs.abspath(path), "pc").replace("\\", "/").rstrip("/");
+	if (!path.startswith(_kosRoot))
+		return;
+	local relPath = path[#_kosRoot:];
+	local gitIgnorePath = _kosRoot[:-1];
+	local gip = _listGitIgnoreInPath(gitIgnorePath);
+	if (gip)
+		yield (gitIgnorePath, gip);
+	for (local part: relPath.split("/")) {
+		gitIgnorePath += "/" + part;
+		gip = _listGitIgnoreInPath(gitIgnorePath);
+		if (gip)
+			yield (gitIgnorePath, gip);
+	}
+}
+
+
+function _isGitIgnoreIgnoringFile(
+		gitIgnorePath: string,
+		gitIgnoreLines: {string...},
+		filename: string): bool {
+	local giRelFile = filename[#gitIgnorePath:].lstrip("/");
+//	print repr gitIgnorePath, repr giRelFile;
+	for (local l: gitIgnoreLines) {
+		if (l.wmatch(giRelFile) || giRelFile.startswith(l + "/"))
+			return true;
+	}
+	return false;
+}
+
+
+@@Check if a given file or path @filename is being .gitignore'd
+function isFileGitIgnored(filename: string): bool {
+	filename = fs.abspath(filename).replace("\\", "/");
+	local path = fs.expand(fs.headof(filename), "pc");
+	for (local gitignore, lines: enumerateRelevantGitIgnoreFiles(path)) {
+		if (_isGitIgnoreIgnoringFile(gitignore, lines, filename))
+			return true;
+	}
+	return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

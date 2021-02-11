@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/termios.h>
- * 
+ *
  * Definitions:
  *    - struct termios { ... };
  */

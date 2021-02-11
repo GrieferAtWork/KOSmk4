@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/wait.h>
- * 
+ *
  * Definitions:
  *    union wait { ... };
  */

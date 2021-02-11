@@ -191,40 +191,40 @@
 
 /* Make room for <decimal:n=1> characters at current position
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=0]
- *      123456789      123456789
- *      ABCDEFGHI  --> ABCD...EF
- *      abcdefghi      abcdefghi
+ * >>     123456789       123456789
+ * >>     ABCDEFGHI  -->  ABCD...EF
+ * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=1]
- *      123456789      123456789
- *      ABCDEFGHI  --> ABCD...EF
- *      abcdefghi      GHIabcdef
+ * >>     123456789       123456789
+ * >>     ABCDEFGHI  -->  ABCD...EF
+ * >>     abcdefghi       GHIabcdef
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=0]
- *      123456789      123456789
- *      ABCDEFGHI  --> D...EFGHI
- *      abcdefghi      abcdefghi
+ * >>     123456789       123456789
+ * >>     ABCDEFGHI  -->  D...EFGHI
+ * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=1]
- *      123456789      456789ABC
- *      ABCDEFGHI  --> D...EFGHI
- *      abcdefghi      abcdefghi */
+ * >>     123456789       456789ABC
+ * >>     ABCDEFGHI  -->  D...EFGHI
+ * >>     abcdefghi       abcdefghi */
 #define AC_ICH(n) _AC_ESC "[" n "@"
 
 /* Delete <decimal:n=1> characters, from current position to end of field
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=0]
- *      123456789      123456789
- *      ABCDEFGHI  --> ABCDHI...
- *      abcdefghi      abcdefghi
+ * >>     123456789       123456789
+ * >>     ABCDEFGHI  -->  ABCDHI...
+ * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=1]
- *      123456789      123456789
- *      ABCDEFGHI  --> ABCDHIabc
- *      abcdefghi      defghi...
+ * >>     123456789       123456789
+ * >>     ABCDEFGHI  -->  ABCDHIabc
+ * >>     abcdefghi       defghi...
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=0]
- *      123456789      123456789
- *      ABCDEFGHI  --> ...AEFGHI
- *      abcdefghi      abcdefghi
+ * >>     123456789       123456789
+ * >>     ABCDEFGHI  -->  ...AEFGHI
+ * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=1]
- *      123456789      ...123456
- *      ABCDEFGHI  --> 789AEFGHI
- *      abcdefghi      abcdefghi */
+ * >>     123456789       ...123456
+ * >>     ABCDEFGHI  -->  789AEFGHI
+ * >>     abcdefghi       abcdefghi */
 #define AC_DCH(n) _AC_ESC "[" n "P"
 
 /* Insert <decimal:n=1> lines if currently in scrolling region */
@@ -237,21 +237,21 @@
 #define AC_REP(n) _AC_ESC "[" n "b"
 
 /* EraseDisplay (with mode <decimal:mode=0>)
- *   mode = "0"  (ANSITTY_CLS_AFTER)
- *   mode = "1"  (ANSITTY_CLS_BEFORE)
- *   mode = "2"  (ANSITTY_CLS_ALL)
- *   mode = "3"  (ANSITTY_CLS_ALLPAGES) */
+ *   `mode = "0"':  ANSITTY_CLS_AFTER
+ *   `mode = "1"':  ANSITTY_CLS_BEFORE
+ *   `mode = "2"':  ANSITTY_CLS_ALL
+ *   `mode = "3"':  ANSITTY_CLS_ALLPAGES */
 #define AC_ED(mode) _AC_ESC "[" mode "J"
 
 /* EraseLine (with mode <decimal:mode=0>)
- *   mode = "0"  (ANSITTY_EL_AFTER)
- *   mode = "1"  (ANSITTY_EL_BEFORE)
- *   mode = "2"  (ANSITTY_EL_ALL) */
+ *   `mode = "0"':  ANSITTY_EL_AFTER
+ *   `mode = "1"':  ANSITTY_EL_BEFORE
+ *   `mode = "2"':  ANSITTY_EL_ALL */
 #define AC_EL(mode) _AC_ESC "[" mode "K"
 
 /* Enable or disable `ANSITTY_FLAG_INSDEL_SCRN' (with mode <decimal:mode=0>)
- *   mode = "0"  (enable ANSITTY_FLAG_INSDEL_SCRN)
- *   mode = "1"  (disable ANSITTY_FLAG_INSDEL_SCRN) */
+ *   `mode = "0"':  enable ANSITTY_FLAG_INSDEL_SCRN
+ *   `mode = "1"':  disable ANSITTY_FLAG_INSDEL_SCRN */
 #define AC_SEM(mode) _AC_ESC "[" mode "Q"
 
 

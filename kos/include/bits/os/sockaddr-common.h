@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/sockaddr-common.h>
- * 
+ *
  * Definitions:
  *    - #define __SOCKADDR_COMMON(sa_prefix) __sa_family_t sa_prefix##family [; ...]
  *    - #define __SOCKADDR_COMMON_SIZE       __SIZEOF_SA_FAMILY_T__ [+ ...]

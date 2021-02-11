@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/termiox.h>
- * 
+ *
  * Definitions:
  *    - struct termiox { ... };
  */

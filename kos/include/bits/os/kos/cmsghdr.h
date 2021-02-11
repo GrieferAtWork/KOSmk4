@@ -43,7 +43,7 @@ struct cmsghdr /*[PREFIX(cmsg_)]*/ {
 #else /* __SIZEOF_SOCKLEN_T__ == __SIZEOF_SIZE_T__ */
 	__size_t         cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure.
 	                                * !! The type should be socklen_t but the definition
-	                                *    of the kernel is incompatible with this. */
+	                                *    of   the  kernel  is  incompatible  with  this. */
 #endif /* __SIZEOF_SOCKLEN_T__ != __SIZEOF_SIZE_T__ */
 	__INT32_TYPE__   cmsg_level;   /* Originating protocol. (One of `SOL_*'; (always `SOL_SOCKET'?)) */
 	__INT32_TYPE__   cmsg_type;    /* Protocol specific type (One of `SCM_*'). */

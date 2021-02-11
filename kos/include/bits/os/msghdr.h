@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/msghdr.h>
- * 
+ *
  * Definitions:
  *    - struct msghdr { ... };
  */

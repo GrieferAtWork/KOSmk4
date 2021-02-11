@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/rusage-convert.h>
- * 
+ *
  * Definitions:
  *    - #define rusage32_to_rusage64(self, result) ...
  *    - #define rusage64_to_rusage32(self, result) ...

@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h> /* __USE_MISC */
 
-#include <bits/os/ipc.h>
+#include <bits/os/kos/ipc.h>
 #include <bits/types.h>
 
 __DECL_BEGIN

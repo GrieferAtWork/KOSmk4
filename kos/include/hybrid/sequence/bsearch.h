@@ -60,7 +60,7 @@
  * predicate,  rather allowing you to implement the entire search function in-line
  *
  * Upon success, the statement immediately following this macro will be executed.
- * Upon failure,  that same statement  is skipped as  though pre-fixed by `if(0)'
+ * Upon  failure, that same  statement is skipped as  though pre-fixed by `if(0)'
  *
  * @param: index: [out] The matching vector index (on success; undefined on failure)
  * @param: vector: [in] The vector to-be searched

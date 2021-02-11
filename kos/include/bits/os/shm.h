@@ -22,7 +22,7 @@
 
 /* File:
  *    <bits/os/shm.h>
- * 
+ *
  * Definitions:
  *    - ...
  */

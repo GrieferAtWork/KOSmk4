@@ -41,93 +41,93 @@
  *  | | | | | | |             Also can't be made to support the bound-elem API, either...))
  *  | | | | | | |
  * [=============]
- * [1 1 2 2 2   1]   Pointers per *_HEAD([name], type) aka. *_HEAD_P(T)
- * [2 1 1 2 2 2 2]   Pointers per *_ENTRY(type)        aka. *_ENTRY_P(T)
+ * [1 1 2 2 2   1]  Pointers per *_HEAD([name], type) aka. *_HEAD_P(T)
+ * [2 1 1 2 2 2 2]  Pointers per *_ENTRY(type)        aka. *_ENTRY_P(T)
  * [=============]
- * [1 1 1 1 1   1]   *_HEAD_INITIALIZER(self)
- * [1 1 1 1 1   1]   *_INIT(self)
- * [          1  ]   *_INIT(elem, key)
- * [1 1 1 1 1   1]   *_CLEAR(self)
- * [    1        ]   *_CONCAT(dst, src)
- * [      1      ]   *_CONCAT(dst, src, key)
- * [1 1 1 1 1   1]   *_EMPTY(self)
- * [1 1 1 1 1   1]   *_FIRST(self)
- * [  1          ]   *_P_FIRST(self)                                  (Return pointer to the pointer to the first item; use with *_P_* functions)
- * [      1 1    ]   *_LAST(self)
- * [1 1 1 1 1 1 1]   *_NEXT(elem, key)
- * [      1      ]   *_PREV(elem, [headname], key)
- * [        1 1 1]   *_PREV(elem, key)
- * [1            ]   *_PREV(elem, [type], key)                       (Return predecessor (undef if no prev-elem exists))
- * [  1          ]   *_P_PREV(p_elem, [type], key)                   (Return predecessor (undef if no prev-elem exists))
- * [  1          ]   *_P_NEXT(elem, key)                             (Return pointer to the pointer to the next item; use with *_P_* functions)
- * [        1    ]   *_LOOP_NEXT(self, elem, key)                    (NOTE: *_NEXT(elem, key) for RINGQ)
- * [        1    ]   *_LOOP_PREV(self, elem, key)                    (NOTE: *_PREV(elem, key) for RINGQ)
- * [1 1 1     1 1]   *_INSERT_AFTER(predecessor, elem, key)
- * [1 1 1     1 1]   *_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)      { ..., predecessor, lo_elem...hi_elem, predecessor.next }
- * [      1 1    ]   *_INSERT_AFTER(self, predecessor, elem, key)
- * [1     1   1  ]   *_INSERT_BEFORE(successor, elem, key)
- * [1     1   1  ]   *_INSERT_BEFORE_R(successor, lo_elem, hi_elem, key)       { ..., successor.prev, lo_elem...hi_elem, successor }
- * [        1   1]   *_INSERT_BEFORE(self, successor, elem, key)
- * [        1   1]   *_INSERT_BEFORE_R(self, successor, lo_elem, hi_elem, key)
- * [  1          ]   *_P_INSERT_BEFORE(p_successor, elem, key)
- * [  1          ]   *_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, key)   { ..., (*p_successor).prev, lo_elem...hi_elem, (*p_successor) }
- * [1 1 1 1 1   1]   *_INSERT[_HEAD](self, elem, key)
- * [1 1 1 1 1   1]   *_INSERT[_HEAD]_R(self, lo_elem, hi_elem, key)
- * [  1          ]   *_ATOMIC_INSERT(self, elem, key)
- * [  1          ]   *_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)
- * [1 1          ]   *_ATOMIC_CLEAR(self)
- * [    1 1 1    ]   *_INSERT_TAIL(self, elem, key)
- * [    1 1 1    ]   *_INSERT_TAIL_R(self, lo_elem, hi_elem, key)
- * [N N         N]   *_INSERT_TAIL(self, elem, [type], key)
- * [N N         N]   *_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key)
- * [  1 1        ]   *_REMOVE_HEAD(elem, key)
- * [1         1  ]   *_REMOVE(elem, key)
- * [1         1  ]   *_REMOVE_R(lo_elem, hi_elem, key)
- * [      1 1   1]   *_REMOVE(self, elem, key)
- * [      1 1   1]   *_REMOVE_R(self, lo_elem, hi_elem, key)
- * [  N N        ]   *_REMOVE(self, elem, [type], key)
- * |             |         Remove all elements `lo_elem...hi_elem' inclusively.
- * |             |         Links between removed elements remain valid.
- * [  1          ]   *_P_REMOVE(p_elem, key)
- * [  1          ]   *_P_REMOVE_R(p_lo_elem, hi_elem, key)
- * [N N N       N]   *_REMOVE_IF(self, out_pelem, [type], key, condition)
- * |             |         NOTE: `*out_pelem' is written to before `condition' is
- * |             |               evaluated to test is `*out_pelem' should be removed
- * |             |         Assumes that `condition' is true for at least 1 element.
- * [  N N        ]   *_TRYREMOVE(self, elem, [type], key, on_failure)
- * [N N N       N]   *_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
- * |             |         Same as *_REMOVE_IF, but allow `condition' to be false for all elements, or
- * |             |         the list itself to be empty. (if this happens, `on_failure' is evaluated)
- * [N N N       N]   *_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
- * |             |         Remove all elements for which `condition' is true, and evaluate `on_match'
- * |             |         every time such a match is confirmed. The associated element is `*out_pelem'
- * [  N N        ]   *_CONTAINS(self, elem, [type], key, on_success)
- * [1         1  ]   *_REPLACE(old_elem, new_elem, key)
- * [1         1  ]   *_REPLACE_R(old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
- * [            1]   *_REPLACE(self, old_elem, new_elem, key)
- * [            1]   *_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
- * [  N N 1 1    ]   *_REPLACE(self, old_elem, new_elem, [type], key)
- * [  N N 1 1    ]   *_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key)
- * [  1          ]   *_P_REPLACE(p_old_elem, new_elem, key)
- * [  1          ]   *_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
- * [    1        ]   *_P_REPLACE(self, p_old_elem, new_elem, key)
- * [    1        ]   *_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
- * [  N N        ]   *_TRYREPLACE(self, old_elem, new_elem, [type], key, on_failure)
- * [  N N        ]   *_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_failure)
- * [N N N N N   N]   *_FOREACH(elem, self, key)
- * [  N N        ]   *_P_FOREACH(p_elem, self, key)
- * [        N    ]   *_FOREACH_REVERSE(elem, self, key)
- * [      N      ]   *_FOREACH_REVERSE(elem, self, [headname], key)
- * [=============]   -- Sub-API: Check if an element is contained within a list,
- * [=============]               but removal requires *_UNBIND instead of *_REMOVE
- * [1     1 1 1  ]   *_ENTRY_UNBOUND_INITIALIZER         -- Static initializer for unbound elements
- * [1     1 1 1  ]   *_ENTRY_UNBOUND_INIT(entry)         -- Runtime initializer for unbound elements
- * [1     1 1 1  ]   *_ISBOUND(elem, key)                -- Returns non-zero if element is bound (to a list)
- * [1         1  ]   *_UNBIND(elem, key)                 -- Remove element and mark as unbound
- * [      1 1    ]   *_UNBIND(self, elem, key)           -- *ditto*
- * [N            ]   *_UNBIND_IF(self, out_pelem, [type], key, condition)
- * [N            ]   *_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
- * [N            ]   *_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
+ * [1 1 1 1 1   1]  *_HEAD_INITIALIZER(self)
+ * [1 1 1 1 1   1]  *_INIT(self)
+ * [          1  ]  *_INIT(elem, key)
+ * [1 1 1 1 1   1]  *_CLEAR(self)
+ * [    1        ]  *_CONCAT(dst, src)
+ * [      1      ]  *_CONCAT(dst, src, key)
+ * [1 1 1 1 1   1]  *_EMPTY(self)
+ * [1 1 1 1 1   1]  *_FIRST(self)
+ * [  1          ]  *_P_FIRST(self)                                  (Return pointer to the pointer to the first item; use with *_P_* functions)
+ * [      1 1    ]  *_LAST(self)
+ * [1 1 1 1 1 1 1]  *_NEXT(elem, key)
+ * [      1      ]  *_PREV(elem, [headname], key)
+ * [        1 1 1]  *_PREV(elem, key)
+ * [1            ]  *_PREV(elem, [type], key)                       (Return predecessor (undef if no prev-elem exists))
+ * [  1          ]  *_P_PREV(p_elem, [type], key)                   (Return predecessor (undef if no prev-elem exists))
+ * [  1          ]  *_P_NEXT(elem, key)                             (Return pointer to the pointer to the next item; use with *_P_* functions)
+ * [        1    ]  *_LOOP_NEXT(self, elem, key)                    (NOTE: *_NEXT(elem, key) for RINGQ)
+ * [        1    ]  *_LOOP_PREV(self, elem, key)                    (NOTE: *_PREV(elem, key) for RINGQ)
+ * [1 1 1     1 1]  *_INSERT_AFTER(predecessor, elem, key)
+ * [1 1 1     1 1]  *_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)      { ..., predecessor, lo_elem...hi_elem, predecessor.next }
+ * [      1 1    ]  *_INSERT_AFTER(self, predecessor, elem, key)
+ * [1     1   1  ]  *_INSERT_BEFORE(successor, elem, key)
+ * [1     1   1  ]  *_INSERT_BEFORE_R(successor, lo_elem, hi_elem, key)       { ..., successor.prev, lo_elem...hi_elem, successor }
+ * [        1   1]  *_INSERT_BEFORE(self, successor, elem, key)
+ * [        1   1]  *_INSERT_BEFORE_R(self, successor, lo_elem, hi_elem, key)
+ * [  1          ]  *_P_INSERT_BEFORE(p_successor, elem, key)
+ * [  1          ]  *_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, key)   { ..., (*p_successor).prev, lo_elem...hi_elem, (*p_successor) }
+ * [1 1 1 1 1   1]  *_INSERT[_HEAD](self, elem, key)
+ * [1 1 1 1 1   1]  *_INSERT[_HEAD]_R(self, lo_elem, hi_elem, key)
+ * [  1          ]  *_ATOMIC_INSERT(self, elem, key)
+ * [  1          ]  *_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)
+ * [1 1          ]  *_ATOMIC_CLEAR(self)
+ * [    1 1 1    ]  *_INSERT_TAIL(self, elem, key)
+ * [    1 1 1    ]  *_INSERT_TAIL_R(self, lo_elem, hi_elem, key)
+ * [N N         N]  *_INSERT_TAIL(self, elem, [type], key)
+ * [N N         N]  *_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key)
+ * [  1 1        ]  *_REMOVE_HEAD(elem, key)
+ * [1         1  ]  *_REMOVE(elem, key)
+ * [1         1  ]  *_REMOVE_R(lo_elem, hi_elem, key)
+ * [      1 1   1]  *_REMOVE(self, elem, key)
+ * [      1 1   1]  *_REMOVE_R(self, lo_elem, hi_elem, key)
+ * [  N N        ]  *_REMOVE(self, elem, [type], key)
+ * |             |        Remove all elements `lo_elem...hi_elem' inclusively.
+ * |             |        Links between removed elements remain valid.
+ * [  1          ]  *_P_REMOVE(p_elem, key)
+ * [  1          ]  *_P_REMOVE_R(p_lo_elem, hi_elem, key)
+ * [N N N       N]  *_REMOVE_IF(self, out_pelem, [type], key, condition)
+ * |             |        NOTE: `*out_pelem' is written to before `condition' is
+ * |             |              evaluated to test is `*out_pelem' should be removed
+ * |             |        Assumes that `condition' is true for at least 1 element.
+ * [  N N        ]  *_TRYREMOVE(self, elem, [type], key, on_failure)
+ * [N N N       N]  *_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
+ * |             |        Same as *_REMOVE_IF, but allow `condition' to be false for all elements, or
+ * |             |        the list itself to be empty. (if this happens, `on_failure' is evaluated)
+ * [N N N       N]  *_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
+ * |             |        Remove all elements for which `condition' is true, and evaluate `on_match'
+ * |             |        every time such a match is confirmed. The associated element is `*out_pelem'
+ * [  N N        ]  *_CONTAINS(self, elem, [type], key, on_success)
+ * [1         1  ]  *_REPLACE(old_elem, new_elem, key)
+ * [1         1  ]  *_REPLACE_R(old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
+ * [            1]  *_REPLACE(self, old_elem, new_elem, key)
+ * [            1]  *_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
+ * [  N N 1 1    ]  *_REPLACE(self, old_elem, new_elem, [type], key)
+ * [  N N 1 1    ]  *_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key)
+ * [  1          ]  *_P_REPLACE(p_old_elem, new_elem, key)
+ * [  1          ]  *_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
+ * [    1        ]  *_P_REPLACE(self, p_old_elem, new_elem, key)
+ * [    1        ]  *_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
+ * [  N N        ]  *_TRYREPLACE(self, old_elem, new_elem, [type], key, on_failure)
+ * [  N N        ]  *_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_failure)
+ * [N N N N N   N]  *_FOREACH(elem, self, key)
+ * [  N N        ]  *_P_FOREACH(p_elem, self, key)
+ * [        N    ]  *_FOREACH_REVERSE(elem, self, key)
+ * [      N      ]  *_FOREACH_REVERSE(elem, self, [headname], key)
+ * [=============]  -- Sub-API: Check if an element is contained within a list,
+ * [=============]              but removal requires *_UNBIND instead of *_REMOVE
+ * [1     1 1 1  ]  *_ENTRY_UNBOUND_INITIALIZER         -- Static initializer for unbound elements
+ * [1     1 1 1  ]  *_ENTRY_UNBOUND_INIT(entry)         -- Runtime initializer for unbound elements
+ * [1     1 1 1  ]  *_ISBOUND(elem, key)                -- Returns non-zero if element is bound (to a list)
+ * [1         1  ]  *_UNBIND(elem, key)                 -- Remove element and mark as unbound
+ * [      1 1    ]  *_UNBIND(self, elem, key)           -- *ditto*
+ * [N            ]  *_UNBIND_IF(self, out_pelem, [type], key, condition)
+ * [N            ]  *_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
+ * [N            ]  *_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
  * \-------------/
  *     Runtime
  *    (in O(x))
