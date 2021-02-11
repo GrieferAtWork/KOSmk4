@@ -2332,8 +2332,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
  * NOTE: This function automatically performs type promotions.
  * @param: op: One of:
  *             '+':                      Add.
- *             '-': Subtract.
- *             '*': Multiply.
+ *             '-':                      Subtract.
+ *             '*':                      Multiply.
  *             '/':                      Divide.
  *             '%':                      Remainder (modulo).
  *             '&':                      Bit-wise and
