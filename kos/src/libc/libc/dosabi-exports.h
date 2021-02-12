@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf474c9c4 */
+/* HASH CRC-32:0x1ca6bc9e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1339,6 +1339,7 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_destroy, libd_pthread_barrierattr_de
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_getpshared, libd_pthread_barrierattr_getpshared);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_setpshared, libd_pthread_barrierattr_setpshared);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_key_create, libd_pthread_key_create);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_key_create_once_np, libd_pthread_key_create_once_np);
 DEFINE_PUBLIC_ALIAS(DOS$tss_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_key_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$tss_get, libd_pthread_getspecific);

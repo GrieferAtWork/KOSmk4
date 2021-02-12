@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8542e986 */
+/* HASH CRC-32:0x865bf183 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -727,6 +727,30 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_barrierattr_setpsh
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_key_create)(pthread_key_t *key, __pthread_destr_function_t destr_function);
+/* >> pthread_key_create_once_np(3)
+ * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
+ * make sure that even in the event of multiple simultaneous threads calling
+ * this function, only one will create the key, and all others will wait until
+ * the key has been created. Once the key was created, further calls to this
+ * function will no longer block, but simply return immediately.
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_key_create_once_np)(pthread_key_t *key, __pthread_destr_function_t destr_function);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pthread_key_create_once_np(3)
+ * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
+ * make sure that even in the event of multiple simultaneous threads calling
+ * this function, only one will create the key, and all others will wait until
+ * the key has been created. Once the key was created, further calls to this
+ * function will no longer block, but simply return immediately.
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_key_create_once_np)(pthread_key_t *key, __pthread_destr_function_t destr_function);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_key_delete(3)
  * Destroy KEY
  * @return: EOK:    Success

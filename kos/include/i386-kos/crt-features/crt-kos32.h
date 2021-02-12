@@ -2756,6 +2756,7 @@
 #define __CRT_HAVE_pthread_gettid_np
 #define __CRT_HAVE_pthread_join
 #define __CRT_HAVE_pthread_key_create
+#define __CRT_HAVE_pthread_key_create_once_np
 #define __CRT_HAVE_pthread_key_delete
 #define __CRT_HAVE_pthread_kill
 #define __CRT_HAVE_pthread_main_np

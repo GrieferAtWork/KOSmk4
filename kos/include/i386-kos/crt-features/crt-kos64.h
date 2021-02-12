@@ -2752,6 +2752,7 @@
 #define __CRT_HAVE_pthread_gettid_np
 #define __CRT_HAVE_pthread_join
 #define __CRT_HAVE_pthread_key_create
+#define __CRT_HAVE_pthread_key_create_once_np
 #define __CRT_HAVE_pthread_key_delete
 #define __CRT_HAVE_pthread_kill
 #define __CRT_HAVE_pthread_main_np
@@ -7014,6 +7015,7 @@
 #define __CRT_HAVE_KOS$pthread_gettid_np
 #define __CRT_HAVE_KOS$pthread_join
 #define __CRT_HAVE_KOS$pthread_key_create
+#define __CRT_HAVE_KOS$pthread_key_create_once_np
 #define __CRT_HAVE_KOS$pthread_key_delete
 #define __CRT_HAVE_KOS$pthread_kill
 #define __CRT_HAVE_KOS$pthread_mutex_consistent
@@ -10425,6 +10427,7 @@
 #define __CRT_HAVE_DOS$pthread_gettid_np
 #define __CRT_HAVE_DOS$pthread_join
 #define __CRT_HAVE_DOS$pthread_key_create
+#define __CRT_HAVE_DOS$pthread_key_create_once_np
 #define __CRT_HAVE_DOS$pthread_key_delete
 #define __CRT_HAVE_DOS$pthread_kill
 #define __CRT_HAVE_DOS$pthread_mutex_consistent

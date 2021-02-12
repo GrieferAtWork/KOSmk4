@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc85a1bb */
+/* HASH CRC-32:0xd091db18 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2139,6 +2139,39 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, __pthread_destr_function_t __destr_function),(__key,__destr_function))
+#ifdef __USE_SOLARIS
+#ifndef PTHREAD_ONCE_KEY_NP
+#ifdef __PTHREAD_ONCE_KEY_NP
+#define PTHREAD_ONCE_KEY_NP __PTHREAD_ONCE_KEY_NP
+#else /* __PTHREAD_ONCE_KEY_NP */
+#define PTHREAD_ONCE_KEY_NP ((pthread_key_t)-1)
+#endif /* !__PTHREAD_ONCE_KEY_NP */
+#endif /* !PTHREAD_ONCE_KEY_NP */
+#ifdef __CRT_HAVE_pthread_key_create_once_np
+/* >> pthread_key_create_once_np(3)
+ * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
+ * make sure that even in the event of multiple simultaneous threads calling
+ * this function, only one will create the key, and all others will wait until
+ * the key has been created. Once the key was created, further calls to this
+ * function will no longer block, but simply return immediately.
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_np,(pthread_key_t *__key, __pthread_destr_function_t __destr_function),(__key,__destr_function))
+#elif defined(__CRT_HAVE_pthread_key_create)
+#include <libc/local/pthread/pthread_key_create_once_np.h>
+/* >> pthread_key_create_once_np(3)
+ * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
+ * make sure that even in the event of multiple simultaneous threads calling
+ * this function, only one will create the key, and all others will wait until
+ * the key has been created. Once the key was created, further calls to this
+ * function will no longer block, but simply return immediately.
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_key_create_once_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_key_create_once_np)(pthread_key_t *__key, __pthread_destr_function_t __destr_function) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_key_create_once_np))(__key, __destr_function); })
+#endif /* ... */
+#endif /* __USE_SOLARIS */
 #ifdef __CRT_HAVE_pthread_key_delete
 /* >> pthread_key_delete(3)
  * Destroy KEY

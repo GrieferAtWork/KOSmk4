@@ -2373,6 +2373,77 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 $errno_t pthread_key_create([[nonnull]] pthread_key_t *key,
                             [[nullable]] __pthread_destr_function_t destr_function);
 
+
+%#ifdef __USE_SOLARIS
+%{
+#ifndef PTHREAD_ONCE_KEY_NP
+#ifdef __PTHREAD_ONCE_KEY_NP
+#define PTHREAD_ONCE_KEY_NP __PTHREAD_ONCE_KEY_NP
+#else /* __PTHREAD_ONCE_KEY_NP */
+#define PTHREAD_ONCE_KEY_NP ((pthread_key_t)-1)
+#endif /* !__PTHREAD_ONCE_KEY_NP */
+#endif /* !PTHREAD_ONCE_KEY_NP */
+}
+
+@@>> pthread_key_create_once_np(3)
+@@Same as `pthread_key_create()', but the given `key' must be pre-initialized
+@@using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
+@@make sure that even in the event of multiple simultaneous threads calling
+@@this function, only one will create the key, and all others will wait until
+@@the key has been created. Once the key was created, further calls to this
+@@function will no longer block, but simply return immediately.
+@@@return: EOK:    Success
+@@@return: ENOMEM: Insufficient memory to create the key
+[[decl_prefix(
+#ifndef ____pthread_destr_function_t_defined
+#define ____pthread_destr_function_t_defined 1
+typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
+#endif /* !____pthread_destr_function_t_defined */
+)]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<hybrid/__atomic.h>")]]
+[[requires_function(pthread_key_create)]]
+$errno_t pthread_key_create_once_np([[nonnull]] pthread_key_t *key,
+                                    [[nullable]] __pthread_destr_function_t destr_function) {
+	pthread_key_t kv;
+	errno_t error;
+again:
+	kv = __hybrid_atomic_load(*key, __ATOMIC_ACQUIRE);
+@@pp_ifdef __PTHREAD_ONCE_KEY_NP@@
+	if (kv != __PTHREAD_ONCE_KEY_NP)
+@@pp_else@@
+	if (kv != (pthread_key_t)-1)
+@@pp_endif@@
+	{
+		return 0; /* Already initialized. */
+	}
+
+	/* Try to do the init ourselves. */
+	error = pthread_key_create(key, destr_function);
+	if unlikely(error != 0)
+		return error; /* Error... */
+
+	/* Try to save the results. */
+@@pp_ifdef __PTHREAD_ONCE_KEY_NP@@
+	if unlikely(!__hybrid_atomic_cmpxch(*key, __PTHREAD_ONCE_KEY_NP, kv,
+	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+@@pp_else@@
+	if unlikely(!__hybrid_atomic_cmpxch(*key, (pthread_key_t)-1, kv,
+	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+@@pp_endif@@
+	{
+		/* Someone else was faster. - Destroy our version of the key,  and
+		 * try again in order to use the other key that was created in the
+		 * mean time. */
+@@pp_if $has_function(pthread_key_delete)@@
+		pthread_key_delete(kv);
+@@pp_endif@@
+		goto again;
+	}
+	return 0;
+}
+%#endif /* __USE_SOLARIS */
+
 @@>> pthread_key_delete(3)
 @@Destroy KEY
 @@@return: EOK:    Success
@@ -2507,7 +2578,6 @@ int pthread_main_np() {
 
 
 
-/* TODO: #if __USE_SOLARIS: pthread_key_create_once_np + PTHREAD_ONCE_KEY_NP */
 
 
 %{

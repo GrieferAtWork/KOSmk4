@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba16d9cc */
+/* HASH CRC-32:0xee1c3151 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1043,6 +1043,7 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_barrierattr_destroy, libc_pthre
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_barrierattr_getpshared, libc_pthread_barrierattr_getpshared, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_barrierattr_setpshared, libc_pthread_barrierattr_setpshared, TIn(__SIZEOF_ERRNO_T__), 2, TP, TD)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_key_create, libc_pthread_key_create, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_key_create_once_np, libc_pthread_key_create_once_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_key_delete, libc_pthread_key_delete, TIn(__SIZEOF_ERRNO_T__), 1, TIn(__SIZEOF_PTHREAD_KEY_T))
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_getspecific, libc_pthread_getspecific, TP, 1, TIn(__SIZEOF_PTHREAD_KEY_T))
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_setspecific, libc_pthread_setspecific, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_KEY_T), TP)

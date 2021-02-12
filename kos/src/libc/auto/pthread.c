@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x729ff0a5 */
+/* HASH CRC-32:0x8f26860 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,6 +141,56 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
 	return 0;
 }
+#include <hybrid/__atomic.h>
+/* >> pthread_key_create_once_np(3)
+ * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
+ * make sure that even in the event of multiple simultaneous threads calling
+ * this function, only one will create the key, and all others will wait until
+ * the key has been created. Once the key was created, further calls to this
+ * function will no longer block, but simply return immediately.
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_key_create_once_np)(pthread_key_t *key,
+                                                      __pthread_destr_function_t destr_function) {
+	pthread_key_t kv;
+	errno_t error;
+again:
+	kv = __hybrid_atomic_load(*key, __ATOMIC_ACQUIRE);
+#ifdef __PTHREAD_ONCE_KEY_NP
+	if (kv != __PTHREAD_ONCE_KEY_NP)
+#else /* __PTHREAD_ONCE_KEY_NP */
+	if (kv != (pthread_key_t)-1)
+#endif /* !__PTHREAD_ONCE_KEY_NP */
+	{
+		return 0; /* Already initialized. */
+	}
+
+	/* Try to do the init ourselves. */
+	error = libc_pthread_key_create(key, destr_function);
+	if unlikely(error != 0)
+		return error; /* Error... */
+
+	/* Try to save the results. */
+#ifdef __PTHREAD_ONCE_KEY_NP
+	if unlikely(!__hybrid_atomic_cmpxch(*key, __PTHREAD_ONCE_KEY_NP, kv,
+	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+#else /* __PTHREAD_ONCE_KEY_NP */
+	if unlikely(!__hybrid_atomic_cmpxch(*key, (pthread_key_t)-1, kv,
+	                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+#endif /* !__PTHREAD_ONCE_KEY_NP */
+	{
+		/* Someone else was faster. - Destroy our version of the key,  and
+		 * try again in order to use the other key that was created in the
+		 * mean time. */
+#if defined(__CRT_HAVE_pthread_key_delete) || defined(__CRT_HAVE_tss_delete)
+		libc_pthread_key_delete(kv);
+#endif /* __CRT_HAVE_pthread_key_delete || __CRT_HAVE_tss_delete */
+		goto again;
+	}
+	return 0;
+}
 #include <bits/os/cpu_set.h>
 /* >> pthread_num_processors_np(3)
  * @return: * : The number of cpus that the calling thread is able to run on */
@@ -204,6 +254,7 @@ DEFINE_PUBLIC_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
+DEFINE_PUBLIC_ALIAS(pthread_key_create_once_np, libc_pthread_key_create_once_np);
 DEFINE_PUBLIC_ALIAS(pthread_num_processors_np, libc_pthread_num_processors_np);
 DEFINE_PUBLIC_ALIAS(pthread_set_num_processors_np, libc_pthread_set_num_processors_np);
 DEFINE_PUBLIC_ALIAS(thr_main, libc_pthread_main_np);

@@ -3374,15 +3374,15 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
 /* Lock for accessing `tls_dtors' and `tls_count' */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock tls_lock = ATOMIC_RWLOCK_INIT;
 
-/* [0..1][lock(WRITE_ONCE)]   TLS   segment   (from   libdl's    `dltlsalloc()')
- * that  is used for representing and storing  TLS values on a per-thread basis.
- * Technically, we could  get rid of  this right here,  and put all  of the  TLS
- * stuff  into `current', but since KOS already supports static TLS declaration,
- * aka  `ATTR_THREAD' (which is  actually the _very_  _much_ preferred method of
- * allocating TLS memory), anything that is written to be more or less optimized
- * for  a  platform  like  KOS  shouldn't  even  have  to  make  use  of   this.
- * As such, don't put more stuff into `current', and use dynamic TLS allocations
- * for implementing pthread-based TLS variables. */
+/* [0..1][lock(WRITE_ONCE)] TLS  segment  (from  libdl's  `dltlsalloc()')  that
+ * is  used  for representing  and storing  TLS values  on a  per-thread basis.
+ * Technically,  we could get  rid of this right  here, and put  all of the TLS
+ * stuff into `current', but since KOS already supports static TLS declaration,
+ * aka `ATTR_THREAD'  (which is  actually the  _very_ _much_  preferred  method
+ * of allocating  TLS memory),  anything that  is written  to be  more or  less
+ * optimized for a platform like KOS shouldn't  even have to make use of  this.
+ * As  such,  don't  put  more  stuff  into  `current',  and  use  dynamic  TLS
+ * allocations for implementing pthread-based TLS variables. */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") void *tls_handle = NULL;
 
 struct pthread_tls_segment {
