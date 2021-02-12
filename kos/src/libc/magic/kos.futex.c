@@ -54,11 +54,11 @@ typedef __uintptr_t lfutex_t;
  * a  way  that makes  repeated polling  behave unexpectedly,  requiring user-space  to take
  * proper care that the behavior will be what is actually intended)
  *
- * Other  than this, there  exists 2 ways of  polling for futex objects
- * in  parallel to polling  any other type of  file descriptor, as well
- * polling for sleeping child processes  (either through use of a  file
- * descriptor created using `TODO:waitfd(pid) (similar to `signalfd()',
- * but may be used to  wait for processes in a  way that is similar  to
+ * Other than this, there exists 2  ways of polling for futex  objects
+ * in parallel to polling any other  type of file descriptor, as  well
+ * polling  for sleeping child processes (either through use of a file
+ * descriptor created using `pidfd_open(pid) (similar to `signalfd()',
+ * but  may be used to wait for processes  in a way that is similar to
  * the waitpid() function)', or through use of `kpoll()').
  *
  * - Using the `kpoll()' system call, which  allows for the use of  poll

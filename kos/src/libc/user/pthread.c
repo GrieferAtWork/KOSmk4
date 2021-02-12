@@ -2468,17 +2468,19 @@ again:
  * HINT: Waiting for 32-bit control words on 64-bit platforms is
  *       done  by  making  use  of   `LFUTEX_WAIT_WHILE_BITMASK' */
 #if __SIZEOF_POINTER__ == 4
-#define sys_lfutex32_waitwhile64(uaddr, val, timeout) \
-	sys_lfutex(uaddr, LFUTEX_WAIT_WHILE, val, timeout, 0)
+#define sys_lfutex32_waitwhile64(uaddr, val, timeout, flags) \
+	sys_lfutex(uaddr, LFUTEX_WAIT_WHILE | flags, val, timeout, 0)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define sys_lfutex32_waitwhile64(uaddr, val, timeout)          \
-	sys_lfutex((uint64_t *)(uaddr), LFUTEX_WAIT_WHILE_BITMASK, \
-	           (uint64_t)UINT32_MAX, timeout,                  \
+#define sys_lfutex32_waitwhile64(uaddr, val, timeout, flags) \
+	sys_lfutex((uint64_t *)(uaddr),                          \
+	           LFUTEX_WAIT_WHILE_BITMASK | flags,            \
+	           (uint64_t)UINT32_MAX, timeout,                \
 	           (uint64_t)(uint32_t)(val))
 #else /* ... */
-#define sys_lfutex32_waitwhile64(uaddr, val, timeout)          \
-	sys_lfutex((uint64_t *)(uaddr), LFUTEX_WAIT_WHILE_BITMASK, \
-	           (uint64_t)(UINT32_MAX << 32), timeout,          \
+#define sys_lfutex32_waitwhile64(uaddr, val, timeout, flags) \
+	sys_lfutex((uint64_t *)(uaddr),                          \
+	           LFUTEX_WAIT_WHILE_BITMASK | flags,            \
+	           (uint64_t)(UINT32_MAX << 32), timeout,        \
 	           (uint64_t)(uint32_t)(val) << 32)
 #endif /* !... */
 
@@ -2505,7 +2507,7 @@ again:
 		return result;
 	/* Wait until the mutex is unlocked. */
 	result = (errno_t)sys_lfutex32_waitwhile64((uint32_t *)&mutex->m_lock,
-	                                           lock, abstime);
+	                                           lock, abstime, 0);
 	/* Check for timeout. */
 	if (result == -ETIMEDOUT || result == -EINVAL)
 		return -result;
@@ -2513,6 +2515,69 @@ again:
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_mutex_timedlock64]]]*/
+
+/*[[[head:libc_pthread_mutex_reltimedlock_np,hash:CRC-32=0x51c986d8]]]*/
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict mutex,
+                                                         struct timespec const *__restrict reltime)
+/*[[[body:libc_pthread_mutex_reltimedlock_np]]]*/
+{
+	uint32_t lock;
+	errno_t result;
+again:
+	result = mutex_trylock_waiters(mutex, &lock);
+	if (result != EBUSY)
+		return result;
+	/* Wait until the mutex is unlocked.
+	 * NOTE: Need to use `FUTEX_WAIT_BITSET', since only that one  takes
+	 *       an absolute timeout, rather than the relative timeout taken
+	 *       by the regular `FUTEX_WAIT' */
+	result = (errno_t)sys_futex((uint32_t *)&mutex->m_lock,
+	                            FUTEX_WAIT, lock, reltime,
+	                            NULL, 0);
+	/* Check for timeout. */
+	if (result == -ETIMEDOUT || result == -EINVAL)
+		return -result;
+	goto again;
+}
+/*[[[end:libc_pthread_mutex_reltimedlock_np]]]*/
+
+/*[[[head:libc_pthread_mutex_reltimedlock64_np,hash:CRC-32=0x870cb3bd]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_mutex_reltimedlock64_np, libc_pthread_mutex_reltimedlock_np);
+#else /* MAGIC:alias */
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict mutex,
+                                                           struct timespec64 const *__restrict reltime)
+/*[[[body:libc_pthread_mutex_reltimedlock64_np]]]*/
+{
+	uint32_t lock;
+	errno_t result;
+again:
+	result = mutex_trylock_waiters(mutex, &lock);
+	if (result != EBUSY)
+		return result;
+	/* Wait until the mutex is unlocked. */
+	result = (errno_t)sys_lfutex32_waitwhile64((uint32_t *)&mutex->m_lock,
+	                                           lock, reltime,
+	                                           LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
+	/* Check for timeout. */
+	if (result == -ETIMEDOUT || result == -EINVAL)
+		return -result;
+	goto again;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_mutex_reltimedlock64_np]]]*/
 
 /*[[[head:libc_pthread_mutex_unlock,hash:CRC-32=0x58d4a192]]]*/
 /* >> pthread_mutex_unlock(3)
@@ -2552,9 +2617,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *mutex)
 }
 /*[[[end:libc_pthread_mutex_unlock]]]*/
 
-/*[[[head:libc_pthread_mutex_getprioceiling,hash:CRC-32=0xa093929]]]*/
+/*[[[head:libc_pthread_mutex_getprioceiling,hash:CRC-32=0x2d66169c]]]*/
 /* >> pthread_mutex_getprioceiling(3)
- * Get the priority ceiling of MUTEX
+ * Get the priority ceiling of `mutex'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *__restrict mutex,
@@ -2568,9 +2633,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *_
 }
 /*[[[end:libc_pthread_mutex_getprioceiling]]]*/
 
-/*[[[head:libc_pthread_mutex_setprioceiling,hash:CRC-32=0x87f01a99]]]*/
+/*[[[head:libc_pthread_mutex_setprioceiling,hash:CRC-32=0x658c4977]]]*/
 /* >> pthread_mutex_setprioceiling(3)
- * Set the priority ceiling of MUTEX to PRIOCEILING,
+ * Set the priority ceiling of `mutex' to PRIOCEILING,
  * return old priority ceiling value in *OLD_CEILING
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
@@ -2588,9 +2653,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restr
 }
 /*[[[end:libc_pthread_mutex_setprioceiling]]]*/
 
-/*[[[head:libc_pthread_mutex_consistent,hash:CRC-32=0xc3fecd63]]]*/
+/*[[[head:libc_pthread_mutex_consistent,hash:CRC-32=0xb8ee5af]]]*/
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by MUTEX as consistent
+ * Declare the state protected by `mutex' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
@@ -2683,9 +2748,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock)
 }
 /*[[[end:libc_pthread_rwlock_tryrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0xea427782]]]*/
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
+/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0xa392ed2a]]]*/
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -2701,12 +2766,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restri
 }
 /*[[[end:libc_pthread_rwlock_timedrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0x37e0e555]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0xbe1542c5]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock);
 #else /* MAGIC:alias */
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -2753,9 +2818,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock)
 }
 /*[[[end:libc_pthread_rwlock_trywrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x3ec44845]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x1fcf25e7]]]*/
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -2771,12 +2836,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restri
 }
 /*[[[end:libc_pthread_rwlock_timedwrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x22f45c12]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x97b9db86]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock);
 #else /* MAGIC:alias */
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -2792,6 +2857,86 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_timedwrlock64]]]*/
+
+/*[[[head:libc_pthread_rwlock_reltimedrdlock_np,hash:CRC-32=0xf21661cf]]]*/
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict rwlock,
+                                                            struct timespec const *__restrict reltime)
+/*[[[body:libc_pthread_rwlock_reltimedrdlock_np]]]*/
+{
+	(void)rwlock;
+	(void)reltime;
+	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc_pthread_rwlock_reltimedrdlock_np]]]*/
+
+/*[[[head:libc_pthread_rwlock_reltimedwrlock_np,hash:CRC-32=0x2fbbd22e]]]*/
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict rwlock,
+                                                            struct timespec const *__restrict reltime)
+/*[[[body:libc_pthread_rwlock_reltimedwrlock_np]]]*/
+{
+	(void)rwlock;
+	(void)reltime;
+	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc_pthread_rwlock_reltimedwrlock_np]]]*/
+
+/*[[[head:libc_pthread_rwlock_reltimedrdlock64_np,hash:CRC-32=0xa59f4c48]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock_reltimedrdlock_np);
+#else /* MAGIC:alias */
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict rwlock,
+                                                              struct timespec64 const *__restrict reltime)
+/*[[[body:libc_pthread_rwlock_reltimedrdlock64_np]]]*/
+{
+	(void)rwlock;
+	(void)reltime;
+	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
+	return ENOSYS;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_rwlock_reltimedrdlock64_np]]]*/
+
+/*[[[head:libc_pthread_rwlock_reltimedwrlock64_np,hash:CRC-32=0x342824e8]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock_reltimedwrlock_np);
+#else /* MAGIC:alias */
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict rwlock,
+                                                              struct timespec64 const *__restrict reltime)
+/*[[[body:libc_pthread_rwlock_reltimedwrlock64_np]]]*/
+{
+	(void)rwlock;
+	(void)reltime;
+	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
+	return ENOSYS;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_rwlock_reltimedwrlock64_np]]]*/
 
 /*[[[head:libc_pthread_rwlock_unlock,hash:CRC-32=0x399e84b6]]]*/
 /* >> pthread_rwlock_unlock(3)
@@ -2841,9 +2986,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *rwlock)
  */
 
 
-/*[[[head:libc_pthread_cond_init,hash:CRC-32=0xa6bdb509]]]*/
+/*[[[head:libc_pthread_cond_init,hash:CRC-32=0x4aa3a613]]]*/
 /* >> pthread_cond_init(3)
- * Initialize condition variable COND using attributes
+ * Initialize condition variable `cond' using attributes
  * ATTR, or use the default values if later is NULL
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
@@ -2857,9 +3002,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond,
 }
 /*[[[end:libc_pthread_cond_init]]]*/
 
-/*[[[head:libc_pthread_cond_destroy,hash:CRC-32=0xc3993c58]]]*/
+/*[[[head:libc_pthread_cond_destroy,hash:CRC-32=0xbbc02af7]]]*/
 /* >> pthread_cond_destroy(3)
- * Destroy condition variable COND
+ * Destroy condition variable `cond'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *cond)
@@ -2920,9 +3065,9 @@ again:
 	return EOK;
 }
 
-/*[[[head:libc_pthread_cond_signal,hash:CRC-32=0x57b63cc8]]]*/
+/*[[[head:libc_pthread_cond_signal,hash:CRC-32=0xaf140c6]]]*/
 /* >> pthread_cond_signal(3)
- * Wake up one thread waiting for condition variable COND
+ * Wake up one thread waiting for condition variable `cond'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *cond)
@@ -2932,9 +3077,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *cond)
 }
 /*[[[end:libc_pthread_cond_signal]]]*/
 
-/*[[[head:libc_pthread_cond_broadcast,hash:CRC-32=0x783ed67a]]]*/
+/*[[[head:libc_pthread_cond_broadcast,hash:CRC-32=0x3a917524]]]*/
 /* >> pthread_cond_broadcast(3)
- * Wake up all threads waiting for condition variables COND
+ * Wake up all threads waiting for condition variables `cond'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *cond)
@@ -2944,10 +3089,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *cond)
 }
 /*[[[end:libc_pthread_cond_broadcast]]]*/
 
-/*[[[head:libc_pthread_cond_wait,hash:CRC-32=0x69679845]]]*/
+/*[[[head:libc_pthread_cond_wait,hash:CRC-32=0x5b6535da]]]*/
 /* >> pthread_cond_wait(3)
- * Wait for condition variable COND to be signaled or broadcast.
- * MUTEX is assumed to be locked before.
+ * Wait for condition variable `cond' to be signaled or broadcast.
+ * `mutex' is assumed to be locked before.
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
@@ -2973,12 +3118,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
 }
 /*[[[end:libc_pthread_cond_wait]]]*/
 
-/*[[[head:libc_pthread_cond_timedwait,hash:CRC-32=0x308e3730]]]*/
+/*[[[head:libc_pthread_cond_timedwait,hash:CRC-32=0xb06e103b]]]*/
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -3012,15 +3157,15 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict con
 }
 /*[[[end:libc_pthread_cond_timedwait]]]*/
 
-/*[[[head:libc_pthread_cond_timedwait64,hash:CRC-32=0x8b0d31f4]]]*/
+/*[[[head:libc_pthread_cond_timedwait64,hash:CRC-32=0xf3789359]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_cond_timedwait64, libc_pthread_cond_timedwait);
 #else /* MAGIC:alias */
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -3043,7 +3188,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
-	result = (errno_t)-sys_lfutex32_waitwhile64(&cond->c_futex, lock, abstime);
+	result = (errno_t)-sys_lfutex32_waitwhile64(&cond->c_futex, lock, abstime, 0);
 	/* Check for timeout. */
 	if (result != ETIMEDOUT && result != EINVAL)
 		result = EOK;
@@ -3053,6 +3198,84 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_cond_timedwait64]]]*/
+
+/*[[[head:libc_pthread_cond_reltimedwait_np,hash:CRC-32=0xcdee07f7]]]*/
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2, 3)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict cond,
+                                                        pthread_mutex_t *__restrict mutex,
+                                                        struct timespec const *__restrict reltime)
+/*[[[body:libc_pthread_cond_reltimedwait_np]]]*/
+{
+	errno_t result;
+	uint32_t lock;
+	/* Interlocked:begin */
+	lock = ATOMIC_READ(cond->c_futex);
+	/* Interlocked:op */
+	libc_pthread_mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we're released `mutex',  else there'd be  a race  condition! */
+		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+	/* Interlocked:wait */
+	result = (errno_t)-sys_futex(&cond->c_futex, FUTEX_WAIT,
+	                             lock, reltime, NULL, 0);
+	/* Check for timeout. */
+	if (result != ETIMEDOUT && result != EINVAL)
+		result = EOK;
+	/* Return-path */
+	libc_pthread_mutex_lock(mutex);
+	return result;
+}
+/*[[[end:libc_pthread_cond_reltimedwait_np]]]*/
+
+/*[[[head:libc_pthread_cond_reltimedwait64_np,hash:CRC-32=0x8a6a58d3]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_cond_reltimedwait64_np, libc_pthread_cond_reltimedwait_np);
+#else /* MAGIC:alias */
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2, 3)) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict cond,
+                                                          pthread_mutex_t *__restrict mutex,
+                                                          struct timespec64 const *__restrict reltime)
+/*[[[body:libc_pthread_cond_reltimedwait64_np]]]*/
+{
+	errno_t result;
+	uint32_t lock;
+	/* Interlocked:begin */
+	lock = ATOMIC_READ(cond->c_futex);
+	/* Interlocked:op */
+	libc_pthread_mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we're released `mutex',  else there'd be  a race  condition! */
+		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+	/* Interlocked:wait */
+	result = (errno_t)-sys_lfutex32_waitwhile64(&cond->c_futex, lock, reltime,
+	                                            LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
+	/* Check for timeout. */
+	if (result != ETIMEDOUT && result != EINVAL)
+		result = EOK;
+	/* Return-path */
+	libc_pthread_mutex_lock(mutex);
+	return result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_pthread_cond_reltimedwait64_np]]]*/
 
 
 
@@ -3479,7 +3702,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4f79b57]]]*/
+/*[[[start:exports,hash:CRC-32=0x25ad3af2]]]*/
 DEFINE_PUBLIC_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_ALIAS(pthread_join, libc_pthread_join);
@@ -3540,6 +3763,8 @@ DEFINE_PUBLIC_ALIAS(pthread_mutex_trylock, libc_pthread_mutex_trylock);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_lock, libc_pthread_mutex_lock);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_timedlock, libc_pthread_mutex_timedlock);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_reltimedlock_np, libc_pthread_mutex_reltimedlock_np);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_reltimedlock64_np, libc_pthread_mutex_reltimedlock64_np);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_unlock, libc_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_getprioceiling, libc_pthread_mutex_getprioceiling);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_setprioceiling, libc_pthread_mutex_setprioceiling);
@@ -3563,12 +3788,16 @@ DEFINE_PUBLIC_ALIAS(pthread_rwlock_init, libc_pthread_rwlock_init);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_destroy, libc_pthread_rwlock_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_rdlock, libc_pthread_rwlock_rdlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_tryrdlock, libc_pthread_rwlock_tryrdlock);
-DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock);
-DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_wrlock, libc_pthread_rwlock_wrlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_trywrlock, libc_pthread_rwlock_trywrlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedwrlock, libc_pthread_rwlock_timedwrlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock64);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedrdlock_np, libc_pthread_rwlock_reltimedrdlock_np);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedwrlock_np, libc_pthread_rwlock_reltimedwrlock_np);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock_reltimedrdlock64_np);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock_reltimedwrlock64_np);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_unlock, libc_pthread_rwlock_unlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_init, libc_pthread_rwlockattr_init);
 DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_destroy, libc_pthread_rwlockattr_destroy);
@@ -3584,6 +3813,8 @@ DEFINE_PUBLIC_ALIAS(pthread_cond_broadcast, libc_pthread_cond_broadcast);
 DEFINE_PUBLIC_ALIAS(pthread_cond_wait, libc_pthread_cond_wait);
 DEFINE_PUBLIC_ALIAS(pthread_cond_timedwait, libc_pthread_cond_timedwait);
 DEFINE_PUBLIC_ALIAS(pthread_cond_timedwait64, libc_pthread_cond_timedwait64);
+DEFINE_PUBLIC_ALIAS(pthread_cond_reltimedwait_np, libc_pthread_cond_reltimedwait_np);
+DEFINE_PUBLIC_ALIAS(pthread_cond_reltimedwait64_np, libc_pthread_cond_reltimedwait64_np);
 DEFINE_PUBLIC_ALIAS(pthread_condattr_init, libc_pthread_condattr_init);
 DEFINE_PUBLIC_ALIAS(pthread_condattr_destroy, libc_pthread_condattr_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_condattr_getpshared, libc_pthread_condattr_getpshared);

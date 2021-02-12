@@ -42,8 +42,8 @@ INTERN_FUNCTION(libc_sig_restore)
 	ASM_CFI_REL_OFFSET_RESTORE_UCPUSTATE(0)
 
 	/* TODO: CFI expressions for conditional restoring of FPU registers:
-	 *    >> if (EBX) {
-	 *    >>     SOME_FPU_REGISTER = RESTORE_FROM_FPUSTATE(EBX);
+	 *    >> if (RBX) {
+	 *    >>     SOME_FPU_REGISTER = RESTORE_FROM_FPUSTATE(RBX);
 	 *    >> } else {
 	 *    >>     SOME_FPU_REGISTER = SAME_VALUE;
 	 *    >> }

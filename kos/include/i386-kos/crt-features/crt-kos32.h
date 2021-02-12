@@ -2729,6 +2729,8 @@
 #define __CRT_HAVE_pthread_cond_broadcast
 #define __CRT_HAVE_pthread_cond_destroy
 #define __CRT_HAVE_pthread_cond_init
+#define __CRT_HAVE_pthread_cond_reltimedwait64_np
+#define __CRT_HAVE_pthread_cond_reltimedwait_np
 #define __CRT_HAVE_pthread_cond_signal
 #define __CRT_HAVE_pthread_cond_timedwait
 #define __CRT_HAVE_pthread_cond_timedwait64
@@ -2763,6 +2765,8 @@
 #define __CRT_HAVE_pthread_mutex_getprioceiling
 #define __CRT_HAVE_pthread_mutex_init
 #define __CRT_HAVE_pthread_mutex_lock
+#define __CRT_HAVE_pthread_mutex_reltimedlock64_np
+#define __CRT_HAVE_pthread_mutex_reltimedlock_np
 #define __CRT_HAVE_pthread_mutex_setprioceiling
 #define __CRT_HAVE_pthread_mutex_timedlock
 #define __CRT_HAVE_pthread_mutex_timedlock64
@@ -2787,6 +2791,10 @@
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
 #define __CRT_HAVE_pthread_rwlock_rdlock
+#define __CRT_HAVE_pthread_rwlock_reltimedrdlock64_np
+#define __CRT_HAVE_pthread_rwlock_reltimedrdlock_np
+#define __CRT_HAVE_pthread_rwlock_reltimedwrlock64_np
+#define __CRT_HAVE_pthread_rwlock_reltimedwrlock_np
 #define __CRT_HAVE_pthread_rwlock_timedrdlock
 #define __CRT_HAVE_pthread_rwlock_timedrdlock64
 #define __CRT_HAVE_pthread_rwlock_timedwrlock

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd96f4e6c */
+/* HASH CRC-32:0xba16d9cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -976,6 +976,8 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_trylock, libc_pthread_mut
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_lock, libc_pthread_mutex_lock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_timedlock, libc_pthread_mutex_timedlock, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_reltimedlock_np, libc_pthread_mutex_reltimedlock_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_reltimedlock64_np, libc_pthread_mutex_reltimedlock64_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_unlock, libc_pthread_mutex_unlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_getprioceiling, libc_pthread_mutex_getprioceiling, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_mutex_setprioceiling, libc_pthread_mutex_setprioceiling, TIn(__SIZEOF_ERRNO_T__), 3, TP, TD, TP)
@@ -996,12 +998,16 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_init, libc_pthread_rwloc
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_destroy, libc_pthread_rwlock_destroy, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_rdlock, libc_pthread_rwlock_rdlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_tryrdlock, libc_pthread_rwlock_tryrdlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_wrlock, libc_pthread_rwlock_wrlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_trywrlock, libc_pthread_rwlock_trywrlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_timedwrlock, libc_pthread_rwlock_timedwrlock, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock64, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_reltimedrdlock_np, libc_pthread_rwlock_reltimedrdlock_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_reltimedwrlock_np, libc_pthread_rwlock_reltimedwrlock_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock_reltimedrdlock64_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock_reltimedwrlock64_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlock_unlock, libc_pthread_rwlock_unlock, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlockattr_init, libc_pthread_rwlockattr_init, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_rwlockattr_destroy, libc_pthread_rwlockattr_destroy, TIn(__SIZEOF_ERRNO_T__), 1, TP)
@@ -1016,6 +1022,8 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_broadcast, libc_pthread_co
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_wait, libc_pthread_cond_wait, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_timedwait, libc_pthread_cond_timedwait, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_timedwait64, libc_pthread_cond_timedwait64, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_reltimedwait_np, libc_pthread_cond_reltimedwait_np, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_cond_reltimedwait64_np, libc_pthread_cond_reltimedwait64_np, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_condattr_init, libc_pthread_condattr_init, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_condattr_destroy, libc_pthread_condattr_destroy, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_condattr_getpshared, libc_pthread_condattr_getpshared, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)

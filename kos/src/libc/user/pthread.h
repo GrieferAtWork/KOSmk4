@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x264c6b65 */
+/* HASH CRC-32:0xb9ddee86 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -317,22 +317,34 @@ INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_mutex_t
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict abstime);
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict mutex, struct timespec const *__restrict reltime);
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict reltime);
 /* >> pthread_mutex_unlock(3)
  * Unlock a mutex
  * @return: EOK: Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *mutex);
 /* >> pthread_mutex_getprioceiling(3)
- * Get the priority ceiling of MUTEX
+ * Get the priority ceiling of `mutex'
  * @return: EOK: Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *__restrict mutex, int *__restrict prioceiling);
 /* >> pthread_mutex_setprioceiling(3)
- * Set the priority ceiling of MUTEX to PRIOCEILING,
+ * Set the priority ceiling of `mutex' to PRIOCEILING,
  * return old priority ceiling value in *OLD_CEILING
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restrict mutex, int prioceiling, int *__restrict old_ceiling);
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by MUTEX as consistent
+ * Declare the state protected by `mutex' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
@@ -411,18 +423,6 @@ INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_rdlock)(pth
  * @return: EBUSY: A read-lock cannot be acquired at the moment,
  *                 because a write-lock is already being held. */
 INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock);
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict abstime);
 /* >> pthread_rwlock_wrlock(3)
  * Acquire write lock for RWLOCK
  * @return: EOK: Success */
@@ -433,18 +433,54 @@ INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pth
  * @return: EBUSY: A write-lock cannot be acquired at the moment,
  *                 because read-locks are already being held. */
 INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock);
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict abstime);
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict abstime);
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict reltime);
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict reltime);
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict reltime);
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict reltime);
 /* >> pthread_rwlock_unlock(3)
  * Unlock RWLOCK
  * @return: EOK: Success */
@@ -476,45 +512,59 @@ INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getk
  * @return: EINVAL: Invalid/unsupported `pref' */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setkind_np)(pthread_rwlockattr_t *attr, int pref);
 /* >> pthread_cond_init(3)
- * Initialize condition variable COND using attributes
+ * Initialize condition variable `cond' using attributes
  * ATTR, or use the default values if later is NULL
  * @return: EOK: Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond, pthread_condattr_t const *__restrict cond_attr);
 /* >> pthread_cond_destroy(3)
- * Destroy condition variable COND
+ * Destroy condition variable `cond'
  * @return: EOK: Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *cond);
 /* >> pthread_cond_signal(3)
- * Wake up one thread waiting for condition variable COND
+ * Wake up one thread waiting for condition variable `cond'
  * @return: EOK: Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *cond);
 /* >> pthread_cond_broadcast(3)
- * Wake up all threads waiting for condition variables COND
+ * Wake up all threads waiting for condition variables `cond'
  * @return: EOK: Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *cond);
 /* >> pthread_cond_wait(3)
- * Wait for condition variable COND to be signaled or broadcast.
- * MUTEX is assumed to be locked before.
+ * Wait for condition variable `cond' to be signaled or broadcast.
+ * `mutex' is assumed to be locked before.
  * @return: EOK: Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex);
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF WUNUSED NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex, struct timespec const *__restrict abstime);
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 INTDEF WUNUSED NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict abstime);
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex, struct timespec const *__restrict reltime);
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+INTDEF WUNUSED NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict reltime);
 /* >> pthread_condattr_init(3)
  * Initialize condition variable attribute ATTR
  * @return: EOK: Success */

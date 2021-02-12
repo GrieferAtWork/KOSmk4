@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d7428e */
+/* HASH CRC-32:0x4025b061 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,6 +393,10 @@
 #define __stub_pthread_rwlock_destroy
 #define __stub_pthread_rwlock_init
 #define __stub_pthread_rwlock_rdlock
+#define __stub_pthread_rwlock_reltimedrdlock64_np
+#define __stub_pthread_rwlock_reltimedrdlock_np
+#define __stub_pthread_rwlock_reltimedwrlock64_np
+#define __stub_pthread_rwlock_reltimedwrlock_np
 #define __stub_pthread_rwlock_timedrdlock
 #define __stub_pthread_rwlock_timedrdlock64
 #define __stub_pthread_rwlock_timedwrlock

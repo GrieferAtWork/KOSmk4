@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c76de7d */
+/* HASH CRC-32:0xcc85a1bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1343,16 +1343,66 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_A
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
+#ifdef __USE_SOLARIS
+#if defined(__CRT_HAVE_pthread_mutex_reltimedlock64_np) && defined(__USE_TIME_BITS64)
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock_np,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock64_np,(__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_mutex_reltimedlock_np) && !defined(__USE_TIME_BITS64)
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock_np,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),(__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_mutex_reltimedlock64_np) || defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
+#include <libc/local/pthread/pthread_mutex_reltimedlock_np.h>
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock_np))(__mutex, __reltime); })
+#endif /* ... */
+#ifdef __USE_TIME64
+#ifdef __CRT_HAVE_pthread_mutex_reltimedlock64_np
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock64_np,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_mutex_reltimedlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock64_np,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
+#include <libc/local/pthread/pthread_mutex_reltimedlock64_np.h>
+/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
+ * Wait until lock becomes available, or specified amount of time has passed
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock64_np))(__mutex, __reltime); })
+#endif /* ... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_SOLARIS */
 /* >> pthread_mutex_unlock(3)
  * Unlock a mutex
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__mutex),(__mutex))
 /* >> pthread_mutex_getprioceiling(3)
- * Get the priority ceiling of MUTEX
+ * Get the priority ceiling of `mutex'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutex_getprioceiling,(pthread_mutex_t const *__restrict __mutex, int *__restrict __prioceiling),(__mutex,__prioceiling))
 /* >> pthread_mutex_setprioceiling(3)
- * Set the priority ceiling of MUTEX to PRIOCEILING,
+ * Set the priority ceiling of `mutex' to PRIOCEILING,
  * return old priority ceiling value in *OLD_CEILING
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
@@ -1360,14 +1410,14 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_setprio
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_pthread_mutex_consistent
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by MUTEX as consistent
+ * Declare the state protected by `mutex' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent,(pthread_mutex_t *__mutex),(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_consistent_np)
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by MUTEX as consistent
+ * Declare the state protected by `mutex' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
@@ -1376,14 +1426,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_pthread_mutex_consistent
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by MUTEX as consistent
+ * Declare the state protected by `mutex' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_np,(pthread_mutex_t *__mutex),pthread_mutex_consistent,(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_consistent_np)
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by MUTEX as consistent
+ * Declare the state protected by `mutex' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
@@ -1524,56 +1574,6 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock
  * @return: EBUSY: A read-lock cannot be acquired at the moment,
  *                 because a write-lock is already being held. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__rwlock),(__rwlock))
-#ifdef __USE_XOPEN2K
-#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) && defined(__USE_TIME_BITS64)
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__rwlock,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && !defined(__USE_TIME_BITS64)
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
-#include <libc/local/pthread/pthread_rwlock_timedrdlock.h>
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__rwlock, __abstime); })
-#endif /* ... */
-#ifdef __USE_TIME64
-#ifdef __CRT_HAVE_pthread_rwlock_timedrdlock64
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
-#include <libc/local/pthread/pthread_rwlock_timedrdlock64.h>
-/* >> pthread_rwlock_timedrdlock(3)
- * Try to acquire read lock for RWLOCK or return after specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__rwlock, __abstime); })
-#endif /* ... */
-#endif /* __USE_TIME64 */
-#endif /* __USE_XOPEN2K */
 /* >> pthread_rwlock_wrlock(3)
  * Acquire write lock for RWLOCK
  * @return: EOK: Success */
@@ -1585,16 +1585,39 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock
  *                 because read-locks are already being held. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthread_rwlock_t *__rwlock),(__rwlock))
 #ifdef __USE_XOPEN2K
+#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) && defined(__USE_TIME_BITS64)
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && !defined(__USE_TIME_BITS64)
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#include <libc/local/pthread/pthread_rwlock_timedrdlock.h>
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__rwlock, __abstime); })
+#endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) && defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && !defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1602,23 +1625,46 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__rwlock, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
+#ifdef __CRT_HAVE_pthread_rwlock_timedrdlock64
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#include <libc/local/pthread/pthread_rwlock_timedrdlock64.h>
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__rwlock, __abstime); })
+#endif /* ... */
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock64
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1626,7 +1672,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock64.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for RWLOCK or return after specified time
+ * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1634,6 +1680,102 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATT
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
+#ifdef __USE_SOLARIS
+#if defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock64_np) && defined(__USE_TIME_BITS64)
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedrdlock64_np,(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np) && !defined(__USE_TIME_BITS64)
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock64_np) || defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np)
+#include <libc/local/pthread/pthread_rwlock_reltimedrdlock_np.h>
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock_np))(__rwlock, __reltime); })
+#endif /* ... */
+#if defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np) && defined(__USE_TIME_BITS64)
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedwrlock64_np,(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && !defined(__USE_TIME_BITS64)
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np) || defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np)
+#include <libc/local/pthread/pthread_rwlock_reltimedwrlock_np.h>
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock_np))(__rwlock, __reltime); })
+#endif /* ... */
+#ifdef __USE_TIME64
+#ifdef __CRT_HAVE_pthread_rwlock_reltimedrdlock64_np
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),pthread_rwlock_reltimedrdlock_np,(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np)
+#include <libc/local/pthread/pthread_rwlock_reltimedrdlock64_np.h>
+/* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
+ * Try to acquire read lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock64_np))(__rwlock, __reltime); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_rwlock_reltimedwrlock64_np
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),pthread_rwlock_reltimedwrlock_np,(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np)
+#include <libc/local/pthread/pthread_rwlock_reltimedwrlock64_np.h>
+/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
+ * Try to acquire write lock for `rwlock' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock64_np))(__rwlock, __reltime); })
+#endif /* ... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_SOLARIS */
 /* >> pthread_rwlock_unlock(3)
  * Unlock RWLOCK
  * @return: EOK: Success */
@@ -1678,50 +1820,50 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_se
 /************************************************************************/
 
 /* >> pthread_cond_init(3)
- * Initialize condition variable COND using attributes
+ * Initialize condition variable `cond' using attributes
  * ATTR, or use the default values if later is NULL
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_cond_init,(pthread_cond_t *__restrict __cond, pthread_condattr_t const *__restrict __cond_attr),(__cond,__cond_attr))
 #ifdef __CRT_HAVE_pthread_cond_destroy
 /* >> pthread_cond_destroy(3)
- * Destroy condition variable COND
+ * Destroy condition variable `cond'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__cond),(__cond))
 #elif defined(__CRT_HAVE_cnd_destroy)
 /* >> pthread_cond_destroy(3)
- * Destroy condition variable COND
+ * Destroy condition variable `cond'
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__cond),cnd_destroy,(__cond))
 #endif /* ... */
 /* >> pthread_cond_signal(3)
- * Wake up one thread waiting for condition variable COND
+ * Wake up one thread waiting for condition variable `cond'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_cond_signal,(pthread_cond_t *__cond),(__cond))
 /* >> pthread_cond_broadcast(3)
- * Wake up all threads waiting for condition variables COND
+ * Wake up all threads waiting for condition variables `cond'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_cond_broadcast,(pthread_cond_t *__cond),(__cond))
 /* >> pthread_cond_wait(3)
- * Wait for condition variable COND to be signaled or broadcast.
- * MUTEX is assumed to be locked before.
+ * Wait for condition variable `cond' to be signaled or broadcast.
+ * `mutex' is assumed to be locked before.
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_cond_wait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex),(__cond,__mutex))
 #if defined(__CRT_HAVE_pthread_cond_timedwait64) && defined(__USE_TIME_BITS64)
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && !defined(__USE_TIME_BITS64)
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1729,10 +1871,10 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthr
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/pthread/pthread_cond_timedwait.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1741,20 +1883,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_ARTI
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_cond_timedwait64
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -1762,16 +1904,72 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pth
 #elif defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/pthread/pthread_cond_timedwait64.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable COND to be signaled or broadcast until
- * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
- * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970).
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `abstime'. `mutex' is assumed to be locked before.
+ * `abstime' is an absolute time specification; zero is the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__cond, __mutex, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
+#ifdef __USE_SOLARIS
+#if defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) && defined(__USE_TIME_BITS64)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__cond,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && !defined(__USE_TIME_BITS64)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),(__cond,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) || defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
+#include <libc/local/pthread/pthread_cond_reltimedwait_np.h>
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__cond, __mutex, __reltime); })
+#endif /* ... */
+#ifdef __USE_TIME64
+#ifdef __CRT_HAVE_pthread_cond_reltimedwait64_np
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__cond,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
+#include <libc/local/pthread/pthread_cond_reltimedwait64_np.h>
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for condition variable `cond' to be signaled or broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np))(__cond, __mutex, __reltime); })
+#endif /* ... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_SOLARIS */
 
 
 /************************************************************************/

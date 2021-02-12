@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2d6b7d0 */
+/* HASH CRC-32:0xf474c9c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1268,6 +1268,8 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_trylock, libd_pthread_mutex_trylock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_lock, libd_pthread_mutex_lock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_timedlock, libd_pthread_mutex_timedlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_timedlock64, libd_pthread_mutex_timedlock64);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock_np, libd_pthread_mutex_reltimedlock_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock64_np, libd_pthread_mutex_reltimedlock64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_unlock, libd_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_getprioceiling, libd_pthread_mutex_getprioceiling);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_setprioceiling, libd_pthread_mutex_setprioceiling);
@@ -1291,12 +1293,16 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_init, libd_pthread_rwlock_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_destroy, libd_pthread_rwlock_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_rdlock, libd_pthread_rwlock_rdlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_tryrdlock, libd_pthread_rwlock_tryrdlock);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedrdlock, libd_pthread_rwlock_timedrdlock);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedrdlock64, libd_pthread_rwlock_timedrdlock64);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_wrlock, libd_pthread_rwlock_wrlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_trywrlock, libd_pthread_rwlock_trywrlock);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedrdlock, libd_pthread_rwlock_timedrdlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedwrlock, libd_pthread_rwlock_timedwrlock);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedrdlock64, libd_pthread_rwlock_timedrdlock64);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedwrlock64, libd_pthread_rwlock_timedwrlock64);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedrdlock_np, libd_pthread_rwlock_reltimedrdlock_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock_np, libd_pthread_rwlock_reltimedwrlock_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedrdlock64_np, libd_pthread_rwlock_reltimedrdlock64_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock64_np, libd_pthread_rwlock_reltimedwrlock64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_unlock, libd_pthread_rwlock_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_init, libd_pthread_rwlockattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_destroy, libd_pthread_rwlockattr_destroy);
@@ -1312,6 +1318,8 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_broadcast, libd_pthread_cond_broadcast);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_wait, libd_pthread_cond_wait);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait, libd_pthread_cond_timedwait);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait64, libd_pthread_cond_timedwait64);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait_np, libd_pthread_cond_reltimedwait_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait64_np, libd_pthread_cond_reltimedwait64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_init, libd_pthread_condattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_destroy, libd_pthread_condattr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_getpshared, libd_pthread_condattr_getpshared);
