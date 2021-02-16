@@ -1339,6 +1339,10 @@ err_buffer_result_errno:
 		libc_seterrno(-result);
 		return NULL;
 	}
+	if unlikely((size_t)result > buflen) {
+		result = -ERANGE;
+		goto err_buffer_result_errno;
+	}
 done:
 	return buffer;
 }

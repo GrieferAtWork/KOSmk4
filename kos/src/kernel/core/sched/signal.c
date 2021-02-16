@@ -1668,12 +1668,12 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 
 		/* This is where it gets complicated, because we must:
 		 *    #1: Disable preemption
-		 *    #2: Acquire the SMP-lock of `con',  and make sure that  `con'
-		 *        wasn't  been delivered,  yet. This  way we  know that the
-		 *        signal pointed to by `con->tc_sig' hasn't been destroyed,
-		 *        yet.
-		 *    #3: While holding the SMP-lock of `con', insert our new connection
-		 *        `route' into the signal's connection queue.
+		 *    #2: Acquire the SMP-lock of `con', and make sure that  `con'
+		 *        hasn't been delivered,  yet. This way  we know that  the
+		 *        signal pointed to by `con->tc_sig' hasn't been destroyed
+		 *        yet, either.
+		 *    #3: While holding the  SMP-lock of `con',  insert our  new
+		 *        connection `route' into the signal's connection queue.
 		 *    #4: Release our SMP-lock on `con'
 		 *    #5: Re-enable preemption (if it was enabled before)
 		 *
