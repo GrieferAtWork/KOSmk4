@@ -18,6 +18,8 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+require_utility libffi "$PKG_CONFIG_PATH/libffi.pc"
+
 SRCPATH="$KOS_ROOT/binutils/src/deemon-git/deemon"
 OPTPATH="$BINUTILS_SYSROOT/opt/deemon"
 
@@ -39,7 +41,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/deemon" ]; then
 			--config-dll-extension=".so" \
 			--with-deemon-home="/usr/$TARGET_LIBPATH/deemon" \
 			--with-deemon-path="/usr/$TARGET_LIBPATH/deemon" \
-			--config-pthread=""
+			--config-pthread="" \
+			--with-system-libffi
 	fi
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT

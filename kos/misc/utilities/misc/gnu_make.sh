@@ -827,7 +827,8 @@ if test -z "$INSTALL_NONE"; then
 							pc_line="Libs:$new_pc_line"
 							;;
 
-						*) ;;
+						*)
+							;;
 						esac
 						echo "$pc_line" >> "$dst_filename"
 					done < "$src_filename"
@@ -839,6 +840,7 @@ if test -z "$INSTALL_NONE"; then
 			*)
 				# Fallback: Install the file normally
 				install_file "$line" "$src_filename"
+				;;
 			esac
 		fi
 	done < <(find . -type f 2>&1)
