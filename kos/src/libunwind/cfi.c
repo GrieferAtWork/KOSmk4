@@ -171,10 +171,10 @@ again:
 	pdyn_libdebuginfo = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
 	if (!pdyn_libdebuginfo)
 		goto err;
-	*(void **)&pdyn_debuginfo_run_entry_value_emulator  = dlsym(pdyn_libdebuginfo, "debuginfo_run_entry_value_emulator");
+	*(void **)&pdyn_debuginfo_run_entry_value_emulator = dlsym(pdyn_libdebuginfo, "debuginfo_run_entry_value_emulator");
 	if unlikely(!pdyn_debuginfo_run_entry_value_emulator)
 		goto err_close;
-	*(void **)&pdyn_debuginfo_cu_parser_getexpr  = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_getexpr");
+	*(void **)&pdyn_debuginfo_cu_parser_getexpr = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_getexpr");
 	if unlikely(!pdyn_debuginfo_cu_parser_getexpr)
 		goto err_close;
 	*(void **)&pdyn_debuginfo_cu_parser_skipform = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_skipform");

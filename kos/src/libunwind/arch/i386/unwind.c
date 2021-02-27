@@ -773,7 +773,7 @@ STATIC_ASSERT(offsetof(struct gpregs, gp_ebx) == OFFSET_GPREGS_EBX);
 STATIC_ASSERT(offsetof(struct gpregs, gp_edx) == OFFSET_GPREGS_EDX);
 STATIC_ASSERT(offsetof(struct gpregs, gp_ecx) == OFFSET_GPREGS_ECX);
 STATIC_ASSERT(offsetof(struct gpregs, gp_eax) == OFFSET_GPREGS_EAX);
-STATIC_ASSERT(sizeof(struct gpregs)          == SIZEOF_GPREGS);
+STATIC_ASSERT(sizeof(struct gpregs)           == SIZEOF_GPREGS);
 
 STATIC_ASSERT(offsetof(struct sgregs, sg_gs) == OFFSET_SGREGS_GS);
 STATIC_ASSERT(offsetof(struct sgregs, sg_fs) == OFFSET_SGREGS_FS);

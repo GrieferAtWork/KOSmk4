@@ -286,7 +286,7 @@ INTDEF char const secname_debug_addr[];
 
 
 /* Bind the .debug_ranges section. */
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
 	if (self->ce_s_debug_ranges)
 		return;
@@ -373,6 +373,7 @@ NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
                                          bool assume_correct_cu) {
 	size_t cu_depth;
 	unsigned int error;
+
 	/* Scan ahead to the first DW_TAG_compile_unit component. */
 	for (;;) {
 		if (self->ce_parser.dup_comp.dic_tag == DW_TAG_compile_unit) {
@@ -494,6 +495,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 			return UNWIND_OPTIMIZED_AWAY;
 		return UNWIND_SUCCESS;
 	}
+
 	/* Lookup an override for the PC register. */
 	pc_register = find_register(self, CFI_UNWIND_REGISTER_PC);
 	if unlikely(!pc_register)
@@ -501,6 +503,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	self->ce_module = module_ataddr_nx((void const *)pc_register->ur_word, self->ce_modtyp);
 	if unlikely(!self->ce_module)
 		goto noinfo_fail;
+
 	/* Fill in data that becomes valid once a module's been loaded. */
 	self->ce_modrelpc = pc_register->ur_word - module_getloadaddr(self->ce_module, self->ce_modtyp);
 #define lock_section(name)                               \
@@ -520,6 +523,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	self->ce_s_debug_loc    = NULL; /* Loaded lazily. */
 	self->ce_s_debug_ranges = NULL; /* Loaded lazily. */
 	memset(&self->ce_sections, 0, sizeof(self->ce_sections));
+
 	/* Bind sections. */
 	if (self->ce_s_debug_aranges) {
 		LOAD_SECTION(self->ce_s_debug_aranges,
@@ -535,6 +539,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	             self->ce_modtyp,
 	             self->ce_sections.ds_debug_info_start,
 	             self->ce_sections.ds_debug_info_end);
+
 	/* Find the proper compilation-unit for `self->ce_modrelpc' */
 	{
 		uintptr_t debuginfo_cu_offset;
@@ -983,6 +988,9 @@ cfi_entry_init_setreg(void *arg,
 	self = (struct cfientry *)arg;
 	lo   = 0;
 	hi   = self->ce_unwind_regc;
+	if (hi > self->_ce_unwind_rega) /* In case we're already above the limit... */
+		hi = self->_ce_unwind_rega;
+
 	/* First up: Check if we've already seen this register. */
 	for (;;) {
 		index = (lo + hi) / 2;
@@ -999,6 +1007,7 @@ cfi_entry_init_setreg(void *arg,
 			return UNWIND_SUCCESS;
 		}
 	}
+
 	/* Need another register override entry. */
 	if (self->ce_unwind_regc < self->_ce_unwind_rega) {
 		/* Must insert at `index' */
@@ -1010,6 +1019,7 @@ cfi_entry_init_setreg(void *arg,
 		memcpy(self->ce_unwind_regv[index].ur_data,
 		       src, CFI_REGISTER_SIZE(dw_regno));
 	}
+
 	/* Track the # of unwind registers. */
 	++self->ce_unwind_regc;
 	return UNWIND_SUCCESS;
