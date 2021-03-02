@@ -2073,7 +2073,7 @@
 	 : (void)0)
 #define __HYBRID_TAILQ_NEXT(elem, X, _)         X(_, elem).tqe_next
 #define __HYBRID_TAILQ_PREV(elem, HEAD_T, X, _) (*(((HEAD_T *)X(_, elem).tqe_prev)->tqh_last))
-#define __HYBRID_TAILQ_PREV4(elem, T, X, _)     (((T **)X(_, elem).tqe_prev)[1])
+#define __HYBRID_TAILQ_PREV4(elem, T, X, _)     (*((T ***)X(_, elem).tqe_prev)[1])
 
 
 

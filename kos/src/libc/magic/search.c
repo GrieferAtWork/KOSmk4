@@ -60,7 +60,7 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-/* Seperately, the implementation is also derived from Glibc */
+/* Separately, the implementation is also derived from Glibc */
 /* Copyright (C) 1993-2017 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1993.

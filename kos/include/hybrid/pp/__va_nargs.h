@@ -125,10 +125,26 @@
 
 #endif /* ... */
 
+/* General-purpose wrapper for macro overloading:
+ * >> #define MY_OVERLOADED_MACRO_1(a)           1 arg: a
+ * >> #define MY_OVERLOADED_MACRO_2(a, b)        2 arg: a, b
+ * >> #define MY_OVERLOADED_MACRO_3(a, b, c)     3 arg: a, b, c
+ * >> #define MY_OVERLOADED_MACRO_4(a, b, c, d)  4 arg: a, b, c, d
+ * >> #define MY_OVERLOADED_MACRO(...) __HYBRID_PP_VA_OVERLOAD(MY_OVERLOADED_MACRO_, (__VA_ARGS__))(__VA_ARGS__) */
 #if !defined(__HYBRID_PP_VA_OVERLOAD) && defined(__HYBRID_PP_VA_NARGS)
 #define __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func, n) func##n
 #define __HYBRID_PP_PRIVATE_VA_OVERLOAD(func, n)  __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func, n)
+#if defined(_MSC_VER) && !defined(__INTELLISENSE__)
+/* Special handling required to prevent MSVC from placing all of the varargs
+ * into the first argument of the varargs function. No idea why this is needed,
+ * or why this works. - After noticing the issue, I've stumbled across this fix
+ * through trial and error, but I'm not complaining, since at least this works! */
+#define __HYBRID_PP_VA_OVERLOAD_FE          /* nothing */
+#define __HYBRID_PP_VA_OVERLOAD(func, args) \
+	__HYBRID_PP_PRIVATE_VA_OVERLOAD(func, __HYBRID_PP_VA_NARGS args) __HYBRID_PP_VA_OVERLOAD_FE
+#else /* _MSC_VER && !__INTELLISENSE__ */
 #define __HYBRID_PP_VA_OVERLOAD(func, args)       __HYBRID_PP_PRIVATE_VA_OVERLOAD(func, __HYBRID_PP_VA_NARGS args)
+#endif /* !_MSC_VER || __INTELLISENSE__ */
 #endif /* !__HYBRID_PP_VA_OVERLOAD && __HYBRID_PP_VA_NARGS */
 
 #endif /* !__GUARD_HYBRID_PP___VA_NARGS_H */
