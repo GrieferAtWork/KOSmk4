@@ -66,7 +66,8 @@ struct fregnode
  * @param: struct fregnode_ops *ops:    Regular file operators.
  * @param: struct fsuper       *super:  Filesystem superblock. */
 #define _fregnode_init(self, ops, super)                        \
-	(_mfile_init_common(self),                                  \
+	(_fnode_assert_ops_(fregnode_ops_as_fnode_ops(ops))         \
+	 _mfile_init_common(self),                                  \
 	 (self)->mf_parts = __NULLPTR,                              \
 	 (self)->mf_flags = (super)->mf_flags &                     \
 	                    (MFILE_F_DELETED | MFILE_F_PERSISTENT | \
@@ -77,7 +78,8 @@ struct fregnode
 	 (self)->mf_part_amask = (super)->mf_part_amask,            \
 	 (self)->fn_super      = incref(super))
 #define _fregnode_cinit(self, ops, super)                       \
-	(_mfile_cinit_common(self),                                 \
+	(_fnode_assert_ops_(fregnode_ops_as_fnode_ops(ops))         \
+	 _mfile_cinit_common(self),                                 \
 	 __hybrid_assert((self)->mf_parts == __NULLPTR),            \
 	 (self)->mf_flags = (super)->mf_flags &                     \
 	                    (MFILE_F_DELETED | MFILE_F_PERSISTENT | \

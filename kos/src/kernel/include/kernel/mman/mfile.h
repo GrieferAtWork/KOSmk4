@@ -293,7 +293,7 @@ struct mfile_ops {
 #define MFILE_OPS_FIELDS(prefix, T)                                                                         \
 	/* [0..1] Finalize + free the given mem-file. */                                                        \
 	NOBLOCK NONNULL((1)) void                                                                               \
-	/*NOTHROW*/ (FCALL *prefix##destroy)(T *__restrict self);                                               \
+	/*NOTHROW*/ (KCALL *prefix##destroy)(T *__restrict self);                                               \
 	                                                                                                        \
 	/* [0..1] Construct a new given mem-part. When not implemented, use the default                         \
 	 *        mechanism for the creation of new mem-parts.                                                  \
@@ -327,7 +327,7 @@ struct mfile_ops {
 	 *  - mp_mem / mp_mem_sc / ...       (Containing the initial backing storage location; s.a. `mp_state') \
 	 *  - mp_meta                        (usually `NULL') */                                                \
 	ATTR_RETNONNULL NONNULL((1)) REF struct mpart *                                                         \
-	(FCALL *prefix##newpart)(T *__restrict self,                                                            \
+	(KCALL *prefix##newpart)(T *__restrict self,                                                            \
 	                         PAGEDIR_PAGEALIGNED pos_t minaddr,                                             \
 	                         PAGEDIR_PAGEALIGNED size_t num_bytes);                                         \
 	                                                                                                        \
@@ -365,7 +365,7 @@ struct mfile_ops {
 	 *                   Contains at least one of `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED'                   \
 	 *                   that wasn't already contained in `oldflags' */                                     \
 	NOBLOCK NONNULL((1)) void                                                                               \
-	/*NOTHROW*/ (FCALL *prefix##changed)(T *__restrict self,                                                \
+	/*NOTHROW*/ (KCALL *prefix##changed)(T *__restrict self,                                                \
 	                                     uintptr_t oldflags, uintptr_t newflags);                           \
 	                                                                                                        \
 	/* [0..1] Stream operators. */                                                                          \
@@ -381,7 +381,7 @@ struct mfile_ops {
 #else /* CONFIG_USE_NEW_FS */
 	/* [0..1] Finalize + free the given mem-file. */
 	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *mo_destroy)(struct mfile *__restrict self);
+	/*NOTHROW*/ (KCALL *mo_destroy)(struct mfile *__restrict self);
 
 	/* [0..1] Construct a new given mem-part. When not implemented, use the default
 	 *        mechanism for the creation of new mem-parts.
@@ -412,7 +412,7 @@ struct mfile_ops {
 	 *  - mp_mem / mp_mem_sc / ...       (Containing the initial backing storage location; s.a. `mp_state')
 	 *  - mp_meta                        (usually `NULL') */
 	ATTR_RETNONNULL NONNULL((1)) REF struct mpart *
-	(FCALL *mo_newpart)(struct mfile *__restrict self,
+	(KCALL *mo_newpart)(struct mfile *__restrict self,
 	                    PAGEDIR_PAGEALIGNED pos_t minaddr,
 	                    PAGEDIR_PAGEALIGNED size_t num_bytes);
 
@@ -447,7 +447,7 @@ struct mfile_ops {
 	 * NOTE: Not invoked if a new change part is created as the result
 	 *       of  an   already-known-as-changed   part   being   split. */
 	NOBLOCK NONNULL((1, 2)) void
-	/*NOTHROW*/ (FCALL *mo_changed)(struct mfile *__restrict self,
+	/*NOTHROW*/ (KCALL *mo_changed)(struct mfile *__restrict self,
 	                                struct mpart *__restrict part);
 
 #ifdef CONFIG_USE_NEW_VM /* Hacky forward-compatibility... */
@@ -541,11 +541,11 @@ SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
 /*efine MFILE_F_                0x00008000  * ... */
 /*      MFILE_F_                0x00010000  * ... Reserved: MS_POSIXACL */
 /*      MFILE_F_                0x00020000  * ... Reserved: MS_UNBINDABLE */
-#define MFILE_F_PERSISTENT      0x00040000 /* [lock(CLEAR_ONCE)] Parts of this file should not be unloaded to free up memory.
-                                            * When   this  flag  is   set,  then  newly   created  parts  (if  non-anonymous)
-                                            * will    be    created     with    the     `MPART_F_PERSISTENT'    flag     set.
-                                            * This  flag  is  used  to   implement  ramfs-based  filesystems,  where  it   is
-                                            * used  to  prevent  files  on  such  filesystem  from  being  deleted  when  the
+#define MFILE_F_PERSISTENT      0x00040000 /* [lock(CLEAR_ONCE)] Parts  of this file  should not be  unloaded to free up
+                                            * memory. When this flag is set, then newly created parts (if non-anonymous)
+                                            * will be created with the `MPART_F_PERSISTENT' flag set.
+                                            * This  flag is used to implement ramfs-based filesystems, where it is
+                                            * used to prevent files on such filesystem from being deleted when the
                                             * kernel tries to reclaim memory.
                                             * This flag is cleared when such a file is (intentionally) unlink(2)'d,
                                             * or when the backing superblock is unmounted. */

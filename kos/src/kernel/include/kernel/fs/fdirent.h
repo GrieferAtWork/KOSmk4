@@ -36,30 +36,29 @@ struct fdirnode;
 struct fdirent_ops {
 	/* [1..1] Destroy callback. */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/
-	(FCALL *fdo_destroy)(struct fdirent *__restrict self);
+	(KCALL *fdo_destroy)(struct fdirent *__restrict self);
 
 	/* [1..1] Open the node  associated with  this directory  entry.
 	 * If the entry has already been deleted, return `NULL' instead.
 	 * @param: dir: The directory that contains `self' */
 	WUNUSED NONNULL((1, 2)) REF struct fnode *
-	(FCALL *fdo_opennode)(struct fdirent *__restrict self,
+	(KCALL *fdo_opennode)(struct fdirent *__restrict self,
 	                      struct fdirnode *__restrict dir);
 };
 
 struct fdirent {
-	/* Additional  fs-specific  data  usually  goes  here  (iow:  at  negative  offsets,
-	 * such   that  the  filesystem  layer  will  use  `container_of()'  to  access  the
-	 * container structure). Alternatively, data could also go at `fd_name[fd_namelen]',
-	 * however  this  is  less  likely,  since  doing  this  would  require  making  use
-	 * of non-constant struct offsets. */
-	WEAK refcnt_t           fd_refcnt;   /* Reference counter. */
-	struct fdirent_ops const *fd_ops;    /* [1..1][const] Operators. */
-	ino_t                   fd_ino;      /* [const] INode number of this directory entry.
-	                                      * Note that this value may not be valid if the entry was deleted! */
-	u16                     fd_namelen;  /* [const][!0] Length of the directory entry name (in characters). */
-	unsigned char           fd_type;     /* [const] Directory entry type (one of `DT_*') */
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char,
-	                        fd_name);    /* [const][fd_namelen] Directory entry name. (NUL-terminated) */
+	/* Additional fs-specific  data usually  goes here  (iow: at  negative
+	 * offsets, such that the  filesystem layer will use  `container_of()'
+	 * to access the container structure). Alternatively, data could  also
+	 * go at  `fd_name[fd_namelen]', however  this is  less likely,  since
+	 * doing this would require making use of non-constant struct offsets. */
+	WEAK refcnt_t                           fd_refcnt;   /* Reference counter. */
+	struct fdirent_ops const               *fd_ops;      /* [1..1][const] Operators. */
+	ino_t                                   fd_ino;      /* [const] INode number of this directory entry.
+	                                                      * WARNING: This value becomes invalid if the entry/file is deleted! */
+	u16                                     fd_namelen;  /* [const][!0] Length of the directory entry name (in characters). */
+	unsigned char                           fd_type;     /* [const] Directory entry type (one of `DT_*') */
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);    /* [const][fd_namelen] Directory entry name. (NUL-terminated) */
 };
 
 #define fdirent_destroy(self) ((*(self)->fd_ops->fdo_destroy)(self))
@@ -70,9 +69,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 /* Return the hash of a given directory entry name.
  * This function is used by various APIs related to file lookup.
  * @throw: E_SEGFAULT: Failed to access the given `name'. */
-FUNDEF WUNUSED NONNULL((1)) uintptr_t KCALL
+FUNDEF WUNUSED NONNULL((1)) uintptr_t FCALL
 fdirent_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
 		THROWS(E_SEGFAULT);
+#define fdirent_hashof(ent) fdirent_hash((ent)->fd_name, (ent)->fd_namelen)
 
 
 DECL_END

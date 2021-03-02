@@ -102,6 +102,8 @@ struct chrdev;
  *      - always: !MFILE_F_FIXEDFILESIZE;
  *   - fdirnode:
  *      - always: fn_nlink == 1;
+ *      - always: mf_filesize == (pos_t)-1;
+ *      - always: MFILE_F_FIXEDFILESIZE;
  *      - always: MFILE_F_NOUSRMMAP;
  *      - always: MFILE_F_NOUSRIO;
  *   - flnknode:
@@ -136,6 +138,17 @@ struct chrdev;
  *      - usually: implements(mso_pwrite) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE); }
  *   - fsuper:
  *      - always: fn_super == self;
+ *
+ *
+ * Data model:
+ *
+ *               fnode  <------(REF_IF([*].mf_flags & MFILE_FN_GLOBAL_REF))------ GLOBAL:fallnodes_list
+ *                | ^
+ *                | |
+ *             REF| |REF_IF([*].mf_flags & MFILE_F_PERSISTENT)
+ *                | |
+ *                v |
+ *               fsuper <------(REF_IF([*].mf_flags & MFILE_FN_GLOBAL_REF))------ GLOBAL:fallsuper_list
  *
  */
 
@@ -200,6 +213,12 @@ struct fnode
 #define fnode_getops(self) \
 	((struct fnode_ops const *)__COMPILER_REQTYPE(struct fnode const *, self)->mf_ops)
 
+#ifdef NDEBUG
+#define _fnode_assert_ops_(ops) /* nothing */
+#else /* NDEBUG */
+#define _fnode_assert_ops_(ops) (ops)->no_changed == &fnode_v_changed,
+#endif /* !NDEBUG */
+
 /* Initialize common+basic fields. The caller must still initialize:
  *  - mf_parts, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime
  *  - fn_nlink, fn_ino, fn_mode, fn_allnodes, fn_supent
@@ -207,24 +226,26 @@ struct fnode
  * @param: struct fnode_ops *ops:   File-node operators.
  * @param: struct fsuper    *super: Filesystem superblock. */
 #define _fnode_init(self, ops, super)                     \
-	(_mfile_init_common(self),                            \
+	(_fnode_assert_ops_(ops)                              \
+	 _mfile_init_common(self),                            \
 	 (self)->mf_ops        = fnode_ops_as_mfile_ops(ops), \
 	 (self)->mf_blockshift = (super)->mf_blockshift,      \
 	 (self)->mf_part_amask = (super)->mf_part_amask,      \
 	 (self)->fn_super      = incref(super))
 #define _fnode_cinit(self, ops, super)                    \
-	(_mfile_cinit_common(self),                           \
+	(_fnode_assert_ops_(ops)                              \
+	 _mfile_cinit_common(self),                           \
 	 (self)->mf_ops        = fnode_ops_as_mfile_ops(ops), \
 	 (self)->mf_blockshift = (super)->mf_blockshift,      \
 	 (self)->mf_part_amask = (super)->mf_part_amask,      \
 	 (self)->fn_super      = incref(super))
 /* Finalize a partially initialized `struct fnode' (as initialized by `_fnode_init()') */
-#define _fnode_fini(self) decref_nokill((self)->fn_super)
+#define _fnode_fini(self)     decref_nokill((self)->fn_super)
 
 /* Mandatory callback for all types derived from `struct fnode',
  * for  use with `mf_ops->mo_changed'.  MUST NOT BE OVERWRITTEN! */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
+NOTHROW(KCALL fnode_v_changed)(struct fnode *__restrict self,
                                uintptr_t old_flags, uintptr_t new_flags);
 
 /* File-node  destroy callback. Must be set in `mo_destroy',
@@ -232,7 +253,7 @@ NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
  * function must be called as the last thing done within the
  * sub-class destroy-operator. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self);
+NOTHROW(KCALL fnode_v_destroy)(struct fnode *__restrict self);
 
 
 
@@ -248,7 +269,7 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self);
 #define fnode_ischrdev(self) S_ISBLK((self)->fn_mode)
 #define fnode_asreg(self)    ((struct fregnode *)(self))
 #define fnode_asdir(self)    ((struct fdirnode *)(self))
-#define fnode_assuper(self)  ((struct fsuper *)(self))
+#define fnode_assuper(self)  __COMPILER_CONTAINER_OF((struct fdirnode *)(self), struct fsuper, fs_root)
 #define fnode_aslnk(self)    ((struct flnknode *)(self))
 #define fnode_asfifo(self)   ((struct ffifonode *)(self))
 #define fnode_assock(self)   ((struct fsocknode *)(self))
@@ -270,12 +291,19 @@ NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self);
 #define mfile_asf(self)       ((struct fnode *)(self))
 #define mfile_asreg(self)     ((struct fregnode *)(self))
 #define mfile_asdir(self)     ((struct fdirnode *)(self))
-#define mfile_assuper(self)   ((struct fsuper *)(self))
+#define mfile_assuper(self)   __COMPILER_CONTAINER_OF((struct fdirnode *)(self), struct fsuper, fs_root)
 #define mfile_aslnk(self)     ((struct flnknode *)(self))
 #define mfile_assock(self)    ((struct fsocknode *)(self))
 #define mfile_asdev(self)     ((struct fdevnode *)(self))
 #define mfile_asblkdev(self)  ((struct blkdev *)(self))
 #define mfile_aschrdev(self)  ((struct chrdev *)(self))
+
+
+/* Filenode tree operations. (for `struct fsuper::fs_nodes') */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct fnode *NOTHROW(FCALL fnode_tree_locate)(/*nullable*/ struct fnode *root, ino_t key);
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fnode_tree_insert)(struct fnode **__restrict proot, struct fnode *__restrict node);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct fnode *NOTHROW(FCALL fnode_tree_remove)(struct fnode **__restrict proot, ino_t key);
+FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL fnode_tree_removenode)(struct fnode **__restrict proot, struct fnode *__restrict node);
 
 
 

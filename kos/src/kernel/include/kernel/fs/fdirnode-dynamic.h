@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#if 0
 #ifndef CONFIG_USE_NEW_FS
 #include <fs/node.h>
 #else /* !CONFIG_USE_NEW_FS */
@@ -39,7 +40,7 @@ DECL_BEGIN
  */
 
 
-/*  */
+/* Callback method for enumerating the contents of a dynamic directory. */
 typedef NONNULL((5)) __BOOL
 (KCALL *fdyndir_enum_callback_t)(void *cookie, ino_t ino, unsigned char type,
                                  u16 namelen, char const *__restrict name);
@@ -96,5 +97,6 @@ fdyndirnode_enum(struct fdyndirnode *__restrict self,
 DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_FS */
+#endif
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_FDIRNODE_DYNAMIC_H */

@@ -116,7 +116,7 @@ DATDEF struct atomic_lock fallnodes_lock;
 DATDEF struct fallnodes_lockop_slist fallnodes_lockops;
 
 /* Reap pending operations from `fallnodes_lockops' */
-FUNDEF NOBLOCK void NOTHROW(FCALL _fallnodes_reap)(void);
+FUNDEF NOBLOCK void NOTHROW(KCALL _fallnodes_reap)(void);
 #define fallnodes_mustreap() \
 	(__hybrid_atomic_load(fallnodes_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
@@ -149,7 +149,7 @@ DATDEF struct atomic_lock fallsuper_lock;
 DATDEF struct fallsuper_lockop_slist fallsuper_lockops;
 
 /* Reap pending operations from `fallsuper_lockops' */
-FUNDEF NOBLOCK void NOTHROW(FCALL _fallsuper_reap)(void);
+FUNDEF NOBLOCK void NOTHROW(KCALL _fallsuper_reap)(void);
 #define fallsuper_mustreap() \
 	(__hybrid_atomic_load(fallsuper_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__

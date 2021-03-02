@@ -28,6 +28,7 @@
 #include <asm/os/oflags.h>
 #include <asm/os/poll.h>
 #include <asm/os/stat.h>
+#include <asm/os/stdio.h>
 #include <bits/types.h>
 
 #ifndef __KOS__
@@ -369,6 +370,25 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #if !defined(O_RSYNC) && defined(__O_SYNC)
 #define O_RSYNC     __O_SYNC      /* ??? */
 #endif /* !O_RSYNC && __O_SYNC */
+
+
+
+/* Seek (whence) options. */
+#if !defined(SEEK_SET) && defined(__SEEK_SET)
+#define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#endif /* !SEEK_SET && __SEEK_SET */
+#if !defined(SEEK_CUR) && defined(__SEEK_CUR)
+#define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#endif /* !SEEK_CUR && __SEEK_CUR */
+#if !defined(SEEK_END) && defined(__SEEK_END)
+#define SEEK_END __SEEK_END /* Seek from end of file. */
+#endif /* !SEEK_END && __SEEK_END */
+#if !defined(SEEK_DATA) && defined(__SEEK_DATA)
+#define SEEK_DATA __SEEK_DATA /* Seek to next data. */
+#endif /* !SEEK_DATA && __SEEK_DATA */
+#if !defined(SEEK_HOLE) && defined(__SEEK_HOLE)
+#define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
+#endif /* !SEEK_HOLE && __SEEK_HOLE */
 
 
 

@@ -306,7 +306,16 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 }
 
 
-PUBLIC size_t
+/* Lookup an ACPI table and store its contents in `buf', and return the number of required bytes
+ * Note however that in the event of `return > buflen', data will have still been written to the
+ * given buffer, leading up to `buflen'. Separately, in the event of `return < buflen', any data
+ * that  could  not  be  derived  from  the  SDT  table  will  be  initialized  as  all  ZEROes.
+ * Also  note  that  the caller  is  required to  ensure  that `buflen >= sizeof(ACPISDTHeader)'
+ * @param: ptableaddr: When  non-NULL, filled with the physical base
+ *                     address of the found SDT header upon success.
+ * @return: 0 : Failed to find the ACPI table.
+ * @return: * : Same as `((ACPISDTHeader *)buf)->rsdp_length' */
+PUBLIC WUNUSED NONNULL((1, 2)) size_t
 NOTHROW(KCALL acpi_lookup)(char const signature[4],
                            void *buf, size_t buflen,
                            physaddr_t *ptableaddr) {
@@ -315,14 +324,17 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 	for (i = 0; i < acpi_sdt_count; ++i) {
 		physaddr_t addr, base;
 		size_t missing;
+		ACPISDTHeader *hdr;
 		addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
 		base = ACPI_POINTER_SIZE == 4
 		       ? (physaddr_t)peekphysl_unaligned(addr)
 		       : (physaddr_t)peekphysq_unaligned(addr);
 		copyfromphys(buf, base, sizeof(ACPISDTHeader));
-		if (*(u32 *)((ACPISDTHeader *)buf)->rsdp_signature != *(u32 *)signature)
+		hdr = (ACPISDTHeader *)buf;
+		if (memcmp(hdr->rsdp_signature, signature,
+		           sizeof(hdr->rsdp_signature)) != 0)
 			continue;
-		result = ((ACPISDTHeader *)buf)->rsdp_length;
+		result = hdr->rsdp_length;
 		/* Make sure not to copy more than the given buffer can hold. */
 		missing = buflen;
 		if (buflen > result) {

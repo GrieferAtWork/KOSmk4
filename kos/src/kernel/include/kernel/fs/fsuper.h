@@ -181,6 +181,24 @@ struct fsuper {
 	/* More fields of custom `fdirnode' sub-classes go here. */
 };
 
+/* TODO: fsuper_init() */
+
+
+/* Reap operations from `self->fs_nodeslockops' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _fsuper_reap_nodes)(struct fsuper *__restrict self);
+
+/* Reap operations from `self->fs_mountslockops' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _fsuper_reap_mounts)(struct fsuper *__restrict self);
+
+/* Filenode tree operations. (caller must be holding a lock to `self->fs_nodeslock') */
+#define fsuper_nodes_locate(self, ino)      fnode_tree_locate((self)->fs_nodes, ino)
+#define fsuper_nodes_insert(self, node)     fnode_tree_insert((self)->fs_nodes, node)
+#define fsuper_nodes_remove(self, ino)      fnode_tree_remove((self)->fs_nodes, ino)
+#define fsuper_nodes_removenode(self, node) fnode_tree_removenode((self)->fs_nodes, node)
+
+
 /* Reference count control simply uses `fs_root' as basis.
  * Note that fields of `struct fsuper' grow upwards so that custom sub-classes of `fdirnode'
  * can  simply be used in order to implement `fs_root', allowing for binary compatibility in

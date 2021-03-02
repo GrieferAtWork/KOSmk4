@@ -4484,14 +4484,8 @@ superblock_open(struct superblock_type *__restrict type,
 
 
 /* DATA BLOCK INTERFACE IMPLEMENTATION FOR INODES */
-#ifdef CONFIG_USE_NEW_VM
-#define MFILE_OPS_CC FCALL
-#else /* CONFIG_USE_NEW_VM */
-#define MFILE_OPS_CC KCALL
-#endif /* !CONFIG_USE_NEW_VM */
-
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(MFILE_OPS_CC inode_destroy)(struct inode *__restrict self) {
+NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 	assertf(!(self->i_flags & (INODE_FCHANGED | INODE_FATTRCHANGED)) ||
 	        self == self->i_super,
 	        "The changed-inode chain should have kept a reference");
@@ -4780,17 +4774,17 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 #endif /* !CONFIG_USE_NEW_VM */
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(MFILE_OPS_CC db_inode_changed)(struct inode *__restrict self,
+NOTHROW(KCALL db_inode_changed)(struct inode *__restrict self,
                                        struct mpart *__restrict UNUSED(part)) {
 	inode_changed(self, INODE_FCHANGED);
 }
 
 PUBLIC struct vm_datablock_type inode_datablock_type = {
-	/* .dt_destroy  = */ (NOBLOCK void(MFILE_OPS_CC *)(struct vm_datablock *__restrict))&inode_destroy,
+	/* .dt_destroy  = */ (NOBLOCK void(KCALL *)(struct vm_datablock *__restrict))&inode_destroy,
 	/* .dt_initpart = */ NULL,
 	/* .dt_loadpart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,physaddr_t,size_t))&db_inode_loadpart,
 	/* .dt_savepart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,physaddr_t,size_t))&db_inode_savepart,
-	/* .dt_changed  = */ (void(MFILE_OPS_CC *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
+	/* .dt_changed  = */ (void(KCALL *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
 };
 
 

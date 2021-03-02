@@ -274,7 +274,7 @@ mfile_sync(struct mfile *__restrict self)
 PUBLIC struct mfile mfile_phys = MFILE_INIT_ANON(&mfile_phys_ops, PAGESHIFT);
 PUBLIC struct mfile mfile_ndef = MFILE_INIT_ANON(&mfile_ndef_ops, PAGESHIFT);
 
-PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
+PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
 mfile_phys_newpart(struct mfile *__restrict UNUSED(self),
                    PAGEDIR_PAGEALIGNED pos_t minaddr,
                    PAGEDIR_PAGEALIGNED size_t num_bytes) {

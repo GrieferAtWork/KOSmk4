@@ -32,6 +32,13 @@
 
 DECL_BEGIN
 
+/* Default operators for `fdirnode_ops::dno_*' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fdirnode_v_destroy)(struct fdirnode *__restrict self) {
+	decref_unlikely(self->dn_parent);
+	fnode_v_destroy(self);
+}
+
 /* Create new files within a given directory.
  * If another  file with  the same  name already  existed,  then
  * `FMKFILE_F_EXISTS' is set, and that file is returned instead.
