@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_SYSCALLS_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_SYSCALLS_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_FUTEX_SYSCALLS_C
+#define GUARD_KERNEL_SRC_MEMORY_FUTEX_SYSCALLS_C 1
 #define _KOS_SOURCE 1
 #define _TIME64_SOURCE 1
 
@@ -47,8 +47,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <stddef.h>
-
-#include "vm-nodeapi.h"
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/timespec.h>
@@ -222,4 +220,4 @@ DECL_END
 #endif /* !__INTELLISENSE__ */
 
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_SYSCALLS_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_FUTEX_SYSCALLS_C */

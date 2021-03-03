@@ -167,9 +167,7 @@ NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) 
 		kfree(self);
 		return;
 	}
-	/* Must unmap sections data.
-	 * NOTE: Must  write `us_data' elsewhere, since the first 2 pointers of the
-	 *       section object will be clobbered by `vm_kernel_locked_operation()' */
+	/* Must unmap sections data. */
 #ifdef CONFIG_USE_NEW_VM
 	{
 		byte_t *sect_base;

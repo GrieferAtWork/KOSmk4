@@ -1493,18 +1493,6 @@ continue_with_next:
 
 
 
-/* Run `op->mlo_func' in the context of holding a lock to the kernel VM at some
- * point in the future. The given `op->mlo_func' is responsible for freeing the
- * backing memory of `op' during its invocation. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op) {
-	/* Atomically insert the new lock operation. */
-	SLIST_ATOMIC_INSERT(&mman_kernel_lockops, op, mlo_link);
-	_mman_lockops_reap();
-}
-
-
-
 
 /* Without blocking, unmap a given region of kernel RAM.
  * NOTE: The caller must ensure that the given the address range can
@@ -1577,7 +1565,9 @@ NOTHROW(FCALL mman_unmap_kram_ex)(/*inherit(always)*/ struct mman_unmap_kram_job
 	} else {
 do_schedule_lockop:
 		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
-		mman_kernel_lockop(&job->mukj_lop_mm);
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
+		                    &job->mukj_lop_mm, mlo_link);
+		_mman_lockops_reap();
 	}
 }
 

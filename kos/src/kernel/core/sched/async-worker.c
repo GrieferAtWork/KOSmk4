@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_ASYNC
+#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <sched/async.h>
 #include <sched/task.h>

@@ -34,7 +34,7 @@
  *   that can be used to implement arbitrarily complex higher-level objects,
  *   such as mutexes, semaphores, condition-variables, ..., _anything_
  * - Whatever state a signal may have in some arbitrary context, it only
- *   gain this  state  indirectly  by  being used  in  a  specific  way.
+ *   gains  this  state  indirectly by  being  used in  a  specific way.
  *
  * Basic example:
  * >> PRIVATE struct sig mysig = SIG_INIT;
@@ -58,15 +58,16 @@
  *   - For  this  purpose, it  doesn't  matter if  the  original thread  that called
  *     `connect()'  has  already called  `wait()'  (and has  been  de-scheduled), or
  *     is still busy doing other things, but is planning to call `wait()' eventually
- *   - The `task_waitfor()' function (when eventually called) will then cause  its
- *     calling thread to suspend execution until one of the signal that its caller
- *     is connection to has been  send (but note that if  one of those signals  is
- *     send before `task_waitfor()'  is called, then  `task_waitfor()' will  never
+ *   - The `task_waitfor()' function (when eventually  called) will then cause  the
+ *     calling thread to suspend execution until one of the signals that its caller
+ *     is  connection to has  been send (but note  that if one  of those signals is
+ *     send before  `task_waitfor()' is  called, then  `task_waitfor()' will  never
  *     block to begin with, but return immediately)
- *   - The moment that `task_waitfor()' returns, _all_ connections that the calling
- *     thread  had made in the past will have already been severed (to be even more
- *     precise:  a connection  is severed  before `sig_send()'  returns, with  the  only
- *     exception being signal completion functions that call `sig_completion_reprime()')
+ *   - The moment that `task_waitfor()' returns, _all_ connections that  the
+ *     calling  thread had made  in the past will  have already been severed
+ *     (to be even more precise: a connection is severed before `sig_send()'
+ *     returns, with the  only exception being  signal completion  functions
+ *     that call `sig_completion_reprime()')
  *
  * How to use `struct sig', and what `interlocked' means:
  *   - If you think of dos's  `InterlockedIncrement' functions, or similar, I'm  sorry
@@ -76,7 +77,7 @@
  *     context where certain events can be monitored/handled, similar to how this would
  *     happen during a transaction (s.a. /kos/src/kernel/modrtm).
  *   - For simplicity, consider the following example:
- *     [ 1] PRIVATE bool       is_ready = false;
+ *     [ 1] PRIVATE bool       is_ready     = false;
  *     [ 2] PRIVATE struct sig became_ready = SIG_INIT;
  *     [ 3]
  *     [ 4] PRIVATE void wait_until_ready(void) {
@@ -92,33 +93,33 @@
  *     [14]     ATOMIC_WRITE(is_ready, true);
  *     [15]     sig_broadcast(&became_ready);
  *     [16] }
- *     Here,  the second read from `is_ready' on  line #6 is interlocked with the
- *     async monitoring of `became_ready' that began on line #5. As such, line #6
- *     knows that when `is_ready' isn't `true'  yet, the calling thread will  get
- *     notified after it becomes  so (s.a. line #15)  As such, all possible  race
+ *     Here, the read from `is_ready' on line #6 is interlocked with the  async
+ *     monitoring  of `became_ready'  that began on  line #5. As  such, line #6
+ *     knows that when `is_ready' isn't `true' yet, the calling thread will get
+ *     notified after it becomes so (s.a. line #15) As such, all possible  race
  *     conditions are handled here:
  *        case #1: `ATOMIC_WRITE(is_ready, true);' happens before `task_connect(&became_ready)':
- *                 - `&became_ready' will not be broadcast
- *                 - The caller of `wait_until_ready()' will notice this in line #6
- *                 -    The   `wait_until_ready()'   function   never   starts   blocking
+ *                  - `&became_ready' will not be broadcast
+ *                  - The caller of `wait_until_ready()' will notice this in line #6
+ *                  - The `wait_until_ready()' function never starts blocking
  *                 Note that since this case is usually the most likely one, another test
  *                 of the `is_ready'  condition usually also  happens before the  initial
  *                 connect. Though since no connect()  will have happened at that  point,
  *                 this test isn't interlocked, and only there to speed up the case where
  *                 an object is already ready from the get-go.
- *                 Such models are referred to as test+connect+test, whereas the minimal
- *                 requirement   for   race-less   synchronization   is    connect+test.
+ *                 Such models  are referred  to  as test+connect+test,  whereas  the
+ *                 minimal requirement for race-less synchronization is connect+test.
  *        case #2: `ATOMIC_WRITE(is_ready, true);' happens after `task_connect(&became_ready)',
  *                 but before `ATOMIC_READ(is_ready)'.
- *                 - Line #6 will notice this, and disconnect from the `became_ready'
- *                   signal once again.
+ *                  - Line #6 will notice this, and disconnect from the `became_ready'
+ *                    signal once again, and the waiting thread never starts blocking.
  *        case #3: `ATOMIC_WRITE(is_ready, true);' happens after `if (ATOMIC_READ(is_ready))'
- *                 - In this case, the caller of `wait_until_ready()' will end up inside of
- *                   `task_waitfor()', which will return as soon as line #15 gets executed.
- *                 - Because  by this point,  the waiting thread has  already been connected to
- *                   the `became_ready'  signal,  it  doesn't matter  if  `sig_broadcast()'  is
- *                   called before, or after `task_waitfor();'. In both cases, `task_waitfor()'
- *                   will not return before `sig_broadcast()' has been called.
+ *                  - In this case, the caller of `wait_until_ready()' will end up inside of
+ *                    `task_waitfor()', which will return as soon as line #15 gets executed.
+ *                  - Because  by this point,  the waiting thread has  already been connected to
+ *                    the `became_ready'  signal,  it  doesn't matter  if  `sig_broadcast()'  is
+ *                    called before, or after `task_waitfor();'. In both cases, `task_waitfor()'
+ *                    will not return before `sig_broadcast()' has been called.
  */
 
 
@@ -551,17 +552,18 @@ NOTHROW(FCALL task_disconnectall)(void);
 
 /* Same as `task_disconnectall()', but don't forward signals with a
  * `TASK_CONNECTION_STAT_SENT'-state, but rather return the  sender
- * of of the signal that was received.
+ * of the signal that was received.
  * As such, the caller must properly pass on information about the
  * fact that a signal may have been received, as well as act  upon
  * this fact. */
 FUNDEF NOBLOCK WUNUSED struct sig *
 NOTHROW(FCALL task_receiveall)(void);
 
-/* Check  if  the  calling  thread  was  connected  to  any signal.
- * For this  purpose,  it  doesn't matter  if  a  connected  signal
- * has  already  been  sent  or  not  (iow:  both  alive  and  dead
- * connections  will  cause   this  function   to  return   `true')
+/* Check if the calling thread was connected to any  signal.
+ * For this purpose, it doesn't matter if a connected signal
+ * has  already been sent  or not (iow:  both alive and dead
+ * connections will cause this function to return `true')
+ *
  * As far as this function is concerned, a connection is only fully
  * released  once the calling thread has done one of the following:
  *  - Called `task_disconnect()' on every connected signal
@@ -599,13 +601,14 @@ FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `ktime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
- * @throw: * :           [task_waitfor] An   error   was  thrown   by  an   RPC  function.
+ * @throw: * :           [task_waitfor] An error was thrown by an RPC function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
  *              WARNING: In  all  other cases,  task connections  are  preserved when  an exception
  *                       is thrown,  meaning that  if some  interlocked signal  check might  thrown
  *                       an exception, you are required to TRY ... EXCEPT { task_disconnectall(); }
  *                       to prevent signal connections from being leaked!
- * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
+ * @return: NULL: No signal  has  become  available  (never  returned
+ *                when `KTIME_INFINITE' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
 FUNDEF struct sig *FCALL
 task_waitfor(ktime_t abs_timeout DFL(KTIME_INFINITE))
@@ -616,9 +619,9 @@ FUNDEF struct sig *FCALL
 task_waitfor_norpc(ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_WOULDBLOCK);
 
-/* Same  as  `task_waitfor', but  only service  NX RPCs,  and return  `NULL' if
- * there are pending RPCs that are allowed to throw exception, or if preemption
- * was disabled, and the operation would have blocked. */
+/* Same as `task_waitfor', but only service NX RPCs, and return `NULL'
+ * if there are pending RPCs that  are allowed to throw exception,  or
+ * if preemption was disabled, and the operation would have blocked. */
 FUNDEF struct sig *
 NOTHROW(FCALL task_waitfor_nx)(ktime_t abs_timeout DFL(KTIME_INFINITE));
 

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_HANDLE_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_FUTEX_HANDLE_C
+#define GUARD_KERNEL_SRC_MEMORY_FUTEX_HANDLE_C 1
 #define _KOS_SOURCE 1
 #define _TIME64_SOURCE 1
 
@@ -102,4 +102,4 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_FUTEX_HANDLE_C */

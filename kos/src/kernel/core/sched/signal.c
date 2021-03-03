@@ -1312,7 +1312,7 @@ NOTHROW(FCALL task_disconnectall)(void) {
 
 /* Same as `task_disconnectall()', but don't forward signals with a
  * `TASK_CONNECTION_STAT_SENT'-state, but rather return the  sender
- * of of the signal that was received.
+ * of the signal that was received.
  * As such, the caller must properly pass on information about the
  * fact that a signal may have been received, as well as act  upon
  * this fact. */
@@ -1328,10 +1328,11 @@ NOTHROW(FCALL task_receiveall)(void) {
 	return result;
 }
 
-/* Check  if  the  calling  thread  was  connected  to  any signal.
- * For this  purpose,  it  doesn't matter  if  a  connected  signal
- * has  already  been  sent  or  not  (iow:  both  alive  and  dead
- * connections  will  cause   this  function   to  return   `true')
+/* Check if the calling thread was connected to any  signal.
+ * For this purpose, it doesn't matter if a connected signal
+ * has  already been sent  or not (iow:  both alive and dead
+ * connections will cause this function to return `true')
+ *
  * As far as this function is concerned, a connection is only fully
  * released  once the calling thread has done one of the following:
  *  - Called `task_disconnect()' on every connected signal
@@ -1341,8 +1342,7 @@ NOTHROW(FCALL task_receiveall)(void) {
  *  - Called `task_waitfor()'
  *  - Called `task_waitfor_nx()'
  *  - Called `task_waitfor_norpc()'
- *  - Called `task_waitfor_norpc_nx()'
- */
+ *  - Called `task_waitfor_norpc_nx()' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL task_wasconnected)(void) {
 	struct task_connections *self;
@@ -1445,9 +1445,9 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 /************************************************************************/
 
 /* Finalize a given signal multi-completion controller.
- * WARNING: This  function  will  _not_ disconnect  any  remaining signals.
- *          If active  connections  could  possibly remain,  it  is  up  to
- *          the caller to call `sig_multicompletion_disconnectall()' first! */
+ * WARNING: This  function will _not_  disconnect any remaining signals.
+ *          If active connections could possibly remain, it is up to the
+ *          caller to call `sig_multicompletion_disconnectall()'  first! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self) {
 	struct _sig_multicompletion_set *ext;
@@ -1466,10 +1466,10 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
 }
 
 
-/* Sever all (still-alive) connections that are active for `self'. Note that this function may
- * not be called from inside of signal-completion-callbacks, or any other callback that may be
- * executed in the  context of  holding an  SMP-lock. (though you  area allowed  to call  this
- * function from a `sig_postcompletion_t' calback) */
+/* Sever all (still-alive) connections that are active for `self'. Note that this  function
+ * may not be called from inside of signal-completion-callbacks, or any other callback that
+ * may  be executed in the context of holding an SMP-lock. (though you area allowed to call
+ * this function from a `sig_postcompletion_t' callback) */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__restrict self) {
 	struct _sig_multicompletion_set *set;
@@ -1503,15 +1503,18 @@ NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion const
 }
 
 
-/* Allocate and return a  new signal completion descriptor  that is attached to  the
- * signal multi-completion controller `self', and  will invoke `cb' when  triggered.
- * The returned pointer  is owned by  `self', meaning that  the caller doesn't  have
- * to bother with ownership themself. Also note that this these functions will  keep
- * on  returning the same  completion until that completion  has been connected, and
- * will re-use older completions if those got tripped, but didn't re-prime themself.
+/* Allocate and return a new signal completion descriptor that  is
+ * attached  to the signal multi-completion controller `self', and
+ * will invoke `cb' when triggered. The returned pointer is  owned
+ * by  `self', meaning that the caller doesn't have to bother with
+ * ownership themself. Also  note that this  these functions  will
+ * keep on returning the same completion until that completion has
+ * been connected, and will re-use older completions if those  got
+ * tripped, but didn't re-prime themself.
  *
- * If all of that sounds too complicated for you, then just use `sig_connect_multicompletion',
- * which   encapsulates   the   job   of   allocating+connecting   to   a   signal   for  you. */
+ * If all of that sounds too complicated for you, then just use
+ * `sig_connect_multicompletion', which encapsulates the job of
+ * allocating+connecting to a signal for you. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sig_completion *FCALL
 sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
                           sig_completion_t cb)
@@ -1628,13 +1631,14 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
  * >> struct sig_multicompletion smc;
  * >> sig_multicompletion_init(&smc);
  * >> sig_multicompletion_connect_from_task(&smc, &my_callback);
- * >> if (task_trywait()) {  // Or `task_receiveall()' if the caller only wants connections to remain in `smc'
+ * >> if (task_receiveall()) {  // Or `task_trywait()' if per-task
+ * >>                           // connections should remain
  * >>     sig_multicompletion_disconnectall(&smc);
  * >>     // Error:   One of the caller's signals may have already
  * >>     //          been delivered before `smc' could connect to
  * >>     //          all of them.
  * >> } else {
- * >>     // Success: Connections established
+ * >>     // Success: Connections established (calling thread is no longer connected)
  * >> }
  * This function is used to implement epoll objects using the regular,
  * old poll-api already exposed via `handle_poll()', without the  need

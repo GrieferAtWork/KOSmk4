@@ -391,7 +391,6 @@ DECL_END
 #define VM_KERNEL_PENDING_CB_RETURN_T   struct mlockop *
 #define VM_KERNEL_PENDING_CB_RETURN     return __NULLPTR
 #define VM_KERNEL_PENDING_CB_CC         FCALL
-#define vm_kernel_locked_operation(...) mman_kernel_lockop(__VA_ARGS__)
 #define vm_onexec_callbacks             mman_onexec_callbacks
 #define vm_oninit_callbacks             mman_oninit_callbacks
 #define vm_onfini_callbacks             mman_onfini_callbacks
@@ -629,7 +628,6 @@ DECL_END
 #define mlockop                                        vm_kernel_pending_operation
 #define mlockop_callback_t                             vm_kernel_pending_cb_t
 #define mlo_func                                       vkpo_exec
-#define mman_kernel_lockop(...)                        vm_kernel_locked_operation(__VA_ARGS__)
 #define mman_onexec_callbacks                          vm_onexec_callbacks
 #define mman_oninit_callbacks                          vm_oninit_callbacks
 #define mman_onfini_callbacks                          vm_onfini_callbacks

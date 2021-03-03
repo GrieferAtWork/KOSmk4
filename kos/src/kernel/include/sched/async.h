@@ -32,7 +32,7 @@
 #include <hybrid/sync/atomic-lock.h>
 
 #ifdef __cplusplus
-#include <kernel/handle.h>
+#include <kos/kernel/handle.h>
 #endif /* __cplusplus */
 
 /* TODO: DEPRECATED: BEGIN */
@@ -58,7 +58,7 @@ INTDEF ATTR_NORETURN void NOTHROW(FCALL _asyncmain)(void);
 struct async;
 struct async_ops {
 	/* [1..1] The driver responsible for this providing the below operators.
-	 * Whenever a driver is unloaded, all async workers claiming to use that
+	 * Whenever  a driver is  unloaded, all async jobs  claiming to use that
 	 * driver will be canceled. */
 	struct driver *ao_driver;
 
@@ -71,7 +71,7 @@ struct async_ops {
 	 * This function should establish connections with `for_poll = true'
 	 * @return: * : Absolute point in time when `ao_time' should be invoked.
 	 *              You may return  `KTIME_INFINITE' to  indicate that  this
-	 *              worker will never time out. */
+	 *              async job will never time out. */
 	NONNULL((1)) ktime_t
 	(FCALL *ao_connect)(struct async *__restrict self);
 
@@ -95,7 +95,7 @@ struct async_ops {
 	WUNUSED NONNULL((1)) unsigned int
 	(FCALL *ao_time)(struct async *__restrict self);
 
-	/* [0..1] Callback invoked (in the context of the async-worker thread) every
+	/* [0..1] Callback invoked (in the context of some async worker-thread)  every
 	 *        time that the job is  canceled. Note that the  # of times that  this
 	 *        callback  is invoked doesn't  necessarily match the  # of times that
 	 *        one  calls  `async_cancel()'. However,  if  the async  job  was ever
@@ -121,14 +121,17 @@ struct async_ops {
 	/*NOTHROW*/ (FCALL *ao_retsize)(struct async *__restrict self);
 };
 
-/* Async worker status values. */
+/* Async work/time return values. */
 #define ASYNC_RESUME   0 /* More work is available. */
-#define ASYNC_FINISHED 1 /* All work is done. (delete the worker) */
-#define ASYNC_CANCEL   2 /* Same as `ASYNC_FINISHED', but invoke `ao_cancel' (if defined),
+#define ASYNC_FINISHED 1 /* All work is done. (delete the async job) */
+#define ASYNC_CANCEL   2 /* Same as `ASYNC_FINISHED',  but invoke  `ao_cancel' (if  defined),
                           * and complete an attached AIO operation as `AIO_COMPLETION_CANCEL' */
 
 
-/* Internal worker states. Transitions:
+
+
+
+/* Internal async states. Transitions:
  *   _ASYNC_ST_INIT           ->  _ASYNC_ST_INIT_STOP       // async_cancel()
  *   _ASYNC_ST_INIT           ->  _ASYNC_ST_ADDALL          // async_start()
  *
@@ -162,6 +165,7 @@ struct async_ops {
 #define _ASYNC_ST_DELALL_STRT    4 /* Same as `_ASYNC_ST_DELALL', but `async_start()' was called */
 #define _ASYNC_ST_DELALL         5 /* A lockop is pending to remove the job from `async_all_list' */
 #define _ASYNC_ST_READY          6 /* The job is fully up & running. */
+/*efine _ASYNC_ST_               7  * ... */
 #define _ASYNC_ST_TRIGGERED      8 /* An async event was triggered. */
 #define _ASYNC_ST_TRIGGERED_STOP 9 /* Same as `_ASYNC_ST_TRIGGERED', but `async_cancel()' was called */
 
@@ -170,11 +174,8 @@ struct async_ops {
 struct aio_handle;
 struct async {
 	WEAK refcnt_t              a_refcnt; /* Reference counter. */
-	unsigned int               a_stat;   /* [lock(ATOMIC)] Async worker status (one of `_ASYNC_ST_*') */
-	struct async_ops const    *a_ops;    /* [1..1][const] Worker operators.
-	                                      * NOTE: This field holds a reference to `a_ops->ao_driver',
-	                                      *       thus  preventing a driver from being fully unloaded
-	                                      *       until all of its async-workers have been deleted. */
+	unsigned int               a_stat;   /* [lock(ATOMIC)] Async status (one of `_ASYNC_ST_*') */
+	struct async_ops const    *a_ops;    /* [1..1][const] Worker operators. */
 #ifdef __WANT_ASYNC__a_lockop
 	union {
 		struct lockop             _a_lockop;     /* ... */
@@ -184,12 +185,12 @@ struct async {
 #else /* __WANT_ASYNC__a_lockop */
 	struct sig_multicompletion a_comp;   /* [valid_if(a_stat >= _ASYNC_ST_READY)][lock(ASYNC_WORKER)]
 	                                      * Internal  signal  completion controller  used  to monitor
-	                                      * async workers  for completion,  as  well as  to  maintain
-	                                      * a list  of  ready  workers,  without  having  to  re-poll
-	                                      * all workers whenever one of them becomes ready. */
+	                                      * async  jobs for completion, as well as to maintain a list
+	                                      * of ready jobs, without having to globally re-connect  all
+	                                      * jobs whenever one of them becomes ready. */
 #endif /* !__WANT_ASYNC__a_lockop */
-	LIST_ENTRY(REF async)      a_all;    /* [0..1][lock(async_all_lock)] Entry in the list of all async workers. */
-	SLIST_ENTRY(REF async)     a_ready;  /* [lock(ATOMIC)] List of ready workers. */
+	LIST_ENTRY(REF async)      a_all;    /* [0..1][lock(async_all_lock)] Entry in the list of all async jobs. */
+	SLIST_ENTRY(REF async)     a_ready;  /* [lock(ATOMIC)] List of ready jobs. */
 	WEAK struct aio_handle    *a_aio;    /* [0..1][lock(CLEAR_ONCE)] Attached AIO and job cancellation indicator. */
 	/* Worker-specific data will go here... */
 };
@@ -200,14 +201,14 @@ struct async {
 	 (self)->a_ops    = (ops),          \
 	 (self)->a_aio    = __NULLPTR)
 
-/* Initialize   the  given  async  controller  and  attach  `aio'.
- * The  caller must follow this up with a call to `async_start()',
- * after  which  point  `aio' will  be  notified once  the  job is
- * completed (when restarted later, or canceled before that point,
- * the AIO  handle will  not be  notified). Additionally,  use  of
- * `async_cancel()'  will  immediatly  indicate  completion  (with
- * CANCEL  status),  and  `aio_handle_cancel()'  will  behave  the
- * same as `async_cancel()' */
+/* Initialize the given async controller and attach `aio'. The
+ * caller must follow this up with a call to  `async_start()',
+ * after  which point `aio'  will be notified  once the job is
+ * completed (when restarted  later, or  canceled before  that
+ * point, the AIO handle will not be notified).  Additionally,
+ * use of `async_cancel()' will immediatly indicate completion
+ * (with CANCEL status), and `aio_handle_cancel()' will behave
+ * the same as `async_cancel()' */
 #define async_init_aio(self, ops, aio) \
 	((self)->a_ops = (ops), _async_init_aio(self, aio))
 FUNDEF NOBLOCK NONNULL((1, 2)) void
@@ -241,14 +242,14 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_destroy)(struct async *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct async, a_refcnt, async_destroy);
 
-/* Start (or re-start) a given async worker.
+/* Start (or re-start) a given async job.
  * Note that when re-starting an async controller, previously attached
  * AIO  handles will always be detached (iow: any async controller can
  * only ever be attached once to only a single AIO handle) */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct async *
 NOTHROW(FCALL async_start)(struct async *__restrict self);
 
-/* Stop (or schedule to stop) a given async worker.
+/* Stop (or schedule to stop) a given async job.
  * When an AIO handle is attached to `self', complete with `AIO_COMPLETION_CANCEL'
  * WARNING: AIO  cancellation  happens asynchronously,  meaning that  this function
  *          may return while  another thread  is still calling  `ao_work', or  some
@@ -269,7 +270,7 @@ NOTHROW(FCALL async_cancel)(struct async *__restrict self);
 LIST_HEAD(async_list, async);
 #endif /* !__async_list_defined */
 
-/* API access to the set of all running async workers. */
+/* API access to the set of all running async jobs. */
 DATDEF struct REF async_list /**/ async_all_list; /* [0..n][lock(async_all_lock)] List of all running async tasks. */
 DATDEF size_t /*               */ async_all_size; /* [lock(async_all_lock)] Total # of async tasks. */
 DATDEF struct atomic_lock /*   */ async_all_lock; /* Lock for the async-task list */
@@ -285,7 +286,7 @@ DATDEF struct lockop_slist /*  */ async_all_lops; /* Pending lock operations for
 #define async_all_available()  atomic_lock_available(&async_all_lock)
 
 
-/* TODO: Functions to control the # of async worker threads. */
+/* TODO: Functions to control the # of async worker-threads. */
 
 
 
@@ -304,8 +305,8 @@ DATDEF struct lockop_slist /*  */ async_all_lops; /* Pending lock operations for
  *       kernel object again with the associated async worker is bound.
  *       Note that `!wasdestroyed((T *)self)' is guarantied here!
  *
- * Also note that the guaranty is made that none of the callbacks will
- * ever  be   invoked   again   once  `self'   has   been   destroyed! */
+ * Also note that the guaranty is made that none of the callbacks
+ * will  ever be  invoked again  once `self'  has been destroyed! */
 struct async_worker_ops {
 	struct async_ops awo_async; /* Underlying async ops. */
 
@@ -353,6 +354,12 @@ async_worker_new(struct async_worker_ops const *__restrict ops,
                  void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC);
 
+
+/* TODO: Once support for `#ifndef CONFIG_USE_NEW_ASYNC' is gone, get rid
+ *       of  `register_async_worker()'  and   `unregister_async_worker()'
+ *       Sub-systems  should  instead make  use  of `async_worker_new()',
+ *       and simply store the returned object somewhere, and simply  make
+ *       use of `async_cancel()+decref()' instead of unregister. */
 
 /* Using  an internal database of known async workers, add or remove
  * workers for the given operator table, that are bound to the given

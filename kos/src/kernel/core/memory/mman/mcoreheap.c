@@ -636,8 +636,10 @@ mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 
 
 PRIVATE NOBLOCK NONNULL((1)) struct mpostlockop *
-NOTHROW(FCALL mlockop_coreheap_free_callback)(union mcorepart *__restrict self) {
-	mcoreheap_free_locked(self);
+NOTHROW(FCALL mlockop_coreheap_free_callback)(struct mlockop *__restrict self) {
+	union mcorepart *me;
+	me = (union mcorepart *)self;
+	mcoreheap_free_locked(me);
 	return NULL;
 }
 
@@ -650,7 +652,11 @@ NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
 		mman_lock_release(&mman_kernel);
 	} else {
 		/* Must enqueue a lock operation for the kernel mman. */
-		mman_kernel_lockop(part, &mlockop_coreheap_free_callback);
+		struct mlockop *lop;
+		lop = (struct mlockop *)part;
+		lop->mlo_func = &mlockop_coreheap_free_callback;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, mlo_link);
+		_mman_lockops_reap();
 	}
 }
 

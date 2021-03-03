@@ -121,7 +121,7 @@ struct forktree {
 	struct mman       *ft_oldmm;    /* [1..1] The old (to-be fork(2)'d) mman. */
 	struct mman       *ft_newmm;    /* [1..1] The new (target) mman */
 	struct mnode_slist ft_freelist; /* [0..n] List of free mem-nodes */
-	bool               ft_didulock; /* Set to true if `ft_newmm' was ever unlocked. */
+	bool               ft_didunlck; /* Set to true if `ft_newmm' was ever unlocked. */
 };
 
 
@@ -242,6 +242,7 @@ NOTHROW(FCALL forktree_unlock_newmm)(struct forktree *__restrict self) {
 
 	/* Release our lock to the new mman. */
 	mman_lock_release(newmm);
+	self->ft_didunlck = true;
 }
 
 
@@ -481,11 +482,12 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 		LIST_ENTRY_UNBOUND_INIT(&iter->mn_writable);
 		addr = mnode_getaddr(iter);
 		size = mnode_getsize(iter);
+
 		/* Need to prepare the pagedir for the deny-write first. If this call fails,
-		 * then simply throw an exception, which our caller will then handle for us.
-		 * But also note that we must first unlock the old and new mman */
+		 * then  simply unmap all  of user-space, thus also  ensuring that any write
+		 * access  goes away (mappings that should be  there will then simply be re-
+		 * created as they are accessed by the original program). */
 		if (!pagedir_prepare(addr, size)) {
-			/* Kill the ant with a shotgun, and just unmap everything. */
 			pagedir_unmap_userspace();
 			iter = next;
 			while (iter) {
@@ -528,14 +530,14 @@ mman_fork(void) THROWS(E_BADALLOC, ...) {
 	/* REMINDER: When not able to acquire a lock, we must call `task_serve()' after
 	 *           releasing all other already-acquired  locks. This is necessary  to
 	 *           deal with another thread within our current mman calling exec().
-	 * Otherwise,  we might get a situation with a process w/ 2 threads, where one
-	 * thread calls exec() while another calls fork(), which could then result  in
-	 * both to exec(), as well as the fork() succeeding, but the fork() succeeding
-	 * in the context of the program being exec'd by the first thread (which would
+	 * Otherwise, we might get a situation with  a process w/ 2 threads, where  one
+	 * thread calls exec() while another calls  fork(), which could then result  in
+	 * both the exec(), as well as the fork() succeeding, but the fork() succeeding
+	 * in  the context of the program being exec'd by the first thread (which would
 	 * be no good), rather than the program that contained the fork() call. */
 
 	SLIST_INIT(&ft.ft_freelist);
-	ft.ft_didulock = false;
+	ft.ft_didunlck = false;
 	TRY {
 		/* Because everything relating to low-level page directories can be  made
 		 * to happen lazily, forking a memory manager is as simply as replicating
@@ -595,9 +597,9 @@ again:
 		/* Release our lock to the old mman. */
 		mman_lock_release(ft.ft_oldmm);
 
-		if (ft.ft_didulock) {
-			/* Write-back  the  tree   of  mappings  into   `ft.ft_newmm'.
-			 * For this purpose, make sure that there aren't any left-over
+		if (ft.ft_didunlck) {
+			/* Write-back the tree of mappings into `ft.ft_newmm'. For
+			 * this purpose, make sure that there aren't any left-over
 			 * nodes from any previous fork-attempts... */
 			if unlikely(ft.ft_newmm->mm_mappings != NULL)
 				forktree_freeall(&ft, ft.ft_newmm->mm_mappings);
@@ -625,7 +627,7 @@ again:
 
 		/* NOTE: No further initialization of the underlying page directory of `ft.ft_newmm'
 		 *       is  needed,  since  everything will  happen  lazily on  first  access. This
-		 *       way, we don't  even have to  create a  single mapping with  the new  mman's
+		 *       way, we don't even have  to create a single  mapping within the new  mman's
 		 *       page directory! */
 	} EXCEPT {
 		mnode_slist_freeall(&ft.ft_freelist);

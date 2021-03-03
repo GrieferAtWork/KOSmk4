@@ -238,12 +238,24 @@ again_mfault_init:
 		TRY {
 again:
 			mman_lock_acquire(mf.mfl_mman);
+
+			/* Load the associated node. */
 			mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings, addr);
 			if unlikely(!mf.mfl_node)
 				goto err_unmapped;
+
+			/* Load the associated part. */
 			mf.mfl_part = mf.mfl_node->mn_part;
 			if unlikely(!mf.mfl_part)
 				goto err_unmapped;
+
+			/* Verify write-access if requested. */
+			if unlikely((flags & MMAN_FAULT_F_WRITE) &&
+			            !(mf.mfl_node->mn_flags & MNODE_F_PWRITE)) {
+				mman_lock_release(mf.mfl_mman);
+				THROW(E_SEGFAULT_READONLY, addr,
+				      E_SEGFAULT_CONTEXT_WRITING);
+			}
 
 #ifdef LIBVIO_CONFIG_ENABLED
 			/* Skip VIO parts, or throw an exception. */
@@ -576,8 +588,8 @@ mfault_or_unlock(struct mfault *__restrict self)
 
 	/* First off: Try to acquire  a lock to the associated  data-part.
 	 * XXX: Maybe change the ABI so this is also done by other caller?
-	 * After all: Our  function name doesn't really suggest that we
-	 *            do this; only the function doc tell about this... */
+	 * After all: Our  function name doesn't  really suggest that we
+	 *            do this; only the function doc tells about this... */
 	if unlikely(!mpart_lock_tryacquire(part)) {
 		incref(part);
 		mman_lock_release(self->mfl_mman);

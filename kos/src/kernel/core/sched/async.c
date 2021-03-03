@@ -44,7 +44,7 @@ DECL_BEGIN
 #define async_from_postlockop(lop) container_of(lop, struct async, _a_postlockop)
 
 
-/* API access to the set of all running async workers. */
+/* API access to the set of all running async jobs. */
 PUBLIC struct REF async_list /**/ async_all_list = LIST_HEAD_INITIALIZER(async_all_list);
 PUBLIC size_t /*               */ async_all_size = 0;
 PUBLIC struct atomic_lock /*   */ async_all_lock = ATOMIC_LOCK_INIT;
@@ -69,7 +69,7 @@ PRIVATE struct sig async_ready_sig = SIG_INIT;
 /* Lock that must be held when removing threads from `async_ready' */
 PRIVATE struct atomic_lock async_ready_poplock = ATOMIC_LOCK_INIT;
 
-/* Try to pop a ready async worker thread. */
+/* Try to pop a ready async job. */
 PRIVATE WUNUSED REF struct async *FCALL async_trypopready(void) {
 	REF struct async *result;
 	/* Pop the first ready async job. */
@@ -122,6 +122,7 @@ again:
 		post->plo_func = &async_addready_postlop;
 		return post;
 	}
+
 	/* Actually remove the async job from the all-list.
 	 * Note that in doing this we'll be holding 2 references to `me'! */
 	if (!ATOMIC_CMPXCH_WEAK(me->a_stat,
@@ -294,7 +295,7 @@ do_delete_job:
 					goto again_rd_stat;
 
 				/* Schedule a pending lock-operation to remove
-				 * `job'  from the list  of all async workers. */
+				 * `job'  from  the  list of  all  async jobs. */
 				sig_multicompletion_disconnectall(&job->a_comp);
 				sig_multicompletion_fini(&job->a_comp);
 				lop          = async_as_lockop(job);
@@ -351,7 +352,7 @@ again_do_work:
 			async_reconnect(job); /* TODO: Deal with timeouts */
 
 			/* Now that we're interlocked with the job's connect callback,
-			 * check once again if there is more work left to be done. */
+			 * check  once again  if there is  more work left  to be done. */
 			if ((*job->a_ops->ao_test)(job))
 				goto again_do_work;
 
@@ -524,7 +525,7 @@ again:
 #define _ASYNC_ST_STOPFOR(x) ((x) | 1)
 
 
-/* Start (or re-start) a given async worker.
+/* Start (or re-start) a given async job.
  * Note that when re-starting an async controller, previously attached
  * AIO  handles will always be detached (iow: any async controller can
  * only ever be attached once to only a single AIO handle) */
@@ -548,7 +549,7 @@ again:
 			LIST_INSERT_HEAD(&async_all_list, self, a_all);
 			async_all_release();
 
-			/* wake-up one of the async worker threads. */
+			/* wake-up one of the async worker-threads. */
 			SLIST_ATOMIC_INSERT(&async_ready, self, a_ready);
 			sig_send(&async_ready_sig);
 		} else {
@@ -556,9 +557,9 @@ again:
 			if (!ATOMIC_CMPXCH_WEAK(self->a_stat, st, _ASYNC_ST_ADDALL))
 				goto again;
 
-			/* Enqueue a pending lock-operation to add the async  worker
-			 * to the list of all jobs, as well as add it to the list of
-			 * ready jobs once that's done. */
+			/* Enqueue a pending lock-operation to add the async  job
+			 * to the list of all jobs, as well as add it to the list
+			 * of ready jobs once that's done. */
 			ATOMIC_ADD(self->a_refcnt, 2); /* +1: async_all_list, +1: async_ready */
 			lop          = async_as_lockop(self);
 			lop->lo_func = &async_addall_lop;
@@ -605,7 +606,7 @@ again:
 	return self;
 }
 
-/* Stop (or schedule to stop) a given async worker.
+/* Stop (or schedule to stop) a given async job.
  * When an AIO handle is attached to `self', complete with `AIO_COMPLETION_CANCEL'
  * WARNING: AIO  cancellation  happens asynchronously,  meaning that  this function
  *          may return while  another thread  is still calling  `ao_work', or  some
@@ -631,9 +632,10 @@ again:
 
 	case _ASYNC_ST_READY:
 		/* Special handling for when the job has a custom cancel callback.
-		 * If it does, then we must force one of the async-worker threads
+		 * If it does, then we must force one of the async  worker-threads
 		 * to invoke that callback for us!
-		 * We can do this by transitioning the the task to `_ASYNC_ST_TRIGGERED_STOP' */
+		 * We can do this by transitioning the the job to `_ASYNC_ST_TRIGGERED_STOP',
+		 * the  same  we also  would  if we  can't  acquire `async_all_tryacquire()'. */
 		if (self->a_ops->ao_cancel != NULL)
 			goto do_async_cancel;
 
@@ -662,7 +664,8 @@ do_async_cancel:
 			                        _ASYNC_ST_TRIGGERED_STOP))
 				goto again;
 
-			/* Add to the ready list and let the async workers deal with this... */
+			/* Add to the ready list and let one of the
+			 * async worker-threads  deal with  this... */
 			incref(self);
 			SLIST_ATOMIC_INSERT(&async_ready, self, a_ready);
 			sig_send(&async_ready_sig);

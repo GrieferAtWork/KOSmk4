@@ -78,28 +78,6 @@ SLIST_HEAD(mpostlockop_slist, mpostlockop);
 DATDEF struct mlockop_slist mman_kernel_lockops;
 #endif /* !__mman_kernel_lockops_defined */
 
-/* Run `op->mlo_func' in the context of holding a lock to the kernel VM at some
- * point in the future. The given `op->mlo_func' is responsible for freeing the
- * backing memory of `op' during its invocation. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_kernel_lockop)(struct mlockop *__restrict op);
-
-#ifdef __cplusplus
-extern "C++" {
-template<class T> FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(mman_kernel_lockop)(T *__restrict obj,
-                            NOBLOCK struct mpostlockop *
-                            /*NOTHROW*/ (FCALL *cb)(T *__restrict self)) {
-	struct mlockop *pend;
-	pend           = (struct mlockop *)obj;
-	pend->mlo_func = (mlockop_callback_t)cb;
-	mman_kernel_lockop(pend);
-}
-} /* extern "C++" */
-#endif /* __cplusplus */
-
-
-
 DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_NEW_VM */

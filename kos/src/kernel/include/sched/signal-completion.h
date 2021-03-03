@@ -157,22 +157,23 @@ NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self)
 /************************************************************************/
 
 /* Signal multi-completion routing.
- * Using this, you  can connect  a single completion  function onto  multiple
- * signals,  where the  completion function  itself is  then invoked whenever
- * any of  the  signal  are  triggered. Note  however,  that  the  completion
- * callback  must  still  behave  just  like  a  regular  `sig_completion_t',
- * with the only addition being that it can extract the completion controller
- * via `((struct sig_multicompletion_route *)self)->mr_con'.  Also note  that
- * as  far as re-priming goes, the completion  function has to decide this on
- * a per-signal basis,  and as  far as synchronization  goes, the  completion
- * function itself  may  be  invoked simultaneously  for  different  signals,
- * though is guarantied  to not be  invoked again for  the same signal  until
- * the mandatory call to `sig_completion_release()' during the PAYLOAD phase.
+ * Using  this, you can connect a single completion function onto multiple
+ * signals, where the completion function itself is then invoked  whenever
+ * any of  the signal  are triggered.  Note however,  that the  completion
+ * callback must still behave just like a regular `sig_completion_t', with
+ * the only addition being that  it can extract the completion  controller
+ * via  `((struct sig_multicompletion_route *)self)->mr_con'.  Also   note
+ * that as far as re-priming goes,  the completion function has to  decide
+ * this  on a  per-signal basis, and  as far as  synchronization goes, the
+ * completion function itself may be invoked simultaneously for  different
+ * signals, though is  guarantied to  not be  invoked again  for the  same
+ * signal until the  mandatory call  to `sig_completion_release()'  during
+ * the PAYLOAD phase.
  *
- * A multi-completion controller can be disconnected from all attached signals
- * by  using `sig_multicompletion_disconnectall()', which also guaranties that
- * any completion function which have be getting invoked on some other CPU has
- * already passed the point of `sig_completion_release()' */
+ * A multi-completion  controller  can  be disconnected  from  all  attached
+ * signals  by  using   `sig_multicompletion_disconnectall()',  which   also
+ * guaranties  that any completion function which have be getting invoked on
+ * some other CPU has already passed the point of `sig_completion_release()' */
 struct sig_multicompletion;
 struct _sig_multicompletion_route
 #ifdef __cplusplus
@@ -185,12 +186,12 @@ struct _sig_multicompletion_route
 	struct sig_multicompletion *mr_con; /* [1..1][const] The attached controller. */
 };
 
-/* Given  a   given  `struct sig_completion *sc',   as  passed   to
- * a `sig_completion_t()', return  the associated  multi-completion
- * controller.  The caller  must ensure  that `sc'  is a completion
- * controller owned  by  some  `struct sig_multicompletion',  which
- * can easily be done by only invoking this function from callbacks
- * registered by
+/* Given a given  `struct sig_completion *sc', as  passed to  a
+ * `sig_completion_t()', return the associated multi-completion
+ * controller. The caller must ensure that `sc' is a completion
+ * controller owned by some `struct sig_multicompletion', which
+ * can  easily  be done  by  only invoking  this  function from
+ * callbacks registered by
  *   - `sig_multicompletion_alloc()' or
  *   - `sig_multicompletion_connect()' */
 #define sig_multicompletion_controller(sc) \
@@ -236,17 +237,17 @@ NOTHROW(FCALL sig_multicompletion_cinit)(struct sig_multicompletion *__restrict 
 #endif /* TASK_CONNECTION_STAT_BROADCAST == 0 && NDEBUG */
 
 /* Finalize a given signal multi-completion controller.
- * WARNING: This  function  will  _not_ disconnect  any  remaining signals.
- *          If active  connections  could  possibly remain,  it  is  up  to
- *          the caller to call `sig_multicompletion_disconnectall()' first! */
+ * WARNING: This  function will _not_  disconnect any remaining signals.
+ *          If active connections could possibly remain, it is up to the
+ *          caller to call `sig_multicompletion_disconnectall()'  first! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self);
 
 
-/* Sever all (still-alive) connections that are active for `self'. Note that this function may
- * not be called from inside of signal-completion-callbacks, or any other callback that may be
- * executed in the  context of  holding an  SMP-lock. (though you  area allowed  to call  this
- * function from a `sig_postcompletion_t' calback) */
+/* Sever all (still-alive) connections that are active for `self'. Note that this  function
+ * may not be called from inside of signal-completion-callbacks, or any other callback that
+ * may  be executed in the context of holding an SMP-lock. (though you area allowed to call
+ * this function from a `sig_postcompletion_t' callback) */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__restrict self);
 
@@ -254,15 +255,18 @@ NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__r
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion const *__restrict self);
 
-/* Allocate and return a  new signal completion descriptor  that is attached to  the
- * signal multi-completion controller `self', and  will invoke `cb' when  triggered.
- * The returned pointer  is owned by  `self', meaning that  the caller doesn't  have
- * to bother with ownership themself. Also note that this these functions will  keep
- * on  returning the same  completion until that completion  has been connected, and
- * will re-use older completions if those got tripped, but didn't re-prime themself.
+/* Allocate and return a new signal completion descriptor that  is
+ * attached  to the signal multi-completion controller `self', and
+ * will invoke `cb' when triggered. The returned pointer is  owned
+ * by  `self', meaning that the caller doesn't have to bother with
+ * ownership themself. Also  note that this  these functions  will
+ * keep on returning the same completion until that completion has
+ * been connected, and will re-use older completions if those  got
+ * tripped, but didn't re-prime themself.
  *
- * If all of that sounds too complicated for you, then just use `sig_connect_multicompletion',
- * which   encapsulates   the   job   of   allocating+connecting   to   a   signal   for  you. */
+ * If all of that sounds too complicated for you, then just use
+ * `sig_connect_multicompletion', which encapsulates the job of
+ * allocating+connecting to a signal for you. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sig_completion *FCALL
 sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
                           sig_completion_t cb)
@@ -309,13 +313,14 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
  * >> struct sig_multicompletion smc;
  * >> sig_multicompletion_init(&smc);
  * >> sig_multicompletion_connect_from_task(&smc, &my_callback);
- * >> if (task_trywait()) {  // Or `task_receiveall()' if the caller only wants connections to remain in `smc'
+ * >> if (task_receiveall()) {  // Or `task_trywait()' if per-task
+ * >>                           // connections should remain
  * >>     sig_multicompletion_disconnectall(&smc);
  * >>     // Error:   One of the caller's signals may have already
  * >>     //          been delivered before `smc' could connect to
  * >>     //          all of them.
  * >> } else {
- * >>     // Success: Connections established
+ * >>     // Success: Connections established (calling thread is no longer connected)
  * >> }
  * This function is used to implement epoll objects using the regular,
  * old poll-api already exposed via `handle_poll()', without the  need
@@ -363,7 +368,9 @@ NOTHROW(FCALL red_phase1)(struct sig_completion *__restrict self,
 	/* Automatic re-prime. Could also be  implemented by counting the #  of
 	 * detected  raising edges, rather than keeping a boolean flag, and re-
 	 * connecting `me' to its signal prior to decrementing the edge-counter
-	 * to `0' in `rising_edge_detector_waitfor()' */
+	 * to `0' in `rising_edge_detector_waitfor()'
+	 * Though admittedly, doing that would turn this into more of a semaphore,
+	 * rather than a simple raising-edge-detector... */
 	sig_completion_reprime(self, true);
 	if (me->red_detected)
 		return 0;
