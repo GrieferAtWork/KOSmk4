@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd5cf465 */
+/* HASH CRC-32:0xaf0acbe0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,8 +37,6 @@ INTDEF NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *fi
 INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream);
 /* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
-/* >> addmntent(3) */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt);
 /* >> endmntent(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
 #endif /* !__KERNEL__ */

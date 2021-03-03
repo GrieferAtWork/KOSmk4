@@ -78,20 +78,6 @@ NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
 }
 /*[[[end:libc_getmntent_r]]]*/
 
-/*[[[head:libc_addmntent,hash:CRC-32=0x66abfa93]]]*/
-/* >> addmntent(3) */
-INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
-                                     struct mntent const *__restrict mnt)
-/*[[[body:libc_addmntent]]]*/
-/*AUTO*/{
-	(void)stream;
-	(void)mnt;
-	CRT_UNIMPLEMENTEDF("addmntent(%p, %p)", stream, mnt); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_addmntent]]]*/
 
 /*[[[head:libc_endmntent,hash:CRC-32=0x16157864]]]*/
 /* >> endmntent(3) */
@@ -110,13 +96,12 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1975f556]]]*/
+/*[[[start:exports,hash:CRC-32=0xf6cf9b3a]]]*/
 DEFINE_PUBLIC_ALIAS(__setmntent, libc_setmntent);
 DEFINE_PUBLIC_ALIAS(setmntent, libc_setmntent);
 DEFINE_PUBLIC_ALIAS(getmntent, libc_getmntent);
 DEFINE_PUBLIC_ALIAS(__getmntent_r, libc_getmntent_r);
 DEFINE_PUBLIC_ALIAS(getmntent_r, libc_getmntent_r);
-DEFINE_PUBLIC_ALIAS(addmntent, libc_addmntent);
 DEFINE_PUBLIC_ALIAS(__endmntent, libc_endmntent);
 DEFINE_PUBLIC_ALIAS(endmntent, libc_endmntent);
 /*[[[end:exports]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89b98b0a */
+/* HASH CRC-32:0xef40d304 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,35 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/mntent.h"
+#include "../user/stdio.h"
 #include "../user/string.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+/* >> addmntent(3)
+ * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
+ * @return: 0: Success
+ * @return: 1: Error (WARNING: `errno' is left undefined) */
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2)) int
+(LIBCCALL libc_addmntent)(FILE *__restrict stream,
+                          struct mntent const *__restrict mnt) THROWS(...) {
+	if unlikely(!mnt ||
+	            !mnt->mnt_fsname || !mnt->mnt_dir ||
+	            !mnt->mnt_type || !mnt->mnt_opts)
+		return 1;
+	if (libc_fseek(stream, 0, __SEEK_END) < 0)
+		return 1;
+	libc_fprintf(stream, "%s %s %s %s %d %d\n",
+	        mnt->mnt_fsname,
+	        mnt->mnt_dir,
+	        mnt->mnt_type,
+	        mnt->mnt_opts,
+	        mnt->mnt_freq,
+	        mnt->mnt_passno);
+	return 0;
+}
 /* >> hasmntopt(3)
  * Check if `mnt->mnt_opts' contains an option matching `opt'.
  * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
@@ -54,6 +78,7 @@ NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(addmntent, libc_addmntent);
 DEFINE_PUBLIC_ALIAS(hasmntopt, libc_hasmntopt);
 #endif /* !__KERNEL__ */
 

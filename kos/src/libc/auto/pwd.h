@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cd960b1 */
+/* HASH CRC-32:0xc8cac3d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,12 +46,18 @@ INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(const cha
  *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
-/* Write the given entry `ent' into the given `stream' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream);
+/* >> putpwent(3)
+ * Write the given entry `ent' into the given `stream'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF NONNULL((1, 2)) int (LIBDCALL libd_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Write the given entry `ent' into the given `stream' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream);
+/* >> putpwent(3)
+ * Write the given entry `ent' into the given `stream'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF NONNULL((1, 2)) int (LIBCCALL libc_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Search for an entry with a matching user ID

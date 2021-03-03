@@ -161,11 +161,7 @@ SLIST_HEAD(lockop_slist, lockop);
 DATDEF ATTR_PERMMAN struct lockop_slist thismman_lockops;
 
 /* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_lockops)' */
-#ifndef __mman_kernel_lockops_defined
-#define __mman_kernel_lockops_defined 1
 DATDEF struct lockop_slist mman_kernel_lockops;
-#endif /* !__mman_kernel_lockops_defined */
-
 
 #ifndef __gfp_t_defined
 #define __gfp_t_defined 1

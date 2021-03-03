@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe89388da */
+/* HASH CRC-32:0x384f1aa3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,8 +36,22 @@ INTDEF NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_setmntent)(char const *fi
 INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);
 /* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
-/* >> addmntent(3) */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt);
+/* >> addmntent(3)
+ * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
+ * @return: 0: Success
+ * @return: 1: Error (WARNING: `errno' is left undefined) */
+INTDEF NONNULL((1, 2)) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> addmntent(3)
+ * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
+ * @return: 0: Success
+ * @return: 1: Error (WARNING: `errno' is left undefined) */
+INTDEF NONNULL((1, 2)) int (LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> endmntent(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
 /* >> hasmntopt(3)

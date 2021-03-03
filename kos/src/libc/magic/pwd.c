@@ -130,8 +130,11 @@ struct passwd *getpwnam([[nonnull]] const char *name);
 [[cp, decl_include("<bits/crt/db/passwd.h>")]]
 struct passwd *fgetpwent([[nonnull]] $FILE *__restrict stream);
 
+@@>> putpwent(3)
 @@Write the given entry `ent' into the given `stream'
-[[cp, decl_include("<bits/crt/db/passwd.h>")]]
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[cp_stdio, decl_include("<bits/crt/db/passwd.h>")]]
 [[requires_function(fprintf), impl_include("<bits/crt/inttypes.h>")]]
 int putpwent([[nonnull]] struct passwd const *__restrict ent,
              [[nonnull]] $FILE *__restrict stream) {

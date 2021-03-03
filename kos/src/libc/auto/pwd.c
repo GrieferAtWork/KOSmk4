@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f23a031 */
+/* HASH CRC-32:0x8f9e9791 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,13 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/crt/inttypes.h>
-/* Write the given entry `ent' into the given `stream' */
+/* >> putpwent(3)
+ * Write the given entry `ent' into the given `stream'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
-                                    FILE *__restrict stream) {
+(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
+                         FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T error;
 	error = libc_fprintf(stream,
 	                "%s:%s:"

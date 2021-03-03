@@ -114,13 +114,6 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 /* ALIAS@thismman_kernel_reservation.mn_link.le_next */
 DATDEF ATTR_PERMMAN struct lockop_slist thismman_lockops;
 
-/* ALIAS@FORMMAN(&mman_kernel, thismman_lockops) */
-#ifndef __mman_kernel_lockops_defined
-#define __mman_kernel_lockops_defined 1
-DATDEF struct lockop_slist mman_kernel_lockops;
-#endif /* !__mman_kernel_lockops_defined */
-
-
 /* Dynamic per-memory-manager init/fini callbacks.
  * XXX: Maybe get rid of these? (there aren't really ~that~ many of these) */
 typedef NONNULL((1)) void (KCALL *permman_init_t)(struct mman *__restrict self) /*THROWS(...)*/;

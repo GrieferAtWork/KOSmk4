@@ -89,9 +89,30 @@ struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
 
 
 @@>> addmntent(3)
-[[cp, decl_include("<bits/crt/db/mntent.h>")]]
+@@Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+@@mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
+@@@return: 0: Success
+@@@return: 1: Error (WARNING: `errno' is left undefined)
+[[cp_stdio, decl_include("<bits/crt/db/mntent.h>")]]
+[[requires_include("<asm/os/stdio.h>")]]
+[[requires(defined(__SEEK_END) && $has_function(fseek) && $has_function(fprintf))]]
 int addmntent([[nonnull]] $FILE *__restrict stream,
-              [[nonnull]] struct mntent const *__restrict mnt);
+              [[nonnull]] struct mntent const *__restrict mnt) {
+	if unlikely(!mnt ||
+	            !mnt->@mnt_fsname@ || !mnt->@mnt_dir@ ||
+	            !mnt->@mnt_type@ || !mnt->@mnt_opts@)
+		return 1;
+	if (fseek(stream, 0, @__SEEK_END@) < 0)
+		return 1;
+	fprintf(stream, "%s %s %s %s %d %d\n",
+	        mnt->@mnt_fsname@,
+	        mnt->@mnt_dir@,
+	        mnt->@mnt_type@,
+	        mnt->@mnt_opts@,
+	        mnt->@mnt_freq@,
+	        mnt->@mnt_passno@);
+	return 0;
+}
 
 @@>> endmntent(3)
 [[cp_nokos, alias(fclose), export_alias("__endmntent")]]
