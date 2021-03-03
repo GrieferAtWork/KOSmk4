@@ -41,24 +41,24 @@ struct oblockop;
 /* Callback prototype for an operation to-be performed once locks have been released. */
 typedef NOBLOCK NONNULL((1)) void
 /*NOTHROW*/ (FCALL *postlockop_callback_t)(struct postlockop *__restrict self);
-typedef NOBLOCK NONNULL((1)) void
-/*NOTHROW*/ (FCALL *obpostlockop_callback_t)(struct obpostlockop *__restrict self, void *obj);
+typedef NOBLOCK NONNULL((1, 2)) void
+/*NOTHROW*/ (FCALL *obpostlockop_callback_t)(struct obpostlockop *__restrict self, void *__restrict obj);
 
 /* Callback prototype for pending locked operations.
  * @return: NULL: Completed.
  * @return: * :   A descriptor for an operation to perform after the lock has been released. */
 typedef NOBLOCK NONNULL((1)) struct postlockop *
 /*NOTHROW*/ (FCALL *lockop_callback_t)(struct lockop *__restrict self);
-typedef NOBLOCK NONNULL((1)) struct obpostlockop *
-/*NOTHROW*/ (FCALL *oblockop_callback_t)(struct oblockop *__restrict self, void *obj);
+typedef NOBLOCK NONNULL((1, 2)) struct obpostlockop *
+/*NOTHROW*/ (FCALL *oblockop_callback_t)(struct oblockop *__restrict self, void *__restrict obj);
 
 struct postlockop {
 	SLIST_ENTRY(postlockop) plo_link; /* [0..1] Next post-lock operation. */
 	postlockop_callback_t   plo_func; /* [1..1][const] Callback to invoke. */
 };
 struct obpostlockop {
-	SLIST_ENTRY(obpostlockop) plo_link; /* [0..1] Next post-lock operation. */
-	obpostlockop_callback_t   plo_func; /* [1..1][const] Callback to invoke. */
+	SLIST_ENTRY(obpostlockop) oplo_link; /* [0..1] Next post-lock operation. */
+	obpostlockop_callback_t   oplo_func; /* [1..1][const] Callback to invoke. */
 };
 
 struct lockop {
@@ -66,8 +66,8 @@ struct lockop {
 	lockop_callback_t   lo_func; /* [1..1][const] Operation to perform. */
 };
 struct oblockop {
-	SLIST_ENTRY(oblockop) lo_link; /* [0..1] Next lock operation. */
-	oblockop_callback_t   lo_func; /* [1..1][const] Operation to perform. */
+	SLIST_ENTRY(oblockop) olo_link; /* [0..1] Next lock operation. */
+	oblockop_callback_t   olo_func; /* [1..1][const] Operation to perform. */
 };
 
 
@@ -82,6 +82,35 @@ SLIST_HEAD(lockop_slist, lockop);
 #define __oblockop_slist_defined 1
 SLIST_HEAD(oblockop_slist, oblockop);
 #endif /* !__oblockop_slist_defined */
+
+#ifdef __cplusplus
+extern "C++" {
+#define Tobpostlockop(T)            _Tobpostlockop<T>
+#define Toblockop(T)                _Toblockop<T>
+#define Toblockop_slist(T)          _Toblockop_slist<T>
+#define Tobpostlockop_callback_t(T) _Tobpostlockop_callback_t<T>
+#define Toblockop_callback_t(T)     _Toblockop_callback_t<T>
+template<class T> struct _Tobpostlockop;
+template<class T> struct _Toblockop;
+template<class T> using _Tobpostlockop_callback_t = NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *)(_Tobpostlockop<T> *__restrict self, T *__restrict obj);
+template<class T> using _Toblockop_callback_t     = NOBLOCK NONNULL((1)) _Tobpostlockop<T> * /*NOTHROW*/ (FCALL *)(_Toblockop<T> *__restrict self, T *__restrict obj);
+template<class T> struct _Tobpostlockop {
+	SLIST_ENTRY(_Tobpostlockop<T>) oplo_link; /* [0..1] Next post-lock operation. */
+	_Tobpostlockop_callback_t<T>   oplo_func; /* [1..1][const] Callback to invoke. */
+};
+template<class T> struct _Toblockop {
+	SLIST_ENTRY(_Toblockop<T>) olo_link; /* [0..1] Next lock operation. */
+	_Toblockop_callback_t<T>   olo_func; /* [1..1][const] Operation to perform. */
+};
+template<class T> SLIST_HEAD(_Toblockop_slist, _Toblockop<T>);
+} /* extern "C++" */
+#else /* __cplusplus */
+#define Tobpostlockop(T)            struct obpostlockop
+#define Toblockop(T)                struct oblockop
+#define Toblockop_slist(T)          struct oblockop_slist
+#define Tobpostlockop_callback_t(T) obpostlockop_callback_t
+#define Toblockop_callback_t(T)     oblockop_callback_t
+#endif /* !__cplusplus */
 
 
 struct atomic_lock;
@@ -102,11 +131,11 @@ NOTHROW(FCALL _lockop_reap_ex)(struct lockop_slist *__restrict self,
                                void (FCALL *unlock)(void *cookie),
                                void *cookie)
 	ASMNAME("lockop_reap_ex");
-FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
+FUNDEF NOBLOCK NONNULL((1, 2, 3, 4)) void
 NOTHROW(FCALL _oblockop_reap_ex)(struct oblockop_slist *__restrict self,
                                  __BOOL (FCALL *trylock)(void *cookie),
                                  void (FCALL *unlock)(void *cookie),
-                                 void *cookie, void *obj)
+                                 void *cookie, void *__restrict obj)
 	ASMNAME("oblockop_reap_ex");
 
 
@@ -129,13 +158,13 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL _lockop_reap_atomic_rwlock)(struct lockop_slist *__restrict self,
                                           struct atomic_rwlock *__restrict lock)
 	ASMNAME("lockop_reap_atomic_rwlock");
-FUNDEF NOBLOCK NONNULL((1, 2)) void
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap_atomic_lock)(struct oblockop_slist *__restrict self,
-                                          struct atomic_lock *__restrict lock, void *obj)
+                                          struct atomic_lock *__restrict lock, void *__restrict obj)
 	ASMNAME("oblockop_reap_atomic_lock");
-FUNDEF NOBLOCK NONNULL((1, 2)) void
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict self,
-                                            struct atomic_rwlock *__restrict lock, void *obj)
+                                            struct atomic_rwlock *__restrict lock, void *__restrict obj)
 	ASMNAME("oblockop_reap_atomic_rwlock");
 
 
@@ -156,14 +185,38 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL _lockop_reap)(struct lockop_slist *__restrict self,
                             struct atomic_rwlock *__restrict lock)
 	ASMNAME("lockop_reap_atomic_rwlock");
-FUNDEF NOBLOCK NONNULL((1, 2)) void
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap)(struct oblockop_slist *__restrict self,
-                              struct atomic_lock *__restrict lock, void *obj)
+                              struct atomic_lock *__restrict lock, void *__restrict obj)
 	ASMNAME("oblockop_reap_atomic_lock");
-FUNDEF NOBLOCK NONNULL((1, 2)) void
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap)(struct oblockop_slist *__restrict self,
-                              struct atomic_rwlock *__restrict lock, void *obj)
+                              struct atomic_rwlock *__restrict lock, void *__restrict obj)
 	ASMNAME("oblockop_reap_atomic_rwlock");
+template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL _oblockop_reap_atomic_lock)(_Toblockop_slist<T> *__restrict self,
+                                          struct atomic_lock *__restrict lock,
+                                          T *__restrict obj) {
+	_oblockop_reap_atomic_lock((struct oblockop_slist *)self, lock, (void *)obj);
+}
+template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL _oblockop_reap_atomic_rwlock)(_Toblockop_slist<T> *__restrict self,
+                                            struct atomic_rwlock *__restrict lock,
+                                            T *__restrict obj) {
+	_oblockop_reap_atomic_rwlock((struct oblockop_slist *)self, lock, (void *)obj);
+}
+template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL _oblockop_reap)(_Toblockop_slist<T> *__restrict self,
+                              struct atomic_lock *__restrict lock,
+                              T *__restrict obj) {
+	_oblockop_reap_atomic_lock((struct oblockop_slist *)self, lock, (void *)obj);
+}
+template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL _oblockop_reap)(_Toblockop_slist<T> *__restrict self,
+                              struct atomic_rwlock *__restrict lock,
+                              T *__restrict obj) {
+	_oblockop_reap_atomic_rwlock((struct oblockop_slist *)self, lock, (void *)obj);
+}
 } /* extern "C++" */
 #endif /* __cplusplus */
 

@@ -142,11 +142,11 @@ FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
 
 
-struct mlockop;
-#ifndef __mlockop_slist_defined
-#define __mlockop_slist_defined 1
-SLIST_HEAD(mlockop_slist, mlockop);
-#endif /* !__mlockop_slist_defined */
+struct lockop;
+#ifndef __lockop_slist_defined
+#define __lockop_slist_defined 1
+SLIST_HEAD(lockop_slist, lockop);
+#endif /* !__lockop_slist_defined */
 
 
 /* Only used by the kernel mman: Linked chain of pending operations
@@ -158,12 +158,12 @@ SLIST_HEAD(mlockop_slist, mlockop);
  * when done for anything but the kernel mman.
  * However, you still mustn't add anything into it for a user-space
  * memory manager! */
-DATDEF ATTR_PERMMAN struct mlockop_slist thismman_lockops;
+DATDEF ATTR_PERMMAN struct lockop_slist thismman_lockops;
 
 /* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_lockops)' */
 #ifndef __mman_kernel_lockops_defined
 #define __mman_kernel_lockops_defined 1
-DATDEF struct mlockop_slist mman_kernel_lockops;
+DATDEF struct lockop_slist mman_kernel_lockops;
 #endif /* !__mman_kernel_lockops_defined */
 
 

@@ -1233,9 +1233,6 @@
 #define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
 
 
-
-
-
 #define AIO_BUFFER_FOREACH(ent,self) for(;;)
 #define AIO_BUFFER_FOREACH_N(ent,self) for(;;)
 #define AIO_PBUFFER_FOREACH(ent,self) for(;;)
@@ -1243,21 +1240,6 @@
 #define DI_DEBUGINFO_CU_PARSER_EACHATTR(a,b) for(;;)
 
 #define __SOCKADDR_COMMON(x) sa_family_t x##family
-
-#define NCURSES_API
-#define NCURSES_IMPEXP
-#define NCURSES_SP_NAME(x) x##_sp
-#define NCURSES_EXPORT(x) x
-#define NCURSES_EXPORT_VAR(x) x
-#define NCURSES_PUBLIC_VAR(x) _nc_##x
-#define NCURSES_WRAPPED_VAR(t,x) t _nc_##x(void)
-#define NCURSES_CONST const
-#define NCURSES_SBOOL char
-#define NCURSES_CPP_TRY
-#define NCURSES_CPP_CATCH(e) if(0)
-#define NCURSES_FIELD_INTERNALS
-#define THROW2(...)
-#define UNDEF(x) CUR_##x
 
 #define ANSITTY_INTERNAL(x) x
 
@@ -1294,6 +1276,12 @@
 #define os_heap_gfparg(v) int v
 #define os_heap_gfppar(v) v
 #define os_heap_gfpvar(v) int v;
+
+#define Tobpostlockop(T)            struct obpostlockop
+#define Toblockop(T)                struct oblockop
+#define Toblockop_slist(T)          struct oblockop_slist
+#define Tobpostlockop_callback_t(T) obpostlockop_callback_t
+#define Toblockop_callback_t(T)     oblockop_callback_t
 
 #define module_type_var(name)    module_type_t name;
 #define module_type_param(name)  module_type_t name
@@ -1413,6 +1401,21 @@
 	FDIRNODE_OPS_FIELDS(prefix, T);\
 	void (*prefix##enumdir)(T *self, fdyndir_enum_callback_t cb, void *cookie)
 
+
+#define NCURSES_API
+#define NCURSES_IMPEXP
+#define NCURSES_SP_NAME(x) x##_sp
+#define NCURSES_EXPORT(x) x
+#define NCURSES_EXPORT_VAR(x) x
+#define NCURSES_PUBLIC_VAR(x) _nc_##x
+#define NCURSES_WRAPPED_VAR(t,x) t _nc_##x(void)
+#define NCURSES_CONST const
+#define NCURSES_SBOOL char
+#define NCURSES_CPP_TRY
+#define NCURSES_CPP_CATCH(e) if(0)
+#define NCURSES_FIELD_INTERNALS
+#define THROW2(...)
+#define UNDEF(x) CUR_##x
 #define BZ_EXTERN
 #define BZ_API(f) f
 #define PIXMAN_API

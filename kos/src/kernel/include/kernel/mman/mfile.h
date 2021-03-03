@@ -29,6 +29,7 @@
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
 #include <sched/atomic64.h>
+#include <sched/lockop.h>
 #include <sched/signal.h>
 
 #include <hybrid/__minmax.h>
@@ -478,8 +479,12 @@ struct mfile_ops {
 #endif /* !CONFIG_USE_NEW_FS */
 };
 
-struct mfile_lockop; /* from "mfile-lockop.h" */
-SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
+struct oblockop;
+
+#ifndef __oblockop_slist_defined
+#define __oblockop_slist_defined 1
+SLIST_HEAD(oblockop_slist, oblockop);
+#endif /* !__oblockop_slist_defined */
 
 #ifdef CONFIG_USE_NEW_FS
 /* Flags defined here also map to:
@@ -574,68 +579,68 @@ SLIST_HEAD(mfile_lockop_slist, mfile_lockop);
 #endif /* CONFIG_USE_NEW_FS */
 
 struct mfile {
-	WEAK refcnt_t               mf_refcnt;     /* Reference counter. */
-	struct mfile_ops const     *mf_ops;        /* [1..1][const] File operators. */
+	WEAK refcnt_t                 mf_refcnt;     /* Reference counter. */
+	struct mfile_ops const       *mf_ops;        /* [1..1][const] File operators. */
 #ifdef CONFIG_MFILE_LEGACY_VIO_OPS
-	struct vio_operators const *mf_vio;        /* [0..1][const] VIO operators. (deprecated field!) */
+	struct vio_operators const   *mf_vio;        /* [0..1][const] VIO operators. (deprecated field!) */
 #endif /* CONFIG_MFILE_LEGACY_VIO_OPS */
-	struct atomic_rwlock        mf_lock;       /* Lock for this file. */
-	RBTREE_ROOT(struct mpart)   mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
-	struct sig                  mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
-	                                            * contained   parts  changes  state   from  INIT  to  LOAD. */
-	struct mfile_lockop_slist   mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of lock operations. */
-	struct REF mpart_slist      mf_changed;    /* [0..n][lock(APPEND: ATOMIC,
-	                                            *             CLEAR:  ATOMIC && mf_lock)]
-	                                            * Chain of references to parts that contain unsaved changes.
-	                                            * NOTE: Set to `MFILE_PARTS_ANONYMOUS' if changed parts should
-	                                            *       always  be ignored unconditionally,  the same way they
-	                                            *       would be when `mf_ops->mo_saveblocks' is `NULL'. */
-	size_t                      mf_part_amask; /* [const] == MAX(PAGESIZE, 1 << mf_blockshift) - 1
-	                                            * This field describes the minimum alignment of file positions
-	                                            * described by parts, minus one (meaning  it can be used as  a
-	                                            * mask) */
-	unsigned int                mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
+	struct atomic_rwlock          mf_lock;       /* Lock for this file. */
+	RBTREE_ROOT(struct mpart)     mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
+	struct sig                    mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
+	                                              * contained   parts  changes  state   from  INIT  to  LOAD. */
+	Toblockop_slist(struct mfile) mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of lock operations. */
+	struct REF mpart_slist        mf_changed;    /* [0..n][lock(APPEND: ATOMIC,
+	                                              *             CLEAR:  ATOMIC && mf_lock)]
+	                                              * Chain of references to parts that contain unsaved changes.
+	                                              * NOTE: Set to `MFILE_PARTS_ANONYMOUS' if changed parts should
+	                                              *       always  be ignored unconditionally,  the same way they
+	                                              *       would be when `mf_ops->mo_saveblocks' is `NULL'. */
+	size_t                        mf_part_amask; /* [const] == MAX(PAGESIZE, 1 << mf_blockshift) - 1
+	                                              * This field describes the minimum alignment of file positions
+	                                              * described by parts, minus one (meaning  it can be used as  a
+	                                              * mask) */
+	unsigned int                  mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
 
 	/* TODO: Change  `mfile_makeanon_subrange()'  to  `mfile_truncate()'  (which   can
 	 *       be used to dynamically alter the `mf_filesize' value of a given mem-file) */
 
 #ifdef CONFIG_USE_NEW_FS
-	uintptr_t                   mf_flags;      /* File flags (set of `MFILE_F_*') */
-	WEAK size_t                 mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
-	                                            *       DEC(ATOMIC))]
-	                                            * Non-zero if `mf_filesize' must not be lowered. Incrementing this
-	                                            * counter requires one  to be holding  a lock to  one of the  mem-
-	                                            * parts  of  this file,  or a  lock to  the file  itself. However,
-	                                            * decrementing it  doesn't impose  such a  requirement. When  this
-	                                            * counter hits 0, then `mf_initdone' must be broadcast. */
-	atomic64_t                  mf_filesize;   /* [lock(READ:      ATOMIC,
-	                                            *       INCREMENT: mf_trunclock != 0 && ATOMIC,  // NOTE: `mf_trunclock' was incremented while holding `mf_lock'!
-	                                            *                                                // By acquiring a write-lock to `mf_lock' and waiting for `mf_trunclock == 0',
-	                                            *                                                // one must be able to prevent `mf_filesize' from changing at all!
-	                                            *       DECREMENT: WRLOCK(mf_lock) && mf_trunclock == 0 &&
-	                                            *                  mpart_lock_acquired(ALL(mf_parts)))]
-	                                            * [const_if(MFILE_F_FIXEDFILESIZE || MFILE_F_DELETED)] // Also cannot be lowered when `mf_trunclock != 0'
-	                                            * [valid_if(!mfile_isanon(self))] File       size       field.
-	                                            * Attempting  to  construct new  mem-parts above  this address
-	                                            * will  fail  and/or clamp  the  max accessible  file  size to
-	                                            * the given address. Note however that  in the case of a  file
-	                                            * that doesn't have the `MFILE_F_FIXEDFILESIZE' flag set, this
-	                                            * values _can_ be increased by  writing beyond the end of  the
-	                                            * file in a call to  `mfile_write()'. Also note that  whenever
-	                                            * this value is increased, then the `mf_initdone' signal  will
-	                                            * be broadcast. */
-	struct timespec             mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
-	                                            * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
-	                                            * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
-	                                            *      before proceeding to use the data you've just read! */
-	struct timespec             mf_mtime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOMTIME)][valid_if(!MFILE_F_DELETED)]
-	                                            * Last-modified timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
-	                                            * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
-	                                            *      before proceeding to use the data you've just read! */
-	struct timespec             mf_ctime;      /* [const][valid_if(!MFILE_F_DELETED)]
-	                                            * Creation timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
-	                                            * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
-	                                            *      before proceeding to use the data you've just read! */
+	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
+	WEAK size_t                   mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
+	                                              *       DEC(ATOMIC))]
+	                                              * Non-zero if `mf_filesize' must not be lowered. Incrementing this
+	                                              * counter requires one  to be holding  a lock to  one of the  mem-
+	                                              * parts  of  this file,  or a  lock to  the file  itself. However,
+	                                              * decrementing it  doesn't impose  such a  requirement. When  this
+	                                              * counter hits 0, then `mf_initdone' must be broadcast. */
+	atomic64_t                    mf_filesize;   /* [lock(READ:      ATOMIC,
+	                                              *       INCREMENT: mf_trunclock != 0 && ATOMIC,  // NOTE: `mf_trunclock' was incremented while holding `mf_lock'!
+	                                              *                                                // By acquiring a write-lock to `mf_lock' and waiting for `mf_trunclock == 0',
+	                                              *                                                // one must be able to prevent `mf_filesize' from changing at all!
+	                                              *       DECREMENT: WRLOCK(mf_lock) && mf_trunclock == 0 &&
+	                                              *                  mpart_lock_acquired(ALL(mf_parts)))]
+	                                              * [const_if(MFILE_F_FIXEDFILESIZE || MFILE_F_DELETED)] // Also cannot be lowered when `mf_trunclock != 0'
+	                                              * [valid_if(!mfile_isanon(self))] File       size       field.
+	                                              * Attempting  to  construct new  mem-parts above  this address
+	                                              * will  fail  and/or clamp  the  max accessible  file  size to
+	                                              * the given address. Note however that  in the case of a  file
+	                                              * that doesn't have the `MFILE_F_FIXEDFILESIZE' flag set, this
+	                                              * values _can_ be increased by  writing beyond the end of  the
+	                                              * file in a call to  `mfile_write()'. Also note that  whenever
+	                                              * this value is increased, then the `mf_initdone' signal  will
+	                                              * be broadcast. */
+	struct timespec               mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
+	                                              * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
+	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
+	                                              *      before proceeding to use the data you've just read! */
+	struct timespec               mf_mtime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOMTIME)][valid_if(!MFILE_F_DELETED)]
+	                                              * Last-modified timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
+	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
+	                                              *      before proceeding to use the data you've just read! */
+	struct timespec               mf_ctime;      /* [const][valid_if(!MFILE_F_DELETED)]
+	                                              * Creation timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
+	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
+	                                              *      before proceeding to use the data you've just read! */
 #endif /* CONFIG_USE_NEW_FS */
 };
 
@@ -825,16 +830,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_addr_ceilalign(self, addr)  (pos_t)(((uint64_t)(addr) + (self)->mf_part_amask) & ~(self)->mf_part_amask)
 #define mfile_addr_aligned(self, addr)    (((uint64_t)(addr) & (self)->mf_part_amask) == 0)
 
-
 /* Reap lock operations of `self' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_lockops_reap)(struct mfile *__restrict self);
-#define mfile_lockops_mustreap(self) \
-	(__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
-#ifdef __OPTIMIZE_SIZE__
-#define mfile_lockops_reap(self) _mfile_lockops_reap(self)
-#else /* __OPTIMIZE_SIZE__ */
-#define mfile_lockops_reap(self) (void)(!mfile_lockops_mustreap(self) || (_mfile_lockops_reap(self), 0))
-#endif /* !__OPTIMIZE_SIZE__ */
+#define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, self)
+#define mfile_lockops_reap(self)     oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, self)
+#define mfile_lockops_mustreap(self) (__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 /* Lock accessor helpers for `struct mfile' */
 #define mfile_lock_write(self)      atomic_rwlock_write(&(self)->mf_lock)

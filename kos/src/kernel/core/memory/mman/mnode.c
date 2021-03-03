@@ -29,12 +29,12 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/sync.h>
 #include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart-lockop.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <sched/lockop.h>
 
 #include <hybrid/atomic.h>
 
@@ -90,7 +90,7 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(struct mpart_postlockop *__restrict self,
+NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(Tobpostlockop(struct mpart) *__restrict self,
                                                   struct mpart *__restrict UNUSED(part)) {
 	struct mnode *me;
 	me = (struct mnode *)self;
@@ -98,10 +98,10 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(struct mpart_postlockop *__res
 	mnode_free(me);
 }
 
-INTERN NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
+INTERN NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
                                              struct mpart *__restrict part) {
-	struct mpart_postlockop *post;
+	Tobpostlockop(struct mpart) *post;
 	struct mnode *me;
 	me = (struct mnode *)self;
 	LIST_REMOVE(me, mn_link);
@@ -111,8 +111,8 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict sel
 	/* Do the rest in post so we won't be holding a lock to the mem-part anymore:
 	 * >> weakdecref(me->mn_mman);
 	 * >> mnode_free(me); */
-	post             = (struct mpart_postlockop *)self;
-	post->mpplo_func = &mnode_unlink_from_part_lockop_post;
+	post             = (Tobpostlockop(struct mpart) *)self;
+	post->oplo_func = &mnode_unlink_from_part_lockop_post;
 	return post;
 }
 
@@ -145,7 +145,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			mpart_lock_release(part);
 			decref_unlikely(part);
 		} else {
-			struct mpart_lockop *lop;
+			Toblockop(struct mpart) *lop;
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
 			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
@@ -153,9 +153,9 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part' */
-			lop = (struct mpart_lockop *)self;
-			lop->mplo_func = &mnode_unlink_from_part_lockop;
-			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, mplo_link);
+			lop = (Toblockop(struct mpart) *)self;
+			lop->olo_func = &mnode_unlink_from_part_lockop;
+			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
 
 			/* Try to reap dead nodes. */
 			_mpart_lockops_reap(part);

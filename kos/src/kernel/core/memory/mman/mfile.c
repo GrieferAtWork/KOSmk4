@@ -25,10 +25,10 @@
 
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mfile-lockop.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <sched/lockop.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -128,61 +128,6 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 		(*self->mf_ops->mo_destroy)(self);
 	} else {
 		kfree(self);
-	}
-}
-
-
-
-SLIST_HEAD(mfile_postlockop_slist, mfile_postlockop);
-
-/* Reap lock operations of `self' */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mfile_lockops_reap)(struct mfile *__restrict self) {
-	struct mfile_lockop_slist lops;
-	struct mfile_postlockop_slist post;
-	struct mfile_lockop *iter;
-	if (!mfile_lock_trywrite(self))
-		return;
-	SLIST_INIT(&post);
-again_steal_and_service_lops:
-	lops.slh_first = SLIST_ATOMIC_CLEAR(&self->mf_lockops);
-again_service_lops:
-	iter = SLIST_FIRST(&lops);
-	while (iter != NULL) {
-		struct mfile_lockop *next;
-		struct mfile_postlockop *later;
-		next = SLIST_NEXT(iter, mflo_link);
-		/* Invoke the lock operation. */
-		later = (*iter->mflo_func)(iter, self);
-		/* Enqueue operations for later execution. */
-		if (later != NULL)
-			SLIST_INSERT(&post, later, mfplo_link);
-		iter = next;
-	}
-	mfile_lock_endwrite_f(self);
-
-	/* Check for more operations. */
-	lops.slh_first = SLIST_ATOMIC_CLEAR(&self->mf_lockops);
-	if unlikely(!SLIST_EMPTY(&lops)) {
-		if likely(mfile_lock_trywrite(self))
-			goto again_service_lops;
-		/* re-queue all stolen lops. */
-		iter = SLIST_FIRST(&lops);
-		while (SLIST_NEXT(iter, mflo_link))
-			iter = SLIST_NEXT(iter, mflo_link);
-		SLIST_ATOMIC_INSERT_R(&self->mf_lockops,
-		                      SLIST_FIRST(&lops),
-		                      iter, mflo_link);
-		if unlikely(mfile_lock_trywrite(self))
-			goto again_steal_and_service_lops;
-	}
-
-	/* Run all enqueued post-operations. */
-	while (!SLIST_EMPTY(&post)) {
-		struct mfile_postlockop *op;
-		op = SLIST_FIRST(&post);
-		SLIST_REMOVE_HEAD(&post, mfplo_link);
-		(*op->mfplo_func)(op, self);
 	}
 }
 

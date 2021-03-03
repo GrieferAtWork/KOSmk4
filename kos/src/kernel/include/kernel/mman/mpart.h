@@ -28,6 +28,7 @@
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
+#include <sched/lockop.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
@@ -175,9 +176,6 @@ struct mchunkvec {
 };
 
 
-struct mpart_lockop; /* from "mpart-lockop.h" */
-SLIST_HEAD(mpart_lockop_slist, mpart_lockop);
-
 #define __ALIGNOF_MPART __ALIGNOF_INT64__
 #if __SIZEOF_POINTER__ == 4
 #define __SIZEOF_MPART 80
@@ -237,7 +235,7 @@ struct mpart {
 #endif /* __WANT_MPART_INIT */
 	struct mnode_list             mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
-	struct mpart_lockop_slist     mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_lockops_reap()') */
+	Toblockop_slist(struct mpart) mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_lockops_reap()') */
 #ifdef __WANT_MPART__mp_newglobl
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_allparts(mp_allparts) { mp_allparts }
@@ -469,8 +467,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mpart, mp_refcnt, mpart_destroy)
 
 /* Reap lock operations enqueued for execution when `self' can be locked. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mpart_lockops_reap)(struct mpart *__restrict self);
-#define mpart_lockops_mustreap(self) \
-	(__hybrid_atomic_load((self)->mp_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define mpart_lockops_mustreap(self) (__hybrid_atomic_load((self)->mp_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
 #define mpart_lockops_reap(self) _mpart_lockops_reap(self)
 #else /* __OPTIMIZE_SIZE__ */

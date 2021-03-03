@@ -24,19 +24,19 @@
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
+#include <kernel/mman/kram.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/kram.h>
-#include <kernel/mman/lockop.h>
-#include <kernel/mman/sync.h>
-#include <kernel/mman/unmapped.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/sync.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <sched/lockop.h>
 
 #include <hybrid/align.h>
 
@@ -635,8 +635,8 @@ mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 }
 
 
-PRIVATE NOBLOCK NONNULL((1)) struct mpostlockop *
-NOTHROW(FCALL mlockop_coreheap_free_callback)(struct mlockop *__restrict self) {
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL lockop_coreheap_free_callback)(struct lockop *__restrict self) {
 	union mcorepart *me;
 	me = (union mcorepart *)self;
 	mcoreheap_free_locked(me);
@@ -652,17 +652,17 @@ NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
 		mman_lock_release(&mman_kernel);
 	} else {
 		/* Must enqueue a lock operation for the kernel mman. */
-		struct mlockop *lop;
-		lop = (struct mlockop *)part;
-		lop->mlo_func = &mlockop_coreheap_free_callback;
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, mlo_link);
+		struct lockop *lop;
+		lop = (struct lockop *)part;
+		lop->lo_func = &lockop_coreheap_free_callback;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, lo_link);
 		_mman_lockops_reap();
 	}
 }
 
 
 /* Same as `mcoreheap_free()', but no need to just through all of the  hoops
- * of enqueuing the free of `part' as a mlockop when no lock can be acquired
+ * of enqueuing the free of `part' as a lockop when no lock can be acquired
  * to the kernel  mman, since the  caller allows us  to assume that  they've
  * already acquired a lock to the kernel mman. */
 PUBLIC NOBLOCK NONNULL((1)) void

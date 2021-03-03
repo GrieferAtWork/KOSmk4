@@ -26,7 +26,7 @@
 #ifndef __INTELLISENSE__
 #define LOCAL_oblockop     1
 #define LOCAL_name         oblockop_reap_atomic_lock
-#define LOCAL_attr         NONNULL((1, 2))
+#define LOCAL_attr         NONNULL((1, 2, 3))
 #define LOCAL_args         struct atomic_lock *__restrict lock
 #define LOCAL_trylock()    atomic_lock_tryacquire(lock)
 #define LOCAL_unlock()     atomic_lock_release(lock)
@@ -34,7 +34,7 @@
 
 #define LOCAL_oblockop     1
 #define LOCAL_name         oblockop_reap_atomic_rwlock
-#define LOCAL_attr         NONNULL((1, 2))
+#define LOCAL_attr         NONNULL((1, 2, 3))
 #define LOCAL_args         struct atomic_rwlock *__restrict lock
 #define LOCAL_trylock()    atomic_rwlock_trywrite(lock)
 #define LOCAL_unlock()     atomic_rwlock_endwrite(lock)
@@ -42,7 +42,7 @@
 
 #define LOCAL_oblockop     1
 #define LOCAL_name         oblockop_reap_ex
-#define LOCAL_attr         NONNULL((1, 2, 3))
+#define LOCAL_attr         NONNULL((1, 2, 3, 4))
 #define LOCAL_args         __BOOL (FCALL *trylock)(void *cookie), void (FCALL *unlock)(void *cookie), void *cookie
 #define LOCAL_trylock()    (*trylock)(cookie)
 #define LOCAL_unlock()     (*unlock)(cookie)

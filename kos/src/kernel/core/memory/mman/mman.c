@@ -112,12 +112,12 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 };
 
 /* ALIAS@thismman_kernel_reservation.mn_link.le_next */
-DATDEF ATTR_PERMMAN struct mlockop_slist thismman_lockops;
+DATDEF ATTR_PERMMAN struct lockop_slist thismman_lockops;
 
 /* ALIAS@FORMMAN(&mman_kernel, thismman_lockops) */
 #ifndef __mman_kernel_lockops_defined
 #define __mman_kernel_lockops_defined 1
-DATDEF struct mlockop_slist mman_kernel_lockops;
+DATDEF struct lockop_slist mman_kernel_lockops;
 #endif /* !__mman_kernel_lockops_defined */
 
 
@@ -162,7 +162,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
 	DEFINE_PUBLIC_SYMBOL(thismman_lockops,
 	                     &thismman_kernel_reservation.mn_link.le_next,
-	                     sizeof(struct mlockop_slist));
+	                     sizeof(struct lockop_slist));
 	_mman_free(self);
 }
 

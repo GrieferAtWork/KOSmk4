@@ -582,7 +582,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 
 #ifdef CONFIG_USE_NEW_VM
 	/* TODO: Use 2-step cleanup and free the task structure _after_ releasing
-	 *       the  lock  to the  kernel mman  (through  use of  a mpostlockop) */
+	 *       the  lock  to the  kernel mman  (through  use of  a postlockop) */
 	{
 		REF struct mman *mm;
 		mm = self->t_mman;

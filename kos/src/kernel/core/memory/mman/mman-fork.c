@@ -29,12 +29,12 @@
 #include <kernel/compat.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/sync.h>
 #include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart-lockop.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <sched/lockop.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 #include <sched/userkern.h>
@@ -125,8 +125,8 @@ struct forktree {
 };
 
 
-INTDEF NOBLOCK NONNULL((1, 2)) struct mpart_postlockop * /* from "mnode.c" */
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(struct mpart_lockop *__restrict self,
+INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) * /* from "mnode.c" */
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
                                              struct mpart *__restrict part);
 INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
@@ -149,7 +149,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			mpart_lock_release(part);
 			decref_unlikely(part);
 		} else {
-			struct mpart_lockop *lop;
+			Toblockop(struct mpart) *lop;
 
 			/* Let the mem-part know that this node has been unmapped. */
 			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
@@ -161,9 +161,9 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part' */
-			lop = (struct mpart_lockop *)node;
-			lop->mplo_func = &mnode_unlink_from_part_lockop;
-			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, mplo_link);
+			lop = (Toblockop(struct mpart) *)node;
+			lop->olo_func = &mnode_unlink_from_part_lockop;
+			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
 
 			/* Try to reap dead nodes. */
 			_mpart_lockops_reap(part);

@@ -24,7 +24,6 @@
 
 #ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/dma.h>
 #include <kernel/mman/enum.h>
 #include <kernel/mman/event.h>
@@ -32,15 +31,15 @@
 #include <kernel/mman/fault.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
-#include <kernel/mman/lockop.h>
 #include <kernel/mman/map.h>
-#include <kernel/mman/rw.h>
-#include <kernel/mman/sync.h>
-#include <kernel/mman/unmapped.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/ramfile.h>
+#include <kernel/mman/rw.h>
+#include <kernel/mman/sync.h>
+#include <kernel/mman/unmapped.h>
 
 #define datapage_t                                    mfile_block_t
 #define VM_DATAPART_PPP_UNINITIALIZED                 MPART_BLOCK_ST_NDEF
@@ -383,12 +382,12 @@ DECL_END
 #define vm_mapinfo_size                 mmapinfo_size
 #define vm_enum_callback_t              mman_enum_callback_t
 #define vm_enum(...)                    mman_enum(__VA_ARGS__)
-#define vm_kernel_pending_operation     mlockop
-#define vm_kernel_pending_cb_t          mlockop_callback_t
-#define vkpo_next                       mlo_link.sle_next
-#define vkpo_exec                       mlo_func
+#define vm_kernel_pending_operation     lockop
+#define vm_kernel_pending_cb_t          lockop_callback_t
+#define vkpo_next                       lo_link.sle_next
+#define vkpo_exec                       lo_func
 #define vm_kernel_pending_operations    mman_kernel_lockops.slh_first
-#define VM_KERNEL_PENDING_CB_RETURN_T   struct mlockop *
+#define VM_KERNEL_PENDING_CB_RETURN_T   struct postlockop *
 #define VM_KERNEL_PENDING_CB_RETURN     return __NULLPTR
 #define VM_KERNEL_PENDING_CB_CC         FCALL
 #define vm_onexec_callbacks             mman_onexec_callbacks
@@ -625,9 +624,6 @@ DECL_END
 #define mmapinfo_size                                  vm_mapinfo_size
 #define mman_enum_callback_t                           vm_enum_callback_t
 #define mman_enum(...)                                 vm_enum(__VA_ARGS__)
-#define mlockop                                        vm_kernel_pending_operation
-#define mlockop_callback_t                             vm_kernel_pending_cb_t
-#define mlo_func                                       vkpo_exec
 #define mman_onexec_callbacks                          vm_onexec_callbacks
 #define mman_oninit_callbacks                          vm_oninit_callbacks
 #define mman_onfini_callbacks                          vm_onfini_callbacks

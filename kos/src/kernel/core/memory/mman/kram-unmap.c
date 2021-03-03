@@ -26,17 +26,17 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/mman.h>
+#include <kernel/mman/kram.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/kram.h>
-#include <kernel/mman/lockop.h>
-#include <kernel/mman/sync.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/swap.h>
+#include <sched/lockop.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -1020,14 +1020,14 @@ fail:
 
 
 PRIVATE NOBLOCK void
-NOTHROW(FCALL mlockop_kram_cb_post)(struct mpostlockop *__restrict self) {
+NOTHROW(FCALL lockop_kram_cb_post)(struct postlockop *__restrict self) {
 	struct mman_unmap_kram_job *job;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_post_lop_mm);
 	(*job->mukj_done)(job);
 }
 
-PRIVATE NOBLOCK struct mpostlockop *
-NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self) {
+PRIVATE NOBLOCK struct postlockop *
+NOTHROW(FCALL lockop_kram_cb)(struct lockop *__restrict self) {
 	struct mman_unmap_kram_job *job, *res;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mm);
 	res = mman_unmap_kram_locked_ex(job, NULL);
@@ -1035,31 +1035,31 @@ NOTHROW(FCALL mlockop_kram_cb)(struct mlockop *__restrict self) {
 		if likely(job->mukj_done != NULL) {
 			/* Set-up a post-lock callback to exec the done-callback.
 			 * */
-			job->mukj_post_lop_mm.mplo_func = &mlockop_kram_cb_post;
+			job->mukj_post_lop_mm.plo_func = &lockop_kram_cb_post;
 			return &job->mukj_post_lop_mm;
 		}
 	} else if (res != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
 		/* Must re-queue as pending for the kernel mman. */
 		/* TODO: This must happen in a post-op so we don't end up in an infinite loop! */
-		res->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		res->mukj_lop_mm.lo_func = &lockop_kram_cb;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
 		                    &res->mukj_lop_mm,
-		                    mlo_link);
+		                    lo_link);
 	}
 	return NULL;
 }
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpartlockop_kram_cb_post)(struct mpart_postlockop *__restrict self,
+NOTHROW(FCALL mpartlockop_kram_cb_post)(Tobpostlockop(struct mpart) *__restrict self,
                                         struct mpart *__restrict UNUSED(part)) {
 	struct mman_unmap_kram_job *job;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_post_lop_mp);
 	(*job->mukj_done)(job);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) struct mpart_postlockop *
-NOTHROW(FCALL mpartlockop_kram_cb)(struct mpart_lockop *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
+NOTHROW(FCALL mpartlockop_kram_cb)(Toblockop(struct mpart) *__restrict self,
                                    struct mpart *__restrict part) {
 	struct mman_unmap_kram_job *job, *res;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mp);
@@ -1067,15 +1067,15 @@ NOTHROW(FCALL mpartlockop_kram_cb)(struct mpart_lockop *__restrict self,
 	if (res == MMAN_UNMAP_KRAM_LOCKED_EX_DONE) {
 		if likely(job->mukj_done != NULL) {
 			/* Set-up a post-lock callback to exec the done-callback */
-			job->mukj_post_lop_mp.mpplo_func = &mpartlockop_kram_cb_post;
+			job->mukj_post_lop_mp.oplo_func = &mpartlockop_kram_cb_post;
 			return &job->mukj_post_lop_mp;
 		}
 	} else if (res != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
 		/* Must re-queue as pending for the kernel mman. */
-		res->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		res->mukj_lop_mm.lo_func = &lockop_kram_cb;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
 		                    &res->mukj_lop_mm,
-		                    mlo_link);
+		                    lo_link);
 	}
 	return NULL;
 }
@@ -1086,27 +1086,27 @@ NOTHROW(FCALL mpartlockop_kram_cb)(struct mpart_lockop *__restrict self,
  * lock to `self', and return `false' */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
-                                           struct mpart_lockop *__restrict lop) {
+                                           Toblockop(struct mpart) *__restrict lop) {
 	bool did_remove;
-	struct mpart_lockop_slist locklist;
-	SLIST_ATOMIC_INSERT(&self->mp_lockops, lop, mplo_link);
+	Toblockop_slist(struct mpart) locklist;
+	SLIST_ATOMIC_INSERT(&self->mp_lockops, lop, olo_link);
 	if likely(!mpart_lock_tryacquire(self))
 		return true;
 	/* Welp... We've got the lock... -> Try to remove `lop' once again. */
 	locklist.slh_first = SLIST_ATOMIC_CLEAR(&self->mp_lockops);
 	did_remove         = true;
-	SLIST_TRYREMOVE(&locklist, lop, mplo_link, {
+	SLIST_TRYREMOVE(&locklist, lop, olo_link, {
 		did_remove = false;
 	});
 	if (locklist.slh_first != NULL) {
 		/* Re-queue all removed elements. */
-		struct mpart_lockop *lastop;
+		Toblockop(struct mpart) *lastop;
 		lastop = SLIST_FIRST(&locklist);
-		while (SLIST_NEXT(lastop, mplo_link))
-			lastop = SLIST_NEXT(lastop, mplo_link);
+		while (SLIST_NEXT(lastop, olo_link))
+			lastop = SLIST_NEXT(lastop, olo_link);
 		SLIST_ATOMIC_INSERT_R(&self->mp_lockops,
 		                      SLIST_FIRST(&locklist),
-		                      lastop, mplo_link);
+		                      lastop, olo_link);
 	}
 	if (!did_remove) {
 		/* Lock acquired, but `lop' was already executed.
@@ -1295,7 +1295,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 				job->mukj_maxaddr          = job_maxaddr;
 				job->mukj_flags            = job_flags;
 				job->mukj_minaddr          = unmap_minaddr;
-				job->mukj_lop_mp.mplo_func = &mpartlockop_kram_cb;
+				job->mukj_lop_mp.olo_func = &mpartlockop_kram_cb;
 				if (mpart_lockop_insert_or_lock(part, &job->mukj_lop_mp))
 					return MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC;
 				if (job_flags & GFP_CALLOC)
@@ -1407,13 +1407,17 @@ NOTHROW(FCALL krulist_merge_adjacent)(struct mman_unmap_kram_job_slist *__restri
 }
 
 
+#ifndef __postlockop_slist_defined
+#define __postlockop_slist_defined 1
+SLIST_HEAD(postlockop_slist, postlockop);
+#endif /* !__postlockop_slist_defined */
 
 /* Reap lock operations of `mman_kernel' */
 PUBLIC NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void) {
 	struct mman_unmap_kram_job_slist krlist;
-	struct mlockop_slist lops;
-	struct mpostlockop_slist post;
-	struct mlockop *iter;
+	struct lockop_slist lops;
+	struct postlockop_slist post;
+	struct lockop *iter;
 /*again:*/
 	if (!mman_lock_tryacquire(&mman_kernel))
 		return;
@@ -1424,12 +1428,12 @@ again_service_lops:
 	SLIST_INIT(&krlist);
 	iter = SLIST_FIRST(&lops);
 	while (iter != NULL) {
-		struct mlockop *next;
-		struct mpostlockop *later;
-		next = SLIST_NEXT(iter, mlo_link);
+		struct lockop *next;
+		struct postlockop *later;
+		next = SLIST_NEXT(iter, lo_link);
 		/* Special handling for unmap-kram jobs with inline-memory.
 		 * For  efficiency,  these  get  merged  with  each  other. */
-		if (iter->mlo_func == &mlockop_kram_cb) {
+		if (iter->lo_func == &lockop_kram_cb) {
 			struct mman_unmap_kram_job *job;
 			job = container_of(iter, struct mman_unmap_kram_job, mukj_lop_mm);
 			if (job->mukj_minaddr == (byte_t *)job) {
@@ -1439,10 +1443,10 @@ again_service_lops:
 			}
 		}
 		/* Invoke the lock operation. */
-		later = (*iter->mlo_func)(iter);
+		later = (*iter->lo_func)(iter);
 		/* Enqueue operations for later execution. */
 		if (later != NULL)
-			SLIST_INSERT(&post, later, mplo_link);
+			SLIST_INSERT(&post, later, plo_link);
 continue_with_next:
 		iter = next;
 	}
@@ -1455,12 +1459,12 @@ continue_with_next:
 		/* Invoke unmap-kernel-ram lops */
 		do {
 			struct mman_unmap_kram_job *job;
-			struct mpostlockop *later;
+			struct postlockop *later;
 			job = SLIST_FIRST(&krlist);
 			SLIST_REMOVE_HEAD(&krlist, mukj_link);
-			later = mlockop_kram_cb(&job->mukj_lop_mm);
+			later = lockop_kram_cb(&job->mukj_lop_mm);
 			if (later != NULL)
-				SLIST_INSERT(&post, later, mplo_link);
+				SLIST_INSERT(&post, later, plo_link);
 		} while (!SLIST_EMPTY(&krlist));
 	}
 
@@ -1473,21 +1477,21 @@ continue_with_next:
 			goto again_service_lops;
 		/* re-queue all stolen lops. */
 		iter = SLIST_FIRST(&lops);
-		while (SLIST_NEXT(iter, mlo_link))
-			iter = SLIST_NEXT(iter, mlo_link);
+		while (SLIST_NEXT(iter, lo_link))
+			iter = SLIST_NEXT(iter, lo_link);
 		SLIST_ATOMIC_INSERT_R(&mman_kernel_lockops,
 		                      SLIST_FIRST(&lops),
-		                      iter, mlo_link);
+		                      iter, lo_link);
 		if unlikely(mman_lock_tryacquire(&mman_kernel))
 			goto again_steal_and_service_lops;
 	}
 
 	/* Run all enqueued post-operations. */
 	while (!SLIST_EMPTY(&post)) {
-		struct mpostlockop *op;
+		struct postlockop *op;
 		op = SLIST_FIRST(&post);
-		SLIST_REMOVE_HEAD(&post, mplo_link);
-		(*op->mplo_func)(op);
+		SLIST_REMOVE_HEAD(&post, plo_link);
+		(*op->plo_func)(op);
 	}
 }
 
@@ -1545,10 +1549,10 @@ NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
 	job = mman_unmap_kram_locked_ex(job);
 	assert(job != MMAN_UNMAP_KRAM_LOCKED_EX_DONE);
 	if unlikely(job != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
-		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		job->mukj_lop_mm.lo_func = &lockop_kram_cb;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
 		                    &job->mukj_lop_mm,
-		                    mlo_link);
+		                    lo_link);
 	}
 }
 
@@ -1564,9 +1568,9 @@ NOTHROW(FCALL mman_unmap_kram_ex)(/*inherit(always)*/ struct mman_unmap_kram_job
 			goto do_schedule_lockop;
 	} else {
 do_schedule_lockop:
-		job->mukj_lop_mm.mlo_func = &mlockop_kram_cb;
+		job->mukj_lop_mm.lo_func = &lockop_kram_cb;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
-		                    &job->mukj_lop_mm, mlo_link);
+		                    &job->mukj_lop_mm, lo_link);
 		_mman_lockops_reap();
 	}
 }

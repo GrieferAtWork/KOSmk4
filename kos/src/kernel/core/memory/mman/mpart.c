@@ -29,14 +29,13 @@
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
-#include <kernel/mman/mfile-lockop.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
-#include <kernel/mman/mpart-lockop.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/swap.h>
+#include <sched/lockop.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -97,10 +96,10 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	assert(!(self->mp_flags & MPART_F_GLOBAL_REF));
 	/* Make sure that we've served _all_ dead nodes that may have still been there. */
 	while (!SLIST_EMPTY(&self->mp_lockops)) {
-		struct mpart_lockop *lop;
+		Toblockop(struct mpart) *lop;
 		lop = SLIST_FIRST(&self->mp_lockops);
-		SLIST_REMOVE_HEAD(&self->mp_lockops, mplo_link);
-		(*lop->mplo_func)(lop, self);
+		SLIST_REMOVE_HEAD(&self->mp_lockops, olo_link);
+		(*lop->olo_func)(lop, self);
 	}
 	/* If valid, free the block-status extension vector. */
 	if (MPART_ST_HASST(self->mp_state) && !(self->mp_flags & MPART_F_BLKST_INL))
@@ -142,12 +141,12 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 
 
 #define mpart_destroy_lockop_encode(prt) \
-	((struct mfile_lockop *)&(prt)->mp_blkst_ptr)
+	((Toblockop(struct mfile) *)&(prt)->mp_blkst_ptr)
 #define mpart_destroy_lockop_decode(lop) \
 	container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpart_destroy_lop_rmall)(struct mfile_postlockop *__restrict self,
+NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(struct mfile) *__restrict self,
                                        struct mfile *__restrict UNUSED(file)) {
 	struct mpart *me;
 	me = mpart_destroy_lockop_decode(self);
@@ -166,10 +165,10 @@ NOTHROW(FCALL mpart_destroy_lop_rmall)(struct mfile_postlockop *__restrict self,
 	mpart_free(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) struct mfile_postlockop *
-NOTHROW(FCALL mpart_destroy_lop_rmfile)(struct mfile_lockop *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mfile) *
+NOTHROW(FCALL mpart_destroy_lop_rmfile)(Toblockop(struct mfile) *__restrict self,
                                         struct mfile *__restrict file) {
-	struct mfile_postlockop *post;
+	Tobpostlockop(struct mfile) *post;
 	struct mpart *me;
 	me = mpart_destroy_lockop_decode(self);
 	/* Remove the dead part from the file's tree of parts. */
@@ -178,10 +177,10 @@ NOTHROW(FCALL mpart_destroy_lop_rmfile)(struct mfile_lockop *__restrict self,
 		mpart_tree_removenode(&file->mf_parts, me);
 	}
 	DBG_memset(&me->mp_filent, 0xcc, sizeof(me->mp_filent));
-	post = (struct mfile_postlockop *)self;
+	post = (Tobpostlockop(struct mfile) *)self;
 	/* Remove from the all-parts list and free _after_ the
 	 * lock  to  the backing  mem-file has  been released. */
-	post->mfplo_func = &mpart_destroy_lop_rmall;
+	post->oplo_func = &mpart_destroy_lop_rmall;
 	return post;
 }
 
@@ -218,10 +217,10 @@ remove_node_from_globals:
 		goto remove_node_from_globals;
 	} else {
 		/* Enqueue the file for later deletion. */
-		struct mfile_lockop *lop;
+		Toblockop(struct mfile) *lop;
 		lop = mpart_destroy_lockop_encode(self);
-		lop->mflo_func = &mpart_destroy_lop_rmfile;
-		SLIST_ATOMIC_INSERT(&file->mf_lockops, lop, mflo_link);
+		lop->olo_func = &mpart_destroy_lop_rmfile;
+		SLIST_ATOMIC_INSERT(&file->mf_lockops, lop, olo_link);
 		_mfile_lockops_reap(file);
 		decref(file);
 		return;
@@ -230,14 +229,14 @@ remove_node_from_globals:
 	mpart_free(self);
 }
 
-SLIST_HEAD(mpart_postlockop_slist, mpart_postlockop);
+SLIST_HEAD(mpart_postlockop_slist, Tobpostlockop(struct mpart));
 
 /* Reap dead nodes of `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mpart_lockops_reap)(struct mpart *__restrict self) {
-	struct mpart_lockop_slist lops;
+	Toblockop_slist(struct mpart) lops;
 	struct mpart_postlockop_slist post;
-	struct mpart_lockop *iter;
+	Toblockop(struct mpart) *iter;
 	if (!mpart_lock_tryacquire(self))
 		return;
 	SLIST_INIT(&post);
@@ -246,14 +245,14 @@ again_steal_and_service_lops:
 again_service_lops:
 	iter = SLIST_FIRST(&lops);
 	while (iter != NULL) {
-		struct mpart_lockop *next;
-		struct mpart_postlockop *later;
-		next = SLIST_NEXT(iter, mplo_link);
+		Toblockop(struct mpart) *next;
+		Tobpostlockop(struct mpart) *later;
+		next = SLIST_NEXT(iter, olo_link);
 		/* Invoke the lock operation. */
-		later = (*iter->mplo_func)(iter, self);
+		later = (*iter->olo_func)(iter, self);
 		/* Enqueue operations for later execution. */
 		if (later != NULL)
-			SLIST_INSERT(&post, later, mpplo_link);
+			SLIST_INSERT(&post, later, oplo_link);
 		iter = next;
 	}
 	mpart_lock_release_f(self);
@@ -265,21 +264,21 @@ again_service_lops:
 			goto again_service_lops;
 		/* re-queue all stolen lops. */
 		iter = SLIST_FIRST(&lops);
-		while (SLIST_NEXT(iter, mplo_link))
-			iter = SLIST_NEXT(iter, mplo_link);
+		while (SLIST_NEXT(iter, olo_link))
+			iter = SLIST_NEXT(iter, olo_link);
 		SLIST_ATOMIC_INSERT_R(&self->mp_lockops,
 		                      SLIST_FIRST(&lops),
-		                      iter, mplo_link);
+		                      iter, olo_link);
 		if unlikely(mpart_lock_tryacquire(self))
 			goto again_steal_and_service_lops;
 	}
 
 	/* Run all enqueued post-operations. */
 	while (!SLIST_EMPTY(&post)) {
-		struct mpart_postlockop *op;
+		Tobpostlockop(struct mpart) *op;
 		op = SLIST_FIRST(&post);
-		SLIST_REMOVE_HEAD(&post, mpplo_link);
-		(*op->mpplo_func)(op, self);
+		SLIST_REMOVE_HEAD(&post, oplo_link);
+		(*op->oplo_func)(op, self);
 	}
 }
 

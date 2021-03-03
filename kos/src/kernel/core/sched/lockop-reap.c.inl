@@ -37,7 +37,11 @@ DECL_BEGIN
 #endif /* !LOCAL_name */
 
 #ifndef LOCAL_attr
+#if LOCAL_oblockop
+#define LOCAL_attr NONNULL((1, 2, 3))
+#else /* LOCAL_oblockop */
 #define LOCAL_attr NONNULL((1, 2))
+#endif /* !LOCAL_oblockop */
 #endif /* !LOCAL_attr */
 
 #ifndef LOCAL_args
@@ -92,12 +96,45 @@ SLIST_HEAD(postlockop_slist, postlockop);
 #endif /* !LOCAL_oblockop */
 #endif /* !LOCAL_postlockop */
 
+#ifndef LOCAL_lo_link
+#if LOCAL_oblockop
+#define LOCAL_lo_link olo_link
+#else /* LOCAL_oblockop */
+#define LOCAL_lo_link lo_link
+#endif /* !LOCAL_oblockop */
+#endif /* !LOCAL_lo_link */
+
+#ifndef LOCAL_lo_func
+#if LOCAL_oblockop
+#define LOCAL_lo_func olo_func
+#else /* LOCAL_oblockop */
+#define LOCAL_lo_func lo_func
+#endif /* !LOCAL_oblockop */
+#endif /* !LOCAL_lo_func */
+
+#ifndef LOCAL_plo_link
+#if LOCAL_oblockop
+#define LOCAL_plo_link oplo_link
+#else /* LOCAL_oblockop */
+#define LOCAL_plo_link plo_link
+#endif /* !LOCAL_oblockop */
+#endif /* !LOCAL_plo_link */
+
+#ifndef LOCAL_plo_func
+#if LOCAL_oblockop
+#define LOCAL_plo_func oplo_func
+#else /* LOCAL_oblockop */
+#define LOCAL_plo_func plo_func
+#endif /* !LOCAL_oblockop */
+#endif /* !LOCAL_plo_func */
+
+
 FUNDEF NOBLOCK LOCAL_attr void
 NOTHROW(FCALL PP_CAT2(_impl_, LOCAL_name))(struct LOCAL_lockop_slist *__restrict self,
                                            LOCAL_args
 #if LOCAL_oblockop
                                            ,
-                                           void *obj
+                                           void *__restrict obj
 #endif /* LOCAL_oblockop */
                                            )
 	ASMNAME(PP_STR(LOCAL_name));
@@ -107,7 +144,7 @@ NOTHROW(FCALL PP_CAT2(_impl_, LOCAL_name))(struct LOCAL_lockop_slist *__restrict
                                            LOCAL_args
 #if LOCAL_oblockop
                                            ,
-                                           void *obj
+                                           void *__restrict obj
 #endif /* LOCAL_oblockop */
                                            ) {
 	struct LOCAL_lockop_slist lops;
@@ -123,16 +160,16 @@ again_service_lops:
 	while (iter != NULL) {
 		struct LOCAL_lockop *next;
 		struct LOCAL_postlockop *later;
-		next = SLIST_NEXT(iter, lo_link);
+		next = SLIST_NEXT(iter, LOCAL_lo_link);
 		/* Invoke the lock operation. */
 #if LOCAL_oblockop
-		later = (*iter->lo_func)(iter, obj);
+		later = (*iter->LOCAL_lo_func)(iter, obj);
 #else /* LOCAL_oblockop */
-		later = (*iter->lo_func)(iter);
+		later = (*iter->LOCAL_lo_func)(iter);
 #endif /* !LOCAL_oblockop */
 		/* Enqueue operations for later execution. */
 		if (later != NULL)
-			SLIST_INSERT(&post, later, plo_link);
+			SLIST_INSERT(&post, later, LOCAL_plo_link);
 		iter = next;
 	}
 	LOCAL_unlock();
@@ -145,9 +182,9 @@ again_service_lops:
 
 		/* re-queue all stolen lops. */
 		iter = SLIST_FIRST(&lops);
-		while (SLIST_NEXT(iter, lo_link))
-			iter = SLIST_NEXT(iter, lo_link);
-		SLIST_ATOMIC_INSERT_R(self, SLIST_FIRST(&lops), iter, lo_link);
+		while (SLIST_NEXT(iter, LOCAL_lo_link))
+			iter = SLIST_NEXT(iter, LOCAL_lo_link);
+		SLIST_ATOMIC_INSERT_R(self, SLIST_FIRST(&lops), iter, LOCAL_lo_link);
 		if unlikely(LOCAL_trylock())
 			goto again_steal_and_service_lops;
 	}
@@ -156,11 +193,11 @@ again_service_lops:
 	while (!SLIST_EMPTY(&post)) {
 		struct LOCAL_postlockop *op;
 		op = SLIST_FIRST(&post);
-		SLIST_REMOVE_HEAD(&post, plo_link);
+		SLIST_REMOVE_HEAD(&post, LOCAL_plo_link);
 #if LOCAL_oblockop
-		(*op->plo_func)(op, obj);
+		(*op->LOCAL_plo_func)(op, obj);
 #else /* LOCAL_oblockop */
-		(*op->plo_func)(op);
+		(*op->LOCAL_plo_func)(op);
 #endif /* !LOCAL_oblockop */
 	}
 }
@@ -175,5 +212,9 @@ again_service_lops:
 #undef LOCAL_lockop
 #undef LOCAL_postlockop_slist
 #undef LOCAL_postlockop
+#undef LOCAL_lo_link
+#undef LOCAL_lo_func
+#undef LOCAL_plo_link
+#undef LOCAL_plo_func
 
 DECL_END

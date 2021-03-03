@@ -25,10 +25,9 @@
 #ifndef CONFIG_USE_NEW_VM
 #include <kernel/vm.h>
 #else /* !CONFIG_USE_NEW_VM */
-#include <kernel/mman/lockop.h>
-#include <kernel/mman/mpart-lockop.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
+#include <sched/lockop.h>
 
 #include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
 
@@ -152,7 +151,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  *
  * In the case of writable mappings, the solution is fairly simple, since
  * all that really needs to  be done is (ab-)use  a small portion of  the
- * region being free'd as a `struct mlockop' that is enqueued for running
+ * region being free'd as a `struct lockop' that is enqueued for running
  * when a lock to the kernel mman becomes available.
  *
  * Once that lock is available, iteratively  go through all nodes of  the
@@ -160,11 +159,11 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  * that any partial nodes don't  have the MNODE_F_NOSPLIT flag set).  For
  * every node encountered in  this manner, try to  acquire a lock to  the
  * associated mem-part. If this lock  cannot be acquired, re-purpose  the
- * region being freed  as a `struct mpart_lockop'  that is executed  once
- * that lock becomes available. If  this was done, the mpart_lockop  will
+ * region being freed  as a `Toblockop(struct mpart)'  that is executed  once
+ * that lock becomes available. If  this was done, the Toblockop(struct mpart)  will
  * try to acquire a lock to the  kernel mman. On success, continue as  if
  * the original mman->part  locking order attempt  was successful.  Else,
- * re-purpose  the `struct mpart_lockop' as yet another `struct mlockop',
+ * re-purpose  the `Toblockop(struct mpart)' as yet another `struct lockop',
  * and  enqueue that one  back onto the kernel  mman lock-job queue, thus
  * letting the request bounce back and forth without ever blocking, until
  * both locks can be acquired at the same time.
@@ -178,7 +177,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  *
  * If the unmap itself (or the  attempt to partially split a  leading/trailing
  * node/part) fails (due to lack of memory during a split or pagedir_prepare),
- * then the unmap operation  is enqueued as a  `struct mlockop' in such a  way
+ * then the unmap operation  is enqueued as a  `struct lockop' in such a  way
  * that it will _not_ be (re-)attempted immediately once the caller (which  is
  * usually `_mman_lockops_reap()')  releases their  lock to  the kernel  mman.
  * The idea here is to hope that more memory will be available once the kernel
@@ -186,12 +185,12 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  *
  * If the remainder of the requested unmap-area is now gone, then  we're
  * done. Otherwise, if the current locking order is mman->part (that is:
- * the current request originates from a `struct mpart_lockop'), release
+ * the current request originates from a `Toblockop(struct mpart)'), release
  * the part lock. Then, continue searching for the next node to unmap.
  *
  * When unmapping a read-only mapping, things are a bit more complicated,
  * since it's not possible to (ab-)use the region being free'd as a lock-
- * job descriptor (either  a `struct mlockop' or  `struct mpart_lockop').
+ * job descriptor (either  a `struct lockop' or  `Toblockop(struct mpart)').
  * In this case, unmapping is only possible if the caller sacrifices  yet
  * another  dynamically allocated (and most importantly: writable) region
  * of memory: a `struct mman_unmap_kram_job'.
@@ -236,10 +235,10 @@ struct mman_unmap_kram_job {
 	byte_t                    *mukj_maxaddr; /* Greatest address being unmapped. */
 	gfp_t                      mukj_flags;   /* Set of `0 | GFP_CALLOC' */
 	union {
-		struct mlockop                   mukj_lop_mm;      /* MMan lockop */
-		struct mpart_lockop              mukj_lop_mp;      /* MPart lockop */
-		struct mpostlockop               mukj_post_lop_mm; /* MMan post-lockop */
-		struct mpart_postlockop          mukj_post_lop_mp; /* MPart post-lockop */
+		struct lockop                    mukj_lop_mm;      /* MMan lockop */
+		Toblockop(struct mpart)          mukj_lop_mp;      /* MPart lockop */
+		struct postlockop                mukj_post_lop_mm; /* MMan post-lockop */
+		Tobpostlockop(struct mpart)      mukj_post_lop_mp; /* MPart post-lockop */
 		SLIST_ENTRY(mman_unmap_kram_job) mukj_link;        /* List link (used internally) */
 	};
 };
