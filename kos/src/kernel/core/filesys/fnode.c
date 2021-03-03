@@ -58,7 +58,8 @@ NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
 		                             next, self));
 		if (next == NULL) {
 			/* First changed node was added to the superblock.
-			 * -> */
+			 * -> Mark the superblock as changed (for `sync(2)') */
+			/* TODO */
 		}
 	}
 }
@@ -69,6 +70,9 @@ NOTHROW(FCALL fnode_v_changed)(struct fnode *__restrict self,
  * sub-class destroy-operator. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_v_destroy)(struct fnode *__restrict self) {
+
+
+	/* TODO */
 }
 
 

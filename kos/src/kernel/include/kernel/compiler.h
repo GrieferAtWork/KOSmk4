@@ -55,6 +55,11 @@
 #define CONFIG_USE_NEW_FS
 #endif
 
+#undef CONFIG_USE_NEW_ASYNC
+#if 1
+#define CONFIG_USE_NEW_ASYNC
+#endif
+
 
 #ifdef CONFIG_USE_NEW_VM
 /* Backward-compatibility */

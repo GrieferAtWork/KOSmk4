@@ -230,11 +230,11 @@ struct mman_unmap_kram_job {
 	 *       been released, so you're free to trylock() anything you want (so long as
 	 *       you make sure that the call is non-blocking). */
 	mman_unmap_kram_job_done_t mukj_done;
-	byte_t       *mukj_minaddr; /* Lowest address being unmapped.
-	                             * When equal to `(byte_t *)self', then the
-	                             * unmap job is  considered to be  in-line. */
-	byte_t       *mukj_maxaddr; /* Greatest address being unmapped. */
-	gfp_t         mukj_flags;   /* Set of `0 | GFP_CALLOC' */
+	byte_t                    *mukj_minaddr; /* Lowest address being unmapped.
+	                                          * When equal to `(byte_t *)self', then the
+	                                          * unmap job is  considered to be  in-line. */
+	byte_t                    *mukj_maxaddr; /* Greatest address being unmapped. */
+	gfp_t                      mukj_flags;   /* Set of `0 | GFP_CALLOC' */
 	union {
 		struct mlockop                   mukj_lop_mm;      /* MMan lockop */
 		struct mpart_lockop              mukj_lop_mp;      /* MPart lockop */

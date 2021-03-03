@@ -545,21 +545,27 @@ Ne2k_WaitForRemoteDmaComplete(Ne2kDevice *__restrict self) {
 /************************************************************************/
 /* async-worker                                                         */
 /************************************************************************/
-PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
-Ne2k_HandleSendTimeout(void *__restrict arg) {
+#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE NONNULL((1)) unsigned int FCALL
+Ne2k_HandleSendTimeout(void *__restrict arg)
+#else /* CONFIG_USE_NEW_ASYNC */
+PRIVATE NONNULL((1)) void FCALL
+Ne2k_HandleSendTimeout(void *__restrict arg)
+#endif /* !CONFIG_USE_NEW_ASYNC */
+{
 	Ne2kState state;
 	Ne2kDevice *me;
 	me            = (Ne2kDevice *)arg;
 	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
 	/* Check if we're still waiting for a packet to be sent */
 	if (state.ns_state != NE2K_STATE_TX_PKSEND)
-		return;
+		goto done;
 	/* Check if the current send operation has really timed out.
 	 * There is a chance that we got here due to a previous send
 	 * operation that didn't time out, before once again finding
 	 * ourselves waiting for (another) packet to be sent. */
 	if (ktime() < me->nk_cursendtmo)
-		return;
+		goto done;
 	printk(KERN_ERR "[ne2k] Watchdog send timeout (TODO)\n");
 	/* TODO: Do   the  equivalent  of  aio_cancel()  for  Ne2k,
 	 *       however indicate a TIMEOUT-error as the reason for
@@ -572,10 +578,26 @@ Ne2k_HandleSendTimeout(void *__restrict arg) {
 	 *       send might complete  after timing out,  in which case  the
 	 *       interrupt  handler  can't  be  responsible  for  signaling
 	 *       transmit completion. */
+done:
+#ifdef CONFIG_USE_NEW_ASYNC
+	return ASYNC_RESUME;
+#else /* CONFIG_USE_NEW_ASYNC */
+	return;
+#endif /* !CONFIG_USE_NEW_ASYNC */
 }
 
 
-PRIVATE NONNULL((1, 2)) bool ASYNC_CALLBACK_CC
+#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE NONNULL((1)) ktime_t FCALL
+Ne2k_AsyncConnect(void *__restrict arg) {
+	Ne2kDevice *me;
+	me = (Ne2kDevice *)arg;
+	task_connect_for_poll(&me->nk_stpkld);
+	return KTIME_INFINITE;
+}
+#else /* CONFIG_USE_NEW_ASYNC */
+
+PRIVATE NONNULL((1, 2)) bool FCALL
 Ne2k_AsyncPoll(void *__restrict arg,
                void *__restrict cookie) {
 	Ne2kState state;
@@ -597,6 +619,7 @@ Ne2k_AsyncPoll(void *__restrict arg,
 	}
 	return false;
 }
+#endif /* !CONFIG_USE_NEW_ASYNC */
 
 /* Switch from TX_UPLOAD to TX_PKSEND */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -620,8 +643,14 @@ NOTHROW(KCALL Ne2k_SwitchToTxPkSendMode)(Ne2kDevice *__restrict self) {
 	                             new_state.ns_word));
 }
 
-PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
-Ne2k_AsyncWork(void *__restrict arg) {
+#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE NONNULL((1)) unsigned int FCALL
+Ne2k_AsyncWork(void *__restrict arg)
+#else /* CONFIG_USE_NEW_ASYNC */
+PRIVATE NONNULL((1)) void FCALL
+Ne2k_AsyncWork(void *__restrict arg)
+#endif /* !CONFIG_USE_NEW_ASYNC */
+{
 	Ne2kState state;
 	Ne2kDevice *me;
 	me = (Ne2kDevice *)arg;
@@ -920,9 +949,12 @@ tx_switch_to_idle:
 		}
 		goto again;
 	}
+#ifdef CONFIG_USE_NEW_ASYNC
+	return ASYNC_RESUME;
+#endif /* CONFIG_USE_NEW_ASYNC */
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) bool FCALL
 Ne2k_AsyncTest(void *__restrict arg) {
 	Ne2kState state;
 	Ne2kDevice *me;
@@ -937,9 +969,17 @@ Ne2k_AsyncTest(void *__restrict arg) {
 
 
 PRIVATE struct async_worker_callbacks const Ne2k_AsyncWorkerCallbacks = {
+#ifdef CONFIG_USE_NEW_ASYNC
+	.awo_async   = ASYNC_WORKER_OPS_INIT_BASE,
+	.awo_connect = &Ne2k_AsyncConnect,
+	.awo_test    = &Ne2k_AsyncTest,
+	.awo_work    = &Ne2k_AsyncWork,
+	.awo_time    = &Ne2k_HandleSendTimeout,
+#else /* CONFIG_USE_NEW_ASYNC */
 	/* .awc_poll = */ &Ne2k_AsyncPoll,
 	/* .awc_work = */ &Ne2k_AsyncWork,
 	/* .awc_test = */ &Ne2k_AsyncTest
+#endif /* !CONFIG_USE_NEW_ASYNC */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) bool

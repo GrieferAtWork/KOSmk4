@@ -610,7 +610,12 @@ UnixSocket_Bind(struct socket *__restrict self,
 }
 
 
-struct async_accept_wait {
+#ifdef CONFIG_USE_NEW_ASYNC
+struct async_accept_wait: async
+#else /* CONFIG_USE_NEW_ASYNC */
+struct async_accept_wait
+#endif /* !CONFIG_USE_NEW_ASYNC */
+{
 	WEAK REF UnixSocket        *aw_socket;    /* [1..1] The pointed-to socket. */
 	/* NOTE: All of the following are [1..1] before
 	 * `UnixSocket_WaitForAccept_Work()' finishes the async job. */
@@ -620,8 +625,15 @@ struct async_accept_wait {
 	REF struct directory_entry *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
 };
 
+
+#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(ASYNC_CALLBACK_CC UnixSocket_WaitForAccept_Fini)(async_job_t self) {
+NOTHROW(FCALL UnixSocket_WaitForAccept_Destroy)(struct async *self)
+#else /* CONFIG_USE_NEW_ASYNC */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL UnixSocket_WaitForAccept_Fini)(async_job_t self)
+#endif /* !CONFIG_USE_NEW_ASYNC */
+{
 	struct async_accept_wait *me;
 	me = (struct async_accept_wait *)self;
 	xdecref(me->aw_client);
@@ -629,9 +641,30 @@ NOTHROW(ASYNC_CALLBACK_CC UnixSocket_WaitForAccept_Fini)(async_job_t self) {
 	xdecref(me->aw_bind_path);
 	xdecref(me->aw_bind_name);
 	weakdecref(me->aw_socket);
+#ifdef CONFIG_USE_NEW_ASYNC
+	kfree(me);
+#endif /* CONFIG_USE_NEW_ASYNC */
 }
 
-PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
+
+#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE NONNULL((1)) ktime_t FCALL
+UnixSocket_WaitForAccept_Connect(struct async *__restrict self) {
+	struct async_accept_wait *me = (struct async_accept_wait *)self;
+	struct unix_client *client   = me->aw_client;
+	/* Connect to the status-changed signal */
+	task_connect_for_poll(&client->uc_status_sig);
+	/* XXX: We could easily implement a timeout for connect()-attempt */
+	return KTIME_INFINITE;
+}
+PRIVATE NONNULL((1)) bool FCALL
+UnixSocket_WaitForAccept_Test(struct async *__restrict self) {
+	struct async_accept_wait *me = (struct async_accept_wait *)self;
+	struct unix_client *client   = me->aw_client;
+	return ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_PENDING;
+}
+#else /* CONFIG_USE_NEW_ASYNC */
+PRIVATE NONNULL((1, 2)) unsigned int FCALL
 UnixSocket_WaitForAccept_Poll(async_job_t self,
                               /*out*/ ktime_t *__restrict UNUSED(abs_timeout)) {
 	struct unix_client *client;
@@ -651,8 +684,9 @@ UnixSocket_WaitForAccept_Poll(async_job_t self,
 	/* Wait for our status change. */
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
+#endif /* !CONFIG_USE_NEW_ASYNC */
 
-PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int FCALL
 UnixSocket_WaitForAccept_Work(async_job_t self) {
 	struct unix_client *client;
 	struct async_accept_wait *me;
@@ -696,14 +730,16 @@ UnixSocket_WaitForAccept_Work(async_job_t self) {
 	return ASYNC_JOB_WORK_COMPLETE;
 }
 
-PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) void FCALL
 UnixSocket_WaitForAccept_Cancel(async_job_t self) {
 	struct unix_client *client;
 	struct async_accept_wait *me;
 	me     = (struct async_accept_wait *)self;
 	client = me->aw_client;
+
 	/* Remove myself from the chain of pending clients. */
 	unix_server_remove_acceptme(&me->aw_bind_node->s_server, client);
+
 	/* Try to change the state of the client to  refused.
 	 * Note that this might fail if the server was faster
 	 * and accepted us before we were able to refuse. */
@@ -717,6 +753,17 @@ UnixSocket_WaitForAccept_Cancel(async_job_t self) {
 }
 
 
+#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE struct async_ops const UnixSocket_WaitForAccept = {
+	.ao_driver  = &drv_self,
+	.ao_destroy = &UnixSocket_WaitForAccept_Destroy,
+	.ao_connect = &UnixSocket_WaitForAccept_Connect,
+	.ao_test    = &UnixSocket_WaitForAccept_Test,
+	.ao_work    = &UnixSocket_WaitForAccept_Work,
+	.ao_time    = NULL,
+	.ao_cancel  = &UnixSocket_WaitForAccept_Cancel,
+};
+#else /* CONFIG_USE_NEW_ASYNC */
 PRIVATE struct async_job_callbacks const UnixSocket_WaitForAccept = {
 	/* .jc_jobsize  = */ sizeof(struct async_accept_wait),
 	/* .jc_jobalign = */ alignof(struct async_accept_wait),
@@ -727,6 +774,7 @@ PRIVATE struct async_job_callbacks const UnixSocket_WaitForAccept = {
 	/* .jc_time     = */ NULL,
 	/* .jc_cancel   = */ &UnixSocket_WaitForAccept_Cancel,
 };
+#endif /* !CONFIG_USE_NEW_ASYNC */
 
 PRIVATE NONNULL((1)) void KCALL
 UnixSocket_Connect(struct socket *__restrict self,
@@ -824,7 +872,11 @@ UnixSocket_Connect(struct socket *__restrict self,
 			TRY {
 				/* Construct an async worker for informing the server of our
 				 * presence, as  well as  to wait  for it  to accept(2)  us. */
+#ifdef CONFIG_USE_NEW_ASYNC
+				job = async_new_aio(struct async_accept_wait, &UnixSocket_WaitForAccept, aio);
+#else /* CONFIG_USE_NEW_ASYNC */
 				job = async_job_alloc(&UnixSocket_WaitForAccept);
+#endif /* !CONFIG_USE_NEW_ASYNC */
 				TRY {
 					/* Inform the server that we're trying to connect to it */
 					REF struct unix_client *next, *last;
@@ -864,7 +916,11 @@ UnixSocket_Connect(struct socket *__restrict self,
 			con->aw_bind_node = bind_node; /* Inherit reference */
 
 			/* Start the job. */
+#ifdef CONFIG_USE_NEW_ASYNC
+			decref(async_start(job));
+#else /* CONFIG_USE_NEW_ASYNC */
 			decref(async_job_start(job, aio));
+#endif /* !CONFIG_USE_NEW_ASYNC */
 		} EXCEPT {
 			decref_unlikely(bind_path);
 			decref_unlikely(bind_name);
@@ -1155,7 +1211,12 @@ again:
 
 
 
-struct async_send_job {
+#ifdef CONFIG_USE_NEW_ASYNC
+struct async_send_job: async
+#else /* CONFIG_USE_NEW_ASYNC */
+struct async_send_job
+#endif /* !CONFIG_USE_NEW_ASYNC */
+{
 	REF UnixSocket          *as_socket;         /* [1..1][const] The socket to which to send data. */
 	struct ancillary_message as_ancillary;      /* [valid_if(as_ancillary_size)] Ancillary message data */
 	size_t                   as_ancillary_size; /* Encoded ancillary data size. */
@@ -1167,18 +1228,31 @@ struct async_send_job {
 #endif /* ANCILLARY_MESSAGE_NEED_MSG_FLAGS */
 };
 
+#ifdef CONFIG_USE_NEW_ASYNC
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(ASYNC_CALLBACK_CC async_send_fini)(async_job_t self) {
+NOTHROW(FCALL AsyncSend_Destroy)(struct async *__restrict self) {
+	struct async_send_job *me;
+	me = (struct async_send_job *)self;
+	kfree((void *)me->as_payload.ab_entv);
+	decref_unlikely(me->as_socket);
+	kfree(me);
+}
+#else /* CONFIG_USE_NEW_ASYNC */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL AsyncSend_Fini)(async_job_t self) {
 	struct async_send_job *me;
 	me = (struct async_send_job *)self;
 	kfree((void *)me->as_payload.ab_entv);
 	decref_unlikely(me->as_socket);
 }
+#endif /* !CONFIG_USE_NEW_ASYNC */
 
 PRIVATE NONNULL((1)) bool FCALL
-async_send_test(struct async_send_job *__restrict me) {
+AsyncSend_Test(async_job_t self) {
 	size_t used, limt, avail;
 	struct pb_buffer *pbuf;
+	struct async_send_job *me;
+	me   = (struct async_send_job *)self;
 	pbuf = me->as_socket->us_sendbuf;
 	used = ATOMIC_READ(pbuf->pb_used);
 	limt = ATOMIC_READ(pbuf->pb_limt);
@@ -1212,21 +1286,30 @@ nope:
 	return false;
 }
 
-PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
-async_send_poll(async_job_t self,
+#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE NONNULL((1)) ktime_t FCALL
+AsyncSend_Connect(struct async *__restrict self) {
+	struct async_send_job *me = (struct async_send_job *)self;
+	task_connect_for_poll(&me->as_socket->us_sendbuf->pb_psta);
+	return KTIME_INFINITE;
+}
+#else /* CONFIG_USE_NEW_ASYNC */
+PRIVATE NONNULL((1, 2)) unsigned int FCALL
+AsyncSend_Poll(async_job_t self,
                 /*out*/ ktime_t *__restrict UNUSED(abs_timeout)) {
 	struct async_send_job *me;
 	me = (struct async_send_job *)self;
-	if (async_send_test(me))
+	if (AsyncSend_Test(me))
 		return ASYNC_JOB_POLL_AVAILABLE;;
 	task_connect_for_poll(&me->as_socket->us_sendbuf->pb_psta);
-	if (async_send_test(me))
+	if (AsyncSend_Test(me))
 		return ASYNC_JOB_POLL_AVAILABLE;;
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
+#endif /* !CONFIG_USE_NEW_ASYNC */
 
-PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
-async_send_work(async_job_t self) {
+PRIVATE NONNULL((1)) unsigned int FCALL
+AsyncSend_Work(async_job_t self) {
 	struct async_send_job *me;
 	struct pb_packet *packet;
 	struct pb_buffer *pbuf;
@@ -1294,16 +1377,28 @@ again_start_packet:
 
 
 /* Async job for sending a UNIX domain datagram. */
-PRIVATE struct async_job_callbacks const async_send = {
+#ifdef CONFIG_USE_NEW_ASYNC
+PRIVATE struct async_ops const AsyncSend_Ops = {
+	.ao_driver  = &drv_self,
+	.ao_destroy = &AsyncSend_Destroy,
+	.ao_connect = &AsyncSend_Connect,
+	.ao_test    = &AsyncSend_Test,
+	.ao_work    = &AsyncSend_Work,
+	.ao_time    = NULL,
+	.ao_cancel  = NULL
+};
+#else /* CONFIG_USE_NEW_ASYNC */
+PRIVATE struct async_job_callbacks const AsyncSend_Ops = {
 	/* .jc_jobsize  = */ sizeof(struct async_send_job),
 	/* .jc_jobalign = */ alignof(struct async_send_job),
 	/* .jc_driver   = */ &drv_self,
-	/* .jc_fini     = */ &async_send_fini,
-	/* .jc_poll     = */ &async_send_poll,
-	/* .jc_work     = */ &async_send_work,
+	/* .jc_fini     = */ &AsyncSend_Fini,
+	/* .jc_poll     = */ &AsyncSend_Poll,
+	/* .jc_work     = */ &AsyncSend_Work,
 	/* .jc_time     = */ NULL,
 	/* .jc_cancel   = */ NULL
 };
+#endif /* !CONFIG_USE_NEW_ASYNC */
 
 
 
@@ -1397,7 +1492,11 @@ again_start_packet:
 			/* Must enqueue an async job to send data once some packets were read. */
 			REF async_job_t aj;
 			struct async_send_job *job;
-			aj  = async_job_alloc(&async_send);
+#ifdef CONFIG_USE_NEW_ASYNC
+			aj  = async_new_aio(struct async_send_job, &AsyncSend_Ops, aio);
+#else /* CONFIG_USE_NEW_ASYNC */
+			aj  = async_job_alloc(&AsyncSend_Ops);
+#endif /* !CONFIG_USE_NEW_ASYNC */
 			job = (struct async_send_job *)aj;
 			TRY {
 				job->as_payload.ab_entv = (struct aio_buffer_entry *)kmalloc(buf->ab_entc *
@@ -1423,7 +1522,11 @@ again_start_packet:
 			job->as_msg_flags = msg_flags;
 #endif /* ANCILLARY_MESSAGE_NEED_MSG_FLAGS */
 			/* Start the job, and connect it the given `aio' */
+#ifdef CONFIG_USE_NEW_ASYNC
+			decref(async_start(aj));
+#else /* CONFIG_USE_NEW_ASYNC */
 			decref(async_job_start(aj, aio));
+#endif /* !CONFIG_USE_NEW_ASYNC */
 			return;
 		}
 	}

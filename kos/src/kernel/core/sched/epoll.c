@@ -166,7 +166,7 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
                                 void *buf, size_t bufsize) {
 	struct epoll_handle_monitor *monitor;
 	uintptr_half_t oldraise;
-	/*sig_multicompletion_trydisconnect(self);*/ /* TODO: Optimization */
+	/*sig_multicompletion_trydisconnectall(self);*/ /* TODO: Optimization */
 
 	/* Figure out our monitor. Note that we're safe to access the monitor, as
 	 * well as its controller because the monitor owns `self', and right  now
@@ -268,7 +268,6 @@ again:
 		/* Signals were delivered in the mean time, and we have not have been able
 		 * to transfer  all  of  them  over to  `self->ehm_comp'.  ->  Try  again. */
 		sig_multicompletion_disconnectall(&self->ehm_comp);
-		task_disconnectall();
 		goto again;
 	}
 }
