@@ -68,22 +68,110 @@ typedef __FILE FILE;
 
 
 @@>> setmntent(3)
-[[cp, export_alias("__setmntent")]]
+[[cp, nocrt, wunused]]
+[[alias("setmntent", "__setmntent", "fopen", "_IO_fopen", "fopen64")]]
 $FILE *setmntent([[nonnull]] char const *file,
                  [[nonnull]] char const *mode);
 
+@@>> endmntent(3)
+[[cp_nokos, nocrt]]
+[[alias("endmntent", "__endmntent", "fclose", "_fclose_nolock", "_IO_fclose")]]
+int endmntent([[nonnull]] $FILE *stream);
+
 @@>> getmntent(3), getmntent_r(3)
 [[cp, decl_include("<bits/crt/db/mntent.h>")]]
-struct mntent *getmntent([[nonnull]] $FILE *stream);
+[[impl_include("<bits/crt/db/mntent.h>")]]
+[[requires_function(getmntent_r)]]
+struct mntent *getmntent([[nonnull]] $FILE *stream) {
+@@pp_if $has_function(malloc)@@
+	static struct mntent *ent = NULL;
+	static char *buf          = NULL;
+	if (!ent && (ent = (struct mntent *)malloc(sizeof(struct mntent))) == NULL)
+		return NULL;
+	if (!buf && (buf = (char *)malloc(512 * sizeof(char))) == NULL)
+		return NULL;
+@@pp_else@@
+	static struct mntent ent[1];
+	static char buf[512];
+@@pp_endif@@
+	return getmntent_r(stream, ent, buf, 512);
+}
 
 %
 %#ifdef __USE_MISC
 [[decl_include("<features.h>", "<bits/crt/db/mntent.h>")]]
 [[cp, doc_alias(getmntent), export_alias("__getmntent_r")]]
+[[requires_function(fgets)]]
 struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
                            [[nonnull]] struct mntent *__restrict result,
                            [[inp(bufsize)]] char *__restrict buffer,
-                           __STDC_INT_AS_SIZE_T bufsize);
+                           __STDC_INT_AS_SIZE_T bufsize) {
+	char *line;
+	do {
+		line = fgets(buffer, bufsize, stream);
+		if (!line)
+			goto err;
+		while (*line && isspace(*line))
+			++line;
+	} while (*line == '#');
+
+	result->@mnt_fsname@ = line;
+	while (*line && !isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && isspace(*line))
+		++line;
+
+	result->@mnt_dir@ = line;
+	while (*line && !isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && isspace(*line))
+		++line;
+
+	result->@mnt_type@ = line;
+	while (*line && !isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && isspace(*line))
+		++line;
+
+	result->@mnt_opts@ = line;
+	while (*line && !isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && isspace(*line))
+		++line;
+
+	result->@mnt_freq@ = 0;
+	while (*line && isdigit(*line)) {
+		result->@mnt_freq@ *= 10;
+		result->@mnt_freq@ += *line - '0';
+		++line;
+	}
+	if (!*line)
+		goto err;
+	while (*line && isspace(*line))
+		++line;
+
+	result->@mnt_passno@ = 0;
+	while (*line && isdigit(*line)) {
+		result->@mnt_passno@ *= 10;
+		result->@mnt_passno@ += *line - '0';
+		++line;
+	}
+	return result;
+err:
+	return NULL;
+}
 %#endif /* __USE_MISC */
 %
 
@@ -113,10 +201,6 @@ int addmntent([[nonnull]] $FILE *__restrict stream,
 	        mnt->@mnt_passno@);
 	return 0;
 }
-
-@@>> endmntent(3)
-[[cp_nokos, alias(fclose), export_alias("__endmntent")]]
-int endmntent([[nonnull]] $FILE *stream);
 
 @@>> hasmntopt(3)
 @@Check if `mnt->mnt_opts' contains an option matching `opt'.

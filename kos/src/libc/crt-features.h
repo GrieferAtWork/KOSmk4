@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x679e19a2 */
+/* HASH CRC-32:0x2cf46366 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -768,7 +768,6 @@
 #define __CRT_HAVE_DOS$ecvt_r
 #define __CRT_HAVE_DOS$encrypt
 #define __CRT_HAVE_DOS$encrypt_r
-#define __CRT_HAVE_DOS$endmntent
 #define __CRT_HAVE_DOS$envz_add
 #define __CRT_HAVE_DOS$envz_entry
 #define __CRT_HAVE_DOS$envz_get
@@ -2238,7 +2237,6 @@
 #define __CRT_HAVE_DOS$setlocale
 #define __CRT_HAVE_DOS$setlogin
 #define __CRT_HAVE_DOS$setlogmask
-#define __CRT_HAVE_DOS$setmntent
 #define __CRT_HAVE_DOS$setmode
 #define __CRT_HAVE_DOS$setnetent
 #define __CRT_HAVE_DOS$setnetgrent
@@ -3722,7 +3720,6 @@
 #define __CRT_HAVE_endaliasent
 #define __CRT_HAVE_endgrent
 #define __CRT_HAVE_endhostent
-#define __CRT_HAVE_endmntent
 #define __CRT_HAVE_endnetent
 #define __CRT_HAVE_endnetgrent
 #define __CRT_HAVE_endprotoent
@@ -5309,7 +5306,6 @@
 #define __CRT_HAVE_setlocale
 #define __CRT_HAVE_setlogin
 #define __CRT_HAVE_setlogmask
-#define __CRT_HAVE_setmntent
 #define __CRT_HAVE_setmode
 #define __CRT_HAVE_setnetent
 #define __CRT_HAVE_setnetgrent

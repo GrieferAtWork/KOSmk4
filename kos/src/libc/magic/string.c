@@ -4244,7 +4244,7 @@ int memcasecmp([[nonnull]] void const *s1,
 
 
 @@Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
-@@During comprisons, casing of character is ignored (s.a. `memmem()')
+@@During comparisons, casing of character is ignored (s.a. `memmem()')
 @@If no such sub-string exists, return `NULL' instead.
 @@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -4304,7 +4304,7 @@ int memcasecmp_l([[nonnull]] void const *s1,
 
 
 @@Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
-@@During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+@@During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
 @@If no such sub-string exists, return `NULL' instead.
 @@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), also return `NULL' unconditionally.

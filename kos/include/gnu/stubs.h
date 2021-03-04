@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6684af28 */
+/* HASH CRC-32:0x25f0adc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,8 +137,6 @@
 #define __stub_endaliasent
 #define __stub_endgrent
 #define __stub_endhostent
-#define __stub___endmntent
-#define __stub_endmntent
 #define __stub_endnetent
 #define __stub_endnetgrent
 #define __stub_endprotoent
@@ -219,9 +217,6 @@
 #define __stub_getifaddrs
 #define __stub_getipv4sourcefilter
 #define __stub_getloadavg
-#define __stub_getmntent
-#define __stub___getmntent_r
-#define __stub_getmntent_r
 #define __stub_getmsg
 #define __stub_getnameinfo
 #define __stub_getnetbyaddr
@@ -445,8 +440,6 @@
 #define __stub_setkey_r
 #define __stub_setlogin
 #define __stub_setlogmask
-#define __stub___setmntent
-#define __stub_setmntent
 #define __stub_setnetent
 #define __stub_setnetgrent
 #define __stub_setprotoent

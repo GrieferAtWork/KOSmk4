@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef40d304 */
+/* HASH CRC-32:0xc46332 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,104 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/mntent.h"
+#include "mntent.h"
+#include "../user/ctype.h"
 #include "../user/stdio.h"
+#include "../user/stdlib.h"
 #include "../user/string.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <bits/crt/db/mntent.h>
+/* >> getmntent(3), getmntent_r(3) */
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) struct mntent *
+NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream) {
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+	static struct mntent *ent = NULL;
+	static char *buf          = NULL;
+	if (!ent && (ent = (struct mntent *)libc_malloc(sizeof(struct mntent))) == NULL)
+		return NULL;
+	if (!buf && (buf = (char *)libc_malloc(512 * sizeof(char))) == NULL)
+		return NULL;
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+	static struct mntent ent[1];
+	static char buf[512];
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
+	return libc_getmntent_r(stream, ent, buf, 512);
+}
+/* >> getmntent(3), getmntent_r(3) */
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2, 3)) struct mntent *
+NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
+                                       struct mntent *__restrict result,
+                                       char *__restrict buffer,
+                                       __STDC_INT_AS_SIZE_T bufsize) {
+	char *line;
+	do {
+		line = libc_fgets(buffer, bufsize, stream);
+		if (!line)
+			goto err;
+		while (*line && libc_isspace(*line))
+			++line;
+	} while (*line == '#');
+
+	result->mnt_fsname = line;
+	while (*line && !libc_isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && libc_isspace(*line))
+		++line;
+
+	result->mnt_dir = line;
+	while (*line && !libc_isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && libc_isspace(*line))
+		++line;
+
+	result->mnt_type = line;
+	while (*line && !libc_isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && libc_isspace(*line))
+		++line;
+
+	result->mnt_opts = line;
+	while (*line && !libc_isspace(*line))
+		++line;
+	if (!*line)
+		goto err;
+	*line++ = '\0';
+	while (*line && libc_isspace(*line))
+		++line;
+
+	result->mnt_freq = 0;
+	while (*line && libc_isdigit(*line)) {
+		result->mnt_freq *= 10;
+		result->mnt_freq += *line - '0';
+		++line;
+	}
+	if (!*line)
+		goto err;
+	while (*line && libc_isspace(*line))
+		++line;
+
+	result->mnt_passno = 0;
+	while (*line && libc_isdigit(*line)) {
+		result->mnt_passno *= 10;
+		result->mnt_passno += *line - '0';
+		++line;
+	}
+	return result;
+err:
+	return NULL;
+}
 /* >> addmntent(3)
  * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
@@ -78,6 +169,9 @@ NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(getmntent, libc_getmntent);
+DEFINE_PUBLIC_ALIAS(__getmntent_r, libc_getmntent_r);
+DEFINE_PUBLIC_ALIAS(getmntent_r, libc_getmntent_r);
 DEFINE_PUBLIC_ALIAS(addmntent, libc_addmntent);
 DEFINE_PUBLIC_ALIAS(hasmntopt, libc_hasmntopt);
 #endif /* !__KERNEL__ */

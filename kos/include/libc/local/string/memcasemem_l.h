@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3d26d50 */
+/* HASH CRC-32:0x8a32a112 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.

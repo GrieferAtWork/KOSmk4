@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8cd636 */
+/* HASH CRC-32:0xf8c741c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,13 +68,44 @@ typedef __FILE FILE;
 
 #ifdef __CRT_HAVE_setmntent
 /* >> setmntent(3) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),(__file,__mode))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),(__file,__mode))
 #elif defined(__CRT_HAVE___setmntent)
 /* >> setmntent(3) */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),__setmntent,(__file,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),__setmntent,(__file,__mode))
+#elif defined(__CRT_HAVE_fopen)
+/* >> setmntent(3) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),fopen,(__file,__mode))
+#elif defined(__CRT_HAVE__IO_fopen)
+/* >> setmntent(3) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),_IO_fopen,(__file,__mode))
+#elif defined(__CRT_HAVE_fopen64)
+/* >> setmntent(3) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),fopen64,(__file,__mode))
 #endif /* ... */
+#ifdef __CRT_HAVE_endmntent
+/* >> endmntent(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),(__stream))
+#elif defined(__CRT_HAVE___endmntent)
+/* >> endmntent(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),__endmntent,(__stream))
+#elif defined(__CRT_HAVE_fclose)
+/* >> endmntent(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),fclose,(__stream))
+#elif defined(__CRT_HAVE__fclose_nolock)
+/* >> endmntent(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),_fclose_nolock,(__stream))
+#elif defined(__CRT_HAVE__IO_fclose)
+/* >> endmntent(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),_IO_fclose,(__stream))
+#endif /* ... */
+#ifdef __CRT_HAVE_getmntent
 /* >> getmntent(3), getmntent_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *__stream),(__stream))
+__CDECLARE(__ATTR_NONNULL((1)),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *__stream),(__stream))
+#elif defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
+#include <libc/local/mntent/getmntent.h>
+/* >> getmntent(3), getmntent_r(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) struct mntent *__NOTHROW_RPC(__LIBCCALL getmntent)(__FILE *__stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getmntent))(__stream); })
+#endif /* ... */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_getmntent_r
@@ -83,6 +114,10 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,(
 #elif defined(__CRT_HAVE___getmntent_r)
 /* >> getmntent(3), getmntent_r(3) */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),__getmntent_r,(__stream,__result,__buffer,__bufsize))
+#elif defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
+#include <libc/local/mntent/getmntent_r.h>
+/* >> getmntent(3), getmntent_r(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getmntent_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) struct mntent *__NOTHROW_RPC(__LIBCCALL getmntent_r)(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getmntent_r))(__stream, __result, __buffer, __bufsize); })
 #endif /* ... */
 #endif /* __USE_MISC */
 
@@ -106,16 +141,6 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__THROWING,addmntent,(__FILE *__restrict _
 __NAMESPACE_LOCAL_USING_OR_IMPL(addmntent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL addmntent)(__FILE *__restrict __stream, struct mntent const *__restrict __mnt) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(addmntent))(__stream, __mnt); })
 #endif /* __SEEK_END && (__CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock) && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */
 #endif /* !__CRT_HAVE_addmntent */
-#ifdef __CRT_HAVE_endmntent
-/* >> endmntent(3) */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),(__stream))
-#elif defined(__CRT_HAVE_fclose)
-/* >> endmntent(3) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),fclose,(__stream))
-#elif defined(__CRT_HAVE___endmntent)
-/* >> endmntent(3) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),__endmntent,(__stream))
-#endif /* ... */
 #ifdef __CRT_HAVE_hasmntopt
 /* >> hasmntopt(3)
  * Check if `mnt->mnt_opts' contains an option matching `opt'.

@@ -3566,11 +3566,13 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6a8fcd4e]]]*/
+/*[[[start:exports,hash:CRC-32=0xfe5da37d]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
 DEFINE_PUBLIC_ALIAS(_IO_fclose, libc_fclose);
+DEFINE_PUBLIC_ALIAS(endmntent, libc_fclose);
+DEFINE_PUBLIC_ALIAS(__endmntent, libc_fclose);
 DEFINE_PUBLIC_ALIAS(fclose, libc_fclose);
 DEFINE_PUBLIC_ALIAS(fflush, libc_fflush);
 DEFINE_PUBLIC_ALIAS(_IO_fflush, libc_fflush);
@@ -3604,6 +3606,8 @@ DEFINE_PUBLIC_ALIAS(ferror_unlocked, libc_ferror);
 DEFINE_PUBLIC_ALIAS(ferror, libc_ferror);
 DEFINE_PUBLIC_ALIAS(tmpfile, libc_tmpfile);
 DEFINE_PUBLIC_ALIAS(_IO_fopen, libc_fopen);
+DEFINE_PUBLIC_ALIAS(setmntent, libc_fopen);
+DEFINE_PUBLIC_ALIAS(__setmntent, libc_fopen);
 DEFINE_PUBLIC_ALIAS(fopen, libc_fopen);
 DEFINE_PUBLIC_ALIAS(freopen, libc_freopen);
 DEFINE_PUBLIC_ALIAS(fgetpos, libc_fgetpos);

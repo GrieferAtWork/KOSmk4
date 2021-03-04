@@ -683,6 +683,7 @@ int rename([[nonnull]] char const *oldname,
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 @@Close and destroy a given file `STREAM'
 [[stdio_throws, std, dos_export_alias("_fclose_nolock"), export_alias("_IO_fclose")]]
+[[export_as("endmntent", "__endmntent")]]
 int fclose([[nonnull]] FILE *__restrict stream);
 
 %[default:section(".text.crt{|.dos}.FILE.locked.write.utility")]
@@ -1066,6 +1067,7 @@ FILE *tmpfile();
 
 @@Create and return a new file-stream for accessing `FILENAME'
 [[cp, std, wunused, export_alias("_IO_fopen"), alias("fopen64")]]
+[[export_as("setmntent", "__setmntent")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fopen64")]]
 FILE *fopen([[nonnull]] char const *__restrict filename,
             [[nonnull]] char const *__restrict modes);

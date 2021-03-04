@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee1c3151 */
+/* HASH CRC-32:0xf2bf4841 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -795,11 +795,9 @@ DFUN(".text.crt.dos.math.math", libd___issignalingf, libc___issignalingf, TD, 1,
 DFUN(".text.crt.dos.math.math", libd___issignalingl, libc___issignalingl, TD, 1, TFL)
 
 /* mntent */
-DFUN(".text.crt.dos.database.mntent", libd_setmntent, libc_setmntent, TP, 2, TP, TP)
 DFUN(".text.crt.dos.database.mntent", libd_getmntent, libc_getmntent, TP, 1, TP)
 DFUN(".text.crt.dos.database.mntent", libd_getmntent_r, libc_getmntent_r, TP, 4, TP, TP, TP, TD)
 DFUN(".text.crt.dos.database.mntent", libd_addmntent, libc_addmntent, TD, 2, TP, TP)
-DFUN(".text.crt.dos.database.mntent", libd_endmntent, libc_endmntent, TD, 1, TP)
 DFUN(".text.crt.dos.database.mntent", libd_hasmntopt, libc_hasmntopt, TP, 2, TP, TP)
 
 /* net.if */

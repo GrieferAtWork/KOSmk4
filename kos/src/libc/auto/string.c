@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3446f93f */
+/* HASH CRC-32:0x8159831a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2983,7 +2983,7 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
 #ifndef __KERNEL__
 #include <features.h>
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comprisons, casing of character is ignored (s.a. `memmem()')
+ * During comparisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -3035,7 +3035,7 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1,
 }
 #include <features.h>
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.

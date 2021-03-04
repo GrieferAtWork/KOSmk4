@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ca6bc9e */
+/* HASH CRC-32:0x7f613226 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1075,14 +1075,10 @@ DEFINE_PUBLIC_ALIAS(DOS$issignalingl, libd___issignalingl);
 DEFINE_PUBLIC_ALIAS(DOS$__issignalingl, libd___issignalingl);
 
 /* mntent */
-DEFINE_PUBLIC_ALIAS(DOS$__setmntent, libd_setmntent);
-DEFINE_PUBLIC_ALIAS(DOS$setmntent, libd_setmntent);
 DEFINE_PUBLIC_ALIAS(DOS$getmntent, libd_getmntent);
 DEFINE_PUBLIC_ALIAS(DOS$__getmntent_r, libd_getmntent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getmntent_r, libd_getmntent_r);
 DEFINE_PUBLIC_ALIAS(DOS$addmntent, libd_addmntent);
-DEFINE_PUBLIC_ALIAS(DOS$__endmntent, libd_endmntent);
-DEFINE_PUBLIC_ALIAS(DOS$endmntent, libd_endmntent);
 DEFINE_PUBLIC_ALIAS(DOS$hasmntopt, libd_hasmntopt);
 
 /* net.if */
@@ -1592,6 +1588,8 @@ DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$tmpnam, libd_tmpnam);
 DEFINE_PUBLIC_ALIAS(DOS$_fclose_nolock, libd_fclose);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fclose, libd_fclose);
+DEFINE_PUBLIC_ALIAS(DOS$endmntent, libd_fclose);
+DEFINE_PUBLIC_ALIAS(DOS$__endmntent, libd_fclose);
 DEFINE_PUBLIC_ALIAS(DOS$fclose, libd_fclose);
 DEFINE_PUBLIC_ALIAS(DOS$fflush, libd_fflush);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fflush, libd_fflush);
@@ -1633,6 +1631,8 @@ DEFINE_PUBLIC_ALIAS(DOS$ferror_unlocked, libd_ferror);
 DEFINE_PUBLIC_ALIAS(DOS$ferror, libd_ferror);
 DEFINE_PUBLIC_ALIAS(DOS$perror, libd_perror);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fopen, libd_fopen);
+DEFINE_PUBLIC_ALIAS(DOS$setmntent, libd_fopen);
+DEFINE_PUBLIC_ALIAS(DOS$__setmntent, libd_fopen);
 DEFINE_PUBLIC_ALIAS(DOS$fopen, libd_fopen);
 DEFINE_PUBLIC_ALIAS(DOS$freopen, libd_freopen);
 DEFINE_PUBLIC_ALIAS(DOS$fgetpos, libd_fgetpos);

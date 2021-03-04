@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x384f1aa3 */
+/* HASH CRC-32:0xe69224bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,22 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> setmntent(3) */
-INTDEF NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_setmntent)(char const *file, char const *mode);
 /* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getmntent(3), getmntent_r(3) */
+INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getmntent(3), getmntent_r(3) */
 INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getmntent(3), getmntent_r(3) */
+INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> addmntent(3)
  * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
@@ -52,8 +62,6 @@ INTDEF NONNULL((1, 2)) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, st
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> endmntent(3) */
-INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
 /* >> hasmntopt(3)
  * Check if `mnt->mnt_opts' contains an option matching `opt'.
  * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
