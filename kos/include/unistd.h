@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedd938d6 */
+/* HASH CRC-32:0x2ff66006 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2479,23 +2479,23 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* !__tell_defined */
 #ifdef __CRT_HAVE_sched_yield
 /* >> thrd_yield(3)
- * Yield execution to another thraed (s.a. `pthread_yield(3)') */
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,yield,(void),sched_yield,())
 #elif defined(__CRT_HAVE_thrd_yield)
 /* >> thrd_yield(3)
- * Yield execution to another thraed (s.a. `pthread_yield(3)') */
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,yield,(void),thrd_yield,())
 #elif defined(__CRT_HAVE_pthread_yield)
 /* >> thrd_yield(3)
- * Yield execution to another thraed (s.a. `pthread_yield(3)') */
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,yield,(void),pthread_yield,())
 #elif defined(__CRT_HAVE___sched_yield)
 /* >> thrd_yield(3)
- * Yield execution to another thraed (s.a. `pthread_yield(3)') */
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,yield,(void),__sched_yield,())
 #elif defined(__CRT_HAVE_yield)
 /* >> thrd_yield(3)
- * Yield execution to another thraed (s.a. `pthread_yield(3)') */
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CDECLARE_VOID(,__NOTHROW,yield,(void),())
 #endif /* ... */
 #ifdef __CRT_HAVE_fchroot

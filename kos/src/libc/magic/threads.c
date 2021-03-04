@@ -376,7 +376,7 @@ int thrd_join(thrd_t thr, int *res) {
 }
 
 @@>> thrd_yield(3)
-@@Yield execution to another thraed (s.a. `pthread_yield(3)')
+@@Yield execution to another thread (s.a. `pthread_yield(3)')
 [[nothrow]]
 void thrd_yield() = pthread_yield;
 
