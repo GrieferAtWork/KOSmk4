@@ -115,10 +115,11 @@ struct unlockinfo;
 
 
 
-/* The lowest (user-space) address that might ever be automatically
- * selected for mapping by `mman_getunmapped()'. Note that the user
- * may   still   employ   `MAP_FIXED'  to   overrule   this  limit,
- * allowing them to mmap anywhere (in user-space)
+/* The lowest (user-space) address  that might ever be  automatically
+ * selected for mapping by  `mman_getunmapped()'. Note that the  user
+ * may still employ `MAP_FIXED' to overrule this limit, allowing them
+ * to mmap anywhere (in user-space).
+ *
  * When `addr' is less than this value, it will be clamped to be equal
  * to this value.  Furthermore, attempting to  search for free  memory
  * mappings below this address always fails.
@@ -126,13 +127,14 @@ struct unlockinfo;
  * The value of this variable is exposed in `/proc/sys/vm/mmap_min_addr' */
 DATDEF USER CHECKED void *mman_getunmapped_user_minaddr;
 
-/* Default  base  address  for  user-space   memory  mappings.  When  trying   to
- * find an  unmapped  area  within  a  user-space  mman,  the  FIXED  flag  isn't
- * given, and the given hint-address is less than `mman_getunmapped_user_minaddr'
- * then     MAX(mman_getunmapped_user_minaddr,     mman_getunmapped_user_defbase)
- * will be used as initial hint instead.
+/* Default base address for user-space  memory mappings. When trying to  find
+ * an unmapped area within a user-space mman, the FIXED flag isn't given, and
+ * the  given hint-address is  less than `mman_getunmapped_user_minaddr' then
+ * MAX(mman_getunmapped_user_minaddr, mman_getunmapped_user_defbase) will  be
+ * used as initial hint instead.
  * Afterwards, the actual address to-be returned will be calculated normally.
- * By   default,   this   variable   is   set   to  `KERNEL_VMHINT_USER_HEAP' */
+ *
+ * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
 DATDEF USER CHECKED void *mman_getunmapped_user_defbase;
 
 /* Same as `mman_getunmapped_user_defbase', but used
@@ -141,10 +143,10 @@ DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_getunmapped()'
- * NOTE: _ONLY_ use this always force the `MAP_NOASLR' flag to
- *       be set, thus allowing you to force-disable ASLR system-wide. Using this
- *       for other flags does what you'd  think, but the results would  probably
- *       be catastrophic.
+ * NOTE: _ONLY_ use this always force the  `MAP_NOASLR' flag to be set,  thus
+ *       allowing you to force-disable ASLR system-wide. Using this for other
+ *       flags  does  what you'd  think, but  the  results would  probably be
+ *       catastrophic.
  *       Also note that modifications to this variable must be done atomically! */
 DATDEF unsigned int mman_getunmapped_extflags;
 
@@ -187,8 +189,8 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self, void *addr,
  * mem-nodes  at the resulting min/max bounds when `MAX_FIXED' w/o `MAP_FIXED_NOREPLACE' is
  * used, and another mapping already existed at  the specified location. If this cannot  be
  * done  without blocking, release all locks, do the split while not holding any locks, and
- * return   `MAP_FAILED',    indicative   of    the    caller   needing    to    re-acquire
- * locks and re-attempt the call.
+ * return `MAP_FAILED', indicative of the caller needing to re-acquire locks and re-attempt
+ * the call.
  * @param: self:      The mman in which to create the mapping. For this purpose,
  *                    any mman  other than  `mman_kernel' will  always cause  an
  *                    error when trying to map to a kernel-space address.

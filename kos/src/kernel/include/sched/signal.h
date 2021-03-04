@@ -271,7 +271,7 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
                                      struct sig *sender);
 
-/* Same  as the regular `sig_broadcast' function, but must be used of
+/* Same  as the regular `sig_broadcast' function, but must be used if
  * `self'  is being broadcast one last time prior to being destroyed.
  * When these functions are used, signal completion callbacks are not
  * allowed to make  use of  `sig_completion_reprime()', but  instead,
@@ -374,15 +374,16 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
 
 
 /* Connection status values (is-connected is every `x' with `!TASK_CONNECTION_STAT_CHECK(x)')
- * This     initial     `!TASK_CONNECTION_STAT_CHECK(x)'-state     can     transition     to:
+ *
+ * This initial `!TASK_CONNECTION_STAT_CHECK(x)'-state can transition to:
  *   - TASK_CONNECTION_STAT_SENT:      Some  thread  called `sig_send(tc_sig)',  and the
  *                                     associated `struct task_connection' was selected.
  *   - TASK_CONNECTION_STAT_BROADCAST: Some thread called `sig_broadcast(tc_sig)'.
+ *
  * Also note that any recipient can only  ever have at most 1 connection  with
  * a state of `TASK_CONNECTION_STAT_SENT' or `TASK_CONNECTION_STAT_BROADCAST',
  * though this invariant is only true  when interlocked with the SMP-locks  of
- * all attached signals. (s.a. `tcs_dlvr')
- */
+ * all attached signals. (s.a. `tcs_dlvr') */
 #define TASK_CONNECTION_STAT_BROADCAST           0x0000 /* Signal was broadcast (forwarding is unnecessary if ignored)
                                                          * In this state, `tc_sig' must be considered to be `[valid_if(false)]', and the
                                                          * thread that originally connected to  the signal mustn't directly  re-connect.
@@ -391,7 +392,8 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
                                                          * NOTE: THIS STATUS WILL NEVER APPEAR IN SIGNAL CONNECTION CHAINS! */
 #define TASK_CONNECTION_STAT_SENT                0x0002 /* Signal was sent, and must be  forwarded if not received via  `task_waitfor()'
                                                          * In this state, the attached signal must  not be free'd, though this case  can
-                                                         * easily be handled by broadcasting signals one last time before disconnecting.
+                                                         * easily be handled by broadcasting signals one last time before disconnecting,
+                                                         * which can safely be done with `sig_broadcast_for_fini()'.
                                                          * Transitions to (with [lock(SMP_LOCK(tc_sig))]):
                                                          *   - TASK_CONNECTION_STAT_BROADCAST: Any thread called `sig_broadcast()'
                                                          *                                     on the attached signal. */
@@ -465,7 +467,28 @@ DATDEF ATTR_PERTASK struct task_connections *this_connections;
 #define THIS_CONNECTIONS PERTASK_GET(this_connections)
 
 
-/* Push/pop the active set of connections. */
+/* Push/pop the active  set of  connections:
+ * >> struct sig a = SIG_INIT, b = SIG_INIT;
+ * >> struct task_connections cons;
+ * >> task_connect(&a);
+ * >> assert(task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_pushconnections(&cons);
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_connect(&b);
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(task_wasconnected(&b));
+ * >>
+ * >> task_disconnectall();
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_popconnections();
+ * >> assert(task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b)); */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons);
 FUNDEF NOBLOCK ATTR_RETNONNULL struct task_connections *
@@ -540,6 +563,12 @@ task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
 
 
 /* Disconnect from a specific signal `target'
+ * WARNING: If `target' was already  send to the calling  thread
+ *          before it could  be disconnected  by this  function,
+ *          the calling  thread will  continue  to remain  in  a
+ *          signaled state, such  that the next  call to one  of
+ *          the signal receive functions (e.g. `task_waitfor()')
+ *          will not block.
  * @return: true:  Disconnected from `target'
  * @return: false: You weren't actually connected to `target' */
 FUNDEF NOBLOCK NONNULL((1)) __BOOL

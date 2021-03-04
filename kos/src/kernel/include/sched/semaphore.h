@@ -36,7 +36,7 @@ struct task;
 
 struct semaphore {
 	struct sig s_avail; /* Signal send for every ticket made available. */
-	uintptr_t  s_count; /* # of available tickets. */
+	uintptr_t  s_count; /* [lock(ATOMIC)] # of available tickets. */
 };
 
 #define SEMAPHORE_INIT(n) \

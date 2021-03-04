@@ -50,10 +50,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef CONFIG_USE_NEW_VM       /* TODO: REMOVE_ME */
-#include <kernel/vm.h>         /* TODO: REMOVE_ME */
-#endif /* CONFIG_USE_NEW_VM */ /* TODO: REMOVE_ME */
-
 DECL_BEGIN
 
 #define HINT_ADDR(x, y) x
@@ -262,7 +258,7 @@ mman_new(void) THROWS(E_BADALLOC, ...) {
 		}
 		mman_oninit_callbacks(result);
 	} EXCEPT {
-		ATOMIC_WRITE(result->v_refcnt, 0);
+		ATOMIC_WRITE(result->mm_refcnt, 0);
 		destroy(result);
 		RETHROW();
 	}

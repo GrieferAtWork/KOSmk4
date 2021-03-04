@@ -45,34 +45,39 @@ typedef NOBLOCK NONNULL((1)) void
                                           void *buf);
 
 struct sig_completion_context {
-	struct sig          *scc_sender;        /* [1..1][const] The sender-signal (which may differ from `self->tc_sig')
-	                                         * when  the signal is being sent through a function like `sig_altsend()' */
-	struct task         *scc_caller;        /* [1..1][const] The thread that (supposedly) is sending the signal.
-	                                         * In  order  to support  functions  like `sig_broadcast_as_nopr()',
-	                                         * the sig-completion  callback should  not make  use of  THIS_TASK,
-	                                         * but instead assume that  `sender_thread' is the caller's  thread. */
-	sig_postcompletion_t scc_post;          /* [0..1][out] When  non-NULL  upon  return  of  `sig_completion_t()',
-	                                         * this callback  will be  enqueued to-be  executed the  buffer  given
-	                                         * to  `sig_completion_t()'  once  all SMP-locks  have  been released.
-	                                         * Using this  mechanism, a  signal completion  callback can  schedule
-	                                         * further operations, which may not necessarily be SMP-lock friendly,
-	                                         * to-be performed  at a  later point,  once all  SMP-locks have  been
-	                                         * released.
-	                                         * Note that even NOBLOCK functions may not always be  SMP-lock-safe,
-	                                         * which  includes further calls  to `sig_send()' / `sig_broadcast()'
-	                                         * When using  this mechanism,  you must  also make  sure to  account
-	                                         * for the  possibility  that  either the  associated  signal  and/or
-	                                         * used  sig_completion  descriptor get  destroyed  before/while this
-	                                         * callback will eventually  be executed. As  such it is  recommended
-	                                         * to use  the normal  signal completion  function as  a  first-stage
-	                                         * callback to construct references to objects which are then written
-	                                         * back to the  shared buffer  and eventually inherited  by a  second
-	                                         * stage callback pointed to by this  field. For an example of  this,
-	                                         * look at the example code at the bottom of this file. */
+	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->tc_sig')
+	                                  * when  the signal is being sent through a function like `sig_altsend()' */
+	struct task         *scc_caller; /* [1..1][const] The thread that (supposedly) is sending the signal.
+	                                  * In order to support functions like `sig_broadcast_as_nopr()', the
+	                                  * sig-completion callback  should not  make use  of THIS_TASK,  but
+	                                  * instead assume that `sender_thread' is the caller's thread. */
+	sig_postcompletion_t scc_post;   /* [0..1][out] When  non-NULL  upon  return  of  `sig_completion_t()',
+	                                  * this callback will be enqueued to-be executed with the buffer given
+	                                  * to  `sig_completion_t()'  once  all SMP-locks  have  been released.
+	                                  * Using this  mechanism, a  signal completion  callback can  schedule
+	                                  * further operations, which may not necessarily be SMP-lock friendly,
+	                                  * to-be performed  at a  later point,  once all  SMP-locks have  been
+	                                  * released.
+	                                  * Note that even NOBLOCK functions may not always be  SMP-lock-safe,
+	                                  * which  includes further calls  to `sig_send()' / `sig_broadcast()'
+	                                  * When using  this mechanism,  you must  also make  sure to  account
+	                                  * for the  possibility  that  either the  associated  signal  and/or
+	                                  * used  sig_completion  descriptor get  destroyed  before/while this
+	                                  * callback will eventually be executed.  As such, it is  recommended
+	                                  * to use  the normal  signal completion  function as  a  first-stage
+	                                  * callback to construct references to objects which are then written
+	                                  * back to the  shared buffer  and eventually inherited  by a  second
+	                                  * stage callback pointed to by this  field. For an example of  this,
+	                                  * look at the example code at the bottom of this file. */
 };
 
 
 /* Callback prototype for signal completion functions.
+ * WARNING: Signal completion functions are invoked in a context where SMP-locks are  held,
+ *          meaning that the set of things they're allowed to do is _very_ limited. (As in:
+ *          not even NOBLOCK functions are necessarily safe). To break out of this  prison,
+ *          the completion function  may set-up a  phase-2 `sig_postcompletion_t'  callback
+ *          that will be invoked once SMP-locks have been released. (s.a. `scc_post')
  * @param: self:        The signal completion controller.
  *                      HINT: The signal that was sent is `self->tc_sig'
  * @param: context:     Context information about how the completion function is being invoked.

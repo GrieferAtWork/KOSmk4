@@ -148,7 +148,7 @@ NOTHROW(FCALL sig_broadcast_as_cleanup_nopr)(struct sig *__restrict self,
 #elif defined(DEFINE_sig_broadcast_for_fini)
 #define HAVE_BROADCAST
 #define HAVE_FOR_FINI
-/* Same  as the regular `sig_broadcast' function, but must be used of
+/* Same  as the regular `sig_broadcast' function, but must be used if
  * `self'  is being broadcast one last time prior to being destroyed.
  * When these functions are used, signal completion callbacks are not
  * allowed to make  use of  `sig_completion_reprime()', but  instead,

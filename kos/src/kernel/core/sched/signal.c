@@ -92,7 +92,28 @@ INTERN NOBLOCK ATTR_RETNONNULL struct task *
 NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 #endif /* __x86_64__ || __i386__ */
 
-/* Push/pop the active set of connections. */
+/* Push/pop the active  set of  connections:
+ * >> struct sig a = SIG_INIT, b = SIG_INIT;
+ * >> struct task_connections cons;
+ * >> task_connect(&a);
+ * >> assert(task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_pushconnections(&cons);
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_connect(&b);
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(task_wasconnected(&b));
+ * >>
+ * >> task_disconnectall();
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_popconnections();
+ * >> assert(task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b)); */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons) {
 	struct task_connections *oldcons;

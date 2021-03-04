@@ -1138,9 +1138,9 @@ done:
 		mpart_destroy(part);
 	}
 
-	/* Reap  lockops _after_  having destroyed  all of  the old parts
-	 * have been destroyed, thus raising the interlocked-ness between
-	 * those 2 operations, which may potentially increase efficiency. */
+	/* Reap lockops _after_ all of the old parts have been destroyed,
+	 * thus  raising the interlocked-ness between those 2 operations,
+	 * which may potentially increase efficiency. */
 	mfile_lockops_reap(self);
 
 	/* Wake-up possibly waiting threads.
