@@ -1305,6 +1305,38 @@ again_signal_cons:
 }
 
 
+/* Disconnect from a specific signal `target'
+ * WARNING: If `target' was already  send to the calling  thread
+ *          before it could  be disconnected  by this  function,
+ *          the calling  thread will  continue  to remain  in  a
+ *          signaled state, such  that the next  call to one  of
+ *          the signal receive functions (e.g. `task_waitfor()')
+ *          will not block.
+ * @return: true:  Disconnected from `target'
+ * @return: false: You weren't actually connected to `target' */
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL task_disconnect)(struct sig *__restrict target) {
+	struct task_connections *self;
+	struct task_connection **p_con, *con;
+	self = THIS_CONNECTIONS;
+	for (p_con = &self->tcs_con; (con = *p_con) != NULL;
+	     p_con = &con->tc_connext) {
+		if (con->tc_sig != target)
+			continue; /* Some other signal... */
+
+		/* Disconnect */
+		task_disconnect_connection(con, self, true);
+
+		/* Unlink */
+		*p_con = con->tc_connext;
+
+		/* Free */
+		task_connection_free(self, con);
+		return true;
+	}
+	return false;
+}
+
 
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_connection_disconnect_all)(struct task_connections *__restrict self,
@@ -2105,6 +2137,50 @@ DEFINE_TEST(broadcast_after_send) {
 	assert(sig_send(&s));
 	assert(sig_broadcast(&s) == 0);
 	task_disconnectall();
+}
+
+DEFINE_TEST(pushpop_connections) {
+	struct sig a = SIG_INIT, b = SIG_INIT;
+	struct task_connections cons;
+	assert(!sig_iswaiting(&a) && sig_numwaiting(&a) == 0);
+	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
+
+	task_connect(&a);
+	assert(task_wasconnected(&a));
+	assert(!task_wasconnected(&b));
+	assert(sig_iswaiting(&a) && sig_numwaiting(&a) == 1);
+	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
+
+	task_pushconnections(&cons);
+	assert(!task_wasconnected(&a));
+	assert(!task_wasconnected(&b));
+	assert(sig_iswaiting(&a) && sig_numwaiting(&a) == 1);
+	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
+
+	task_connect(&b);
+	assert(!task_wasconnected(&a));
+	assert(task_wasconnected(&b));
+	assert(sig_iswaiting(&a) && sig_numwaiting(&a) == 1);
+	assert(sig_iswaiting(&b) && sig_numwaiting(&b) == 1);
+
+	task_disconnectall();
+	assert(!task_wasconnected(&a));
+	assert(!task_wasconnected(&b));
+	assert(sig_iswaiting(&a) && sig_numwaiting(&a) == 1);
+	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
+
+	assert(task_popconnections() == &cons);
+	assert(task_wasconnected(&a));
+	assert(!task_wasconnected(&b));
+	assert(sig_iswaiting(&a) && sig_numwaiting(&a) == 1);
+	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
+
+	assert(task_disconnect(&a));
+	assert(!task_wasconnected(&a));
+	assert(!task_wasconnected(&b));
+	assert(!task_wasconnected());
+	assert(!sig_iswaiting(&a) && sig_numwaiting(&a) == 0);
+	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
 }
 #endif /* DEFINE_TEST */
 
