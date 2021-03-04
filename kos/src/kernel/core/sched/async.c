@@ -30,6 +30,7 @@
 #include <sched/async.h>
 #include <sched/lockop.h>
 #include <sched/signal.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -49,6 +50,7 @@ PUBLIC struct REF async_list /**/ async_all_list = LIST_HEAD_INITIALIZER(async_a
 PUBLIC size_t /*               */ async_all_size = 0;
 PUBLIC struct atomic_lock /*   */ async_all_lock = ATOMIC_LOCK_INIT;
 PUBLIC struct lockop_slist /*  */ async_all_lops = SLIST_HEAD_INITIALIZER(async_all_lops);
+
 
 
 #ifndef __async_slist_defined
@@ -152,16 +154,6 @@ again:
 }
 
 
-//TODO:struct async_timeout_entry {
-//TODO:	REF struct async *ate_job; /* [1..1] The job with a non-infinite timeout. */
-//TODO:	ktime_t           ate_tmo; /* The timeout of `ate_job'. */
-//TODO:};
-//TODO:
-//TODO:struct async_timeout_list {
-//TODO:
-//TODO:};
-
-
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
                                     void *buf) {
@@ -170,7 +162,8 @@ NOTHROW(FCALL async_postcompletion)(struct sig_completion_context *__restrict UN
 	me = *(REF struct async **)buf;
 again:
 	st = ATOMIC_READ(me->a_stat);
-	if unlikely(st != _ASYNC_ST_READY) {
+	if unlikely(st != _ASYNC_ST_READY &&
+	            st != _ASYNC_ST_READY_TMO) {
 		/* Can happen if the job  was cancel'd in the mean  time,
 		 * or if more than one of the job's connected signals was
 		 * delivered before we could get here. */
@@ -179,9 +172,7 @@ again:
 	}
 
 	/* Mark the job as having been triggered. */
-	if (!ATOMIC_CMPXCH_WEAK(me->a_stat,
-	                        _ASYNC_ST_READY,
-	                        _ASYNC_ST_TRIGGERED))
+	if (!ATOMIC_CMPXCH_WEAK(me->a_stat, st, _ASYNC_ST_TRIGGERED))
 		goto again;
 
 	/* Add the job to the list of ready jobs. */
@@ -235,155 +226,349 @@ again:
 }
 
 
+/* NOTE: This list usually contains async jobs with status `_ASYNC_ST_READY_TMO'.
+ *       Jobs that have a different status should be ignored, and you may  assume
+ *       that there are already pending lockops to remove them! */
+PRIVATE struct REF async_list /**/ async_tmo_list; /* [0..n][lock(async_tmo_lock)] List of timeout jobs. */
+PRIVATE struct atomic_lock /*   */ async_tmo_lock; /* Lock for the timeout-job list */
+PRIVATE struct lockop_slist /*  */ async_tmo_lops; /* Pending lock operations for `async_tmo_lock' */
+#define _async_tmo_reap()      _lockop_reap_atomic_lock(&async_tmo_lops, &async_tmo_lock)
+#define async_tmo_reap()       lockop_reap_atomic_lock(&async_tmo_lops, &async_tmo_lock)
+#define async_tmo_tryacquire() atomic_lock_tryacquire(&async_tmo_lock)
+#define async_tmo_acquire()    atomic_lock_acquire(&async_tmo_lock)
+#define async_tmo_acquire_nx() atomic_lock_acquire_nx(&async_tmo_lock)
+#define async_tmo_release()    (atomic_lock_release(&async_tmo_lock), async_tmo_reap())
+#define async_tmo_release_f()  atomic_lock_release(&async_tmo_lock)
+#define async_tmo_acquired()   atomic_lock_acquired(&async_tmo_lock)
+#define async_tmo_available()  atomic_lock_available(&async_tmo_lock)
 
-INTERN ATTR_NORETURN void
-NOTHROW(FCALL _asyncmain)(void) {
+
+/* Insert the given `job' into the async-timeout list, inheriting a reference */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_tmo_insert)(REF struct async *__restrict job, ktime_t timeout) {
+	struct async **p_next, *next;
+	for (p_next = &async_tmo_list.lh_first; (next = *p_next) != NULL;
+	     p_next = &next->a_tmolnk.le_next) {
+		ktime_t next_timeout;
+
+		COMPILER_READ_BARRIER();
+		next_timeout = next->a_tmo;
+		COMPILER_READ_BARRIER();
+
+		/* Make sure that this is a valid entry, and that the
+		 * timeout  value   we've   read   is   valid,   too. */
+		if (ATOMIC_READ(next->a_stat) != _ASYNC_ST_READY_TMO)
+			continue;
+
+		if (timeout >= next_timeout)
+			break; /* Insert before this one! */
+	}
+
+	/* Actually insert the new job into the list. */
+	if ((job->a_tmolnk.le_next = next) != NULL)
+		next->a_tmolnk.le_prev = &job->a_tmolnk.le_next;
+	job->a_tmolnk.le_prev = p_next;
+}
+
+
+
+/************************************************************************
+ * ASYNC WORKER THREAD MAIN FUNCTION                                    *
+ ************************************************************************
+ * This function is designed to be called by an arbitrary # of threads,
+ * and  will do all of the work of servicing async jobs as they appear.
+ * When there's nothing to do, simply wait for more jobs to come in.
+ *
+ * In order to service async jobs faster, you may spawn threads to run
+ * this  function in parallel,  and you may also  kill such threads by
+ * sending them an RPC that will throw an E_EXIT_THREAD exception, but
+ * be careful not to kill the hard-coded `_asyncwork' thread, which is
+ * statically allocated and must not be killed.
+ ************************************************************************/
+INTERN ATTR_NORETURN void KCALL _asyncmain(void) {
 	REF struct async *job;
+	unsigned int st;
+	/* Wait for & consume ready async jobs. */
 again:
-	TRY {
-		unsigned int st;
-		/* Wait for & consume ready async jobs. */
 again_pop_job:
+	job = async_trypopready();
+	if (job == NULL) {
+		/* Wait for jobs to become available (but respect `async_timeout') */
+		task_connect(&async_ready_sig);
 		job = async_trypopready();
-		if (!job) {
-			/* Wait for jobs to become available (but respect `async_timeout') */
-			task_connect(&async_ready_sig);
-			job = async_trypopready();
-			if unlikely(job != NULL) {
-				task_disconnectall();
-			} else {
-				task_waitfor(); /* TODO: Timeout! */
-				goto again_pop_job;
-			}
-		}
-again_rd_stat:
-		st = ATOMIC_READ(job->a_stat);
-		if unlikely(st != _ASYNC_ST_TRIGGERED) {
-			struct aio_handle *aio;
-			assert(st == _ASYNC_ST_TRIGGERED_STOP);
-			aio = ATOMIC_XCH(job->a_aio, NULL);
-			if (aio) {
-				PREEMPTION_DISABLE();
-				aio_handle_complete_nopr(aio, AIO_COMPLETION_CANCEL);
-				PREEMPTION_ENABLE();
-			}
-			if (job->a_ops->ao_cancel) {
-				/* Invoke the cancel-callback. */
-				TRY {
-					(*job->a_ops->ao_cancel)(job);
-				} EXCEPT {
-					error_printf("canceling async job %p", job);
-				}
-			}
-			/* Get rid of this job */
-do_delete_job:
-			if (async_all_tryacquire()) {
-				if (!ATOMIC_CMPXCH_WEAK(job->a_stat, st,
-				                        _ASYNC_ST_INIT_STOP)) {
-					async_all_release();
-					goto again_rd_stat;
-				}
-				LIST_REMOVE(job, a_all);
-				--async_all_size;
-				async_all_release();
-				decref_nokill(job); /* The reference from `async_all_list' */
-				decref(job);        /* The reference from `async_ready' (returned by `async_popready') */
-			} else {
-				struct lockop *lop;
-				if (!ATOMIC_CMPXCH_WEAK(job->a_stat, st,
-				                        _ASYNC_ST_DELALL))
+		if unlikely(job != NULL) {
+			task_disconnectall();
+		} else {
+			/* Try to get a job that is pending for timeout. */
+			async_tmo_acquire();
+			LIST_FOREACH (job, &async_tmo_list, a_tmolnk) {
+				struct sig *wait_status;
+				ktime_t timeout;
+				if unlikely(!ATOMIC_CMPXCH(job->a_stat,
+				                           _ASYNC_ST_READY_TMO,
+				                           _ASYNC_ST_SLEEPING))
+					continue;
+
+				/* Remove `job' from the list of timeout jobs, thus
+				 * claiming it for ourselves. */
+				LIST_REMOVE(job, a_tmolnk);
+				async_tmo_release();
+				COMPILER_READ_BARRIER();
+				timeout = job->a_tmo;
+				COMPILER_READ_BARRIER();
+
+				/* After having read the timeout, re-verify that the job hasn't
+				 * been cancel'd in the mean time. Because if it has been, then
+				 * there's a chance that the  timeout we've read is bogus.  And
+				 * furthermore, we wouldn't even be supposed to wait for it! */
+				if unlikely(ATOMIC_READ(job->a_stat) != _ASYNC_ST_SLEEPING)
 					goto again_rd_stat;
 
-				/* Schedule a pending lock-operation to remove
-				 * `job'  from  the  list of  all  async jobs. */
-				sig_multicompletion_disconnectall(&job->a_comp);
-				sig_multicompletion_fini(&job->a_comp);
-				lop          = async_as_lockop(job);
-				lop->lo_func = &async_delall_lop; /* NOTE: `async_delall_lop' inherits a reference to `job'! */
-				SLIST_ATOMIC_INSERT(&async_all_lops, lop, lo_link);
-				_async_all_reap();
-			}
-			goto again;
-		}
-
-		/* Switch the job from TRIGGERED to READY */
-again_handle_triggered:
-		if (!ATOMIC_CMPXCH_WEAK(job->a_stat,
-		                        _ASYNC_ST_TRIGGERED,
-		                        _ASYNC_ST_READY))
-			goto again_rd_stat;
-
-		/* Check if this job is ready! */
-		TRY {
-			unsigned int status;
-again_do_work:
-			/* Do the work! */
-			status = (*job->a_ops->ao_work)(job);
-			assert(status == ASYNC_RESUME ||
-			       status == ASYNC_FINISHED ||
-			       status == ASYNC_CANCEL);
-			if (status != ASYNC_RESUME) {
-				struct aio_handle *aio;
-				/* Complete the async job. */
-				ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED_STOP);
-				aio = ATOMIC_XCH(job->a_aio, NULL);
-				if (status == ASYNC_CANCEL) {
-					if (aio) {
-						PREEMPTION_DISABLE();
-						aio_handle_complete_nopr(aio, AIO_COMPLETION_CANCEL);
-						PREEMPTION_ENABLE();
+				if unlikely(ktime() >= timeout) {
+					unsigned int tmo_status;
+do_handle_timeout:
+					/* Timeout expired. */
+					tmo_status = ASYNC_CANCEL;
+					if (job->a_ops->ao_time != NULL) {
+						TRY {
+							tmo_status = (*job->a_ops->ao_time)(job);
+						} EXCEPT {
+							struct aio_handle *aio;
+							aio = ATOMIC_XCH(job->a_aio, NULL);
+							if (aio) {
+								PREEMPTION_DISABLE();
+								aio_handle_complete_nopr(aio, AIO_COMPLETION_FAILURE);
+								PREEMPTION_ENABLE();
+							} else {
+								error_printf("timeout async job %p", job);
+							}
+						}
 					}
-					goto again_rd_stat;
+					if (tmo_status == ASYNC_CANCEL) {
+						/* Cancel the async job.
+						 *   #1: job->a_stat == _ASYNC_ST_SLEEPING
+						 *       -> Set status to `_ASYNC_ST_TRIGGERED_STOP' and handle a normal trigger event
+						 *   #2: job->a_stat == _ASYNC_ST_TRIGGERED_STOP
+						 *       Cause: `async_cancel()'
+						 *       -> Leave status as `_ASYNC_ST_TRIGGERED_STOP' and handle a normal trigger event
+						 *   #3: job->a_stat == _ASYNC_ST_TRIGGERED
+						 *       Cause: `async_cancel()+async_start()'
+						 *       -> Leave status as `_ASYNC_ST_TRIGGERED' and handle a normal trigger event */
+						ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_SLEEPING, _ASYNC_ST_TRIGGERED_STOP);
+						goto again_rd_stat;
+					}
+					if (tmo_status == ASYNC_FINISHED) {
+						/* Finish the async job. (but don't call the cancel callback)
+						 * -> Complete an attached AIO handle with a successful status
+						 *   #1: job->a_stat == _ASYNC_ST_SLEEPING
+						 *   #2: job->a_stat == _ASYNC_ST_TRIGGERED_STOP
+						 *   #3: job->a_stat == _ASYNC_ST_TRIGGERED
+						 * If `job->a_stat == _ASYNC_ST_SLEEPING', continue with removing
+						 * the job. - Otherwise, later code will jump to  `again_rd_stat'
+						 * in order to handle a generic trigger event. */
+						struct aio_handle *aio;
+						aio = ATOMIC_XCH(job->a_aio, NULL);
+						if (aio) {
+							PREEMPTION_DISABLE();
+							aio_handle_complete_nopr(aio, AIO_COMPLETION_SUCCESS);
+							PREEMPTION_ENABLE();
+						}
+						st = _ASYNC_ST_SLEEPING;
+						goto do_delete_job;
+					}
+					/* Keep the async job, and handle a regular trigger event.
+					 * If the status  still indicates SLEEPING,  change it  to
+					 * indicate a normal trigger event instead. */
+					ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_SLEEPING, _ASYNC_ST_TRIGGERED);
+					goto again_do_work;
 				}
-				/* Non-cancel completion. */
+
+				/* Wait for something to happen... */
+				TRY {
+					wait_status = task_waitfor(timeout);
+				} EXCEPT {
+					decref_unlikely(job);
+					RETHROW();
+				}
+
+				/* Check if the timeout has expired. */
+				if (wait_status == NULL && ktime() >= timeout)
+					goto do_handle_timeout;
+
+				/* Timeout didn't expire.
+				 * -> Try to re-add the job to the list of sleeping
+				 *    jobs, since we know that it's time has yet to
+				 *    come! */
+				async_tmo_acquire();
+				if likely(ATOMIC_CMPXCH(job->a_stat,
+				                        _ASYNC_ST_SLEEPING,
+				                        _ASYNC_ST_READY_TMO)) {
+					async_tmo_insert(job, timeout); /* Inherit reference */
+					async_tmo_release();
+					goto again_pop_job;
+				}
+				async_tmo_release();
+
+				/* The job's status no longer indicates SLEEPING.
+				 * This can happen if the job was canceled in the mean time. */
+				goto again_rd_stat;
+			} /* LIST_FOREACH (job, &async_tmo_list, a_tmolnk) */
+			async_tmo_release();
+
+			/* Wait without any timeouts. */
+			task_waitfor();
+			goto again_pop_job;
+		} /* if (job == NULL) */
+	}     /* if (job == NULL) */
+again_rd_stat:
+	st = ATOMIC_READ(job->a_stat);
+	if unlikely(st != _ASYNC_ST_TRIGGERED) {
+		struct aio_handle *aio;
+		assert(st == _ASYNC_ST_TRIGGERED_STOP);
+do_handle_triggered_stop:
+		aio = ATOMIC_XCH(job->a_aio, NULL);
+		if (aio) {
+			PREEMPTION_DISABLE();
+			aio_handle_complete_nopr(aio, AIO_COMPLETION_CANCEL);
+			PREEMPTION_ENABLE();
+		}
+		if (job->a_ops->ao_cancel) {
+			/* Invoke the cancel-callback. */
+			TRY {
+				(*job->a_ops->ao_cancel)(job);
+			} EXCEPT {
+				error_printf("canceling async job %p", job);
+			}
+		}
+		/* Get rid of this job */
+do_delete_job:
+		if (async_all_tryacquire()) {
+			if (!ATOMIC_CMPXCH_WEAK(job->a_stat, st,
+			                        _ASYNC_ST_INIT_STOP)) {
+				async_all_release();
+				goto again_rd_stat;
+			}
+			LIST_REMOVE(job, a_all);
+			--async_all_size;
+			async_all_release();
+			decref_nokill(job); /* The reference from `async_all_list' */
+			decref(job);        /* The reference from `async_ready' (returned by `async_popready') */
+		} else {
+			struct lockop *lop;
+			if (!ATOMIC_CMPXCH_WEAK(job->a_stat, st,
+			                        _ASYNC_ST_DELALL))
+				goto again_rd_stat;
+
+			/* Schedule a pending lock-operation to remove
+			 * `job'  from  the  list of  all  async jobs. */
+			sig_multicompletion_disconnectall(&job->a_comp);
+			sig_multicompletion_fini(&job->a_comp);
+			lop          = async_as_lockop(job);
+			lop->lo_func = &async_delall_lop; /* NOTE: `async_delall_lop' inherits a reference to `job'! */
+			SLIST_ATOMIC_INSERT(&async_all_lops, lop, lo_link);
+			_async_all_reap();
+		}
+		goto again;
+	}
+
+	/* Switch the job from TRIGGERED to READY */
+again_handle_triggered:
+	if (!ATOMIC_CMPXCH_WEAK(job->a_stat,
+	                        _ASYNC_ST_TRIGGERED,
+	                        _ASYNC_ST_READY))
+		goto again_rd_stat;
+
+	/* Check if this job is ready! */
+again_do_work:
+	TRY {
+		unsigned int status;
+		/* Do the work! */
+		status = (*job->a_ops->ao_work)(job);
+		assert(status == ASYNC_RESUME ||
+		       status == ASYNC_FINISHED ||
+		       status == ASYNC_CANCEL);
+		if (status != ASYNC_RESUME) {
+			struct aio_handle *aio;
+			/* Complete the async job. */
+			ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED_STOP);
+			aio = ATOMIC_XCH(job->a_aio, NULL);
+			if (status == ASYNC_CANCEL) {
 				if (aio) {
 					PREEMPTION_DISABLE();
-					aio_handle_complete_nopr(aio, AIO_COMPLETION_SUCCESS);
+					aio_handle_complete_nopr(aio, AIO_COMPLETION_CANCEL);
 					PREEMPTION_ENABLE();
 				}
-				st = ATOMIC_READ(job->a_stat);
-				if unlikely(st == _ASYNC_ST_TRIGGERED)
-					goto again_handle_triggered;
-				assert(st == _ASYNC_ST_TRIGGERED_STOP);
-				goto do_delete_job;
+				goto again_rd_stat;
 			}
+			/* Non-cancel completion. */
+			if (aio) {
+				PREEMPTION_DISABLE();
+				aio_handle_complete_nopr(aio, AIO_COMPLETION_SUCCESS);
+				PREEMPTION_ENABLE();
+			}
+			st = ATOMIC_READ(job->a_stat);
+			if unlikely(st == _ASYNC_ST_TRIGGERED)
+				goto again_handle_triggered;
+			assert(st == _ASYNC_ST_TRIGGERED_STOP);
+			goto do_delete_job;
+		}
 
+again_rd_stat_before_reconnect:
+		st = ATOMIC_READ(job->a_stat);
+		if likely(st == _ASYNC_ST_READY) {
+			ktime_t timeout;
 			/* Re-connect completion handling for `job' */
-			async_reconnect(job); /* TODO: Deal with timeouts */
+			timeout = async_reconnect(job);
 
 			/* Now that we're interlocked with the job's connect callback,
 			 * check  once again  if there is  more work left  to be done. */
 			if ((*job->a_ops->ao_test)(job))
 				goto again_do_work;
 
-		} EXCEPT {
-			/* Async error-completion.
-			 * Note that when an AIO handle is attached to the job, then we
-			 * don't  print an error message, but let _it_ handle the error
-			 * for us! */
-			struct aio_handle *aio;
-			aio = ATOMIC_XCH(job->a_aio, NULL);
-			if (aio) {
-				PREEMPTION_DISABLE();
-				aio_handle_complete_nopr(aio, AIO_COMPLETION_FAILURE);
-				PREEMPTION_ENABLE();
-			} else {
-				/* May get here in case of errors happening in an async  job
-				 * that doesn't have an AIO handle attached, or that used to
-				 * have one attached, but was  canceled before it could  use
-				 * that handle. */
-				error_printf("running async job %p", job);
+			if (timeout != KTIME_INFINITE) {
+				job->a_tmo = timeout;
+				async_tmo_acquire();
+				if (!ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_READY_TMO)) {
+					async_tmo_release();
+					goto again_rd_stat_before_reconnect;
+				}
+				/* Insert `job' into the async-tmo-queue at the correct position. */
+				async_tmo_insert(job, timeout); /* Inherit reference */
+				async_tmo_release();
+				/* Directly jump back to the start and don't decref() job,
+				 * since  we've gifted out  reference to the timeout-list! */
+				goto again;
 			}
-			ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED_STOP);
-			goto again_rd_stat;
+		} else {
+			if (st == _ASYNC_ST_TRIGGERED_STOP)
+				goto do_handle_triggered_stop; /* async_cancel() was called in the mean time... */
+			if (st == _ASYNC_ST_TRIGGERED)
+				goto again_handle_triggered; /* async_cancel()+async_start() was called in the mean time... */
 		}
-
-		/* Drop the reference that we've gotten from the ready-list. */
-		decref_unlikely(job);
 	} EXCEPT {
-		/* Shouldn't get here. */
-		error_printf("_asyncmain");
+		/* Async error-completion.
+		 * Note that when an AIO handle is attached to the job, then we
+		 * don't  print an error message, but let _it_ handle the error
+		 * for us! */
+		struct aio_handle *aio;
+		aio = ATOMIC_XCH(job->a_aio, NULL);
+		if (aio) {
+			PREEMPTION_DISABLE();
+			aio_handle_complete_nopr(aio, AIO_COMPLETION_FAILURE);
+			PREEMPTION_ENABLE();
+		} else {
+			/* May get here in case of errors happening in an async  job
+			 * that doesn't have an AIO handle attached, or that used to
+			 * have one attached, but was  canceled before it could  use
+			 * that handle. */
+			error_printf("running async job %p", job);
+		}
+		ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED_STOP);
+		goto again_rd_stat;
 	}
+
+	/* Drop the reference that we've gotten from the ready-list. */
+	decref_unlikely(job);
 	goto again;
 }
 
@@ -568,12 +753,14 @@ again:
 		}
 		break;
 
-#if (_ASYNC_ST_STRTFOR(_ASYNC_ST_ADDALL_STOP) == _ASYNC_ST_ADDALL && \
-     _ASYNC_ST_STRTFOR(_ASYNC_ST_DELALL) == _ASYNC_ST_DELALL_STRT && \
-     _ASYNC_ST_STRTFOR(_ASYNC_ST_TRIGGERED_STOP) == _ASYNC_ST_TRIGGERED)
+#if (_ASYNC_ST_STRTFOR(_ASYNC_ST_ADDALL_STOP) == _ASYNC_ST_ADDALL &&       \
+     _ASYNC_ST_STRTFOR(_ASYNC_ST_DELALL) == _ASYNC_ST_DELALL_STRT &&       \
+     _ASYNC_ST_STRTFOR(_ASYNC_ST_TRIGGERED_STOP) == _ASYNC_ST_TRIGGERED && \
+     _ASYNC_ST_STRTFOR(_ASYNC_ST_DELTMO) == _ASYNC_ST_DELTMO_STRT)
 	case _ASYNC_ST_ADDALL_STOP:
 	case _ASYNC_ST_DELALL:
 	case _ASYNC_ST_TRIGGERED_STOP:
+	case _ASYNC_ST_DELTMO:
 		if (!ATOMIC_CMPXCH_WEAK(self->a_stat, st, _ASYNC_ST_STRTFOR(st)))
 			goto again;
 		break;
@@ -598,6 +785,13 @@ again:
 		                        _ASYNC_ST_TRIGGERED))
 			goto again;
 		break;
+
+	case _ASYNC_ST_DELTMO:
+		if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+		                        _ASYNC_ST_DELTMO,
+		                        _ASYNC_ST_DELTMO_STRT))
+			goto again;
+		break;
 #endif /* !... */
 
 	default:
@@ -605,6 +799,41 @@ again:
 	}
 	return self;
 }
+
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL async_deltmo_lop)(struct lockop *__restrict self) {
+	REF struct async *me;
+	unsigned int st;
+	me = container_of(self, struct async, _a_tmolockop);
+
+	/* Actually remove from the timeout list! */
+	LIST_REMOVE(me, a_tmolnk); /* Inherit reference */
+	decref_nokill(me); /* The caller already gave us a reference, drop the new one. */
+
+again_rd_stat:
+	st = ATOMIC_READ(me->a_stat);
+	assert(st == _ASYNC_ST_DELTMO ||
+	       st == _ASYNC_ST_DELTMO_STRT);
+	if unlikely(st == _ASYNC_ST_DELTMO_STRT) {
+		/* Mark the async job as triggered to reset its state. */
+		if (!ATOMIC_CMPXCH_WEAK(me->a_stat,
+		                        _ASYNC_ST_DELTMO_STRT,
+		                        _ASYNC_ST_TRIGGERED))
+			goto again_rd_stat;
+	} else {
+		/* Mark the async job as stop-triggered. */
+		if (!ATOMIC_CMPXCH_WEAK(me->a_stat,
+		                        _ASYNC_ST_DELTMO,
+		                        _ASYNC_ST_TRIGGERED_STOP))
+			goto again_rd_stat;
+	}
+	/* Use a post-lockop to add the job to the ready-list. */
+	me->_a_tmopostlockop.plo_func = &async_addready_postlop;
+	return &me->_a_tmopostlockop;
+}
+
+
 
 /* Stop (or schedule to stop) a given async job.
  * When an AIO handle is attached to `self', complete with `AIO_COMPLETION_CANCEL'
@@ -672,14 +901,103 @@ do_async_cancel:
 		}
 		break;
 
-#if (_ASYNC_ST_STOPFOR(_ASYNC_ST_INIT) == _ASYNC_ST_INIT_STOP &&     \
-     _ASYNC_ST_STOPFOR(_ASYNC_ST_ADDALL) == _ASYNC_ST_ADDALL_STOP && \
-     _ASYNC_ST_STOPFOR(_ASYNC_ST_DELALL_STRT) == _ASYNC_ST_DELALL && \
-     _ASYNC_ST_STOPFOR(_ASYNC_ST_TRIGGERED) == _ASYNC_ST_TRIGGERED_STOP)
+	case _ASYNC_ST_READY_TMO:
+		/* Remove the async job from the list of jobs w/ timeouts. */
+		if (async_tmo_tryacquire()) {
+			if (self->a_ops->ao_cancel == NULL) {
+				if (async_all_tryacquire()) {
+					/* Remove from the all- and tmo-list at the same time.
+					 * This way, we don't need one of the async workers to do anything for us! */
+					if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+					                        _ASYNC_ST_READY_TMO,
+					                        _ASYNC_ST_INIT_STOP)) {
+						async_all_release_f();
+						async_tmo_release_f();
+						async_all_reap();
+						async_tmo_reap();
+						goto again;
+					}
+					LIST_REMOVE(self, a_all); /* Remove from the all-list */
+					--async_all_size;
+					async_all_release_f();
+					LIST_REMOVE(self, a_tmolnk); /* Remove from the timeout list */
+					async_tmo_release_f();
+					async_all_reap();
+					async_tmo_reap();
+					sig_multicompletion_disconnectall(&self->a_comp);
+					sig_multicompletion_fini(&self->a_comp);
+					decref_nokill(self); /* Drop the old reference from `async_all_list' */
+					decref_nokill(self); /* Drop the old reference from `async_tmo_list' */
+					break;
+				}
+			}
+			if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+			                        _ASYNC_ST_READY_TMO,
+			                        _ASYNC_ST_TRIGGERED_STOP)) {
+				async_tmo_release();
+				goto again;
+			}
+			LIST_REMOVE(self, a_tmolnk); /* Inherit reference */
+			async_tmo_release();
+			SLIST_ATOMIC_INSERT(&async_ready, self, a_ready); /* Inherit reference */
+			sig_send(&async_ready_sig);
+		} else {
+			if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+			                        _ASYNC_ST_READY_TMO,
+			                        _ASYNC_ST_DELTMO))
+				goto again;
+			/* Enqueue a lock-operation to remove `self' from the timeout list. */
+			incref(self);
+			self->_a_tmolockop.lo_func = &async_deltmo_lop;
+			SLIST_ATOMIC_INSERT(&async_tmo_lops, &self->_a_tmolockop, lo_link);
+			_async_tmo_reap();
+		}
+		break;
+
+	case _ASYNC_ST_SLEEPING:
+		if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+		                        _ASYNC_ST_SLEEPING,
+		                        _ASYNC_ST_TRIGGERED_STOP))
+			goto again;
+
+		/* Add the job to the ready-list. */
+		incref(self);
+		SLIST_ATOMIC_INSERT(&async_ready, self, a_ready);
+
+		/* We know that one of the async workers is currently sleeping
+		 * in an attempt to wait for the timeout of `self' to  expire.
+		 * As such, we need to wake that specific async worker thread.
+		 *
+		 * As of right now, there is no way to map async->task to figure
+		 * out which thread is sleeping for which async job, so we  have
+		 * to wake all of them.
+		 *
+		 * TODO: Fix this in the future such that only the async worker
+		 *       responsible for `self' is woken!
+		 *       On solution could be to keep a mapping of task->async
+		 *       that  contains a field for every async-worker-thread:
+		 *          struct async *sleeping; // [0..1][lock(PRIVATE(THIS_WORKER))]
+		 *       And  the controller itself could be reference counted,
+		 *       and be accessed via an  ARREF(). In this szenario,  we
+		 *       could locate the relevant async-worker thread and send
+		 *       the signal to it specifically.
+		 *       For  this purpose, there  would also need  to be a new
+		 *       signal API function `sig_sendto()' that sends a signal
+		 *       to only a specific thread. */
+		sig_broadcast(&async_ready_sig);
+		break;
+
+
+#if (_ASYNC_ST_STOPFOR(_ASYNC_ST_INIT) == _ASYNC_ST_INIT_STOP &&           \
+     _ASYNC_ST_STOPFOR(_ASYNC_ST_ADDALL) == _ASYNC_ST_ADDALL_STOP &&       \
+     _ASYNC_ST_STOPFOR(_ASYNC_ST_DELALL_STRT) == _ASYNC_ST_DELALL &&       \
+     _ASYNC_ST_STOPFOR(_ASYNC_ST_TRIGGERED) == _ASYNC_ST_TRIGGERED_STOP && \
+     _ASYNC_ST_STOPFOR(_ASYNC_ST_DELTMO_STRT) == _ASYNC_ST_DELTMO)
 	case _ASYNC_ST_INIT:
 	case _ASYNC_ST_ADDALL:
 	case _ASYNC_ST_DELALL_STRT:
 	case _ASYNC_ST_TRIGGERED:
+	case _ASYNC_ST_DELTMO_STRT:
 		if (!ATOMIC_CMPXCH_WEAK(self->a_stat, st, _ASYNC_ST_STOPFOR(st)))
 			goto again;
 		break;
@@ -709,6 +1027,13 @@ do_async_cancel:
 		if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
 		                        _ASYNC_ST_TRIGGERED,
 		                        _ASYNC_ST_TRIGGERED_STOP))
+			goto again;
+		break;
+
+	case _ASYNC_ST_DELTMO_STRT:
+		if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+		                        _ASYNC_ST_DELTMO_STRT,
+		                        _ASYNC_ST_DELTMO))
 			goto again;
 		break;
 #endif /* !... */
@@ -983,8 +1308,7 @@ NOTHROW(FCALL async_worker_timeout)(ktime_t abs_timeout,
  * @return: false: Move onto the step of waiting for something to happen. */
 PRIVATE bool NOTHROW(FCALL _asyncjob_main)(void);
 
-INTERN ATTR_NORETURN void
-NOTHROW(FCALL _asyncmain)(void) {
+INTERN ATTR_NORETURN void KCALL _asyncmain(void) {
 	for (;;) {
 		size_t i;
 		REF struct awork_vector *workers;

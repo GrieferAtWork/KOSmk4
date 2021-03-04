@@ -51,7 +51,7 @@ DECL_BEGIN
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 struct task;
 INTDEF struct task _asyncwork;
-INTDEF ATTR_NORETURN void NOTHROW(FCALL _asyncmain)(void);
+INTDEF ATTR_NORETURN void KCALL _asyncmain(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
@@ -90,7 +90,8 @@ struct async_ops {
 
 	/* [0..1] Called when the timeout returned by `ao_connect()' has expired.
 	 *        When set to `NULL', behave the same as though a function had been
-	 *        specified that always returns `ASYNC_FINISHED'.
+	 *        specified that always returns `ASYNC_CANCEL'.
+	 * NOTE: May only ever be called when `ao_connect()' returns `!= KTIME_INFINITE'
 	 * @return: * : One of `ASYNC_RESUME', `ASYNC_FINISHED' or `ASYNC_CANCEL' */
 	WUNUSED NONNULL((1)) unsigned int
 	(FCALL *ao_time)(struct async *__restrict self);
@@ -102,8 +103,8 @@ struct async_ops {
 	 *        started (via  `async_start()'), this  callback is  guarantied to  be
 	 *        called at some point in the future. And if `async_start()' is called
 	 *        once  again after this  callback is invoked (or  even from inside of
-	 *        this callback), then this callback is guarantied to be invoked again
-	 *        at some point in the future.
+	 *        this callback), then this callback  is guarantied to be invoked  yet
+	 *        again at some point in the future.
 	 * NOTE:  This  callback is not invoked if `ASYNC_FINISHED' is returned by either
 	 *        `ao_work' or `ao_time'. But it is called if `ASYNC_CANCEL' is returned. */
 	NONNULL((1)) void
@@ -144,7 +145,17 @@ struct async_ops {
  *   _ASYNC_ST_ADDALL_STOP    ->  _ASYNC_ST_INIT_STOP       // add-to-all-lockop-completion
  *
  *   _ASYNC_ST_READY          ->  _ASYNC_ST_TRIGGERED       // Signal-completion-callback
- *   _ASYNC_ST_READY          ->  _ASYNC_ST_TRIGGERED_STOP  // async_cancel() or `ASYNC_FINISHED'
+ *   _ASYNC_ST_READY          ->  _ASYNC_ST_TRIGGERED_STOP  // ao_work:!=ASYNC_RESUME or async_cancel()
+ *   _ASYNC_ST_READY          ->  _ASYNC_ST_READY_TMO       // ao_connect:return!=KTIME_INFINITE
+ *
+ *   _ASYNC_ST_READY_TMO      ->  _ASYNC_ST_SLEEPING        // worker-waits-for-timeout
+ *   _ASYNC_ST_READY_TMO      ->  _ASYNC_ST_DELTMO          // async_cancel()
+ *
+ *   _ASYNC_ST_SLEEPING       ->  _ASYNC_ST_READY_TMO       // timeout-not-expired
+ *   _ASYNC_ST_SLEEPING       ->  _ASYNC_ST_TRIGGERED_STOP  // async_cancel()
+ *   _ASYNC_ST_SLEEPING       ->  _ASYNC_ST_TRIGGERED       // timeout-expired->ao_time:ASYNC_RESUME
+ *   _ASYNC_ST_SLEEPING       ->  _ASYNC_ST_DELTMO          // timeout-expired->ao_time:ASYNC_FINISHED
+ *   _ASYNC_ST_SLEEPING       ->  _ASYNC_ST_TRIGGERED_STOP  // timeout-expired->ao_time:ASYNC_CANCEL
  *
  *   _ASYNC_ST_TRIGGERED      ->  _ASYNC_ST_TRIGGERED_STOP  // async_cancel()
  *   _ASYNC_ST_TRIGGERED      ->  _ASYNC_ST_READY           // Async-event-handled
@@ -157,25 +168,36 @@ struct async_ops {
  *
  *   _ASYNC_ST_DELALL         ->  _ASYNC_ST_DELALL_STRT     // async_start()
  *   _ASYNC_ST_DELALL         ->  _ASYNC_ST_INIT_STOP       // del-from-all-lockop-completion
+ *
+ *   _ASYNC_ST_DELTMO_STRT    ->  _ASYNC_ST_TRIGGERED       // del-from-tmo-lockop-completion
+ *
+ *   _ASYNC_ST_DELTMO         ->  _ASYNC_ST_DELTMO_STRT     // async_start()
+ *   _ASYNC_ST_DELTMO         ->  _ASYNC_ST_TRIGGERED_STOP  // del-from-tmo-lockop-completion
  */
-#define _ASYNC_ST_INIT           0 /* Initial state */
-#define _ASYNC_ST_INIT_STOP      1 /* Same as `_ASYNC_ST_INIT', but `async_cancel()' was called */
-#define _ASYNC_ST_ADDALL         2 /* A lockop is pending to add the job to `async_all_list' */
-#define _ASYNC_ST_ADDALL_STOP    3 /* Same as `_ASYNC_ST_ADDALL', but `async_cancel()' was called */
-#define _ASYNC_ST_DELALL_STRT    4 /* Same as `_ASYNC_ST_DELALL', but `async_start()' was called */
-#define _ASYNC_ST_DELALL         5 /* A lockop is pending to remove the job from `async_all_list' */
-#define _ASYNC_ST_READY          6 /* The job is fully up & running. */
-/*efine _ASYNC_ST_               7  * ... */
-#define _ASYNC_ST_TRIGGERED      8 /* An async event was triggered. */
-#define _ASYNC_ST_TRIGGERED_STOP 9 /* Same as `_ASYNC_ST_TRIGGERED', but `async_cancel()' was called */
+#define _ASYNC_ST_INIT            0 /* Initial state */
+#define _ASYNC_ST_INIT_STOP       1 /* Same as `_ASYNC_ST_INIT', but `async_cancel()' was called */
+#define _ASYNC_ST_ADDALL          2 /* A lockop is pending to add the job to `async_all_list' */
+#define _ASYNC_ST_ADDALL_STOP     3 /* Same as `_ASYNC_ST_ADDALL', but `async_cancel()' was called */
+#define _ASYNC_ST_DELALL_STRT     4 /* Same as `_ASYNC_ST_DELALL', but `async_start()' was called */
+#define _ASYNC_ST_DELALL          5 /* A lockop is pending to remove the job from `async_all_list' */
+#define _ASYNC_ST_READY           6 /* The job is fully up & running. */
+/*efine _ASYNC_ST_                7  * ... */
+#define _ASYNC_ST_READY_TMO       8 /* Same as `_ASYNC_ST_READY', but a timeout was set. () */
+/*efine _ASYNC_ST_                9  * ... */
+#define _ASYNC_ST_TRIGGERED      10 /* An async event was triggered. */
+#define _ASYNC_ST_TRIGGERED_STOP 11 /* Same as `_ASYNC_ST_TRIGGERED', but `async_cancel()' was called */
+#define _ASYNC_ST_SLEEPING       12 /* Waiting for timeout to expire. */
+/*efine _ASYNC_ST_               13  * ... */
+#define _ASYNC_ST_DELTMO_STRT    14 /* Same as `_ASYNC_ST_DELTMO', but `async_start()' was called */
+#define _ASYNC_ST_DELTMO         15 /* A lockop is pending to remove the job from the timeout queue */
 
 
 
 struct aio_handle;
 struct async {
-	WEAK refcnt_t              a_refcnt; /* Reference counter. */
-	unsigned int               a_stat;   /* [lock(ATOMIC)] Async status (one of `_ASYNC_ST_*') */
-	struct async_ops const    *a_ops;    /* [1..1][const] Worker operators. */
+	WEAK refcnt_t              a_refcnt;  /* Reference counter. */
+	unsigned int               a_stat;    /* [lock(ATOMIC)] Async status (one of `_ASYNC_ST_*') */
+	struct async_ops const    *a_ops;     /* [1..1][const] Worker operators. */
 #ifdef __WANT_ASYNC__a_lockop
 	union {
 		struct lockop             _a_lockop;     /* ... */
@@ -183,15 +205,25 @@ struct async {
 		struct sig_multicompletion a_comp;       /* ... */
 	};
 #else /* __WANT_ASYNC__a_lockop */
-	struct sig_multicompletion a_comp;   /* [valid_if(a_stat >= _ASYNC_ST_READY)][lock(ASYNC_WORKER)]
-	                                      * Internal  signal  completion controller  used  to monitor
-	                                      * async  jobs for completion, as well as to maintain a list
-	                                      * of ready jobs, without having to globally re-connect  all
-	                                      * jobs whenever one of them becomes ready. */
+	struct sig_multicompletion a_comp;    /* [valid_if(a_stat >= _ASYNC_ST_READY)][lock(ASYNC_WORKER)]
+	                                       * Internal  signal  completion controller  used  to monitor
+	                                       * async  jobs for completion, as well as to maintain a list
+	                                       * of ready jobs, without having to globally re-connect  all
+	                                       * jobs whenever one of them becomes ready. */
 #endif /* !__WANT_ASYNC__a_lockop */
-	LIST_ENTRY(REF async)      a_all;    /* [0..1][lock(async_all_lock)] Entry in the list of all async jobs. */
-	SLIST_ENTRY(REF async)     a_ready;  /* [lock(ATOMIC)] List of ready jobs. */
-	WEAK struct aio_handle    *a_aio;    /* [0..1][lock(CLEAR_ONCE)] Attached AIO and job cancellation indicator. */
+	LIST_ENTRY(REF async)      a_all;     /* [0..1][lock(async_all_lock)] Entry in the list of all async jobs. */
+	SLIST_ENTRY(REF async)     a_ready;   /* [lock(ATOMIC)] List of ready jobs. */
+	WEAK struct aio_handle    *a_aio;     /* [0..1][lock(CLEAR_ONCE)] Attached AIO and job cancellation indicator. */
+	LIST_ENTRY(REF async)      a_tmolnk;  /* [0..1][lock(INTERN)]
+	                                       * [valid_if(_ASYNC_ST_READY_TMO || _ASYNC_ST_DELTMO ||
+	                                       *           _ASYNC_ST_DELTMO_STRT)]
+	                                       * Link entry in the list of async jobs w/ timeouts. */
+	union {
+		ktime_t                a_tmo;     /* [lock(INTERN)][valid_if(_ASYNC_ST_READY_TMO || _ASYNC_ST_SLEEPING)]
+	                                       * Timeout of this job. */
+		struct lockop         _a_tmolockop;     /* ... */
+		struct postlockop     _a_tmopostlockop; /* ... */
+	};
 	/* Worker-specific data will go here... */
 };
 
@@ -271,9 +303,9 @@ LIST_HEAD(async_list, async);
 #endif /* !__async_list_defined */
 
 /* API access to the set of all running async jobs. */
-DATDEF struct REF async_list /**/ async_all_list; /* [0..n][lock(async_all_lock)] List of all running async tasks. */
-DATDEF size_t /*               */ async_all_size; /* [lock(async_all_lock)] Total # of async tasks. */
-DATDEF struct atomic_lock /*   */ async_all_lock; /* Lock for the async-task list */
+DATDEF struct REF async_list /**/ async_all_list; /* [0..n][lock(async_all_lock)] List of all running async jobs. */
+DATDEF size_t /*               */ async_all_size; /* [lock(async_all_lock)] Total # of async jobs. */
+DATDEF struct atomic_lock /*   */ async_all_lock; /* Lock for the async-job list */
 DATDEF struct lockop_slist /*  */ async_all_lops; /* Pending lock operations for `async_all_lock' */
 #define _async_all_reap()      _lockop_reap_atomic_lock(&async_all_lops, &async_all_lock)
 #define async_all_reap()       lockop_reap_atomic_lock(&async_all_lops, &async_all_lock)
@@ -428,7 +460,7 @@ DECL_BEGIN
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 struct task;
 INTDEF struct task _asyncwork;
-INTDEF ATTR_NORETURN void NOTHROW(FCALL _asyncmain)(void);
+INTDEF ATTR_NORETURN void KCALL _asyncmain(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 struct async_worker_callbacks {

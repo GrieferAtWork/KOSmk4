@@ -210,6 +210,7 @@ struct _sig_multicompletion_set {
 };
 
 struct sig_multicompletion {
+	/* TODO: The initial # of statically allocated routes should only be `1'! */
 	struct _sig_multicompletion_set sm_set; /* Set of connections */
 };
 

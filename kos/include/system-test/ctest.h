@@ -34,9 +34,6 @@
 
 #include <hybrid/__assert.h>
 
-#include <err.h>
-#include <inttypes.h>
-
 #if !defined(__INSIDE_LIBTEST) && !defined(__DEEMON__)
 #error "Only include this file from within *.ctest files that are apart of /bin/system-test"
 #endif /* __INSIDE_LIBTEST */
@@ -52,14 +49,15 @@ struct testdecl {
 	void (__LIBKCALL *td_func)(void);  /* [1..1] Test function */
 };
 
-#define DEFINE_TEST(name)                                                                        \
-	__PRIVATE __ATTR_USED void __LIBKCALL test_##name(void);                                     \
-	__PRIVATE __ATTR_USED __ATTR_SECTION(".data.system_tests") struct testdecl __decl_##name = { \
-		.td_name = #name,                                                                        \
-		.td_file = __FILE__,                                                                     \
-		.td_line = __LINE__,                                                                     \
-		.td_func = &test_##name,                                                                 \
-	};                                                                                           \
+#define DEFINE_TEST(name)                                      \
+	__PRIVATE __ATTR_USED void __LIBKCALL test_##name(void);   \
+	__PRIVATE __ATTR_USED __ATTR_SECTION(".data.system_tests") \
+	struct testdecl __decl_##name = {                          \
+		.td_name = #name,                                      \
+		.td_file = __FILE__,                                   \
+		.td_line = __LINE__,                                   \
+		.td_func = &test_##name,                               \
+	};                                                         \
 	__PRIVATE __ATTR_USED void __LIBKCALL test_##name(void)
 
 __INTDEF void __NOTHROW_NCX(__VLIBKCALL ctest_subtestf)(char const *__restrict __format, ...);
@@ -70,16 +68,44 @@ __INTDEF void __NOTHROW_NCX(__LIBKCALL ctest_vsubstatf)(char const *__restrict _
 
 __DECL_END
 #endif /* __CC__ */
+#endif /* !__KOS__ || !__KERNEL__ */
 
+/************************************************************************/
+/* Assertion check helpers                                              */
+/************************************************************************/
 
-#define _OPt(a, op, b, T, PRIt)                                                    \
-	do {                                                                           \
-		T _a = (T)(a), _b = (T)(b);                                                \
-		if (!(_a op _b)) {                                                         \
-			err(1, "fail:%d: " #a " " #op " " #b " (%" PRIt " " #op " %" PRIt ")", \
-			    __LINE__, _a, _b);                                                 \
-		}                                                                          \
+#include <parts/assert-failed.h>
+#ifdef __assertion_checkf
+#define _OPt(a, op, b, T, PRIt)                                                         \
+	do {                                                                                \
+		for (;;) {                                                                      \
+			T _a = (T)(a), _b = (T)(b);                                                 \
+			if (_a op _b)                                                               \
+				break;                                                                  \
+			if (!__assertion_checkf(#a " " #op " " #b,                                  \
+			                        #a " " #op " " #b " (%" PRIt " " #op " %" PRIt ")", \
+			                        _a, _b))                                            \
+				break;                                                                  \
+		}                                                                               \
 	}	__WHILE0
+#else /* __assertion_checkf */
+#include <parts/assert.h>
+#ifdef __do_assertf
+#define _OPt(a, op, b, T, PRIt)                                          \
+	do {                                                                 \
+		T _a = (T)(a), _b = (T)(b);                                      \
+		__do_assertf(_a op _b, #a " " #op " " #b,                        \
+		             #a " " #op " " #b " (%" PRIt " " #op " %" PRIt ")", \
+		             _a, _b);                                            \
+	}	__WHILE0
+#else /* __do_assertf */
+#include <assert.h>
+#define _OPt(a, op, b, T, PRIt) assert((T)(a) op (T)(b))
+#endif /* !__do_assertf */
+#endif /* !__assertion_checkf */
+
+#include <inttypes.h>
+
 /*[[[deemon
 for (local name, op: {
 	("LO", "<"),
@@ -188,5 +214,4 @@ for (local name, op: {
 /*[[[end]]]*/
 
 
-#endif /* !__KOS__ || !__KERNEL__ */
 #endif /* !_SYSTEM_TEST_CTEST_H */
