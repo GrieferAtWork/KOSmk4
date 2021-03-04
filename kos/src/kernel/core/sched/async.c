@@ -31,6 +31,7 @@
 #include <sched/async.h>
 #include <sched/lockop.h>
 #include <sched/signal.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
@@ -274,38 +275,13 @@ NOTHROW(FCALL async_tmo_insert)(REF struct async *__restrict job, ktime_t timeou
 
 
 
-/* The default set of async workers (which is exactly 1, that is `_asyncwork'). */
-PRIVATE struct async_thread_controller _async_workers_deafult = {
-	.atc_refcnt  = 2, /* +1: _async_workers_deafult, +1: async_threads */
-	.atc_count   = 1,
-	.atc_threads = {
-		[0] = {
-			.atd_thread  = &_asyncwork,
-			.atd_sleepon = NULL,
-		},
-	},
-};
-
-/* Destroy the given async-thread-controller. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_thread_controller_destroy)(struct async_thread_controller *__restrict self) {
-	size_t i;
-	for (i = 0; i < self->atc_count; ++i)
-		decref(self->atc_threads[i].atd_thread);
-	kfree(self);
-}
-
-
-/* [1..1] The current controller for running async worker threads. */
-PUBLIC struct async_thread_controller_arref async_threads = ARREF_INIT(&_async_workers_deafult);
-
 /* Find the given `thread' within the given async-thread-controller. */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) struct async_thread_data *
 NOTHROW(FCALL async_thread_controller_findthread)(struct async_thread_controller *__restrict self,
                                                   struct task *__restrict thread) {
 	size_t i;
-	BSEARCH(i, self->atc_threads, self->atc_count, .atd_thread, thread) {
-		return &self->atc_threads[i];
+	BSEARCH(i, self->atc_threads, self->atc_count, ->atd_thread, thread) {
+		return self->atc_threads[i];
 	}
 	return NULL;
 }
@@ -316,8 +292,8 @@ NOTHROW(FCALL async_thread_controller_findsleepon)(struct async_thread_controlle
                                                    struct async *__restrict job) {
 	size_t i;
 	for (i = 0; i < self->atc_count; ++i) {
-		if (ATOMIC_READ(self->atc_threads[i].atd_sleepon) == job)
-			return &self->atc_threads[i];
+		if (ATOMIC_READ(self->atc_threads[i]->atd_sleepon) == job)
+			return self->atc_threads[i];
 	}
 	return NULL;
 }
@@ -382,6 +358,8 @@ again_pop_job:
 				ctx = async_thread_controller_findthread(ctl, THIS_TASK);
 				assertf(ctx, "If this fails, that would mean that we're not actually "
 				             "one of the currently registered async worker threads!");
+				incref(ctx);
+				decref_unlikely(ctl);
 				ATOMIC_WRITE(ctx->atd_sleepon, job);
 
 				/* After having read the timeout, re-verify that the job hasn't
@@ -390,14 +368,14 @@ again_pop_job:
 				 * furthermore, we wouldn't even be supposed to wait for it! */
 				if unlikely(ATOMIC_READ(job->a_stat) != _ASYNC_ST_SLEEPING) {
 					ATOMIC_WRITE(ctx->atd_sleepon, NULL);
-					decref_unlikely(ctl);
+					decref_unlikely(ctx);
 					goto again_rd_stat;
 				}
 
 				if unlikely(ktime() >= timeout) {
 					unsigned int tmo_status;
 					ATOMIC_WRITE(ctx->atd_sleepon, NULL);
-					decref_unlikely(ctl);
+					decref_unlikely(ctx);
 do_handle_timeout:
 					/* Timeout expired. */
 					tmo_status = ASYNC_CANCEL;
@@ -461,13 +439,13 @@ do_handle_timeout:
 				} EXCEPT {
 					ATOMIC_WRITE(ctx->atd_sleepon, NULL);
 					decref_unlikely(job);
-					decref_unlikely(ctl);
+					decref_unlikely(ctx);
 					RETHROW();
 				}
 
 				/* Write-back that we've stopped sleeping on `job' */
 				ATOMIC_WRITE(ctx->atd_sleepon, NULL);
-				decref_unlikely(ctl);
+				decref_unlikely(ctx);
 
 				/* Check if the timeout has expired. */
 				if (wait_status == NULL && ktime() >= timeout)
@@ -1055,7 +1033,7 @@ do_async_cancel:
 
 		/* Send the async-ready signal (which  is what's used to  control
 		 * when individual async-worker-threads are awake, with the usual
-		 * system  state reflecing _all_  worker threads being connected,
+		 * system  state reflecting _all_ worker threads being connected,
 		 * and waiting for this signal to be delivered)
 		 *
 		 * As such, make use of the special `sig_sendto()' function to
@@ -1073,15 +1051,7 @@ do_async_cancel:
 		/* If something goes wrong, and we're unable to locate the
 		 * specific async worker thread of `self', or were  unable
 		 * to successfully  send it  the async-ready-signal,  then
-		 * fall back to broadcasting all threads.
-		 *
-		 * Normally, this should only happen  if the thread in  question
-		 * has stopped sleeping in the mean time. However, there is also
-		 * a potential race condition where  our `ctl' is no longer  up-
-		 * to-date, as the result of a  new set of async worker  threads
-		 * being spawned/killed.  So  to  keep  things  simple  in  this
-		 * _highly_ unlikely case,  just wake-up everyone  and left  the
-		 * async system re-figure itself out once again! */
+		 * fall back to broadcasting all threads. */
 fallback_wait_all_threads:
 		decref_unlikely(ctl);
 		sig_broadcast(&async_ready_sig);

@@ -32,27 +32,33 @@
 
 DECL_BEGIN
 
+struct rpc_entry;
 struct async_thread_data {
 	/* Per-async-worker-thread controller context. */
-	REF struct task *atd_thread;  /* [1..1][const] The async-worker thread in question. */
-	struct async    *atd_sleepon; /* [0..1][lock(PRIVATE(THIS_TASK))] The job that  this
-	                               * thread is currently sleeping upon in order to await
-	                               * its timeout to expire.
-	                               * NOTE: When the  controller is  copied, this  field
-	                               *       is initialized as `NULL', since the original
-	                               *       thread wouldn't know  that its  thread-local
-	                               *       area was allocated anew. */
+	WEAK refcnt_t     atd_refcnt;  /* Reference counter. */
+	REF struct task  *atd_thread;  /* [1..1][const] The async-worker thread in question. */
+	struct async     *atd_sleepon; /* [0..1][lock(PRIVATE(THIS_TASK))] The job that  this
+	                                * thread is currently sleeping upon in order to await
+	                                * its timeout to expire. */
+	struct rpc_entry *atd_killrpc; /* [0..1][owned][lock(CLEAR_ONCE)] RPC which may be used
+	                                * to  kill  the associated  thread  (iow: `atd_thread') */
 };
+
+/* Destroy the given async-thread-data. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_thread_data_destroy)(struct async_thread_data *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct async_thread_data, atd_refcnt, async_thread_data_destroy);
+
 
 struct async_thread_controller {
 	/* Async thread controller.  - Used to  maintain the list  of
 	 * running async worker threads, as well as to maintain their
 	 * individual per-thread variables. */
-	WEAK refcnt_t                                     atc_refcnt;   /* Reference counter. */
-	size_t                                            atc_count;    /* [const] # of threads */
-	COMPILER_FLEXIBLE_ARRAY(struct async_thread_data, atc_threads); /* [atc_count] Per-thread  info  (sorted  ascendingly
-	                                                                 * by `ADDROF(atd_thread)', thus allowing for threads
-	                                                                 * to be located via BSEARCH) */
+	WEAK refcnt_t                                           atc_refcnt;   /* Reference counter. */
+	size_t                                                  atc_count;    /* [const] # of threads */
+	COMPILER_FLEXIBLE_ARRAY(REF struct async_thread_data *, atc_threads); /* [1..1][const][atc_count]  Per-thread  info (sorted
+	                                                                       * ascendingly by `ADDROF(atd_thread)', thus allowing
+	                                                                       * for threads to be located via BSEARCH) */
 };
 
 /* Destroy the given async-thread-controller. */
@@ -69,8 +75,24 @@ ARREF(async_thread_controller_arref, async_thread_controller);
 /* [1..1] The current controller for running async worker threads. */
 DATDEF struct async_thread_controller_arref async_threads;
 
+/* Spawn a new async worker thread, and return a reference to it. */
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *FCALL async_threads_spawn(void) THROWS(E_BADALLOC);
 
-/* TODO: Functions to control the # of async worker-threads. */
+/* Kill the given async-worker-thread.
+ * @return: true:  Success: The given `thread' will soon be dead!
+ * @return: false: Either `thread' isn't  an async-worker  thread, is  the
+ *                 root async worker thread (`_asyncwork'), or has already
+ *                 been killed  (the thread  actually terminating  happens
+ *                 asynchronously, and independent of this function) */
+FUNDEF NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread);
+
+
+/* Get/Set the # of async worker threads running on the system.
+ * NOTE: Attempting to set the async threads count to `0' is
+ *       silently ignored. */
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(FCALL async_threads_getcount)(void);
+FUNDEF size_t FCALL async_threads_setcount(size_t new_count) THROWS(E_BADALLOC);
 
 
 DECL_END
