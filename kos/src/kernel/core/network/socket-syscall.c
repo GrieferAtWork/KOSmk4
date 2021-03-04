@@ -501,8 +501,8 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	{
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_message control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 		if (msg.msg_controllen) {
@@ -511,19 +511,19 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 			control.am_control    = msg.msg_control;
 			control.am_controllen = msg.msg_controllen;
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -535,14 +535,14 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 					validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually send the packet! */
 			if (msg.msg_namelen) {
@@ -599,8 +599,8 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		      HANDLE_TYPEKIND_GENERIC, subkind);
 	}
 	{
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_message control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 		if (msg.msg_controllen) {
@@ -610,19 +610,19 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 			control.am_controllen     = msg.msg_controllen;
 			msg_flags |= MSG_CMSG_COMPAT;
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -634,14 +634,14 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 					compat_validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually send the packet! */
 			if (msg.msg_namelen) {
@@ -695,8 +695,8 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 	for (i = 0; i < vlen; ++i) {
 		size_t result;
 		struct msghdr msg;
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_message control, *pcontrol;
 		memcpy(&msg, &vmessages[i].msg_hdr, sizeof(msg));
 		/* Verify user-space message buffers. */
@@ -710,19 +710,19 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 			control.am_control    = msg.msg_control;
 			control.am_controllen = msg.msg_controllen;
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -734,14 +734,14 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually send the packet! */
 			TRY {
@@ -813,8 +813,8 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 	for (i = 0; i < vlen; ++i) {
 		size_t result;
 		struct compat_msghdr msg;
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_message control, *pcontrol;
 		memcpy(&msg, &vmessages[i].msg_hdr, sizeof(msg));
 		/* Verify user-space message buffers. */
@@ -828,19 +828,19 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 			control.am_control_compat = msg.msg_control;
 			control.am_controllen     = msg.msg_controllen;
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -852,14 +852,14 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 					compat_validate_readable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually send the packet! */
 			TRY {
@@ -1035,8 +1035,8 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 	}
 	{
 		struct socket *me = (struct socket *)sock.h_data;
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_rmessage control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY(me);
 		if (sock.h_mode & IO_NONBLOCK)
@@ -1049,19 +1049,19 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 			control.am_controllen  = msg.msg_controllen;
 			control.am_controlused = (USER CHECKED size_t *)&message->msg_controllen; /* Write-back */
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -1073,14 +1073,14 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 					validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually receive the packet! */
 			if (msg.msg_namelen) {
@@ -1139,8 +1139,8 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 	}
 	{
 		struct socket *me = (struct socket *)sock.h_data;
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_rmessage control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY(me);
 		if (sock.h_mode & IO_NONBLOCK)
@@ -1153,19 +1153,19 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 			control.am_controlused_compat = &message->msg_controllen; /* Write-back */
 			msg_flags |= MSG_CMSG_COMPAT;
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -1177,14 +1177,14 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 					compat_validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually send the packet! */
 			if (msg.msg_namelen) {
@@ -1248,8 +1248,8 @@ sys_recvmmsg_impl(fd_t sockfd,
 	for (i = 0; i < vlen; ++i) {
 		size_t result;
 		struct msghdr msg;
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_rmessage control, *pcontrol;
 		if (i >= 1 && (msg_flags & MSG_WAITFORONE))
 			msg_flags |= MSG_DONTWAIT;
@@ -1267,19 +1267,19 @@ sys_recvmmsg_impl(fd_t sockfd,
 			control.am_controllen  = msg.msg_controllen;
 			control.am_controlused = (USER CHECKED size_t *)&vmessages[i].msg_hdr.msg_controllen; /* Write-back */
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -1291,14 +1291,14 @@ sys_recvmmsg_impl(fd_t sockfd,
 					validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually send the packet! */
 			TRY {
@@ -1434,8 +1434,8 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 	for (i = 0; i < vlen; ++i) {
 		size_t result;
 		struct compat_msghdr msg;
-		struct aio_buffer iov;
-		struct aio_buffer_entry *iov_vec;
+		struct iov_buffer iov;
+		struct iov_entry *iov_vec;
 		struct ancillary_rmessage control, *pcontrol;
 		if (i >= 1 && (msg_flags & MSG_WAITFORONE))
 			msg_flags |= MSG_DONTWAIT;
@@ -1452,19 +1452,19 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 			control.am_controllen         = msg.msg_controllen;
 			control.am_controlused_compat = &vmessages[i].msg_hdr.msg_controllen; /* Write-back */
 		}
-		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
-		                                             sizeof(struct aio_buffer_entry));
-		iov.ab_entv = iov_vec;
+		iov_vec = (struct iov_entry *)malloca(msg.msg_iovlen *
+		                                             sizeof(struct iov_entry));
+		iov.iv_entv = iov_vec;
 		TRY {
 			size_t iov_total = 0;
 			/* Load the IO-vector */
 			if unlikely(!msg.msg_iovlen) {
 				/* Special case: Empty packet. */
-				iov.ab_entc         = 1;
-				iov.ab_entv         = &iov.ab_head;
-				iov.ab_head.ab_base = NULL;
-				iov.ab_head.ab_size = 0;
-				iov.ab_last         = 0;
+				iov.iv_entc         = 1;
+				iov.iv_entv         = &iov.iv_head;
+				iov.iv_head.ive_base = NULL;
+				iov.iv_head.ive_size = 0;
+				iov.iv_last         = 0;
 			} else {
 				size_t iov_i;
 				for (iov_i = 0; iov_i < msg.msg_iovlen; ++iov_i) {
@@ -1476,14 +1476,14 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 					validate_writable(vec.iov_base, vec.iov_len);
 					if (OVERFLOW_UADD(iov_total, vec.iov_len, &iov_total))
 						THROW(E_OVERFLOW); /* XXX: On x86, this could be done with `add+into' */
-					iov_vec[iov_i].ab_base = (USER CHECKED byte_t *)vec.iov_base;
-					iov_vec[iov_i].ab_size = vec.iov_len;
+					iov_vec[iov_i].ive_base = (USER CHECKED byte_t *)vec.iov_base;
+					iov_vec[iov_i].ive_size = vec.iov_len;
 				}
-				iov.ab_entc         = msg.msg_iovlen;
-				iov.ab_entv         = iov_vec;
-				iov.ab_head.ab_base = iov_vec[0].ab_base;
-				iov.ab_head.ab_size = iov_vec[0].ab_size;
-				iov.ab_last         = iov_vec[msg.msg_iovlen - 1].ab_size;
+				iov.iv_entc         = msg.msg_iovlen;
+				iov.iv_entv         = iov_vec;
+				iov.iv_head.ive_base = iov_vec[0].ive_base;
+				iov.iv_head.ive_size = iov_vec[0].ive_size;
+				iov.iv_last         = iov_vec[msg.msg_iovlen - 1].ive_size;
 			}
 			/* Actually send the packet! */
 			TRY {

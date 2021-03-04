@@ -44,7 +44,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct socket;
-struct aio_buffer;
+struct iov_buffer;
 struct sockaddr;
 
 struct ancillary_message {
@@ -340,7 +340,7 @@ struct socket_ops {
 	/* [if(!so_sendto, [1..1]), else([0..1])] */
 	NONNULL((1, 2, 6)) void
 	(KCALL *so_sendv)(struct socket *__restrict self,
-	                  struct aio_buffer const *__restrict buf, size_t bufsize,
+	                  struct iov_buffer const *__restrict buf, size_t bufsize,
 	                  struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
 	                  /*out*/ struct aio_handle *__restrict aio)
 			THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
@@ -376,7 +376,7 @@ struct socket_ops {
 	/* [if(!so_send, [1..1]), else([0..1])] */
 	NONNULL((1, 2, 8)) void
 	(KCALL *so_sendtov)(struct socket *__restrict self,
-	                    struct aio_buffer const *__restrict buf, size_t bufsize,
+	                    struct iov_buffer const *__restrict buf, size_t bufsize,
 	                    /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
 	                    struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
 	                    /*out*/ struct aio_handle *__restrict aio)
@@ -417,7 +417,7 @@ struct socket_ops {
 	/* [if(!so_recvfromv, [1..1]), else([0..1])] */
 	NONNULL((1, 2)) size_t
 	(KCALL *so_recvv)(struct socket *__restrict self,
-	                  struct aio_buffer const *__restrict buf, size_t bufsize,
+	                  struct iov_buffer const *__restrict buf, size_t bufsize,
 	                  /*0..1*/ USER CHECKED u32 *presult_flags,
 	                  struct ancillary_rmessage const *msg_control,
 	                  syscall_ulong_t msg_flags,
@@ -459,7 +459,7 @@ struct socket_ops {
 	/* [0..1][if(!so_recvv, [1..1])] */
 	NONNULL((1, 2)) size_t
 	(KCALL *so_recvfromv)(struct socket *__restrict self,
-	                      struct aio_buffer const *__restrict buf, size_t bufsize,
+	                      struct iov_buffer const *__restrict buf, size_t bufsize,
 	                      /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
 	                      /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
 	                      /*0..1*/ USER CHECKED u32 *presult_flags,
@@ -822,7 +822,7 @@ socket_asend(struct socket *__restrict self,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 FUNDEF NONNULL((1, 2, 6)) void KCALL
 socket_asendv(struct socket *__restrict self,
-              struct aio_buffer const *__restrict buf, size_t bufsize,
+              struct iov_buffer const *__restrict buf, size_t bufsize,
               struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
               /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
@@ -842,7 +842,7 @@ socket_send(struct socket *__restrict self,
 		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK);
 FUNDEF NONNULL((1, 2)) size_t KCALL
 socket_sendv(struct socket *__restrict self,
-             struct aio_buffer const *__restrict buf, size_t bufsize,
+             struct iov_buffer const *__restrict buf, size_t bufsize,
              struct ancillary_message const *msg_control,
              syscall_ulong_t msg_flags, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
@@ -875,7 +875,7 @@ socket_asendto(struct socket *__restrict self,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL);
 FUNDEF NONNULL((1, 2, 8)) void KCALL
 socket_asendtov(struct socket *__restrict self,
-                struct aio_buffer const *__restrict buf, size_t bufsize,
+                struct iov_buffer const *__restrict buf, size_t bufsize,
                 /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                 /*out*/ struct aio_handle *__restrict aio)
@@ -897,7 +897,7 @@ socket_sendto(struct socket *__restrict self,
 		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK, E_BUFFER_TOO_SMALL);
 FUNDEF NONNULL((1, 2)) size_t KCALL
 socket_sendtov(struct socket *__restrict self,
-               struct aio_buffer const *__restrict buf, size_t bufsize,
+               struct iov_buffer const *__restrict buf, size_t bufsize,
                /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                iomode_t mode)
@@ -935,7 +935,7 @@ socket_recv(struct socket *__restrict self,
 		       E_NET_TIMEOUT, E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvv(struct socket *__restrict self,
-             struct aio_buffer const *__restrict buf, size_t bufsize,
+             struct iov_buffer const *__restrict buf, size_t bufsize,
              /*0..1*/ USER CHECKED u32 *presult_flags,
              struct ancillary_rmessage const *msg_control,
              syscall_ulong_t msg_flags,
@@ -975,7 +975,7 @@ socket_recvfrom(struct socket *__restrict self,
 		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfromv(struct socket *__restrict self,
-                 struct aio_buffer const *__restrict buf, size_t bufsize,
+                 struct iov_buffer const *__restrict buf, size_t bufsize,
                  /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
                  /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
                  /*0..1*/ USER CHECKED u32 *presult_flags,

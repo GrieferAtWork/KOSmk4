@@ -582,31 +582,31 @@ handle_characterdevice_pwrite(struct character_device *__restrict self,
 
 INTERN size_t KCALL
 handle_characterdevice_readv(struct character_device *__restrict self,
-                             struct aio_buffer *__restrict dst,
+                             struct iov_buffer *__restrict dst,
                              size_t num_bytes, iomode_t mode) {
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	size_t temp, result = 0;
-	assert(num_bytes == aio_buffer_size(dst));
+	assert(num_bytes == iov_buffer_size(dst));
 	(void)num_bytes;
 	if likely(self->cd_type.ct_read) {
-		AIO_BUFFER_FOREACH(ent, dst) {
+		IOV_BUFFER_FOREACH(ent, dst) {
 			temp = (*self->cd_type.ct_read)(self,
-			                                ent.ab_base,
-			                                ent.ab_size,
+			                                ent.ive_base,
+			                                ent.ive_size,
 			                                mode);
 			result += temp;
-			if (temp != ent.ab_size)
+			if (temp != ent.ive_size)
 				break;
 		}
 	} else if likely(self->cd_type.ct_pread) {
-		AIO_BUFFER_FOREACH(ent, dst) {
+		IOV_BUFFER_FOREACH(ent, dst) {
 			temp = (*self->cd_type.ct_pread)(self,
-			                                 ent.ab_base,
-			                                 ent.ab_size,
+			                                 ent.ive_base,
+			                                 ent.ive_size,
 			                                 (pos_t)result,
 			                                 mode);
 			result += temp;
-			if (temp != ent.ab_size)
+			if (temp != ent.ive_size)
 				break;
 		}
 	} else {
@@ -618,31 +618,31 @@ handle_characterdevice_readv(struct character_device *__restrict self,
 
 INTERN size_t KCALL
 handle_characterdevice_writev(struct character_device *__restrict self,
-                              struct aio_buffer *__restrict src,
+                              struct iov_buffer *__restrict src,
                               size_t num_bytes, iomode_t mode) {
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	size_t temp, result = 0;
-	assert(num_bytes == aio_buffer_size(src));
+	assert(num_bytes == iov_buffer_size(src));
 	(void)num_bytes;
 	if likely(self->cd_type.ct_write) {
-		AIO_BUFFER_FOREACH(ent, src) {
+		IOV_BUFFER_FOREACH(ent, src) {
 			temp = (*self->cd_type.ct_write)(self,
-			                                 ent.ab_base,
-			                                 ent.ab_size,
+			                                 ent.ive_base,
+			                                 ent.ive_size,
 			                                 mode);
 			result += temp;
-			if (temp != ent.ab_size)
+			if (temp != ent.ive_size)
 				break;
 		}
 	} else if likely(self->cd_type.ct_pwrite) {
-		AIO_BUFFER_FOREACH(ent, src) {
+		IOV_BUFFER_FOREACH(ent, src) {
 			temp = (*self->cd_type.ct_pwrite)(self,
-			                                  ent.ab_base,
-			                                  ent.ab_size,
+			                                  ent.ive_base,
+			                                  ent.ive_size,
 			                                  (pos_t)result,
 			                                  mode);
 			result += temp;
-			if (temp != ent.ab_size)
+			if (temp != ent.ive_size)
 				break;
 		}
 	} else {
@@ -654,22 +654,22 @@ handle_characterdevice_writev(struct character_device *__restrict self,
 
 INTERN size_t KCALL
 handle_characterdevice_preadv(struct character_device *__restrict self,
-                              struct aio_buffer *__restrict dst,
+                              struct iov_buffer *__restrict dst,
                               size_t num_bytes, pos_t addr, iomode_t mode) {
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	size_t result = 0;
-	assert(num_bytes == aio_buffer_size(dst));
+	assert(num_bytes == iov_buffer_size(dst));
 	(void)num_bytes;
 	if likely(self->cd_type.ct_pread) {
-		AIO_BUFFER_FOREACH(ent, dst) {
+		IOV_BUFFER_FOREACH(ent, dst) {
 			size_t temp;
 			temp = (*self->cd_type.ct_pread)(self,
-			                                 ent.ab_base,
-			                                 ent.ab_size,
+			                                 ent.ive_base,
+			                                 ent.ive_size,
 			                                 addr,
 			                                 mode);
 			result += temp;
-			if (temp != ent.ab_size)
+			if (temp != ent.ive_size)
 				break;
 			addr += temp;
 		}
@@ -682,22 +682,22 @@ handle_characterdevice_preadv(struct character_device *__restrict self,
 
 INTERN size_t KCALL
 handle_characterdevice_pwritev(struct character_device *__restrict self,
-                               struct aio_buffer *__restrict src,
+                               struct iov_buffer *__restrict src,
                                size_t num_bytes, pos_t addr, iomode_t mode) {
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	size_t result = 0;
-	assert(num_bytes == aio_buffer_size(src));
+	assert(num_bytes == iov_buffer_size(src));
 	(void)num_bytes;
 	if likely(self->cd_type.ct_pwrite) {
-		AIO_BUFFER_FOREACH(ent, src) {
+		IOV_BUFFER_FOREACH(ent, src) {
 			size_t temp;
 			temp = (*self->cd_type.ct_pwrite)(self,
-			                                  ent.ab_base,
-			                                  ent.ab_size,
+			                                  ent.ive_base,
+			                                  ent.ive_size,
 			                                  addr,
 			                                  mode);
 			result += temp;
-			if (temp != ent.ab_size)
+			if (temp != ent.ive_size)
 				break;
 			addr += temp;
 		}

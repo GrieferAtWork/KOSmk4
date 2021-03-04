@@ -111,9 +111,9 @@ handle_datapart_pwrite(struct vm_datapart *__restrict self,
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_datapart_preadv(struct vm_datapart *__restrict self,
-                       struct aio_buffer *__restrict dst,
+                       struct iov_buffer *__restrict dst,
                        size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
-	assert(aio_buffer_size(dst) == num_bytes);
+	assert(iov_buffer_size(dst) == num_bytes);
 #if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
 	if (addr > (pos_t)SIZE_MAX)
 		return 0;
@@ -123,9 +123,9 @@ handle_datapart_preadv(struct vm_datapart *__restrict self,
 
 INTERN NONNULL((1, 2)) size_t KCALL
 handle_datapart_pwritev(struct vm_datapart *__restrict self,
-                        struct aio_buffer *__restrict src,
+                        struct iov_buffer *__restrict src,
                         size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
-	assert(aio_buffer_size(src) == num_bytes);
+	assert(iov_buffer_size(src) == num_bytes);
 #if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
 	if (addr > (pos_t)SIZE_MAX)
 		return 0;

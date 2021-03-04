@@ -164,7 +164,7 @@ handle_file_pwrite(struct file *__restrict self,
 
 INTERN size_t KCALL
 handle_file_readv(struct file *__restrict self,
-                  struct aio_buffer *__restrict dst,
+                  struct iov_buffer *__restrict dst,
                   size_t num_bytes,
                   iomode_t UNUSED(mode)) {
 	pos_t old_pos;
@@ -192,7 +192,7 @@ handle_file_readv(struct file *__restrict self,
 
 INTERN size_t KCALL
 handle_file_writev(struct file *__restrict self,
-                   struct aio_buffer *__restrict src,
+                   struct iov_buffer *__restrict src,
                    size_t num_bytes,
                    iomode_t mode) {
 	pos_t old_pos, dst_pos;
@@ -214,7 +214,7 @@ handle_file_writev(struct file *__restrict self,
 
 INTERN size_t KCALL
 handle_file_preadv(struct file *__restrict self,
-                   struct aio_buffer *__restrict dst,
+                   struct iov_buffer *__restrict dst,
                    size_t num_bytes, pos_t addr,
                    iomode_t UNUSED(mode)) {
 	size_t result;
@@ -235,7 +235,7 @@ handle_file_preadv(struct file *__restrict self,
 
 INTERN size_t KCALL
 handle_file_pwritev(struct file *__restrict self,
-                    struct aio_buffer *__restrict src,
+                    struct iov_buffer *__restrict src,
                     size_t num_bytes,
                     pos_t addr, iomode_t mode) {
 	(void)mode;

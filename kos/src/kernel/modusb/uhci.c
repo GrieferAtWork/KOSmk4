@@ -1715,22 +1715,22 @@ NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
 	return result;
 }
 
-PRIVATE struct aio_pbuffer *KCALL
+PRIVATE struct iov_physbuffer *KCALL
 usb_transfer_allocate_pbuffer(struct uhci_syncheap *__restrict heap,
                               size_t num_bytes) {
-	struct aio_pbuffer *result;
-	struct aio_pbuffer_entry *entv;
+	struct iov_physbuffer *result;
+	struct iov_physentry *entv;
 	size_t req_pages = CEILDIV(num_bytes, PAGESIZE);
 	assert(req_pages != 0);
-	result = (struct aio_pbuffer *)kmalloc(sizeof(struct aio_pbuffer) +
+	result = (struct iov_physbuffer *)kmalloc(sizeof(struct iov_physbuffer) +
 	                                       req_pages *
-	                                       sizeof(struct aio_pbuffer_entry),
+	                                       sizeof(struct iov_physentry),
 	                                       GFP_NORMAL);
 	TRY {
 		size_t i;
-		entv = (struct aio_pbuffer_entry *)((byte_t *)result + sizeof(struct aio_pbuffer));
-		result->ab_entc = req_pages;
-		result->ab_entv = entv;
+		entv = (struct iov_physentry *)((byte_t *)result + sizeof(struct iov_physbuffer));
+		result->iv_entc = req_pages;
+		result->iv_entv = entv;
 		for (i = 0; i < req_pages; ++i) {
 			u32 addr;
 			size_t reqbytes;
@@ -1740,11 +1740,11 @@ usb_transfer_allocate_pbuffer(struct uhci_syncheap *__restrict heap,
 			addr = uhci_syncheap_alloc(heap, reqbytes);
 			if unlikely(addr == UHCI_SYNCHEAP_ALLOC_FAILED)
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, reqbytes);
-			entv[i].ab_base = (physaddr_t)addr;
-			entv[i].ab_size = reqbytes;
+			entv[i].ive_base = (physaddr_t)addr;
+			entv[i].ive_size = reqbytes;
 		}
-		result->ab_head = entv[0];
-		result->ab_last = entv[req_pages - 1].ab_size;
+		result->iv_head = entv[0];
+		result->iv_last = entv[req_pages - 1].ive_size;
 	} EXCEPT {
 		kfree(result);
 		RETHROW();
@@ -1812,10 +1812,10 @@ uhci_transfer_sync_with_phys(struct uhci_controller *__restrict self,
 				tx_copy->ut_bufp = tx_iter->ut_bufp;
 			} else if (tx_iter->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
 #if __SIZEOF_PHYSADDR_T__ > 4
-				struct aio_pbuffer_entry ent;
-				AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
-					if (ent.ab_base > (physaddr_t)0xffffffff ||
-					    (ent.ab_base + ent.ab_size) > (physaddr_t)0xffffffff)
+				struct iov_physentry ent;
+				IOV_PHYSBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
+					if (ent.ive_base > (physaddr_t)0xffffffff ||
+					    (ent.ive_base + ent.ive_size) > (physaddr_t)0xffffffff)
 						goto do_alloc_new_buffer;
 				}
 #endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
@@ -1832,7 +1832,7 @@ do_alloc_new_buffer:
 
 				case USB_TRANSFER_BUFTYP_VIRT:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
-						aio_pbuffer_copyfrommem(tx_copy->ut_vbufp,
+						iov_physbuffer_copyfrommem(tx_copy->ut_vbufp,
 						                        0,
 						                        tx_iter->ut_buf,
 						                        tx_copy->ut_buflen);
@@ -1845,13 +1845,13 @@ do_alloc_new_buffer:
 
 				case USB_TRANSFER_BUFTYP_VIRTVEC:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
-						aio_buffer_copytovphys(tx_iter->ut_vbuf,
+						iov_buffer_copytovphys(tx_iter->ut_vbuf,
 						                       tx_copy->ut_vbufp,
 						                       0,
 						                       0,
 						                       tx_copy->ut_buflen);
 					} else {
-						aio_buffer_copytophys(tx_iter->ut_vbuf,
+						iov_buffer_copytophys(tx_iter->ut_vbuf,
 						                      tx_copy->ut_bufp,
 						                      0,
 						                      tx_copy->ut_buflen);
@@ -1866,7 +1866,7 @@ do_alloc_new_buffer:
 						              tx_iter->ut_bufp,
 						              tx_copy->ut_buflen);
 					} else {
-						aio_pbuffer_copytophys(tx_copy->ut_vbufp,
+						iov_physbuffer_copytophys(tx_copy->ut_vbufp,
 						                       tx_iter->ut_bufp,
 						                       0,
 						                       tx_copy->ut_buflen);
@@ -1877,13 +1877,13 @@ do_alloc_new_buffer:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
 						if (tx_copy->ut_vbufp == tx_iter->ut_vbufp)
 							break; /* Same buffer was used. */
-						aio_pbuffer_copytovphys(tx_copy->ut_vbufp,
+						iov_physbuffer_copytovphys(tx_copy->ut_vbufp,
 						                        tx_iter->ut_vbufp,
 						                        0,
 						                        0,
 						                        tx_copy->ut_buflen);
 					} else {
-						aio_pbuffer_copyfromphys(tx_iter->ut_vbufp,
+						iov_physbuffer_copyfromphys(tx_iter->ut_vbufp,
 						                         0,
 						                         tx_copy->ut_bufp,
 						                         tx_copy->ut_buflen);
@@ -1926,7 +1926,7 @@ copy_next_tx:
 
 				case USB_TRANSFER_BUFTYP_VIRT:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
-						aio_pbuffer_copytomem(tx_copy->ut_vbufp,
+						iov_physbuffer_copytomem(tx_copy->ut_vbufp,
 						                      tx_iter->ut_buf,
 						                      0,
 						                      tx_copy->ut_buflen);
@@ -1939,13 +1939,13 @@ copy_next_tx:
 
 				case USB_TRANSFER_BUFTYP_VIRTVEC:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
-						aio_pbuffer_copytovmem(tx_copy->ut_vbufp,
+						iov_physbuffer_copytovmem(tx_copy->ut_vbufp,
 						                       tx_iter->ut_vbuf,
 						                       0,
 						                       0,
 						                       tx_copy->ut_buflen);
 					} else {
-						aio_buffer_copyfromphys(tx_iter->ut_vbuf,
+						iov_buffer_copyfromphys(tx_iter->ut_vbuf,
 						                        0,
 						                        tx_copy->ut_bufp,
 						                        tx_copy->ut_buflen);
@@ -1960,7 +1960,7 @@ copy_next_tx:
 						              tx_copy->ut_bufp,
 						              tx_copy->ut_buflen);
 					} else {
-						aio_pbuffer_copytophys(tx_copy->ut_vbufp,
+						iov_physbuffer_copytophys(tx_copy->ut_vbufp,
 						                       tx_iter->ut_bufp,
 						                       0,
 						                       tx_copy->ut_buflen);
@@ -1971,13 +1971,13 @@ copy_next_tx:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
 						if (tx_copy->ut_vbufp == tx_iter->ut_vbufp)
 							break; /* Same buffer was used. */
-						aio_pbuffer_copytovphys(tx_copy->ut_vbufp,
+						iov_physbuffer_copytovphys(tx_copy->ut_vbufp,
 						                        tx_iter->ut_vbufp,
 						                        0,
 						                        0,
 						                        tx_copy->ut_buflen);
 					} else {
-						aio_pbuffer_copyfromphys(tx_iter->ut_vbufp,
+						iov_physbuffer_copyfromphys(tx_iter->ut_vbufp,
 						                         0,
 						                         tx_copy->ut_bufp,
 						                         tx_copy->ut_buflen);
@@ -2115,21 +2115,21 @@ do_configure_simple_empty:
 					break;
 
 				case USB_TRANSFER_BUFTYP_PHYSVEC: {
-					struct aio_pbuffer_entry ent;
-					AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
+					struct iov_physentry ent;
+					IOV_PHYSBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
 #if __SIZEOF_PHYSADDR_T__ > 4
 						if unlikely(!uhci_construct_tds(&pnexttd,
 						                                tx_iter->ut_endp,
 						                                tx_iter,
-						                                ent.ab_base,
-						                                ent.ab_size))
+						                                ent.ive_base,
+						                                ent.ive_size))
 							goto cleanup_configured_and_do_syncio;
 #else /* __SIZEOF_PHYSADDR_T__ > 4 */
 						uhci_construct_tds(&pnexttd,
 						                   tx_iter->ut_endp,
 						                   tx_iter,
-						                   ent.ab_base,
-						                   ent.ab_size);
+						                   ent.ive_base,
+						                   ent.ive_size);
 #endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 					}
 				}	break;

@@ -166,32 +166,32 @@ unlock_and_done:
  * segment that cannot be fully faulted.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 PUBLIC size_t FCALL
-mman_prefaultv(struct aio_buffer const *__restrict buffer,
+mman_prefaultv(struct iov_buffer const *__restrict buffer,
                size_t offset, size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	size_t temp, result = 0;
-	AIO_BUFFER_FOREACH(ent, buffer) {
+	IOV_BUFFER_FOREACH(ent, buffer) {
 		if (offset != 0) {
-			if (offset >= ent.ab_size) {
-				offset -= ent.ab_size;
+			if (offset >= ent.ive_size) {
+				offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += offset;
-			ent.ab_size -= offset;
+			ent.ive_base += offset;
+			ent.ive_size -= offset;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
 		/* Prefault this part. */
-		temp = mman_prefault(ent.ab_base, ent.ab_size, flags);
+		temp = mman_prefault(ent.ive_base, ent.ive_size, flags);
 		result += temp;
 		/* Stop upon the first partial error (iow: once reaching
 		 * the   first   byte   that  could   not   be  faulted) */
-		if (temp < ent.ab_size)
+		if (temp < ent.ive_size)
 			break;
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size >= num_bytes)
 			break;
-		num_bytes -= ent.ab_size;
+		num_bytes -= ent.ive_size;
 	}
 	return result;
 }
@@ -333,26 +333,26 @@ err_unmapped_now:
 /* Same as `mman_forcefault()', but fault all memory pointed-to by the given buffer. */
 PUBLIC NONNULL((1, 2)) void FCALL
 mman_forcefaultv(struct mman *__restrict self,
-                 struct aio_buffer const *__restrict buffer,
+                 struct iov_buffer const *__restrict buffer,
                  size_t offset, size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH(ent, buffer) {
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, buffer) {
 		if (offset != 0) {
-			if (offset >= ent.ab_size) {
-				offset -= ent.ab_size;
+			if (offset >= ent.ive_size) {
+				offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += offset;
-			ent.ab_size -= offset;
+			ent.ive_base += offset;
+			ent.ive_size -= offset;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
 		/* Force-fault this part. */
-		mman_forcefault(self, ent.ab_base, ent.ab_size, flags);
-		if (ent.ab_size >= num_bytes)
+		mman_forcefault(self, ent.ive_base, ent.ive_size, flags);
+		if (ent.ive_size >= num_bytes)
 			break;
-		num_bytes -= ent.ab_size;
+		num_bytes -= ent.ive_size;
 	}
 }
 

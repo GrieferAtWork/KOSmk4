@@ -19,146 +19,146 @@
  */
 #ifdef __INTELLISENSE__
 #include "iovec.c"
-#define DEFINE_FOR_AIO_BUFFER 1
-//#define DEFINE_FOR_AIO_PBUFFER 1
+#define DEFINE_FOR_IOV_BUFFER 1
+//#define DEFINE_FOR_IOV_PHYSBUFFER 1
 #endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
-#if (defined(DEFINE_FOR_AIO_BUFFER) + defined(DEFINE_FOR_AIO_PBUFFER)) != 1
-#error "Must #define exactly one of `DEFINE_FOR_AIO_BUFFER', `DEFINE_FOR_AIO_PBUFFER'"
+#if (defined(DEFINE_FOR_IOV_BUFFER) + defined(DEFINE_FOR_IOV_PHYSBUFFER)) != 1
+#error "Must #define exactly one of `DEFINE_FOR_IOV_BUFFER', `DEFINE_FOR_IOV_PHYSBUFFER'"
 #endif /* ... */
 
 
-#ifdef DEFINE_FOR_AIO_BUFFER
-#define STRUCT_AIO_BUFFER       struct aio_buffer
-#define STRUCT_AIO_BUFFER_ENTRY struct aio_buffer_entry
-#define AIO_ARITH_TYPE          byte_t *
-#define AIO_BUFFER_FUNC(name)   aio_buffer_##name
-#else /* DEFINE_FOR_AIO_BUFFER */
-#define STRUCT_AIO_BUFFER       struct aio_pbuffer
-#define STRUCT_AIO_BUFFER_ENTRY struct aio_pbuffer_entry
-#define AIO_ARITH_TYPE          physaddr_t
-#define AIO_BUFFER_FUNC(name)   aio_pbuffer_##name
-#endif /* !DEFINE_FOR_AIO_BUFFER */
+#ifdef DEFINE_FOR_IOV_BUFFER
+#define STRUCT_IOV_BUFFER     struct iov_buffer
+#define STRUCT_IOV_ENTRY      struct iov_entry
+#define IOV_ARITH_TYPE        byte_t *
+#define IOV_BUFFER_FUNC(name) iov_buffer_##name
+#else /* DEFINE_FOR_IOV_BUFFER */
+#define STRUCT_IOV_BUFFER     struct iov_physbuffer
+#define STRUCT_IOV_ENTRY      struct iov_physentry
+#define IOV_ARITH_TYPE        physaddr_t
+#define IOV_BUFFER_FUNC(name) iov_physbuffer_##name
+#endif /* !DEFINE_FOR_IOV_BUFFER */
 
 
 /* Helper functions */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW(KCALL AIO_BUFFER_FUNC(size))(STRUCT_AIO_BUFFER const *__restrict self) {
+NOTHROW(KCALL IOV_BUFFER_FUNC(size))(STRUCT_IOV_BUFFER const *__restrict self) {
 	size_t i, result;
-	result = self->ab_last + self->ab_head.ab_size;
-	for (i = 1; i < self->ab_entc - 1; ++i)
-		result += self->ab_entv[i].ab_size;
+	result = self->iv_last + self->iv_head.ive_size;
+	for (i = 1; i < self->iv_entc - 1; ++i)
+		result += self->iv_entv[i].ive_size;
 	return result;
 }
 
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL AIO_BUFFER_FUNC(init_view_before))(STRUCT_AIO_BUFFER *__restrict self,
-                                                 STRUCT_AIO_BUFFER const *__restrict base,
+NOTHROW(KCALL IOV_BUFFER_FUNC(init_view_before))(STRUCT_IOV_BUFFER *__restrict self,
+                                                 STRUCT_IOV_BUFFER const *__restrict base,
                                                  uintptr_t end_offset) {
 	size_t i;
 	uintptr_t total = 0;
 	assert(end_offset != 0);
-	self->ab_entv = base->ab_entv;
-	self->ab_head = base->ab_head;
-	for (i = 0; i < base->ab_entc - 1; ++i) {
+	self->iv_entv = base->iv_entv;
+	self->iv_head = base->iv_head;
+	for (i = 0; i < base->iv_entc - 1; ++i) {
 		size_t entsize;
-		entsize = i ? base->ab_entv[i].ab_size
-		            : base->ab_head.ab_size;
+		entsize = i ? base->iv_entv[i].ive_size
+		            : base->iv_head.ive_size;
 		total += entsize;
 		if (total >= end_offset) {
-			self->ab_entc = i;
+			self->iv_entc = i;
 			total -= entsize;
-			self->ab_last = (size_t)(end_offset - total);
+			self->iv_last = (size_t)(end_offset - total);
 			return;
 		}
 	}
-	assert(total + base->ab_last >= end_offset);
-	self->ab_entc = i;
-	self->ab_last = end_offset - total;
+	assert(total + base->iv_last >= end_offset);
+	self->iv_entc = i;
+	self->iv_last = end_offset - total;
 }
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL AIO_BUFFER_FUNC(init_view_after))(STRUCT_AIO_BUFFER *__restrict self,
-                                                STRUCT_AIO_BUFFER const *__restrict base,
+NOTHROW(KCALL IOV_BUFFER_FUNC(init_view_after))(STRUCT_IOV_BUFFER *__restrict self,
+                                                STRUCT_IOV_BUFFER const *__restrict base,
                                                 uintptr_t start_offset) {
-	self->ab_last = base->ab_last;
-	if (start_offset < base->ab_head.ab_size) {
-		self->ab_entc         = base->ab_entc;
-		self->ab_entv         = base->ab_entv;
-		self->ab_head.ab_base = (AIO_ARITH_TYPE)base->ab_head.ab_base + start_offset;
-		self->ab_head.ab_size = base->ab_head.ab_size - start_offset;
+	self->iv_last = base->iv_last;
+	if (start_offset < base->iv_head.ive_size) {
+		self->iv_entc         = base->iv_entc;
+		self->iv_entv         = base->iv_entv;
+		self->iv_head.ive_base = (IOV_ARITH_TYPE)base->iv_head.ive_base + start_offset;
+		self->iv_head.ive_size = base->iv_head.ive_size - start_offset;
 	} else {
 		size_t i;
-		start_offset -= base->ab_head.ab_size;
+		start_offset -= base->iv_head.ive_size;
 		for (i = 1;; ++i) {
-			assert(i < base->ab_entc);
-			if (start_offset < base->ab_entv[i].ab_size) {
-				self->ab_entc = base->ab_entc - i;
-				self->ab_entv = base->ab_entv + i;
-				self->ab_head = self->ab_entv[0];
-				self->ab_head.ab_base = (AIO_ARITH_TYPE)self->ab_head.ab_base + start_offset;
-				self->ab_head.ab_size -= start_offset;
+			assert(i < base->iv_entc);
+			if (start_offset < base->iv_entv[i].ive_size) {
+				self->iv_entc = base->iv_entc - i;
+				self->iv_entv = base->iv_entv + i;
+				self->iv_head = self->iv_entv[0];
+				self->iv_head.ive_base = (IOV_ARITH_TYPE)self->iv_head.ive_base + start_offset;
+				self->iv_head.ive_size -= start_offset;
 				return;
 			}
-			start_offset -= base->ab_entv[i].ab_size;
+			start_offset -= base->iv_entv[i].ive_size;
 		}
 	}
 }
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL AIO_BUFFER_FUNC(init_view))(STRUCT_AIO_BUFFER *__restrict self,
-                                          STRUCT_AIO_BUFFER const *__restrict base,
+NOTHROW(KCALL IOV_BUFFER_FUNC(init_view))(STRUCT_IOV_BUFFER *__restrict self,
+                                          STRUCT_IOV_BUFFER const *__restrict base,
                                           uintptr_t start_offset, size_t num_bytes) {
 	size_t i, entc_after_start;
 	uintptr_t total;
 	assert(num_bytes != 0);
-	if (start_offset < base->ab_head.ab_size) {
-		entc_after_start      = base->ab_entc;
-		self->ab_entv         = base->ab_entv;
-		self->ab_head.ab_base = (AIO_ARITH_TYPE)base->ab_head.ab_base + start_offset;
-		self->ab_head.ab_size = base->ab_head.ab_size - start_offset;
+	if (start_offset < base->iv_head.ive_size) {
+		entc_after_start       = base->iv_entc;
+		self->iv_entv          = base->iv_entv;
+		self->iv_head.ive_base = (IOV_ARITH_TYPE)base->iv_head.ive_base + start_offset;
+		self->iv_head.ive_size = base->iv_head.ive_size - start_offset;
 	} else {
-		start_offset -= base->ab_head.ab_size;
+		start_offset -= base->iv_head.ive_size;
 		for (i = 1;; ++i) {
-			assert(i < base->ab_entc);
-			if (start_offset < base->ab_entv[i].ab_size) {
-				entc_after_start      = base->ab_entc - i;
-				self->ab_entv         = base->ab_entv + i;
-				self->ab_head         = self->ab_entv[0];
-				self->ab_head.ab_base = (AIO_ARITH_TYPE)self->ab_head.ab_base + start_offset;
-				self->ab_head.ab_size -= start_offset;
+			assert(i < base->iv_entc);
+			if (start_offset < base->iv_entv[i].ive_size) {
+				entc_after_start       = base->iv_entc - i;
+				self->iv_entv          = base->iv_entv + i;
+				self->iv_head          = self->iv_entv[0];
+				self->iv_head.ive_base = (IOV_ARITH_TYPE)self->iv_head.ive_base + start_offset;
+				self->iv_head.ive_size -= start_offset;
 				return;
 			}
-			start_offset -= base->ab_entv[i].ab_size;
+			start_offset -= base->iv_entv[i].ive_size;
 		}
 	}
 	total = 0;
 	for (i = 0; i < entc_after_start - 1; ++i) {
 		size_t entsize;
-		entsize = i ? self->ab_entv[i].ab_size
-		            : self->ab_head.ab_size;
+		entsize = i ? self->iv_entv[i].ive_size
+		            : self->iv_head.ive_size;
 		total += entsize;
 		if (total >= num_bytes) {
-			self->ab_entc = i;
+			self->iv_entc = i;
 			total -= entsize;
-			self->ab_last = (size_t)(num_bytes - total);
+			self->iv_last = (size_t)(num_bytes - total);
 			return;
 		}
 	}
-	assert(total + base->ab_last >= num_bytes);
-	self->ab_entc = i;
-	self->ab_last = num_bytes - total;
+	assert(total + base->iv_last >= num_bytes);
+	self->iv_entc = i;
+	self->iv_last = num_bytes - total;
 }
 
-#undef AIO_BUFFER_FUNC
-#undef AIO_ARITH_TYPE
-#undef STRUCT_AIO_BUFFER_ENTRY
-#undef STRUCT_AIO_BUFFER
+#undef IOV_BUFFER_FUNC
+#undef IOV_ARITH_TYPE
+#undef STRUCT_IOV_ENTRY
+#undef STRUCT_IOV_BUFFER
 
 DECL_END
 
-#undef DEFINE_FOR_AIO_PBUFFER
-#undef DEFINE_FOR_AIO_BUFFER
+#undef DEFINE_FOR_IOV_PHYSBUFFER
+#undef DEFINE_FOR_IOV_BUFFER

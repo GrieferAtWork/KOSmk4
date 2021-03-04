@@ -115,7 +115,7 @@ handle_datablock_pwrite(struct vm_datablock *__restrict self,
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datablock_preadv(struct vm_datablock *__restrict self,
-                        struct aio_buffer *__restrict dst, size_t num_bytes,
+                        struct iov_buffer *__restrict dst, size_t num_bytes,
                         pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
 		/* TODO: Support for `IO_NONBLOCK' */
@@ -132,7 +132,7 @@ handle_datablock_preadv(struct vm_datablock *__restrict self,
 
 INTERN NONNULL((1)) size_t KCALL
 handle_datablock_pwritev(struct vm_datablock *__restrict self,
-                         struct aio_buffer *__restrict src, size_t num_bytes,
+                         struct iov_buffer *__restrict src, size_t num_bytes,
                          pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
 		/* TODO: Support for `IO_NONBLOCK' */

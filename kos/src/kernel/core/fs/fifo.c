@@ -236,20 +236,20 @@ done:
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_fifo_user_readv(struct fifo_user *__restrict self,
-                       struct aio_buffer *__restrict dst,
+                       struct iov_buffer *__restrict dst,
                        size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	size_t temp, result = 0;
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	struct fifo_node *fifo = self->fu_fifo;
 	(void)num_bytes;
-	AIO_BUFFER_FOREACH(ent, dst) {
+	IOV_BUFFER_FOREACH(ent, dst) {
 again_read_ent:
 		temp = ringbuffer_read_nonblock(&fifo->f_fifo.ff_buffer,
-		                                ent.ab_base,
-		                                ent.ab_size);
+		                                ent.ive_base,
+		                                ent.ive_size);
 		result += temp;
-		if (temp < ent.ab_size) {
+		if (temp < ent.ive_size) {
 			/* Buffer is empty. */
 			if (result)
 				break;
@@ -264,7 +264,7 @@ again_read_ent:
 			/* Retry reading data, now that we're being interlocked. */
 			TRY {
 				temp = ringbuffer_read_nonblock(&fifo->f_fifo.ff_buffer,
-				                                ent.ab_base, ent.ab_size);
+				                                ent.ive_base, ent.ive_size);
 			} EXCEPT {
 				task_disconnectall();
 				RETHROW();
@@ -272,7 +272,7 @@ again_read_ent:
 			if unlikely(temp) {
 				task_disconnectall();
 				result += temp;
-				if (temp == ent.ab_size)
+				if (temp == ent.ive_size)
 					continue; /* Write further segments. */
 				break;
 			}
@@ -292,11 +292,11 @@ again_read_ent:
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_fifo_user_writev(struct fifo_user *__restrict self,
-                        struct aio_buffer *__restrict src,
+                        struct iov_buffer *__restrict src,
                         size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	size_t temp, result = 0;
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	struct fifo_node *fifo = self->fu_fifo;
 	(void)num_bytes;
 	if (!ATOMIC_READ(fifo->f_fifo.ff_rdcnt)) {
@@ -308,13 +308,13 @@ no_readers:
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 			  E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS);
 	}
-	AIO_BUFFER_FOREACH(ent, src) {
+	IOV_BUFFER_FOREACH(ent, src) {
 again_write_ent:
 		temp = ringbuffer_write_nonblock(&fifo->f_fifo.ff_buffer,
-		                                 ent.ab_base,
-		                                 ent.ab_size);
+		                                 ent.ive_base,
+		                                 ent.ive_size);
 		result += temp;
-		if (temp < ent.ab_size) {
+		if (temp < ent.ive_size) {
 			/* Buffer is full. */
 			if (result)
 				break;
@@ -329,7 +329,7 @@ again_write_ent:
 			/* Retry writing data, now that we're being interlocked. */
 			TRY {
 				temp = ringbuffer_write_nonblock(&fifo->f_fifo.ff_buffer,
-				                                 ent.ab_base, ent.ab_size);
+				                                 ent.ive_base, ent.ive_size);
 			} EXCEPT {
 				task_disconnectall();
 				RETHROW();
@@ -337,7 +337,7 @@ again_write_ent:
 			if unlikely(temp) {
 				task_disconnectall();
 				result += temp;
-				if (temp == ent.ab_size)
+				if (temp == ent.ive_size)
 					continue; /* Write further segments. */
 				break;
 			}

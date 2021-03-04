@@ -147,10 +147,10 @@ struct handle_types {
 	/* Vector-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
 
 	/* Read a directory entry from the given handle.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)

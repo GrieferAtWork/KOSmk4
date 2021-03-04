@@ -157,7 +157,7 @@ nic_packetlist_newpacket(struct nic_packetlist *__restrict self,
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_newpacketv(struct nic_packetlist *__restrict self,
                           struct nic_device const *__restrict dev,
-                          struct aio_buffer const *__restrict payload,
+                          struct iov_buffer const *__restrict payload,
                           size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *packet;
@@ -318,8 +318,8 @@ nic_packetlist_segments_ex(struct nic_packetlist *__restrict self,
 				assert(used_payloadsz != 0);
 				if (used_payloadsz <= payloadsz) {
 					/* head(remainder) + payload(start) */
-					struct aio_buffer buf;
-					aio_buffer_init_view_before(&buf, &packet->npd_payload, used_payloadsz);
+					struct iov_buffer buf;
+					iov_buffer_init_view_before(&buf, &packet->npd_payload, used_payloadsz);
 					pck = nic_packetlist_newpacketv(self, dev, &buf,
 					                                max_segment_head_size + headsz,
 					                                max_segment_tail_size);
@@ -351,8 +351,8 @@ nic_packetlist_segments_ex(struct nic_packetlist *__restrict self,
 			}
 			/* Create packets for whole-packet payload segments. */
 			while (payloadsz >= max_segment_payload_size) {
-				struct aio_buffer buf;
-				aio_buffer_init_view(&buf, &packet->npd_payload,
+				struct iov_buffer buf;
+				iov_buffer_init_view(&buf, &packet->npd_payload,
 				                     payload_offset, max_segment_payload_size);
 #ifdef NDEBUG
 				nic_packetlist_newpacketv(self, dev, &packet->npd_payload,
@@ -370,8 +370,8 @@ nic_packetlist_segments_ex(struct nic_packetlist *__restrict self,
 			if (payloadsz) {
 				/* Include the remainder of the payload with the start of tail data. */
 				size_t used_tailsz;
-				struct aio_buffer buf;
-				aio_buffer_init_view_after(&buf, &packet->npd_payload, payload_offset);
+				struct iov_buffer buf;
+				iov_buffer_init_view_after(&buf, &packet->npd_payload, payload_offset);
 				used_tailsz = max_segment_payload_size - payloadsz;
 				if (used_tailsz > tailsz)
 					used_tailsz = tailsz;

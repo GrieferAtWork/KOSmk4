@@ -122,9 +122,9 @@ KCALL vm_datablock_write
 #endif
                           (struct vm_datablock *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-                           struct aio_pbuffer const *__restrict buf,
+                           struct iov_physbuffer const *__restrict buf,
 #elif defined(DEFINE_IO_VECTOR)
-                           struct aio_buffer const *__restrict buf,
+                           struct iov_buffer const *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
                            physaddr_t buf,
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_UNSAFE)
@@ -146,9 +146,9 @@ KCALL vm_datablock_write
 {
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
-	struct aio_pbuffer view,view2;
+	struct iov_physbuffer view,view2;
 #else /* DEFINE_IO_PHYS */
-	struct aio_buffer view,view2;
+	struct iov_buffer view,view2;
 #endif /* !DEFINE_IO_PHYS */
 #endif /* DEFINE_IO_VECTOR */
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -191,18 +191,18 @@ KCALL vm_datablock_write
 		num_bytes -= temp;
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 		if (buf == &view) {
-			aio_pbuffer_init_view_after(&view2, &view, temp);
+			iov_physbuffer_init_view_after(&view2, &view, temp);
 			buf = &view2;
 		} else {
-			aio_pbuffer_init_view_after(&view, buf, temp);
+			iov_physbuffer_init_view_after(&view, buf, temp);
 			buf = &view;
 		}
 #elif defined(DEFINE_IO_VECTOR)
 		if (buf == &view) {
-			aio_buffer_init_view_after(&view2, &view, temp);
+			iov_buffer_init_view_after(&view2, &view, temp);
 			buf = &view2;
 		} else {
-			aio_buffer_init_view_after(&view, buf, temp);
+			iov_buffer_init_view_after(&view, buf, temp);
 			buf = &view;
 		}
 #elif defined(DEFINE_IO_PHYS)
@@ -239,9 +239,9 @@ KCALL vm_datablock_vio_write
 #endif
                               (struct vm_datablock *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-                               struct aio_pbuffer const *__restrict buf,
+                               struct iov_physbuffer const *__restrict buf,
 #elif defined(DEFINE_IO_VECTOR)
-                               struct aio_buffer const *__restrict buf,
+                               struct iov_buffer const *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
                                physaddr_t buf,
                                size_t num_bytes,
@@ -260,27 +260,27 @@ KCALL vm_datablock_vio_write
 #endif /* !DEFINE_IO_PHYS */
 {
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH(ent, buf) {
+	struct iov_physentry ent;
+	IOV_PHYSBUFFER_FOREACH(ent, buf) {
 		FUNC_VIO_RW(_phys)(self,
-		                   ent.ab_base,
-		                   ent.ab_size,
+		                   ent.ive_base,
+		                   ent.ive_size,
 		                   src_offset);
-		src_offset += ent.ab_size;
+		src_offset += ent.ive_size;
 	}
 #elif defined(DEFINE_IO_VECTOR)
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH(ent,buf) {
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent,buf) {
 #ifdef DEFINE_IO_READ
 		vm_datablock_vio_read
 #else /* DEFINE_IO_READ */
 		vm_datablock_vio_write
 #endif /* !DEFINE_IO_READ */
 		                      (self,
-		                       ent.ab_base,
-		                       ent.ab_size,
+		                       ent.ive_base,
+		                       ent.ive_size,
 		                       src_offset);
-		src_offset += ent.ab_size;
+		src_offset += ent.ive_size;
 	}
 #elif defined(DEFINE_IO_PHYS)
 	pagedir_pushval_t backup;

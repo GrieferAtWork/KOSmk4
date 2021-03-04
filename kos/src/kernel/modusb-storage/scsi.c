@@ -244,7 +244,7 @@ ms_scsi_read_phys(struct block_device *__restrict self,
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_readv(struct block_device *__restrict self,
-              struct aio_buffer *__restrict buf, size_t num_sectors,
+              struct iov_buffer *__restrict buf, size_t num_sectors,
               lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;
@@ -253,13 +253,13 @@ ms_scsi_readv(struct block_device *__restrict self,
 	tx.ut_buftyp = USB_TRANSFER_BUFTYP_VIRTVEC;
 	tx.ut_buflen = num_sectors * self->bd_sector_size;
 	tx.ut_vbuf   = buf;
-	assert(aio_buffer_size(buf) == num_sectors * self->bd_sector_size);
+	assert(iov_buffer_size(buf) == num_sectors * self->bd_sector_size);
 	ms_scsi_doio(me, &tx, false, num_sectors, addr, aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_readv_phys(struct block_device *__restrict self,
-                   struct aio_pbuffer *__restrict buf, size_t num_sectors,
+                   struct iov_physbuffer *__restrict buf, size_t num_sectors,
                    lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;
@@ -268,7 +268,7 @@ ms_scsi_readv_phys(struct block_device *__restrict self,
 	tx.ut_buftyp = USB_TRANSFER_BUFTYP_PHYSVEC;
 	tx.ut_buflen = num_sectors * self->bd_sector_size;
 	tx.ut_vbufp  = buf;
-	assert(aio_pbuffer_size(buf) == num_sectors * self->bd_sector_size);
+	assert(iov_physbuffer_size(buf) == num_sectors * self->bd_sector_size);
 	ms_scsi_doio(me, &tx, false, num_sectors, addr, aio);
 }
 
@@ -303,7 +303,7 @@ ms_scsi_write_phys(struct block_device *__restrict self,
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_writev(struct block_device *__restrict self,
-               struct aio_buffer *__restrict buf, size_t num_sectors,
+               struct iov_buffer *__restrict buf, size_t num_sectors,
                lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;
@@ -312,13 +312,13 @@ ms_scsi_writev(struct block_device *__restrict self,
 	tx.ut_buftyp = USB_TRANSFER_BUFTYP_VIRTVEC;
 	tx.ut_buflen = num_sectors * self->bd_sector_size;
 	tx.ut_vbuf   = buf;
-	assert(aio_buffer_size(buf) == num_sectors * self->bd_sector_size);
+	assert(iov_buffer_size(buf) == num_sectors * self->bd_sector_size);
 	ms_scsi_doio(me, &tx, true, num_sectors, addr, aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_writev_phys(struct block_device *__restrict self,
-                    struct aio_pbuffer *__restrict buf, size_t num_sectors,
+                    struct iov_physbuffer *__restrict buf, size_t num_sectors,
                     lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;
@@ -327,7 +327,7 @@ ms_scsi_writev_phys(struct block_device *__restrict self,
 	tx.ut_buftyp = USB_TRANSFER_BUFTYP_PHYSVEC;
 	tx.ut_buflen = num_sectors * self->bd_sector_size;
 	tx.ut_vbufp  = buf;
-	assert(aio_pbuffer_size(buf) == num_sectors * self->bd_sector_size);
+	assert(iov_physbuffer_size(buf) == num_sectors * self->bd_sector_size);
 	ms_scsi_doio(me, &tx, true, num_sectors, addr, aio);
 }
 

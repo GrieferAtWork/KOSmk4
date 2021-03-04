@@ -97,8 +97,8 @@ DECL_BEGIN
 #endif /* DEFINE_mfile_tailreadv */
 #define LOCAL_READING
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct aio_buffer const *__restrict
-#define LOCAL_buffer_ent_t       struct aio_buffer_entry
+#define LOCAL_buffer_t           struct iov_buffer const *__restrict
+#define LOCAL_buffer_ent_t       struct iov_entry
 #define LOCAL_mfile_viorw        mfile_vioreadv
 #define LOCAL_mfile_normrw       mfile_readv
 #define LOCAL_mfile_tailrw       mfile_tailreadv
@@ -110,8 +110,8 @@ DECL_BEGIN
 #endif /* DEFINE_mfile_tailwritev */
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct aio_buffer const *__restrict
-#define LOCAL_buffer_ent_t       struct aio_buffer_entry
+#define LOCAL_buffer_t           struct iov_buffer const *__restrict
+#define LOCAL_buffer_ent_t       struct iov_entry
 #define LOCAL_mfile_viorw        mfile_viowritev
 #define LOCAL_mfile_normrw       mfile_writev
 #define LOCAL_mfile_tailrw       mfile_tailwritev
@@ -150,8 +150,8 @@ DECL_BEGIN
 #define LOCAL_READING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
-#define LOCAL_buffer_ent_t       struct aio_pbuffer_entry
+#define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
+#define LOCAL_buffer_ent_t       struct iov_physentry
 #define LOCAL_mfile_viorw        mfile_vioreadv_p
 #define LOCAL_mfile_normrw       mfile_readv_p
 #define LOCAL_mfile_tailrw       mfile_tailreadv_p
@@ -164,8 +164,8 @@ DECL_BEGIN
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
-#define LOCAL_buffer_ent_t       struct aio_pbuffer_entry
+#define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
+#define LOCAL_buffer_ent_t       struct iov_physentry
 #define LOCAL_mfile_viorw        mfile_viowritev_p
 #define LOCAL_mfile_normrw       mfile_writev_p
 #define LOCAL_mfile_tailrw       mfile_tailwritev_p
@@ -926,9 +926,9 @@ extend_failed:
 	TRY {
 #ifdef LOCAL_BUFFER_IS_IOVEC
 #ifdef LOCAL_BUFFER_IS_PHYS
-#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) aio_pbuffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), num_bytes)
+#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) iov_physbuffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), num_bytes)
 #else /* LOCAL_BUFFER_IS_PHYS */
-#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) aio_buffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), num_bytes)
+#define LOCAL_BUFFER_copy2phys(dstaddr, src_offset, num_bytes) iov_buffer_copytophys(buffer, dstaddr, buf_offset + (src_offset), num_bytes)
 #endif /* !LOCAL_BUFFER_IS_PHYS */
 #else /* LOCAL_BUFFER_IS_IOVEC */
 #ifdef LOCAL_BUFFER_IS_PHYS

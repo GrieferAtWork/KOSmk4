@@ -1163,7 +1163,7 @@ UnixSocket_PollTest(struct socket *__restrict self,
  * @return: * : The actual number of sent bytes. */
 PRIVATE NONNULL((1, 2)) size_t KCALL
 PbBuffer_Stream_Sendv_NoBlock(struct pb_buffer *__restrict self,
-                              struct aio_buffer const *__restrict buf,
+                              struct iov_buffer const *__restrict buf,
                               uintptr_t offset, size_t bufsize)
 		THROWS(E_NET_SHUTDOWN) {
 	size_t used, limt, avail;
@@ -1196,7 +1196,7 @@ again:
 		goto again; /* Race condition: Something changed in the mean time. */
 	/* Fill in packet data. */
 	TRY {
-		aio_buffer_copytomem(buf,
+		iov_buffer_copytomem(buf,
 		                     pb_packet_payload(packet),
 		                     offset, avail);
 	} EXCEPT {
@@ -1220,7 +1220,7 @@ struct async_send_job
 	REF UnixSocket          *as_socket;         /* [1..1][const] The socket to which to send data. */
 	struct ancillary_message as_ancillary;      /* [valid_if(as_ancillary_size)] Ancillary message data */
 	size_t                   as_ancillary_size; /* Encoded ancillary data size. */
-	struct aio_buffer        as_payload;        /* [owned(.ab_entv)] The actual payload the should be sent. */
+	struct iov_buffer        as_payload;        /* [owned(.iv_entv)] The actual payload the should be sent. */
 	uintptr_t                as_payload_offset; /* Offset into `as_payload', to the start of unsent data. */
 	size_t                   as_payload_size;   /* # of payload bytes that have yet to be sent, starting at `as_payload_offset'. */
 #ifdef ANCILLARY_MESSAGE_NEED_MSG_FLAGS
@@ -1233,7 +1233,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL AsyncSend_Destroy)(struct async *__restrict self) {
 	struct async_send_job *me;
 	me = (struct async_send_job *)self;
-	kfree((void *)me->as_payload.ab_entv);
+	kfree((void *)me->as_payload.iv_entv);
 	decref_unlikely(me->as_socket);
 	kfree(me);
 }
@@ -1242,7 +1242,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL AsyncSend_Fini)(async_job_t self) {
 	struct async_send_job *me;
 	me = (struct async_send_job *)self;
-	kfree((void *)me->as_payload.ab_entv);
+	kfree((void *)me->as_payload.iv_entv);
 	decref_unlikely(me->as_socket);
 }
 #endif /* !CONFIG_USE_NEW_ASYNC */
@@ -1355,7 +1355,7 @@ again_start_packet:
 	/* Populate the packet */
 	TRY {
 		/* Copy over the payload */
-		aio_buffer_copytomem(&me->as_payload,
+		iov_buffer_copytomem(&me->as_payload,
 		                     pb_packet_payload(packet),
 		                     me->as_payload_offset,
 		                     me->as_payload_size);
@@ -1406,7 +1406,7 @@ PRIVATE struct async_job_callbacks const AsyncSend_Ops = {
 
 PRIVATE NONNULL((1, 2, 6)) void KCALL
 UnixSocket_Sendv(struct socket *__restrict self,
-                 struct aio_buffer const *__restrict buf, size_t bufsize,
+                 struct iov_buffer const *__restrict buf, size_t bufsize,
                  struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                  /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
@@ -1499,8 +1499,8 @@ again_start_packet:
 #endif /* !CONFIG_USE_NEW_ASYNC */
 			job = (struct async_send_job *)aj;
 			TRY {
-				job->as_payload.ab_entv = (struct aio_buffer_entry *)kmalloc(buf->ab_entc *
-				                                                             sizeof(struct aio_buffer_entry),
+				job->as_payload.iv_entv = (struct iov_entry *)kmalloc(buf->iv_entc *
+				                                                             sizeof(struct iov_entry),
 				                                                             GFP_NORMAL);
 			} EXCEPT {
 				async_job_free(aj);
@@ -1511,11 +1511,11 @@ again_start_packet:
 			job->as_ancillary_size = ancillary_size;
 			if (ancillary_size)
 				memcpy(&job->as_ancillary, msg_control, sizeof(*msg_control));
-			job->as_payload.ab_entc = buf->ab_entc;
-			job->as_payload.ab_head = buf->ab_head;
-			job->as_payload.ab_last = buf->ab_last;
-			memcpy((void *)job->as_payload.ab_entv, buf->ab_entv,
-			       buf->ab_entc, sizeof(struct aio_buffer_entry));
+			job->as_payload.iv_entc = buf->iv_entc;
+			job->as_payload.iv_head = buf->iv_head;
+			job->as_payload.iv_last = buf->iv_last;
+			memcpy((void *)job->as_payload.iv_entv, buf->iv_entv,
+			       buf->iv_entc, sizeof(struct iov_entry));
 			job->as_payload_offset = offset;
 			job->as_payload_size   = bufsize;
 #ifdef ANCILLARY_MESSAGE_NEED_MSG_FLAGS
@@ -1532,7 +1532,7 @@ again_start_packet:
 	}
 	TRY {
 		/* Copy over the payload */
-		aio_buffer_copytomem(buf, pb_packet_payload(packet),
+		iov_buffer_copytomem(buf, pb_packet_payload(packet),
 		                     offset, bufsize);
 		if (ancillary_size) {
 			unix_ancillary_data_encode(msg_control,
@@ -1555,7 +1555,7 @@ again_start_packet:
 
 PRIVATE NONNULL((1, 2)) size_t KCALL
 UnixSocket_Recvv(struct socket *__restrict self,
-                 struct aio_buffer const *__restrict buf, size_t bufsize,
+                 struct iov_buffer const *__restrict buf, size_t bufsize,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
@@ -1622,7 +1622,7 @@ again_read_packet:
 				/* Don't remove the packet, but peek its data. */
 				if (payload > bufsize)
 					payload = bufsize;
-				aio_buffer_copyfrommem(buf, result,
+				iov_buffer_copyfrommem(buf, result,
 				                       pb_packet_payload(packet),
 				                       bufsize);
 				result += bufsize;
@@ -1649,7 +1649,7 @@ again_read_packet:
 			}
 			if (payload > bufsize) {
 				/* Can only read part of the packet. */
-				aio_buffer_copyfrommem(buf, result,
+				iov_buffer_copyfrommem(buf, result,
 				                       pb_packet_payload(packet),
 				                       bufsize);
 				result += bufsize;
@@ -1662,7 +1662,7 @@ again_read_packet:
 				goto done;
 			}
 			/* Read the whole packet. */
-			aio_buffer_copyfrommem(buf, result,
+			iov_buffer_copyfrommem(buf, result,
 			                       pb_packet_payload(packet),
 			                       payload);
 			result += payload;
@@ -1711,7 +1711,7 @@ again_read_packet:
 			}
 			if (msg_flags & MSG_PEEK) {
 				/* Copy payload memory for which there is enough space. */
-				aio_buffer_copyfrommem(buf, result,
+				iov_buffer_copyfrommem(buf, result,
 				                       pb_packet_payload(packet),
 				                       payload);
 				result += payload;
@@ -1738,7 +1738,7 @@ again_read_packet:
 				goto done;
 			}
 			/* Read the whole packet. */
-			aio_buffer_copyfrommem(buf, result,
+			iov_buffer_copyfrommem(buf, result,
 			                       pb_packet_payload(packet),
 			                       payload);
 			result += payload;

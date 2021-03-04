@@ -43,10 +43,10 @@ DECL_BEGIN
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 #define DST_MEMSET(offset, byte, num_bytes) \
-	aio_pbuffer_memset(buf, offset, byte, num_bytes)
+	iov_physbuffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_VECTOR)
 #define DST_MEMSET(offset, byte, num_bytes) \
-	aio_buffer_memset(buf, offset, byte, num_bytes)
+	iov_buffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_PHYS)
 #define DST_MEMSET(offset, byte, num_bytes) \
 	vm_memsetphys((buf) + (offset), byte, num_bytes)
@@ -137,13 +137,13 @@ DECL_BEGIN
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv_phys_sector)(struct block_device *__restrict self,
-                                                struct aio_pbuffer *__restrict buf,
+                                                struct iov_physbuffer *__restrict buf,
                                                 size_t num_sectors, lba_t addr,
                                                 /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv_sector)(struct block_device *__restrict self,
-                                           struct aio_buffer *__restrict buf,
+                                           struct iov_buffer *__restrict buf,
                                            size_t num_sectors, lba_t addr,
                                            /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_PHYS)
@@ -161,13 +161,13 @@ NOTHROW(KCALL _block_device_aread_sector)(struct block_device *__restrict self,
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv_phys)(struct block_device *__restrict self,
-                                         struct aio_pbuffer *__restrict buf, size_t num_bytes,
+                                         struct iov_physbuffer *__restrict buf, size_t num_bytes,
                                          pos_t device_position,
                                          /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv)(struct block_device *__restrict self,
-                                    struct aio_buffer *__restrict buf, size_t num_bytes,
+                                    struct iov_buffer *__restrict buf, size_t num_bytes,
                                     pos_t device_position,
                                     /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_PHYS)
@@ -189,13 +189,13 @@ NOTHROW(KCALL _block_device_aread)(struct block_device *__restrict self,
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev_phys_sector)(struct block_device *__restrict self,
-                                                 struct aio_pbuffer *__restrict buf,
+                                                 struct iov_physbuffer *__restrict buf,
                                                  size_t num_sectors, lba_t addr,
                                                  /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev_sector)(struct block_device *__restrict self,
-                                            struct aio_buffer *__restrict buf,
+                                            struct iov_buffer *__restrict buf,
                                             size_t num_sectors, lba_t addr,
                                             /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_PHYS)
@@ -213,13 +213,13 @@ NOTHROW(KCALL _block_device_awrite_sector)(struct block_device *__restrict self,
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev_phys)(struct block_device *__restrict self,
-                                          struct aio_pbuffer *__restrict buf,
+                                          struct iov_physbuffer *__restrict buf,
                                           size_t num_bytes, pos_t device_position,
                                           /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev)(struct block_device *__restrict self,
-                                     struct aio_buffer *__restrict buf,
+                                     struct iov_buffer *__restrict buf,
                                      size_t num_bytes, pos_t device_position,
                                      /*out*/ struct aio_handle *__restrict aio)
 #elif defined(DEFINE_IO_PHYS)
@@ -247,22 +247,22 @@ NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self,
 #ifdef DEFINE_IO_SECTOR
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
-	assertf(aio_pbuffer_size(buf) == num_sectors * self->bd_sector_size,
-	        "aio_pbuffer_size(buf)              = %" PRIuSIZ "\n"
+	assertf(iov_physbuffer_size(buf) == num_sectors * self->bd_sector_size,
+	        "iov_physbuffer_size(buf)              = %" PRIuSIZ "\n"
 	        "num_sectors                        = %" PRIuSIZ "\n"
 	        "self->bd_sector_size               = %" PRIuSIZ "\n"
 	        "num_sectors * self->bd_sector_size = %" PRIuSIZ "\n",
-	        (size_t)aio_pbuffer_size(buf),
+	        (size_t)iov_physbuffer_size(buf),
 	        (size_t)num_sectors,
 	        (size_t)self->bd_sector_size,
 	        (size_t)(num_sectors * self->bd_sector_size));
 #else /* DEFINE_IO_PHYS */
-	assertf(aio_buffer_size(buf) == num_sectors * self->bd_sector_size,
-	        "aio_buffer_size(buf)               = %" PRIuSIZ "\n"
+	assertf(iov_buffer_size(buf) == num_sectors * self->bd_sector_size,
+	        "iov_buffer_size(buf)               = %" PRIuSIZ "\n"
 	        "num_sectors                        = %" PRIuSIZ "\n"
 	        "self->bd_sector_size               = %" PRIuSIZ "\n"
 	        "num_sectors * self->bd_sector_size = %" PRIuSIZ "\n",
-	        (size_t)aio_buffer_size(buf),
+	        (size_t)iov_buffer_size(buf),
 	        (size_t)num_sectors,
 	        (size_t)self->bd_sector_size,
 	        (size_t)(num_sectors * self->bd_sector_size));
@@ -294,16 +294,16 @@ NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self,
 				           (num_sectors - new_num_sectors) * self->bd_sector_size);
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 				{
-					struct aio_pbuffer view;
-					aio_pbuffer_init_view_before(&view, buf, new_num_sectors * self->bd_sector_size);
+					struct iov_physbuffer view;
+					iov_physbuffer_init_view_before(&view, buf, new_num_sectors * self->bd_sector_size);
 					assert(self->bd_type.dt_readv_phys);
 					(*self->bd_type.dt_readv_phys)(self, &view, num_sectors, addr, aio);
 					return;
 				}
 #elif defined(DEFINE_IO_VECTOR)
 				{
-					struct aio_buffer view;
-					aio_buffer_init_view_before(&view, buf, new_num_sectors * self->bd_sector_size);
+					struct iov_buffer view;
+					iov_buffer_init_view_before(&view, buf, new_num_sectors * self->bd_sector_size);
 					assert(self->bd_type.dt_readv);
 					(*self->bd_type.dt_readv)(self, &view, num_sectors, addr, aio);
 					return;
@@ -329,15 +329,15 @@ done_success:
 	size_t total_sectors;
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
-	assertf(aio_pbuffer_size(buf) == num_bytes,
-	        "aio_pbuffer_size(buf) = %" PRIuSIZ "\n"
+	assertf(iov_physbuffer_size(buf) == num_bytes,
+	        "iov_physbuffer_size(buf) = %" PRIuSIZ "\n"
 	        "num_bytes             = %" PRIuSIZ "\n",
-	        (size_t)aio_pbuffer_size(buf), (size_t)num_bytes);
+	        (size_t)iov_physbuffer_size(buf), (size_t)num_bytes);
 #else /* DEFINE_IO_PHYS */
-	assertf(aio_buffer_size(buf) == num_bytes,
-	        "aio_buffer_size(buf) = %" PRIuSIZ "\n"
+	assertf(iov_buffer_size(buf) == num_bytes,
+	        "iov_buffer_size(buf) = %" PRIuSIZ "\n"
 	        "num_bytes            = %" PRIuSIZ "\n",
-	        (size_t)aio_buffer_size(buf), (size_t)num_bytes);
+	        (size_t)iov_buffer_size(buf), (size_t)num_bytes);
 #endif /* !DEFINE_IO_PHYS */
 #endif /* !DEFINE_IO_VECTOR */
 	if unlikely(!num_bytes)
@@ -362,15 +362,15 @@ done_success:
 			DST_MEMSET(new_num_bytes, 0, num_bytes - new_num_bytes);
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 			{
-				struct aio_pbuffer view;
-				aio_pbuffer_init_view_before(&view, buf, new_num_bytes * self->bd_sector_size);
+				struct iov_physbuffer view;
+				iov_physbuffer_init_view_before(&view, buf, new_num_bytes * self->bd_sector_size);
 				_block_device_areadv_phys(self, &view, new_num_bytes, device_position, aio);
 				return;
 			}
 #elif defined(DEFINE_IO_VECTOR)
 			{
-				struct aio_buffer view;
-				aio_buffer_init_view_before(&view, buf, new_num_bytes * self->bd_sector_size);
+				struct iov_buffer view;
+				iov_buffer_init_view_before(&view, buf, new_num_bytes * self->bd_sector_size);
 				_block_device_areadv(self, &view, new_num_bytes, device_position, aio);
 				return;
 			}
@@ -408,11 +408,11 @@ done_success:
 		if (unaligned_head) {
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
-			struct aio_pbuffer view;
-			aio_pbuffer_init_view_before(&view, buf, unaligned_head);
+			struct iov_physbuffer view;
+			iov_physbuffer_init_view_before(&view, buf, unaligned_head);
 #else /* DEFINE_IO_PHYS */
-			struct aio_buffer view;
-			aio_buffer_init_view_before(&view, buf, unaligned_head);
+			struct iov_buffer view;
+			iov_buffer_init_view_before(&view, buf, unaligned_head);
 #endif /* !DEFINE_IO_PHYS */
 			INVOKE_BUFFERED_IO(self, &view, unaligned_head, device_position);
 #else /* DEFINE_IO_VECTOR */
@@ -422,11 +422,11 @@ done_success:
 		if (unaligned_tail) {
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
-			struct aio_pbuffer view;
-			aio_pbuffer_init_view_after(&view, buf, num_bytes - unaligned_tail);
+			struct iov_physbuffer view;
+			iov_physbuffer_init_view_after(&view, buf, num_bytes - unaligned_tail);
 #else /* DEFINE_IO_PHYS */
-			struct aio_buffer view;
-			aio_buffer_init_view_after(&view, buf, num_bytes - unaligned_tail);
+			struct iov_buffer view;
+			iov_buffer_init_view_after(&view, buf, num_bytes - unaligned_tail);
 #endif /* !DEFINE_IO_PHYS */
 			INVOKE_BUFFERED_IO(self, &view, unaligned_tail,
 			                   (device_position + (pos_t)num_bytes) - (pos_t)unaligned_tail);
@@ -441,11 +441,11 @@ done_success:
 		if (total_sectors) {
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
-			struct aio_pbuffer view;
-			aio_pbuffer_init_view(&view, buf, unaligned_head, total_sectors * self->bd_sector_size);
+			struct iov_physbuffer view;
+			iov_physbuffer_init_view(&view, buf, unaligned_head, total_sectors * self->bd_sector_size);
 #else /* DEFINE_IO_PHYS */
-			struct aio_buffer view;
-			aio_buffer_init_view(&view, buf, unaligned_head, total_sectors * self->bd_sector_size);
+			struct iov_buffer view;
+			iov_buffer_init_view(&view, buf, unaligned_head, total_sectors * self->bd_sector_size);
 #endif /* !DEFINE_IO_PHYS */
 			INVOKE_IO(self, &view, total_sectors, device_lba, aio);
 #elif defined(DEFINE_IO_PHYS)
@@ -473,11 +473,11 @@ PUBLIC NONNULL((1)) void
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 (KCALL _block_device_readv_phys_sync)(struct block_device *__restrict self,
-                                      struct aio_pbuffer *__restrict buf,
+                                      struct iov_physbuffer *__restrict buf,
                                       size_t num_bytes, pos_t device_position)
 #elif defined(DEFINE_IO_VECTOR)
 (KCALL _block_device_readv_sync)(struct block_device *__restrict self,
-                                 struct aio_buffer *__restrict buf,
+                                 struct iov_buffer *__restrict buf,
                                  size_t num_bytes, pos_t device_position)
 #elif defined(DEFINE_IO_PHYS)
 (KCALL _block_device_read_phys_sync)(struct block_device *__restrict self,
@@ -491,11 +491,11 @@ PUBLIC NONNULL((1)) void
 #else /* DEFINE_IO_READ */
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 (KCALL _block_device_writev_phys_sync)(struct block_device *__restrict self,
-                                       struct aio_pbuffer *__restrict buf,
+                                       struct iov_physbuffer *__restrict buf,
                                        size_t num_bytes, pos_t device_position)
 #elif defined(DEFINE_IO_VECTOR)
 (KCALL _block_device_writev_sync)(struct block_device *__restrict self,
-                                  struct aio_buffer *__restrict buf,
+                                  struct iov_buffer *__restrict buf,
                                   size_t num_bytes, pos_t device_position)
 #elif defined(DEFINE_IO_PHYS)
 (KCALL _block_device_write_phys_sync)(struct block_device *__restrict self,

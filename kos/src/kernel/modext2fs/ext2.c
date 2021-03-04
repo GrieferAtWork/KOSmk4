@@ -121,7 +121,7 @@ Ext2_WriteToINodePhys(struct inode *__restrict self,
 
 INTERN void KCALL
 Ext2_ReadFromINodeVector(struct inode *__restrict self,
-                         struct aio_buffer *__restrict buf, size_t bufsize,
+                         struct iov_buffer *__restrict buf, size_t bufsize,
                          pos_t pos, struct aio_multihandle *__restrict aio) {
 	(void)self;
 	(void)buf;
@@ -134,7 +134,7 @@ Ext2_ReadFromINodeVector(struct inode *__restrict self,
 
 INTERN void KCALL
 Ext2_WriteToINodeVector(struct inode *__restrict self,
-                        struct aio_buffer *__restrict buf, size_t bufsize,
+                        struct iov_buffer *__restrict buf, size_t bufsize,
                         pos_t pos, struct aio_multihandle *__restrict aio) {
 	(void)self;
 	(void)buf;
@@ -147,7 +147,7 @@ Ext2_WriteToINodeVector(struct inode *__restrict self,
 
 INTERN void KCALL
 Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self,
-                             struct aio_pbuffer *__restrict buf, size_t bufsize,
+                             struct iov_physbuffer *__restrict buf, size_t bufsize,
                              pos_t pos, struct aio_multihandle *__restrict aio) {
 	(void)self;
 	(void)buf;
@@ -160,7 +160,7 @@ Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self,
 
 INTERN void KCALL
 Ext2_WriteToINodeVectorPhys(struct inode *__restrict self,
-                            struct aio_pbuffer *__restrict buf, size_t bufsize,
+                            struct iov_physbuffer *__restrict buf, size_t bufsize,
                             pos_t pos, struct aio_multihandle *__restrict aio) {
 	(void)self;
 	(void)buf;

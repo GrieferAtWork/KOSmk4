@@ -45,7 +45,7 @@
 DECL_BEGIN
 
 struct mman;
-struct aio_buffer;
+struct iov_buffer;
 
 /* Try to pre-fault access to the given addres range, such that `memcpy_nopf()'
  * may succeed when re-attempted.
@@ -82,7 +82,7 @@ mman_prefault(USER CHECKED void const *addr,
  * segment that cannot be fully faulted.
  * @param: flags: Set of `MMAN_FAULT_F_*' */
 FUNDEF NONNULL((1)) size_t FCALL
-mman_prefaultv(struct aio_buffer const *__restrict buffer,
+mman_prefaultv(struct iov_buffer const *__restrict buffer,
                size_t offset, size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -119,7 +119,7 @@ mman_forcefault(struct mman *__restrict self,
 /* Same as `mman_forcefault()', but fault all memory pointed-to by the given buffer. */
 FUNDEF NONNULL((1, 2)) void FCALL
 mman_forcefaultv(struct mman *__restrict self,
-                 struct aio_buffer const *__restrict buffer,
+                 struct iov_buffer const *__restrict buffer,
                  size_t offset, size_t num_bytes, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 

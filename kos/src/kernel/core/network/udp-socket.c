@@ -222,7 +222,7 @@ udp_connect(struct socket *__restrict self,
 
 PRIVATE NONNULL((1, 2, 8)) void KCALL
 udp_sendtov(struct socket *__restrict self,
-            struct aio_buffer const *__restrict buf, size_t bufsize,
+            struct iov_buffer const *__restrict buf, size_t bufsize,
             /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
             struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
             /*out*/ struct aio_handle *__restrict aio) {
@@ -292,7 +292,7 @@ udp_sendtov(struct socket *__restrict self,
 
 PRIVATE NONNULL((1, 2)) size_t KCALL
 udp_recvfromv(struct socket *__restrict self,
-              struct aio_buffer const *__restrict buf, size_t bufsize,
+              struct iov_buffer const *__restrict buf, size_t bufsize,
               /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
               /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
               /*0..1*/ USER CHECKED u32 *presult_flags,

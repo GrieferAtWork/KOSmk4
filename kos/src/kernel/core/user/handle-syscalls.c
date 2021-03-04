@@ -796,7 +796,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
                 size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -805,28 +805,28 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_readv(hand,
 				                      &dst,
 				                      num_bytes);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);
@@ -843,7 +843,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
                 size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -852,28 +852,28 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_writev(hand,
 				                       &dst,
 				                       num_bytes);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);
@@ -890,7 +890,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
                        size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -899,28 +899,28 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_readv(hand,
 				                      &dst,
 				                      num_bytes);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);
@@ -937,7 +937,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
                        size_t, count) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -946,28 +946,28 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_writev(hand,
 				                       &dst,
 				                       num_bytes);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);
@@ -991,7 +991,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
                 size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -1000,29 +1000,29 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_preadv(hand,
 				                       &dst,
 				                       num_bytes,
 				                       (pos_t)offset);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);
@@ -1039,7 +1039,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
                 size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -1048,29 +1048,29 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                  ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_pwritev(hand,
 				                        &dst,
 				                        num_bytes,
 				                        (pos_t)offset);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);
@@ -1087,7 +1087,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
                        size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -1096,29 +1096,29 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_writable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_preadv(hand,
 				                       &dst,
 				                       num_bytes,
 				                       (pos_t)offset);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);
@@ -1135,7 +1135,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
                        size_t, count, uint64_t, offset) {
 	size_t result, num_bytes;
 	struct handle hand;
-	struct aio_buffer dst;
+	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -1144,29 +1144,29 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		if unlikely(!count)
 			result = 0;
 		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
+			dst.iv_entc = count;
+			dst.iv_entv = (struct iov_entry *)malloca(count *
+			                                                 sizeof(struct iov_entry));
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+					((struct iov_entry *)dst.iv_entv)[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct iov_entry *)dst.iv_entv)[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_readable(((struct iov_entry *)dst.iv_entv)[i].ive_base,
+					                         ((struct iov_entry *)dst.iv_entv)[i].ive_size);
+					num_bytes += ((struct iov_entry *)dst.iv_entv)[i].ive_size;
 				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				dst.iv_head = dst.iv_entv[0];
+				dst.iv_last = dst.iv_entv[count - 1].ive_size;
 				result = handle_pwritev(hand,
 				                        &dst,
 				                        num_bytes,
 				                        (pos_t)offset);
 			} EXCEPT {
-				freea((void *)dst.ab_entv);
+				freea((void *)dst.iv_entv);
 				RETHROW();
 			}
-			freea((void *)dst.ab_entv);
+			freea((void *)dst.iv_entv);
 		}
 	} EXCEPT {
 		decref(hand);

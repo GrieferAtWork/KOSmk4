@@ -80,7 +80,7 @@ nic_packetlist_newpacket(struct nic_packetlist *__restrict self,
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_newpacketv(struct nic_packetlist *__restrict self,
                           struct nic_device const *__restrict dev,
-                          struct aio_buffer const *__restrict payload,
+                          struct iov_buffer const *__restrict payload,
                           size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
@@ -129,8 +129,8 @@ struct nic_packet_desc {
 	size_t            npd_headsz;    /* Size of headers */
 	byte_t           *npd_tail;      /* [0..npd_tailsz] Start of footers */
 	size_t            npd_tailsz;    /* Size of footers */
-	struct aio_buffer npd_payload;   /* Packet payload data. */
-	size_t            npd_payloadsz; /* [== aio_buffer_size(&np_payload)] Total payload size (in bytes) */
+	struct iov_buffer npd_payload;   /* Packet payload data. */
+	size_t            npd_payloadsz; /* [== iov_buffer_size(&np_payload)] Total payload size (in bytes) */
 };
 
 /* Return the size of some part of a given NIC packet descriptor. */
@@ -153,16 +153,16 @@ NOTHROW(KCALL nic_packet_desc_for_packet)(struct nic_packet_desc *__restrict sel
 	self->npd_tailsz    = nic_packet_headsize(packet);
 	self->npd_payloadsz = packet->np_payloads;
 	if (packet->np_payloadc) {
-		self->npd_payload.ab_entc = packet->np_payloadc;
-		self->npd_payload.ab_entv = packet->np_payloadv;
-		self->npd_payload.ab_head = packet->np_payloadv[0];
-		self->npd_payload.ab_last = packet->np_payloadv[packet->np_payloadc - 1].ab_size;
+		self->npd_payload.iv_entc = packet->np_payloadc;
+		self->npd_payload.iv_entv = packet->np_payloadv;
+		self->npd_payload.iv_head = packet->np_payloadv[0];
+		self->npd_payload.iv_last = packet->np_payloadv[packet->np_payloadc - 1].ive_size;
 	} else {
-		self->npd_payload.ab_entc         = 1;
-		self->npd_payload.ab_entv         = __NULLPTR;
-		self->npd_payload.ab_head.ab_base = __NULLPTR;
-		self->npd_payload.ab_head.ab_size = 0;
-		self->npd_payload.ab_last         = 0;
+		self->npd_payload.iv_entc         = 1;
+		self->npd_payload.iv_entv         = __NULLPTR;
+		self->npd_payload.iv_head.ive_base = __NULLPTR;
+		self->npd_payload.iv_head.ive_size = 0;
+		self->npd_payload.iv_last         = 0;
 	}
 }
 

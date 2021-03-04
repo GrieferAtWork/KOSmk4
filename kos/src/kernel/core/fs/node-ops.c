@@ -110,42 +110,42 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 /* Implementation for `f_writev' that uses `f_write' */
 PUBLIC NONNULL((1, 2, 5)) void KCALL
 inode_file_writev_with_write(struct inode *__restrict self,
-                             struct aio_buffer *__restrict buf,
+                             struct iov_buffer *__restrict buf,
                              size_t num_bytes, pos_t file_position,
                              struct aio_multihandle *__restrict aio)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct aio_buffer_entry ent;
-	assert(num_bytes == aio_buffer_size(buf));
+	struct iov_entry ent;
+	assert(num_bytes == iov_buffer_size(buf));
 	assert(self->i_type->it_file.f_write);
 	(void)num_bytes;
-	AIO_BUFFER_FOREACH(ent, buf) {
+	IOV_BUFFER_FOREACH(ent, buf) {
 		(*self->i_type->it_file.f_write)(self,
-		                                 ent.ab_base,
-		                                 ent.ab_size,
+		                                 ent.ive_base,
+		                                 ent.ive_size,
 		                                 file_position,
 		                                 aio);
-		file_position += ent.ab_size;
+		file_position += ent.ive_size;
 	}
 }
 
 /* Implementation for `f_pwritev' that uses `f_pwrite' */
 PUBLIC NONNULL((1, 2, 5)) void KCALL
 inode_file_pwritev_with_pwrite(struct inode *__restrict self,
-                               struct aio_pbuffer *__restrict buf,
+                               struct iov_physbuffer *__restrict buf,
                                size_t num_bytes, pos_t file_position,
                                struct aio_multihandle *__restrict aio)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct aio_pbuffer_entry ent;
-	assert(num_bytes == aio_pbuffer_size(buf));
+	struct iov_physentry ent;
+	assert(num_bytes == iov_physbuffer_size(buf));
 	assert(self->i_type->it_file.f_pwrite);
 	(void)num_bytes;
-	AIO_PBUFFER_FOREACH(ent, buf) {
+	IOV_PHYSBUFFER_FOREACH(ent, buf) {
 		(*self->i_type->it_file.f_pwrite)(self,
-		                                  ent.ab_base,
-		                                  ent.ab_size,
+		                                  ent.ive_base,
+		                                  ent.ive_size,
 		                                  file_position,
 		                                  aio);
-		file_position += ent.ab_size;
+		file_position += ent.ive_size;
 	}
 }
 

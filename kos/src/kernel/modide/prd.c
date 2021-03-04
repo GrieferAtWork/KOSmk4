@@ -261,15 +261,15 @@ set_lock_vec:
 }
 
 INTERN WUNUSED size_t KCALL
-AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct aio_buffer *__restrict buf,
+AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct iov_buffer *__restrict buf,
                           size_t num_bytes, AtaAIOHandleData *__restrict handle, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct vm *effective_vm = &vm_kernel;
 	struct ata_dma_acquire_data data;
 	size_t req_locks, req_prd;
-	if (ADDR_ISUSER(buf->ab_head.ab_base))
+	if (ADDR_ISUSER(buf->iv_head.ive_base))
 		effective_vm = THIS_MMAN;
-	assert(num_bytes == aio_buffer_size(buf));
+	assert(num_bytes == iov_buffer_size(buf));
 	data.ad_base = data.ad_buf = prd_buf;
 	data.ad_siz = data.ad_max = prd_siz;
 	/* Try to start DMAing within the given address range. */
@@ -386,20 +386,20 @@ NOTHROW(KCALL AtaPRD_InitFromPhys)(AtaPRD *__restrict prd_buf,
 INTERN WUNUSED size_t
 NOTHROW(KCALL AtaPRD_InitFromPhysVector)(AtaPRD *__restrict prd_buf,
                                          size_t prd_siz,
-                                         struct aio_pbuffer *__restrict buf,
+                                         struct iov_physbuffer *__restrict buf,
                                          size_t num_bytes) {
 	size_t result;
-	struct aio_pbuffer_entry ent;
+	struct iov_physentry ent;
 	struct ata_dma_acquire_data data;
-	assert(aio_pbuffer_size(buf) == num_bytes);
+	assert(iov_physbuffer_size(buf) == num_bytes);
 	(void)num_bytes;
 	data.ad_base = prd_buf;
 	data.ad_buf  = prd_buf;
 	data.ad_siz  = prd_siz;
-	AIO_PBUFFER_FOREACH(ent, buf) {
+	IOV_PHYSBUFFER_FOREACH(ent, buf) {
 		if (!ata_dma_acquire_func(&data,
-		                          ent.ab_base,
-		                          ent.ab_size))
+		                          ent.ive_base,
+		                          ent.ive_size))
 			goto err;
 	}
 	result = (size_t)(data.ad_buf - data.ad_base);

@@ -477,10 +477,10 @@ INTDEF NONNULL((1, 5)) void KCALL Fat32_ReadFromINode(struct inode *__restrict s
 INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINode(struct inode *__restrict self, CHECKED USER void const *buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 INTDEF NONNULL((1, 5)) void KCALL Fat32_ReadFromINodePhys(struct inode *__restrict self, physaddr_t dst, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINodePhys(struct inode *__restrict self, physaddr_t src, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat32_ReadFromINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat32_ReadFromINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat32_ReadFromINodeVector(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINodeVector(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat32_ReadFromINodeVectorPhys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat32_WriteToINodeVectorPhys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 
 /* Same  as the functions  above, but used for
  * operating with the FAT12/16 root directory.
@@ -494,10 +494,10 @@ INTDEF NONNULL((1, 5)) void KCALL Fat16_ReadFromRootDirectory(FatSuperblock *__r
 INTDEF NONNULL((1, 5)) void KCALL Fat16_WriteToRootDirectory(FatSuperblock *__restrict self, CHECKED USER void const *buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 INTDEF NONNULL((1, 5)) void KCALL Fat16_ReadFromRootDirectoryPhys(FatSuperblock *__restrict self, physaddr_t dst, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 INTDEF NONNULL((1, 5)) void KCALL Fat16_WriteToRootDirectoryPhys(FatSuperblock *__restrict self, physaddr_t src, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat16_ReadFromRootDirectoryVector(FatSuperblock *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat16_WriteToRootDirectoryVector(FatSuperblock *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat16_ReadFromRootDirectoryVectorPhys(FatSuperblock *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat16_WriteToRootDirectoryVectorPhys(FatSuperblock *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat16_ReadFromRootDirectoryVector(FatSuperblock *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat16_WriteToRootDirectoryVector(FatSuperblock *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat16_ReadFromRootDirectoryVectorPhys(FatSuperblock *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat16_WriteToRootDirectoryVectorPhys(FatSuperblock *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 
 /* Hybrid of the functions above:
  * Determine the type, then read from the INode. */
@@ -508,10 +508,10 @@ INTDEF NONNULL((1, 5)) void KCALL Fat_ReadFromINode(struct inode *__restrict sel
 INTDEF NONNULL((1, 5)) void KCALL Fat_WriteToINode(struct inode *__restrict self, CHECKED USER void const *buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 INTDEF NONNULL((1, 5)) void KCALL Fat_ReadFromINodePhys(struct inode *__restrict self, physaddr_t dst, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 INTDEF NONNULL((1, 5)) void KCALL Fat_WriteToINodePhys(struct inode *__restrict self, physaddr_t src, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat_ReadFromINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat_WriteToINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat_ReadFromINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF NONNULL((1, 5)) void KCALL Fat_WriteToINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat_ReadFromINodeVector(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat_WriteToINodeVector(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat_ReadFromINodeVectorPhys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF NONNULL((1, 5)) void KCALL Fat_WriteToINodeVectorPhys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio) THROWS(...);
 
 /* Returns the absolute on-disk position of `pos' in `self' */
 INTDEF NONNULL((1)) pos_t KCALL

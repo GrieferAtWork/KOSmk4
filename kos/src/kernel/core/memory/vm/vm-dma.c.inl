@@ -80,7 +80,7 @@ NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
                                vm_dmarangefunc_t prange,
                                vm_dmaresetfunc_t preset, void *arg,
                                struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-                               struct aio_buffer const *__restrict vaddr_buf,
+                               struct iov_buffer const *__restrict vaddr_buf,
                                bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2, 3, 5)) size_t
@@ -98,7 +98,7 @@ vm_startdmav(struct vm *__restrict effective_vm,
              vm_dmarangefunc_t prange,
              vm_dmaresetfunc_t preset, void *arg,
              struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-             struct aio_buffer const *__restrict vaddr_buf,
+             struct iov_buffer const *__restrict vaddr_buf,
              bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2, 3, 5)) size_t KCALL
@@ -126,7 +126,7 @@ vm_startdma(struct vm *__restrict effective_vm,
  *                     any changes made appear in PRIVATE  mappings of the associated memory  region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
- *              Upon full success, this is identical to the given `num_bytes' /  `aio_buffer_size(vaddr_buf)',
+ *              Upon full success, this is identical to the given `num_bytes' /  `iov_buffer_size(vaddr_buf)',
  *              though for the same reasons that `vm_startdma[v][_nx]' can fail (s.a. its `@return: 0' cases),
  *              this may be less than that */
 #ifdef DMA_NX
@@ -134,7 +134,7 @@ vm_startdma(struct vm *__restrict effective_vm,
 PUBLIC NONNULL((1, 2, 4)) size_t
 NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
                               vm_dmarangefunc_t prange, void *arg,
-                              struct aio_buffer const *__restrict vaddr_buf,
+                              struct iov_buffer const *__restrict vaddr_buf,
                               bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2)) size_t
@@ -148,7 +148,7 @@ NOTHROW(KCALL vm_enumdma_nx)(struct vm *__restrict effective_vm,
 PUBLIC NONNULL((1, 2, 4)) size_t KCALL
 vm_enumdmav(struct vm *__restrict effective_vm,
             vm_dmarangefunc_t prange, void *arg,
-            struct aio_buffer const *__restrict vaddr_buf,
+            struct iov_buffer const *__restrict vaddr_buf,
             bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2)) size_t KCALL
@@ -168,13 +168,13 @@ vm_enumdma(struct vm *__restrict effective_vm,
 	size_t lock_used;
 #endif /* !DMA_ENUM */
 #ifdef DMA_VECTOR
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 #ifdef __INTELLISENSE__
 	UNCHECKED void *vaddr;
 	size_t num_bytes;
 #else
-#define vaddr     ent.ab_base
-#define num_bytes ent.ab_size
+#define vaddr     ent.ive_base
+#define num_bytes ent.ive_size
 #endif
 #ifndef DMA_ENUM
 again:
@@ -189,7 +189,7 @@ again:
 #else /* DMA_NX */
 	sync_read(effective_vm);
 #endif /* !DMA_NX */
-	AIO_BUFFER_FOREACH(ent, vaddr_buf)
+	IOV_BUFFER_FOREACH(ent, vaddr_buf)
 #else /* DMA_VECTOR */
 #ifndef DMA_ENUM
 again:

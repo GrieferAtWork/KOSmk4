@@ -102,7 +102,7 @@ handle_blockdevice_pwrite(struct basic_block_device *__restrict self,
 
 INTERN size_t KCALL
 handle_blockdevice_preadv(struct basic_block_device *__restrict self,
-                          struct aio_buffer *__restrict dst, size_t num_bytes,
+                          struct iov_buffer *__restrict dst, size_t num_bytes,
                           pos_t addr, iomode_t mode) {
 	/* TODO: IO_NONBLOCK */
 	(void)mode;
@@ -115,7 +115,7 @@ handle_blockdevice_preadv(struct basic_block_device *__restrict self,
 
 INTERN size_t KCALL
 handle_blockdevice_pwritev(struct basic_block_device *__restrict self,
-                           struct aio_buffer *__restrict src, size_t num_bytes,
+                           struct iov_buffer *__restrict src, size_t num_bytes,
                            pos_t addr, iomode_t mode) {
 	/* TODO: IO_NONBLOCK */
 	(void)mode;

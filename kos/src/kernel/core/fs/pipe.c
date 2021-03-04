@@ -500,23 +500,23 @@ handle_pipe_write(struct pipe *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_readv(struct pipe *__restrict self,
-                  struct aio_buffer *__restrict dst,
+                  struct iov_buffer *__restrict dst,
                   size_t num_bytes, iomode_t mode) {
 	size_t temp, result = 0;
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	(void)num_bytes;
-	AIO_BUFFER_FOREACH(ent, dst) {
+	IOV_BUFFER_FOREACH(ent, dst) {
 		if (result) {
-			temp = ringbuffer_read_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
+			temp = ringbuffer_read_nonblock(&self->p_buffer, ent.ive_base, ent.ive_size);
 		} else if (mode & IO_NONBLOCK) {
-			temp = ringbuffer_read_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
-			if (!temp && ent.ab_size && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
+			temp = ringbuffer_read_nonblock(&self->p_buffer, ent.ive_base, ent.ive_size);
+			if (!temp && ent.ive_size && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No data available. */
 		} else {
-			temp = ringbuffer_read(&self->p_buffer, ent.ab_base, ent.ab_size);
+			temp = ringbuffer_read(&self->p_buffer, ent.ive_base, ent.ive_size);
 		}
 		result += temp;
-		if (temp < ent.ab_size)
+		if (temp < ent.ive_size)
 			break;
 	}
 	return result;
@@ -524,23 +524,23 @@ handle_pipe_readv(struct pipe *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_writev(struct pipe *__restrict self,
-                   struct aio_buffer *__restrict src,
+                   struct iov_buffer *__restrict src,
                    size_t num_bytes, iomode_t mode) {
 	size_t temp, result = 0;
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	(void)num_bytes;
-	AIO_BUFFER_FOREACH(ent, src) {
+	IOV_BUFFER_FOREACH(ent, src) {
 		if (result) {
-			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
+			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ive_base, ent.ive_size);
 		} else if (mode & IO_NONBLOCK) {
-			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
-			if (!temp && ent.ab_size && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
+			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ive_base, ent.ive_size);
+			if (!temp && ent.ive_size && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 		} else {
-			temp = ringbuffer_write(&self->p_buffer, ent.ab_base, ent.ab_size);
+			temp = ringbuffer_write(&self->p_buffer, ent.ive_base, ent.ive_size);
 		}
 		result += temp;
-		if (temp < ent.ab_size)
+		if (temp < ent.ive_size)
 			break;
 	}
 	return result;
@@ -597,7 +597,7 @@ handle_pipe_reader_read(struct pipe_reader *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_reader_readv(struct pipe_reader *__restrict self,
-                         struct aio_buffer *__restrict dst,
+                         struct iov_buffer *__restrict dst,
                          size_t num_bytes, iomode_t mode) {
 	return handle_pipe_readv(self->pr_pipe, dst, num_bytes, mode);
 }
@@ -654,7 +654,7 @@ handle_pipe_writer_write(struct pipe_writer *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_writer_writev(struct pipe_writer *__restrict self,
-                          struct aio_buffer *__restrict src,
+                          struct iov_buffer *__restrict src,
                           size_t num_bytes, iomode_t mode) {
 	return handle_pipe_writev(self->pw_pipe, src, num_bytes, mode);
 }
@@ -714,7 +714,7 @@ handle_pipe_reader_aread(struct pipe_reader *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_reader_areadv(struct pipe_reader *__restrict self,
-                          struct aio_buffer *__restrict dst, size_t num_bytes,
+                          struct iov_buffer *__restrict dst, size_t num_bytes,
                           iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
 	return handle_pipe_readv(self->pr_pipe, dst, num_bytes, mode);
 }
@@ -728,7 +728,7 @@ handle_pipe_writer_awrite(struct pipe_writer *__restrict self,
 
 INTERN size_t KCALL
 handle_pipe_writer_awritev(struct pipe_writer *__restrict self,
-                           struct aio_buffer *__restrict src, size_t num_bytes,
+                           struct iov_buffer *__restrict src, size_t num_bytes,
                            iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
 	return handle_pipe_writev(self->pw_pipe, src, num_bytes, mode);
 }

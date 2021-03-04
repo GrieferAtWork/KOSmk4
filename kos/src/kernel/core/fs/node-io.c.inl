@@ -121,9 +121,9 @@ PUBLIC
 #ifdef DEFINE_IO_ASYNC
 NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-                             struct aio_pbuffer *__restrict buf,
+                             struct iov_physbuffer *__restrict buf,
 #elif defined(DEFINE_IO_VECTOR)
-                             struct aio_buffer *__restrict buf,
+                             struct iov_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
                              physaddr_t buf,
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_KERNEL)
@@ -140,9 +140,9 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #else /* DEFINE_IO_ASYNC */
 (KCALL FUNC2(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-                      struct aio_pbuffer *__restrict buf,
+                      struct iov_physbuffer *__restrict buf,
 #elif defined(DEFINE_IO_VECTOR)
-                      struct aio_buffer *__restrict buf,
+                      struct iov_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
                       physaddr_t buf,
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_KERNEL)
@@ -249,32 +249,32 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #elif defined(DEFINE_IO_VECTOR)
 			{
 #ifdef DEFINE_IO_PHYS
-				struct aio_pbuffer_entry ent;
-				AIO_PBUFFER_FOREACH_N(ent, buf)
+				struct iov_physentry ent;
+				IOV_PHYSBUFFER_FOREACH_N(ent, buf)
 #else
-				struct aio_buffer_entry ent;
-				AIO_BUFFER_FOREACH_N(ent, buf)
+				struct iov_entry ent;
+				IOV_BUFFER_FOREACH_N(ent, buf)
 #endif
 				{
-					if (ent.ab_size > num_bytes)
-						ent.ab_size = num_bytes;
+					if (ent.ive_size > num_bytes)
+						ent.ive_size = num_bytes;
 #ifdef DEFINE_IO_PHYS
 #ifdef DEFINE_IO_READ
-					vio_copyfromvio_to_phys(&args, file_position, ent.ab_base, ent.ab_size);
+					vio_copyfromvio_to_phys(&args, file_position, ent.ive_base, ent.ive_size);
 #else /* DEFINE_IO_READ */
-					vio_copytovio_from_phys(&args, file_position, ent.ab_base, ent.ab_size);
+					vio_copytovio_from_phys(&args, file_position, ent.ive_base, ent.ive_size);
 #endif /* !DEFINE_IO_READ */
 #else /* DEFINE_IO_PHYS */
 #ifdef DEFINE_IO_READ
-					vio_copyfromvio(&args, file_position, ent.ab_base, ent.ab_size);
+					vio_copyfromvio(&args, file_position, ent.ive_base, ent.ive_size);
 #else /* DEFINE_IO_READ */
-					vio_copytovio(&args, file_position, ent.ab_base, ent.ab_size);
+					vio_copytovio(&args, file_position, ent.ive_base, ent.ive_size);
 #endif /* !DEFINE_IO_READ */
 #endif /* !DEFINE_IO_PHYS */
-					if (ent.ab_size >= num_bytes)
+					if (ent.ive_size >= num_bytes)
 						break;
-					num_bytes -= ent.ab_size;
-					file_position += ent.ab_size;
+					num_bytes -= ent.ive_size;
+					file_position += ent.ive_size;
 				}
 			}
 #elif defined(DEFINE_IO_READ)
@@ -334,11 +334,11 @@ load_next_part:
 			part_offset = (pos_t)(file_position - vm_datapart_startbyte(part));
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
-			struct aio_pbuffer view;
-			aio_pbuffer_init_view_after(&view, buf, buf_offset);
+			struct iov_physbuffer view;
+			iov_physbuffer_init_view_after(&view, buf, buf_offset);
 #else /* DEFINE_IO_PHYS */
-			struct aio_buffer view;
-			aio_buffer_init_view_after(&view, buf, buf_offset);
+			struct iov_buffer view;
+			iov_buffer_init_view_after(&view, buf, buf_offset);
 #endif /* !DEFINE_IO_PHYS */
 #ifdef DEFINE_IO_READ
 			max_io_bytes = FUNC0(vm_datapart_read)(part, &view, part_offset);
@@ -490,9 +490,9 @@ do_inode_flexread_phys(struct inode *__restrict self,
 #ifdef DEFINE_IO_ASYNC
 NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-                                  struct aio_pbuffer *__restrict buf,
+                                  struct iov_physbuffer *__restrict buf,
 #elif defined(DEFINE_IO_VECTOR)
-                                  struct aio_buffer *__restrict buf,
+                                  struct iov_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
                                   physaddr_t buf,
 #else
@@ -503,9 +503,9 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #else /* DEFINE_IO_ASYNC */
 (KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-                           struct aio_pbuffer *__restrict buf,
+                           struct iov_physbuffer *__restrict buf,
 #elif defined(DEFINE_IO_VECTOR)
-                           struct aio_buffer *__restrict buf,
+                           struct iov_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
                            physaddr_t buf,
 #else
@@ -534,26 +534,26 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR)
 		size_t temp, result = 0;
 #ifdef DEFINE_IO_PHYS
-		struct aio_pbuffer_entry ent;
-		AIO_PBUFFER_FOREACH_N(ent, buf)
+		struct iov_physentry ent;
+		IOV_PHYSBUFFER_FOREACH_N(ent, buf)
 #else /* DEFINE_IO_PHYS */
-		struct aio_buffer_entry ent;
-		AIO_BUFFER_FOREACH_N(ent, buf)
+		struct iov_entry ent;
+		IOV_BUFFER_FOREACH_N(ent, buf)
 #endif /* !DEFINE_IO_PHYS */
 		{
 #ifdef DEFINE_IO_PHYS
 			temp = do_inode_flexread_phys(self,
-			                              ent.ab_base,
-			                              ent.ab_size,
+			                              ent.ive_base,
+			                              ent.ive_size,
 			                              file_position);
 #else /* DEFINE_IO_PHYS */
 			temp = (*self->i_type->it_file.f_flexread)(self,
-			                                           ent.ab_base,
-			                                           ent.ab_size,
+			                                           ent.ive_base,
+			                                           ent.ive_size,
 			                                           file_position);
 #endif /* !DEFINE_IO_PHYS */
 			result += temp;
-			if (temp < ent.ab_size)
+			if (temp < ent.ive_size)
 				break;
 			file_position += temp;
 		}
@@ -644,9 +644,9 @@ eof:
     size_t
 (KCALL PP_CAT2(FUNC0(inode_read),_blocking))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-                                             struct aio_pbuffer *__restrict buf,
+                                             struct iov_physbuffer *__restrict buf,
 #elif defined(DEFINE_IO_VECTOR)
-                                             struct aio_buffer *__restrict buf,
+                                             struct iov_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
                                              physaddr_t buf,
 #else
@@ -666,26 +666,26 @@ eof:
 #if defined(DEFINE_IO_VECTOR)
 		size_t temp, result = 0;
 #ifdef DEFINE_IO_PHYS
-		struct aio_pbuffer_entry ent;
-		AIO_PBUFFER_FOREACH_N(ent, buf)
+		struct iov_physentry ent;
+		IOV_PHYSBUFFER_FOREACH_N(ent, buf)
 #else /* DEFINE_IO_PHYS */
-		struct aio_buffer_entry ent;
-		AIO_BUFFER_FOREACH_N(ent, buf)
+		struct iov_entry ent;
+		IOV_BUFFER_FOREACH_N(ent, buf)
 #endif /* !DEFINE_IO_PHYS */
 		{
 #ifdef DEFINE_IO_PHYS
 			temp = do_inode_flexread_phys(self,
-			                              ent.ab_base,
-			                              ent.ab_size,
+			                              ent.ive_base,
+			                              ent.ive_size,
 			                              file_position);
 #else /* DEFINE_IO_PHYS */
 			temp = (*self->i_type->it_file.f_flexread)(self,
-			                                           ent.ab_base,
-			                                           ent.ab_size,
+			                                           ent.ive_base,
+			                                           ent.ive_size,
 			                                           file_position);
 #endif /* !DEFINE_IO_PHYS */
 			result += temp;
-			if (temp < ent.ab_size)
+			if (temp < ent.ive_size)
 				break;
 			file_position += temp;
 		}

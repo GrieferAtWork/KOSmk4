@@ -75,7 +75,7 @@ Iso9660_ReadFromINodePhys(struct inode *__restrict self,
 
 INTERN void KCALL
 Iso9660_ReadFromINodeVector(struct inode *__restrict self,
-                            struct aio_buffer *__restrict buf,
+                            struct iov_buffer *__restrict buf,
                             size_t bufsize, pos_t pos,
                             struct aio_multihandle *__restrict aio) {
 	block_device_areadv(self->i_super->s_device,
@@ -87,7 +87,7 @@ Iso9660_ReadFromINodeVector(struct inode *__restrict self,
 
 INTERN void KCALL
 Iso9660_ReadFromINodeVectorPhys(struct inode *__restrict self,
-                                struct aio_pbuffer *__restrict buf,
+                                struct iov_physbuffer *__restrict buf,
                                 size_t bufsize, pos_t pos,
                                 struct aio_multihandle *__restrict aio) {
 	block_device_areadv_phys(self->i_super->s_device,

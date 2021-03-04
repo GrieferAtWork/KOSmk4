@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f2869f5 */
+/* HASH CRC-32:0x88edc431 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,8 @@
 
 #include <termios.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 struct termios;
 struct winsize;
@@ -98,8 +97,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE_forkpty */
 #endif /* !__forkpty_defined */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_PTY_H */

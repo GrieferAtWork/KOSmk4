@@ -69,25 +69,25 @@ ramfs_pread(struct inode *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_readv(struct inode *__restrict UNUSED(self),
-            struct aio_buffer *__restrict buf,
+            struct iov_buffer *__restrict buf,
             size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
             struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH(ent, buf) {
-		memset(ent.ab_base, 0, ent.ab_size);
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH(ent, buf) {
+		memset(ent.ive_base, 0, ent.ive_size);
 	}
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_preadv(struct inode *__restrict UNUSED(self),
-             struct aio_pbuffer *__restrict buf,
+             struct iov_physbuffer *__restrict buf,
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
              struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH(ent, buf) {
-		vm_memsetphys(ent.ab_base, 0, ent.ab_size);
+	struct iov_physentry ent;
+	IOV_PHYSBUFFER_FOREACH(ent, buf) {
+		vm_memsetphys(ent.ive_base, 0, ent.ive_size);
 	}
 }
 
@@ -112,7 +112,7 @@ ramfs_pwrite(struct inode *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_writev(struct inode *__restrict UNUSED(self),
-             struct aio_buffer *__restrict UNUSED(buf),
+             struct iov_buffer *__restrict UNUSED(buf),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
              struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
@@ -121,7 +121,7 @@ ramfs_writev(struct inode *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_pwritev(struct inode *__restrict UNUSED(self),
-              struct aio_pbuffer *__restrict UNUSED(buf),
+              struct iov_physbuffer *__restrict UNUSED(buf),
               size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
               struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {

@@ -89,47 +89,47 @@ DECL_BEGIN
 #elif defined(DEFINE_mpart_readv)
 #define LOCAL_READING
 #define LOCAL_BUFFER_IS_AIO
-#define LOCAL_BUFFER_IS_AIO_BUFFER
-#define LOCAL_buffer_t           struct aio_buffer const *__restrict
+#define LOCAL_BUFFER_IS_IOV_BUFFER
+#define LOCAL_buffer_t           struct iov_buffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_vioreadv
 #define LOCAL_mpart_rw           mpart_readv
 #define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_readv
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	aio_buffer_copyfromphys_nopf(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
+	iov_buffer_copyfromphys_nopf(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_writev)
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_AIO
-#define LOCAL_BUFFER_IS_AIO_BUFFER
-#define LOCAL_buffer_t           struct aio_buffer const *__restrict
+#define LOCAL_BUFFER_IS_IOV_BUFFER
+#define LOCAL_buffer_t           struct iov_buffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_viowritev
 #define LOCAL_mpart_rw           mpart_writev
 #define LOCAL_mpart_rw_or_unlock mpart_writev_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_writev
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	aio_buffer_copytophys_nopf(buffer, mpart_physaddr, buf_offset + (buffer_offset), num_bytes)
+	iov_buffer_copytophys_nopf(buffer, mpart_physaddr, buf_offset + (buffer_offset), num_bytes)
 #elif defined(DEFINE_mpart_readv_p)
 #define LOCAL_READING
 #define LOCAL_BUFFER_IS_AIO
-#define LOCAL_BUFFER_IS_AIO_PBUFFER
-#define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
+#define LOCAL_BUFFER_IS_IOV_PHYSBUFFER
+#define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_vioreadv_p
 #define LOCAL_mpart_rw           mpart_readv_p
 #define LOCAL_mpart_rw_or_unlock mpart_readv_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	aio_pbuffer_copyfromphys(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
+	iov_physbuffer_copyfromphys(buffer, buf_offset + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_writev_p)
 #define LOCAL_WRITING
 #define LOCAL_BUFFER_IS_AIO
-#define LOCAL_BUFFER_IS_AIO_PBUFFER
-#define LOCAL_buffer_t           struct aio_pbuffer const *__restrict
+#define LOCAL_BUFFER_IS_IOV_PHYSBUFFER
+#define LOCAL_buffer_t           struct iov_physbuffer const *__restrict
 #define LOCAL_mfile_vio_rw       mfile_viowritev_p
 #define LOCAL_mpart_rw           mpart_writev_p
 #define LOCAL_mpart_rw_or_unlock mpart_writev_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	aio_pbuffer_copytophys(buffer, mpart_physaddr, buf_offset + (buffer_offset), num_bytes)
+	iov_physbuffer_copytophys(buffer, mpart_physaddr, buf_offset + (buffer_offset), num_bytes)
 #else /* ... */
 #error "Bad configuration"
 #endif /* !... */
@@ -161,7 +161,7 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 #ifdef LOCAL_WRITING
 		/* Load data into `stk_buf' */
 #ifdef LOCAL_BUFFER_IS_AIO
-		aio_buffer_copytomem(buffer, stk_buf, buf_offset, part);
+		iov_buffer_copytomem(buffer, stk_buf, buf_offset, part);
 #else /* LOCAL_BUFFER_IS_AIO */
 		memcpy(stk_buf, buffer, part);
 #endif /* !LOCAL_BUFFER_IS_AIO */
@@ -175,7 +175,7 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 
 		/* Copy data from `stk_buf' */
 #ifdef LOCAL_BUFFER_IS_AIO
-		aio_buffer_copyfrommem(buffer, buf_offset, stk_buf, ok);
+		iov_buffer_copyfrommem(buffer, buf_offset, stk_buf, ok);
 #else /* LOCAL_BUFFER_IS_AIO */
 		memcpy(buffer, stk_buf, ok);
 #endif /* !LOCAL_BUFFER_IS_AIO */
@@ -318,13 +318,13 @@ again_memaddr:
 #else /* LOCAL_WRITING */
 #define LOCAL_prefault_flags MMAN_FAULT_F_WRITE /* Reading into a buffer means we must write to said buffer! */
 #endif /* !LOCAL_WRITING */
-#ifdef LOCAL_BUFFER_IS_AIO_BUFFER
+#ifdef LOCAL_BUFFER_IS_IOV_BUFFER
 			copy_error = mman_prefaultv(buffer, result, num_bytes,
 			                            LOCAL_prefault_flags);
-#else /* LOCAL_BUFFER_IS_AIO_BUFFER */
+#else /* LOCAL_BUFFER_IS_IOV_BUFFER */
 			copy_error = mman_prefault((byte_t *)buffer + result,
 			                           num_bytes, LOCAL_prefault_flags);
-#endif /* !LOCAL_BUFFER_IS_AIO_BUFFER */
+#endif /* !LOCAL_BUFFER_IS_IOV_BUFFER */
 #undef LOCAL_prefault_flags
 			/* If we've managed to prefault memory, then re-attempt the direct transfer. */
 			if (copy_error != 0)
@@ -469,13 +469,13 @@ again_memaddr:
 #else /* LOCAL_WRITING */
 #define LOCAL_prefault_flags MMAN_FAULT_F_WRITE /* Reading into a buffer means we must write to said buffer! */
 #endif /* !LOCAL_WRITING */
-#ifdef LOCAL_BUFFER_IS_AIO_BUFFER
+#ifdef LOCAL_BUFFER_IS_IOV_BUFFER
 			copy_error = mman_prefaultv(buffer, result, num_bytes,
 			                            LOCAL_prefault_flags);
-#else /* LOCAL_BUFFER_IS_AIO_BUFFER */
+#else /* LOCAL_BUFFER_IS_IOV_BUFFER */
 			copy_error = mman_prefault((byte_t *)buffer + result,
 			                           num_bytes, LOCAL_prefault_flags);
-#endif /* !LOCAL_BUFFER_IS_AIO_BUFFER */
+#endif /* !LOCAL_BUFFER_IS_IOV_BUFFER */
 #undef LOCAL_prefault_flags
 			/* If we've managed to prefault memory, then re-attempt the direct transfer. */
 			if (copy_error != 0 || result != 0)
@@ -509,8 +509,8 @@ again_memaddr:
 #undef LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #undef LOCAL_buffer_transfer_nopf
 #undef LOCAL_BUFFER_IS_AIO
-#undef LOCAL_BUFFER_IS_AIO_BUFFER
-#undef LOCAL_BUFFER_IS_AIO_PBUFFER
+#undef LOCAL_BUFFER_IS_IOV_BUFFER
+#undef LOCAL_BUFFER_IS_IOV_PHYSBUFFER
 #undef LOCAL_ubuffer_t
 #undef LOCAL_buffer_t
 #undef LOCAL_mfile_vio_rw

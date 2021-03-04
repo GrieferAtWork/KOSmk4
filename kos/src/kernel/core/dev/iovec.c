@@ -34,337 +34,370 @@
 DECL_BEGIN
 
 /* Verify static offset constants. */
-STATIC_ASSERT(offsetof(struct aio_buffer_entry, ab_base) == OFFSET_AIO_BUFFER_ENTRY_BASE);
-STATIC_ASSERT(offsetof(struct aio_buffer_entry, ab_size) == OFFSET_AIO_BUFFER_ENTRY_SIZE);
-STATIC_ASSERT(sizeof(struct aio_buffer_entry) == SIZEOF_AIO_BUFFER_ENTRY);
-STATIC_ASSERT(offsetof(struct aio_buffer, ab_entc) == OFFSET_AIO_BUFFER_ENTC);
-STATIC_ASSERT(offsetof(struct aio_buffer, ab_entv) == OFFSET_AIO_BUFFER_ENTV);
-STATIC_ASSERT(offsetof(struct aio_buffer, ab_head) == OFFSET_AIO_BUFFER_HEAD);
-STATIC_ASSERT(offsetof(struct aio_buffer, ab_last) == OFFSET_AIO_BUFFER_LAST);
-STATIC_ASSERT(sizeof(struct aio_buffer) == SIZEOF_AIO_BUFFER);
-STATIC_ASSERT(offsetof(struct aio_pbuffer_entry, ab_base) == OFFSET_AIO_PBUFFER_ENTRY_BASE);
-STATIC_ASSERT(offsetof(struct aio_pbuffer_entry, ab_size) == OFFSET_AIO_PBUFFER_ENTRY_SIZE);
-STATIC_ASSERT(sizeof(struct aio_pbuffer_entry) == SIZEOF_AIO_PBUFFER_ENTRY);
-STATIC_ASSERT(offsetof(struct aio_pbuffer, ab_entc) == OFFSET_AIO_PBUFFER_ENTC);
-STATIC_ASSERT(offsetof(struct aio_pbuffer, ab_entv) == OFFSET_AIO_PBUFFER_ENTV);
-STATIC_ASSERT(offsetof(struct aio_pbuffer, ab_head) == OFFSET_AIO_PBUFFER_HEAD);
-STATIC_ASSERT(offsetof(struct aio_pbuffer, ab_last) == OFFSET_AIO_PBUFFER_LAST);
-STATIC_ASSERT(sizeof(struct aio_pbuffer) == SIZEOF_AIO_PBUFFER);
+STATIC_ASSERT(offsetof(struct iov_entry, ive_base) == OFFSET_IOV_ENTRY_BASE);
+STATIC_ASSERT(offsetof(struct iov_entry, ive_size) == OFFSET_IOV_ENTRY_SIZE);
+STATIC_ASSERT(sizeof(struct iov_entry) == SIZEOF_IOV_ENTRY);
+STATIC_ASSERT(offsetof(struct iov_buffer, iv_entc) == OFFSET_IOV_BUFFER_ENTC);
+STATIC_ASSERT(offsetof(struct iov_buffer, iv_entv) == OFFSET_IOV_BUFFER_ENTV);
+STATIC_ASSERT(offsetof(struct iov_buffer, iv_head) == OFFSET_IOV_BUFFER_HEAD);
+STATIC_ASSERT(offsetof(struct iov_buffer, iv_last) == OFFSET_IOV_BUFFER_LAST);
+STATIC_ASSERT(sizeof(struct iov_buffer) == SIZEOF_IOV_BUFFER);
+STATIC_ASSERT(offsetof(struct iov_physentry, ive_base) == OFFSET_IOV_PHYSENTRY_BASE);
+STATIC_ASSERT(offsetof(struct iov_physentry, ive_size) == OFFSET_IOV_PHYSENTRY_SIZE);
+STATIC_ASSERT(sizeof(struct iov_physentry) == SIZEOF_IOV_PHYSENTRY);
+STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_entc) == OFFSET_IOV_PHYSBUFFER_ENTC);
+STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_entv) == OFFSET_IOV_PHYSBUFFER_ENTV);
+STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_head) == OFFSET_IOV_PHYSBUFFER_HEAD);
+STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_last) == OFFSET_IOV_PHYSBUFFER_LAST);
+STATIC_ASSERT(sizeof(struct iov_physbuffer) == SIZEOF_IOV_PHYSBUFFER);
 
 
 
 
 /* Read/write/set data associated with AIO buffers. */
 PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copyfromphys(struct aio_buffer const *__restrict self,
+iov_buffer_copyfromphys(struct iov_buffer const *__restrict self,
                         uintptr_t dst_offset, physaddr_t src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH_N(ent, self) {
+		if (dst_offset >= ent.ive_size) {
+			dst_offset -= ent.ive_size;
 			continue;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyfromphys(ent.ab_base + dst_offset, src, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		vm_copyfromphys(ent.ive_base + dst_offset, src, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		src += ent.ab_size;
-		num_bytes -= ent.ab_size;
+		src += ent.ive_size;
+		num_bytes -= ent.ive_size;
 		dst_offset = 0;
 	}
 }
 
 PUBLIC NONNULL((1)) size_t
-NOTHROW(KCALL aio_buffer_copyfromphys_nopf)(struct aio_buffer const *__restrict self,
+NOTHROW(KCALL iov_buffer_copyfromphys_nopf)(struct iov_buffer const *__restrict self,
                                             uintptr_t dst_offset, physaddr_t src, size_t num_bytes) {
 	size_t error;
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH_N(ent, self) {
+		if (dst_offset >= ent.ive_size) {
+			dst_offset -= ent.ive_size;
 			continue;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		error = vm_copyfromphys_nopf(ent.ab_base + dst_offset, src, ent.ab_size);
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		error = vm_copyfromphys_nopf(ent.ive_base + dst_offset, src, ent.ive_size);
 		if unlikely(error != 0)
-			return error + (num_bytes - ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+			return error + (num_bytes - ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		src += ent.ab_size;
-		num_bytes -= ent.ab_size;
+		src += ent.ive_size;
+		num_bytes -= ent.ive_size;
 		dst_offset = 0;
 	}
 	return 0;
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copytophys(struct aio_buffer const *__restrict self,
+iov_buffer_copytophys(struct iov_buffer const *__restrict self,
                       physaddr_t dst, uintptr_t src_offset, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH_N(ent, self) {
 		if (src_offset != 0) {
-			if (src_offset >= ent.ab_size) {
-				src_offset -= ent.ab_size;
+			if (src_offset >= ent.ive_size) {
+				src_offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += src_offset;
-			ent.ab_size -= src_offset;
+			ent.ive_base += src_offset;
+			ent.ive_size -= src_offset;
 			src_offset = 0;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copytophys(dst, ent.ab_base, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		vm_copytophys(dst, ent.ive_base, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		dst += ent.ab_size;
-		num_bytes -= ent.ab_size;
+		dst += ent.ive_size;
+		num_bytes -= ent.ive_size;
 	}
 }
 
 PUBLIC NONNULL((1)) size_t
-NOTHROW(KCALL aio_buffer_copytophys_nopf)(struct aio_buffer const *__restrict self,
+NOTHROW(KCALL iov_buffer_copytophys_nopf)(struct iov_buffer const *__restrict self,
                                           physaddr_t dst, uintptr_t src_offset, size_t num_bytes) {
 	size_t error;
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH_N(ent, self) {
 		if (src_offset != 0) {
-			if (src_offset >= ent.ab_size) {
-				src_offset -= ent.ab_size;
+			if (src_offset >= ent.ive_size) {
+				src_offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += src_offset;
-			ent.ab_size -= src_offset;
+			ent.ive_base += src_offset;
+			ent.ive_size -= src_offset;
 			src_offset = 0;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		error = vm_copytophys_nopf(dst, ent.ab_base, ent.ab_size);
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		error = vm_copytophys_nopf(dst, ent.ive_base, ent.ive_size);
 		if unlikely(error != 0)
-			return error + (num_bytes - ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+			return error + (num_bytes - ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		dst += ent.ab_size;
-		num_bytes -= ent.ab_size;
+		dst += ent.ive_size;
+		num_bytes -= ent.ive_size;
 	}
 	return 0;
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_buffer_memset(struct aio_buffer const *__restrict self,
+iov_buffer_memset(struct iov_buffer const *__restrict self,
                   uintptr_t dst_offset,
                   int byte, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH_N(ent, self) {
+		if (dst_offset >= ent.ive_size) {
+			dst_offset -= ent.ive_size;
 			continue;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		memset(ent.ab_base + dst_offset,
-		       byte, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		memset(ent.ive_base + dst_offset,
+		       byte, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		num_bytes -= ent.ab_size;
+		num_bytes -= ent.ive_size;
 		dst_offset = 0;
 	}
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_memset)(struct aio_pbuffer const *__restrict self,
+NOTHROW(KCALL iov_physbuffer_memset)(struct iov_physbuffer const *__restrict self,
                                   uintptr_t dst_offset, int byte, size_t num_bytes) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
+	struct iov_physentry ent;
+	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
+		if (dst_offset >= ent.ive_size) {
+			dst_offset -= ent.ive_size;
 			continue;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_memsetphys(ent.ab_base + dst_offset, byte, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		vm_memsetphys(ent.ive_base + dst_offset, byte, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		num_bytes -= ent.ab_size;
+		num_bytes -= ent.ive_size;
 		dst_offset = 0;
 	}
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copyfrommem(struct aio_buffer const *__restrict self, uintptr_t dst_offset,
+iov_buffer_copyfrommem(struct iov_buffer const *__restrict self, uintptr_t dst_offset,
                        USER CHECKED void const *__restrict src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH_N(ent, self) {
+		if (dst_offset >= ent.ive_size) {
+			dst_offset -= ent.ive_size;
 			continue;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		memcpy(ent.ab_base + dst_offset, src, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		memcpy(ent.ive_base + dst_offset, src, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		src = (byte_t const *)src + ent.ab_size;
-		num_bytes -= ent.ab_size;
+		src = (byte_t const *)src + ent.ive_size;
+		num_bytes -= ent.ive_size;
 		dst_offset = 0;
 	}
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_pbuffer_copyfrommem(struct aio_pbuffer const *__restrict self,
+iov_physbuffer_copyfrommem(struct iov_physbuffer const *__restrict self,
                         uintptr_t dst_offset,
                         USER CHECKED void const *src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
+	struct iov_physentry ent;
+	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
+		if (dst_offset >= ent.ive_size) {
+			dst_offset -= ent.ive_size;
 			continue;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copytophys(ent.ab_base + dst_offset, src, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		vm_copytophys(ent.ive_base + dst_offset, src, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		src = (byte_t const *)src + ent.ab_size;
-		num_bytes -= ent.ab_size;
+		src = (byte_t const *)src + ent.ive_size;
+		num_bytes -= ent.ive_size;
 		dst_offset = 0;
 	}
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copytomem(struct aio_buffer const *__restrict self,
+iov_buffer_copytomem(struct iov_buffer const *__restrict self,
                      USER CHECKED void *__restrict dst,
                      uintptr_t src_offset, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
+	struct iov_entry ent;
+	IOV_BUFFER_FOREACH_N(ent, self) {
 		if (src_offset != 0) {
-			if (src_offset >= ent.ab_size) {
-				src_offset -= ent.ab_size;
+			if (src_offset >= ent.ive_size) {
+				src_offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += src_offset;
-			ent.ab_size -= src_offset;
+			ent.ive_base += src_offset;
+			ent.ive_size -= src_offset;
 			src_offset = 0;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		memcpy(dst, ent.ab_base, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		memcpy(dst, ent.ive_base, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		dst = (byte_t *)dst + ent.ab_size;
-		num_bytes -= ent.ab_size;
+		dst = (byte_t *)dst + ent.ive_size;
+		num_bytes -= ent.ive_size;
 	}
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_pbuffer_copytomem(struct aio_pbuffer const *__restrict self,
+iov_physbuffer_copytomem(struct iov_physbuffer const *__restrict self,
                       USER CHECKED void *dst,
                       uintptr_t src_offset, size_t num_bytes)
        THROWS(E_SEGFAULT) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
+	struct iov_physentry ent;
+	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
 		if (src_offset != 0) {
-			if (src_offset >= ent.ab_size) {
-				src_offset -= ent.ab_size;
+			if (src_offset >= ent.ive_size) {
+				src_offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += src_offset;
-			ent.ab_size -= src_offset;
+			ent.ive_base += src_offset;
+			ent.ive_size -= src_offset;
 			src_offset = 0;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyfromphys(dst, ent.ab_base, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		vm_copyfromphys(dst, ent.ive_base, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		dst = (byte_t *)dst + ent.ab_size;
-		num_bytes -= ent.ab_size;
+		dst = (byte_t *)dst + ent.ive_size;
+		num_bytes -= ent.ive_size;
 	}
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_copyfromphys)(struct aio_pbuffer const *__restrict self,
+NOTHROW(KCALL iov_physbuffer_copyfromphys)(struct iov_physbuffer const *__restrict self,
                                         uintptr_t dst_offset,
                                         physaddr_t src, size_t num_bytes) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
+	struct iov_physentry ent;
+	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
 		if (dst_offset != 0) {
-			if (dst_offset >= ent.ab_size) {
-				dst_offset -= ent.ab_size;
+			if (dst_offset >= ent.ive_size) {
+				dst_offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += dst_offset;
-			ent.ab_size -= dst_offset;
+			ent.ive_base += dst_offset;
+			ent.ive_size -= dst_offset;
 			dst_offset = 0;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyinphys(ent.ab_base, src, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		vm_copyinphys(ent.ive_base, src, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		src += ent.ab_size;
-		num_bytes -= ent.ab_size;
+		src += ent.ive_size;
+		num_bytes -= ent.ive_size;
 	}
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_copytophys)(struct aio_pbuffer const *__restrict self,
+NOTHROW(KCALL iov_physbuffer_copytophys)(struct iov_physbuffer const *__restrict self,
                                       physaddr_t dst,
                                       uintptr_t src_offset, size_t num_bytes) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
+	struct iov_physentry ent;
+	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
 		if (src_offset != 0) {
-			if (src_offset >= ent.ab_size) {
-				src_offset -= ent.ab_size;
+			if (src_offset >= ent.ive_size) {
+				src_offset -= ent.ive_size;
 				continue;
 			}
-			ent.ab_base += src_offset;
-			ent.ab_size -= src_offset;
+			ent.ive_base += src_offset;
+			ent.ive_size -= src_offset;
 			src_offset = 0;
 		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyinphys(dst, ent.ab_base, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
+		if (ent.ive_size > num_bytes)
+			ent.ive_size = num_bytes;
+		vm_copyinphys(dst, ent.ive_base, ent.ive_size);
+		if (ent.ive_size >= num_bytes)
 			break;
-		dst += ent.ab_size;
-		num_bytes -= ent.ab_size;
+		dst += ent.ive_size;
+		num_bytes -= ent.ive_size;
 	}
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copytovphys(struct aio_buffer const *__restrict src,
-                       struct aio_pbuffer const *__restrict dst,
-                       uintptr_t dst_offset,
-                       uintptr_t src_offset,
-                       size_t num_bytes)
+iov_buffer_copytovmem(struct iov_buffer const *__restrict src,
+                      struct iov_buffer const *__restrict dst,
+                      uintptr_t dst_offset, uintptr_t src_offset,
+                      size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_pbuffer_entry dstent;
-	assert(aio_buffer_size(src) >= src_offset + num_bytes);
-	assert(aio_pbuffer_size(dst) >= dst_offset + num_bytes);
-	AIO_PBUFFER_FOREACH_N(dstent, dst) {
+	struct iov_entry dstent;
+	assert(iov_buffer_size(src) >= src_offset + num_bytes);
+	assert(iov_buffer_size(dst) >= dst_offset + num_bytes);
+	IOV_BUFFER_FOREACH_N(dstent, dst) {
 		size_t partcopy;
 		if (dst_offset != 0) {
-			if (dst_offset >= dstent.ab_size) {
-				dst_offset -= dstent.ab_size;
+			if (dst_offset >= dstent.ive_size) {
+				dst_offset -= dstent.ive_size;
 				continue;
 			}
-			dstent.ab_base += dst_offset;
-			dstent.ab_size -= dst_offset;
+			dstent.ive_base += dst_offset;
+			dstent.ive_size -= dst_offset;
 			dst_offset = 0;
 		}
-		partcopy = dstent.ab_size;
+		partcopy = dstent.ive_size;
 		if (partcopy > num_bytes)
 			partcopy = num_bytes;
-		aio_buffer_copytophys(src,
-		                      dstent.ab_base,
+		iov_buffer_copytomem(src,
+		                     dstent.ive_base,
+		                     src_offset,
+		                     partcopy);
+		if (partcopy >= num_bytes)
+			break;
+		num_bytes  -= partcopy;
+		src_offset += partcopy;
+	}
+}
+
+PUBLIC NONNULL((1)) void KCALL
+iov_buffer_copytovphys(struct iov_buffer const *__restrict src,
+                       struct iov_physbuffer const *__restrict dst,
+                       uintptr_t dst_offset, uintptr_t src_offset,
+                       size_t num_bytes)
+		THROWS(E_SEGFAULT) {
+	struct iov_physentry dstent;
+	assert(iov_buffer_size(src) >= src_offset + num_bytes);
+	assert(iov_physbuffer_size(dst) >= dst_offset + num_bytes);
+	IOV_PHYSBUFFER_FOREACH_N(dstent, dst) {
+		size_t partcopy;
+		if (dst_offset != 0) {
+			if (dst_offset >= dstent.ive_size) {
+				dst_offset -= dstent.ive_size;
+				continue;
+			}
+			dstent.ive_base += dst_offset;
+			dstent.ive_size -= dst_offset;
+			dst_offset = 0;
+		}
+		partcopy = dstent.ive_size;
+		if (partcopy > num_bytes)
+			partcopy = num_bytes;
+		iov_buffer_copytophys(src,
+		                      dstent.ive_base,
 		                      src_offset,
 		                      partcopy);
 		if (partcopy >= num_bytes)
@@ -375,31 +408,31 @@ aio_buffer_copytovphys(struct aio_buffer const *__restrict src,
 }
 
 PUBLIC NONNULL((1)) void KCALL
-aio_pbuffer_copytovmem(struct aio_pbuffer const *__restrict src,
-                       struct aio_buffer const *__restrict dst,
+iov_physbuffer_copytovmem(struct iov_physbuffer const *__restrict src,
+                       struct iov_buffer const *__restrict dst,
                        uintptr_t dst_offset,
                        uintptr_t src_offset,
                        size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry dstent;
-	assert(aio_pbuffer_size(src) >= src_offset + num_bytes);
-	assert(aio_buffer_size(dst) >= dst_offset + num_bytes);
-	AIO_BUFFER_FOREACH_N(dstent, dst) {
+	struct iov_entry dstent;
+	assert(iov_physbuffer_size(src) >= src_offset + num_bytes);
+	assert(iov_buffer_size(dst) >= dst_offset + num_bytes);
+	IOV_BUFFER_FOREACH_N(dstent, dst) {
 		size_t partcopy;
 		if (dst_offset != 0) {
-			if (dst_offset >= dstent.ab_size) {
-				dst_offset -= dstent.ab_size;
+			if (dst_offset >= dstent.ive_size) {
+				dst_offset -= dstent.ive_size;
 				continue;
 			}
-			dstent.ab_base += dst_offset;
-			dstent.ab_size -= dst_offset;
+			dstent.ive_base += dst_offset;
+			dstent.ive_size -= dst_offset;
 			dst_offset = 0;
 		}
-		partcopy = dstent.ab_size;
+		partcopy = dstent.ive_size;
 		if (partcopy > num_bytes)
 			partcopy = num_bytes;
-		aio_pbuffer_copytomem(src,
-		                      dstent.ab_base,
+		iov_physbuffer_copytomem(src,
+		                      dstent.ive_base,
 		                      src_offset,
 		                      partcopy);
 		if (partcopy >= num_bytes)
@@ -410,30 +443,30 @@ aio_pbuffer_copytovmem(struct aio_pbuffer const *__restrict src,
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_copytovphys)(struct aio_pbuffer const *__restrict src,
-                                       struct aio_pbuffer const *__restrict dst,
+NOTHROW(KCALL iov_physbuffer_copytovphys)(struct iov_physbuffer const *__restrict src,
+                                       struct iov_physbuffer const *__restrict dst,
                                        uintptr_t dst_offset,
                                        uintptr_t src_offset,
                                        size_t num_bytes) {
-	struct aio_pbuffer_entry dstent;
-	assert(aio_pbuffer_size(src) >= src_offset + num_bytes);
-	assert(aio_pbuffer_size(dst) >= dst_offset + num_bytes);
-	AIO_PBUFFER_FOREACH_N(dstent, dst) {
+	struct iov_physentry dstent;
+	assert(iov_physbuffer_size(src) >= src_offset + num_bytes);
+	assert(iov_physbuffer_size(dst) >= dst_offset + num_bytes);
+	IOV_PHYSBUFFER_FOREACH_N(dstent, dst) {
 		size_t partcopy;
 		if (dst_offset != 0) {
-			if (dst_offset >= dstent.ab_size) {
-				dst_offset -= dstent.ab_size;
+			if (dst_offset >= dstent.ive_size) {
+				dst_offset -= dstent.ive_size;
 				continue;
 			}
-			dstent.ab_base += dst_offset;
-			dstent.ab_size -= dst_offset;
+			dstent.ive_base += dst_offset;
+			dstent.ive_size -= dst_offset;
 			dst_offset = 0;
 		}
-		partcopy = dstent.ab_size;
+		partcopy = dstent.ive_size;
 		if (partcopy > num_bytes)
 			partcopy = num_bytes;
-		aio_pbuffer_copytophys(src,
-		                       dstent.ab_base,
+		iov_physbuffer_copytophys(src,
+		                       dstent.ive_base,
 		                       src_offset,
 		                       partcopy);
 		if (partcopy >= num_bytes)
@@ -447,33 +480,33 @@ DECL_END
 
 
 
-#undef AIO_BUFFER_BINARY_COMPATIBLE_AIO_PBUFFER
-#if (OFFSET_AIO_BUFFER_LAST == OFFSET_AIO_PBUFFER_LAST &&   \
-     OFFSET_AIO_BUFFER_HEAD == OFFSET_AIO_PBUFFER_HEAD &&   \
-     OFFSET_AIO_BUFFER_ENTC == OFFSET_AIO_PBUFFER_ENTC &&   \
-     SIZEOF_AIO_BUFFER_ENTRY == SIZEOF_AIO_PBUFFER_ENTRY && \
-     OFFSET_AIO_BUFFER_ENTRY_SIZE == OFFSET_AIO_PBUFFER_ENTRY_SIZE)
-#define AIO_BUFFER_BINARY_COMPATIBLE_AIO_PBUFFER 1
-#endif /* BINARY_COMPATIBLE(aio_pbuffer, aio_buffer)... */
+#undef IOV_BUFFER_BINARY_COMPATIBLE_IOV_PHYSBUFFER
+#if (OFFSET_IOV_BUFFER_LAST == OFFSET_IOV_PHYSBUFFER_LAST && \
+     OFFSET_IOV_BUFFER_HEAD == OFFSET_IOV_PHYSBUFFER_HEAD && \
+     OFFSET_IOV_BUFFER_ENTC == OFFSET_IOV_PHYSBUFFER_ENTC && \
+     SIZEOF_IOV_ENTRY == SIZEOF_IOV_PHYSENTRY &&             \
+     OFFSET_IOV_ENTRY_SIZE == OFFSET_IOV_PHYSENTRY_SIZE)
+#define IOV_BUFFER_BINARY_COMPATIBLE_IOV_PHYSBUFFER 1
+#endif /* BINARY_COMPATIBLE(iov_physbuffer, iov_buffer)... */
 
 
 #ifndef __INTELLISENSE__
-#define DEFINE_FOR_AIO_BUFFER 1
+#define DEFINE_FOR_IOV_BUFFER 1
 #include "iovec-aio-buffer.c.inl"
 
-#ifdef AIO_BUFFER_BINARY_COMPATIBLE_AIO_PBUFFER
+#ifdef IOV_BUFFER_BINARY_COMPATIBLE_IOV_PHYSBUFFER
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(aio_pbuffer_size, aio_buffer_size);
-DEFINE_PUBLIC_ALIAS(aio_pbuffer_init_view_before, aio_buffer_init_view_before);
-DEFINE_PUBLIC_ALIAS(aio_pbuffer_init_view_after, aio_buffer_init_view_after);
-DEFINE_PUBLIC_ALIAS(aio_pbuffer_init_view, aio_buffer_init_view);
+DEFINE_PUBLIC_ALIAS(iov_physbuffer_size, iov_buffer_size);
+DEFINE_PUBLIC_ALIAS(iov_physbuffer_init_view_before, iov_buffer_init_view_before);
+DEFINE_PUBLIC_ALIAS(iov_physbuffer_init_view_after, iov_buffer_init_view_after);
+DEFINE_PUBLIC_ALIAS(iov_physbuffer_init_view, iov_buffer_init_view);
 
 DECL_END
-#else /* AIO_BUFFER_BINARY_COMPATIBLE_AIO_PBUFFER */
-#define DEFINE_FOR_AIO_PBUFFER 1
+#else /* IOV_BUFFER_BINARY_COMPATIBLE_IOV_PHYSBUFFER */
+#define DEFINE_FOR_IOV_PHYSBUFFER 1
 #include "iovec-aio-buffer.c.inl"
-#endif /* !AIO_BUFFER_BINARY_COMPATIBLE_AIO_PBUFFER */
+#endif /* !IOV_BUFFER_BINARY_COMPATIBLE_IOV_PHYSBUFFER */
 #endif /* !__INTELLISENSE__ */
 
 

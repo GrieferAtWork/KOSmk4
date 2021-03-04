@@ -44,13 +44,13 @@ struct aio_multihandle;
 struct nic_device_stat;
 struct nic_device;
 
-#ifndef __aio_buffer_entry_defined
-#define __aio_buffer_entry_defined 1
-struct aio_buffer_entry {
-	USER CHECKED byte_t *ab_base; /* [?..ab_size] Virtual base address of the buffer. */
-	size_t               ab_size; /* Buffer size of `ab_base' (in bytes) */
+#ifndef __iov_entry_defined
+#define __iov_entry_defined 1
+struct iov_entry {
+	USER CHECKED byte_t *ive_base; /* [?..ive_size] Virtual base address of the buffer. */
+	size_t               ive_size; /* Buffer size of `ive_base' (in bytes) */
 };
-#endif /* !__aio_buffer_entry_defined */
+#endif /* !__iov_entry_defined */
 
 struct nic_packet {
 	/* NetworkInterfaceCard buffer for outgoing  packets.
@@ -86,7 +86,7 @@ struct nic_packet {
 	 *    protocols directly implemented within the kernel)) */
 	size_t            np_payloads; /* [const] Total payload size (in bytes) */
 	size_t            np_payloadc; /* [const] # of payload vectors. */
-	COMPILER_FLEXIBLE_ARRAY(struct aio_buffer_entry, np_payloadv); /* [const][np_payloadc] Specified payloads */
+	COMPILER_FLEXIBLE_ARRAY(struct iov_entry, np_payloadv); /* [const][np_payloadc] Specified payloads */
 };
 
 /* Return the amount of free head/tail memory */
@@ -128,7 +128,7 @@ struct nic_packet {
 		size_t _npp_i;                                                                \
 		cb((self)->np_head, nic_packet_headsize(self));                               \
 		for (_npp_i = 0; _npp_i < (self)->np_payloadc; ++_npp_i) {                    \
-			cb(self->np_payloadv[_npp_i].ab_base, self->np_payloadv[_npp_i].ab_size); \
+			cb(self->np_payloadv[_npp_i].ive_base, self->np_payloadv[_npp_i].ive_size); \
 		}                                                                             \
 		cb((self)->np_tail, nic_packet_tailsize(self));                               \
 	} __WHILE0
@@ -214,7 +214,7 @@ nic_device_newpacket(struct nic_device const *__restrict self,
 		THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct nic_packet *KCALL
 nic_device_newpacketv(struct nic_device const *__restrict self,
-                      struct aio_buffer const *__restrict payload,
+                      struct iov_buffer const *__restrict payload,
                       size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL

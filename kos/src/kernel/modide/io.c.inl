@@ -107,16 +107,16 @@ DECL_BEGIN
 #define _ATA_DATA_TYPE physaddr_t
 #elif defined(DEFINE_DATA_VirtVector)
 #define _ATA_DATA_IS_VIRTUAL
-#define _ATA_DATA_ENTRY                  struct aio_buffer_entry
-#define _ATA_DATA_TYPE                   struct aio_buffer *__restrict
-#define _ATA_DATA_VECTOR                 struct aio_buffer
-#define _ATA_DATA_VECTOR_INIT_VIEW_AFTER aio_buffer_init_view_after
+#define _ATA_DATA_ENTRY                  struct iov_entry
+#define _ATA_DATA_TYPE                   struct iov_buffer *__restrict
+#define _ATA_DATA_VECTOR                 struct iov_buffer
+#define _ATA_DATA_VECTOR_INIT_VIEW_AFTER iov_buffer_init_view_after
 #elif defined(DEFINE_DATA_PhysVector)
 #define _ATA_DATA_IS_PHYSICAL
-#define _ATA_DATA_ENTRY                  struct aio_pbuffer_entry
-#define _ATA_DATA_TYPE                   struct aio_pbuffer *__restrict
-#define _ATA_DATA_VECTOR                 struct aio_pbuffer
-#define _ATA_DATA_VECTOR_INIT_VIEW_AFTER aio_pbuffer_init_view_after
+#define _ATA_DATA_ENTRY                  struct iov_physentry
+#define _ATA_DATA_TYPE                   struct iov_physbuffer *__restrict
+#define _ATA_DATA_VECTOR                 struct iov_physbuffer
+#define _ATA_DATA_VECTOR_INIT_VIEW_AFTER iov_physbuffer_init_view_after
 #endif /* DEFINE_DATA_... */
 
 #ifdef DEFINE_IOMETHOD_Dma

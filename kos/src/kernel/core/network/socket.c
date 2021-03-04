@@ -81,13 +81,13 @@ PUBLIC size_t socket_default_sndbufmax = 65536;
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_buffer_init)(struct aio_buffer *__restrict self,
+NOTHROW(KCALL aio_buffer_init)(struct iov_buffer *__restrict self,
                                USER CHECKED void const *buf, size_t buflen) {
-	self->ab_entc         = 1;
-	self->ab_entv         = &self->ab_head;
-	self->ab_head.ab_base = (USER CHECKED byte_t *)buf;
-	self->ab_head.ab_size = buflen;
-	self->ab_last         = buflen;
+	self->iv_entc         = 1;
+	self->iv_entv         = &self->iv_head;
+	self->iv_head.ive_base = (USER CHECKED byte_t *)buf;
+	self->iv_head.ive_size = buflen;
+	self->iv_last         = buflen;
 }
 
 
@@ -352,7 +352,7 @@ socket_asendto_peer_impl(struct socket *__restrict self,
 		(*self->sk_ops->so_sendto)(self, buf, bufsize, addr, reqlen,
 		                           msg_control, msg_flags, aio);
 	} else {
-		struct aio_buffer iov;
+		struct iov_buffer iov;
 		aio_buffer_init(&iov, buf, bufsize);
 		(*self->sk_ops->so_sendtov)(self, &iov, bufsize, addr, reqlen,
 		                            msg_control, msg_flags, aio);
@@ -407,7 +407,7 @@ socket_asend(struct socket *__restrict self,
 	if (self->sk_ops->so_send) {
 		(*self->sk_ops->so_send)(self, buf, bufsize, msg_control, msg_flags, aio);
 	} else if (self->sk_ops->so_sendv) {
-		struct aio_buffer iov;
+		struct iov_buffer iov;
 		aio_buffer_init(&iov, buf, bufsize);
 		(*self->sk_ops->so_sendv)(self, &iov, bufsize, msg_control, msg_flags, aio);
 	} else {
@@ -419,7 +419,7 @@ socket_asend(struct socket *__restrict self,
 /* Use getpeeraddr() + sendtov() */
 PRIVATE ATTR_NOINLINE NONNULL((1, 6)) socklen_t KCALL
 socket_asendtov_peer_impl(struct socket *__restrict self,
-                          struct aio_buffer const *buf, size_t bufsize,
+                          struct iov_buffer const *buf, size_t bufsize,
                           struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                           /*out*/ struct aio_handle *__restrict aio, socklen_t buflen)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
@@ -441,7 +441,7 @@ socket_asendtov_peer_impl(struct socket *__restrict self,
 /* Use getpeeraddr() + sendtov() */
 PRIVATE NONNULL((1, 6)) void KCALL
 socket_asendtov_peer(struct socket *__restrict self,
-                     struct aio_buffer const *buf, size_t bufsize,
+                     struct iov_buffer const *buf, size_t bufsize,
                      struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                      /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
@@ -459,15 +459,15 @@ socket_asendtov_peer(struct socket *__restrict self,
 
 PUBLIC NONNULL((1, 2, 6)) void KCALL
 socket_asendv(struct socket *__restrict self,
-              struct aio_buffer const *__restrict buf, size_t bufsize,
+              struct iov_buffer const *__restrict buf, size_t bufsize,
               struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
               /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendv) {
-		if (buf->ab_entc == 1 && self->sk_ops->so_send) {
-			(*self->sk_ops->so_send)(self, buf->ab_head.ab_base, bufsize, msg_control, msg_flags, aio);
+		if (buf->iv_entc == 1 && self->sk_ops->so_send) {
+			(*self->sk_ops->so_send)(self, buf->iv_head.ive_base, bufsize, msg_control, msg_flags, aio);
 		} else {
 			(*self->sk_ops->so_sendv)(self, buf, bufsize, msg_control, msg_flags, aio);
 		}
@@ -565,7 +565,7 @@ socket_send(struct socket *__restrict self,
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 socket_sendv(struct socket *__restrict self,
-             struct aio_buffer const *__restrict buf, size_t bufsize,
+             struct iov_buffer const *__restrict buf, size_t bufsize,
              struct ancillary_message const *msg_control,
              syscall_ulong_t msg_flags, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
@@ -626,8 +626,8 @@ struct connect_and_send_job
 	struct ancillary_message *cas_pcontrol; /* [0..1][const] Pointer to ancillary message data. */
 	struct ancillary_message  cas_control;  /* [const][valid_if(cas_pcontrol)] ancillary message data. */
 	syscall_ulong_t           cas_msgflags; /* [const] Message flags */
-	struct aio_buffer         cas_buffer;   /* [override(.ab_entv, [if(.ab_entc != 1, [owned])])][const] I/O buffer. */
-	size_t                    cas_bufsize;  /* [const][== aio_buffer_size(&cas_buffer)] I/O buffer size. */
+	struct iov_buffer         cas_buffer;   /* [override(.iv_entv, [if(.iv_entc != 1, [owned])])][const] I/O buffer. */
+	size_t                    cas_bufsize;  /* [const][== iov_buffer_size(&cas_buffer)] I/O buffer size. */
 	struct aio_handle_generic cas_aio;      /* if (cas_socket != NULL): AIO handle for connect()
 	                                         * if (cas_socket ==  NULL): AIO  handle for  send() */
 };
@@ -643,8 +643,8 @@ NOTHROW(FCALL connect_and_send_fini)(async_job_t self)
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	aio_handle_generic_fini(&me->cas_aio);
-	if (me->cas_buffer.ab_entc != 1)
-		kfree((void *)me->cas_buffer.ab_entv);
+	if (me->cas_buffer.iv_entc != 1)
+		kfree((void *)me->cas_buffer.iv_entv);
 	xweakdecref_unlikely(me->cas_socket);
 	xdecref_unlikely(me->cas_bufmm);
 #ifdef CONFIG_USE_NEW_ASYNC
@@ -773,7 +773,7 @@ PRIVATE struct async_job_callbacks const connect_and_send_cb = {
 /* Perform a sendto() operation via connect() + send() */
 PRIVATE NONNULL((1, 2, 8)) void KCALL
 socket_asendtov_connect_and_send(struct socket *__restrict self,
-                                 struct aio_buffer const *__restrict buf, size_t bufsize,
+                                 struct iov_buffer const *__restrict buf, size_t bufsize,
                                  /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                                  struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                                  /*out*/ struct aio_handle *__restrict aio)
@@ -800,24 +800,24 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 		}
 		job->cas_msgflags = msg_flags;
 		job->cas_bufsize = bufsize;
-		if (buf->ab_entc != 1) {
-			struct aio_buffer_entry *entv;
-			entv = (struct aio_buffer_entry *)kmalloc(buf->ab_entc *
-			                                          sizeof(struct aio_buffer_entry),
+		if (buf->iv_entc != 1) {
+			struct iov_entry *entv;
+			entv = (struct iov_entry *)kmalloc(buf->iv_entc *
+			                                          sizeof(struct iov_entry),
 			                                          GFP_NORMAL);
-			if (buf->ab_entc > 1)
-				memcpy(entv + 1, buf->ab_entv + 1, buf->ab_entc - 1, sizeof(struct aio_buffer_entry));
-			job->cas_buffer.ab_entc         = buf->ab_entc;
-			job->cas_buffer.ab_entv         = entv;
-			job->cas_buffer.ab_head.ab_base = buf->ab_head.ab_base;
-			job->cas_buffer.ab_head.ab_size = buf->ab_head.ab_size;
-			job->cas_buffer.ab_last         = buf->ab_last;
+			if (buf->iv_entc > 1)
+				memcpy(entv + 1, buf->iv_entv + 1, buf->iv_entc - 1, sizeof(struct iov_entry));
+			job->cas_buffer.iv_entc         = buf->iv_entc;
+			job->cas_buffer.iv_entv         = entv;
+			job->cas_buffer.iv_head.ive_base = buf->iv_head.ive_base;
+			job->cas_buffer.iv_head.ive_size = buf->iv_head.ive_size;
+			job->cas_buffer.iv_last         = buf->iv_last;
 		} else {
-			job->cas_buffer.ab_entc         = 1;
-			job->cas_buffer.ab_entv         = &job->cas_buffer.ab_head;
-			job->cas_buffer.ab_head.ab_base = buf->ab_head.ab_base;
-			job->cas_buffer.ab_head.ab_size = buf->ab_head.ab_size;
-			job->cas_buffer.ab_last         = buf->ab_last;
+			job->cas_buffer.iv_entc         = 1;
+			job->cas_buffer.iv_entv         = &job->cas_buffer.iv_head;
+			job->cas_buffer.iv_head.ive_base = buf->iv_head.ive_base;
+			job->cas_buffer.iv_head.ive_size = buf->iv_head.ive_size;
+			job->cas_buffer.iv_last         = buf->iv_last;
 		}
 		aio_handle_generic_init(&job->cas_aio);
 		job->cas_bufmm = incref(THIS_MMAN);
@@ -825,8 +825,8 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 			/* Initiate the connect() operation. */
 			(*self->sk_ops->so_connect)(self, addr, addr_len, &job->cas_aio);
 		} EXCEPT {
-			if (job->cas_buffer.ab_entc != 1)
-				kfree((void *)job->cas_buffer.ab_entv);
+			if (job->cas_buffer.iv_entc != 1)
+				kfree((void *)job->cas_buffer.iv_entv);
 			decref_unlikely(job->cas_bufmm);
 			RETHROW();
 		}
@@ -871,7 +871,7 @@ socket_asendto(struct socket *__restrict self,
 		(*self->sk_ops->so_sendto)(self, buf, bufsize, addr, addr_len,
 		                           msg_control, msg_flags, aio);
 	} else {
-		struct aio_buffer iov;
+		struct iov_buffer iov;
 		aio_buffer_init(&iov, buf, bufsize);
 		if (self->sk_ops->so_sendtov) {
 			(*self->sk_ops->so_sendtov)(self, &iov, bufsize, addr, addr_len,
@@ -886,7 +886,7 @@ socket_asendto(struct socket *__restrict self,
 
 PUBLIC NONNULL((1, 2, 8)) void KCALL
 socket_asendtov(struct socket *__restrict self,
-                struct aio_buffer const *__restrict buf, size_t bufsize,
+                struct iov_buffer const *__restrict buf, size_t bufsize,
                 /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                 /*out*/ struct aio_handle *__restrict aio)
@@ -894,8 +894,8 @@ socket_asendtov(struct socket *__restrict self,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL) {
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_SENDMASK;
 	if (self->sk_ops->so_sendtov) {
-		if (buf->ab_entc == 1 && self->sk_ops->so_sendto) {
-			(*self->sk_ops->so_sendto)(self, buf->ab_head.ab_base, bufsize, addr,
+		if (buf->iv_entc == 1 && self->sk_ops->so_sendto) {
+			(*self->sk_ops->so_sendto)(self, buf->iv_head.ive_base, bufsize, addr,
 			                           addr_len, msg_control, msg_flags, aio);
 		} else {
 			(*self->sk_ops->so_sendtov)(self, buf, bufsize, addr, addr_len,
@@ -966,7 +966,7 @@ socket_sendto(struct socket *__restrict self,
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 socket_sendtov(struct socket *__restrict self,
-               struct aio_buffer const *__restrict buf, size_t bufsize,
+               struct iov_buffer const *__restrict buf, size_t bufsize,
                /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                iomode_t mode)
@@ -1017,7 +1017,7 @@ socket_sendtov(struct socket *__restrict self,
 /* Receive data, and verify that it originates from the bound peer. */
 PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfrom_peer(struct socket *__restrict self,
-                     struct aio_buffer const *__restrict buf, size_t bufsize,
+                     struct iov_buffer const *__restrict buf, size_t bufsize,
                      /*0..1*/ USER CHECKED u32 *presult_flags,
                      struct ancillary_rmessage const *msg_control,
                      syscall_ulong_t msg_flags,
@@ -1046,14 +1046,14 @@ again_get_wanted_peer_name:
 		}
 		/* Now to actually implement the call! */
 again_receive:
-		if (buf->ab_entc == 1 && self->sk_ops->so_recvfrom) {
-			assert(bufsize == buf->ab_head.ab_size);
-			assert(bufsize == buf->ab_last);
-			assert(bufsize == buf->ab_entv[0].ab_size);
-			assert(buf->ab_head.ab_base == buf->ab_entv[0].ab_base);
+		if (buf->iv_entc == 1 && self->sk_ops->so_recvfrom) {
+			assert(bufsize == buf->iv_head.ive_size);
+			assert(bufsize == buf->iv_last);
+			assert(bufsize == buf->iv_entv[0].ive_size);
+			assert(buf->iv_head.ive_base == buf->iv_entv[0].ive_base);
 			/* Prefer the simplified normal receive buffer. */
 			result = (*self->sk_ops->so_recvfrom)(self,
-			                                      buf->ab_head.ab_base,
+			                                      buf->iv_head.ive_base,
 			                                      bufsize,
 			                                      peer_have,
 			                                      peer_want_len,
@@ -1146,7 +1146,7 @@ socket_recv(struct socket *__restrict self,
 		result = (*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
 		                                  msg_control, msg_flags, abs_timeout);
 	} else {
-		struct aio_buffer iov;
+		struct iov_buffer iov;
 		aio_buffer_init(&iov, buf, bufsize);
 		if (self->sk_ops->so_recvv) {
 			result = (*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
@@ -1161,7 +1161,7 @@ socket_recv(struct socket *__restrict self,
 
 PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvv(struct socket *__restrict self,
-             struct aio_buffer const *__restrict buf, size_t bufsize,
+             struct iov_buffer const *__restrict buf, size_t bufsize,
              /*0..1*/ USER CHECKED u32 *presult_flags,
              struct ancillary_rmessage const *msg_control,
              syscall_ulong_t msg_flags,
@@ -1233,7 +1233,7 @@ socket_recvfrom(struct socket *__restrict self,
 		                                      preq_addr_len, presult_flags,
 		                                      msg_control, msg_flags, abs_timeout);
 	} else if (self->sk_ops->so_recvfromv) {
-		struct aio_buffer iov;
+		struct iov_buffer iov;
 		aio_buffer_init(&iov, buf, bufsize);
 		result = (*self->sk_ops->so_recvfromv)(self, &iov, bufsize, addr, addr_len,
 		                                       preq_addr_len, presult_flags,
@@ -1246,7 +1246,7 @@ socket_recvfrom(struct socket *__restrict self,
 			result = (*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
 			                                  msg_control, msg_flags, abs_timeout);
 		} else {
-			struct aio_buffer iov;
+			struct iov_buffer iov;
 			assert(self->sk_ops->so_recvv);
 			aio_buffer_init(&iov, buf, bufsize);
 			result = (*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
@@ -1258,7 +1258,7 @@ socket_recvfrom(struct socket *__restrict self,
 
 PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfromv(struct socket *__restrict self,
-                 struct aio_buffer const *__restrict buf, size_t bufsize,
+                 struct iov_buffer const *__restrict buf, size_t bufsize,
                  /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
                  /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
@@ -2035,7 +2035,7 @@ handle_socket_pwrite(struct socket *__restrict self,
 /* readv() and writev() operators for socket handles. */
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_socket_readv(struct socket *__restrict self,
-                    struct aio_buffer *__restrict dst,
+                    struct iov_buffer *__restrict dst,
                     size_t num_bytes, iomode_t mode) THROWS(...) {
 	syscall_ulong_t msg_flags = 0;
 	if (mode & IO_NONBLOCK)
@@ -2045,14 +2045,14 @@ handle_socket_readv(struct socket *__restrict self,
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_socket_writev(struct socket *__restrict self,
-                     struct aio_buffer *__restrict src,
+                     struct iov_buffer *__restrict src,
                      size_t num_bytes, iomode_t mode) THROWS(...) {
 	return socket_sendv(self, src, num_bytes, NULL, 0, mode);
 }
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_socket_preadv(struct socket *__restrict self,
-                     struct aio_buffer *__restrict dst,
+                     struct iov_buffer *__restrict dst,
                      size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
@@ -2061,7 +2061,7 @@ handle_socket_preadv(struct socket *__restrict self,
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_socket_pwritev(struct socket *__restrict self,
-                      struct aio_buffer *__restrict src,
+                      struct iov_buffer *__restrict src,
                       size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);

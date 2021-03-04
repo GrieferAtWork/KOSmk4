@@ -55,13 +55,13 @@ DECL_BEGIN
 
 
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
-#define VECTOR_TYPE struct aio_pbuffer
-#define BUFFER_TYPE struct aio_pbuffer *__restrict
-#define DST_MEMSET(offset, byte, num_bytes) aio_pbuffer_memset(buf, offset, byte, num_bytes)
+#define VECTOR_TYPE struct iov_physbuffer
+#define BUFFER_TYPE struct iov_physbuffer *__restrict
+#define DST_MEMSET(offset, byte, num_bytes) iov_physbuffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_VECTOR)
-#define VECTOR_TYPE struct aio_buffer
-#define BUFFER_TYPE struct aio_buffer *__restrict
-#define DST_MEMSET(offset, byte, num_bytes) aio_buffer_memset(buf, offset, byte, num_bytes)
+#define VECTOR_TYPE struct iov_buffer
+#define BUFFER_TYPE struct iov_buffer *__restrict
+#define DST_MEMSET(offset, byte, num_bytes) iov_buffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_PHYS)
 #define BUFFER_TYPE physaddr_t
 #define DST_MEMSET(offset, byte, num_bytes) vm_memsetphys((buf) + (offset), byte, num_bytes)
@@ -186,16 +186,16 @@ FUNC1(Fat32_)(struct inode *__restrict self,
 #ifdef DEFINE_IO_VECTOR
 		if (buf == &view) {
 #ifdef DEFINE_IO_PHYS
-			aio_pbuffer_init_view_after(&view2, &view, max_io);
+			iov_physbuffer_init_view_after(&view2, &view, max_io);
 #else /* DEFINE_IO_PHYS */
-			aio_buffer_init_view_after(&view2, &view, max_io);
+			iov_buffer_init_view_after(&view2, &view, max_io);
 #endif /* !DEFINE_IO_PHYS */
 			buf = &view2;
 		} else {
 #ifdef DEFINE_IO_PHYS
-			aio_pbuffer_init_view_after(&view, buf, max_io);
+			iov_physbuffer_init_view_after(&view, buf, max_io);
 #else /* DEFINE_IO_PHYS */
-			aio_buffer_init_view_after(&view, buf, max_io);
+			iov_buffer_init_view_after(&view, buf, max_io);
 #endif /* !DEFINE_IO_PHYS */
 			buf = &view;
 		}
@@ -239,9 +239,9 @@ FUNC2(Fat16_)(FatSuperblock *__restrict self,
 		{
 			VECTOR_TYPE view;
 #ifdef DEFINE_IO_PHYS
-			aio_pbuffer_init_view_before(&view, buf, max_io);
+			iov_physbuffer_init_view_before(&view, buf, max_io);
 #else /* DEFINE_IO_PHYS */
-			aio_buffer_init_view_before(&view, buf, max_io);
+			iov_buffer_init_view_before(&view, buf, max_io);
 #endif /* !DEFINE_IO_PHYS */
 			BLOCK_DEVICE_IO(self->s_device,
 			                &view,

@@ -49,21 +49,21 @@ DECL_BEGIN
 #define LOCAL_mfile_vio_rw mfile_viowrite_p
 #elif defined(DEFINE_mfile_vioreadv)
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t     struct aio_buffer const *__restrict
+#define LOCAL_buffer_t     struct iov_buffer const *__restrict
 #define LOCAL_mfile_vio_rw mfile_vioreadv
 #elif defined(DEFINE_mfile_viowritev)
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t     struct aio_buffer const *__restrict
+#define LOCAL_buffer_t     struct iov_buffer const *__restrict
 #define LOCAL_mfile_vio_rw mfile_viowritev
 #elif defined(DEFINE_mfile_vioreadv_p)
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
+#define LOCAL_buffer_t     struct iov_physbuffer const *__restrict
 #define LOCAL_mfile_vio_rw mfile_vioreadv_p
 #elif defined(DEFINE_mfile_viowritev_p)
 #define LOCAL_BUFFER_IS_PHYS
 #define LOCAL_BUFFER_IS_IOVEC
-#define LOCAL_buffer_t     struct aio_pbuffer const *__restrict
+#define LOCAL_buffer_t     struct iov_physbuffer const *__restrict
 #define LOCAL_mfile_vio_rw mfile_viowritev_p
 #else /* ... */
 #error "Bad configuration"
@@ -95,37 +95,37 @@ LOCAL_mfile_vio_rw(struct mfile *__restrict self,
 #elif defined(LOCAL_BUFFER_IS_IOVEC)
 	{
 #ifdef LOCAL_BUFFER_IS_PHYS
-		struct aio_pbuffer_entry ent;
-		AIO_PBUFFER_FOREACH(ent, buffer)
+		struct iov_physentry ent;
+		IOV_PHYSBUFFER_FOREACH(ent, buffer)
 #else /* LOCAL_BUFFER_IS_PHYS */
-		struct aio_buffer_entry ent;
-		AIO_BUFFER_FOREACH(ent, buffer)
+		struct iov_entry ent;
+		IOV_BUFFER_FOREACH(ent, buffer)
 #endif /* !LOCAL_BUFFER_IS_PHYS */
 		{
 			if (buf_offset) {
-				if (buf_offset >= ent.ab_size) {
-					buf_offset -= ent.ab_size;
+				if (buf_offset >= ent.ive_size) {
+					buf_offset -= ent.ive_size;
 					continue;
 				}
-				ent.ab_base += buf_offset;
-				ent.ab_size -= buf_offset;
+				ent.ive_base += buf_offset;
+				ent.ive_size -= buf_offset;
 				buf_offset = 0;
 			}
-			if (ent.ab_size > num_bytes)
-				ent.ab_size = num_bytes;
+			if (ent.ive_size > num_bytes)
+				ent.ive_size = num_bytes;
 #ifdef DEFINE_mfile_vioreadv
-			vio_copyfromvio(&args, (vio_addr_t)offset, ent.ab_base, ent.ab_size);
+			vio_copyfromvio(&args, (vio_addr_t)offset, ent.ive_base, ent.ive_size);
 #elif defined(DEFINE_mfile_viowritev)
-			vio_copytovio(&args, (vio_addr_t)offset, ent.ab_base, ent.ab_size);
+			vio_copytovio(&args, (vio_addr_t)offset, ent.ive_base, ent.ive_size);
 #elif defined(DEFINE_mfile_vioreadv_p)
-			vio_copyfromvio_to_phys(&args, (vio_addr_t)offset, (__physaddr_t)ent.ab_base, ent.ab_size);
+			vio_copyfromvio_to_phys(&args, (vio_addr_t)offset, (__physaddr_t)ent.ive_base, ent.ive_size);
 #elif defined(DEFINE_mfile_viowritev_p)
-			vio_copytovio_from_phys(&args, (vio_addr_t)offset, (__physaddr_t)ent.ab_base, ent.ab_size);
+			vio_copytovio_from_phys(&args, (vio_addr_t)offset, (__physaddr_t)ent.ive_base, ent.ive_size);
 #endif /* ... */
-			if (ent.ab_size >= num_bytes)
+			if (ent.ive_size >= num_bytes)
 				break;
-			num_bytes -= ent.ab_size;
-			offset += ent.ab_size;
+			num_bytes -= ent.ive_size;
+			offset += ent.ive_size;
 		}
 	}
 #else /* ... */

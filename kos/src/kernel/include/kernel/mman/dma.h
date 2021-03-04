@@ -35,7 +35,7 @@
 DECL_BEGIN
 
 struct mman;
-struct aio_buffer;
+struct iov_buffer;
 
 /* Callback for enumerating physical memory ranges for the purposes of DMA
  * @param: cookie:    The same `cookie' given to `mman_startdma[v]'
@@ -89,7 +89,7 @@ mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
 FUNDEF NONNULL((1, 2, 4, 6)) size_t KCALL
 mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
                void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
-               struct aio_buffer const *__restrict addr_v, __BOOL for_writing)
+               struct iov_buffer const *__restrict addr_v, __BOOL for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
@@ -106,7 +106,7 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
  *                      any changes made appear in PRIVATE mappings of the associated memory region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
- *              Upon full success, this is identical to the given `num_bytes' / `aio_buffer_size(buf)',
+ *              Upon full success, this is identical to the given `num_bytes' / `iov_buffer_size(buf)',
  *              though for the same reasons that `mman_startdma[v]' can fail (s.a. `@return: 0' cases),
  *              this may be less than that */
 FUNDEF NONNULL((1, 2)) size_t KCALL
@@ -117,7 +117,7 @@ mman_enumdma(struct mman *__restrict self,
 FUNDEF NONNULL((1, 2, 4)) size_t KCALL
 mman_enumdmav(struct mman *__restrict self,
               mdma_range_callback_t prange, void *cookie,
-              struct aio_buffer const *__restrict addr_v,
+              struct iov_buffer const *__restrict addr_v,
               __BOOL for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 

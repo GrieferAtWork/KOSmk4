@@ -241,12 +241,12 @@ got_identify_signal:
 				}
 				ddrive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveRead;
 				ddrive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveReadPhys;
-				ddrive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveReadVector;
-				ddrive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveReadVectorPhys;
+				ddrive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveReadVector;
+				ddrive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveReadVectorPhys;
 				ddrive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveWrite;
 				ddrive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveWritePhys;
-				ddrive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveWriteVector;
-				ddrive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveWriteVectorPhys;
+				ddrive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveWriteVector;
+				ddrive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_DmaDriveWriteVectorPhys;
 				if (specs.command_set_2 & HD_DRIVEID_COMMAND_SET_2_LBA48) {
 					if ((specs.capability & HD_DRIVEID_CAPABILITY_LBA) &&
 						(u64)specs.lba_capacity_2 == (u64)specs.lba_capacity)
@@ -289,35 +289,35 @@ use_28bit_dma:
 						goto use_28bit_lba;
 					drive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveRead;
 					drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveReadPhys;
-					drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveReadVector;
-					drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveReadVectorPhys;
+					drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveReadVector;
+					drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveReadVectorPhys;
 					drive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveWrite;
 					drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveWritePhys;
-					drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveWriteVector;
-					drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveWriteVectorPhys;
+					drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveWriteVector;
+					drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba48DriveWriteVectorPhys;
 calculate_lba48:
 					drive->bd_sector_count = (lba_t)specs.lba_capacity_2;
 				} else if (specs.capability & HD_DRIVEID_CAPABILITY_LBA) {
 use_28bit_lba:
 					drive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveRead;
 					drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveReadPhys;
-					drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveReadVector;
-					drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveReadVectorPhys;
+					drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveReadVector;
+					drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveReadVectorPhys;
 					drive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveWrite;
 					drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveWritePhys;
-					drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveWriteVector;
-					drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveWriteVectorPhys;
+					drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveWriteVector;
+					drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_Lba28DriveWriteVectorPhys;
 calculate_lba28:
 					drive->bd_sector_count = (lba_t)specs.lba_capacity;
 				} else {
 					drive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveRead;
 					drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveReadPhys;
-					drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveReadVector;
-					drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveReadVectorPhys;
+					drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveReadVector;
+					drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveReadVectorPhys;
 					drive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveWrite;
 					drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveWritePhys;
-					drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveWriteVector;
-					drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveWriteVectorPhys;
+					drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct iov_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveWriteVector;
+					drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct iov_physbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&AtaDrive_ChsDriveWriteVectorPhys;
 calculate_chs:
 					drive->bd_sector_count = (lba_t)(u8)specs.heads *
 					                         (lba_t)(u16)specs.cyls *

@@ -46,7 +46,7 @@ DECL_BEGIN
 
 #define nic_packet_alloc(nic, num_payloads, ht_size)                                       \
 	((REF struct nic_packet *)kmalloc(offsetof(struct nic_packet, np_payloadv) +           \
-	                                  ((num_payloads) * sizeof(struct aio_buffer_entry)) + \
+	                                  ((num_payloads) * sizeof(struct iov_entry)) + \
 	                                  (ht_size),                                           \
 	                                  (nic)->nd_hdgfp))
 
@@ -63,8 +63,8 @@ nic_device_newpacket(struct nic_device const *__restrict self,
 	result->np_refcnt              = 1;
 	result->np_payloads            = payload_size;
 	result->np_payloadc            = 1;
-	result->np_payloadv[0].ab_base = (byte_t *)payload;
-	result->np_payloadv[0].ab_size = payload_size;
+	result->np_payloadv[0].ive_base = (byte_t *)payload;
+	result->np_payloadv[0].ive_size = payload_size;
 	result->np_tail    = (byte_t *)&result->np_payloadv[1] + max_head_size;
 	result->np_head    = result->np_tail;
 	result->np_tailend = result->np_tail;
@@ -73,23 +73,23 @@ nic_device_newpacket(struct nic_device const *__restrict self,
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct nic_packet *KCALL
 nic_device_newpacketv(struct nic_device const *__restrict self,
-                      struct aio_buffer const *__restrict payload,
+                      struct iov_buffer const *__restrict payload,
                       size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
 	size_t i, total;
-	result = nic_packet_alloc(self, payload->ab_entc,
+	result = nic_packet_alloc(self, payload->iv_entc,
 	                          max_head_size + max_tail_size);
 	result->np_refcnt   = 1;
-	result->np_payloadc = payload->ab_entc;
-	total = payload->ab_head.ab_size;
-	result->np_payloadv[0].ab_base = payload->ab_head.ab_base;
-	result->np_payloadv[0].ab_size = total;
+	result->np_payloadc = payload->iv_entc;
+	total = payload->iv_head.ive_size;
+	result->np_payloadv[0].ive_base = payload->iv_head.ive_base;
+	result->np_payloadv[0].ive_size = total;
 	for (i = 1; i < result->np_payloadc; ++i) {
 		size_t temp;
-		temp = payload->ab_entv[i].ab_size;
-		result->np_payloadv[i].ab_base = payload->ab_entv[i].ab_base;
-		result->np_payloadv[i].ab_size = temp;
+		temp = payload->iv_entv[i].ive_size;
+		result->np_payloadv[i].ive_base = payload->iv_entv[i].ive_base;
+		result->np_payloadv[i].ive_size = temp;
 		total += temp;
 	}
 	result->np_payloads = total;

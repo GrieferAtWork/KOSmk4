@@ -81,13 +81,13 @@ DECL_BEGIN
 #elif defined(DEFINE_DATA_Phys)
 #define _ATA_DATA_TYPE physaddr_t
 #elif defined(DEFINE_DATA_VirtVector)
-#define _ATA_DATA_SIZE  aio_buffer_size
-#define _ATA_DATA_ENTRY struct aio_buffer_entry
-#define _ATA_DATA_TYPE  struct aio_buffer *__restrict
+#define _ATA_DATA_SIZE  iov_buffer_size
+#define _ATA_DATA_ENTRY struct iov_entry
+#define _ATA_DATA_TYPE  struct iov_buffer *__restrict
 #elif defined(DEFINE_DATA_PhysVector)
-#define _ATA_DATA_SIZE  aio_pbuffer_size
-#define _ATA_DATA_ENTRY struct aio_pbuffer_entry
-#define _ATA_DATA_TYPE  struct aio_pbuffer *__restrict
+#define _ATA_DATA_SIZE  iov_physbuffer_size
+#define _ATA_DATA_ENTRY struct iov_physentry
+#define _ATA_DATA_TYPE  struct iov_physbuffer *__restrict
 #endif /* DEFINE_DATA_... */
 
 #ifdef DEFINE_DATA_Virt
@@ -131,7 +131,7 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
                                                             _ATA_DATA_TYPE buf,
                                                             u16 num_sectors) {
 #ifdef _ATA_DATA_ENTRY
-	_ATA_DATA_ENTRY ent = buf->ab_head;
+	_ATA_DATA_ENTRY ent = buf->iv_head;
 	size_t next_ent_index = 1;
 	assert(_ATA_DATA_SIZE(buf) == 2 * num_sectors * ATA_SECTOR_SIZE(drive));
 #endif /* _ATA_DATA_ENTRY */
@@ -164,19 +164,19 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
 			{
 				size_t io_bytes = ATA_SECTOR_SIZE(drive);
 				while (io_bytes) {
-					size_t max_bytes = ent.ab_size;
+					size_t max_bytes = ent.ive_size;
 					if (!max_bytes) {
-						assert(next_ent_index < buf->ab_entc);
-						AIO_BUFFER_GETENT(ent, buf, next_ent_index);
+						assert(next_ent_index < buf->iv_entc);
+						IOV_BUFFER_GETENT(ent, buf, next_ent_index);
 						++next_ent_index;
-						max_bytes = ent.ab_size;
+						max_bytes = ent.ive_size;
 					}
 					if (max_bytes > io_bytes)
 						max_bytes = io_bytes;
 					assert(max_bytes != 0);
-					_ATA_LOWLEVEL_IO(bus->ab_busio + ATA_DATA, ent.ab_base, max_bytes / 2);
+					_ATA_LOWLEVEL_IO(bus->ab_busio + ATA_DATA, ent.ive_base, max_bytes / 2);
 					if unlikely(max_bytes & 1) { /* Deal with unaligned buf entries. */
-						assert(max_bytes == ent.ab_size);
+						assert(max_bytes == ent.ive_size);
 						++max_bytes;
 						assert(max_bytes <= io_bytes);
 						union {
@@ -185,25 +185,25 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
 						} data;
 #ifdef DEFINE_RW_Read
 						data.word = inw(bus->ab_busio + ATA_DATA);
-						_ATA_DATA_WRITEB(ent.ab_base + ent.ab_size - 1, data.bytes[0]);
+						_ATA_DATA_WRITEB(ent.ive_base + ent.ive_size - 1, data.bytes[0]);
 #elif defined(DEFINE_RW_Write)
-						data.bytes[0] = _ATA_DATA_READB(ent.ab_base + ent.ab_size - 1);
+						data.bytes[0] = _ATA_DATA_READB(ent.ive_base + ent.ive_size - 1);
 #endif /* ... */
-						assert(next_ent_index < buf->ab_entc);
-						AIO_BUFFER_GETENT(ent, buf, next_ent_index);
-						assert(ent.ab_size);
+						assert(next_ent_index < buf->iv_entc);
+						IOV_BUFFER_GETENT(ent, buf, next_ent_index);
+						assert(ent.ive_size);
 						++next_ent_index;
 #ifdef DEFINE_RW_Read
-						_ATA_DATA_WRITEB(ent.ab_base, data.bytes[1]);
+						_ATA_DATA_WRITEB(ent.ive_base, data.bytes[1]);
 #elif defined(DEFINE_RW_Write)
-						data.bytes[1] = _ATA_DATA_READB(ent.ab_base);
+						data.bytes[1] = _ATA_DATA_READB(ent.ive_base);
 						outw(bus->ab_busio + ATA_DATA, data.word);
 #endif /* ... */
-						++ent.ab_base;
-						--ent.ab_size;
+						++ent.ive_base;
+						--ent.ive_size;
 					}
-					ent.ab_base += max_bytes;
-					ent.ab_size -= max_bytes;
+					ent.ive_base += max_bytes;
+					ent.ive_size -= max_bytes;
 					if (io_bytes >= max_bytes)
 						break;
 				}

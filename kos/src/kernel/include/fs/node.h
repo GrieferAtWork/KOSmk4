@@ -62,8 +62,8 @@ struct directory_node;
 struct symlink_node;
 struct driver;
 struct wall_clock;
-struct aio_buffer;
-struct aio_pbuffer;
+struct iov_buffer;
+struct iov_physbuffer;
 struct handle;
 struct stat;
 struct vfs;
@@ -229,13 +229,13 @@ struct inode_type {
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 		NONNULL((1, 2, 5))
 		void (KCALL *f_readv)(struct inode *__restrict self,
-		                      struct aio_buffer *__restrict buf,
+		                      struct iov_buffer *__restrict buf,
 		                      size_t num_bytes, pos_t file_position,
 		                      struct aio_multihandle *__restrict aio)
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 		NONNULL((1, 2, 5))
 		void (KCALL *f_preadv)(struct inode *__restrict self,
-		                       struct aio_pbuffer *__restrict buf,
+		                       struct iov_physbuffer *__restrict buf,
 		                       size_t num_bytes, pos_t file_position,
 		                       struct aio_multihandle *__restrict aio)
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
@@ -272,13 +272,13 @@ struct inode_type {
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 		NONNULL((1, 2, 5))
 		void (KCALL *f_writev)(struct inode *__restrict self,
-		                       struct aio_buffer *__restrict buf,
+		                       struct iov_buffer *__restrict buf,
 		                       size_t num_bytes, pos_t file_position,
 		                       struct aio_multihandle *__restrict aio)
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 		NONNULL((1, 2, 5))
 		void (KCALL *f_pwritev)(struct inode *__restrict self,
-		                        struct aio_pbuffer *__restrict buf,
+		                        struct iov_physbuffer *__restrict buf,
 		                        size_t num_bytes, pos_t file_position,
 		                        struct aio_multihandle *__restrict aio)
 				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
@@ -772,7 +772,7 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 /* Implementation for `f_writev' that uses `f_write' */
 FUNDEF NONNULL((1, 2, 5)) void KCALL
 inode_file_writev_with_write(struct inode *__restrict self,
-                             struct aio_buffer *__restrict buf,
+                             struct iov_buffer *__restrict buf,
                              size_t num_bytes, pos_t file_position,
                              struct aio_multihandle *__restrict aio)
 	THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
@@ -780,7 +780,7 @@ inode_file_writev_with_write(struct inode *__restrict self,
 /* Implementation for `f_pwritev' that uses `f_pwrite' */
 FUNDEF NONNULL((1, 2, 5)) void KCALL
 inode_file_pwritev_with_pwrite(struct inode *__restrict self,
-                               struct aio_pbuffer *__restrict buf,
+                               struct iov_physbuffer *__restrict buf,
                                size_t num_bytes, pos_t file_position,
                                struct aio_multihandle *__restrict aio)
 	THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
@@ -1179,34 +1179,34 @@ DATDEF WEAK size_t inodes_recent_lim;
 FUNDEF NONNULL((1, 2)) size_t KCALL inode_readk(struct inode *__restrict self, void *__restrict dst, size_t num_bytes, pos_t file_position) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) size_t KCALL inode_read(struct inode *__restrict self, CHECKED USER void *dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) size_t KCALL inode_read_phys(struct inode *__restrict self, physaddr_t dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,...);
-FUNDEF NONNULL((1, 2)) size_t KCALL inode_readv(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
-FUNDEF NONNULL((1, 2)) size_t KCALL inode_readv_phys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) size_t KCALL inode_readv(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) size_t KCALL inode_readv_phys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 2)) void KCALL inode_writek(struct inode *__restrict self, void const *__restrict dst, size_t num_bytes, pos_t file_position) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) void KCALL inode_write(struct inode *__restrict self, CHECKED USER void const *src, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) void KCALL inode_write_phys(struct inode *__restrict self, physaddr_t src, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,...);
-FUNDEF NONNULL((1, 2)) void KCALL inode_writev(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
-FUNDEF NONNULL((1, 2)) void KCALL inode_writev_phys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) void KCALL inode_writev(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) void KCALL inode_writev_phys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 2, 5)) size_t NOTHROW(KCALL inode_areadk)(struct inode *__restrict self, void *__restrict dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 5)) size_t NOTHROW(KCALL inode_aread)(struct inode *__restrict self, CHECKED USER void *dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 5)) size_t NOTHROW(KCALL inode_aread_phys)(struct inode *__restrict self, physaddr_t dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,...);
-FUNDEF NONNULL((1, 2, 5)) size_t NOTHROW(KCALL inode_areadv)(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
-FUNDEF NONNULL((1, 2, 5)) size_t NOTHROW(KCALL inode_areadv_phys)(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2, 5)) size_t NOTHROW(KCALL inode_areadv)(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2, 5)) size_t NOTHROW(KCALL inode_areadv_phys)(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_awritek)(struct inode *__restrict self, void const *__restrict dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL inode_awrite)(struct inode *__restrict self, CHECKED USER void const *src, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL inode_awrite_phys)(struct inode *__restrict self, physaddr_t src, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,...);
-FUNDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_awritev)(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
-FUNDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_awritev_phys)(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_awritev)(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_awritev_phys)(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_FSERROR_DISK_FULL,E_FSERROR_READONLY,E_IOERROR,E_SEGFAULT,...);
 /* Same as `inode_read()', but throw an `E_IOERROR_BADBOUNDS' error if not all data could be read. */
 FUNDEF NONNULL((1, 2)) void KCALL inode_readallk(struct inode *__restrict self, void *__restrict dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) void KCALL inode_readall(struct inode *__restrict self, CHECKED USER void *dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) void KCALL inode_readall_phys(struct inode *__restrict self, physaddr_t dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,...);
-FUNDEF NONNULL((1, 2)) void KCALL inode_readallv(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
-FUNDEF NONNULL((1, 2)) void KCALL inode_readallv_phys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) void KCALL inode_readallv(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) void KCALL inode_readallv_phys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1, 2)) void NOTHROW(KCALL inode_areadallk)(struct inode *__restrict self, void *__restrict dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) void NOTHROW(KCALL inode_areadall)(struct inode *__restrict self, CHECKED USER void *dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 FUNDEF NONNULL((1)) void NOTHROW(KCALL inode_areadall_phys)(struct inode *__restrict self, physaddr_t dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,...);
-FUNDEF NONNULL((1, 2)) void NOTHROW(KCALL inode_areadallv)(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
-FUNDEF NONNULL((1, 2)) void NOTHROW(KCALL inode_areadallv_phys)(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) void NOTHROW(KCALL inode_areadallv)(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
+FUNDEF NONNULL((1, 2)) void NOTHROW(KCALL inode_areadallv_phys)(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR_BADBOUNDS,E_IOERROR,E_SEGFAULT,...);
 
 /* Same  as  the read  functions above,  but  if no  data could  be  read (because  the read
  * happened to be performed beyond the file's allocated size), block until data can be read.
@@ -1229,12 +1229,12 @@ inode_pread_blocking(struct inode *__restrict self, physaddr_t dst,
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 FUNDEF NONNULL((1)) size_t KCALL
 inode_readv_blocking(struct inode *__restrict self,
-                     struct aio_buffer *__restrict buf,
+                     struct iov_buffer *__restrict buf,
                      size_t num_bytes, pos_t file_position)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL
 inode_preadv_blocking(struct inode *__restrict self,
-                      struct aio_pbuffer *__restrict buf,
+                      struct iov_physbuffer *__restrict buf,
                       size_t num_bytes, pos_t file_position)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 

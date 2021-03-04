@@ -43,18 +43,18 @@ DECL_BEGIN
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_readv(struct vm_datapart *__restrict self,
-                  struct aio_buffer const *__restrict buf,
+                  struct iov_buffer const *__restrict buf,
                   size_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	size_t temp, result = 0;
-	AIO_BUFFER_FOREACH(ent, buf) {
+	IOV_BUFFER_FOREACH(ent, buf) {
 		temp = vm_datapart_read(self,
-		                        ent.ab_base,
-		                        ent.ab_size,
+		                        ent.ive_base,
+		                        ent.ive_size,
 		                        src_offset);
 		result += temp;
-		if (temp != ent.ab_size)
+		if (temp != ent.ive_size)
 			break;
 		src_offset += temp;
 	}
@@ -63,20 +63,20 @@ vm_datapart_readv(struct vm_datapart *__restrict self,
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_writev(struct vm_datapart *__restrict self,
-                   struct aio_buffer const *__restrict buf,
+                   struct iov_buffer const *__restrict buf,
                    size_t split_bytes,
                    size_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	struct aio_buffer_entry ent;
+	struct iov_entry ent;
 	size_t temp, result = 0;
-	AIO_BUFFER_FOREACH(ent, buf) {
+	IOV_BUFFER_FOREACH(ent, buf) {
 		temp = vm_datapart_write(self,
-		                         ent.ab_base,
-		                         ent.ab_size,
+		                         ent.ive_base,
+		                         ent.ive_size,
 		                         split_bytes,
 		                         dst_offset);
 		result += temp;
-		if (temp != ent.ab_size)
+		if (temp != ent.ive_size)
 			break;
 		dst_offset += temp;
 		if unlikely(OVERFLOW_USUB(split_bytes, temp, &split_bytes))
@@ -87,18 +87,18 @@ vm_datapart_writev(struct vm_datapart *__restrict self,
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_readv_phys(struct vm_datapart *__restrict self,
-                       struct aio_pbuffer const *__restrict buf,
+                       struct iov_physbuffer const *__restrict buf,
                        size_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
-	struct aio_pbuffer_entry ent;
+	struct iov_physentry ent;
 	size_t temp, result = 0;
-	AIO_PBUFFER_FOREACH(ent, buf) {
+	IOV_PHYSBUFFER_FOREACH(ent, buf) {
 		temp = vm_datapart_read_phys(self,
-		                             ent.ab_base,
-		                             ent.ab_size,
+		                             ent.ive_base,
+		                             ent.ive_size,
 		                             src_offset);
 		result += temp;
-		if (temp != ent.ab_size)
+		if (temp != ent.ive_size)
 			break;
 		src_offset += temp;
 	}
@@ -107,20 +107,20 @@ vm_datapart_readv_phys(struct vm_datapart *__restrict self,
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_writev_phys(struct vm_datapart *__restrict self,
-                        struct aio_pbuffer const *__restrict buf,
+                        struct iov_physbuffer const *__restrict buf,
                         size_t split_bytes,
                         size_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
-	struct aio_pbuffer_entry ent;
+	struct iov_physentry ent;
 	size_t temp, result = 0;
-	AIO_PBUFFER_FOREACH(ent, buf) {
+	IOV_PHYSBUFFER_FOREACH(ent, buf) {
 		temp = vm_datapart_write_phys(self,
-		                              ent.ab_base,
-		                              ent.ab_size,
+		                              ent.ive_base,
+		                              ent.ive_size,
 		                              split_bytes,
 		                              dst_offset);
 		result += temp;
-		if (temp != ent.ab_size)
+		if (temp != ent.ive_size)
 			break;
 		dst_offset += temp;
 		if unlikely(OVERFLOW_USUB(split_bytes, temp, &split_bytes))

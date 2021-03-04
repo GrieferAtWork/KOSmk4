@@ -1296,10 +1296,10 @@ FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, physaddr_t dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_phys(struct vm_datapart *__restrict self, physaddr_t src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__restrict self, struct iov_buffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct iov_buffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct iov_physbuffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting  to
@@ -2019,10 +2019,10 @@ FUNDEF NONNULL((1)) void KCALL vm_datablock_read(struct vm_datablock *__restrict
 FUNDEF NONNULL((1)) void KCALL vm_datablock_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL vm_datablock_read_phys(struct vm_datablock *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1)) void KCALL vm_datablock_write_phys(struct vm_datablock *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv(struct vm_datablock *__restrict self, struct iov_buffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev(struct vm_datablock *__restrict self, struct iov_buffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv_phys(struct vm_datablock *__restrict self, struct iov_physbuffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev_phys(struct vm_datablock *__restrict self, struct iov_physbuffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the `vm_datablock_(read|write)', however make the assumption that the
  * memory  backing is `safe' (i.e. access could  never cause a #PF attempting to
@@ -2037,10 +2037,10 @@ FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read(struct vm_datablock *__rest
 FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read_phys(struct vm_datablock *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write_phys(struct vm_datablock *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, pos_t src_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t src_offset) THROWS(...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv(struct vm_datablock *__restrict self, struct iov_buffer const *__restrict buf, pos_t src_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev(struct vm_datablock *__restrict self, struct iov_buffer const *__restrict buf, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv_phys(struct vm_datablock *__restrict self, struct iov_physbuffer const *__restrict buf, pos_t src_offset) THROWS(...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev_phys(struct vm_datablock *__restrict self, struct iov_physbuffer const *__restrict buf, pos_t dst_offset) THROWS(...);
 #endif /* LIBVIO_CONFIG_ENABLED */
 
 
@@ -3211,7 +3211,7 @@ FUNDEF NONNULL((1, 2, 3, 5, 7)) size_t KCALL
 vm_startdmav(struct vm *__restrict effective_vm,
              vm_dmarangefunc_t prange, vm_dmaresetfunc_t preset, void *arg,
              struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-             struct aio_buffer const *__restrict vaddr_buf, bool for_writing)
+             struct iov_buffer const *__restrict vaddr_buf, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2, 3, 5)) size_t
 NOTHROW(KCALL vm_startdma_nx)(struct vm *__restrict effective_vm,
@@ -3222,7 +3222,7 @@ FUNDEF NONNULL((1, 2, 3, 5, 7)) size_t
 NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
                                vm_dmarangefunc_t prange, vm_dmaresetfunc_t preset, void *arg,
                                struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-                               struct aio_buffer const *__restrict vaddr_buf, bool for_writing);
+                               struct iov_buffer const *__restrict vaddr_buf, bool for_writing);
 
 /* Similar to `vm_startdma[v][_nx]', however instead used to enumerate the DMA memory range individually.
  * @param: prange:     A  callback that is  invoked for each  affected physical memory range
@@ -3238,7 +3238,7 @@ NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
  *                     any changes made appear in PRIVATE  mappings of the associated memory  region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
- *              Upon  full success, this  is identical to the  given `num_bytes' / `aio_buffer_size(buf)',
+ *              Upon  full success, this  is identical to the  given `num_bytes' / `iov_buffer_size(buf)',
  *              though for the same reasons that `vm_startdma[v][_nx]' can fail (s.a. `@return: 0' cases),
  *              this may be less than that */
 FUNDEF NONNULL((1, 2)) size_t KCALL
@@ -3250,7 +3250,7 @@ vm_enumdma(struct vm *__restrict effective_vm,
 FUNDEF NONNULL((1, 2, 4)) size_t KCALL
 vm_enumdmav(struct vm *__restrict effective_vm,
             vm_dmarangefunc_t prange, void *arg,
-            struct aio_buffer const *__restrict vaddr_buf,
+            struct iov_buffer const *__restrict vaddr_buf,
             bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) size_t
@@ -3261,7 +3261,7 @@ NOTHROW(KCALL vm_enumdma_nx)(struct vm *__restrict effective_vm,
 FUNDEF NONNULL((1, 2, 4)) size_t
 NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
                               vm_dmarangefunc_t prange, void *arg,
-                              struct aio_buffer const *__restrict vaddr_buf,
+                              struct iov_buffer const *__restrict vaddr_buf,
                               bool for_writing);
 
 

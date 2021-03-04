@@ -29,12 +29,12 @@ DECL_BEGIN
 /* PIO-based data transfer helpers for passing data to/from an ATA drive. */
 LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_ReadDataSectors(AtaBus *__restrict bus, AtaDrive *__restrict drive, USER CHECKED byte_t *buf, u16 num_sectors);
 LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_ReadDataSectorsPhys(AtaBus *__restrict bus, AtaDrive *__restrict drive, physaddr_t buf, u16 num_sectors);
-LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_ReadDataSectorsVector(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct aio_buffer *__restrict buf, u16 num_sectors);
-LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_ReadDataSectorsVectorPhys(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct aio_pbuffer *__restrict buf, u16 num_sectors);
+LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_ReadDataSectorsVector(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct iov_buffer *__restrict buf, u16 num_sectors);
+LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_ReadDataSectorsVectorPhys(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct iov_physbuffer *__restrict buf, u16 num_sectors);
 LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_WriteDataSectors(AtaBus *__restrict bus, AtaDrive *__restrict drive, USER CHECKED byte_t const *buf, u16 num_sectors);
 LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_WriteDataSectorsPhys(AtaBus *__restrict bus, AtaDrive *__restrict drive, physaddr_t buf, u16 num_sectors);
-LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_WriteDataSectorsVector(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct aio_buffer *__restrict buf, u16 num_sectors);
-LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_WriteDataSectorsVectorPhys(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct aio_pbuffer *__restrict buf, u16 num_sectors);
+LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_WriteDataSectorsVector(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct iov_buffer *__restrict buf, u16 num_sectors);
+LOCAL NONNULL((1, 2)) AtaError_t KCALL AtaBus_WriteDataSectorsVectorPhys(AtaBus *__restrict bus, AtaDrive *__restrict drive, struct iov_physbuffer *__restrict buf, u16 num_sectors);
 
 DECL_END
 

@@ -417,10 +417,10 @@ INTDEF void KCALL Ext2_ReadFromINode(struct inode *__restrict self, CHECKED USER
 INTDEF void KCALL Ext2_WriteToINode(struct inode *__restrict self, CHECKED USER void const *buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
 INTDEF void KCALL Ext2_ReadFromINodePhys(struct inode *__restrict self, physaddr_t dst, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
 INTDEF void KCALL Ext2_WriteToINodePhys(struct inode *__restrict self, physaddr_t src, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
-INTDEF void KCALL Ext2_ReadFromINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
-INTDEF void KCALL Ext2_WriteToINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
-INTDEF void KCALL Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
-INTDEF void KCALL Ext2_WriteToINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
+INTDEF void KCALL Ext2_ReadFromINodeVector(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
+INTDEF void KCALL Ext2_WriteToINodeVector(struct inode *__restrict self, struct iov_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
+INTDEF void KCALL Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
+INTDEF void KCALL Ext2_WriteToINodeVectorPhys(struct inode *__restrict self, struct iov_physbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
 INTDEF void KCALL Ext2_ReadSymLink(struct symlink_node *__restrict self);
 
 

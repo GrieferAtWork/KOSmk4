@@ -1233,10 +1233,10 @@
 #define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
 
 
-#define AIO_BUFFER_FOREACH(ent,self) for(;;)
-#define AIO_BUFFER_FOREACH_N(ent,self) for(;;)
-#define AIO_PBUFFER_FOREACH(ent,self) for(;;)
-#define AIO_PBUFFER_FOREACH_N(ent,self) for(;;)
+#define IOV_BUFFER_FOREACH(ent,self) for(;;)
+#define IOV_BUFFER_FOREACH_N(ent,self) for(;;)
+#define IOV_PHYSBUFFER_FOREACH(ent,self) for(;;)
+#define IOV_PHYSBUFFER_FOREACH_N(ent,self) for(;;)
 #define DI_DEBUGINFO_CU_PARSER_EACHATTR(a,b) for(;;)
 
 #define __SOCKADDR_COMMON(x) sa_family_t x##family

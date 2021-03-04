@@ -73,7 +73,7 @@ mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
 PUBLIC NONNULL((1, 2, 4, 6)) size_t KCALL
 mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
                void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
-               struct aio_buffer const *__restrict addr_v, __BOOL for_writing)
+               struct iov_buffer const *__restrict addr_v, __BOOL for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #define LOCAL_IS_VECTOR
 #elif defined(DEFINE_mman_enumdma)
@@ -91,7 +91,7 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
  *                      any changes made appear in PRIVATE mappings of the associated memory region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
- *              Upon full success, this is identical to the given `num_bytes' / `aio_buffer_size(buf)',
+ *              Upon full success, this is identical to the given `num_bytes' / `iov_buffer_size(buf)',
  *              though for the same reasons that `mman_startdma[v]' can fail (s.a. `@return: 0' cases),
  *              this may be less than that */
 PUBLIC NONNULL((1, 2)) size_t KCALL
@@ -105,7 +105,7 @@ mman_enumdma(struct mman *__restrict self,
 PUBLIC NONNULL((1, 2, 4)) size_t KCALL
 mman_enumdmav(struct mman *__restrict self,
               mdma_range_callback_t prange, void *cookie,
-              struct aio_buffer const *__restrict addr_v,
+              struct iov_buffer const *__restrict addr_v,
               bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #define LOCAL_IS_ENUM
@@ -115,7 +115,7 @@ mman_enumdmav(struct mman *__restrict self,
 #endif /* !... */
 {
 #ifdef LOCAL_IS_VECTOR
-	struct aio_buffer_entry _addrv_ent;
+	struct iov_entry _addrv_ent;
 #endif /* LOCAL_IS_VECTOR */
 	size_t result = 0;
 
@@ -124,9 +124,9 @@ mman_enumdmav(struct mman *__restrict self,
 #endif /* !LOCAL_IS_ENUM */
 	{
 #ifdef LOCAL_IS_VECTOR
-		AIO_BUFFER_FOREACH(_addrv_ent, addr_v)
-#define addr      _addrv_ent.ab_base
-#define num_bytes _addrv_ent.ab_size
+		IOV_BUFFER_FOREACH(_addrv_ent, addr_v)
+#define addr      _addrv_ent.ive_base
+#define num_bytes _addrv_ent.ive_size
 #endif /* LOCAL_IS_VECTOR */
 		while (num_bytes != 0) {
 			struct mfault mf;

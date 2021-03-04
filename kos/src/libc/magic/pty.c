@@ -37,9 +37,8 @@
 
 #include <termios.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 struct termios;
 struct winsize;
@@ -114,8 +113,7 @@ done_slave:
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
