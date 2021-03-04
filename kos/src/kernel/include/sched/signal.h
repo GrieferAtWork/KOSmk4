@@ -231,6 +231,30 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL sig_altsend_nopr)(struct sig *self,
                                 struct sig *sender);
 
+/* Send signal `self' to the given thread `target'
+ *  - Behaves  the same as `sig_send()', however signal completion
+ *    callbacks  and task_connection's that point to threads other
+ *    than `target' are silently skipped, and the function behaves
+ *    as  though anything other  than true thread-connections made
+ *    by `target' didn't exist.
+ * @return: true:  The specified `target' was connected, and the signal
+ *                 was delivered as expected.
+ * @return: false: The specified `target' wasn't connected to `self'. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL sig_sendto)(struct sig *__restrict self,
+                          struct task *__restrict target);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) __BOOL
+NOTHROW(FCALL sig_altsendto)(struct sig *self,
+                             struct task *__restrict target,
+                             struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sig_sendto_nopr)(struct sig *__restrict self,
+                               struct task *__restrict target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL
+NOTHROW(FCALL sig_altsendto_nopr)(struct sig *self,
+                                  struct task *__restrict target,
+                                  struct sig *sender);
+
 /* Same as `sig_send()', but repeat the operation up to `maxcount' times,
  * and return the # of times that `sig_send()' would have returned `true'
  * Equivalent to:

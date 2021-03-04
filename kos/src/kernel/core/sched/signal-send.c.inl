@@ -19,10 +19,14 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-#define DEFINE_sig_send 1
+//#define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_send_nopr 1
 //#define DEFINE_sig_altsend_nopr 1
+#define DEFINE_sig_sendto 1
+//#define DEFINE_sig_altsendto 1
+//#define DEFINE_sig_sendto_nopr 1
+//#define DEFINE_sig_altsendto_nopr 1
 //#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
 //#define DEFINE_sig_broadcast_nopr 1
@@ -43,6 +47,10 @@
      defined(DEFINE_sig_send_nopr) +                       \
      defined(DEFINE_sig_altsend) +                         \
      defined(DEFINE_sig_altsend_nopr) +                    \
+     defined(DEFINE_sig_sendto) +                          \
+     defined(DEFINE_sig_sendto_nopr) +                     \
+     defined(DEFINE_sig_altsendto) +                       \
+     defined(DEFINE_sig_altsendto_nopr) +                  \
      defined(DEFINE_sig_broadcast) +                       \
      defined(DEFINE_sig_broadcast_nopr) +                  \
      defined(DEFINE_sig_altbroadcast) +                    \
@@ -69,23 +77,58 @@ DECL_BEGIN
  *    For  more  information  on  this  subject,  see `task_connect_for_poll()'.
  * @return: true:  A waiting thread was signaled.
  * @return: false: The given signal didn't have any active connections. */
-PUBLIC NOBLOCK NONNULL((1)) __BOOL
+PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sig_send)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altsend)
 #define HAVE_SENDER
-PUBLIC NOBLOCK NONNULL((1, 2)) __BOOL
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender)
 #elif defined(DEFINE_sig_send_nopr)
 #define HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) __BOOL
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
 NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altsend_nopr)
 #define HAVE_SENDER
 #define HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_altsend_nopr)(struct sig *self,
                                 struct sig *sender)
+#elif defined(DEFINE_sig_sendto)
+#define HAVE_TARGET_THREAD
+/* Send signal `self' to the given thread `target'
+ *  - Behaves  the same as `sig_send()', however signal completion
+ *    callbacks  and task_connection's that point to threads other
+ *    than `target' are silently skipped, and the function behaves
+ *    as  though anything other  than true thread-connections made
+ *    by `target' didn't exist.
+ * @return: true:  The specified `target' was connected, and the signal
+ *                 was delivered as expected.
+ * @return: false: The specified `target' wasn't connected to `self'. */
+FUNDEF NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL sig_sendto)(struct sig *__restrict self,
+                          struct task *__restrict target)
+#elif defined(DEFINE_sig_altsendto)
+#define HAVE_TARGET_THREAD
+#define HAVE_SENDER
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL sig_altsendto)(struct sig *self,
+                             struct task *__restrict target,
+                             struct sig *sender)
+#elif defined(DEFINE_sig_sendto_nopr)
+#define HAVE_TARGET_THREAD
+#define HAVE_NOPREEMPT
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) bool
+NOTHROW(FCALL sig_sendto_nopr)(struct sig *__restrict self,
+                               struct task *__restrict target)
+#elif defined(DEFINE_sig_altsendto_nopr)
+#define HAVE_TARGET_THREAD
+#define HAVE_SENDER
+#define HAVE_NOPREEMPT
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL sig_altsendto_nopr)(struct sig *self,
+                                  struct task *__restrict target,
+                                  struct sig *sender)
 #elif defined(DEFINE_sig_broadcast)
 #define HAVE_BROADCAST
 /* Send signal to all connected threads.
@@ -270,9 +313,9 @@ again:
 #endif /* CONFIG_NO_SMP */
 	con = ATOMIC_READ(self->s_con);
 	if (!con) {
-#ifndef CONFIG_NO_SMP
+#if !defined(CONFIG_NO_SMP) || defined(HAVE_TARGET_THREAD)
 done_exec_cleanup:
-#endif /* !CONFIG_NO_SMP */
+#endif /* !CONFIG_NO_SMP || HAVE_TARGET_THREAD */
 		LOCAL_exec_cleanup();
 		LOCAL_PREEMPTION_POP();
 #ifdef HAVE_BROADCAST
@@ -428,6 +471,34 @@ again_read_target_cons:
 	}
 	goto again;
 #else /* HAVE_BROADCAST */
+	receiver = sig_smplock_clr(con);
+
+#ifdef HAVE_TARGET_THREAD
+	/* Find a suitable receiver: Just pick the first true-task  connection
+	 *                           that points to the caller-given `target'.
+	 * NOTE: Assuming that `target' isn't connected more than once, we don't
+	 *       actually search for  the oldest connection  that qualifies  for
+	 *       what we're looking  for, since there  really shouldn't be  more
+	 *       than a single connection  matching those requirements to  begin
+	 *       with! */
+again_read_target_cons:
+	target_cons = ATOMIC_READ(receiver->tc_cons);
+#ifndef CONFIG_NO_SMP
+	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
+		task_pause();
+		target_cons = ATOMIC_READ(receiver->tc_cons);
+	}
+#endif /* !CONFIG_NO_SMP */
+	if (TASK_CONNECTION_STAT_ISSPEC(target_cons) ||
+	    ATOMIC_READ(TASK_CONNECTION_STAT_ASCONS(target_cons)->tcs_thread) != target) {
+		receiver = receiver->tc_signext;
+		if (!receiver)
+			goto done_exec_cleanup; /* No receiver found... */
+		goto again_read_target_cons;
+	}
+
+#else /* HAVE_TARGET_THREAD */
+
 	/* Find a suitable candidate:
 	 *    During send:
 	 *       #1: Use the last-in-chain, non-poll connection
@@ -436,7 +507,6 @@ again_read_target_cons:
 	 *           down)
 	 *       #3: If no non-poll connection could be found,
 	 *           return `false' */
-	receiver = sig_smplock_clr(con);
 	if (!receiver->tc_signext) {
 		/* Special case: Only one connection to choose from... */
 	} else {
@@ -517,21 +587,26 @@ again_read_target_cons:
 		}
 		return true;
 	}
+#endif /* !HAVE_TARGET_THREAD */
 	if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
 		REF struct task *thread;
+
 		/* Special case: poll-based connections don't (really) count.
 		 * Instead, those get marked for broadcast. */
 		if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
 		                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
 		                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
 			goto again_read_target_cons;
+
 		task_connection_unlink_from_sig(self, receiver);
 		target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
-		thread = NULL;
+		thread      = NULL;
+
 		/* Set the delivered signal, and capture
 		 * the thread  thread, if  there is  one */
 		if (ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender))
 			thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+
 		/* Unlock the connection. */
 		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		if (thread) {
@@ -551,11 +626,13 @@ again_read_target_cons:
 		}
 		goto again;
 	}
+
 	/* Mark the receiver as sent, and acquire a lock to it. */
 	if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
 	                        (struct task_connections *)(TASK_CONNECTION_STAT_SENT |
 	                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
 		goto again_read_target_cons;
+
 	/* Set the signal sender as being delivered for the target connection set. */
 	if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
 		/* Unlink the signal, and mark it as broadcast. */
@@ -564,6 +641,7 @@ again_read_target_cons:
 		goto again;
 	}
 	sig_smplock_release_nopr(self);
+
 	/* The simple case: We managed to deliver the signal, and now we must wake-up
 	 * the connected thread (if any) */
 	{
@@ -595,6 +673,7 @@ again_read_target_cons:
 }
 
 #undef HAVE_SENDER_THREAD
+#undef HAVE_TARGET_THREAD
 #undef HAVE_CLEANUP
 #undef HAVE_BROADCAST
 #undef HAVE_FOR_FINI
@@ -608,6 +687,10 @@ DECL_END
 #undef DEFINE_sig_send_nopr
 #undef DEFINE_sig_altsend
 #undef DEFINE_sig_altsend_nopr
+#undef DEFINE_sig_sendto
+#undef DEFINE_sig_sendto_nopr
+#undef DEFINE_sig_altsendto
+#undef DEFINE_sig_altsendto_nopr
 #undef DEFINE_sig_broadcast
 #undef DEFINE_sig_broadcast_nopr
 #undef DEFINE_sig_altbroadcast

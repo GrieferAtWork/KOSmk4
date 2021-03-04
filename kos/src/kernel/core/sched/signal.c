@@ -2200,6 +2200,18 @@ DECL_END
 #define DEFINE_sig_altsend_nopr 1
 #include "signal-send.c.inl"
 
+#define DEFINE_sig_sendto 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_sendto_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_altsendto 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_altsendto_nopr 1
+#include "signal-send.c.inl"
+
 #define DEFINE_sig_broadcast 1
 #include "signal-send.c.inl"
 
