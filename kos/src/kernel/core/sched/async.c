@@ -517,6 +517,7 @@ again_rd_stat_before_reconnect:
 		st = ATOMIC_READ(job->a_stat);
 		if likely(st == _ASYNC_ST_READY) {
 			ktime_t timeout;
+
 			/* Re-connect completion handling for `job' */
 			timeout = async_reconnect(job);
 

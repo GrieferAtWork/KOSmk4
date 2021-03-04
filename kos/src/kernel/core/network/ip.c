@@ -754,8 +754,12 @@ ip_arp_and_datagram_work(async_job_t self) {
 	if (me->adj_arpc == 0) {
 		assert(aio_handle_generic_hascompleted(&me->adj_done));
 		aio_handle_generic_checkerror(&me->adj_done);
+#ifdef CONFIG_USE_NEW_ASYNC
+		return ASYNC_FINISHED;
+#else /* CONFIG_USE_NEW_ASYNC */
 		/* The delete-transmit-complete is handled by poll() */
 		return ASYNC_JOB_WORK_AGAIN;
+#endif /* !CONFIG_USE_NEW_ASYNC */
 	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
@@ -1068,8 +1072,12 @@ ip_arp_and_datagrams_work(async_job_t self) {
 	if (me->adj_arpc == 0) {
 		assert(aio_multihandle_generic_hascompleted(&me->adj_done));
 		aio_multihandle_generic_checkerror(&me->adj_done);
+#ifdef CONFIG_USE_NEW_ASYNC
+		return ASYNC_FINISHED;
+#else /* CONFIG_USE_NEW_ASYNC */
 		/* The delete-transmit-complete is handled by poll() */
 		return ASYNC_JOB_WORK_AGAIN;
+#endif /* !CONFIG_USE_NEW_ASYNC */
 	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
