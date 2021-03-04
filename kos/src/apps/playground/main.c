@@ -521,17 +521,17 @@ int main_sock(int argc, char *argv[], char *envp[]) {
 	ksysctl_insmod("ne2k", NULL);
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock < 0)
-		err(EXIT_FAILURE, "socket() failed: %s", strerror(errno));
+		err(EXIT_FAILURE, "socket() failed");
 	in.sin_family      = AF_INET;
 	in.sin_addr.s_addr = inet_addr("10.0.2.2");
 	in.sin_port        = htons(8080);
 	if (connect(sock, (struct sockaddr *)&in, sizeof(in)))
-		err(EXIT_FAILURE, "connect() failed: %s", strerror(errno));
+		err(EXIT_FAILURE, "connect() failed");
 	if (send(sock, payload, sizeof(payload), 0) < 0)
-		err(EXIT_FAILURE, "send() failed: %s", strerror(errno));
+		err(EXIT_FAILURE, "send() failed");
 	resplen = recv(sock, response, sizeof(response), 0);
 	if (resplen < 0)
-		err(EXIT_FAILURE, "recv() failed: %s", strerror(errno));
+		err(EXIT_FAILURE, "recv() failed");
 	printf("Response: %$q\n", (size_t)resplen, response);
 	close(sock);
 	return 0;
