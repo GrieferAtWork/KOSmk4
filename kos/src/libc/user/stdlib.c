@@ -2084,8 +2084,24 @@ NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
 /*AUTO*/{
 	void *result;
 	result = realloc(mallptr, num_bytes);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#ifdef __REALLOC_ZERO_IS_NONNULL
 	if unlikely(!result)
+#else /* __REALLOC_ZERO_IS_NONNULL */
+	/* Must check that num_bytes != 0 because if it isn't
+	 * (iow: num_bytes == 0), then realloc(mallptr, 0) may
+	 * act  the same as  `free(mallptr)'. If that happens,
+	 * then we mustn't double-free `mallptr'.
+	 * Note that realloc(<non-NULL>, 0) can't possibly fail
+	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
+	 * was guessed incorrectly, so this may of doing it  is
+	 * entirely safe! */
+	if unlikely(!result && num_bytes != 0)
+#endif /* !__REALLOC_ZERO_IS_NONNULL */
+	{
 		free(mallptr);
+	}
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return result;
 }
 /*[[[end:libc_reallocf]]]*/

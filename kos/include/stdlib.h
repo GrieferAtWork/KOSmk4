@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeb92c3d */
+/* HASH CRC-32:0xd8473cba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2504,7 +2504,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shexec, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #ifdef __USE_BSD
 #ifdef __CRT_HAVE_reallocf
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
-#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif defined(__CRT_HAVE_realloc)
 #include <libc/local/stdlib/reallocf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
 #endif /* ... */
