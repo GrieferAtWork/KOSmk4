@@ -50,10 +50,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef CONFIG_USE_NEW_VM       /* TODO: REMOVE_ME */
-#include <kernel/vm.h>         /* TODO: REMOVE_ME */
-#endif /* CONFIG_USE_NEW_VM */ /* TODO: REMOVE_ME */
-
 DECL_BEGIN
 
 #ifndef NDEBUG

@@ -33,19 +33,26 @@
 #ifdef __CC__
 DECL_BEGIN
 
+/* Mask of MNODE_F_* flags found in `struct mmapinfo::mmi_flags' */
+#define MMAPINFO_FLAGS_MASK                               \
+	(MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |     \
+	 MNODE_F_SHARED | MNODE_F_MPREPARED | MNODE_F_MHINT | \
+	 MNODE_F_MLOCK | MNODE_F_NOSPLIT | MNODE_F_NOMERGE)
+
+
 struct mmapinfo {
 	/* VM Memory mapping information (as passed to `mman_enum_callback_t') */
 	UNCHECKED void             *mmi_min;    /* Address of the lowest mapped byte */
 	UNCHECKED void             *mmi_max;    /* [> mmi_min] Address of the greatest mapped byte */
-	unsigned int                mmi_flags;  /* VM Node flags (Set of `MNODE_F_*'). */
+	uintptr_t                   mmi_flags;  /* VM Node flags (Set of flags from `MMAPINFO_FLAGS_MASK'). */
 	REF struct mfile           *mmi_file;   /* [0..1] Mapped mem-file (or `NULL' of reserved memory mappings) */
 	pos_t                       mmi_offset; /* Byte-offset into `mmi_block', where the mapping at `mmi_min' starts. */
 	REF struct path            *mmi_fspath; /* [0..1] Mapped object filesystem path (or NULL if unknown or N/A) */
 	REF struct directory_entry *mmi_fsname; /* [0..1] Mapped object filesystem name (or NULL if unknown or N/A) */
-	size_t                      mmi_index;  /* ID   of   the   first   `struct mnode'   that   this   area   is   apart   of.
-	                                         * For  this   purpose,  node-ids   are  counted   such  that   the  first   node
-	                                         * that  either  overlaps,  or  comes  after  `enum_minaddr'  has  `mmi_index=0'.
-	                                         * This counter is used to generate INode numbers for `/proc/[pid]/map_files/...' */
+	size_t                      mmi_index;  /* ID of the first `struct mnode' that this area is apart of. For this purpose,
+	                                         * node-ids are counted such that the first node that either overlaps, or comes
+	                                         * after  `enum_minaddr' has  `mmi_index=0'. This  counter is  used to generate
+	                                         * INode numbers for `/proc/[pid]/map_files/...' */
 };
 #define mmapinfo_size(self) \
 	((size_t)((byte_t *)(self)->mmi_max - (byte_t *)(self)->mmi_min) + 1)

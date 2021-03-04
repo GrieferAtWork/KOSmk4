@@ -81,13 +81,13 @@ PUBLIC size_t socket_default_sndbufmax = 65536;
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_buffer_init)(struct iov_buffer *__restrict self,
+NOTHROW(KCALL iov_buffer_init)(struct iov_buffer *__restrict self,
                                USER CHECKED void const *buf, size_t buflen) {
-	self->iv_entc         = 1;
-	self->iv_entv         = &self->iv_head;
+	self->iv_entc          = 1;
+	self->iv_entv          = &self->iv_head;
 	self->iv_head.ive_base = (USER CHECKED byte_t *)buf;
 	self->iv_head.ive_size = buflen;
-	self->iv_last         = buflen;
+	self->iv_last          = buflen;
 }
 
 
@@ -353,7 +353,7 @@ socket_asendto_peer_impl(struct socket *__restrict self,
 		                           msg_control, msg_flags, aio);
 	} else {
 		struct iov_buffer iov;
-		aio_buffer_init(&iov, buf, bufsize);
+		iov_buffer_init(&iov, buf, bufsize);
 		(*self->sk_ops->so_sendtov)(self, &iov, bufsize, addr, reqlen,
 		                            msg_control, msg_flags, aio);
 	}
@@ -408,7 +408,7 @@ socket_asend(struct socket *__restrict self,
 		(*self->sk_ops->so_send)(self, buf, bufsize, msg_control, msg_flags, aio);
 	} else if (self->sk_ops->so_sendv) {
 		struct iov_buffer iov;
-		aio_buffer_init(&iov, buf, bufsize);
+		iov_buffer_init(&iov, buf, bufsize);
 		(*self->sk_ops->so_sendv)(self, &iov, bufsize, msg_control, msg_flags, aio);
 	} else {
 		/* Use getpeeraddr() + sendto() */
@@ -872,7 +872,7 @@ socket_asendto(struct socket *__restrict self,
 		                           msg_control, msg_flags, aio);
 	} else {
 		struct iov_buffer iov;
-		aio_buffer_init(&iov, buf, bufsize);
+		iov_buffer_init(&iov, buf, bufsize);
 		if (self->sk_ops->so_sendtov) {
 			(*self->sk_ops->so_sendtov)(self, &iov, bufsize, addr, addr_len,
 			                            msg_control, msg_flags, aio);
@@ -1147,7 +1147,7 @@ socket_recv(struct socket *__restrict self,
 		                                  msg_control, msg_flags, abs_timeout);
 	} else {
 		struct iov_buffer iov;
-		aio_buffer_init(&iov, buf, bufsize);
+		iov_buffer_init(&iov, buf, bufsize);
 		if (self->sk_ops->so_recvv) {
 			result = (*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
 			                                   msg_control, msg_flags, abs_timeout);
@@ -1234,7 +1234,7 @@ socket_recvfrom(struct socket *__restrict self,
 		                                      msg_control, msg_flags, abs_timeout);
 	} else if (self->sk_ops->so_recvfromv) {
 		struct iov_buffer iov;
-		aio_buffer_init(&iov, buf, bufsize);
+		iov_buffer_init(&iov, buf, bufsize);
 		result = (*self->sk_ops->so_recvfromv)(self, &iov, bufsize, addr, addr_len,
 		                                       preq_addr_len, presult_flags,
 		                                       msg_control, msg_flags, abs_timeout);
@@ -1248,7 +1248,7 @@ socket_recvfrom(struct socket *__restrict self,
 		} else {
 			struct iov_buffer iov;
 			assert(self->sk_ops->so_recvv);
-			aio_buffer_init(&iov, buf, bufsize);
+			iov_buffer_init(&iov, buf, bufsize);
 			result = (*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
 			                                   msg_control, msg_flags, abs_timeout);
 		}

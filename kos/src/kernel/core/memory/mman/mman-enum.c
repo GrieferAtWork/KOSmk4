@@ -23,10 +23,19 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/enum.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+
+#include <hybrid/overflow.h>
 
 #include <kos/except.h>
+
+#include <assert.h>
+#include <stddef.h>
 
 DECL_BEGIN
 
@@ -54,14 +63,123 @@ DECL_BEGIN
 FUNDEF ssize_t KCALL
 mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
           UNCHECKED void *enum_minaddr, UNCHECKED void *enum_maxaddr) {
-	(void)self;
-	(void)cb;
-	(void)arg;
-	(void)enum_minaddr;
-	(void)enum_maxaddr;
-	COMPILER_IMPURE();
-	/* TODO */
-	return 0;
+	ssize_t temp, result = 0;
+	struct mmapinfo mi;
+	size_t num_nodes = 0;
+	while (enum_minaddr <= enum_maxaddr) {
+		struct mnode_tree_minmax mima;
+		struct mnode *node;
+		struct mpart *part;
+again_lookup_node:
+		mi.mmi_index = num_nodes++;
+		mman_lock_read(self);
+		mnode_tree_minmaxlocate(self->mm_mappings,
+		                        enum_minaddr,
+		                        enum_maxaddr,
+		                        &mima);
+		node = mima.mm_min;
+		if (!node) {
+			mman_lock_endread(self);
+			break;
+		}
+		mi.mmi_min   = mnode_getminaddr(node);
+		mi.mmi_flags = node->mn_flags & MMAPINFO_FLAGS_MASK;
+		part         = node->mn_part;
+		if (part) {
+			if (!mpart_lock_tryacquire(part)) {
+waitfor_part:
+				/* Wait for the lock of `part' to become available. */
+				incref(part);
+				mman_lock_endread(self);
+				FINALLY_DECREF_UNLIKELY(part);
+				while (!mpart_lock_available(part))
+					task_yield();
+				num_nodes = mi.mmi_index;
+				goto again_lookup_node;
+			}
+			mi.mmi_file   = incref(part->mp_file);
+			mi.mmi_offset = mnode_getfileaddr(node);
+			mpart_lock_release(part);
+		} else {
+			mi.mmi_file   = NULL;
+			mi.mmi_offset = 0;
+		}
+		if (mi.mmi_min < enum_minaddr) {
+			if (part != NULL) {
+				mi.mmi_offset += (size_t)((byte_t *)enum_minaddr -
+				                          (byte_t *)mi.mmi_min);
+			}
+			mi.mmi_min = enum_minaddr;
+		}
+		mi.mmi_fspath = xincref(node->mn_fspath);
+		mi.mmi_fsname = xincref(node->mn_fsname);
+		for (;;) {
+			mi.mmi_max = mnode_getmaxaddr(node);
+			if (mi.mmi_max >= enum_maxaddr)
+				break;
+			if (node == mima.mm_max)
+				break; /* Nothing hereafter -> We're done! */
+			/* Search for adjacent nodes that may reference the same underlying file. */
+			node = mnode_tree_nextnode(node);
+			assertf(node != NULL,
+			        "But the last node should have been `mima.mm_max', "
+			        "and we didn't get to that one, yet...");
+			if ((byte_t *)mi.mmi_max + 1 !=  mnode_getminaddr(node))
+				break; /* Not a continuous mapping */
+			if (mi.mmi_flags != (node->mn_flags & MMAPINFO_FLAGS_MASK))
+				break; /* Different flags */
+			if (mi.mmi_fsname != node->mn_fsname ||
+			    mi.mmi_fspath != node->mn_fspath)
+				break; /* Different file name */
+			if (part) {
+				pos_t expected_offset;
+				bool part_ok;
+				if (!node->mn_part)
+					break;
+				expected_offset = mi.mmi_offset;
+				expected_offset += (size_t)((byte_t *)mnode_getminaddr(node) -
+				                            (byte_t *)mi.mmi_min);
+				if (!mpart_lock_tryacquire(part))
+					goto waitfor_part;
+				/* Check that the part maps the expected location. */
+				part_ok = (part->mp_file == mi.mmi_file) &&
+				          (mnode_getfileaddr(node) == expected_offset);
+				mpart_lock_release(part);
+				if (!part_ok)
+					break;
+			} else {
+				if (node->mn_part)
+					break;
+			}
+			/* The secondary node is considered to be apart of the same mapping! */
+			++num_nodes;
+		}
+		mman_lock_endread(self);
+
+		/* Limit the enumerated address range to the requested range */
+		if (mi.mmi_max > enum_maxaddr)
+			mi.mmi_max = enum_maxaddr;
+
+		/* Invoke the given callback. */
+		TRY {
+			temp = (*cb)(arg, &mi);
+		} EXCEPT {
+			xdecref(mi.mmi_file);
+			xdecref(mi.mmi_fsname);
+			xdecref(mi.mmi_fspath);
+			RETHROW();
+		}
+		xdecref(mi.mmi_file);
+		xdecref(mi.mmi_fsname);
+		xdecref(mi.mmi_fspath);
+		if unlikely(temp < 0)
+			return temp;
+		result += temp;
+		if (OVERFLOW_UADD((uintptr_t)mi.mmi_max, 1,
+		                  (uintptr_t *)&enum_minaddr))
+			break;
+	}
+	return result;
 }
 
 DECL_END
