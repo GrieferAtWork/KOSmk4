@@ -318,9 +318,6 @@ DATDEF struct lockop_slist /*  */ async_all_lops; /* Pending lock operations for
 #define async_all_available()  atomic_lock_available(&async_all_lock)
 
 
-/* TODO: Functions to control the # of async worker-threads. */
-
-
 
 
 
