@@ -727,9 +727,9 @@ for (local name: classes.keys.sorted()) {
 		break;
 @@pp_endif@@
 
-@@pp_if defined(EPERM)@@
+@@pp_if defined(ENOSYS)@@
 	case @E_NOT_IMPLEMENTED@:
-		result = EPERM;
+		result = ENOSYS;
 		break;
 @@pp_endif@@
 

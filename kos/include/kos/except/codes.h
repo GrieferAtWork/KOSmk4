@@ -294,7 +294,7 @@
 /* E_NOT_IMPLEMENTED                                                    */
 /************************************************************************/
 #ifndef E_NOT_IMPLEMENTED
-#define E_NOT_IMPLEMENTED                         (0x0003)                    /* [errno(EPERM), msg("Unimplemented function")] */
+#define E_NOT_IMPLEMENTED                         (0x0003)                    /* [errno(ENOSYS), msg("Unimplemented function")] */
 #endif /* !E_NOT_IMPLEMENTED */
 #ifndef E_NOT_IMPLEMENTED_UNSUPPORTED
 #define E_NOT_IMPLEMENTED_UNSUPPORTED             (E_NOT_IMPLEMENTED, 0x0001) /* [msg("Unsupported function")] */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcffbf28d */
+/* HASH CRC-32:0x5cdd01a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -508,11 +508,11 @@ for (local name: classes.keys.sorted()) {
 		break;
 #endif /* __ENOEXEC */
 
-#ifdef __EPERM
+#ifdef __ENOSYS
 	case E_NOT_IMPLEMENTED:
-		__result = __EPERM;
+		__result = __ENOSYS;
 		break;
-#endif /* __EPERM */
+#endif /* __ENOSYS */
 
 #ifdef __ENODEV
 	case E_NO_DEVICE:
