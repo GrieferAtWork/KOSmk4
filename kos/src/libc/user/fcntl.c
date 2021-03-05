@@ -72,8 +72,9 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0x32278851]]]*/
-/* Open a new file handle to the file specified by `FILENAME'
+/*[[[head:libd_open,hash:CRC-32=0xf88515e7]]]*/
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -125,8 +126,9 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0x9b69c88a]]]*/
-/* Open a new file handle to the file specified by `FILENAME'
+/*[[[head:libc_open,hash:CRC-32=0xc5032e77]]]*/
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -163,8 +165,9 @@ NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
 }
 /*[[[end:libc_open]]]*/
 
-/*[[[head:libd_creat,hash:CRC-32=0x5f132f7e]]]*/
-/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
+/*[[[head:libd_creat,hash:CRC-32=0x65d65d67]]]*/
+/* >> creat(2), creat64(2)
+ * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
                                  mode_t mode)
@@ -174,8 +177,9 @@ NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
 }
 /*[[[end:libd_creat]]]*/
 
-/*[[[head:libc_creat,hash:CRC-32=0x3efdeb8]]]*/
-/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
+/*[[[head:libc_creat,hash:CRC-32=0x750279dc]]]*/
+/* >> creat(2), creat64(2)
+ * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
                                  mode_t mode)
@@ -193,8 +197,9 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0xf9bbc15e]]]*/
-/* Open a new file handle to the file specified by `FILENAME'
+/*[[[head:libd_openat,hash:CRC-32=0x196e2615]]]*/
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -237,8 +242,9 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0x4ff5eb96]]]*/
-/* Open a new file handle to the file specified by `FILENAME'
+/*[[[head:libc_openat,hash:CRC-32=0x73281a0b]]]*/
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:

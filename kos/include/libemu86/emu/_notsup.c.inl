@@ -676,39 +676,39 @@ notsup_modrm_getsetxyzmm:
 #ifdef NEED_notsup_modrm_getxyzmm
 #undef NEED_notsup_modrm_getxyzmm
 notsup_modrm_getxyzmm:
-		MODRM_DECODE();
-		if (EMU86_MODRM_ISMEM(modrm.mi_type)) {
-			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(),
-		                                SSE_OPERAND_SIZE_IN_BYTES(),
-		                                true, false);
-		}
-		goto return_unsupported_instruction;
+	MODRM_DECODE();
+	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {
+		EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(),
+		                            SSE_OPERAND_SIZE_IN_BYTES(),
+		                            true, false);
+	}
+	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_modrm_getxyzmm */
 
 #ifdef NEED_notsup_modrm_setxyzmm
 #undef NEED_notsup_modrm_setxyzmm
 notsup_modrm_getxyzmm:
-		MODRM_DECODE();
-		if (EMU86_MODRM_ISMEM(modrm.mi_type)) {
-			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(),
-		                                SSE_OPERAND_SIZE_IN_BYTES(),
-		                                false, true);
-		}
-		goto return_unsupported_instruction;
+	MODRM_DECODE();
+	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {
+		EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(),
+		                            SSE_OPERAND_SIZE_IN_BYTES(),
+		                            false, true);
+	}
+	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_modrm_setxyzmm */
 
 #ifdef NEED_notsup_modrm_getsetxyzmm
 #undef NEED_notsup_modrm_getsetxyzmm
 notsup_modrm_getxyzmm:
-		MODRM_DECODE();
-		if (EMU86_MODRM_ISMEM(modrm.mi_type)) {
-			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(),
-		                                SSE_OPERAND_SIZE_IN_BYTES(),
-		                                true, true);
-		}
-		goto return_unsupported_instruction;
+	MODRM_DECODE();
+	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {
+		EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(),
+		                            SSE_OPERAND_SIZE_IN_BYTES(),
+		                            true, true);
+	}
+	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 #endif /* NEED_notsup_modrm_getsetxyzmm */
 #endif /* Not all 3 */

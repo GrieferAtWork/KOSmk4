@@ -94,7 +94,7 @@ int feclearexcept(int excepts) {
 
 @@@param: EXCEPTS: Set of `FE_*'
 [[std, throws, preferred_fastbind, libc, impl_include("<bits/crt/fenv-inline.h>")]]
-int feraiseexcept:(int excepts) {
+int feraiseexcept(int excepts) {
 	@__inline_feraiseexcept@(excepts);
 	return 0;
 }

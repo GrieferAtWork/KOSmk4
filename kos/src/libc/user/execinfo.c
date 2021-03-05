@@ -134,8 +134,9 @@ bool LIBCCALL init_libdebuginfo(void) {
 
 
 
-/*[[[head:libc_backtrace,hash:CRC-32=0x8b224395]]]*/
-/* Create a traceback of up to `SIZE' instruction pointers from
+/*[[[head:libc_backtrace,hash:CRC-32=0x1e7cdda3]]]*/
+/* >> backtrace(3)
+ * Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
  * and the functions from `<libunwind/...>'. However, on other
@@ -217,8 +218,9 @@ err0:
 	return 0;
 }
 
-/*[[[head:libc_backtrace_symbols,hash:CRC-32=0xd6351c6f]]]*/
-/* Return an array of exactly `size' elements that contains the
+/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x9c129a6c]]]*/
+/* >> backtrace_symbols(3)
+ * Return an array of exactly `size' elements that contains the
  * names associated with program-counters from the given `ARRAY'
  * This function is meant to be used together with `backtrace(3)'.
  * On KOS, the names of functions are gathered with the help of
@@ -277,8 +279,9 @@ err_nodata:
 }
 /*[[[end:libc_backtrace_symbols]]]*/
 
-/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0x722999a8]]]*/
-/* Same as `backtrace_symbols()', but rather than return a vector
+/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0xd4c9e83b]]]*/
+/* >> backtrace_symbols_fd(3)
+ * Same as `backtrace_symbols()', but rather than return a vector
  * of symbol names, print the names directly to `fd', such that
  * one function NAME will be written per line, with `size' lines
  * written in total. */

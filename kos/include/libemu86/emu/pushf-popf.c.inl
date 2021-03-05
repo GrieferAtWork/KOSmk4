@@ -36,7 +36,7 @@ case EMU86_OPCODE_ENCODE(0x9c): {
 #if EMU86_EMULATE_CONFIG_VM86
 	if (EMU86_ISVM86()) {
 		value |= EFLAGS_IOPL(3); /* (visible) IOPL is always 3 in vm86 mode. */
-		value &= EFLAGS_IF;
+		value &= ~EFLAGS_IF;
 		if (EMU86_EMULATE_VM86_GETIF())
 			value |= EFLAGS_IF;
 	}

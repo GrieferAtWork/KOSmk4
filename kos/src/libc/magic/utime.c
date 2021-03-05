@@ -136,7 +136,7 @@ int utime([[nonnull]] char const *filename, [[nullable]] struct utimbuf const *f
 [[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, export_alias("_utime64"), time64_variant_of(utime)]]
 [[userimpl, requires_function(crt_utime32)]]
-int utime64:([[nonnull]] char const *filename, [[nullable]] struct utimbuf64 const *file_times) {
+int utime64([[nonnull]] char const *filename, [[nullable]] struct utimbuf64 const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")

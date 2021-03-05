@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x852b842c */
+/* HASH CRC-32:0xf39f7a09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_open32_defined
 #define __local___localdep_open32_defined 1
 #ifdef __CRT_HAVE_open
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -43,7 +44,8 @@ __NAMESPACE_LOCAL_BEGIN
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open)
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -58,7 +60,8 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open)
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -79,7 +82,8 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:

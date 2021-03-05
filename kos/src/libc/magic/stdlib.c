@@ -2811,7 +2811,7 @@ __LIBC char **__initenv;
 #else /* __CRT_HAVE___initenv */
 }
 @@Access to the initial environment block
-[[guard, wunused, ATTR_CONST]] __p___initenv:() -> [[nonnull]] char ***;
+[[guard, wunused, ATTR_CONST]] __p___initenv() -> [[nonnull]] char ***;
 %{
 #ifdef ____p___initenv_defined
 #define __initenv (*__p___initenv())
@@ -2824,7 +2824,7 @@ __LIBC wchar_t **__winitenv;
 #else /* __CRT_HAVE___winitenv */
 }
 @@Access to the initial environment block
-[[guard, wunused, ATTR_CONST, wchar]] __p___winitenv:() -> [[nonnull]] wchar_t ***;
+[[guard, wunused, ATTR_CONST, wchar]] __p___winitenv() -> [[nonnull]] wchar_t ***;
 %{
 #ifdef ____p___winitenv_defined
 #define __winitenv (*__p___winitenv())

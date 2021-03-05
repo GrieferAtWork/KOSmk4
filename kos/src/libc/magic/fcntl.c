@@ -1257,12 +1257,16 @@ enum __pid_type {
 
 
 
-
-#ifdef __O_TMPFILE
-#define __OPEN_NEEDS_MODE(oflags) (((oflags) & O_CREAT) || ((oflags) & __O_TMPFILE) == __O_TMPFILE)
+#ifndef __OPEN_NEEDS_MODE
+#if defined(__O_CREAT) && defined(__O_TMPFILE)
+#define __OPEN_NEEDS_MODE(oflags) (((oflags) & __O_CREAT) || ((oflags) & __O_TMPFILE) == __O_TMPFILE)
+#elif defined(__O_CREAT)
+#define __OPEN_NEEDS_MODE(oflags) ((oflags) & __O_CREAT)
 #else /* __O_TMPFILE */
-#define __OPEN_NEEDS_MODE(oflags) ((oflags) & O_CREAT)
+#define __OPEN_NEEDS_MODE(oflags) 0
 #endif /* !__O_TMPFILE */
+#endif /* !__OPEN_NEEDS_MODE */
+
 
 /* For XPG all symbols from <sys/stat.h> should also be available. */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
@@ -1647,7 +1651,8 @@ __STDC_INT_AS_SSIZE_T fcntl($fd_t fd, __STDC_INT_AS_UINT_T cmd, ...);
 $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 
 
-@@Open a new file handle to the file specified by `FILENAME'
+@@>> open(2), open64(2), openat(2), openat64(2)
+@@Open a new file handle to the file specified by `filename'
 @@When `oflags & O_CREAT', then `mode' specifies the initial
 @@file access permissions with which the file should be opened.
 @@On KOS, the returned handle can be anything, but is usually one of:
@@ -1679,6 +1684,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	return result;
 }
 
+@@>> creat(2), creat64(2)
 @@Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)'
 [[cp, guard, wunused, no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("creat64")]]

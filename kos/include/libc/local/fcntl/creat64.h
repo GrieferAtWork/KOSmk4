@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe7c4a0a */
+/* HASH CRC-32:0xa9b847af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_open64_defined
 #define __local___localdep_open64_defined 1
 #ifdef __CRT_HAVE_open64
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -43,7 +44,8 @@ __NAMESPACE_LOCAL_BEGIN
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open64)
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -58,7 +60,8 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -73,7 +76,8 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -91,7 +95,8 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/open64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Open a new file handle to the file specified by `FILENAME'
+/* >> open(2), open64(2), openat(2), openat64(2)
+ * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -112,7 +117,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
+/* >> creat(2), creat64(2)
+ * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __LOCAL_LIBC(creat64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat64))(char const *__filename, __mode_t __mode) {
 	return __localdep_open64(__filename, __O_CREAT | __O_WRONLY | __O_TRUNC, __mode);

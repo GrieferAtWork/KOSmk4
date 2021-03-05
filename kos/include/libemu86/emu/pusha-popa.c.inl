@@ -32,9 +32,9 @@ case EMU86_OPCODE_ENCODE(0x60): {
 	 * 60     PUSHAD     Push EAX, ECX, EDX, EBX, original ESP, EBP, ESI, and EDI. */
 #if EMU86_EMULATE_CONFIG_WANT_PUSHA && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	{
 		byte_t *sp;
@@ -98,9 +98,9 @@ case EMU86_OPCODE_ENCODE(0x61): {
 	 * 61     POPAD     Pop EDI, ESI, EBP, EBX, EDX, ECX, and EAX. */
 #if EMU86_EMULATE_CONFIG_WANT_POPA && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	{
 		byte_t *sp;

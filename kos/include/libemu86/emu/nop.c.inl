@@ -31,16 +31,16 @@ case EMU86_OPCODE_ENCODE(0x0f1f):
 	 * NP 0F 1F /0     NOP r/m32     Multi-byte no-operation instruction. */
 	MODRM_DECODE();
 	if (modrm.mi_reg != 0) {
-#define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
 	}
 	goto done;
 #elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 case EMU86_OPCODE_ENCODE(0x0f1f):
 	MODRM_DECODE();
 	if (modrm.mi_reg != 0) {
-#define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
 	}
 	goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg

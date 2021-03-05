@@ -1398,14 +1398,14 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 
 
 
-#define EMU86_EMULATE_DECL INTERN
-#define EMU86_EMULATE_ATTR NONNULL((1))
-#define EMU86_EMULATE_RETURN()    return
-#define EMU86_EMULATE_RETURN_TYPE void
-#define EMU86_EMULATE_NOTHROW /* nothing */
-#define EMU86_EMULATE_CC CC
-#define EMU86_EMULATE_NAME libviocore_emulate
-#define EMU86_EMULATE_ARGS struct vio_emulate_args *__restrict self
+#define EMU86_EMULATE_DECL         INTERN
+#define EMU86_EMULATE_ATTR         NONNULL((1))
+#define EMU86_EMULATE_RETURN()     return
+#define EMU86_EMULATE_RETURN_TYPE  void
+#define EMU86_EMULATE_NOTHROW      /* nothing */
+#define EMU86_EMULATE_CC           CC
+#define EMU86_EMULATE_NAME         libviocore_emulate
+#define EMU86_EMULATE_ARGS         struct vio_emulate_args *__restrict self
 #define EMU86_EMULATE_HELPER_ATTR  NONNULL((1))
 #define EMU86_EMULATE_HELPER_ARGS  struct vio_emulate_args *__restrict self
 #define EMU86_EMULATE_HELPER_PARAM self

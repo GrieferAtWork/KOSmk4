@@ -38,6 +38,7 @@ __SYSDECL_BEGIN
 
 }
 
+@@>> backtrace(3)
 @@Create a traceback of up to `SIZE' instruction pointers from
 @@the calling function, their caller, and so forth. On KOS, this
 @@information is constructed with the help of CFI instrumentation,
@@ -49,6 +50,7 @@ __SYSDECL_BEGIN
 __STDC_INT_AS_SIZE_T backtrace([[nonnull]] void **array,
                                __STDC_INT_AS_SIZE_T size);
 
+@@>> backtrace_symbols(3)
 @@Return an array of exactly `size' elements that contains the
 @@names associated with program-counters from the given `ARRAY'
 @@This function is meant to be used together with `backtrace(3)'.
@@ -68,6 +70,7 @@ __STDC_INT_AS_SIZE_T backtrace([[nonnull]] void **array,
 char **backtrace_symbols([[nonnull]] void *const *array,
                          __STDC_INT_AS_SIZE_T size);
 
+@@>> backtrace_symbols_fd(3)
 @@Same as `backtrace_symbols()', but rather than return a vector
 @@of symbol names, print the names directly to `fd', such that
 @@one function NAME will be written per line, with `size' lines

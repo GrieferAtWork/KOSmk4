@@ -18,32 +18,32 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#define EMU86_EMULATE_CONFIG_WANT_SLDT 1
-#define EMU86_EMULATE_CONFIG_WANT_LLDT 1
-#define EMU86_EMULATE_CONFIG_WANT_STR  1
-#define EMU86_EMULATE_CONFIG_WANT_LTR  1
-#define EMU86_EMULATE_CONFIG_WANT_SGDT 1
-#define EMU86_EMULATE_CONFIG_WANT_LGDT 1
-#define EMU86_EMULATE_CONFIG_WANT_SIDT 1
-#define EMU86_EMULATE_CONFIG_WANT_LIDT 1
-#define EMU86_EMULATE_CONFIG_WANT_VERR 1
-#define EMU86_EMULATE_CONFIG_WANT_VERW 1
-#define EMU86_EMULATE_CONFIG_WANT_SMSW 1
-#define EMU86_EMULATE_CONFIG_WANT_LMSW 1
+#define EMU86_EMULATE_CONFIG_WANT_SLDT    1
+#define EMU86_EMULATE_CONFIG_WANT_LLDT    1
+#define EMU86_EMULATE_CONFIG_WANT_STR     1
+#define EMU86_EMULATE_CONFIG_WANT_LTR     1
+#define EMU86_EMULATE_CONFIG_WANT_SGDT    1
+#define EMU86_EMULATE_CONFIG_WANT_LGDT    1
+#define EMU86_EMULATE_CONFIG_WANT_SIDT    1
+#define EMU86_EMULATE_CONFIG_WANT_LIDT    1
+#define EMU86_EMULATE_CONFIG_WANT_VERR    1
+#define EMU86_EMULATE_CONFIG_WANT_VERW    1
+#define EMU86_EMULATE_CONFIG_WANT_SMSW    1
+#define EMU86_EMULATE_CONFIG_WANT_LMSW    1
 #define EMU86_EMULATE_CONFIG_WANT_MONITOR 1
-#define EMU86_EMULATE_CONFIG_WANT_MWAIT 1
-#define EMU86_EMULATE_CONFIG_WANT_ENCLS 1
-#define EMU86_EMULATE_CONFIG_WANT_STGI 1
-#define EMU86_EMULATE_CONFIG_WANT_CLGI 1
-#define EMU86_EMULATE_CONFIG_WANT_INVLPG 1
-#define EMU86_EMULATE_CONFIG_WANT_RDTSCP 1
-#define EMU86_EMULATE_CONFIG_WANT_SWAPGS 1
+#define EMU86_EMULATE_CONFIG_WANT_MWAIT   1
+#define EMU86_EMULATE_CONFIG_WANT_ENCLS   1
+#define EMU86_EMULATE_CONFIG_WANT_STGI    1
+#define EMU86_EMULATE_CONFIG_WANT_CLGI    1
+#define EMU86_EMULATE_CONFIG_WANT_INVLPG  1
+#define EMU86_EMULATE_CONFIG_WANT_RDTSCP  1
+#define EMU86_EMULATE_CONFIG_WANT_SWAPGS  1
 #define EMU86_EMULATE_CONFIG_WANT_MCOMMIT 1
-#define EMU86_EMULATE_CONFIG_WANT_CLZERO 1
-#define EMU86_EMULATE_CONFIG_WANT_XGETBV 1
-#define EMU86_EMULATE_CONFIG_WANT_XSETBV 1
-#define EMU86_EMULATE_CONFIG_WANT_LAR 1
-#define EMU86_EMULATE_CONFIG_WANT_LSL 1
+#define EMU86_EMULATE_CONFIG_WANT_CLZERO  1
+#define EMU86_EMULATE_CONFIG_WANT_XGETBV  1
+#define EMU86_EMULATE_CONFIG_WANT_XSETBV  1
+#define EMU86_EMULATE_CONFIG_WANT_LAR     1
+#define EMU86_EMULATE_CONFIG_WANT_LSL     1
 #include "../emulate.c.inl"
 #endif /* __INTELLISENSE__ */
 
@@ -71,8 +71,8 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
 			                                                 X86_REGISTER_MISC_LDT, 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* !EMU86_GETCR4_UMIP_IS_ZERO */
@@ -103,8 +103,8 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
 			                                                 X86_REGISTER_MISC_TR, 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* !EMU86_GETCR4_UMIP_IS_ZERO */
@@ -140,8 +140,8 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 			                                                 X86_REGISTER_MISC_LDT, 0, ldtr, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
@@ -171,8 +171,8 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 			                                                 X86_REGISTER_MISC_TR, 0, tr, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
@@ -193,9 +193,9 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 	case 4: {
 		/* 0F 00 /4     VERR r/m16     Set ZF=1 if segment specified with r/m16 can be read. */
 #if CONFIG_LIBEMU86_WANT_16BIT
-#define NEED_return_unsupported_instruction
 		if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
 			goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_16BIT */
 #if EMU86_EMULATE_CONFIG_WANT_VERR && defined(EMU86_EMULATE_VERR)
 		{
@@ -219,9 +219,9 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 	case 5: {
 		/* 0F 00 /5     VERW r/m16     Set ZF=1 if segment specified with r/m16 can be written. */
 #if CONFIG_LIBEMU86_WANT_16BIT
-#define NEED_return_unsupported_instruction
 		if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
 			goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_16BIT */
 #if EMU86_EMULATE_CONFIG_WANT_VERW && defined(EMU86_EMULATE_VERW)
 		{
@@ -243,8 +243,8 @@ case EMU86_OPCODE_ENCODE(0x0f00): {
 
 
 	default:
-#define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
 	}
 	break;
 }
@@ -299,9 +299,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		/* 0F 01 /0     SGDT m16&32     Store GDTR to m.
 		 * 0F 01 /0     SGDT m16&64     Store GDTR to m. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 #ifndef EMU86_GETCR4_UMIP_IS_ZERO
@@ -313,8 +313,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			                                                 :) X86_REGISTER_MISC_GDT_BASEL,
 			                                                 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* !EMU86_GETCR4_UMIP_IS_ZERO */
@@ -583,9 +583,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		/* 0F 01 /1     SIDT m16&32     Store IDTR to m.
 		 * 0F 01 /1     SIDT m16&64     Store IDTR to m. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 #ifndef EMU86_GETCR4_UMIP_IS_ZERO
@@ -597,8 +597,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			                                                 :) X86_REGISTER_MISC_IDT_BASEL,
 			                                                 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* !EMU86_GETCR4_UMIP_IS_ZERO */
@@ -855,9 +855,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 		/* 0F 01 /2     LGDT m16&32     Load m into GDTR.
 		 * 0F 01 /2     LGDT m16&64     Load m into GDTR. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT
 		{
@@ -1037,9 +1037,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LIDT
 		{
@@ -1065,8 +1065,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			                                                 :) X86_REGISTER_MISC_IDT_BASEL,
 			                                                 limit, base, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
@@ -1094,8 +1094,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
 			                                                 X86_REGISTER_CONTROL_CR0, 0, 0, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* !EMU86_GETCR4_UMIP_IS_ZERO */
@@ -1131,8 +1131,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 			EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
 			                                                 X86_REGISTER_CONTROL_CR0, 0, msw, 0);
 #else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
-#define NEED_return_privileged_instruction_rmreg
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 		}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
@@ -1314,14 +1314,14 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 
 		/* 0F 01 /7     INVLPG m      Invalidate TLB entries for page containing m. */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define NEED_return_expected_memory_modrm_rmreg
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))
 			goto return_expected_memory_modrm_rmreg;
+#define NEED_return_expected_memory_modrm_rmreg
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
-#define NEED_return_privileged_instruction_rmreg
 		if (EMU86_ISUSER())
 			goto return_privileged_instruction_rmreg;
+#define NEED_return_privileged_instruction_rmreg
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */
 #if EMU86_EMULATE_CONFIG_WANT_LMSW && defined(EMU86_EMULATE_INVLPG)
 		{
@@ -1339,8 +1339,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 
 
 	default:
-#define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
+#define NEED_return_unknown_instruction_rmreg
 	}
 	break;
 }
@@ -1354,9 +1354,9 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 case EMU86_OPCODE_ENCODE(0x0f02): {
 	/* 0F 02 /r     LAR r16, r16/m16     r16 := access rights referenced by r16/m16 */
 #if CONFIG_LIBEMU86_WANT_16BIT
-#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
 		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_16BIT */
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_LAR && defined(EMU86_EMULATE_LAR)
@@ -1387,9 +1387,9 @@ case EMU86_OPCODE_ENCODE(0x0f03): {
 	 *         0F 03 /r     LSL r32, r32/m16     Load: r32 := segment limit, selector r32/m16.
 	 * REX.W + 0F 03 /r     LSL r64, r32/m16     Load: r64 := segment limit, selector r32/m16 */
 #if CONFIG_LIBEMU86_WANT_16BIT
-#define NEED_return_unsupported_instruction
 	if (EMU86_F_IS16(op_flags)) /* This also includes vm86! */
 		goto return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* CONFIG_LIBEMU86_WANT_16BIT */
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_LSL && defined(EMU86_EMULATE_LSL)

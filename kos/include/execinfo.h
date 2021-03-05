@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe0d8016 */
+/* HASH CRC-32:0xa944c290 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,8 @@
 __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_backtrace
-/* Create a traceback of up to `SIZE' instruction pointers from
+/* >> backtrace(3)
+ * Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
  * and the functions from `<libunwind/...>'. However, on other
@@ -48,7 +49,8 @@ __SYSDECL_BEGIN
  * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace)
-/* Create a traceback of up to `SIZE' instruction pointers from
+/* >> backtrace(3)
+ * Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
  * and the functions from `<libunwind/...>'. However, on other
@@ -58,7 +60,8 @@ __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(voi
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),__backtrace,(__array,__size))
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols
-/* Return an array of exactly `size' elements that contains the
+/* >> backtrace_symbols(3)
+ * Return an array of exactly `size' elements that contains the
  * names associated with program-counters from the given `ARRAY'
  * This function is meant to be used together with `backtrace(3)'.
  * On KOS, the names of functions are gathered with the help of
@@ -75,7 +78,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(vo
  * @return: NULL: Insufficient heap memory available */
 __CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace_symbols)
-/* Return an array of exactly `size' elements that contains the
+/* >> backtrace_symbols(3)
+ * Return an array of exactly `size' elements that contains the
  * names associated with program-counters from the given `ARRAY'
  * This function is meant to be used together with `backtrace(3)'.
  * On KOS, the names of functions are gathered with the help of
@@ -93,13 +97,15 @@ __CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *co
 __CREDIRECT(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),__backtrace_symbols,(__array,__size))
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols_fd
-/* Same as `backtrace_symbols()', but rather than return a vector
+/* >> backtrace_symbols_fd(3)
+ * Same as `backtrace_symbols()', but rather than return a vector
  * of symbol names, print the names directly to `fd', such that
  * one function NAME will be written per line, with `size' lines
  * written in total. */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
 #elif defined(__CRT_HAVE___backtrace_symbols_fd)
-/* Same as `backtrace_symbols()', but rather than return a vector
+/* >> backtrace_symbols_fd(3)
+ * Same as `backtrace_symbols()', but rather than return a vector
  * of symbol names, print the names directly to `fd', such that
  * one function NAME will be written per line, with `size' lines
  * written in total. */

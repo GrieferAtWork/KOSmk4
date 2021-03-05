@@ -36,10 +36,12 @@
  * be entirety reentrant-safe.
  *
  * >> get() {
+ * >>     __PRIVATE_AR_INTR_PUSHOFF();
  * >>     ATOMIC_INC(arr_cnt);
  * >>     result = arr_obj;
  * >>     incref(result);
  * >>     ATOMIC_DEC(arr_cnt);
+ * >>     __PRIVATE_AR_INTR_POP();
  * >>     return result;
  * >> }
  *
@@ -303,13 +305,13 @@
 	struct name {                                            \
 		__REF type *axr_obj; /* [0..1] Referenced object. */ \
 	}
-#define __PRIVATE_AWREF_1(type)                         \
-	struct {                                            \
-		type *awr_self; /* [0..1] Referenced object. */ \
+#define __PRIVATE_AWREF_1(type)                        \
+	struct {                                           \
+		type *awr_obj; /* [0..1] Referenced object. */ \
 	}
-#define __PRIVATE_AWREF_2(name, type)                   \
-	struct name {                                       \
-		type *awr_self; /* [0..1] Referenced object. */ \
+#define __PRIVATE_AWREF_2(name, type)                  \
+	struct name {                                      \
+		type *awr_obj; /* [0..1] Referenced object. */ \
 	}
 #else /* __cplusplus */
 #define __PRIVATE_ARREF_1(type)                                     \
@@ -328,13 +330,13 @@
 	struct name {                                                   \
 		__REF struct type *axr_obj; /* [0..1] Referenced object. */ \
 	}
-#define __PRIVATE_AWREF_1(type)                                \
-	struct {                                                   \
-		struct type *awr_self; /* [0..1] Referenced object. */ \
+#define __PRIVATE_AWREF_1(type)                               \
+	struct {                                                  \
+		struct type *awr_obj; /* [0..1] Referenced object. */ \
 	}
-#define __PRIVATE_AWREF_2(name, type)                          \
-	struct name {                                              \
-		struct type *awr_self; /* [0..1] Referenced object. */ \
+#define __PRIVATE_AWREF_2(name, type)                         \
+	struct name {                                             \
+		struct type *awr_obj; /* [0..1] Referenced object. */ \
 	}
 #endif /* !__cplusplus */
 #else  /* __ARCH_HAVE_AR_NOSMP */

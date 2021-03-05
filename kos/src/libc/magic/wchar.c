@@ -1636,7 +1636,7 @@ $size_t fuzzy_wmemcasecmp([[inp(s1_bytes)]] wchar_t const *s1, $size_t s1_bytes,
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, wunused, ATTR_PURE, requires_function(fuzzy_wmemcasecmp)]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
-fuzzy_wcscasecmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> $size_t {
+$size_t fuzzy_wcscasecmp([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) {
 	return fuzzy_wmemcasecmp(s1, wcslen(s1), s2, wcslen(s2));
 }
 
