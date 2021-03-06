@@ -120,7 +120,7 @@ public:
 #define __WEAKREFCNT_METHODS_BASE_P(i)                      decltype(((i), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))
 
 #ifdef __INTELLISENSE__
-#define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)                                                                                               \
+#define __DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_)                                                                                               \
 	extern "C++" {                                                                                                                                  \
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                 \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE(T, field) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict self); \
@@ -139,7 +139,7 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                           \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                         \
 	}
-#define __DEFINE_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                                                                               \
+#define __DEFINE_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                                                                               \
 	extern "C++" {                                                                                                                                        \
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                       \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_EX(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict self); \
@@ -158,7 +158,7 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                                 \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                               \
 	}
-#define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                                                                               \
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)                                                                                               \
 	extern "C++" {                                                                                                                                      \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                 \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE(T, field) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict self); \
@@ -177,7 +177,7 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                           \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                         \
 	}
-#define __DEFINE_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                                                                               \
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                                                                               \
 	extern "C++" {                                                                                                                                            \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                       \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_EX(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict self); \
@@ -243,7 +243,7 @@ public:
 #endif /* !__USE_KOS && !__USE_KOS_KERNEL && (!__KOS__ || !__KERNEL__) */
 
 
-#ifndef __DEFINE_REFCNT_FUNCTIONS
+#ifndef __DEFINE_REFCOUNT_FUNCTIONS
 } /* extern "C++" */
 #include <hybrid/__assert.h>
 extern "C++" {
@@ -309,7 +309,7 @@ extern "C++" {
 #endif /* !__PRIVATE_REFCNT_IMPL_TRYINCREF */
 
 
-#define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)                                                \
+#define __DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_)                                              \
 	extern "C++" {                                                                                   \
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                  \
 	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                    \
@@ -350,7 +350,7 @@ extern "C++" {
 		}                                                                                            \
 	};                                                                                               \
 	}
-#define __DEFINE_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                          \
+#define __DEFINE_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                         \
 	extern "C++" {                                                                                   \
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                  \
 	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                    \
@@ -391,7 +391,7 @@ extern "C++" {
 		}                                                                                            \
 	};                                                                                               \
 	}
-#define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                             \
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)                                           \
 	extern "C++" {                                                                                    \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                               \
 	template<> class weakrefcnt_methods< T > {                                                        \
@@ -432,7 +432,7 @@ extern "C++" {
 		}                                                                                             \
 	};                                                                                                \
 	}
-#define __DEFINE_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                          \
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                         \
 	extern "C++" {                                                                                       \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                  \
 	template<> class weakrefcnt_methods< T > {                                                           \
@@ -473,7 +473,7 @@ extern "C++" {
 		}                                                                                                \
 	};                                                                                                   \
 	}
-#endif /* !__DEFINE_REFCNT_FUNCTIONS */
+#endif /* !__DEFINE_REFCOUNT_FUNCTIONS */
 
 
 #if !defined(__INTELLISENSE__) || (!defined(__USE_KOS) && !defined(__USE_KOS_KERNEL))
@@ -679,10 +679,10 @@ __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(__T *__self) {
 
 #else /* __cplusplus && __CC__ */
 
-#define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)           /* nothing */
-#define __DEFINE_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)     /* nothing */
-#define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)       /* nothing */
-#define __DEFINE_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_) /* nothing */
+#define __DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_)           /* nothing */
+#define __DEFINE_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)     /* nothing */
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)       /* nothing */
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_) /* nothing */
 
 #endif /* !__cplusplus || !__CC__ */
 

@@ -693,7 +693,7 @@ struct __async_job_struct { WEAK refcnt_t __aj_refcnt; };
 #define async_job_refcnt(self) (((WEAK refcnt_t *)(self))[-1])
 #endif /* !__cplusplus */
 
-DEFINE_REFCOUNT_FUNCTIONS_EX(struct async_job, async_job_refcnt, async_job_destroy)
+DEFINE_REFCOUNT_FUNCTIONS_P(struct async_job, async_job_refcnt, async_job_destroy)
 
 /* Allocate and  return a  new async-job  with the  given  callbacks.
  * Note that this  job hasn't  been started yet,  which is  something

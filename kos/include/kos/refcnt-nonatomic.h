@@ -33,14 +33,14 @@
 #if (defined(__USE_KOS) || defined(__USE_KOS_KERNEL) || \
      (defined(__KOS__) && defined(__KERNEL__)))
 #ifdef __INTELLISENSE__
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS        __DEFINE_REFCNT_FUNCTIONS
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS_EX     __DEFINE_REFCNT_FUNCTIONS_EX
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS    __DEFINE_WEAKREFCNT_FUNCTIONS
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS_EX __DEFINE_WEAKREFCNT_FUNCTIONS_EX
+#define __DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS       __DEFINE_REFCOUNT_FUNCTIONS
+#define __DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS_P     __DEFINE_REFCOUNT_FUNCTIONS_P
+#define __DEFINE_NONATOMIC_WEAKREFCOUNT_FUNCTIONS   __DEFINE_WEAKREFCOUNT_FUNCTIONS
+#define __DEFINE_NONATOMIC_WEAKREFCOUNT_FUNCTIONS_P __DEFINE_WEAKREFCOUNT_FUNCTIONS_P
 #endif /* __INTELLISENSE__ */
 #endif /* __USE_KOS || __USE_KOS_KERNEL || (__KOS__ && __KERNEL__) */
 
-#ifndef __DEFINE_NONATOMIC_REFCNT_FUNCTIONS
+#ifndef __DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS
 /* [weak]incref() */
 #ifndef __PRIVATE_NONATOMIC_REFCNT_IMPL_INCREF
 #define __PRIVATE_NONATOMIC_REFCNT_IMPL_INCREF(T, function, destroy_, refcnt_field)                     \
@@ -86,7 +86,7 @@
 #endif /* !__PRIVATE_NONATOMIC_REFCNT_IMPL_TRYINCREF */
 
 
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS(T, field, destroy_)                                             \
+#define __DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS(T, field, destroy_)                                           \
 	extern "C++" {                                                                                          \
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                         \
 	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                           \
@@ -127,7 +127,7 @@
 		}                                                                                                   \
 	};                                                                                                      \
 	}
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                          \
+#define __DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                         \
 	extern "C++" {                                                                                             \
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                            \
 	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                              \
@@ -168,7 +168,7 @@
 		}                                                                                                      \
 	};                                                                                                         \
 	}
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                             \
+#define __DEFINE_NONATOMIC_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)                                           \
 	extern "C++" {                                                                                              \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                         \
 	template<> class weakrefcnt_methods< T > {                                                                  \
@@ -209,7 +209,7 @@
 		}                                                                                                       \
 	};                                                                                                          \
 	}
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                          \
+#define __DEFINE_NONATOMIC_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                         \
 	extern "C++" {                                                                                                 \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                            \
 	template<> class weakrefcnt_methods< T > {                                                                     \
@@ -250,14 +250,14 @@
 		}                                                                                                          \
 	};                                                                                                             \
 	}
-#endif /* !__DEFINE_NONATOMIC_REFCNT_FUNCTIONS */
+#endif /* !__DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS */
 
 #else /* __cplusplus && __CC__ */
 
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS(T, field, destroy_)           /* nothing */
-#define __DEFINE_NONATOMIC_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)     /* nothing */
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS(T, field, destroy_)       /* nothing */
-#define __DEFINE_NONATOMIC_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_) /* nothing */
+#define __DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS(T, field, destroy_)          /* nothing */
+#define __DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)     /* nothing */
+#define __DEFINE_NONATOMIC_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)      /* nothing */
+#define __DEFINE_NONATOMIC_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_) /* nothing */
 
 #endif /* !__cplusplus || !__CC__ */
 

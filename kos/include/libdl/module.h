@@ -278,8 +278,8 @@ INTDEF NONNULL((1)) void LIBDL_CC DlModule_Free(DlModule *__restrict self);
 #define DlModule_Destroy(self) (DL_API_SYMBOL(DlModule_Destroy)(self))
 #define DlModule_Free(self)    (DL_API_SYMBOL(DlModule_Free)(self))
 #endif /* !__BUILDING_LIBDL */
-__DEFINE_REFCNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
-__DEFINE_WEAKREFCNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
+__DEFINE_REFCOUNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
+__DEFINE_WEAKREFCOUNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
 
 #endif /* __CC__ */
 
