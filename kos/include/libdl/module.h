@@ -206,13 +206,13 @@ struct dlmodule_format;
 /* The actual data-structure to which a pointer is returned by `dlopen()' */
 struct dlmodule {
 	/* Fields from `struct link_map' (for binary compatibility... *ugh*) */
-	uintptr_t                 dm_loadaddr;     /* [const] Load address of the module. */
-	char                     *dm_filename;     /* [1..1][owned] Name of the executable binary file (absolute path). */
-	ElfW(Dyn) const          *dm_dynhdr;       /* [0..dm_elf.de_dyncnt][const] Vector of dynamic ELF definition entries.
-	                                            * WARNING: This field is ELF-only! Other  module formats must keep  this
-	                                            *          field set to NULL (it only has to be ~here~ because of binary
-	                                            *          compatibility with GNU's `struct link_map') */
-	DLIST_ENTRY(dlmodule)     dm_modules;      /* [lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
+	uintptr_t                 dm_loadaddr;   /* [const] Load address of the module. */
+	char                     *dm_filename;   /* [1..1][owned] Name of the executable binary file (absolute path). */
+	ElfW(Dyn) const          *dm_dynhdr;     /* [0..dm_elf.de_dyncnt][const] Vector of dynamic ELF definition entries.
+	                                          * WARNING: This field is ELF-only! Other  module formats must keep  this
+	                                          *          field set to NULL (it only has to be ~here~ because of binary
+	                                          *          compatibility with GNU's `struct link_map') */
+	DLIST_ENTRY(dlmodule)     dm_modules;    /* [lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
 	/* --- End of `struct link_map' emulation --- */
 
 	/* TLS variables (PT_TLS). */
@@ -233,6 +233,7 @@ struct dlmodule {
 	 * have to allocate the full DlModule structure. The rest following
 	 * below is what should be considered the actual module  structure. */
 	__WEAK refcnt_t           dm_refcnt;     /* Reference counter. */
+	__WEAK refcnt_t           dm_weakrefcnt; /* Weak reference counter. */
 
 	/* Module global binding. */
 	LIST_ENTRY(__WEAK dlmodule) dm_globals;  /* [lock(DlModule_GlobalLock)][valid_if(dm_flags & RTLD_GLOBAL)]
@@ -272,37 +273,13 @@ struct dlmodule {
 
 #ifdef __BUILDING_LIBDL
 INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(DlModule *__restrict self);
+INTDEF NONNULL((1)) void LIBDL_CC DlModule_Free(DlModule *__restrict self);
 #else /* __BUILDING_LIBDL */
 #define DlModule_Destroy(self) (DL_API_SYMBOL(DlModule_Destroy)(self))
+#define DlModule_Free(self)    (DL_API_SYMBOL(DlModule_Free)(self))
 #endif /* !__BUILDING_LIBDL */
 __DEFINE_REFCNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
-
-/* Dl Module reference control. */
-#ifdef __INTELLISENSE__
-NONNULL((1)) void DlModule_Incref(DlModule *__restrict self);
-NONNULL((1)) bool DlModule_Decref(DlModule *__restrict self);
-NONNULL((1)) void DlModule_DecrefNoKill(DlModule *__restrict self);
-#else /* __INTELLISENSE__ */
-#define DlModule_Incref(self) \
-	__hybrid_atomic_inc((self)->dm_refcnt, __ATOMIC_SEQ_CST)
-#define DlModule_Decref(self) \
-	(__hybrid_atomic_decfetch((self)->dm_refcnt, __ATOMIC_SEQ_CST) || (DlModule_Destroy(self), 0))
-#define DlModule_DecrefNoKill(self) \
-	__hybrid_atomic_dec((self)->dm_refcnt, __ATOMIC_SEQ_CST)
-#endif /* !__INTELLISENSE__ */
-
-FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool LIBDL_CC
-DlModule_TryIncref(DlModule *__restrict self) {
-	refcnt_t refcnt;
-	do {
-		refcnt = __hybrid_atomic_load(self->dm_refcnt, __ATOMIC_ACQUIRE);
-		if (!refcnt)
-			return false;
-	} while (!__hybrid_atomic_cmpxch_weak(self->dm_refcnt, refcnt, refcnt + 1,
-	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-	return true;
-}
-
+__DEFINE_WEAKREFCNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
 
 #endif /* __CC__ */
 

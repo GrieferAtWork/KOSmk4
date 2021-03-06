@@ -69,6 +69,7 @@ INTERN DlModule dl_rtld_module = {
 	.dm_tls_fini      = NULL,
 	.dm_tls_arg       = NULL,
 	.dm_refcnt        = 2, /* dl_rtld_module, DlModule_GlobalList */
+	.dm_weakrefcnt    = 1,
 	.dm_globals       = LIST_ENTRY_UNBOUND_INITIALIZER,
 	.dm_file          = -1,
 	.dm_flags         = RTLD_LOCAL | RTLD_NODELETE,
@@ -192,7 +193,7 @@ linker_main(struct elfexec_info *__restrict info,
 	assert(DLIST_FIRST(&DlModule_AllList) == &dl_rtld_module);
 	assert(DLIST_NEXT(&dl_rtld_module, dm_modules) == base_module);
 
-	/*DlModule_Decref(base_module);*/ /* Intentionally left dangling! */
+	/*decref(base_module);*/ /* Intentionally left dangling! */
 
 	return result;
 err:

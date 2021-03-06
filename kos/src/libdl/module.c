@@ -184,7 +184,7 @@ done_fini:
 			DlModule *temp;
 			temp = self->dm_depvec[i];
 			if (!(temp->dm_flags & RTLD_NODELETE))
-				DlModule_Decref(temp);
+				decref(temp);
 		}
 	}
 	if (self->dm_file > 0)
@@ -240,6 +240,12 @@ again_free_sections:
 	}
 	free(self->dm_depvec);
 	free(self->dm_filename);
+	weakdecref_likely(self);
+}
+
+/* DlModule functions */
+INTERN NONNULL((1)) void CC
+DlModule_Free(DlModule *__restrict self) {
 	free(self);
 }
 

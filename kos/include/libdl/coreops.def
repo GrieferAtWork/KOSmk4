@@ -28,6 +28,7 @@
 #ifndef DL_COREOPS_SKIP_DLMODULE_DESTROY
 DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlModule_Destroy, (DlModule *__restrict self))
 #endif /* !DL_COREOPS_SKIP_DLMODULE_DESTROY */
+DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlModule_Free, (DlModule *__restrict self))
 DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlSection_Destroy, (DlSection *__restrict self))
 DL_COREOP(__REF_IF(!(return->dm_flags & RTLD_NODELETE)), DlModule *, LIBDL_CC, DlModule_FindFromFilename, (char const *__restrict filename))
 DL_COREOP(NONNULL((1)), int, LIBDL_VCC, dl_seterrorf, (char const *__restrict format, ...))

@@ -147,7 +147,7 @@ INTERN void CC DlModule_RunAllStaticInitializers(void) {
 	DlModule *last;
 	primary = LIST_FIRST(&DlModule_GlobalList);
 	assert(primary != &dl_rtld_module);
-	DlModule_Incref(primary);
+	incref(primary);
 again_search_noinit:
 	atomic_rwlock_read(&DlModule_GlobalLock);
 	/* XXX: last     =      LIST_LAST(&DlModule_GlobalList);
@@ -166,7 +166,7 @@ again_search_noinit:
 	}
 	assert(last != &dl_rtld_module);
 	last->dm_flags &= ~RTLD_NOINIT;
-	DlModule_Incref(last);
+	incref(last);
 	atomic_rwlock_endread(&DlModule_GlobalLock);
 	/* TODO: Support for formats other than ELF. */
 #if 1 /* This is called during init. - If an exception happens here, it wouldn't even matter... */
@@ -175,16 +175,16 @@ again_search_noinit:
 	TRY {
 		DlModule_ElfRunInitializers(last);
 	} EXCEPT {
-		DlModule_Decref(last);
-		DlModule_Decref(primary);
+		decref(last);
+		decref(primary);
 		RETHROW();
 	}
 #endif
-	DlModule_Decref(last);
+	decref(last);
 	if (last != primary)
 		goto again_search_noinit;
 done:
-	DlModule_Decref(primary);
+	decref(primary);
 }
 
 

@@ -212,7 +212,7 @@ try_incref_extension_table_modules(struct dtls_extension *__restrict self) {
 	DlModule *mod;
 again:
 	mod = dtls_extension_getmodule(self);
-	if (mod && !DlModule_TryIncref(mod))
+	if (mod && !tryincref(mod))
 		self->te_redblack &= 1;
 	if (self->te_tree.rb_lhs) {
 		if (self->te_tree.rb_rhs)
@@ -233,7 +233,7 @@ decref_tls_extension_modules(struct dtls_extension *__restrict self) {
 again:
 	mod = dtls_extension_getmodule(self);
 	if (mod)
-		DlModule_Decref(mod);
+		decref(mod);
 	minptr = self->te_tree.rb_lhs;
 	maxptr = self->te_tree.rb_rhs;
 	free(self);
@@ -267,7 +267,7 @@ again:
 				RETHROW();
 			}
 		}
-		DlModule_Decref(mod);
+		decref(mod);
 	}
 	minptr = self->te_tree.rb_lhs;
 	maxptr = self->te_tree.rb_rhs;
@@ -349,7 +349,7 @@ again:
 				RETHROW();
 			}
 		}
-		DlModule_Decref(mod);
+		decref(mod);
 	}
 	minptr = self->te_tree.rb_lhs;
 	maxptr = self->te_tree.rb_rhs;
@@ -398,28 +398,30 @@ err_badptr:
 }
 
 
-#define SIZEOF_DL_MODULE_FOR_TLS              \
-	MAX_C(offsetafter(DlModule, dm_refcnt),   \
-	      offsetafter(DlModule, dm_tls_arg),  \
-	      offsetafter(DlModule, dm_tls_fini), \
-	      offsetafter(DlModule, dm_tls_init), \
-	      offsetafter(DlModule, dm_tlsstoff), \
-	      offsetafter(DlModule, dm_tlsalign), \
-	      offsetafter(DlModule, dm_tlsmsize), \
-	      offsetafter(DlModule, dm_tlsfsize), \
-	      offsetafter(DlModule, dm_tlsinit),  \
+#define SIZEOF_DL_MODULE_FOR_TLS                \
+	MAX_C(offsetafter(DlModule, dm_refcnt),     \
+	      offsetafter(DlModule, dm_weakrefcnt), \
+	      offsetafter(DlModule, dm_tls_arg),    \
+	      offsetafter(DlModule, dm_tls_fini),   \
+	      offsetafter(DlModule, dm_tls_init),   \
+	      offsetafter(DlModule, dm_tlsstoff),   \
+	      offsetafter(DlModule, dm_tlsalign),   \
+	      offsetafter(DlModule, dm_tlsmsize),   \
+	      offsetafter(DlModule, dm_tlsfsize),   \
+	      offsetafter(DlModule, dm_tlsinit),    \
 	      offsetafter(DlModule, dm_tlsoff))
 
-#define OFFSETOF_DL_MODULE_FOR_TLS         \
-	MIN_C(offsetof(DlModule, dm_refcnt),   \
-	      offsetof(DlModule, dm_tls_arg),  \
-	      offsetof(DlModule, dm_tls_fini), \
-	      offsetof(DlModule, dm_tls_init), \
-	      offsetof(DlModule, dm_tlsstoff), \
-	      offsetof(DlModule, dm_tlsalign), \
-	      offsetof(DlModule, dm_tlsmsize), \
-	      offsetof(DlModule, dm_tlsfsize), \
-	      offsetof(DlModule, dm_tlsinit),  \
+#define OFFSETOF_DL_MODULE_FOR_TLS           \
+	MIN_C(offsetof(DlModule, dm_refcnt),     \
+	      offsetof(DlModule, dm_weakrefcnt), \
+	      offsetof(DlModule, dm_tls_arg),    \
+	      offsetof(DlModule, dm_tls_fini),   \
+	      offsetof(DlModule, dm_tls_init),   \
+	      offsetof(DlModule, dm_tlsstoff),   \
+	      offsetof(DlModule, dm_tlsalign),   \
+	      offsetof(DlModule, dm_tlsmsize),   \
+	      offsetof(DlModule, dm_tlsfsize),   \
+	      offsetof(DlModule, dm_tlsinit),    \
 	      offsetof(DlModule, dm_tlsoff))
 
 
@@ -486,16 +488,17 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
 		goto err_nomem;
 	/* Invalidate all of the `struct link_map' emulation garbage. */
 	DBG_memset(result, 0xcc, OFFSETOF_DL_MODULE_FOR_TLS);
-	result->dm_tlsoff   = 0;
-	result->dm_tlsinit  = NULL;
-	result->dm_tlsfsize = template_size;
-	result->dm_tlsmsize = num_bytes;
-	result->dm_tlsalign = min_alignment;
-	result->dm_tlsstoff = 0;
-	result->dm_tls_init = perthread_init;
-	result->dm_tls_fini = perthread_fini;
-	result->dm_tls_arg  = perthread_callback_arg;
-	result->dm_refcnt   = 1;
+	result->dm_tlsoff     = 0;
+	result->dm_tlsinit    = NULL;
+	result->dm_tlsfsize   = template_size;
+	result->dm_tlsmsize   = num_bytes;
+	result->dm_tlsalign   = min_alignment;
+	result->dm_tlsstoff   = 0;
+	result->dm_tls_init   = perthread_init;
+	result->dm_tls_fini   = perthread_fini;
+	result->dm_tls_arg    = perthread_callback_arg;
+	result->dm_refcnt     = 1;
+	result->dm_weakrefcnt = 1;
 	/* Copy TLS template data. */
 	if (template_size) {
 		result->dm_tlsinit = (byte_t *)malloc(template_size);
@@ -526,13 +529,13 @@ libdl_dltlsfree(DlModule *self) {
 	DlModule_RemoveTLSExtension(self);
 	/* Wait for other threads to  complete finalization (which may  happen
 	 * if  they  began to  do so,  just before  this function  got called)
-	 * s.a. `libdl_dltlsfreeseg()' doing a DlModule_TryIncref() to prevent
+	 * s.a. `libdl_dltlsfreeseg()' doing a tryincref() to prevent
 	 *       modules from unloading while TLS finalizers contained within
 	 *       get invoked. */
 	while unlikely(ATOMIC_READ(self->dm_refcnt) != 1)
 		sys_sched_yield();
 	free((byte_t *)self->dm_tlsinit);
-	free(self);
+	weakdecref_likely(self);
 	return 0;
 err_nullmodule:
 	return dl_seterror_badmodule(self);

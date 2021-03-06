@@ -149,7 +149,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			if (error > 0) {
 				/* Weak definition (remember if this is the first one) */
 				if (!pweak_symbol->ds_mod) {
-					DlModule_Incref(symbol.ds_mod);
+					incref(symbol.ds_mod);
 					*pweak_symbol = symbol;
 				}
 			} else {
@@ -173,7 +173,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {
 				/* Weak definition (remember if this is the first one) */
 				if (!pweak_symbol->ds_mod) {
-					DlModule_Incref(symbol.ds_mod);
+					incref(symbol.ds_mod);
 					*pweak_symbol = symbol;
 				}
 			} else {
@@ -188,7 +188,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 						addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
 					} EXCEPT {
 						if (pweak_symbol->ds_mod)
-							DlModule_Decref(pweak_symbol->ds_mod);
+							decref(pweak_symbol->ds_mod);
 						RETHROW();
 					}
 				}
@@ -220,7 +220,7 @@ DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
 		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
 			weak_symbol.ds_mod = self;
 			weak_symbol.ds_sym = symbol;
-			DlModule_Incref(self);
+			incref(self);
 			goto search_external_symbol;
 		}
 got_local_symbol:
@@ -247,7 +247,7 @@ search_external_symbol:
 		for (;;) {
 again_search_globals_next:
 			assert(iter);
-			if (iter == self || unlikely(!DlModule_TryIncref(iter))) {
+			if (iter == self || unlikely(!tryincref(iter))) {
 				iter = LIST_NEXT(iter, dm_globals);
 				if unlikely(!iter) {
 					atomic_rwlock_endread(&DlModule_GlobalLock);
@@ -262,7 +262,7 @@ again_search_globals_module:
 				addr = (ElfW(Addr))dlsym_builtin(name);
 				if (addr) {
 					if (weak_symbol.ds_mod)
-						DlModule_Decref(weak_symbol.ds_mod);
+						decref(weak_symbol.ds_mod);
 					if unlikely(psize)
 						*psize = builtin_symbol_size(name);
 					if unlikely(pmodule)
@@ -293,13 +293,13 @@ again_search_globals_module:
 					} else {
 						/* Found it! */
 						if (weak_symbol.ds_mod)
-							DlModule_Decref(weak_symbol.ds_mod);
+							decref(weak_symbol.ds_mod);
 						addr = (ElfW(Addr))symbol_addr;
 						if unlikely(psize)
 							*psize = symbol_size;
 						if unlikely(pmodule)
 							*pmodule = iter;
-						DlModule_Decref(iter);
+						decref(iter);
 						goto done;
 					}
 				}
@@ -324,7 +324,7 @@ again_search_globals_module:
 					} else {
 						/* Found it! */
 						if (weak_symbol.ds_mod)
-							DlModule_Decref(weak_symbol.ds_mod);
+							decref(weak_symbol.ds_mod);
 						addr = symbol->st_value;
 						if (symbol->st_shndx != SHN_ABS)
 							addr += iter->dm_loadaddr;
@@ -333,7 +333,7 @@ again_search_globals_module:
 							TRY {
 								addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
 							} EXCEPT {
-								DlModule_Decref(iter);
+								decref(iter);
 								RETHROW();
 							}
 						}
@@ -341,17 +341,17 @@ again_search_globals_module:
 							*psize = symbol->st_size;
 						if unlikely(pmodule)
 							*pmodule = iter;
-						DlModule_Decref(iter);
+						decref(iter);
 						goto done;
 					}
 				}
 			}
 			atomic_rwlock_read(&DlModule_GlobalLock);
 			next = LIST_NEXT(iter, dm_globals);
-			while (likely(next) && (next == self || unlikely(!DlModule_TryIncref(next))))
+			while (likely(next) && (next == self || unlikely(!tryincref(next))))
 				next = LIST_NEXT(next, dm_globals);
 			atomic_rwlock_endread(&DlModule_GlobalLock);
-			DlModule_Decref(iter);
+			decref(iter);
 			if unlikely(!next)
 				break;
 			iter = next;
@@ -375,7 +375,7 @@ again_search_globals_module:
 				                                             depth);
 				if (error == DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND) {
 					if (weak_symbol.ds_mod)
-						DlModule_Decref(weak_symbol.ds_mod);
+						decref(weak_symbol.ds_mod);
 					return true;
 				}
 				if (error == DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE)
@@ -397,7 +397,7 @@ again_search_globals_module:
 					TRY {
 						addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
 					} EXCEPT {
-						DlModule_Decref(weak_symbol.ds_mod);
+						decref(weak_symbol.ds_mod);
 						RETHROW();
 					}
 				}
@@ -406,7 +406,7 @@ again_search_globals_module:
 			}
 			if unlikely(pmodule)
 				*pmodule = weak_symbol.ds_mod;
-			DlModule_Decref(weak_symbol.ds_mod);
+			decref(weak_symbol.ds_mod);
 			goto done;
 		}
 

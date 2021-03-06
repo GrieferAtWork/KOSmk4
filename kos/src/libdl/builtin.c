@@ -269,7 +269,7 @@ again:
 			if (ATOMIC_READ(result->dm_refcnt) <= 1) {
 				/* The module is supposed to go away! (try to load it again) */
 				if (!(result->dm_flags & RTLD_NODELETE))
-					DlModule_Decref(result);
+					decref(result);
 				goto again;
 			}
 			sys_sched_yield();
@@ -285,7 +285,7 @@ libdl_dlclose(REF DlModule *self) {
 		goto err_bad_module;
 	/* Don't decref NODELETE modules! */
 	if likely(!(self->dm_flags & RTLD_NODELETE))
-		DlModule_Decref(self);
+		decref(self);
 	return 0;
 err_bad_module:
 	return dl_seterror_badmodule(self);
@@ -428,7 +428,7 @@ libdl_dlsym(DlModule *self, char const *__restrict name) {
 		symbol.ds_mod = LIST_FIRST(&DlModule_GlobalList);
 		assert(symbol.ds_mod);
 		for (;;) {
-			if unlikely(!DlModule_TryIncref(symbol.ds_mod)) {
+			if unlikely(!tryincref(symbol.ds_mod)) {
 again_search_globals_next_noref:
 				symbol.ds_mod = LIST_NEXT(symbol.ds_mod, dm_globals);
 				if unlikely(!symbol.ds_mod) {
@@ -443,7 +443,7 @@ again_search_globals_module:
 			if (symbol.ds_mod == &dl_rtld_module) {
 				result = (ElfW(Addr))dlsym_builtin(name);
 				if (result) {
-					DlModule_DecrefNoKill(symbol.ds_mod);
+					decref_nokill(symbol.ds_mod);
 					goto done;
 				}
 			} else if (symbol.ds_mod->dm_ops) {
@@ -456,14 +456,14 @@ again_search_globals_module:
 						if (!weak_symbol.ds_mod)
 							weak_symbol = symbol; /* First weak def */
 						else {
-							DlModule_Decref(symbol.ds_mod); /* Second weak def */
+							decref(symbol.ds_mod); /* Second weak def */
 						}
 					} else {
 						/* Found the symbol! */
 						if (weak_symbol.ds_mod)
-							DlModule_Decref(weak_symbol.ds_mod);
+							decref(weak_symbol.ds_mod);
 						result = (ElfW(Addr))symbol.ds_sym;
-						DlModule_Decref(symbol.ds_mod);
+						decref(symbol.ds_mod);
 						goto done;
 					}
 				}
@@ -479,12 +479,12 @@ again_search_globals_module:
 						if (!weak_symbol.ds_mod)
 							weak_symbol = symbol; /* First weak def */
 						else {
-							DlModule_Decref(symbol.ds_mod); /* Second weak def */
+							decref(symbol.ds_mod); /* Second weak def */
 						}
 					} else {
 						/* Found the symbol! */
 						if (weak_symbol.ds_mod)
-							DlModule_Decref(weak_symbol.ds_mod);
+							decref(weak_symbol.ds_mod);
 						result = symbol.ds_sym->st_value;
 						if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_TLS) {
 							void *tlsbase;
@@ -500,22 +500,22 @@ again_search_globals_module:
 								TRY {
 									result = (*(ElfW(Addr)(*)(void))(void *)result)();
 								} EXCEPT {
-									DlModule_Decref(symbol.ds_mod);
+									decref(symbol.ds_mod);
 									RETHROW();
 								}
 							}
 						}
-						DlModule_Decref(symbol.ds_mod);
+						decref(symbol.ds_mod);
 						goto done;
 					}
 				}
 			}
 			atomic_rwlock_read(&DlModule_GlobalLock);
 			next_module = LIST_NEXT(symbol.ds_mod, dm_globals);
-			while (likely(next_module) && unlikely(!DlModule_TryIncref(next_module)))
+			while (likely(next_module) && unlikely(!tryincref(next_module)))
 				next_module = LIST_NEXT(next_module, dm_globals);
 			atomic_rwlock_endread(&DlModule_GlobalLock);
-			DlModule_Decref(symbol.ds_mod);
+			decref(symbol.ds_mod);
 			if unlikely(!next_module)
 				break;
 			symbol.ds_mod = next_module;
@@ -541,13 +541,13 @@ again_search_globals_module:
 						TRY {
 							result = (*(ElfW(Addr)(*)(void))(void *)result)();
 						} EXCEPT {
-							DlModule_Decref(weak_symbol.ds_mod);
+							decref(weak_symbol.ds_mod);
 							RETHROW();
 						}
 					}
 				}
 			}
-			DlModule_Decref(weak_symbol.ds_mod);
+			decref(weak_symbol.ds_mod);
 			goto done;
 		}
 		if unlikely(self == RTLD_NEXT) {
@@ -689,10 +689,10 @@ done:
 err:
 	return NULL;
 err_symbol_mod:
-	DlModule_Decref(symbol.ds_mod);
+	decref(symbol.ds_mod);
 	goto err;
 err_weak_symbol_mod:
-	DlModule_Decref(weak_symbol.ds_mod);
+	decref(weak_symbol.ds_mod);
 	goto err;
 err_rtld_next_no_base:
 	dl_seterrorf("Can only use `RTLD_NEXT' from dynamically loaded code");
@@ -750,7 +750,7 @@ got_result:
 	/* Found the module! */
 	if ((flags & DLGETHANDLE_FINCREF) &&
 	    !(result->dm_flags & RTLD_NODELETE))
-		DlModule_Incref(result);
+		incref(result);
 	atomic_rwlock_endread(&DlModule_AllLock);
 	return result;
 }
@@ -866,7 +866,7 @@ err:
 got_result:
 	if ((flags & DLGETHANDLE_FINCREF) &&
 	    !(result->dm_flags & RTLD_NODELETE))
-		DlModule_Incref(result);
+		incref(result);
 	atomic_rwlock_endread(&DlModule_AllLock);
 	return result;
 }
@@ -892,7 +892,7 @@ libdl_dladdr(void const *address, Dl_info *info) {
 		                                   (uintptr_t)address - mod->dm_loadaddr,
 		                                   info);
 		if (!(mod->dm_flags & RTLD_NODELETE))
-			DlModule_Decref(mod);
+			decref(mod);
 		return result;
 	}
 	/* Search for the closest dynamic symbol. */
@@ -921,7 +921,7 @@ libdl_dladdr(void const *address, Dl_info *info) {
 	}
 done:
 	if (!(mod->dm_flags & RTLD_NODELETE))
-		DlModule_Decref(mod);
+		decref(mod);
 	return 0;
 err:
 	return -1;
@@ -972,12 +972,12 @@ again:
 	if (mod) {
 		if (!atomic_rwlock_trywrite(&mod->dm_sections_lock)) {
 			bool hasref;
-			hasref = DlModule_TryIncref(mod);
+			hasref = tryincref(mod);
 			atomic_rwlock_endwrite(&self->ds_module_lock);
 			if (hasref) {
 				atomic_rwlock_write(&mod->dm_sections_lock);
 				atomic_rwlock_endwrite(&mod->dm_sections_lock);
-				DlModule_Decref(mod);
+				decref(mod);
 			}
 			goto again;
 		}
@@ -991,7 +991,7 @@ again:
 	atomic_rwlock_endwrite(&self->ds_module_lock);
 	/* Drop the reference stored in `ds_module' */
 	if (mod && !(self->ds_flags & DLSECTION_FLAG_OWNED))
-		DlModule_Decref(mod);
+		decref(mod);
 	free(self);
 }
 
@@ -1088,7 +1088,7 @@ again_read_section:
 				/* Section is already allocated in member. */
 				result->ds_data  = info.dsi_addr;
 				result->ds_flags = DLSECTION_FLAG_NORMAL;
-				DlModule_Incref(self); /* Reference stored in `result->ds_module' */
+				incref(self); /* Reference stored in `result->ds_module' */
 			} else {
 				result->ds_data  = (void *)-1;
 				result->ds_flags = DLSECTION_FLAG_OWNED;
@@ -1204,7 +1204,7 @@ again_read_elf_section:
 				/* Section is already allocated in member. */
 				result->ds_data  = (void *)(self->dm_loadaddr + sect->sh_addr);
 				result->ds_flags = DLSECTION_FLAG_NORMAL;
-				DlModule_Incref(self); /* Reference stored in `result->ds_module' */
+				incref(self); /* Reference stored in `result->ds_module' */
 			} else {
 				result->ds_data  = (void *)-1;
 				result->ds_flags = DLSECTION_FLAG_OWNED;
@@ -1280,7 +1280,7 @@ libdl_dlunlocksection(REF DlSection *sect) {
 set_dangling_section:
 		atomic_rwlock_read(&sect->ds_module_lock);
 		mod = sect->ds_module;
-		if (mod && !DlModule_TryIncref(mod))
+		if (mod && !tryincref(mod))
 			mod = NULL;
 		atomic_rwlock_endread(&sect->ds_module_lock);
 		if (mod) {
@@ -1290,11 +1290,11 @@ set_dangling_section:
 				sect->ds_dangling         = mod->dm_sections_dangling;
 				mod->dm_sections_dangling = sect;
 				atomic_rwlock_endwrite(&mod->dm_sections_lock);
-				DlModule_Decref(mod);
+				decref(mod);
 				return 0;
 			}
 			atomic_rwlock_endwrite(&mod->dm_sections_lock);
-			DlModule_Decref(mod);
+			decref(mod);
 		}
 	}
 	DlSection_Decref(sect);
@@ -1311,7 +1311,7 @@ libdl_dlsectionname(DlSection *sect) {
 		goto err_bad_section;
 	atomic_rwlock_read(&sect->ds_module_lock);
 	mod = sect->ds_module;
-	if (!mod || !DlModule_TryIncref(mod)) {
+	if (!mod || !tryincref(mod)) {
 		atomic_rwlock_endread(&sect->ds_module_lock);
 err_mod_unloaded:
 		dl_seterrorf("Module associated with section was unloaded");
@@ -1340,8 +1340,10 @@ err_mod_unloaded:
 			result += mod->dm_elf.de_shdr[sect->ds_index].sh_name;
 		}
 	}
-	if unlikely(!DlModule_Decref(mod))
+	if unlikely(ATOMIC_DECFETCH(mod->dm_refcnt) == 0) {
+		destroy(mod);
 		goto err_mod_unloaded;
+	}
 	return result;
 err_bad_section:
 	dl_seterror_badsection(sect);
@@ -1374,7 +1376,7 @@ libdl_dlsectionmodule(DlSection *sect, unsigned int flags) {
 	atomic_rwlock_read(&sect->ds_module_lock);
 	mod = sect->ds_module;
 	if (!mod || ((flags & DLGETHANDLE_FINCREF)
-	             ? !DlModule_TryIncref(mod)
+	             ? !tryincref(mod)
 	             : !ATOMIC_READ(mod->dm_refcnt))) {
 		atomic_rwlock_endread(&sect->ds_module_lock);
 		dl_seterrorf("Module associated with section was unloaded");
@@ -1602,7 +1604,7 @@ again_clear_modules:
 		atomic_rwlock_read(&DlModule_AllLock);
 		DlModule_AllList_FOREACH(module_iter) {
 			refcnt_t refcnt;
-			if (!DlModule_TryIncref(module_iter))
+			if (!tryincref(module_iter))
 				continue;
 			atomic_rwlock_endread(&DlModule_AllLock);
 			if (DlModule_InvokeDlCacheFunctions(module_iter))
@@ -1610,7 +1612,7 @@ again_clear_modules:
 again_try_descref_module_iter:
 			refcnt = ATOMIC_READ(module_iter->dm_refcnt);
 			if (refcnt <= 1) {
-				DlModule_Decref(module_iter);
+				decref(module_iter);
 				goto again_clear_modules;
 			}
 			atomic_rwlock_read(&DlModule_AllLock);
@@ -1632,12 +1634,12 @@ again_lock_global:
 				continue;
 			if (!atomic_rwlock_trywrite(&module_iter->dm_sections_lock)) {
 				bool hasref;
-				hasref = DlModule_TryIncref(module_iter);
+				hasref = tryincref(module_iter);
 				atomic_rwlock_endread(&DlModule_AllLock);
 				if (hasref) {
 					atomic_rwlock_write(&module_iter->dm_sections_lock);
 					atomic_rwlock_endwrite(&module_iter->dm_sections_lock);
-					DlModule_Decref(module_iter);
+					decref(module_iter);
 				}
 				goto again_lock_global;
 			}
@@ -1678,7 +1680,7 @@ again:
 		 * initialized or has already been finalized. */
 		if (ATOMIC_FETCHOR(mod->dm_flags, (RTLD_NOINIT /*| RTLD_NODELETE*/)) & RTLD_NOINIT)
 			continue;
-		if unlikely(!DlModule_TryIncref(mod))
+		if unlikely(!tryincref(mod))
 			continue;
 		atomic_rwlock_endread(&DlModule_AllLock);
 		/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
@@ -1690,7 +1692,7 @@ again:
 				TRY {
 					(*mod->dm_ops->df_run_finalizers)(mod);
 				} EXCEPT {
-					DlModule_Decref(mod);
+					decref(mod);
 					RETHROW();
 				}
 			}
@@ -1730,11 +1732,11 @@ done_dyntag:
 			if (fini_func)
 				(*(void (*)(void))(fini_func + mod->dm_loadaddr))();
 		} EXCEPT {
-			DlModule_Decref(mod);
+			decref(mod);
 			RETHROW();
 		}
 decref_module_and_continue:
-		DlModule_Decref(mod);
+		decref(mod);
 		goto again;
 	}
 	atomic_rwlock_endread(&DlModule_AllLock);

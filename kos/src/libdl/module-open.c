@@ -518,11 +518,12 @@ DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restri
 				result->dm_loadend = end;
 		}
 	}
-	result->dm_refcnt   = 1;
-	result->dm_file     = (fd_t)-1;
-	result->dm_flags    = (uint32_t)(RTLD_LAZY | RTLD_GLOBAL | RTLD_NODELETE | RTLD_NOINIT | RTLD_LOADING);
-	result->dm_filename = filename; /* Inherit data */
-	result->dm_loadaddr = loadaddr;
+	result->dm_refcnt     = 1;
+	result->dm_weakrefcnt = 1;
+	result->dm_file       = (fd_t)-1;
+	result->dm_flags      = (uint32_t)(RTLD_LAZY | RTLD_GLOBAL | RTLD_NODELETE | RTLD_NOINIT | RTLD_LOADING);
+	result->dm_filename   = filename; /* Inherit data */
+	result->dm_loadaddr   = loadaddr;
 	result->dm_loadstart += loadaddr;
 	result->dm_loadend   += loadaddr;
 	result->dm_elf.de_phnum    = info->ei_pnum;
@@ -537,7 +538,7 @@ err_nomem:
 	dl_seterror_nomem();
 	return NULL;
 err_r:
-	DlModule_Decref(result);
+	decref(result);
 	return NULL;
 }
 
@@ -616,9 +617,10 @@ DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
 		result->dm_shnum           = (size_t)-1;
 		result->dm_elf.de_shstrndx = (ElfW(Half))-1;
 	}
-	result->dm_refcnt    = 1;
-	result->dm_loadstart = (uintptr_t)-1;
-	/*result->dm_loadend = 0;*/
+	result->dm_refcnt     = 1;
+	result->dm_weakrefcnt = 1;
+	result->dm_loadstart  = (uintptr_t)-1;
+	/*result->dm_loadend  = 0;*/
 	for (pidx = 0; pidx < result->dm_elf.de_phnum; ++pidx) {
 		uintptr_t base = result->dm_loadaddr + result->dm_elf.de_phdr[pidx].p_vaddr;
 		if (result->dm_elf.de_phdr[pidx].p_type == PT_LOAD) {
@@ -744,7 +746,7 @@ DlModule_FindFromFilename(char const *__restrict filename) {
 		if (strcmp(result->dm_filename, filename) != 0)
 			continue;
 		if (!(result->dm_flags & RTLD_NODELETE))
-			DlModule_Incref(result);
+			incref(result);
 		break;
 	}
 	atomic_rwlock_endread(&DlModule_AllLock);
@@ -795,7 +797,7 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 	dl_seterror_no_mod_at_addr(static_pointer);
 	return NULL;
 got_result:
-	/*DlModule_Incref(result);*/ /* This function doesn't return a reference! */
+	/*incref(result);*/ /* This function doesn't return a reference! */
 	atomic_rwlock_endread(&DlModule_GlobalLock);
 	return result;
 }
