@@ -25,6 +25,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef GUARD_KERNEL_SRC_MISC_PANIC_C
 #define GUARD_KERNEL_SRC_MISC_PANIC_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -54,6 +55,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/kernel/cpu-state-helpers.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -546,7 +548,7 @@ panic_genfail_dbg_main(/*char const **/ void *message) {
 	dbg_printf(DBGSTR(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON) "%s" AC_DEFCOLOR "%[vinfo:"
 	                  "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
 	                  "func: " AC_WHITE("%n") "\n]"
-	                  "addr: " AC_WHITE("%p") "+" AC_WHITE("%Iu") "\n"),
+	                  "addr: " AC_WHITE("%p") "+" AC_WHITE("%" PRIuSIZ) "\n"),
 	           message, prev_pc, prev_pc,
 	           (size_t)(pc - prev_pc));
 	dbg_main(0);
@@ -637,7 +639,7 @@ panic_kernel_dbg_main(void *arg) {
 		dbg_indent -= 6;
 		dbg_print(AC_DEFCOLOR "\n");
 	}
-	dbg_printf(DBGSTR("addr: " AC_WHITE("%p") "+" AC_WHITE("%Iu") "\n"),
+	dbg_printf(DBGSTR("addr: " AC_WHITE("%p") "+" AC_WHITE("%" PRIuSIZ) "\n"),
 	           prev_pc, (size_t)(pc - prev_pc));
 	dbg_main(0);
 }

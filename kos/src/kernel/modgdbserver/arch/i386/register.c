@@ -37,6 +37,7 @@
 
 #include <assert.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "../../gdb.h"
@@ -71,7 +72,10 @@ NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread,
 	new_flags = flags & ~EFLAGS_TF;
 	if (enabled)
 		new_flags |= EFLAGS_TF;
-	GDB_DEBUG("[gdb] GDB_SetSingleStep(%p(%u.%u), %s) (was: %s)\n",
+	GDB_DEBUG("[gdb] GDB_SetSingleStep(%p("
+	          "%" PRIuN(__SIZEOF_PID_T__) "."
+	          "%" PRIuN(__SIZEOF_PID_T__) "), "
+	          "%s) (was: %s)\n",
 	          thread,
 	          task_getrootpid_of_s(thread),
 	          task_getroottid_of_s(thread),
@@ -85,8 +89,8 @@ NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread,
 		assert(GDB_GetRegister(thread, FLAGS_REGNO, &flags, sizeof(flags)));
 		assertf((flags & EFLAGS_TF) == (new_flags & EFLAGS_TF),
 		        "EFLAGS.TF was not applied properly:\n"
-		        "flags     = %#Ix\n"
-		        "new_flags = %#Ix\n",
+		        "flags     = %#" PRIx32 "\n"
+		        "new_flags = %#" PRIx32 "\n",
 		        flags, new_flags);
 #endif /* !NDEBUG */
 	}

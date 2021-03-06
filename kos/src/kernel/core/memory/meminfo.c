@@ -112,8 +112,8 @@ INTDEF struct pmembank kernel_membanks_initial[];
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL minfo_split_bank)(size_t bank_index, physaddr_t start) {
 	assertf(bank_index < minfo.mb_bankc,
-	        "bank_index     = %Iu\n"
-	        "minfo.mb_bankc = %Iu\n",
+	        "bank_index     = %" PRIuSIZ "\n"
+	        "minfo.mb_bankc = %" PRIuSIZ "\n",
 	        bank_index, minfo.mb_bankc);
 	assertf(start > PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]),
 	        "bank_index                                              = %" PRIuSIZ "\n"

@@ -355,7 +355,7 @@ int main_environ(int argc, char *argv[], char *envp[]) {
 	if (envp) {
 		size_t i;
 		for (i = 0; envp[i]; ++i)
-			printf("envp[%Iu]: %q\n", i, envp[i]);
+			printf("envp[%" PRIuSIZ "]: %q\n", i, envp[i]);
 	}
 	return 0;
 }
@@ -418,8 +418,8 @@ int main_logtime(int argc, char *argv[], char *envp[]) {
 			char buf_prev[26], buf_next[26];
 			syslog(LOG_ERR,
 			       "ERROR:\n"
-			       "\tprev: {%I64d, %Iu} (%q)\n"
-			       "\tnext: {%I64d, %Iu} (%q)\n",
+			       "\tprev: {%" PRId64 ", %" PRIuPTR "} (%q)\n"
+			       "\tnext: {%" PRId64 ", %" PRIuPTR "} (%q)\n",
 			       (s64)prev.tv_sec, (uintptr_t)prev.tv_usec, ctime_r(&prev.tv_sec, buf_prev),
 			       (s64)next.tv_sec, (uintptr_t)next.tv_usec, ctime_r(&next.tv_sec, buf_next));
 		}
@@ -767,7 +767,7 @@ int main_leak(int argc, char *argv[], char *envp[]) {
 	/* Just check for leaks in kernel-space. */
 	size_t count;
 	count = KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
-	assertf(count == 0, "Leaks: %Iu", count);
+	assertf(count == 0, "Leaks: %" PRIuSIZ, count);
 	KSysctl(KSYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING);
 	return 0;
 }

@@ -41,6 +41,7 @@
 #include <kos/debugtrap.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 
 #include "gdb.h"
@@ -136,7 +137,10 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	stop_event.e.tse_mayresume = stop_event.e.tse_reason
 	                             ? GDB_THREAD_MAYRESUME_STOP    /* With asnotif */
 	                             : GDB_THREAD_MAYRESUME_NASYNC; /* No asnotif */
-	GDB_DEBUG("[gdb] Stop %s with %p (%u.%u) [flags=%#Ix]\n",
+	GDB_DEBUG("[gdb] Stop %s with %p ("
+	          "%" PRIuN(__SIZEOF_PID_T__) "."
+	          "%" PRIuN(__SIZEOF_PID_T__) ") "
+	          "[flags=%#" PRIxPTR "]\n",
 	          (flags & GDBTHREAD_STOPRPCIMPL_F_STOPCPU) ? "cpu" : "thread",
 	          stop_event.e.tse_thread,
 	          task_getrootpid_of_s(stop_event.e.tse_thread),
@@ -376,7 +380,9 @@ INTERN void NOTHROW(FCALL GDBThread_StopAllCpus)(void) {
 
 LOCAL NONNULL((1)) void
 NOTHROW(FCALL GDBThread_ResumeSingleStopEvent)(GDBThreadStopEvent *__restrict self) {
-	GDB_DEBUG("[gdb] Resume %s with %p (%u.%u)\n",
+	GDB_DEBUG("[gdb] Resume %s with %p ("
+	          "%" PRIuN(__SIZEOF_PID_T__) "."
+	          "%" PRIuN(__SIZEOF_PID_T__) ")\n",
 	          self->tse_isacpu ? "cpu" : "thread",
 	          self->tse_thread,
 	          task_getrootpid_of_s(self->tse_thread),
@@ -528,7 +534,10 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restri
 	/* TODO: Don't directly access `thiscpu_sched_override'! */
 	FORCPU(me, thiscpu_sched_override) = thread;
 	COMPILER_BARRIER();
-	GDB_DEBUG("[gdb] Send Stop RPC to with %p (%u.%u) [async-altcpu]\n",
+	GDB_DEBUG("[gdb] Send Stop RPC to with %p ("
+	          "%" PRIuN(__SIZEOF_PID_T__) "."
+	          "%" PRIuN(__SIZEOF_PID_T__) ") "
+	          "[async-altcpu]\n",
 	          thread,
 	          task_getrootpid_of_s(thread),
 	          task_getroottid_of_s(thread));
@@ -635,7 +644,10 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			/* TODO: Don't directly access `thiscpu_sched_override'! */
 			FORCPU(target_cpu, thiscpu_sched_override) = thread;
 			COMPILER_BARRIER();
-			GDB_DEBUG("[gdb] Send Stop RPC to with %p (%u.%u) [async]\n",
+			GDB_DEBUG("[gdb] Send Stop RPC to with %p ("
+			          "%" PRIuN(__SIZEOF_PID_T__) "."
+			          "%" PRIuN(__SIZEOF_PID_T__) ") "
+			          "[async]\n",
 			          thread,
 			          task_getrootpid_of_s(thread),
 			          task_getroottid_of_s(thread));
@@ -703,7 +715,9 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 		}
 		return true; /* Already stopped */
 	}
-	GDB_DEBUG("[gdb] Send Stop RPC to with %p (%u.%u)\n",
+	GDB_DEBUG("[gdb] Send Stop RPC to with %p ("
+	          "%" PRIuN(__SIZEOF_PID_T__) "."
+	          "%" PRIuN(__SIZEOF_PID_T__) ")\n",
 	          thread,
 	          task_getrootpid_of_s(thread),
 	          task_getroottid_of_s(thread));

@@ -70,16 +70,16 @@ DECL_BEGIN
 
 #ifndef EH_FRAME_CFA_LANDING_APPLY
 #ifdef EH_FRAME_CFA_APPLY
-/* Execute CFA  result  instruction  until  `absolute_pc'  has  been  reached,
- * or   the  entirety  of   the  FDE  instruction   code  has  been  executed.
- * This function is used to fill in CFA result information at a given address,
- * which can then  be used  to unwind  a register  result for  the purpose  of
- * implementing  language-level,  zero-effort   exception  support,  as   well
- * as  for  generating   tracebacks  when   combined  with   `libdebuginfo.so'
+/* Execute CFA state instruction  until `absolute_pc' has been  reached,
+ * or  the entirety of  the FDE instruction code  has been executed. This
+ * function is used to fill in CFA state information at a given address,
+ * which  can then be used to unwind a register state for the purpose of
+ * implementing language-level, zero-effort exception support, as well as
+ * for generating tracebacks when combined with `libdebuginfo.so'
  * NOTE: Usually, the caller will have already ensured that:
  *      `self->f_pcstart <= absolute_pc && self->f_pcend >= absolute_pc'
  * @param: self:   The FDE to execute in search of `absolute_pc'
- * @param: result: CFA result descriptor, to-be filled with restore information upon success.
+ * @param: result: CFA state descriptor, to-be filled with restore information upon success.
  * @return: UNWIND_SUCCESS:                 ...
  * @return: UNWIND_INVALID_REGISTER:        ...
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
@@ -169,14 +169,15 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes);
 
 
 #ifdef EH_FRAME_CFA_APPLY
-/* Apply a given CFA unwind state in order to apply register information from from reg_getter to reg_setter.
- * Note   however   that   only  registers   with   a  rule   other   than  `DW_CFA_register_rule_undefined'
- * will be applied, meaning that `*reg_setter' will not get invoked for these registers.
- * WARNING: This function will modify `self' in such a manner that repeated calls
- *          require  that `self' must be restored to its state prior to a call to
+/* Apply  a given CFA  unwind state in order  to apply register information
+ * from `REG_GETTER'  to `REG_SETTER'.  Note  however that  only  registers
+ * with a rule other than `DW_CFA_register_rule_undefined' will be applied,
+ * meaning  that `*REG_SETTER'  will not  get invoked  for these registers.
+ * WARNING: This function will modify `SELF' in such a manner that repeated calls
+ *          require  that `SELF' must be restored to its state prior to a call to
  *          this function before a repeated call can be made!
- * @param: self:        The CFA state to-be used when applying registers
- * @param: absolute_pc: Same value as was previously used to calculate `fde' from `self'
+ * @param: SELF:        The CFA state to-be used when applying registers
+ * @param: ABSOLUTE_PC: Same value as was previously used to calculate `FDE' from `SELF'
  * @return: UNWIND_SUCCESS:               ...
  * @return: UNWIND_INVALID_REGISTER:      ...
  * @return: UNWIND_SEGFAULT:              ...

@@ -33,6 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/compiler.h>
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h> /* strend() */
@@ -427,17 +428,17 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 			DO(format_printf(printer, arg, REPR_STRING("%#p:"), parser.dup_cu_info_pos));
 			s = libdi_debug_repr_DW_TAG(parser.dup_comp.dic_tag);
 			DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s:\n"), s)
-			     : format_printf(printer, arg, REPR_STRING("%#Ix:\n"), parser.dup_comp.dic_tag));
+			     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":\n"), (uintptr_t)parser.dup_comp.dic_tag));
 			di_debuginfo_component_attrib_t attr;
 			DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
 				DO(format_repeat(printer, arg, '\t', parser.dup_child_depth + 1));
 				PRINT("[");
 				s = libdi_debug_repr_DW_AT(attr.dica_name);
 				DO(s ? format_printf(printer, arg, REPR_STRING("DW_AT_%s:"), s)
-				     : format_printf(printer, arg, REPR_STRING("%#Ix:"), attr.dica_name));
+				     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":"), (uintptr_t)attr.dica_name));
 				s = libdi_debug_repr_DW_FORM(attr.dica_form);
 				DO(s ? format_printf(printer, arg, REPR_STRING("DW_FORM_%s"), s)
-				     : format_printf(printer, arg, REPR_STRING("%#Ix"), attr.dica_form));
+				     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ""), (uintptr_t)attr.dica_form));
 				PRINT("] = ");
 				switch (attr.dica_form) {
 
@@ -467,7 +468,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					uintptr_t value;
 					if (!libdi_debuginfo_cu_parser_getconst(&parser, attr.dica_form, &value))
 						goto err_bad_value;
-					DO(format_printf(printer, arg, REPR_STRING("%Iu (%#Ix)"), value, value));
+					DO(format_printf(printer, arg, REPR_STRING("%" PRIuPTR " (%#" PRIxPTR ")"), value, value));
 				}	break;
 
 				case DW_FORM_flag:
@@ -498,7 +499,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 						DO(format_printf(printer, arg, REPR_STRING("%#p:"), p2.dup_cu_info_pos));
 						s = libdi_debug_repr_DW_TAG(p2.dup_comp.dic_tag);
 						DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s"), s)
-						     : format_printf(printer, arg, REPR_STRING("%#Ix"), p2.dup_comp.dic_tag));
+						     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR), (uintptr_t)p2.dup_comp.dic_tag));
 					}
 				}	break;
 

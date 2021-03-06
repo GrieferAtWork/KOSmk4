@@ -85,7 +85,7 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	info->ei_flags |= EXCEPT_FINCATCH;
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
-	                  "__cxa_begin_catch [%#Ix] [error=%s ("
+	                  "__cxa_begin_catch [%#" PRIx8 "] [error=%s ("
 	                  "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
 	                  "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ")]\n",
 	                  __builtin_return_address(0),

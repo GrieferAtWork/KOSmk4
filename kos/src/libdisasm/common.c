@@ -133,7 +133,7 @@ libda_disasm_print_line_nolf(struct disassembler *__restrict self) {
 		bytes_base = self->d_pc;
 		i = 0;
 		for (; i < self->d_maxbytes && i < instrlen; ++i)
-			disasm_printf(self, "%.2I8x ", bytes_base[i]);
+			disasm_printf(self, "%.2" PRIx8 " ", bytes_base[i]);
 		if (i < self->d_maxbytes) {
 			ssize_t temp;
 			temp = format_repeat(self->d_printer, self->d_arg, ' ',
@@ -160,7 +160,7 @@ libda_disasm_print_line_nolf(struct disassembler *__restrict self) {
 #error "Unsupported __SIZEOF_POINTER__"
 #endif /* __SIZEOF_POINTER__ != ... */
 			for (j = 0; j < self->d_maxbytes && i < instrlen; ++j, ++i)
-				disasm_printf(self, "%.2I8x ", bytes_base[i]);
+				disasm_printf(self, "%.2" PRIx8 " ", bytes_base[i]);
 		}
 	} else {
 		libda_disasm_print_instruction(self);
@@ -205,7 +205,7 @@ libda_single_generic(struct disassembler *__restrict self) {
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 	disasm_print(self, ".byte", 5);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
-	disasm_printf(self, " %#.2I8x", *self->d_pc++);
+	disasm_printf(self, " %#.2" PRIx8, *self->d_pc++);
 }
 
 #undef CONFIG_LOOKUP_SYMBOL_NAME
@@ -390,7 +390,7 @@ generic_print_symbol_addr:
 				if (dladdr(symbol_addr, &info) == 0 &&
 				    info.dli_sname != NULL && *info.dli_sname) {
 					/* Use DL symbol information as source for symbol names. */
-					disasm_printf(self, "<%s+%#Ix>", info.dli_sname,
+					disasm_printf(self, "<%s+%#" PRIxPTR ">", info.dli_sname,
 					              (uintptr_t)((byte_t *)symbol_addr - (byte_t *)info.dli_saddr));
 				} else
 #endif /* !__KERNEL__ */

@@ -1011,7 +1011,7 @@ do_nextop_nocomma:
 				case OPC_U8:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#I8x", *(u8 *)self->d_pc);
+					disasm_printf(self, "%#" PRIx8, *(u8 *)self->d_pc);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 1;
 					break;
@@ -1027,7 +1027,7 @@ do_nextop_nocomma:
 				case OPC_U16:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#I16x", UNALIGNED_GET16((u16 *)self->d_pc));
+					disasm_printf(self, "%#" PRIx16, UNALIGNED_GET16((u16 *)self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 2;
 					break;
@@ -1043,7 +1043,7 @@ do_nextop_nocomma:
 				case OPC_U32:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#I32x", UNALIGNED_GET32((u32 *)self->d_pc));
+					disasm_printf(self, "%#" PRIx32, UNALIGNED_GET32((u32 *)self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 4;
 					break;
@@ -1051,7 +1051,7 @@ do_nextop_nocomma:
 				case OPC_U64:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#I64x", UNALIGNED_GET64((u64 *)self->d_pc));
+					disasm_printf(self, "%#" PRIx64, UNALIGNED_GET64((u64 *)self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 8;
 					break;
@@ -1554,11 +1554,11 @@ nextop_nocomma:
 					self->d_pc += 2;
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#I16x", segment);
+					disasm_printf(self, "%#" PRIx16, segment);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					disasm_print(self, ":", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_SYMBOL_PREFIX);
-					disasm_printf(self, "%#I32p", offset);
+					disasm_printf(self, "%#" PRIp32, offset);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_SYMBOL_SUFFIX);
 				}	break;
 
@@ -1682,7 +1682,7 @@ print_byte:
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 	disasm_print(self, ".byte", 5);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
-	disasm_printf(self, " %#.2I8x", *self->d_pc++);
+	disasm_printf(self, " %#.2" PRIx8, *self->d_pc++);
 }
 
 #ifdef __GNUC__

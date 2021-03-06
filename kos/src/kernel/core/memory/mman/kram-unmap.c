@@ -46,6 +46,7 @@
 #include <sys/mmio.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -274,7 +275,7 @@ NOTHROW(FCALL mpart_truncate_trailing)(struct mpart *__restrict self,
                                        freefun_t freefun, gfp_t flags,
                                        uintptr_t node_flags) {
 	physpagecnt_t part_pages;
-	TRACE_KRAM(KERN_TRACE "[mm] mpart_truncate_trailing(%p, %Iu, %p, %#x, %#Ix)\n",
+	TRACE_KRAM(KERN_TRACE "[mm] mpart_truncate_trailing(%p, %" PRIuSIZ ", %p, %#x, %#" PRIuPTR ")\n",
 	           self, part_size, freefun, flags, node_flags);
 	assert(self->mp_maxaddr > self->mp_minaddr + part_size - 1);
 	self->mp_maxaddr = self->mp_minaddr + part_size - 1;

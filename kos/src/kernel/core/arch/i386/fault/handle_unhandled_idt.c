@@ -224,7 +224,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 	struct ucpustate ustate;
 	__cli();
 	icpustate_to_ucpustate(state, &ustate);
-	printk(KERN_EMERG "Unhandled interrupt %Ix (%Iu) [pc=%p]",
+	printk(KERN_EMERG "Unhandled interrupt %#" PRIxPTR " (%" PRIuPTR ") [pc=%p]",
 	       intno, intno, state->ics_irregs.ir_pip);
 	{
 		char const *name, *desc;

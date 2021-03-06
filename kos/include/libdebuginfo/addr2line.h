@@ -181,7 +181,7 @@ typedef struct {
  * >>     error = debug_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
- * >>     printf("%s(%Iu) : %s : HERE\n",
+ * >>     printf("%s(%" PRIuPTR ") : %s : HERE\n",
  * >>            info.al_srcfile,
  * >>            info.al_srcline,
  * >>            info.al_name);
@@ -201,8 +201,9 @@ typedef struct {
  *                                    isn't  equal   to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
  *                                    `result->al_levelcnt' is  set to  0 if  no information  is
  *                                    known at all, or whatever the total number of  information
- *                                    levels know is.
- * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
+ *                                    levels know is. (all other  fields of `*result' are  NULL-
+ *                                    initialized)
+ * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
 typedef __ATTR_NONNULL((1, 2)) unsigned int
 (LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE)(di_addr2line_sections_t const *__restrict sections,
                                     di_debug_addr2line_t *__restrict result,

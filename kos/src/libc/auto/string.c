@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8159831a */
+/* HASH CRC-32:0xa59b8294 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1148,6 +1148,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmovel)(void *dst,
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEL */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUPW
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveupw)(void *dst,
@@ -1157,7 +1158,11 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupw)(void *dst,
 	u16 const *psrc;
 	pdst = (u16 *)dst + n_words;
 	psrc = (u16 const *)src + n_words;
-	__hybrid_assertf(pdst >= psrc || !n_words, "%p < %p (count:%Iu)", dst, src, n_words);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst >= psrc || !n_words, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_words);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst >= psrc || !n_words, "%p < %p (count:%zu)", dst, src, n_words);
+#endif /* !__PRIP_PREFIX */
 	while (n_words--)
 		*--pdst = *--psrc;
 	return (u16 *)dst;
@@ -1165,6 +1170,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupw)(void *dst,
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEUPW */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNW
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memmovedownw)(void *dst,
@@ -1174,7 +1180,11 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownw)(void *dst,
 	u16 const *psrc;
 	pdst = (u16 *)dst;
 	psrc = (u16 const *)src;
-	__hybrid_assertf(pdst <= psrc || !n_words, "%p > %p (count:%Iu)", dst, src, n_words);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst <= psrc || !n_words, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_words);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst <= psrc || !n_words, "%p > %p (count:%zu)", dst, src, n_words);
+#endif /* !__PRIP_PREFIX */
 	while (n_words--)
 		*pdst++ = *psrc++;
 	return (u16 *)dst;
@@ -1200,6 +1210,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmovedownw)(void *dst,
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNW */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUPL
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveupl)(void *dst,
@@ -1209,7 +1220,11 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupl)(void *dst,
 	u32 const  *psrc;
 	pdst = (u32 *)dst + n_dwords;
 	psrc = (u32 const *)src + n_dwords;
-	__hybrid_assertf(pdst >= psrc || !n_dwords, "%p < %p (count:%Iu)", dst, src, n_dwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst >= psrc || !n_dwords, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_dwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst >= psrc || !n_dwords, "%p < %p (count:%zu)", dst, src, n_dwords);
+#endif /* !__PRIP_PREFIX */
 	while (n_dwords--)
 		*--pdst = *--psrc;
 	return (u32 *)dst;
@@ -1217,6 +1232,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupl)(void *dst,
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEUPL */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNL
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memmovedownl)(void *dst,
@@ -1226,7 +1242,11 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownl)(void *dst,
 	u32 const *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 const *)src;
-	__hybrid_assertf(pdst <= psrc || !n_dwords, "%p > %p (count:%Iu)", dst, src, n_dwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst <= psrc || !n_dwords, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_dwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst <= psrc || !n_dwords, "%p > %p (count:%zu)", dst, src, n_dwords);
+#endif /* !__PRIP_PREFIX */
 	while (n_dwords--)
 		*pdst++ = *psrc++;
 	return (u32 *)dst;
@@ -1651,6 +1671,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveq)(void *__restrict dst,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUPQ
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
@@ -1661,7 +1682,11 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
 	u64 const *psrc;
 	pdst = (u64 *)dst + n_qwords;
 	psrc = (u64 const *)src + n_qwords;
-	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%zu)", dst, src, n_qwords);
+#endif /* !__PRIP_PREFIX */
 	while (n_qwords--)
 		*--pdst = *--psrc;
 #else /* __SIZEOF_BUSINT__ >= 8 */
@@ -1669,7 +1694,11 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
 	u32 const *psrc;
 	pdst = (u32 *)dst + (n_qwords * 2);
 	psrc = (u32 const *)src + (n_qwords * 2);
-	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%zu)", dst, src, n_qwords);
+#endif /* !__PRIP_PREFIX */
 	while (n_qwords--) {
 		*--pdst = *--psrc;
 		*--pdst = *--psrc;
@@ -1681,6 +1710,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNQ
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
@@ -1691,7 +1721,11 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
 	u64 const *psrc;
 	pdst = (u64 *)dst;
 	psrc = (u64 const *)src;
-	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%zu)", dst, src, n_qwords);
+#endif /* !__PRIP_PREFIX */
 	while (n_qwords--)
 		*pdst++ = *psrc++;
 #else /* __SIZEOF_BUSINT__ >= 8 */
@@ -1699,7 +1733,11 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
 	u32 const *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 const *)src;
-	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%zu)", dst, src, n_qwords);
+#endif /* !__PRIP_PREFIX */
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
@@ -2369,6 +2407,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrxlenq)(void const *__restrict haystack,
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUP
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -2379,7 +2418,11 @@ NOTHROW_NCX(LIBCCALL libc_memmoveup)(void *dst,
 	byte_t const *psrc;
 	pdst = (byte_t *)dst + n_bytes;
 	psrc = (byte_t const *)src + n_bytes;
-	__hybrid_assertf(pdst >= psrc || !n_bytes, "%p < %p (count:%Iu)", dst, src, n_bytes);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst >= psrc || !n_bytes, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_bytes);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst >= psrc || !n_bytes, "%p < %p (count:%zu)", dst, src, n_bytes);
+#endif /* !__PRIP_PREFIX */
 	while (n_bytes--)
 		*--pdst = *--psrc;
 	return dst;
@@ -2387,6 +2430,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveup)(void *dst,
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEUP */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWN
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -2397,7 +2441,11 @@ NOTHROW_NCX(LIBCCALL libc_memmovedown)(void *dst,
 	byte_t const *psrc;
 	pdst = (byte_t *)dst;
 	psrc = (byte_t const *)src;
-	__hybrid_assertf(pdst <= psrc || !n_bytes, "%p > %p (count:%Iu)", dst, src, n_bytes);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(pdst <= psrc || !n_bytes, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_bytes);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(pdst <= psrc || !n_bytes, "%p > %p (count:%zu)", dst, src, n_bytes);
+#endif /* !__PRIP_PREFIX */
 	while (n_bytes--)
 		*pdst++ = *psrc++;
 	return dst;

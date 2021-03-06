@@ -666,8 +666,8 @@ notsup_modrm_getsetxyzmm:
 		MODRM_DECODE();
 		if (EMU86_MODRM_ISMEM(modrm.mi_type)) {
 			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(),
-		                                SSE_OPERAND_SIZE_IN_BYTES(),
-		                                reading, writing);
+			                            SSE_OPERAND_SIZE_IN_BYTES(),
+			                            reading, writing);
 		}
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction

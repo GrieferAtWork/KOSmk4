@@ -103,7 +103,7 @@ cmdline_decode(char *cmdline,
  * >> char *iter, *my_cmdline = get_cmdline();
  * >> size_t i, argc = cmdline_split(my_cmdline, NULL);
  * >> for (iter = my_cmdline, i = 0; i < argc; ++i, iter = strend(iter) + 1) {
- * >>     printf("argv[%Iu] = %q\n", i, iter);
+ * >>     printf("argv[%" PRIuSIZ "] = %q\n", i, iter);
  * >> }
  * @param: pendptr: When non-NULL, store a pointer to one byte past the end of the last argument
  * @return: * :     The total number of individual argument strings. */

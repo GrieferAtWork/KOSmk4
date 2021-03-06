@@ -32,6 +32,7 @@
 #include <kos/syscalls.h>
 
 #include <elf.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -477,10 +478,10 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* !ELF_ARCH_LAZYINDX */
 	{
 #if ELF_ARCH_LAZYINDX
-		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation index %Iu > %Iu in %q\n",
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation index %" PRIuPTR " > %" PRIuSIZ " in %q\n",
 		       jmp_rel_index, self->dm_elf.de_jmpcount, self->dm_filename);
 #else /* ELF_ARCH_LAZYINDX */
-		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation offset %Iu > %Iu in %q\n",
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation offset %" PRIuPTR " > %" PRIuSIZ " in %q\n",
 		       jmp_rel_offset, self->dm_elf.de_jmpsize, self->dm_filename);
 #endif /* !ELF_ARCH_LAZYINDX */
 		sys_exit_group(EXIT_FAILURE);
@@ -499,8 +500,8 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 	rel = (ElfW(Rel) *)((uintptr_t)self->dm_elf.de_jmprel + jmp_rel_offset);
 #endif /* !ELF_ARCH_LAZYINDX */
 	if unlikely(!ELF_ARCH_IS_R_JMP_SLOT(ELFW(R_TYPE)(rel->r_info))) {
-		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu (index:%Iu) "
-		                  "[r_offset=%#Ix,r_info=%#I32x"
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%" PRIuSIZ " (index:%" PRIuPTR ") "
+		                  "[r_offset=%#" PRIxPTR ",r_info=%#" PRIxPTR
 #if !ELF_ARCH_USESRELA
 		                  "] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n"
 #endif /* !ELF_ARCH_USESRELA */
@@ -511,13 +512,14 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 #else /* ELF_ARCH_LAZYINDX */
 		       (size_t)jmp_rel_offset,
 #if ELF_ARCH_USESRELA
-		       self->dm_flags & RTLD_JMPRELA ? (size_t)((ElfW(Rela) *)rel - self->dm_elf.de_jmprela)
-		                                     : (size_t)(rel - self->dm_elf.de_jmprel),
+		       self->dm_flags & RTLD_JMPRELA ? (uintptr_t)((ElfW(Rela) *)rel - self->dm_elf.de_jmprela)
+		                                     : (uintptr_t)(rel - self->dm_elf.de_jmprel),
 #else /* ELF_ARCH_USESRELA */
-		       (size_t)(rel - self->dm_elf.de_jmprel),
+		       (uintptr_t)(rel - self->dm_elf.de_jmprel),
 #endif /* ELF_ARCH_USESRELA */
 #endif /* !ELF_ARCH_LAZYINDX */
-		       rel->r_offset, rel->r_info
+		       (uintptr_t)rel->r_offset,
+		       (uintptr_t)rel->r_info
 #if !ELF_ARCH_USESRELA
 		       ,
 		       self->dm_filename
@@ -525,7 +527,7 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 		       );
 #if ELF_ARCH_USESRELA
 		if (self->dm_flags & RTLD_JMPRELA)
-			syslog(LOG_ERROR, ",r_addend=%Id", (ssize_t)((ElfW(Rela) *)rel)->r_addend);
+			syslog(LOG_ERROR, ",r_addend=%" PRIdPTR, (intptr_t)((ElfW(Rela) *)rel)->r_addend);
 		syslog(LOG_ERROR, "] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n", self->dm_filename);
 #endif /* ELF_ARCH_USESRELA */
 		sys_exit_group(EXIT_FAILURE);

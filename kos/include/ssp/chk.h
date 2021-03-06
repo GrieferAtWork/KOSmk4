@@ -26,17 +26,32 @@
 #include <hybrid/__assert.h>
 #include <hybrid/typecore.h>
 
+#include <bits/crt/inttypes.h>
+
 __DECL_BEGIN
 
 #ifdef __CC__
-#define __ssp_chk_dstbuf(funcname, buf, required_bufsize, available_bufsize)                        \
-	do {                                                                                            \
-		if ((available_bufsize) != (__SIZE_TYPE__)-1) {                                             \
-			__hybrid_assertf((required_bufsize) <= (available_bufsize),                             \
-			                 "%s: Buffer at %p (%Iu bytes) is smaller than the accessed %Iu bytes", \
-			                 funcname, buf, required_bufsize, available_bufsize);                   \
-		}                                                                                           \
-	} __WHILE0
+#ifdef __PRIP_PREFIX
+#define __ssp_chk_dstbuf(funcname, buf, required_bufsize, available_bufsize)        \
+	do {                                                                            \
+		if ((available_bufsize) != (__SIZE_TYPE__)-1) {                             \
+			__hybrid_assertf((required_bufsize) <= (available_bufsize),             \
+			                 "%s: Buffer at %p (%" __PRIP_PREFIX "u bytes) is "     \
+			                 "smaller than the accessed %" __PRIP_PREFIX "u bytes", \
+			                 funcname, buf, required_bufsize, available_bufsize);   \
+		}                                                                           \
+	}	__WHILE0
+#else /* __PRIP_PREFIX */
+#define __ssp_chk_dstbuf(funcname, buf, required_bufsize, available_bufsize)      \
+	do {                                                                          \
+		if ((available_bufsize) != (__SIZE_TYPE__)-1) {                           \
+			__hybrid_assertf((required_bufsize) <= (available_bufsize),           \
+			                 "%s: Buffer at %p (%zu bytes) is "                   \
+			                 "smaller than the accessed %zu bytes",               \
+			                 funcname, buf, required_bufsize, available_bufsize); \
+		}                                                                         \
+	}	__WHILE0
+#endif /* !__PRIP_PREFIX */
 #endif /* __CC__ */
 
 __DECL_END

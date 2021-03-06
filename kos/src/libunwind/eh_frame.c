@@ -34,6 +34,7 @@
 #include <kos/types.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -269,12 +270,12 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 
 
 
-/* Similar  to  `unwind_fde_exec()',   but  used   to  calculate   the
- * unwind  rule   for  `dw_regno'   at   the  given   text   location.
- * This  is  used  to  implement  unwinding  for  uncommon  registers,
- * since  `unwind_fde_exec()'   will  not   already  calculate   these
- * during the first  pass (thus keeping  down the memory  requirements
- * imposed on the one responsible for allocating `unwind_cfa_state_t')
+/* Similar to `unwind_fde_exec()', but used to calculate the unwind rule
+ * for `dw_regno' at the given text location. This is used to  implement
+ * unwinding  for uncommon registers, since `unwind_fde_exec()' will not
+ * already  calculate these during the first pass (thus keeping down the
+ * memory requirements  imposed on  the one  responsible for  allocating
+ * `unwind_cfa_state_t')
  * @param: self:   The FDE to execute in search of `absolute_pc'
  * @param: result: The CFA register result controller to-be filled.
  * @return: UNWIND_SUCCESS:                 ...
@@ -508,7 +509,7 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 			TRACE("DW_CFA_advance_loc\n");
 			current_pc += (uintptr_t)operand * parser->cp_fde->f_codealign;
 		} else if (opcode == DW_CFA_offset) {
-			TRACE("DW_CFA_offset(%I8u)\n", operand);
+			TRACE("DW_CFA_offset(%" PRIu8 ")\n", operand);
 			dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 		} else if (opcode == DW_CFA_restore) {
 			TRACE("DW_CFA_restore\n");
@@ -568,14 +569,14 @@ NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
 				break;
 
 			CASE(DW_CFA_def_cfa_expression) {
-				uintptr_t expr_size;
+				size_t expr_size;
 skip_expression:
 				expr_size = dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				if unlikely(OVERFLOW_UADD((uintptr_t)cfa_reader, expr_size,
 				                          (uintptr_t *)(byte_t const **)&cfa_reader) ||
 				            cfa_reader > parser->cp_end) {
 					ERRORF(err_illegal_instruction,
-					       "cfa_reader=%p, expr_size=%Iu(%#Ix), cfa_end=%p",
+					       "cfa_reader=%p, expr_size=%" PRIuSIZ "(%#" PRIxSIZ "), cfa_end=%p",
 					       (uintptr_t)cfa_reader - expr_size,
 					       expr_size, expr_size, parser->cp_end);
 				}
@@ -600,7 +601,7 @@ skip_expression:
 				goto done;
 
 			default:
-				ERRORF(err_unknown_instruction, "operand=%#.2I8x\n", operand);
+				ERRORF(err_unknown_instruction, "operand=%#.2" PRIx8 "\n", operand);
 			}
 		}
 	}
@@ -850,7 +851,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict sel
 			TRACE("DW_CFA_advance_loc\n");
 			current_pc += (uintptr_t)operand * self->f_codealign;
 		} else if (opcode == DW_CFA_offset) {
-			TRACE("DW_CFA_offset(%I8u)\n", operand);
+			TRACE("DW_CFA_offset(%" PRIu8 ")\n", operand);
 			dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 		} else if (opcode == DW_CFA_restore) {
 			TRACE("DW_CFA_restore\n");
@@ -916,7 +917,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict sel
 					/* Check if we have enough stack space left to create a backup. */
 #ifdef __KERNEL__
 					if (get_stack_avail() < ((256 * sizeof(void *)) + sizeof(landing1_backup_t)))
-						ERRORF(err_nomem, "get_stack_avail()=%Iu", get_stack_avail());
+						ERRORF(err_nomem, "get_stack_avail()=%" PRIuSIZ "", get_stack_avail());
 					backup = (landing1_backup_t *)alloca(sizeof(landing1_backup_t));
 #else /* __KERNEL__ */
 					backup = (landing1_backup_t *)malloc(sizeof(landing1_backup_t));
@@ -953,14 +954,14 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict sel
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 
 			CASE(DW_CFA_def_cfa_expression) {
-				uintptr_t expr_size;
+				size_t expr_size;
 skip_expression:
 				expr_size = dwarf_decode_uleb128((byte_t const **)&cfa_reader);
 				if unlikely(OVERFLOW_UADD((uintptr_t)cfa_reader, expr_size,
 				                          (uintptr_t *)(byte_t const **)&cfa_reader) ||
 				            cfa_reader > cfa_end) {
 					ERRORF(err_illegal_instruction,
-					       "cfa_reader=%p, expr_size=%Iu(%#Ix), cfa_end=%p",
+					       "cfa_reader=%p, expr_size=%" PRIuSIZ "(%#" PRIxSIZ "), cfa_end=%p",
 					       (uintptr_t)cfa_reader - expr_size,
 					       expr_size, expr_size, cfa_end);
 				}
@@ -980,7 +981,7 @@ skip_expression:
 				break;
 
 			default:
-				ERRORF(err_unknown_instruction, "operand=%#.2I8x\n", operand);
+				ERRORF(err_unknown_instruction, "operand=%#.2" PRIx8 "\n", operand);
 			}
 		}
 	}

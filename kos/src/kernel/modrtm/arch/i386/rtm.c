@@ -53,6 +53,7 @@
 
 #include <errno.h>
 #include <int128.h>
+#include <inttypes.h>
 #include <stddef.h> /* UINT32_C */
 #include <stdint.h> /* UINT32_C */
 #include <string.h>
@@ -1466,9 +1467,25 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 			              (void *)mach.r_pip,
 			              DISASSEMBLER_TARGET_CURRENT,
 			              DISASSEMBLER_FNOADDR);
-			printk(KERN_TRACE "\t# a=%#Ix c=%#Ix d=%#Ix b=%#Ix sp=%#Ix bp=%#Ix si=%#Ix di=%#Ix"
+			printk(KERN_TRACE "\t# "
+			                  "a=%#" PRIxPTR " "
+			                  "c=%#" PRIxPTR " "
+			                  "d=%#" PRIxPTR " "
+			                  "b=%#" PRIxPTR " "
+			                  "sp=%#" PRIxPTR " "
+			                  "bp=%#" PRIxPTR " "
+			                  "si=%#" PRIxPTR " "
+			                  "di=%#" PRIxPTR
 #ifdef __x86_64__
-			                  " 8=%#Ix 9=%#Ix 10=%#Ix 11=%#Ix 12=%#Ix 13=%#Ix 14=%#Ix 15=%#Ix"
+			                  " "
+			                  "8=%#" PRIxPTR " "
+			                  "9=%#" PRIxPTR " "
+			                  "10=%#" PRIxPTR " "
+			                  "11=%#" PRIxPTR " "
+			                  "12=%#" PRIxPTR " "
+			                  "13=%#" PRIxPTR " "
+			                  "14=%#" PRIxPTR " "
+			                  "15=%#" PRIxPTR
 #endif /* __x86_64__ */
 			                  "\n",
 			       mach.r_pax, mach.r_pcx, mach.r_pdx, mach.r_pbx,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ceaa2d5 */
+/* HASH CRC-32:0x3e91d672 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 __LOCAL_LIBC(memmovedownq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
@@ -32,7 +33,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownq))(void *__dst, void cons
 	__UINT64_TYPE__ const *__psrc;
 	__pdst = (__UINT64_TYPE__ *)__dst;
 	__psrc = (__UINT64_TYPE__ const *)__src;
-	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%Iu)", __dst, __src, __n_qwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%" __PRIP_PREFIX "u)", __dst, __src, __n_qwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%zu)", __dst, __src, __n_qwords);
+#endif /* !__PRIP_PREFIX */
 	while (__n_qwords--)
 		*__pdst++ = *__psrc++;
 #else /* __SIZEOF_BUSINT__ >= 8 */
@@ -40,7 +45,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownq))(void *__dst, void cons
 	__UINT32_TYPE__ const *__psrc;
 	__pdst = (__UINT32_TYPE__ *)__dst;
 	__psrc = (__UINT32_TYPE__ const *)__src;
-	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%Iu)", __dst, __src, __n_qwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%" __PRIP_PREFIX "u)", __dst, __src, __n_qwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%zu)", __dst, __src, __n_qwords);
+#endif /* !__PRIP_PREFIX */
 	while (__n_qwords--) {
 		*__pdst++ = *__psrc++;
 		*__pdst++ = *__psrc++;

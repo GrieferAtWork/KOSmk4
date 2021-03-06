@@ -1068,8 +1068,7 @@ return_zero:
 		char *argsend, *datastart, *dataend;
 		struct handle *h;
 		intptr_t fd;
-		uintptr_t count;
-		size_t used_count;
+		size_t used_count, count;
 		u64 offset;
 		fd = strtos(args, &argsend, 16);
 		if unlikely(*argsend++ != ',')
@@ -1094,7 +1093,7 @@ return_zero:
 			o = GDBFs_EncodeCurrentError(o);
 			goto do_transmit;
 		}
-		datastart = o + sprintf(o, "F%Ix;", count);
+		datastart = o + sprintf(o, "F%" PRIxSIZ ";", count);
 		dataend = GDB_EncodeEscapedBinaryEx(datastart,
 		                                    o + CONFIG_GDBSERVER_PACKET_MAXLEN,
 		                                    GDBRemote_CommandBuffer, count,
@@ -1109,7 +1108,7 @@ return_zero:
 			char temp[PACKETLEN_MAX_HEXLEN + 1];
 			size_t oldlen, newlen;
 			oldlen = (size_t)(datastart - o) - 2;
-			newlen = sprintf(temp, "%Ix", used_count);
+			newlen = sprintf(temp, "%" PRIxSIZ, used_count);
 			assert(newlen <= oldlen);
 			memset(o + 1, '0', oldlen - newlen, sizeof(char));
 			memcpy(o + 1 + oldlen - newlen, temp, newlen, sizeof(char));
@@ -1140,7 +1139,7 @@ return_zero:
 			o = GDBFs_EncodeCurrentError(o);
 			goto do_transmit;
 		}
-		o += sprintf(o, "F%Ix", count);
+		o += sprintf(o, "F%" PRIxSIZ, count);
 	} else if (strcmp(command, "fstat") == 0) {
 		char *argsend;
 		struct handle *h;
@@ -1176,7 +1175,7 @@ return_zero:
 		gst.st_ctime   = (gdb_time_t)st.st_ctime;
 		GDB_DEBUG("[gdb] gst.st_size = %#I64x\n", gst.st_size);
 
-		o += sprintf(o, "F%Ix;", sizeof(gst));
+		o += sprintf(o, "F%" PRIxSIZ ";", sizeof(gst));
 		o = GDB_EncodeEscapedBinary(o, &gst, sizeof(gst));
 	} else if (strcmp(command, "unlink") == 0) {
 		gdb_errno_t error;
@@ -1217,13 +1216,13 @@ return_zero:
 		} else {
 			char temp[PACKETLEN_MAX_HEXLEN + 1];
 			size_t lenlen;
-			lenlen = sprintf(temp, "%Ix", buflen);
+			lenlen = sprintf(temp, "%" PRIxSIZ, buflen);
 			assert(lenlen >= 3);
 			if (buflen >= CONFIG_GDBSERVER_PACKET_MAXLEN - 4) {
 				char temp2[PACKETLEN_MAX_HEXLEN + 1];
 				size_t lenlen2;
 				buflen -= lenlen - 2;
-				lenlen2 = sprintf(temp2, "%Ix", buflen);
+				lenlen2 = sprintf(temp2, "%" PRIxSIZ, buflen);
 				assert(lenlen2 <= lenlen);
 				memcpy(mempset(temp, '0', lenlen - lenlen2, sizeof(char)),
 				       temp2, lenlen2, sizeof(char));

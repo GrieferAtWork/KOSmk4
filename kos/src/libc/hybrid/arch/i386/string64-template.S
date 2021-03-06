@@ -22,10 +22,14 @@
 #define RETURN_PCPY   0
 #define __ASSEMBLER__ 1
 #endif /* __INTELLISENSE__ */
+#define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
 #include <asm/instr/movzxq.h>
+
+#include <inttypes.h>
 
 #ifndef __DEEMON__
 #ifndef N
@@ -218,7 +222,7 @@ DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempmove),
 #ifndef MEMMOVEDOWN_INVALID_ORDER_STRINGS_DEFINED
 #define MEMMOVEDOWN_INVALID_ORDER_STRINGS_DEFINED 1
 .pushsection .rodata.crt.string.memory
-	.Linvalid_order_str_format: .asciz "This isn't a memmovedown() operation, but is memmoveup(): dst(%p) > src(%p) (count:%Iu)"
+	.Linvalid_order_str_format: .asciz "This isn't a memmovedown() operation, but is memmoveup(): dst(%p) > src(%p) (count:%" PRIuSIZ ")"
 	.Linvalid_order_str_file:   .asciz __FILE__
 	.Linvalid_order_str_expr:   .asciz "dst <= src"
 .popsection
@@ -314,7 +318,7 @@ DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempmovedown),
 #ifndef MEMMOVEUP_INVALID_ORDER_STRINGS_DEFINED
 #define MEMMOVEUP_INVALID_ORDER_STRINGS_DEFINED 1
 	.pushsection .rodata.crt.string.memory
-.Linvalid_orderup_str_format: .asciz "This isn't a memmoveup() operation, but is memmovedown(): dst(%p) < src(%p) (count:%Iu)"
+.Linvalid_orderup_str_format: .asciz "This isn't a memmoveup() operation, but is memmovedown(): dst(%p) < src(%p) (count:%" PRIuSIZ ")"
 .Linvalid_orderup_str_expr:   .asciz "dst >= src"
 	.popsection
 #endif /* !MEMMOVEUP_INVALID_ORDER_STRINGS_DEFINED */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf21752a */
+/* HASH CRC-32:0xbb819c03 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
 __LOCAL_LIBC(memmoveupl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
@@ -31,7 +32,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveupl))(void *__dst, void const 
 	__UINT32_TYPE__ const  *__psrc;
 	__pdst = (__UINT32_TYPE__ *)__dst + __n_dwords;
 	__psrc = (__UINT32_TYPE__ const *)__src + __n_dwords;
-	__hybrid_assertf(__pdst >= __psrc || !__n_dwords, "%p < %p (count:%Iu)", __dst, __src, __n_dwords);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(__pdst >= __psrc || !__n_dwords, "%p < %p (count:%" __PRIP_PREFIX "u)", __dst, __src, __n_dwords);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(__pdst >= __psrc || !__n_dwords, "%p < %p (count:%zu)", __dst, __src, __n_dwords);
+#endif /* !__PRIP_PREFIX */
 	while (__n_dwords--)
 		*--__pdst = *--__psrc;
 	return (__UINT32_TYPE__ *)__dst;

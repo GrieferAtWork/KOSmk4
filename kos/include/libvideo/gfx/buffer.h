@@ -121,8 +121,8 @@ struct video_buffer {
 	__uintptr_t              vb_refcnt; /* Reference counter. */
 	struct video_buffer_ops *vb_ops;    /* [1..1][const] Buffer operations. */
 	struct video_format      vb_format; /* [const] Buffer format. */
-	__uintptr_t              vb_size_x; /* Buffer size in X */
-	__uintptr_t              vb_size_y; /* Buffer size in Y */
+	__size_t                 vb_size_x; /* Buffer size in X */
+	__size_t                 vb_size_y; /* Buffer size in Y */
 	/* Buffer-specific fields go here */
 
 #ifdef __cplusplus

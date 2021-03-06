@@ -49,27 +49,27 @@ DECL_BEGIN
 
 #undef ASSERT_ABS_COORDS_IS_NOOP
 #if !defined(NDEBUG) && 0
-#define ASSERT_ABS_COORDS(self, x, y)           \
-	(assertf((x) >= (self)->vx_xmin &&          \
-	         (x) < (self)->vx_xend,             \
-	         "x       = %Iu (%#Ix)\n"           \
-	         "vx_xmin = %Iu (%#Ix)\n"           \
-	         "vx_xend = %Iu (%#Ix)",            \
-	         (x), (x),                          \
-	         (self)->vx_xmin, (self)->vx_xmin,  \
-	         (self)->vx_xend, (self)->vx_xend), \
-	 assertf((y) >= (self)->vx_ymin &&          \
-	         (y) < (self)->vx_yend,             \
-	         "y       = %Iu (%#Ix)\n"           \
-	         "vx_ymin = %Iu (%#Ix)\n"           \
-	         "vx_yend = %Iu (%#Ix)",            \
-	         (y), (y),                          \
-	         (self)->vx_ymin, (self)->vx_ymin,  \
+#define ASSERT_ABS_COORDS(self, x, y)                   \
+	(assertf((x) >= (self)->vx_xmin &&                  \
+	         (x) < (self)->vx_xend,                     \
+	         "x       = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_xmin = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_xend = %" PRIuPTR " (%#" PRIxPTR ")",  \
+	         (x), (x),                                  \
+	         (self)->vx_xmin, (self)->vx_xmin,          \
+	         (self)->vx_xend, (self)->vx_xend),         \
+	 assertf((y) >= (self)->vx_ymin &&                  \
+	         (y) < (self)->vx_yend,                     \
+	         "y       = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_ymin = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_yend = %" PRIuPTR " (%#" PRIxPTR ")",  \
+	         (y), (y),                                  \
+	         (self)->vx_ymin, (self)->vx_ymin,          \
 	         (self)->vx_yend, (self)->vx_yend))
-#else
+#else /* !NDEBUG */
 #define ASSERT_ABS_COORDS(self, x, y) (void)0
 #define ASSERT_ABS_COORDS_IS_NOOP 1
-#endif
+#endif /* NDEBUG */
 
 
 #define video_gfx_getabscolor(self, abs_x, abs_y) \

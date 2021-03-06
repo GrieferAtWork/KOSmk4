@@ -1936,7 +1936,7 @@ mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
 [[if_fast_defined(memmoveupw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmoveupw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmoveupw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
-[[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPW))]]
 memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
             [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1945,7 +1945,11 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 	u16 const *psrc;
 	pdst = (u16 *)dst + n_words;
 	psrc = (u16 const *)src + n_words;
-	@__hybrid_assertf@(pdst >= psrc || !n_words, "%p < %p (count:%Iu)", dst, src, n_words);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst >= psrc || !n_words, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_words);
+@@pp_else@@
+	@__hybrid_assertf@(pdst >= psrc || !n_words, "%p < %p (count:%zu)", dst, src, n_words);
+@@pp_endif@@
 	while (n_words--)
 		*--pdst = *--psrc;
 	return (u16 *)dst;
@@ -1960,7 +1964,7 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 [[if_fast_defined(memmovedownw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmovedownw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
 [[if_fast_defined(memmovedownw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
-[[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNW))]]
 memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
               [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1969,7 +1973,11 @@ memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 	u16 const *psrc;
 	pdst = (u16 *)dst;
 	psrc = (u16 const *)src;
-	@__hybrid_assertf@(pdst <= psrc || !n_words, "%p > %p (count:%Iu)", dst, src, n_words);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst <= psrc || !n_words, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_words);
+@@pp_else@@
+	@__hybrid_assertf@(pdst <= psrc || !n_words, "%p > %p (count:%zu)", dst, src, n_words);
+@@pp_endif@@
 	while (n_words--)
 		*pdst++ = *psrc++;
 	return (u16 *)dst;
@@ -2016,7 +2024,7 @@ mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 [[if_fast_defined(memmoveupl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmoveupl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmoveupl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
-[[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPL))]]
 memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
             [[nonnull]] /*aligned(4)*/ void const *src,
@@ -2025,7 +2033,11 @@ memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 	u32 const  *psrc;
 	pdst = (u32 *)dst + n_dwords;
 	psrc = (u32 const *)src + n_dwords;
-	@__hybrid_assertf@(pdst >= psrc || !n_dwords, "%p < %p (count:%Iu)", dst, src, n_dwords);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst >= psrc || !n_dwords, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_dwords);
+@@pp_else@@
+	@__hybrid_assertf@(pdst >= psrc || !n_dwords, "%p < %p (count:%zu)", dst, src, n_dwords);
+@@pp_endif@@
 	while (n_dwords--)
 		*--pdst = *--psrc;
 	return (u32 *)dst;
@@ -2040,7 +2052,7 @@ memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 [[if_fast_defined(memmovedownl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmovedownl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
 [[if_fast_defined(memmovedownl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
-[[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNL))]]
 memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
               [[nonnull]] /*aligned(4)*/ void const *src,
@@ -2049,7 +2061,11 @@ memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 	u32 const *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 const *)src;
-	@__hybrid_assertf@(pdst <= psrc || !n_dwords, "%p > %p (count:%Iu)", dst, src, n_dwords);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst <= psrc || !n_dwords, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_dwords);
+@@pp_else@@
+	@__hybrid_assertf@(pdst <= psrc || !n_dwords, "%p > %p (count:%zu)", dst, src, n_dwords);
+@@pp_endif@@
 	while (n_dwords--)
 		*pdst++ = *psrc++;
 	return (u32 *)dst;
@@ -2656,7 +2672,7 @@ mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmoveq"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(memmoveupq, ["memmoveupq", "memmoveq"])]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPQ))]]
 memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
             [[nonnull]] /*aligned(8)*/ void const *src,
@@ -2666,7 +2682,11 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
 	u64 const *psrc;
 	pdst = (u64 *)dst + n_qwords;
 	psrc = (u64 const *)src + n_qwords;
-	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+@@pp_else@@
+	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%zu)", dst, src, n_qwords);
+@@pp_endif@@
 	while (n_qwords--)
 		*--pdst = *--psrc;
 @@pp_else@@
@@ -2674,7 +2694,11 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
 	u32 const *psrc;
 	pdst = (u32 *)dst + (n_qwords * 2);
 	psrc = (u32 const *)src + (n_qwords * 2);
-	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+@@pp_else@@
+	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%zu)", dst, src, n_qwords);
+@@pp_endif@@
 	while (n_qwords--) {
 		*--pdst = *--psrc;
 		*--pdst = *--psrc;
@@ -2686,7 +2710,7 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmoveq"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(memmovedownq, ["memmovedownq", "memmoveq"])]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNQ))]]
 memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
               [[nonnull]] /*aligned(8)*/ void const *src,
@@ -2696,7 +2720,11 @@ memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
 	u64 const *psrc;
 	pdst = (u64 *)dst;
 	psrc = (u64 const *)src;
-	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+@@pp_else@@
+	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%zu)", dst, src, n_qwords);
+@@pp_endif@@
 	while (n_qwords--)
 		*pdst++ = *psrc++;
 @@pp_else@@
@@ -2704,7 +2732,11 @@ memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
 	u32 const *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 const *)src;
-	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_qwords);
+@@pp_else@@
+	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%zu)", dst, src, n_qwords);
+@@pp_endif@@
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
@@ -3486,7 +3518,8 @@ $size_t rawmemrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 @@@return: * : Always re-returns `dst'
 [[libc, kernel, ATTR_LEAF, alias("memmove")]]
 [[preferred_fastbind(memmoveup, ["memmoveup", "memmove"])]]
-[[impl_include("<hybrid/__assert.h>"), decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUP))]]
 memmoveup:([[nonnull]] void *dst,
            [[nonnull]] void const *src,
@@ -3495,7 +3528,11 @@ memmoveup:([[nonnull]] void *dst,
 	byte_t const *psrc;
 	pdst = (byte_t *)dst + n_bytes;
 	psrc = (byte_t const *)src + n_bytes;
-	@__hybrid_assertf@(pdst >= psrc || !n_bytes, "%p < %p (count:%Iu)", dst, src, n_bytes);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst >= psrc || !n_bytes, "%p < %p (count:%" __PRIP_PREFIX "u)", dst, src, n_bytes);
+@@pp_else@@
+	@__hybrid_assertf@(pdst >= psrc || !n_bytes, "%p < %p (count:%zu)", dst, src, n_bytes);
+@@pp_endif@@
 	while (n_bytes--)
 		*--pdst = *--psrc;
 	return dst;
@@ -3505,7 +3542,8 @@ memmoveup:([[nonnull]] void *dst,
 @@@return: * : Always re-returns `dst'
 [[libc, kernel, ATTR_LEAF, alias("memmove")]]
 [[preferred_fastbind(memmovedown, ["memmovedown", "memmove"])]]
-[[impl_include("<hybrid/__assert.h>"), decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<bits/crt/inttypes.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWN))]]
 memmovedown:([[nonnull]] void *dst,
              [[nonnull]] void const *src,
@@ -3514,7 +3552,11 @@ memmovedown:([[nonnull]] void *dst,
 	byte_t const *psrc;
 	pdst = (byte_t *)dst;
 	psrc = (byte_t const *)src;
-	@__hybrid_assertf@(pdst <= psrc || !n_bytes, "%p > %p (count:%Iu)", dst, src, n_bytes);
+@@pp_ifdef __PRIP_PREFIX@@
+	@__hybrid_assertf@(pdst <= psrc || !n_bytes, "%p > %p (count:%" __PRIP_PREFIX "u)", dst, src, n_bytes);
+@@pp_else@@
+	@__hybrid_assertf@(pdst <= psrc || !n_bytes, "%p > %p (count:%zu)", dst, src, n_bytes);
+@@pp_endif@@
 	while (n_bytes--)
 		*pdst++ = *psrc++;
 	return dst;

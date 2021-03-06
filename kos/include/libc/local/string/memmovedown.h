@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x411f5be */
+/* HASH CRC-32:0x1db3be30 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
@@ -32,7 +33,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedown))(void *__dst, void const
 	__BYTE_TYPE__ const *__psrc;
 	__pdst = (__BYTE_TYPE__ *)__dst;
 	__psrc = (__BYTE_TYPE__ const *)__src;
-	__hybrid_assertf(__pdst <= __psrc || !__n_bytes, "%p > %p (count:%Iu)", __dst, __src, __n_bytes);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(__pdst <= __psrc || !__n_bytes, "%p > %p (count:%" __PRIP_PREFIX "u)", __dst, __src, __n_bytes);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(__pdst <= __psrc || !__n_bytes, "%p > %p (count:%zu)", __dst, __src, __n_bytes);
+#endif /* !__PRIP_PREFIX */
 	while (__n_bytes--)
 		*__pdst++ = *__psrc++;
 	return __dst;

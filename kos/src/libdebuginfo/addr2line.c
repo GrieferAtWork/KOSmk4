@@ -541,6 +541,8 @@ err_corrupt:
 }
 
 /* Analyze data from the given `sections' to locate source-level information about `module_relative_pc'.
+ * HINT: Using this function, you can implement the behavior of `$ addr2line -ife ...' entirely in
+ *       software, by combining this api with functions from <dlfcn.h>
  * @param: sections: The mapping locations for the different debug sections associated with the  program.
  *                   This structure must be initialized with available section information by the caller,
  *                   although for  minimal  functionality,  only the  .debug_line  section  is  required.
@@ -560,19 +562,29 @@ err_corrupt:
  * >>     error = debug_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
- * >>     printk("%s(%Iu) : %s : HERE\n",
+ * >>     printf("%s(%" PRIuPTR ") : %s : HERE\n",
  * >>            info.al_srcfile,
  * >>            info.al_srcline,
  * >>            info.al_name);
  * >> } while (++level < info.al_levelcnt);
+ * NOTE: The return value differs from `DEBUG_INFO_ERROR_SUCCESS', `*result' will have
+ *       been initialized as follows:
+ *        - al_levelcnt:  The  number of known  information levels for the
+ *                        address, or 0 if no information is known at all.
+ *        - al_symstart:  Set to `module_relative_pc'
+ *        - al_symend:    Set to `module_relative_pc'
+ *        - al_linestart: Set to `module_relative_pc'
+ *        - al_lineend:   Set to `module_relative_pc'
+ *        - * :           All other fields are 0/NULL
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully retrieved information.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either no information is known about `module_relative_pc',
  *                                    or the given `level >= OUT(result->al_levelcnt)', and also
  *                                    isn't  equal   to  `DEBUG_ADDR2LINE_LEVEL_SOURCE',   where
  *                                    `result->al_levelcnt' is  set to  0 if  no information  is
  *                                    known at all, or whatever the total number of  information
- *                                    levels know is.
- * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
+ *                                    levels know is. (all other  fields of `*result' are  NULL-
+ *                                    initialized)
+ * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
 INTERN TEXTSECTION NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libdi_debug_addr2line)(di_addr2line_sections_t const *__restrict sections,
                                       di_debug_addr2line_t *__restrict result,

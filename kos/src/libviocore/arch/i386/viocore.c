@@ -67,6 +67,7 @@ opt.append("-Os");
 
 #include <assert.h>
 #include <int128.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
 #include <string.h>
@@ -83,6 +84,13 @@ opt.append("-Os");
 #include <sched/except-handler.h>
 #include <sched/task.h>
 #endif /* __KERNEL__ */
+
+#ifdef __KERNEL__
+#define PRINT_WARN(...) printk(KERN_WARNING __VA_ARGS__)
+#else /* __KERNEL__ */
+#define PRINT_WARN(...) syslog(LOG_WARN, __VA_ARGS__)
+#endif /* !__KERNEL__ */
+
 
 DECL_BEGIN
 
@@ -2222,15 +2230,12 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
 	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
-#ifdef __KERNEL__
-	printk(KERN_WARNING "[vio] Illegal instruction %p-%p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
-	       pc, opcode, self->vea_ptrlo, self->vea_ptrhi, (u64)self->vea_addr,
-	       ERROR_CLASS(code), ERROR_SUBCLASS(code));
-#else /* __KERNEL__ */
-	syslog(LOG_WARN, "[vio] Illegal instruction %p-%p:%#Ix [cr2=%p:%#I64x,code=%Ix:%Ix]\n",
-	       pc, opcode, self->vea_ptrlo, self->vea_ptrhi, (u64)self->vea_addr,
-	       ERROR_CLASS(code), ERROR_SUBCLASS(code));
-#endif /* !__KERNEL__ */
+	PRINT_WARN("[vio] Illegal instruction %p:%#" PRIxPTR " "
+	           "[cr2=%p:%#" PRIx64 ",code="
+	           "%" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+	           "%" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) "]\n",
+	           pc, opcode, self->vea_ptrlo, (u64)self->vea_addr,
+	           ERROR_CLASS(code), ERROR_SUBCLASS(code));
 	/* Throw an exception detailing an unsupported opcode. */
 	data = error_data();
 	data->e_code               = code;

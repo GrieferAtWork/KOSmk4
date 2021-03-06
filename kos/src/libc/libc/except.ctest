@@ -56,13 +56,13 @@ DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
 		} catch (...) {
 			reached_inner = true;
 			assertf(error_code() == ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
-			        "error_code() = %#Ix", (uintptr_t)error_code());
+			        "error_code() = %#" PRIxN(__SIZEOF_ERROR_CODE_T__), error_code());
 			throw; /* Rethrow the exception */
 		}
 	} catch (...) {
 		reached_outer = true;
 		assertf(error_code() == ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
-		        "error_code() = %#Ix", (uintptr_t)error_code());
+		        "error_code() = %#" PRIxN(__SIZEOF_ERROR_CODE_T__), error_code());
 		assertf((void *)error_data()->e_args.e_segfault.s_addr == (void *)p,
 		        "error_data()->e_args.e_segfault.s_addr = %p\n",
 		        "p                                      = %p\n",

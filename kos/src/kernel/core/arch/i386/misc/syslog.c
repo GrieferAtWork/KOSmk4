@@ -193,7 +193,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 			value = *(DBG_MONITOR_TYPE volatile *)(0xc0000000 + DBG_MONITOR_MEMORY);
 			pagedir_pop_mapone((void *)addr, pv);
 			sync_endwrite(&monitor_memory_lock);
-			len = sprintf(buf, "[" PP_STR(DBG_MONITOR_TYPE) "@%Ix=%#" DBG_MONITOR_FMT "]",
+			len = sprintf(buf, "[" PP_STR(DBG_MONITOR_TYPE) "@%" PRIxPTR "=%#" DBG_MONITOR_FMT "]",
 			              (uintptr_t)DBG_MONITOR_MEMORY, value);
 			x86_syslog_write(buf, len);
 		}

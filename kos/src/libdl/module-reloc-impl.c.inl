@@ -145,7 +145,8 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				if (src_size == 0 && src_module == &dl_rtld_module)
 					src_size = dst_sym->st_size;
 				else {
-					syslog(LOG_WARN, "[rtld] %q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
+					syslog(LOG_WARN, "[rtld] %q: Symbol %q imported with %" PRIuSIZ " "
+			                         "bytes, but exported with %" PRIuSIZ " from %q\n",
 					       self->dm_filename, self->dm_elf.de_dynstr + dst_sym->st_name,
 					       dst_sym->st_info, src_size, src_module->dm_filename);
 					/* NOTE: When `src_size' is  ZERO(0), then always  copy the size  information
@@ -407,22 +408,24 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 
 		default:
+			syslog(LOG_WARN,
+			       "[rtld] %q: Relocation #%" PRIuSIZ " at %p "
+			       "(%#" PRIxPTR "+%#" PRIxPTR ") has unknown type %u (%#x)"
 #ifdef APPLY_RELA
-			syslog(LOG_WARN, "[rtld] %q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x) [addend=%s%#Ix]\n",
+			       " [addend=%s%#" PRIxPTR "]"
+#endif /* APPLY_RELA */
+			       "\n",
 			       self->dm_filename,
 			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
 			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
-			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info)
+#ifdef APPLY_RELA
+			       ,
 			       rel.r_addend < 0 ? "-" : "",
 			       rel.r_addend < 0 ? (uintptr_t)-rel.r_addend
-			                        : (uintptr_t)rel.r_addend);
-#else /* APPLY_RELA */
-			syslog(LOG_WARN, "[rtld] %q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x)\n",
-			       self->dm_filename,
-			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
-			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
-			       (unsigned int)ELFW(R_TYPE)(rel.r_info));
-#endif /* !APPLY_RELA */
+			                        : (uintptr_t)rel.r_addend
+#endif /* APPLY_RELA */
+			       );
 			break;
 		}
 #undef REL_ADDEND

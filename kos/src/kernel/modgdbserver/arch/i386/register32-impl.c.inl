@@ -29,6 +29,8 @@
 #include <kos/kernel/fpu-state32.h>
 #include <kos/kernel/gdb-cpu-state32.h>
 
+#include <inttypes.h>
+
 DECL_BEGIN
 
 #ifdef SET_REGISTER
@@ -682,7 +684,7 @@ NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
 	uintptr_t regno;
 	for (regno = 0; regno < sizeof(struct gdb_cpustate32) / 4; ++regno) {
 		if (FUNC(Register)(thread, regno, (u32 *)buf + regno, 4) != 4) {
-			GDB_DEBUG("[gdb] Failed to access i386 register %#Ix\n", regno);
+			GDB_DEBUG("[gdb] Failed to access i386 register %#" PRIxPTR "\n", regno);
 			return false;
 		}
 	}

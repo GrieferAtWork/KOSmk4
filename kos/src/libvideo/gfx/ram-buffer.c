@@ -36,6 +36,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <sys/mman.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <string.h>
@@ -57,26 +58,26 @@ DECL_BEGIN
 #define RAMGFX_STRIDE (size_t)self->vx_driver[VIDEO_BUFFER_RAMGFX_STRIDE]
 
 #if !defined(NDEBUG) && 1
-#define ASSERT_ABS_COORDS(self, x, y)           \
-	(assertf((x) >= (self)->vx_xmin &&          \
-	         (x) < (self)->vx_xend,             \
-	         "x       = %Iu (%#Ix)\n"           \
-	         "vx_xmin = %Iu (%#Ix)\n"           \
-	         "vx_xend = %Iu (%#Ix)",            \
-	         (x), (x),                          \
-	         (self)->vx_xmin, (self)->vx_xmin,  \
-	         (self)->vx_xend, (self)->vx_xend), \
-	 assertf((y) >= (self)->vx_ymin &&          \
-	         (y) < (self)->vx_yend,             \
-	         "y       = %Iu (%#Ix)\n"           \
-	         "vx_ymin = %Iu (%#Ix)\n"           \
-	         "vx_yend = %Iu (%#Ix)",            \
-	         (y), (y),                          \
-	         (self)->vx_ymin, (self)->vx_ymin,  \
+#define ASSERT_ABS_COORDS(self, x, y)                   \
+	(assertf((x) >= (self)->vx_xmin &&                  \
+	         (x) < (self)->vx_xend,                     \
+	         "x       = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_xmin = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_xend = %" PRIuPTR " (%#" PRIxPTR ")",  \
+	         (x), (x),                                  \
+	         (self)->vx_xmin, (self)->vx_xmin,          \
+	         (self)->vx_xend, (self)->vx_xend),         \
+	 assertf((y) >= (self)->vx_ymin &&                  \
+	         (y) < (self)->vx_yend,                     \
+	         "y       = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_ymin = %" PRIuPTR " (%#" PRIxPTR ")\n" \
+	         "vx_yend = %" PRIuPTR " (%#" PRIxPTR ")",  \
+	         (y), (y),                                  \
+	         (self)->vx_ymin, (self)->vx_ymin,          \
 	         (self)->vx_yend, (self)->vx_yend))
-#else
+#else /* !NDEBUG */
 #define ASSERT_ABS_COORDS(self, x, y) (void)0
-#endif
+#endif /* NDEBUG */
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
@@ -554,24 +555,24 @@ rambuffer_gfx_select_gfxops(struct video_gfx *__restrict self) {
 	/* Compare < because empty clip rects aren't allowed / are
 	 * handled separately by setting stub/empty GFX pixel ops. */
 	assertf(self->vx_xmin < self->vx_xend,
-	        "self->vx_xmin = %Iu (%#Ix)\n"
-	        "self->vx_xend = %Iu (%#Ix)",
+	        "self->vx_xmin = %" PRIuPTR " (%#" PRIxPTR ")\n"
+	        "self->vx_xend = %" PRIuPTR " (%#" PRIxPTR ")",
 	        self->vx_xmin, self->vx_xmin,
 	        self->vx_xend, self->vx_xend);
 	assertf(self->vx_ymin < self->vx_yend,
-	        "self->vx_ymin = %Iu (%#Ix)\n"
-	        "self->vx_yend = %Iu (%#Ix)",
+	        "self->vx_ymin = %" PRIuPTR " (%#" PRIxPTR ")\n"
+	        "self->vx_yend = %" PRIuPTR " (%#" PRIxPTR ")",
 	        self->vx_ymin, self->vx_ymin,
 	        self->vx_yend, self->vx_yend);
 	assertf(self->vx_xend <= self->vx_buffer->vb_size_x,
-	        "self->vx_xend              = %Iu (%#Ix)\n"
-	        "self->vx_buffer->vb_size_x = %Iu (%#Ix)",
+	        "self->vx_xend              = %" PRIuPTR " (%#" PRIxPTR ")\n"
+	        "self->vx_buffer->vb_size_x = %" PRIuSIZ " (%#" PRIxSIZ ")",
 	        self->vx_xend, self->vx_xend,
 	        self->vx_buffer->vb_size_x,
 	        self->vx_buffer->vb_size_x);
 	assertf(self->vx_yend <= self->vx_buffer->vb_size_y,
-	        "self->vx_yend              = %Iu (%#Ix)\n"
-	        "self->vx_buffer->vb_size_y = %Iu (%#Ix)",
+	        "self->vx_yend              = %" PRIuPTR " (%#" PRIxPTR ")\n"
+	        "self->vx_buffer->vb_size_y = %" PRIuSIZ " (%#" PRIxSIZ ")",
 	        self->vx_yend, self->vx_yend,
 	        self->vx_buffer->vb_size_y,
 	        self->vx_buffer->vb_size_y);

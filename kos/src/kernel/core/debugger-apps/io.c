@@ -327,7 +327,8 @@ DBG_COMMAND(instrlen,
             "instrlen [PC=registers.PC]\n"
             "\tPrint the length of the specified instruction\n",
             argc, argv) {
-	uintptr_t addr, current_pc, length;
+	uintptr_t addr, current_pc;
+	size_t length;
 	current_pc = (uintptr_t)dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
 	addr       = current_pc;
 	if (argc >= 2) {
@@ -335,7 +336,7 @@ DBG_COMMAND(instrlen,
 			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	length = instruction_length((void *)addr, INSTRLEN_ISA_DEFAULT);
-	dbg_printf(DBGSTR("%Iu\n"), length);
+	dbg_printf(DBGSTR("%" PRIuSIZ "\n"), length);
 	return 0;
 }
 

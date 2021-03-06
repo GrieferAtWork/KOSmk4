@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7401344a */
+/* HASH CRC-32:0x760d968 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
+#include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
 __LOCAL_LIBC(memmovedownw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *
@@ -31,7 +32,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownw))(void *__dst, void cons
 	__UINT16_TYPE__ const *__psrc;
 	__pdst = (__UINT16_TYPE__ *)__dst;
 	__psrc = (__UINT16_TYPE__ const *)__src;
-	__hybrid_assertf(__pdst <= __psrc || !__n_words, "%p > %p (count:%Iu)", __dst, __src, __n_words);
+#ifdef __PRIP_PREFIX
+	__hybrid_assertf(__pdst <= __psrc || !__n_words, "%p > %p (count:%" __PRIP_PREFIX "u)", __dst, __src, __n_words);
+#else /* __PRIP_PREFIX */
+	__hybrid_assertf(__pdst <= __psrc || !__n_words, "%p > %p (count:%zu)", __dst, __src, __n_words);
+#endif /* !__PRIP_PREFIX */
 	while (__n_words--)
 		*__pdst++ = *__psrc++;
 	return (__UINT16_TYPE__ *)__dst;

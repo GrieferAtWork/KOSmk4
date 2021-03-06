@@ -26,6 +26,7 @@
 #include <kos/kernel/fpu-state64.h>
 #include <kos/kernel/gdb-cpu-state64.h>
 
+#include <inttypes.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -635,14 +636,14 @@ NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
 	byte_t BUF_CONST *ptr = (byte_t BUF_CONST *)buf;
 	for (regno = 0; regno < GDB_REGISTER_X86_64_RFLAGS; ++regno) {
 		if (FUNC(Register)(thread, regno, ptr, 8) != 8) {
-			GDB_DEBUG("[gdb] Failed to access x86_64 8-byte register %#Ix\n", regno);
+			GDB_DEBUG("[gdb] Failed to access x86_64 8-byte register %#" PRIxPTR "\n", regno);
 			return false;
 		}
 		ptr += 8;
 	}
 	for (; regno < GDB_REGISTER_X86_64_ST0; ++regno) {
 		if (FUNC(Register)(thread, regno, ptr, 4) != 4) {
-			GDB_DEBUG("[gdb] Failed to access x86_64 4-byte register %#Ix\n", regno);
+			GDB_DEBUG("[gdb] Failed to access x86_64 4-byte register %#" PRIxPTR "\n", regno);
 			return false;
 		}
 		ptr += 4;

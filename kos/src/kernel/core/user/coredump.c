@@ -346,12 +346,12 @@ coredump_create(struct ucpustate const *curr_ustate,
 	if (orig_kstate)
 		printk(KERN_RAW VINFO_FORMAT " orig_kstate\n", kcpustate_getpc(orig_kstate));
 	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
-		printk(KERN_RAW VINFO_FORMAT " ktraceback_vector[%Iu]\n",
+		printk(KERN_RAW VINFO_FORMAT " ktraceback_vector[%" PRIuSIZ "]\n",
 		       ktraceback_vector[tbi], tbi);
 	}
 	printk(KERN_RAW VINFO_FORMAT " orig_ustate\n", ucpustate_getpc(orig_ustate));
 	for (tbi = 0; tbi < traceback_length; ++tbi) {
-		printk(KERN_RAW VINFO_FORMAT " traceback_vector[%Iu]\n",
+		printk(KERN_RAW VINFO_FORMAT " traceback_vector[%" PRIuSIZ "]\n",
 		       traceback_vector[tbi], tbi);
 	}
 	if (ucpustate_getpc(curr_ustate) != ucpustate_getpc(orig_ustate) &&
