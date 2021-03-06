@@ -36,9 +36,9 @@ DECL_BEGIN
 
 
 #ifndef FIND_SPECIFIC_ADDRESS
-/* Load the  next_chunk  eh_frame  function  descriptor  from  `*peh_frame_reader',  which
- * must  either  be  a  pointer  to  the start  of  the  `.eh_frame'  section,  or  be the
- * value written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
+/* Load the next eh_frame function  descriptor from `*peh_frame_reader', which  must
+ * either be a  pointer to the  start of the  `.eh_frame' section, or  be the  value
+ * written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 #ifdef DEBUG_FRAME

@@ -108,7 +108,7 @@ BEGIN
 	DEFINE_SIMPLE_LIBRARY("libphys", LD_FLAGS({ "-fini=libphys_fini" }))
 
 //	DEFINE_SIMPLE_ARCH_LIBRARY("libstdc++")
-	DEFINE_SIMPLE_ARCH_LIBRARY("libunwind", USELIB("libdl"))
+	DEFINE_SIMPLE_ARCH_LIBRARY("libunwind", USELIB("libdl") LD_FLAGS({ "-fini=libuw_fini" }))
 	DEFINE_SIMPLE_ARCH_LIBRARY("librpc")
 	DEFINE_SIMPLE_ARCH_LIBRARY("libregdump", USELIB("libdl"))
 	DEFINE_SIMPLE_ARCH_LIBRARY("libcpustate")

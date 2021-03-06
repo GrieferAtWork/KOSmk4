@@ -108,9 +108,9 @@ typedef struct unwind_fde_struct {
 } unwind_fde_t;
 
 
-/* Load  the   next  eh_frame   function   descriptor  from   `*PEH_FRAME_READER',   which
- * must  either  be  a  pointer  to  the start  of  the  `.eh_frame'  section,  or  be the
- * value written back to `*PEH_FRAME_READER' after a previous call to `unwind_fde_load()'.
+/* Load the next eh_frame function  descriptor from `*peh_frame_reader', which  must
+ * either be a  pointer to the  start of the  `.eh_frame' section, or  be the  value
+ * written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL((1, 2, 3)) unsigned int
@@ -229,10 +229,10 @@ typedef struct unwind_cfa_landing_state_struct {
 } unwind_cfa_landing_state_t;
 
 
-/* Execute CFA state instruction  until `absolute_pc' has been  reached,
+/* Execute CFA state  instruction until `absolute_pc'  has been  reached,
  * or  the entirety of  the FDE instruction code  has been executed. This
- * function is used to fill in CFA state information at a given address,
- * which  can then be used to unwind a register state for the purpose of
+ * function is used to fill in CFA state information at a given  address,
+ * which can then be used to unwind  a register state for the purpose  of
  * implementing language-level, zero-effort exception support, as well as
  * for generating tracebacks when combined with `libdebuginfo.so'
  * NOTE: Usually, the caller will have already ensured that:

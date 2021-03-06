@@ -95,6 +95,8 @@ struct my_node {
 /* #define RBTREE_WANT_RLOCATE            (Declare `RBTREE(rlocate)') */
 /* #define RBTREE_WANT_TRYINSERT          (Declare `RBTREE(tryinsert)') */
 /* #define RBTREE_OMIT_REMOVE             (Omit    `RBTREE(remove)') */
+/* #define RBTREE_OMIT_REMOVENODE         (Omit    `RBTREE(removenode)') */
+/* #define RBTREE_OMIT_INSERT             (Omit    `RBTREE(insert)') */
 /* #define RBTREE_DEBUG                   (Enable internal debug assertions and verification) */
 /* #define RBTREE_NDEBUG                  (Disable internal debug assertions and verification) */
 /* #define RBTREE_LEFT_LEANING            (Define ABI for a left-leaning tree, which doesn't require a parent
@@ -128,11 +130,13 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
                                           RBTREE_Tkey maxkey);
 #endif /* RBTREE_WANT_RLOCATE */
 
+#ifndef RBTREE_OMIT_INSERT
 /* Insert the given node into the given tree. The caller must ensure
  * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_DECL __ATTR_NONNULL((1, 2)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
                                          RBTREE_T *__restrict node);
+#endif /* !RBTREE_OMIT_INSERT */
 
 #ifdef RBTREE_WANT_TRYINSERT
 /* Same as `RBTREE(insert)', but gracefully fail (by returning `false')
@@ -159,10 +163,13 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict proot,
                                           RBTREE_Tkey maxkey);
 #endif /* RBTREE_WANT_RREMOVE */
 
+#ifndef RBTREE_OMIT_REMOVENODE
 /* Remove the given node from the given tree. */
 RBTREE_DECL __ATTR_NONNULL((1, 2)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
                                              RBTREE_T *__restrict node);
+#endif /* !RBTREE_OMIT_REMOVENODE */
+
 
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 /* Return the next node with a key-range located below `node'
@@ -509,6 +516,9 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
 /* LEFT-LEANING                                                         */
 /************************************************************************/
 
+#if (defined(RBTREE_WANT_TRYINSERT) || !defined(RBTREE_OMIT_INSERT) ||   \
+     !defined(RBTREE_OMIT_REMOVENODE) || !defined(RBTREE_OMIT_REMOVE) || \
+     defined(RBTREE_WANT_RREMOVE))
 __PRIVATE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotl))(RBTREE_T *__restrict lhs) {
 	RBTREE_T *rhs;
@@ -531,7 +541,9 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotr))(RBTREE_T *__restrict rhs) {
 	RBTREE_SETRED(rhs);
 	return lhs;
 }
+#endif /* ... */
 
+#ifndef RBTREE_OMIT_INSERT
 __PRIVATE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_insert_impl))(RBTREE_T *root,
                                                RBTREE_T *__restrict node) {
@@ -583,6 +595,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
 	*proot = root;
 	_RBTREE_VALIDATE(root);
 }
+#endif /* !RBTREE_OMIT_INSERT */
 
 
 #ifdef RBTREE_WANT_TRYINSERT
@@ -650,7 +663,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
 }
 #endif /* RBTREE_WANT_TRYINSERT */
 
-
+#if !defined(RBTREE_OMIT_REMOVENODE) || !defined(RBTREE_OMIT_REMOVE) || defined(RBTREE_WANT_RREMOVE)
 __PRIVATE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_move_red_to_left))(RBTREE_T *__restrict node) {
 	RBTREE_T *lhs, *rhs;
@@ -799,7 +812,11 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_remove_impl))(RBTREE_T *root,
 
 
 /* Remove the given node from the given tree. */
+#ifdef RBTREE_OMIT_REMOVENODE
+__PRIVATE __ATTR_NONNULL((1, 2)) void
+#else /* RBTREE_OMIT_REMOVENODE */
 RBTREE_IMPL __ATTR_NONNULL((1, 2)) void
+#endif /* !RBTREE_OMIT_REMOVENODE */
 RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
                                              RBTREE_T *__restrict node) {
 	RBTREE_T *root;
@@ -828,6 +845,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 /* TODO: RBTREE(remove) and RBTREE(rremove) can be implemented more efficiently
  *       for  left-leaning RBTREEs by merging the node lookup with building the
  *       parent-path to that same node. */
+#endif /* !RBTREE_OMIT_REMOVENODE || !RBTREE_OMIT_REMOVE || RBTREE_WANT_RREMOVE */
 
 #else /* RBTREE_LEFT_LEANING */
 /************************************************************************/
@@ -839,6 +857,9 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 #endif /* !RBTREE_REPPAR */
 
 
+#if (defined(RBTREE_WANT_TRYINSERT) || !defined(RBTREE_OMIT_INSERT) ||   \
+     !defined(RBTREE_OMIT_REMOVENODE) || !defined(RBTREE_OMIT_REMOVE) || \
+     defined(RBTREE_WANT_RREMOVE))
 /* Have `self' swap positions with its rhs-child.
  *
  *          parent         >>        parent
@@ -908,8 +929,10 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_rotr))(RBTREE_T *__restrict self) {
 	}
 	RBTREE_SETPAR(lhs, parent);
 }
+#endif /* ... */
 
 
+#if defined(RBTREE_WANT_TRYINSERT) || !defined(RBTREE_OMIT_INSERT)
 /* @return: * : The newly set parent-node of `node' */
 __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_insert_worker))(RBTREE_T *__restrict root,
@@ -1030,7 +1053,9 @@ again:
 	}
 	_RBTREE_VALIDATE(*proot);
 }
+#endif /* RBTREE_WANT_TRYINSERT || !RBTREE_OMIT_INSERT */
 
+#ifndef RBTREE_OMIT_INSERT
 /* Insert the given node into the given tree. The caller must ensure
  * that no  already-existing node  overlaps  with the  given  `node' */
 RBTREE_IMPL __ATTR_NONNULL((1, 2)) void
@@ -1054,6 +1079,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
 	/* Repair the RB-tree. */
 	(RBTREE(_insert_repair)(proot, node, parent));
 }
+#endif /* !RBTREE_OMIT_INSERT */
 
 
 #ifdef RBTREE_WANT_TRYINSERT
@@ -1108,6 +1134,7 @@ again:
 }
 #endif /* RBTREE_WANT_TRYINSERT */
 
+#if !defined(RBTREE_OMIT_REMOVENODE) || !defined(RBTREE_OMIT_REMOVE) || defined(RBTREE_WANT_RREMOVE)
 __LOCAL __ATTR_NONNULL((1, 2, 3)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_replace))(RBTREE_T **__restrict proot,
                                            RBTREE_T const *__restrict node,
@@ -1153,7 +1180,11 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_replace))(RBTREE_T **__restrict proot,
 }
 
 /* Remove the given node from the given tree. */
+#ifdef RBTREE_OMIT_REMOVENODE
+__PRIVATE __ATTR_NONNULL((1, 2)) void
+#else /* RBTREE_OMIT_REMOVENODE */
 RBTREE_IMPL __ATTR_NONNULL((1, 2)) void
+#endif /* !RBTREE_OMIT_REMOVENODE */
 RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
                                              RBTREE_T *__restrict node) {
 	RBTREE_T *lhs, *rhs, *parent;
@@ -1350,6 +1381,7 @@ done:;
 #endif /* __SIZEOF_POINTER__ == ... */
 #endif /* !RBTREE_NDEBUG */
 }
+#endif /* !RBTREE_OMIT_REMOVENODE || !RBTREE_OMIT_REMOVE || RBTREE_WANT_RREMOVE */
 #endif /* !RBTREE_LEFT_LEANING */
 
 
