@@ -1771,6 +1771,38 @@ libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
 	}
 	switch (cmd) {
 
+	case DLAUXCTRL_MOD_INCREF:
+		incref(self);
+		result = self;
+		break;
+
+	case DLAUXCTRL_MOD_DECREF:
+		decref(self);
+		result = self;
+		break;
+
+	case DLAUXCTRL_MOD_WEAKINCREF:
+		weakincref(self);
+		result = self;
+		break;
+
+	case DLAUXCTRL_MOD_WEAKDECREF:
+		weakdecref(self);
+		result = self;
+		break;
+
+	case DLAUXCTRL_MOD_TRYINCREF:
+		result = self;
+		if (!tryincref(self))
+			result = NULL;
+		break;
+
+	case DLAUXCTRL_MOD_NOTDESTROYED:
+		result = self;
+		if (wasdestroyed(self))
+			result = NULL;
+		break;
+
 	case DLAUXCTRL_ADD_FINALIZER: {
 		struct dlmodule_finalizers *flz;
 		void (LIBDL_CC *func)(void *);

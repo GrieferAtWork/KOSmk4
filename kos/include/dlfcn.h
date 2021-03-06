@@ -308,13 +308,13 @@ __COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,__NOTHROW
                     dlsym,(void *__handle, char const *__restrict __symbol_name),dlfunc,(__handle,__symbol_name))
 #endif /* ... */
 
-/* Return  and  clear the  current  libdl error  message  string, such  that for
- * any error  that  occurs,  this  function will  only  returns  non-NULL  once.
- * The returned string has a human-readable format and is generated dynamically,
- * meaning  that it may contain information that  is more specific than a simple
- * `File or directory not found'  message, but rather  something along the lines
- * of                  `Symbol "foo" could not be found in library "libfoo.so"'.
- * The      implementation      of      this      function      looks      like:
+/* Return  and clear the  current libdl error message  string, such that for
+ * any error that occurs, this function will only returns non-NULL once. The
+ * returned string has a human-readable format and is generated dynamically,
+ * meaning that it  may contain  information that  is more  specific than  a
+ * simple  `File or directory not found' message, but rather something along
+ * the  lines  of  `Symbol "foo" could not be found in library "libfoo.so"'.
+ * The implementation of this function looks like:
  * >> return ATOMIC_XCH(error_message_pointer, NULL);
  * Where internally, libdl will set `error_message_pointer' to a non-NULL pointer
  * when an error happens.
@@ -730,6 +730,12 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
                                      unsigned int __cmd,
                                      ...);
 
+#define DLAUXCTRL_MOD_INCREF         0xa001 /* incref() the module handle (always re-returns `HANDLE') */
+#define DLAUXCTRL_MOD_DECREF         0xa002 /* decref() the module handle (always re-returns `HANDLE') */
+#define DLAUXCTRL_MOD_WEAKINCREF     0xa003 /* weakincref() the module handle (always re-returns `HANDLE') */
+#define DLAUXCTRL_MOD_WEAKDECREF     0xa004 /* weakdecref() the module handle (always re-returns `HANDLE') */
+#define DLAUXCTRL_MOD_TRYINCREF      0xa005 /* tryincref() the module handle (always re-returns `HANDLE', or `NULL' if the module was destroyed) */
+#define DLAUXCTRL_MOD_NOTDESTROYED   0xa006 /* check if the module wasdestroyed() (re-returns `HANDLE' if not, or `NULL' if so) */
 #define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `HANDLE' is ignored but should be any valid module handle, or `NULL',
                                              * and  all  other arguments  are also  ignored; always  returns  `NULL', but  doesn't set  an error */
 #define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `HANDLE' is ignored but should be any
@@ -767,6 +773,7 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
                                              * If  the  number  of  symbols  is  unknown,  `(size_t)-1'  written  to  `*pcount'. */
 #define DLAUXCTRL_ELF_GET_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *') */
 #define DLAUXCTRL_ELF_GET_SHSTRTAB   0xef06 /* Returns the module's section header name string table (`char const *') */
+
 #endif /* __CRT_HAVE_dlauxctrl */
 
 #endif /* __USE_KOS */
