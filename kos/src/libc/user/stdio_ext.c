@@ -111,9 +111,9 @@ NOTHROW_NCX(LIBCCALL libc___flbf)(FILE *fp)
 	assert(fp->if_exdata);
 	if (fp->if_flag & IO_LNIFTYY) {
 		if (FMUSTLOCK(fp)) {
-			file_write(fp);
+			file_lock_write(fp);
 			file_determine_isatty(fp);
-			file_endwrite(fp);
+			file_lock_endwrite(fp);
 		} else {
 			file_determine_isatty(fp);
 		}
@@ -133,13 +133,13 @@ NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *fp)
 	ex = fp->if_exdata;
 	assert(ex);
 	if (FMUSTLOCK(fp)) {
-		file_write(fp);
+		file_lock_write(fp);
 		fp->if_ptr += fp->if_cnt;
 		fp->if_cnt  = 0;
 		ex->io_chng = fp->if_base;
 		ex->io_chsz = 0;
 		ex->io_mbs.__word = 0;
-		file_endwrite(fp);
+		file_lock_endwrite(fp);
 	} else {
 		fp->if_ptr += fp->if_cnt;
 		fp->if_cnt  = 0;

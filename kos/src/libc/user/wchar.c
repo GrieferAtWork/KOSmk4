@@ -89,9 +89,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") NONNULL((1)) wint_t
 {
 	wint_t result;
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = (wint_t)file_getc32(stream);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = (wint_t)file_getc32(stream);
 	}
@@ -106,9 +106,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") NONNULL((1)) wi
 {
 	wint_t result;
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = (wint_t)file_getc16(stream);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = (wint_t)file_getc16(stream);
 	}
@@ -148,9 +148,9 @@ NOTHROW_NCX(LIBKCALL libc_ungetwc)(wint_t wc,
 {
 	wint_t result;
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = (wint_t)file_ungetc32(stream, (char32_t)wc);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = (wint_t)file_ungetc32(stream, (char32_t)wc);
 	}
@@ -166,9 +166,9 @@ NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint_t wc,
 {
 	wint_t result;
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = (wint_t)file_ungetc16(stream, (char16_t)wc);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = (wint_t)file_ungetc16(stream, (char16_t)wc);
 	}
@@ -211,9 +211,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") NONNULL((2)) wint_
 	ssize_t error;
 	wint_t result = (wint_t)wc;
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		error = file_print32(stream, &wc, 1);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		error = file_print32(stream, &wc, 1);
 	}
@@ -232,9 +232,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") NONNULL((2)) w
 	ssize_t error;
 	wint_t result = (wint_t)wc;
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		error = file_print16(stream, &wc, 1);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		error = file_print16(stream, &wc, 1);
 	}
@@ -358,9 +358,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) s
 	ssize_t result;
 	FILE *me = (FILE *)arg;
 	if (FMUSTLOCK(me)) {
-		file_write(me);
+		file_lock_write(me);
 		result = file_print32(arg, data, datalen);
-		file_endwrite(me);
+		file_lock_endwrite(me);
 	} else {
 		result = file_print32(arg, data, datalen);
 	}
@@ -393,9 +393,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2
 	ssize_t result;
 	FILE *me = (FILE *)arg;
 	if (FMUSTLOCK(me)) {
-		file_write(me);
+		file_lock_write(me);
 		result = file_print16(arg, data, datalen);
-		file_endwrite(me);
+		file_lock_endwrite(me);
 	} else {
 		result = file_print16(arg, data, datalen);
 	}

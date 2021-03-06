@@ -31,6 +31,7 @@
 #include <asm/os/stdio.h>
 #include <bits/crt/io-file.h>
 #include <bits/crt/mbstate.h>
+#include <kos/refcnt.h>
 #include <kos/types.h>
 
 #include <assert.h>
@@ -167,51 +168,23 @@ struct iofile_data: iofile_data_novtab {
 #define IOBUF_MIN                512
 #define IOBUF_RELOCATE_THRESHOLD 2048 /* When >= this amount of bytes are unused in the buffer, free them. */
 
-#define file_reading(x)     atomic_owner_rwlock_reading(&(x)->if_exdata->io_lock)
-#define file_writing(x)     atomic_owner_rwlock_writing(&(x)->if_exdata->io_lock)
-#define file_tryread(x)     atomic_owner_rwlock_tryread(&(x)->if_exdata->io_lock)
-#define file_trywrite(x)    atomic_owner_rwlock_trywrite(&(x)->if_exdata->io_lock)
-#define file_tryupgrade(x)  atomic_owner_rwlock_tryupgrade(&(x)->if_exdata->io_lock)
-#define file_read(x)        atomic_owner_rwlock_read(&(x)->if_exdata->io_lock)
-#define file_write(x)       atomic_owner_rwlock_write(&(x)->if_exdata->io_lock)
-#define file_upgrade(x)     atomic_owner_rwlock_upgrade(&(x)->if_exdata->io_lock)
-#define file_downgrade(x)   atomic_owner_rwlock_downgrade(&(x)->if_exdata->io_lock)
-#define file_endread(x)     atomic_owner_rwlock_endread(&(x)->if_exdata->io_lock)
-#define file_endwrite(x)    atomic_owner_rwlock_endwrite(&(x)->if_exdata->io_lock)
+/* File locking helpers. */
+#define file_lock_reading(x)     atomic_owner_rwlock_reading(&(x)->if_exdata->io_lock)
+#define file_lock_writing(x)     atomic_owner_rwlock_writing(&(x)->if_exdata->io_lock)
+#define file_lock_tryread(x)     atomic_owner_rwlock_tryread(&(x)->if_exdata->io_lock)
+#define file_lock_trywrite(x)    atomic_owner_rwlock_trywrite(&(x)->if_exdata->io_lock)
+#define file_lock_tryupgrade(x)  atomic_owner_rwlock_tryupgrade(&(x)->if_exdata->io_lock)
+#define file_lock_read(x)        atomic_owner_rwlock_read(&(x)->if_exdata->io_lock)
+#define file_lock_write(x)       atomic_owner_rwlock_write(&(x)->if_exdata->io_lock)
+#define file_lock_upgrade(x)     atomic_owner_rwlock_upgrade(&(x)->if_exdata->io_lock)
+#define file_lock_downgrade(x)   atomic_owner_rwlock_downgrade(&(x)->if_exdata->io_lock)
+#define file_lock_endread(x)     atomic_owner_rwlock_endread(&(x)->if_exdata->io_lock)
+#define file_lock_endwrite(x)    atomic_owner_rwlock_endwrite(&(x)->if_exdata->io_lock)
 
-/* TODO: Use <kos/refcnt.h> for reference counting, rather than these inline functions here! */
+/* Destroy the given file */
+INTDEF NONNULL((1)) void LIBCCALL file_destroy(FILE *__restrict self);
+__DEFINE_REFCNT_FUNCTIONS(FILE, if_exdata->io_refcnt, file_destroy);
 
-LOCAL NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_tryincref")
-WUNUSED bool LIBCCALL file_tryincref(FILE *__restrict self) {
-	refcnt_t refcnt;
-	struct iofile_data *ex;
-	assert(self);
-	ex = self->if_exdata;
-	assert(ex);
-	do {
-		refcnt = ATOMIC_READ(ex->io_refcnt);
-		if unlikely(refcnt == 0)
-			return false;
-	} while (!ATOMIC_CMPXCH_WEAK(ex->io_refcnt, refcnt, refcnt + 1));
-	return true;
-}
-
-LOCAL NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_incref")
-void LIBCCALL file_incref(FILE *__restrict self) {
-#ifdef NDEBUG
-	struct iofile_data *ex;
-	assert(self);
-	ex = self->if_exdata;
-	assert(ex);
-	ATOMIC_INC(ex->io_refcnt);
-#else /* NDEBUG */
-	bool ok;
-	ok = file_tryincref(self);
-	assert(ok);
-#endif /* !NDEBUG */
-}
-
-INTDEF NONNULL((1)) void LIBCCALL file_decref(FILE *__restrict self);
 
 /* Synchronize unwritten data of all line-buffered files. */
 INTDEF void LIBCCALL file_sync_lnfiles(void);

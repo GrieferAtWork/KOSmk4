@@ -478,85 +478,80 @@ PRIVATE ATTR_SECTION(".text.crt.application.exit.file_sync_locked")
 int LIBCCALL file_sync_locked(FILE *__restrict self) {
 	int result;
 	if (FMUSTLOCK(self)) {
-		file_write(self);
+		file_lock_write(self);
 		result = file_sync(self);
-		file_endwrite(self);
+		file_lock_endwrite(self);
 	} else {
 		result = file_sync(self);
 	}
 	return result;
 }
 
-INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_decref")
-void LIBCCALL file_decref(FILE *__restrict self) {
+INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_destroy") void LIBCCALL
+file_destroy(FILE *__restrict self) {
 	refcnt_t refcnt;
 	struct iofile_data *ex;
-	assert(self);
 	ex = self->if_exdata;
-	assert(ex);
-	refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
-	assert(refcnt != 0);
-	if (refcnt == 1) {
-		/* Last reference -> This file has to go away! */
-		assert(self != &default_stdin &&
-		       self != &default_stdout &&
-		       self != &default_stderr);
-		assert(ex != &default_stdin_io &&
-		       ex != &default_stdout_io &&
-		       ex != &default_stderr_io);
-		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
-		assert(!(self->if_flag & IO_READING));
-		if (ex->io_chsz != 0) {
-			/* The file still contains some changed data.
-			 * -> Try to flush data data. */
-			atomic_owner_rwlock_init_read(&ex->io_lock);
-			ATOMIC_WRITE(ex->io_refcnt, 1);
-			/* NOTE: Errors during this sync are ignored! */
-			file_sync(self);
-			atomic_owner_rwlock_endread(&ex->io_lock);
-			refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
-			assert(refcnt != 0);
-			if (refcnt != 1)
-				return; /* The file was revived. */
-		}
-		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
-		assert(!(self->if_flag & IO_READING));
-		/* Close the underlying file. */
-		if (self->if_flag & IO_HASVTAB) {
-			errno_t saved_errno;
-			/* In this case, we have to be careful in case the file gets revived. */
-			atomic_owner_rwlock_init_read(&ex->io_lock);
-			ATOMIC_WRITE(ex->io_refcnt, 1);
-			saved_errno = libc_geterrno_safe();
-			/* NOTE: Errors during this close are ignored! */
-			(*ex->io_vtab.close)(ex->io_magi);
-			libc_seterrno(saved_errno);
-			atomic_owner_rwlock_endread(&ex->io_lock);
-			refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
-			assert(refcnt != 0);
-			if (refcnt != 1)
-				return; /* The file was revived. */
-		} else {
-			sys_close(self->if_fd);
-		}
-		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
-		assert(!(self->if_flag & IO_READING));
-		/* Make sure that the file is no longer accessible through the global file lists. */
-		if (LIST_ISBOUND(self, if_exdata->io_lnch))
-			changed_linebuffered_remove(self);
-		allfiles_remove(self);
-		/* Free a heap-allocated buffer. */
-		if (self->if_flag & IO_MALLBUF)
-			free(self->if_base);
-#if 1 /* This is always the case... */
-		assert(ex == (struct iofile_data *)(self + 1));
-#else
-		if (ex != (struct iofile_data *)(self + 1))
-			free(ex);
-#endif
-		free(self);
+	/* Last reference -> This file has to go away! */
+	assert(self != &default_stdin &&
+	       self != &default_stdout &&
+	       self != &default_stderr);
+	assert(ex != &default_stdin_io &&
+	       ex != &default_stdout_io &&
+	       ex != &default_stderr_io);
+	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+	assert(!(self->if_flag & IO_READING));
+	if (ex->io_chsz != 0) {
+		/* The file still contains some changed data.
+		 * -> Try to flush data data. */
+		atomic_owner_rwlock_init_read(&ex->io_lock);
+		ATOMIC_WRITE(ex->io_refcnt, 1);
+		/* NOTE: Errors during this sync are ignored! */
+		file_sync(self);
+		atomic_owner_rwlock_endread(&ex->io_lock);
+		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
+		assert(refcnt != 0);
+		if (refcnt != 1)
+			return; /* The file was revived. */
 	}
+	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+	assert(!(self->if_flag & IO_READING));
+	/* Close the underlying file. */
+	if (self->if_flag & IO_HASVTAB) {
+		errno_t saved_errno;
+		/* In this case, we have to be careful in case the file gets revived. */
+		atomic_owner_rwlock_init_read(&ex->io_lock);
+		ATOMIC_WRITE(ex->io_refcnt, 1);
+		saved_errno = libc_geterrno_safe();
+		/* NOTE: Errors during this close are ignored! */
+		(*ex->io_vtab.close)(ex->io_magi);
+		libc_seterrno(saved_errno);
+		atomic_owner_rwlock_endread(&ex->io_lock);
+		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
+		assert(refcnt != 0);
+		if (refcnt != 1)
+			return; /* The file was revived. */
+	} else {
+		sys_close(self->if_fd);
+	}
+	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+	assert(!(self->if_flag & IO_READING));
+	/* Make sure that the file is no longer accessible through the global file lists. */
+	if (LIST_ISBOUND(self, if_exdata->io_lnch))
+		changed_linebuffered_remove(self);
+	allfiles_remove(self);
+	/* Free a heap-allocated buffer. */
+	if (self->if_flag & IO_MALLBUF)
+		free(self->if_base);
+#if 1 /* This is always the case... */
+	assert(ex == (struct iofile_data *)(self + 1));
+#else
+	if (ex != (struct iofile_data *)(self + 1))
+		free(ex);
+#endif
+	free(self);
 }
+
 
 
 /* Synchronize unwritten data of all line-buffered files. */
@@ -569,20 +564,20 @@ again:
 	atomic_lock_acquire(&changed_linebuffered_files_lock);
 	LIST_FOREACH (fp, &changed_linebuffered_files, if_exdata->io_lnch) {
 		/* Skip files which we can't incref. */
-		if (!file_tryincref(fp))
+		if (!tryincref(fp))
 			continue;
 		/* Unbind the file from the chain of changed line-buffered files. */
 		LIST_UNBIND(fp, if_exdata->io_lnch);
 		atomic_lock_release(&changed_linebuffered_files_lock);
 		/* Synchronize this buffer. */
 		if (FMUSTLOCK(fp)) {
-			file_write(fp);
+			file_lock_write(fp);
 			file_sync(fp);
-			file_endwrite(fp);
+			file_lock_endwrite(fp);
 		} else {
 			file_sync(fp);
 		}
-		file_decref(fp);
+		decref(fp);
 		goto again;
 	}
 	atomic_lock_release(&changed_linebuffered_files_lock);
@@ -595,7 +590,7 @@ void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 		atomic_rwlock_read(&all_files_lock);
 		LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 			if (fp->if_exdata->io_fver != version) {
-				if (file_tryincref(fp))
+				if (tryincref(fp))
 					break;
 			}
 		}
@@ -604,10 +599,10 @@ void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 			break;
 do_flush_fp:
 		if (FMUSTLOCK(fp)) {
-			file_write(fp);
+			file_lock_write(fp);
 			fp->if_exdata->io_fver = version;
 			file_sync(fp);
-			file_endwrite(fp);
+			file_lock_endwrite(fp);
 		} else {
 			fp->if_exdata->io_fver = version;
 			file_sync(fp);
@@ -616,10 +611,10 @@ do_flush_fp:
 		next_fp = LIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
 		       (next_fp->if_exdata->io_fver == version ||
-		        !file_tryincref(next_fp)))
+		        !tryincref(next_fp)))
 			next_fp = LIST_NEXT(next_fp, if_exdata->io_link);
 		atomic_rwlock_endread(&all_files_lock);
-		file_decref(fp);
+		decref(fp);
 		if (!next_fp)
 			continue; /* Do another full scan for changed files. */
 		fp = next_fp;
@@ -634,7 +629,7 @@ void LIBCCALL file_do_syncall_unlocked(uintptr_t version) {
 		atomic_rwlock_read(&all_files_lock);
 		LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
 			if (fp->if_exdata->io_fver != version) {
-				if (file_tryincref(fp))
+				if (tryincref(fp))
 					break;
 			}
 		}
@@ -648,10 +643,10 @@ do_flush_fp:
 		next_fp = LIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
 		       (next_fp->if_exdata->io_fver == version ||
-		        !file_tryincref(next_fp)))
+		        !tryincref(next_fp)))
 			next_fp = LIST_NEXT(next_fp, if_exdata->io_link);
 		atomic_rwlock_endread(&all_files_lock);
-		file_decref(fp);
+		decref(fp);
 		if (!next_fp)
 			continue; /* Do another full scan for changed files. */
 		fp = next_fp;
@@ -1909,7 +1904,7 @@ NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *__restrict stream)
 {
 	if unlikely(!stream)
 		return -1;
-	return file_trywrite(stream) ? 0 : 1;
+	return file_lock_trywrite(stream) ? 0 : 1;
 }
 /*[[[end:libc_ftrylockfile]]]*/
 
@@ -1920,7 +1915,7 @@ NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
 /*[[[body:libc_funlockfile]]]*/
 {
 	if likely(stream)
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 }
 /*[[[end:libc_funlockfile]]]*/
 
@@ -1931,7 +1926,7 @@ NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream)
 /*[[[body:libc_flockfile]]]*/
 {
 	if likely(stream)
-		file_write(stream);
+		file_lock_write(stream);
 }
 /*[[[end:libc_flockfile]]]*/
 
@@ -1946,9 +1941,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.utility") int
 	if (!stream)
 		return flushall();
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_sync(stream);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_sync(stream);
 	}
@@ -1994,12 +1989,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 4)) s
 		return 0;
 	}
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_readdata(stream, buf, total);
 		/* Unread the last partially read element. */
 		if unlikely(result != total)
 			file_seek(stream, -(result % elemsize), SEEK_CUR);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_readdata(stream, buf, total);
 		/* Unread the last partially read element. */
@@ -2061,9 +2056,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 4)) size_t
 		return 0;
 	}
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_writedata(stream, buf, total);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_writedata(stream, buf, total);
 	}
@@ -2108,11 +2103,11 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
 	FILE *me = (FILE *)arg;
 	ssize_t result;
 	if (FMUSTLOCK(me)) {
-		file_write(me);
+		file_lock_write(me);
 		result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
 		if unlikely(!result && FERROR(me))
 			result = -1;
-		file_endwrite(me);
+		file_lock_endwrite(me);
 	} else {
 		result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
 		if unlikely(!result && FERROR(me))
@@ -2149,9 +2144,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) long
 	pos64_t result;
 	if unlikely(!stream)
 		return (long int)libc_seterrno(EINVAL);
-	file_read(stream);
+	file_lock_read(stream);
 	result = file_seek(stream, 0, SEEK_CUR);
-	file_endread(stream);
+	file_lock_endread(stream);
 	if unlikely(result > LONG_MAX)
 		return (long int)libc_seterrno(EOVERFLOW);
 	return (long int)(off64_t)result;
@@ -2170,10 +2165,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		file_seek(stream, (off64_t)off, whence);
 		result = unlikely(FERROR(stream)) ? -1 : 0;
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		file_seek(stream, (off64_t)off, whence);
 		result = unlikely(FERROR(stream)) ? -1 : 0;
@@ -2191,9 +2186,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off_
 	pos64_t result;
 	if unlikely(!stream)
 		return (off_t)libc_seterrno(EINVAL);
-	file_read(stream);
+	file_lock_read(stream);
 	result = file_seek(stream, 0, SEEK_CUR);
-	file_endread(stream);
+	file_lock_endread(stream);
 	if unlikely(result > INT32_MAX)
 		return (off_t)libc_seterrno(EOVERFLOW);
 	return (off_t)(pos_t)result;
@@ -2212,9 +2207,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off6
 	pos64_t result;
 	if unlikely(!stream)
 		return (off64_t)libc_seterrno(EINVAL);
-	file_read(stream);
+	file_lock_read(stream);
 	result = file_seek(stream, 0, SEEK_CUR);
-	file_endread(stream);
+	file_lock_endread(stream);
 	if unlikely(result > INT64_MAX)
 		return (off64_t)libc_seterrno(EOVERFLOW);
 	return (off64_t)result;
@@ -2235,10 +2230,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		file_seek(stream, (off64_t)off, whence);
 		result = unlikely(FERROR(stream)) ? -1 : 0;
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		file_seek(stream, (off64_t)off, whence);
 		result = unlikely(FERROR(stream)) ? -1 : 0;
@@ -2262,10 +2257,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		file_seek(stream, (off64_t)off, whence);
 		result = unlikely(FERROR(stream)) ? -1 : 0;
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		file_seek(stream, (off64_t)off, whence);
 		result = unlikely(FERROR(stream)) ? -1 : 0;
@@ -2514,9 +2509,9 @@ NOTHROW_NCX(LIBCCALL libc_ungetc)(int ch,
 		return EOF;
 	}
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_ungetc(stream, (unsigned char)(unsigned int)ch);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_ungetc(stream, (unsigned char)(unsigned int)ch);
 	}
@@ -2548,10 +2543,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.utility") NONNULL((1)) void
 {
 	if likely(stream) {
 		if (FMUSTLOCK(stream)) {
-			file_write(stream);
+			file_lock_write(stream);
 			file_seek(stream, 0, SEEK_SET);
 			stream->if_flag &= ~(IO_EOF | IO_ERR);
-			file_endwrite(stream);
+			file_lock_endwrite(stream);
 		} else {
 			file_seek(stream, 0, SEEK_SET);
 			stream->if_flag &= ~(IO_EOF | IO_ERR);
@@ -2600,9 +2595,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) int
 		return -1;
 	}
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_truncate(stream, (pos64_t)length);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_truncate(stream, (pos64_t)length);
 	}
@@ -2645,9 +2640,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) int
 		return -1;
 	}
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_truncate(stream, (pos64_t)length);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_truncate(stream, (pos64_t)length);
 	}
@@ -2692,7 +2687,7 @@ NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_sync(stream);
 		if likely(result == 0) {
 			result = file_setmode(stream,
@@ -2700,7 +2695,7 @@ NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
 			                      modes,
 			                      bufsize);
 		}
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_sync(stream);
 		if likely(result == 0) {
@@ -2836,7 +2831,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) int
 {
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	file_decref(stream);
+	decref(stream);
 	return 0;
 }
 /*[[[end:libc_fclose]]]*/
@@ -2897,9 +2892,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
 		return EOF;
 	}
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_getc(stream);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_getc(stream);
 	}
@@ -2978,7 +2973,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 again:
 	atomic_rwlock_write(&all_files_lock);
 	LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
-		if (!file_tryincref(fp))
+		if (!tryincref(fp))
 			continue;
 		LIST_UNBIND(fp, if_exdata->io_link);
 		atomic_rwlock_endwrite(&all_files_lock);
@@ -2986,7 +2981,7 @@ again:
 		 * This is entirely unsafe, but if you think about it:
 		 * This  function could only  ever be entirely unsafe! */
 		ATOMIC_WRITE(fp->if_exdata->io_refcnt, 1);
-		file_decref(fp);
+		decref(fp);
 		++result;
 		goto again;
 	}
@@ -3450,10 +3445,10 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
 		goto done;
 	}
 	if (FMUSTLOCK(stream))
-		file_write(stream);
+		file_lock_write(stream);
 	oldfd = stream->if_fd;
 	if unlikely(fd == oldfd) {
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 		libc_seterrno(EBADF);
 		stream = NULL;
 		goto done;
@@ -3461,7 +3456,7 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
 	stream->if_fd   = fd;
 	stream->if_flag = IO_LNIFTYY | (stream->if_flag & IO_NOLOCK);
 	if (FMUSTLOCK(stream))
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	sys_close(oldfd);
 done:
 	return stream;
@@ -3513,9 +3508,9 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 	if unlikely(fd < 0)
 		return NULL;
 	if (FMUSTLOCK(stream)) {
-		file_write(stream);
+		file_lock_write(stream);
 		result = file_reopenfd(stream, fd, flags);
-		file_endwrite(stream);
+		file_lock_endwrite(stream);
 	} else {
 		result = file_reopenfd(stream, fd, flags);
 	}
