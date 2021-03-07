@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e27d968 */
+/* HASH CRC-32:0xcae41d95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3631,14 +3631,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fparseln, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #undef __fparseln_defined
 #endif /* !... */
 #endif /* !__fparseln_defined */
+#ifndef __fpurge_defined
+#define __fpurge_defined 1
 #ifdef __CRT_HAVE___fpurge
 /* Discard all pending buffered I/O on the stream FP */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__fp),__fpurge,(__fp))
 #elif defined(__CRT_HAVE_fpurge)
 /* Discard all pending buffered I/O on the stream FP */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__fp),(__fp))
-#endif /* ... */
+#else /* ... */
+#undef __fpurge_defined
+#endif /* !... */
+#endif /* !__fpurge_defined */
+#if !defined(__fgetln_defined) && defined(__CRT_HAVE_fgetln)
+#define __fgetln_defined 1
+/* >> fgetln(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,fgetln,(FILE *__restrict __fp, size_t *__restrict __lenp),(__fp,__lenp))
+#endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
+#if !defined(__fmtcheck_defined) && defined(__CRT_HAVE_fmtcheck)
+#define __fmtcheck_defined 1
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the same (or compatible) underlying C
+ * types, and in the same order.
+ * If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to be used to validate user-provided printf
+ * format strings before actually using them, after they've been read from lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
+#endif /* !__fmtcheck_defined && __CRT_HAVE_fmtcheck */
 #endif /* __USE_NETBSD */
+
 #if defined(__USE_NETBSD) || defined(__USE_KOS)
 #ifndef ____funopen_types_defined
 #define ____funopen_types_defined 1
@@ -3725,8 +3750,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(funopen2_64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_LARGEFILE64 */
 #ifdef __USE_NETBSD
 #ifdef __funopen_defined
-#define fropen(cookie, fn)  funopen(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR)
-#define fwopen(cookie, fn)  funopen(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR)
+#define fropen(cookie, fn) funopen(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR)
+#define fwopen(cookie, fn) funopen(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR)
 #endif /* __funopen_defined */
 #ifdef __funopen2_defined
 #define fropen2(cookie, fn) funopen2(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR, __NULLPTR)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd519a496 */
+/* HASH CRC-32:0xe2c6c1d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -360,6 +360,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 
 
 #if defined(__USE_KOS) || defined(__USE_GNU) || defined(__USE_BSD)
+#ifndef __explicit_bzero_defined
+#define __explicit_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
 /* >> explicit_bzero(3)
  * Same as `bzero(buf, num_bytes)', however compilers will not optimize
@@ -390,6 +392,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__buf, size_t __num_bytes)
  * may be a security-concious application trying to wipe sensitive data) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL explicit_bzero)(void *__buf, size_t __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))(__buf, __num_bytes); })
 #endif /* !... */
+#endif /* !__explicit_bzero_defined */
 #endif /* __USE_KOS || __USE_GNU || __USE_BSD */
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads! */

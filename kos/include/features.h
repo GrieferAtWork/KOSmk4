@@ -252,6 +252,8 @@
 #define _ATFILE_SOURCE 1
 #undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
+#undef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
 #endif /* _NETBSD_SOURCE */
 
 /* Make available some BSD-specific extensions such as `cfmakesane()' */

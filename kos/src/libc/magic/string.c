@@ -1635,7 +1635,7 @@ __STDC_INT_AS_UINT_T ffsll(__LONGLONG i) {
 }
 %#endif /* __USE_GNU */
 
-[[ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[ATTR_LEAF, guard, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRLCAT))]]
 $size_t strlcat([[nonnull]] char *__restrict dst,
                 [[nonnull]] char const *__restrict src,
@@ -1650,7 +1650,7 @@ $size_t strlcat([[nonnull]] char *__restrict dst,
 	return result + (new_dst - dst);
 }
 
-[[ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[ATTR_LEAF, guard, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRLCPY))]]
 $size_t strlcpy([[nonnull]] char *__restrict dst,
                 [[nonnull]] char const *__restrict src,
@@ -7116,7 +7116,7 @@ __SYSDECL_BEGIN
 @@Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
 @@If found, return a pointer to its location within `str', else return `NULL'
 @@This function originates from BSD, but is also provided as a KOS extension
-[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, guard, decl_include("<hybrid/typecore.h>")]]
 char *strnstr([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $size_t haystack_maxlen)
 	[([[nonnull]] char *haystack, [[nonnull]] char *needle, $size_t haystack_maxlen): char *]
 	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $size_t haystack_maxlen): char const *]
@@ -7170,7 +7170,7 @@ miss:
 @@   p[10] = ' '; // '+', if "alternate or additional access control
 @@                //          methods associated with the inode"
 @@   p[11] = '\0';
-[[section(".text.crt{|.dos}.bsd.strstat")]]
+[[guard, section(".text.crt{|.dos}.bsd.strstat")]]
 [[impl_include("<asm/os/stat.h>"), decl_include("<bits/types.h>")]]
 void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	char ch;

@@ -2141,8 +2141,6 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 	return result;
 }
 
-/* TODO: Implement using `funopen2()' (which is more powerful, and should
- *       become the new internal base-line API for custom FILE objects) */
 
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.read.read")]
@@ -3075,14 +3073,38 @@ __STDC_INT_AS_SIZE_T scanf_unlocked([[nonnull]] char const *__restrict format, .
 %
 %#ifdef __USE_NETBSD
 %[insert:extern(fparseln)]
-%[insert:function(fpurge = __fpurge)]
-/* TODO: fgetln */
-/* TODO: fmtcheck */
+%[insert:guarded_function(fpurge = __fpurge)]
+
+@@>> fgetln(3)
+[[guard, wunused]] char *
+fgetln([[nonnull]] FILE *__restrict fp,
+       [[nonnull]] size_t *__restrict lenp);
+
+@@>> fmtcheck(3)
+@@Check if `user_format' may be used as a drop-in replacement for `good_format'
+@@in the context of a call to `printf(3)' (or `format_printf()'), such that all
+@@contained format qualifiers reference the same (or compatible) underlying C
+@@types, and in the same order.
+@@If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+@@when `user_format' isn't compatible with `good_format'), return `good_format'
+@@instead. This function is meant to be used to validate user-provided printf
+@@format strings before actually using them, after they've been read from lang
+@@config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");'
+[[guard, wunused, nonnull, attribute("__ATTR_FORMAT_ARG(2)")]] char const *
+fmtcheck([[nullable]] char const *user_format,
+         [[nonnull]] char const *good_format); /* TODO: Implement inline */
 %#endif /* __USE_NETBSD */
 
-%#if defined(__USE_NETBSD) || defined(__USE_KOS)
-/* funopen and funopen2 */
 
+
+
+/************************************************************************/
+/************************************************************************/
+/* funopen and funopen2                                                 */
+/************************************************************************/
+/************************************************************************/
+%
+%#if defined(__USE_NETBSD) || defined(__USE_KOS)
 %[define_type_class(__funopen_readfn_t     = "TP")]
 %[define_type_class(__funopen_writefn_t    = "TP")]
 %[define_type_class(__funopen_seekfn_t     = "TP")]
@@ -3954,8 +3976,8 @@ FILE *funopen2_64(void const *cookie,
 %{
 #ifdef __USE_NETBSD
 #ifdef __funopen_defined
-#define fropen(cookie, fn)  funopen(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR)
-#define fwopen(cookie, fn)  funopen(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR)
+#define fropen(cookie, fn) funopen(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR)
+#define fwopen(cookie, fn) funopen(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR)
 #endif /* __funopen_defined */
 #ifdef __funopen2_defined
 #define fropen2(cookie, fn) funopen2(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR, __NULLPTR)
@@ -3964,6 +3986,8 @@ FILE *funopen2_64(void const *cookie,
 #endif /* __USE_NETBSD */
 }
 %#endif /* __USE_NETBSD || __USE_KOS */
+/************************************************************************/
+/************************************************************************/
 
 
 

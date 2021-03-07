@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x150b1441 */
+/* HASH CRC-32:0x6ff79cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -299,11 +299,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futimesat64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #undef timerclear
 #undef timercmp
 #define timerisset(tvp) ((tvp)->tv_sec || (tvp)->tv_usec)
-#define timerclear(tvp) ((tvp)->tv_sec = (tvp)->tv_usec = 0)
-#define timercmp(a, b, CMP)           \
-	(((a)->tv_sec == (b)->tv_sec)     \
-	 ? ((a)->tv_usec CMP(b)->tv_usec) \
-	 : ((a)->tv_sec CMP(b)->tv_sec))
+#define timerclear(tvp) ((tvp)->tv_sec = 0, (tvp)->tv_usec = 0)
+#define timercmp(a, b, CMP)            \
+	(((a)->tv_sec == (b)->tv_sec)      \
+	 ? ((a)->tv_usec CMP (b)->tv_usec) \
+	 : ((a)->tv_sec CMP (b)->tv_sec))
 #define timeradd(a, b, result)                           \
 	do {                                                 \
 		(result)->tv_sec  = (a)->tv_sec + (b)->tv_sec;   \
@@ -323,6 +323,38 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futimesat64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 		}                                                \
 	} __WHILE0
 #endif /* __USE_MISC */
+
+#ifdef __USE_NETBSD
+#undef timespecisset
+#undef timespecclear
+#undef timespeccmp
+#define timespecisset(tsp) ((tsp)->tv_sec || (tsp)->tv_nsec)
+#define timespecclear(tsp) ((tsp)->tv_sec = 0, (tsp)->tv_nsec = 0)
+#define timespeccmp(a, b, CMP)         \
+	(((a)->tv_sec == (b)->tv_sec)      \
+	 ? ((a)->tv_nsec CMP (b)->tv_nsec) \
+	 : ((a)->tv_sec CMP (b)->tv_sec))
+#define timespecadd(tsp, usp, vsp)                        \
+	do {                                                  \
+		(vsp)->tv_sec  = (tsp)->tv_sec + (usp)->tv_sec;   \
+		(vsp)->tv_nsec = (tsp)->tv_nsec + (usp)->tv_nsec; \
+		if ((vsp)->tv_nsec >= 1000000000L) {              \
+			++(vsp)->tv_sec;                              \
+			(vsp)->tv_nsec -= 1000000000L;                \
+		}                                                 \
+	} __WHILE0
+#define timespecsub(tsp, usp, vsp)                        \
+	do {                                                  \
+		(vsp)->tv_sec  = (tsp)->tv_sec - (usp)->tv_sec;   \
+		(vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec; \
+		if ((vsp)->tv_nsec < 0) {                         \
+			--(vsp)->tv_sec;                              \
+			(vsp)->tv_nsec += 1000000000L;                \
+		}                                                 \
+	} __WHILE0
+#define timespec2ns(tsp) \
+	(((__uint64_t)(tsp)->tv_sec) * 1000000000L + (tsp)->tv_nsec)
+#endif /* __USE_NETBSD */
 
 #endif /* __CC__ */
 

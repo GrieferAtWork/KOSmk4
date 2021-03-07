@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x456225d6 */
+/* HASH CRC-32:0xfc9eb8e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -884,6 +884,7 @@
 #define __CRT_HAVE_DOS$fgetc_unlocked
 #define __CRT_HAVE_DOS$fgetgrent
 #define __CRT_HAVE_DOS$fgetgrent_r
+#define __CRT_HAVE_DOS$fgetln
 #define __CRT_HAVE_DOS$fgetpos
 #define __CRT_HAVE_DOS$fgetpos64
 #define __CRT_HAVE_DOS$fgetpos64_unlocked
@@ -937,6 +938,7 @@
 #define __CRT_HAVE_DOS$fmod
 #define __CRT_HAVE_DOS$fmodf
 #define __CRT_HAVE_DOS$fmodl
+#define __CRT_HAVE_DOS$fmtcheck
 #define __CRT_HAVE_DOS$fnmatch
 #define __CRT_HAVE_DOS$fopen
 #define __CRT_HAVE_DOS$fopen64
@@ -3877,6 +3879,7 @@
 #define __CRT_HAVE_fgetc_unlocked
 #define __CRT_HAVE_fgetgrent
 #define __CRT_HAVE_fgetgrent_r
+#define __CRT_HAVE_fgetln
 #define __CRT_HAVE_fgetpos
 #define __CRT_HAVE_fgetpos64
 #define __CRT_HAVE_fgetpos64_unlocked
@@ -3926,6 +3929,7 @@
 #define __CRT_HAVE_fmod
 #define __CRT_HAVE_fmodf
 #define __CRT_HAVE_fmodl
+#define __CRT_HAVE_fmtcheck
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64

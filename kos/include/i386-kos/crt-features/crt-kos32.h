@@ -1642,6 +1642,7 @@
 #define __CRT_HAVE_fgetc_unlocked
 #define __CRT_HAVE_fgetgrent
 #define __CRT_HAVE_fgetgrent_r
+#define __CRT_HAVE_fgetln
 #define __CRT_HAVE_fgetpos
 #define __CRT_HAVE_fgetpos64
 #define __CRT_HAVE_fgetpos64_unlocked
@@ -1691,6 +1692,7 @@
 #define __CRT_HAVE_fmod
 #define __CRT_HAVE_fmodf
 #define __CRT_HAVE_fmodl
+#define __CRT_HAVE_fmtcheck
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64

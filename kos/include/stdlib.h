@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8473cba */
+/* HASH CRC-32:0xed8608b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2502,12 +2502,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shexec, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #endif /* __USE_KOS */
 
 #ifdef __USE_BSD
+#ifndef __reallocf_defined
+#define __reallocf_defined 1
 #ifdef __CRT_HAVE_reallocf
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc)
 #include <libc/local/stdlib/reallocf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
-#endif /* ... */
+#else /* ... */
+#undef __reallocf_defined
+#endif /* !... */
+#endif /* !__reallocf_defined */
+#ifndef __recallocarray_defined
+#define __recallocarray_defined 1
 #ifdef __CRT_HAVE_recallocarray
 /* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
@@ -2519,7 +2526,12 @@ __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)),
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 __NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
-#endif /* ... */
+#else /* ... */
+#undef __recallocarray_defined
+#endif /* !... */
+#endif /* !__recallocarray_defined */
+#ifndef __freezero_defined
+#define __freezero_defined 1
 #ifdef __CRT_HAVE_freezero
 /* Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
@@ -2533,7 +2545,10 @@ __CDECLARE_VOID(,__NOTHROW_NCX,freezero,(void *__mallptr, __SIZE_TYPE__ __num_by
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL freezero)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(freezero))(__mallptr, __num_bytes); })
-#endif /* ... */
+#else /* ... */
+#undef __freezero_defined
+#endif /* !... */
+#endif /* !__freezero_defined */
 #endif /* __USE_BSD */
 #ifdef __USE_SOLARIS
 #ifndef __uid_t_defined

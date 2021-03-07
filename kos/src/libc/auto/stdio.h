@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49309760 */
+/* HASH CRC-32:0x823905e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -566,6 +566,19 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCAL
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> fgetln(3) */
+INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__restrict fp, size_t *__restrict lenp);
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the same (or compatible) underlying C
+ * types, and in the same order.
+ * If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to be used to validate user-provided printf
+ * format strings before actually using them, after they've been read from lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBDCALL libd_fmtcheck)(char const *user_format, char const *good_format);
 /* >> funopen(3), funopen64(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen_seekfn_t seekfn, __funopen_closefn_t closefn);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

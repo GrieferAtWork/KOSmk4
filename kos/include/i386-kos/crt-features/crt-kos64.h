@@ -1638,6 +1638,7 @@
 #define __CRT_HAVE_fgetc_unlocked
 #define __CRT_HAVE_fgetgrent
 #define __CRT_HAVE_fgetgrent_r
+#define __CRT_HAVE_fgetln
 #define __CRT_HAVE_fgetpos
 #define __CRT_HAVE_fgetpos64
 #define __CRT_HAVE_fgetpos64_unlocked
@@ -1687,6 +1688,7 @@
 #define __CRT_HAVE_fmod
 #define __CRT_HAVE_fmodf
 #define __CRT_HAVE_fmodl
+#define __CRT_HAVE_fmtcheck
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64
@@ -5991,6 +5993,7 @@
 #define __CRT_HAVE_KOS$fgetc_unlocked
 #define __CRT_HAVE_KOS$fgetgrent
 #define __CRT_HAVE_KOS$fgetgrent_r
+#define __CRT_HAVE_KOS$fgetln
 #define __CRT_HAVE_KOS$fgetpos
 #define __CRT_HAVE_KOS$fgetpos64
 #define __CRT_HAVE_KOS$fgetpos64_unlocked
@@ -6037,6 +6040,7 @@
 #define __CRT_HAVE_KOS$fmod
 #define __CRT_HAVE_KOS$fmodf
 #define __CRT_HAVE_KOS$fmodl
+#define __CRT_HAVE_KOS$fmtcheck
 #define __CRT_HAVE_KOS$fnmatch
 #define __CRT_HAVE_KOS$fopen
 #define __CRT_HAVE_KOS$fopen64
@@ -9408,6 +9412,7 @@
 #define __CRT_HAVE_DOS$fgetc_unlocked
 #define __CRT_HAVE_DOS$fgetgrent
 #define __CRT_HAVE_DOS$fgetgrent_r
+#define __CRT_HAVE_DOS$fgetln
 #define __CRT_HAVE_DOS$fgetpos
 #define __CRT_HAVE_DOS$fgetpos64
 #define __CRT_HAVE_DOS$fgetpos64_unlocked
@@ -9454,6 +9459,7 @@
 #define __CRT_HAVE_DOS$fmod
 #define __CRT_HAVE_DOS$fmodf
 #define __CRT_HAVE_DOS$fmodl
+#define __CRT_HAVE_DOS$fmtcheck
 #define __CRT_HAVE_DOS$fnmatch
 #define __CRT_HAVE_DOS$fopen
 #define __CRT_HAVE_DOS$fopen64

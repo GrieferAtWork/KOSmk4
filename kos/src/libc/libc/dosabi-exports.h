@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d2655ac */
+/* HASH CRC-32:0x51650394 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1761,6 +1761,8 @@ DEFINE_PUBLIC_ALIAS(DOS$vprintf_s, libd_vprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$vprintf_unlocked, libd_vprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$vfscanf_unlocked, libd_vfscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$vscanf_unlocked, libd_vscanf_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$fgetln, libd_fgetln);
+DEFINE_PUBLIC_ALIAS(DOS$fmtcheck, libd_fmtcheck);
 DEFINE_PUBLIC_ALIAS(DOS$funopen, libd_funopen);
 DEFINE_PUBLIC_ALIAS(DOS$funopen2, libd_funopen2);
 DEFINE_PUBLIC_ALIAS(DOS$funopen64, libd_funopen64);

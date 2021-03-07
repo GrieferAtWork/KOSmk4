@@ -2665,6 +2665,45 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64_unlocked]]]*/
 
+/*[[[head:libc_fgetln,hash:CRC-32=0x22063a80]]]*/
+/* >> fgetln(3) */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED NONNULL((1, 2)) char *
+NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict fp,
+                                  size_t *__restrict lenp)
+/*[[[body:libc_fgetln]]]*/
+/*AUTO*/{
+	(void)fp;
+	(void)lenp;
+	CRT_UNIMPLEMENTEDF("fgetln(%p, %p)", fp, lenp); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_fgetln]]]*/
+
+/*[[[head:libc_fmtcheck,hash:CRC-32=0xf6a96542]]]*/
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the same (or compatible) underlying C
+ * types, and in the same order.
+ * If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to be used to validate user-provided printf
+ * format strings before actually using them, after they've been read from lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *
+NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format,
+                                    char const *good_format)
+/*[[[body:libc_fmtcheck]]]*/
+/*AUTO*/{
+	(void)user_format;
+	(void)good_format;
+	CRT_UNIMPLEMENTEDF("fmtcheck(%q, %q)", user_format, good_format); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_fmtcheck]]]*/
+
 
 
 ATTR_SECTION(".text.crt.FILE.core.utility.file_funopen")
@@ -3686,7 +3725,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x69ec174c]]]*/
+/*[[[start:exports,hash:CRC-32=0x6247aab6]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3813,6 +3852,8 @@ DEFINE_PUBLIC_ALIAS(fgetpos64_unlocked, libc_fgetpos64_unlocked);
 DEFINE_PUBLIC_ALIAS(fsetpos64_unlocked, libc_fsetpos64_unlocked);
 DEFINE_PUBLIC_ALIAS(fftruncate64, libc_fftruncate64);
 DEFINE_PUBLIC_ALIAS(fftruncate64_unlocked, libc_fftruncate64_unlocked);
+DEFINE_PUBLIC_ALIAS(fgetln, libc_fgetln);
+DEFINE_PUBLIC_ALIAS(fmtcheck, libc_fmtcheck);
 DEFINE_PUBLIC_ALIAS(funopen2, libc_funopen2);
 DEFINE_PUBLIC_ALIAS(funopen2_64, libc_funopen2_64);
 DEFINE_PUBLIC_ALIAS(_flushall, libc__flushall);

@@ -2371,7 +2371,7 @@ int shexec([[nullable]] char const *command) {
 [[section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[userimpl, requires_function(realloc)]]
-[[impl_include("<asm/crt/malloc.h>")]]
+[[impl_include("<asm/crt/malloc.h>"), guard]]
 void *reallocf(void *mallptr, $size_t num_bytes) {
 	void *result;
 	result = realloc(mallptr, num_bytes);
@@ -2399,7 +2399,7 @@ void *reallocf(void *mallptr, $size_t num_bytes) {
 @@Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
 @@when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
 @@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
-[[section(".text.crt{|.dos}.heap.rare_helpers")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), guard]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((3, 4))]]
 [[userimpl, requires_function(recallocv, calloc, malloc_usable_size)]]
 void *recallocarray(void *mallptr, $size_t old_elem_count,
@@ -2436,7 +2436,7 @@ void *recallocarray(void *mallptr, $size_t old_elem_count,
 @@immediately returned to the OS, rather than being left in cache
 @@while still containing its previous contents.
 [[section(".text.crt{|.dos}.heap.rare_helpers")]]
-[[userimpl, requires_function(free)]]
+[[userimpl, requires_function(free), guard]]
 void freezero(void *mallptr, $size_t num_bytes) {
 	if likely(mallptr) {
 		explicit_bzero(mallptr, num_bytes);
