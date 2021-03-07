@@ -146,10 +146,28 @@ struct iofile_data_novtab {
 		/* .io_mbs    = */ MBSTATE_INIT                    \
 	}
 
+#ifndef ____funopen2_types_defined
+#define ____funopen2_types_defined 1
+typedef __ssize_t (__LIBKCALL *__funopen2_readfn_t)(void *__cookie, void *__buf, __size_t __num_bytes);
+typedef __ssize_t (__LIBKCALL *__funopen2_writefn_t)(void *__cookie, void const *__buf, __size_t __num_bytes);
+typedef __FS_TYPE(off) (__LIBKCALL *__funopen2_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
+typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
+typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
+#endif /* !____funopen2_types_defined */
+
+#ifndef ____funopen2_64_types_defined
+#define ____funopen2_64_types_defined 1
+typedef __off64_t (__LIBKCALL *__funopen2_64_seekfn_t)(void *__cookie, __off64_t __off, int __whence);
+#endif /* !____funopen2_64_types_defined */
+
 struct iofile_data: iofile_data_novtab {
 	/* All of the following fields only exist when `IO_HASVTAB' is set. */
-	cookie_io_functions_t io_vtab; /* [const] File buffer */
-	void                 *io_magi; /* [const] Magic cook */
+	__funopen2_readfn_t    io_readfn;  /* [0..1][const] Read function */
+	__funopen2_writefn_t   io_writefn; /* [0..1][const] Write function */
+	__funopen2_64_seekfn_t io_seekfn;  /* [0..1][const] Seek function */
+	__funopen2_flushfn_t   io_flushfn; /* [0..1][const] Flush function */
+	__funopen2_closefn_t   io_closefn; /* [0..1][const] Close function */
+	void                  *io_cookie;  /* [const] Magic cookie */
 };
 
 
@@ -220,7 +238,6 @@ INTDEF WUNUSED uint32_t LIBCCALL file_evalmodes(char const *modes, oflag_t *pofl
 /* @param: flags: Set of `IO_*' */
 INTDEF WUNUSED FILE *LIBCCALL file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags);
 INTDEF WUNUSED NONNULL((1)) FILE *LIBCCALL file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags);
-INTDEF WUNUSED NONNULL((1)) FILE *LIBCCALL file_opencookie(cookie_io_functions_t const *__restrict io, void *magic, uint32_t flags);
 
 
 DECL_END

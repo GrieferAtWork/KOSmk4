@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a4f2d3f */
+/* HASH CRC-32:0x9678b93c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,9 +194,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_closefn_defined 1
 __LOCAL_LIBC(__funopen_to_funopen2_closefn) int
 (__LIBKCALL __funopen_to_funopen2_closefn)(void *__cookie) {
+	int __result = 0;
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
-	return (*__holder->__fh_closefn)(__holder->__fh_cookie);
+	if (__holder->__fh_closefn != __NULLPTR)
+		__result = (*__holder->__fh_closefn)(__holder->__fh_cookie);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__holder);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_closefn_defined */
@@ -470,14 +476,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen64))(void const *__cookie, __f
 	                     /* writefn: */ __writefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
 	                     /* seekfn:  */ __seekfn  ? (__funopen2_64_seekfn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_seekfn  : __NULLPTR,
 	                     /* flushfn: */ __NULLPTR,
-	                     /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 	__result = __localdep_funopen2_64(/* cookie:  */ __holder,
 	                     /* readfn:  */ __readfn  ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_readfn  : __NULLPTR,
 	                     /* writefn: */ __writefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
 	                     /* seekfn:  */ __seekfn  ? &__NAMESPACE_LOCAL_SYM __funopen64_to_funopen2_64_seekfn  : __NULLPTR,
 	                     /* flushfn: */ __NULLPTR,
-	                     /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
 #elif defined(__CRT_HAVE_fopencookie)
 	{
@@ -489,7 +495,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen64))(void const *__cookie, __f
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 		__ioc_functions.seek  = __seekfn ? &__NAMESPACE_LOCAL_SYM __funopen64_to_fopencookie_seekfn : __NULLPTR;
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
-		__ioc_functions.close = __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR;
+		__ioc_functions.close = &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn;
 		__result = __localdep_crt_fopencookie(__holder, __readfn && __writefn ? "r+" : __readfn ? "r" : "w", __ioc_functions);
 	}
 #else /* ... */
@@ -499,13 +505,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen64))(void const *__cookie, __f
 	                   /* readfn:  */ __readfn  ? (__funopen_readfn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_readfn  : __NULLPTR,
 	                   /* writefn: */ __writefn ? (__funopen_writefn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
 	                   /* seekfn:  */ __seekfn  ? (__funopen_seekfn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_seekfn  : __NULLPTR,
-	                   /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 	__result = __localdep_funopen32(/* cookie:  */ __holder,
 	                   /* readfn:  */ __readfn  ? (__funopen_readfn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_readfn  : __NULLPTR,
 	                   /* writefn: */ __writefn ? (__funopen_writefn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
 	                   /* seekfn:  */ __seekfn  ? &__NAMESPACE_LOCAL_SYM __funopen64_to_funopen_seekfn  : __NULLPTR,
-	                   /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 #if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
@@ -513,13 +519,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen64))(void const *__cookie, __f
 	                   /* readfn:  */ __readfn  ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_readfn  : __NULLPTR,
 	                   /* writefn: */ __writefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_writefn : __NULLPTR,
 	                   /* seekfn:  */ __seekfn  ? (__funopen_seekfn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_seekfn  : __NULLPTR,
-	                   /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 	__result = __localdep_funopen32(/* cookie:  */ __holder,
 	                   /* readfn:  */ __readfn  ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_readfn  : __NULLPTR,
 	                   /* writefn: */ __writefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_writefn : __NULLPTR,
 	                   /* seekfn:  */ __seekfn  ? &__NAMESPACE_LOCAL_SYM __funopen64_to_funopen_seekfn  : __NULLPTR,
-	                   /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 #endif /* !... */

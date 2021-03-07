@@ -140,14 +140,17 @@ NONNULL((1)) void LIBCCALL changed_linebuffered_remove(FILE *__restrict self) {
 }
 
 /* Low-level file read operation. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_system_read")
-NONNULL((1)) ssize_t LIBCCALL file_system_read(FILE *__restrict self,
-                                               void *buf, size_t num_bytes) {
+ATTR_SECTION(".text.crt.FILE.core.read.file_system_read")
+PRIVATE NONNULL((1)) ssize_t LIBCCALL
+file_system_read(FILE *__restrict self,
+                 void *buf, size_t num_bytes) {
 	ssize_t result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;
 		ex = self->if_exdata;
-		result = (*ex->io_vtab.read)(ex->io_magi, (char *)buf, num_bytes);
+		if unlikely(!ex->io_readfn)
+			return libc_seterrno(EPERM);
+		result = (*ex->io_readfn)(ex->io_cookie, buf, num_bytes);
 	} else {
 		result = read(self->if_fd, buf, num_bytes);
 	}
@@ -155,52 +158,51 @@ NONNULL((1)) ssize_t LIBCCALL file_system_read(FILE *__restrict self,
 }
 
 /* Low-level file write operation. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_write")
-NONNULL((1)) ssize_t LIBCCALL file_system_write(FILE *__restrict self,
-                                                void const *buf, size_t num_bytes) {
+ATTR_SECTION(".text.crt.FILE.core.write.file_system_write")
+PRIVATE NONNULL((1)) ssize_t LIBCCALL
+file_system_write(FILE *__restrict self,
+                  void const *buf, size_t num_bytes) {
 	ssize_t result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;
 		ex = self->if_exdata;
-		result = (*ex->io_vtab.write)(ex->io_magi, (char const *)buf, num_bytes);
+		if unlikely(!ex->io_writefn)
+			return libc_seterrno(EPERM);
+		result = (*ex->io_writefn)(ex->io_cookie, buf, num_bytes);
 	} else {
 		result = write(self->if_fd, buf, num_bytes);
 	}
 	return result;
 }
 
-LOCAL ATTR_SECTION(".text.crt.FILE.core.write.file_system_writeall_vt")
-NONNULL((1)) ssize_t LIBCCALL file_system_writeall_vt(FILE *__restrict self,
-                                                      void const *buf, size_t num_bytes) {
-	ssize_t result;
-	struct iofile_data *ex;
-	ex = self->if_exdata;
-	result = (*ex->io_vtab.write)(ex->io_magi, (char const *)buf, num_bytes);
-	if (result > 0 && (size_t)result < num_bytes) {
-		/* Keep on writing */
-		for (;;) {
-			ssize_t temp;
-			temp = (*ex->io_vtab.write)(ex->io_magi,
-			                            (char const *)((byte_t *)buf + (size_t)result),
-			                            num_bytes - (size_t)result);
-			if (temp <= 0) {
-				result = temp;
-				break;
-			}
-			result += temp;
-			if ((size_t)result >= num_bytes)
-				break;
-		}
-	}
-	return result;
-}
-
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_writeall")
-NONNULL((1)) ssize_t LIBCCALL file_system_writeall(FILE *__restrict self,
-                                                   void const *buf, size_t num_bytes) {
+ATTR_SECTION(".text.crt.FILE.core.write.file_system_writeall")
+PRIVATE NONNULL((1)) ssize_t LIBCCALL
+file_system_writeall(FILE *__restrict self,
+                     void const *buf, size_t num_bytes) {
 	ssize_t result;
 	if (self->if_flag & IO_HASVTAB) {
-		result = file_system_writeall_vt(self, buf, num_bytes);
+		ssize_t result;
+		struct iofile_data *ex;
+		ex = self->if_exdata;
+		if unlikely(!ex->io_writefn)
+			return libc_seterrno(EPERM);
+		result = (*ex->io_writefn)(ex->io_cookie, buf, num_bytes);
+		if (result > 0 && (size_t)result < num_bytes) {
+			/* Keep on writing */
+			for (;;) {
+				ssize_t temp;
+				temp = (*ex->io_writefn)(ex->io_cookie,
+				                         (byte_t const *)buf + (size_t)result,
+				                         num_bytes - (size_t)result);
+				if (temp <= 0) {
+					result = temp;
+					break;
+				}
+				result += temp;
+				if ((size_t)result >= num_bytes)
+					break;
+			}
+		}
 	} else {
 		result = writeall(self->if_fd, buf, num_bytes);
 	}
@@ -208,16 +210,17 @@ NONNULL((1)) ssize_t LIBCCALL file_system_writeall(FILE *__restrict self,
 }
 
 /* Low-level file seek operation. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.seek.file_system_seek")
-NONNULL((1)) off64_t LIBCCALL file_system_seek(FILE *__restrict self,
-                                               off64_t offset, int whence) {
+ATTR_SECTION(".text.crt.FILE.core.seek.file_system_seek")
+PRIVATE NONNULL((1)) off64_t LIBCCALL
+file_system_seek(FILE *__restrict self,
+                 off64_t offset, int whence) {
 	off64_t result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;
-		ex     = self->if_exdata;
-		result = offset;
-		if ((*ex->io_vtab.seek)(ex->io_magi, (pos64_t *)&result, whence))
-			result = -1;
+		ex = self->if_exdata;
+		if unlikely(!ex->io_seekfn)
+			return libc_seterrno(EPERM);
+		result = (*ex->io_seekfn)(ex->io_cookie, offset, whence);
 	} else {
 		result = lseek64(self->if_fd, offset, whence);
 	}
@@ -225,13 +228,16 @@ NONNULL((1)) off64_t LIBCCALL file_system_seek(FILE *__restrict self,
 }
 
 /* Low-level file close operation. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_system_close")
-NONNULL((1)) int LIBCCALL file_system_close(FILE *__restrict self) {
+ATTR_SECTION(".text.crt.FILE.core.utility.file_system_close")
+PRIVATE NONNULL((1)) int LIBCCALL
+file_system_close(FILE *__restrict self) {
 	int result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;
 		ex     = self->if_exdata;
-		result = (*ex->io_vtab.close)(ex->io_magi);
+		result = 0;
+		if (ex->io_closefn != NULL)
+			result = (*ex->io_closefn)(ex->io_cookie);
 	} else {
 		result = close(self->if_fd);
 	}
@@ -239,11 +245,16 @@ NONNULL((1)) int LIBCCALL file_system_close(FILE *__restrict self) {
 }
 
 /* Low-level file sync operation. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
-NONNULL((1)) int LIBCCALL file_system_sync(FILE *__restrict self) {
+ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
+PRIVATE NONNULL((1)) int LIBCCALL
+file_system_sync(FILE *__restrict self) {
 	int result;
 	if (self->if_flag & IO_HASVTAB) {
-		result = 0; /* No-op */
+		struct iofile_data *ex;
+		ex     = self->if_exdata;
+		result = 0;
+		if (ex->io_flushfn != NULL)
+			result = (*ex->io_flushfn)(ex->io_cookie);
 	} else {
 		result = fsync(self->if_fd);
 	}
@@ -251,8 +262,9 @@ NONNULL((1)) int LIBCCALL file_system_sync(FILE *__restrict self) {
 }
 
 /* Low-level file truncate operation. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
-NONNULL((1)) int LIBCCALL file_system_trunc(FILE *__restrict self, pos64_t new_size) {
+ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
+PRIVATE NONNULL((1)) int LIBCCALL
+file_system_trunc(FILE *__restrict self, pos64_t new_size) {
 	int result;
 	if (self->if_flag & IO_HASVTAB) {
 		/* Not allowed for VTABLE files. */
@@ -265,8 +277,9 @@ NONNULL((1)) int LIBCCALL file_system_trunc(FILE *__restrict self, pos64_t new_s
 }
 
 /* Determine if `self' is a TTY */
-INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_determine_isatty")
-NONNULL((1)) void LIBCCALL file_determine_isatty(FILE *__restrict self) {
+ATTR_SECTION(".text.crt.FILE.core.utility.file_determine_isatty")
+INTERN NONNULL((1)) void LIBCCALL
+file_determine_isatty(FILE *__restrict self) {
 	uint32_t flags = self->if_flag;
 	if (!(flags & (IO_NOTATTY | IO_ISATTY))) {
 		if (flags & IO_HASVTAB) {
@@ -313,9 +326,10 @@ file_buffer_realloc_dynscale(FILE *__restrict self,
 
 
 /* Change the operations mode of a given buffer. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_setmode")
-WUNUSED NONNULL((1)) int LIBCCALL file_setmode(FILE *__restrict self,
-                                               void *buf, int mode, size_t size) {
+ATTR_SECTION(".text.crt.FILE.core.utility.file_setmode")
+PRIVATE WUNUSED NONNULL((1)) int LIBCCALL
+file_setmode(FILE *__restrict self,
+             void *buf, int mode, size_t size) {
 	/* Convert DOS names. */
 	if unlikely(mode == 0x0040)
 		mode = _IOLBF;
@@ -411,8 +425,9 @@ err:
 	return -1;
 }
 
-INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.write.file_sync")
-int LIBCCALL file_sync(FILE *__restrict self) {
+ATTR_SECTION(".text.crt.FILE.core.write.file_sync")
+INTERN NONNULL((1)) int LIBCCALL
+file_sync(FILE *__restrict self) {
 	pos64_t abs_chngpos;
 	size_t changed_size;
 	ssize_t temp;
@@ -474,8 +489,8 @@ err:
 	return -1;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.application.exit.file_sync_locked")
-int LIBCCALL file_sync_locked(FILE *__restrict self) {
+PRIVATE NONNULL((1)) ATTR_SECTION(".text.crt.application.exit.file_sync_locked") int LIBCCALL
+file_sync_locked(FILE *__restrict self) {
 	int result;
 	if (FMUSTLOCK(self)) {
 		file_lock_write(self);
@@ -518,14 +533,16 @@ file_destroy(FILE *__restrict self) {
 	assert(!(self->if_flag & IO_READING));
 	/* Close the underlying file. */
 	if (self->if_flag & IO_HASVTAB) {
-		errno_t saved_errno;
 		/* In this case, we have to be careful in case the file gets revived. */
 		atomic_owner_rwlock_init_read(&ex->io_lock);
 		ATOMIC_WRITE(ex->io_refcnt, 1);
-		saved_errno = libc_geterrno_safe();
 		/* NOTE: Errors during this close are ignored! */
-		(*ex->io_vtab.close)(ex->io_magi);
-		libc_seterrno(saved_errno);
+		if (ex->io_closefn != NULL) {
+			errno_t saved_errno;
+			saved_errno = libc_geterrno_safe();
+			(*ex->io_closefn)(ex->io_cookie);
+			libc_seterrno(saved_errno);
+		}
 		atomic_owner_rwlock_endread(&ex->io_lock);
 		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
 		assert(refcnt != 0);
@@ -1805,31 +1822,6 @@ WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
 }
 
 
-INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
-WUNUSED FILE *LIBCCALL file_opencookie(cookie_io_functions_t const *__restrict io,
-                                       void *magic, uint32_t flags) {
-	FILE *result;
-	struct iofile_data *ex;
-	result = (FILE *)calloc(sizeof(FILE) +
-	                        sizeof(struct iofile_data));
-	if unlikely(!result)
-		goto done;
-	ex = (struct iofile_data *)(result + 1);
-	result->if_exdata = ex;
-	atomic_owner_rwlock_cinit(&ex->io_lock);
-	assert(ex->io_zero == 0);
-	ex->io_refcnt = 1;
-	/* Check if the stream handle is a tty the first time it is read from. */
-	result->if_flag = IO_HASVTAB | IO_NOTATTY | (flags & ~IO_LNIFTYY);
-	ex->io_magi = magic;
-	memcpy(&ex->io_vtab, io, sizeof(cookie_io_functions_t));
-	/* Insert the new file stream into the global list of them. */
-	allfiles_insert(result);
-done:
-	return result;
-}
-
-
 
 
 
@@ -2673,16 +2665,91 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64_unlocked]]]*/
 
-//TODO:funopen2:INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
-//TODO:funopen2:NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
-//TODO:funopen2:                                       char const *__restrict modes,
-//TODO:funopen2:                                       cookie_io_functions_t io_funcs) {
-//TODO:funopen2:	FILE *result;
-//TODO:funopen2:	uint32_t flags;
-//TODO:funopen2:	flags  = file_evalmodes(modes, NULL);
-//TODO:funopen2:	result = file_opencookie(&io_funcs, magic_cookie, flags);
-//TODO:funopen2:	return result;
-//TODO:funopen2:}
+
+
+ATTR_SECTION(".text.crt.FILE.core.utility.file_funopen")
+LOCAL WUNUSED NONNULL((1)) FILE *LIBCCALL
+file_funopen(void const *cookie,
+             __funopen2_readfn_t readfn, __funopen2_writefn_t writefn,
+             __funopen2_64_seekfn_t seekfn, __funopen2_flushfn_t flushfn,
+             __funopen2_closefn_t closefn) {
+	FILE *result;
+	struct iofile_data *ex;
+	result = (FILE *)calloc(sizeof(FILE) +
+	                        sizeof(struct iofile_data));
+	if unlikely(!result)
+		goto done;
+	ex = (struct iofile_data *)(result + 1);
+	result->if_exdata = ex;
+	atomic_owner_rwlock_cinit(&ex->io_lock);
+	assert(ex->io_zero == 0);
+	ex->io_refcnt = 1;
+
+	/* Initialize as read/write, not-a-tty and w/ a V-table. */
+	result->if_flag = IO_HASVTAB | IO_NOTATTY | IO_RW;
+	ex->io_readfn   = readfn;
+	ex->io_writefn  = writefn;
+	ex->io_seekfn   = seekfn;
+	ex->io_flushfn  = flushfn;
+	ex->io_closefn  = closefn;
+	ex->io_cookie   = (void *)cookie;
+
+	/* Insert the new file stream into the global list of them. */
+	allfiles_insert(result);
+done:
+	return result;
+}
+
+
+#if __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__
+struct funopen2_32_holder {
+	void                *fh_cookie;  /* [?..?] funopen2 cookie */
+	__funopen2_readfn_t  fh_readfn;  /* [0..1] funopen2 readfn */
+	__funopen2_writefn_t fh_writefn; /* [0..1] funopen2 writefn */
+	__funopen2_seekfn_t  fh_seekfn;  /* [0..1] funopen2 seekfn */
+	__funopen2_flushfn_t fh_flushfn; /* [0..1] funopen2 flushfn */
+	__funopen2_closefn_t fh_closefn; /* [0..1] funopen2 closefn */
+};
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.utility") ssize_t LIBKCALL
+funopen2_32_readfn(void *cookie, void *buf, size_t num_bytes) {
+	struct funopen2_32_holder *holder;
+	holder = (struct funopen2_32_holder *)cookie;
+	return (*holder->fh_readfn)(holder->fh_cookie, buf, num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.utility") ssize_t LIBKCALL
+funopen2_32_writefn(void *cookie, void const *buf, size_t num_bytes) {
+	struct funopen2_32_holder *holder;
+	holder = (struct funopen2_32_holder *)cookie;
+	return (*holder->fh_writefn)(holder->fh_cookie, buf, num_bytes);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.utility") off64_t LIBKCALL
+funopen2_32_seekfn(void *cookie, off64_t off, int whence) {
+	struct funopen2_32_holder *holder;
+	holder = (struct funopen2_32_holder *)cookie;
+	return (off64_t)(*holder->fh_seekfn)(holder->fh_cookie, (off32_t)off, whence);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.utility") int LIBKCALL
+funopen2_32_flushfn(void *cookie) {
+	struct funopen2_32_holder *holder;
+	holder = (struct funopen2_32_holder *)cookie;
+	return (*holder->fh_flushfn)(holder->fh_cookie);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.utility") int LIBKCALL
+funopen2_32_closefn(void *cookie) {
+	int result = 0;
+	struct funopen2_32_holder *holder;
+	holder = (struct funopen2_32_holder *)cookie;
+	if (holder->fh_closefn)
+		result = (*holder->fh_closefn)(holder->fh_cookie);
+	free(holder);
+	return result;
+}
+#endif /* __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__ */
 
 /*[[[head:libc_funopen2,hash:CRC-32=0xe336b5a4]]]*/
 /* >> funopen2(3), funopen2_64(3) */
@@ -2695,15 +2762,34 @@ NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie,
                                     __funopen2_closefn_t closefn)
 /*[[[body:libc_funopen2]]]*/
 {
-	(void)cookie;
-	(void)readfn;
-	(void)writefn;
-	(void)seekfn;
-	(void)flushfn;
-	(void)closefn;
-	CRT_UNIMPLEMENTEDF("funopen2(%p, %p, %p, %p, %p, %p)", cookie, readfn, writefn, seekfn, flushfn, closefn); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+#if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
+	return file_funopen(cookie, readfn, writefn, seekfn, flushfn, closefn);
+#else /* __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__ */
+	FILE *result;
+	struct funopen2_32_holder *holder;
+	if (!seekfn)
+		return file_funopen(cookie, readfn, writefn, NULL, flushfn, closefn);
+	/* Need a custom wrapper for `seekfn'! */
+	holder = (struct funopen2_32_holder *)malloc(sizeof(struct funopen2_32_holder));
+	if unlikely(!holder)
+		return NULL;
+	holder->fh_cookie  = (void *)cookie;
+	holder->fh_readfn  = readfn;
+	holder->fh_writefn = writefn;
+	holder->fh_seekfn  = seekfn;
+	holder->fh_flushfn = flushfn;
+
+	/* Open the actual file. */
+	result = file_funopen(/* cookie:  */ holder,
+	                      /* readfn:  */ readfn ? &funopen2_32_readfn : NULL,
+	                      /* writefn: */ writefn ? &funopen2_32_writefn : NULL,
+	                      /* seekfn:  */ seekfn ? &funopen2_32_seekfn : NULL,
+	                      /* flushfn: */ flushfn ? &funopen2_32_flushfn : NULL,
+	                      /* closefn: */ closefn ? &funopen2_32_closefn : NULL);
+	if unlikely(!result)
+		free(holder);
+	return result;
+#endif /* __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__ */
 }
 /*[[[end:libc_funopen2]]]*/
 
@@ -2721,15 +2807,7 @@ NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie,
                                        __funopen2_closefn_t closefn)
 /*[[[body:libc_funopen2_64]]]*/
 {
-	(void)cookie;
-	(void)readfn;
-	(void)writefn;
-	(void)seekfn;
-	(void)flushfn;
-	(void)closefn;
-	CRT_UNIMPLEMENTEDF("funopen2_64(%p, %p, %p, %p, %p, %p)", cookie, readfn, writefn, seekfn, flushfn, closefn); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	return file_funopen(cookie, readfn, writefn, seekfn, flushfn, closefn);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_funopen2_64]]]*/
@@ -3045,7 +3123,7 @@ struct memopen_cookie {
 };
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.read")
-ssize_t LIBCCALL memopen_read(void *cookie, char *buf, size_t num_bytes) {
+ssize_t LIBCCALL memopen_read(void *cookie, void *buf, size_t num_bytes) {
 	size_t maxlen;
 	struct memopen_cookie *me;
 	me = (struct memopen_cookie *)cookie;
@@ -3058,7 +3136,7 @@ ssize_t LIBCCALL memopen_read(void *cookie, char *buf, size_t num_bytes) {
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.write")
-ssize_t LIBCCALL memopen_write(void *cookie, char const *buf, size_t num_bytes) {
+ssize_t LIBCCALL memopen_write(void *cookie, void const *buf, size_t num_bytes) {
 	size_t maxlen;
 	struct memopen_cookie *me;
 	me = (struct memopen_cookie *)cookie;
@@ -3071,12 +3149,12 @@ ssize_t LIBCCALL memopen_write(void *cookie, char const *buf, size_t num_bytes) 
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.seek")
-int LIBCCALL memopen_seek(void *cookie, pos64_t *pos, int whence) {
+off64_t LIBCCALL memopen_seek(void *cookie, off64_t off, int whence) {
 	pos64_t newpos;
 	struct memopen_cookie *me;
 	size_t maxlen;
 	me = (struct memopen_cookie *)cookie;
-	newpos = *pos;
+	newpos = (pos64_t)off;
 	maxlen = (size_t)(me->moc_end - me->moc_cur);
 	switch (whence) {
 
@@ -3102,8 +3180,7 @@ int LIBCCALL memopen_seek(void *cookie, pos64_t *pos, int whence) {
 	if (newpos > maxlen)
 		newpos = maxlen;
 	me->moc_cur = me->moc_base + (size_t)newpos;
-	*pos = newpos;
-	return 0;
+	return (off64_t)newpos;
 err_EOVERFLOW:
 	libc_seterrno(EOVERFLOW);
 	return -1;
@@ -3124,9 +3201,9 @@ NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
                                     char const *modes)
 /*[[[body:libc_fmemopen]]]*/
 {
+	/* TODO: This function can be fully implemented via magic! */
 	FILE *result;
 	uint32_t flags;
-	cookie_io_functions_t cookies;
 	struct memopen_cookie *magic;
 	magic = (struct memopen_cookie *)malloc(sizeof(struct memopen_cookie));
 	if unlikely(!magic)
@@ -3134,12 +3211,15 @@ NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
 	magic->moc_base = (byte_t *)mem;
 	magic->moc_cur  = (byte_t *)mem;
 	magic->moc_end  = (byte_t *)mem + len;
-	cookies.read  = &memopen_read;
-	cookies.write = &memopen_write;
-	cookies.seek  = &memopen_seek;
-	cookies.close = &memopen_close;
+	/* Open a custom file-stream. */
 	flags  = file_evalmodes(modes, NULL);
-	result = file_opencookie(&cookies, magic, flags);
+	result = funopen2_64(magic,
+	                     &memopen_read,
+	                     flags & IO_RW ? &memopen_write
+	                                   : NULL,
+	                     &memopen_seek,
+	                     NULL,
+	                     &memopen_close);
 	if unlikely(!result)
 		free(magic);
 	return result;
@@ -3157,7 +3237,7 @@ struct memstream_file {
 };
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.read")
-ssize_t LIBCCALL memstream_read(void *cookie, char *buf, size_t num_bytes) {
+ssize_t LIBCCALL memstream_read(void *cookie, void *buf, size_t num_bytes) {
 	struct memstream_file *me;
 	me = (struct memstream_file *)cookie;
 	size_t maxread = me->mf_end - me->mf_ptr;
@@ -3169,7 +3249,7 @@ ssize_t LIBCCALL memstream_read(void *cookie, char *buf, size_t num_bytes) {
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.write")
-ssize_t LIBCCALL memstream_write(void *cookie, char const *buf, size_t num_bytes) {
+ssize_t LIBCCALL memstream_write(void *cookie, void const *buf, size_t num_bytes) {
 	struct memstream_file *me;
 	size_t new_alloc, result = 0;
 	byte_t *new_buffer;
@@ -3180,7 +3260,7 @@ ssize_t LIBCCALL memstream_write(void *cookie, char const *buf, size_t num_bytes
 			result = num_bytes;
 		memcpy(me->mf_ptr, buf, num_bytes);
 		me->mf_ptr += result;
-		buf += result;
+		buf = (byte_t const *)buf + result;
 		num_bytes -= result;
 	}
 	if (!num_bytes)
@@ -3212,7 +3292,7 @@ err:
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.seek")
-int LIBCCALL memstream_seek(void *cookie, pos64_t *offset, int whence) {
+off64_t LIBCCALL memstream_seek(void *cookie, off64_t off, int whence) {
 	struct memstream_file *me;
 	pos64_t new_pos;
 	me = (struct memstream_file *)cookie;
@@ -3220,29 +3300,26 @@ int LIBCCALL memstream_seek(void *cookie, pos64_t *offset, int whence) {
 	switch (whence) {
 
 	case SEEK_SET:
-		new_pos = *offset;
+		new_pos = (pos64_t)off;
 		break;
 
 	case SEEK_CUR:
-		new_pos += *offset;
+		new_pos += (pos64_t)off;
 		break;
 
 	case SEEK_END:
-		new_pos = (size_t)(me->mf_end - me->mf_base) - *offset;
+		new_pos = (size_t)(me->mf_end - me->mf_base) - (pos64_t)off;
 		break;
 
 	default:
-		libc_seterrno(EINVAL);
-		return -1;
+		return libc_seterrno(EINVAL);
 	}
 	if unlikely(new_pos < 0)
 		goto err_EOVERFLOW;
 	me->mf_ptr = me->mf_base + (size_t)new_pos;
-	*offset      = (pos64_t)new_pos;
-	return 0;
+	return (off64_t)new_pos;
 err_EOVERFLOW:
-	libc_seterrno(EOVERFLOW);
-	return -1;
+	return libc_seterrno(EOVERFLOW);
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.close")
@@ -3258,7 +3335,6 @@ NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc,
 /*[[[body:libc_open_memstream]]]*/
 {
 	FILE *result;
-	cookie_io_functions_t cookies;
 	struct memstream_file *magic;
 	magic = (struct memstream_file *)malloc(sizeof(struct memstream_file));
 	if unlikely(!magic)
@@ -3268,11 +3344,13 @@ NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc,
 	magic->mf_base  = NULL;
 	magic->mf_ptr   = NULL;
 	magic->mf_end   = NULL;
-	cookies.read    = &memstream_read;
-	cookies.write   = &memstream_write;
-	cookies.seek    = &memstream_seek;
-	cookies.close   = &memstream_close;
-	result = file_opencookie(&cookies, magic, IO_RW);
+	/* Open a custom file-stream. */
+	result = funopen2_64(magic,
+	                     &memstream_read,
+	                     &memstream_write,
+	                     &memstream_seek,
+	                     NULL,
+	                     &memstream_close);
 	if unlikely(!result)
 		free(magic);
 	return result;

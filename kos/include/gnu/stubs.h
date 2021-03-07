@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb49513c */
+/* HASH CRC-32:0x25f0adc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,8 +184,6 @@
 #define __stub_fts_set
 #define __stub_ftw
 #define __stub_ftw64
-#define __stub_funopen2
-#define __stub_funopen2_64
 #define __stub_gai_cancel
 #define __stub_gai_error
 #define __stub_gai_strerror

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fc3c51 */
+/* HASH CRC-32:0xa2f944fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -669,9 +669,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_closefn_defined 1
 __LOCAL_LIBC(fopencookie_to_funopen_closefn) int
 (__LIBKCALL fopencookie_to_funopen_closefn)(void *cookie) {
+	int result = 0;
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
-	return (int)(*holder->foch_funcs.close)(holder->foch_cookie);
+	if (holder->foch_funcs.close != NULL)
+		result = (*holder->foch_funcs.close)(holder->foch_cookie);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	libc_free(holder);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__fopencookie_to_funopen_closefn_defined */
@@ -1014,26 +1020,26 @@ NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
 	                     /* writefn: */ io_funcs.write ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen2_writefn : NULL,
 	                     /* seekfn:  */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen64_seekfn : NULL,
 	                     /* flushfn: */ NULL,
-	                     /* closefn: */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn);
 #elif defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 	result = libc_funopen2(/* cookie:  */ holder,
 	                  /* readfn:  */ io_funcs.read ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen2_readfn : NULL,
 	                  /* writefn: */ io_funcs.write ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen2_writefn : NULL,
 	                  /* seekfn:  */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_seekfn : NULL,
 	                  /* flushfn: */ NULL,
-	                  /* closefn: */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+	                  /* closefn: */ &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn);
 #elif (defined(__CRT_HAVE_funopen) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen64) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_funopen2) || defined(__CRT_HAVE_fopencookie) || defined(__CRT_HAVE_funopen)))
 	result = libc_funopen64(/* cookie:  */ holder,
 	                   /* readfn:  */ io_funcs.read ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_readfn : NULL,
 	                   /* writefn: */ io_funcs.write ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_writefn : NULL,
 	                   /* seekfn:  */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen64_seekfn : NULL,
-	                   /* closefn: */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn);
 #else /* ... */
 	result = libc_funopen(/* cookie:  */ holder,
 	                 /* readfn:  */ io_funcs.read ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_readfn : NULL,
 	                 /* writefn: */ io_funcs.write ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_writefn : NULL,
 	                 /* seekfn:  */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_seekfn : NULL,
-	                 /* closefn: */ io_funcs.seek ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+	                 /* closefn: */ &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn);
 #endif /* !... */
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	if unlikely(!result)
@@ -1457,9 +1463,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_closefn_defined 1
 __LOCAL_LIBC(funopen_to_funopen2_closefn) int
 (__LIBKCALL funopen_to_funopen2_closefn)(void *cookie) {
+	int result = 0;
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	return (*holder->fh_closefn)(holder->fh_cookie);
+	if (holder->fh_closefn != NULL)
+		result = (*holder->fh_closefn)(holder->fh_cookie);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	libc_free(holder);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_closefn_defined */
@@ -1673,14 +1685,14 @@ NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie,
 	                  /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                  /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_seekfn  : NULL,
 	                  /* flushfn: */ NULL,
-	                  /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                  /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #elif defined(__CRT_HAVE_fopencookie)
 	{
 		_IO_cookie_io_functions_t ioc_functions;
 		ioc_functions.read  = readfn ? (__io_read_fn *)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn : NULL;
 		ioc_functions.write = writefn ? (__io_write_fn *)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL;
 		ioc_functions.seek  = seekfn ? &__NAMESPACE_LOCAL_SYM funopen_to_fopencookie_seekfn  : NULL;
-		ioc_functions.close = closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL;
+		ioc_functions.close = &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn;
 		result = crt_fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
 	}
 #else /* ... */
@@ -1689,13 +1701,13 @@ NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie,
 	                   /* readfn:  */ readfn  ? (__funopen_readfn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                   /* writefn: */ writefn ? (__funopen_writefn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                   /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
-	                   /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 	result = libc_funopen64(/* cookie:  */ holder,
 	                   /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
 	                   /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
 	                   /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
-	                   /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 #endif /* !... */
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
@@ -1764,9 +1776,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_closefn_defined 1
 __LOCAL_LIBC(funopen_to_funopen2_closefn) int
 (__LIBKCALL funopen_to_funopen2_closefn)(void *cookie) {
+	int result = 0;
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	return (*holder->fh_closefn)(holder->fh_cookie);
+	if (holder->fh_closefn != NULL)
+		result = (*holder->fh_closefn)(holder->fh_cookie);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	libc_free(holder);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_closefn_defined */
@@ -2043,14 +2061,14 @@ NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie,
 	                     /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                     /* seekfn:  */ seekfn  ? (__funopen2_64_seekfn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_seekfn  : NULL,
 	                     /* flushfn: */ NULL,
-	                     /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 	result = libc_funopen2_64(/* cookie:  */ holder,
 	                     /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                     /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                     /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen2_64_seekfn  : NULL,
 	                     /* flushfn: */ NULL,
-	                     /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
 #elif defined(__CRT_HAVE_fopencookie)
 	{
@@ -2062,7 +2080,7 @@ NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie,
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 		ioc_functions.seek  = seekfn ? &__NAMESPACE_LOCAL_SYM funopen64_to_fopencookie_seekfn : NULL;
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
-		ioc_functions.close = closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL;
+		ioc_functions.close = &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn;
 		result = crt_fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
 	}
 #else /* ... */
@@ -2072,13 +2090,13 @@ NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie,
 	                   /* readfn:  */ readfn  ? (__funopen_readfn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                   /* writefn: */ writefn ? (__funopen_writefn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                   /* seekfn:  */ seekfn  ? (__funopen_seekfn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
-	                   /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 	result = funopen32(/* cookie:  */ holder,
 	                   /* readfn:  */ readfn  ? (__funopen_readfn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                   /* writefn: */ writefn ? (__funopen_writefn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                   /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen_seekfn  : NULL,
-	                   /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 #if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
@@ -2086,13 +2104,13 @@ NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie,
 	                   /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
 	                   /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
 	                   /* seekfn:  */ seekfn  ? (__funopen_seekfn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
-	                   /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
 	result = funopen32(/* cookie:  */ holder,
 	                   /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
 	                   /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
 	                   /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen_seekfn  : NULL,
-	                   /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 #endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 #endif /* !... */

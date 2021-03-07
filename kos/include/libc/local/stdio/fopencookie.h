@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf22ab04 */
+/* HASH CRC-32:0xc01e984a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -237,9 +237,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_closefn_defined 1
 __LOCAL_LIBC(__fopencookie_to_funopen_closefn) int
 (__LIBKCALL __fopencookie_to_funopen_closefn)(void *__cookie) {
+	int __result = 0;
 	struct __fopencookie_holder *__holder;
 	__holder = (struct __fopencookie_holder *)__cookie;
-	return (int)(*__holder->__foch_funcs.close)(__holder->__foch_cookie);
+	if (__holder->__foch_funcs.close != __NULLPTR)
+		__result = (*__holder->__foch_funcs.close)(__holder->__foch_cookie);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__holder);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__fopencookie_to_funopen_closefn_defined */
@@ -568,7 +574,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fopencookie))(void *__restrict __magi
 	                   /* readfn:  */ __io_funcs.read ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_readfn : __NULLPTR,
 	                   /* writefn: */ __io_funcs.write ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_writefn : __NULLPTR,
 	                   /* seekfn:  */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen64_seekfn : __NULLPTR,
-	                   /* closefn: */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn : __NULLPTR);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn);
 #elif defined(__CRT_HAVE_funopen) && !defined(__CRT_HAVE_funopen2_64) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 	__result = __localdep_funopen(/* cookie:  */ __holder,
 	                 /* readfn:  */ __io_funcs.read ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_readfn : __NULLPTR,
@@ -581,7 +587,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fopencookie))(void *__restrict __magi
 	                     /* writefn: */ __io_funcs.write ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen2_writefn : __NULLPTR,
 	                     /* seekfn:  */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen64_seekfn : __NULLPTR,
 	                     /* flushfn: */ __NULLPTR,
-	                     /* closefn: */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn : __NULLPTR);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn);
 
 
 
@@ -594,13 +600,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fopencookie))(void *__restrict __magi
 	                   /* readfn:  */ __io_funcs.read ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_readfn : __NULLPTR,
 	                   /* writefn: */ __io_funcs.write ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_writefn : __NULLPTR,
 	                   /* seekfn:  */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen64_seekfn : __NULLPTR,
-	                   /* closefn: */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn : __NULLPTR);
+	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn);
 #else /* ... */
 	__result = __localdep_funopen(/* cookie:  */ __holder,
 	                 /* readfn:  */ __io_funcs.read ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_readfn : __NULLPTR,
 	                 /* writefn: */ __io_funcs.write ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_writefn : __NULLPTR,
 	                 /* seekfn:  */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_seekfn : __NULLPTR,
-	                 /* closefn: */ __io_funcs.seek ? &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn : __NULLPTR);
+	                 /* closefn: */ &__NAMESPACE_LOCAL_SYM __fopencookie_to_funopen_closefn);
 #endif /* !... */
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	if __unlikely(!__result)

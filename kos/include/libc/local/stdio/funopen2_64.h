@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1fef031 */
+/* HASH CRC-32:0x2ea8fc3c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,9 +145,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_closefn_defined 1
 __LOCAL_LIBC(__funopen_to_funopen2_closefn) int
 (__LIBKCALL __funopen_to_funopen2_closefn)(void *__cookie) {
+	int __result = 0;
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
-	return (*__holder->__fh_closefn)(__holder->__fh_cookie);
+	if (__holder->__fh_closefn != __NULLPTR)
+		__result = (*__holder->__fh_closefn)(__holder->__fh_cookie);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__holder);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_closefn_defined */
@@ -227,14 +233,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen2_64))(void const *__cookie, _
 	                     /* writefn: */ __writefn ? (__funopen2_writefn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
 	                     /* seekfn:  */ __seekfn  ? &__NAMESPACE_LOCAL_SYM __funopen2_64_to_funopen2_seekfn  : __NULLPTR,
 	                     /* flushfn: */ __flushfn ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_flushfn : __NULLPTR,
-	                     /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 	__result = __localdep_funopen2_32(/* cookie:  */ __holder,
 	                     /* readfn:  */ __readfn  ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_readfn  : __NULLPTR,
 	                     /* writefn: */ __writefn ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_writefn : __NULLPTR,
 	                     /* seekfn:  */ __seekfn  ? &__NAMESPACE_LOCAL_SYM __funopen2_64_to_funopen2_seekfn  : __NULLPTR,
 	                     /* flushfn: */ __flushfn ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_flushfn : __NULLPTR,
-	                     /* closefn: */ __closefn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn : __NULLPTR);
+	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	if __unlikely(!__result)
