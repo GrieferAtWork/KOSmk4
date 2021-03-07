@@ -79,7 +79,6 @@ Functions:
 	- walkcontext()
 	- getprogname()
 	- setprogname()
-	- funopen()
 
 
 TODO: Implement kernel-support for socketcall(2) with command codes:
