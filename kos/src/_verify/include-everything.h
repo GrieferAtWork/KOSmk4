@@ -244,6 +244,7 @@ incdir("");
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadtypesizes.h>
 #include <bits/crt/semaphore.h>
+#include <bits/crt/stdio.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/crt/threads.h>
 #include <bits/crt/tm.h>
@@ -357,14 +358,26 @@ incdir("");
 #include <bits/xopen_lim.h>
 #include <bitstring.h>
 #include <bsd/bitstring.h>
+#include <bsd/bsd.h>
 #include <bsd/err.h>
+#include <bsd/getopt.h>
+#include <bsd/grp.h>
+#include <bsd/inttypes.h>
 #include <bsd/libutil.h>
+#include <bsd/pwd.h>
+#include <bsd/stdio.h>
+#include <bsd/stdlib.h>
+#include <bsd/string.h>
 #include <bsd/stringlist.h>
 #include <bsd/sys/bitstring.h>
 #include <bsd/sys/cdefs.h>
 #include <bsd/sys/endian.h>
 #include <bsd/sys/param.h>
 #include <bsd/sys/poll.h>
+#include <bsd/sys/queue.h>
+#include <bsd/sys/time.h>
+#include <bsd/unistd.h>
+#include <bsd/wchar.h>
 #include <byteswap.h>
 #include <compat/bits/os/cmsghdr.h>
 #include <compat/bits/os/flock.h>
@@ -527,6 +540,7 @@ incdir("");
 #include <io.h>
 #include <iso646.h>
 #include <kos/anno.h>
+#include <kos/aref.h>
 #include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
 #include <kos/asm/uaio.h>
@@ -635,6 +649,7 @@ incdir("");
 #include <libc/core/fenv.h>
 #include <libc/core/malloc.h>
 #include <libc/core/parts.uchar.string.h>
+#include <libc/core/signal.h>
 #include <libc/core/ssp.string.h>
 #include <libc/core/stdlib.h>
 #include <libc/core/string.h>
@@ -646,6 +661,7 @@ incdir("");
 #include <libc/fenv.h>
 #include <libc/malloc.h>
 #include <libc/parts.uchar.string.h>
+#include <libc/signal.h>
 #include <libc/ssp.string.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
@@ -751,6 +767,8 @@ incdir("");
 #include <libm/significand.h>
 #include <libm/sqrt.h>
 #include <libm/trunc.h>
+#include <libphys/api.h>
+#include <libphys/phys.h>
 #include <libregdump/api.h>
 #include <libregdump/printer.h>
 #include <libregex/api.h>

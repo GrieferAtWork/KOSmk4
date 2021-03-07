@@ -49,7 +49,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct mfree {
-	LLIST_NODE(struct mfree)    mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
+	LIST_ENTRY(mfree)           mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
 	LLRBTREE_NODE(struct mfree) mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
 	size_t                      mf_size;    /* Size of this block (in bytes; aligned by `HEAP_ALIGNMENT'; including this header) */
 #define MFREE_FUNDEFINED        0x00        /* Memory    initialization    is     undefined.
@@ -111,10 +111,15 @@ struct heap_pending_free {
 	u8                        hpf_flags; /* Set of `MFREE_F*' */
 };
 
+#ifndef __mfree_list_defined
+#define __mfree_list_defined
+LIST_HEAD(mfree_list, mfree);
+#endif /* !__mfree_list_defined */
+
 struct heap {
 	struct atomic_lock        h_lock;       /* Lock for this heap. */
 	RBTREE_ROOT(struct mfree) h_addr;       /* [lock(h_lock)][0..1] Heap sorted by address. */
-	LLIST(struct mfree)       h_size[HEAP_BUCKET_COUNT];
+	struct mfree_list         h_size[HEAP_BUCKET_COUNT];
 	                                        /* [lock(h_lock)][0..1][*] Heap sorted by free range size. */
 	WEAK size_t               h_overalloc;  /* Amount (in bytes) by which to over-allocate memory in heaps.
 	                                         * NOTE:    Set   to   ZERO(0)   to   disable   overallocation. */

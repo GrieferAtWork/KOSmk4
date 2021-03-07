@@ -320,7 +320,7 @@ NOTHROW(KCALL quick_verify_mfree)(struct mfree *__restrict self) {
 		struct mfree **pself;
 		if __untraced(!IS_ALIGNED(self->mf_size, HEAP_ALIGNMENT))
 			goto bad;
-		pself = self->mf_lsize.ln_pself;
+		pself = self->mf_lsize.le_prev;
 		if __untraced(!ADDR_ISKERN(pself))
 			goto bad;
 		if __untraced(*pself != self)
@@ -364,8 +364,8 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 		return;
 	for (i = 0; i < COMPILER_LENOF(self->h_size); ++i) {
 		struct mfree **piter, *iter;
-		piter = &self->h_size[i];
-		for (; (iter = *piter) != NULL; piter = &iter->mf_lsize.ln_next) {
+		piter = &self->h_size[i].lh_first;
+		for (; (iter = *piter) != NULL; piter = &iter->mf_lsize.le_next) {
 			void *faulting_address;
 			u32 expected_data;
 			assertf(IS_ALIGNED((uintptr_t)iter, HEAP_ALIGNMENT),
@@ -409,12 +409,12 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        (uintptr_t)&iter->mf_laddr.rb_rhs,
 			        (uintptr_t)&iter->mf_laddr.rb_rhs + sizeof(void *) - 1,
 			        MFREE_MIN(iter), MFREE_MAX(iter), iter->mf_laddr.rb_rhs);
-			assertf(iter->mf_lsize.ln_pself == piter,
+			assertf(iter->mf_lsize.le_prev == piter,
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
 			        "Expected self pointer of free node %p...%p at %p, but is actually at %p",
-			        (uintptr_t)&iter->mf_lsize.ln_pself,
-			        (uintptr_t)&iter->mf_lsize.ln_pself + sizeof(void *) - 1,
-			        MFREE_MIN(iter), MFREE_MAX(iter), piter, iter->mf_lsize.ln_pself);
+			        (uintptr_t)&iter->mf_lsize.le_prev,
+			        (uintptr_t)&iter->mf_lsize.le_prev + sizeof(void *) - 1,
+			        MFREE_MIN(iter), MFREE_MAX(iter), piter, iter->mf_lsize.le_prev);
 			assertf(iter->mf_szchk == mfree_get_checksum(iter),
 			        "\tPotential USE-AFTER-FREE of <%p...%p> or %p\n"
 			        "Invalid checksum in free node %p...%p (expected %#.2" PRIx8 ", but got %#.2" PRIx8 ")",
@@ -507,14 +507,14 @@ NOTHROW(KCALL heap_insert_node_unlocked)(struct heap *__restrict self,
 	/* Insert the node into the address and size trees. */
 	mfree_tree_insert(&self->h_addr, node);
 	/* Figure out where the free-slot should go in the chain of free ranges. */
-	pslot = &LLIST_HEAD(self->h_size[HEAP_BUCKET_OF(num_bytes)]);
+	pslot = &self->h_size[HEAP_BUCKET_OF(num_bytes)].lh_first;
 	while ((slot = *pslot) != NULL &&
 	       MFREE_SIZE(slot) < num_bytes)
-		pslot = &LLIST_NEXT(slot, mf_lsize);
-	node->mf_lsize.ln_pself = pslot;
-	node->mf_lsize.ln_next  = slot;
+		pslot = &slot->mf_lsize.le_next;
+	node->mf_lsize.le_prev = pslot;
+	node->mf_lsize.le_next = slot;
 	if (slot)
-		slot->mf_lsize.ln_pself = &node->mf_lsize.ln_next;
+		slot->mf_lsize.le_prev = &node->mf_lsize.le_next;
 	*pslot = node;
 }
 
@@ -736,7 +736,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 	slot = mfree_tree_remove(&self->h_addr, (uintptr_t)ptr - 1);
 	if (slot) {
 		struct mfree *high_slot;
-		LLIST_REMOVE(slot, mf_lsize);
+		LIST_REMOVE(slot, mf_lsize);
 
 		/* Extend this node above. */
 #ifndef CONFIG_DEBUG_HEAP
@@ -781,7 +781,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 		high_slot = mfree_tree_remove(&self->h_addr, (uintptr_t)ptr + num_bytes);
 		if unlikely(high_slot) {
 			/* Include this high-slot in the union that will be freed. */
-			LLIST_REMOVE(high_slot, mf_lsize);
+			LIST_REMOVE(high_slot, mf_lsize);
 #ifndef CONFIG_DEBUG_HEAP
 			slot->mf_flags &= high_slot->mf_flags & GFP_CALLOC;
 			slot->mf_size += high_slot->mf_size;
@@ -838,7 +838,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 	if (slot) {
 		gfp_t slot_flags;
 		size_t slot_size;
-		LLIST_REMOVE(slot, mf_lsize);
+		LIST_REMOVE(slot, mf_lsize);
 		/* Extend this node below. */
 
 #ifndef CONFIG_DEBUG_HEAP
@@ -1073,7 +1073,7 @@ return_old_size:
 PUBLIC NONNULL((1)) size_t
 NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold) {
 	size_t result = 0;
-	struct mfree **iter, **end;
+	struct mfree_list *iter, *end;
 	DEFINE_PUBLIC_SYMBOL(kernel_default_heap, &kernel_heaps[GFP_NORMAL], sizeof(struct heap));
 	DEFINE_PUBLIC_SYMBOL(kernel_locked_heap, &kernel_heaps[GFP_LOCKED], sizeof(struct heap));
 	threshold = CEIL_ALIGN(threshold, PAGESIZE);
@@ -1092,13 +1092,13 @@ again:
 		void *tail_pointer;
 		u8 free_flags;
 		/* Search this bucket. */
-		chain = *iter;
+		chain = LIST_FIRST(iter);
 		while (chain &&
 		       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
 		                     "MFREE_SIZE(chain) = %#" PRIxSIZ,
 		                     MFREE_SIZE(chain)),
 		        MFREE_SIZE(chain) < threshold))
-			chain = LLIST_NEXT(chain, mf_lsize);
+			chain = LIST_NEXT(chain, mf_lsize);
 		if (!chain)
 			continue;
 		/* Figure out how much we can actually return to the core. */
@@ -1118,7 +1118,7 @@ again:
 			continue;
 		/* Remove this chain entry. */
 		mfree_tree_removenode(&self->h_addr, chain);
-		LLIST_REMOVE(chain, mf_lsize);
+		LIST_REMOVE(chain, mf_lsize);
 		sync_endwrite(&self->h_lock);
 
 		tail_pointer = (void *)((uintptr_t)MFREE_END(chain) - tail_keep);

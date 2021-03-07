@@ -656,7 +656,7 @@ PUBLIC WUNUSED NONNULL((1)) struct heapptr
 NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
 	struct heapptr result;
-	struct mfree **iter, **end;
+	struct mfree_list *iter, *end;
 	heap_validate_all_paranoid();
 	TRACE(PP_STR(FUNC(heap_alloc_untraced)) "(%p, %" PRIuSIZ ", %#x)\n", self, num_bytes, flags);
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz))
@@ -682,19 +682,19 @@ search_heap:
 		struct mfree *chain;
 		gfp_t chain_flags;
 		/* Search this bucket. */
-		chain = *iter;
+		chain = LIST_FIRST(iter);
 		while (chain) {
 			HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
 			             "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
 			             MFREE_SIZE(chain));
 			if (MFREE_SIZE(chain) >= result.hp_siz)
 				break;
-			chain = LLIST_NEXT(chain, mf_lsize);
+			chain = LIST_NEXT(chain, mf_lsize);
 		}
 		if (!chain)
 			continue;
 		mfree_tree_removenode(&self->h_addr, chain);
-		LLIST_REMOVE(chain, mf_lsize);
+		LIST_REMOVE(chain, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		/* Track the potentially unused data size as dangling data. */
 		dangle_size = MFREE_SIZE(chain) - result.hp_siz;
@@ -977,7 +977,7 @@ again:
 	if (ptr == (void *)MFREE_BEGIN(slot)) {
 		/* Allocate this entire slot, then remove unused memory from the end. */
 		mfree_tree_removenode(&self->h_addr, slot);
-		LLIST_REMOVE(slot, mf_lsize);
+		LIST_REMOVE(slot, mf_lsize);
 		sync_endwrite(&self->h_lock);
 		result     = slot->mf_size;
 		slot_flags = (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | slot->mf_flags;
@@ -1052,7 +1052,7 @@ again:
 			goto again;
 		}
 		mfree_tree_removenode(&self->h_addr, slot);
-		LLIST_REMOVE(slot, mf_lsize);
+		LIST_REMOVE(slot, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		/* Trace leading free data as dangling. */
 		HEAP_ADD_DANGLE(self, free_offset);
@@ -1164,7 +1164,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 		alloc_bytes = HEAP_MINSIZE;
 #if 1
 	{
-		struct mfree **iter, **end;
+		struct mfree_list *iter, *end;
 		iter = &self->h_size[HEAP_BUCKET_OF(alloc_bytes)];
 		end  = COMPILER_ENDOF(self->h_size);
 		HEAP_ASSERTF(iter >= self->h_size &&
@@ -1186,13 +1186,13 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			size_t dangle_size;
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 			/* Search this bucket. */
-			chain = *iter;
+			chain = LIST_FIRST(iter);
 			while (chain &&
 			       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
 			                     "MFREE_SIZE(chain) = %#" PRIxSIZ,
 			                     MFREE_SIZE(chain)),
 			        MFREE_SIZE(chain) < alloc_bytes))
-				chain = LLIST_NEXT(chain, mf_lsize);
+				chain = LIST_NEXT(chain, mf_lsize);
 			if (!chain)
 				continue;
 			/* Check if this chain entry can sustain our required alignment. */
@@ -1217,7 +1217,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			if ((alignment_base + alloc_bytes) > (byte_t *)MFREE_END(chain))
 				continue; /* The chain entry is too small once alignment was taken into consideration. */
 			mfree_tree_removenode(&self->h_addr, chain);
-			LLIST_REMOVE(chain, mf_lsize);
+			LIST_REMOVE(chain, mf_lsize);
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 			/* Trace potentially unused data as dangling. */
 			dangle_size = chain->mf_size - alloc_bytes;
