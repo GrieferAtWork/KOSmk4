@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cf46366 */
+/* HASH CRC-32:0x456225d6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1063,6 +1063,10 @@
 #define __CRT_HAVE_DOS$ftw
 #define __CRT_HAVE_DOS$ftw64
 #define __CRT_HAVE_DOS$funlockfile
+#define __CRT_HAVE_DOS$funopen
+#define __CRT_HAVE_DOS$funopen2
+#define __CRT_HAVE_DOS$funopen2_64
+#define __CRT_HAVE_DOS$funopen64
 #define __CRT_HAVE_DOS$futex_setspin
 #define __CRT_HAVE_DOS$futex_timedwaitlock
 #define __CRT_HAVE_DOS$futex_timedwaitlock64
@@ -4046,6 +4050,10 @@
 #define __CRT_HAVE_ftw
 #define __CRT_HAVE_ftw64
 #define __CRT_HAVE_funlockfile
+#define __CRT_HAVE_funopen
+#define __CRT_HAVE_funopen2
+#define __CRT_HAVE_funopen2_64
+#define __CRT_HAVE_funopen64
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin
 #define __CRT_HAVE_futex_timedwaitlock

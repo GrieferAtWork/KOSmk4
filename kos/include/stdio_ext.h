@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4ed1a01 */
+/* HASH CRC-32:0x61ff54d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,8 +124,13 @@ __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwritable,(__FILE *__fp),(__fp))
 /* Return non-zero value iff the stream FP is line-buffered */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__flbf,(__FILE *__fp),(__fp))
+#ifdef __CRT_HAVE___fpurge
 /* Discard all pending buffered I/O on the stream FP */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__fp),(__fp))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__fp),(__fp))
+#elif defined(__CRT_HAVE_fpurge)
+/* Discard all pending buffered I/O on the stream FP */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__fp),fpurge,(__fp))
+#endif /* ... */
 /* Return amount of output in bytes pending on a stream FP */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fpending,(__FILE *__fp),(__fp))
 #ifdef __CRT_HAVE__flushlbf

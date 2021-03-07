@@ -31,9 +31,13 @@
 %[default:section(".text.crt{|.dos}.FILE.utility.ext")]
 
 %{
+}%[insert:prefix(
 #include <stdio.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%[insert:prefix(
 #include <asm/crt/stdio_ext.h>
+)]%{
 
 __SYSDECL_BEGIN
 
@@ -135,6 +139,7 @@ int __fwritable([[nonnull]] $FILE *fp);
 int __flbf([[nonnull]] $FILE *fp);
 
 @@Discard all pending buffered I/O on the stream FP
+[[export_alias("fpurge")]]
 void __fpurge([[nonnull]] $FILE *fp);
 
 @@Return amount of output in bytes pending on a stream FP

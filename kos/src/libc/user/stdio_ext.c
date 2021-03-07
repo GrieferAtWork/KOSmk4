@@ -207,13 +207,14 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *fp,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x38cda9ad]]]*/
+/*[[[start:exports,hash:CRC-32=0x8a0deb0e]]]*/
 DEFINE_PUBLIC_ALIAS(__fbufsize, libc___fbufsize);
 DEFINE_PUBLIC_ALIAS(__freading, libc___freading);
 DEFINE_PUBLIC_ALIAS(__fwriting, libc___fwriting);
 DEFINE_PUBLIC_ALIAS(__freadable, libc___freadable);
 DEFINE_PUBLIC_ALIAS(__fwritable, libc___fwritable);
 DEFINE_PUBLIC_ALIAS(__flbf, libc___flbf);
+DEFINE_PUBLIC_ALIAS(fpurge, libc___fpurge);
 DEFINE_PUBLIC_ALIAS(__fpurge, libc___fpurge);
 DEFINE_PUBLIC_ALIAS(__fpending, libc___fpending);
 DEFINE_PUBLIC_ALIAS(_IO_flush_all_linebuffere, libc__flushlbf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x238c4d40 */
+/* HASH CRC-32:0xb414b86a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ typedef __ssize_t (__LIBKCALL __io_read_fn)(void *__cookie, char *__buf, __size_
  * @param: num_byts: The max # of bytes to write.
  * @return: * :      The actual # of bytes written.
  * @return: 0 :      Error. */
-typedef __ssize_t (__LIBKCALL __io_write_fn)(void *__cookie, const char *__buf, __size_t __num_bytes);
+typedef __ssize_t (__LIBKCALL __io_write_fn)(void *__cookie, char const *__buf, __size_t __num_bytes);
 
 /* User-defined seek function:
  * @param: cookie:   Pointer to custom user-data.

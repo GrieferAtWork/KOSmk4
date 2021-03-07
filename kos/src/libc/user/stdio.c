@@ -2299,8 +2299,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fsetpos]]]*/
 
-/*[[[head:libc_fgetpos64,hash:CRC-32=0x11b168e]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/*[[[head:libc_fgetpos64,hash:CRC-32=0x6aada482]]]*/
+#if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fgetpos64, fgetpos);
 #else /* MAGIC:alias */
 /* 64-bit variant of `fgetpos' */
@@ -2319,8 +2319,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fgetpos64]]]*/
 
-/*[[[head:libc_fsetpos64,hash:CRC-32=0x31debbbb]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/*[[[head:libc_fsetpos64,hash:CRC-32=0x50801533]]]*/
+#if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fsetpos64, fsetpos);
 #else /* MAGIC:alias */
 /* 64-bit variant of `fsetpos' */
@@ -2463,8 +2463,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fsetpos_unlocked]]]*/
 
-/*[[[head:libc_fgetpos64_unlocked,hash:CRC-32=0xb2e036cd]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/*[[[head:libc_fgetpos64_unlocked,hash:CRC-32=0x561312e5]]]*/
+#if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fgetpos64_unlocked, fgetpos_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
@@ -2482,8 +2482,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fgetpos64_unlocked]]]*/
 
-/*[[[head:libc_fsetpos64_unlocked,hash:CRC-32=0x85297401]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/*[[[head:libc_fsetpos64_unlocked,hash:CRC-32=0x60afbbab]]]*/
+#if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fsetpos64_unlocked, fsetpos_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
@@ -2672,6 +2672,56 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64_unlocked]]]*/
+
+/*[[[head:libc_funopen2,hash:CRC-32=0xe336b5a4]]]*/
+/* >> funopen2(3), funopen2_64(3) */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
+NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie,
+                                    __funopen2_readfn_t readfn,
+                                    __funopen2_writefn_t writefn,
+                                    __funopen2_seekfn_t seekfn,
+                                    __funopen2_flushfn_t flushfn,
+                                    __funopen2_closefn_t closefn)
+/*[[[body:libc_funopen2]]]*/
+{
+	(void)cookie;
+	(void)readfn;
+	(void)writefn;
+	(void)seekfn;
+	(void)flushfn;
+	(void)closefn;
+	CRT_UNIMPLEMENTEDF("funopen2(%p, %p, %p, %p, %p, %p)", cookie, readfn, writefn, seekfn, flushfn, closefn); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_funopen2]]]*/
+
+/*[[[head:libc_funopen2_64,hash:CRC-32=0x15e3587d]]]*/
+#if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
+DEFINE_INTERN_ALIAS(libc_funopen2_64, funopen2);
+#else /* MAGIC:alias */
+/* >> funopen2(3), funopen2_64(3) */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
+NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie,
+                                       __funopen2_readfn_t readfn,
+                                       __funopen2_writefn_t writefn,
+                                       __funopen2_64_seekfn_t seekfn,
+                                       __funopen2_flushfn_t flushfn,
+                                       __funopen2_closefn_t closefn)
+/*[[[body:libc_funopen2_64]]]*/
+{
+	(void)cookie;
+	(void)readfn;
+	(void)writefn;
+	(void)seekfn;
+	(void)flushfn;
+	(void)closefn;
+	CRT_UNIMPLEMENTEDF("funopen2_64(%p, %p, %p, %p, %p, %p)", cookie, readfn, writefn, seekfn, flushfn, closefn); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_funopen2_64]]]*/
 
 /*[[[head:libc_setvbuf,hash:CRC-32=0xbcb7d06e]]]*/
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
@@ -3561,7 +3611,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xfe5da37d]]]*/
+/*[[[start:exports,hash:CRC-32=0x719960df]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3689,6 +3739,8 @@ DEFINE_PUBLIC_ALIAS(fgetpos64_unlocked, libc_fgetpos64_unlocked);
 DEFINE_PUBLIC_ALIAS(fsetpos64_unlocked, libc_fsetpos64_unlocked);
 DEFINE_PUBLIC_ALIAS(fftruncate64, libc_fftruncate64);
 DEFINE_PUBLIC_ALIAS(fftruncate64_unlocked, libc_fftruncate64_unlocked);
+DEFINE_PUBLIC_ALIAS(funopen2, libc_funopen2);
+DEFINE_PUBLIC_ALIAS(funopen2_64, libc_funopen2_64);
 DEFINE_PUBLIC_ALIAS(_flushall, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_IO_flush_all, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_rmtmp, libc__rmtmp);

@@ -1738,6 +1738,7 @@
 #define __CRT_HAVE_fpreset
 #define __CRT_HAVE_fprintf
 #define __CRT_HAVE_fprintf_unlocked
+#define __CRT_HAVE_fpurge
 #define __CRT_HAVE_fputc
 #define __CRT_HAVE_fputc_unlocked
 #define __CRT_HAVE_fputs
@@ -1820,6 +1821,10 @@
 #define __CRT_HAVE_ftw
 #define __CRT_HAVE_ftw64
 #define __CRT_HAVE_funlockfile
+#define __CRT_HAVE_funopen
+#define __CRT_HAVE_funopen2
+#define __CRT_HAVE_funopen2_64
+#define __CRT_HAVE_funopen64
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin
 #define __CRT_HAVE_futex_timedwaitlock

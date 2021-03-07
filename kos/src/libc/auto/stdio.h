@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x201f0841 */
+/* HASH CRC-32:0xc6334279 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -559,6 +559,26 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCAL
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> funopen(3), funopen64(3) */
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen_seekfn_t seekfn, __funopen_closefn_t closefn);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> funopen(3), funopen64(3) */
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen_seekfn_t seekfn, __funopen_closefn_t closefn);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> funopen2(3), funopen2_64(3) */
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2)(void const *cookie, __funopen2_readfn_t readfn, __funopen2_writefn_t writefn, __funopen2_seekfn_t seekfn, __funopen2_flushfn_t flushfn, __funopen2_closefn_t closefn);
+/* >> funopen(3), funopen64(3) */
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen64)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen64_seekfn_t seekfn, __funopen_closefn_t closefn);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> funopen(3), funopen64(3) */
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen64_seekfn_t seekfn, __funopen_closefn_t closefn);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> funopen2(3), funopen2_64(3) */
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2_64)(void const *cookie, __funopen2_readfn_t readfn, __funopen2_writefn_t writefn, __funopen2_64_seekfn_t seekfn, __funopen2_flushfn_t flushfn, __funopen2_closefn_t closefn);
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename, char const *modes, int sflag);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

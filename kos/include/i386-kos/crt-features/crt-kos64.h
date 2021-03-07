@@ -1734,6 +1734,7 @@
 #define __CRT_HAVE_fpreset
 #define __CRT_HAVE_fprintf
 #define __CRT_HAVE_fprintf_unlocked
+#define __CRT_HAVE_fpurge
 #define __CRT_HAVE_fputc
 #define __CRT_HAVE_fputc_unlocked
 #define __CRT_HAVE_fputs
@@ -1816,6 +1817,10 @@
 #define __CRT_HAVE_ftw
 #define __CRT_HAVE_ftw64
 #define __CRT_HAVE_funlockfile
+#define __CRT_HAVE_funopen
+#define __CRT_HAVE_funopen2
+#define __CRT_HAVE_funopen2_64
+#define __CRT_HAVE_funopen64
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin
 #define __CRT_HAVE_futex_timedwaitlock
@@ -6073,6 +6078,7 @@
 #define __CRT_HAVE_KOS$fprintf
 #define __CRT_HAVE_fprintf_s
 #define __CRT_HAVE_KOS$fprintf_unlocked
+#define __CRT_HAVE_KOS$fpurge
 #define __CRT_HAVE_KOS$fputc
 #define __CRT_HAVE_KOS$fputc_unlocked
 #define __CRT_HAVE_KOS$fputs
@@ -6155,6 +6161,10 @@
 #define __CRT_HAVE_KOS$ftw
 #define __CRT_HAVE_KOS$ftw64
 #define __CRT_HAVE_KOS$funlockfile
+#define __CRT_HAVE_KOS$funopen
+#define __CRT_HAVE_KOS$funopen2
+#define __CRT_HAVE_KOS$funopen2_64
+#define __CRT_HAVE_KOS$funopen64
 #define __CRT_HAVE_KOS$futex_setspin
 #define __CRT_HAVE_KOS$futex_timedwaitlock
 #define __CRT_HAVE_KOS$futex_timedwaitlock64
@@ -9485,6 +9495,7 @@
 #define __CRT_HAVE_DOS$fprintf
 #define __CRT_HAVE_DOS$fprintf_s
 #define __CRT_HAVE_DOS$fprintf_unlocked
+#define __CRT_HAVE_DOS$fpurge
 #define __CRT_HAVE_DOS$fputc
 #define __CRT_HAVE_DOS$fputc_unlocked
 #define __CRT_HAVE_DOS$fputs
@@ -9567,6 +9578,10 @@
 #define __CRT_HAVE_DOS$ftw
 #define __CRT_HAVE_DOS$ftw64
 #define __CRT_HAVE_DOS$funlockfile
+#define __CRT_HAVE_DOS$funopen
+#define __CRT_HAVE_DOS$funopen2
+#define __CRT_HAVE_DOS$funopen2_64
+#define __CRT_HAVE_DOS$funopen64
 #define __CRT_HAVE_DOS$futex_setspin
 #define __CRT_HAVE_DOS$futex_timedwaitlock
 #define __CRT_HAVE_DOS$futex_timedwaitlock64
