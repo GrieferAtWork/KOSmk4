@@ -43,7 +43,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-typedef __intptr_t __fd_mask;
+#define __fd_mask __intptr_t
 
 typedef struct __fd_set_struct {
 #ifdef __USE_XOPEN

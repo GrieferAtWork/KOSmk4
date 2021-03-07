@@ -108,11 +108,18 @@ __ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
 #define FD_CLR   FD_CLR
 #define FD_ISSET FD_ISSET
 #define FD_ZERO  FD_ZERO
+#ifdef __USE_NETBSD
+__ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
+#define FD_COPY  FD_COPY
+#endif /* __USE_NETBSD */
 #else /* __INTELLISENSE__ */
 #define FD_SET(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] |= __FD_MASK(fd))
 #define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] &= ~__FD_MASK(fd))
 #define FD_ISSET(fd, fdsetp) ((__FDS_BITS(fdsetp)[__FD_ELT(fd)] & __FD_MASK(fd)) != 0)
 #define FD_ZERO(fdsetp)      __libc_bzero(__FDS_BITS(fdsetp), __SIZEOF_FD_SET)
+#ifdef __USE_NETBSD
+#define FD_COPY(src, dst) (void)__libc_memcpy(dst, src, __SIZEOF_FD_SET)
+#endif /* __USE_NETBSD */
 #endif /* !__INTELLISENSE__ */
 
 }
