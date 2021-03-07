@@ -2673,6 +2673,17 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64_unlocked]]]*/
 
+//TODO:funopen2:INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
+//TODO:funopen2:NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
+//TODO:funopen2:                                       char const *__restrict modes,
+//TODO:funopen2:                                       cookie_io_functions_t io_funcs) {
+//TODO:funopen2:	FILE *result;
+//TODO:funopen2:	uint32_t flags;
+//TODO:funopen2:	flags  = file_evalmodes(modes, NULL);
+//TODO:funopen2:	result = file_opencookie(&io_funcs, magic_cookie, flags);
+//TODO:funopen2:	return result;
+//TODO:funopen2:}
+
 /*[[[head:libc_funopen2,hash:CRC-32=0xe336b5a4]]]*/
 /* >> funopen2(3), funopen2_64(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
@@ -2988,20 +2999,6 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
 /*[[[impl:libc_pclose]]]*/
 DEFINE_INTERN_ALIAS(libc_pclose, libc_fclose);
 
-/*[[[head:libc_fopencookie,hash:CRC-32=0x7ee8842f]]]*/
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
-NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
-                                       char const *__restrict modes,
-                                       cookie_io_functions_t io_funcs)
-/*[[[body:libc_fopencookie]]]*/
-{
-	FILE *result;
-	uint32_t flags;
-	flags  = file_evalmodes(modes, NULL);
-	result = file_opencookie(&io_funcs, magic_cookie, flags);
-	return result;
-}
-/*[[[end:libc_fopencookie]]]*/
 
 /*[[[head:libc_tmpnam_r,hash:CRC-32=0x17e45bf4]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
@@ -3611,7 +3608,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x719960df]]]*/
+/*[[[start:exports,hash:CRC-32=0x69ec174c]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3690,7 +3687,6 @@ DEFINE_PUBLIC_ALIAS(_IO_popen, libc_popen);
 DEFINE_PUBLIC_ALIAS(popen, libc_popen);
 DEFINE_PUBLIC_ALIAS(pclose, libc_pclose);
 DEFINE_PUBLIC_ALIAS(fcloseall, libc_fcloseall);
-DEFINE_PUBLIC_ALIAS(fopencookie, libc_fopencookie);
 DEFINE_PUBLIC_ALIAS(obstack_vprintf, libc_obstack_vprintf);
 DEFINE_PUBLIC_ALIAS(fseeko, libc_fseeko);
 DEFINE_PUBLIC_ALIAS(ftello, libc_ftello);

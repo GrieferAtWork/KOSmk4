@@ -1894,11 +1894,247 @@ int fcloseall();
 %
 %#ifdef __USE_GNU
 
+%[define(DEFINE_FOPENCOOKIE_HOLDER =
+@@pp_ifndef ____fopencookie_holder_defined@@
+@@push_namespace(local)@@
+#define ____fopencookie_holder_defined 1
+struct __fopencookie_holder {
+	void                     *foch_cookie; /* User-defined `magic_cookie' */
+	_IO_cookie_io_functions_t foch_funcs;  /* Cookie functions */
+};
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPENCOOKIE_TO_FUNOPEN_CLOSEFN =
+@@pp_ifndef __fopencookie_to_funopen_closefn_defined@@
+@@push_namespace(local)@@
+#define __fopencookie_to_funopen_closefn_defined 1
+__LOCAL_LIBC(fopencookie_to_funopen_closefn) int
+(__LIBKCALL fopencookie_to_funopen_closefn)(void *cookie) {
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+	return (int)(*holder->foch_funcs.@close@)(holder->foch_cookie);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPENCOOKIE_TO_FUNOPEN_READFN =
+@@pp_ifndef __fopencookie_to_funopen_readfn_defined@@
+@@push_namespace(local)@@
+#define __fopencookie_to_funopen_readfn_defined 1
+__LOCAL_LIBC(fopencookie_to_funopen_readfn) int
+(__LIBKCALL fopencookie_to_funopen_readfn)(void *cookie, char *buf, int num_bytes) {
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+	return (int)(*holder->foch_funcs.@read@)(holder->foch_cookie, buf, (size_t)(unsigned int)num_bytes);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPENCOOKIE_TO_FUNOPEN2_READFN =
+@@pp_ifndef __fopencookie_to_funopen2_readfn_defined@@
+@@push_namespace(local)@@
+#define __fopencookie_to_funopen2_readfn_defined 1
+__LOCAL_LIBC(fopencookie_to_funopen2_readfn) ssize_t
+(__LIBKCALL fopencookie_to_funopen2_readfn)(void *cookie, void *buf, size_t num_bytes) {
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+	return (*holder->foch_funcs.@read@)(holder->foch_cookie, (char *)buf, num_bytes);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPENCOOKIE_TO_FUNOPEN_WRITEFN =
+@@pp_ifndef __fopencookie_to_funopen_writefn_defined@@
+@@push_namespace(local)@@
+#define __fopencookie_to_funopen_writefn_defined 1
+__LOCAL_LIBC(fopencookie_to_funopen_writefn) int
+(__LIBKCALL fopencookie_to_funopen_writefn)(void *cookie, char const *buf, int num_bytes) {
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+	return (int)(*holder->foch_funcs.@write@)(holder->foch_cookie, buf, (size_t)(unsigned int)num_bytes);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPENCOOKIE_TO_FUNOPEN2_WRITEFN =
+@@pp_ifndef __fopencookie_to_funopen2_writefn_defined@@
+@@push_namespace(local)@@
+#define __fopencookie_to_funopen2_writefn_defined 1
+__LOCAL_LIBC(fopencookie_to_funopen2_writefn) ssize_t
+(__LIBKCALL fopencookie_to_funopen2_writefn)(void *cookie, void const *buf, size_t num_bytes) {
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+	return (*holder->foch_funcs.@write@)(holder->foch_cookie, (char const *)buf, num_bytes);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPENCOOKIE_TO_FUNOPEN_SEEKFN =
+@@pp_ifndef __fopencookie_to_funopen_seekfn_defined@@
+@@push_namespace(local)@@
+#define __fopencookie_to_funopen_seekfn_defined 1
+__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(@off@)
+(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __FS_TYPE(@off@) off, int whence) {
+@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+@@pp_ifdef __USE_KOS_ALTERATIONS@@
+	if ((*holder->foch_funcs.@seek@)(holder->foch_cookie, (pos64_t *)&off, whence) != 0)
+		return -1;
+@@pp_else@@
+	if ((*holder->foch_funcs.@seek@)(holder->foch_cookie, (off64_t *)&off, whence) != 0)
+		return -1;
+@@pp_endif@@
+	return off;
+@@pp_else@@
+@@pp_ifdef __USE_KOS_ALTERATIONS@@
+	pos64_t newpos = (pos64_t)off;
+@@pp_else@@
+	off64_t newpos = off;
+@@pp_endif@@
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+	if ((*holder->foch_funcs.@seek@)(holder->foch_cookie, &newpos, whence) != 0)
+		return -1;
+	return (__FS_TYPE(@off@))newpos;
+@@pp_endif@@
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPENCOOKIE_TO_FUNOPEN64_SEEKFN =
+@@pp_ifndef __fopencookie_to_funopen64_seekfn_defined@@
+@@push_namespace(local)@@
+#define __fopencookie_to_funopen64_seekfn_defined 1
+__LOCAL_LIBC(fopencookie_to_funopen64_seekfn) off64_t
+(__LIBKCALL fopencookie_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
+	struct __fopencookie_holder *holder;
+	holder = (struct __fopencookie_holder *)cookie;
+@@pp_ifdef __USE_KOS_ALTERATIONS@@
+	if ((*holder->foch_funcs.@seek@)(holder->foch_cookie, (pos64_t *)&off, whence) != 0)
+		return -1;
+@@pp_else@@
+	if ((*holder->foch_funcs.@seek@)(holder->foch_cookie, &off, whence) != 0)
+		return -1;
+@@pp_endif@@
+	return off;
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+[[ignore, wunused, decl_include("<libio.h>")]]
+[[doc_alias("fopencookie"), nocrt, alias("fopencookie")]]
+$FILE *crt_fopencookie(void *__restrict magic_cookie,
+                       [[nonnull]] char const *__restrict modes,
+                       $cookie_io_functions_t io_funcs);
+
+
+@@>> fopencookie(3)
 [[wunused, section(".text.crt{|.dos}.FILE.locked.access")]]
 [[decl_include("<libio.h>")]]
+[[requires($has_function(malloc) && ($has_function(funopen) || $has_function(funopen2)))]]
+[[impl_include("<libio.h>")]]
+[[impl_include("<features.h>")]]
+[[impl_include("<bits/types.h>")]]
+[[impl_prefix(DEFINE_FOPENCOOKIE_HOLDER)]]
+[[impl_prefix(
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_CLOSEFN
+@@pp_if !defined(__BUILDING_LIBC) && $crt_has_function(funopen64) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_READFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_WRITEFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN64_SEEKFN
+@@pp_elif !defined(__BUILDING_LIBC) && $crt_has_function(funopen) && !$crt_has_function(funopen2_64) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_READFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_WRITEFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_SEEKFN
+@@pp_elif $has_function(funopen2_64)@@
+DEFINE_FOPENCOOKIE_TO_FUNOPEN2_READFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN2_WRITEFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN64_SEEKFN
+@@pp_elif $has_function(funopen2)@@
+DEFINE_FOPENCOOKIE_TO_FUNOPEN2_READFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN2_WRITEFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_SEEKFN
+@@pp_elif $has_function(funopen64)@@
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_READFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_WRITEFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN64_SEEKFN
+@@pp_else@@
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_READFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_WRITEFN
+DEFINE_FOPENCOOKIE_TO_FUNOPEN_SEEKFN
+@@pp_endif@@
+)]]
 $FILE *fopencookie(void *__restrict magic_cookie,
                    [[nonnull]] char const *__restrict modes,
-                   $cookie_io_functions_t io_funcs);
+                   $cookie_io_functions_t io_funcs) {
+	FILE *result;
+	struct __NAMESPACE_LOCAL_SYM __fopencookie_holder *holder;
+	(void)modes; /* unused... */
+	holder = (struct __NAMESPACE_LOCAL_SYM __fopencookie_holder *)malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __fopencookie_holder));
+	if unlikely(!holder)
+		return NULL;
+	holder->foch_cookie        = magic_cookie;
+	holder->foch_funcs.@read@  = io_funcs.@read@;
+	holder->foch_funcs.@write@ = io_funcs.@write@;
+	holder->foch_funcs.@seek@  = io_funcs.@seek@;
+	holder->foch_funcs.@close@ = io_funcs.@close@;
+@@pp_if !defined(__BUILDING_LIBC) && $crt_has_function(funopen64) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
+	result = funopen64(/* cookie:  */ holder,
+	                   /* readfn:  */ io_funcs.@read@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_readfn : NULL,
+	                   /* writefn: */ io_funcs.@write@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_writefn : NULL,
+	                   /* seekfn:  */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen64_seekfn : NULL,
+	                   /* closefn: */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+@@pp_elif !defined(__BUILDING_LIBC) && $crt_has_function(funopen) && !$crt_has_function(funopen2_64) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
+	result = funopen(/* cookie:  */ holder,
+	                 /* readfn:  */ io_funcs.@read@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_readfn : NULL,
+	                 /* writefn: */ io_funcs.@write@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_writefn : NULL,
+	                 /* seekfn:  */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_seekfn : NULL,
+	                 /* closefn: */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+@@pp_elif $has_function(funopen2_64)@@
+	result = funopen2_64(/* cookie:  */ holder,
+	                     /* readfn:  */ io_funcs.@read@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen2_readfn : NULL,
+	                     /* writefn: */ io_funcs.@write@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen2_writefn : NULL,
+	                     /* seekfn:  */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen64_seekfn : NULL,
+	                     /* flushfn: */ NULL,
+	                     /* closefn: */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+@@pp_elif $has_function(funopen2)@@
+	result = funopen2(/* cookie:  */ holder,
+	                  /* readfn:  */ io_funcs.@read@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen2_readfn : NULL,
+	                  /* writefn: */ io_funcs.@write@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen2_writefn : NULL,
+	                  /* seekfn:  */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_seekfn : NULL,
+	                  /* flushfn: */ NULL,
+	                  /* closefn: */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+@@pp_elif $has_function(funopen64)@@
+	result = funopen64(/* cookie:  */ holder,
+	                   /* readfn:  */ io_funcs.@read@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_readfn : NULL,
+	                   /* writefn: */ io_funcs.@write@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_writefn : NULL,
+	                   /* seekfn:  */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen64_seekfn : NULL,
+	                   /* closefn: */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+@@pp_else@@
+	result = funopen(/* cookie:  */ holder,
+	                 /* readfn:  */ io_funcs.@read@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_readfn : NULL,
+	                 /* writefn: */ io_funcs.@write@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_writefn : NULL,
+	                 /* seekfn:  */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_seekfn : NULL,
+	                 /* closefn: */ io_funcs.@seek@ ? &__NAMESPACE_LOCAL_SYM fopencookie_to_funopen_closefn : NULL);
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	if unlikely(!result)
+		free(holder);
+@@pp_endif@@
+	return result;
+}
+
 /* TODO: Implement using `funopen2()' (which is more powerful, and should
  *       become the new internal base-line API for custom FILE objects) */
 
@@ -3103,17 +3339,24 @@ __LOCAL_LIBC(funopen_to_funopen64_seekfn) off64_t
 [[decl_prefix(DEFINE_FUNOPEN_TYPES), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias("funopen")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias("funopen64")]]
-[[requires($has_function(malloc) && ($has_function(funopen2) || $has_function(fopencookie) || $has_function(funopen64)))]]
-[[impl_prefix(DEFINE_FUNOPEN_TYPES)]]
-[[impl_prefix(DEFINE_FUNOPEN_HOLDER)]]
-[[impl_prefix(DEFINE_FUNOPEN_TO_FUNOPEN2_CLOSEFN)]]
+[[requires_include("<hybrid/typecore.h>")]]
+[[requires((__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2)) ||
+           ($has_function(malloc) && ($has_function(funopen2) ||
+                                      $has_function(crt_fopencookie) ||
+                                      $has_function(funopen64))))]]
 [[impl_prefix(
+@@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2)@@
+DEFINE_FUNOPEN2_TYPES
+@@pp_else@@
+DEFINE_FUNOPEN_TYPES
+DEFINE_FUNOPEN_HOLDER
+DEFINE_FUNOPEN_TO_FUNOPEN2_CLOSEFN
 @@pp_if $has_function(funopen2)@@
 DEFINE_FUNOPEN_TO_FUNOPEN2_READFN
 DEFINE_FUNOPEN_TO_FUNOPEN2_WRITEFN
 DEFINE_FUNOPEN2_TYPES
 DEFINE_FUNOPEN_TO_FUNOPEN2_SEEKFN
-@@pp_elif $has_function(fopencookie)@@
+@@pp_elif $has_function(crt_fopencookie)@@
 DEFINE_FUNOPEN_TO_FUNOPEN2_READFN
 DEFINE_FUNOPEN_TO_FUNOPEN2_WRITEFN
 DEFINE_FUNOPEN_TO_FOPENCOOKIE_SEEKFN
@@ -3129,12 +3372,19 @@ DEFINE_FUNOPEN_TO_FUNOPEN64_WRITEFN
 @@pp_endif@@
 DEFINE_FUNOPEN_TO_FUNOPEN64_SEEKFN
 @@pp_endif@@
+@@pp_endif@@
 )]]
 FILE *funopen(void const *cookie,
               __funopen_readfn_t readfn,
               __funopen_writefn_t writefn,
               __funopen_seekfn_t seekfn,
               __funopen_closefn_t closefn) {
+@@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2)@@
+	return funopen2(cookie,
+	                (__funopen2_readfn_t)readfn,
+	                (__funopen2_writefn_t)writefn,
+	                seekfn, NULL, closefn);
+@@pp_else@@
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen_holder *holder;
 @@pp_if $has_function(funopen64)@@
@@ -3156,14 +3406,14 @@ FILE *funopen(void const *cookie,
 	                  /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_seekfn  : NULL,
 	                  /* flushfn: */ NULL,
 	                  /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
-@@pp_elif $has_function(fopencookie)@@
+@@pp_elif $has_function(crt_fopencookie)@@
 	{
 		_IO_cookie_io_functions_t ioc_functions;
 		ioc_functions.@read@  = readfn ? (__io_read_fn *)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn : NULL;
 		ioc_functions.@write@ = writefn ? (__io_write_fn *)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL;
 		ioc_functions.@seek@  = seekfn ? &__NAMESPACE_LOCAL_SYM funopen_to_fopencookie_seekfn  : NULL;
 		ioc_functions.@close@ = closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL;
-		result = fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
+		result = crt_fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
 	}
 @@pp_else@@
 @@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
@@ -3185,6 +3435,7 @@ FILE *funopen(void const *cookie,
 		free(holder);
 @@pp_endif@@
 	return result;
+@@pp_endif@@
 }
 
 
@@ -3433,13 +3684,19 @@ __LOCAL_LIBC(funopen64_to_funopen_seekfn) __FS_TYPE(@off@)
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), crt_intern_kos_alias("funopen")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), preferred_alias("funopen")]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
-[[requires($has_function(malloc) && ($has_function(funopen2_64) || $has_function(fopencookie) || $has_function(funopen32)))]]
-[[impl_prefix(DEFINE_FUNOPEN_TYPES)]]
-[[impl_prefix(DEFINE_FUNOPEN64_TYPES)]]
-[[impl_prefix(DEFINE_FUNOPEN_HOLDER)]]
-[[impl_prefix(DEFINE_FUNOPEN64_HOLDER)]]
-[[impl_prefix(DEFINE_FUNOPEN_TO_FUNOPEN2_CLOSEFN)]]
+[[requires((__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2_64)) ||
+           ($has_function(malloc) && ($has_function(funopen2_64) ||
+                                      $has_function(crt_fopencookie) ||
+                                      $has_function(funopen32))))]]
 [[impl_prefix(
+@@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2_64)@@
+DEFINE_FUNOPEN2_TYPES
+@@pp_else@@
+DEFINE_FUNOPEN_TYPES
+DEFINE_FUNOPEN64_TYPES
+DEFINE_FUNOPEN_HOLDER
+DEFINE_FUNOPEN64_HOLDER
+DEFINE_FUNOPEN_TO_FUNOPEN2_CLOSEFN
 @@pp_if $has_function(funopen2_64)@@
 DEFINE_FUNOPEN_TO_FUNOPEN2_READFN
 DEFINE_FUNOPEN_TO_FUNOPEN2_WRITEFN
@@ -3449,7 +3706,7 @@ DEFINE_FUNOPEN_TO_FUNOPEN2_SEEKFN
 @@pp_else@@
 DEFINE_FUNOPEN64_TO_FUNOPEN2_64_SEEKFN
 @@pp_endif@@
-@@pp_elif $has_function(fopencookie)@@
+@@pp_elif $has_function(crt_fopencookie)@@
 DEFINE_FUNOPEN_TO_FUNOPEN2_READFN
 DEFINE_FUNOPEN_TO_FUNOPEN2_WRITEFN
 @@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
@@ -3473,12 +3730,19 @@ DEFINE_FUNOPEN_TO_FUNOPEN64_SEEKFN
 DEFINE_FUNOPEN64_TO_FUNOPEN_SEEKFN
 @@pp_endif@@
 @@pp_endif@@
+@@pp_endif@@
 )]]
 FILE *funopen64(void const *cookie,
                 __funopen_readfn_t readfn,
                 __funopen_writefn_t writefn,
                 __funopen64_seekfn_t seekfn,
                 __funopen_closefn_t closefn) {
+@@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2_64)@@
+	return funopen2_64(cookie,
+	                   (__funopen2_readfn_t)readfn,
+	                   (__funopen2_writefn_t)writefn,
+	                   seekfn, NULL, closefn);
+@@pp_else@@
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen64_holder *holder;
 @@pp_ifndef __BUILDING_LIBC@@
@@ -3511,7 +3775,7 @@ FILE *funopen64(void const *cookie,
 	                     /* flushfn: */ NULL,
 	                     /* closefn: */ closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL);
 @@pp_endif@@
-@@pp_elif $has_function(fopencookie)@@
+@@pp_elif $has_function(crt_fopencookie)@@
 	{
 		_IO_cookie_io_functions_t ioc_functions;
 		ioc_functions.@read@  = readfn ? (__io_read_fn *)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn : NULL;
@@ -3522,7 +3786,7 @@ FILE *funopen64(void const *cookie,
 		ioc_functions.@seek@  = seekfn ? &__NAMESPACE_LOCAL_SYM funopen64_to_fopencookie_seekfn : NULL;
 @@pp_endif@@
 		ioc_functions.@close@ = closefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn : NULL;
-		result = fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
+		result = crt_fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
 	}
 @@pp_else@@
 @@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
@@ -3560,6 +3824,7 @@ FILE *funopen64(void const *cookie,
 		free(holder);
 @@pp_endif@@
 	return result;
+@@pp_endif@@
 }
 
 
