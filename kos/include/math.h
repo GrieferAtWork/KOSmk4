@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1747f20 */
+/* HASH CRC-32:0xea5b321d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3131,25 +3131,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remquof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* ... */
 #if __has_builtin(__builtin_lrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CEIDECLARE(,long int,__NOTHROW_NCX,lrintf,(float __x),{ return __builtin_lrintf(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),{ return __builtin_lrintf(__x); })
 #elif defined(__CRT_HAVE_lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CDECLARE(,long int,__NOTHROW_NCX,lrintf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),(__x))
 #elif defined(__CRT_HAVE___lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,lrintf,(float __x),__lrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),__lrintf,(__x))
 #elif defined(__CRT_HAVE_llrintf) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,lrintf,(float __x),llrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),llrintf,(__x))
 #elif defined(__CRT_HAVE___llrintf) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,lrintf,(float __x),__llrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),__llrintf,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/lrintf.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lrintf, __FORCELOCAL __ATTR_ARTIFICIAL long int __NOTHROW_NCX(__LIBCCALL lrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lrintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); })
 #endif /* !... */
 #if __has_builtin(__builtin_lroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -5085,19 +5085,19 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remquo)
 #endif /* ... */
 #if __has_builtin(__builtin_lrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CEIREDIRECT(,long int,__NOTHROW_NCX,lrint,(float __x),lrintf,{ return __builtin_lrintf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(float __x),lrintf,{ return __builtin_lrintf(__x); })
 #elif defined(__CRT_HAVE_lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,lrint,(float __x),lrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(float __x),lrintf,(__x))
 #elif defined(__CRT_HAVE___lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,lrint,(float __x),__lrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(float __x),__lrintf,(__x))
 #elif defined(__CRT_HAVE_llrintf) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,lrint,(float __x),llrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(float __x),llrintf,(__x))
 #elif defined(__CRT_HAVE___llrintf) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,lrint,(float __x),__llrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(float __x),__llrintf,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5105,7 +5105,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Round X to nearest integral value according to current rounding direction */
-__FORCELOCAL __ATTR_ARTIFICIAL long int __NOTHROW_NCX(__LIBCCALL lrint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lrint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_lroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -9947,23 +9947,23 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __remqu
 #endif /* ... */
 #if __has_builtin(__builtin_lrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CEIREDIRECT(,long int,__NOTHROW_NCX,__lrintf,(float __x),lrintf,{ return __builtin_lrintf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintf,(float __x),lrintf,{ return __builtin_lrintf(__x); })
 #elif defined(__CRT_HAVE_lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,__lrintf,(float __x),lrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintf,(float __x),lrintf,(__x))
 #elif defined(__CRT_HAVE___lrintf)
 /* Round X to nearest integral value according to current rounding direction */
-__CDECLARE(,long int,__NOTHROW_NCX,__lrintf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintf,(float __x),(__x))
 #elif defined(__CRT_HAVE_llrintf) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,__lrintf,(float __x),llrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintf,(float __x),llrintf,(__x))
 #elif defined(__CRT_HAVE___llrintf) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(,long int,__NOTHROW_NCX,__lrintf,(float __x),__llrintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintf,(float __x),__llrintf,(__x))
 #else /* ... */
 #include <libc/local/math/lrintf.h>
 /* Round X to nearest integral value according to current rounding direction */
-__FORCELOCAL __ATTR_ARTIFICIAL long int __NOTHROW_NCX(__LIBCCALL __lrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_lroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */

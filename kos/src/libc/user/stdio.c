@@ -181,7 +181,6 @@ file_system_writeall(FILE *__restrict self,
                      void const *buf, size_t num_bytes) {
 	ssize_t result;
 	if (self->if_flag & IO_HASVTAB) {
-		ssize_t result;
 		struct iofile_data *ex;
 		ex = self->if_exdata;
 		if unlikely(!ex->io_writefn)

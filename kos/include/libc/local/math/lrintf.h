@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc95e106e */
+/* HASH CRC-32:0xe7a8601c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,8 +63,8 @@ __NAMESPACE_LOCAL_END
 #include <libm/lrint.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
-__LOCAL_LIBC(lrintf) long int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lrintf))(float __x) {
+__LOCAL_LIBC(lrintf) __ATTR_CONST __ATTR_WUNUSED long int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrintf))(float __x) {
 #ifdef __LIBM_MATHFUNIF
 	return __LIBM_MATHFUNIF(lrint, __x);
 #else /* __LIBM_MATHFUNIF */

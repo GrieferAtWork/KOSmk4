@@ -1075,7 +1075,7 @@ float nearbyintf(float x);
 [[std, crtbuiltin, export_alias("__truncf")]]  truncf(*)  %{generate(double2float("trunc"))}
 [[std, crtbuiltin, export_alias("__remquof")]] remquof(*) %{generate(double2float("remquo"))}
 
-[[std, crtbuiltin, export_alias("__lrintf")]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lrintf")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintf", "__llrintf")]]
 long int lrintf(float x) %{generate(double2float("lrint"))}
 

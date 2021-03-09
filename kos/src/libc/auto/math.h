@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c43f46b */
+/* HASH CRC-32:0xac1c92d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1052,11 +1052,11 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remquof)(float x, float y, int *pquo)
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF long int NOTHROW_NCX(LIBDCALL libd_lrintf)(float x);
+INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBDCALL libd_lrintf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF long int NOTHROW_NCX(LIBCCALL libc_lrintf)(float x);
+INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lrintf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Round X to nearest integral value, rounding halfway cases away from zero */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ca77a95 */
+/* HASH CRC-32:0xd982f114 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1598,8 +1598,8 @@ NOTHROW(LIBCCALL libc_remquof)(float x,
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
 /* Round X to nearest integral value according to current rounding direction */
-INTERN ATTR_SECTION(".text.crt.math.math") long int
-NOTHROW_NCX(LIBCCALL libc_lrintf)(float x) {
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED long int
+NOTHROW(LIBCCALL libc_lrintf)(float x) {
 #ifdef __LIBM_MATHFUNIF
 	return __LIBM_MATHFUNIF(lrint, x);
 #else /* __LIBM_MATHFUNIF */
