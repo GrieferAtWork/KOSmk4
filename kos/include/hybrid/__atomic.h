@@ -92,7 +92,6 @@ __SYSDECL_BEGIN
 #define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)          __XBLOCK({ __typeof__(x) __oldv = (oldv); __XRETURN __atomic_compare_exchange_n(&(x), &__oldv, newv, 0, succ, fail); })
 #define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail)     __XBLOCK({ __typeof__(x) __oldv = (oldv); __XRETURN __atomic_compare_exchange_n(&(x), &__oldv, newv, 1, succ, fail); })
 #define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)      __XBLOCK({ __typeof__(x) __oldv = (oldv); __atomic_compare_exchange_n(&(x), &__oldv, newv, 0, succ, fail); __XRETURN __oldv; })
-#define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv = (oldv); __atomic_compare_exchange_n(&(x), &__oldv, newv, 1, succ, fail); __XRETURN __oldv; })
 #define __hybrid_atomic_addfetch(x, v, order)                      __atomic_add_fetch(&(x), v, order)
 #define __hybrid_atomic_subfetch(x, v, order)                      __atomic_sub_fetch(&(x), v, order)
 #define __hybrid_atomic_andfetch(x, v, order)                      __atomic_and_fetch(&(x), v, order)
@@ -119,7 +118,6 @@ __SYSDECL_BEGIN
 #define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)          __XBLOCK({ __typeof__(x) __oldv = (oldv); __XRETURN __c11_atomic_compare_exchange_strong(&(x), &__oldv, newv, succ, fail); })
 #define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail)     __XBLOCK({ __typeof__(x) __oldv = (oldv); __XRETURN __c11_atomic_compare_exchange_weak(&(x), &__oldv, newv, succ, fail); })
 #define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)      __XBLOCK({ __typeof__(x) __oldv = (oldv); __c11_atomic_compare_exchange_strong(&(x), &__oldv, newv, succ, fail); __XRETURN __oldv; })
-#define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv = (oldv); __c11_atomic_compare_exchange_weak(&(x), &__oldv, newv, succ, fail); __XRETURN __oldv; })
 #define __hybrid_atomic_fetchadd(x, v, order)                      __c11_atomic_fetch_add(&(x), v, order)
 #define __hybrid_atomic_fetchsub(x, v, order)                      __c11_atomic_fetch_sub(&(x), v, order)
 #define __hybrid_atomic_fetchand(x, v, order)                      __c11_atomic_fetch_and(&(x), v, order)
@@ -326,10 +324,6 @@ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __V __oldv, __V __newv, int 
 #define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail) \
 	__hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)
 #endif /* !__hybrid_atomic_cmpxch_weak */
-#ifndef __hybrid_atomic_cmpxch_val_weak
-#define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) \
-	__hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)
-#endif /* !__hybrid_atomic_cmpxch_val_weak */
 
 
 /* Define atomic load/store operations. */

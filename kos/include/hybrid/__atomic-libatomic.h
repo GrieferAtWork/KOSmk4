@@ -555,12 +555,8 @@ __HYBRID_DEFINE_ATOMIC_CMPXCH_N(__UINT128_TYPE__, 16)
 #endif /* !__cplusplus */
 #define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail) \
 	__hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)
-#define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) \
-	__hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)
-
 
 __NAMESPACE_INT_END
-
 __DECL_END
 
 #endif /* !__GUARD_HYBRID___ATOMIC_LIBATOMIC_H */

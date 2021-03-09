@@ -158,17 +158,17 @@ typedef enum {
 } memory_order;
 
 #if 1 /* ??? */
-#define __atomic_var_field(x) *(x)
-#define ATOMIC_VAR_INIT(x)     (x)
-#define __COMPILER_ATOMIC(T)  _Atomic T
+#define __atomic_var_field(x)   *(x)
+#define ATOMIC_VAR_INIT(x)      (x)
+#define __COMPILER_ATOMIC(T)    _Atomic T
 #elif 0
-#define __atomic_var_field(x) (x)->__std_atom
-#define ATOMIC_VAR_INIT(x)    { x }
-#define __COMPILER_ATOMIC(T)  struct { T __std_atom; }
+#define __atomic_var_field(x)   (x)->__std_atom
+#define ATOMIC_VAR_INIT(x)      { x }
+#define __COMPILER_ATOMIC(T)    struct { T __std_atom; }
 #else
-#define __atomic_var_field(x) *(x)
-#define ATOMIC_VAR_INIT(x)    (x)
-#define __COMPILER_ATOMIC(T)  T
+#define __atomic_var_field(x)   *(x)
+#define ATOMIC_VAR_INIT(x)      (x)
+#define __COMPILER_ATOMIC(T)    T
 #endif
 
 typedef __COMPILER_ATOMIC(__BOOL) atomic_bool;
@@ -238,14 +238,14 @@ typedef __COMPILER_ATOMIC(__UINTMAX_TYPE__) atomic_uintmax_t;
 		                                                         __acese_newval, succ,     \
 		                                                         fail)) == __acese_newval; \
 	})
-#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                 \
-	__XBLOCK({                                                                                  \
-		__auto_type __acese_poldval = (poldval);                                                \
-		__auto_type __acese_newval  = (newval);                                                 \
-		__XRETURN (*__acese_poldval = __hybrid_atomic_cmpxch_val_weak(__atomic_var_field(ptr),  \
-		                                                              *__acese_poldval,         \
-		                                                              __acese_newval, succ,     \
-		                                                              fail)) == __acese_newval; \
+#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                                                 \
+	__XBLOCK({                                                                                                                  \
+		__auto_type __acese_ptr     = (ptr);                                                                                    \
+		__auto_type __acese_poldval = (poldval);                                                                                \
+		__BOOL __acese_ok = __hybrid_atomic_cmpxch_weak(__atomic_var_field(__acese_ptr), *__acese_poldval, newval, succ, fail); \
+		if (!__acese_ok)                                                                                                        \
+			*__acese_poldval = __hybrid_atomic_load(__atomic_var_field(__acese_ptr), __ATOMIC_ACQUIRE);                         \
+		__XRETURN __acese_ok;                                                                                                   \
 	})
 #else /* __COMPILER_HAVE_AUTOTYPE */
 #define atomic_compare_exchange_strong_explicit(ptr, poldval, newval, succ, fail)          \
@@ -257,21 +257,23 @@ typedef __COMPILER_ATOMIC(__UINTMAX_TYPE__) atomic_uintmax_t;
 		                                                         __acese_newval, succ,     \
 		                                                         fail)) == __acese_newval; \
 	})
-#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                 \
-	__XBLOCK({                                                                                  \
-		__typeof__(poldval) __acese_poldval = (poldval);                                        \
-		__typeof__(newval) __acese_newval  = (newval);                                          \
-		__XRETURN (*__acese_poldval = __hybrid_atomic_cmpxch_val_weak(__atomic_var_field(ptr),  \
-		                                                              *__acese_poldval,         \
-		                                                              __acese_newval, succ,     \
-		                                                              fail)) == __acese_newval; \
+#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                                                 \
+	__XBLOCK({                                                                                                                  \
+		__typeof__(ptr) __acese_ptr = (ptr);                                                                                    \
+		__typeof__(poldval) __acese_poldval = (poldval);                                                                        \
+		__BOOL __acese_ok = __hybrid_atomic_cmpxch_weak(__atomic_var_field(__acese_ptr), *__acese_poldval, newval, succ, fail); \
+		if (!__acese_ok)                                                                                                        \
+			*__acese_poldval = __hybrid_atomic_load(__atomic_var_field(__acese_ptr), __ATOMIC_ACQUIRE);                         \
+		__XRETURN __acese_ok;                                                                                                   \
 	})
 #endif /* !__COMPILER_HAVE_AUTOTYPE */
 #else /* ... */
 #define atomic_compare_exchange_strong_explicit(ptr, poldval, newval, succ, fail) \
 	((*(poldval) = __hybrid_atomic_cmpxch_val(__atomic_var_field(ptr), *(poldval), newval, succ, fail)) == (newval))
-#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail) \
-	((*(poldval) = __hybrid_atomic_cmpxch_val_weak(__atomic_var_field(ptr), *(poldval), newval, succ, fail)) == (newval))
+#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)           \
+	(__hybrid_atomic_cmpxch_weak(__atomic_var_field(ptr), *(poldval), newval, succ, fail) \
+	 ? 1                                                                                  \
+	 : (*(poldval) = __hybrid_atomic_load(__atomic_var_field(ptr), __ATOMIC_ACQUIRE), 0))
 #endif /* !... */
 #define atomic_compare_exchange_strong(ptr, poldval, newval) \
 	atomic_compare_exchange_strong_explicit(ptr, poldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
@@ -295,8 +297,6 @@ typedef __COMPILER_ATOMIC(__UINTMAX_TYPE__) atomic_uintmax_t;
 #define atomic_cmpxch_val(ptr, oldv, newv)                           __hybrid_atomic_cmpxch_val(__atomic_var_field(ptr), oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define atomic_cmpxch_weak_explicit(ptr, oldv, newv, succ, fail)     __hybrid_atomic_cmpxch_weak(__atomic_var_field(ptr), oldv, newv, succ, fail)
 #define atomic_cmpxch_weak(ptr, oldv, newv)                          __hybrid_atomic_cmpxch_weak(__atomic_var_field(ptr), oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define atomic_cmpxch_val_weak_explicit(ptr, oldv, newv, succ, fail) __hybrid_atomic_cmpxch_val_weak(__atomic_var_field(ptr), oldv, newv, succ, fail)
-#define atomic_cmpxch_val_weak(ptr, oldv, newv)                      __hybrid_atomic_cmpxch_val_weak(__atomic_var_field(ptr), oldv, newv, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define atomic_fetch_nand(ptr, val)                                  __hybrid_atomic_fetchnand(__atomic_var_field(ptr), val, __ATOMIC_SEQ_CST)
 #define atomic_fetch_nand_explicit(ptr, val, mo)                     __hybrid_atomic_fetchnand(__atomic_var_field(ptr), val, mo)
 #endif /* __USE_KOS */

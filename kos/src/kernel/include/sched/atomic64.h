@@ -107,10 +107,6 @@ typedef u64 atomic64_t;
 #define atomic64_cmpxch_val(self, oldval, newval) \
 	__hybrid_atomic_cmpxch_val(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
-/* Atomically compare-exchange a 64-bit data word from `self' */
-#define atomic64_cmpxch_val_weak(self, oldval, newval) \
-	__hybrid_atomic_cmpxch_val_weak(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-
 /* Atomically exchange a 64-bit data word from `self' */
 #define atomic64_xch(self, value) \
 	__hybrid_atomic_xch(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)

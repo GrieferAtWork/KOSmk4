@@ -683,9 +683,9 @@ part_setcore:
 			pos_t newsize, oldsize;
 			newsize = offset + io_bytes;
 			for (;;) {
-				oldsize = (pos_t)atomic64_cmpxch_val_weak(&self->mf_filesize,
-				                                          (u64)filesize,
-				                                          (u64)newsize);
+				oldsize = (pos_t)atomic64_cmpxch_val(&self->mf_filesize,
+				                                     (u64)filesize,
+				                                     (u64)newsize);
 				if (oldsize == filesize) {
 					/* Successfully altered the file's size. */
 					uintptr_t old_flags, new_flags;
@@ -1064,9 +1064,9 @@ handle_part_insert_failure:
 		 * beyond that point. */
 		newsize = offset + num_bytes;
 		for (;;) {
-			oldsize = (pos_t)atomic64_cmpxch_val_weak(&self->mf_filesize,
-			                                          (u64)filesize,
-			                                          (u64)newsize);
+			oldsize = (pos_t)atomic64_cmpxch_val(&self->mf_filesize,
+			                                     (u64)filesize,
+			                                     (u64)newsize);
 			if (oldsize == filesize) {
 				changes |= MFILE_F_ATTRCHANGED;
 				break;

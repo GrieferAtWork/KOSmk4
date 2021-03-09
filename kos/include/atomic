@@ -59,26 +59,18 @@ typedef enum {
 	compare_exchange_weak(T &__exp, T __val,                                                            \
 	                      memory_order __succ,                                                          \
 	                      memory_order __fail) __CXX_NOEXCEPT {                                         \
-		T __oldval;                                                                                     \
-		bool __result;                                                                                  \
-		__oldval = __hybrid_atomic_cmpxch_val_weak(__m_val,                                             \
-		                                           __val, __exp,                                        \
-		                                           __succ, __fail);                                     \
-		__result = __exp == __oldval;                                                                   \
-		__exp    = __oldval;                                                                            \
+		bool __result = __hybrid_atomic_cmpxch_weak(__m_val, __val, __exp, __succ, __fail);             \
+		if (!__result)                                                                                  \
+			__exp = __hybrid_atomic_load(__m_val, __ATOMIC_ACQUIRE);                                    \
 		return __result;                                                                                \
 	}                                                                                                   \
 	__CXX_CLASSMEMBER bool                                                                              \
 	compare_exchange_weak(T &__exp, T __val,                                                            \
 	                      memory_order __succ,                                                          \
 	                      memory_order __fail) volatile __CXX_NOEXCEPT {                                \
-		T __oldval;                                                                                     \
-		bool __result;                                                                                  \
-		__oldval = __hybrid_atomic_cmpxch_val_weak(__m_val,                                             \
-		                                           __val, __exp,                                        \
-		                                           __succ, __fail);                                     \
-		__result = __exp == __oldval;                                                                   \
-		__exp    = __oldval;                                                                            \
+		bool __result = __hybrid_atomic_cmpxch_weak(__m_val, __val, __exp, __succ, __fail);             \
+		if (!__result)                                                                                  \
+			__exp = __hybrid_atomic_load(__m_val, __ATOMIC_ACQUIRE);                                    \
 		return __result;                                                                                \
 	}                                                                                                   \
 	__CXX_CLASSMEMBER bool                                                                              \
@@ -217,22 +209,6 @@ typedef enum {
 	            memory_order __order __DFL(memory_order_seq_cst)) volatile __CXX_NOEXCEPT {     \
 		return cmpxch_weak(__oldv, __newv, __order,                                             \
 		                   ::std::__intern::__cmpxch_failure_order(__order));                   \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val_weak(T __oldv, T __newv,                                                         \
-	                memory_order __succ,                                                        \
-	                memory_order __fail) __CXX_NOEXCEPT {                                       \
-		return __hybrid_atomic_cmpxch_val_weak(__m_val,                                         \
-		                                       __oldv, __newv,                                  \
-		                                       __succ, __fail);                                 \
-	}                                                                                           \
-	__CXX_CLASSMEMBER T                                                                         \
-	cmpxch_val_weak(T __oldv, T __newv,                                                         \
-	                memory_order __succ,                                                        \
-	                memory_order __fail) volatile __CXX_NOEXCEPT {                              \
-		return __hybrid_atomic_cmpxch_val_weak(__m_val,                                         \
-		                                       __oldv, __newv,                                  \
-		                                       __succ, __fail);                                 \
 	}                                                                                           \
 	__CXX_CLASSMEMBER T                                                                         \
 	cmpxch_val_weak(T __oldv, T __newv,                                                         \
