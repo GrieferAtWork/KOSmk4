@@ -54,7 +54,7 @@ struct video_palette;
 	(*(self)->vf_codec->vc_linefill)(dst_line, dst_x, pixel, num_pixels)
 
 struct video_format {
-	struct video_codec           *vf_codec;  /* [1..1] Video codec. */
+	struct video_codec const     *vf_codec;  /* [1..1] Video codec. */
 	/*REF*/ struct video_palette *vf_pal;    /* [0..1] Color palette (if applicable) */
 #ifdef __cplusplus
 public: /* Low-level, memory-based pixel accessor functions. */

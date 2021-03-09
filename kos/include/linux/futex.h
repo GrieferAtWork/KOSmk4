@@ -99,13 +99,16 @@ struct robust_list {
  * (When an incompatible change is done, we'll increase the structure
  *  size, which glibc will detect) */
 struct robust_list_head {
+
 	/* The head of the list. Points back to itself if empty: */
 	struct robust_list  list;
+
 	/* This  relative offset is set by user-space, it gives the kernel
 	 * the relative position of the  futex field to examine. This  way
 	 * we keep userspace flexible, to freely shape its data-structure,
 	 * without hardcoding any particular offset into the kernel: */
 	__LONGPTR_TYPE__    futex_offset;
+
 	/* The death of  the thread may  race with userspace  setting
 	 * up a lock's links. So to handle this race, userspace first
 	 * sets this field  to the address  of the to-be-taken  lock,

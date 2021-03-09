@@ -1725,3 +1725,4 @@
 #define __locale_t            locale_t
 #define __sighandler_t        sighandler_t
 #define __sa_family_t         sa_family_t
+#define __IOPORT_T            port_t

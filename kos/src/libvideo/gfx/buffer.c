@@ -58,7 +58,7 @@ DECL_BEGIN
  * @param: palette: The palette to use (only needed if used by `codec') */
 INTERN WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
-                       struct video_codec *codec, struct video_palette *palette) {
+                       struct video_codec const *codec, struct video_palette *palette) {
 	struct video_buffer *result;
 	/* Check for special case: empty video buffer. */
 	if unlikely(!size_x || !size_y)
@@ -184,7 +184,7 @@ libvideo_preferred_format(void) {
 	struct video_format *result;
 	result = &preferred_video_format;
 	if (!result->vf_codec) {
-		struct video_codec *codec;
+		struct video_codec const *codec;
 		/* TODO: Ask the bound video driver for its preferred format. */
 		COMPILER_IMPURE();
 		codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);

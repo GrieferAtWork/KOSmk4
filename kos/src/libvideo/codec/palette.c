@@ -164,7 +164,8 @@ libvideo_palette_getpixel(struct video_palette *__restrict self,
 		ent.cp_g = g;
 		ent.cp_b = b;
 		ent.cp_i = (uint8_t)result;
-		memmoveupl(cs->cs_pairs + 1, cs->cs_pairs, VPC_SIZE);
+		memmoveup(cs->cs_pairs + 1, cs->cs_pairs, VPC_SIZE - 1,
+		          sizeof(union video_palette_cachepair));
 		ATOMIC_WRITE(cs->cs_pairs[0].cp_word, ent.cp_word);
 	}
 done:

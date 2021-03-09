@@ -26,40 +26,40 @@
 #include <hybrid/typecore.h>
 
 #ifndef INT8_C
-#define INT8_C(c) __INT8_C(c)
+#define INT8_C    __INT8_C
 #endif /* !INT8_C */
 #ifndef UINT8_C
-#define UINT8_C(c) __UINT8_C(c)
+#define UINT8_C   __UINT8_C
 #endif /* !UINT8_C */
 
 #ifndef INT16_C
-#define INT16_C(c) __INT16_C(c)
+#define INT16_C   __INT16_C
 #endif /* !INT16_C */
 #ifndef UINT16_C
-#define UINT16_C(c) __UINT16_C(c)
+#define UINT16_C  __UINT16_C
 #endif /* !UINT16_C */
 
 #ifndef INT32_C
-#define INT32_C(c) __INT32_C(c)
+#define INT32_C   __INT32_C
 #endif /* !INT32_C */
 #ifndef UINT32_C
-#define UINT32_C(c) __UINT32_C(c)
+#define UINT32_C  __UINT32_C
 #endif /* !UINT32_C */
 
 #ifdef __UINT64_C
 #ifndef INT64_C
-#define INT64_C(c) __INT64_C(c)
+#define INT64_C   __INT64_C
 #endif /* !INT64_C */
 #ifndef UINT64_C
-#define UINT64_C(c) __UINT64_C(c)
+#define UINT64_C  __UINT64_C
 #endif /* !UINT64_C */
 #endif /* __UINT64_C */
 
 #ifndef INTMAX_C
-#define INTMAX_C(c) __INTMAX_C(c)
+#define INTMAX_C  __INTMAX_C
 #endif /* !INTMAX_C */
 #ifndef UINTMAX_C
-#define UINTMAX_C(c) __UINTMAX_C(c)
+#define UINTMAX_C __UINTMAX_C
 #endif /* !UINTMAX_C */
 
 #endif /* !_SYS_INT_CONST_H */

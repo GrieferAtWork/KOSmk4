@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fc0b3d */
+/* HASH CRC-32:0xe7922be3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,12 +55,12 @@ typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #if defined(__CRT_HAVE_sendfile64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count),sendfile64,(__out_fd,__in_fd,__offset,__count))
+__CREDIRECT(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, size_t __count),sendfile64,(__out_fd,__in_fd,__offset,__count))
 #elif defined(__CRT_HAVE_sendfile) && !defined(__USE_FILE_OFFSET64)
-__CDECLARE(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, size_t __count),(__out_fd,__in_fd,__offset,__count))
 #elif defined(__CRT_HAVE_sendfile64) || defined(__CRT_HAVE_sendfile)
 #include <libc/local/sys.sendfile/sendfile.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL __ATTR_ARTIFICIAL ssize_t __NOTHROW_NCX(__LIBCCALL sendfile)(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile))(__out_fd, __in_fd, __offset, __count); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL __ATTR_ARTIFICIAL ssize_t __NOTHROW_NCX(__LIBCCALL sendfile)(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile))(__out_fd, __in_fd, __offset, __count); })
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_sendfile64

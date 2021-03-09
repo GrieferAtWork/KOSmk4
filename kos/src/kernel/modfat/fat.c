@@ -237,7 +237,8 @@ Fat32_VWriteToINode(struct inode *__restrict self,
 			                          FAT_GETCLUSTER_MODE_FCREATE) ==
 			       cluster + 1) {
 				max_io += fat->f_clustersize;
-				++cluster_number, ++cluster;
+				++cluster_number;
+				++cluster;
 			}
 			if (max_io > bufsize)
 				max_io = bufsize;

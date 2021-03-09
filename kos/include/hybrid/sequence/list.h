@@ -144,16 +144,12 @@
 #else /* NDEBUG */
 #include "../typecore.h"
 #if __SIZEOF_POINTER__ == 4
-#define __HYBRID_Q_BADPTRVAL     __UINT32_C(0xcccccccc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT32_C(0xcccccccc))
 #elif __SIZEOF_POINTER__ == 8
-#define __HYBRID_Q_BADPTRVAL     __UINT64_C(0xcccccccccccccccc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT64_C(0xcccccccccccccccc))
 #elif __SIZEOF_POINTER__ == 2
-#define __HYBRID_Q_BADPTRVAL     __UINT16_C(0xcccc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT16_C(0xcccc))
 #elif __SIZEOF_POINTER__ == 1
-#define __HYBRID_Q_BADPTRVAL     __UINT8_C(0xcc)
 #define __HYBRID_Q_BADPTR(field) (void)(*(void **)&(field) = (void *)__UINT8_C(0xcc))
 #elif defined(__KOS_SYSTEM_HEADERS__)
 #include <libc/string.h>

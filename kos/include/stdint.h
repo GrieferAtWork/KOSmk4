@@ -448,42 +448,48 @@ __DECL_END
 #endif /* !WINT_MAX */
 
 #ifndef INTMAX_C
-#define INTMAX_C(x)  __INTMAX_C(x)
+#define INTMAX_C  __INTMAX_C
 #endif /* !INTMAX_C */
 #ifndef UINTMAX_C
-#define UINTMAX_C(x) __UINTMAX_C(x)
+#define UINTMAX_C __UINTMAX_C
 #endif /* !UINTMAX_C */
 #ifndef INT8_C
-#define INT8_C(x)    __INT8_C(x)
+#define INT8_C    __INT8_C
 #endif /* !INT8_C */
 #ifndef INT16_C
-#define INT16_C(x)   __INT16_C(x)
+#define INT16_C   __INT16_C
 #endif /* !INT16_C */
 #ifndef INT32_C
-#define INT32_C(x)   __INT32_C(x)
+#define INT32_C   __INT32_C
 #endif /* !INT32_C */
 #ifndef INT64_C
-#define INT64_C(x)   __INT64_C(x)
+#define INT64_C   __INT64_C
 #endif /* !INT64_C */
 #ifndef UINT8_C
-#define UINT8_C(x)   __UINT8_C(x)
+#define UINT8_C   __UINT8_C
 #endif /* !UINT8_C */
 #ifndef UINT16_C
-#define UINT16_C(x)  __UINT16_C(x)
+#define UINT16_C  __UINT16_C
 #endif /* !UINT16_C */
 #ifndef UINT32_C
-#define UINT32_C(x)  __UINT32_C(x)
+#define UINT32_C  __UINT32_C
 #endif /* !UINT32_C */
 #ifndef UINT64_C
-#define UINT64_C(x)  __UINT64_C(x)
+#define UINT64_C  __UINT64_C
 #endif /* !UINT64_C */
 #ifdef __USE_KOS
 #ifndef SIZE_C
-#define SIZE_C(x)    __SIZE_C(x)
+#define SIZE_C    __SIZE_C
 #endif /* !SIZE_C */
 #ifndef SSIZE_C
-#define SSIZE_C(x)   __SSIZE_C(x)
+#define SSIZE_C   __SSIZE_C
 #endif /* !SSIZE_C */
+#ifndef INTPTR_C
+#define INTPTR_C  __INTPTR_C
+#endif /* !INTPTR_C */
+#ifndef UINTPTR_C
+#define UINTPTR_C __UINTPTR_C
+#endif /* !UINTPTR_C */
 #endif /* __USE_KOS */
 
 #ifdef __CXX_SYSTEM_HEADER

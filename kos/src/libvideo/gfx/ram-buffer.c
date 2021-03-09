@@ -758,7 +758,7 @@ struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
 /* Create a new RAM-based video buffer */
 INTERN WUNUSED NONNULL((3)) /*REF*/ struct video_buffer *CC
 libvideo_rambuffer_create(size_t size_x, size_t size_y,
-                          struct video_codec *__restrict codec,
+                          struct video_codec const *__restrict codec,
                           struct video_palette *palette) {
 	/*REF*/ struct video_rambuffer *result;
 	struct video_rambuffer_requirements req;

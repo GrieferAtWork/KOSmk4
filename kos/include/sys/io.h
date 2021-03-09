@@ -23,11 +23,13 @@
 #ifndef _SYS_IO_H
 #define _SYS_IO_H 1
 
+#include <__crt.h>
 #include <__stdinc.h>
 #include <features.h> /* __USE_KOS_KERNEL */
 
 #include <hybrid/typecore.h>
 
+#include <bits/typesizes.h> /* Optional override for `__SIZEOF_PORT_T__' */
 #include <sys/perm.h>
 
 #ifndef __SIZEOF_PORT_T__
@@ -62,40 +64,43 @@ __SYSDECL_BEGIN
  * The prototypes in this header are mainly meant to describe the signatures that
  * architecture-specific implementations will mirror. */
 
-extern __UINT8_TYPE__ __NOTHROW(inb)(__IOPORT_T __port);
-extern __UINT16_TYPE__ __NOTHROW(inw)(__IOPORT_T __port);
-extern __UINT32_TYPE__ __NOTHROW(inl)(__IOPORT_T __port);
-
-extern __UINT8_TYPE__ __NOTHROW(inb_p)(__IOPORT_T __port);
-extern __UINT16_TYPE__ __NOTHROW(inw_p)(__IOPORT_T __port);
-extern __UINT32_TYPE__ __NOTHROW(inl_p)(__IOPORT_T __port);
-
-extern void __NOTHROW(insb)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_bytes);
-extern void __NOTHROW(insw)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_words);
-extern void __NOTHROW(insl)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_dwords);
-
-extern void __NOTHROW(outsb)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_bytes);
-extern void __NOTHROW(outsw)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_words);
-extern void __NOTHROW(outsl)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_dwords);
+__CDECLARE(,__UINT8_TYPE__,__NOTHROW,inb,(__IOPORT_T __port),(__port))
+__CDECLARE(,__UINT16_TYPE__,__NOTHROW,inw,(__IOPORT_T __port),(__port))
+__CDECLARE(,__UINT32_TYPE__,__NOTHROW,inl,(__IOPORT_T __port),(__port))
+__CDECLARE(,__UINT8_TYPE__,__NOTHROW,inb_p,(__IOPORT_T __port),(__port))
+__CDECLARE(,__UINT16_TYPE__,__NOTHROW,inw_p,(__IOPORT_T __port),(__port))
+__CDECLARE(,__UINT32_TYPE__,__NOTHROW,inl_p,(__IOPORT_T __port),(__port))
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW,insb,(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_bytes),(__port,__buf,__n_bytes))
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW,insw,(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_words),(__port,__buf,__n_words))
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW,insl,(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_dwords),(__port,__buf,__n_dwords))
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW,outsb,(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_bytes),(__port,__buf,__n_bytes))
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW,outsw,(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_words),(__port,__buf,__n_words))
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW,outsl,(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_dwords),(__port,__buf,__n_dwords))
 
 #ifdef __USE_KOS_ALTERATIONS
-extern void __NOTHROW(outb)(__IOPORT_T __port, __UINT8_TYPE__ __val);
-extern void __NOTHROW(outw)(__IOPORT_T __port, __UINT16_TYPE__ __val);
-extern void __NOTHROW(outl)(__IOPORT_T __port, __UINT32_TYPE__ __val);
-extern void __NOTHROW(outb_p)(__IOPORT_T __port, __UINT8_TYPE__ __val);
-extern void __NOTHROW(outw_p)(__IOPORT_T __port, __UINT16_TYPE__ __val);
-extern void __NOTHROW(outl_p)(__IOPORT_T __port, __UINT32_TYPE__ __val);
+__CREDIRECT_VOID(,__NOTHROW,__abi_outb,(__UINT8_TYPE__ __val, __IOPORT_T __port),outb,(__val,__port))
+__CREDIRECT_VOID(,__NOTHROW,__abi_outw,(__UINT16_TYPE__ __val, __IOPORT_T __port),outw,(__val,__port))
+__CREDIRECT_VOID(,__NOTHROW,__abi_outl,(__UINT32_TYPE__ __val, __IOPORT_T __port),outl,(__val,__port))
+__CREDIRECT_VOID(,__NOTHROW,__abi_outb_p,(__UINT8_TYPE__ __val, __IOPORT_T __port),outb_p,(__val,__port))
+__CREDIRECT_VOID(,__NOTHROW,__abi_outw_p,(__UINT16_TYPE__ __val, __IOPORT_T __port),outw_p,(__val,__port))
+__CREDIRECT_VOID(,__NOTHROW,__abi_outl_p,(__UINT32_TYPE__ __val, __IOPORT_T __port),outl_p,(__val,__port))
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL outb)(__IOPORT_T __port, __UINT8_TYPE__ __val) { __abi_outb(__val, __port); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL outw)(__IOPORT_T __port, __UINT16_TYPE__ __val) { __abi_outw(__val, __port); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL outl)(__IOPORT_T __port, __UINT32_TYPE__ __val) { __abi_outl(__val, __port); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL outb_p)(__IOPORT_T __port, __UINT8_TYPE__ __val) { __abi_outb_p(__val, __port); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL outw_p)(__IOPORT_T __port, __UINT16_TYPE__ __val) { __abi_outw_p(__val, __port); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL outl_p)(__IOPORT_T __port, __UINT32_TYPE__ __val) { __abi_outl_p(__val, __port); }
 #else /* __USE_KOS_ALTERATIONS */
-extern void __NOTHROW(outb)(__UINT8_TYPE__ __val, __IOPORT_T __port);
-extern void __NOTHROW(outw)(__UINT16_TYPE__ __val, __IOPORT_T __port);
-extern void __NOTHROW(outl)(__UINT32_TYPE__ __val, __IOPORT_T __port);
-extern void __NOTHROW(outb_p)(__UINT8_TYPE__ __val, __IOPORT_T __port);
-extern void __NOTHROW(outw_p)(__UINT16_TYPE__ __val, __IOPORT_T __port);
-extern void __NOTHROW(outl_p)(__UINT32_TYPE__ __val, __IOPORT_T __port);
+__CDECLARE_VOID(,__NOTHROW,outb,(__UINT8_TYPE__ __val, __IOPORT_T __port),(__val,__port))
+__CDECLARE_VOID(,__NOTHROW,outw,(__UINT16_TYPE__ __val, __IOPORT_T __port),(__val,__port))
+__CDECLARE_VOID(,__NOTHROW,outl,(__UINT32_TYPE__ __val, __IOPORT_T __port),(__val,__port))
+__CDECLARE_VOID(,__NOTHROW,outb_p,(__UINT8_TYPE__ __val, __IOPORT_T __port),(__val,__port))
+__CDECLARE_VOID(,__NOTHROW,outw_p,(__UINT16_TYPE__ __val, __IOPORT_T __port),(__val,__port))
+__CDECLARE_VOID(,__NOTHROW,outl_p,(__UINT32_TYPE__ __val, __IOPORT_T __port),(__val,__port))
 #endif /* !__USE_KOS_ALTERATIONS */
 
 #ifdef __USE_KOS_KERNEL
-extern void __NOTHROW(io_delay)(void);
+__CDECLARE_VOID(,__NOTHROW,io_delay,(void),())
 #endif /* __USE_KOS_KERNEL */
 
 __SYSDECL_END

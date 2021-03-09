@@ -1312,16 +1312,16 @@ buffer1_requirements(size_t size_x, size_t size_y,
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
-INTERN WUNUSED ATTR_CONST struct video_codec *
-CC libvideo_codec_lookup(video_codec_t codec) {
-	struct video_codec *result;
+INTERN WUNUSED ATTR_CONST struct video_codec const *CC
+libvideo_codec_lookup(video_codec_t codec) {
+	struct video_codec const *result;
 	switch (codec) {
 #if defined(__KERNEL__) || (!defined(__PIC__) && !defined(__PIE__) && !defined(__pic__) && !defined(__pie__))
 #define DEFINE_CODEC(codec, align, rambuffer_requirements,              \
                      getpixel, setpixel, linecopy, linefill,            \
                      pixel2color, color2pixel)                          \
 	case codec: {                                                       \
-		PRIVATE struct video_codec _codec_##codec = {                   \
+		PRIVATE struct video_codec const _codec_##codec = {             \
 			/* .vc_codec                  = */ codec,                   \
 			/* ._vc_flags                 = */ VD_FORMAT_FLAG_NORMAL,   \
 			/* .vc_align                  = */ align,                   \

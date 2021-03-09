@@ -251,11 +251,11 @@ __DEFINE_REFCOUNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy
  * @param: palette: The palette to use (only needed if used by `codec') */
 typedef __ATTR_WUNUSED __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CREATE)(unsigned int __type, __size_t __size_x, __size_t __size_y,
-                                        struct video_codec *__codec, struct video_palette *__palette);
+                                        struct video_codec const *__codec, struct video_palette *__palette);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_create(unsigned int __type, __size_t __size_x, __size_t __size_y,
-                    struct video_codec *__codec, struct video_palette *__palette);
+                    struct video_codec const *__codec, struct video_palette *__palette);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)

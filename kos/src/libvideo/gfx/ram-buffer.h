@@ -65,7 +65,7 @@ INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_alphablend(struct video
 /* Create a new RAM-based video buffer */
 INTDEF WUNUSED NONNULL((3)) /*REF*/ struct video_buffer *CC
 libvideo_rambuffer_create(size_t size_x, size_t size_y,
-                          struct video_codec *__restrict codec,
+                          struct video_codec const *__restrict codec,
                           struct video_palette *palette);
 
 /* Return the preferred video format.

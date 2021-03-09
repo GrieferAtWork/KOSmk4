@@ -70,7 +70,7 @@ ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
 [[userimpl, requires($has_function(sendfile32) || $has_function(sendfile64))]]
 ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
-                 [[nullable]] off_t *offset, size_t count) {
+                 [[nullable]] $off_t *offset, size_t count) {
 @@pp_if $has_function(sendfile64)@@
 	ssize_t result;
 	if (offset) {

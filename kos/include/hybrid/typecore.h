@@ -284,8 +284,13 @@
 #endif /* __INT128_C */
 
 #ifndef __INTMAX_C
-#define __INTMAX_C(c)  __INT64_C(c)
-#define __UINTMAX_C(c) __UINT64_C(c)
+#ifdef __INT64_C
+#define __INTMAX_C  __INT64_C
+#define __UINTMAX_C __UINT64_C
+#else /* __INT64_C */
+#define __INTMAX_C  __INT32_C
+#define __UINTMAX_C __UINT32_C
+#endif /* !__INT64_C */
 #endif /* !__INTMAX_C */
 
 #ifndef __SIZEOF_POINTER__

@@ -113,11 +113,11 @@ struct in_place_type_t {
 	explicit __CXX_DEFAULT_CTOR(in_place_type_t);
 };
 
-static __CXX11_CONSTEXPR in_place_type_t in_place_type = in_place_type_t();
+static __CXX11_CONSTEXPR in_place_type_t in_place_type {};
 
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR
 template<__SIZE_TYPE__ __I> struct in_place_index_t { explicit __CXX_DEFAULT_CTOR(in_place_index_t); };
-template<__SIZE_TYPE__ __I> static __CXX11_CONSTEXPR in_place_index in_place_type = {};
+template<__SIZE_TYPE__ __I> static __CXX11_CONSTEXPR in_place_index_t<__I> in_place_type {};
 #endif /* __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR */
 #endif /* __USE_ISOCXX17 */
 

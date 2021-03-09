@@ -142,11 +142,11 @@ struct video_codec {
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
-typedef __ATTR_WUNUSED __ATTR_CONST struct video_codec *
+typedef __ATTR_WUNUSED __ATTR_CONST struct video_codec const *
 (LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP)(video_codec_t codec);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
-LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_CONST struct video_codec *
-LIBVIDEO_CODEC_CC video_codec_lookup(video_codec_t codec);
+LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_CONST struct video_codec const *
+(LIBVIDEO_CODEC_CC video_codec_lookup)(video_codec_t codec);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
 #endif /* __CC__ */
