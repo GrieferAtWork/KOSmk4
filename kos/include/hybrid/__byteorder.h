@@ -26,34 +26,74 @@
 #define __ORDER_LITTLE_ENDIAN__ 1234
 #endif /* !__ORDER_LITTLE_ENDIAN__ */
 #ifndef __ORDER_BIG_ENDIAN__
-#define __ORDER_BIG_ENDIAN__    4321
+#define __ORDER_BIG_ENDIAN__ 4321
 #endif /* !__ORDER_BIG_ENDIAN__ */
 #ifndef __ORDER_PDP_ENDIAN__
-#define __ORDER_PDP_ENDIAN__    3412
+#define __ORDER_PDP_ENDIAN__ 3412
 #endif /* !__ORDER_PDP_ENDIAN__ */
 
 #ifndef __BYTE_ORDER__
 #ifdef __BYTEORDER__
-#   define __BYTE_ORDER__   __BYTEORDER__
+#define __BYTE_ORDER__ __BYTEORDER__
 #elif defined(__BYTE_ORDER)
-#   define __BYTE_ORDER__   __BYTE_ORDER
+#define __BYTE_ORDER__ __BYTE_ORDER
 #elif defined(__BYTEORDER)
-#   define __BYTE_ORDER__   __BYTEORDER
+#define __BYTE_ORDER__ __BYTEORDER
 #elif defined(__ENDIAN__)
-#   define __BYTE_ORDER__   __ENDIAN__
-#else
-#   include "host.h"
-#if defined(__hppa__) || defined(__m68k__) || \
-    defined(mc68000) ||  defined(_M_M68K) || \
-   (defined(__MIPS__) && defined(__MISPEB__)) || \
-    defined(__ppc__) || defined(__powerpc__) || \
-    defined(_M_PPC) || defined(__ARMEB__) || \
-    defined(__sparc__)
-#   define __BYTE_ORDER__ 4321
-#else
-#   define __BYTE_ORDER__ 1234
-#endif
-#endif
+#define __BYTE_ORDER__ __ENDIAN__
+#elif (defined(__BIG_ENDIAN__) || defined(__big_endian__) ||          \
+       defined(__ARM_BIG_ENDIAN) || defined(__ARMEB__) ||             \
+       defined(__MIPSEB__) || defined(_BIG_ENDIAN) ||                 \
+       defined(__ckcoreBE__) || defined(__cskyBE__) ||                \
+       defined(__cskybe__) || defined(__CSKYBE__) ||                  \
+       defined(__MCOREBE__) || defined(__MICROBLAZEEB__) ||           \
+       defined(__MIPSEB) || defined(__MIPSEB__) ||                    \
+       defined(_MIPSEB) || defined(__MOXIE_BIG_ENDIAN__) ||           \
+       defined(__NDS32_EB__) || defined(__nios2_big_endian) ||        \
+       defined(__nios2_big_endian__) || defined(__RX_BIG_ENDIAN__) || \
+       defined(__XTENSA_EB__))
+#define __BYTE_ORDER__ 4321
+#elif (defined(__LITTLE_ENDIAN__) || defined(__little_endian__) ||          \
+       defined(__ARMEL__) || defined(__MIPSEL__) ||                         \
+       defined(_LITTLE_ENDIAN) || defined(__ckcoreLE__) ||                  \
+       defined(__cskyLE__) || defined(__cskyle__) ||                        \
+       defined(__CSKYLE__) || defined(__LITTLEENDIAN__) ||                  \
+       defined(__MCORELE__) || defined(__MICROBLAZEEL__) ||                 \
+       defined(__MIPSEL) || defined(__MIPSEL__) ||                          \
+       defined(_MIPSEL) || defined(__MOXIE_LITTLE_ENDIAN__) ||              \
+       defined(__NDS32_EL__) || defined(__nios2_little_endian) ||           \
+       defined(__nios2_little_endian__) || defined(__RX_LITTLE_ENDIAN__) || \
+       defined(__XTENSA_EL__))
+#define __BYTE_ORDER__ 1234
+#else /* ... */
+#ifndef __NO_has_include
+#endif /* !__NO_has_include */
+
+/* Fallback: Figure out based on host defines */
+#ifndef __BYTE_ORDER__
+#include "host.h"
+#if (defined(__arm__) && defined(ARMEB))
+#define __BYTE_ORDER__ 4321
+#elif (defined(__arm__) && defined(ARMEL))
+#define __BYTE_ORDER__ 1234
+#elif (defined(__mips__) && defined(MIPSEB))
+#define __BYTE_ORDER__ 4321
+#elif (defined(__mips__) && defined(MIPSEL))
+#define __BYTE_ORDER__ 1234
+#elif (defined(__nios2__) && defined(nios2_big_endian))
+#define __BYTE_ORDER__ 1234
+#elif (defined(__nios2__) && defined(nios2_little_endian))
+#define __BYTE_ORDER__ 1234
+#elif defined(__pdp11__)
+#define __BYTE_ORDER__ 3412
+#elif (defined(__hppa__) || defined(__m68k__) || \
+       defined(__powerpc__) || defined(__sparc__))
+#define __BYTE_ORDER__ 4321
+#else /* ... */
+#define __BYTE_ORDER__ 1234
+#endif /* !... */
+#endif /* !__BYTE_ORDER__ */
+#endif /* !... */
 #endif /* !__BYTE_ORDER__ */
 
 #ifndef __FLOAT_WORD_ORDER__

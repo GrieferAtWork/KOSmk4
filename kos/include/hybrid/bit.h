@@ -26,7 +26,7 @@
 
 #ifdef __CC__
 
-/* unsigned int FFS(unsigned Integer i):
+/* unsigned int FFS(UNSIGNED i):
  *     FindFirstSet
  *     Returns the index (starting at 1 for 0x01) of the first
  *     1-bit in given value, or ZERO(0) if the given value is ZERO(0).
@@ -34,24 +34,24 @@
  *     >> assert(!x || !(x & ((1 << (ffs(x)-1))-1))); // Less significant bits are clear */
 #define FFS(i) __hybrid_ffs(i)
 
-/* unsigned int CLZ(unsigned Integer i):
+/* unsigned int CLZ(UNSIGNED i):
  *     CountLeadingZeroes
  *     Return  the number of  leading ZEROes in `i',  starting at the most
  *     significant bit. When `i' is ZERO(0), then the result is undefined. */
 #define CLZ(i) __hybrid_clz(i)
 
-/* unsigned int CTZ(unsigned Integer i):
+/* unsigned int CTZ(UNSIGNED i):
  *     CounTrailingZeroes
  *     Return the number of trailing ZEROes in `i', starting at the  least
  *     significant bit. When `i' is ZERO(0), then the result is undefined. */
 #define CTZ(i) __hybrid_ctz(i)
 
-/* unsigned int POPCOUNT(unsigned Integer i):
+/* unsigned int POPCOUNT(UNSIGNED i):
  *     POPulationCOUNT
  *     Return the number of 1-bits in `i' */
 #define POPCOUNT(i) __hybrid_popcount(i)
 
-/* unsigned int PARITY(unsigned Integer i):
+/* unsigned int PARITY(UNSIGNED i):
  *     Return the parity of `i', that is `POPCOUNT(i) % 2' */
 #define PARITY(i) __hybrid_parity(i)
 

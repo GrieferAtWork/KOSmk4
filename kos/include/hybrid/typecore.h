@@ -48,6 +48,12 @@
 #ifndef __SIZEOF_INT__
 #ifdef __sizeof_int
 #define __SIZEOF_INT__ __sizeof_int
+#elif defined(__pdp11_int)
+#if (__pdp11_int + 0) == 16
+#define __SIZEOF_INT__ 2
+#else /* __pdp11_int == 16 */
+#define __SIZEOF_INT__ 4
+#endif /* __pdp11_int != 16 */
 #elif (defined(_ILP64) || defined(__ILP64__) || \
        defined(_SILP64) || defined(__SILP64__))
 #define __SIZEOF_INT__ 8
@@ -62,8 +68,9 @@
 #elif (defined(_LP32) || defined(__LP32__) || defined(_ILP32) || \
        defined(__ILP32__) || defined(_SILP32) || defined(__SILP32__))
 #define __SIZEOF_LONG__ 4
-#elif (defined(_LP64) || defined(__LP64__) || defined(_ILP64) || \
-       defined(__ILP64__) || defined(_SILP64) || defined(__SILP64__))
+#elif (defined(_LP64) || defined(__LP64__) || defined(_ILP64) ||        \
+       defined(__ILP64__) || defined(_SILP64) || defined(__SILP64__) || \
+       defined(__LONG64))
 #define __SIZEOF_LONG__ 8
 #elif defined(_LLP64) || defined(__LLP64__)
 #define __SIZEOF_LONG__ 4
@@ -305,12 +312,14 @@
 #define __SIZEOF_POINTER__ 8
 #else /* ... */
 #include "host.h"
-#if (defined(__x86_64__) || defined(__aarch64__) ||  \
-     defined(__alpha__) || defined(__ia64__) ||      \
-     defined(__sparc64__) || defined(__sparcv9__) || \
-     defined(__s390x__) ||  defined(__powerpc64__))
+#if (defined(__x86_64__) || defined(__aarch64__) ||   \
+     defined(__alpha__) || defined(__ia64__) ||       \
+     defined(__sparc64__) || defined(__sparc_v9__) || \
+     defined(__s390x__) ||  defined(__powerpc64__) || \
+     defined(__arch64__) || defined(_WIN64) ||        \
+     defined(__mips64))
 #define __SIZEOF_POINTER__ 8
-#elif defined(__i386__) || defined(__arm__)
+#elif defined(__i386__) || defined(__arm__) || defined(__CYGWIN32__)
 #define __SIZEOF_POINTER__ 4
 #elif defined(__SIZEOF_SIZE_T__)
 #define __SIZEOF_POINTER__ __SIZEOF_SIZE_T__
@@ -666,14 +675,14 @@
 #endif
 #endif /* __WINT_MAX__ */
 #ifndef __SIZEOF_WINT_T__
-#if defined(__CYGWIN__) || defined(__CYGWIN32__) || \
-    defined(__MINGW32__) || defined(WIN32) || defined(_WIN32) || \
-    defined(WIN64) || defined(_WIN64)
+#if (defined(__CYGWIN__) || defined(__CYGWIN32__) || \
+     defined(__MINGW32__) || defined(WIN32) || defined(_WIN32) || \
+     defined(WIN64) || defined(_WIN64))
 #define __SIZEOF_WINT_T__ 2
 #define __WINT_UNSIGNED__ 1
-#else
+#else /* ... */
 #define __SIZEOF_WINT_T__ __SIZEOF_INT__
-#endif
+#endif /* !... */
 #endif /* !__SIZEOF_WINT_T__ */
 #endif /* !__SIZEOF_WINT_T__ */
 #else /* !__SIZEOF_WINT_T__ */
