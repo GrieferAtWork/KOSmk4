@@ -384,11 +384,11 @@ NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
 					break;
 				if (self->cr_cu.cu_ranges.r_ranges_offset != (uintptr_t)-1)
 					cfientry_bind_debug_ranges(self);
-				error = debuginfo_ranges_contains(&self->cr_cu.cu_ranges, &self->ce_parser,
-				                                  self->cr_cu.cu_ranges.r_startpc,
-				                                  self->ce_modrelpc,
-				                                  self->ce_sections.ds_debug_ranges_start,
-				                                  self->ce_sections.ds_debug_ranges_end);
+				error = libdi_debuginfo_ranges_contains(&self->cr_cu.cu_ranges, &self->ce_parser,
+				                                        self->cr_cu.cu_ranges.r_startpc,
+				                                        self->ce_modrelpc,
+				                                        self->ce_sections.ds_debug_ranges_start,
+				                                        self->ce_sections.ds_debug_ranges_end);
 				if (error != DEBUG_INFO_ERROR_SUCCESS)
 					ERROR(err_function_not_found);
 				break;
@@ -418,11 +418,11 @@ NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
 				/* Check if this might be the function we're looking for. */
 				if (ranges.r_ranges_offset != (uintptr_t)-1)
 					cfientry_bind_debug_ranges(self);
-				error = debuginfo_ranges_contains(&ranges, &self->ce_parser,
-				                                  ranges.r_startpc,
-				                                  self->ce_modrelpc,
-				                                  self->ce_sections.ds_debug_ranges_start,
-				                                  self->ce_sections.ds_debug_ranges_end);
+				error = libdi_debuginfo_ranges_contains(&ranges, &self->ce_parser,
+				                                        ranges.r_startpc,
+				                                        self->ce_modrelpc,
+				                                        self->ce_sections.ds_debug_ranges_start,
+				                                        self->ce_sections.ds_debug_ranges_end);
 				if (error == DEBUG_INFO_ERROR_SUCCESS) {
 					size_t sp_element_depth;
 					/* Found the relevant containing function! */

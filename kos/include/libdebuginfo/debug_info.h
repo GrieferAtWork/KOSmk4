@@ -377,7 +377,7 @@ typedef struct {
 } di_debuginfo_ranges_iterator_t;
 
 /* Initialize an iterator for enumerating ranges stored within a given debug_info range selector.
- * >> __uintptr_t start_pc,end_pc;
+ * >> uintptr_t start_pc, end_pc;
  * >> di_debuginfo_ranges_iterator_t iter;
  * >> di_debuginfo_ranges_iterator_init(&iter, ...);
  * >> while (di_debuginfo_ranges_iterator_next(&iter, &start_pc, &end_pc)) {
@@ -385,170 +385,62 @@ typedef struct {
  * >> }
  * @param: debug_ranges_start: Starting address of the `.debug_ranges' section.
  * @param: debug_ranges_end:   End address of the `.debug_ranges' section. */
-__LOCAL __ATTR_NONNULL((1, 2, 3, 5, 6)) void
+typedef __ATTR_NONNULL((1, 2, 3, 5, 6)) void
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_ITERATOR_INIT)(di_debuginfo_ranges_iterator_t *__restrict self,
+                                                                     di_debuginfo_ranges_t const *__restrict ranges,
+                                                                     di_debuginfo_cu_parser_t const *__restrict parser,
+                                                                     __uintptr_t cu_base,
+                                                                     __byte_t const *__restrict debug_ranges_start,
+                                                                     __byte_t const *__restrict debug_ranges_end);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 5, 6)) void
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_iterator_init)(di_debuginfo_ranges_iterator_t *__restrict self,
                                                               di_debuginfo_ranges_t const *__restrict ranges,
                                                               di_debuginfo_cu_parser_t const *__restrict parser,
                                                               __uintptr_t cu_base,
                                                               __byte_t const *__restrict debug_ranges_start,
-                                                              __byte_t const *__restrict debug_ranges_end) {
-	/* TODO: Make this one an external in-library function! */
-	self->ri_ranges   = ranges;
-	self->ri_addrsize = parser->dup_addrsize;
-	self->ri_initbase = ranges->r_startpc != (__uintptr_t)-1 ? ranges->r_startpc : cu_base;
-	if (DEBUGINFO_RANGES_ISSINGLERANGE(ranges)) {
-		self->ri_pos = self->ri_end = (__byte_t const *)-1;
-	} else if (ranges->r_ranges_offset >= (__size_t)(debug_ranges_end - debug_ranges_start)) {
-		self->ri_pos = self->ri_end = __NULLPTR;
-	} else {
-		self->ri_pos = debug_ranges_start + ranges->r_ranges_offset;
-		self->ri_end = debug_ranges_end;
-	}
-}
+                                                              __byte_t const *__restrict debug_ranges_end);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Yield the next range accessible through a given debug-ranges iterator. */
-__LOCAL __ATTR_NONNULL((1, 2, 3)) __BOOL
+typedef __ATTR_NONNULL((1, 2, 3)) __BOOL
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_ITERATOR_NEXT)(di_debuginfo_ranges_iterator_t *__restrict self,
+                                                                     __uintptr_t *__restrict pmodule_relative_start_pc,
+                                                                     __uintptr_t *__restrict pmodule_relative_end_pc);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) __BOOL
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_iterator_next)(di_debuginfo_ranges_iterator_t *__restrict self,
                                                               __uintptr_t *__restrict pmodule_relative_start_pc,
-                                                              __uintptr_t *__restrict pmodule_relative_end_pc) {
-	/* TODO: Make this one an external in-library function! */
-	__uintptr_t range_start, range_end;
-again:
-	if (self->ri_pos >= self->ri_end) {
-		if (self->ri_end == (__byte_t const *)-1) {
-			*pmodule_relative_start_pc = self->ri_ranges->r_startpc;
-			*pmodule_relative_end_pc   = self->ri_ranges->r_endpc;
-			self->ri_end = __NULLPTR;
-			return 1;
-		}
-		return 0;
-	}
-	switch (self->ri_addrsize) {
-	case 1:
-		range_start   = *(__uint8_t const *)self->ri_pos;
-		self->ri_pos += 1;
-		range_end     = *(__uint8_t const *)self->ri_pos;
-		self->ri_pos += 1;
-		break;
-	case 2:
-		range_start   = __hybrid_unaligned_get16((__uint16_t const *)self->ri_pos);
-		self->ri_pos += 2;
-		range_end     = __hybrid_unaligned_get16((__uint16_t const *)self->ri_pos);
-		self->ri_pos += 2;
-		break;
-	case 4:
-		range_start   = __hybrid_unaligned_get32((__uint32_t const *)self->ri_pos);
-		self->ri_pos += 4;
-		range_end     = __hybrid_unaligned_get32((__uint32_t const *)self->ri_pos);
-		self->ri_pos += 4;
-		break;
-#if __SIZEOF_POINTER__ > 4
-	case 8:
-		range_start   = __hybrid_unaligned_get64((__uint64_t const *)self->ri_pos);
-		self->ri_pos += 8;
-		range_end     = __hybrid_unaligned_get64((__uint64_t const *)self->ri_pos);
-		self->ri_pos += 8;
-		break;
-#endif
-	default: __builtin_unreachable();
-	}
-	if (range_start == (__uintptr_t)-1) {
-		/* Base address selection entry! */
-		self->ri_initbase = range_end;
-		goto again;
-	} else if (!range_start && !range_end) {
-		/* Range list end entry. */
-		self->ri_pos = self->ri_end;
-		return 0;
-	} else {
-		range_start += self->ri_initbase;
-		range_end   += self->ri_initbase;
-	}
-	*pmodule_relative_start_pc = range_start;
-	*pmodule_relative_end_pc   = range_end;
-	return 1;
-}
-
-
+                                                              __uintptr_t *__restrict pmodule_relative_end_pc);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Check if a given `module_relative_pc' is apart of the given range selector.
  * @param: self: The ranges object to query for `module_relative_pc' */
-__LOCAL __ATTR_NONNULL((1, 2, 5, 6)) unsigned int
+typedef __ATTR_NONNULL((1, 2, 5, 6)) unsigned int
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_CONTAINS)(di_debuginfo_ranges_t const *__restrict self,
+                                                                di_debuginfo_cu_parser_t const *__restrict parser,
+                                                                __uintptr_t cu_base,
+                                                                __uintptr_t module_relative_pc,
+                                                                __byte_t const *__restrict debug_ranges_start,
+                                                                __byte_t const *__restrict debug_ranges_end);
+typedef __ATTR_NONNULL((1, 2, 5, 6, 7, 8)) unsigned int
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_CONTAINS_EX)(di_debuginfo_ranges_t const *__restrict self,
+                                                                   di_debuginfo_cu_parser_t const *__restrict parser,
+                                                                   __uintptr_t cu_base,
+                                                                   __uintptr_t module_relative_pc,
+                                                                   __byte_t const *__restrict debug_ranges_start,
+                                                                   __byte_t const *__restrict debug_ranges_end,
+                                                                   __uintptr_t *__restrict poverlap_start,
+                                                                   __uintptr_t *__restrict poverlap_end);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5, 6)) unsigned int
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains)(di_debuginfo_ranges_t const *__restrict self,
                                                          di_debuginfo_cu_parser_t const *__restrict parser,
                                                          __uintptr_t cu_base,
                                                          __uintptr_t module_relative_pc,
                                                          __byte_t const *__restrict debug_ranges_start,
-                                                         __byte_t const *__restrict debug_ranges_end) {
-	/* TODO: Make this one an external in-library function! */
-	__byte_t const *iter;
-	if (DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
-		return (module_relative_pc >= self->r_startpc &&
-		        module_relative_pc < self->r_endpc)
-		       ? DEBUG_INFO_ERROR_SUCCESS
-		       : DEBUG_INFO_ERROR_NOFRAME;
-	}
-	if __unlikely(self->r_ranges_offset >= (__size_t)(debug_ranges_end - debug_ranges_start))
-		return DEBUG_INFO_ERROR_CORRUPT;
-	if (self->r_startpc != (__uintptr_t)-1)
-		cu_base = self->r_startpc;
-	iter = debug_ranges_start + self->r_ranges_offset;
-	while (iter < debug_ranges_end) {
-		__uintptr_t range_start,range_end;
-		switch (parser->dup_addrsize) {
-
-		case 1:
-			range_start = *(__uint8_t const *)iter;
-			iter       += 1;
-			range_end   = *(__uint8_t const *)iter;
-			iter       += 1;
-			break;
-
-		case 2:
-			range_start = __hybrid_unaligned_get16((__uint16_t const *)iter);
-			iter       += 2;
-			range_end   = __hybrid_unaligned_get16((__uint16_t const *)iter);
-			iter       += 2;
-			break;
-
-		case 4:
-			range_start = __hybrid_unaligned_get32((__uint32_t const *)iter);
-			iter       += 4;
-			range_end   = __hybrid_unaligned_get32((__uint32_t const *)iter);
-			iter       += 4;
-			break;
-
-#if __SIZEOF_POINTER__ > 4
-		case 8:
-			range_start = __hybrid_unaligned_get64((__uint64_t const *)iter);
-			iter       += 8;
-			range_end   = __hybrid_unaligned_get64((__uint64_t const *)iter);
-			iter       += 8;
-			break;
-#endif /* __SIZEOF_POINTER__ > 4 */
-
-		default:
-			__builtin_unreachable();
-		}
-		if (range_start == (__uintptr_t)-1) {
-			/* Base address selection entry! */
-			cu_base = range_end;
-			continue;
-		} else if (!range_start && !range_end) {
-			/* Range list end entry. */
-			break;
-		} else {
-			range_start += cu_base;
-			range_end   += cu_base;
-		}
-		if (module_relative_pc >= range_start &&
-		    module_relative_pc < range_end)
-			return DEBUG_INFO_ERROR_SUCCESS;
-	}
-	return DEBUG_INFO_ERROR_NOFRAME;
-}
-
-__LOCAL __ATTR_NONNULL((1, 2, 5, 6, 7, 8)) unsigned int
+                                                         __byte_t const *__restrict debug_ranges_end);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5, 6, 7, 8)) unsigned int
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains_ex)(di_debuginfo_ranges_t const *__restrict self,
                                                             di_debuginfo_cu_parser_t const *__restrict parser,
                                                             __uintptr_t cu_base,
@@ -556,82 +448,8 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains_ex)(di_debuginfo_ranges_
                                                             __byte_t const *__restrict debug_ranges_start,
                                                             __byte_t const *__restrict debug_ranges_end,
                                                             __uintptr_t *__restrict poverlap_start,
-                                                            __uintptr_t *__restrict poverlap_end) {
-	/* TODO: Make this one an external in-library function! */
-	__byte_t const *iter;
-	__COMPILER_IGNORE_UNINITIALIZED(*poverlap_start);
-	__COMPILER_IGNORE_UNINITIALIZED(*poverlap_end);
-	if (DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
-		if (module_relative_pc < self->r_startpc ||
-		    module_relative_pc >= self->r_endpc)
-			return DEBUG_INFO_ERROR_NOFRAME;
-		*poverlap_start = self->r_startpc;
-		*poverlap_end   = self->r_endpc;
-		return DEBUG_INFO_ERROR_SUCCESS;
-	}
-	if __unlikely(self->r_ranges_offset >= (__size_t)(debug_ranges_end - debug_ranges_start))
-		return DEBUG_INFO_ERROR_CORRUPT;
-	if (self->r_startpc != (__uintptr_t)-1)
-		cu_base = self->r_startpc;
-	iter = debug_ranges_start + self->r_ranges_offset;
-	while (iter < debug_ranges_end) {
-		__uintptr_t range_start,range_end;
-		switch (parser->dup_addrsize) {
-
-		case 1:
-			range_start = *(__uint8_t const *)iter;
-			iter       += 1;
-			range_end   = *(__uint8_t const *)iter;
-			iter       += 1;
-			break;
-
-		case 2:
-			range_start = __hybrid_unaligned_get16((__uint16_t const *)iter);
-			iter       += 2;
-			range_end   = __hybrid_unaligned_get16((__uint16_t const *)iter);
-			iter       += 2;
-			break;
-
-		case 4:
-			range_start = __hybrid_unaligned_get32((__uint32_t const *)iter);
-			iter       += 4;
-			range_end   = __hybrid_unaligned_get32((__uint32_t const *)iter);
-			iter       += 4;
-			break;
-
-#if __SIZEOF_POINTER__ > 4
-		case 8:
-			range_start = __hybrid_unaligned_get64((__uint64_t const *)iter);
-			iter       += 8;
-			range_end   = __hybrid_unaligned_get64((__uint64_t const *)iter);
-			iter       += 8;
-			break;
-#endif /* __SIZEOF_POINTER__ > 4 */
-
-		default:
-			__builtin_unreachable();
-		}
-		if (range_start == (__uintptr_t)-1) {
-			/* Base address selection entry! */
-			cu_base = range_end;
-			continue;
-		} else if (!range_start && !range_end) {
-			/* Range list end entry. */
-			break;
-		} else {
-			range_start += cu_base;
-			range_end   += cu_base;
-		}
-		if (module_relative_pc >= range_start &&
-		    module_relative_pc < range_end) {
-			*poverlap_start = range_start;
-			*poverlap_end   = range_end;
-			return DEBUG_INFO_ERROR_SUCCESS;
-		}
-	}
-	return DEBUG_INFO_ERROR_NOFRAME;
-}
-
+                                                            __uintptr_t *__restrict poverlap_end);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
 

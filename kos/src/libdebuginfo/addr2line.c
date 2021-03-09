@@ -208,11 +208,11 @@ again:
 		if (!libdi_debuginfo_cu_parser_loadattr_compile_unit(self, &cu))
 			goto err_corrupt;
 		if (!assume_correct_cu) {
-			error = debuginfo_ranges_contains(&cu.cu_ranges, self,
-			                                  cu.cu_ranges.r_startpc,
-			                                  module_relative_pc,
-			                                  sections->ds_debug_ranges_start,
-			                                  sections->ds_debug_ranges_end);
+			error = libdi_debuginfo_ranges_contains(&cu.cu_ranges, self,
+			                                        cu.cu_ranges.r_startpc,
+			                                        module_relative_pc,
+			                                        sections->ds_debug_ranges_start,
+			                                        sections->ds_debug_ranges_end);
 			if (error == DEBUG_INFO_ERROR_NOFRAME)
 				goto next_root;
 		}
@@ -239,13 +239,13 @@ again_cu_component:
 				subprogram_depth = self->dup_child_depth;
 
 				/* Check if the given pointer is apart of this sub-program. */
-				error = debuginfo_ranges_contains_ex(&sp.sp_ranges, self,
-				                                     cu.cu_ranges.r_startpc,
-				                                     module_relative_pc,
-				                                     sections->ds_debug_ranges_start,
-				                                     sections->ds_debug_ranges_end,
-				                                     &result->al_symstart,
-				                                     &result->al_symend);
+				error = libdi_debuginfo_ranges_contains_ex(&sp.sp_ranges, self,
+				                                           cu.cu_ranges.r_startpc,
+				                                           module_relative_pc,
+				                                           sections->ds_debug_ranges_start,
+				                                           sections->ds_debug_ranges_end,
+				                                           &result->al_symstart,
+				                                           &result->al_symend);
 				if (error != DEBUG_INFO_ERROR_SUCCESS) {
 					/* Must be apart of a different sub-program. */
 					for (;;) {
@@ -356,13 +356,13 @@ fill_result_sp_any_cu:
 						if (!libdi_debuginfo_cu_parser_loadattr_inlined_subroutine(self, &is))
 							break;
 						/* Check if our PC is apart of the inline-function's body. */
-						error = debuginfo_ranges_contains_ex(&is.is_ranges, self,
-						                                     cu.cu_ranges.r_startpc,
-						                                     module_relative_pc,
-						                                     sections->ds_debug_ranges_start,
-						                                     sections->ds_debug_ranges_end,
-						                                     &innermost_inline_symstart,
-						                                     &innermost_inline_symend);
+						error = libdi_debuginfo_ranges_contains_ex(&is.is_ranges, self,
+						                                           cu.cu_ranges.r_startpc,
+						                                           module_relative_pc,
+						                                           sections->ds_debug_ranges_start,
+						                                           sections->ds_debug_ranges_end,
+						                                           &innermost_inline_symstart,
+						                                           &innermost_inline_symend);
 						if (error == DEBUG_INFO_ERROR_SUCCESS) {
 							innermost_is_subprogram = is.is_subprogram;
 							++inline_recursion; /* Yet, it is! (this inline function makes up one of the known levels!) */
@@ -404,11 +404,11 @@ fill_result_sp_any_cu:
 				}
 				/* Request for source information about an inline function call-site.
 				 * For  this,   we  must   gather  information   from  2   locations:
-				 *   The  addr2line  file/line/col  information   must  be  taken  from   the
-				 *   first inline function encountered after `(inline_recursion - level) - 1'
-				 *   others  have  been skipped,  where it  is  specified through  the inline
+				 * - The addr2line file/line/col information must be taken from the first
+				 *   inline function  encountered after  `(inline_recursion - level) - 1'
+				 *   others have been skipped, where  it is specified through the  inline
 				 *   call-site-location attributes.
-				 *   The addr2line name/decl information must be taken from the
+				 * - The addr2line name/decl information must be taken from the
 				 *   first inline function encountered after `(inline_recursion - level) - 2'
 				 *   others have been skipped, where it  is available through the SP  pointed
 				 *   to  by the information. - However, when `level == inline_recursion - 1',
@@ -435,13 +435,13 @@ fill_result_sp_any_cu:
 						if (!libdi_debuginfo_cu_parser_loadattr_inlined_subroutine(self, &is))
 							break;
 						/* Check if our PC is apart of the inline-function's body. */
-						error = debuginfo_ranges_contains_ex(&is.is_ranges, self,
-						                                     cu.cu_ranges.r_startpc,
-						                                     module_relative_pc,
-						                                     sections->ds_debug_ranges_start,
-						                                     sections->ds_debug_ranges_end,
-						                                     &result->al_linestart,
-						                                     &result->al_lineend);
+						error = libdi_debuginfo_ranges_contains_ex(&is.is_ranges, self,
+						                                           cu.cu_ranges.r_startpc,
+						                                           module_relative_pc,
+						                                           sections->ds_debug_ranges_start,
+						                                           sections->ds_debug_ranges_end,
+						                                           &result->al_linestart,
+						                                           &result->al_lineend);
 						if (error == DEBUG_INFO_ERROR_SUCCESS) {
 							/* This is one of ours */
 							if (inline_recursion == 1) {
