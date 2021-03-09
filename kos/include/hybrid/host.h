@@ -329,13 +329,24 @@
 #endif /* _ALIGNMENT_REQUIRED == 0 */
 #endif /* ... */
 
+#undef __ARCH_STACK_GROWS_UPWARDS
 #undef __ARCH_STACK_GROWS_DOWNWARDS
 #if defined(__i386__) || defined(__x86_64__)
 #define __ARCH_STACK_GROWS_DOWNWARDS 1
 #elif defined(__arm__)
 #define __ARCH_STACK_GROWS_DOWNWARDS 1
 #else /* ... */
+#if !defined(__KOS_SYSTEM_HEADERS__) && __has_include(<sys/isa_defs.h>)
+#include <sys/isa_defs.h>
+#if defined(_STACK_GROWS_DOWNWARD) && !defined(_STACK_GROWS_UPWARD)
 #define __ARCH_STACK_GROWS_DOWNWARDS 1
+#elif !defined(_STACK_GROWS_DOWNWARD) && defined(_STACK_GROWS_UPWARD)
+#define __ARCH_STACK_GROWS_UPWARDS 1
+#endif /* !_STACK_GROWS_DOWNWARD */
+#endif /* ... */
+#if !defined(__ARCH_STACK_GROWS_DOWNWARDS) && !defined(__ARCH_STACK_GROWS_UPWARDS)
+#define __ARCH_STACK_GROWS_DOWNWARDS 1 /* Default assumption... */
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS && !__ARCH_STACK_GROWS_UPWARDS */
 #endif /* !... */
 
 /* The native PAGE size of the hosting arch (if known to be  constant)

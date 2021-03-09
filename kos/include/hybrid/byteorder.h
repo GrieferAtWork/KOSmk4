@@ -66,8 +66,40 @@
        defined(__XTENSA_EL__))
 #define __BYTE_ORDER__ 1234
 #else /* ... */
-#ifndef __NO_has_include
-#endif /* !__NO_has_include */
+#if !defined(__NO_has_include) && !defined(__KOS_SYSTEM_HEADERS__)
+#if __has_include(<endian.h>)
+#include <endian.h>
+#elif __has_include(<sys/endian.h>)
+#include <sys/endian.h>
+#elif __has_include(<machine/endian.h>)
+#include <machine/endian.h>
+#elif __has_include(<machine/_endian.h>)
+#include <machine/_endian.h>
+#endif /* ... */
+#ifndef __BYTE_ORDER__
+#ifdef __BYTE_ORDER
+#define __BYTE_ORDER__ __BYTE_ORDER
+#elif defined(_BYTE_ORDER)
+#define __BYTE_ORDER__ _BYTE_ORDER
+#elif defined(BYTE_ORDER)
+#define __BYTE_ORDER__ BYTE_ORDER
+#else /* ... */
+#if __has_include(<sys/isa_defs.h>)
+#include <sys/isa_defs.h>
+#endif /* __has_include(<sys/isa_defs.h>) */
+#if defined(_LITTLE_ENDIAN) && !defined(_BIG_ENDIAN) && !defined(_PDB_ENDIAN)
+#define __BYTE_ORDER__ 1234
+#elif !defined(_LITTLE_ENDIAN) && defined(_BIG_ENDIAN) && !defined(_PDB_ENDIAN)
+#define __BYTE_ORDER__ 4321
+#elif !defined(_LITTLE_ENDIAN) && !defined(_BIG_ENDIAN) && defined(_PDB_ENDIAN)
+#define __BYTE_ORDER__ 3412
+#endif /* ... */
+#ifndef __BYTE_ORDER__
+/* Can't figure out w/ system headers. -> Try to figure out from CPU macros... */
+#endif /* !__BYTE_ORDER__ */
+#endif /* !... */
+#endif /* !__BYTE_ORDER__ */
+#endif /* !__NO_has_include && !__KOS_SYSTEM_HEADERS__ */
 
 /* Fallback: Figure out based on host defines */
 #ifndef __BYTE_ORDER__
