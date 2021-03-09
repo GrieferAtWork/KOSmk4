@@ -22,11 +22,11 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
+#include <hybrid/byteorder.h>
 
-#include <bits/types.h>
 #include <bits/crt/inttypes.h>
+#include <bits/types.h>
 
 #define __OFFSET_GUID_A 0
 #define __OFFSET_GUID_B 4

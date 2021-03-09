@@ -24,7 +24,7 @@
 
 #include <__stdinc.h>
 #include <_ansi.h>
-#include <hybrid/__byteorder.h> /* __BYTE_ORDER__, __ORDER_..._ENDIAN__ */
+#include <hybrid/byteorder.h> /* __BYTE_ORDER__, __ORDER_..._ENDIAN__ */
 
 #ifdef _SYS_ISA_DEFS_H
 #ifndef __NO_WARNINGS

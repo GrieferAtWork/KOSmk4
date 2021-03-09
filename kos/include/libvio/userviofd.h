@@ -24,7 +24,7 @@
 
 #include <features.h>
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/int128.h>
 #include <hybrid/typecore.h>
 

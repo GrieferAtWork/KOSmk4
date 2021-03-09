@@ -35,7 +35,7 @@
 #endif /* !ELF_ARCH_CLASS */
 
 #ifndef ELF_ARCH_DATA
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define ELF_ARCH_DATA ELFDATA2LSB
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__

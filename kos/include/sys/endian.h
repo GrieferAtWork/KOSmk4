@@ -23,9 +23,9 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
 #include <machine/endian.h>

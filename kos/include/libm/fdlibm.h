@@ -22,7 +22,7 @@
 
 #include <__crt.h>
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>

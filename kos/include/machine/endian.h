@@ -25,8 +25,8 @@
 
 #include <features.h>
 
-#include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
+#include <hybrid/byteorder.h>
 
 #include <machine/_endian.h>
 #include <sys/_types.h>

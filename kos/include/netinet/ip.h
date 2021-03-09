@@ -46,7 +46,7 @@
 
 #include <features.h>
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 
 #include <bits/types.h>
 #include <net/bits/types.h>

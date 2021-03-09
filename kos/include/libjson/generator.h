@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <__crt.h> /* __NO_FPU */
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
 #include "api.h"

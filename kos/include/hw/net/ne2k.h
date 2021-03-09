@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 
 #include <bits/types.h>
 

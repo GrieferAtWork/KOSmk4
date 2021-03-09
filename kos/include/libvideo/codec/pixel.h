@@ -22,7 +22,7 @@
 
 #include "api.h"
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 
 #include <bits/types.h>
 #include <kos/ioctl/video.h>

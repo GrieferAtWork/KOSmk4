@@ -40,9 +40,9 @@
 
 #include <libvio/api.h> /* LIBVIO_CONFIG_ENABLED */
 
-#if __SIZEOF_POS_T__ > __SIZEOF_POINTER__
-#include <hybrid/__byteorder.h>
-#endif /* __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
+#if defined(__WANT_MPART_INIT) && __SIZEOF_POS_T__ > __SIZEOF_POINTER__
+#include <hybrid/byteorder.h>
+#endif /* __WANT_MPART_INIT && __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
 
 /* Possible values that an mpart block-status can take. */
 #define MPART_BLOCK_ST_NDEF 0 /* Contents of backing memory are undefined. */

@@ -990,7 +990,7 @@ void const *____intellisense_reqcptr(void const *);
 #endif /* !__cplusplus */
 
 
-#include "__byteorder.h"
+#include "byteorder.h"
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __hybrid_unaligned_getle(ptr)      __hybrid_unaligned_get(ptr)
 #define __hybrid_unaligned_setle(ptr, v)   __hybrid_unaligned_set(ptr, v)

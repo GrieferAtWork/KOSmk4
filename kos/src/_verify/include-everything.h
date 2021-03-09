@@ -486,7 +486,6 @@ incdir("");
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/__bit.h>
-#include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__debug-alignment.h>
 #include <hybrid/__minmax.h>

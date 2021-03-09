@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c09e536 */
+/* HASH CRC-32:0x26d8119c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 
 #include <features.h>
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/typecore.h>

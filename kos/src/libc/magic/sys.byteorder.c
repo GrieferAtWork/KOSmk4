@@ -28,7 +28,7 @@
 )]%{
 
 }%[insert:prefix(
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 )]%[insert:prefix(
 #include <hybrid/__byteswap.h>
 )]%[insert:prefix(

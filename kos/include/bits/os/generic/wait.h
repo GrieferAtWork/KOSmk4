@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 
 #ifdef __CC__
 __DECL_BEGIN

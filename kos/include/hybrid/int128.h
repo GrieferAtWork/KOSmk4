@@ -319,7 +319,7 @@
 #endif /* __cplusplus && WANT_INT128_CXX_INTEGRATION */
 
 #include "__overflow.h"
-#include "__byteorder.h"
+#include "byteorder.h"
 
 #undef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 #if defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8

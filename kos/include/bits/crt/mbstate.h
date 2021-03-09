@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <hybrid/__byteorder.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
 __SYSDECL_BEGIN
