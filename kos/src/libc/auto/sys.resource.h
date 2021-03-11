@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73b70fc6 */
+/* HASH CRC-32:0x892e48c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,13 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrlimit)(__rlimit_resource_t
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_setrlimit)(__rlimit_resource_t resource, struct rlimit const *rlimits);
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrusage)(__rusage_who_t who, struct rusage *usage);
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrusage64)(__rusage_who_t who, struct rusage64 *usage);
+/* >> getpriority(2), setpriority(2)
+ * @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+ * @param: who:   An ID in the namespace indicated by `which' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_getpriority)(__priority_which_t which, id_t who);
+/* >> getpriority(2), setpriority(2)
+ * @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+ * @param: who:   An ID in the namespace indicated by `which' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setpriority)(__priority_which_t which, id_t who, int prio);
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrlimit64)(__rlimit_resource_t resource, struct rlimit64 *rlimits);
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_setrlimit64)(__rlimit_resource_t resource, struct rlimit64 const *rlimits);

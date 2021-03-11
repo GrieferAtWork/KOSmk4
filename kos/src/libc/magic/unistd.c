@@ -1865,7 +1865,7 @@ void setusershell();
 
 @@>> daemon(3)
 [[cp, section(".text.crt{|.dos}.system.utility")]]
-[[decl_include("<features.h>")]]
+[[guard, decl_include("<features.h>")]]
 int daemon(__STDC_INT_AS_UINT_T nochdir,
            __STDC_INT_AS_UINT_T noclose);
 

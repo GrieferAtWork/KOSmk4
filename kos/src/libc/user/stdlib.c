@@ -2162,11 +2162,56 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 }
 /*[[[end:libc_freezero]]]*/
 
+/*[[[head:libc_devname_r,hash:CRC-32=0x4bcc89ac]]]*/
+/* >> devname(3), devname_r(3) */
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((3)) int
+NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev,
+                                     mode_t type,
+                                     char *buf,
+                                     size_t len)
+/*[[[body:libc_devname_r]]]*/
+/*AUTO*/{
+	(void)dev;
+	(void)type;
+	(void)buf;
+	(void)len;
+	CRT_UNIMPLEMENTEDF("devname_r(%" PRIxN(__SIZEOF_DEV_T__) ", %" PRIxN(__SIZEOF_MODE_T__) ", %q, %Ix)", dev, type, buf, len); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_devname_r]]]*/
+
+/*[[[head:libd_setproctitle,hash:CRC-32=0x1f9f6c1a]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) void
+NOTHROW_NCX(VLIBDCALL libd_setproctitle)(const char *format,
+                                         ...)
+/*[[[body:libd_setproctitle]]]*/
+/*AUTO*/{
+	(void)format;
+	CRT_UNIMPLEMENTED("setproctitle"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_setproctitle]]]*/
+
+/*[[[head:libc_setproctitle,hash:CRC-32=0x973df151]]]*/
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) void
+NOTHROW_NCX(VLIBCCALL libc_setproctitle)(const char *format,
+                                         ...)
+/*[[[body:libc_setproctitle]]]*/
+/*AUTO*/{
+	(void)format;
+	CRT_UNIMPLEMENTED("setproctitle"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+/*[[[end:libc_setproctitle]]]*/
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0x39f33ea4]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x11de7e81]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2218,14 +2263,19 @@ DEFINE_PUBLIC_ALIAS(setenv, libc_setenv);
 DEFINE_PUBLIC_ALIAS(unsetenv, libc_unsetenv);
 DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
 DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
+DEFINE_PUBLIC_ALIAS(ptsname_r, libc_ptsname_r);
 DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
-DEFINE_PUBLIC_ALIAS(ptsname_r, libc_ptsname_r);
 DEFINE_PUBLIC_ALIAS(getpt, libc_getpt);
 DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);
 DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
 DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
 DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);
+DEFINE_PUBLIC_ALIAS(devname_r, libc_devname_r);
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$setproctitle, libd_setproctitle);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(setproctitle, libc_setproctitle);
 DEFINE_PUBLIC_ALIAS(DOS$_get_errno, libd__get_errno);
 DEFINE_PUBLIC_ALIAS(_get_errno, libc__get_errno);
 DEFINE_PUBLIC_ALIAS(DOS$_set_errno, libd__set_errno);

@@ -223,7 +223,7 @@ void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes
 	return memdup(ptr, n_bytes);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>"), export_alias("reallocarr")]]
 [[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl]]
 [[impl_include("<hybrid/__overflow.h>"), requires_function(realloc)]]

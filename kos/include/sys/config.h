@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0e8a11b */
+/* HASH CRC-32:0x127c6561 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,9 +127,9 @@
 #if defined(__KOS_SYSTEM_HEADERS__) || __has_include(<fnmatch.h>)
 #define HAVE_FNMATCH_H 1
 #endif /* __KOS_SYSTEM_HEADERS__ || __has_include(<fnmatch.h>) */
-#if __has_include(<ftw.h>)
-#define HAVE_FTW_H 1 /* TODO: Planned __KOS_SYSTEM_HEADERS__-header */
-#endif /* __has_include(<ftw.h>) */
+#if defined(__KOS_SYSTEM_HEADERS__) || __has_include(<ftw.h>)
+#define HAVE_FTW_H 1
+#endif /* __KOS_SYSTEM_HEADERS__ || __has_include(<ftw.h>) */
 #if defined(__KOS_SYSTEM_HEADERS__) || __has_include(<glob.h>)
 #define HAVE_GLOB_H 1
 #endif /* __KOS_SYSTEM_HEADERS__ || __has_include(<glob.h>) */
@@ -300,9 +300,11 @@
 #endif /* (__CRT_HAVE__chsize && !__USE_FILE_OFFSET64) || (__CRT_HAVE_chsize && !__USE_FILE_OFFSET64) || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate */
 
 #undef HAVE_FTW
-//TODO:}%[insert:pp_if($has_function(ftw))]%{
-//TODO:#define HAVE_FTW 1
-//TODO:}%[insert:pp_endif]%{
+#include <bits/os/stat.h>
+#include <features.h>
+#if (defined(__CRT_HAVE_ftw) && defined(__STAT32_MATCHES_STAT64)) || (defined(__CRT_HAVE_ftw64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_ftw) && !defined(__USE_FILE_OFFSET64))
+#define HAVE_FTW 1
+#endif /* (__CRT_HAVE_ftw && __STAT32_MATCHES_STAT64) || (__CRT_HAVE_ftw64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_ftw && !__USE_FILE_OFFSET64) */
 
 #undef HAVE_GETCWD
 #if defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
@@ -323,7 +325,6 @@
 #endif /* __CRT_HAVE_gethostname */
 
 #undef HAVE_GETMNTENT
-#include <features.h>
 #if defined(__CRT_HAVE_getmntent) || defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
 #define HAVE_GETMNTENT 1
 #endif /* __CRT_HAVE_getmntent || __CRT_HAVE_getmntent_r || __CRT_HAVE___getmntent_r || __CRT_HAVE_fgets || __CRT_HAVE_fgets_unlocked || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked)) */

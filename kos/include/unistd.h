@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ff66006 */
+/* HASH CRC-32:0x94d9ed05 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1974,8 +1974,11 @@ __CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getusershell,(void),())
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endusershell,(void),())
 /* >> setusershell(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setusershell,(void),())
+#if !defined(__daemon_defined) && defined(__CRT_HAVE_daemon)
+#define __daemon_defined 1
 /* >> daemon(3) */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
+__CDECLARE(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
+#endif /* !__daemon_defined && __CRT_HAVE_daemon */
 /* >> revoke(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,revoke,(char const *__file),(__file))
 #if !defined(__acct_defined) && defined(__CRT_HAVE_acct)

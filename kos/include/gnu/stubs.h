@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8812544 */
+/* HASH CRC-32:0xba987ecd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,6 +128,7 @@
 #define __stub_cosh
 #define __stub_crypt
 #define __stub_crypt_r
+#define __stub_devname_r
 #define __stub_drand48
 #define __stub_drand48_r
 #define __stub___duplocale
@@ -444,6 +445,7 @@
 #define __stub_setlogmask
 #define __stub_setnetent
 #define __stub_setnetgrent
+#define __stub_setproctitle
 #define __stub_setprotoent
 #define __stub_setrlimit64
 #define __stub_setrpcent
@@ -533,6 +535,7 @@
 #define __stub_DOS$open_wmemstream
 #ifndef __LIBCCALL_IS_LIBDCALL
 #define __stub_DOS$semctl
+#define __stub_DOS$setproctitle
 #define __stub_DOS$strfmon
 #define __stub_DOS$__strfmon_l
 #define __stub_DOS$strfmon_l

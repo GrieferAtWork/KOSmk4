@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc9eb8e */
+/* HASH CRC-32:0x98c4f5b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -752,6 +752,8 @@
 #define __CRT_HAVE_DOS$daemon
 #define __CRT_HAVE_DOS$delay
 #define __CRT_HAVE_DOS$detach
+#define __CRT_HAVE_DOS$devname
+#define __CRT_HAVE_DOS$devname_r
 #define __CRT_HAVE_DOS$difftime
 #define __CRT_HAVE_DOS$difftime64
 #define __CRT_HAVE_DOS$dirfd
@@ -2249,6 +2251,8 @@
 #define __CRT_HAVE_DOS$setns
 #define __CRT_HAVE_DOS$setpgid
 #define __CRT_HAVE_DOS$setpriority
+#define __CRT_HAVE_DOS$setproctitle
+#define __CRT_HAVE_DOS$setprogname
 #define __CRT_HAVE_DOS$setprotoent
 #define __CRT_HAVE_DOS$setregid
 #define __CRT_HAVE_DOS$setresgid
@@ -3706,6 +3710,8 @@
 #define __CRT_HAVE_daemon
 #define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
+#define __CRT_HAVE_devname
+#define __CRT_HAVE_devname_r
 #define __CRT_HAVE_difftime
 #define __CRT_HAVE_difftime64
 #define __CRT_HAVE_dirfd
@@ -4267,6 +4273,7 @@
 #define __CRT_HAVE_getpmsg
 #define __CRT_HAVE_getppid
 #define __CRT_HAVE_getpriority
+#define __CRT_HAVE_getprogname
 #define __CRT_HAVE_getprotobyname
 #define __CRT_HAVE_getprotobyname_r
 #define __CRT_HAVE_getprotobynumber
@@ -5325,6 +5332,8 @@
 #define __CRT_HAVE_setpgid
 #define __CRT_HAVE_setpgrp
 #define __CRT_HAVE_setpriority
+#define __CRT_HAVE_setproctitle
+#define __CRT_HAVE_setprogname
 #define __CRT_HAVE_setprotoent
 #define __CRT_HAVE_setpwent
 #define __CRT_HAVE_setregid

@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xfdecd5f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,54 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%(c_prefix){
-/* (#) Portability: libbsd (/include/bsd/stdlib.h) */
+#ifndef __local_devname_defined
+#define __local_devname_defined 1
+#include <__crt.h>
+#ifdef __CRT_HAVE_devname_r
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: devname_r from stdlib */
+#ifndef __local___localdep_devname_r_defined
+#define __local___localdep_devname_r_defined 1
+/* >> devname(3), devname_r(3) */
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_devname_r,(__dev_t __dev, __mode_t __type, char *__buf, __SIZE_TYPE__ __len),devname_r,(__dev,__type,__buf,__len))
+#endif /* !__local___localdep_devname_r_defined */
+/* >> devname(3), devname_r(3) */
+__LOCAL_LIBC(devname) __ATTR_CONST char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(devname))(__dev_t __dev, __mode_t __type) {
+	static char __buf[64];
+	return __localdep_devname_r(__dev, __type, __buf, sizeof(__buf)) ? __NULLPTR : __buf;
 }
-
-%[insert:prefix(
-#include <stdlib.h>
-)]%[insert:prefix(
-#include <features.h>
-)]%[insert:prefix(
-#include <bits/types.h>
-)]%[insert:prefix(
-#include <sys/stat.h>
-)]%[insert:prefix(
-#include <stdint.h>
-)]%{
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-}
-
-//TODO:%[insert:extern(arc4random)]
-//TODO:%[insert:extern(arc4random_stir)]
-//TODO:%[insert:extern(arc4random_addrandom)]
-//TODO:%[insert:extern(arc4random_buf)]
-//TODO:%[insert:extern(arc4random_uniform)]
-
-//TODO:%[insert:extern(dehumanize_number)]
-
-%[insert:extern(getprogname)]
-%[insert:extern(setprogname)]
-
-//TODO:%[insert:extern(heapsort)]
-//TODO:%[insert:extern(mergesort)]
-//TODO:%[insert:extern(radixsort)]
-//TODO:%[insert:extern(sradixsort)]
-
-%[insert:extern(reallocf)]
-%[insert:extern(reallocarray)]
-%[insert:extern(recallocarray)]
-%[insert:extern(freezero)]
-
-//TODO:%[insert:extern(strtonum)]
-//TODO:%[insert:extern(getbsize)]
-
-%{
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_devname_defined
+#define __local___localdep_devname_defined 1
+#define __localdep_devname __LIBC_LOCAL_NAME(devname)
+#endif /* !__local___localdep_devname_defined */
+#else /* __CRT_HAVE_devname_r */
+#undef __local_devname_defined
+#endif /* !__CRT_HAVE_devname_r */
+#endif /* !__local_devname_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32364ad */
+/* HASH CRC-32:0x1314ef14 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1553,6 +1553,23 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 	}
 	return result;
 }
+/* >> devname(3), devname_r(3) */
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST char *
+NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
+                                   mode_t type) {
+	static char buf[64];
+	return libc_devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
+}
+/* >> getprogname(3), setprogname(3) */
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_getprogname)(void) {
+	return __LOCAL_program_invocation_short_name;
+}
+/* >> getprogname(3), setprogname(3) */
+INTERN ATTR_SECTION(".text.crt.bsd") void
+NOTHROW_NCX(LIBCCALL libc_setprogname)(char const *name) {
+	__LOCAL_program_invocation_short_name_p = (char *)name;
+}
 #include <libc/local/program_invocation_name.h>
 /* Alias for argv[0], as passed to main() */
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
@@ -1575,6 +1592,7 @@ NOTHROW_NCX(LIBKCALL libc__get_wpgmptr)(char32_t **pvalue) {
 	*pvalue = *libc___p__wpgmptr();
 	return EOK;
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__abs64, libc_abs);
 #elif __SIZEOF_LONG_LONG__ == 8
@@ -3602,8 +3620,10 @@ DEFINE_PUBLIC_ALIAS(qsort, libc_qsort);
 DEFINE_PUBLIC_ALIAS(bsearch, libc_bsearch);
 DEFINE_PUBLIC_ALIAS(labs, libc_labs);
 DEFINE_PUBLIC_ALIAS(llabs, libc_llabs);
+DEFINE_PUBLIC_ALIAS(qabs, libc_llabs);
 DEFINE_PUBLIC_ALIAS(ldiv, libc_ldiv);
 DEFINE_PUBLIC_ALIAS(lldiv, libc_lldiv);
+DEFINE_PUBLIC_ALIAS(qdiv, libc_lldiv);
 DEFINE_PUBLIC_ALIAS(abs, libc_abs);
 DEFINE_PUBLIC_ALIAS(div, libc_div);
 DEFINE_PUBLIC_ALIAS(mblen, libc_mblen);
@@ -3628,10 +3648,10 @@ DEFINE_PUBLIC_ALIAS(atol, libc_atol);
 DEFINE_PUBLIC_ALIAS(atoll, libc_atoll);
 DEFINE_PUBLIC_ALIAS(strtoul, libc_strtoul);
 DEFINE_PUBLIC_ALIAS(strtol, libc_strtol);
-DEFINE_PUBLIC_ALIAS(strtouq, libc_strtoull);
 DEFINE_PUBLIC_ALIAS(strtoull, libc_strtoull);
-DEFINE_PUBLIC_ALIAS(strtoq, libc_strtoll);
+DEFINE_PUBLIC_ALIAS(strtouq, libc_strtoull);
 DEFINE_PUBLIC_ALIAS(strtoll, libc_strtoll);
+DEFINE_PUBLIC_ALIAS(strtoq, libc_strtoll);
 DEFINE_PUBLIC_ALIAS(atof, libc_atof);
 DEFINE_PUBLIC_ALIAS(strtod, libc_strtod);
 DEFINE_PUBLIC_ALIAS(strtof, libc_strtof);
@@ -3680,18 +3700,20 @@ DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
 DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
+DEFINE_PUBLIC_ALIAS(strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_ALIAS(_strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_ALIAS(__strtol_l, libc_strtol_l);
-DEFINE_PUBLIC_ALIAS(strtol_l, libc_strtol_l);
+DEFINE_PUBLIC_ALIAS(strtoul_l, libc_strtoul_l);
 DEFINE_PUBLIC_ALIAS(_strtoul_l, libc_strtoul_l);
 DEFINE_PUBLIC_ALIAS(__strtoul_l, libc_strtoul_l);
-DEFINE_PUBLIC_ALIAS(strtoul_l, libc_strtoul_l);
+DEFINE_PUBLIC_ALIAS(strtoll_l, libc_strtoll_l);
 DEFINE_PUBLIC_ALIAS(_strtoll_l, libc_strtoll_l);
 DEFINE_PUBLIC_ALIAS(__strtoll_l, libc_strtoll_l);
-DEFINE_PUBLIC_ALIAS(strtoll_l, libc_strtoll_l);
+DEFINE_PUBLIC_ALIAS(strtoq_l, libc_strtoll_l);
+DEFINE_PUBLIC_ALIAS(strtoull_l, libc_strtoull_l);
 DEFINE_PUBLIC_ALIAS(_strtoull_l, libc_strtoull_l);
 DEFINE_PUBLIC_ALIAS(__strtoull_l, libc_strtoull_l);
-DEFINE_PUBLIC_ALIAS(strtoull_l, libc_strtoull_l);
+DEFINE_PUBLIC_ALIAS(strtouq_l, libc_strtoull_l);
 DEFINE_PUBLIC_ALIAS(_strtod_l, libc_strtod_l);
 DEFINE_PUBLIC_ALIAS(__strtod_l, libc_strtod_l);
 DEFINE_PUBLIC_ALIAS(strtod_l, libc_strtod_l);
@@ -3708,6 +3730,9 @@ DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
+DEFINE_PUBLIC_ALIAS(devname, libc_devname);
+DEFINE_PUBLIC_ALIAS(getprogname, libc_getprogname);
+DEFINE_PUBLIC_ALIAS(setprogname, libc_setprogname);
 DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
 DEFINE_PUBLIC_ALIAS(__p__pgmptr, libc___p__pgmptr);
 DEFINE_PUBLIC_ALIAS(_get_pgmptr, libc__get_pgmptr);

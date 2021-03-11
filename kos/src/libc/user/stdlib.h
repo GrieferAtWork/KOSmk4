@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4a30253 */
+/* HASH CRC-32:0x3beaf08e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,10 +118,10 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags);
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated with the master descriptor `FD' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
@@ -136,6 +136,14 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_N
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr, size_t num_bytes);
+/* >> devname(3), devname_r(3) */
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBDCALL libd_setproctitle)(const char *format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBCCALL libc_setproctitle)(const char *format, ...);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_errno)(errno_t err);

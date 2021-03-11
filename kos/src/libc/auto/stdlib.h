@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1871310 */
+/* HASH CRC-32:0x55cd4460 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -470,6 +470,9 @@ INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
+INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_strtol_l)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -513,9 +516,6 @@ INTDEF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname);
-/* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `FD' */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename);
@@ -611,6 +611,30 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fdwalk)(__fdwalk_func_t func, 
  * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func, void *cookie);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> devname(3), devname_r(3) */
+INTDEF ATTR_CONST char *NOTHROW_NCX(LIBDCALL libd_devname)(dev_t dev, mode_t type);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> devname(3), devname_r(3) */
+INTDEF ATTR_CONST char *NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev, mode_t type);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> devname(3), devname_r(3) */
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getprogname(3), setprogname(3) */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getprogname)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> getprogname(3), setprogname(3) */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_setprogname)(char const *name);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getprogname(3), setprogname(3) */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_setprogname)(char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_doserrno)(u32 err);

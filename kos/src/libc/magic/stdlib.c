@@ -235,6 +235,23 @@ typedef void (__LIBCCALL *__atexit_func_t)(void);
 
 }
 
+%[define_crt_name_list(CNL_llabs       = ["llabs", "qabs"])]
+%[define_crt_name_list(CNL_lldiv       = ["lldiv", "qdiv"])]
+%[define_crt_name_list(CNL_strtol      = ["strtol"])]
+%[define_crt_name_list(CNL_strtoul     = ["strtoul"])]
+%[define_crt_name_list(CNL_strtoll     = ["strtoll", "strtoq"])]
+%[define_crt_name_list(CNL_strtoull    = ["strtoull", "strtouq"])]
+%[define_crt_name_list(CNL_strtoimax   = ["strtoimax"])]
+%[define_crt_name_list(CNL_strtoumax   = ["strtoumax"])]
+%[define_crt_name_list(CNL_strtol_l    = ["strtol_l", "_strtol_l", "__strtol_l"])]
+%[define_crt_name_list(CNL_strtoul_l   = ["strtoul_l", "_strtoul_l", "__strtoul_l"])]
+%[define_crt_name_list(CNL_strtoll_l   = ["strtoll_l", "_strtoll_l", "__strtoll_l", "strtoq_l"])]
+%[define_crt_name_list(CNL_strtoull_l  = ["strtoull_l", "_strtoull_l", "__strtoull_l", "strtouq_l"])]
+%[define_crt_name_list(CNL_strtoimax_l = ["strtoimax_l", "_strtoimax_l", "__strtoimax_l"])]
+%[define_crt_name_list(CNL_strtoumax_l = ["strtoumax_l", "_strtoumax_l", "__strtoumax_l"])]
+
+
+
 %#ifdef __USE_GNU
 %{
 #ifndef __compar_d_fn_t_defined
@@ -431,7 +448,7 @@ void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_
 
 [[ATTR_CONST, wunused, nothrow, std, crtbuiltin]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, abs)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_llabs...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxabs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_abs64")]]
 long labs(long x) {
@@ -440,6 +457,7 @@ long labs(long x) {
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
 [[ATTR_CONST, wunused, nothrow, std, crtbuiltin]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_llabs...)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, "abs")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "labs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxabs")]]
@@ -507,7 +525,7 @@ __LONGLONG llabs(__LONGLONG x) {
 
 [[ATTR_CONST, wunused, std]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, div)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("lldiv")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_lldiv...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxdiv")]]
 $ldiv_t ldiv(long numer, long denom) {
 	ldiv_t result;
@@ -518,6 +536,7 @@ $ldiv_t ldiv(long numer, long denom) {
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
 [[ATTR_CONST, wunused, std]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_lldiv...)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, div)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, ldiv)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("imaxdiv")]]
@@ -531,7 +550,7 @@ $lldiv_t lldiv(__LONGLONG numer, __LONGLONG denom) {
 
 [[ATTR_CONST, wunused, nothrow, std, crtbuiltin]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("labs")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("llabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(CNL_llabs...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias("imaxabs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_abs64")]]
 int abs(int x) {
@@ -540,7 +559,7 @@ int abs(int x) {
 
 [[ATTR_CONST, wunused, std]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ldiv")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("lldiv")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(CNL_lldiv...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias("imaxdiv")]]
 struct __div_struct div(int numer, int denom) {
 	div_t result;
@@ -819,11 +838,12 @@ __LONGLONG atoll([[nonnull]] char const *__restrict nptr) {
 
 [[std, ATTR_LEAF]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoul...)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, strtou32)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, strtou64)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoull", "strtouq")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_strtoui64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_strtoull...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                    alias("_strtoui64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__),  alias(CNL_strtoumax...)]]
 unsigned long strtoul([[nonnull]] char const *__restrict nptr,
                       [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 @@pp_if __SIZEOF_LONG__ <= 4@@
@@ -834,12 +854,13 @@ unsigned long strtoul([[nonnull]] char const *__restrict nptr,
 }
 
 [[std, ATTR_LEAF]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtol...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, strto32)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, strto64)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoll", "strtoq")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_strtoi64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_strtoll...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                    alias("_strtoi64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__),  alias(CNL_strtoimax...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strto32)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strto64)]]
 long strtol([[nonnull]] char const *__restrict nptr,
@@ -853,13 +874,14 @@ long strtol([[nonnull]] char const *__restrict nptr,
 
 %(std)#ifdef __ULONGLONG
 %(std)#ifdef __USE_ISOC99
-[[std, guard, ATTR_LEAF, export_alias("strtouq")]]
+[[std, guard, ATTR_LEAF]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoull...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strtou64)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strtou32)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtoul")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_strtoui64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_strtoul...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                   alias("_strtoui64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_strtoumax...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strtou64)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strtou32)]]
 __ULONGLONG strtoull([[nonnull]] char const *__restrict nptr,
@@ -871,13 +893,14 @@ __ULONGLONG strtoull([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[std, guard, ATTR_LEAF, export_alias("strtoq")]]
+[[std, guard, ATTR_LEAF]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoll...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strto64)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strto32)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtol")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_strtoi64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_strtol...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                   alias("_strtoi64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_strtoimax...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strto64)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strto32)]]
 __LONGLONG strtoll([[nonnull]] char const *__restrict nptr,
@@ -1032,9 +1055,9 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 
 %#ifdef __USE_KOS
 [[kernel, ATTR_LEAF]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strtoul")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtoull", "strtouq")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtoul...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoull...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoumax...)]]
 [[decl_include("<features.h>")]]
 $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
@@ -1084,9 +1107,9 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 
 [[kernel, ATTR_LEAF]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strtol")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtoll", "strtoq")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtol...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoll...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoimax...)]]
 $int32_t strto32([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 	u32 result;
@@ -1104,9 +1127,9 @@ $int32_t strto32([[nonnull]] char const *__restrict nptr,
 
 %#ifdef __UINT64_TYPE__
 [[kernel, ATTR_LEAF, alias("_strtoui64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtoul")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strtoull", "strtouq")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strtoumax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtoul...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoull...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoumax...)]]
 [[if(!defined(__KERNEL__)), export_as("_strtoui64")]]
 [[decl_include("<features.h>")]]
 $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
@@ -1157,9 +1180,9 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 
 [[kernel, ATTR_LEAF, alias("_strtoi64")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtol")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strtoll", "strtoq")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strtoimax")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtol...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoll...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoimax...)]]
 [[if(!defined(__KERNEL__)), export_as("_strtoi64")]]
 $int64_t strto64([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
@@ -1180,9 +1203,9 @@ $int64_t strto64([[nonnull]] char const *__restrict nptr,
 %
 %#ifdef __USE_XOPEN2K8
 [[ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strtoul_l", "_strtoul_l", "__strtoul_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtoull_l", "_strtoull_l", "__strtoull_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtoumax_l", "_strtoumax_l", "__strtoumax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtoul_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoull_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoumax_l...)]]
 $uint32_t strtou32_l([[nonnull]] char const *__restrict nptr,
                      [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
 	(void)locale;
@@ -1191,9 +1214,9 @@ $uint32_t strtou32_l([[nonnull]] char const *__restrict nptr,
 
 [[ATTR_LEAF]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strtol_l", "_strtol_l", "__strtol_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtoll_l", "_strtoll_l", "__strtoll_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtoimax_l", "_strtoimax_l", "__strtoimax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtol_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoll_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoimax_l...)]]
 $int32_t strto32_l([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
 	(void)locale;
@@ -1203,9 +1226,9 @@ $int32_t strto32_l([[nonnull]] char const *__restrict nptr,
 %#ifdef __UINT64_TYPE__
 [[ATTR_LEAF, export_alias("_strtoui64_l")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtoul_l", "_strtoul_l", "__strtoul_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strtoull_l", "_strtoull_l", "__strtoull_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strtoumax_l", "_strtoumax_l", "__strtoumax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtoul_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoull_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoumax_l...)]]
 $uint64_t strtou64_l([[nonnull]] char const *__restrict nptr,
                      [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
 	(void)locale;
@@ -1214,9 +1237,9 @@ $uint64_t strtou64_l([[nonnull]] char const *__restrict nptr,
 
 [[ATTR_LEAF, export_alias("_strtoi64_l")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtol_l", "_strtol_l", "__strtol_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strtoll_l", "_strtoll_l", "__strtoll_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strtoimax_l", "_strtoimax_l", "__strtoimax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtol_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoll_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoimax_l...)]]
 $int64_t strto64_l([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
 	(void)locale;
@@ -1883,13 +1906,20 @@ $fd_t posix_openpt($oflag_t oflags);
 %#endif /* __USE_XOPEN2KXSI */
 
 
+%#if defined(__USE_GNU) || defined(__USE_NETBSD)
+@@Returns the name of the PTY slave (Pseudo TTY slave)
+@@associated with the master descriptor `FD'
+[[section(".text.crt{|.dos}.io.tty"), decl_include("<bits/types.h>")]]
+int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
+%#endif /* __USE_GNU || __USE_NETBSD */
+
 %#ifdef __USE_GNU
 %[default:section(".text.crt{|.dos}.unicode.static.convert")]
-[[export_alias("_strtol_l", "__strtol_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoll_l", "_strtoll_l", "__strtoll_l")]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtol_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_strtoll_l...)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, strto32_l)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, strto64_l)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoimax_l", "_strtoimax_l", "__strtoimax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_strtoimax_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strto32_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strto64_l)]]
 [[decl_include("<features.h>")]]
@@ -1900,11 +1930,11 @@ long strtol_l([[nonnull]] char const *__restrict nptr,
 	return strtol(nptr, endptr, base);
 }
 
-[[export_alias("_strtoul_l", "__strtoul_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoull_l", "_strtoll_l", "__strtoll_l")]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoul_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_strtoull_l...)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, strtou32_l)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, strtou64_l)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoumax_l", "_strtoumax_l", "__strtoumax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_strtoumax_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strtou32_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strtou64_l)]]
 [[decl_include("<features.h>")]]
@@ -1916,11 +1946,11 @@ unsigned long strtoul_l([[nonnull]] char const *__restrict nptr,
 }
 
 %#ifdef __LONGLONG
-[[export_alias("_strtoll_l", "__strtoll_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtol_l", "_strtol_l", "__strtol_l")]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoll_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(CNL_strtol_l...)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strto64_l)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strto32_l)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoimax_l", "_strtoimax_l", "__strtoimax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_strtoimax_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(strto64_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strto32_l)]]
 [[decl_include("<features.h>")]]
@@ -1931,11 +1961,11 @@ __LONGLONG strtoll_l([[nonnull]] char const *__restrict nptr,
 	return strtoll(nptr, endptr, base);
 }
 
-[[export_as("_strtoull_l", "__strtoull_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtoul_l", "_strtoul_l")]]
+[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoull_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(CNL_strtoul_l...)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strtou64_l)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strtou32_l)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoumax_l", "_strtoumax_l", "__strtoumax_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_strtoumax_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(strtou64_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strtou32_l)]]
 [[decl_include("<features.h>")]]
@@ -1979,11 +2009,6 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 [[export_alias("__secure_getenv"), alias("getenv")]]
 [[if($extended_include_prefix("<libc/local/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
 char *secure_getenv([[nonnull]] char const *varname);
-
-@@Returns the name of the PTY slave (Pseudo TTY slave)
-@@associated with the master descriptor `FD'
-[[section(".text.crt{|.dos}.io.tty"), decl_include("<bits/types.h>")]]
-int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
 
 [[cp]]
 int getpt();
@@ -2529,8 +2554,97 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 //TODO: char *getpassphrase(const char *);
 //TODO: char *lltostr(long long, char *);
 //TODO: char *ulltostr(unsigned long long, char *);
-
 %#endif /* __USE_SOLARIS */
+
+
+%
+%#ifdef __USE_NETBSD
+%[default:section(".text.crt{|.dos}.bsd")]
+
+//TODO:int heapsort(void *, size_t, size_t, int (*)(const void *, const void *));
+//TODO:int mergesort(void *, size_t, size_t, int (*)(const void *, const void *));
+//TODO:int radixsort(const unsigned char **, int, const unsigned char *, unsigned);
+//TODO:int sradixsort(const unsigned char **, int, const unsigned char *, unsigned);
+
+//TODO:uint32_t arc4random(void);
+//TODO:void arc4random_stir(void);
+//TODO:void arc4random_buf(void *, size_t);
+//TODO:uint32_t arc4random_uniform(uint32_t);
+//TODO:void arc4random_addrandom(unsigned char *, int);
+
+//TODO:char *cgetcap(char *, const char *, int);
+//TODO:int cgetclose(void);
+//TODO:int cgetent(char **, const char *const *, const char *);
+//TODO:int cgetfirst(char **, const char *const *);
+//TODO:int cgetmatch(const char *, const char *);
+//TODO:int cgetnext(char **, const char *const *);
+//TODO:int cgetnum(char *, const char *, long *);
+//TODO:int cgetset(const char *);
+//TODO:int cgetstr(char *, const char *, char **);
+//TODO:int cgetustr(char *, const char *, char **);
+//TODO:void csetexpandtc(int);
+
+//TODO:char *getbsize(int *headerlenp, long *blocksizep);
+
+@@>> devname(3), devname_r(3)
+[[const, alias("__devname50"), requires_function(devname_r)]]
+char *devname(dev_t dev, mode_t type) {
+	static char buf[64];
+	return devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
+}
+
+[[doc_alias(devname)]]
+int devname_r(dev_t dev, mode_t type, [[outp(len)]] char *buf, size_t len);
+
+
+//TODO:#define HN_DECIMAL      0x01
+//TODO:#define HN_NOSPACE      0x02
+//TODO:#define HN_B            0x04
+//TODO:#define HN_DIVISOR_1000 0x08
+//TODO:#define HN_GETSCALE     0x10
+//TODO:#define HN_AUTOSCALE    0x20
+//TODO:int humanize_number(char *, size_t, int64_t, const char *, int, int);
+//TODO:int dehumanize_number(const char *, int64_t *);
+
+//TODO:ssize_t hmac(const char *, const void *, size_t, const void *, size_t, void *, size_t);
+//TODO:devmajor_t getdevmajor(const char *, mode_t);
+//TODO:int getenv_r(const char *, char *, size_t);
+//TODO:void mi_vector_hash(const void *__restrict, size_t, uint32_t, uint32_t[3]);
+
+[[ATTR_LIBC_PRINTF(1, 2)]]
+void setproctitle(const char *format, ...);
+
+@@>> getprogname(3), setprogname(3)
+[[guard, wunused, const]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_program_invocation_short_name))]]
+char const *getprogname(void) {
+	return __LOCAL_program_invocation_short_name;
+}
+
+[[guard, doc_alias("getprogname")]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_program_invocation_short_name_p))]]
+void setprogname(char const *name) {
+	__LOCAL_program_invocation_short_name_p = (char *)name;
+}
+
+//TODO:long long strsuftoll(const char *, const char *, long long, long long);
+//TODO:long long strsuftollx(const char *, const char *, long long, long long, char *, size_t);
+//TODO:int l64a_r(long, char *, int);
+//TODO:size_t shquote(const char *, char *, size_t);
+//TODO:size_t shquotev(int, char *const *, char *, size_t);
+
+%[insert:extern(daemon)]
+%[insert:function(reallocarr = reallocarray)]
+%#ifdef __ULONGLONG
+%typedef struct __lldiv_struct qdiv_t;
+%[insert:function(qabs = llabs)]
+%[insert:function(qdiv = lldiv)]
+%[insert:function(strtoq_l = strtoll_l)]
+%[insert:function(strtouq_l = strtoull_l)]
+%#endif /* __ULONGLONG */
+%#endif /* __USE_NETBSD */
 
 
 %{
@@ -2939,8 +3053,10 @@ unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);
 %#else /* _MSC_VER && __LIBCCALL_IS_LIBDCALL */
 %[default:section(".text.crt.dos.math.utility")]
 [[ATTR_CONST, wunused, nothrow]]
-[[alt_variant_of(__SIZEOF_INT__ == 8, abs)]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, llabs)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), crt_intern_kos_alias("libc_abs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), crt_intern_kos_alias("libc_llabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("abs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_llabs...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("imaxabs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), bind_local_function(abs)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(llabs)]]

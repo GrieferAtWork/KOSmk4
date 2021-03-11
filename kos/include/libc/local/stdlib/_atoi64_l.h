@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e545bb7 */
+/* HASH CRC-32:0x9ea4bd19 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,6 +73,12 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoll_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_strtoq_l) && __SIZEOF_LONG_LONG__ == 8
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtoq_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtoimax_l) && __SIZEOF_INTMAX_T__ == 8
 __NAMESPACE_LOCAL_END
 #include <features.h>

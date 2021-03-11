@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1164bfce */
+/* HASH CRC-32:0xbf68ae65 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -423,7 +423,13 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __w
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, struct rusage64 *__usage),getrusage,(__who,__usage))
 #endif /* ... */
 #endif /* __USE_TIME_BITS64 */
+/* >> getpriority(2), setpriority(2)
+ * @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+ * @param: who:   An ID in the namespace indicated by `which' */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,getpriority,(__priority_which_t __which, id_t __who),(__which,__who))
+/* >> getpriority(2), setpriority(2)
+ * @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+ * @param: who:   An ID in the namespace indicated by `which' */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setpriority,(__priority_which_t __which, id_t __who, int __prio),(__which,__who,__prio))
 
 #ifdef __USE_LARGEFILE64

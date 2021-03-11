@@ -1446,6 +1446,8 @@
 #define __CRT_HAVE_daylight
 #define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
+#define __CRT_HAVE_devname
+#define __CRT_HAVE_devname_r
 #define __CRT_HAVE_difftime
 #define __CRT_HAVE_difftime64
 #define __CRT_HAVE_dirfd
@@ -2039,6 +2041,7 @@
 #define __CRT_HAVE_getpmsg
 #define __CRT_HAVE_getppid
 #define __CRT_HAVE_getpriority
+#define __CRT_HAVE_getprogname
 #define __CRT_HAVE_getprotobyname
 #define __CRT_HAVE_getprotobyname_r
 #define __CRT_HAVE_getprotobynumber
@@ -2865,6 +2868,8 @@
 #define __CRT_HAVE_pwriteall64
 #define __CRT_HAVE_pwritev
 #define __CRT_HAVE_pwritev64
+#define __CRT_HAVE_qabs
+#define __CRT_HAVE_qdiv
 #define __CRT_HAVE_qecvt
 #define __CRT_HAVE_qecvt_r
 #define __CRT_HAVE_qfcvt
@@ -2935,6 +2940,7 @@
 #define __CRT_HAVE_readv
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place
+#define __CRT_HAVE_reallocarr
 #define __CRT_HAVE_reallocarray
 #define __CRT_HAVE_reallocf
 #define __CRT_HAVE_realpath
@@ -3078,6 +3084,8 @@
 #define __CRT_HAVE_setpgid
 #define __CRT_HAVE_setpgrp
 #define __CRT_HAVE_setpriority
+#define __CRT_HAVE_setproctitle
+#define __CRT_HAVE_setprogname
 #define __CRT_HAVE_setprotoent
 #define __CRT_HAVE_setpwent
 #define __CRT_HAVE_setregid
@@ -3310,6 +3318,7 @@
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtoq
+#define __CRT_HAVE_strtoq_l
 #define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
@@ -3322,6 +3331,7 @@
 #define __CRT_HAVE_strtoumax
 #define __CRT_HAVE_strtoumax_l
 #define __CRT_HAVE_strtouq
+#define __CRT_HAVE_strtouq_l
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
 #define __CRT_HAVE_strverscmp
@@ -5853,6 +5863,8 @@
 #define __CRT_HAVE_KOS$daemon
 #define __CRT_HAVE_KOS$delay
 #define __CRT_HAVE_KOS$detach
+#define __CRT_HAVE_KOS$devname
+#define __CRT_HAVE_KOS$devname_r
 #define __CRT_HAVE_KOS$difftime
 #define __CRT_HAVE_KOS$difftime64
 #define __CRT_HAVE_KOS$dirfd
@@ -7130,6 +7142,8 @@
 #define __CRT_HAVE_KOS$pwriteall64
 #define __CRT_HAVE_KOS$pwritev
 #define __CRT_HAVE_KOS$pwritev64
+#define __CRT_HAVE_KOS$qabs
+#define __CRT_HAVE_KOS$qdiv
 #define __CRT_HAVE_KOS$qecvt
 #define __CRT_HAVE_KOS$qecvt_r
 #define __CRT_HAVE_KOS$qfcvt
@@ -7197,6 +7211,7 @@
 #define __CRT_HAVE_KOS$readv
 #define __CRT_HAVE_KOS$realloc
 #define __CRT_HAVE_KOS$realloc_in_place
+#define __CRT_HAVE_KOS$reallocarr
 #define __CRT_HAVE_KOS$reallocarray
 #define __CRT_HAVE_KOS$reallocf
 #define __CRT_HAVE_KOS$realpath
@@ -7329,6 +7344,8 @@
 #define __CRT_HAVE_KOS$setns
 #define __CRT_HAVE_KOS$setpgid
 #define __CRT_HAVE_KOS$setpriority
+#define __CRT_HAVE_KOS$setproctitle
+#define __CRT_HAVE_KOS$setprogname
 #define __CRT_HAVE_KOS$setprotoent
 #define __CRT_HAVE_KOS$setregid
 #define __CRT_HAVE_KOS$setresgid
@@ -7546,6 +7563,7 @@
 #define __CRT_HAVE_KOS$strtoll
 #define __CRT_HAVE_KOS$strtoll_l
 #define __CRT_HAVE_KOS$strtoq
+#define __CRT_HAVE_KOS$strtoq_l
 #define __CRT_HAVE_KOS$strtosigno
 #define __CRT_HAVE_KOS$strtou32
 #define __CRT_HAVE_KOS$strtou32_l
@@ -7558,6 +7576,7 @@
 #define __CRT_HAVE_KOS$strtoumax
 #define __CRT_HAVE_KOS$strtoumax_l
 #define __CRT_HAVE_KOS$strtouq
+#define __CRT_HAVE_KOS$strtouq_l
 #define __CRT_HAVE_KOS$strupr
 #define __CRT_HAVE_KOS$strupr_l
 #define __CRT_HAVE_KOS$strverscmp
@@ -9272,6 +9291,8 @@
 #define __CRT_HAVE_DOS$daemon
 #define __CRT_HAVE_DOS$delay
 #define __CRT_HAVE_DOS$detach
+#define __CRT_HAVE_DOS$devname
+#define __CRT_HAVE_DOS$devname_r
 #define __CRT_HAVE_DOS$difftime
 #define __CRT_HAVE_DOS$difftime64
 #define __CRT_HAVE_DOS$dirfd
@@ -10549,6 +10570,8 @@
 #define __CRT_HAVE_DOS$pwriteall64
 #define __CRT_HAVE_DOS$pwritev
 #define __CRT_HAVE_DOS$pwritev64
+#define __CRT_HAVE_DOS$qabs
+#define __CRT_HAVE_DOS$qdiv
 #define __CRT_HAVE_DOS$qecvt
 #define __CRT_HAVE_DOS$qecvt_r
 #define __CRT_HAVE_DOS$qfcvt
@@ -10616,6 +10639,7 @@
 #define __CRT_HAVE_DOS$readv
 #define __CRT_HAVE_DOS$realloc
 #define __CRT_HAVE_DOS$realloc_in_place
+#define __CRT_HAVE_DOS$reallocarr
 #define __CRT_HAVE_DOS$reallocarray
 #define __CRT_HAVE_DOS$reallocf
 #define __CRT_HAVE_DOS$realpath
@@ -10748,6 +10772,8 @@
 #define __CRT_HAVE_DOS$setns
 #define __CRT_HAVE_DOS$setpgid
 #define __CRT_HAVE_DOS$setpriority
+#define __CRT_HAVE_DOS$setproctitle
+#define __CRT_HAVE_DOS$setprogname
 #define __CRT_HAVE_DOS$setprotoent
 #define __CRT_HAVE_DOS$setregid
 #define __CRT_HAVE_DOS$setresgid
@@ -10965,6 +10991,7 @@
 #define __CRT_HAVE_DOS$strtoll
 #define __CRT_HAVE_DOS$strtoll_l
 #define __CRT_HAVE_DOS$strtoq
+#define __CRT_HAVE_DOS$strtoq_l
 #define __CRT_HAVE_DOS$strtosigno
 #define __CRT_HAVE_DOS$strtou32
 #define __CRT_HAVE_DOS$strtou32_l
@@ -10977,6 +11004,7 @@
 #define __CRT_HAVE_DOS$strtoumax
 #define __CRT_HAVE_DOS$strtoumax_l
 #define __CRT_HAVE_DOS$strtouq
+#define __CRT_HAVE_DOS$strtouq_l
 #define __CRT_HAVE_DOS$strupr
 #define __CRT_HAVE_DOS$strupr_l
 #define __CRT_HAVE_DOS$strverscmp

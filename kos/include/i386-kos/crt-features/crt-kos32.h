@@ -1450,6 +1450,8 @@
 #define __CRT_HAVE_daylight
 #define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
+#define __CRT_HAVE_devname
+#define __CRT_HAVE_devname_r
 #define __CRT_HAVE_difftime
 #define __CRT_HAVE_difftime64
 #define __CRT_HAVE_dirfd
@@ -2043,6 +2045,7 @@
 #define __CRT_HAVE_getpmsg
 #define __CRT_HAVE_getppid
 #define __CRT_HAVE_getpriority
+#define __CRT_HAVE_getprogname
 #define __CRT_HAVE_getprotobyname
 #define __CRT_HAVE_getprotobyname_r
 #define __CRT_HAVE_getprotobynumber
@@ -2869,6 +2872,8 @@
 #define __CRT_HAVE_pwriteall64
 #define __CRT_HAVE_pwritev
 #define __CRT_HAVE_pwritev64
+#define __CRT_HAVE_qabs
+#define __CRT_HAVE_qdiv
 #define __CRT_HAVE_qecvt
 #define __CRT_HAVE_qecvt_r
 #define __CRT_HAVE_qfcvt
@@ -2939,6 +2944,7 @@
 #define __CRT_HAVE_readv
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place
+#define __CRT_HAVE_reallocarr
 #define __CRT_HAVE_reallocarray
 #define __CRT_HAVE_reallocf
 #define __CRT_HAVE_realpath
@@ -3082,6 +3088,8 @@
 #define __CRT_HAVE_setpgid
 #define __CRT_HAVE_setpgrp
 #define __CRT_HAVE_setpriority
+#define __CRT_HAVE_setproctitle
+#define __CRT_HAVE_setprogname
 #define __CRT_HAVE_setprotoent
 #define __CRT_HAVE_setpwent
 #define __CRT_HAVE_setregid
@@ -3314,6 +3322,7 @@
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtoq
+#define __CRT_HAVE_strtoq_l
 #define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
@@ -3326,6 +3335,7 @@
 #define __CRT_HAVE_strtoumax
 #define __CRT_HAVE_strtoumax_l
 #define __CRT_HAVE_strtouq
+#define __CRT_HAVE_strtouq_l
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
 #define __CRT_HAVE_strverscmp

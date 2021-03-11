@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x1ca934f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,54 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%(c_prefix){
-/* (#) Portability: libbsd (/include/bsd/stdlib.h) */
+#ifndef __local_getprogname_defined
+#define __local_getprogname_defined 1
+#include <__crt.h>
+#include <libc/local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_short_name
+__NAMESPACE_LOCAL_BEGIN
+/* >> getprogname(3), setprogname(3) */
+__LOCAL_LIBC(getprogname) __ATTR_CONST __ATTR_WUNUSED char const *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getprogname))(void) {
+	return __LOCAL_program_invocation_short_name;
 }
-
-%[insert:prefix(
-#include <stdlib.h>
-)]%[insert:prefix(
-#include <features.h>
-)]%[insert:prefix(
-#include <bits/types.h>
-)]%[insert:prefix(
-#include <sys/stat.h>
-)]%[insert:prefix(
-#include <stdint.h>
-)]%{
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-}
-
-//TODO:%[insert:extern(arc4random)]
-//TODO:%[insert:extern(arc4random_stir)]
-//TODO:%[insert:extern(arc4random_addrandom)]
-//TODO:%[insert:extern(arc4random_buf)]
-//TODO:%[insert:extern(arc4random_uniform)]
-
-//TODO:%[insert:extern(dehumanize_number)]
-
-%[insert:extern(getprogname)]
-%[insert:extern(setprogname)]
-
-//TODO:%[insert:extern(heapsort)]
-//TODO:%[insert:extern(mergesort)]
-//TODO:%[insert:extern(radixsort)]
-//TODO:%[insert:extern(sradixsort)]
-
-%[insert:extern(reallocf)]
-%[insert:extern(reallocarray)]
-%[insert:extern(recallocarray)]
-%[insert:extern(freezero)]
-
-//TODO:%[insert:extern(strtonum)]
-//TODO:%[insert:extern(getbsize)]
-
-%{
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_getprogname_defined
+#define __local___localdep_getprogname_defined 1
+#define __localdep_getprogname __LIBC_LOCAL_NAME(getprogname)
+#endif /* !__local___localdep_getprogname_defined */
+#else /* __LOCAL_program_invocation_short_name */
+#undef __local_getprogname_defined
+#endif /* !__LOCAL_program_invocation_short_name */
+#endif /* !__local_getprogname_defined */

@@ -442,10 +442,13 @@ int getrusage64(__rusage_who_t who,
                 [[nonnull]] struct rusage64 *usage); /* TODO: Inline implementation using `getrusage()' */
 %#endif /* __USE_TIME_BITS64 */
 
+@@>> getpriority(2), setpriority(2)
+@@@param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+@@@param: who:   An ID in the namespace indicated by `which'
 [[decl_include("<bits/types.h>")]]
 int getpriority(__priority_which_t which, id_t who);
 
-[[decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>"), doc_alias("getpriority")]]
 int setpriority(__priority_which_t which, id_t who, int prio);
 
 %

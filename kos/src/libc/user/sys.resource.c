@@ -169,7 +169,10 @@ NOTHROW_NCX(LIBCCALL libc_getrusage64)(__rusage_who_t who,
 #endif /* MAGIC:alias */
 /*[[[end:libc_getrusage64]]]*/
 
-/*[[[head:libc_getpriority,hash:CRC-32=0x51680cf9]]]*/
+/*[[[head:libc_getpriority,hash:CRC-32=0xff1d3dce]]]*/
+/* >> getpriority(2), setpriority(2)
+ * @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+ * @param: who:   An ID in the namespace indicated by `which' */
 INTERN ATTR_SECTION(".text.crt.sched.resource") int
 NOTHROW_NCX(LIBCCALL libc_getpriority)(__priority_which_t which,
                                        id_t who)
@@ -185,7 +188,10 @@ NOTHROW_NCX(LIBCCALL libc_getpriority)(__priority_which_t which,
 }
 /*[[[end:libc_getpriority]]]*/
 
-/*[[[head:libc_setpriority,hash:CRC-32=0x321495b6]]]*/
+/*[[[head:libc_setpriority,hash:CRC-32=0x1a043b74]]]*/
+/* >> getpriority(2), setpriority(2)
+ * @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
+ * @param: who:   An ID in the namespace indicated by `which' */
 INTERN ATTR_SECTION(".text.crt.sched.resource") int
 NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
                                        id_t who,

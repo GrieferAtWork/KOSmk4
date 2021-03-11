@@ -77,8 +77,6 @@ Functions:
 	- timingsafe_bcmp()
 	- timingsafe_memcmp()
 	- walkcontext()
-	- getprogname()
-	- setprogname()
 
 
 TODO: Implement kernel-support for socketcall(2) with command codes:

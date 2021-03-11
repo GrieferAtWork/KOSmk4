@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b5a6e56 */
+/* HASH CRC-32:0xa305dfe3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,38 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __getprogname_defined
+#define __getprogname_defined 1
+#ifdef __CRT_HAVE_getprogname
+/* >> getprogname(3), setprogname(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
+#else /* __CRT_HAVE_getprogname */
+#include <libc/local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_short_name
+#include <libc/local/stdlib/getprogname.h>
+/* >> getprogname(3), setprogname(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getprogname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getprogname))(); })
+#else /* __LOCAL_program_invocation_short_name */
+#undef __getprogname_defined
+#endif /* !__LOCAL_program_invocation_short_name */
+#endif /* !__CRT_HAVE_getprogname */
+#endif /* !__getprogname_defined */
+#ifndef __setprogname_defined
+#define __setprogname_defined 1
+#ifdef __CRT_HAVE_setprogname
+/* >> getprogname(3), setprogname(3) */
+__CDECLARE_VOID(,__NOTHROW_NCX,setprogname,(char const *__name),(__name))
+#else /* __CRT_HAVE_setprogname */
+#include <libc/local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_short_name_p
+#include <libc/local/stdlib/setprogname.h>
+/* >> getprogname(3), setprogname(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setprogname, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL setprogname)(char const *__name) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setprogname))(__name); })
+#else /* __LOCAL_program_invocation_short_name_p */
+#undef __setprogname_defined
+#endif /* !__LOCAL_program_invocation_short_name_p */
+#endif /* !__CRT_HAVE_setprogname */
+#endif /* !__setprogname_defined */
 #ifndef __reallocf_defined
 #define __reallocf_defined 1
 #ifdef __CRT_HAVE_reallocf
@@ -53,6 +85,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #define __reallocarray_defined 1
 #ifdef __CRT_HAVE_reallocarray
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_reallocarr)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarr,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc)
 #include <libc/local/malloc/reallocarray.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarray)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); })

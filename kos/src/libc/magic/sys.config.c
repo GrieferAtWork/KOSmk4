@@ -120,9 +120,9 @@
 #if defined(__KOS_SYSTEM_HEADERS__) || __has_include(<fnmatch.h>)
 #define HAVE_FNMATCH_H 1
 #endif /* __KOS_SYSTEM_HEADERS__ || __has_include(<fnmatch.h>) */
-#if __has_include(<ftw.h>)
-#define HAVE_FTW_H 1 /* TODO: Planned __KOS_SYSTEM_HEADERS__-header */
-#endif /* __has_include(<ftw.h>) */
+#if defined(__KOS_SYSTEM_HEADERS__) || __has_include(<ftw.h>)
+#define HAVE_FTW_H 1
+#endif /* __KOS_SYSTEM_HEADERS__ || __has_include(<ftw.h>) */
 #if defined(__KOS_SYSTEM_HEADERS__) || __has_include(<glob.h>)
 #define HAVE_GLOB_H 1
 #endif /* __KOS_SYSTEM_HEADERS__ || __has_include(<glob.h>) */
@@ -298,9 +298,9 @@
 }%[insert:pp_endif]%{
 
 #undef HAVE_FTW
-//TODO:}%[insert:pp_if($has_function(ftw))]%{
-//TODO:#define HAVE_FTW 1
-//TODO:}%[insert:pp_endif]%{
+}%[insert:pp_if($has_function(ftw))]%{
+#define HAVE_FTW 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_GETCWD
 }%[insert:pp_if($has_function(getcwd))]%{
