@@ -1423,7 +1423,7 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 	EXCEPT {                                                            \
 		libviocore_complete_except(self, _EMU86_GETOPCODE(), op_flags); \
 	}
-#define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflagsof)(self->vea_args.va_state)
+#define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflags_from)(self->vea_args.va_state)
 #ifdef __x86_64__
 #define EMU86_EMULATE_CONFIG_VM86 0
 #else /* __x86_64__ */

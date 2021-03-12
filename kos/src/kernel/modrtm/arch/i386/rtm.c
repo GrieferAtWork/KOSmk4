@@ -814,7 +814,7 @@ x86_emulate_rtm_instruction_int(struct rtm_machstate *__restrict self,
 #define EMU86_EMULATE_THROW_DIVIDE_ERROR() \
 	return ABORT_WITH(_XABORT_FAILED)
 
-#define EMU86_EMULATE_GETOPFLAGS()          emu86_opflagsof_icpustate(self->r_icstate)
+#define EMU86_EMULATE_GETOPFLAGS()          emu86_opflags_from_icpustate(self->r_icstate)
 #define EMU86_EMULATE_TRANSLATEADDR_IS_NOOP 1
 #define EMU86_EMULATE_TRANSLATEADDR(addr) (addr)
 #define EMU86_GETCR4_UMIP_IS_ZERO 1 /* TODO: Support me! */

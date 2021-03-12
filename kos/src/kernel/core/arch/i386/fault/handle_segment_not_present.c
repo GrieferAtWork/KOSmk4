@@ -203,7 +203,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 	if (ecode & 1) {
 		tiny_opcode = 0;
 	} else {
-		op_flags = emu86_opflagsof_icpustate(state);
+		op_flags = emu86_opflags_from_icpustate(state);
 		pc       = emu86_opcode_decode(pc, &tiny_opcode, &op_flags);
 		TRY {
 			switch (tiny_opcode) {

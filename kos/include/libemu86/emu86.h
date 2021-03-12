@@ -361,7 +361,7 @@ typedef __uint32_t emu86_opflags_t;
  * @param: popcode: Filled with the opcode's number
  * @param: pflags:  [in(EMU86_F_BITMASK)|out] Opcode flags.
  *                  NOTE: The caller should  have previously initialized  flags
- *                        through use of `emu86_opflagsof_*()', or by explicity
+ *                        through use of `emu86_opflags_from_*()', or by explicity
  *                        setting `EMU86_F_BITMASK' */
 typedef __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t *
 /*__NOTHROW_NCX*/ (LIBEMU86_CC *PEMU86_OPCODE_DECODE)(__byte_t const *__restrict pc,
@@ -413,33 +413,33 @@ __DECL_END
 
 #if defined(__x86_64__) || defined(__i386__)
 #ifndef CONFIG_LIBEMU86_NEED_ARCHMODE
-#define emu86_opflagsof_icpustate(state) EMU86_F_NORMAL
-#define emu86_opflagsof_scpustate(state) EMU86_F_NORMAL
-#define emu86_opflagsof_ucpustate(state) EMU86_F_NORMAL
-#define emu86_opflagsof_fcpustate(state) EMU86_F_NORMAL
+#define emu86_opflags_from_icpustate(state) EMU86_F_NORMAL
+#define emu86_opflags_from_scpustate(state) EMU86_F_NORMAL
+#define emu86_opflags_from_ucpustate(state) EMU86_F_NORMAL
+#define emu86_opflags_from_fcpustate(state) EMU86_F_NORMAL
 #else /* !CONFIG_LIBEMU86_NEED_ARCHMODE */
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #if (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
-#define emu86_opflagsof_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : icpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : scpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : ucpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : fcpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : icpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : scpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : ucpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : fcpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #elif (CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
-#define emu86_opflagsof_icpustate(state) (icpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_scpustate(state) (scpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_ucpustate(state) (ucpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_fcpustate(state) (fcpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_icpustate(state) (icpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_scpustate(state) (scpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_ucpustate(state) (ucpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_fcpustate(state) (fcpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT)
-#define emu86_opflagsof_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
-#define emu86_opflagsof_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
-#define emu86_opflagsof_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
-#define emu86_opflagsof_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
+#define emu86_opflags_from_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
+#define emu86_opflags_from_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
+#define emu86_opflags_from_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
+#define emu86_opflags_from_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
 #elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_64BIT)
-#define emu86_opflagsof_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
-#define emu86_opflagsof_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
+#define emu86_opflags_from_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */

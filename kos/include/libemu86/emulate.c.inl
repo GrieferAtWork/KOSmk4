@@ -1273,7 +1273,7 @@ __DECL_BEGIN
 /* Return the initial set of opcode flags. */
 #ifndef EMU86_EMULATE_GETOPFLAGS
 #ifdef CONFIG_LIBEMU86_NEED_ARCHMODE
-#define EMU86_EMULATE_GETOPFLAGS() emu86_opflagsof_icpustate(_state)
+#define EMU86_EMULATE_GETOPFLAGS() emu86_opflags_from_icpustate(_state)
 #else /* CONFIG_LIBEMU86_NEED_ARCHMODE */
 #define EMU86_EMULATE_GETOPFLAGS() EMU86_F_NORMAL
 #endif /* !CONFIG_LIBEMU86_NEED_ARCHMODE */

@@ -704,7 +704,7 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 	throw_illegal_instruction_exception(_state, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), \
 	                                    _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 
-#define EMU86_EMULATE_GETOPFLAGS() emu86_opflagsof_icpustate(_state)
+#define EMU86_EMULATE_GETOPFLAGS() emu86_opflags_from_icpustate(_state)
 #define EMU86_EMULATE_TRANSLATEADDR_IS_NOOP 1
 #define EMU86_EMULATE_TRANSLATEADDR(addr) (addr)
 #define EMU86_GETCR4_UMIP_IS_ZERO 1 /* TODO: Support me! */
