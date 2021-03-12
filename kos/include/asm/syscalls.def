@@ -2326,8 +2326,11 @@ coredumpx64:([tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *curr_state,
 /************************************************************************/
 /* SOCKET                                                               */
 /************************************************************************/
-socketcall:([tostr(SOCKETCALL_CALL)] syscall_ulong_t call,
-            [tostr(SOCKETCALL_ARGS:call)] syscall_ulong_t *args) -> errno_t; /* UNIMPLEMENTED! */
+%[startgroup]
+socketcall:([tostr(SOCKETCALL_CALL)] syscall_ulong_t call, [tostr(SOCKETCALL_ARGS:call)] syscall_ulong_t *args) -> syscall_slong_t;
+socketcallx32:([tostr(SOCKETCALL_CALL)] __ULONG32_TYPE__ call, [tostr(SOCKETCALL_ARGS:call)] __ULONG32_TYPE__ *args) -> __LONG32_TYPE__;
+socketcallx64:([tostr(SOCKETCALL_CALL)] __ULONG64_TYPE__ call, [tostr(SOCKETCALL_ARGS:call)] __ULONG64_TYPE__ *args) -> __LONG64_TYPE__;
+%[endgroup]
 
 @@Create a new socket for the given domain/type/protocol triple.
 @@@param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')

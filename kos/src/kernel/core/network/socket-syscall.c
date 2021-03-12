@@ -51,7 +51,13 @@
 #include <compat/bits/os/mmsghdr.h>
 #include <compat/bits/os/msghdr.h>
 #include <compat/bits/os/timespec.h>
+#include <compat/kos/types.h>
 #endif /* __ARCH_HAVE_COMPAT */
+
+#if (defined(__ARCH_WANT_SYSCALL_SOCKETCALL) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SOCKETCALL))
+#include <linux/net.h> /* SYS_* (socketcall syscall numbers) */
+#endif /* __ARCH_WANT_SYSCALL_SOCKETCALL... */
 
 DECL_BEGIN
 
@@ -1606,6 +1612,443 @@ DEFINE_SYSCALL2(errno_t, shutdown, fd_t, sockfd,
 }
 #endif /* __ARCH_WANT_SYSCALL_SHUTDOWN */
 
+
+
+
+#if (defined(__ARCH_WANT_SYSCALL_SOCKETCALL) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SOCKETCALL))
+/* Argument count matrix for `sys_socketcall(2)' */
+#define SYS_SOCKETCALL_ARGC_MAX 6
+PRIVATE u8 const sys_socketcall_argc[] = {
+	/* [0]               = */ 0,
+	/* [SYS_SOCKET]      = */ 3,
+	/* [SYS_BIND]        = */ 3,
+	/* [SYS_CONNECT]     = */ 3,
+	/* [SYS_LISTEN]      = */ 2,
+	/* [SYS_ACCEPT]      = */ 3,
+	/* [SYS_GETSOCKNAME] = */ 3,
+	/* [SYS_GETPEERNAME] = */ 3,
+	/* [SYS_SOCKETPAIR]  = */ 4,
+	/* [SYS_SEND]        = */ 4,
+	/* [SYS_RECV]        = */ 4,
+	/* [SYS_SENDTO]      = */ 6,
+	/* [SYS_RECVFROM]    = */ 6,
+	/* [SYS_SHUTDOWN]    = */ 2,
+	/* [SYS_SETSOCKOPT]  = */ 5,
+	/* [SYS_GETSOCKOPT]  = */ 5,
+	/* [SYS_SENDMSG]     = */ 3,
+	/* [SYS_RECVMSG]     = */ 3,
+	/* [SYS_ACCEPT4]     = */ 4,
+	/* [SYS_RECVMMSG]    = */ 5,
+	/* [SYS_SENDMMSG]    = */ 4,
+};
+#endif /* __ARCH_WANT_SYSCALL_SOCKETCALL... */
+
+
+#ifdef __ARCH_WANT_SYSCALL_SOCKETCALL
+DEFINE_SYSCALL2(syscall_slong_t, socketcall,
+                syscall_ulong_t, call,
+                USER CHECKED syscall_ulong_t *, args) {
+	syscall_slong_t result;
+	syscall_ulong_t argv[SYS_SOCKETCALL_ARGC_MAX];
+
+	/* Validate call bounds. */
+	if unlikely(call >= COMPILER_LENOF(sys_socketcall_argc))
+		goto err_badcall;
+
+	/* Load arguments. */
+	validate_readable(args,
+	                  sys_socketcall_argc[call] *
+	                  sizeof(syscall_ulong_t));
+	memcpy(argv, args, sys_socketcall_argc[call], sizeof(syscall_ulong_t));
+
+	/* Branch based on the requested call. */
+	switch (call) {
+
+#ifdef __ARCH_WANT_SYSCALL_SOCKET
+	case SYS_SOCKET:
+		result = sys_socket(argv[0], argv[1], argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SOCKET */
+
+#ifdef __ARCH_WANT_SYSCALL_BIND
+	case SYS_BIND:
+		result = sys_bind(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_BIND */
+
+#ifdef __ARCH_WANT_SYSCALL_CONNECT
+	case SYS_CONNECT:
+		result = sys_connect(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_CONNECT */
+
+#ifdef __ARCH_WANT_SYSCALL_LISTEN
+	case SYS_LISTEN:
+		result = sys_listen(argv[0], argv[1]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_LISTEN */
+
+#ifdef __ARCH_WANT_SYSCALL_ACCEPT
+	case SYS_ACCEPT:
+		result = sys_accept(argv[0],
+		                    (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                    (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		break;
+#elif defined(__ARCH_WANT_SYSCALL_ACCEPT4)
+	case SYS_ACCEPT:
+		result = sys_accept4(argv[0],
+		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2], 0);
+		break;
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
+	case SYS_GETSOCKNAME:
+		result = sys_getsockname(argv[0],
+		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
+
+#ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
+	case SYS_GETPEERNAME:
+		result = sys_getpeername(argv[0],
+		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
+
+#ifdef __ARCH_WANT_SYSCALL_SOCKETPAIR
+	case SYS_SOCKETPAIR:
+		result = sys_socketpair(argv[0], argv[1], argv[2],
+		                        (USER UNCHECKED fd_t *)(uintptr_t)argv[3]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SOCKETPAIR */
+
+#ifdef __ARCH_WANT_SYSCALL_SEND
+	case SYS_SEND:
+		result = sys_send(argv[0],
+		                  (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                  argv[2], argv[3]);
+		break;
+#elif defined(__ARCH_WANT_SYSCALL_SENDTO)
+	case SYS_SEND:
+		result = sys_sendto(argv[0],
+		                    (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                    argv[2], argv[3], NULL, 0);
+		break;
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_RECV
+	case SYS_RECV:
+		result = sys_recv(argv[0],
+		                  (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                  argv[2], argv[3]);
+		break;
+#elif defined(__ARCH_WANT_SYSCALL_RECVFROM)
+	case SYS_RECV:
+		result = sys_recvfrom(argv[0],
+		                      (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                      argv[2], argv[3], NULL, 0);
+		break;
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_SENDTO
+	case SYS_SENDTO:
+		result = sys_sendto(argv[0], (USER UNCHECKED void const *)(uintptr_t)argv[1], argv[2],
+		                    argv[3], (USER UNCHECKED struct sockaddr const *)(uintptr_t)argv[4], argv[5]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SENDTO */
+
+#ifdef __ARCH_WANT_SYSCALL_RECVFROM
+	case SYS_RECVFROM:
+		result = sys_recvfrom(argv[0], (USER UNCHECKED void *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[4],
+		                      (USER UNCHECKED socklen_t *)(uintptr_t)argv[5]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_RECVFROM */
+
+#ifdef __ARCH_WANT_SYSCALL_SHUTDOWN
+	case SYS_SHUTDOWN:
+		result = sys_shutdown(argv[0], argv[1]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SHUTDOWN */
+
+#ifdef __ARCH_WANT_SYSCALL_SETSOCKOPT
+	case SYS_SETSOCKOPT:
+		result = sys_setsockopt(argv[0], argv[1], argv[2],
+		                        (USER UNCHECKED void const *)(uintptr_t)argv[3],
+		                        argv[4]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SETSOCKOPT */
+
+#ifdef __ARCH_WANT_SYSCALL_GETSOCKOPT
+	case SYS_GETSOCKOPT:
+		result = sys_getsockopt(argv[0], argv[1], argv[2],
+		                        (USER UNCHECKED void *)(uintptr_t)argv[3],
+		                        (USER UNCHECKED socklen_t *)(uintptr_t)argv[4]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_GETSOCKOPT */
+
+#ifdef __ARCH_WANT_SYSCALL_SENDMSG
+	case SYS_SENDMSG:
+		result = sys_sendmsg(argv[0],
+		                     (USER UNCHECKED struct msghdr const *)(uintptr_t)argv[1],
+		                     argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SENDMSG */
+
+#ifdef __ARCH_WANT_SYSCALL_RECVMSG
+	case SYS_RECVMSG:
+		result = sys_recvmsg(argv[0],
+		                     (USER UNCHECKED struct msghdr *)(uintptr_t)argv[1],
+		                     argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_RECVMSG */
+
+#ifdef __ARCH_WANT_SYSCALL_ACCEPT4
+	case SYS_ACCEPT4:
+		result = sys_accept4(argv[0],
+		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2],
+		                     argv[3]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_ACCEPT4 */
+
+#ifdef __ARCH_WANT_SYSCALL_RECVMMSG
+	case SYS_RECVMMSG:
+		result = sys_recvmmsg(argv[0], (USER UNCHECKED struct mmsghdr *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (USER UNCHECKED struct timespec32 const *)(uintptr_t)argv[4]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_RECVMMSG */
+
+#ifdef __ARCH_WANT_SYSCALL_SENDMMSG
+	case SYS_SENDMMSG:
+		result = sys_sendmmsg(argv[0], (USER UNCHECKED struct mmsghdr *)(uintptr_t)argv[1],
+		                      argv[2], argv[3]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SENDMMSG */
+
+	default:
+err_badcall:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL,
+		      call);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_SOCKETCALL */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SOCKETCALL
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#define compat_sys_sendmsg  impl_sys32_sendmsg
+#define compat_sys_recvmsg  impl_sys32_recvmsg
+#define compat_sys_sendmmsg impl_sys32_sendmmsg
+#define compat_sys_recvmmsg impl_sys32_recvmmsg
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#define compat_sys_sendmsg  impl_sys64_sendmsg
+#define compat_sys_recvmsg  impl_sys64_recvmsg
+#define compat_sys_sendmmsg impl_sys64_sendmmsg
+#define compat_sys_recvmmsg impl_sys64_recvmmsg
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
+#error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
+
+DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
+                       compat_syscall_ulong_t, call,
+                       USER CHECKED compat_syscall_ulong_t *, args) {
+	compat_syscall_slong_t result;
+	compat_syscall_ulong_t argv[SYS_SOCKETCALL_ARGC_MAX];
+
+	/* Validate call bounds. */
+	if unlikely(call >= COMPILER_LENOF(sys_socketcall_argc))
+		goto err_badcall;
+
+	/* Load arguments. */
+	compat_validate_readable(args,
+	                         sys_socketcall_argc[call] *
+	                         sizeof(compat_syscall_ulong_t));
+	memcpy(argv, args, sys_socketcall_argc[call], sizeof(compat_syscall_ulong_t));
+
+	/* Branch based on the requested call. */
+	switch (call) {
+
+#ifdef __ARCH_WANT_SYSCALL_SOCKET
+	case SYS_SOCKET:
+		result = sys_socket(argv[0], argv[1], argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SOCKET */
+
+#ifdef __ARCH_WANT_SYSCALL_BIND
+	case SYS_BIND:
+		result = sys_bind(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_BIND */
+
+#ifdef __ARCH_WANT_SYSCALL_CONNECT
+	case SYS_CONNECT:
+		result = sys_connect(argv[0], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1], argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_CONNECT */
+
+#ifdef __ARCH_WANT_SYSCALL_LISTEN
+	case SYS_LISTEN:
+		result = sys_listen(argv[0], argv[1]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_LISTEN */
+
+#ifdef __ARCH_WANT_SYSCALL_ACCEPT
+	case SYS_ACCEPT:
+		result = sys_accept(argv[0],
+		                    (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                    (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		break;
+#elif defined(__ARCH_WANT_SYSCALL_ACCEPT4)
+	case SYS_ACCEPT:
+		result = sys_accept4(argv[0],
+		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2],
+		                     argv[3]);
+		break;
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
+	case SYS_GETSOCKNAME:
+		result = sys_getsockname(argv[0],
+		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
+
+#ifdef __ARCH_WANT_SYSCALL_GETSOCKNAME
+	case SYS_GETPEERNAME:
+		result = sys_getpeername(argv[0],
+		                         (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                         (USER UNCHECKED socklen_t *)(uintptr_t)argv[2]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_GETSOCKNAME */
+
+#ifdef __ARCH_WANT_SYSCALL_SOCKETPAIR
+	case SYS_SOCKETPAIR:
+		result = sys_socketpair(argv[0], argv[1], argv[2],
+		                        (USER UNCHECKED fd_t *)(uintptr_t)argv[3]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SOCKETPAIR */
+
+#ifdef __ARCH_WANT_SYSCALL_SEND
+	case SYS_SEND:
+		result = sys_send(argv[0],
+		                  (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                  argv[2], argv[3]);
+		break;
+#elif defined(__ARCH_WANT_SYSCALL_SENDTO)
+	case SYS_SEND:
+		result = sys_sendto(argv[0],
+		                    (USER UNCHECKED void const *)(uintptr_t)argv[1],
+		                    argv[2], argv[3], NULL, 0);
+		break;
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_RECV
+	case SYS_RECV:
+		result = sys_recv(argv[0],
+		                  (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                  argv[2], argv[3]);
+		break;
+#elif defined(__ARCH_WANT_SYSCALL_RECVFROM)
+	case SYS_RECV:
+		result = sys_recvfrom(argv[0],
+		                      (USER UNCHECKED void *)(uintptr_t)argv[1],
+		                      argv[2], argv[3], NULL, 0);
+		break;
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_SENDTO
+	case SYS_SENDTO:
+		result = sys_sendto(argv[0], (USER UNCHECKED void const *)(uintptr_t)argv[1], argv[2],
+		                    argv[3], (USER UNCHECKED struct sockaddr const *)(uintptr_t)argv[4], argv[5]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SENDTO */
+
+#ifdef __ARCH_WANT_SYSCALL_RECVFROM
+	case SYS_RECVFROM:
+		result = sys_recvfrom(argv[0], (USER UNCHECKED void *)(uintptr_t)argv[1], argv[2],
+		                      argv[3], (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[4],
+		                      (USER UNCHECKED socklen_t *)(uintptr_t)argv[5]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_RECVFROM */
+
+#ifdef __ARCH_WANT_SYSCALL_SHUTDOWN
+	case SYS_SHUTDOWN:
+		result = sys_shutdown(argv[0], argv[1]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SHUTDOWN */
+
+#ifdef __ARCH_WANT_SYSCALL_SETSOCKOPT
+	case SYS_SETSOCKOPT:
+		result = sys_setsockopt(argv[0], argv[1], argv[2],
+		                        (USER UNCHECKED void const *)(uintptr_t)argv[3],
+		                        argv[4]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_SETSOCKOPT */
+
+#ifdef __ARCH_WANT_SYSCALL_GETSOCKOPT
+	case SYS_GETSOCKOPT:
+		result = sys_getsockopt(argv[0], argv[1], argv[2],
+		                        (USER UNCHECKED void *)(uintptr_t)argv[3],
+		                        (USER UNCHECKED socklen_t *)(uintptr_t)argv[4]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_GETSOCKOPT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SENDMSG
+	case SYS_SENDMSG:
+		result = compat_sys_sendmsg(argv[0],
+		                            (USER UNCHECKED struct compat_msghdr const *)(uintptr_t)argv[1],
+		                            argv[2]);
+		break;
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SENDMSG */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RECVMSG
+	case SYS_RECVMSG:
+		result = compat_sys_recvmsg(argv[0],
+		                            (USER UNCHECKED struct compat_msghdr *)(uintptr_t)argv[1],
+		                            argv[2]);
+		break;
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RECVMSG */
+
+#ifdef __ARCH_WANT_SYSCALL_ACCEPT4
+	case SYS_ACCEPT4:
+		result = sys_accept4(argv[0],
+		                     (USER UNCHECKED struct sockaddr *)(uintptr_t)argv[1],
+		                     (USER UNCHECKED socklen_t *)(uintptr_t)argv[2],
+		                     argv[3]);
+		break;
+#endif /* __ARCH_WANT_SYSCALL_ACCEPT4 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG
+	case SYS_RECVMMSG:
+		result = compat_sys_recvmmsg(argv[0], (USER UNCHECKED struct compat_mmsghdr *)(uintptr_t)argv[1], argv[2],
+		                             argv[3], (USER UNCHECKED struct compat_timespec32 const *)(uintptr_t)argv[4]);
+		break;
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RECVMMSG */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SENDMMSG
+	case SYS_SENDMMSG:
+		result = compat_sys_sendmmsg(argv[0], (USER UNCHECKED struct compat_mmsghdr *)(uintptr_t)argv[1],
+		                             argv[2], argv[3]);
+		break;
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SENDMMSG */
+
+	default:
+err_badcall:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL,
+		      call);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SOCKETCALL */
 
 
 

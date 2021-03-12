@@ -17,29 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIOCORE_VIOCORE_H
-#define _LIBVIOCORE_VIOCORE_H 1
+#ifndef _LINUX_SOCKET_H
+#define _LINUX_SOCKET_H 1
 
-#include "api.h"
+#include <__stdinc.h>
 
-#include <libviocore/bits/viocore.h> /* struct vio_emulate_args */
+#include <bits/os/sockaddr_storage.h> /* `struct sockaddr_storage', __SIZEOF_SOCKADDR_STORAGE, __SOCKADDR_COMMON_ALIGN */
+
+#if !defined(_K_SS_MAXSIZE) && defined(__SIZEOF_SOCKADDR_STORAGE)
+#define _K_SS_MAXSIZE __SIZEOF_SOCKADDR_STORAGE
+#endif /* !_K_SS_MAXSIZE && __SIZEOF_SOCKADDR_STORAGE */
+#ifndef _K_SS_ALIGNSIZE
+#include <hybrid/typecore.h>
+#if defined(__SOCKADDR_COMMON_ALIGN) && __SOCKADDR_COMMON_ALIGN > __ALIGNOF_POINTER__
+#define _K_SS_ALIGNSIZE __SOCKADDR_COMMON_ALIGN
+#else /* __SOCKADDR_COMMON_ALIGN > __ALIGNOF_POINTER__ */
+#define _K_SS_ALIGNSIZE __ALIGNOF_POINTER__
+#endif /* __SOCKADDR_COMMON_ALIGN <= __ALIGNOF_POINTER__ */
+#endif /* !_K_SS_ALIGNSIZE */
 
 #ifdef __CC__
-__DECL_BEGIN
-
-/* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
- * any memory access made to `self->vea_ptrlo ... self->vea_ptrhi' via the  VIO
- * callback table.
- * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
- * which may  be  placed  at  a  different address  than  it  was  upon  entry.
- * This function is intended to be called from a page fault handler. */
-typedef void (LIBVIOCORE_CC *PVIOCORE_EMULATE)(struct vio_emulate_args *__restrict self);
-#ifdef LIBVIOCORE_WANT_PROTOTYPES
-LIBVIOCORE_DECL void LIBVIOCORE_CC viocore_emulate(struct vio_emulate_args *__restrict self);
-#endif /* LIBVIOCORE_WANT_PROTOTYPES */
-
-
-__DECL_END
+#define __kernel_sa_family_t      __sa_family_t
+#define __kernel_sockaddr_storage sockaddr_storage
 #endif /* __CC__ */
 
-#endif /* !_LIBVIOCORE_VIOCORE_H */
+#endif /* !_LINUX_SOCKET_H */

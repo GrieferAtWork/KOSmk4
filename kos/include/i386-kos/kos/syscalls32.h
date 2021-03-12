@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x804f428d */
+/* HASH CRC-32:0x5f808002 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2323,7 +2323,7 @@ __CDECLARE_SC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__set
 __CDECLARE_SC(,__fd_t,socket,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol),(__domain,__type,__protocol))
 #endif /* __CRT_HAVE_SC(socket) */
 #if __CRT_HAVE_SC(socketcall)
-__CDECLARE_SC(,__errno_t,socketcall,(__syscall_ulong_t __call, __syscall_ulong_t *__args),(__call,__args))
+__CDECLARE_SC(,__LONG32_TYPE__,socketcall,(__ULONG32_TYPE__ __call, __ULONG32_TYPE__ *__args),(__call,__args))
 #endif /* __CRT_HAVE_SC(socketcall) */
 #if __CRT_HAVE_SC(socketpair)
 /* Create a new socket for the given domain/type/protocol triple.
@@ -4812,7 +4812,7 @@ __CDECLARE_XSC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__se
 __CDECLARE_XSC(,__fd_t,socket,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol),(__domain,__type,__protocol))
 #endif /* __CRT_HAVE_XSC(socket) */
 #if __CRT_HAVE_XSC(socketcall)
-__CDECLARE_XSC(,__errno_t,socketcall,(__syscall_ulong_t __call, __syscall_ulong_t *__args),(__call,__args))
+__CDECLARE_XSC(,__LONG32_TYPE__,socketcall,(__ULONG32_TYPE__ __call, __ULONG32_TYPE__ *__args),(__call,__args))
 #endif /* __CRT_HAVE_XSC(socketcall) */
 #if __CRT_HAVE_XSC(socketpair)
 /* Create a new socket for the given domain/type/protocol triple.

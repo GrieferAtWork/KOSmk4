@@ -28,9 +28,9 @@
 #ifdef LIBVIO_CONFIG_ENABLED
 DECL_BEGIN
 
-/* Emulate  the instruction pointed-to  by `self->vea_args.va_state' and dispatch
- * any memory access made to `self->vea_ptrlo ... self->vea_ptrhi' by dispatching
- * it using the VIO callback table.
+/* Emulate the instruction pointed-to by `self->vea_args.va_state' and dispatch
+ * any memory access made to `self->vea_ptrlo ... self->vea_ptrhi' via the  VIO
+ * callback table.
  * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
  * which may  be  placed  at  a  different address  than  it  was  upon  entry.
  * This function is intended to be called from a page fault handler. */

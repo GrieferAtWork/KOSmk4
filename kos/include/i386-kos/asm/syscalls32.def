@@ -200,6 +200,7 @@ io_pgetevents = io_pgeteventsx32;
 io_pgetevents_time64 = io_pgeteventsx32_64;
 pidfd_send_signal = pidfd_send_signalx32;
 times = timesx32;
+socketcall = socketcallx32;
 
 /* Deal with the whole new-vs-old select issue. */
 _newselect = selectx32;

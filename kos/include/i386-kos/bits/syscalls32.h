@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dfe152e */
+/* HASH CRC-32:0xe3e5725f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -223,7 +223,7 @@
 #define SYS_statfs                       __NR_statfs                       /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
 #define SYS_fstatfs                      __NR_fstatfs                      /* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
 #define SYS_ioperm                       __NR_ioperm                       /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
-#define SYS_socketcall                   __NR_socketcall                   /* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
+#define SYS_socketcall                   __NR_socketcall                   /* __LONG32_TYPE__ socketcall(__ULONG32_TYPE__ call, __ULONG32_TYPE__ *args) */
 #define SYS_syslog                       __NR_syslog                       /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 #define SYS_setitimer                    __NR_setitimer                    /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */

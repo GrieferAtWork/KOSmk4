@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4a7f4df */
+/* HASH CRC-32:0xf7c41f4c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1336,7 +1336,7 @@ INTERN_FUNCTION(libc_sys_ioperm)
 END(libc_sys_ioperm)
 DEFINE_PUBLIC_ALIAS(sys_ioperm, libc_sys_ioperm)
 
-/* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
+/* __LONG32_TYPE__ socketcall(__ULONG32_TYPE__ call, __ULONG32_TYPE__ *args) */
 INTERN_FUNCTION(libc_sys_socketcall)
 	movl   $(0x66), %eax
 	jmp    libc_x86_exec_syscall2
@@ -5823,7 +5823,7 @@ INTERN_FUNCTION(libc_sys_Xioperm)
 END(libc_sys_Xioperm)
 DEFINE_PUBLIC_ALIAS(sys_Xioperm, libc_sys_Xioperm)
 
-/* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
+/* __LONG32_TYPE__ socketcall(__ULONG32_TYPE__ call, __ULONG32_TYPE__ *args) */
 INTERN_FUNCTION(libc_sys_Xsocketcall)
 	movl   $(0x66), %eax
 	jmp    libc_x86_exec_Xsyscall2

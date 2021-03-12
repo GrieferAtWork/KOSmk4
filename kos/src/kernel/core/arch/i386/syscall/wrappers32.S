@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43f9c987 */
+/* HASH CRC-32:0xdb5922f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3869,7 +3869,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioperm)
 	.cfi_endproc
 END(__x86_asm32_int80_ioperm)
 
-/* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
+/* __LONG32_TYPE__ socketcall(__ULONG32_TYPE__ call, __ULONG32_TYPE__ *args) */
 .section .text.x86.asm32_syscall_int80.socketcall
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketcall)
 	.cfi_startproc simple
@@ -23499,7 +23499,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioperm)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ioperm)
 
-/* errno_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
+/* __LONG32_TYPE__ socketcall(__ULONG32_TYPE__ call, __ULONG32_TYPE__ *args) */
 .section .text.x86.asm32_syscall_sysenter.socketcall
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socketcall)
 	.cfi_startproc simple

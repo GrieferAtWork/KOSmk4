@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3f92a84 */
+/* HASH CRC-32:0x9c7cb9e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1467,7 +1467,7 @@
 #define __NR32ATR0_socketcall                   SC_REPR_SOCKETCALL_CALL                                              /* call */ 
 #define __NR32ATR1_socketcall                   SC_REPR_SOCKETCALL_ARGS                                              /* args */ 
 #define __NR32ATL1_socketcall                   0                                                                    /* args -> call */ 
-#define __NR32RTR_socketcall                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32RTR_socketcall                    SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32ATR0_syslog                       SC_REPR_SYSLOG_LEVEL                                                 /* level */ 
 #define __NR32ATR1_syslog                       SC_REPR_STRING                                                       /* str */ 
 #define __NR32ATL1_syslog                       2                                                                    /* str -> len */ 

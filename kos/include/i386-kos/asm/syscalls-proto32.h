@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49be2e6c */
+/* HASH CRC-32:0x4845c740 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -645,7 +645,7 @@
 #define __NRRT_statfs                       (errno_t, __errno_t)
 #define __NRRT_fstatfs                      (errno_t, __errno_t)
 #define __NRRT_ioperm                       (errno_t, __errno_t)
-#define __NRRT_socketcall                   (errno_t, __errno_t)
+#define __NRRT_socketcall                   (__LONG32_TYPE__, __LONG32_TYPE__)
 #define __NRRT_syslog                       (ssize_t, __ssize_t)
 #define __NRRT_setitimer                    (errno_t, __errno_t)
 #define __NRRT_getitimer                    (errno_t, __errno_t)
@@ -1211,8 +1211,8 @@
 #define __NRAT0_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_socketcall                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_socketcall                   (syscall_ulong_t *, __syscall_ulong_t *)
+#define __NRAT0_socketcall                   (__ULONG32_TYPE__, __ULONG32_TYPE__)
+#define __NRAT1_socketcall                   (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
 #define __NRAT0_syslog                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_syslog                       (char const *, char const *)
 #define __NRAT2_syslog                       (size_t, __size_t)
@@ -2313,7 +2313,7 @@
 #define __NRAM_statfs(a, b, c, d, e, f)                       (char const *)a, (struct __statfsx32 *)b
 #define __NRAM_fstatfs(a, b, c, d, e, f)                      (__fd_t)a, (struct __statfsx32 *)b
 #define __NRAM_ioperm(a, b, c, d, e, f)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAM_socketcall(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t *)b
+#define __NRAM_socketcall(a, b, c, d, e, f)                   (__ULONG32_TYPE__)a, (__ULONG32_TYPE__ *)b
 #define __NRAM_syslog(a, b, c, d, e, f)                       (__syscall_ulong_t)a, (char const *)b, (__size_t)c
 #define __NRAM_setitimer(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct __itimervalx32 const *)b, (struct __itimervalx32 *)c
 #define __NRAM_getitimer(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct __itimervalx32 *)b

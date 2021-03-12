@@ -200,6 +200,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 	E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
+	E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL,                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -375,6 +376,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 #define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -547,6 +549,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                  151 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            152 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 #define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  153 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 154 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
