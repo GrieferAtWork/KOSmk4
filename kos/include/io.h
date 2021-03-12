@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d0d39b8 */
+/* HASH CRC-32:0xdd6b6bdc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,16 +93,19 @@ struct _finddata64i32_t;
 #ifndef __remove_defined
 #define __remove_defined 1
 #ifdef __std_remove_defined
-/* Remove a file or directory `FILENAME' */
+/* >> remove(3)
+ * Remove a file or directory `filename' */
 __NAMESPACE_STD_USING(remove)
 #elif defined(__CRT_HAVE_remove)
-/* Remove a file or directory `FILENAME' */
+/* >> remove(3)
+ * Remove a file or directory `filename' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,remove,(char const *__filename),(__filename))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_removeat)
 #include <libc/local/stdio/remove.h>
-/* Remove a file or directory `FILENAME' */
+/* >> remove(3)
+ * Remove a file or directory `filename' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL remove)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remove))(__filename); })
 #else /* __AT_FDCWD && __CRT_HAVE_removeat */
 #undef __remove_defined
@@ -112,19 +115,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #ifndef __rename_defined
 #define __rename_defined 1
 #ifdef __std_rename_defined
-/* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
- * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
+/* >> rename(3)
+ * Rename a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
 __NAMESPACE_STD_USING(rename)
 #elif defined(__CRT_HAVE_rename)
-/* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
- * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
+/* >> rename(3)
+ * Rename a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
 #include <libc/local/stdio/rename.h>
-/* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
- * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
+/* >> rename(3)
+ * Rename a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL rename)(char const *__oldname, char const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rename))(__oldname, __newname_or_path); })
 #else /* __AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat) */
 #undef __rename_defined
@@ -135,18 +141,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #define __unlink_defined 1
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__file))
 #elif defined(__CRT_HAVE__unlink)
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
 #else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __unlink_defined
@@ -289,21 +295,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #define __access_defined 1
 #ifdef __CRT_HAVE_access
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE__access)
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <libc/local/unistd/access.h>
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); })
 #else /* __AT_FDCWD && __CRT_HAVE_faccessat */
 #undef __access_defined
@@ -324,15 +330,15 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename,
 #define __close_defined 1
 #ifdef __CRT_HAVE_close
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CDECLARE(,int,__NOTHROW_NCX,close,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __close_defined
@@ -343,12 +349,12 @@ __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__close,(__fd))
 #ifdef __CRT_HAVE_dup
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `FD' and return its duplicated handle number */
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__dup)
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `FD' and return its duplicated handle number */
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
 __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),_dup,(__fd))
 #else /* ... */
 #undef __dup_defined
@@ -358,18 +364,18 @@ __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),_dup,(__fd))
 #define __dup2_defined 1
 #ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CDECLARE(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 #elif defined(__CRT_HAVE__dup2)
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE___dup2)
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
 #else /* ... */
 #undef __dup2_defined
@@ -381,13 +387,13 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
- * Check if the given file handle `FD' refers to a TTY */
+ * Check if the given file handle `fd' refers to a TTY */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__isatty)
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
- * Check if the given file handle `FD' refers to a TTY */
+ * Check if the given file handle `fd' refers to a TTY */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),_isatty,(__fd))
 #else /* ... */
 #undef __isatty_defined
@@ -397,28 +403,28 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),_isatty,(__fd)
 #define __lseek_defined 1
 #if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <libc/local/unistd/lseek.h>
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lseek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL lseek)(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek))(__fd, __offset, __whence); })
 #else /* ... */
 #undef __lseek_defined
@@ -556,21 +562,21 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void c
 #endif /* !__write_defined */
 #ifdef __CRT_HAVE_access
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),access,(__file,__type))
 #elif defined(__CRT_HAVE__access)
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <libc/local/unistd/access.h>
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); }
 #endif /* __AT_FDCWD && __CRT_HAVE_faccessat */
 #endif /* !... */
@@ -615,46 +621,46 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename,
 __CDECLARE_OPT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, int __type),(__filename,__type))
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CDECLARE(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),(__fd,__length))
 #elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate.h>
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _chsize)(__fd_t __fd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate))(__fd, __length); }
 #endif /* ... */
 #ifdef __CRT_HAVE_ftruncate64
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CDECLARE(,int,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __PIO_OFFSET64 __length),(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate64.h>
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _chsize_s)(__fd_t __fd, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate64))(__fd, __length); }
 #endif /* ... */
 #ifdef __CRT_HAVE_fsync
@@ -681,46 +687,46 @@ __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL _commit)(__fd_t __fd
 #endif /* !... */
 #if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <libc/local/unistd/lseek.h>
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL _lseek)(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek))(__fd, __offset, __whence); }
 #endif /* ... */
 #ifdef __CRT_HAVE_lseek64
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64)
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__off64_t,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <libc/local/unistd/lseek64.h>
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __FORCELOCAL __ATTR_ARTIFICIAL __off64_t __NOTHROW_NCX(__LIBCCALL _lseeki64)(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek64))(__fd, __offset, __whence); }
 #endif /* ... */
 #if defined(__CRT_HAVE_lockf64) && defined(__USE_FILE_OFFSET64)
@@ -737,18 +743,18 @@ __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL _locking)(__fd_t __f
 #define ___unlink_defined 1
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),(__file))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); }
 #else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef ___unlink_defined
@@ -757,42 +763,42 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 #endif /* !___unlink_defined */
 #ifdef __CRT_HAVE_close
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CDECLARE(,int,__NOTHROW_NCX,_close,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE___close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,_close,(__fd_t __fd),__close,(__fd))
 #endif /* ... */
 #ifdef __CRT_HAVE_dup
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `FD' and return its duplicated handle number */
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
 __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),dup,(__fd))
 #elif defined(__CRT_HAVE__dup)
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `FD' and return its duplicated handle number */
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),(__fd))
 #endif /* ... */
 #ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE__dup2)
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CDECLARE(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 #elif defined(__CRT_HAVE___dup2)
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
 #endif /* ... */
 #ifdef __CRT_HAVE_read
@@ -956,13 +962,13 @@ __CDECLARE(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),(__mode))
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
- * Check if the given file handle `FD' refers to a TTY */
+ * Check if the given file handle `fd' refers to a TTY */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),isatty,(__fd))
 #elif defined(__CRT_HAVE__isatty)
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
- * Check if the given file handle `FD' refers to a TTY */
+ * Check if the given file handle `fd' refers to a TTY */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),(__fd))
 #endif /* ... */
 
@@ -1159,28 +1165,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setmode, __FORCELOCAL __ATTR_ARTIFICIAL __oflag_
 #endif /* !... */
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
 #elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CDECLARE(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __PIO_OFFSET __length),(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 #include <libc/local/unistd/ftruncate.h>
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL chsize)(__fd_t __fd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate))(__fd, __length); }
 #endif /* ... */
 #if defined(__CRT_HAVE_lockf64) && defined(__USE_FILE_OFFSET64)

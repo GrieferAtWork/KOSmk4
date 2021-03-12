@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x938efb42 */
+/* HASH CRC-32:0xcc1102b9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strrchr(3)
- * Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+ * Return the pointer of the last instance of `needle', or `NULL' if `needle' wasn't found. */
 __LOCAL_LIBC(strrchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strrchr))(char const *__restrict __haystack, int __needle) {
 	char const *__result = __NULLPTR;

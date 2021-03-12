@@ -2037,7 +2037,7 @@ DlModule_IteratePhdr(DlModule *__restrict self,
 
 
 /* Enumerate all loaded modules, as  well as information about  them.
- * Enumeration stops when `*CALLBACK' returns a non-zero value, which
+ * Enumeration stops when `*callback' returns a non-zero value, which
  * will then also be returned  by this function. Otherwise, `0'  will
  * be returned after all modules have been enumerated. */
 INTERN int DLFCN_CC

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92c993dd */
+/* HASH CRC-32:0x593bcef7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempsetq_defined
 #define __local___localdep_mempsetq_defined 1
 #ifdef __CRT_HAVE_mempsetq
-/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),mempsetq,(__dst,__qword,__n_qwords))
 #else /* __CRT_HAVE_mempsetq */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempsetq.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 #define __localdep_mempsetq __LIBC_LOCAL_NAME(mempsetq)
 #endif /* !__CRT_HAVE_mempsetq */
 #endif /* !__local___localdep_mempsetq_defined */

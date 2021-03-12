@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71b26f72 */
+/* HASH CRC-32:0x254da871 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,26 +27,26 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32schrnul_defined
 #define __local___localdep_c32schrnul_defined 1
 #if defined(__CRT_HAVE_wcschrnul) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32schrnul,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif defined(__CRT_HAVE_KOS$wcschrnul)
-/* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32schrnul,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_c32schrnul (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__))&__LIBC_LOCAL_NAME(wcschrnul))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32schrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_c32schrnul __LIBC_LOCAL_NAME(c32schrnul)
 #endif /* !... */
 #endif /* !__local___localdep_c32schrnul_defined */
-/* Same as `wcschrnul', but return the offset from `STR', rather than the actual address */
+/* Same as `wcschrnul', but return the offset from `str', rather than the actual address */
 __LOCAL_LIBC(c32soff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32soff))(__CHAR32_TYPE__ const *__restrict __haystack, __CHAR32_TYPE__ __needle) {
 	return (__SIZE_TYPE__)(__localdep_c32schrnul(__haystack, __needle) - __haystack);

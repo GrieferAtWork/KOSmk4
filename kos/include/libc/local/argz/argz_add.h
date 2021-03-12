@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47c3c008 */
+/* HASH CRC-32:0x17261910 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,13 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_argz_append_defined 1
 #ifdef __CRT_HAVE_argz_append
 /* >> argz_append(3)
- * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * Increase allocated memory of `*pargz' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),argz_append,(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE___argz_create_sep)
 /* >> argz_append(3)
- * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * Increase allocated memory of `*pargz' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_append.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> argz_append(3)
- * Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * Increase allocated memory of `*pargz' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 #define __localdep_argz_append __LIBC_LOCAL_NAME(argz_append)
@@ -60,19 +60,19 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 /* >> argz_add(3)
- * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * Append `str' (including the trailing NUL-character) to the argz string in `*pargz...+=pargz_len'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */

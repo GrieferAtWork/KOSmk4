@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf807454 */
+/* HASH CRC-32:0xa151a46f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,14 +67,14 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
@@ -82,14 +82,14 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> argz_create_sep(3)
- * Create an ARGZ string from `string' by splitting that string at each
+ * Create an argz-string from `string' by splitting that string at each
  * occurance of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
  * are merged, such that no empty sub-strings will be present in the resulting
- * ARGZ string.
- * For more information on the semantics of ARGZ strings, see the
+ * argz-string.
+ * For more information on the semantics of argz-strings, see the
  * documentation of `argz_create()'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */

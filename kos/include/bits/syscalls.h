@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d268220 */
+/* HASH CRC-32:0x60dc9865 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,7 @@
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_fchownat               __NR_fchownat               /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define SYS_fchown                 __NR_fchown                 /* errno_t fchown(fd_t fd, uid_t owner, gid_t group) */
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -141,7 +141,7 @@
  *   - *:                                  Certain filesystem names can literally return anything, such
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define SYS_openat                 __NR_openat                 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 #define SYS_close                  __NR_close                  /* errno_t close(fd_t fd) */
 #define SYS_vhangup                __NR_vhangup                /* errno_t vhangup(void) */
 #define SYS_pipe2                  __NR_pipe2                  /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
@@ -151,15 +151,15 @@
 #define SYS_getdents64             __NR_getdents64             /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 #define SYS_read                   __NR_read                   /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 #define SYS_write                  __NR_write                  /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
@@ -167,8 +167,8 @@
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 #define SYS_readv                  __NR_readv                  /* ssize_t readv(fd_t fd, struct iovec const *iovec, size_t count) */
@@ -176,7 +176,7 @@
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -605,8 +605,8 @@
 #define SYS_request_key            __NR_request_key            /* errno_t request_key(int TODO_PROTOTYPE) */
 #define SYS_keyctl                 __NR_keyctl                 /* errno_t keyctl(int TODO_PROTOTYPE) */
 #define SYS_clone                  __NR_clone                  /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 #define SYS_execve                 __NR_execve                 /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
 #define SYS_swapon                 __NR_swapon                 /* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
@@ -710,14 +710,14 @@
 /* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 #define SYS_memfd_create           __NR_memfd_create           /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define SYS_bpf                    __NR_bpf                    /* errno_t bpf(int TODO_PROTOTYPE) */
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_execveat               __NR_execveat               /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
 #define SYS_userfaultfd            __NR_userfaultfd            /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier             __NR_membarrier             /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                 __NR_mlock2                 /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -774,9 +774,9 @@
 #define SYS_lseek                  __NR_lseek                  /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 #define SYS_mmap                   __NR_mmap                   /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 #define SYS_alarm                  __NR_alarm                  /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define SYS_getpgrp                __NR_getpgrp                /* pid_t getpgrp(void) */

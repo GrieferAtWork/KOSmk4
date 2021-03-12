@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d115b0e */
+/* HASH CRC-32:0x4a761267 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,7 +179,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_crt_ftello64,(__
 #undef __local___localdep_crt_ftello64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_ftello64_defined */
-/* 64-bit variant of `fgetpos' */
+/* >> fgetpos(3), fgetpos64(3)
+ * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __LOCAL_LIBC(fgetpos64) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetpos64))(__FILE *__restrict __stream, __fpos64_t *__restrict __pos) __THROWS(...) {
 #if (defined(__CRT_HAVE_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_ftello) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || (defined(__CRT_HAVE_ftell_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__ftell_nolock) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock)

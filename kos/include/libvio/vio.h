@@ -234,7 +234,7 @@ struct vio_operators {
 	 * >> int (*vio_function)(int, int);
 	 * >> *(void **)&vio_function = (byte_t *)vio_base + 1234;
 	 * >>
-	 * >> // This function will invoke `vo_call(ARGS, 1234)'
+	 * >> // This function will invoke `vo_call(args, 1234)'
 	 * >> // vioargs_getstate(): (user-space register state; assuming i386)
 	 * >> //    eip: RETURN_ADDRESS (here: ADDR_OF(ASSIGNMENT_TO_X))
 	 * >> //    esp: [+0: (int)10, +4: (int)20]

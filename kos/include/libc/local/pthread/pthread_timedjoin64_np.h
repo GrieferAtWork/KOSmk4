@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfda4d0 */
+/* HASH CRC-32:0x2385379 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,18 +30,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_timedjoin32_np_defined
 #define __local___localdep_pthread_timedjoin32_np_defined 1
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #endif /* !__local___localdep_pthread_timedjoin32_np_defined */
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */

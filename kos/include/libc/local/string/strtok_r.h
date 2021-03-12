@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x335a3b3b */
+/* HASH CRC-32:0x5a626bbf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #if __has_builtin(__builtin_strcspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcspn)
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strcspn,(char const *__haystack, char const *__reject),strcspn,{ return __builtin_strcspn(__haystack, __reject); })
 #elif defined(__CRT_HAVE_strcspn)
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strcspn,(char const *__haystack, char const *__reject),strcspn,(__haystack,__reject))
 #else /* ... */
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_strcspn __LIBC_LOCAL_NAME(strcspn)
 #endif /* !... */
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strspn,(char const *__haystack, char const *__accept),strspn,{ return __builtin_strspn(__haystack, __accept); })
 #elif defined(__CRT_HAVE_strspn)
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strspn,(char const *__haystack, char const *__accept),strspn,(__haystack,__accept))
 #else /* ... */
@@ -75,33 +75,33 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_strspn __LIBC_LOCAL_NAME(strspn)
 #endif /* !... */
 #endif /* !__local___localdep_strspn_defined */
 __LOCAL_LIBC(strtok_r) __ATTR_LEAF __ATTR_NONNULL((2, 3)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok_r))(char *__string, char const *__delim, char **__restrict __save_ptr) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok_r))(char *__str, char const *__delim, char **__restrict __save_ptr) {
 	char *__end;
-	if (!__string)
-		__string = *__save_ptr;
-	if (!*__string) {
-		*__save_ptr = __string;
+	if (!__str)
+		__str = *__save_ptr;
+	if (!*__str) {
+		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__string += __localdep_strspn(__string, __delim);
-	if (!*__string) {
-		*__save_ptr = __string;
+	__str += __localdep_strspn(__str, __delim);
+	if (!*__str) {
+		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__end = __string + __localdep_strcspn(__string, __delim);
+	__end = __str + __localdep_strcspn(__str, __delim);
 	if (!*__end) {
 		*__save_ptr = __end;
-		return __string;
+		return __str;
 	}
 	*__end = '\0';
 	*__save_ptr = __end + 1;
-	return __string;
+	return __str;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtok_r_defined

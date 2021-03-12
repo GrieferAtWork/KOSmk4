@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a8958b3 */
+/* HASH CRC-32:0xb510bd36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,8 @@ __CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_IO_flush_all,())
 #undef __local___localdep_crt_flushall_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_flushall_defined */
-/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fflush_unlocked(3)
+ * Same as `fflush()', but performs I/O without acquiring a lock to `stream' */
 __LOCAL_LIBC(fflush_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush_unlocked))(__FILE *__stream) __THROWS(...) {
 	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no

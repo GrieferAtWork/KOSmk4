@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0a7afa3 */
+/* HASH CRC-32:0x452cf00f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,16 +29,20 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ferror_defined
 #define __local___localdep_ferror_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Check if an I/O error occurred in `STREAM' */
+/* >> ferror(3)
+ * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
-/* Check if an I/O error occurred in `STREAM' */
+/* >> ferror(3)
+ * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
-/* Check if an I/O error occurred in `STREAM' */
+/* >> ferror(3)
+ * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
-/* Check if an I/O error occurred in `STREAM' */
+/* >> ferror(3)
+ * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_ferror_defined
@@ -48,46 +52,54 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__l
 #ifndef __local___localdep_fgetc_defined
 #define __local___localdep_fgetc_defined 1
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE_getc)
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 #define __localdep_fgetc __LIBC_LOCAL_NAME(fgetc)
 #else /* ... */
@@ -98,22 +110,28 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ungetc_defined
 #define __local___localdep_ungetc_defined 1
 #if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Unget a single character byte of data previously returned by `getc()' */
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
-/* Unget a single character byte of data previously returned by `getc()' */
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
-/* Unget a single character byte of data previously returned by `getc()' */
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_ungetc)
-/* Unget a single character byte of data previously returned by `getc()' */
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc_unlocked)
-/* Unget a single character byte of data previously returned by `getc()' */
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock)
-/* Unget a single character byte of data previously returned by `getc()' */
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #else /* ... */
 #undef __local___localdep_ungetc_defined
@@ -123,9 +141,10 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
- * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
+/* >> fgets(3)
+ * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
+ * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 __LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgets))(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __n;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c519d4b */
+/* HASH CRC-32:0xc1a54b3b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cosh_defined
 #define __local___localdep_cosh_defined 1
 #if __has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)
-/* Hyperbolic cosine of X */
+/* Hyperbolic cosine of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,{ return __builtin_cosh(__x); })
 #elif defined(__CRT_HAVE_cosh)
-/* Hyperbolic cosine of X */
+/* Hyperbolic cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,(__x))
 #elif defined(__CRT_HAVE___cosh)
-/* Hyperbolic cosine of X */
+/* Hyperbolic cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),__cosh,(__x))
 #else /* ... */
 #undef __local___localdep_cosh_defined
 #endif /* !... */
 #endif /* !__local___localdep_cosh_defined */
-/* Hyperbolic cosine of X */
+/* Hyperbolic cosine of `x' */
 __LOCAL_LIBC(coshl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(coshl))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_cosh((double)__x);

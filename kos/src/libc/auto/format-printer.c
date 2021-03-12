@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f09f77a */
+/* HASH CRC-32:0x3f895f4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,9 +48,9 @@ DECL_BEGIN
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 /* >> format_repeat(3)
- * Repeat `CH' a number of `NUM_REPETITIONS' times
+ * Repeat `ch' a number of `num_repetitions' times
  * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
+ * is allowed to call `printer' as often as it chooses */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 (LIBCCALL libc_format_repeat)(pformatprinter printer,
                               void *arg,
@@ -109,8 +109,8 @@ err:
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
  * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+ * @param: printer: A function called for all quoted portions of the text
+ * @param: textlen: The total number of bytes to escape, starting at `text' */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 (LIBCCALL libc_format_escape)(pformatprinter printer,
                               void *arg,
@@ -387,14 +387,14 @@ err:
 #include <hybrid/byteorder.h>
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  The format printer callback
- * @param: DATA:     A pointer to the data that should be dumped
- * @param: SIZE:     The amount of bytes read starting at DATA
- * @param: LINESIZE: The max amount of bytes to include per-line
+ * @param: printer:  The format printer callback
+ * @param: data:     A pointer to the data that should be dumped
+ * @param: size:     The amount of bytes read starting at data
+ * @param: linesize: The max amount of bytes to include per-line
  *                   HINT: Pass ZERO(0) to use a default size (16)
- * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 (LIBCCALL libc_format_hexdump)(pformatprinter printer,
                                void *arg,
@@ -609,18 +609,18 @@ err:
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -663,9 +663,9 @@ err:
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -694,8 +694,8 @@ err:
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t
 (LIBCCALL libc_format_vprintf)(pformatprinter printer,
                                void *arg,
@@ -726,18 +726,18 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -780,9 +780,9 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -811,8 +811,8 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t
 (VLIBDCALL libd_format_printf)(pformatprinter printer,
                                void *arg,
@@ -829,18 +829,18 @@ INTERN ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_PRINTF(3, 4) NONNUL
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -883,9 +883,9 @@ INTERN ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_PRINTF(3, 4) NONNUL
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -914,8 +914,8 @@ INTERN ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_PRINTF(3, 4) NONNUL
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t
 (VLIBCCALL libc_format_printf)(pformatprinter printer,
                                void *arg,
@@ -933,14 +933,14 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1
 /* >> format_scanf(3), format_vscanf(3)
  * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
- * functions will call the given `SCANNER' function which in
+ * functions will call the given `pgetc' function which in
  * return should successively yield a character at a time from
  * some kind of input source.
- *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
  *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `SCANNER' to track the last read character to get
+ *  - The user may use `pgetc' to track the last read character to get
  *    additional information about what character caused the scan to fail.
- *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
  *  - This implementation supports the following extensions:
  *    - `%[A-Z]'   -- Character ranges in scan patterns
  *    - `%[^abc]'  -- Inversion of a scan pattern
@@ -975,14 +975,14 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 0) NONNULL((1,
 /* >> format_scanf(3), format_vscanf(3)
  * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
- * functions will call the given `SCANNER' function which in
+ * functions will call the given `pgetc' function which in
  * return should successively yield a character at a time from
  * some kind of input source.
- *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
  *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `SCANNER' to track the last read character to get
+ *  - The user may use `pgetc' to track the last read character to get
  *    additional information about what character caused the scan to fail.
- *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
  *  - This implementation supports the following extensions:
  *    - `%[A-Z]'   -- Character ranges in scan patterns
  *    - `%[^abc]'  -- Inversion of a scan pattern
@@ -1013,14 +1013,14 @@ INTERN ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_SCANF(4, 5) NONNULL
 /* >> format_scanf(3), format_vscanf(3)
  * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
- * functions will call the given `SCANNER' function which in
+ * functions will call the given `pgetc' function which in
  * return should successively yield a character at a time from
  * some kind of input source.
- *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
  *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `SCANNER' to track the last read character to get
+ *  - The user may use `pgetc' to track the last read character to get
  *    additional information about what character caused the scan to fail.
- *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
  *  - This implementation supports the following extensions:
  *    - `%[A-Z]'   -- Character ranges in scan patterns
  *    - `%[^abc]'  -- Inversion of a scan pattern
@@ -1060,9 +1060,9 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprintf_printer)(void *arg,
 /* >> format_snprintf_printer(3)
  * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
  * WARNING: No trailing NUL-character is implicitly appended
- * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
- * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer(3)' */
+ * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
+ * NOTE: The number of required characters is `arg->sd_buffer - <orig_buf>', or
+ *       alternatively the sum of return values of all calls to `format_snprintf_printer(3)' */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg,
                                                              char const *__restrict data,
@@ -1084,7 +1084,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg,
 #include <libc/local/unicode_utf8seqlen.h>
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
- * The `ARG' argument is ignored, and you may safely pass `NULL' */
+ * The `arg' argument is ignored, and you may safely pass `NULL' */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_PURE NONNULL((2)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,
                                                   char const *__restrict data,
@@ -1105,7 +1105,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,
 }
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
- * Both the `ARG' and `DATA' arguments are simply ignored */
+ * Both the `arg' and `data' arguments are simply ignored */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_CONST ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg,
                                                    char const *__restrict data,

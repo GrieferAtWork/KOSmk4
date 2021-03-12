@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d98a577 */
+/* HASH CRC-32:0x2b34d0cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <libm/round.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(roundf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundf))(float __x) {
 #ifdef __LIBM_MATHFUNF

@@ -32,8 +32,8 @@
 DECL_BEGIN
 
 
-/* Execute the CFI expression loaded into the given unwind-emulator  `SELF'.
- * Upon  success, `SELF->ue_stacksz' will have been updated to the new stack
+/* Execute the CFI expression loaded into the given unwind-emulator  `self'.
+ * Upon  success, `self->ue_stacksz' will have been updated to the new stack
  * size, allowing the caller to read the expression's return values from it.
  * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
  *        but will automatically allocated/free the expression stack upon entry/return, pushing
@@ -59,18 +59,18 @@ libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
 
 
 
-/* Return a pointer to the next unwind instruction following `UNWIND_PC'
+/* Return a pointer to the next unwind instruction following `unwind_pc'
  * -> Useful for dumping unwind instruction without having to take care
  *    of handling all possible instruction  (after all: CFI has a  CISC
  *    instruction set with variable-length instructions)
- * @param: ADDRSIZE: Size of a target address.
- * @param: PTRSIZE:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
- * @return: NULL: The instruction at `UNWIND_PC' wasn't recognized. */
+ * @param: addrsize: Size of a target address.
+ * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
+ * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
 NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc,
                                               uint8_t addrsize, uint8_t ptrsize);
 
-/* Return a pointer to a CFI expression that is applicable for `CU_BASE + MODULE_RELATIVE_PC'
+/* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
 INTDEF WUNUSED NONNULL((1, 5)) byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
@@ -79,7 +79,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
                                                 uint8_t addrsize,
                                                 size_t *__restrict pexpr_length);
 
-/* Load the effective l-value address of `SELF' into `*PADDR':
+/* Load the effective l-value address of `self' into `*PADDR':
  *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
  *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset
@@ -87,27 +87,27 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  *   UNWIND_STE_RW_LVALUE:    Write-back s_lvalue
  *   UNWIND_STE_RO_LVALUE:    Write-back s_lvalue
  * @return: UNWIND_SUCCESS:                      Success.
- * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `SELF'
- * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `SELF' */
+ * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
+ * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self' */
 INTDEF NONNULL((1, 2, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void **__restrict paddr);
 
 /* Read/write bit-wise data to/from an unwind stack-entry location.
- * @param: SELF:           The unwind STE-element to/from which to read/write.
- * @param: REGGET:         Register getter.
- * @param: REGGET_ARG:     Register getter argument.
- * @param: REGSET:         Register setter.
- * @param: REGSET_ARG:     Register setter argument.
- * @param: DST:            Destination memory buffer.
- * @param: SRC:            Source memory buffer.
- * @param: NUM_BITS:       The # of bits to read/write to/from `DST' or `SRC'
- * @param: SRC_LEFT_SHIFT: The # of leading bits to leave unchanged in the source.
- * @param: DST_LEFT_SHIFT: The # of leading bits to leave unchanged in the destination.
+ * @param: self:           The unwind STE-element to/from which to read/write.
+ * @param: regget:         Register getter.
+ * @param: regget_arg:     Register getter argument.
+ * @param: regset:         Register setter.
+ * @param: regset_arg:     Register setter argument.
+ * @param: dst:            Destination memory buffer.
+ * @param: src:            Source memory buffer.
+ * @param: num_bits:       The # of bits to read/write to/from `dst' or `src'
+ * @param: src_left_shift: The # of leading bits to leave unchanged in the source.
+ * @param: dst_left_shift: The # of leading bits to leave unchanged in the destination.
  * @return: UNWIND_SUCCESS:                      Success.
- * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `SELF'
- * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `SELF'
+ * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
+ * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
 INTDEF NONNULL((1, 2, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self,
@@ -122,38 +122,38 @@ NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self,
                                        unsigned int dst_left_shift, unsigned int src_left_shift);
 
 /* Read/Write the value associated with a given debuginfo location descriptor.
- * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
- * @param: SECTINFO:              Emulator section  information  (to-be  filled in  by  the  caller)
+ * @param: self:                  The debug info location descriptor (s.a. libdebuginfo.so)
+ * @param: sectinfo:              Emulator section  information  (to-be  filled in  by  the  caller)
  *                                Optionally,  this argument may  be `NULL', however  if this is the
  *                                case, the function may fail in cases where it would have otherwise
  *                                succeeded.
- * @param: REGGET:                Register getter callback.
- * @param: REGGET_ARG:            Register getter callback argument.
- * @param: REGSET:                Register setter callback.
- * @param: REGSET_ARG:            Register setter callback argument.
- * @param: CU:                    Associated compilation unit debug info (or NULL).
+ * @param: regget:                Register getter callback.
+ * @param: regget_arg:            Register getter callback argument.
+ * @param: regset:                Register setter callback.
+ * @param: regset_arg:            Register setter callback argument.
+ * @param: cu:                    Associated compilation unit debug info (or NULL).
  *                                When  non-NULL, the following fields may be used:
- *                                  - CU->cu_ranges.r_startpc
- *                                  - CU->cu_addr_base
- * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
+ *                                  - cu->cu_ranges.r_startpc
+ *                                  - cu->cu_addr_base
+ * @param: module_relative_pc:    The module-relative program counter, to-be used to select
  *                                the   appropriate  expression  within  a  location  list.
- * @param: MODULE_ADDROFFSET:     The load address of the associated module. (addend for DW_OP_addr)
- * @param: BUF:                   Source/target buffer containing the value read from,
+ * @param: module_addroffset:     The load address of the associated module. (addend for DW_OP_addr)
+ * @param: buf:                   Source/target buffer containing the value read from,
  *                                or written to the location expression.
- * @param: BUFSIZE:               Size of the given `BUF' in bytes.
- * @param: PNUM_WRITTEN_BITS:     The number of _BITS_ (not bytes!) read from the location expression,
- *                                and written to the given `BUF'  (any trailing bits of buffer  memory
+ * @param: bufsize:               Size of the given `buf' in bytes.
+ * @param: pnum_written_bits:     The number of _BITS_ (not bytes!) read from the location expression,
+ *                                and written to the given `buf'  (any trailing bits of buffer  memory
  *                                that weren't written will be filled with `0' upon success)
- * @param: PNUM_READ_BITS:        The number of _BITS_ (not bytes!) written to the location expression,
- *                                and read from the given `BUF'.
- * @param: FRAME_BASE_EXPRESSION: The expression used to calculate the frame-base address (or NULL if unknown)
- * @param: OBJADDR:               The address of the base-object (used e.g. for structure member expressions)
- * @param: ADDRSIZE:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
- * @param: PTRSIZE:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
+ * @param: pnum_read_bits:        The number of _BITS_ (not bytes!) written to the location expression,
+ *                                and read from the given `buf'.
+ * @param: frame_base_expression: The expression used to calculate the frame-base address (or NULL if unknown)
+ * @param: objaddr:               The address of the base-object (used e.g. for structure member expressions)
+ * @param: addrsize:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
+ * @param: ptrsize:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
  * @return: * :                               One of `UNWIND_*'
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
- * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `BUFSIZE' is too small.
- * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `MODULE_RELATIVE_PC' */
+ * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
+ * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
 INTDEF NONNULL((1, 3, 8, 10)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,

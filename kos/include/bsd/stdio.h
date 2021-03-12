@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f71a72c */
+/* HASH CRC-32:0x2eb3cd11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,11 +66,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,fgetln,(FI
 #ifndef __fpurge_defined
 #define __fpurge_defined 1
 #ifdef __CRT_HAVE___fpurge
-/* Discard all pending buffered I/O on the stream FP */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__fp),__fpurge,(__fp))
+/* >> __fpurge(3)
+ * Discard all pending buffered I/O on `stream' */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),__fpurge,(__stream))
 #elif defined(__CRT_HAVE_fpurge)
-/* Discard all pending buffered I/O on the stream FP */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__fp),(__fp))
+/* >> __fpurge(3)
+ * Discard all pending buffered I/O on `stream' */
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
 #else /* ... */
 #undef __fpurge_defined
 #endif /* !... */

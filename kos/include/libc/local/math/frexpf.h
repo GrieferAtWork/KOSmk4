@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0346201 */
+/* HASH CRC-32:0x248cf07b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_frexp_defined
 #define __local___localdep_frexp_defined 1
 #if __has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
+/* Break `value' into a normalized fraction and an integral power of 2 */
 __CEIREDIRECT(__ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),frexp,{ return __builtin_frexp(__x, __pexponent); })
 #elif defined(__CRT_HAVE_frexp)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
+/* Break `value' into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),frexp,(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexp)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
+/* Break `value' into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),__frexp,(__x,__pexponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/frexp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Break VALUE into a normalized fraction and an integral power of 2 */
+/* Break `value' into a normalized fraction and an integral power of 2 */
 #define __localdep_frexp __LIBC_LOCAL_NAME(frexp)
 #else /* ... */
 #undef __local___localdep_frexp_defined
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/frexp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Break VALUE into a normalized fraction and an integral power of 2 */
+/* Break `value' into a normalized fraction and an integral power of 2 */
 __LOCAL_LIBC(frexpf) __ATTR_NONNULL((2)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpf))(float __x, int *__pexponent) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

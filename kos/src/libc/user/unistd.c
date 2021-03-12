@@ -86,10 +86,10 @@ NOTHROW(LIBCCALL libc_p_environ)(void) {
 
 
 
-/*[[[head:libc_execve,hash:CRC-32=0x4dda358b]]]*/
+/*[[[head:libc_execve,hash:CRC-32=0xae5637c3]]]*/
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path,
                                   __TARGV,
@@ -130,9 +130,9 @@ NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2])
 }
 /*[[[end:libc_pipe]]]*/
 
-/*[[[head:libc_sleep,hash:CRC-32=0xdc9c695b]]]*/
+/*[[[head:libc_sleep,hash:CRC-32=0x56bdadfa]]]*/
 /* >> sleep(3)
- * Sleep for up to `SECONDS' seconds */
+ * Sleep for up to `seconds' seconds */
 INTERN ATTR_SECTION(".text.crt.system.utility") unsigned int
 NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds)
 /*[[[body:libc_sleep]]]*/
@@ -174,13 +174,13 @@ NOTHROW_NCX(LIBCCALL libc_getpgrp)(void)
 }
 /*[[[end:libc_getpgrp]]]*/
 
-/*[[[head:libc_setpgid,hash:CRC-32=0x4d5e0620]]]*/
+/*[[[head:libc_setpgid,hash:CRC-32=0x5c9bcdc1]]]*/
 /* >> setpgid(2)
- * Change the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Change the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
- * When `PID' is ZERO(0), use `gettid()' for it instead.
- * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead.
+ * When `pgid' is ZERO(0), use `pid' (after it was substituted) for instead */
 INTERN ATTR_SECTION(".text.crt.sched.process") int
 NOTHROW_NCX(LIBCCALL libc_setpgid)(pid_t pid,
                                    pid_t pgid)
@@ -292,11 +292,11 @@ NOTHROW_NCX(LIBCCALL libc_getgroups)(int size,
 }
 /*[[[end:libc_getgroups]]]*/
 
-/*[[[head:libc_setuid,hash:CRC-32=0x5b00aa94]]]*/
+/*[[[head:libc_setuid,hash:CRC-32=0x36baefd7]]]*/
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `UID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `uid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setuid)(uid_t uid)
@@ -312,11 +312,11 @@ NOTHROW_NCX(LIBCCALL libc_setuid)(uid_t uid)
 }
 /*[[[end:libc_setuid]]]*/
 
-/*[[[head:libc_setgid,hash:CRC-32=0xbb851fbc]]]*/
+/*[[[head:libc_setgid,hash:CRC-32=0xd63f5aff]]]*/
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `GID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `gid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid)
@@ -353,12 +353,12 @@ NOTHROW_NCX(LIBCCALL libc_fork)(void)
 }
 /*[[[end:libc_fork]]]*/
 
-/*[[[head:libc_alarm,hash:CRC-32=0xc26c7b8b]]]*/
+/*[[[head:libc_alarm,hash:CRC-32=0x38df66e8]]]*/
 /* >> alarm(2)
  * @return: 0 : No alarm was scheduled before.
  * @return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
  * Schedule an to deliver a `SIGALRM' after letting `seconds' elapse.
- * You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm */
+ * You may pass `0' for `seconds' to disable a previously scheduled alarm */
 INTERN ATTR_SECTION(".text.crt.system.utility") unsigned int
 NOTHROW_NCX(LIBCCALL libc_alarm)(unsigned int seconds)
 /*[[[body:libc_alarm]]]*/
@@ -541,9 +541,9 @@ NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 }
 /*[[[end:libc_setlogin]]]*/
 
-/*[[[head:libc_chown,hash:CRC-32=0x61d0972c]]]*/
+/*[[[head:libc_chown,hash:CRC-32=0xd604eb29]]]*/
 /* >> chown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER' */
+ * Change the ownership of a given `file' to `group:owner' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_chown)(char const *file,
                                  uid_t owner,
@@ -560,9 +560,9 @@ NOTHROW_RPC(LIBCCALL libc_chown)(char const *file,
 }
 /*[[[end:libc_chown]]]*/
 
-/*[[[head:libc_link,hash:CRC-32=0x2a0edacd]]]*/
+/*[[[head:libc_link,hash:CRC-32=0xf1911c10]]]*/
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
                                 char const *to)
@@ -614,9 +614,9 @@ NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
 }
 /*[[[end:libc_write]]]*/
 
-/*[[[head:libc_lseek,hash:CRC-32=0x559c2bf8]]]*/
+/*[[[head:libc_lseek,hash:CRC-32=0xf5643ece]]]*/
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTERN ATTR_SECTION(".text.crt.io.seek") off_t
 NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
                                  off_t offset,
@@ -633,11 +633,11 @@ NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
 }
 /*[[[end:libc_lseek]]]*/
 
-/*[[[head:libc_isatty,hash:CRC-32=0xf74a9548]]]*/
+/*[[[head:libc_isatty,hash:CRC-32=0xf1b04f0]]]*/
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
- * Check if the given file handle `FD' refers to a TTY */
+ * Check if the given file handle `fd' refers to a TTY */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd)
 /*[[[body:libc_isatty]]]*/
@@ -647,10 +647,10 @@ NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd)
 }
 /*[[[end:libc_isatty]]]*/
 
-/*[[[head:libc_dup2,hash:CRC-32=0xda83cf00]]]*/
+/*[[[head:libc_dup2,hash:CRC-32=0x7ac90214]]]*/
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 INTERN ATTR_SECTION(".text.crt.io.access") fd_t
 NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
                                 fd_t newfd)
@@ -662,10 +662,10 @@ NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
 }
 /*[[[end:libc_dup2]]]*/
 
-/*[[[head:libc_dup,hash:CRC-32=0xc51eab6c]]]*/
+/*[[[head:libc_dup,hash:CRC-32=0x9db26688]]]*/
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `FD' and return its duplicated handle number */
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED fd_t
 NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 /*[[[body:libc_dup]]]*/
@@ -676,9 +676,9 @@ NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 }
 /*[[[end:libc_dup]]]*/
 
-/*[[[head:libc_close,hash:CRC-32=0xabf09747]]]*/
+/*[[[head:libc_close,hash:CRC-32=0x30df5919]]]*/
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 INTERN ATTR_SECTION(".text.crt.io.access") int
 NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 /*[[[body:libc_close]]]*/
@@ -689,10 +689,10 @@ NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 }
 /*[[[end:libc_close]]]*/
 
-/*[[[head:libc_access,hash:CRC-32=0x960e2f3]]]*/
+/*[[[head:libc_access,hash:CRC-32=0x262b886e]]]*/
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
@@ -704,9 +704,9 @@ NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
 }
 /*[[[end:libc_access]]]*/
 
-/*[[[head:libc_chdir,hash:CRC-32=0xd3cd439d]]]*/
+/*[[[head:libc_chdir,hash:CRC-32=0xae25299f]]]*/
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 INTERN ATTR_SECTION(".text.crt.fs.basic_property") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path)
 /*[[[body:libc_chdir]]]*/
@@ -778,9 +778,9 @@ done:
 }
 /*[[[end:libc_getcwd]]]*/
 
-/*[[[head:libc_unlink,hash:CRC-32=0x889af3d5]]]*/
+/*[[[head:libc_unlink,hash:CRC-32=0xf2a3ec93]]]*/
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 /*[[[body:libc_unlink]]]*/
@@ -795,9 +795,9 @@ NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 }
 /*[[[end:libc_unlink]]]*/
 
-/*[[[head:libc_rmdir,hash:CRC-32=0x2a419b8]]]*/
+/*[[[head:libc_rmdir,hash:CRC-32=0x51e1f733]]]*/
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 /*[[[body:libc_rmdir]]]*/
@@ -812,10 +812,10 @@ NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 }
 /*[[[end:libc_rmdir]]]*/
 
-/*[[[head:libc_euidaccess,hash:CRC-32=0x452a2ec]]]*/
+/*[[[head:libc_euidaccess,hash:CRC-32=0x10962284]]]*/
 /* >> euidaccess(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
                                       __STDC_INT_AS_UINT_T type)
@@ -830,10 +830,10 @@ NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
 }
 /*[[[end:libc_euidaccess]]]*/
 
-/*[[[head:libc_faccessat,hash:CRC-32=0x1d183b66]]]*/
+/*[[[head:libc_faccessat,hash:CRC-32=0xd99c78b0]]]*/
 /* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `dfd:file', testing for `type' */
 INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
                                      char const *file,
@@ -850,9 +850,9 @@ NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
 }
 /*[[[end:libc_faccessat]]]*/
 
-/*[[[head:libc_fchownat,hash:CRC-32=0x2f5885f8]]]*/
+/*[[[head:libc_fchownat,hash:CRC-32=0xfdb7221f]]]*/
 /* >> fchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
+ * Change the ownership of a given `dfd:file' to `group:owner' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd,
                                     char const *file,
@@ -871,9 +871,9 @@ NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd,
 }
 /*[[[end:libc_fchownat]]]*/
 
-/*[[[head:libc_linkat,hash:CRC-32=0x1bef3774]]]*/
+/*[[[head:libc_linkat,hash:CRC-32=0xc42322fe]]]*/
 /* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+ * Create a hard link from `fromfd:from', leading to `tofd:to' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
                                   char const *from,
@@ -892,10 +892,10 @@ NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
 }
 /*[[[end:libc_linkat]]]*/
 
-/*[[[head:libc_symlinkat,hash:CRC-32=0xe23c488]]]*/
+/*[[[head:libc_symlinkat,hash:CRC-32=0x5689b9b5]]]*/
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+ * Create a new symbolic link loaded with `link_text' as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 3)) int
 NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
                                      fd_t tofd,
@@ -910,9 +910,9 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
 }
 /*[[[end:libc_symlinkat]]]*/
 
-/*[[[head:libc_readlinkat,hash:CRC-32=0x395bb63b]]]*/
+/*[[[head:libc_readlinkat,hash:CRC-32=0x3ba8f438]]]*/
 /* >> readlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
@@ -935,9 +935,9 @@ NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
 }
 /*[[[end:libc_readlinkat]]]*/
 
-/*[[[head:libc_unlinkat,hash:CRC-32=0x3d902d39]]]*/
+/*[[[head:libc_unlinkat,hash:CRC-32=0xbd33e56e]]]*/
 /* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+ * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
                                     char const *name,
@@ -952,12 +952,12 @@ NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
 }
 /*[[[end:libc_unlinkat]]]*/
 
-/*[[[head:libc_lseek64,hash:CRC-32=0x804bca6]]]*/
+/*[[[head:libc_lseek64,hash:CRC-32=0x94399d16]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lseek64, libc_lseek);
 #else /* MAGIC:alias */
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTERN ATTR_SECTION(".text.crt.io.large.seek") off64_t
 NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
                                    off64_t offset,
@@ -1265,9 +1265,9 @@ err:
 }
 /*[[[end:libc_ualarm]]]*/
 
-/*[[[head:libc_fchown,hash:CRC-32=0x17d60241]]]*/
+/*[[[head:libc_fchown,hash:CRC-32=0x91a498d1]]]*/
 /* >> fchown(2)
- * Change the ownership of a given `FD' to `GROUP:OWNER' */
+ * Change the ownership of a given `fd' to `group:owner' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") int
 NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd,
                                   uid_t owner,
@@ -1288,9 +1288,9 @@ NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd,
 }
 /*[[[end:libc_fchown]]]*/
 
-/*[[[head:libc_fchdir,hash:CRC-32=0xbff54254]]]*/
+/*[[[head:libc_fchdir,hash:CRC-32=0x47010fa5]]]*/
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 INTERN ATTR_SECTION(".text.crt.fs.basic_property") int
 NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd)
 /*[[[body:libc_fchdir]]]*/
@@ -1301,12 +1301,12 @@ NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd)
 }
 /*[[[end:libc_fchdir]]]*/
 
-/*[[[head:libc_getpgid,hash:CRC-32=0x9d2b3e0c]]]*/
+/*[[[head:libc_getpgid,hash:CRC-32=0x5ffda70]]]*/
 /* >> getpgid(2)
- * Return the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Return the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
- * When `PID' is ZERO(0), use `gettid()' for it instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead */
 INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_getpgid)(pid_t pid)
 /*[[[body:libc_getpgid]]]*/
@@ -1317,9 +1317,9 @@ NOTHROW_NCX(LIBCCALL libc_getpgid)(pid_t pid)
 }
 /*[[[end:libc_getpgid]]]*/
 
-/*[[[head:libc_getsid,hash:CRC-32=0xd4f82285]]]*/
+/*[[[head:libc_getsid,hash:CRC-32=0xe542b6c7]]]*/
 /* >> getsid(2)
- * Return the ID of the session which a process `PID' is apart of.
+ * Return the ID of the session which a process `pid' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 INTERN ATTR_SECTION(".text.crt.sched.process") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
@@ -1331,9 +1331,9 @@ NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
 }
 /*[[[end:libc_getsid]]]*/
 
-/*[[[head:libc_lchown,hash:CRC-32=0xebc0d16b]]]*/
+/*[[[head:libc_lchown,hash:CRC-32=0x65b469a0]]]*/
 /* >> lchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER',
+ * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if that file is a symbolic link */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
@@ -1355,9 +1355,9 @@ NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
 }
 /*[[[end:libc_lchown]]]*/
 
-/*[[[head:libc_truncate,hash:CRC-32=0xbe92bdae]]]*/
+/*[[[head:libc_truncate,hash:CRC-32=0x7c24ef0]]]*/
 /* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
                                     __PIO_OFFSET length)
@@ -1370,12 +1370,12 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
 }
 /*[[[end:libc_truncate]]]*/
 
-/*[[[head:libc_truncate64,hash:CRC-32=0x43661925]]]*/
+/*[[[head:libc_truncate64,hash:CRC-32=0x7bf49012]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_truncate64, libc_truncate);
 #else /* MAGIC:alias */
 /* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
                                       __PIO_OFFSET64 length)
@@ -1389,10 +1389,10 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_truncate64]]]*/
 
-/*[[[head:libc_fexecve,hash:CRC-32=0xa71cb333]]]*/
+/*[[[head:libc_fexecve,hash:CRC-32=0xac08f77f]]]*/
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `FD' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `fd' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd,
                                    __TARGV,
@@ -1528,11 +1528,11 @@ got_fd:
 }
 /*[[[end:libc_sethostid]]]*/
 
-/*[[[head:libc_seteuid,hash:CRC-32=0x17145d9f]]]*/
+/*[[[head:libc_seteuid,hash:CRC-32=0x14fcb70c]]]*/
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid)
@@ -1557,11 +1557,11 @@ NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid)
 }
 /*[[[end:libc_seteuid]]]*/
 
-/*[[[head:libc_setegid,hash:CRC-32=0x52fc1bfe]]]*/
+/*[[[head:libc_setegid,hash:CRC-32=0x5114f16d]]]*/
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid)
@@ -1598,11 +1598,11 @@ NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
 }
 /*[[[end:libc_ttyslot]]]*/
 
-/*[[[head:libc_symlink,hash:CRC-32=0x18a9125e]]]*/
+/*[[[head:libc_symlink,hash:CRC-32=0x386d6ca5]]]*/
 /* >> symlink(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+ * Create a new symbolic link loaded with `link_text' as link
+ * text, at the filesystem location referred to by `target_path'.
+ * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
                                    char const *target_path)
@@ -1614,10 +1614,10 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
 }
 /*[[[end:libc_symlink]]]*/
 
-/*[[[head:libc_readlink,hash:CRC-32=0x9e5deaad]]]*/
+/*[[[head:libc_readlink,hash:CRC-32=0xb933789e]]]*/
 /* >> readlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * Read the text of a symbolic link under `path' into the provided buffer.
+ * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
@@ -1842,10 +1842,10 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[skip:libc_syscall]]]*/
 /*[[[skip:libc_syscall64]]]*/
 
-/*[[[head:libc_chroot,hash:CRC-32=0xd6905a0e]]]*/
+/*[[[head:libc_chroot,hash:CRC-32=0xc5ab98aa]]]*/
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
- * (usually the process) to a path that was previously address by `PATH' */
+ * (usually the process) to a path that was previously address by `path' */
 INTERN ATTR_SECTION(".text.crt.fs.utility") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
 /*[[[body:libc_chroot]]]*/
@@ -1869,9 +1869,9 @@ NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
 }
 /*[[[end:libc_getpass]]]*/
 
-/*[[[head:libc_ftruncate,hash:CRC-32=0xb64cac17]]]*/
+/*[[[head:libc_ftruncate,hash:CRC-32=0xcd4e0d6b]]]*/
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.io.write") int
 NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
                                      __PIO_OFFSET length)
@@ -1883,12 +1883,12 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
 }
 /*[[[end:libc_ftruncate]]]*/
 
-/*[[[head:libc_ftruncate64,hash:CRC-32=0x2aad9505]]]*/
+/*[[[head:libc_ftruncate64,hash:CRC-32=0x4d1db1cd]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_ftruncate64, libc_ftruncate);
 #else /* MAGIC:alias */
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.io.large.write") int
 NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd,
                                        __PIO_OFFSET64 length)
@@ -2078,13 +2078,13 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") u8 const pc_superblock_features_
 	[_PC_2_SYMLINKS]         = FIELD_UNDEFINED, /* Custom! */
 };
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0x258cc134]]]*/
+/*[[[head:libc_fpathconf,hash:CRC-32=0x53714ecc]]]*/
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `FD'
- * return: * : The configuration limit associated with `NAME' for `FD'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * Return a path configuration value associated with `name' for `fd'
+ * return: * : The configuration limit associated with `name' for `fd'
+ * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED longptr_t
 NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
                                      __STDC_INT_AS_UINT_T name)
@@ -2154,13 +2154,13 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 }
 /*[[[end:libc_fpathconf]]]*/
 
-/*[[[head:libc_pathconf,hash:CRC-32=0xa0692a7a]]]*/
+/*[[[head:libc_pathconf,hash:CRC-32=0x87341e12]]]*/
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * Return a path configuration value associated with `name' for `path'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1)) longptr_t
 NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
@@ -3105,14 +3105,14 @@ STATIC_ASSERT(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
 
 
 
-/*[[[head:libc_sysconf,hash:CRC-32=0xd86a6bd3]]]*/
+/*[[[head:libc_sysconf,hash:CRC-32=0x4e89c8f0]]]*/
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `NAME'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ * @param: name: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `name'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
 NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name)
 /*[[[body:libc_sysconf]]]*/
@@ -3279,10 +3279,10 @@ for (local name: SYSCONF_VALUES_LO_INT32) {
 }
 /*[[[end:libc_sysconf]]]*/
 
-/*[[[head:libc_freadlinkat,hash:CRC-32=0xd73b6b7d]]]*/
+/*[[[head:libc_freadlinkat,hash:CRC-32=0xbfc3ac49]]]*/
 /* >> freadlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
 INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
                                        char const *path,
@@ -3601,9 +3601,9 @@ NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 }
 /*[[[end:libc_fdatasync]]]*/
 
-/*[[[head:libc_ctermid_r,hash:CRC-32=0x56be854b]]]*/
+/*[[[head:libc_ctermid_r,hash:CRC-32=0x4e77dd5c]]]*/
 /* >> ctermid_r(3)
- * Same as `ctermid', but return `NULL' when `S' is `NULL' */
+ * Same as `ctermid', but return `NULL' when `s' is `NULL' */
 INTERN ATTR_SECTION(".text.crt.io.tty") char *
 NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 /*[[[body:libc_ctermid_r]]]*/

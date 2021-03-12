@@ -89,7 +89,8 @@ typedef __SIZE_TYPE__ size_t;
 @@          in use. However, an `E_BADALLOC' exception is thrown if insufficient
 @@          memory (for internal control structures) is available to complete
 @@          the operation
-[[libc, dos_export_alias("_expand"), ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
+[[libc, dos_only_export_alias("_expand")]]
+[[ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.helpers"), decl_include("<hybrid/typecore.h>")]]
 void *realloc_in_place(void *__restrict mallptr, size_t n_bytes);
 
@@ -181,7 +182,7 @@ int malloc_trim(size_t pad) {
 
 %
 [[decl_include("<hybrid/typecore.h>")]]
-[[libc, wunused, ATTR_PURE, dos_export_alias("_msize")]]
+[[libc, wunused, ATTR_PURE, dos_only_export_alias("_msize")]]
 [[section(".text.crt{|.dos}.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
 

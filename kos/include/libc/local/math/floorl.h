@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfaae6cb6 */
+/* HASH CRC-32:0x9b07366a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <libm/floor.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Largest integer not greater than X */
+/* Largest integer not greater than `x' */
 __LOCAL_LIBC(floorl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floorl))(__LONGDOUBLE __x) {
 #ifdef __LIBM_MATHFUNL

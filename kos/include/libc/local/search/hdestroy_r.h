@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b63c042 */
+/* HASH CRC-32:0xd220da69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_hdestroy_r_defined
 #define __local_hdestroy_r_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: free from stdlib */
@@ -49,7 +48,7 @@ struct hsearch_data {
 #endif /* !__hsearch_data_defined */
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Reentrant versions which can handle multiple hashing tables at the same time */
+/* >> hdestroy_r(3) */
 __LOCAL_LIBC(hdestroy_r) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__htab) {
 	if (__htab == __NULLPTR) {
@@ -58,7 +57,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__h
 #endif /* __EINVAL */
 		return;
 	}
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	__localdep_free(__htab->table);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	__htab->table = __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
@@ -66,7 +67,4 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_hdestroy_r_defined 1
 #define __localdep_hdestroy_r __LIBC_LOCAL_NAME(hdestroy_r)
 #endif /* !__local___localdep_hdestroy_r_defined */
-#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-#undef __local_hdestroy_r_defined
-#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local_hdestroy_r_defined */

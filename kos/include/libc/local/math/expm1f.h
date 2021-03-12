@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6fd0ba7 */
+/* HASH CRC-32:0x239b06a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_expm1_defined
 #define __local___localdep_expm1_defined 1
 #if __has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)
-/* Return exp(X) - 1 */
+/* Return `exp(x) - 1' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_expm1,(double __x),expm1,{ return __builtin_expm1(__x); })
 #elif defined(__CRT_HAVE_expm1)
-/* Return exp(X) - 1 */
+/* Return `exp(x) - 1' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_expm1,(double __x),expm1,(__x))
 #elif defined(__CRT_HAVE___expm1)
-/* Return exp(X) - 1 */
+/* Return `exp(x) - 1' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_expm1,(double __x),__expm1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/expm1.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return exp(X) - 1 */
+/* Return `exp(x) - 1' */
 #define __localdep_expm1 __LIBC_LOCAL_NAME(expm1)
 #else /* ... */
 #undef __local___localdep_expm1_defined
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_END
 #include <libm/finite.h>
 #include <libm/expm1.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return exp(X) - 1 */
+/* Return `exp(x) - 1' */
 __LOCAL_LIBC(expm1f) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expm1f))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

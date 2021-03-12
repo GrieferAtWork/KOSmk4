@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68b37e9f */
+/* HASH CRC-32:0x6fa1a9ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+ * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
 #endif /* !__local___localdep_wlinkat_defined */
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 __LOCAL_LIBC(wlink) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlink))(__WCHAR_TYPE__ const *__from, __WCHAR_TYPE__ const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */

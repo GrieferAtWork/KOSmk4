@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf64d552 */
+/* HASH CRC-32:0x1faf9ee4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_modf_defined
 #define __local___localdep_modf_defined 1
 #if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
-/* Break VALUE into integral and fractional parts */
+/* Break `value' into integral and fractional parts */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,{ return __builtin_modf(__x, __iptr); })
 #elif defined(__CRT_HAVE_modf)
-/* Break VALUE into integral and fractional parts */
+/* Break `value' into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,(__x,__iptr))
 #elif defined(__CRT_HAVE___modf)
-/* Break VALUE into integral and fractional parts */
+/* Break `value' into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),__modf,(__x,__iptr))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/modf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Break VALUE into integral and fractional parts */
+/* Break `value' into integral and fractional parts */
 #define __localdep_modf __LIBC_LOCAL_NAME(modf)
 #else /* ... */
 #undef __local___localdep_modf_defined
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/modf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Break VALUE into integral and fractional parts */
+/* Break `value' into integral and fractional parts */
 __LOCAL_LIBC(modff) __ATTR_WUNUSED __ATTR_NONNULL((2)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modff))(float __x, float *__iptr) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

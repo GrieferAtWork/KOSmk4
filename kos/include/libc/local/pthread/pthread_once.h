@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x602127fd */
+/* HASH CRC-32:0x8c4da980 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,10 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 #include <hybrid/sched/__yield.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_once(3)
- * Guarantee that the initialization function INIT_ROUTINE will be called
+ * Guarantee that the initialization function `init_routine' will be called
  * only once, even if pthread_once is executed several times with the
- * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT.
+ * same `once_control' argument. `once_control' must point to a static or
+ * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __LOCAL_LIBC(pthread_once) __ATTR_NONNULL((1, 2)) __errno_t
 (__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) {

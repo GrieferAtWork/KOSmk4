@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3626f118 */
+/* HASH CRC-32:0x6e0cbcbd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrit
 __NAMESPACE_LOCAL_END
 #include <bits/crt/io-file.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Write a single character `CH' to `STREAM' */
+/* >> fputc(3)
+ * Write a single character `ch' to `stream' */
 __LOCAL_LIBC(fputc) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc))(int __ch, __FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf) && (!defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fwrite) && !defined(__CRT_HAVE__IO_fwrite) && !defined(__CRT_HAVE_fwrite_s) && !defined(__CRT_HAVE_fwrite_unlocked) && !defined(__CRT_HAVE__fwrite_nolock)))

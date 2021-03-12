@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd38b024e */
+/* HASH CRC-32:0xf76c72b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,21 +32,21 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+ * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
 #elif defined(__CRT_HAVE_DOS$wunlinkat)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+ * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
 #else /* ... */
 #undef __local___localdep_c16unlinkat_defined
 #endif /* !... */
 #endif /* !__local___localdep_c16unlinkat_defined */
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __LOCAL_LIBC(c16rmdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16rmdir))(__CHAR16_TYPE__ const *__path) {
 	return __localdep_c16unlinkat(__AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */

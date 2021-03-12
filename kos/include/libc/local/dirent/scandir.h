@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e29bb4 */
+/* HASH CRC-32:0x2cbf74d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,16 +35,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_scandirat_defined
 #define __local___localdep_scandirat_defined 1
 #if defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
-/* Scan a directory `DIRFD:DIR' for all contained directory entries */
+/* >> scandirat(3), scandirat64(3)
+ * Scan a directory `dirfd:dir' for all contained directory entries */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
-/* Scan a directory `DIRFD:DIR' for all contained directory entries */
+/* >> scandirat(3), scandirat64(3)
+ * Scan a directory `dirfd:dir' for all contained directory entries */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #else /* ... */
 #undef __local___localdep_scandirat_defined
 #endif /* !... */
 #endif /* !__local___localdep_scandirat_defined */
-/* Scan a directory `DIR' for all contained directory entries */
+/* >> scandir(3), scandir64(3)
+ * Scan a directory `dir' for all contained directory entries */
 __LOCAL_LIBC(scandir) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir))(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp) {
 	return __localdep_scandirat(__AT_FDCWD, __dir, __namelist, __selector, __cmp);

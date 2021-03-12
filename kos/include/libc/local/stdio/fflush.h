@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37e18078 */
+/* HASH CRC-32:0x80e1cb54 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,8 @@ __CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_IO_flush_all,())
 #undef __local___localdep_crt_flushall_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_flushall_defined */
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __LOCAL_LIBC(fflush) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush))(__FILE *__stream) __THROWS(...) {
 	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no

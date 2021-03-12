@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd262fe5c */
+/* HASH CRC-32:0x48709f7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_log1p_defined
 #define __local___localdep_log1p_defined 1
 #if __has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)
-/* Return log(1 + X) */
+/* Return `log(1 + x)' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),log1p,{ return __builtin_log1p(__x); })
 #elif defined(__CRT_HAVE_log1p)
-/* Return log(1 + X) */
+/* Return `log(1 + x)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),log1p,(__x))
 #elif defined(__CRT_HAVE___log1p)
-/* Return log(1 + X) */
+/* Return `log(1 + x)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),__log1p,(__x))
 #else /* ... */
 #undef __local___localdep_log1p_defined
 #endif /* !... */
 #endif /* !__local___localdep_log1p_defined */
-/* Return log(1 + X) */
+/* Return `log(1 + x)' */
 __LOCAL_LIBC(log1pf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log1pf))(float __x) {
 	return (float)__localdep_log1p((double)__x);

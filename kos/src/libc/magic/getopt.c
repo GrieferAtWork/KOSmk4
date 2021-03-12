@@ -93,19 +93,19 @@ enum {
  * When `getopt' finds an option that takes an argument,
  * the argument value is returned here.
  * Also,  when  `ordering'  is   RETURN_IN_ORDER,
- * each non-option ARGV-element is returned here. */
+ * each non-option argv-element is returned here. */
 __LIBC char *optarg;
 #endif /* __CRT_HAVE_optarg */
 
 #ifdef __CRT_HAVE_optind
-/* Index in ARGV of the next element to be scanned.
+/* Index in `argv' of the next element to be scanned.
  * - This  is  used for  communication  to and  from  the caller
  *   and for communication between successive calls to `getopt'.
  * - On entry to `getopt', zero means this is the first call; initialize.
  * - When `getopt' returns -1, this is the index of the first of
  *   the non-option elements that the caller should itself scan.
- * - Otherwise,  `optind' communicates from one call to
- *   the next how much of ARGV has been scanned so far. */
+ * - Otherwise, `optind'  communicates from  one call  to
+ *   the next how much of `argv' has been scanned so far. */
 __LIBC __INT32_TYPE__ optind;
 #endif /* __CRT_HAVE_optind */
 
@@ -120,9 +120,22 @@ __LIBC __INT32_TYPE__ opterr;
 __LIBC __INT32_TYPE__ optopt;
 #endif /* __CRT_HAVE_optopt */
 
-/* Describe    the   long-named   options   requested   by   the   application.
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("name")
+#pragma push_macro("has_arg")
+#pragma push_macro("flag")
+#pragma push_macro("val")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef name
+#undef has_arg
+#undef flag
+#undef val
+
+/* Describe the long-named options requested by the application.
+ *
  * The  LONG_OPTIONS argument  to getopt_long  or getopt_long_only  is a vector
  * of `struct option' terminated by an element containing a name which is zero.
+ *
  * - The field `has_arg' is:
  *     - no_argument       (or 0) if the option does not take an argument,
  *     - required_argument (or 1) if the option requires an argument,
@@ -142,6 +155,13 @@ struct option {
 	__INT32_TYPE__  *flag;
 	__INT32_TYPE__   val;
 };
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("val")
+#pragma pop_macro("flag")
+#pragma pop_macro("has_arg")
+#pragma pop_macro("name")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 }
 

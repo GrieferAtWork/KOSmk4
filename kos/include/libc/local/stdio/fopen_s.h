@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1097d13 */
+/* HASH CRC-32:0x878a57b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopen64_defined
 #define __local___localdep_fopen64_defined 1
 #ifdef __CRT_HAVE_fopen64
-/* 64-bit variant of `fopen' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen)
-/* 64-bit variant of `fopen' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
 #elif defined(__CRT_HAVE__IO_fopen)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fopen64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* 64-bit variant of `fopen' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 #define __localdep_fopen64 __LIBC_LOCAL_NAME(fopen64)
 #else /* ... */
 #undef __local___localdep_fopen64_defined

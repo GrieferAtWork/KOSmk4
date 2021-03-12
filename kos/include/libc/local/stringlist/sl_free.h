@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38a4cc05 */
+/* HASH CRC-32:0x5138dfb0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,15 +46,15 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 /* >> sl_free(3)
- * Free a given string list. When `ALL' is non-zero, all contained
- * string pointers (as previously added with `sl_add()') will also
- * be `free(3)'ed. */
+ * Free a given string list. When `freeit' is non-zero, all contained
+ * string pointers (as previously added with `sl_add()') will also be
+ * `free(3)'d. */
 __LOCAL_LIBC(sl_free) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_free))(struct _stringlist *__sl, int __all) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_free))(struct _stringlist *__sl, int __freeit) {
 	if __unlikely(!__sl)
 		return;
 	if __likely(__sl->sl_str) {
-		if (__all) {
+		if (__freeit) {
 			__SIZE_TYPE__ __i;
 			for (__i = 0; __i < __sl->sl_cur; ++__i)
 				__localdep_free(__sl->sl_str[__i]);

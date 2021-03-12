@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a734c6 */
+/* HASH CRC-32:0x770dd5ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,13 +31,13 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
-/* Reentrant versions which can handle multiple hashing tables at the same time */
+/* >> hcreate_r(3) */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_hcreate_r,(__SIZE_TYPE__ __nel, struct hsearch_data *__htab),hcreate_r,(__nel,__htab))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/hcreate_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Reentrant versions which can handle multiple hashing tables at the same time */
+/* >> hcreate_r(3) */
 #define __localdep_hcreate_r __LIBC_LOCAL_NAME(hcreate_r)
 #else /* ... */
 #undef __local___localdep_hcreate_r_defined
@@ -56,11 +56,12 @@ struct hsearch_data {
 #ifndef __local_htab_defined
 #define __local_htab_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = {__NULLPTR, 0, 0};
+__LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = { __NULLPTR, 0, 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_htab_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Create a new hashing table which will at most contain NEL elements */
+/* >> hcreate(3)
+ * Create a new hashing table which will at most contain `nel' elements */
 __LOCAL_LIBC(hcreate) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate))(__SIZE_TYPE__ __nel) {
 	return __localdep_hcreate_r(__nel, &__NAMESPACE_LOCAL_SYM __htab);

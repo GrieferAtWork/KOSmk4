@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ecc6f5 */
+/* HASH CRC-32:0x59a467b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ldexp_defined
 #define __local___localdep_ldexp_defined 1
 #if __has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)
-/* X times (two to the EXP power) */
+/* `x' times (two to the `exponent' power) */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __exponent),ldexp,{ return __builtin_ldexp(__x, __exponent); })
 #elif defined(__CRT_HAVE_ldexp)
-/* X times (two to the EXP power) */
+/* `x' times (two to the `exponent' power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __exponent),ldexp,(__x,__exponent))
 #elif defined(__CRT_HAVE___ldexp)
-/* X times (two to the EXP power) */
+/* `x' times (two to the `exponent' power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __exponent),__ldexp,(__x,__exponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/ldexp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* X times (two to the EXP power) */
+/* `x' times (two to the `exponent' power) */
 #define __localdep_ldexp __LIBC_LOCAL_NAME(ldexp)
 #else /* ... */
 #undef __local___localdep_ldexp_defined
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <libm/finite.h>
 #include <libm/ldexp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* X times (two to the EXP power) */
+/* `x' times (two to the `exponent' power) */
 __LOCAL_LIBC(ldexpf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x, int __exponent) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

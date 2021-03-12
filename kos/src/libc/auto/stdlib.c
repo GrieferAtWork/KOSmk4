@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1314ef14 */
+/* HASH CRC-32:0xfdf22147 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1171,7 +1171,7 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 	return 0;
 }
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `FD' */
+ * associated with the master descriptor `fd' */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
 	static char buf[64];
@@ -1521,13 +1521,14 @@ NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
 }
 #include <asm/os/fcntl.h>
 #include <libc/errno.h>
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
  * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
  * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
                                   void *cookie) {
+	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int result = 0;
 #ifdef __libc_geterrno
 	errno_t saved_err;
@@ -1538,7 +1539,7 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 		saved_err = __libc_geterrno();
 #endif /* __libc_geterrno */
 		/* fcntl(F_NEXT) returns the next valid  (i.e.
-		 * currently open) FD that is >= the given FD. */
+		 * currently open) fd that is >= the given fd. */
 		fd = libc_fcntl(fd, __F_NEXT);
 		if (fd < 0) {
 #ifdef __libc_geterrno
@@ -3659,40 +3660,48 @@ DEFINE_PUBLIC_ALIAS(strtold, libc_strtold);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strtou32, libc_strtou32);
 DEFINE_PUBLIC_ALIAS(strto32, libc_strto32);
-#ifndef __KERNEL__
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_strtoui64, libc_strtou64);
-#endif /* !__KERNEL__ */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strtou64, libc_strtou64);
-#ifndef __KERNEL__
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_strtoi64, libc_strto64);
-#endif /* !__KERNEL__ */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strto64, libc_strto64);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strtou32_l, libc_strtou32_l);
 DEFINE_PUBLIC_ALIAS(strto32_l, libc_strto32_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoui64_l, libc_strtou64_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strtou64_l, libc_strtou64_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoi64_l, libc_strto64_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strto64_l, libc_strto64_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_gcvt, libc_gcvt);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(gcvt, libc_gcvt);
 DEFINE_PUBLIC_ALIAS(ecvt_r, libc_ecvt_r);
 DEFINE_PUBLIC_ALIAS(fcvt_r, libc_fcvt_r);
 DEFINE_PUBLIC_ALIAS(qgcvt, libc_qgcvt);
 DEFINE_PUBLIC_ALIAS(qecvt_r, libc_qecvt_r);
 DEFINE_PUBLIC_ALIAS(qfcvt_r, libc_qfcvt_r);
-DEFINE_PUBLIC_ALIAS(_ecvt, libc_qecvt);
 DEFINE_PUBLIC_ALIAS(qecvt, libc_qecvt);
-DEFINE_PUBLIC_ALIAS(_fcvt, libc_qfcvt);
 DEFINE_PUBLIC_ALIAS(qfcvt, libc_qfcvt);
 DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
 DEFINE_PUBLIC_ALIAS(__mktemp, libc_mktemp);
 DEFINE_PUBLIC_ALIAS(mktemp, libc_mktemp);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_ecvt, libc_ecvt);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(ecvt, libc_ecvt);
-DEFINE_PUBLIC_ALIAS(_ecvt, libc_fcvt);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_fcvt, libc_fcvt);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fcvt, libc_fcvt);
 DEFINE_PUBLIC_ALIAS(getsubopt, libc_getsubopt);
 DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp);
@@ -3700,27 +3709,39 @@ DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
 DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
-DEFINE_PUBLIC_ALIAS(strtol_l, libc_strtol_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtol_l, libc_strtol_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtol_l, libc_strtol_l);
-DEFINE_PUBLIC_ALIAS(strtoul_l, libc_strtoul_l);
+DEFINE_PUBLIC_ALIAS(strtol_l, libc_strtol_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoul_l, libc_strtoul_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtoul_l, libc_strtoul_l);
-DEFINE_PUBLIC_ALIAS(strtoll_l, libc_strtoll_l);
+DEFINE_PUBLIC_ALIAS(strtoul_l, libc_strtoul_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoll_l, libc_strtoll_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtoll_l, libc_strtoll_l);
-DEFINE_PUBLIC_ALIAS(strtoq_l, libc_strtoll_l);
-DEFINE_PUBLIC_ALIAS(strtoull_l, libc_strtoull_l);
+DEFINE_PUBLIC_ALIAS(strtoll_l, libc_strtoll_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoull_l, libc_strtoull_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtoull_l, libc_strtoull_l);
-DEFINE_PUBLIC_ALIAS(strtouq_l, libc_strtoull_l);
+DEFINE_PUBLIC_ALIAS(strtoull_l, libc_strtoull_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtod_l, libc_strtod_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtod_l, libc_strtod_l);
 DEFINE_PUBLIC_ALIAS(strtod_l, libc_strtod_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtof_l, libc_strtof_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtof_l, libc_strtof_l);
 DEFINE_PUBLIC_ALIAS(strtof_l, libc_strtof_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtold_l, libc_strtold_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp);

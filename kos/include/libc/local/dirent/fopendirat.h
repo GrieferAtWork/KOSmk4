@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe00e57ed */
+/* HASH CRC-32:0x8d3b58dd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
@@ -47,7 +47,8 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 /* Dependency: fdopendir from dirent */
 #ifndef __local___localdep_fdopendir_defined
 #define __local___localdep_fdopendir_defined 1
-/* Create a new directory stream by inheriting the given `FD' as stream handle */
+/* >> fdopendir(3)
+ * Create a new directory stream by inheriting the given `fd' as stream handle */
 __CREDIRECT(__ATTR_WUNUSED,struct __dirstream *,__NOTHROW_NCX,__localdep_fdopendir,(__fd_t __fd),fdopendir,(__fd))
 #endif /* !__local___localdep_fdopendir_defined */
 /* Dependency: openat from fcntl */
@@ -106,7 +107,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_openat __LIBC_LOCAL_NAME(openat)
 #endif /* !... */
 #endif /* !__local___localdep_openat_defined */
-/* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+/* >> fopendirat(3)
+ * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __LOCAL_LIBC(fopendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopendirat))(__fd_t __dirfd, char const *__name, __oflag_t __oflags) {
 	struct __dirstream *__result;

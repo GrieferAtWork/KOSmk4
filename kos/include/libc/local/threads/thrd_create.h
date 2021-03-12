@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf24c184 */
+/* HASH CRC-32:0xe1c7d3c0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,9 +36,9 @@ typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
 #endif /* !____pthread_start_routine_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_create(3)
- * Create a new thread, starting with execution of START-ROUTINE
- * getting passed ARG. Creation attributed come from ATTR. The new
- * handle is stored in *NEWTHREAD
+ * Create a new thread, starting with execution of `start_routine'
+ * getting passed `arg'. Creation attributed come from `attr'. The new
+ * handle is stored in `*newthread'
  * @return: EOK:    Success
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))

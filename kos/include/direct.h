@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaff49370 */
+/* HASH CRC-32:0x4ea659b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,27 +56,27 @@ __CDECLARE(,char *,__NOTHROW_RPC,_getcwd,(char *__buf, size_t __bufsize),(__buf,
 #endif /* ... */
 #ifdef __CRT_HAVE_chdir
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chdir,(char const *__path),chdir,(__path))
 #elif defined(__CRT_HAVE__chdir)
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chdir,(char const *__path),(__path))
 #endif /* ... */
 #ifdef __CRT_HAVE_rmdir
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),rmdir,(__path))
 #elif defined(__CRT_HAVE__rmdir)
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); }
 #endif /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #endif /* !... */
@@ -108,18 +108,18 @@ __CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd
 #define __rmdir_defined 1
 #ifdef __CRT_HAVE_rmdir
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),(__path))
 #elif defined(__CRT_HAVE__rmdir)
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),_rmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
 #else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __rmdir_defined

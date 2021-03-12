@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2290c8b2 */
+/* HASH CRC-32:0xac732187 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,15 +29,15 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
 __NAMESPACE_LOCAL_END
@@ -92,14 +92,14 @@ __NAMESPACE_LOCAL_END
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/ftruncate64.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 #define __localdep_ftruncate64 __LIBC_LOCAL_NAME(ftruncate64)
 #else /* ... */
 #undef __local___localdep_ftruncate64_defined
@@ -199,7 +199,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_wtruncate32_defined) && defined(__CRT_HAVE_wtruncate)
 #define __local___localdep_wtruncate32_defined 1
 /* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
 #endif /* !__local___localdep_wtruncate32_defined && __CRT_HAVE_wtruncate */
 __NAMESPACE_LOCAL_END
@@ -215,7 +215,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __LOCAL_LIBC(wtruncate64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtruncate64))(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length) {
 #ifdef __CRT_HAVE_wtruncate

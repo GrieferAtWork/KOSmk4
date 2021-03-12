@@ -335,8 +335,8 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 
 
 @@>> execv(3)
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, export_alias("_execv"), argument_names(path, ___argv)]]
 [[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execv, { return __builtin_execv(path, (char *const *)___argv); })]]
@@ -348,8 +348,8 @@ int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 }
 
 @@>> execve(2)
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, export_alias("_execve"), argument_names(path, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[if(__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS)),
@@ -357,8 +357,8 @@ int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 @@>> execvp(3)
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, export_alias("_execvp"), argument_names(file, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS)),
@@ -371,8 +371,8 @@ int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 
 
 @@>> execl(3)
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list
 [[cp, guard, ATTR_SENTINEL, export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(execv), crtbuiltin]]
 int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
@@ -380,8 +380,8 @@ int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (ch
 }
 
 @@>> execle(3)
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execle"), crtbuiltin]]
 [[requires_dependent_function(execve), ATTR_SENTINEL_O(1)]]
@@ -390,8 +390,8 @@ int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (c
 }
 
 @@>> execlp(3)
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlp")]]
 [[requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin]]
 int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
@@ -401,8 +401,8 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU)
 @@>> execvpe(3)
-@@Replace the calling process with the application image referred to by `FILE' and
-@@execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `file' and
+@@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
 [[requires_include("<hybrid/__alloca.h>"), dependency(mempcpyc)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -439,7 +439,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the  specified
+	 * then $path is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 @@pp_ifdef _WIN32@@
@@ -449,7 +449,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 	if (strchr(file, '/'))
 		return execve(file, ___argv, ___envp);
 @@pp_endif@@
-	env_path = getenv("PATH");
+	env_path = getenv("path");
 	if (env_path && *env_path) {
 		size_t filelen;
 		filelen = strlen(file);
@@ -479,8 +479,9 @@ int execvpe([[nonnull]] char const *__restrict file,
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS)
 @@>> execlpe(3)
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+@@and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlpe")]]
 [[requires_dependent_function(execvpe), ATTR_SENTINEL_O(1)]]
 int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
@@ -521,7 +522,7 @@ int pipe([[nonnull]] $fd_t pipedes[2]) {
 }
 
 @@>> sleep(3)
-@@Sleep for up to `SECONDS' seconds
+@@Sleep for up to `seconds' seconds
 [[cp, guard, section(".text.crt{|.dos}.system.utility")]]
 [[userimpl, requires_function(dos_sleep)]]
 unsigned int sleep(unsigned int seconds) {
@@ -562,11 +563,11 @@ $pid_t getpgrp();
 %[insert:function(__getpgid = getpgid)]
 
 @@>> setpgid(2)
-@@Change the ID of the process group associated with `PID's process.
-@@(That is the TID of the leader of the process group of `PID's leader)
+@@Change the ID of the process group associated with `pid's process.
+@@(That is the TID of the leader of the process group of `pid's leader)
 @@THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
-@@When `PID' is ZERO(0), use `gettid()' for it instead.
-@@When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead
+@@When `pid' is ZERO(0), use `gettid()' for it instead.
+@@When `pgid' is ZERO(0), use `pid' (after it was substituted) for instead
 [[export_alias("__setpgid")]]
 [[decl_include("<bits/types.h>")]]
 int setpgid($pid_t pid, $pid_t pgid);
@@ -613,7 +614,7 @@ int getgroups(int size, $gid_t list[]);
 @@>> setuid(2)
 @@Set the effective user ID of the calling process
 @@@return: 0 : Success
-@@@return: -1: [errno=EINVAL] : The given `UID' is invalid
+@@@return: -1: [errno=EINVAL] : The given `uid' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 int setuid($uid_t uid);
@@ -621,7 +622,7 @@ int setuid($uid_t uid);
 @@>> setgid(2)
 @@Set the effective group ID of the calling process
 @@@return: 0 : Success
-@@@return: -1: [errno=EINVAL] : The given `GID' is invalid
+@@@return: -1: [errno=EINVAL] : The given `gid' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 int setgid($gid_t gid);
@@ -649,7 +650,7 @@ $pid_t fork();
 @@@return: 0 : No alarm was scheduled before.
 @@@return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
 @@Schedule an to deliver a `SIGALRM' after letting `seconds' elapse.
-@@You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm
+@@You may pass `0' for `seconds' to disable a previously scheduled alarm
 unsigned int alarm(unsigned int seconds);
 
 @@>> pause(2)
@@ -658,11 +659,11 @@ unsigned int alarm(unsigned int seconds);
 int pause();
 
 @@>> fpathconf(2)
-@@@param: NAME: One of `_PC_*' from <asm/crt/confname.h>
-@@Return a path configuration value associated with `NAME' for `FD'
-@@return: * : The configuration limit associated with `NAME' for `FD'
-@@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
-@@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
+@@@param: name: One of `_PC_*' from <asm/crt/confname.h>
+@@Return a path configuration value associated with `name' for `fd'
+@@return: * : The configuration limit associated with `name' for `fd'
+@@return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
+@@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 $longptr_t fpathconf($fd_t fd, __STDC_INT_AS_UINT_T name);
@@ -710,7 +711,7 @@ char *getlogin() {
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
 @@>> chown(2)
-@@Change the ownership of a given `FILE' to `GROUP:OWNER'
+@@Change the ownership of a given `file' to `group:owner'
 [[cp, decl_include("<bits/types.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchownat))]]
@@ -719,11 +720,11 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 }
 
 @@>> pathconf(2)
-@@@param: NAME: One of `_PC_*' from <asm/crt/confname.h>
-@@Return a path configuration value associated with `NAME' for `PATH'
-@@return: * : The configuration limit associated with `NAME' for `PATH'
-@@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
-@@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
+@@@param: name: One of `_PC_*' from <asm/crt/confname.h>
+@@Return a path configuration value associated with `name' for `path'
+@@return: * : The configuration limit associated with `name' for `path'
+@@return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
+@@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
 [[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY))]]
@@ -741,7 +742,7 @@ $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 }
 
 @@>> link(2)
-@@Create a hard link from `FROM', leading to `TO'
+@@Create a hard link from `from', leading to `to'
 [[cp, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(linkat))]]
 int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
@@ -849,7 +850,7 @@ ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 $off32_t lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 
 @@>> lseek(2)
-@@Change the position of the file read/write pointer within a file referred to by `FD'
+@@Change the position of the file read/write pointer within a file referred to by `fd'
 [[guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lseek64", "_lseeki64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lseek", "_lseek", "__lseek")]]
@@ -866,34 +867,34 @@ $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 @@>> isatty(2)
 @@@return: 1: Is a tty
 @@@return: 0: Not a tty
-@@Check if the given file handle `FD' refers to a TTY
+@@Check if the given file handle `fd' refers to a TTY
 [[guard, wunused, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.tty"), export_alias("_isatty")]]
 int isatty($fd_t fd);
 
 @@>> dup2(2)
-@@@return: NEWFD: Returns the new handle upon success.
-@@Duplicate a file referred to by `OLDFD' into `NEWFD'
+@@@return: newfd: Returns the new handle upon success.
+@@Duplicate a file referred to by `oldfd' into `newfd'
 [[guard, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.access"), export_alias("_dup2", "__dup2")]]
 $fd_t dup2($fd_t oldfd, $fd_t newfd);
 
 @@>> dup(2)
 @@@return: * : Returns the new handle upon success.
-@@Duplicate a file referred to by `FD' and return its duplicated handle number
+@@Duplicate a file referred to by `fd' and return its duplicated handle number
 [[guard, wunused, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.access"), export_alias("_dup")]]
 $fd_t dup($fd_t fd);
 
 @@>> close(2)
-@@Close a given file descriptor/handle `FD'
+@@Close a given file descriptor/handle `fd'
 [[guard, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.access"), export_alias("_close", "__close")]]
 int close($fd_t fd);
 
 @@>> access(2)
-@@@param: TYPE: Set of `X_OK|W_OK|R_OK'
-@@Test for access to the specified file `FILE', testing for `TYPE'
+@@@param: type: Set of `X_OK | W_OK | R_OK'
+@@Test for access to the specified file `file', testing for `type'
 [[cp, guard, wunused, decl_include("<features.h>")]]
 [[export_alias("_access"), section(".text.crt{|.dos}.fs.property")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
@@ -903,7 +904,7 @@ int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 }
 
 @@>> chdir(2)
-@@Change the current working directory to `PATH'
+@@Change the current working directory to `path'
 [[cp, guard, export_alias("_chdir")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
 int chdir([[nonnull]] char const *path);
@@ -916,7 +917,7 @@ char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
 @@>> unlink(2)
-@@Remove a file, symbolic link, device or FIFO referred to by `FILE'
+@@Remove a file, symbolic link, device or FIFO referred to by `file'
 [[cp, guard, export_alias("_unlink")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
@@ -925,7 +926,7 @@ int unlink([[nonnull]] char const *file) {
 }
 
 @@>> rmdir(2)
-@@Remove a directory referred to by `PATH'
+@@Remove a directory referred to by `path'
 [[cp, guard, export_alias("_rmdir")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
@@ -937,8 +938,8 @@ int rmdir([[nonnull]] char const *path) {
 
 %#ifdef __USE_GNU
 @@>> euidaccess(2)
-@@@param: TYPE: Set of `X_OK | W_OK | R_OK'
-@@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
+@@@param: type: Set of `X_OK | W_OK | R_OK'
+@@Test for access to the specified file `file', testing for `type', using the effective filesystem ids
 [[decl_include("<features.h>")]]
 [[cp, wunused, export_alias("eaccess")]]
 [[if(defined(__CRT_DOS)), alias("_access")]]
@@ -949,8 +950,8 @@ int euidaccess([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 }
 
 @@>> eaccess(2)
-@@@param: TYPE: Set of `X_OK | W_OK | R_OK'
-@@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
+@@@param: type: Set of `X_OK | W_OK | R_OK'
+@@Test for access to the specified file `file', testing for `type', using the effective filesystem ids
 eaccess(*) = euidaccess;
 
 %#endif /* __USE_GNU */
@@ -958,8 +959,8 @@ eaccess(*) = euidaccess;
 %
 %#ifdef __USE_ATFILE
 @@>> faccessat(2)
-@@@param: TYPE: Set of `X_OK | W_OK | R_OK'
-@@Test for access to the specified file `DFD:FILE', testing for `TYPE'
+@@@param: type: Set of `X_OK | W_OK | R_OK'
+@@Test for access to the specified file `dfd:file', testing for `type'
 [[cp, decl_include("<features.h>")]]
 int faccessat($fd_t dfd, [[nonnull]] char const *file,
               __STDC_INT_AS_UINT_T type, $atflag_t flags);
@@ -967,20 +968,20 @@ int faccessat($fd_t dfd, [[nonnull]] char const *file,
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
 @@>> fchownat(2)
-@@Change the ownership of a given `DFD:FILE' to `GROUP:OWNER'
+@@Change the ownership of a given `dfd:file' to `group:owner'
 [[cp, decl_include("<bits/types.h>")]]
 int fchownat($fd_t dfd, [[nonnull]] char const *file,
              $uid_t owner, $gid_t group, $atflag_t flags);
 
 @@>> linkat(2)
-@@Create a hard link from `FROMFD:FROM', leading to `TOFD:TO'
+@@Create a hard link from `fromfd:from', leading to `tofd:to'
 [[cp, decl_include("<bits/types.h>")]]
 int linkat($fd_t fromfd, [[nonnull]] char const *from,
            $fd_t tofd, [[nonnull]] char const *to, $atflag_t flags);
 
 @@>> symlinkat(3)
-@@Create a new symbolic link loaded with `LINK_TEXT' as link
-@@text, at the filesystem location referred to by `TOFD:TARGET_PATH'
+@@Create a new symbolic link loaded with `link_text' as link
+@@text, at the filesystem location referred to by `tofd:target_path'
 [[cp, decl_include("<bits/types.h>")]]
 int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
               [[nonnull]] char const *target_path);
@@ -988,7 +989,7 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 %[default:section(".text.crt{|.dos}.fs.property")];
 
 @@>> readlinkat(2)
-@@Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
+@@Read the text of a symbolic link under `dfd:path' into the provided buffer.
 @@WARNING: This function is badly designed and will neither append a trailing
 @@         NUL-character to the buffer, nor will it return the required buffer
 @@         size. Instead, it will return the written size, and the caller must
@@ -1001,8 +1002,8 @@ ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *path,
 
 %#ifdef __USE_KOS
 @@>> freadlinkat(2)
-@@Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
-@@@param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE'
+@@Read the text of a symbolic link under `dfd:path' into the provided buffer.
+@@@param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE'
 [[cp, decl_include("<bits/types.h>")]]
 ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *path,
                     [[outp(buflen)]] char *buf, size_t buflen,
@@ -1012,7 +1013,7 @@ ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *path,
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
 @@>> unlinkat(2)
-@@Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME'
+@@Remove a file, symbolic link, device or FIFO referred to by `dfd:name'
 [[cp, decl_include("<bits/types.h>")]]
 int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
@@ -1020,7 +1021,7 @@ int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %
 %#ifdef __USE_LARGEFILE64
 @@>> lseek64(2)
-@@Change the position of the file read/write pointer within a file referred to by `FD'
+@@Change the position of the file read/write pointer within a file referred to by `fd'
 [[off64_variant_of(lseek), export_alias("_lseeki64"), decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.large.seek"), userimpl, requires_function(lseek32)]]
 [[decl_include("<bits/types.h>")]]
@@ -1450,35 +1451,35 @@ $pid_t vfork();
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
 @@>> fchown(2)
-@@Change the ownership of a given `FD' to `GROUP:OWNER'
+@@Change the ownership of a given `fd' to `group:owner'
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
 [[decl_include("<bits/types.h>")]]
 int fchown($fd_t fd, $uid_t owner, $gid_t group);
 
 @@>> chdir(2)
-@@Change the current working directory to `PATH'
+@@Change the current working directory to `path'
 [[cp, section(".text.crt{|.dos}.fs.basic_property")]]
 [[decl_include("<bits/types.h>")]]
 int fchdir($fd_t fd);
 
 @@>> getpgid(2)
-@@Return the ID of the process group associated with `PID's process.
-@@(That is the TID of the leader of the process group of `PID's leader)
+@@Return the ID of the process group associated with `pid's process.
+@@(That is the TID of the leader of the process group of `pid's leader)
 @@THREAD[PID]->LEADER->GROUP_LEADER->PID
-@@When `PID' is ZERO(0), use `gettid()' for it instead
+@@When `pid' is ZERO(0), use `gettid()' for it instead
 [[wunused, section(".text.crt{|.dos}.sched.user"), export_alias("__getpgid")]]
 [[decl_include("<bits/types.h>")]]
 $pid_t getpgid($pid_t pid);
 
 @@>> getsid(2)
-@@Return the ID of the session which a process `PID' is apart of.
+@@Return the ID of the session which a process `pid' is apart of.
 @@return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID;
 [[wunused, section(".text.crt{|.dos}.sched.process")]]
 [[decl_include("<bits/types.h>")]]
 $pid_t getsid($pid_t pid);
 
 @@>> lchown(2)
-@@Change the ownership of a given `FILE' to `GROUP:OWNER',
+@@Change the ownership of a given `file' to `group:owner',
 @@but don't reference it if that file is a symbolic link
 [[cp, section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
@@ -1508,7 +1509,7 @@ int truncate32([[nonnull]] char const *file, $pos32_t length);
 
 
 @@>> truncate(2)
-@@Truncate the given file `FILE' to a length of `LENGTH'
+@@Truncate the given file `file' to a length of `length'
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("truncate64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("truncate")]]
@@ -1537,7 +1538,7 @@ int truncate([[nonnull]] char const *file, __PIO_OFFSET length) {
 %
 %#ifdef __USE_LARGEFILE64
 @@>> truncate64(2)
-@@Truncate the given file `FILE' to a length of `LENGTH'
+@@Truncate the given file `file' to a length of `length'
 [[section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
 [[off64_variant_of(truncate), impl_include("<features.h>"), impl_prefix(DEFINE_PIO_OFFSET)]]
 [[userimpl, requires($has_function(truncate32) || ($has_function(open64) && $has_function(ftruncate64)))]]
@@ -1563,8 +1564,8 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 %#ifdef __USE_XOPEN2K8
 
 @@>> fexecve(2)
-@@Replace the calling process with the application image referred to by `FD' and
-@@execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `fd' and
+@@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, argument_names(fd, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[decl_include("<bits/types.h>"), section(".text.crt{|.dos}.fs.exec.exec")]]
@@ -1708,7 +1709,7 @@ __STDC_INT_AS_SIZE_T getdtablesize() {
 @@>> seteuid(2)
 @@Set the effective user ID of the calling process
 @@@return: 0 : Success
-@@@return: -1: [errno=EINVAL] : The given `EUID' is invalid
+@@@return: -1: [errno=EINVAL] : The given `euid' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[section(".text.crt{|.dos}.sched.user")]]
 [[decl_include("<bits/types.h>")]]
@@ -1717,7 +1718,7 @@ int seteuid($uid_t euid);
 @@>> setegid(2)
 @@Set the effective group ID of the calling process
 @@@return: 0 : Success
-@@@return: -1: [errno=EINVAL] : The given `EGID' is invalid
+@@@return: -1: [errno=EINVAL] : The given `egid' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[section(".text.crt{|.dos}.sched.user")]]
 [[decl_include("<bits/types.h>")]]
@@ -1737,9 +1738,9 @@ int ttyslot();
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
 @@>> symlink(3)
-@@Create a new symbolic link loaded with `LINK_TEXT' as link
-@@text, at the filesystem location referred to by `TARGET_PATH'.
-@@Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)'
+@@Create a new symbolic link loaded with `link_text' as link
+@@text, at the filesystem location referred to by `target_path'.
+@@Same as `symlinkat(link_text, AT_FDCWD, target_path)'
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(symlinkat))]]
@@ -1750,8 +1751,8 @@ int symlink([[nonnull]] char const *link_text,
 }
 
 @@>> readlink(3)
-@@Read the text of a symbolic link under `PATH' into the provided buffer.
-@@Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+@@Read the text of a symbolic link under `path' into the provided buffer.
+@@Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
 @@WARNING: This function is badly designed and will neither append a trailing
 @@         NUL-character to the buffer, nor will it return the required buffer
 @@         size. Instead, it will return the written size, and the caller must
@@ -1899,7 +1900,7 @@ __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 %#if (defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 @@>> chroot(2)
 @@Change the root directory of the calling `CLONE_FS' group of threads
-@@(usually the process) to a path that was previously address by `PATH'
+@@(usually the process) to a path that was previously address by `path'
 [[cp, section(".text.crt{|.dos}.fs.utility")]]
 int chroot([[nonnull]] char const *__restrict path);
 
@@ -1916,7 +1917,7 @@ char *getpass([[nonnull]] char const *__restrict prompt);
 int ftruncate32($fd_t fd, $pos32_t length);
 
 @@>> ftruncate(2), ftruncate64(2)
-@@Truncate the given file `FD' to a length of `LENGTH'
+@@Truncate the given file `fd' to a length of `length'
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[no_crt_self_import, decl_include("<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate64", "_chsize_s")]]
@@ -2053,7 +2054,7 @@ char *cuserid(char *s) {
 %
 %#if defined(__USE_REENTRANT) || defined(__USE_SOLARIS)
 @@>> ctermid_r(3)
-@@Same as `ctermid', but return `NULL' when `S' is `NULL'
+@@Same as `ctermid', but return `NULL' when `s' is `NULL'
 [[guard, section(".text.crt{|.dos}.io.tty")]]
 [[userimpl, requires($has_function(ctermid))]]
 char *ctermid_r([[nullable]] char *s) {
@@ -2064,12 +2065,12 @@ char *ctermid_r([[nullable]] char *s) {
 %
 
 @@>> sysconf(2)
-@@@param: NAME: One of `_SC_*' from <asm/crt/confname.h>
-@@Return a system configuration value `NAME'
-@@return: * : The configuration limit associated with `NAME' for `PATH'
-@@return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+@@@param: name: One of `_SC_*' from <asm/crt/confname.h>
+@@Return a system configuration value `name'
+@@return: * : The configuration limit associated with `name' for `path'
+@@return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
 @@                                limit, and that limit is indeterminate
-@@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
+@@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
 [[cp, wunused, section(".text.crt{|.dos}.system.configuration")]]
 [[export_alias("_sysconf", "__sysconf"), decl_include("<features.h>")]]
 $longptr_t sysconf(__STDC_INT_AS_UINT_T name);

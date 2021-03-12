@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb413bb */
+/* HASH CRC-32:0x585fa93b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_atan2_defined
 #define __local___localdep_atan2_defined 1
 #if __has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)
-/* Arc tangent of Y/X */
+/* Arc tangent of `y / x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan2,(double __y, double __x),atan2,{ return __builtin_atan2(__y, __x); })
 #elif defined(__CRT_HAVE_atan2)
-/* Arc tangent of Y/X */
+/* Arc tangent of `y / x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan2,(double __y, double __x),atan2,(__y,__x))
 #elif defined(__CRT_HAVE___atan2)
-/* Arc tangent of Y/X */
+/* Arc tangent of `y / x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan2,(double __y, double __x),__atan2,(__y,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/atan2.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Arc tangent of Y/X */
+/* Arc tangent of `y / x' */
 #define __localdep_atan2 __LIBC_LOCAL_NAME(atan2)
 #else /* ... */
 #undef __local___localdep_atan2_defined
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <libm/matherr.h>
 #include <libm/atan2.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Arc tangent of Y/X */
+/* Arc tangent of `y / x' */
 __LOCAL_LIBC(atan2f) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2f))(float __y, float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

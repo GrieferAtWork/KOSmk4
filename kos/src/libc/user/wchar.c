@@ -347,8 +347,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_L
 /*[[[end:libd_vfwscanf]]]*/
 
 
-/*[[[head:libc_file_wprinter,hash:CRC-32=0x2b4d3203]]]*/
-/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
+/*[[[head:libc_file_wprinter,hash:CRC-32=0xa52798dc]]]*/
+/* >> file_wprinter(3)
+ * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
 (LIBKCALL libc_file_wprinter)(void *arg,
                               char32_t const *__restrict data,
@@ -368,8 +369,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) s
 }
 /*[[[end:libc_file_wprinter]]]*/
 
-/*[[[head:libc_file_wprinter_unlocked,hash:CRC-32=0x88afa937]]]*/
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/*[[[head:libc_file_wprinter_unlocked,hash:CRC-32=0xd8bf6604]]]*/
+/* >> file_wprinter_unlocked(3)
+ * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) ssize_t
 (LIBKCALL libc_file_wprinter_unlocked)(void *arg,
                                        char32_t const *__restrict data,
@@ -382,8 +384,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2))
 }
 /*[[[end:libc_file_wprinter_unlocked]]]*/
 
-/*[[[head:libd_file_wprinter,hash:CRC-32=0xe22e1bab]]]*/
-/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
+/*[[[head:libd_file_wprinter,hash:CRC-32=0xdde447d8]]]*/
+/* >> file_wprinter(3)
+ * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
 (LIBDCALL libd_file_wprinter)(void *arg,
                               char16_t const *__restrict data,
@@ -403,8 +406,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2
 }
 /*[[[end:libd_file_wprinter]]]*/
 
-/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0x498047c6]]]*/
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0x10448251]]]*/
+/* >> file_wprinter_unlocked(3)
+ * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) ssize_t
 (LIBDCALL libd_file_wprinter_unlocked)(void *arg,
                                        char16_t const *__restrict data,

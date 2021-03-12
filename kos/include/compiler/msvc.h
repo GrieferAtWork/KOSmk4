@@ -383,12 +383,12 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 namespace __intern {
 extern "C" {
 #endif /* __cplusplus */
-#if defined(__i386__) || defined(__i386) || defined(i386) || \
-    defined(__I86__) || defined(_M_IX86) || defined(__X86__) || \
-    defined(_X86_) || defined(__THW_INTEL__) || defined(__INTEL__) || \
-    defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
-    defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) || \
-    defined(_WIN64) || defined(WIN64)
+#if (defined(__i386__) || defined(__i386) || defined(i386) ||          \
+     defined(__I86__) || defined(_M_IX86) || defined(__X86__) ||       \
+     defined(_X86_) || defined(__THW_INTEL__) || defined(__INTEL__) || \
+     defined(__x86_64__) || defined(__amd64__) || defined(__amd64) ||  \
+     defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) ||      \
+     defined(_WIN64) || defined(WIN64))
 extern void (__cdecl _m_prefetch)(void *);
 #pragma intrinsic(_m_prefetch)
 #ifdef __cplusplus
@@ -456,12 +456,12 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 #ifdef _M_CEE_PURE
 typedef System::ArgIterator __builtin_va_list;
 #else /* _M_CEE_PURE */
-#define __builtin_va_list  char *
+#define __builtin_va_list char *
 #endif  /* _M_CEE_PURE */
 #ifdef __cplusplus
-#define __MSVC_VA_ADDROF(v)   &reinterpret_cast<char const &>(v)
+#define __MSVC_VA_ADDROF(v) &reinterpret_cast<char const &>(v)
 #else /* __cplusplus */
-#define __MSVC_VA_ADDROF(v)   &(v)
+#define __MSVC_VA_ADDROF(v) &(v)
 #endif /* !__cplusplus */
 #if (defined(__i386__) || defined(__i386) || defined(i386) || \
      defined(__I86__) || defined(_M_IX86) || defined(__X86__) || \
@@ -504,9 +504,9 @@ extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __built
 #endif /* !__builtin_va_copy */
 
 #if defined(__INTELLISENSE__) && defined(__cplusplus)
-/* Help detect invalid  argument count that  can easily  be caused by  copying the  `va_start'
- * source line  and  replacing `start'  with  `end'  without removing  the  section  argument.
- * (The following hack causes the second argument red in such use cases to be underlined red). */
+/* Help  detect invalid argument count that can easily be caused by copying the `va_start'
+ * source  line and  replacing `start' with  `end' without removing  the section argument.
+ * (The following hack causes the second argument in such use cases to be underlined red). */
 #undef __builtin_va_end
 void __builtin_va_end(__builtin_va_list &__ap);
 #define __builtin_va_end  __builtin_va_end
@@ -517,12 +517,11 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #pragma warning(disable: 4710) /* Function not inlined (Emit for local varargs functions...) */
 #ifndef __cplusplus
 /* Disable some warnings that are caused by function redirections in system headers. */
-#define __REDIRECT_WSUPPRESS_BEGIN \
- __pragma(warning(push)) \
- __pragma(warning(disable: /* Redirections  */ 4210 4028 4142 4565 4559 4211 4115 4996 \
-                           /* Unnamed union */ 4201))
-
-#define __REDIRECT_WSUPPRESS_END   __pragma(warning(pop))
+#define __REDIRECT_WSUPPRESS_BEGIN                                                        \
+	__pragma(warning(push))                                                               \
+	__pragma(warning(disable: /* Redirections  */ 4210 4028 4142 4565 4559 4211 4115 4996 \
+	                          /* Unnamed union */ 4201))
+#define __REDIRECT_WSUPPRESS_END __pragma(warning(pop))
 /* Suppress warnings caused by C-mode redirections in system headers. */
 #define __SYSDECL_BEGIN __DECL_BEGIN __REDIRECT_WSUPPRESS_BEGIN
 #define __SYSDECL_END   __REDIRECT_WSUPPRESS_END __DECL_END

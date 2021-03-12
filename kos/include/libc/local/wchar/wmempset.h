@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34168c46 */
+/* HASH CRC-32:0x637ce77f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempset_defined
 #define __local___localdep_mempset_defined 1
 #ifdef __CRT_HAVE_mempset
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_mempset */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
 #define __localdep_mempset __LIBC_LOCAL_NAME(mempset)
 #endif /* !__CRT_HAVE_mempset */
 #endif /* !__local___localdep_mempset_defined */
@@ -41,19 +41,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempsetl_defined
 #define __local___localdep_mempsetl_defined 1
 #ifdef __CRT_HAVE_mempsetl
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
 #elif defined(__CRT_HAVE_wmempset) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),wmempset,(__dst,__dword,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmempset) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),KOS$wmempset,(__dst,__dword,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempsetl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 #define __localdep_mempsetl __LIBC_LOCAL_NAME(mempsetl)
 #endif /* !... */
 #endif /* !__local___localdep_mempsetl_defined */
@@ -61,19 +61,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempsetw_defined
 #define __local___localdep_mempsetw_defined 1
 #ifdef __CRT_HAVE_mempsetw
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_wmempset) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),wmempset,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmempset) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),DOS$wmempset,(__dst,__word,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempsetw.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 #define __localdep_mempsetw __LIBC_LOCAL_NAME(mempsetw)
 #endif /* !... */
 #endif /* !__local___localdep_mempsetw_defined */

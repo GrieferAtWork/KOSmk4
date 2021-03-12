@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbd8737b */
+/* HASH CRC-32:0x96cef41b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/significand.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the fractional part of X after dividing out `ilogb(X)' */
+/* Return the fractional part of `x' after dividing out `ilogb(x)' */
 __LOCAL_LIBC(significand) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significand))(double __x) {
 	return __LIBM_MATHFUN(significand, __x);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef10fb22 */
+/* HASH CRC-32:0x629bbddf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <libm/fabs.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Absolute value of X */
+/* Absolute value of `x' */
 __LOCAL_LIBC(fabsf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsf))(float __x) {
 #ifdef __LIBM_MATHFUNF

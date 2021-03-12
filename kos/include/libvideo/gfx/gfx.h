@@ -199,12 +199,12 @@ struct video_gfx_ops {
 	                               __size_t __src_size_x, __size_t __src_size_y);
 
 	/* Same as `fxo_fill()', but only fill in a pixel if:
-	 * >> offset = BITSKIP + (FINAL_Y - DST_Y) * BITSCAN + (FINAL_X - DST_X);
-	 * >> if ((((u8 *)BITMASK)[offset / 8] & (1 << (7 - (offset % 8)))) != 0) {
+	 * >> offset = bitskip + (<final_y> - dst_y) * bitscan + (<final_x> - dst_x);
+	 * >> if ((((u8 *)bitmask)[offset / 8] & (1 << (7 - (offset % 8)))) != 0) {
 	 * >>     FILL_PIXEL();
 	 * >> }
-	 * @param: BITSKIP: Number of leading bits to skip
-	 * @param: BITSCAN: Length of a scanline within BITMASK (in bits)
+	 * @param: bitskip: Number of leading bits to skip
+	 * @param: bitscan: Length of a scanline within `bitmask' (in bits)
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
 	__ATTR_NONNULL((1, 7)) void
 	(LIBVIDEO_GFX_CC *fxo_bitfill)(struct video_gfx *__restrict __self,
@@ -214,7 +214,7 @@ struct video_gfx_ops {
 	                               void const *__restrict __bitmask,
 	                               __uintptr_t __bitskip, __size_t __bitscan);
 
-	/* Same as `fxo_bitfill()', but take source colors from `SRC' */
+	/* Same as `fxo_bitfill()', but take source colors from `src' */
 	__ATTR_NONNULL((1, 4, 9)) void
 	(LIBVIDEO_GFX_CC *fxo_bitblit)(struct video_gfx *__self,
 	                               __intptr_t __dst_x, __intptr_t __dst_y,
@@ -228,13 +228,13 @@ struct video_gfx_ops {
 	 * The  resulting  image   will  be   similar  (but  not   necessarily  identical)   to:
 	 * >> struct video_buffer *temp;
 	 * >> struct video_gfx temp_gfx;
-	 * >> temp = video_buffer_create(VIDEO_BUFFER_AUTO, SRC_SIZE_X, SRC_SIZE_Y,
+	 * >> temp = video_buffer_create(VIDEO_BUFFER_AUTO, src_size_x, src_size_y,
 	 * >>                            video_codec_lookup(VIDEO_CODEC_RGBA8888),
 	 * >>                            NULL);
 	 * >> temp->gfx(temp_gfx, GFX_BLENDINFO_OVERRIDE);
-	 * >> temp_gfx.bitfill(0, 0, SRC_SIZE_X, SRC_SIZE_Y, COLOR, BITMASK, BITSKIP);
-	 * >> // NOTE: Pixels that aren't masked by BITMASK may not necessary get blended during this call!
-	 * >> SELF->stretch(DST_X, DST_Y, DST_SIZE_X, DST_SIZE_Y, &temp_gfx, 0, 0, SRC_SIZE_X, SRC_SIZE_Y);
+	 * >> temp_gfx.bitfill(0, 0, src_size_x, src_size_y, color, bitmask, bitskip);
+	 * >> // NOTE: Pixels that aren't masked by `bitmask' may not necessary get blended during this call!
+	 * >> self->stretch(dst_x, dst_y, dst_size_x, dst_size_y, &temp_gfx, 0, 0, src_size_x, src_size_y);
 	 * >> destroy(temp); */
 	__ATTR_NONNULL((1, 9)) void
 	(LIBVIDEO_GFX_CC *fxo_bitstretchfill)(struct video_gfx *__restrict __self,

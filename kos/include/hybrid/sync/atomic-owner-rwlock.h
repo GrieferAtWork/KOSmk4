@@ -266,7 +266,7 @@ __NOTHROW(atomic_owner_rwlock_trywrite_r)(struct atomic_owner_rwlock *__restrict
 		__hybrid_assertf(!(__f & __ATOMIC_OWNER_RWLOCK_WFLAG) ||
 		                 !__hybrid_gettid_iscaller(__self->aorw_owner),
 		                 "atomic_owner_rwlock_trywrite_r() cannot be used if you're "
-		                 "already holding a write-lock to `SELF'\n"
+		                 "already holding a write-lock to `self'\n"
 		                 "Lock:   %#lx\n"
 		                 "Caller: " __HYBRID_GETTID_PRINTF_FMT "\n"
 		                 "Owner:  " __HYBRID_GETTID_PRINTF_FMT "\n",

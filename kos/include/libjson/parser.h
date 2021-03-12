@@ -122,7 +122,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_init)(struct json_parser *__restrict __self
                                            void const *__start, void const *__end);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
-/* Yield to the current token and advance to the next one (*PTR++)
+/* Yield to the current token and advance to the next one (*<ptr>++)
  * @return: JSON_PARSER_*:     The previously selected token (the parser now points at its end)
  * @return: JSON_ERROR_EOF:    The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
@@ -133,7 +133,7 @@ LIBJSON_DECL __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(LIBJSON_CC json_parser_yield)(struct json_parser *__restrict __self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
-/* Yield to the previous token and return it (*--PTR)
+/* Yield to the previous token and return it (*--<ptr>)
  * @return: JSON_PARSER_*:     The now selected token (The parser is now located at the previous token)
  * @return: JSON_ERROR_EOF:    The start of the input file had already been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1791876 */
+/* HASH CRC-32:0x654eb74 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcoll __LIBC_LOCAL_NAME(strcoll)
 #endif /* !__CRT_HAVE_strcoll */
 #endif /* !__local___localdep_strcoll_defined */
-/* 64-bit variant of `alphasort()' */
+/* >> alphasort(3), alphasort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
 __LOCAL_LIBC(alphasort64) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(alphasort64))(struct dirent64 const **__e1, struct dirent64 const **__e2) {
 	return __localdep_strcoll((*__e1)->d_name, (*__e2)->d_name);

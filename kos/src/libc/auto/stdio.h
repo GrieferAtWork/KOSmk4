@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x823905e8 */
+/* HASH CRC-32:0x30fd6050 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,96 +30,124 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Remove a file or directory `FILENAME' */
+/* >> remove(3)
+ * Remove a file or directory `filename' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
-/* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
- * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
+/* >> rename(3)
+ * Rename a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_rename)(char const *oldname, char const *newname_or_path);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf);
-/* Close and destroy a given file `STREAM' */
+/* >> fclose(3)
+ * Close and destroy a given file `stream' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fclose)(FILE *__restrict stream) THROWS(...);
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 INTDEF int (LIBDCALL libd_fflush)(FILE *stream) THROWS(...);
-/* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
+/* >> setbuf(3)
+ * Alias for `setvbuf(stream, buf, _IOFBF, BUFSIZ)' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_setbuf)(FILE *__restrict stream, char *buf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
+/* >> setbuf(3)
+ * Alias for `setvbuf(stream, buf, _IOFBF, BUFSIZ)' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stream, char *buf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+/* >> setvbuf(3)
+ * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setvbuf)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fgetc)(FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Alias for `fgetc(stdin)' */
+/* >> getchar(3)
+ * Alias for `fgetc(stdin)' */
 INTDEF int (LIBCCALL libc_getchar)(void) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Write a single character `CH' to `STREAM' */
+/* >> fputc(3)
+ * Write a single character `ch' to `stream' */
 INTDEF NONNULL((2)) int (LIBDCALL libd_fputc)(int ch, FILE *__restrict stream) THROWS(...);
-/* Alias for `fputc(CH, stdout)' */
+/* >> putchar(3)
+ * Alias for `fputc(ch, stdout)' */
 INTDEF int (LIBDCALL libd_putchar)(int ch) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Alias for `fputc(CH, stdout)' */
+/* >> putchar(3)
+ * Alias for `fputc(ch, stdout)' */
 INTDEF int (LIBCCALL libc_putchar)(int ch) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
- * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
+/* >> fgets(3)
+ * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
+ * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBDCALL libd_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
- * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
+/* >> fgets(3)
+ * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
+ * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBCCALL libc_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print a given string `STR' to `STREAM'. This is identical to:
+/* >> fputs(3)
+ * Print a given string `str' to `stream'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_fputs)(char const *__restrict str, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print a given string `STR' to `STREAM'. This is identical to:
+/* >> fputs(3)
+ * Print a given string `str' to `stream'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_fputs)(char const *__restrict str, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print a given string `STR', followed by a line-feed to `STDOUT' */
+/* >> puts(3)
+ * Print a given string `str', followed by a line-feed to `stdout' */
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_puts)(char const *__restrict string) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print a given string `STR', followed by a line-feed to `STDOUT' */
+/* >> puts(3)
+ * Print a given string `str', followed by a line-feed to `stdout' */
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts)(char const *__restrict string) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Unget a single character byte of data previously returned by `getc()' */
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ungetc)(int ch, FILE *__restrict stream);
-/* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
+/* >> fread(3)
+ * Read up to `elemsize * elemcount' bytes of data from `stream' into `buf' */
 INTDEF WUNUSED NONNULL((1, 4)) size_t (LIBDCALL libd_fread)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
-/* Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM' */
+/* >> fwrite(3)
+ * Write up to `elemsize * elemcount' bytes of data from `buf' into `stream' */
 INTDEF NONNULL((1, 4)) size_t (LIBDCALL libd_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
-/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+/* >> fseek(3)
+ * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fseek)(FILE *__restrict stream, long int off, int whence) THROWS(...);
-/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+/* >> ftell(3)
+ * Return the current in-file position of `stream' as a byte-offet from the start of the file */
 INTDEF WUNUSED NONNULL((1)) long int (LIBDCALL libd_ftell)(FILE *__restrict stream) THROWS(...);
-/* Rewind the current in-file position of `STREAM' to its starting position */
+/* >> rewind(3)
+ * Rewind the current in-file position of `stream' to its starting position */
 INTDEF NONNULL((1)) void (LIBDCALL libd_rewind)(FILE *__restrict stream) THROWS(...);
-/* Clear the error state of `STREAM', returning the stream to normal operations mode */
+/* >> clearerr(3)
+ * Clear the error state of `stream', returning the stream to normal operations mode */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_clearerr)(FILE *__restrict stream);
-/* Check if end-of-file has been reached in `STREAM' */
+/* >> feof(3)
+ * Check if end-of-file has been reached in `stream' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_feof)(FILE __KOS_FIXED_CONST *__restrict stream);
-/* Check if an I/O error occurred in `STREAM' */
+/* >> ferror(3)
+ * Check if an I/O error occurred in `stream' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ferror)(FILE __KOS_FIXED_CONST *__restrict stream);
-/* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
+/* >> perror(3)
+ * Print a given `message' alongside `strerror(errno)' to stderr:
  * >> if (message) {
  * >>     fprintf(stderr, "%s: %s\n", message, strerror(errno));
  * >> } else {
@@ -128,7 +156,8 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ferror)(FILE
 INTDEF void NOTHROW_RPC(LIBDCALL libd_perror)(char const *message);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
+/* >> perror(3)
+ * Print a given `message' alongside `strerror(errno)' to stderr:
  * >> if (message) {
  * >>     fprintf(stderr, "%s: %s\n", message, strerror(errno));
  * >> } else {
@@ -137,91 +166,111 @@ INTDEF void NOTHROW_RPC(LIBDCALL libd_perror)(char const *message);
 INTDEF void NOTHROW_RPC(LIBCCALL libc_perror)(char const *message);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Create and return a new file-stream for accessing `FILENAME' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename, char const *__restrict modes);
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
-/* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
- * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
+/* >> fgetpos(3), fgetpos64(3)
+ * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fgetpos)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
-/* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
+/* >> fsetpos(3), fsetpos64(3)
+ * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print data to `stdout', following `FORMAT'
+/* >> printf(3), vprintf(3)
+ * Print data to `stdout', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vprintf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print data to `stdout', following `FORMAT'
+/* >> printf(3), vprintf(3)
+ * Print data to `stdout', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print data to `stdout', following `FORMAT'
+/* >> printf(3), vprintf(3)
+ * Print data to `stdout', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_printf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print data to `stdout', following `FORMAT'
+/* >> printf(3), vprintf(3)
+ * Print data to `stdout', following `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan data from `STREAM', following `FORMAT'
+/* >> fscanf(3), vfscanf(3)
+ * Scan data from `stream', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan data from `STREAM', following `FORMAT'
+/* >> fscanf(3), vfscanf(3)
+ * Scan data from `stream', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vscanf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan data from `STREAM', following `FORMAT'
+/* >> fscanf(3), vfscanf(3)
+ * Scan data from `stream', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan data from `STREAM', following `FORMAT'
+/* >> fscanf(3), vfscanf(3)
+ * Scan data from `stream', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_scanf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
@@ -232,158 +281,210 @@ INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") N
 INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") NONNULL((1)) char *(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan data from a given `INPUT' string, following `FORMAT'
+/* >> sscanf(3), vsscanf(3)
+ * Scan data from a given `input' string, following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan data from a given `INPUT' string, following `FORMAT'
+/* >> sscanf(3), vsscanf(3)
+ * Scan data from a given `input' string, following `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan data from a given `INPUT' string, following `FORMAT'
+/* >> sscanf(3), vsscanf(3)
+ * Scan data from a given `input' string, following `format'
  * Return the number of successfully scanned data items */
 INTDEF ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan data from a given `INPUT' string, following `FORMAT'
+/* >> sscanf(3), vsscanf(3)
+ * Scan data from a given `input' string, following `format'
  * Return the number of successfully scanned data items */
 INTDEF ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sprintf)(char *__restrict buf, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+/* >> snprintf(3), vsnprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+/* >> snprintf(3), vsnprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character),
- * and never write more than `BUFLEN' characters to `BUF' */
+/* >> snprintf(3), vsnprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character),
- * and never write more than `BUFLEN' characters to `BUF' */
+/* >> snprintf(3), vsnprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> dprintf(3), vdprintf(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> dprintf(3), vdprintf(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> dprintf(3), vdprintf(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBDCALL libd_dprintf)(fd_t fd, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> dprintf(3), vdprintf(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> renameat(2) */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path);
-/* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char const *filename);
-/* @param flags: Set of `0 | AT_DOSPATH' */
+/* >> frenameat(2)
+ * @param flags: Set of `0 | AT_DOSPATH' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_frenameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
+/* >> tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam_r)(char *buf);
-/* Specify the location and size for the buffer to-be used by `STREAM' */
+/* >> setbuffer(3)
+ * Specify the location and size for the buffer to-be used by `stream' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_setbuffer)(FILE *__restrict stream, char *buf, size_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Specify the location and size for the buffer to-be used by `STREAM' */
+/* >> setbuffer(3)
+ * Specify the location and size for the buffer to-be used by `stream' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream, char *buf, size_t bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Change the given `STREAM' to become line-buffered */
+/* >> setlinebuf(3)
+ * Change the given `stream' to become line-buffered */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_setlinebuf)(FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Change the given `STREAM' to become line-buffered */
+/* >> setlinebuf(3)
+ * Change the given `stream' to become line-buffered */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fflush_unlocked(3)
+ * Same as `fflush()', but performs I/O without acquiring a lock to `stream' */
 INTDEF int (LIBDCALL libd_fflush_unlocked)(FILE *stream) THROWS(...);
-/* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fread_unlocked(3)
+ * Same as `fread()', but performs I/O without acquiring a lock to `stream' */
 INTDEF WUNUSED NONNULL((1, 4)) size_t (LIBDCALL libd_fread_unlocked)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
-/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fwrite_unlocked(3)
+ * Same as `fwrite()', but performs I/O without acquiring a lock to `stream' */
 INTDEF WUNUSED NONNULL((1, 4)) size_t (LIBDCALL libd_fwrite_unlocked)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fgetc_unlocked)(FILE *__restrict stream) THROWS(...);
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 INTDEF NONNULL((2)) int (LIBDCALL libd_fputc_unlocked)(int ch, FILE *__restrict stream) THROWS(...);
+/* >> tempnam(3) */
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_tempnam)(char const *dir, char const *pfx);
-/* Open a new file stream by inheriting a given file descriptor `FD'
- * Note that upon success (`return != NULL'), the given `FD'
+/* >> fdopen(3)
+ * Open a new file stream by inheriting a given file descriptor `fd'
+ * Note that upon success (`return != NULL'), the given `fd'
  * will be `close()'d once `fclose(return)' is called */
 INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, char const *__restrict modes);
-/* Return the underlying file descriptor number used by `STREAM' */
+/* >> fileno(3)
+ * Return the underlying file descriptor number used by `stream' */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_fileno)(FILE *__restrict stream);
+/* >> fmemopen(3) */
 INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBDCALL libd_fmemopen)(void *mem, size_t len, char const *modes);
+/* >> open_memstream(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_open_memstream)(char **bufloc, size_t *sizeloc);
+/* >> getdelim(3) */
 INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t (LIBDCALL libd_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> getdelim(3) */
 INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t (LIBCCALL libc_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> getline(3) */
 INTDEF WUNUSED NONNULL((1, 2, 3)) ssize_t (LIBDCALL libd_getline)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> getline(3) */
 INTDEF WUNUSED NONNULL((1, 2, 3)) ssize_t (LIBCCALL libc_getline)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
-/* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
+/* >> getchar_unlocked(3)
+ * Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 INTDEF int (LIBCCALL libc_getchar_unlocked)(void) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
+/* >> putchar_unlocked(3)
+ * Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 INTDEF int (LIBDCALL libd_putchar_unlocked)(int ch) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
+/* >> putchar_unlocked(3)
+ * Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 INTDEF int (LIBCCALL libc_putchar_unlocked)(int ch) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
+/* >> flockfile(3)
+ * Acquire a lock to `stream' and block until doing so succeeds */
 INTDEF NONNULL((1)) void NOTHROW_RPC(LIBDCALL libd_flockfile)(FILE *__restrict stream);
-/* Release a previously acquired lock from `STREAM' */
+/* >> funlockfile(3)
+ * Release a previously acquired lock from `stream' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_funlockfile)(FILE *__restrict stream);
-/* Try to acquire a lock to `STREAM' */
+/* >> ftrylockfile(3)
+ * Try to acquire a lock to `stream' */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ftrylockfile)(FILE *__restrict stream);
-/* Open and return a new process I/O stream for executing `COMMAND' */
+/* >> popen(3)
+ * Open and return a new process I/O stream for executing `COMMAND' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_popen)(char const *command, char const *modes);
-/* Close a process I/O file `STREAM' */
+/* >> pclose(3)
+ * Close a process I/O file `stream' (s.a. `popen(3)') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pclose)(FILE *stream);
-/* Similar to `getc()', but read 2 bytes */
+/* >> getw(3)
+ * Similar to `getc()', but read 2 bytes */
 INTDEF NONNULL((1)) int (LIBDCALL libd_getw)(FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Similar to `getc()', but read 2 bytes */
+/* >> getw(3)
+ * Similar to `getc()', but read 2 bytes */
 INTDEF NONNULL((1)) int (LIBCCALL libc_getw)(FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
+/* >> putw(3)
+ * Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 INTDEF NONNULL((2)) int (LIBDCALL libd_putw)(int w, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
+/* >> putw(3)
+ * Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 INTDEF NONNULL((2)) int (LIBCCALL libc_putw)(int w, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -395,19 +496,23 @@ INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd_fopencookie)(void *_
 INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie, char const *__restrict modes, cookie_io_functions_t io_funcs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fgets_unlocked(3)
+ * Same as `fgets()', but performs I/O without acquiring a lock to `stream' */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBDCALL libd_fgets_unlocked)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fgets_unlocked(3)
+ * Same as `fgets()', but performs I/O without acquiring a lock to `stream' */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBCCALL libc_fgets_unlocked)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fputs_unlocked(3)
+ * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fputs_unlocked(3)
+ * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -418,45 +523,62 @@ INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(VLIBDCALL libd_obs
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Change the current in-file position of `STREAM' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fseeko)(FILE *__restrict stream, off_t off, int whence) THROWS(...);
-/* Return the current in-file position of `STREAM' */
+/* >> ftello(3), ftello64(3)
+ * Return the current in-file position of `stream' */
 INTDEF WUNUSED NONNULL((1)) off_t (LIBDCALL libd_ftello)(FILE *__restrict stream) THROWS(...);
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fseeko64)(FILE *__restrict stream, off64_t off, int whence) THROWS(...);
-/* 64-bit variant of `ftello' */
+/* >> ftello(3), ftello64(3)
+ * Return the current in-file position of `stream' */
 INTDEF WUNUSED NONNULL((1)) off64_t (LIBDCALL libd_ftello64)(FILE *__restrict stream) THROWS(...);
-/* 64-bit variant of `fopen' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_fopen64)(char const *__restrict filename, char const *__restrict modes);
-/* 64-bit variant of `freopen' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen64)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
-/* 64-bit variant of `fgetpos' */
+/* >> fgetpos(3), fgetpos64(3)
+ * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fgetpos64)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
-/* 64-bit variant of `fsetpos' */
+/* >> fsetpos(3), fsetpos64(3)
+ * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
-/* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
+/* >> asprintf(3), vasprintf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
+/* >> asprintf(3), vasprintf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
+/* >> asprintf(3), vasprintf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
+/* >> asprintf(3), vasprintf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 INTDEF NONNULL((1)) int (LIBDCALL libd_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) long int (LIBDCALL libd_ftell_unlocked)(FILE *__restrict stream) THROWS(...);
@@ -478,9 +600,11 @@ INTDEF NONNULL((2)) int (LIBCCALL libc_putw_unlocked)(int w, FILE *__restrict st
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setvbuf_unlocked)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ungetc_unlocked)(int ch, FILE *__restrict stream);
+/* >> getdelim(3) */
 INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t (LIBDCALL libd_getdelim_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> getdelim(3) */
 INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t (LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -493,7 +617,7 @@ INTDEF WUNUSED NONNULL((1, 2, 3)) ssize_t (LIBCCALL libc_getline_unlocked)(char 
 INTDEF NONNULL((1)) void (LIBDCALL libd_rewind_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fisatty)(FILE *__restrict stream);
 /* >> fftruncate(3)
- * Truncate the given file `STREAM' to a length of `LENGTH' */
+ * Truncate the given file `stream' to a length of `length' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fftruncate)(FILE *__restrict stream, __PIO_OFFSET length) THROWS(...);
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
@@ -509,60 +633,72 @@ INTDEF WUNUSED NONNULL((1)) off64_t (LIBDCALL libd_ftello64_unlocked)(FILE *__re
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* >> fftruncate64(3)
- * Truncate the given file `STREAM' to a length of `LENGTH' */
+ * Truncate the given file `stream' to a length of `length' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fftruncate64)(FILE *__restrict stream, __PIO_OFFSET64 length) THROWS(...);
 /* >> fftruncate64_unlocked(3)
- * Truncate the given file `STREAM' to a length of `LENGTH' */
+ * Truncate the given file `stream' to a length of `length' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fftruncate64_unlocked)(FILE *__restrict stream, __PIO_OFFSET64 length) THROWS(...);
+/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vprintf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_printf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> printf_unlocked(3), vprintf_unlocked(3) */
 INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
+/* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
+/* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vscanf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> scanf_unlocked(3), vscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

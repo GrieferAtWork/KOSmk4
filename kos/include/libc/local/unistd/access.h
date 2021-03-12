@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x407c6386 */
+/* HASH CRC-32:0x66a42628 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_faccessat_defined
 #define __local___localdep_faccessat_defined 1
 /* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `dfd:file', testing for `type' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),faccessat,(__dfd,__file,__type,__flags))
 #endif /* !__local___localdep_faccessat_defined */
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 __LOCAL_LIBC(access) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(access))(char const *__file, __STDC_INT_AS_UINT_T __type) {
 	return __localdep_faccessat(__AT_FDCWD, __file, __type, 0);

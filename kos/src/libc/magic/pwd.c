@@ -122,7 +122,7 @@ struct passwd *getpwnam([[nonnull]] const char *name);
 
 %
 %#ifdef __USE_MISC
-@@Read an entry from STREAM
+@@Read an entry from `stream'
 @@return: * :                         A pointer to the read password entry
 @@return: NULL: (errno = <unchanged>) The last entry has already been read
 @@                                    (use `rewind(stream)' to rewind the database)
@@ -178,7 +178,7 @@ $errno_t getpwnam_r([[nonnull]] const char *__restrict name,
                     [[nonnull]] struct passwd **__restrict result);
 
 %#ifdef __USE_MISC
-@@Read an entry from the password-file stream, opening it if necessary
+@@Read an entry from the password-file stream, opening it if necessary.
 @@@return: 0 :     Success (`*result' is made to point at `resultbuf')
 @@@return: ENOENT: The last entry has already been read (use `setpwent()' to rewind the database)
 @@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
@@ -188,7 +188,7 @@ $errno_t getpwent_r([[nonnull]] struct passwd *__restrict resultbuf,
                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                     [[nonnull]] struct passwd **__restrict result);
 
-@@Read an entry from STREAM. This function is not standardized and probably never will
+@@Read an entry from `stream'. This function is not standardized and probably never will be.
 @@@return: 0 :     Success (`*result' is made to point at `resultbuf')
 @@@return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
 @@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)

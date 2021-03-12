@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2b94eb1 */
+/* HASH CRC-32:0x9b6a86b9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Truncate32_defined
 #define __local___localdep_Truncate32_defined 1
 /* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
 #endif /* !__local___localdep_Truncate32_defined */
 /* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __LOCAL_LIBC(Truncate64) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Truncate64))(char const *__file, __pos64_t __length) __THROWS(...) {
 	__localdep_Truncate32(__file, (__pos32_t)__length);

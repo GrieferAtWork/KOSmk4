@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ef28032 */
+/* HASH CRC-32:0x5102c568 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getsid(2)
- * Return the ID of the session which a process `PID' is apart of.
+ * Return the ID of the session which a process `pid' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getsid,(__pid_t __pid),getsid,(__pid))
 #endif /* !__local___localdep_getsid_defined && __CRT_HAVE_getsid */

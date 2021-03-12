@@ -44,10 +44,10 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_Execv,hash:CRC-32=0x17a5ddde]]]*/
+/*[[[head:libc_Execv,hash:CRC-32=0x606a28a8]]]*/
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2)) void
 (LIBCCALL libc_Execv)(char const *__restrict path,
                       __TARGV) THROWS(...)
@@ -58,10 +58,10 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 }
 /*[[[end:libc_Execv]]]*/
 
-/*[[[head:libc_Execvp,hash:CRC-32=0x97e853b1]]]*/
+/*[[[head:libc_Execvp,hash:CRC-32=0x235afc9d]]]*/
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2)) void
 (LIBCCALL libc_Execvp)(char const *__restrict file,
                        __TARGV) THROWS(...)
@@ -71,10 +71,10 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 }
 /*[[[end:libc_Execvp]]]*/
 
-/*[[[head:libc_Execvpe,hash:CRC-32=0x259d81a7]]]*/
+/*[[[head:libc_Execvpe,hash:CRC-32=0xd2bf4da7]]]*/
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `file' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2, 3)) void
 (LIBCCALL libc_Execvpe)(char const *__restrict file,
                         __TARGV,
@@ -122,11 +122,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 /*[[[end:libc_Execvpe]]]*/
 
 
-/*[[[head:libd_Execl,hash:CRC-32=0x85647fe4]]]*/
+/*[[[head:libd_Execl,hash:CRC-32=0xfe5230b1]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> execl(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
 (VLIBDCALL libd_Execl)(char const *__restrict path,
                        char const *args,
@@ -151,10 +151,10 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 /*[[[end:libd_Execl]]]*/
 
 
-/*[[[head:libc_Execl,hash:CRC-32=0xfeda1e35]]]*/
+/*[[[head:libc_Execl,hash:CRC-32=0xad5f444d]]]*/
 /* >> execl(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
 (VLIBCCALL libc_Execl)(char const *__restrict path,
                        char const *args,
@@ -177,11 +177,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 }
 /*[[[end:libc_Execl]]]*/
 
-/*[[[head:libd_Execle,hash:CRC-32=0x625a6aa5]]]*/
+/*[[[head:libd_Execle,hash:CRC-32=0x382f8f0b]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
 (VLIBDCALL libd_Execle)(char const *__restrict path,
@@ -212,10 +212,10 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_Execle]]]*/
 
-/*[[[head:libc_Execle,hash:CRC-32=0x8d7fd6d]]]*/
+/*[[[head:libc_Execle,hash:CRC-32=0xcc3fe01]]]*/
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
 (VLIBCCALL libc_Execle)(char const *__restrict path,
@@ -245,11 +245,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 }
 /*[[[end:libc_Execle]]]*/
 
-/*[[[head:libd_Execpl,hash:CRC-32=0xe9867161]]]*/
+/*[[[head:libd_Execpl,hash:CRC-32=0x3baa5b12]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> execlp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
 (VLIBDCALL libd_Execpl)(char const *__restrict file,
                         char const *args,
@@ -273,10 +273,10 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_Execpl]]]*/
 
-/*[[[head:libc_Execpl,hash:CRC-32=0x28fa657d]]]*/
+/*[[[head:libc_Execpl,hash:CRC-32=0xaf9e9eb7]]]*/
 /* >> execlp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
 (VLIBCCALL libc_Execpl)(char const *__restrict file,
                         char const *args,
@@ -299,11 +299,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 }
 /*[[[end:libc_Execpl]]]*/
 
-/*[[[head:libd_Execlpe,hash:CRC-32=0x1f52ec79]]]*/
+/*[[[head:libd_Execlpe,hash:CRC-32=0xcfd21e53]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
 (VLIBDCALL libd_Execlpe)(char const *__restrict file,
@@ -334,10 +334,10 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_Execlpe]]]*/
 
-/*[[[head:libc_Execlpe,hash:CRC-32=0x2de7c8ab]]]*/
+/*[[[head:libc_Execlpe,hash:CRC-32=0x5ddd7d55]]]*/
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
 (VLIBCCALL libc_Execlpe)(char const *__restrict file,
@@ -558,10 +558,10 @@ INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_MALLOC ATTR_MALL_
 }
 /*[[[end:libc_GetCurrentDirName]]]*/
 
-/*[[[head:libc_FExecve,hash:CRC-32=0xacec86d9]]]*/
+/*[[[head:libc_FExecve,hash:CRC-32=0xd38d9f26]]]*/
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `FD' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `fd' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((2, 3)) void
 (LIBCCALL libc_FExecve)(fd_t fd,
                         __TARGV,
@@ -608,11 +608,11 @@ INTERN ATTR_SECTION(".text.crt.except.sched.process") void
 }
 /*[[[end:libc_SetPGrp]]]*/
 
-/*[[[head:libc_SetEUid,hash:CRC-32=0xdf1a87ff]]]*/
+/*[[[head:libc_SetEUid,hash:CRC-32=0x88c95a73]]]*/
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTERN ATTR_SECTION(".text.crt.except.sched.user") void
 (LIBCCALL libc_SetEUid)(uid_t euid) THROWS(...)
@@ -630,11 +630,11 @@ INTERN ATTR_SECTION(".text.crt.except.sched.user") void
 }
 /*[[[end:libc_SetEUid]]]*/
 
-/*[[[head:libc_SetEGid,hash:CRC-32=0xa634d45f]]]*/
+/*[[[head:libc_SetEGid,hash:CRC-32=0xf1e709d3]]]*/
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTERN ATTR_SECTION(".text.crt.except.sched.user") void
 (LIBCCALL libc_SetEGid)(gid_t egid) THROWS(...)

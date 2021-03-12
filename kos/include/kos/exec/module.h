@@ -53,7 +53,7 @@
 
 #ifndef DLLOCKSECTION_FNORMAL
 #define DLLOCKSECTION_FNORMAL   0x0000 /* Normal section locking flags. */
-#define DLLOCKSECTION_FINDEX    0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
+#define DLLOCKSECTION_FINDEX    0x0001 /* The given `name' is actually the `(uintptr_t)name' index of the section */
 #define DLLOCKSECTION_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
                                         * been loaded, then this flag is simply ignored. */
 #endif /* !DLLOCKSECTION_FNORMAL */
@@ -61,7 +61,7 @@
 
 /* Flags for `module_locksection()' */
 #define MODULE_LOCKSECTION_FNORMAL DLLOCKSECTION_FNORMAL /* Normal section locking flags. */
-#define MODULE_LOCKSECTION_FINDEX  DLLOCKSECTION_FINDEX  /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
+#define MODULE_LOCKSECTION_FINDEX  DLLOCKSECTION_FINDEX  /* The given `name' is actually the `(uintptr_t)name' index of the section */
 #define MODULE_LOCKSECTION_FNODATA DLLOCKSECTION_FNODATA /* Do not lock section data into memory, though if the section had already
                                                           * been loaded, then this flag is simply ignored. */
 

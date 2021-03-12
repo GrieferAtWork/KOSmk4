@@ -43,14 +43,14 @@ INTDEF NONNULL((1, 2, 3)) void
 NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
                                     void const *start, void const *end);
 
-/* Yield to the current token and advance to the next one (*PTR++)
+/* Yield to the current token and advance to the next one (*<ptr>++)
  * @return: JSON_PARSER_*:     The previously selected token (the parser now points at its end)
  * @return: JSON_ERROR_EOF:    The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
 INTDEF NONNULL((1)) int
 NOTHROW_NCX(CC libjson_parser_yield)(struct json_parser *__restrict self);
 
-/* Yield to the previous token and return it (*--PTR)
+/* Yield to the previous token and return it (*--<ptr>)
  * @return: JSON_PARSER_*:     The now selected token (The parser is now located at the previous token)
  * @return: JSON_ERROR_EOF:    The start of the input file had already been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ebc422a */
+/* HASH CRC-32:0x53391b27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__loc
 __NAMESPACE_LOCAL_END
 #include <bits/crt/io-file.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __LOCAL_LIBC(fgetc_unlocked) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)

@@ -139,7 +139,7 @@ unwind_through_debug_frame(void const *absolute_pc,
 
 
 /* Same as the regular unwind(3) (from libunwind.so), however (if configured),
- * this  one also handles the case where `ABSOLUTE_PC' points into user-space,
+ * this  one also handles the case where `absolute_pc' points into user-space,
  * allowing user-space text locations to be correctly unwound.
  * NOTE: This function should only be used when printing tracebacks for
  *       debugging purposes, but _NEVER_  for the purpose of  something

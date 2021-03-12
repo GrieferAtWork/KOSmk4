@@ -1472,9 +1472,9 @@ NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 }
 /*[[[end:libc_getpt]]]*/
 
-/*[[[head:libc_ptsname_r,hash:CRC-32=0xe46d5080]]]*/
+/*[[[head:libc_ptsname_r,hash:CRC-32=0xb81b248a]]]*/
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `FD' */
+ * associated with the master descriptor `fd' */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
                                      char *buf,

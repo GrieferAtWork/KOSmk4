@@ -35,7 +35,7 @@ __NAMESPACE_FAST_BEGIN
 
 #ifndef __ASSERT_MEMCPY_CT
 #if !defined(NDEBUG) && 0 /* Doesn't work correctly and actually causes false positives */
-extern __ATTR_ERROR("memcpy(): The `DST' and `SRC' buffers overlap - Use `memmove()' instead") void __memcpy_overlapping_buffers(void);
+extern __ATTR_ERROR("memcpy(): The `dst' and `src' buffers overlap - Use `memmove()' instead") void __memcpy_overlapping_buffers(void);
 /* Compile-time overlap assertions */
 #define __ASSERT_MEMCPY_CT_DOES_OVERLAP(dst, src, num_bytes) \
 	((dst) + (num_bytes) > (src) &&                          \
@@ -4445,8 +4445,8 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *__restrict _
 #endif
 
 #if !defined(NDEBUG) && defined(__OPTIMIZE_STRING_MEMOVE_DIRECTION)
-extern __ATTR_ERROR("memmovedown(): The passed DST pointer is greater than SRC (DST > SRC) - Use `memmoveup()' instead") void __memmovedown_invalid_pointer_order(void);
-extern __ATTR_ERROR("memmoveup(): The passed DST pointer is lower than SRC (DST < SRC) - Use `memmovedown()' instead") void __memmoveup_invalid_pointer_order(void);
+extern __ATTR_ERROR("memmovedown(): The passed dst pointer is greater than src (dst > src) - Use `memmoveup()' instead") void __memmovedown_invalid_pointer_order(void);
+extern __ATTR_ERROR("memmoveup(): The passed dst pointer is lower than src (dst < src) - Use `memmovedown()' instead") void __memmoveup_invalid_pointer_order(void);
 /* Compile-time ordering assertions */
 #define __ASSERT_MEMMOVEDOWN_CT(dst, src)                            \
 	if __untraced(__builtin_constant_p(dst <= src) && !(dst <= src)) \

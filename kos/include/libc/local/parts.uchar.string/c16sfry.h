@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf20a0fa2 */
+/* HASH CRC-32:0xc0b1f9b2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,28 +30,28 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16slen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16slen,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_DOS$wcslen)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16slen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16slen,(__CHAR16_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_c16slen (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16slen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_c16slen __LIBC_LOCAL_NAME(c16slen)
 #endif /* !... */
 #endif /* !__local___localdep_c16slen_defined */
@@ -78,18 +78,18 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16sfry) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sfry))(__CHAR16_TYPE__ *__restrict __string) {
-	__SIZE_TYPE__ __i, __count = __localdep_c16slen(__string);
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sfry))(__CHAR16_TYPE__ *__restrict __str) {
+	__SIZE_TYPE__ __i, __count = __localdep_c16slen(__str);
 	for (__i = 0; __i < __count; ++__i) {
 		__CHAR16_TYPE__ __temp;
 		__SIZE_TYPE__ __j = __localdep_rand();
 		__j = __i + (__j % (__count - __i));
 		/* Swap these 2 characters. */
-		__temp = __string[__i];
-		__string[__i] = __string[__j];
-		__string[__j] = __temp;
+		__temp = __str[__i];
+		__str[__i] = __str[__j];
+		__str[__j] = __temp;
 	}
-	return __string;
+	return __str;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16sfry_defined

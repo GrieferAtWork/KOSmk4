@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c09ff9c */
+/* HASH CRC-32:0x33403b4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,25 +29,32 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_freopen_defined
 #define __local___localdep_freopen_defined 1
 #if defined(__CRT_HAVE_freopen64_unlocked) && defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64) && defined(__USE_FILE_OFFSET64)
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen)
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64)
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen_unlocked)
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked)
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #else /* ... */
 #undef __local___localdep_freopen_defined

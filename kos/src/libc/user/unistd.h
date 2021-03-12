@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91045149 */
+/* HASH CRC-32:0xcdeb3d7a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,8 +33,8 @@ DECL_BEGIN
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_environ)(void);
 #ifndef __KERNEL__
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path, __TARGV, __TENVP);
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
@@ -48,7 +48,7 @@ INTDEF ATTR_CONST WUNUSED pid_t NOTHROW(LIBCCALL libc_gettid)(void);
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2]);
 /* >> sleep(3)
- * Sleep for up to `SECONDS' seconds */
+ * Sleep for up to `seconds' seconds */
 INTDEF unsigned int NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
@@ -65,11 +65,11 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getppid)(void);
  * THIS_THREAD->LEADER->GROUP_LEADER->PID */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getpgrp)(void);
 /* >> setpgid(2)
- * Change the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Change the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
- * When `PID' is ZERO(0), use `gettid()' for it instead.
- * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead.
+ * When `pgid' is ZERO(0), use `pid' (after it was substituted) for instead */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgid)(pid_t pid, pid_t pgid);
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
@@ -99,13 +99,13 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_getgroups)(int size, gid_t list[]);
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `UID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `uid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setuid)(uid_t uid);
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `GID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `gid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid);
 /* >> fork(2)
@@ -123,17 +123,17 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_fork)(void);
  * @return: 0 : No alarm was scheduled before.
  * @return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
  * Schedule an to deliver a `SIGALRM' after letting `seconds' elapse.
- * You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm */
+ * You may pass `0' for `seconds' to disable a previously scheduled alarm */
 INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc_alarm)(unsigned int seconds);
 /* >> pause(2)
  * Suspend execution until the delivery of a POSIX_SIGNAL */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `FD'
- * return: * : The configuration limit associated with `NAME' for `FD'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * Return a path configuration value associated with `name' for `fd'
+ * return: * : The configuration limit associated with `name' for `fd'
+ * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
@@ -148,17 +148,17 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
  * Set the foreground process group of a given TTY file descriptor */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 /* >> chown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER' */
+ * Change the ownership of a given `file' to `group:owner' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t owner, gid_t group);
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * Return a path configuration value associated with `name' for `path'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, char const *to);
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
@@ -190,60 +190,60 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *bu
  * written (in which case `bufsize' is returned). */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
- * Check if the given file handle `FD' refers to a TTY */
+ * Check if the given file handle `fd' refers to a TTY */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd);
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd, fd_t newfd);
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `FD' and return its duplicated handle number */
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd);
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd);
 /* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type' */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_access)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path);
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 INTDEF char *NOTHROW_RPC(LIBCCALL libc_getcwd)(char *buf, size_t bufsize);
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file);
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path);
 /* >> euidaccess(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
+ * @param: type: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `dfd:file', testing for `type' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd, char const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
 /* >> fchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
+ * Change the ownership of a given `dfd:file' to `group:owner' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags);
 /* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+ * Create a hard link from `fromfd:from', leading to `tofd:to' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+ * Create a new symbolic link loaded with `link_text' as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
 /* >> readlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
@@ -252,14 +252,14 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
 /* >> freadlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
 INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
 /* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+ * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> pread(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
@@ -345,34 +345,34 @@ INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t
  * process performs any of the actions above. */
 INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_vfork)(void);
 /* >> fchown(2)
- * Change the ownership of a given `FD' to `GROUP:OWNER' */
+ * Change the ownership of a given `fd' to `group:owner' */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd, uid_t owner, gid_t group);
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd);
 /* >> getpgid(2)
- * Return the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Return the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
- * When `PID' is ZERO(0), use `gettid()' for it instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getpgid)(pid_t pid);
 /* >> getsid(2)
- * Return the ID of the session which a process `PID' is apart of.
+ * Return the ID of the session which a process `pid' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid);
 /* >> lchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER',
+ * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if that file is a symbolic link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file, uid_t owner, gid_t group);
 /* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file, __PIO_OFFSET length);
 /* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `FD' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `fd' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
 /* Retrieve a system configuration string specified by `name'
@@ -407,25 +407,25 @@ INTDEF WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid);
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid);
 /* >> ttyslot(3) */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
 /* >> symlink(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+ * Create a new symbolic link loaded with `link_text' as link
+ * text, at the filesystem location referred to by `target_path'.
+ * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text, char const *target_path);
 /* >> readlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * Read the text of a symbolic link under `path' into the provided buffer.
+ * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
@@ -469,15 +469,15 @@ INTDEF longptr_t NOTHROW_RPC(VLIBCCALL libc_syscall)(longptr_t sysno, ...);
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(syscall_ulong_t sysno, ...);
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
- * (usually the process) to a path that was previously address by `PATH' */
+ * (usually the process) to a path that was previously address by `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path);
 /* >> getpass(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt);
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd, __PIO_OFFSET length);
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
 /* >> brk(2), sbrk(2)
  * Change the program break, allowing for a rudimentary implementation of a heap.
@@ -492,15 +492,15 @@ INTDEF void *NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta);
  * timestamps, and its size), meaning that changes are written to disk */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
 /* >> ctermid_r(3)
- * Same as `ctermid', but return `NULL' when `S' is `NULL' */
+ * Same as `ctermid', but return `NULL' when `s' is `NULL' */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `NAME'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ * @param: name: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `name'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name);
 #endif /* !__KERNEL__ */
 

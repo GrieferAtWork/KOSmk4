@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13671e81 */
+/* HASH CRC-32:0x3055feb4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_fmaxl_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return maximum numeric value from X and Y */
+/* Return maximum numeric value from `x' and `y' */
 __LOCAL_LIBC(fmaxl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmaxl))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 	/* TODO: ieee754-specific function */

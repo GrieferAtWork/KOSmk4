@@ -49,7 +49,7 @@ typedef /*utf-32*/ __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatgetc)(void *__ar
 typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatungetc)(/*utf-32*/ __CHAR32_TYPE__ __ch, void *__arg);
 #endif /* __KOS_VERSION__ < 400 */
 
-/* Read up to `NUM_BYTES' bytes into  `BUF', returning the actual number  of
+/* Read up to `num_bytes' bytes into  `buf', returning the actual number  of
  * read bytes, or a negative error value to-be propagated up the call-stack. */
 typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatreader)(void *__arg, void *__restrict __buf, __SIZE_TYPE__ __num_bytes);
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d815ed8 */
+/* HASH CRC-32:0xb6cb599 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,11 +32,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+ * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 4)),__THROWING,__localdep_LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),LinkAt,(__fromfd,__from,__tofd,__to,__flags))
 #endif /* !__local___localdep_LinkAt_defined */
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 __LOCAL_LIBC(Link) __ATTR_NONNULL((1, 2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Link))(char const *__from, char const *__to) __THROWS(...) {
 	__localdep_LinkAt(__AT_FDCWD, __from, __AT_FDCWD, __to, 0);

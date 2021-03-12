@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0ab6e12 */
+/* HASH CRC-32:0x804462c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
- * area. DESTR_FUNCTION, if non-NULL, is called with the value
+ * area. `destr_function', if non-`NULL', is called with the value
  * associated to that key when the key is destroyed.
- * DESTR_FUNCTION is not called if the value associated is NULL when
- * the key is destroyed
+ * `destr_function' is not called if the value associated is `NULL'
+ * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))
@@ -48,13 +48,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_c
 #define __local___localdep_pthread_key_delete_defined 1
 #ifdef __CRT_HAVE_pthread_key_delete
 /* >> pthread_key_delete(3)
- * Destroy KEY
+ * Destroy the given `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key' */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_key_delete,(__pthread_key_t __key),pthread_key_delete,(__key))
 #elif defined(__CRT_HAVE_tss_delete)
 /* >> pthread_key_delete(3)
- * Destroy KEY
+ * Destroy the given `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key' */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_key_delete,(__pthread_key_t __key),tss_delete,(__key))

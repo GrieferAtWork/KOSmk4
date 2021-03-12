@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80c88c89 */
+/* HASH CRC-32:0x4ef4b56d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/os/dirent.h>
-/* Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would */
+/* >> alphasort(3), alphasort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
                                      struct dirent const **e2) {
@@ -41,7 +42,8 @@ NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
 DEFINE_INTERN_ALIAS(libc_alphasort64, libc_alphasort);
 #else /* _DIRENT_MATCHES_DIRENT64 */
 #include <bits/os/dirent.h>
-/* 64-bit variant of `alphasort()' */
+/* >> alphasort(3), alphasort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
                                        struct dirent64 const **e2) {
@@ -49,7 +51,8 @@ NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
 }
 #endif /* !_DIRENT_MATCHES_DIRENT64 */
 #include <bits/os/dirent.h>
-/* Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would. */
+/* >> versionsort(3), versionsort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
                                        struct dirent const **e2) {
@@ -59,7 +62,8 @@ NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
 DEFINE_INTERN_ALIAS(libc_versionsort64, libc_versionsort);
 #else /* _DIRENT_MATCHES_DIRENT64 */
 #include <bits/os/dirent.h>
-/* 64-bit variant of `versionsort()' */
+/* >> versionsort(3), versionsort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1,
                                          struct dirent64 const **e2) {

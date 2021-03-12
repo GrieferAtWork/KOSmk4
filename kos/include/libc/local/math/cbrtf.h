@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ad0288a */
+/* HASH CRC-32:0xfe0d1f79 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cbrt_defined
 #define __local___localdep_cbrt_defined 1
 #if __has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)
-/* Return the cube root of X */
+/* Return the cube root of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_cbrt,(double __x),cbrt,{ return __builtin_cbrt(__x); })
 #elif defined(__CRT_HAVE_cbrt)
-/* Return the cube root of X */
+/* Return the cube root of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_cbrt,(double __x),cbrt,(__x))
 #elif defined(__CRT_HAVE___cbrt)
-/* Return the cube root of X */
+/* Return the cube root of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_cbrt,(double __x),__cbrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/cbrt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the cube root of X */
+/* Return the cube root of `x' */
 #define __localdep_cbrt __LIBC_LOCAL_NAME(cbrt)
 #else /* ... */
 #undef __local___localdep_cbrt_defined
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/cbrt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the cube root of X */
+/* Return the cube root of `x' */
 __LOCAL_LIBC(cbrtf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cbrtf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7ca7a09 */
+/* HASH CRC-32:0x21796d14 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtok_r_defined
 #define __local___localdep_strtok_r_defined 1
 #ifdef __CRT_HAVE_strtok_r
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_r,(__string,__delim,__save_ptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__str, char const *__delim, char **__restrict __save_ptr),strtok_r,(__str,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_strtok_s)
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_s,(__string,__delim,__save_ptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__str, char const *__delim, char **__restrict __save_ptr),strtok_s,(__str,__delim,__save_ptr))
 #elif defined(__CRT_HAVE___strtok_r)
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),__strtok_r,(__string,__delim,__save_ptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__str, char const *__delim, char **__restrict __save_ptr),__strtok_r,(__str,__delim,__save_ptr))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strtok_r.h>
@@ -39,9 +39,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strtok_r_defined */
 __LOCAL_LIBC(strtok) __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok))(char *__string, char const *__delim) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok))(char *__str, char const *__delim) {
 	static char *__save_ptr = __NULLPTR;
-	return __localdep_strtok_r(__string, __delim, &__save_ptr);
+	return __localdep_strtok_r(__str, __delim, &__save_ptr);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtok_defined

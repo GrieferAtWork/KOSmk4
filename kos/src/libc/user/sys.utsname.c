@@ -33,9 +33,9 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_uname,hash:CRC-32=0x2381c02a]]]*/
+/*[[[head:libc_uname,hash:CRC-32=0x89815ceb]]]*/
 /* >> uname(2)
- * Put information about the system in NAME
+ * Put information about the system in `name'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int

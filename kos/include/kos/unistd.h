@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x666408f */
+/* HASH CRC-32:0x6f121575 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,27 +50,27 @@ typedef __pos64_t pos64_t; /* File/device position */
 #endif /* __USE_LARGEFILE64 */
 
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execv,(char const *__restrict __path, __TARGV),(__path,___argv))
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
 #ifdef __CRT_HAVE_Execl
 /* >> execl(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execl");
 #elif defined(__CRT_HAVE_Execv)
 #include <libc/local/kos.unistd/Execl.h>
 /* >> execl(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -79,15 +79,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #endif /* ... */
 #ifdef __CRT_HAVE_Execle
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execle");
 #elif defined(__CRT_HAVE_Execve)
 #include <libc/local/kos.unistd/Execle.h>
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))(__path, __args, __builtin_va_arg_pack()); })
@@ -97,14 +97,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* ... */
 #ifdef __CRT_HAVE_Execpl
 /* >> execlp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execpl");
 #elif defined(__CRT_HAVE_Execvp)
 #include <libc/local/kos.unistd/Execpl.h>
 /* >> execlp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execpl))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -113,15 +113,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* ... */
 #ifdef __CRT_HAVE_Execlpe
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execlpe");
 #elif defined(__CRT_HAVE_Execvpe)
 #include <libc/local/kos.unistd/Execlpe.h>
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))(__file, __args, __builtin_va_arg_pack()); })
@@ -150,11 +150,11 @@ __CREDIRECT_VOID(,__THROWING,FSync,(__fd_t __fd),FDataSync,(__fd))
 __NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FSync))(__fd); })
 #endif /* !... */
 /* >> setpgid(2)
- * Change the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Change the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
- * When `PID' is ZERO(0), use `gettid()' for it instead.
- * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead.
+ * When `pgid' is ZERO(0), use `pid' (after it was substituted) for instead */
 __CDECLARE_VOID_OPT(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
@@ -167,13 +167,13 @@ __CDECLARE_OPT(,__pid_t,__THROWING,SetSid,(void),())
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `UID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `uid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_VOID_OPT(,__THROWING,SetUid,(__uid_t __uid),(__uid))
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `GID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `gid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
 /* >> fork(2)
@@ -189,27 +189,27 @@ __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
 #ifdef __CRT_HAVE_Chown
 /* >> chown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER' */
+ * Change the ownership of a given `file' to `group:owner' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_Chown */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <libc/local/kos.unistd/Chown.h>
 /* >> chown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER' */
+ * Change the ownership of a given `file' to `group:owner' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Chown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Chown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __CRT_HAVE_FChownAt */
 #endif /* !__CRT_HAVE_Chown */
 #ifdef __CRT_HAVE_Link
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Link,(char const *__from, char const *__to),(__from,__to))
 #else /* __CRT_HAVE_Link */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_LinkAt)
 #include <libc/local/kos.unistd/Link.h>
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Link)(char const *__from, char const *__to) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Link))(__from, __to); })
 #endif /* __AT_FDCWD && __CRT_HAVE_LinkAt */
 #endif /* !__CRT_HAVE_Link */
@@ -253,71 +253,71 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* __USE_KOS */
 #if defined(__CRT_HAVE_LSeek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),LSeek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
 #include <libc/local/kos.unistd/LSeek.h>
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(pos) (__LIBCCALL LSeek)(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
 #endif /* ... */
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CDECLARE_OPT(,__fd_t,__THROWING,Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
- * Duplicate a file referred to by `FD' and return its duplicated handle number */
+ * Duplicate a file referred to by `fd' and return its duplicated handle number */
 __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,Dup,(__fd_t __fd),(__fd))
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Chdir,(char const *__path),(__path))
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CDECLARE_OPT(,char *,__THROWING,GetCwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
 #ifdef __CRT_HAVE_Unlink
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Unlink,(char const *__file),(__file))
 #else /* __CRT_HAVE_Unlink */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <libc/local/kos.unistd/Unlink.h>
 /* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+ * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Unlink)(char const *__file) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Unlink))(__file); })
 #endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
 #endif /* !__CRT_HAVE_Unlink */
 #ifdef __CRT_HAVE_Rmdir
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Rmdir,(char const *__path),(__path))
 #else /* __CRT_HAVE_Rmdir */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <libc/local/kos.unistd/Rmdir.h>
 /* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
+ * Remove a directory referred to by `path' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Rmdir)(char const *__path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Rmdir))(__path); })
 #endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
 #endif /* !__CRT_HAVE_Rmdir */
 #ifdef __USE_ATFILE
 /* >> fchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
+ * Change the ownership of a given `dfd:file' to `group:owner' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
 /* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+ * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 4)),__THROWING,LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+ * Create a new symbolic link loaded with `link_text' as link
+ * text, at the filesystem location referred to by `tofd:target_path' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
 /* >> readlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
@@ -327,12 +327,12 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__l
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),size_t,__THROWING,ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
 #ifdef __USE_KOS
 /* >> freadlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
+ * Read the text of a symbolic link under `dfd:path' into the provided buffer.
+ * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),size_t,__THROWING,FReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
 /* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+ * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
 #endif /* __USE_ATFILE */
 
@@ -340,16 +340,16 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,UnlinkAt,(__fd_t __dfd, char 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_LSeek64
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__pos64_t,__THROWING,LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__pos64_t,__THROWING,LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek)
 #include <libc/local/kos.unistd/LSeek64.h>
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __ATTR_ARTIFICIAL __pos64_t (__LIBCCALL LSeek64)(__fd_t __fd, __off64_t __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek64))(__fd, __offset, __whence); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
@@ -506,24 +506,24 @@ __CDECLARE_VOID_OPT(,__THROWING,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid
 __CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(void),())
 #endif
 /* >> fchown(2)
- * Change the ownership of a given `FD' to `GROUP:OWNER' */
+ * Change the ownership of a given `fd' to `group:owner' */
 __CDECLARE_VOID_OPT(,__THROWING,FChown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
 /* >> chdir(2)
- * Change the current working directory to `PATH' */
+ * Change the current working directory to `path' */
 __CDECLARE_VOID_OPT(,__THROWING,FChdir,(__fd_t __fd),(__fd))
 /* >> getpgid(2)
- * Return the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Return the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
- * When `PID' is ZERO(0), use `gettid()' for it instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetPGid,(__pid_t __pid),(__pid))
 /* >> getsid(2)
- * Return the ID of the session which a process `PID' is apart of.
+ * Return the ID of the session which a process `pid' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetSid,(__pid_t __pid),(__pid))
 #ifdef __CRT_HAVE_LChown
 /* >> lchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER',
+ * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if that file is a symbolic link */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_LChown */
@@ -531,7 +531,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChown,(char const *__file, __uid
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <libc/local/kos.unistd/LChown.h>
 /* >> lchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER',
+ * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if that file is a symbolic link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL LChown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LChown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __CRT_HAVE_FChownAt */
@@ -540,31 +540,31 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #if defined(__CRT_HAVE_Truncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate,(char const *__file, pos_t __length),Truncate64,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate) && !defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate,(char const *__file, pos_t __length),(__file,__length))
 #elif defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
 #include <libc/local/kos.unistd/Truncate.h>
 /* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Truncate)(char const *__file, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Truncate))(__file, __length); })
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_Truncate64
 /* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate64,(char const *__file, pos64_t __length),(__file,__length))
 #elif defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate64,(char const *__file, pos64_t __length),Truncate,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate)
 #include <libc/local/kos.unistd/Truncate64.h>
 /* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+ * Truncate the given file `file' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Truncate64)(char const *__file, pos64_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Truncate64))(__file, __length); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
@@ -574,15 +574,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if !defined(__FExecve_defined) && defined(__CRT_HAVE_FExecve)
 #define __FExecve_defined 1
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `FD' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `fd' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((2, 3)),__THROWING,FExecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
 #endif /* !__FExecve_defined && __CRT_HAVE_FExecve */
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_GNU
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `file' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #endif /* __USE_GNU */
 
@@ -616,13 +616,13 @@ __CDECLARE_VOID_OPT(,__THROWING,SetReGid,(__gid_t __rgid, __gid_t __egid),(__rgi
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_VOID_OPT(,__THROWING,SetEUid,(__uid_t __euid),(__euid))
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_VOID_OPT(,__THROWING,SetEGid,(__gid_t __egid),(__egid))
 #endif /* __USE_XOPEN2K */
@@ -630,25 +630,25 @@ __CDECLARE_VOID_OPT(,__THROWING,SetEGid,(__gid_t __egid),(__egid))
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifdef __CRT_HAVE_Symlink
 /* >> symlink(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+ * Create a new symbolic link loaded with `link_text' as link
+ * text, at the filesystem location referred to by `target_path'.
+ * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
 #else /* __CRT_HAVE_Symlink */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
 #include <libc/local/kos.unistd/Symlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+ * Create a new symbolic link loaded with `link_text' as link
+ * text, at the filesystem location referred to by `target_path'.
+ * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Symlink)(char const *__link_text, char const *__target_path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Symlink))(__link_text, __target_path); })
 #endif /* __AT_FDCWD && __CRT_HAVE_SymlinkAt */
 #endif /* !__CRT_HAVE_Symlink */
 #ifdef __CRT_HAVE_Readlink
 /* >> readlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * Read the text of a symbolic link under `path' into the provided buffer.
+ * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
@@ -661,8 +661,8 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__THROWING,Readlink,(char const *__rest
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
 #include <libc/local/kos.unistd/Readlink.h>
 /* >> readlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * Read the text of a symbolic link under `path' into the provided buffer.
+ * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
@@ -706,38 +706,38 @@ __LIBC __LONG64_TYPE__ (__VLIBCCALL Syscall64)(__syscall_ulong_t __sysno, ...) _
    (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
- * (usually the process) to a path that was previously address by `PATH' */
+ * (usually the process) to a path that was previously address by `path' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,ChRoot,(char const *__restrict __path),(__path))
 #endif /* ... */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_FTruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),FTruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CDECLARE_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
 #include <libc/local/kos.unistd/FTruncate.h>
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate)(__fd_t __fd, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate))(__fd, __length); })
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_FTruncate64
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CDECLARE_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
 #include <libc/local/kos.unistd/FTruncate64.h>
 /* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
+ * Truncate the given file `fd' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate64, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate64)(__fd_t __fd, pos64_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate64))(__fd, __length); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */

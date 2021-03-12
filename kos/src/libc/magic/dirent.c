@@ -225,6 +225,7 @@ typedef struct __dirstream DIR;
 
 %[define(DEFINE_STRUCT_DIRSTREAM = struct __dirstream;)]
 
+@@>> opendir(3)
 @@Open and return a new directory stream for reading, referring to `name'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
@@ -238,6 +239,7 @@ DIR *opendir([[nonnull]] char const *name) {
 
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
+@@>> fopendirat(3)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
 [[userimpl, requires_function(fdopendir, openat)]]
@@ -254,6 +256,7 @@ DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 	return result;
 }
 
+@@>> opendirat(3)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires_function(fopendirat)]]
@@ -263,6 +266,7 @@ DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
 %#endif /* __USE_KOS && __USE_ATFILE */
 
 %
+@@>> closedir(3)
 @@Close a directory stream previously returned by `opendir(3)' and friends
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 int closedir([[nonnull]] DIR *dirp);
@@ -270,20 +274,23 @@ int closedir([[nonnull]] DIR *dirp);
 
 %
 %#ifdef __USE_BSD
-@@Same as `closedir()', but instead of closing the underlying file descriptor, return it
+@@>> fdclosedir(3)
+@@Same as `closedir()', but instead of also closing the underlying file descriptor, return it
 [[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
 $fd_t fdclosedir([[nonnull]] DIR *dirp);
 %#endif /* __USE_BSD */
 
 %
-@@Read and return the next pending directory entry of the given directory stream `DIRP'
-@@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
+@@>> readdir(3), readdir64(3)
+@@Read and return the next pending directory entry of the given directory stream `dirp'
+@@@except: Returns `NULL' for end-of-directory; throws an error if something else went wrong
 [[cp, no_crt_self_import, decl_include("<bits/os/dirent.h>"), decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir64")]]
 struct dirent *readdir([[nonnull]] DIR *__restrict dirp);
 
 %
+@@>> rewinddir(3)
 @@Rewind the given directory stream in such a way that the next call
 @@to `readdir(3)' will once again return the first directory entry
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
@@ -291,23 +298,27 @@ void rewinddir([[nonnull]] DIR *__restrict dirp);
 
 %
 %#ifdef __USE_XOPEN2K8
-@@Create a new directory stream by inheriting the given `FD' as stream handle
+@@>> fdopendir(3)
+@@Create a new directory stream by inheriting the given `fd' as stream handle
 [[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
 DIR *fdopendir($fd_t fd);
 %#endif /* __USE_XOPEN2K8 */
 
 %
 %#ifdef __USE_LARGEFILE64
-@@64-bit equivalent of `readdir(3)'
-@@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
-[[cp, dirent64_variant_of(readdir)]]
+[[cp, dirent64_variant_of(readdir), doc_alias("readdir")]]
 [[decl_include("<bits/os/dirent.h>"), decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 struct dirent64 *readdir64([[nonnull]] DIR *__restrict dirp);
 %#endif /* __USE_LARGEFILE64 */
 
 
 %#ifdef __USE_POSIX
-@@Reentrant version of `readdir(3)' (Using this is not recommended in KOS)
+@@>> readdir_r(3), readdir64_r(3)
+@@Reentrant version of `readdir(3)'
+@@NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
+@@      kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
+@@>> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
+@@   per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT')
 [[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir_r")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir64_r")]]
@@ -317,11 +328,8 @@ int readdir_r([[nonnull]] DIR *__restrict dirp,
 
 %
 %#ifdef __USE_LARGEFILE64
-@@NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
-@@      kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
-@@>> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
-@@   per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT')
-[[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), dirent64_variant_of(readdir_r)]]
+[[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[dirent64_variant_of(readdir_r), doc_alias("readdir_r")]]
 int readdir64_r([[nonnull]] DIR *__restrict dirp,
                 [[nonnull]] struct dirent64 *__restrict entry,
                 [[nonnull]] struct dirent64 **__restrict result);
@@ -331,10 +339,12 @@ int readdir64_r([[nonnull]] DIR *__restrict dirp,
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
 
+@@>> seekdir(3)
 @@Get the directory stream position
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
 void seekdir([[nonnull]] DIR *__restrict dirp, $longptr_t pos);
 
+@@>> telldir(3)
 @@Get the directory stream position
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
 $longptr_t telldir([[nonnull]] DIR *__restrict dirp);
@@ -345,6 +355,8 @@ $longptr_t telldir([[nonnull]] DIR *__restrict dirp);
 
 %
 %#ifdef __USE_XOPEN2K8
+
+@@>> dirfd(3)
 @@Return the underlying file descriptor of the given directory stream
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[ATTR_PURE, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
@@ -370,7 +382,8 @@ typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);
 )]
 
 %
-@@Scan a directory `DIR' for all contained directory entries
+@@>> scandir(3), scandir64(3)
+@@Scan a directory `dir' for all contained directory entries
 [[cp, no_crt_self_import, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(scandirat))]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandir")]]
@@ -383,7 +396,8 @@ __STDC_INT_AS_SSIZE_T scandir([[nonnull]] char const *__restrict dir,
 }
 
 %
-@@Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would
+@@>> alphasort(3), alphasort64(3)
+@@Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would
 [[ATTR_PURE, no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("alphasort")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("alphasort64")]]
@@ -393,8 +407,7 @@ int alphasort([[nonnull]] struct dirent const **e1,
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
-@@64-bit variant of `alphasort()'
-[[ATTR_PURE, dirent64_variant_of(alphasort)]]
+[[ATTR_PURE, dirent64_variant_of(alphasort), doc_alias("alphasort")]]
 [[decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>")]]
 int alphasort64([[nonnull]] struct dirent64 const **e1,
                 [[nonnull]] struct dirent64 const **e2) {
@@ -404,7 +417,8 @@ int alphasort64([[nonnull]] struct dirent64 const **e1,
 
 %
 %#ifdef __USE_GNU
-@@Scan a directory `DIRFD:DIR' for all contained directory entries
+@@>> scandirat(3), scandirat64(3)
+@@Scan a directory `dirfd:dir' for all contained directory entries
 [[cp, no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandirat")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandirat64")]]
@@ -433,9 +447,8 @@ typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const
 @@pp_endif@@
 )]
 
-@@64-bit variant of `scandir()'
 [[cp, dirent64_variant_of(scandir), decl_include("<features.h>", "<bits/os/dirent.h>")]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>"), doc_alias("scandir")]]
 [[requires(defined(__AT_FDCWD) && $has_function(scandirat64))]]
 [[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T)]]
 __STDC_INT_AS_SSIZE_T scandir64([[nonnull]] char const *__restrict dir,
@@ -444,9 +457,8 @@ __STDC_INT_AS_SSIZE_T scandir64([[nonnull]] char const *__restrict dir,
 	return scandirat64(__AT_FDCWD, dir, namelist, selector, cmp);
 }
 
-@@64-bit variant of `scandirat()'
 [[cp, dirent64_variant_of(scandirat), decl_include("<features.h>", "<bits/os/dirent.h>")]]
-[[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T)]]
+[[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T), doc_alias("scandirat")]]
 __STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[nonnull]] char const *__restrict dir,
                                   [[nonnull]] struct dirent64 ***__restrict namelist,
                                   __scandir64_selector_t selector, __scandir64_cmp_t cmp);
@@ -457,6 +469,7 @@ __STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[nonnull]] char const *__restric
 
 %
 %#ifdef __USE_MISC
+@@>> getdirentries(2), getdirentries64(2)
 @@Linux's underlying system call for reading the entries of a directory
 [[cp, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
 [[if(!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), preferred_alias("getdirentries")]]
@@ -465,8 +478,8 @@ $ssize_t getdirentries($fd_t fd, [[nonnull]] char *__restrict buf,
                        size_t nbytes, [[nonnull]] $off_t *__restrict basep);
 
 %#ifdef __USE_LARGEFILE64
-@@64-bit variant of `getdirentries()'
-[[cp, dirent64_variant_of(getdirentries), decl_include("<bits/types.h>")]]
+[[cp, dirent64_variant_of(getdirentries)]]
+[[decl_include("<bits/types.h>"), doc_alias("getdirentries")]]
 $ssize_t getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbytes,
                          [[nonnull]] $off64_t *__restrict basep);
 %#endif /* __USE_LARGEFILE64 */
@@ -474,7 +487,8 @@ $ssize_t getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbyt
 
 %
 %#ifdef __USE_GNU
-@@Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would.
+@@>> versionsort(3), versionsort64(3)
+@@Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would.
 [[decl_include("<bits/os/dirent.h>")]]
 [[ATTR_PURE, no_crt_self_import, impl_include("<bits/os/dirent.h>")]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("versionsort")]]
@@ -484,8 +498,7 @@ int versionsort([[nonnull]] struct dirent const **e1,
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
-@@64-bit variant of `versionsort()'
-[[decl_include("<bits/os/dirent.h>")]]
+[[decl_include("<bits/os/dirent.h>"), doc_alias("versionsort")]]
 [[ATTR_PURE, dirent64_variant_of(versionsort), impl_include("<bits/os/dirent.h>")]]
 int versionsort64([[nonnull]] struct dirent64 const **e1,
                   [[nonnull]] struct dirent64 const **e2) {
@@ -496,12 +509,13 @@ int versionsort64([[nonnull]] struct dirent64 const **e1,
 
 %
 %#if defined(__USE_KOS) && defined(__KOS__)
+@@>> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
 @@The KOS-specific system call for reading a single directory entry
 @@from a file descriptor referring to an open directory stream.
-@@@param: MODE: One of `READDIR_*' (See below)
+@@@param: mode: One of `READDIR_*' (See below)
 @@@return: * : The actually required buffer size for the directory entry (in bytes)
-@@             NOTE: When `READDIR_DEFAULT' was passed for `MODE', the directory
-@@                   stream will only be advanced when this value is >= 'BUFSIZE'
+@@             NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+@@                   stream will only be advanced when this value is >= 'bufsize'
 @@@return: 0 : The end of the directory has been reached.
 @@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')
 [[decl_include("<bits/os/dirent.h>", "<bits/types.h>")]]
@@ -511,23 +525,15 @@ $ssize_t kreaddir($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mod
 	return kreaddirf(fd, buf, bufsize, mode, 0);
 }
 
-@@The KOS-specific system call for reading a single directory entry
-@@from a file descriptor referring to an open directory stream.
-@@@param: MODE: One of `READDIR_*' (See below)
-@@@return: * : The actually required buffer size for the directory entry (in bytes)
-@@             NOTE: When `READDIR_DEFAULT' was passed for `MODE', the directory
-@@                   stream will only be advanced when this value is >= 'BUFSIZE'
-@@@return: 0 : The end of the directory has been reached.
-@@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')
-[[cp, wunused, no_crt_self_import, decl_include("<bits/os/dirent.h>", "<bits/types.h>")]]
+[[cp, wunused, no_crt_self_import, doc_alias("kreaddir")]]
+[[decl_include("<bits/os/dirent.h>", "<bits/types.h>")]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("kreaddirf")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("kreaddirf64")]]
 $ssize_t kreaddirf($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, $oflag_t flags);
 
 %#ifdef __USE_LARGEFILE64
 
-@@64-bit variant of `kreaddir()'
-[[cp, wunused, dirent64_variant_of(kreaddir)]]
+[[cp, wunused, dirent64_variant_of(kreaddir), doc_alias("kreaddir")]]
 [[if(defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddir")]]
 [[userimpl, requires_function(kreaddirf64)]]
 [[decl_include("<bits/os/dirent.h>", "<bits/types.h>")]]
@@ -535,8 +541,7 @@ $ssize_t kreaddir64($fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int
 	return kreaddirf64(fd, buf, bufsize, mode, 0);
 }
 
-@@64-bit variant of `kreaddirf()'
-[[cp, wunused, dirent64_variant_of(kreaddirf)]]
+[[cp, wunused, dirent64_variant_of(kreaddirf), doc_alias("kreaddirf")]]
 [[decl_include("<bits/os/dirent.h>", "<bits/types.h>")]]
 $ssize_t kreaddirf64($fd_t fd, struct dirent64 *buf, size_t bufsize,
                      unsigned int mode, $oflag_t flags);

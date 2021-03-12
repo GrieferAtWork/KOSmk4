@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa4ebf85 */
+/* HASH CRC-32:0x2740eb50 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,8 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputc32_
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> file_wprinter_unlocked(3)
+ * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 __LOCAL_LIBC(file_c32printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBKCALL __LIBC_LOCAL_NAME(file_c32printer_unlocked))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	__SIZE_TYPE__ __i;

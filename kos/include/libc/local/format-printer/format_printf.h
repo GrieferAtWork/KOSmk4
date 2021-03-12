@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3c30f28 */
+/* HASH CRC-32:0x554d0cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,18 +32,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -86,9 +86,9 @@ __NAMESPACE_LOCAL_BEGIN
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -117,8 +117,8 @@ __NAMESPACE_LOCAL_BEGIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vprintf */
 __NAMESPACE_LOCAL_END
@@ -127,18 +127,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -181,9 +181,9 @@ __NAMESPACE_LOCAL_BEGIN
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -212,26 +212,26 @@ __NAMESPACE_LOCAL_BEGIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 #define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
 #endif /* !__CRT_HAVE_format_vprintf */
 #endif /* !__local___localdep_format_vprintf_defined */
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -274,9 +274,9 @@ __NAMESPACE_LOCAL_BEGIN
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -305,8 +305,8 @@ __NAMESPACE_LOCAL_BEGIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 __LOCAL_LIBC(format_printf) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
 (__VLIBCCALL __LIBC_LOCAL_NAME(format_printf))(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) {
 	__SSIZE_TYPE__ __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8fd8c2b */
+/* HASH CRC-32:0x6adc29a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrit
 #undef __local___localdep_crt_fwrite_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fwrite_unlocked_defined */
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __LOCAL_LIBC(fputc_unlocked) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc_unlocked))(int __ch, __FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)

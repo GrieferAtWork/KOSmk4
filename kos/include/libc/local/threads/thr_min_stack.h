@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7b0ffc5 */
+/* HASH CRC-32:0x533fa0df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,36 +31,36 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `NAME'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ * @param: name: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `name'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__STDC_INT_AS_UINT_T __name),sysconf,(__name))
 #elif defined(__CRT_HAVE__sysconf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `NAME'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ * @param: name: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `name'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__STDC_INT_AS_UINT_T __name),_sysconf,(__name))
 #elif defined(__CRT_HAVE___sysconf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `NAME'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ * @param: name: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `name'
+ * return: * : The configuration limit associated with `name' for `path'
+ * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+ * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__STDC_INT_AS_UINT_T __name),__sysconf,(__name))
 #else /* ... */
 #undef __local___localdep_sysconf_defined

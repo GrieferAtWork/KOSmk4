@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13b26aeb */
+/* HASH CRC-32:0x786a40bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strverscmp __LIBC_LOCAL_NAME(strverscmp)
 #endif /* !... */
 #endif /* !__local___localdep_strverscmp_defined */
-/* Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would. */
+/* >> versionsort(3), versionsort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
 __LOCAL_LIBC(versionsort) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(versionsort))(struct dirent const **__e1, struct dirent const **__e2) {
 	return __localdep_strverscmp((*__e1)->d_name, (*__e2)->d_name);

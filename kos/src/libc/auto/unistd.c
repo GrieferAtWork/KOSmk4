@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x797f841 */
+/* HASH CRC-32:0xcb735d27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,8 +36,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <libc/local/environ.h>
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
                                  __TARGV) {
@@ -45,8 +45,8 @@ NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
 }
 #include <libc/local/environ.h>
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
                                   __TARGV) {
@@ -56,8 +56,8 @@ NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execl(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path,
                                   char const *args,
@@ -68,8 +68,8 @@ NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path,
 #ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execl(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
                                   char const *args,
@@ -80,8 +80,8 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path,
@@ -93,8 +93,8 @@ NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path,
 #ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execle(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
@@ -106,8 +106,8 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execlp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file,
                                    char const *args,
@@ -118,8 +118,8 @@ NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file,
 #ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execlp(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
                                    char const *args,
@@ -152,8 +152,8 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 }
 __NAMESPACE_LOCAL_END
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `file' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
                                    __TARGV,
@@ -161,7 +161,7 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 	char *env_path;
 	/* [...]
 	 * If the specified filename includes a slash character,
-	 * then $PATH is ignored, and the file at the  specified
+	 * then $path is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
 #ifdef _WIN32
@@ -171,7 +171,7 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 	if (libc_strchr(file, '/'))
 		return libc_execve(file, ___argv, ___envp);
 #endif /* !_WIN32 */
-	env_path = libc_getenv("PATH");
+	env_path = libc_getenv("path");
 	if (env_path && *env_path) {
 		size_t filelen;
 		filelen = libc_strlen(file);
@@ -199,8 +199,9 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execlpe(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file,
                                     char const *args,
@@ -211,8 +212,9 @@ NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file,
 #ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execlpe(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
+ * Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
                                     char const *args,

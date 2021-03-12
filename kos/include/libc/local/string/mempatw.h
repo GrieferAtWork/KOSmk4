@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cb425bd */
+/* HASH CRC-32:0xa36f8c49 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempsetw_defined
 #define __local___localdep_mempsetw_defined 1
 #ifdef __CRT_HAVE_mempsetw
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_wmempset) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),wmempset,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmempset) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),DOS$wmempset,(__dst,__word,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempsetw.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 #define __localdep_mempsetw __LIBC_LOCAL_NAME(mempsetw)
 #endif /* !... */
 #endif /* !__local___localdep_mempsetw_defined */

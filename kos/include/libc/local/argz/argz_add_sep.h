@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7ceaa70 */
+/* HASH CRC-32:0x70c46fc5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,14 +60,14 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
@@ -76,11 +76,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> argz_add_sep(3)
  * A combination of `argz_create_sep()' and `argz_append()' that will
- * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * append a duplication of `string' onto `*pargz', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
  * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
- * strings will be present in the resulting ARGZ string.
+ * strings will be present in the resulting argz-string.
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_add_sep) __ATTR_NONNULL((1, 2, 3)) __errno_t
@@ -94,7 +94,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 	/* Note that GLibc actually has a bug here that causes it to write `NULL'
 	 * into  the given  `*pargz' pointer  when the  allocation fails, instead
 	 * of leaving that  pointer in  its original state  (allowing the  caller
-	 * to cleanup the  ARGZ array,  instead of  forcing the  array to  become
+	 * to cleanup the  argz-array,  instead of  forcing the  array to  become
 	 * a memory leak)
 	 * -> That bug is fixed here!
 	 * Glibc's  version  of this:

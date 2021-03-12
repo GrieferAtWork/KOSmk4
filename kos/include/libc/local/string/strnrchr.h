@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd658d891 */
+/* HASH CRC-32:0x6116f31c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `strrchr', but don't exceed `MAX_CHARS' characters. */
+/* Same as `strrchr', but don't exceed `max_chars' characters. */
 __LOCAL_LIBC(strnrchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnrchr))(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen) {
 	char const *__result = __NULLPTR;

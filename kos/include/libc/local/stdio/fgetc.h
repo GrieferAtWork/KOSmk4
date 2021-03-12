@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d30bda3 */
+/* HASH CRC-32:0x3864438 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,8 +69,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__loc
 __NAMESPACE_LOCAL_END
 #include <bits/crt/io-file.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __LOCAL_LIBC(fgetc) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc))(__FILE *__restrict __stream) __THROWS(...) {

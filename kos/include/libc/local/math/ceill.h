@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c29da39 */
+/* HASH CRC-32:0xbce4af34 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <libm/ceil.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Smallest integral value not less than X */
+/* Smallest integral value not less than `x' */
 __LOCAL_LIBC(ceill) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceill))(__LONGDOUBLE __x) {
 #ifdef __LIBM_MATHFUNL

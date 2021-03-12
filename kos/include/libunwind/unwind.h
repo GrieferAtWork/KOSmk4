@@ -92,9 +92,9 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void const *__absolute_pc,
 /* Top-level function for unwinding the specific register state, automatically
  * locating the associated FDE entry, before using it to unwind the  specified
  * register state.
- * NOTE: The given `ABSOLUTE_PC' should point _to_ or _into_ the instruction that
+ * NOTE: The given `absolute_pc' should point _to_ or _into_ the instruction that
  *       should be  unwound; Not  after it.  - i.e.  range checking  is done  as:
- *       `ABSOLUTE_PC >= start && ABSOLUTE_PC < end'
+ *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 typedef __ATTR_NONNULL((2, 4)) unsigned int
 (LIBUNWIND_CC *PUNWIND)(void const *__absolute_pc,

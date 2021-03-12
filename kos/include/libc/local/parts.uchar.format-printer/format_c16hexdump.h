@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf60f0a8 */
+/* HASH CRC-32:0xcf87b476 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,33 +30,33 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_c16repeat_defined 1
 #if defined(__CRT_HAVE_format_wrepeat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> format_repeat(3)
- * Repeat `CH' a number of `NUM_REPETITIONS' times
+ * Repeat `ch' a number of `num_repetitions' times
  * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
+ * is allowed to call `printer' as often as it chooses */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16repeat,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #elif defined(__CRT_HAVE_DOS$format_wrepeat)
 /* >> format_repeat(3)
- * Repeat `CH' a number of `NUM_REPETITIONS' times
+ * Repeat `ch' a number of `num_repetitions' times
  * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
+ * is allowed to call `printer' as often as it chooses */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16repeat,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_wrepeat.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_repeat(3)
- * Repeat `CH' a number of `NUM_REPETITIONS' times
+ * Repeat `ch' a number of `num_repetitions' times
  * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
+ * is allowed to call `printer' as often as it chooses */
 #define __localdep_format_c16repeat (*(__SSIZE_TYPE__(__LIBDCALL *)(__pc16formatprinter, void *, __CHAR16_TYPE__, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wrepeat))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.format-printer/format_c16repeat.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_repeat(3)
- * Repeat `CH' a number of `NUM_REPETITIONS' times
+ * Repeat `ch' a number of `num_repetitions' times
  * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
+ * is allowed to call `printer' as often as it chooses */
 #define __localdep_format_c16repeat __LIBC_LOCAL_NAME(format_c16repeat)
 #endif /* !... */
 #endif /* !__local___localdep_format_c16repeat_defined */
@@ -81,14 +81,14 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  The format printer callback
- * @param: DATA:     A pointer to the data that should be dumped
- * @param: SIZE:     The amount of bytes read starting at DATA
- * @param: LINESIZE: The max amount of bytes to include per-line
+ * @param: printer:  The format printer callback
+ * @param: data:     A pointer to the data that should be dumped
+ * @param: size:     The amount of bytes read starting at data
+ * @param: linesize: The max amount of bytes to include per-line
  *                   HINT: Pass ZERO(0) to use a default size (16)
- * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 __LOCAL_LIBC(format_c16hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) {
 #ifndef __DECIMALS_SELECTOR

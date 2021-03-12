@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe622e2a */
+/* HASH CRC-32:0x1f35c02b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_acosh_defined
 #define __local___localdep_acosh_defined 1
 #if __has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)
-/* Hyperbolic arc cosine of X */
+/* Hyperbolic arc cosine of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),acosh,{ return __builtin_acosh(__x); })
 #elif defined(__CRT_HAVE_acosh)
-/* Hyperbolic arc cosine of X */
+/* Hyperbolic arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),acosh,(__x))
 #elif defined(__CRT_HAVE___acosh)
-/* Hyperbolic arc cosine of X */
+/* Hyperbolic arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),__acosh,(__x))
 #else /* ... */
 #undef __local___localdep_acosh_defined
 #endif /* !... */
 #endif /* !__local___localdep_acosh_defined */
-/* Hyperbolic arc cosine of X */
+/* Hyperbolic arc cosine of `x' */
 __LOCAL_LIBC(acoshl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acoshl))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_acosh((double)__x);

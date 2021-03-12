@@ -103,16 +103,16 @@ __SYSDECL_BEGIN
 #define __pformatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
- * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
- * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
- * @param: DATALEN: The  amount  of  characters  that  should  be  printed,  starting  at  `data'.
+ * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
+ * @param: data:    The base address of a `datalen' bytes long character vector that should be printed.
+ * @param: datalen: The  amount  of  characters  that  should  be  printed,  starting  at  `data'.
  *                  Note  that  this is  an exact  value, meaning  that a  NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually,  the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success is 'DATALEN'. */
+ *                  usual return value used to indicate success is `datalen'. */
 typedef __pformatprinter pformatprinter;
 
 /* Read and return one character.
@@ -129,9 +129,9 @@ typedef __pformatungetc pformatungetc;
 
 
 @@>> format_repeat(3)
-@@Repeat `CH' a number of `NUM_REPETITIONS' times
+@@Repeat `ch' a number of `num_repetitions' times
 @@The usual format-printer rules apply, and this function
-@@is allowed to call `PRINTER' as often as it chooses
+@@is allowed to call `printer' as often as it chooses
 [[kernel, throws, decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__alloca.h>", "<libc/string.h>")]]
 $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
@@ -214,8 +214,8 @@ err:
 @@preferring octal encoding for control characters and hex-encoding
 @@for other non-ascii characters, a behavior that may be modified
 @@with the `FORMAT_ESCAPE_FFORCE*' flags
-@@@param: PRINTER: A function called for all quoted portions of the text
-@@@param: TEXTLEN: The total number of bytes to escape, starting at `text'
+@@@param: printer: A function called for all quoted portions of the text
+@@@param: textlen: The total number of bytes to escape, starting at `text'
 [[kernel, throws, alias("format_quote")]]
 [[if(!defined(__KERNEL__)), export_as("format_quote")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
@@ -523,14 +523,14 @@ err:
 
 @@>> format_hexdump(3)
 @@Print a hex dump of the given data using the provided format printer
-@@@param: PRINTER:  The format printer callback
-@@@param: DATA:     A pointer to the data that should be dumped
-@@@param: SIZE:     The amount of bytes read starting at DATA
-@@@param: LINESIZE: The max amount of bytes to include per-line
+@@@param: printer:  The format printer callback
+@@@param: data:     A pointer to the data that should be dumped
+@@@param: size:     The amount of bytes read starting at data
+@@@param: linesize: The max amount of bytes to include per-line
 @@                  HINT: Pass ZERO(0) to use a default size (16)
-@@@param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
-@@@return: >= 0: The sum of all values returned by `PRINTER'
-@@@return: < 0:  The first negative value ever returned by `PRINTER' (if any)
+@@@param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
+@@@return: >= 0: The sum of all values returned by `printer'
+@@@return: < 0:  The first negative value ever returned by `printer' (if any)
 [[kernel, throws, decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__alloca.h>", "<hybrid/__unaligned.h>", "<hybrid/byteorder.h>")]]
 $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
@@ -735,18 +735,18 @@ err:
 @@>> format_printf(3), format_vprintf(3)
 @@Generic printf implementation
 @@Taking a regular printf-style format string and arguments, these
-@@functions will call the given `PRINTER' callback with various strings
+@@functions will call the given `printer' callback with various strings
 @@that, when put together, result in the desired formated text.
-@@ - `PRINTER' obviously is called with the text parts in their correct order
-@@ - If `PRINTER' returns '< 0', the function returns immediately,
+@@ - `printer' obviously is called with the text parts in their correct order
+@@ - If `printer' returns '< 0', the function returns immediately,
 @@   yielding that same value. Otherwise, `format_printf(3)' returns
-@@   the sum of all return values from `PRINTER'.
-@@ - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+@@   the sum of all return values from `printer'.
+@@ - The strings passed to `printer' may not necessarily be zero-terminated, and
 @@   a second argument is passed that indicates the absolute length in characters.
 @@Supported extensions:
 @@ - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
-@@                       `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
-@@                       `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+@@                       - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+@@                       - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
 @@ - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
 @@ - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
 @@            a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -789,9 +789,9 @@ err:
 @@                - When the second form (with a fixed buffer size) is used, do a full
 @@                  disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
 @@                  s.a. `disasm()'
-@@            - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+@@            - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
 @@                - Print addr2line information for a text address read from `va_arg(args, void *)'
-@@                - The given FORMAT string is a special printf-like format declaration
+@@                - The given `format' string is a special printf-like format declaration
 @@                  that accepts the following substitutions:
 @@                  - `%%'   Print a single `%'-character (used for escaping `%')
 @@                  - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -820,8 +820,8 @@ err:
 @@                     increasing the buffer when it gets filled completely.
 @@ - syslog:           Unbuffered system-log output.
 @@ - ...               There are a _lot_ more...
-@@@return: >= 0: The sum of all values returned by `PRINTER'
-@@@return: < 0:  The first negative value ever returned by `PRINTER' (if any)
+@@@return: >= 0: The sum of all values returned by `printer'
+@@@return: < 0:  The first negative value ever returned by `printer' (if any)
 [[kernel, throws, ATTR_LIBC_PRINTF(3, 0)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
@@ -888,14 +888,14 @@ $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
 @@>> format_scanf(3), format_vscanf(3)
 @@Generic scanf implementation
 @@Taking a regular scanf-style format string and argument, these
-@@functions will call the given `SCANNER' function which in
+@@functions will call the given `pgetc' function which in
 @@return should successively yield a character at a time from
 @@some kind of input source.
-@@ - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+@@ - If `pgetc' returns `< 0', scanning aborts and that value is returned.
 @@   Otherwise, the function returns the amount of successfully parsed arguments.
-@@ - The user may use `SCANNER' to track the last read character to get
+@@ - The user may use `pgetc' to track the last read character to get
 @@   additional information about what character caused the scan to fail.
-@@ - The given `SCANNER' should also indicate EOF by returning `NUL'
+@@ - The given `pgetc' should also indicate EOF by returning `NUL'
 @@ - This implementation supports the following extensions:
 @@   - `%[A-Z]'   -- Character ranges in scan patterns
 @@   - `%[^abc]'  -- Inversion of a scan pattern
@@ -979,9 +979,9 @@ struct format_snprintf_data {
 @@>> format_snprintf_printer(3)
 @@Format-printer implementation for printing to a string buffer like `snprintf(3)' would
 @@WARNING: No trailing NUL-character is implicitly appended
-@@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
-@@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
-@@      the sum of return values of all calls to `format_snprintf_printer(3)'
+@@NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
+@@NOTE: The number of required characters is `arg->sd_buffer - <orig_buf>', or
+@@      alternatively the sum of return values of all calls to `format_snprintf_printer(3)'
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
@@ -1004,7 +1004,7 @@ $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ vo
 
 @@>> format_width(3)
 @@Returns the width (number of characters; not bytes) of the given unicode string
-@@The `ARG' argument is ignored, and you may safely pass `NULL'
+@@The `arg' argument is ignored, and you may safely pass `NULL'
 [[kernel, ATTR_PURE, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
@@ -1028,7 +1028,7 @@ $ssize_t format_width(void *arg,
 
 @@>> format_length(3)
 @@Always re-return `datalen' and ignore all other arguments
-@@Both the `ARG' and `DATA' arguments are simply ignored
+@@Both the `arg' and `data' arguments are simply ignored
 [[kernel, ATTR_CONST, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[if(!defined(__KERNEL__)), kos_export_alias("format_wwidth")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]

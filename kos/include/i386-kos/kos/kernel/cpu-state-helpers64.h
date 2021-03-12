@@ -866,7 +866,7 @@ __NOTHROW_NCX(fcpustate64_to_ucpustate64)(struct fcpustate64 const *__restrict _
 	__result->ucs_cs           = __self->fcs_sgregs.sg_cs;
 	__result->ucs_ss           = __self->fcs_sgregs.sg_ss;
 }
-/* Assign fields from `DATA' (but leave fields not defined by `DATA' as unchanged) */
+/* Assign fields from `data' (but leave fields not defined by `data' as unchanged) */
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_assign_ucpustate64)(struct fcpustate64 *__restrict __self,
                                               struct ucpustate64 const *__restrict __data) {

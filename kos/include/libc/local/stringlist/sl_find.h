@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x629b9777 */
+/* HASH CRC-32:0x11176bc8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,10 +53,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
 /* >> sl_find(3)
- * Search for `NAME' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `SL' (i.e. the
+ * Search for `name' within the given StringList. Upon success,
+ * return a pointer to the equivalent string within `sl' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
- * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
+ * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
 __LOCAL_LIBC(sl_find) __ATTR_PURE __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_find))(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name) {
 	__SIZE_TYPE__ __i, __count = __sl->sl_cur;

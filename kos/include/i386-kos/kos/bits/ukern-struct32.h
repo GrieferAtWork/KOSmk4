@@ -116,7 +116,7 @@ struct userkern32 /*[PREFIX(uk_)]*/ {
 	                                       * Attempting  to  write  other  values  causes  an  `E_INVALID_ARGUMENT_BAD_VALUE'  exception
 	                                       * to be thrown (context `E_INVALID_ARGUMENT_CONTEXT_USERKERN_PPID') */
 	__uint32_t                  uk_pgid;  /* ID  of  the process  group  that the  calling  thread is  apart of.
-	                                       * Writing to this field has the same effect as `setpgid(0, <VALUE>)'. */
+	                                       * Writing to this field has the same effect as `setpgid(0, <value>)'. */
 	__uint32_t                  uk_sid;   /* ID of the session that the calling thread is apart of.
 	                                       * Writing either `0' of  the TID or PID  of the calling thread  has the same effect  as
 	                                       * `setsid()'. Attempting to write other values causes an `E_INVALID_ARGUMENT_BAD_VALUE'

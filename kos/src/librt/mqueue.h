@@ -47,9 +47,9 @@
 
 DECL_BEGIN
 
-/* Establish  connection  between  a process  and  a message  queue  NAME and
- * return message queue descriptor or  (mqd_t)-1 on error. OFLAGS  determines
- * the type of access used.  If O_CREAT is on  OFLAGS, the third argument  is
+/* Establish connection  between a  process and  a message  queue `name'  and
+ * return message queue descriptor or (mqd_t)-1 on error. `oflags' determines
+ * the  type of access used. If O_CREAT is on `oflags', the third argument is
  * taken as a `mode_t', the mode of the created message queue, and the fourth
  * argument  is  taken  as  `struct mq_attr *',  pointer  to  message   queue
  * attributes. If the fourth argument  is NULL, default attributes are  used. */
@@ -70,7 +70,7 @@ NOTHROW_NCX(CC librt_mq_setattr)(mqd_t mqdes,
                                  struct mq_attr const *__restrict mqstat,
                                  struct mq_attr *__restrict omqstat);
 
-/* Remove message queue named NAME. */
+/* Remove message queue named `name'. */
 INTDEF NONNULL((1)) int
 NOTHROW_NCX(CC librt_mq_unlink)(char const *name);
 

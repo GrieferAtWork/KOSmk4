@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda2cd50c */
+/* HASH CRC-32:0xb877ce6e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include <libm/finite.h>
 #include <libm/expm1.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return exp(X) - 1 */
+/* Return `exp(x) - 1' */
 __LOCAL_LIBC(expm1) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expm1))(double __x) {
 	double __result;

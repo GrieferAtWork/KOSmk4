@@ -186,15 +186,27 @@ INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_va
  * >>
  * >>     // Load the value of this variable.
  * >>     buffer = malloca(typ.t_sizeof);
- * >>     debug_cfa_getvalue(&REGISTERS, &GET_REGISTER, var.v_location, buffer, typ.t_sizeof);
+ * >>     size_t num_written_bits;
+ * >>     debuginfo_location_getvalue(&var.v_location,
+ * >>                                 <sections>,
+ * >>                                 &<get_register>,
+ * >>                                 &<registers>,
+ * >>                                 &<cu>,
+ * >>                                 module_relative_pc,
+ * >>                                 buffer,
+ * >>                                 typ.t_sizeof,
+ * >>                                 &num_written_bits,
+ * >>                                 &<sp>->sp_frame_base,
+ * >>                                 NULL,
+ * >>                                 parser->dup_addrsize,
+ * >>                                 parser->dup_ptrsize);
  * >>
  * >>     // Print a representation of the variable, and its data.
- * >>     debuginfo_print_value(PRINTER, ARG, &pp, &type, v.v_name, buffer, typ.t_sizeof);
+ * >>     debuginfo_print_value(printer, arg, &pp, &type, v.v_name, buffer, typ.t_sizeof);
  * >> }
  * @param: varname: Name of the value (when NULL, print as a cast-like expression;
  *                  otherwise, print as an declaration)
- * @param: flags:   Set of `DEBUGINFO_PRINT_VALUE_F*'
- */
+ * @param: flags:   Set of `DEBUGINFO_PRINT_VALUE_F*' */
 INTDEF NONNULL((1, 3, 4, 6)) ssize_t CC
 libdi_debuginfo_print_value(pformatprinter printer, void *arg,
                             di_debuginfo_cu_parser_t const *__restrict parser,

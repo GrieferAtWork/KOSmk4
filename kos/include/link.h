@@ -91,7 +91,7 @@ typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
 #endif /* !____dl_iterator_callback_defined */
 
 /* Enumerate all loaded modules, as  well as information about  them.
- * Enumeration stops when `*CALLBACK' returns a non-zero value, which
+ * Enumeration stops when `*callback' returns a non-zero value, which
  * will then also be returned  by this function. Otherwise, `0'  will
  * be returned after all modules have been enumerated. */
 #ifdef __CRT_HAVE_dl_iterate_phdr

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46263593 */
+/* HASH CRC-32:0x5d8b6ca0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,23 +27,23 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmoveup_defined
 #define __local___localdep_memmoveup_defined 1
 #ifdef __CRT_HAVE_memmoveup
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmoveup,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_memmove)
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmoveup.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmoveup __LIBC_LOCAL_NAME(memmoveup)
 #endif /* !... */
 #endif /* !__local___localdep_memmoveup_defined */
-/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 __LOCAL_LIBC(mempmoveup) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveup))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
 	return (void *)((__BYTE_TYPE__ *)__localdep_memmoveup(__dst, __src, __n_bytes) + __n_bytes);

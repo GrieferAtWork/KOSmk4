@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e3f9c89 */
+/* HASH CRC-32:0xc888c789 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1882,9 +1882,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fcvt_r, libd_fcvt_r);
 DEFINE_PUBLIC_ALIAS(DOS$qgcvt, libd_qgcvt);
 DEFINE_PUBLIC_ALIAS(DOS$qecvt_r, libd_qecvt_r);
 DEFINE_PUBLIC_ALIAS(DOS$qfcvt_r, libd_qfcvt_r);
-DEFINE_PUBLIC_ALIAS(DOS$_ecvt, libd_qecvt);
 DEFINE_PUBLIC_ALIAS(DOS$qecvt, libd_qecvt);
-DEFINE_PUBLIC_ALIAS(DOS$_fcvt, libd_qfcvt);
 DEFINE_PUBLIC_ALIAS(DOS$qfcvt, libd_qfcvt);
 DEFINE_PUBLIC_ALIAS(DOS$drand48_r, libd_drand48_r);
 DEFINE_PUBLIC_ALIAS(DOS$erand48_r, libd_erand48_r);
@@ -1928,7 +1926,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__mktemp, libd_mktemp);
 DEFINE_PUBLIC_ALIAS(DOS$mktemp, libd_mktemp);
 DEFINE_PUBLIC_ALIAS(DOS$_ecvt, libd_ecvt);
 DEFINE_PUBLIC_ALIAS(DOS$ecvt, libd_ecvt);
-DEFINE_PUBLIC_ALIAS(DOS$_ecvt, libd_fcvt);
+DEFINE_PUBLIC_ALIAS(DOS$_fcvt, libd_fcvt);
 DEFINE_PUBLIC_ALIAS(DOS$fcvt, libd_fcvt);
 DEFINE_PUBLIC_ALIAS(DOS$getsubopt, libd_getsubopt);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemp64, libd_mkstemp);
@@ -1939,20 +1937,18 @@ DEFINE_PUBLIC_ALIAS(DOS$unlockpt, libd_unlockpt);
 DEFINE_PUBLIC_ALIAS(DOS$ptsname, libd_ptsname);
 DEFINE_PUBLIC_ALIAS(DOS$posix_openpt, libd_posix_openpt);
 DEFINE_PUBLIC_ALIAS(DOS$ptsname_r, libd_ptsname_r);
-DEFINE_PUBLIC_ALIAS(DOS$strtol_l, libd_strtol_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strtol_l, libd_strtol_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtol_l, libd_strtol_l);
-DEFINE_PUBLIC_ALIAS(DOS$strtoul_l, libd_strtoul_l);
+DEFINE_PUBLIC_ALIAS(DOS$strtol_l, libd_strtol_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strtoul_l, libd_strtoul_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtoul_l, libd_strtoul_l);
-DEFINE_PUBLIC_ALIAS(DOS$strtoll_l, libd_strtoll_l);
+DEFINE_PUBLIC_ALIAS(DOS$strtoul_l, libd_strtoul_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strtoll_l, libd_strtoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtoll_l, libd_strtoll_l);
-DEFINE_PUBLIC_ALIAS(DOS$strtoq_l, libd_strtoll_l);
-DEFINE_PUBLIC_ALIAS(DOS$strtoull_l, libd_strtoull_l);
+DEFINE_PUBLIC_ALIAS(DOS$strtoll_l, libd_strtoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strtoull_l, libd_strtoull_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtoull_l, libd_strtoull_l);
-DEFINE_PUBLIC_ALIAS(DOS$strtouq_l, libd_strtoull_l);
+DEFINE_PUBLIC_ALIAS(DOS$strtoull_l, libd_strtoull_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strtod_l, libd_strtod_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtod_l, libd_strtod_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtod_l, libd_strtod_l);

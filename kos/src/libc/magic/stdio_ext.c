@@ -68,8 +68,8 @@ enum {
 	FSETLOCKING_QUERY    = __FSETLOCKING_QUERY,    /* Query current state of the locking status. */
 #endif /* __FSETLOCKING_QUERY */
 #ifdef __FSETLOCKING_INTERNAL
-	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects  all uses  of the stream  functions, except  for
-	                                                * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects all uses of the stream functions, except for uses
+	                                                * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
 #endif /* __FSETLOCKING_INTERNAL */
 #ifdef __FSETLOCKING_BYCALLER
 	FSETLOCKING_BYCALLER = __FSETLOCKING_BYCALLER  /* The user will take care of locking.
@@ -83,8 +83,8 @@ enum {
 #define FSETLOCKING_QUERY    FSETLOCKING_QUERY    /* Query current state of the locking status. */
 #endif /* __FSETLOCKING_QUERY */
 #ifdef __FSETLOCKING_INTERNAL
-#define FSETLOCKING_INTERNAL FSETLOCKING_INTERNAL /* The library protects  all uses  of the stream  functions, except  for
-                                                   * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+#define FSETLOCKING_INTERNAL FSETLOCKING_INTERNAL /* The library protects all uses of the stream functions, except for uses
+                                                   * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
 #endif /* __FSETLOCKING_INTERNAL */
 #ifdef __FSETLOCKING_BYCALLER
 #define FSETLOCKING_BYCALLER FSETLOCKING_BYCALLER /* The user will take care of locking.
@@ -95,8 +95,8 @@ enum {
 #define FSETLOCKING_QUERY    __FSETLOCKING_QUERY    /* Query current state of the locking status. */
 #endif /* __FSETLOCKING_QUERY */
 #ifdef __FSETLOCKING_INTERNAL
-#define FSETLOCKING_INTERNAL __FSETLOCKING_INTERNAL /* The library protects  all uses  of the stream  functions, except  for
-                                                     * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+#define FSETLOCKING_INTERNAL __FSETLOCKING_INTERNAL /* The library protects all uses of the stream functions, except for uses
+                                                     * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
 #endif /* __FSETLOCKING_INTERNAL */
 #ifdef __FSETLOCKING_BYCALLER
 #define FSETLOCKING_BYCALLER __FSETLOCKING_BYCALLER /* The user will take care of locking.
@@ -111,49 +111,60 @@ enum {
 
 }
 
-@@Return the size of the buffer of FP in bytes currently in use by the given stream
+@@>> __fbufsize(3)
+@@Return the size of the buffer of `stream' in
+@@bytes currently in use by the given stream
 [[wunused, ATTR_PURE]]
-$size_t __fbufsize([[nonnull]] $FILE *fp);
+$size_t __fbufsize([[nonnull]] $FILE *stream);
 
-@@Return non-zero value iff the stream FP is opened readonly,
-@@or if the last operation on the stream was a read operation
+@@>> __freading(3)
+@@Return non-zero value when `stream' is opened readonly,
+@@or if the last operation on `stream' was a read operation
 [[wunused, ATTR_PURE]]
-int __freading([[nonnull]] $FILE *fp);
+int __freading([[nonnull]] $FILE *stream);
 
-@@Return non-zero value iff the stream FP is opened write-only or
-@@append-only, or if the last operation on the stream was a write
+@@>> __fwriting(3)
+@@Return non-zero value when `stream' is opened write-only or
+@@append-only, or if the last operation on `stream' was a write
 @@operation
 [[wunused, ATTR_PURE]]
-int __fwriting([[nonnull]] $FILE *fp);
+int __fwriting([[nonnull]] $FILE *stream);
 
-@@Return non-zero value iff stream FP is not opened write-only or append-only
+@@>> __freadable(3)
+@@Return non-zero value when `stream' is not opened write-only or append-only
 [[wunused, ATTR_PURE]]
-int __freadable([[nonnull]] $FILE *fp);
+int __freadable([[nonnull]] $FILE *stream);
 
-@@Return non-zero value iff stream FP is not opened read-only
+@@>> __fwritable(3)
+@@Return non-zero value when `stream' is not opened read-only
 [[wunused, ATTR_PURE]]
-int __fwritable([[nonnull]] $FILE *fp);
+int __fwritable([[nonnull]] $FILE *stream);
 
-@@Return non-zero value iff the stream FP is line-buffered
+@@>> __flbf(3)
+@@Return non-zero value when `stream' is line-buffered
 [[wunused, ATTR_PURE]]
-int __flbf([[nonnull]] $FILE *fp);
+int __flbf([[nonnull]] $FILE *stream);
 
-@@Discard all pending buffered I/O on the stream FP
+@@>> __fpurge(3)
+@@Discard all pending buffered I/O on `stream'
 [[export_alias("fpurge")]]
-void __fpurge([[nonnull]] $FILE *fp);
+void __fpurge([[nonnull]] $FILE *stream);
 
-@@Return amount of output in bytes pending on a stream FP
+@@>> __fpending(3)
+@@Return amount of output in bytes pending on a `stream'
 [[wunused, ATTR_PURE]]
-size_t __fpending([[nonnull]] $FILE *fp);
+size_t __fpending([[nonnull]] $FILE *stream);
 
+@@>> _flushlbf(3)
 @@Flush all line-buffered files
 /* NOTE: I feel like this is a typo, but that's
  *       the  symbol that also exists in GLibC! */
 [[cp_stdio, export_alias("_IO_flush_all_linebuffere")]]
 void _flushlbf();
 
-@@Set locking status of stream FP to TYPE
-int __fsetlocking([[nonnull]] $FILE *fp, int type);
+@@>> __fsetlocking(3)
+@@Set locking status of `stream' to `type'
+int __fsetlocking([[nonnull]] $FILE *stream, int type);
 
 %{
 #endif /* __CC__ */

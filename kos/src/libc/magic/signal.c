@@ -1552,8 +1552,8 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 @@Change the signal mask for the calling thread. Note that portable
 @@programs that also make use of multithreading must instead use the
 @@pthread-specific `pthread_sigmask()' function instead, as POSIX
-@@states that this function behaves undefined in such szenarios.
-@@However, on KOS, `pthread_sigmask()' is imply an alias for this
+@@states that this function behaves undefined in such scenarios.
+@@However, on KOS, `pthread_sigmask()' is simply an alias for this
 @@function, and `sigprocmask()' always operates thread-local.
 @@Note also that on KOS 2 additional functions `getsigmaskptr()'
 @@and `setsigmaskptr()' exist, which can be used to get/set the

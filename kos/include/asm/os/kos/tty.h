@@ -68,7 +68,7 @@
 #define __TCSBRKP             _IO('T', 0x25) /* [int deciseconds] Needed for POSIX tcsendbreak() */
 #define __TIOCSBRK            _IO('T', 0x27) /* BSD compatibility */
 #define __TIOCCBRK            _IO('T', 0x28) /* BSD compatibility */
-#define __TIOCGSID            _IO('T', 0x29) /* [pid_t *arg] Return the session ID of FD */
+#define __TIOCGSID            _IO('T', 0x29) /* [pid_t *arg] Return the session ID of a tty */
 #define __TCGETS2            _IOR('T', 0x2a, struct termios2) /* ... */
 #define __TCSETS2            _IOW('T', 0x2b, struct termios2) /* ... */
 #define __TCSETSW2           _IOW('T', 0x2c, struct termios2) /* ... */

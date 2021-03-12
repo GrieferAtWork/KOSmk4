@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92a7bb79 */
+/* HASH CRC-32:0x803877b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,25 +53,25 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return X to the Y power */
+/* Return `x' to the `y' power */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),powl,{ return __builtin_powl(__x, __y); })
 #elif defined(__CRT_HAVE_powl)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return X to the Y power */
+/* Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),powl,(__x,__y))
 #elif defined(__CRT_HAVE___powl)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return X to the Y power */
+/* Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/powl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return X to the Y power */
+/* Return `x' to the `y' power */
 #define __localdep_powl __LIBC_LOCAL_NAME(powl)
 #else /* ... */
 #undef __local___localdep_powl_defined

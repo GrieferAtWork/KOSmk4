@@ -87,11 +87,11 @@
 #endif /* ELF_ARCH_R_DTPOFF32 && !ELF_ARCH_CASE_R_DTPOFF32 */
 
 #if defined(ELF_ARCH_R_NEG_TPOFF32) && !defined(ELF_ARCH_CASE_R_NEG_TPOFF32)
-#define ELF_ARCH_CASE_R_NEG_TPOFF32 case ELF_ARCH_R_NEG_TPOFF32 /* *ADDR = -(dm_tlsstoff + VALUE) */
+#define ELF_ARCH_CASE_R_NEG_TPOFF32 case ELF_ARCH_R_NEG_TPOFF32 /* `*addr = -(dm_tlsstoff + value)' */
 #endif /* ELF_ARCH_R_NEG_TPOFF32 && !ELF_ARCH_CASE_R_NEG_TPOFF32 */
 
 #if defined(ELF_ARCH_R_TPOFF32) && !defined(ELF_ARCH_CASE_R_TPOFF32)
-#define ELF_ARCH_CASE_R_TPOFF32 case ELF_ARCH_R_TPOFF32 /* *ADDR = dm_tlsstoff + VALUE */
+#define ELF_ARCH_CASE_R_TPOFF32 case ELF_ARCH_R_TPOFF32 /* `*addr = dm_tlsstoff + value' */
 #endif /* ELF_ARCH_R_TPOFF32 && !ELF_ARCH_CASE_R_TPOFF32 */
 
 #if defined(ELF_ARCH_R_DTPMOD64) && !defined(ELF_ARCH_CASE_R_DTPMOD64)
@@ -103,11 +103,11 @@
 #endif /* ELF_ARCH_R_DTPOFF64 && !ELF_ARCH_CASE_R_DTPOFF64 */
 
 #if defined(ELF_ARCH_R_NEG_TPOFF64) && !defined(ELF_ARCH_CASE_R_NEG_TPOFF64)
-#define ELF_ARCH_CASE_R_NEG_TPOFF64 case ELF_ARCH_R_NEG_TPOFF64 /* *ADDR = -(dm_tlsstoff + VALUE) */
+#define ELF_ARCH_CASE_R_NEG_TPOFF64 case ELF_ARCH_R_NEG_TPOFF64 /* `*addr = -(dm_tlsstoff + value)' */
 #endif /* ELF_ARCH_R_NEG_TPOFF64 && !ELF_ARCH_CASE_R_NEG_TPOFF64 */
 
 #if defined(ELF_ARCH_R_TPOFF64) && !defined(ELF_ARCH_CASE_R_TPOFF64)
-#define ELF_ARCH_CASE_R_TPOFF64 case ELF_ARCH_R_TPOFF64 /* *ADDR = dm_tlsstoff + VALUE */
+#define ELF_ARCH_CASE_R_TPOFF64 case ELF_ARCH_R_TPOFF64 /* `*addr = dm_tlsstoff + value' */
 #endif /* ELF_ARCH_R_TPOFF64 && !ELF_ARCH_CASE_R_TPOFF64 */
 
 #if defined(ELF_ARCH_R_SIZE32) && !defined(ELF_ARCH_CASE_R_SIZE32)

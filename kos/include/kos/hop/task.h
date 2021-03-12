@@ -169,9 +169,9 @@ struct hop_task_setsessionleader /*[PREFIX(tssl_)]*/ {
                                                               * NOTE: If the given leader isn't a process leader,
                                                               *      `HOP_TASK_OPEN_PROCESS(leader)' will be used instead.
                                                               * @throw: E_PROCESS_EXITED: [...] */
-/* TODO: HOP_TASK_SIGNAL -- FD-interface for the kill() and friends */
+/* TODO: HOP_TASK_SIGNAL -- FD-interface for kill() and friends */
 /* TODO: HOP_TASK_SIGNAL -- This should also include a function to raise a signal with a custom CPU context. */
-/* TODO: HOP_TASK_RPC -- FD-interface for the `rpc_schedule()' system call */
+/* TODO: HOP_TASK_RPC -- FD-interface for `rpc_schedule()' */
 
 
 

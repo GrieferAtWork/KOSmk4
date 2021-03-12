@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2e19f03 */
+/* HASH CRC-32:0x70226e46 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,16 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_memchr_defined 1
 #ifdef __CRT_HAVE_memchr
 /* >> memchr(3)
- * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
- * Return `NULL' if `NEEDLE' wasn't found. */
+ * Ascendingly search for `needle', starting at `haystack'.
+ * Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memchr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memchr.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> memchr(3)
- * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
- * Return `NULL' if `NEEDLE' wasn't found. */
+ * Ascendingly search for `needle', starting at `haystack'.
+ * Return `NULL' if `needle' wasn't found. */
 #define __localdep_memchr __LIBC_LOCAL_NAME(memchr)
 #endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
@@ -45,19 +45,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memchrl_defined
 #define __local___localdep_memchrl_defined 1
 #ifdef __CRT_HAVE_memchrl
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords),memchrl,(__haystack,__needle,__n_dwords))
 #elif defined(__CRT_HAVE_wmemchr) && __SIZEOF_WCHAR_T__ == 4
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords),wmemchr,(__haystack,__needle,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmemchr) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords),KOS$wmemchr,(__haystack,__needle,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memchrl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __localdep_memchrl __LIBC_LOCAL_NAME(memchrl)
 #endif /* !... */
 #endif /* !__local___localdep_memchrl_defined */
@@ -65,19 +65,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memchrw_defined
 #define __local___localdep_memchrw_defined 1
 #ifdef __CRT_HAVE_memchrw
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memchrw,(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words),memchrw,(__haystack,__needle,__n_words))
 #elif defined(__CRT_HAVE_wmemchr) && __SIZEOF_WCHAR_T__ == 2
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memchrw,(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words),wmemchr,(__haystack,__needle,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmemchr) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memchrw,(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words),DOS$wmemchr,(__haystack,__needle,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memchrw.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __localdep_memchrw __LIBC_LOCAL_NAME(memchrw)
 #endif /* !... */
 #endif /* !__local___localdep_memchrw_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4eddbc8a */
+/* HASH CRC-32:0xb918df2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmoveq __LIBC_LOCAL_NAME(memmoveq)
 #endif /* !__CRT_HAVE_memmoveq */
 #endif /* !__local___localdep_memmoveq_defined */
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' */
 __LOCAL_LIBC(mempmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveq))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) {
 	return (__UINT64_TYPE__ *)__localdep_memmoveq(__dst, __src, __n_qwords) + __n_qwords;

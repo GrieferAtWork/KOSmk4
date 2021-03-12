@@ -90,7 +90,7 @@
 #define __DLFCN_VCC __VLIBCCALL
 #endif /* !__DLFCN_CC */
 
-/* The MODE argument to `dlopen(3)' must contain one of the following: */
+/* The mode-argument to `dlopen(3)' must contain one of the following: */
 #ifdef __RTLD_LAZY
 #define RTLD_LAZY __RTLD_LAZY /* Lazy function call binding. */
 #endif /* __RTLD_LAZY */
@@ -102,9 +102,9 @@
 #endif /* __RTLD_BINDING_MASK */
 
 
-/* The MODE argument to `dlopen(3)' must contain one of the following: */
+/* The mode-argument to `dlopen(3)' must contain one of the following: */
 #ifdef __RTLD_GLOBAL
-#define RTLD_GLOBAL __RTLD_GLOBAL /* If the following bit is set  in the MODE argument to  `dlopen',
+#define RTLD_GLOBAL __RTLD_GLOBAL /* If the following bit is set  in the mode-argument to  `dlopen',
                                    * the  symbols of the loaded object and its dependencies are made
                                    * visible as if the object were linked directly into the program. */
 #endif /* __RTLD_GLOBAL */
@@ -114,7 +114,7 @@
 
 
 
-/* The MODE argument to `dlopen(3)' may optionally contain any of the following: */
+/* The mode-argument to `dlopen(3)' may optionally contain any of the following: */
 #ifdef __RTLD_NOLOAD
 #define RTLD_NOLOAD __RTLD_NOLOAD /* Do not load the object. */
 #endif /* __RTLD_NOLOAD */
@@ -159,9 +159,9 @@
 
 
 #if defined(__USE_NETBSD) || defined(__USE_GNU)
-/* If the first argument of `dlsym' or `dlvsym' is set to  RTLD_NEXT
- * the run-time address of the symbol called NAME in the next shared
- * object is returned. The "next"  relation is defined by the  order
+/* If  the first argument  of `dlsym' or `dlvsym'  is set to RTLD_NEXT
+ * the run-time address of the symbol called `name' in the next shared
+ * object is returned.  The "next"  relation is defined  by the  order
  * the shared objects were loaded.
  * Or for the C-savvy:
  *     `RTLD_DEFAULT' <==> `#include'
@@ -170,8 +170,8 @@
 #define RTLD_NEXT __RTLD_NEXT
 #endif /* __RTLD_NEXT */
 
-/* If the first argument to `dlsym' or `dlvsym' is set to RTLD_DEFAULT
- * the run-time address of the symbol called NAME in the global  scope
+/* If the first argument to `dlsym' or `dlvsym' is set to  RTLD_DEFAULT
+ * the run-time address of the symbol called `name' in the global scope
  * is returned.
  * HINT: The global scope is the  same as that of  the root executable, as  seen
  *       under /proc/PID/exe (or as returned by `dlmodulename(dlopen(NULL, 0))'. */
@@ -213,15 +213,15 @@ typedef __Lmid_t Lmid_t;
 
 
 /* Lazily load a shared library file, and return a handle to said file.
- * @param: FILENAME: The filename of the shared library.
+ * @param: filename: The filename of the shared library.
  *                   If  this string contains  at least 1 '/'-character,
  *                   the string will be  interpreted as a raw  filename,
  *                   such that passing it to open(2) would return a file
  *                   handle for the named library file.
- *                   In this case, `FILENAME' may either be an absolute path,
+ *                   In this case, `filename' may either be an absolute path,
  *                   or a path relative to the current working directory,  as
  *                   set by `chdir(2)'
- *                   If  `FILENAME'  doesn't  contain  any  '/'-characters,  the  string
+ *                   If  `filename'  doesn't  contain  any  '/'-characters,  the  string
  *                   is  the  filename  of the  library  (e.g. "libc.so"),  and  will be
  *                   searched for in the set  of system library locations, as  specified
  *                   by  a  ':'-separated string  read  from `getenv("LD_LIBRARY_PATH")'
@@ -230,7 +230,7 @@ typedef __Lmid_t Lmid_t;
  *                   When `NULL' is  passed for  this argument,  a handle  for the  main
  *                   executable module (i.e.  the `readlink  /proc/self/exe` binary)  is
  *                   returned.
- * @param: MODE:     Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
+ * @param: mode:     Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
  *                   exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
  *                   or'd with any of the other `RTLD_*' flags.
  * @return: * :   A handle to the library that got loaded.
@@ -252,7 +252,7 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC dlopen)(char const *__fil
  * defined callbacks may be invoked, including `__attribute__((destructor))'
  * callbacks,  as well  as callbacks  registered dynamically  through use of
  * `DLAUXCTRL_ADD_FINALIZER' (which in turn is used by `__cxa_atexit()')
- * @return: 0 : Successfully closed the given HANDLE.
+ * @return: 0 : Successfully closed the given handle.
  * @return: * : Failed to close the handle  (which is likely to simply  be
  *              invalid; s.a. `dlerror()') Warning: Don't just willy-nilly
  *              pass invalid handles  to this function.  Depending on  how
@@ -264,7 +264,7 @@ __IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dlclose)(void *__handle);
 #endif /* __CRT_HAVE_dlclose */
 
-/* Lookup the load address of a symbol within a shared library  `HANDLE',
+/* Lookup the load address of a symbol within a shared library  `handle',
  * given its `SYMBOL_NAME'. If no such symbol exists, `NULL' is returned,
  * and `dlerror()' is modified to return a human-readable error message.
  * WARNING: If  the actual address of the symbol is `NULL', then this
@@ -289,7 +289,7 @@ __NOTHROW_NCX(__DLFCN_CC dlclose)(void *__handle);
  *          >>     if (message != NULL) // Symbol lookup really failed.
  *          >>         fprintf(stderr, "dlerror: %s\n", message);
  *          >> }
- * @param: HANDLE: The dynamic  library handle  of the  library which  should  be
+ * @param: handle: The dynamic  library handle  of the  library which  should  be
  *                 search  for  the  specified  `SYMBOL_NAME',  before  moving on
  *                 to also  search all  of that  libraries dependencies  for  the
  *                 same `SYMBOL_NAME', and  moving on to  search those  libraries
@@ -352,9 +352,9 @@ __NOTHROW_NCX(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol
 /* BSD also has a function `fdlopen()' that does the same as our's does. */
 #if defined(__USE_KOS) || defined(__USE_BSD)
 /* Open a library, given a file descriptor previously acquired by `open()'
- * NOTE: This function will inherit the given `FD' on success.
- * @param: FD:   The file descriptor to use & inhert for the shared library
- * @param: MODE: Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
+ * NOTE: This function will inherit the given `fd' on success.
+ * @param: fd:   The file descriptor to use & inhert for the shared library
+ * @param: mode: Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
  *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
  *               or'd with any of the other `RTLD_*' flags. */
 #ifdef __CRT_HAVE_dlfopen
@@ -371,7 +371,7 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC fdlopen)(/*inherit(on_suc
 
 /* Check if a given module is exception aware.
  * TODO: Figure out how we want to detect this condition...
- * @param: HANDLE: The module to check
+ * @param: handle: The module to check
  * @return: 1 : The given module is exception aware
  * @return: 0 : The given module isn't exception aware
  * @return: * : The given module handler is invalid (s.a. `dlerror()') */
@@ -395,7 +395,7 @@ __NOTHROW_NCX(__DLFCN_CC dlexceptaware)(void *__handle);
 #endif /* ... */
 
 /* Return the handle of an already loaded library, given a static data/text pointer
- * @param: FLAGS: Set of `DLGETHANDLE_F*' */
+ * @param: flags: Set of `DLGETHANDLE_F*' */
 #ifdef __CRT_HAVE_dlgethandle
 #ifndef __dlgethandle_defined
 #define __dlgethandle_defined 1
@@ -406,7 +406,7 @@ __NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
 #endif /* __CRT_HAVE_dlgethandle */
 
 /* Return the handle of an already loaded library, given its name
- * @param: NAME:  One of the following (checked in this order):
+ * @param: name:  One of the following (checked in this order):
  *                 - "/lib/libc.so"
  *                 - "libc.so"
  *                 - "libc"
@@ -416,22 +416,22 @@ __NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
  *                 - "LIBC"          (requires `DLGETHANDLE_FNOCASE')
  *                 - "C"             (requires `DLGETHANDLE_FNOCASE')
  *                Alternatively, `NULL' can be passed to return a handle for the caller's module.
- * @param: FLAGS: Set of `DLGETHANDLE_F*' */
+ * @param: flags: Set of `DLGETHANDLE_F*' */
 #ifdef __CRT_HAVE_dlgetmodule
 __IMPDEF __ATTR_WUNUSED void *
 __NOTHROW_NCX(__DLFCN_CC dlgetmodule)(char const *__name,
                                       unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
 #endif /* __CRT_HAVE_dlgetmodule */
 
-/* Return the internally used file descriptor for the given module `HANDLE'
+/* Return the internally used file descriptor for the given module `handle'
  * Note  however that this  descriptor is usually  only opened for reading!
- * @param: HANDLE: A handle returned by `dlopen()'.
- * @return: * : An open file descriptor for the given module `HANDLE'
+ * @param: handle: A handle returned by `dlopen()'.
+ * @return: * : An open file descriptor for the given module `handle'
  *              WARNING: Attempting  to  close()  this  handle  may  cause  future
  *                       operations  performed with the associated module to fail!
- *                       Additionally, using dlclose() to close `HANDLE' after the
- *                       module's FD was already  closed will attempt to  re-close
- *                       that same FD, possibly closing  some other handle if  the
+ *                       Additionally, using dlclose() to close `handle' after the
+ *                       module's fd was already  closed will attempt to  re-close
+ *                       that same fd, possibly closing  some other handle if  the
  *                       same slot was re-used in the mean time.
  * @return: * : Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlmodulefd
@@ -439,26 +439,26 @@ __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_NCX(__DLFCN_CC dlmodulefd)(void *__handle);
 #endif /* __CRT_HAVE_dlmodulefd */
 
-/* Return the internally  used filename for  the given module  `HANDLE'
+/* Return the internally  used filename for  the given module  `handle'
  * Note that this path is an absolute, canonical (realpath()) filename.
- * @param: HANDLE: A handle returned by `dlopen()'.
- * @return: * :    The absolute, unambiguous filename for the given module `HANDLE'
+ * @param: handle: A handle returned by `dlopen()'.
+ * @return: * :    The absolute, unambiguous filename for the given module `handle'
  * @return: NULL:  Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlmodulename
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
 __NOTHROW_NCX(__DLFCN_CC dlmodulename)(void *__handle);
 #endif /* __CRT_HAVE_dlmodulename */
 
-/* Return the base address offset chosen by ASLR, which is added to addresses of the given module `HANDLE'.
+/* Return the base address offset chosen by ASLR, which is added to addresses of the given module `handle'.
  * WARNING: This function usually returns `NULL' for the root executable, in which case  dlerror()
  *          is  not modified, meaning  that in order to  safely use this  function, you must first
  *          call `dlerror()' in  order to clear  any existing errors,  then invoke this  function,
  *          and call `dlerror()' again when NULL is returned to check if an error really occurred.
- *          Or alternatively, you  can simply  make sure that  `HANDLE' isn't  invalid, since  the
- *          only  case when this  function can ever fail  is when `HANDLE'  was already closed, is
+ *          Or alternatively, you  can simply  make sure that  `handle' isn't  invalid, since  the
+ *          only  case when this  function can ever fail  is when `handle'  was already closed, is
  *         `NULL', or isn't a pointer returned by `dlopen()', `dlgetmodule()' or `dlgethandle()'
- * @param: HANDLE: A handle returned by `dlopen()'.
- * @return: * :    The load address / module base for the given `HANDLE'.
+ * @param: handle: A handle returned by `dlopen()'.
+ * @return: * :    The load address / module base for the given `handle'.
  * @return: NULL:  Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlmodulebase
 #ifndef __dlmodulebase_defined
@@ -489,14 +489,14 @@ struct dl_section {
 #ifdef __CRT_HAVE_dllocksection
 #ifndef DLLOCKSECTION_FNORMAL
 #define DLLOCKSECTION_FNORMAL   0x0000 /* Normal section locking flags. */
-#define DLLOCKSECTION_FINDEX    0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
+#define DLLOCKSECTION_FINDEX    0x0001 /* The given `name' is actually the `(uintptr_t)name' index of the section */
 #define DLLOCKSECTION_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
                                         * been loaded, then this flag is simply ignored. */
 #endif /* !DLLOCKSECTION_FNORMAL */
 
 /* Lock a named section of a given dynamic library into memory.
- * @param: HANDLE: Handle for the library who's section `NAME' should be locked & loaded.
- * @param: NAME:   Name of the section to load into memory.
+ * @param: handle: Handle for the library who's section `name' should be locked & loaded.
+ * @param: name:   Name of the section to load into memory.
  * @return: * :    A reference to a locked section object  (s.a. exposed portion of the section  above),
  *                 and allows the user to access the contents of the section, as it is loaded in memory.
  *                 Note however that the actual section data is usually mapped as read-only!
@@ -549,7 +549,7 @@ __NOTHROW_NCX(__DLFCN_CC dlsectionindex)(struct dl_section *__sect);
 #endif /* __CRT_HAVE_dlsectionindex */
 
 /* Return the module associated with a given section, or NULL on error.
- * @param: FLAGS: Set of `DLGETHANDLE_F*'
+ * @param: flags: Set of `DLGETHANDLE_F*'
  * @return: * :   A pointer, or reference to the module handle (when `DLGETHANDLE_FINCREF' was given)
  * @return: NULL: Error (s.a. `dlerror()'; usually, the module was already unloaded) */
 #ifdef __CRT_HAVE_dlsectionmodule
@@ -623,36 +623,36 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
  * ATTR_THREAD-based  TLS memory also works. - However  using these functions, TLS memory can
  * be  allocated dynamically at  runtime (behaving the same  as a call  to dlopen() loading a
  * module containing a TLS segment would).
- * @param: NUM_BYTES:      The size of the TLS segment (in bytes)
- * @param: MIN_ALIGNMENT:  The minimum alignment requirements for the TLS segment base address.
- * @param: TEMPLATE_DATA:  Base address of an initialization template.
- *                         The first `TEMPLATE_SIZE' bytes  of any per-thread data  segment
+ * @param: num_bytes:      The size of the TLS segment (in bytes)
+ * @param: min_alignment:  The minimum alignment requirements for the TLS segment base address.
+ * @param: template_data:  Base address of an initialization template.
+ *                         The first `template_size' bytes  of any per-thread data  segment
  *                         that gets allocated will be initialized to the contents of these
- *                         values before `PERTHREAD_INIT' is optionally invoked in order to
+ *                         values before `perthread_init' is optionally invoked in order to
  *                         perform additional initialization.
- * @param: TEMPLATE_SIZE:  The size of `TEMPLATE_DATA' in bytes, indicating the number  of
+ * @param: template_size:  The size of `template_data' in bytes, indicating the number  of
  *                         leading bytes within the TLS segment that should be pre-defined
- *                         to mirror the contents of `TEMPLATE_DATA' at the time of a call
- *                         to this  function (`TEMPLATE_DATA'  need  not remain  valid  or
+ *                         to mirror the contents of `template_data' at the time of a call
+ *                         to this  function (`template_data'  need  not remain  valid  or
  *                         accessible after this function returns)
- *                         Any memory after `TEMPLATE_SIZE', but before `NUM_BYTES' is initialized
- *                         to  all  ZEROes,  however  `TEMPLATE_SIZE'  must  not  be  greater than
- *                        `NUM_BYTES', and if it is, this function returns `NULL' and sets
+ *                         Any memory after `template_size', but before `num_bytes' is initialized
+ *                         to  all  ZEROes,  however  `template_size'  must  not  be  greater than
+ *                        `num_bytes', and if it is, this function returns `NULL' and sets
  *                        `dlerror()' accordingly.
- * @param: PERTHREAD_INIT: An optional callback that will be invoked on a per-thread basis
+ * @param: perthread_init: An optional callback that will be invoked on a per-thread basis
  *                         in order to perform additional initialization of the associated
  *                         TLS segment within the associated thread.
  *                         This function will be called upon first access of the segment
  *                         within   the  thread  using  the  data  (s.a.  `dltlsaddr()')
- *                         @param: ARG:  The value of `PERTHREAD_CALLBACK_ARG' passed to `dltlsalloc'
- *                         @param: BASE: The base address of the associated segment within the calling
+ *                         @param: arg:  The value of `perthread_callback_arg' passed to `dltlsalloc'
+ *                         @param: base: The base address of the associated segment within the calling
  *                                       thread   (same   as  the   return  value   of  `dltlsaddr()')
- * @param: PERTHREAD_FINI: An optional callback that behaves similar to `PERTHREAD_INIT',
+ * @param: perthread_fini: An optional callback that behaves similar to `perthread_init',
  *                         but called by `pthread_exit()'  or any other thread  finalizer
  *                        (more specifically: by `dltlsfreeseg()') within any thread that
  *                         has been seen using the associated segment, and causing it to
  *                         be allocated and initialized for that thread.
- * @param: PERTHREAD_CALLBACK_ARG: A user-specified argument passed to the init/fini callbacks.
+ * @param: perthread_callback_arg: A user-specified argument passed to the init/fini callbacks.
  * @return: * :            An opaque handle for the newly created TLS segment.
  *                         This handle may be used in future calls to `dltlsaddr()', and can be
  *                         destroyed (causing  all threads  that had  previously allocated  the
@@ -682,29 +682,29 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfree)(void *__tls_handle);
 #endif /* !__DLFCN_DLTLSADDR2_CC */
 
 
-/* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
+/* Return the calling thread's base address of the TLS segment associated with `tls_handle'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
  *       passed  to `dltlsalloc()' will be called by this function upon the first use of
  *       that  segment within each  individual thread, also causing  the finalizer to be
  *       enqueued for invocation when the calling thread exits.
  * WARNING: The order in which TLS finalizers are invoked is entirely UNDEFINED!
- * NOTE: the  given  `TLS_HANDLE' may  also  be a  module  handle, as  returned  by `dlopen()',
+ * NOTE: the  given  `tls_handle' may  also  be a  module  handle, as  returned  by `dlopen()',
  *       in which case this function  returns a pointer to the  TLS segment of that module  for
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
- * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
- * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
+ * @return: * :   Pointer to the base of the TLS segment associated with `tls_handle' within the calling thread.
+ * @return: NULL: Invalid `tls_handle', or allocation/initialization failed. (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dltlsaddr
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__DLFCN_DLTLSADDR_CC dltlsaddr)(void *__tls_handle);
 #endif /* __CRT_HAVE_dltlsaddr */
 
-/* Same as `dltlsaddr()', but used to lookup a TLS block relative to a given `TLS_SEGMENT',
+/* Same as `dltlsaddr()', but used to lookup a TLS block relative to a given `tls_segment',
  * where the later was previously  allocated using `dltlsallocseg()'. This function  allows
  * the caller to get a pointer to the TLS data of another thread, and is used to initialize
  * the `pthread_self()' of a newly created thread from within `pthread_create()'.
- * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE'
- *                within the given `TLS_SEGMENT'.
- * @return: NULL: Invalid `TLS_HANDLE' or `TLS_SEGMENT', or
+ * @return: * :   Pointer to the base of the TLS segment associated with `tls_handle'
+ *                within the given `tls_segment'.
+ * @return: NULL: Invalid `tls_handle' or `tls_segment', or
  *                allocation/initialization failed. (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dltlsaddr2
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
@@ -713,59 +713,59 @@ __NOTHROW_NCX(__DLFCN_DLTLSADDR2_CC dltlsaddr2)(void *__tls_handle,
 #endif /* __CRT_HAVE_dltlsaddr2 */
 
 
-/* Perform an auxiliary control command about a given module `HANDLE'
+/* Perform an auxiliary control command about a given module `handle'
  * This function is used internally, and invocation requirements for different values
- * for `CMD' may change in the future. - It's purpose is to provide access to binary-
+ * for `cmd' may change in the future. - It's purpose is to provide access to binary-
  * specific information about loaded modules.
- * @param: HANDLE:   Handle of the module for which to query information,
+ * @param: handle:   Handle of the module for which to query information,
  *                   or  NULL  to   query  for   the  root   application.
  *                   Some commands  may not  make use  of this  argument.
- * @param: CMD:      The command with which information should be requested.
- * @return: NULL: No information available, or no buffer was provided (depending on `CMD')
- * @return: NULL: Error: Unknown `CMD' (s.a. dlerror())
- * @return: NULL: Error: Invalid `HANDLE' (s.a. dlerror()) */
+ * @param: cmd:      The command with which information should be requested.
+ * @return: NULL: No information available, or no buffer was provided (depending on `cmd')
+ * @return: NULL: Error: Unknown `cmd' (s.a. dlerror())
+ * @return: NULL: Error: Invalid `handle' (s.a. dlerror()) */
 #ifdef __CRT_HAVE_dlauxctrl
 __IMPDEF void *
 __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
                                      unsigned int __cmd,
                                      ...);
 
-#define DLAUXCTRL_MOD_INCREF         0xa001 /* incref() the module handle (always re-returns `HANDLE') */
-#define DLAUXCTRL_MOD_DECREF         0xa002 /* decref() the module handle (always re-returns `HANDLE') */
-#define DLAUXCTRL_MOD_WEAKINCREF     0xa003 /* weakincref() the module handle (always re-returns `HANDLE') */
-#define DLAUXCTRL_MOD_WEAKDECREF     0xa004 /* weakdecref() the module handle (always re-returns `HANDLE') */
-#define DLAUXCTRL_MOD_TRYINCREF      0xa005 /* tryincref() the module handle (always re-returns `HANDLE', or `NULL' if the module was destroyed) */
-#define DLAUXCTRL_MOD_NOTDESTROYED   0xa006 /* check if the module wasdestroyed() (re-returns `HANDLE' if not, or `NULL' if so) */
-#define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `HANDLE' is ignored but should be any valid module handle, or `NULL',
+#define DLAUXCTRL_MOD_INCREF         0xa001 /* incref() the module handle (always re-returns `handle') */
+#define DLAUXCTRL_MOD_DECREF         0xa002 /* decref() the module handle (always re-returns `handle') */
+#define DLAUXCTRL_MOD_WEAKINCREF     0xa003 /* weakincref() the module handle (always re-returns `handle') */
+#define DLAUXCTRL_MOD_WEAKDECREF     0xa004 /* weakdecref() the module handle (always re-returns `handle') */
+#define DLAUXCTRL_MOD_TRYINCREF      0xa005 /* tryincref() the module handle (always re-returns `handle', or `NULL' if the module was destroyed) */
+#define DLAUXCTRL_MOD_NOTDESTROYED   0xa006 /* check if the module wasdestroyed() (re-returns `handle' if not, or `NULL' if so) */
+#define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `handle' is ignored but should be any valid module handle, or `NULL',
                                              * and  all  other arguments  are also  ignored; always  returns  `NULL', but  doesn't set  an error */
-#define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `HANDLE' is ignored but should be any
+#define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `handle' is ignored but should be any
                                              * valid   module  handle,   or  `NULL',  and   all  other  arguments   are  also  ignored.
                                              * Always returns `NULL', but doesn't set an error */
-#define DLAUXCTRL_ADD_FINALIZER      0xd103 /* Register a dynamic finalizer callback for `HANDLE':
-                                             * >> CALLBACK = va_arg(void(__DLFCN_CC *)(void *));
-                                             * >> ARG      = va_arg(void *);
-                                             * NOTE: When returning `HANDLE', and `HANDLE' was `NULL', the
+#define DLAUXCTRL_ADD_FINALIZER      0xd103 /* Register a dynamic finalizer callback for `handle':
+                                             * >> callback = va_arg(void(__DLFCN_CC *)(void *));
+                                             * >> arg      = va_arg(void *);
+                                             * NOTE: When returning `handle', and `handle' was `NULL', the
                                              *       handle  for the root application is returned instead.
-                                             * @return: HANDLE: Re-returns `HANDLE' upon success.
-                                             * @return: HANDLE: Module  finalizers   have   already   been   invoked.
-                                             *                  In this case, CALLBACK was invoked prior to returning
-                                             * @return: NULL:   Invalid `HANDLE' (dlerror() is modified)
-                                             * @return: NULL:   Failed to allocate additional memory for registering `CALLBACK'. */
+                                             * @return: handle: Re-returns `handle' upon success.
+                                             * @return: handle: Module finalizers  have  already  been  invoked.  In
+                                             *                  this case, `callback' was invoked prior to returning
+                                             * @return: NULL:   Invalid `handle' (dlerror() is modified)
+                                             * @return: NULL:   Failed to allocate additional memory for registering `callback'. */
 #define DLAUXCTRL_REGISTER_EXTENSION 0xd201 /* Register an extension to libdl:
                                              * >> extension              = va_arg(struct dlmodule_format *);
                                              * >> sizeof_dlmodule_format = va_arg(size_t);
                                              * >> sizeof_dlcore_ops      = va_arg(size_t);
-                                             * NOTE: When returning `HANDLE', and `HANDLE' was `NULL', the
+                                             * NOTE: When returning `handle', and `handle' was `NULL', the
                                              *       handle  for the root application is returned instead.
-                                             * @return: HANDLE: Re-returns `HANDLE' upon success.
-                                             * @return: NULL:   Invalid `HANDLE' (dlerror() is modified)
+                                             * @return: handle: Re-returns `handle' upon success.
+                                             * @return: NULL:   Invalid `handle' (dlerror() is modified)
                                              * @return: NULL:   `extension' is an invalid pointer
                                              * @return: NULL:   Unsupported value for `sizeof_dlmodule_format' (dlerror() is modified)
                                              * @return: NULL:   Unsupported value for `sizeof_dlcore_ops' (dlerror() is modified)
                                              * @return: NULL:   `extension->df_open' does not map to a static memory segment (dlerror() is modified)
                                              * NOTE: Upon success, the module containing `extension->df_open' becomes undeletable. */
 #define DLAUXCTRL_GET_DEPENDS        0xd202 /* [size_t *pcount [0..1]] Returns the module's vector of module dependencies (`MODULE **') */
-#define DLAUXCTRL_ELF_CHECK          0xef00 /* Check if this module is an ELF module (re-returns `HANDLE' if so, otherwise returns `NULL' but leaves `dlerror()' unmodified) */
+#define DLAUXCTRL_ELF_CHECK          0xef00 /* Check if this module is an ELF module (re-returns `handle' if so, otherwise returns `NULL' but leaves `dlerror()' unmodified) */
 #define DLAUXCTRL_ELF_GET_PHDR       0xef01 /* [size_t *pcount [0..1]] Returns the module's vector of program headers (`ElfW(Phdr) *') */
 #define DLAUXCTRL_ELF_GET_SHDR       0xef02 /* [size_t *pcount [0..1]] Returns the module's vector of section headers (`ElfW(Shdr) *') */
 #define DLAUXCTRL_ELF_GET_DYN        0xef03 /* [size_t *pcount [0..1]] Returns the module's vector of dynamic tags (`ElfW(Dyn) *') */

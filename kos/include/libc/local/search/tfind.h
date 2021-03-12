@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd90d0969 */
+/* HASH CRC-32:0xc0a21e9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,8 +26,9 @@
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Search for an entry matching the given KEY in the tree pointed
- * to by *ROOTP. If no matching entry is available return NULL */
+/* >> tfind(3)
+ * Search for an entry matching the given `key' in the tree pointed
+ * to by `*rootp'. If no matching entry is available return `NULL' */
 __LOCAL_LIBC(tfind) __ATTR_NONNULL((3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key, void *const *__vrootp, __compar_fn_t __compar) {
 	typedef struct __node_struct {

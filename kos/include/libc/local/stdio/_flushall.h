@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a488b0d */
+/* HASH CRC-32:0x80f7ad83 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,28 +30,35 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_fflush_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock) && defined(__USE_STDIO_UNLOCKED)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
 #elif defined(__CRT_HAVE_fflush)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush,(__stream))
 #elif defined(__CRT_HAVE__IO_fflush)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_IO_fflush,(__stream))
 #elif defined(__CRT_HAVE_fflush_unlocked)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fflush.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 #define __localdep_fflush __LIBC_LOCAL_NAME(fflush)
 #endif /* !... */
 #endif /* !__local___localdep_fflush_defined */

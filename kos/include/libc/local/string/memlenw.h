@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8285155f */
+/* HASH CRC-32:0xd5a17961 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memendw_defined
 #define __local___localdep_memendw_defined 1
 #ifdef __CRT_HAVE_memendw
-/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrw', but return `haystack + N_WORDS * 2', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memendw,(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_bytes),memendw,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memendw */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memendw.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrw', but return `haystack + N_WORDS * 2', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_memendw __LIBC_LOCAL_NAME(memendw)
 #endif /* !__CRT_HAVE_memendw */
 #endif /* !__local___localdep_memendw_defined */
-/* Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found */
+/* Same as `memendw', but return the offset from `haystack', rather than the actual address.
+ * Returns `haystack + N_DWORDS * 2' if the given `needle' wasn't found */
 __LOCAL_LIBC(memlenw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memlenw))(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words) {
 	return (__SIZE_TYPE__)(__localdep_memendw(__haystack, __needle, __n_words) - (__UINT16_TYPE__ *)__haystack);

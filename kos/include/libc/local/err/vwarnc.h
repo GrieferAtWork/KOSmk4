@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8161df5 */
+/* HASH CRC-32:0xb83f2fb0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,13 +31,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_flockfile_defined
 #define __local___localdep_flockfile_defined 1
 #ifdef __CRT_HAVE_flockfile
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
+/* >> flockfile(3)
+ * Acquire a lock to `stream' and block until doing so succeeds */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
 #elif defined(__CRT_HAVE__lock_file)
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
+/* >> flockfile(3)
+ * Acquire a lock to `stream' and block until doing so succeeds */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_flockfile)
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
+/* >> flockfile(3)
+ * Acquire a lock to `stream' and block until doing so succeeds */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
 #else /* ... */
 #undef __local___localdep_flockfile_defined
@@ -47,34 +50,41 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE 
 #ifndef __local___localdep_fprintf_defined
 #define __local___localdep_fprintf_defined 1
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf,{ return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif defined(__CRT_HAVE_fprintf)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
 #elif defined(__CRT_HAVE__IO_fprintf)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
 #elif defined(__CRT_HAVE_fprintf_s)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
 #elif defined(__CRT_HAVE_fprintf_unlocked)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 #define __localdep_fprintf __LIBC_LOCAL_NAME(fprintf)
 #endif /* !... */
@@ -83,13 +93,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_funlockfile_defined
 #define __local___localdep_funlockfile_defined 1
 #ifdef __CRT_HAVE_funlockfile
-/* Release a previously acquired lock from `STREAM' */
+/* >> funlockfile(3)
+ * Release a previously acquired lock from `stream' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
 #elif defined(__CRT_HAVE__unlock_file)
-/* Release a previously acquired lock from `STREAM' */
+/* >> funlockfile(3)
+ * Release a previously acquired lock from `stream' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_funlockfile)
-/* Release a previously acquired lock from `STREAM' */
+/* >> funlockfile(3)
+ * Release a previously acquired lock from `stream' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
 #else /* ... */
 #undef __local___localdep_funlockfile_defined
@@ -111,34 +124,41 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfprintf_defined
 #define __local___localdep_vfprintf_defined 1
 #if __has_builtin(__builtin_vfprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vfprintf)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,{ return __builtin_vfprintf(__stream, __format, __args); })
 #elif defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf_s)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_s,(__stream,__format,__args))
 #elif defined(__CRT_HAVE__IO_vfprintf)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf_unlocked)
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vfprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 #define __localdep_vfprintf __LIBC_LOCAL_NAME(vfprintf)
 #else /* ... */

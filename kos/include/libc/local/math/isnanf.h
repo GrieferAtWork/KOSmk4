@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ac8b93a */
+/* HASH CRC-32:0x1373888 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,22 +28,22 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isnan_defined
 #define __local___localdep_isnan_defined 1
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),isnan,{ return __builtin_isnan(__x); })
 #elif defined(__CRT_HAVE_isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),isnan,(__x))
 #elif defined(__CRT_HAVE___isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),_isnan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/isnan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 #define __localdep_isnan __LIBC_LOCAL_NAME(isnan)
 #else /* ... */
 #undef __local___localdep_isnan_defined
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/isnan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __LOCAL_LIBC(isnanf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

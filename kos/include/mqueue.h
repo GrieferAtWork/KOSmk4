@@ -79,9 +79,9 @@ typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 
 
-/* Establish  connection  between  a process  and  a message  queue  NAME and
- * return message queue descriptor or  (mqd_t)-1 on error. OFLAGS  determines
- * the type of access used.  If O_CREAT is on  OFLAGS, the third argument  is
+/* Establish connection  between a  process and  a message  queue `name'  and
+ * return message queue descriptor or (mqd_t)-1 on error. `oflags' determines
+ * the  type of access used. If O_CREAT is on `oflags', the third argument is
  * taken as a `mode_t', the mode of the created message queue, and the fourth
  * argument  is  taken  as  `struct mq_attr *',  pointer  to  message   queue
  * attributes. If the fourth argument  is NULL, default attributes are  used. */
@@ -114,7 +114,7 @@ __NOTHROW_NCX(__LIBRT_CC mq_setattr)(mqd_t __mqdes,
                                      struct mq_attr *__restrict __omqstat);
 #endif /* !__mq_setattr_defined */
 
-/* Remove message queue named NAME. */
+/* Remove message queue named `name'. */
 #ifndef __mq_unlink_defined
 #define __mq_unlink_defined 1
 __LIBRT_DECL __ATTR_NONNULL((1)) int

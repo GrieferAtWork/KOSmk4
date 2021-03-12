@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ee25ee4 */
+/* HASH CRC-32:0x6b94bbf4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,12 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `STR+wcslen(STR)' */
+/* Same as `str+wcslen(str)' */
 __LOCAL_LIBC(wcsend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsend))(__WCHAR_TYPE__ const *__restrict __string) {
-	while (*__string)
-		++__string;
-	return (__WCHAR_TYPE__ *)__string;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsend))(__WCHAR_TYPE__ const *__restrict __str) {
+	while (*__str)
+		++__str;
+	return (__WCHAR_TYPE__ *)__str;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsend_defined

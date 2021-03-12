@@ -196,17 +196,19 @@
  *  - This  can then also  be implemented in user-space,  to only require a
  *    single evaluation-pass over the FDE body to gather all registers that
  *    are likely to ever be used.
- *  - This entire  sub-system is  be implemented  in parallel  to the  CFA_EXEC+CFA_APPLY
- *    functions  and  when building  with  __OPTIMIZE_SIZE__, we  could  simply implement
- *    these functions as aliases, since all they do is add another layer of optimization.
+ *  - This  entire sub-system is be implemented in parallel to the CFA_EXEC+
+ *    CFA_APPLY functions and when building with __OPTIMIZE_SIZE__, we could
+ *    simply implement these functions as aliases, since all they do is  add
+ *    another layer of optimization.
  */
 
-/* Register    <-->     Sigframe     Common/Uncommon-register     mapping
- * Signal  frames  are normally  used to  unwind  to an  interrupted code
- * location. - For this purpose, they need to restore _all_ GP registers,
- * the  FLAGS  register,  as  well  as  all  of  the  segment  registers.
- * To  speed  up   this  process,  define   a  special  unwind   register
- * namespace specifically for signal frame functions. */
+/* Register <--> Sigframe Common/Uncommon-register mapping
+ *
+ * Signal  frames are  normally used  to unwind  to an interrupted
+ * code location. - For this  purpose, they need to restore  _all_
+ * GP registers, the FLAGS register, as well as all of the segment
+ * registers. To speed  up this process,  define a special  unwind
+ * register namespace specifically for signal frame functions. */
 #define CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_SP  CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ESP
 #define CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX    0
 #define CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ECX    1

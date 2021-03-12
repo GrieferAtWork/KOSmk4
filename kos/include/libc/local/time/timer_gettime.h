@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x597a50e2 */
+/* HASH CRC-32:0xe51c05ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,29 +28,29 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: timer_gettime32 from time */
 #if !defined(__local___localdep_timer_gettime32_defined) && defined(__CRT_HAVE_timer_gettime)
 #define __local___localdep_timer_gettime32_defined 1
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *__value),timer_gettime,(__timerid,__value))
 #endif /* !__local___localdep_timer_gettime32_defined && __CRT_HAVE_timer_gettime */
 /* Dependency: timer_gettime64 from time */
 #ifndef __local___localdep_timer_gettime64_defined
 #define __local___localdep_timer_gettime64_defined 1
 #ifdef __CRT_HAVE_timer_gettime64
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *__value),timer_gettime64,(__timerid,__value))
 #elif defined(__CRT_HAVE_timer_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *__value),timer_gettime,(__timerid,__value))
 #elif defined(__CRT_HAVE_timer_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/timer_gettime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 #define __localdep_timer_gettime64 __LIBC_LOCAL_NAME(timer_gettime64)
 #else /* ... */
 #undef __local___localdep_timer_gettime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_timer_gettime64_defined */
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 __LOCAL_LIBC(timer_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime))(__timer_t __timerid, struct itimerspec *__value) {
 #ifdef __CRT_HAVE_timer_gettime

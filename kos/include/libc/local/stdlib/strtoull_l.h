@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a23c7e */
+/* HASH CRC-32:0xfc65ad7b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoull (*(__ULONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou64))
 #elif __SIZEOF_LONG__ == 4
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <libc/local/stdlib/strtou32.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoull (*(__ULONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou32))

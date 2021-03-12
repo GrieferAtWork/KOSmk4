@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35247714 */
+/* HASH CRC-32:0x94aec084 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,11 +32,11 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Time used by the program so far (user time + system time)
- * The result / CLOCKS_PER_SECOND is program time in seconds */
+ * The `result / CLOCKS_PER_SECOND' is program time in seconds */
 INTDEF WUNUSED clock_t NOTHROW_NCX(LIBCCALL libc_clock)(void);
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
+/* Return the current time and put it in `*timer' if `timer' is not `NULL' */
 INTDEF time_t NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer);
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
+/* Return the current time and put it in `*timer' if `timer' is not `NULL' */
 INTDEF time64_t NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer);
 /* Set time conversion information from the TZ environment variable.
  * If TZ is not defined, a locale-dependent default is used */
@@ -49,19 +49,19 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_stime64)(time64_t const *when)
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_nanosleep)(struct timespec const *requested_time, struct timespec *remaining);
 /* Get resolution of clock CLOCK_ID */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_getres)(clockid_t clock_id, struct timespec *res);
-/* Get current value of clock CLOCK_ID and store it in TP */
+/* Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_gettime)(clockid_t clock_id, struct timespec *tp);
-/* Set clock CLOCK_ID to value TP */
+/* Set clock `clock_id' to value `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_settime)(clockid_t clock_id, struct timespec const *tp);
-/* Create new per-process timer using CLOCK_ID */
+/* Create new per-process timer using `clock_id' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_create)(clockid_t clock_id, struct sigevent *__restrict evp, timer_t *__restrict timerid);
-/* Delete timer TIMERID */
+/* Delete timer `timerid' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_timer_delete)(timer_t timerid);
-/* Set timer TIMERID to VALUE, returning old value in OVALUE */
+/* Set timer `timerid' to `value', returning old value in `ovalue' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_settime)(timer_t timerid, __STDC_INT_AS_UINT_T flags, struct itimerspec const *__restrict value, struct itimerspec *__restrict ovalue);
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_timer_gettime)(timer_t timerid, struct itimerspec *value);
-/* Get expiration overrun for timer TIMERID */
+/* Get expiration overrun for timer `timerid' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid);
 /* High-resolution sleep with the specified clock */
 INTDEF NONNULL((3)) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining);
@@ -71,21 +71,21 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid, clockid_t *
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_nanosleep64)(struct timespec64 const *__restrict requested_time, struct timespec64 *remaining);
 /* Get resolution of clock CLOCK_ID */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_getres64)(clockid_t clock_id, struct timespec64 *res);
-/* Get current value of clock CLOCK_ID and store it in TP */
+/* Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_gettime64)(clockid_t clock_id, struct timespec64 *tp);
-/* Set clock CLOCK_ID to value TP */
+/* Set clock `clock_id' to value `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id, struct timespec64 const *tp);
-/* Set timer TIMERID to VALUE, returning old value in OVALUE */
+/* Set timer `timerid' to `value', returning old value in `ovalue' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *__restrict value, struct itimerspec64 *__restrict ovalue);
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timerid, struct itimerspec64 *value);
 /* High-resolution sleep with the specified clock */
 INTDEF NONNULL((3)) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
-/* Set TS to calendar time based in time base BASE */
+/* Set `ts' to calendar time based in time base `base' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts, __STDC_INT_AS_UINT_T base);
 /* Parse the given string as a date specification and return a value
- * representing the value.  The templates from the file identified by
- * the environment variable DATEMSK are used.  In case of an error
+ * representing the value. The templates from the file identified by
+ * the environment variable `$DATEMSK' are used. In case of an error
  * `getdate_err' is set */
 INTDEF NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
 #endif /* !__KERNEL__ */

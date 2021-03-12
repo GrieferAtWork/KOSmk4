@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52956468 */
+/* HASH CRC-32:0xab162b5f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,27 +33,31 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* >> file_printer(3)
+ * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__FORMATPRINTER_CC,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_printer)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* >> file_printer(3)
+ * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__FORMATPRINTER_CC,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_printer_unlocked)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* >> file_printer(3)
+ * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__FORMATPRINTER_CC,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/file_printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* >> file_printer(3)
+ * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_printer __LIBC_LOCAL_NAME(file_printer)
 #else /* ... */
 #undef __local___localdep_file_printer_defined
@@ -70,18 +74,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -124,9 +128,9 @@ __NAMESPACE_LOCAL_BEGIN
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -155,8 +159,8 @@ __NAMESPACE_LOCAL_BEGIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vprintf */
 __NAMESPACE_LOCAL_END
@@ -165,18 +169,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
- * functions will call the given `PRINTER' callback with various strings
+ * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
- *  - `PRINTER' obviously is called with the text parts in their correct order
- *  - If `PRINTER' returns '< 0', the function returns immediately,
+ *  - `printer' obviously is called with the text parts in their correct order
+ *  - If `printer' returns '< 0', the function returns immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
- *    the sum of all return values from `PRINTER'.
- *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
+ *    the sum of all return values from `printer'.
+ *  - The strings passed to `printer' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
- *                        `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
- *                        `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
+ *                        - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
+ *                        - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
  *  - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
  *  - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
  *             a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
@@ -219,9 +223,9 @@ __NAMESPACE_LOCAL_BEGIN
  *                 - When the second form (with a fixed buffer size) is used, do a full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
- *             - `%[vinfo]' / `%[vinfo:<FORMAT=%f(%l,%c) : %n>]'
+ *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
  *                 - Print addr2line information for a text address read from `va_arg(args, void *)'
- *                 - The given FORMAT string is a special printf-like format declaration
+ *                 - The given `format' string is a special printf-like format declaration
  *                   that accepts the following substitutions:
  *                   - `%%'   Print a single `%'-character (used for escaping `%')
  *                   - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
@@ -250,12 +254,13 @@ __NAMESPACE_LOCAL_BEGIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
- * @return: >= 0: The sum of all values returned by `PRINTER'
- * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
+ * @return: >= 0: The sum of all values returned by `printer'
+ * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 #define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
 #endif /* !__CRT_HAVE_format_vprintf */
 #endif /* !__local___localdep_format_vprintf_defined */
-/* Print data to `STREAM', following `FORMAT'
+/* >> fprintf(3), vfprintf(3)
+ * Print data to `stream', following `format'
  * Return the number of successfully printed bytes */
 __LOCAL_LIBC(vfprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfprintf))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {

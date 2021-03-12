@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb4c4569 */
+/* HASH CRC-32:0x587d3916 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Since `getdate' is not reentrant because of the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The functionality is the same.  The result is returned in
- * the buffer pointed to by RESBUFP and in case of an error the return
+ * the buffer pointed to by `resbufp' and in case of an error the return
  * value is != 0 with the same values as given above for `getdate_err'. */
 __LOCAL_LIBC(getdate_r) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdate_r))(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf877bbf */
+/* HASH CRC-32:0x5658542e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_argz_add_defined 1
 #ifdef __CRT_HAVE_argz_add
 /* >> argz_add(3)
- * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * Append `str' (including the trailing NUL-character) to the argz string in `*pargz...+=pargz_len'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
 /* >> argz_add(3)
- * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * Append `str' (including the trailing NUL-character) to the argz string in `*pargz...+=pargz_len'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_add.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> argz_add(3)
- * Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * Append `str' (including the trailing NUL-character) to the argz string in `*pargz...+=pargz_len'
  * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
@@ -79,14 +79,14 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmoveupc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmoveupc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmoveupc __LIBC_LOCAL_NAME(memmoveupc)
 #endif /* !__CRT_HAVE_memmoveupc */
@@ -114,14 +114,14 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
@@ -129,14 +129,14 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> argz_insert(3)
- * When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * When `before' is `NULL', do the same as `argz_add(pargz, pargz_len, entry)'
  * Otherwise, `before' should point somewhere into the middle, or to the start
  * of an existing argument entry, who's beginning will first be located, before
  * this function will then allocate additional memory to insert a copy of `entry'
  * such that the copy will appear before the entry pointed to by `before'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory
- * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
+ * @return: EINVAL: The given `before' is either `NULL', or apart of `*pargz' */
 __LOCAL_LIBC(argz_insert) __ATTR_NONNULL((1, 2, 4)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__before, char const *__restrict __entry) {
 	char *__argz;
@@ -179,7 +179,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 		return 1;
 #endif /* !__ENOMEM */
 	}
-	/* Update ARGZ pointers. */
+	/* Update argz-pointers. */
 	*__pargz     = __argz;
 	*__pargz_len = __argz_len;
 	/* Make space for the new entry. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x836100a9 */
+/* HASH CRC-32:0xa28182d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/scalbn.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return X times (2 to the Nth power) */
+/* Return `x' times (2 to the Nth power) */
 __LOCAL_LIBC(scalbn) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbn))(double __x, int __n) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6849e42c */
+/* HASH CRC-32:0xe47405e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
-/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `dst + N_DWORDS', rather than `dst' */
 __LOCAL_LIBC(mempcpyl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpyl))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) {
 	return (__UINT32_TYPE__ *)__localdep_memcpyl(__dst, __src, __n_dwords) + __n_dwords;

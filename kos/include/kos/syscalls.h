@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67eb36bf */
+/* HASH CRC-32:0x39a99a9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -233,7 +233,7 @@ __CDECLARE_SC(,__errno_t,clock_settime,(__clockid_t __clock_id, struct timespec 
 __CDECLARE_SC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __pid_t *__ptid, __uintptr_t __newtls, __pid_t *__ctid),(__flags,__child_stack,__ptid,__newtls,__ctid))
 #endif /* __CRT_HAVE_SC(clone) */
 #if __CRT_HAVE_SC(close)
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 __CDECLARE_SC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(close) */
 #if __CRT_HAVE_SC(connect)
@@ -352,13 +352,13 @@ __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_SC(eventfd2) */
 #if __CRT_HAVE_SC(execve)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_SC(,__errno_t,execve,(char const *__path, char const *const *___argv, char const *const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_SC(execve) */
 #if __CRT_HAVE_SC(execveat)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, char const *const *___argv, char const *const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
 #endif /* __CRT_HAVE_SC(execveat) */
@@ -776,9 +776,9 @@ __CDECLARE_SC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #if __CRT_HAVE_SC(mmap)
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 __CDECLARE_SC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_SC(mmap) */
 #if __CRT_HAVE_SC(mount)
@@ -855,7 +855,7 @@ __CDECLARE_SC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__pid_t,oldwait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_SC(oldwait4) */
 #if __CRT_HAVE_SC(open)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -874,7 +874,7 @@ __CDECLARE_SC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t
 __CDECLARE_SC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle const *__handle, __oflag_t __flags),(__mountdirfd,__handle,__flags))
 #endif /* __CRT_HAVE_SC(open_by_handle_at) */
 #if __CRT_HAVE_SC(openat)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -963,8 +963,8 @@ __CDECLARE_SC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CDECLARE_SC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -983,8 +983,8 @@ __CDECLARE_SC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *_
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 __CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct iovec const *__iovec, __size_t __count),(__fd,__iovec,__count))
@@ -1567,9 +1567,9 @@ __CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(write)
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CDECLARE_SC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -1579,7 +1579,7 @@ __CDECLARE_SC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsi
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -1694,7 +1694,7 @@ __CDECLARE_XSC(,__errno_t,clock_settime,(__clockid_t __clock_id, struct timespec
 __CDECLARE_XSC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __pid_t *__ptid, __uintptr_t __newtls, __pid_t *__ctid),(__flags,__child_stack,__ptid,__newtls,__ctid))
 #endif /* __CRT_HAVE_XSC(clone) */
 #if __CRT_HAVE_XSC(close)
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 __CDECLARE_XSC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(close) */
 #if __CRT_HAVE_XSC(connect)
@@ -1813,13 +1813,13 @@ __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_XSC(eventfd2) */
 #if __CRT_HAVE_XSC(execve)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_XSC(,__errno_t,execve,(char const *__path, char const *const *___argv, char const *const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_XSC(execve) */
 #if __CRT_HAVE_XSC(execveat)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, char const *const *___argv, char const *const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
 #endif /* __CRT_HAVE_XSC(execveat) */
@@ -2237,9 +2237,9 @@ __CDECLARE_XSC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #if __CRT_HAVE_XSC(mmap)
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 __CDECLARE_XSC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_XSC(mmap) */
 #if __CRT_HAVE_XSC(mount)
@@ -2316,7 +2316,7 @@ __CDECLARE_XSC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__pid_t,oldwait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_XSC(oldwait4) */
 #if __CRT_HAVE_XSC(open)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -2335,7 +2335,7 @@ __CDECLARE_XSC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_
 __CDECLARE_XSC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle const *__handle, __oflag_t __flags),(__mountdirfd,__handle,__flags))
 #endif /* __CRT_HAVE_XSC(open_by_handle_at) */
 #if __CRT_HAVE_XSC(openat)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -2424,8 +2424,8 @@ __CDECLARE_XSC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CDECLARE_XSC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -2444,8 +2444,8 @@ __CDECLARE_XSC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 __CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct iovec const *__iovec, __size_t __count),(__fd,__iovec,__count))
@@ -3025,9 +3025,9 @@ __CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struc
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(write)
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CDECLARE_XSC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -3037,7 +3037,7 @@ __CDECLARE_XSC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufs
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */

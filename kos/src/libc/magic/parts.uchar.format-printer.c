@@ -59,16 +59,16 @@ __SYSDECL_BEGIN
 #define __pc16formatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pc(16|32)formatprinter' usually returns the number of characters printed, but isn't required to.
- * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
- * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
- * @param: DATALEN: The  amount  of  characters  that  should  be  printed,  starting  at  `data'.
+ * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
+ * @param: data:    The base address of a `datalen' bytes long character vector that should be printed.
+ * @param: datalen: The  amount  of  characters  that  should  be  printed,  starting  at  `data'.
  *                  Note  that  this is  an exact  value, meaning  that a  NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually,  the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success is 'DATALEN'. */
+ *                  usual return value used to indicate success is `datalen'. */
 typedef __pc16formatprinter pc16formatprinter;
 typedef __pc32formatprinter pc32formatprinter;
 #endif /* !__pc16formatprinter_defined */

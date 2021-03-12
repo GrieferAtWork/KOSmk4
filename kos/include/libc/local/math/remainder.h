@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4961cb09 */
+/* HASH CRC-32:0x99ba9148 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include <libm/isinf.h>
 #include <libm/remainder.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the remainder of integer division X/P with infinite precision */
+/* Return the remainder of integer division `x / p' with infinite precision */
 __LOCAL_LIBC(remainder) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainder))(double __x, double __p) {
 	if (((__p == 0.0 && !__LIBM_MATHFUN(isnan, __x)) ||

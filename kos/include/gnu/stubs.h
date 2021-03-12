@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba987ecd */
+/* HASH CRC-32:0xd3646f1f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -373,6 +373,9 @@
 #define __stub_open_wmemstream
 #define __stub_opendev
 #define __stub_openlog
+#ifdef __LIBCCALL_IS_LIBDCALL
+#define __stub__popen
+#endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub__IO_popen
 #define __stub_popen
 #define __stub_posix_fadvise64
@@ -482,6 +485,9 @@
 #define __stub_tan
 #define __stub___tanh
 #define __stub_tanh
+#ifdef __LIBCCALL_IS_LIBDCALL
+#define __stub__tempnam
+#endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub_tempnam
 #define __stub___tgamma
 #define __stub_tgamma

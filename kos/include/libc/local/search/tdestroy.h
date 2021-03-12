@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e603b90 */
+/* HASH CRC-32:0xa51ad4d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_tdestroy_defined
 #define __local_tdestroy_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #ifndef ____free_fn_t_defined
 #define ____free_fn_t_defined 1
 typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
@@ -40,7 +39,8 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Destroy the whole tree, call FREEFCT for each node or leaf */
+/* >> tdestroy(3)
+ * Destroy the whole tree, call `freefct' for each node or leaf */
 __LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, __free_fn_t __freefct) {
 __again:
@@ -49,7 +49,9 @@ __again:
 		__l = ((void **)__root)[1];
 		__r = ((void **)__root)[2];
 		(*__freefct)(((void **)__root)[0]);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		__localdep_free(__root);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		if (__l) {
 			if (__r)
 				__LIBC_LOCAL_NAME(tdestroy)(__r, __freefct);
@@ -67,7 +69,4 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tdestroy_defined 1
 #define __localdep_tdestroy __LIBC_LOCAL_NAME(tdestroy)
 #endif /* !__local___localdep_tdestroy_defined */
-#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-#undef __local_tdestroy_defined
-#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local_tdestroy_defined */

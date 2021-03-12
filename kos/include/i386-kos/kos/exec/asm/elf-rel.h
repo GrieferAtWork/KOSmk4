@@ -51,10 +51,10 @@
 #define ELF_ARCH_R_SIZE64            R_X86_64_SIZE64
 #define ELF_ARCH_R_DTPMOD64          R_X86_64_DTPMOD64
 #define ELF_ARCH_R_DTPOFF64          R_X86_64_DTPOFF64
-#define ELF_ARCH_R_TPOFF64           R_X86_64_TPOFF64 /* *ADDR = VALUE - dm_tlsstoff */
+#define ELF_ARCH_R_TPOFF64           R_X86_64_TPOFF64 /* `*addr = value - dm_tlsstoff' */
 #define ELF_ARCH_NAME_R_TPOFF64     "R_X86_64_TPOFF64"
 #define ELF_ARCH_R_DTPOFF32          R_X86_64_DTPOFF32
-#define ELF_ARCH_R_TPOFF32           R_X86_64_TPOFF32 /* *ADDR = VALUE - dm_tlsstoff */
+#define ELF_ARCH_R_TPOFF32           R_X86_64_TPOFF32 /* `*addr = value - dm_tlsstoff' */
 #define ELF_ARCH_NAME_R_TPOFF32     "R_X86_64_TPOFF32"
 #define ELF_ARCH_R_TLSDESC           R_X86_64_TLSDESC
 #else  /* __x86_64__ */
@@ -72,9 +72,9 @@
 #define ELF_ARCH_R_RELATIVE32        R_386_RELATIVE
 #define ELF_ARCH_R_DTPMOD32          R_386_TLS_DTPMOD32
 #define ELF_ARCH_R_DTPOFF32          R_386_TLS_DTPOFF32
-#define ELF_ARCH_R_NEG_TPOFF32       R_386_TLS_TPOFF32  /* *ADDR = -(dm_tlsstoff + VALUE) */
+#define ELF_ARCH_R_NEG_TPOFF32       R_386_TLS_TPOFF32  /* `*addr = -(dm_tlsstoff + value)' */
 #define ELF_ARCH_NAME_R_NEG_TPOFF32 "R_386_TLS_TPOFF32"
-#define ELF_ARCH_R_TPOFF32           R_386_TLS_TPOFF    /* *ADDR = dm_tlsstoff + VALUE */
+#define ELF_ARCH_R_TPOFF32           R_386_TLS_TPOFF    /* `*addr = dm_tlsstoff + value' */
 #define ELF_ARCH_NAME_R_TPOFF32     "R_386_TLS_TPOFF"
 #define ELF_ARCH_R_SIZE32            R_386_SIZE32
 #define ELF_ARCH_R_TLSDESC           R_386_TLS_DESC

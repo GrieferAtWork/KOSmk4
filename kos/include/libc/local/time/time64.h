@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a16aa6 */
+/* HASH CRC-32:0x8661e144 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_time32_defined
 #define __local___localdep_time32_defined 1
 #ifdef __CRT_HAVE_time
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
+/* Return the current time and put it in `*timer' if `timer' is not `NULL' */
 __CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),time,(__timer))
 #elif defined(__CRT_HAVE__time32)
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
+/* Return the current time and put it in `*timer' if `timer' is not `NULL' */
 __CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),_time32,(__timer))
 #else /* ... */
 #undef __local___localdep_time32_defined
 #endif /* !... */
 #endif /* !__local___localdep_time32_defined */
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
+/* Return the current time and put it in `*timer' if `timer' is not `NULL' */
 __LOCAL_LIBC(time64) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time64))(__time64_t *__timer) {
 	__time32_t __tm32 = __localdep_time32(__NULLPTR);

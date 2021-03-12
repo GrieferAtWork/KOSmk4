@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23971fba */
+/* HASH CRC-32:0x1e70abb0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_mutex_trylock(3)
- * Try locking a mutex
+ * Try locking the given `mutex'
  * @return: EOK:   Success
  * @return: EBUSY: The mutex has already been locked
  *                 In case of a recursive mutex, another

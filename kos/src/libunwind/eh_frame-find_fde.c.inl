@@ -56,7 +56,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t const **__restrict peh_frame_reader
 #else /* !FIND_SPECIFIC_ADDRESS */
 /* Same as `unwind_fde_load()', but quickly search for and return the
  * FDE descriptor containing  the given  `absolute_pc' text  address.
- * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
+ * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTERN NONNULL((1, 2, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t const *__restrict reader,

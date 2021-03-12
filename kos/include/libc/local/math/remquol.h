@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabda38ab */
+/* HASH CRC-32:0x335a5339 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,17 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_remquo_defined
 #define __local___localdep_remquo_defined 1
 #if __has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)
-/* Compute remainder of X and Y and put in *QUO a value with sign
+/* Compute remainder of `x' and `y' and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remquo,(double __x, double __y, int *__pquo),remquo,{ return __builtin_remquo(__x, __y, __pquo); })
 #elif defined(__CRT_HAVE_remquo)
-/* Compute remainder of X and Y and put in *QUO a value with sign
+/* Compute remainder of `x' and `y' and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remquo,(double __x, double __y, int *__pquo),remquo,(__x,__y,__pquo))
 #elif defined(__CRT_HAVE___remquo)
-/* Compute remainder of X and Y and put in *QUO a value with sign
+/* Compute remainder of `x' and `y' and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remquo,(double __x, double __y, int *__pquo),__remquo,(__x,__y,__pquo))
@@ -45,7 +45,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remquo,(double __x, doubl
 #undef __local___localdep_remquo_defined
 #endif /* !... */
 #endif /* !__local___localdep_remquo_defined */
-/* Compute remainder of X and Y and put in *QUO a value with sign
+/* Compute remainder of `x' and `y' and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __LOCAL_LIBC(remquol) __ATTR_WUNUSED __LONGDOUBLE

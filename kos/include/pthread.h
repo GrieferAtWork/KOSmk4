@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd091db18 */
+/* HASH CRC-32:0x9aa9fdfb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -624,9 +624,9 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 
 
 /* >> pthread_create(3)
- * Create a new thread, starting with execution of START-ROUTINE
- * getting passed ARG. Creation attributed come from ATTR. The new
- * handle is stored in *NEWTHREAD
+ * Create a new thread, starting with execution of `start_routine'
+ * getting passed `arg'. Creation attributed come from `attr'. The new
+ * handle is stored in `*newthread'
  * @return: EOK:    Success
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),(__newthread,__attr,__start_routine,__arg))
@@ -635,33 +635,34 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_create,(pt
  * The registered cleanup handlers are called via exception handling */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN,__THROWING,pthread_exit,(void *__retval),(__retval))
 /* >> pthread_join(3)
- * Make calling thread wait for termination of the thread THREAD. The
- * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
- * is not NULL
+ * Make calling thread wait for termination of the thread `pthread'.
+ * The exit status of the thread is stored in `*thread_return', if
+ * `thread_return' is not `NULL'.
  * @return: EOK: Success */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_RPC,pthread_join,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
 #ifdef __USE_GNU
 /* >> pthread_tryjoin_np(3)
- * Check whether thread THREAD has terminated. If yes return the status of
- * the thread in *THREAD_RETURN, if THREAD_RETURN is not NULL
+ * Check whether thread `pthread' has terminated. If so return the
+ * status of the thread in `*thread_return', if `thread_return' is
+ * not `NULL'.
  * @return: EOK:   Success
  * @return: EBUSY: The thread has yet to terminate */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_tryjoin_np,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
 struct timespec;
 #if defined(__CRT_HAVE_pthread_timedjoin64_np) && defined(__USE_TIME_BITS64)
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np) && !defined(__USE_TIME_BITS64)
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -669,9 +670,9 @@ __CDECLARE(,__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, v
 #elif defined(__CRT_HAVE_pthread_timedjoin64_np) || defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <libc/local/pthread/pthread_timedjoin_np.h>
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -680,18 +681,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFI
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_timedjoin64_np
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(,__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime),(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -699,9 +700,9 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <libc/local/pthread/pthread_timedjoin64_np.h>
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL.
+ * Make calling thread wait for termination of the thread `pthread',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in `*thread_return', if `thread_return' is not `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -710,9 +711,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTI
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
 /* >> pthread_detach(3)
- * Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
- * The resources of THREAD will therefore be freed immediately when it
- * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it
+ * Indicate that the thread `pthread' is never to be joined with `pthread_join(3)'.
+ * The resources of `pthread' will therefore be freed immediately when it
+ * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__pthread))
 #ifdef __CRT_HAVE_pthread_self
@@ -749,12 +750,12 @@ __LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_equal)(pthread_t __thr1, p
 /* Thread attribute handling. */
 
 /* >> pthread_attr_init(3)
- * Initialize thread attribute *ATTR with default attributes (detachstate is
- * PTHREAD_JOINABLE, scheduling policy is SCHED_OTHER, no user-provided stack)
+ * Initialize thread attribute `*attr' with default attributes (detachstate is
+ * `PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pthread_attr_t *__attr),(__attr))
 /* >> pthread_attr_destroy(3)
- * Destroy thread attribute *ATTR
+ * Destroy thread attribute `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_destroy,(pthread_attr_t *__attr),(__attr))
 /* >> pthread_attr_getdetachstate(3)
@@ -775,38 +776,38 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getgu
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setguardsize,(pthread_attr_t *__attr, size_t __guardsize),(__attr,__guardsize))
 /* >> pthread_attr_getschedparam(3)
- * Return in *PARAM the scheduling parameters of *ATTR
+ * Return in `*param' the scheduling parameters of `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getschedparam,(pthread_attr_t const *__restrict __attr, struct sched_param *__restrict __param),(__attr,__param))
 /* >> pthread_attr_setschedparam(3)
- * Set scheduling parameters (priority, etc) in *ATTR according to PARAM
+ * Set scheduling parameters (priority, etc) in `*attr' according to `param'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `param' */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_setschedparam,(pthread_attr_t *__restrict __attr, struct sched_param const *__restrict __param),(__attr,__param))
 /* >> pthread_attr_getschedpolicy(3)
- * Return in *POLICY the scheduling policy of *ATTR
+ * Return in `*policy' the scheduling policy of `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getschedpolicy,(pthread_attr_t const *__restrict __attr, int *__restrict __policy),(__attr,__policy))
 /* >> pthread_attr_setschedpolicy(3)
- * Set scheduling policy in *ATTR according to POLICY
+ * Set scheduling policy in `*attr' according to `policy'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `policy' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setschedpolicy,(pthread_attr_t *__attr, int __policy),(__attr,__policy))
 /* >> pthread_attr_getinheritsched(3)
- * Return in *INHERIT the scheduling inheritance mode of *ATTR
+ * Return in `*inherit' the scheduling inheritance mode of `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getinheritsched,(pthread_attr_t const *__restrict __attr, int *__restrict __inherit),(__attr,__inherit))
 /* >> pthread_attr_setinheritsched(3)
- * Set scheduling inheritance mode in *ATTR according to INHERIT
+ * Set scheduling inheritance mode in `*attr' according to `inherit'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `inherit' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setinheritsched,(pthread_attr_t *__attr, int __inherit),(__attr,__inherit))
 /* >> pthread_attr_getscope(3)
- * Return in *SCOPE the scheduling contention scope of *ATTR
+ * Return in `*scope' the scheduling contention scope of `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getscope,(pthread_attr_t const *__restrict __attr, int *__restrict __scope),(__attr,__scope))
 /* >> pthread_attr_setscope(3)
- * Set scheduling contention scope in *ATTR according to SCOPE
+ * Set scheduling contention scope in `*attr' according to `scope'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `scope' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setscope,(pthread_attr_t *__attr, int __scope),(__attr,__scope))
@@ -818,7 +819,7 @@ __CDECLARE_OPT(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((
  * Set the starting address of the stack of the thread to be created.
  * Depending on whether the stack grows up or down the value must either
  * be higher or lower than all the address in the memory block. The
- * minimal size of the block must be PTHREAD_STACK_MIN
+ * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
 __CDECLARE_OPT(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstackaddr,(pthread_attr_t *__attr, void *__stackaddr),(__attr,__stackaddr))
@@ -828,7 +829,7 @@ __CDECLARE_OPT(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getstacksize,(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize),(__attr,__stacksize))
 /* >> pthread_attr_setstacksize(3)
  * Add information about the minimum stack size needed for the thread
- * to be started. This size must never be less than PTHREAD_STACK_MIN
+ * to be started. This size must never be less than `PTHREAD_STACK_MIN'
  * and must also not exceed the system limits
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small */
@@ -848,14 +849,15 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstack
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_GNU
 /* >> pthread_attr_setaffinity_np(3)
- * Thread created with attribute ATTR will be limited to run only on
- * the processors represented in CPUSET
+ * Thread created with attribute `attr' will be limited
+ * to run only on the processors represented in `cpuset'
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__attr, size_t __cpusetsize, cpu_set_t const *__cpuset),(__attr,__cpusetsize,__cpuset))
 /* >> pthread_attr_getaffinity_np(3)
- * Get bit set in CPUSET representing the processors threads created with ATTR can run on
+ * Get bit set in `cpuset' representing the processors
+ * threads created with `attr' can run on
  * @return: EOK:    Success
  * @return: EINVAL: `cpusetsize' is too small */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_attr_getaffinity_np,(pthread_attr_t const *__attr, size_t __cpusetsize, cpu_set_t *__cpuset),(__attr,__cpusetsize,__cpuset))
@@ -870,9 +872,9 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_getattr_defau
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_setattr_default_np,(pthread_attr_t const *__attr),(__attr))
 /* >> pthread_getattr_np(3)
- * Initialize thread attribute *ATTR with attributes corresponding to the
- * already running thread THREAD. It shall be called on uninitialized ATTR
- * and destroyed with pthread_attr_destroy when no longer needed
+ * Initialize thread attribute `*attr' with attributes corresponding to the
+ * already running thread `pthread'. It shall be called on uninitialized `attr'
+ * and destroyed with `pthread_attr_destroy(3)' when no longer needed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getattr_np,(pthread_t __pthread, pthread_attr_t *__attr),(__pthread,__attr))
@@ -880,32 +882,32 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getattr_np,(p
 
 /* Functions for scheduling control. */
 
-/* >> pthread_gettid_np(3)
- * Set the scheduling parameters for TARGET_THREAD according to POLICY and *PARAM
+/* >> pthread_setschedparam(3)
+ * Set the scheduling parameters for `target_thread' according to `policy' and `*param'
  * @return: EOK:    Success
  * @return: EPERM:  The caller isn't allowed to specify `policy' and `param'
  * @return: ESRCH:  `pthread' has already exited
  * @return: EINVAL: Invalid/unsupported `policy', or `param' is malformed for `policy' */
 __CDECLARE_OPT(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_setschedparam,(pthread_t __target_thread, int __policy, struct sched_param const *__param),(__target_thread,__policy,__param))
-/* >> pthread_gettid_np(3)
- * Return in *POLICY and *PARAM the scheduling parameters for TARGET_THREAD
+/* >> pthread_getschedparam(3)
+ * Return in `*policy' and `*param' the scheduling parameters for `target_thread'
  * @return: EOK:   Success
  * @return: ESRCH: `pthread' has already exited */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),__errno_t,__NOTHROW_NCX,pthread_getschedparam,(pthread_t __target_thread, int *__restrict __policy, struct sched_param *__restrict __param),(__target_thread,__policy,__param))
-/* >> pthread_gettid_np(3)
- * Set the scheduling priority for TARGET_THREAD
+/* >> pthread_setschedprio(3)
+ * Set the scheduling priority for `target_thread'
  * @return: EOK:    Success
  * @return: EPERM:  The caller isn't allowed to specify `prio'
  * @return: ESRCH:  `pthread' has already exited
  * @return: EINVAL: Invalid/unsupported `prio' */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setschedprio,(pthread_t __target_thread, int __prio),(__target_thread,__prio))
 #ifdef __USE_GNU
-/* >> pthread_gettid_np(3)
+/* >> pthread_getname_np(3)
  * Get thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `buflen' is too small */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __target_thread, char *__buf, size_t __buflen),(__target_thread,__buf,__buflen))
-/* >> pthread_gettid_np(3)
+/* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
@@ -917,7 +919,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(p
 /* >> pthread_gettid_np(3)
  * Return the TID of the given `target_thread'.
  * If the given `target_thread' has already terminated, 0 is returned
- * @return: * : The PID OF the given thread
+ * @return: * : The TID of the given thread
  * @return: 0 : The given `target_thread' has already terminated */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
 #endif /* !__pthread_gettid_np_defined && __CRT_HAVE_pthread_gettid_np */
@@ -928,7 +930,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(p
  * @return: * : The current concurrency level */
 __CDECLARE_OPT(__ATTR_PURE,int,__NOTHROW_NCX,pthread_getconcurrency,(void),())
 /* >> pthread_setconcurrency(3)
- * Set new concurrency level to LEVEL
+ * Set new concurrency level to `level'
  * @return: EOK:    Success
  * @return: EINVAL: The given `level' is negative */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setconcurrency,(int __level),(__level))
@@ -976,12 +978,12 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),__sched_yield,())
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),yield,())
 #endif /* ... */
 /* >> pthread_setaffinity_np(3)
- * Limit specified thread THREAD to run only on the processors represented in CPUSET
+ * Limit specified thread `pthread' to run only on the processors represented in `cpuset'
  * @return: EOK:   Success
  * @return: ESRCH: `pthread' has already exited */
 __CDECLARE_OPT(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_setaffinity_np,(pthread_t __pthread, size_t __cpusetsize, cpu_set_t const *__cpuset),(__pthread,__cpusetsize,__cpuset))
 /* >> pthread_getaffinity_np(3)
- * Get bit set in CPUSET representing the processors THREAD can run on
+ * Get bit set in `cpuset' representing the processors `pthread' can run on
  * @return: EOK:   Success
  * @return: ESRCH: `pthread' has already exited */
 __CDECLARE_OPT(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_getaffinity_np,(pthread_t __pthread, size_t __cpusetsize, cpu_set_t *__cpuset),(__pthread,__cpusetsize,__cpuset))
@@ -996,27 +998,27 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 
 #ifdef __CRT_HAVE_pthread_once
 /* >> pthread_once(3)
- * Guarantee that the initialization function INIT_ROUTINE will be called
+ * Guarantee that the initialization function `init_routine' will be called
  * only once, even if pthread_once is executed several times with the
- * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT.
+ * same `once_control' argument. `once_control' must point to a static or
+ * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),(__once_control,__init_routine))
 #elif defined(__CRT_HAVE_call_once)
 /* >> pthread_once(3)
- * Guarantee that the initialization function INIT_ROUTINE will be called
+ * Guarantee that the initialization function `init_routine' will be called
  * only once, even if pthread_once is executed several times with the
- * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT.
+ * same `once_control' argument. `once_control' must point to a static or
+ * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
 /* >> pthread_once(3)
- * Guarantee that the initialization function INIT_ROUTINE will be called
+ * Guarantee that the initialization function `init_routine' will be called
  * only once, even if pthread_once is executed several times with the
- * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT.
+ * same `once_control' argument. `once_control' must point to a static or
+ * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
 #endif /* !... */
@@ -1026,28 +1028,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * exception in C++ code. If cancellation is implemented by unwinding
  * this is necessary to have the compiler generate the unwind information. */
 /* >> pthread_setcancelstate(3)
- * Set cancelability state of current thread to STATE,
- * returning old state in *OLDSTATE if OLDSTATE is not NULL
+ * Set cancelability state of current thread to `state',
+ * returning old state in `*oldstate' if `oldstate' is not `NULL'.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `state' */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setcancelstate,(int __state, int *__oldstate),(__state,__oldstate))
 #if !defined(__pthread_setcanceltype_defined) && defined(__CRT_HAVE_pthread_setcanceltype)
 #define __pthread_setcanceltype_defined 1
 /* >> pthread_setcanceltype(3)
- * Set cancellation state of current thread to TYPE,
- * returning the old type in *OLDTYPE if OLDTYPE is not NULL
+ * Set cancellation state of current thread to `type',
+ * returning the old type in `*oldtype' if `oldtype' is not `NULL'.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `type' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_setcanceltype,(int __type, int *__oldtype),(__type,__oldtype))
 #endif /* !__pthread_setcanceltype_defined && __CRT_HAVE_pthread_setcanceltype */
 /* >> pthread_cancel(3)
- * Cancel THREAD immediately or at the next possibility
+ * Cancel `pthread' immediately or at the next possibility
  * @return: EOK:   Success
  * @return: ESRCH: `pthread' has already exited */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_cancel,(pthread_t __pthread),(__pthread))
 /* >> pthread_testcancel(3)
- * Test for pending cancellation for the current thread and terminate
- * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled */
+ * Test for pending cancellation for the current thread and terminate the
+ * thread as per `pthread_exit(PTHREAD_CANCELED)' if it has been canceled */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,pthread_testcancel,(void),())
 
 /* Cancellation handling with integration into exception handling. */
@@ -1096,38 +1098,38 @@ public:
 #endif /* __pthread_setcanceltype_defined */
 };
 
-/* Install a cleanup handler: ROUTINE will be called with arguments ARG
- * when the thread is canceled or calls pthread_exit. ROUTINE will also
- * be called with arguments  ARG when the matching  pthread_cleanup_pop
- * is executed with non-zero EXECUTE argument.
- * pthread_cleanup_push and pthread_cleanup_pop are macros and must always
- * be used  in  matching  pairs  at the  same  nesting  level  of  braces. */
+/* Install a cleanup handler: `routine' will be called with arguments `arg'
+ * when the thread is canceled  or calls pthread_exit. `routine' will  also
+ * be called  with arguments  `arg' when  the matching  pthread_cleanup_pop
+ * is executed with non-zero `execute' argument.
+ * `pthread_cleanup_push(3)' and `pthread_cleanup_pop(3)' are macros and must
+ * always be used  in matching  pairs at the  same nesting  level of  braces. */
 #define pthread_cleanup_push(routine, arg) \
 	do {                                   \
 		__pthread_cleanup_class __clframe(routine, arg)
 
-/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
- * If   EXECUTE   is   non-zero,   the   handler   function   is    called. */
+/* Remove a cleanup handler installed by the matching `pthread_cleanup_push(3)'.
+ * If `execute' is non-zero, the handler function is called. */
 #define pthread_cleanup_pop(execute)  \
 		__clframe.__setdoit(execute); \
-	} __WHILE0
+	}	__WHILE0
 
 #ifdef __USE_GNU
-/* Install a cleanup handler as pthread_cleanup_push does, but also
- * saves the  current cancellation  type and  sets it  to  deferred
+/* Install a cleanup handler as `pthread_cleanup_push(3)' does, but
+ * also saves the current cancellation type and sets it to deferred
  * cancellation. */
 #define pthread_cleanup_push_defer_np(routine, arg)      \
 	do {                                                 \
 		__pthread_cleanup_class __clframe(routine, arg); \
 		__clframe.__defer()
 
-/* Remove a  cleanup handler  as  pthread_cleanup_pop does,  but  also
+/* Remove a cleanup handler as `pthread_cleanup_pop(3)' does, but also
  * restores the cancellation type that was in effect when the matching
- * pthread_cleanup_push_defer was called. */
+ * `pthread_cleanup_push_defer(3)' was called. */
 #define pthread_cleanup_pop_restore_np(execute) \
 		__clframe.__restore();                  \
 		__clframe.__setdoit(execute);           \
-	} __WHILE0
+	}	__WHILE0
 #endif /* __USE_GNU */
 #else /* __cplusplus */
 #ifdef __CRT_HAVE___pthread_cleanup_routine
@@ -1141,12 +1143,12 @@ __CEIDECLARE(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,__pthread_cleanup_routine,(s
  * needed or fall back on the copy which must exist somewhere else */
 __LOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_routine)(struct __pthread_cleanup_frame *__frame) { if (__frame->__do_it) (*__frame->__cancel_routine)(__frame->__cancel_arg); }
 #endif /* !__CRT_HAVE___pthread_cleanup_routine */
-/* Install a cleanup handler: ROUTINE will be called with arguments ARG
- * when the thread is canceled or calls pthread_exit. ROUTINE will also
- * be called with arguments  ARG when the matching  pthread_cleanup_pop
- * is executed with non-zero EXECUTE argument.
- * pthread_cleanup_push and pthread_cleanup_pop are macros and must always
- * be used  in  matching  pairs  at the  same  nesting  level  of  braces. */
+/* Install  a cleanup handler: `routine' will be called with arguments `arg'
+ * when  the thread is  canceled or calls  pthread_exit. `routine' will also
+ * be called with arguments `arg' when the matching `pthread_cleanup_pop(3)'
+ * is executed with non-zero `execute' argument.
+ * `pthread_cleanup_push(3)' and `pthread_cleanup_pop(3)' are macros and must
+ * always be used  in matching  pairs at the  same nesting  level of  braces. */
 #define pthread_cleanup_push(routine, arg)                          \
 	do {                                                            \
 		struct __pthread_cleanup_frame __clframe                    \
@@ -1156,15 +1158,15 @@ __LOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_rout
 			.__do_it = 1                                            \
 		};
 
-/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
- * If   EXECUTE   is   non-zero,   the   handler   function   is    called. */
+/* Remove a cleanup handler installed by the matching `pthread_cleanup_push(3)'.
+ * If `execute' is non-zero, the handler function is called. */
 #define pthread_cleanup_pop(execute)   \
 		__clframe.__do_it = (execute); \
-	} __WHILE0
+	}	__WHILE0
 
 #ifdef __USE_GNU
-/* Install a cleanup handler as pthread_cleanup_push does, but also
- * saves the  current cancellation  type and  sets it  to  deferred
+/* Install a cleanup handler as `pthread_cleanup_push(3)' does, but
+ * also saves the current cancellation type and sets it to deferred
  * cancellation. */
 #define pthread_cleanup_push_defer_np(routine, arg)                 \
 	do {                                                            \
@@ -1176,23 +1178,23 @@ __LOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_rout
 		};                                                          \
 		(void)pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &__clframe.__cancel_type)
 
-/* Remove a  cleanup handler  as  pthread_cleanup_pop does,  but  also
+/* Remove a cleanup handler as `pthread_cleanup_pop(3)' does, but also
  * restores the cancellation type that was in effect when the matching
- * pthread_cleanup_push_defer was called. */
-#define pthread_cleanup_pop_restore_np(execute)                     \
-		(void)pthread_setcanceltype(__clframe.__cancel_type, NULL); \
-		__clframe.__do_it = (execute);                              \
-	} __WHILE0
+ * `pthread_cleanup_push_defer(3)' was called. */
+#define pthread_cleanup_pop_restore_np(execute)                          \
+		(void)pthread_setcanceltype(__clframe.__cancel_type, __NULLPTR); \
+		__clframe.__do_it = (execute);                                   \
+	}	__WHILE0
 
 #endif /* __USE_GNU */
 #endif /* !__cplusplus */
 #else /* __GNUC__ && __EXCEPTIONS */
-/* Install a cleanup handler: ROUTINE will be called with arguments ARG
- * when the thread is canceled or calls pthread_exit. ROUTINE will also
- * be called with arguments ARG when the matching pthread_cleanup_pop
- * is executed with non-zero EXECUTE argument.
- * pthread_cleanup_push and pthread_cleanup_pop are macros and must always
- * be used in matching pairs at the same nesting level of braces. */
+/* Install  a cleanup handler: `routine' will be called with arguments `arg'
+ * when  the thread is  canceled or calls  pthread_exit. `routine' will also
+ * be called with arguments `arg' when the matching `pthread_cleanup_pop(3)'
+ * is executed with non-zero `execute' argument.
+ * pthread_cleanup_push and `pthread_cleanup_pop(3)' are macros and must
+ * always be used in matching pairs at the same nesting level of braces. */
 #define pthread_cleanup_push(routine, arg)                                                                    \
 	do {                                                                                                      \
 		__pthread_unwind_buf_t __cancel_buf;                                                                  \
@@ -1208,26 +1210,26 @@ __LOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_rout
 		do {
 
 __CDECLARE_VOID_OPT(__cleanup_fct_attribute,__NOTHROW_NCX,__pthread_register_cancel,(__pthread_unwind_buf_t *__buf),(__buf))
-/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
- * If EXECUTE is non-zero, the handler function is called. */
-#define pthread_cleanup_pop(execute)                                           \
-			do {                                                               \
-			} __WHILE0; /* Empty to allow label before pthread_cleanup_pop. */ \
-		} __WHILE0;                                                            \
-		__pthread_unregister_cancel(&__cancel_buf);                            \
-		if (execute)                                                           \
-			(*__cancel_routine)(__cancel_arg);                                 \
-	} __WHILE0
+/* Remove a cleanup handler installed by the matching `pthread_cleanup_push(3)'.
+ * If `execute' is non-zero, the handler function is called. */
+#define pthread_cleanup_pop(execute)                                                \
+			do {                                                                    \
+			} __WHILE0; /* Empty to allow label before `pthread_cleanup_pop(3)'. */ \
+		} __WHILE0;                                                                 \
+		__pthread_unregister_cancel(&__cancel_buf);                                 \
+		if (execute)                                                                \
+			(*__cancel_routine)(__cancel_arg);                                      \
+	}	__WHILE0
 __CDECLARE_VOID_OPT(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel,(__pthread_unwind_buf_t *__buf),(__buf))
 #ifdef __USE_GNU
-/* Install a cleanup handler as pthread_cleanup_push does, but also
- * saves the current cancellation type and sets it to deferred
+/* Install a cleanup handler as `pthread_cleanup_push(3)' does, but
+ * also saves the current cancellation type and sets it to deferred
  * cancellation. */
 #define pthread_cleanup_push_defer_np(routine, arg)                                                           \
 	do {                                                                                                      \
 		__pthread_unwind_buf_t __cancel_buf;                                                                  \
 		void (__LIBKCALL *__cancel_routine)(void *) = (routine);                                              \
-		void *__cancel_arg               = (arg);                                                             \
+		void *__cancel_arg = (arg);                                                                           \
 		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 		if __unlikely(__not_first_call) {                                                                     \
 			__cancel_routine(__cancel_arg);                                                                   \
@@ -1237,17 +1239,17 @@ __CDECLARE_VOID_OPT(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__
 		__pthread_register_cancel_defer(&__cancel_buf);                                                       \
 		do {
 __CDECLARE_VOID_OPT(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_register_cancel_defer,(__pthread_unwind_buf_t *__buf),(__buf))
-/* Remove a cleanup handler as pthread_cleanup_pop does, but also
+/* Remove a cleanup handler as `pthread_cleanup_pop(3)' does, but also
  * restores the cancellation type that was in effect when the matching
- * pthread_cleanup_push_defer was called. */
-#define pthread_cleanup_pop_restore_np(execute)                                \
-			do {                                                               \
-			} __WHILE0; /* Empty to allow label before pthread_cleanup_pop. */ \
-		} __WHILE0;                                                            \
-		__pthread_unregister_cancel_restore(&__cancel_buf);                    \
-		if (execute)                                                           \
-			(*__cancel_routine)(__cancel_arg);                                 \
-	} __WHILE0
+ * `pthread_cleanup_push_defer(3)' was called. */
+#define pthread_cleanup_pop_restore_np(execute)                                     \
+			do {                                                                    \
+			} __WHILE0; /* Empty to allow label before `pthread_cleanup_pop(3)'. */ \
+		} __WHILE0;                                                                 \
+		__pthread_unregister_cancel_restore(&__cancel_buf);                         \
+		if (execute)                                                                \
+			(*__cancel_routine)(__cancel_arg);                                      \
+	}	__WHILE0
 __CDECLARE_VOID_OPT(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel_restore,(__pthread_unwind_buf_t *__buf),(__buf))
 #endif /* __USE_GNU */
 /* Internal interface to initiate cleanup */
@@ -1268,29 +1270,29 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigsetjmp,(struct __jmp_buf_
 /************************************************************************/
 
 /* >> pthread_mutex_init(3)
- * Initialize a mutex
+ * Initialize the given `mutex'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_init,(pthread_mutex_t *__mutex, pthread_mutexattr_t const *__mutexattr),(__mutex,__mutexattr))
 #ifdef __CRT_HAVE_pthread_mutex_destroy
 /* >> pthread_mutex_destroy(3)
- * Destroy a mutex
+ * Destroy the given `mutex'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),(__mutex))
 #elif defined(__CRT_HAVE_mtx_destroy)
 /* >> pthread_mutex_destroy(3)
- * Destroy a mutex
+ * Destroy the given `mutex'
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),mtx_destroy,(__mutex))
 #endif /* ... */
 /* >> pthread_mutex_trylock(3)
- * Try locking a mutex
+ * Try locking the given `mutex'
  * @return: EOK:   Success
  * @return: EBUSY: The mutex has already been locked
  *                 In case of a recursive mutex, another
  *                 thread was the one to acquire the lock. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_trylock,(pthread_mutex_t *__mutex),(__mutex))
 /* >> pthread_mutex_lock(3)
- * Lock a mutex
+ * Lock the given `mutex'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthread_mutex_t *__mutex),(__mutex))
 #ifdef __USE_XOPEN2K
@@ -1394,7 +1396,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
 /* >> pthread_mutex_unlock(3)
- * Unlock a mutex
+ * Unlock the given `mutex'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__mutex),(__mutex))
 /* >> pthread_mutex_getprioceiling(3)
@@ -1402,8 +1404,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutex_getprioceiling,(pthread_mutex_t const *__restrict __mutex, int *__restrict __prioceiling),(__mutex,__prioceiling))
 /* >> pthread_mutex_setprioceiling(3)
- * Set the priority ceiling of `mutex' to PRIOCEILING,
- * return old priority ceiling value in *OLD_CEILING
+ * Set the priority ceiling of `mutex' to `prioceiling',
+ * return old priority ceiling value in `*old_ceiling'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_setprioceiling,(pthread_mutex_t *__restrict __mutex, int __prioceiling, int *__restrict __old_ceiling),(__mutex,__prioceiling,__old_ceiling))
@@ -1448,74 +1450,75 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_
 /************************************************************************/
 
 /* >> pthread_mutexattr_init(3)
- * Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP)
+ * Initialize mutex attribute object `attr' with default
+ * attributes (kind is `PTHREAD_MUTEX_TIMED_NP')
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_init,(pthread_mutexattr_t *__attr),(__attr))
 /* >> pthread_mutexattr_destroy(3)
- * Destroy mutex attribute object ATTR
+ * Destroy mutex attribute object `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_destroy,(pthread_mutexattr_t *__attr),(__attr))
 /* >> pthread_mutexattr_getpshared(3)
- * Get the process-shared flag of the mutex attribute ATTR
+ * Get the process-shared flag of the mutex attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getpshared,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
 /* >> pthread_mutexattr_setpshared(3)
- * Set the process-shared flag of the mutex attribute ATTR
+ * Set the process-shared flag of the mutex attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setpshared,(pthread_mutexattr_t *__attr, int __pshared),(__attr,__pshared))
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 /* >> pthread_mutexattr_gettype(3)
- * Return in *KIND the mutex kind attribute in *ATTR
+ * Return in `*kind' the mutex kind attribute in `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __kind),(__attr,__kind))
 /* >> pthread_mutexattr_settype(3)
- * Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
- * PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or PTHREAD_MUTEX_DEFAULT)
+ * Set the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__attr, int __kind),(__attr,__kind))
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 /* >> pthread_mutexattr_getprotocol(3)
- * Return in *PROTOCOL the mutex protocol attribute in *ATTR
+ * Return in `*protocol' the mutex protocol attribute in `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getprotocol,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __protocol),(__attr,__protocol))
 /* >> pthread_mutexattr_setprotocol(3)
- * Set the mutex protocol attribute in *ATTR to PROTOCOL (either
- * PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT, or PTHREAD_PRIO_PROTECT)
+ * Set the mutex protocol attribute in `*attr' to `protocol' (either
+ * `PTHREAD_PRIO_NONE', `PTHREAD_PRIO_INHERIT', or `PTHREAD_PRIO_PROTECT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `protocol' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setprotocol,(pthread_mutexattr_t *__attr, int __protocol),(__attr,__protocol))
 /* >> pthread_mutexattr_getprioceiling(3)
- * Return in *PRIOCEILING the mutex prioceiling attribute in *ATTR
+ * Return in `*prioceiling' the mutex prioceiling attribute in `*attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getprioceiling,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __prioceiling),(__attr,__prioceiling))
 /* >> pthread_mutexattr_setprioceiling(3)
- * Set the mutex prioceiling attribute in *ATTR to PRIOCEILING
+ * Set the mutex prioceiling attribute in `*attr' to `prioceiling'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setprioceiling,(pthread_mutexattr_t *__attr, int __prioceiling),(__attr,__prioceiling))
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_pthread_mutexattr_getrobust
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute ATTR
+ * Get the robustness flag of the mutex attribute `attr'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust,(pthread_mutexattr_t const *__attr, int *__robustness),(__attr,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_getrobust_np)
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute ATTR
+ * Get the robustness flag of the mutex attribute `attr'
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust,(pthread_mutexattr_t const *__attr, int *__robustness),pthread_mutexattr_getrobust_np,(__attr,__robustness))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutexattr_setrobust
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute ATTR
+ * Set the robustness flag of the mutex attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust,(pthread_mutexattr_t *__attr, int __robustness),(__attr,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_setrobust_np)
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute ATTR
+ * Set the robustness flag of the mutex attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust,(pthread_mutexattr_t *__attr, int __robustness),pthread_mutexattr_setrobust_np,(__attr,__robustness))
@@ -1524,24 +1527,24 @@ __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrob
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_pthread_mutexattr_getrobust
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute ATTR
+ * Get the robustness flag of the mutex attribute `attr'
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust_np,(pthread_mutexattr_t const *__attr, int *__robustness),pthread_mutexattr_getrobust,(__attr,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_getrobust_np)
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute ATTR
+ * Get the robustness flag of the mutex attribute `attr'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust_np,(pthread_mutexattr_t const *__attr, int *__robustness),(__attr,__robustness))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutexattr_setrobust
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute ATTR
+ * Set the robustness flag of the mutex attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_np,(pthread_mutexattr_t *__attr, int __robustness),pthread_mutexattr_setrobust,(__attr,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_setrobust_np)
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute ATTR
+ * Set the robustness flag of the mutex attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_np,(pthread_mutexattr_t *__attr, int __robustness),(__attr,__robustness))
@@ -1556,30 +1559,30 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobu
 /************************************************************************/
 
 /* >> pthread_rwlock_init(3)
- * Initialize read-write lock RWLOCK using attributes ATTR,
- * or use the default values if later is NULL
+ * Initialize read-write lock `rwlock' using attributes `attr',
+ * or use the default values if later is `NULL'.
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_init,(pthread_rwlock_t *__restrict __rwlock, pthread_rwlockattr_t const *__restrict __attr),(__rwlock,__attr))
 /* >> pthread_rwlock_destroy(3)
- * Destroy read-write lock RWLOCK
+ * Destroy read-write lock `rwlock'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_destroy,(pthread_rwlock_t *__rwlock),(__rwlock))
 /* >> pthread_rwlock_rdlock(3)
- * Acquire read lock for RWLOCK
+ * Acquire read lock for `rwlock'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock,(pthread_rwlock_t *__rwlock),(__rwlock))
 /* >> pthread_rwlock_tryrdlock(3)
- * Try to acquire read lock for RWLOCK
+ * Try to acquire read lock for `rwlock'
  * @return: EOK:   Success
  * @return: EBUSY: A read-lock cannot be acquired at the moment,
  *                 because a write-lock is already being held. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__rwlock),(__rwlock))
 /* >> pthread_rwlock_wrlock(3)
- * Acquire write lock for RWLOCK
+ * Acquire write lock for `rwlock'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock,(pthread_rwlock_t *__rwlock),(__rwlock))
 /* >> pthread_rwlock_trywrlock(3)
- * Try to acquire write lock for RWLOCK
+ * Try to acquire write lock for `rwlock'
  * @return: EOK:   Success
  * @return: EBUSY: A write-lock cannot be acquired at the moment,
  *                 because read-locks are already being held. */
@@ -1777,7 +1780,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
 /* >> pthread_rwlock_unlock(3)
- * Unlock RWLOCK
+ * Unlock `rwlock'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock,(pthread_rwlock_t *__rwlock),(__rwlock))
 
@@ -1787,19 +1790,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock
 /************************************************************************/
 
 /* >> pthread_rwlockattr_init(3)
- * Initialize attribute object ATTR with default values
+ * Initialize attribute object `attr' with default values
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_init,(pthread_rwlockattr_t *__attr),(__attr))
 /* >> pthread_rwlockattr_destroy(3)
- * Destroy attribute object ATTR
+ * Destroy attribute object `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_destroy,(pthread_rwlockattr_t *__attr),(__attr))
 /* >> pthread_rwlockattr_getpshared(3)
- * Return current setting of process-shared attribute of ATTR in PSHARED
+ * Return current setting of process-shared attribute of `attr' in `*pshared'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_getpshared,(pthread_rwlockattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
 /* >> pthread_rwlockattr_setpshared(3)
- * Set process-shared attribute of ATTR to PSHARED
+ * Set process-shared attribute of `attr' to `pshared'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pthread' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setpshared,(pthread_rwlockattr_t *__attr, int __pshared),(__attr,__pshared))
@@ -1821,7 +1824,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_se
 
 /* >> pthread_cond_init(3)
  * Initialize condition variable `cond' using attributes
- * ATTR, or use the default values if later is NULL
+ * `attr', or use the default values if later is `NULL'.
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_cond_init,(pthread_cond_t *__restrict __cond, pthread_condattr_t const *__restrict __cond_attr),(__cond,__cond_attr))
 #ifdef __CRT_HAVE_pthread_cond_destroy
@@ -1977,29 +1980,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __A
 /************************************************************************/
 
 /* >> pthread_condattr_init(3)
- * Initialize condition variable attribute ATTR
+ * Initialize condition variable attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_condattr_init,(pthread_condattr_t *__attr),(__attr))
 /* >> pthread_condattr_destroy(3)
- * Destroy condition variable attribute ATTR
+ * Destroy condition variable attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_condattr_destroy,(pthread_condattr_t *__attr),(__attr))
 /* >> pthread_condattr_getpshared(3)
- * Get the process-shared flag of the condition variable attribute ATTR
+ * Get the process-shared flag of the condition variable attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_condattr_getpshared,(pthread_condattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
 /* >> pthread_condattr_setpshared(3)
- * Set the process-shared flag of the condition variable attribute ATTR
+ * Set the process-shared flag of the condition variable attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_condattr_setpshared,(pthread_condattr_t *__attr, int __pshared),(__attr,__pshared))
 #ifdef __USE_XOPEN2K
 /* >> pthread_condattr_getclock(3)
- * Get the clock selected for the condition variable attribute ATTR
+ * Get the clock selected for the condition variable attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_condattr_getclock,(pthread_condattr_t const *__restrict __attr, __clockid_t *__restrict __clock_id),(__attr,__clock_id))
 /* >> pthread_condattr_setclock(3)
- * Set the clock selected for the condition variable attribute ATTR
+ * Set the clock selected for the condition variable attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `clock_id' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_condattr_setclock,(pthread_condattr_t *__attr, __clockid_t __clock_id),(__attr,__clock_id))
@@ -2013,65 +2016,65 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_condattr_setc
 
 #ifdef __CRT_HAVE_pthread_spin_init
 /* >> pthread_spin_init(3)
- * Initialize the spinlock LOCK. If PSHARED is nonzero the
- * spinlock can be shared between different processes
+ * Initialize the spinlock `lock'. If `pshared' is nonzero
+ * the spinlock can be shared between different processes
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_init,(pthread_spinlock_t *__lock, int __pshared),(__lock,__pshared))
 #else /* __CRT_HAVE_pthread_spin_init */
 #include <libc/local/pthread/pthread_spin_init.h>
 /* >> pthread_spin_init(3)
- * Initialize the spinlock LOCK. If PSHARED is nonzero the
- * spinlock can be shared between different processes
+ * Initialize the spinlock `lock'. If `pshared' is nonzero
+ * the spinlock can be shared between different processes
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__lock, __pshared); })
 #endif /* !__CRT_HAVE_pthread_spin_init */
 #ifdef __CRT_HAVE_pthread_spin_destroy
 /* >> pthread_spin_destroy(3)
- * Destroy the spinlock LOCK
+ * Destroy the spinlock `lock'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_destroy,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_destroy */
 #include <libc/local/pthread/pthread_spin_destroy.h>
 /* >> pthread_spin_destroy(3)
- * Destroy the spinlock LOCK
+ * Destroy the spinlock `lock'
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_destroy */
 #ifdef __CRT_HAVE_pthread_spin_lock
 /* >> pthread_spin_lock(3)
- * Wait until spinlock LOCK is retrieved
+ * Wait until spinlock `lock' is retrieved
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_lock,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_lock */
 #include <libc/local/pthread/pthread_spin_lock.h>
 /* >> pthread_spin_lock(3)
- * Wait until spinlock LOCK is retrieved
+ * Wait until spinlock `lock' is retrieved
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_lock */
 #ifdef __CRT_HAVE_pthread_spin_trylock
 /* >> pthread_spin_trylock(3)
- * Try to lock spinlock LOCK
+ * Try to lock spinlock `lock'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_trylock,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_trylock */
 #include <libc/local/pthread/pthread_spin_trylock.h>
 /* >> pthread_spin_trylock(3)
- * Try to lock spinlock LOCK
+ * Try to lock spinlock `lock'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_trylock */
 #ifdef __CRT_HAVE_pthread_spin_unlock
 /* >> pthread_spin_unlock(3)
- * Release spinlock LOCK
+ * Release spinlock `lock'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_unlock,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_unlock */
 #include <libc/local/pthread/pthread_spin_unlock.h>
 /* >> pthread_spin_unlock(3)
- * Release spinlock LOCK
+ * Release spinlock `lock'
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_unlock */
@@ -2082,17 +2085,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFIC
 /************************************************************************/
 
 /* >> pthread_barrier_init(3)
- * Initialize BARRIER with the attributes in ATTR.
- * The barrier is opened when COUNT waiters arrived
+ * Initialize `barrier' with the attributes in `attr'.
+ * The barrier is opened when `count' waiters arrived
  * @return: EOK:    Success
  * @return: EINVAL: The given `count' is ZERO(0) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_barrier_init,(pthread_barrier_t *__restrict __barrier, pthread_barrierattr_t const *__restrict __attr, unsigned int __count),(__barrier,__attr,__count))
 /* >> pthread_barrier_destroy(3)
- * Destroy a previously dynamically initialized barrier BARRIER
+ * Destroy the given (previously dynamically initialized) `barrier'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_barrier_destroy,(pthread_barrier_t *__barrier),(__barrier))
 /* >> pthread_barrier_wait(3)
- * Wait on barrier BARRIER
+ * Wait on the given `barrier'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pthread_barrier_t *__barrier),(__barrier))
 
@@ -2102,19 +2105,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,
 /************************************************************************/
 
 /* >> pthread_barrierattr_init(3)
- * Initialize barrier attribute ATTR
+ * Initialize barrier attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_barrierattr_init,(pthread_barrierattr_t *__attr),(__attr))
 /* >> pthread_barrierattr_destroy(3)
- * Destroy previously dynamically initialized barrier attribute ATTR
+ * Destroy previously dynamically initialized barrier attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_barrierattr_destroy,(pthread_barrierattr_t *__attr),(__attr))
 /* >> pthread_barrierattr_getpshared(3)
- * Get the process-shared flag of the barrier attribute ATTR
+ * Get the process-shared flag of the barrier attribute `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_barrierattr_getpshared,(pthread_barrierattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
 /* >> pthread_barrierattr_setpshared(3)
- * Set the process-shared flag of the barrier attribute ATTR
+ * Set the process-shared flag of the barrier attribute `attr'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_barrierattr_setpshared,(pthread_barrierattr_t *__attr, int __pshared),(__attr,__pshared))
@@ -2132,10 +2135,10 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
- * area. DESTR_FUNCTION, if non-NULL, is called with the value
+ * area. `destr_function', if non-`NULL', is called with the value
  * associated to that key when the key is destroyed.
- * DESTR_FUNCTION is not called if the value associated is NULL when
- * the key is destroyed
+ * `destr_function' is not called if the value associated is `NULL'
+ * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, __pthread_destr_function_t __destr_function),(__key,__destr_function))
@@ -2174,20 +2177,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_key_create_once_np, __FORCELOCAL __ATTR_
 #endif /* __USE_SOLARIS */
 #ifdef __CRT_HAVE_pthread_key_delete
 /* >> pthread_key_delete(3)
- * Destroy KEY
+ * Destroy the given `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),(__key))
 #elif defined(__CRT_HAVE_tss_delete)
 /* >> pthread_key_delete(3)
- * Destroy KEY
+ * Destroy the given `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key' */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),tss_delete,(__key))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_getspecific
 /* >> pthread_getspecific(3)
- * Return current value of the thread-specific data slot identified by KEY
+ * Return current value of the thread-specific data slot identified by `key'
  * @return: * :   The value currently associated with `key' in the calling thread
  * @return: NULL: The current value is `NULL'
  * @return: NULL: No value has been bound, yet
@@ -2195,7 +2198,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),ts
 __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),(__key))
 #elif defined(__CRT_HAVE_tss_get)
 /* >> pthread_getspecific(3)
- * Return current value of the thread-specific data slot identified by KEY
+ * Return current value of the thread-specific data slot identified by `key'
  * @return: * :   The value currently associated with `key' in the calling thread
  * @return: NULL: The current value is `NULL'
  * @return: NULL: No value has been bound, yet
@@ -2203,15 +2206,15 @@ __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),tss_get,(__key))
 #endif /* ... */
 /* >> pthread_setspecific(3)
- * Store POINTER in the thread-specific data slot identified by KEY
+ * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer' is non-NULL, `key' had yet to be allowed for the
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allowed for the
  *                  calling thread, and an attempt to allocate it just now failed */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))
 #ifdef __USE_XOPEN2K
 /* >> pthread_getcpuclockid(3)
- * Get ID of CPU-time clock for thread THREAD_ID
+ * Get the ID of CPU-time clock for thread `pthread'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __pthread, __clockid_t *__clock_id),(__pthread,__clock_id))
 #endif /* __USE_XOPEN2K */
@@ -2223,16 +2226,16 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
 /* >> pthread_atfork(3)
- * Install handlers to be called when a new process is created with FORK.
- * The PREPARE handler is called in the parent process just before performing
- * FORK. The PARENT handler is called in the parent process just after FORK.
- * The CHILD handler is called in the child process. Each of the three
- * handlers can be NULL, meaning that no handler needs to be called at that
- * point.
- * PTHREAD_ATFORK can be called several times, in which case the PREPARE
- * handlers are called in LIFO order (last added with PTHREAD_ATFORK,
- * first called before FORK), and the PARENT and CHILD handlers are called
- * in FIFO (first added, first called)
+ * Install handlers to be called when a new process is created with `fork(2)'.
+ * The `prepare' handler is called in the parent process just before performing
+ * `fork(2)'. The `parent' handler is called in the parent process just after
+ * `fork(2)'. The `child' handler is called in the child process. Each of the
+ * three handlers can be `NULL', meaning that no handler needs to be called at
+ * that point.
+ * `pthread_atfork(3)' can be called several times, in which case the `prepare'
+ * handlers are called in LIFO order (last added with `pthread_atfork(3)',
+ * first called before `fork(2)'), and the `parent' and `child' handlers are
+ * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))

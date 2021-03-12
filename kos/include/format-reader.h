@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37f4f249 */
+/* HASH CRC-32:0x817939 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,11 +38,11 @@ __SYSDECL_BEGIN
 #ifndef __pformatreader_defined
 #define __pformatreader_defined 1
 /* Callback function for custom data providers, to-be used by data consumers.
- * @param: BUF:       The base address of a `NUM_BYTES' bytes long vector that should be filled.
- * @param: NUM_BYTES: The max number of bytes that should be returned in `BUF'
- * @param: ARG:       The user-defined closure parameter passed alongside this function pointer.
+ * @param: buf:       The base address of a `num_bytes' bytes long vector that should be filled.
+ * @param: num_bytes: The max number of bytes that should be returned in `buf'
+ * @param: arg:       The user-defined closure parameter passed alongside this function pointer.
  * @return: < 0:      An error occurred and the calling function shall return with this same value.
- * @return: >= 0:     The number of leading bytes of `BUF' that were filled. */
+ * @return: >= 0:     The number of leading bytes of `buf' that were filled. */
 typedef __pformatreader pformatreader;
 #endif /* !__pformatreader_defined */
 

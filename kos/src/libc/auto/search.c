@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fd7b81b */
+/* HASH CRC-32:0x88d8b256 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Insert ELEM into a doubly-linked list, after PREV */
+/* >> insque(3)
+ * Insert ELEM into a doubly-linked list, after PREV */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
                                   void *prev) {
@@ -53,7 +54,8 @@ NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
 		((struct libc_link *)elem)->l_forw = NULL;
 	}
 }
-/* Unlink ELEM from the doubly-linked list that it is in */
+/* >> remque(3)
+ * Unlink ELEM from the doubly-linked list that it is in */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
 	struct libc_link {
@@ -80,12 +82,13 @@ struct hsearch_data {
 #ifndef __local_htab_defined
 #define __local_htab_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_htab_defined */
-/* Search for entry matching ITEM.key in internal hash table.
- * If ACTION is `FIND' return found entry or signal error by returning NULL.
- * If ACTION is `ENTER' replace existing data (if any) with ITEM.data */
+/* >> hsearch(3)
+ * Search for entry matching `item.key' in internal hash table.
+ * If `action' is `FIND' return found entry or signal error by returning `NULL'.
+ * If `action' is `ENTER' replace existing data (if any) with `item.data' */
 INTERN ATTR_SECTION(".text.crt.utility.search") ENTRY *
 NOTHROW_NCX(LIBCCALL libc_hsearch)(ENTRY item,
                                    ACTION action) {
@@ -105,10 +108,11 @@ struct hsearch_data {
 #ifndef __local_htab_defined
 #define __local_htab_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_htab_defined */
-/* Create a new hashing table which will at most contain NEL elements */
+/* >> hcreate(3)
+ * Create a new hashing table which will at most contain `nel' elements */
 INTERN ATTR_SECTION(".text.crt.utility.search") int
 NOTHROW_NCX(LIBCCALL libc_hcreate)(size_t nel) {
 	return libc_hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
@@ -125,10 +129,11 @@ struct hsearch_data {
 #ifndef __local_htab_defined
 #define __local_htab_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_htab_defined */
-/* Destroy current internal hashing table */
+/* >> hdestroy(3)
+ * Destroy current internal hashing table */
 INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy)(void) {
 	libc_hdestroy_r(&__NAMESPACE_LOCAL_SYM htab);
@@ -150,7 +155,8 @@ typedef struct entry {
 } ENTRY;
 #endif /* !__ENTRY_defined */
 #include <libc/errno.h>
-/* Reentrant versions which can handle multiple hashing tables at the same time */
+/* >> hsearch_r(3)
+ * Reentrant versions which can handle multiple hashing tables at the same time */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3, 4)) int
 NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
                                      ACTION action,
@@ -247,7 +253,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isprime))(unsigned int number) {
 	return 1;
 }
 __NAMESPACE_LOCAL_END
-/* Reentrant versions which can handle multiple hashing tables at the same time */
+/* >> hcreate_r(3) */
 INTERN ATTR_SECTION(".text.crt.utility.search") int
 NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
                                      struct hsearch_data *htab) {
@@ -292,7 +298,7 @@ struct hsearch_data {
 };
 #endif /* !__hsearch_data_defined */
 #include <libc/errno.h>
-/* Reentrant versions which can handle multiple hashing tables at the same time */
+/* >> hdestroy_r(3) */
 INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
 	if (htab == NULL) {
@@ -301,16 +307,18 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
 #endif /* EINVAL */
 		return;
 	}
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	libc_free(htab->table);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	htab->table = NULL;
 }
 __NAMESPACE_LOCAL_BEGIN
-/* Possibly "split" a  node with two  red successors, and/or  fix up two  red
- * edges  in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
- * and  GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
- * comparison values that determined which way was taken in the tree to reach
- * ROOTP. MODE is 1 if we need not  do the split, but must check for two  red
- * edges between GPARENTP and ROOTP */
+/* Possibly  "split" a node with two red  successors, and/or fix up two red
+ * edges in a  row. `rootp' is  a pointer  to the lowest  node we  visited,
+ * `parentp' and `gparentp' pointers  to its parent/grandparent. `p_r'  and
+ * `gp_r' contain the comparison values that determined which way was taken
+ * in  the tree to reach `rootp'. `mode' is  1 if we need not do the split,
+ * but must check for two red edges between `gparentp' and `rootp' */
 __LOCAL_LIBC(maybe_split_for_insert) NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp, /*nullable*/ void **parentp,
                                                                     void **gparentp, int p_r, int gp_r, int mode) {
@@ -368,8 +376,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp
 	}
 }
 __NAMESPACE_LOCAL_END
-/* Search for an entry matching the given KEY in the tree
- * pointed to by *ROOTP and insert a new element if not found */
+/* >> tsearch(3)
+ * Search for an entry matching the given `key' in the tree
+ * pointed to by `*rootp' and insert a new element if not found */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
                                    void **vrootp,
@@ -426,8 +435,9 @@ NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
 	}
 	return q;
 }
-/* Search for an entry matching the given KEY in the tree pointed
- * to by *ROOTP. If no matching entry is available return NULL */
+/* >> tfind(3)
+ * Search for an entry matching the given `key' in the tree pointed
+ * to by `*rootp'. If no matching entry is available return `NULL' */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
                                  void *const *vrootp,
@@ -452,7 +462,8 @@ NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
 }
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>
-/* Remove the element matching KEY from the tree pointed to by *ROOTP */
+/* >> tdelete(3)
+ * Remove the element matching `key' from the tree pointed to by `*rootp' */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
                                    void **__restrict vrootp,
@@ -625,15 +636,17 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 		if (r != NULL)
 			r->is_red = 0;
 	}
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	libc_free(unchained);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 done:
 	__freea(nodestack);
 	return retval;
 }
 __NAMESPACE_LOCAL_BEGIN
 /* Walk the nodes of a tree.
- * ROOT is the root of the tree to be walked, ACTION the function to be
- * called at each node. LEVEL  is the level of  ROOT in the whole  tree */
+ * `root' is the root of the tree to be walked, `action' the function to be
+ * called at each node. `level'  is the level of  `root' in the whole  tree */
 __LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
 __LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	void *l, *r;
@@ -652,14 +665,16 @@ __LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	}
 }
 __NAMESPACE_LOCAL_END
-/* Walk through the whole tree and call the ACTION callback for every node or leaf */
+/* >> twalk(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
 INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_twalk)(void const *root,
                                  __action_fn_t action) {
 	if (root && action)
 		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(root, action, 0);
 }
-/* Destroy the whole tree, call FREEFCT for each node or leaf */
+/* >> tdestroy(3)
+ * Destroy the whole tree, call `freefct' for each node or leaf */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
 NOTHROW_NCX(LIBCCALL libc_tdestroy)(void *root,
                                     __free_fn_t freefct) {
@@ -669,7 +684,9 @@ again:
 		l = ((void **)root)[1];
 		r = ((void **)root)[2];
 		(*freefct)(((void **)root)[0]);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		libc_free(root);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		if (l) {
 			if (r)
 				libc_tdestroy(r, freefct);
@@ -682,7 +699,8 @@ again:
 		}
 	}
 }
-/* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
 NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
                                  void const *base,
@@ -698,8 +716,9 @@ NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
 	}
 	return NULL;
 }
-/* Perform linear search for KEY by comparing by COMPAR function
- * in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found */
+/* >> lsearch(3)
+ * Perform linear search for `key' by comparing by `compar' function
+ * in array [base, base+nmemb*size) and insert entry if not found */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
 NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
                                    void *base,

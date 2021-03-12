@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x984a3eeb */
+/* HASH CRC-32:0xe11c112 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,19 +30,23 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_file_wprinter_defined
 #define __local___localdep_file_wprinter_defined 1
 #if defined(__CRT_HAVE_file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
+/* >> file_wprinter(3)
+ * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter)
-/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
+/* >> file_wprinter(3)
+ * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked)
-/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
+/* >> file_wprinter(3)
+ * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/file_wprinter.h>
 __NAMESPACE_LOCAL_BEGIN
-/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
+/* >> file_wprinter(3)
+ * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_wprinter __LIBC_LOCAL_NAME(file_wprinter)
 #else /* ... */
 #undef __local___localdep_file_wprinter_defined
@@ -53,21 +57,21 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcslen_defined 1
 #ifdef __CRT_HAVE_wcslen
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
 #else /* __CRT_HAVE_wcslen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
 #endif /* !__CRT_HAVE_wcslen */
 #endif /* !__local___localdep_wcslen_defined */
 __LOCAL_LIBC(fputws) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(__LIBCCALL __LIBC_LOCAL_NAME(fputws))(__WCHAR_TYPE__ const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(fputws))(__WCHAR_TYPE__ const *__restrict __str, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
-	__result = __localdep_file_wprinter(__stream, __string, __localdep_wcslen(__string));
+	__result = __localdep_file_wprinter(__stream, __str, __localdep_wcslen(__str));
 	return __result;
 }
 __NAMESPACE_LOCAL_END

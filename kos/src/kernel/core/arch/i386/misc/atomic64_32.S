@@ -216,7 +216,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchadd)
 	/* %ebx:%ecx += oldval */
 	addl   %eax, %ebx
 	adcl   %edx, %ecx
-	/* VALUE = %ebx:%ecx */
+	/* value = %ebx:%ecx */
 	movl   %ebx, 0(%edi)
 	movl   %ecx, 4(%edi)
 	UNLOCK()
@@ -239,7 +239,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchand)
 	/* %ebx:%ecx &= oldval */
 	andl   %eax, %ebx
 	andl   %edx, %ecx
-	/* VALUE = %ebx:%ecx */
+	/* value = %ebx:%ecx */
 	movl   %ebx, 0(%edi)
 	movl   %ecx, 4(%edi)
 	UNLOCK()
@@ -262,7 +262,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchor)
 	/* %ebx:%ecx |= oldval */
 	orl    %eax, %ebx
 	orl    %edx, %ecx
-	/* VALUE = %ebx:%ecx */
+	/* value = %ebx:%ecx */
 	movl   %ebx, 0(%edi)
 	movl   %ecx, 4(%edi)
 	UNLOCK()
@@ -285,7 +285,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchxor)
 	/* %ebx:%ecx ^= oldval */
 	xorl   %eax, %ebx
 	xorl   %edx, %ecx
-	/* VALUE = %ebx:%ecx */
+	/* value = %ebx:%ecx */
 	movl   %ebx, 0(%edi)
 	movl   %ecx, 4(%edi)
 	UNLOCK()

@@ -1861,8 +1861,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 /*[[[end:libc_flushall_unlocked]]]*/
 
 
-/*[[[head:libc_removeat,hash:CRC-32=0xcdc16c8]]]*/
-/* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
+/*[[[head:libc_removeat,hash:CRC-32=0xb1a4dbad]]]*/
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd,
                                     char const *filename)
@@ -1875,8 +1876,9 @@ NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd,
 }
 /*[[[end:libc_removeat]]]*/
 
-/*[[[head:libc_remove,hash:CRC-32=0x3134090b]]]*/
-/* Remove a file or directory `FILENAME' */
+/*[[[head:libc_remove,hash:CRC-32=0xdee82fbb]]]*/
+/* >> remove(3)
+ * Remove a file or directory `filename' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename)
 /*[[[body:libc_remove]]]*/
@@ -1887,8 +1889,9 @@ NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename)
 
 
 
-/*[[[head:libc_ftrylockfile,hash:CRC-32=0x23c3c2a8]]]*/
-/* Try to acquire a lock to `STREAM' */
+/*[[[head:libc_ftrylockfile,hash:CRC-32=0x740c6ac5]]]*/
+/* >> ftrylockfile(3)
+ * Try to acquire a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *__restrict stream)
 /*[[[body:libc_ftrylockfile]]]*/
@@ -1899,8 +1902,9 @@ NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *__restrict stream)
 }
 /*[[[end:libc_ftrylockfile]]]*/
 
-/*[[[head:libc_funlockfile,hash:CRC-32=0x7c9513dc]]]*/
-/* Release a previously acquired lock from `STREAM' */
+/*[[[head:libc_funlockfile,hash:CRC-32=0x10594f1d]]]*/
+/* >> funlockfile(3)
+ * Release a previously acquired lock from `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
 /*[[[body:libc_funlockfile]]]*/
@@ -1910,8 +1914,9 @@ NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
 }
 /*[[[end:libc_funlockfile]]]*/
 
-/*[[[head:libc_flockfile,hash:CRC-32=0x9b428077]]]*/
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
+/*[[[head:libc_flockfile,hash:CRC-32=0x2ffba992]]]*/
+/* >> flockfile(3)
+ * Acquire a lock to `stream' and block until doing so succeeds */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) void
 NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream)
 /*[[[body:libc_flockfile]]]*/
@@ -1922,8 +1927,9 @@ NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream)
 /*[[[end:libc_flockfile]]]*/
 
 
-/*[[[head:libc_fflush,hash:CRC-32=0x6e6d623e]]]*/
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+/*[[[head:libc_fflush,hash:CRC-32=0x5aeba993]]]*/
+/* >> fflush(3)
+ * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.utility") int
 (LIBCCALL libc_fflush)(FILE *stream) THROWS(...)
 /*[[[body:libc_fflush]]]*/
@@ -1942,8 +1948,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.utility") int
 }
 /*[[[end:libc_fflush]]]*/
 
-/*[[[head:libc_fflush_unlocked,hash:CRC-32=0xe73c9ca9]]]*/
-/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+/*[[[head:libc_fflush_unlocked,hash:CRC-32=0xdc145d17]]]*/
+/* >> fflush_unlocked(3)
+ * Same as `fflush()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 (LIBCCALL libc_fflush_unlocked)(FILE *stream) THROWS(...)
 /*[[[body:libc_fflush_unlocked]]]*/
@@ -1958,8 +1965,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 
 
 
-/*[[[head:libc_fread,hash:CRC-32=0xc93425d1]]]*/
-/* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
+/*[[[head:libc_fread,hash:CRC-32=0x36d006b5]]]*/
+/* >> fread(3)
+ * Read up to `elemsize * elemcount' bytes of data from `stream' into `buf' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 4)) size_t
 (LIBCCALL libc_fread)(void *__restrict buf,
                       size_t elemsize,
@@ -1996,8 +2004,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 4)) s
 }
 /*[[[end:libc_fread]]]*/
 
-/*[[[head:libc_fread_unlocked,hash:CRC-32=0x4d616c6d]]]*/
-/* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
+/*[[[head:libc_fread_unlocked,hash:CRC-32=0x19c9d74d]]]*/
+/* >> fread_unlocked(3)
+ * Same as `fread()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 4)) size_t
 (LIBCCALL libc_fread_unlocked)(void *__restrict buf,
                                size_t elemsize,
@@ -2025,8 +2034,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 4))
 }
 /*[[[end:libc_fread_unlocked]]]*/
 
-/*[[[head:libc_fwrite,hash:CRC-32=0xf1a2d423]]]*/
-/* Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM' */
+/*[[[head:libc_fwrite,hash:CRC-32=0x6271375a]]]*/
+/* >> fwrite(3)
+ * Write up to `elemsize * elemcount' bytes of data from `buf' into `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 4)) size_t
 (LIBCCALL libc_fwrite)(void const *__restrict buf,
                        size_t elemsize,
@@ -2057,8 +2067,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 4)) size_t
 }
 /*[[[end:libc_fwrite]]]*/
 
-/*[[[head:libc_fwrite_unlocked,hash:CRC-32=0x5e0de671]]]*/
-/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
+/*[[[head:libc_fwrite_unlocked,hash:CRC-32=0x70df0944]]]*/
+/* >> fwrite_unlocked(3)
+ * Same as `fwrite()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") WUNUSED NONNULL((1, 4)) size_t
 (LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf,
                                 size_t elemsize,
@@ -2083,8 +2094,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") WUNUSED NONNULL((1, 4
 }
 /*[[[end:libc_fwrite_unlocked]]]*/
 
-/*[[[head:libc_file_printer,hash:CRC-32=0x2d96cf1e]]]*/
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/*[[[head:libc_file_printer,hash:CRC-32=0x461c8b3f]]]*/
+/* >> file_printer(3)
+ * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
 (__FORMATPRINTER_CC libc_file_printer)(void *arg,
                                        char const *__restrict data,
@@ -2108,8 +2120,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
 }
 /*[[[end:libc_file_printer]]]*/
 
-/*[[[head:libc_file_printer_unlocked,hash:CRC-32=0xceaefce8]]]*/
-/* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/*[[[head:libc_file_printer_unlocked,hash:CRC-32=0x4a7be98d]]]*/
+/* >> file_printer_unlocked(3)
+ * Same as `file_printer()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) ssize_t
 (__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg,
                                                 char const *__restrict data,
@@ -2126,8 +2139,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) ssize
 /*[[[end:libc_file_printer_unlocked]]]*/
 
 
-/*[[[head:libc_ftell,hash:CRC-32=0xf473beff]]]*/
-/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+/*[[[head:libc_ftell,hash:CRC-32=0x5cceab65]]]*/
+/* >> ftell(3)
+ * Return the current in-file position of `stream' as a byte-offet from the start of the file */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) long int
 (LIBCCALL libc_ftell)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_ftell]]]*/
@@ -2144,8 +2158,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) long
 }
 /*[[[end:libc_ftell]]]*/
 
-/*[[[head:libc_fseek,hash:CRC-32=0xffde0570]]]*/
-/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+/*[[[head:libc_fseek,hash:CRC-32=0xa1e74e72]]]*/
+/* >> fseek(3)
+ * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 (LIBCCALL libc_fseek)(FILE *__restrict stream,
                       long int off,
@@ -2168,8 +2183,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 }
 /*[[[end:libc_fseek]]]*/
 
-/*[[[head:libc_ftello,hash:CRC-32=0xed48d6b5]]]*/
-/* Return the current in-file position of `STREAM' */
+/*[[[head:libc_ftello,hash:CRC-32=0x5e33bad]]]*/
+/* >> ftello(3), ftello64(3)
+ * Return the current in-file position of `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off_t
 (LIBCCALL libc_ftello)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_ftello]]]*/
@@ -2186,11 +2202,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off_
 }
 /*[[[end:libc_ftello]]]*/
 
-/*[[[head:libc_ftello64,hash:CRC-32=0x4d1d2167]]]*/
+/*[[[head:libc_ftello64,hash:CRC-32=0x9b7b6a1c]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_ftello64, ftello);
 #else /* MAGIC:alias */
-/* 64-bit variant of `ftello' */
+/* >> ftello(3), ftello64(3)
+ * Return the current in-file position of `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off64_t
 (LIBCCALL libc_ftello64)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_ftello64]]]*/
@@ -2209,8 +2226,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off6
 /*[[[end:libc_ftello64]]]*/
 
 
-/*[[[head:libc_fseeko,hash:CRC-32=0x7b111a39]]]*/
-/* Change the current in-file position of `STREAM' */
+/*[[[head:libc_fseeko,hash:CRC-32=0x46202317]]]*/
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 (LIBCCALL libc_fseeko)(FILE *__restrict stream,
                        off_t off,
@@ -2233,11 +2251,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 }
 /*[[[end:libc_fseeko]]]*/
 
-/*[[[head:libc_fseeko64,hash:CRC-32=0x4769a24b]]]*/
+/*[[[head:libc_fseeko64,hash:CRC-32=0x755959aa]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fseeko64, fseeko);
 #else /* MAGIC:alias */
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 (LIBCCALL libc_fseeko64)(FILE *__restrict stream,
                          off64_t off,
@@ -2262,9 +2281,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 /*[[[end:libc_fseeko64]]]*/
 
 
-/*[[[head:libc_fgetpos,hash:CRC-32=0x3dd40ea0]]]*/
-/* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
- * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
+/*[[[head:libc_fgetpos,hash:CRC-32=0x8bc8e736]]]*/
+/* >> fgetpos(3), fgetpos64(3)
+ * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fgetpos)(FILE *__restrict stream,
                         fpos_t *__restrict pos) THROWS(...)
@@ -2279,8 +2299,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fgetpos]]]*/
 
-/*[[[head:libc_fsetpos,hash:CRC-32=0xd70db159]]]*/
-/* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
+/*[[[head:libc_fsetpos,hash:CRC-32=0xe015939d]]]*/
+/* >> fsetpos(3), fsetpos64(3)
+ * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fsetpos)(FILE *__restrict stream,
                         fpos_t const *__restrict pos) THROWS(...)
@@ -2290,11 +2311,13 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fsetpos]]]*/
 
-/*[[[head:libc_fgetpos64,hash:CRC-32=0x6aada482]]]*/
+/*[[[head:libc_fgetpos64,hash:CRC-32=0x8c5330d4]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fgetpos64, fgetpos);
 #else /* MAGIC:alias */
-/* 64-bit variant of `fgetpos' */
+/* >> fgetpos(3), fgetpos64(3)
+ * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fgetpos64)(FILE *__restrict stream,
                           fpos64_t *__restrict pos) THROWS(...)
@@ -2310,11 +2333,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fgetpos64]]]*/
 
-/*[[[head:libc_fsetpos64,hash:CRC-32=0x50801533]]]*/
+/*[[[head:libc_fsetpos64,hash:CRC-32=0xf636a493]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fsetpos64, fsetpos);
 #else /* MAGIC:alias */
-/* 64-bit variant of `fsetpos' */
+/* >> fsetpos(3), fsetpos64(3)
+ * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fsetpos64)(FILE *__restrict stream,
                           fpos64_t const *__restrict pos) THROWS(...)
@@ -2487,8 +2511,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fsetpos64_unlocked]]]*/
 
-/*[[[head:libc_ungetc,hash:CRC-32=0xdbbea242]]]*/
-/* Unget a single character byte of data previously returned by `getc()' */
+/*[[[head:libc_ungetc,hash:CRC-32=0xa350829a]]]*/
+/* >> ungetc(3)
+ * Unget a single character byte of data previously returned by `getc()' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_ungetc)(int ch,
                                   FILE *__restrict stream)
@@ -2526,8 +2551,9 @@ NOTHROW_NCX(LIBCCALL libc_ungetc_unlocked)(int ch,
 }
 /*[[[end:libc_ungetc_unlocked]]]*/
 
-/*[[[head:libc_rewind,hash:CRC-32=0x3d00fad9]]]*/
-/* Rewind the current in-file position of `STREAM' to its starting position */
+/*[[[head:libc_rewind,hash:CRC-32=0x906e3147]]]*/
+/* >> rewind(3)
+ * Rewind the current in-file position of `stream' to its starting position */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.utility") NONNULL((1)) void
 (LIBCCALL libc_rewind)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_rewind]]]*/
@@ -2572,9 +2598,9 @@ NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
 }
 /*[[[end:libc_fisatty]]]*/
 
-/*[[[head:libc_fftruncate,hash:CRC-32=0xaf5d2961]]]*/
+/*[[[head:libc_fftruncate,hash:CRC-32=0x68fd1cf]]]*/
 /* >> fftruncate(3)
- * Truncate the given file `STREAM' to a length of `LENGTH' */
+ * Truncate the given file `stream' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) int
 (LIBCCALL libc_fftruncate)(FILE *__restrict stream,
                            __PIO_OFFSET length) THROWS(...)
@@ -2614,12 +2640,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 }
 /*[[[end:libc_fftruncate_unlocked]]]*/
 
-/*[[[head:libc_fftruncate64,hash:CRC-32=0x7be23fb2]]]*/
+/*[[[head:libc_fftruncate64,hash:CRC-32=0x7a44434d]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fftruncate64, fftruncate);
 #else /* MAGIC:alias */
 /* >> fftruncate64(3)
- * Truncate the given file `STREAM' to a length of `LENGTH' */
+ * Truncate the given file `stream' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) int
 (LIBCCALL libc_fftruncate64)(FILE *__restrict stream,
                              __PIO_OFFSET64 length) THROWS(...)
@@ -2642,12 +2668,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64]]]*/
 
-/*[[[head:libc_fftruncate64_unlocked,hash:CRC-32=0x464308ac]]]*/
+/*[[[head:libc_fftruncate64_unlocked,hash:CRC-32=0x7c1ffbbf]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fftruncate64_unlocked, fftruncate_unlocked);
 #else /* MAGIC:alias */
 /* >> fftruncate64_unlocked(3)
- * Truncate the given file `STREAM' to a length of `LENGTH' */
+ * Truncate the given file `stream' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 (LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream,
                                       __PIO_OFFSET64 length) THROWS(...)
@@ -2850,8 +2876,9 @@ NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie,
 #endif /* MAGIC:alias */
 /*[[[end:libc_funopen2_64]]]*/
 
-/*[[[head:libc_setvbuf,hash:CRC-32=0xbcb7d06e]]]*/
-/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+/*[[[head:libc_setvbuf,hash:CRC-32=0xca168189]]]*/
+/* >> setvbuf(3)
+ * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
@@ -2908,8 +2935,9 @@ NOTHROW_NCX(LIBCCALL libc_setvbuf_unlocked)(FILE *__restrict stream,
 }
 /*[[[end:libc_setvbuf_unlocked]]]*/
 
-/*[[[head:libc_feof,hash:CRC-32=0x5297d584]]]*/
-/* Check if end-of-file has been reached in `STREAM' */
+/*[[[head:libc_feof,hash:CRC-32=0xbe068e02]]]*/
+/* >> feof(3)
+ * Check if end-of-file has been reached in `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_feof)(FILE __KOS_FIXED_CONST *__restrict stream)
 /*[[[body:libc_feof]]]*/
@@ -2920,8 +2948,9 @@ NOTHROW_NCX(LIBCCALL libc_feof)(FILE __KOS_FIXED_CONST *__restrict stream)
 }
 /*[[[end:libc_feof]]]*/
 
-/*[[[head:libc_ferror,hash:CRC-32=0xe742f691]]]*/
-/* Check if an I/O error occurred in `STREAM' */
+/*[[[head:libc_ferror,hash:CRC-32=0xefb1aad3]]]*/
+/* >> ferror(3)
+ * Check if an I/O error occurred in `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ferror)(FILE __KOS_FIXED_CONST *__restrict stream)
 /*[[[body:libc_ferror]]]*/
@@ -2932,8 +2961,9 @@ NOTHROW_NCX(LIBCCALL libc_ferror)(FILE __KOS_FIXED_CONST *__restrict stream)
 }
 /*[[[end:libc_ferror]]]*/
 
-/*[[[head:libc_clearerr,hash:CRC-32=0xa0ac3047]]]*/
-/* Clear the error state of `STREAM', returning the stream to normal operations mode */
+/*[[[head:libc_clearerr,hash:CRC-32=0x48094766]]]*/
+/* >> clearerr(3)
+ * Clear the error state of `stream', returning the stream to normal operations mode */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_clearerr)(FILE *__restrict stream)
 /*[[[body:libc_clearerr]]]*/
@@ -2943,8 +2973,9 @@ NOTHROW_NCX(LIBCCALL libc_clearerr)(FILE *__restrict stream)
 }
 /*[[[end:libc_clearerr]]]*/
 
-/*[[[head:libc_tmpfile,hash:CRC-32=0x383c0241]]]*/
-/* Create and return a new file-stream for accessing a temporary file for reading/writing */
+/*[[[head:libc_tmpfile,hash:CRC-32=0xe9ec4ee6]]]*/
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
 NOTHROW_RPC(LIBCCALL libc_tmpfile)(void)
 /*[[[body:libc_tmpfile]]]*/
@@ -2959,8 +2990,9 @@ NOTHROW_RPC(LIBCCALL libc_tmpfile)(void)
 DEFINE_INTERN_ALIAS(libc_tmpfile64, libc_tmpfile);
 
 
-/*[[[head:libc_fopen,hash:CRC-32=0x230be8fc]]]*/
-/* Create and return a new file-stream for accessing `FILENAME' */
+/*[[[head:libc_fopen,hash:CRC-32=0x8e368ed0]]]*/
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
                                  char const *__restrict modes)
@@ -2983,9 +3015,10 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 }
 /*[[[end:libc_fopen]]]*/
 
-/*[[[head:libc_fdopen,hash:CRC-32=0x4c61ec63]]]*/
-/* Open a new file stream by inheriting a given file descriptor `FD'
- * Note that upon success (`return != NULL'), the given `FD'
+/*[[[head:libc_fdopen,hash:CRC-32=0xa368f2ec]]]*/
+/* >> fdopen(3)
+ * Open a new file stream by inheriting a given file descriptor `fd'
+ * Note that upon success (`return != NULL'), the given `fd'
  * will be `close()'d once `fclose(return)' is called */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((2)) FILE *
 NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
@@ -3000,8 +3033,9 @@ NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
 }
 /*[[[end:libc_fdopen]]]*/
 
-/*[[[head:libc_fclose,hash:CRC-32=0x3135e2e6]]]*/
-/* Close and destroy a given file `STREAM' */
+/*[[[head:libc_fclose,hash:CRC-32=0xfd36aa48]]]*/
+/* >> fclose(3)
+ * Close and destroy a given file `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) int
 (LIBCCALL libc_fclose)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_fclose]]]*/
@@ -3013,8 +3047,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) int
 }
 /*[[[end:libc_fclose]]]*/
 
-/*[[[head:libc_fputc,hash:CRC-32=0x705f6afd]]]*/
-/* Write a single character `CH' to `STREAM' */
+/*[[[head:libc_fputc,hash:CRC-32=0xd4afb91b]]]*/
+/* >> fputc(3)
+ * Write a single character `ch' to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 (LIBCCALL libc_fputc)(int ch,
                       FILE *__restrict stream) THROWS(...)
@@ -3025,8 +3060,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 }
 /*[[[end:libc_fputc]]]*/
 
-/*[[[head:libc_fputc_unlocked,hash:CRC-32=0xffc55dc2]]]*/
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/*[[[head:libc_fputc_unlocked,hash:CRC-32=0xed1f3ad1]]]*/
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
 (LIBCCALL libc_fputc_unlocked)(int ch,
                                FILE *__restrict stream) THROWS(...)
@@ -3037,8 +3073,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
 }
 /*[[[end:libc_fputc_unlocked]]]*/
 
-/*[[[head:libc_fileno,hash:CRC-32=0xf1bb50d9]]]*/
-/* Return the underlying file descriptor number used by `STREAM' */
+/*[[[head:libc_fileno,hash:CRC-32=0x1fa780d8]]]*/
+/* >> fileno(3)
+ * Return the underlying file descriptor number used by `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
 /*[[[body:libc_fileno]]]*/
@@ -3055,9 +3092,10 @@ NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
 
 
 
-/*[[[head:libc_fgetc,hash:CRC-32=0x8abadedd]]]*/
-/* Read and return a single character from `STREAM'
- * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+/*[[[head:libc_fgetc,hash:CRC-32=0x4b1b3faa]]]*/
+/* >> fgetc(3)
+ * Read and return a single character from `stream'
+ * If the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_fgetc)(FILE *__restrict stream) THROWS(...)
@@ -3079,8 +3117,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
 }
 /*[[[end:libc_fgetc]]]*/
 
-/*[[[head:libc_fgetc_unlocked,hash:CRC-32=0xf567ad36]]]*/
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/*[[[head:libc_fgetc_unlocked,hash:CRC-32=0x4731442]]]*/
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_fgetc_unlocked)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_fgetc_unlocked]]]*/
@@ -3097,8 +3136,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 
 
 
-/*[[[head:libc_popen,hash:CRC-32=0xdbd9033c]]]*/
-/* Open and return a new process I/O stream for executing `COMMAND' */
+/*[[[head:libc_popen,hash:CRC-32=0x1aef4101]]]*/
+/* >> popen(3)
+ * Open and return a new process I/O stream for executing `COMMAND' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
                                  char const *modes)
@@ -3116,7 +3156,8 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
 DEFINE_INTERN_ALIAS(libc_pclose, libc_fclose);
 
 
-/*[[[head:libc_tmpnam_r,hash:CRC-32=0x17e45bf4]]]*/
+/*[[[head:libc_tmpnam_r,hash:CRC-32=0xa1d59189]]]*/
+/* >> tmpnam_r(3) */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf)
 /*[[[body:libc_tmpnam_r]]]*/
@@ -3125,8 +3166,9 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf)
 }
 /*[[[end:libc_tmpnam_r]]]*/
 
-/*[[[head:libc_fcloseall,hash:CRC-32=0x744e6cbe]]]*/
-/* Alias for `_fcloseall()' */
+/*[[[head:libc_fcloseall,hash:CRC-32=0x35bbcabc]]]*/
+/* >> fcloseall(3)
+ * Close all opened files */
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 (LIBCCALL libc_fcloseall)(void) THROWS(...)
 /*[[[body:libc_fcloseall]]]*/
@@ -3232,7 +3274,8 @@ int LIBCCALL memopen_close(void *cookie) {
 
 
 
-/*[[[head:libc_fmemopen,hash:CRC-32=0x20e83a1]]]*/
+/*[[[head:libc_fmemopen,hash:CRC-32=0xd9a94561]]]*/
+/* >> fmemopen(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 3)) FILE *
 NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
                                     size_t len,
@@ -3366,7 +3409,8 @@ int LIBCCALL memstream_close(void *cookie) {
 	return 0;
 }
 
-/*[[[head:libc_open_memstream,hash:CRC-32=0xfea1d3e6]]]*/
+/*[[[head:libc_open_memstream,hash:CRC-32=0xe6bf204f]]]*/
+/* >> open_memstream(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
 NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc,
                                           size_t *sizeloc)
@@ -3414,7 +3458,8 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf)
 }
 /*[[[end:libc_tmpnam]]]*/
 
-/*[[[head:libc_tempnam,hash:CRC-32=0x38d00440]]]*/
+/*[[[head:libc_tempnam,hash:CRC-32=0x898712d2]]]*/
+/* >> tempnam(3) */
 INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_MALLOC WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
                                    char const *pfx)
@@ -3437,9 +3482,10 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 
 
 
-/*[[[head:libc_rename,hash:CRC-32=0xd3688e6b]]]*/
-/* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
- * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
+/*[[[head:libc_rename,hash:CRC-32=0xd946aa28]]]*/
+/* >> rename(3)
+ * Rename a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,
                                   char const *newname_or_path)
@@ -3451,7 +3497,8 @@ NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,
 }
 /*[[[end:libc_rename]]]*/
 
-/*[[[head:libc_renameat,hash:CRC-32=0x5851a79]]]*/
+/*[[[head:libc_renameat,hash:CRC-32=0x8856fbf3]]]*/
+/* >> renameat(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd,
                                     char const *oldname,
@@ -3468,8 +3515,9 @@ NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd,
 }
 /*[[[end:libc_renameat]]]*/
 
-/*[[[head:libc_frenameat,hash:CRC-32=0x60bde4b9]]]*/
-/* @param flags: Set of `0 | AT_DOSPATH' */
+/*[[[head:libc_frenameat,hash:CRC-32=0x706c2a1a]]]*/
+/* >> frenameat(2)
+ * @param flags: Set of `0 | AT_DOSPATH' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_frenameat)(fd_t oldfd,
                                      char const *oldname,
@@ -3593,8 +3641,9 @@ NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 }
 /*[[[end:libc__set_printf_count_output]]]*/
 
-/*[[[head:libc_fdreopen,hash:CRC-32=0xfc32b587]]]*/
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/*[[[head:libc_fdreopen,hash:CRC-32=0x2df3c663]]]*/
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
                                     char const *__restrict modes,
@@ -3626,8 +3675,9 @@ done:
 }
 /*[[[end:libc_fdreopen]]]*/
 
-/*[[[head:libc_fdreopen_unlocked,hash:CRC-32=0xc1bf34fb]]]*/
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/*[[[head:libc_fdreopen_unlocked,hash:CRC-32=0x10ea89fb]]]*/
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.access") NONNULL((2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd,
                                              char const *__restrict modes,
@@ -3654,8 +3704,9 @@ done:
 }
 /*[[[end:libc_fdreopen_unlocked]]]*/
 
-/*[[[head:libc_freopen,hash:CRC-32=0xb45f9403]]]*/
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/*[[[head:libc_freopen,hash:CRC-32=0xb196b2c8]]]*/
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
                                    char const *__restrict modes,
@@ -3683,8 +3734,9 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 }
 /*[[[end:libc_freopen]]]*/
 
-/*[[[head:libc_freopen_unlocked,hash:CRC-32=0x2da7603]]]*/
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+/*[[[head:libc_freopen_unlocked,hash:CRC-32=0xfccc30a6]]]*/
+/* >> freopen(3), freopen64(3)
+ * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
                                             char const *__restrict modes,
@@ -3724,10 +3776,13 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6247aab6]]]*/
+/*[[[start:exports,hash:CRC-32=0x6840f9aa]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_fclose_nolock, libc_fclose);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(_IO_fclose, libc_fclose);
 DEFINE_PUBLIC_ALIAS(endmntent, libc_fclose);
 DEFINE_PUBLIC_ALIAS(__endmntent, libc_fclose);
@@ -3786,22 +3841,46 @@ DEFINE_PUBLIC_ALIAS(fgetc_unlocked, libc_fgetc_unlocked);
 DEFINE_PUBLIC_ALIAS(getc_unlocked, libc_fgetc_unlocked);
 DEFINE_PUBLIC_ALIAS(fputc_unlocked, libc_fputc_unlocked);
 DEFINE_PUBLIC_ALIAS(putc_unlocked, libc_fputc_unlocked);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_tempnam, libc_tempnam);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(tempnam, libc_tempnam);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_fdopen, libc_fdopen);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(_IO_fdopen, libc_fdopen);
 DEFINE_PUBLIC_ALIAS(fdopen, libc_fdopen);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_fileno, libc_fileno);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fileno_unlocked, libc_fileno);
 DEFINE_PUBLIC_ALIAS(fileno, libc_fileno);
 DEFINE_PUBLIC_ALIAS(fmemopen, libc_fmemopen);
 DEFINE_PUBLIC_ALIAS(open_memstream, libc_open_memstream);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_lock_file, libc_flockfile);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(_IO_flockfile, libc_flockfile);
 DEFINE_PUBLIC_ALIAS(flockfile, libc_flockfile);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_unlock_file, libc_funlockfile);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(_IO_funlockfile, libc_funlockfile);
 DEFINE_PUBLIC_ALIAS(funlockfile, libc_funlockfile);
 DEFINE_PUBLIC_ALIAS(_IO_ftrylockfile, libc_ftrylockfile);
 DEFINE_PUBLIC_ALIAS(ftrylockfile, libc_ftrylockfile);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_popen, libc_popen);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(_IO_popen, libc_popen);
 DEFINE_PUBLIC_ALIAS(popen, libc_popen);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_pclose, libc_pclose);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(pclose, libc_pclose);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_fcloseall, libc_fcloseall);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fcloseall, libc_fcloseall);
 DEFINE_PUBLIC_ALIAS(obstack_vprintf, libc_obstack_vprintf);
 DEFINE_PUBLIC_ALIAS(fseeko, libc_fseeko);

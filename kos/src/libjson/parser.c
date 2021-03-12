@@ -42,7 +42,7 @@ DECL_BEGIN
 #define isradixch(ch) ((ch) == 'x' || (ch) == 'X' || (ch) == 'b' || (ch) == 'B')
 
 
-/* RETURN *PTR++; */
+/* RETURN *<ptr>++; */
 PRIVATE NONNULL((1)) char32_t
 NOTHROW_NCX(CC json_getc)(struct json_parser *__restrict self) {
 	char32_t result;
@@ -79,7 +79,7 @@ NOTHROW_NCX(CC json_getc)(struct json_parser *__restrict self) {
 }
 
 
-/* RETURN *--PTR; */
+/* RETURN *--<ptr>; */
 PRIVATE NONNULL((1)) char32_t
 NOTHROW_NCX(CC json_ungetc)(struct json_parser *__restrict self) {
 	char32_t result;
@@ -441,7 +441,7 @@ NOTHROW_NCX(CC json_truncate_pos_for_alignment)(struct json_parser *__restrict s
 	self->jp_pos = new_pointer;
 }
 
-/* Yield to the current token and advance to the next one (*PTR++)
+/* Yield to the current token and advance to the next one (*<ptr>++)
  * @return: JSON_PARSER_*:     The previously selected token (the parser now points at its end)
  * @return: JSON_ERROR_EOF:    The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
@@ -613,7 +613,7 @@ syn2:
 	return JSON_ERROR_SYNTAX;
 }
 
-/* Yield to the previous token and return it (*--PTR)
+/* Yield to the previous token and return it (*--<ptr>)
  * @return: JSON_PARSER_*:     The now selected token (The parser is now located at the previous token)
  * @return: JSON_ERROR_EOF:    The start of the input file had already been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */

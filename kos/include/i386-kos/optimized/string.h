@@ -44,7 +44,7 @@ __NAMESPACE_FAST_BEGIN
 
 #ifndef __ASSERT_MEMCPY_CT
 #if !defined(NDEBUG) && 0 /* Doesn't work... */
-extern __ATTR_ERROR("memcpy(): The `DST' and `SRC' buffers overlap - Use `memmove()' instead") void __memcpy_overlapping_buffers(void);
+extern __ATTR_ERROR("memcpy(): The `dst' and `src' buffers overlap - Use `memmove()' instead") void __memcpy_overlapping_buffers(void);
 /* Compile-time overlap assertions */
 #define __ASSERT_MEMCPY_CT_DOES_OVERLAP(dst, src, num_bytes) \
 	((dst) + (num_bytes) > (src) &&                          \

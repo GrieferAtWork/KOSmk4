@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69b69739 */
+/* HASH CRC-32:0x93482a75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,26 +27,26 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16snrchrnul_defined
 #define __local___localdep_c16snrchrnul_defined 1
 #if defined(__CRT_HAVE_wcsnrchrnul) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-/* Same as `wcsnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16snrchrnul,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle, __SIZE_TYPE__ __maxlen),wcsnrchrnul,(__haystack,__needle,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsnrchrnul)
-/* Same as `wcsnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16snrchrnul,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle, __SIZE_TYPE__ __maxlen),wcsnrchrnul,(__haystack,__needle,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnrchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcsnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_c16snrchrnul (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnrchrnul))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16snrchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcsnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_c16snrchrnul __LIBC_LOCAL_NAME(c16snrchrnul)
 #endif /* !... */
 #endif /* !__local___localdep_c16snrchrnul_defined */
-/* Same as `wcsnrchrnul', but return the offset from `STR', rather than the actual address */
+/* Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
 __LOCAL_LIBC(c16snroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16snroff))(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)(__localdep_c16snrchrnul(__haystack, __needle, __maxlen) - __haystack);

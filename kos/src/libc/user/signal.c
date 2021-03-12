@@ -319,12 +319,12 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 #endif /* !__NR_sigprocmask */
 
 
-/*[[[head:libc_sigprocmask,hash:CRC-32=0x5ef0eb3e]]]*/
+/*[[[head:libc_sigprocmask,hash:CRC-32=0x4fb0ffa0]]]*/
 /* Change the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
  * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such szenarios.
- * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * states that this function behaves undefined in such scenarios.
+ * However, on KOS, `pthread_sigmask()' is simply an alias for this
  * function, and `sigprocmask()' always operates thread-local.
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the
@@ -354,6 +354,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 	}
 	if (oset)
 		memcpy(oset, old_set, sizeof(sigset_t));
+
 	/* Check for special case: do we even need to set a new procmask? */
 	if (!set)
 		return 0;
@@ -363,6 +364,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 	if (new_set != &me->pt_pmask.lpm_masks[0] &&
 	    new_set != &me->pt_pmask.lpm_masks[1])
 		new_set = &me->pt_pmask.lpm_masks[0];
+
 	/* Initialize `new_set' based on `how', `old_set' and `set' */
 	switch (how) {
 
@@ -391,7 +393,19 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 	if (how == SIG_BLOCK)
 		return 0;
 
-	/* Check previously pending signals became available */
+	/* Check if previously pending signals became available.
+	 *
+	 * Q: It the below ~really~ reentrant-safe (in terms of a  signal
+	 *    handler being invoked while we're down below, which in turn
+	 *    ends up doing yet another call to sigprocmask(2))?
+	 * A: I think it's reentrant-safe (as far as signal-masking logic
+	 *    goes), because the  below's only supposed  to do  something
+	 *    when a signal became unmasked.  - If a signal handler  ends
+	 *    up re-masking a signal before then, then it wouldn't be our
+	 *    fault,  and the  async nature  of posix  signals in general
+	 *    would allow us to argue  that the signal may have  actually
+	 *    been  delivered  _after_ the  signal handler  re-masked the
+	 *    associates signal! */
 	{
 		unsigned int i;
 		for (i = 0; i < __SIGSET_NWORDS; ++i) {
@@ -401,14 +415,17 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 			if (!pending_word)
 				continue; /* Nothing pending in here. */
 			newmask_word = new_set->__val[i];
+
 			/* Check if any of the pending signals are currently unmasked. */
 			if ((pending_word & ~newmask_word) != 0) {
+
 				/* Clear the set of pending signals (because the kernel won't do this)
 				 * Also  note that  there is no  guaranty that the  signal that became
 				 * available in the mean time is still available now. - The signal may
 				 * have  been directed at  our process as a  whole, and another thread
 				 * may have already handled it. */
 				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
+
 				/* Calls the kernel's `sigmask_check()' function */
 				sys_sigmask_check();
 				break;

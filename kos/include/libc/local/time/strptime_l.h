@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dcf63bd */
+/* HASH CRC-32:0x1fc295ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,15 +27,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strptime_defined
 #define __local___localdep_strptime_defined 1
 #ifdef __CRT_HAVE_strptime
-/* Parse S according to FORMAT and store binary time information in TP.
- * The return value is a pointer to the first unparsed character in S */
+/* Parse `s' according to `format' and store binary time information in `tp'.
+ * The return value is a pointer to the first unparsed character in `s' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,__localdep_strptime,(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp),strptime,(__s,__format,__tp))
 #else /* __CRT_HAVE_strptime */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/strptime.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Parse S according to FORMAT and store binary time information in TP.
- * The return value is a pointer to the first unparsed character in S */
+/* Parse `s' according to `format' and store binary time information in `tp'.
+ * The return value is a pointer to the first unparsed character in `s' */
 #define __localdep_strptime __LIBC_LOCAL_NAME(strptime)
 #endif /* !__CRT_HAVE_strptime */
 #endif /* !__local___localdep_strptime_defined */

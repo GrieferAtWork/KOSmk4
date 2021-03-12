@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29609c5f */
+/* HASH CRC-32:0x50fccd59 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_setspecific(3)
- * Store POINTER in the thread-specific data slot identified by KEY
+ * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer' is non-NULL, `key' had yet to be allowed for the
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allowed for the
  *                  calling thread, and an attempt to allocate it just now failed */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #endif /* !__local___localdep_pthread_setspecific_defined */

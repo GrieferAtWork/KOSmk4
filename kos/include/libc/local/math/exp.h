@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc03f6217 */
+/* HASH CRC-32:0x28dfa6c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #include <libm/matherr.h>
 #include <libm/exp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Exponential function of X */
+/* Exponential function of `x' */
 __LOCAL_LIBC(exp) __ATTR_WUNUSED __DECL_SIMD_exp double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp))(double __x) {
 	double __result;

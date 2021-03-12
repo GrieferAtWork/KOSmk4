@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4585e81 */
+/* HASH CRC-32:0x23b8eb05 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,19 +26,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_roundf_defined
 #define __local___localdep_roundf_defined 1
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_roundf,(float __x),roundf,{ return __builtin_roundf(__x); })
 #elif defined(__CRT_HAVE_roundf)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_roundf,(float __x),roundf,(__x))
 #elif defined(__CRT_HAVE___roundf)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_roundf,(float __x),__roundf,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/roundf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 #define __localdep_roundf __LIBC_LOCAL_NAME(roundf)
 #endif /* !... */
 #endif /* !__local___localdep_roundf_defined */
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libm/lround.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(llroundf) __ATTR_CONST __ATTR_WUNUSED __LONGLONG
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llroundf))(float __x) {
 #ifdef __LIBM_MATHFUNIF

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6976c60c */
+/* HASH CRC-32:0xbf4d5903 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,52 +31,52 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Arc cosine of X */
+/* Arc cosine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acos)(double x);
-/* Arc sine of X */
+/* Arc sine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_asin)(double x);
-/* Cosine of X */
+/* Cosine of `x' */
 INTDEF WUNUSED __DECL_SIMD_cos double NOTHROW(LIBCCALL libc_cos)(double x);
-/* Sine of X */
+/* Sine of `x' */
 INTDEF WUNUSED __DECL_SIMD_sin double NOTHROW(LIBCCALL libc_sin)(double x);
-/* Tangent of X */
+/* Tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tan)(double x);
-/* Hyperbolic cosine of X */
+/* Hyperbolic cosine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_cosh)(double x);
-/* Hyperbolic sine of X */
+/* Hyperbolic sine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_sinh)(double x);
-/* Hyperbolic tangent of X */
+/* Hyperbolic tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tanh)(double x);
-/* Hyperbolic arc cosine of X */
+/* Hyperbolic arc cosine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acosh)(double x);
-/* Hyperbolic arc sine of X */
+/* Hyperbolic arc sine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_asinh)(double x);
-/* Hyperbolic arc tangent of X */
+/* Hyperbolic arc tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_atanh)(double x);
-/* Natural logarithm of X */
+/* Natural logarithm of `x' */
 INTDEF WUNUSED __DECL_SIMD_log double NOTHROW(LIBCCALL libc_log)(double x);
-/* Base-ten logarithm of X */
+/* Base-ten logarithm of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log10)(double x);
-/* Return log(1 + X) */
+/* Return `log(1 + x)' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log1p)(double x);
-/* Return the base 2 signed integral exponent of X */
+/* Return the base 2 signed integral exponent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_logb)(double x);
-/* Compute base-2 exponential of X */
+/* Compute base-2 exponential of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
-/* Compute base-2 logarithm of X */
+/* Compute base-2 logarithm of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log2)(double x);
-/* Return `sqrt(X*X + Y*Y)' */
+/* Return `sqrt(x*x + y*y)' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_hypot)(double x, double y);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erf)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erfc)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_lgamma)(double x);
 /* True gamma function */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
-/* Compute remainder of X and Y and put in *QUO a value with sign
+/* Compute remainder of `x' and `y' and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remquo)(double x, double y, int *pquo);
-/* Cosine and sine of X */
+/* Cosine and sine of `x' */
 INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincos)(double x, double *psinx, double *pcosx);
 /* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp10)(double x);

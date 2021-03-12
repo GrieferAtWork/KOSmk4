@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76d97c0e */
+/* HASH CRC-32:0x4db4ab84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
- * The `ARG' argument is ignored, and you may safely pass `NULL' */
+ * The `arg' argument is ignored, and you may safely pass `NULL' */
 __LOCAL_LIBC(format_c32width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32width))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 
@@ -46,10 +46,11 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32width))(void *__arg, __CHAR
 
 	(void)__arg;
 	(void)__data;
-	/* XXX: Not   necessarily   correct,   as   the   32-bit   variant   is   actually   ATTR_CONST.
-	 *      However, magic  headers  don't support  conditional  attributes,  so we  can't  just  do
-	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
+	 *
+	 * However, magic  headers  don't support  conditional  attributes,  so we  can't  just  do
+	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
+	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
 	__COMPILER_IMPURE();
 	return (__SSIZE_TYPE__)__datalen;
 

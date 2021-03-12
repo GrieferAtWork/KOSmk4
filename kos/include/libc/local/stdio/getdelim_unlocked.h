@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29410f */
+/* HASH CRC-32:0xe868b41b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,25 +30,31 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc_unlocked_defined
 #define __local___localdep_fgetc_unlocked_defined 1
 #ifdef __CRT_HAVE_fgetc_unlocked
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fgetc_unlocked(3)
+ * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 #define __localdep_fgetc_unlocked __LIBC_LOCAL_NAME(fgetc_unlocked)
 #else /* ... */
 #undef __local___localdep_fgetc_unlocked_defined
@@ -82,6 +88,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> getdelim(3) */
 __LOCAL_LIBC(getdelim_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getdelim_unlocked))(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) {
 	int __ch;

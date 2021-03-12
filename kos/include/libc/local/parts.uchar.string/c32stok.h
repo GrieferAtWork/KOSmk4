@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8bc7bce */
+/* HASH CRC-32:0xe995b30e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,13 @@ __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcscspn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32scspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #elif defined(__CRT_HAVE_KOS$wcscspn)
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32scspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #elif __SIZEOF_WCHAR_T__ == 4
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_c32scspn (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__ const *))&__LIBC_LOCAL_NAME(wcscspn))
 #else /* ... */
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_c32scspn __LIBC_LOCAL_NAME(c32scspn)
 #endif /* !... */
@@ -64,13 +64,13 @@ __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcsspn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32sspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #elif defined(__CRT_HAVE_KOS$wcsspn)
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32sspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #elif __SIZEOF_WCHAR_T__ == 4
@@ -79,7 +79,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_c32sspn (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__ const *))&__LIBC_LOCAL_NAME(wcsspn))
 #else /* ... */
@@ -88,33 +88,33 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_c32sspn __LIBC_LOCAL_NAME(c32sspn)
 #endif /* !... */
 #endif /* !__local___localdep_c32sspn_defined */
 __LOCAL_LIBC(c32stok) __ATTR_NONNULL((2, 3)) __CHAR32_TYPE__ *
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stok))(__CHAR32_TYPE__ *__string, __CHAR32_TYPE__ const *__restrict __delim, __CHAR32_TYPE__ **__restrict __save_ptr) {
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stok))(__CHAR32_TYPE__ *__str, __CHAR32_TYPE__ const *__restrict __delim, __CHAR32_TYPE__ **__restrict __save_ptr) {
 	__CHAR32_TYPE__ *__end;
-	if (!__string)
-		__string = *__save_ptr;
-	if (!*__string) {
-		*__save_ptr = __string;
+	if (!__str)
+		__str = *__save_ptr;
+	if (!*__str) {
+		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__string += __localdep_c32sspn(__string, __delim);
-	if (!*__string) {
-		*__save_ptr = __string;
+	__str += __localdep_c32sspn(__str, __delim);
+	if (!*__str) {
+		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__end = __string + __localdep_c32scspn(__string, __delim);
+	__end = __str + __localdep_c32scspn(__str, __delim);
 	if (!*__end) {
 		*__save_ptr = __end;
-		return __string;
+		return __str;
 	}
 	*__end = '\0';
 	*__save_ptr = __end + 1;
-	return __string;
+	return __str;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32stok_defined

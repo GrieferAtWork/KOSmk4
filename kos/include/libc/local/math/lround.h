@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff5d4b7a */
+/* HASH CRC-32:0x2a9c4839 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,19 +26,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_round_defined
 #define __local___localdep_round_defined 1
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,{ return __builtin_round(__x); })
 #elif defined(__CRT_HAVE_round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,(__x))
 #elif defined(__CRT_HAVE___round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/round.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 #define __localdep_round __LIBC_LOCAL_NAME(round)
 #endif /* !... */
 #endif /* !__local___localdep_round_defined */
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libm/lround.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
+/* Round `x' to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(lround) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lround))(double __x) {
 #ifdef __LIBM_MATHFUNI

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbeb4a20 */
+/* HASH CRC-32:0xe6f3de0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,10 +38,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
- * area. DESTR_FUNCTION, if non-NULL, is called with the value
+ * area. `destr_function', if non-`NULL', is called with the value
  * associated to that key when the key is destroyed.
- * DESTR_FUNCTION is not called if the value associated is NULL when
- * the key is destroyed
+ * `destr_function' is not called if the value associated is `NULL'
+ * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))

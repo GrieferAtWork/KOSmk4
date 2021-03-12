@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7235a4d0 */
+/* HASH CRC-32:0x53af742b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,15 +79,15 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 /* >> close(2)
- * Close a given file descriptor/handle `FD' */
+ * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
@@ -126,18 +126,18 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,__localdep_crt_
 #define __local___localdep_dup2_defined 1
 #ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE__dup2)
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE___dup2)
 /* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
 #else /* ... */
 #undef __local___localdep_dup2_defined
@@ -147,8 +147,8 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 #if !defined(__local___localdep_fexecve_defined) && defined(__CRT_HAVE_fexecve)
 #define __local___localdep_fexecve_defined 1
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `FD' and
- * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+ * Replace the calling process with the application image referred to by `fd' and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __fd, __TARGV, __TENVP),fexecve,(__fd,___argv,___envp))
 #endif /* !__local___localdep_fexecve_defined && __CRT_HAVE_fexecve */
 /* Dependency: fork from unistd */
@@ -399,7 +399,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setscheduler,(__pid_t __pid, int
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setegid,(__gid_t __egid),setegid,(__egid))
 #endif /* !__local___localdep_setegid_defined && __CRT_HAVE_setegid */
@@ -409,7 +409,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setegid,(__gid_t __egid),setegid,(__eg
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_seteuid,(__uid_t __euid),seteuid,(__euid))
 #endif /* !__local___localdep_seteuid_defined && __CRT_HAVE_seteuid */
@@ -418,19 +418,19 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_seteuid,(__uid_t __euid),seteuid,(__eu
 #define __local___localdep_setpgid_defined 1
 #ifdef __CRT_HAVE_setpgid
 /* >> setpgid(2)
- * Change the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Change the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
- * When `PID' is ZERO(0), use `gettid()' for it instead.
- * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead.
+ * When `pgid' is ZERO(0), use `pid' (after it was substituted) for instead */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid),setpgid,(__pid,__pgid))
 #elif defined(__CRT_HAVE___setpgid)
 /* >> setpgid(2)
- * Change the ID of the process group associated with `PID's process.
- * (That is the TID of the leader of the process group of `PID's leader)
+ * Change the ID of the process group associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
- * When `PID' is ZERO(0), use `gettid()' for it instead.
- * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
+ * When `pid' is ZERO(0), use `gettid()' for it instead.
+ * When `pgid' is ZERO(0), use `pid' (after it was substituted) for instead */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid,(__pid,__pgid))
 #else /* ... */
 #undef __local___localdep_setpgid_defined
@@ -629,8 +629,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Change the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
  * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such szenarios.
- * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * states that this function behaves undefined in such scenarios.
+ * However, on KOS, `pthread_sigmask()' is simply an alias for this
  * function, and `sigprocmask()' always operates thread-local.
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the
@@ -646,8 +646,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Change the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
  * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such szenarios.
- * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * states that this function behaves undefined in such scenarios.
+ * However, on KOS, `pthread_sigmask()' is simply an alias for this
  * function, and `sigprocmask()' always operates thread-local.
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the
@@ -664,22 +664,26 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __ho
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_sprintf,(char *__restrict __buf, char const *__restrict __format, ...),sprintf,{ return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_sprintf)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
 #elif defined(__CRT_HAVE__IO_sprintf)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/sprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 #define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
 #endif /* !... */

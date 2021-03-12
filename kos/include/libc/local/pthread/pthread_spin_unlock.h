@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f988c20 */
+/* HASH CRC-32:0x2542e50e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_spin_unlock(3)
- * Release spinlock LOCK
+ * Release spinlock `lock'
  * @return: EOK: Success */
 __LOCAL_LIBC(pthread_spin_unlock) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_unlock))(__pthread_spinlock_t *__lock) {

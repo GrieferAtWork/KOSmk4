@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4697b56 */
+/* HASH CRC-32:0x41d1a6c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_repeat(3)
- * Repeat `CH' a number of `NUM_REPETITIONS' times
+ * Repeat `ch' a number of `num_repetitions' times
  * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
+ * is allowed to call `printer' as often as it chooses */
 __LOCAL_LIBC(format_c16repeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(format_c16repeat))(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
 	__SSIZE_TYPE__ __result, __temp;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f9e9791 */
+/* HASH CRC-32:0x3b57331b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2)) int
 	                ent->pw_shell);
 	return likely(error >= 0) ? 0 : -1;
 }
-/* Read an entry from STREAM. This function is not standardized and probably never will
+/* Read an entry from `stream'. This function is not standardized and probably never will be.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
  * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)

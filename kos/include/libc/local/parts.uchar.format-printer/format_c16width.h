@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8e920a6 */
+/* HASH CRC-32:0x6b6bb44e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
- * The `ARG' argument is ignored, and you may safely pass `NULL' */
+ * The `arg' argument is ignored, and you may safely pass `NULL' */
 __LOCAL_LIBC(format_c16width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16width))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 
@@ -43,6 +43,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16width))(void *__arg, __CHAR
 		++__result;
 	}
 	return (__SSIZE_TYPE__)__result;
+
 
 
 

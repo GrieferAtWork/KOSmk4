@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fab4bf7 */
+/* HASH CRC-32:0x62e032b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_tdelete_defined
 #define __local_tdelete_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #ifndef ____compar_fn_t_defined
 #define ____compar_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
@@ -63,7 +62,8 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Remove the element matching KEY from the tree pointed to by *ROOTP */
+/* >> tdelete(3)
+ * Remove the element matching `key' from the tree pointed to by `*rootp' */
 __LOCAL_LIBC(tdelete) __ATTR_NONNULL((3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar) {
 	typedef struct __node_struct {
@@ -234,7 +234,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 		if (__r != __NULLPTR)
 			__r->__is_red = 0;
 	}
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	__localdep_free(__unchained);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 __done:
 	__freea(__nodestack);
 	return __retval;
@@ -244,7 +246,4 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tdelete_defined 1
 #define __localdep_tdelete __LIBC_LOCAL_NAME(tdelete)
 #endif /* !__local___localdep_tdelete_defined */
-#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-#undef __local_tdelete_defined
-#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local_tdelete_defined */

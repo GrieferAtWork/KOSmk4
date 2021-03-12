@@ -92,10 +92,10 @@ NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
 }
 /*[[[end:libc_sched_getcpu]]]*/
 
-/*[[[head:libc_setns,hash:CRC-32=0x9fc156c5]]]*/
+/*[[[head:libc_setns,hash:CRC-32=0x5a5b838e]]]*/
 /* >> setns(2)
- * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
- * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
+ * With `fd' referring to a namespace, reassociate the calling thread with that namespace.
+ * For this purpose, `fd' was opened for one of the files in `/proc/[pid]/ns/'
  * @param: nstype: The type of namespace to re-associate (either 0 to allow any
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',

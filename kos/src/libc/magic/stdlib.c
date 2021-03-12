@@ -1054,11 +1054,10 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 
 
 %#ifdef __USE_KOS
-[[kernel, ATTR_LEAF]]
+[[kernel, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoull...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoumax...)]]
-[[decl_include("<features.h>")]]
 $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 	u32 result, temp;
@@ -1105,8 +1104,7 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 	return result;
 }
 
-[[kernel, ATTR_LEAF]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[kernel, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoimax...)]]
@@ -1127,10 +1125,10 @@ $int32_t strto32([[nonnull]] char const *__restrict nptr,
 
 %#ifdef __UINT64_TYPE__
 [[kernel, ATTR_LEAF, alias("_strtoui64")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_strtoui64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoull...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoumax...)]]
-[[if(!defined(__KERNEL__)), export_as("_strtoui64")]]
 [[decl_include("<features.h>")]]
 $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
@@ -1179,11 +1177,11 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 }
 
 [[kernel, ATTR_LEAF, alias("_strtoi64")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_strtoi64")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoimax...)]]
-[[if(!defined(__KERNEL__)), export_as("_strtoi64")]]
 $int64_t strto64([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 	u64 result;
@@ -1212,8 +1210,7 @@ $uint32_t strtou32_l([[nonnull]] char const *__restrict nptr,
 	return strtou32(nptr, endptr, base);
 }
 
-[[ATTR_LEAF]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoll_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoimax_l...)]]
@@ -1224,7 +1221,7 @@ $int32_t strto32_l([[nonnull]] char const *__restrict nptr,
 }
 
 %#ifdef __UINT64_TYPE__
-[[ATTR_LEAF, export_alias("_strtoui64_l")]]
+[[ATTR_LEAF, dos_only_export_alias("_strtoui64_l")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoull_l...)]]
@@ -1235,7 +1232,7 @@ $uint64_t strtou64_l([[nonnull]] char const *__restrict nptr,
 	return strtou64(nptr, endptr, base);
 }
 
-[[ATTR_LEAF, export_alias("_strtoi64_l")]]
+[[ATTR_LEAF, dos_only_export_alias("_strtoi64_l")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoll_l...)]]
@@ -1254,7 +1251,7 @@ $int64_t strto64_l([[nonnull]] char const *__restrict nptr,
 %#if defined(__USE_MISC) || defined(__USE_DOS) || \
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 %#ifndef __NO_FPU
-[[wunused, export_alias("_gcvt")]]
+[[wunused, dos_only_export_alias("_gcvt")]]
 [[impl_include("<hybrid/floatcore.h>")]]
 char *gcvt(double val, int ndigit, [[nonnull]] char *buf) {
 @@pp_ifndef DBL_NDIGIT_MAX@@
@@ -1334,7 +1331,7 @@ int fcvt_r(double val, int ndigit,
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[impl_include("<hybrid/floatcore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(_gcvt)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("gcvt", "_gcvt")]]
 char *qgcvt(__LONGDOUBLE val, int ndigit, [[nonnull]] char *buf) {
 @@pp_ifndef LDBG_NDIGIT_MAX@@
 @@pp_if __LDBL_MANT_DIG__ == 53@@
@@ -1399,7 +1396,8 @@ static char qcvt_buffer[32];
 }
 
 
-[[wunused, export_alias("_ecvt")]]
+[[wunused]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("ecvt", "_ecvt")]]
 char *qecvt(__LONGDOUBLE val, int ndigit,
             [[nonnull]] int *__restrict decptr,
             [[nonnull]] int *__restrict sign) {
@@ -1411,7 +1409,8 @@ char *qecvt(__LONGDOUBLE val, int ndigit,
 	return qcvt_buffer;
 }
 
-[[wunused, export_alias("_fcvt")]]
+[[wunused]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("fcvt", "_fcvt")]]
 char *qfcvt(__LONGDOUBLE val, int ndigit,
             [[nonnull]] int *__restrict decptr,
             [[nonnull]] int *__restrict sign) {
@@ -1569,9 +1568,9 @@ aligned_alloc(*) = memalign;
 #ifndef MB_CUR_MAX
 #ifdef __CRT_HAVE___ctype_get_mb_cur_max
 __CDECLARE(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),())
-#define MB_CUR_MAX  (__ctype_get_mb_cur_max())
+#define MB_CUR_MAX (__ctype_get_mb_cur_max())
 #else /* __CRT_HAVE___ctype_get_mb_cur_max */
-#define MB_CUR_MAX   7 /* == UNICODE_UTF8_CURLEN */
+#define MB_CUR_MAX 7 /* == UNICODE_UTF8_CURLEN */
 #endif /* !__CRT_HAVE___ctype_get_mb_cur_max */
 #endif /* !MB_CUR_MAX */
 }
@@ -1759,7 +1758,7 @@ int unsetenv([[nonnull]] char const *varname) {
 %[default:section(".text.crt{|.dos}.unicode.static.convert")]
 
 %#ifndef __NO_FPU
-[[wunused, export_alias("_ecvt")]]
+[[wunused, dos_only_export_alias("_ecvt")]]
 char *ecvt(double val, int ndigit,
            [[nonnull]] int *__restrict decptr,
            [[nonnull]] int *__restrict sign) {
@@ -1771,7 +1770,7 @@ char *ecvt(double val, int ndigit,
 	return qcvt_buffer;
 }
 
-[[wunused, export_alias("_ecvt")]]
+[[wunused, dos_only_export_alias("_fcvt")]]
 char *fcvt(double val, int ndigit,
            [[nonnull]] int *__restrict decptr,
            [[nonnull]] int *__restrict sign) {
@@ -1888,7 +1887,7 @@ int unlockpt($fd_t fd) {
 }
 
 @@Returns the name of the PTY slave (Pseudo TTY slave)
-@@associated with the master descriptor `FD'
+@@associated with the master descriptor `fd'
 [[wunused, requires_function(ptsname_r)]]
 [[decl_include("<bits/types.h>")]]
 char *ptsname($fd_t fd) {
@@ -1908,14 +1907,14 @@ $fd_t posix_openpt($oflag_t oflags);
 
 %#if defined(__USE_GNU) || defined(__USE_NETBSD)
 @@Returns the name of the PTY slave (Pseudo TTY slave)
-@@associated with the master descriptor `FD'
+@@associated with the master descriptor `fd'
 [[section(".text.crt{|.dos}.io.tty"), decl_include("<bits/types.h>")]]
 int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
 %#endif /* __USE_GNU || __USE_NETBSD */
 
 %#ifdef __USE_GNU
 %[default:section(".text.crt{|.dos}.unicode.static.convert")]
-[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtol_l...)]]
+[[dos_only_export_alias("_strtol_l"), export_alias("__strtol_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_strtoll_l...)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, strto32_l)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, strto64_l)]]
@@ -1930,7 +1929,7 @@ long strtol_l([[nonnull]] char const *__restrict nptr,
 	return strtol(nptr, endptr, base);
 }
 
-[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoul_l...)]]
+[[dos_only_export_alias("_strtoul_l"), export_alias("__strtoul_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_strtoull_l...)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, strtou32_l)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, strtou64_l)]]
@@ -1946,7 +1945,7 @@ unsigned long strtoul_l([[nonnull]] char const *__restrict nptr,
 }
 
 %#ifdef __LONGLONG
-[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoll_l...)]]
+[[dos_only_export_alias("_strtoll_l"), export_alias("__strtoll_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(CNL_strtol_l...)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strto64_l)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strto32_l)]]
@@ -1961,7 +1960,7 @@ __LONGLONG strtoll_l([[nonnull]] char const *__restrict nptr,
 	return strtoll(nptr, endptr, base);
 }
 
-[[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoull_l...)]]
+[[dos_only_export_alias("_strtoull_l"), export_alias("__strtoull_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(CNL_strtoul_l...)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strtou64_l)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strtou32_l)]]
@@ -1978,7 +1977,7 @@ __ULONGLONG strtoull_l([[nonnull]] char const *__restrict nptr,
 %#endif /* __LONGLONG */
 
 %#ifndef __NO_FPU
-[[export_alias("_strtod_l", "__strtod_l")]]
+[[dos_only_export_alias("_strtod_l"), export_alias("__strtod_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("strtold_l", "_strtold_l", "__strtold_l")]]
 double strtod_l([[nonnull]] char const *__restrict nptr,
                 char **endptr, $locale_t locale) {
@@ -1986,7 +1985,7 @@ double strtod_l([[nonnull]] char const *__restrict nptr,
 	return strtod(nptr, endptr);
 }
 
-[[export_alias("_strtof_l", "__strtof_l")]]
+[[dos_only_export_alias("_strtof_l"), export_alias("__strtof_l")]]
 float strtof_l([[nonnull]] char const *__restrict nptr,
                char **endptr, $locale_t locale) {
 	(void)locale;
@@ -1994,7 +1993,7 @@ float strtof_l([[nonnull]] char const *__restrict nptr,
 }
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[export_alias("_strtold_l", "__strtold_l")]]
+[[dos_only_export_alias("_strtold_l"), export_alias("__strtold_l")]]
 [[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("_strtod_l", "__strtod_l")]]
 __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
@@ -2516,7 +2515,7 @@ typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
 )]
 
 
-@@Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+@@Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
 @@If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
 @@and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
 @@invocations return 0, `fdwalk()' will also return 0.
@@ -2525,6 +2524,7 @@ typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
 [[requires($has_function(fcntl) && defined(__F_NEXT))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
 int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
+	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int result = 0;
 @@pp_ifdef __libc_geterrno@@
 	errno_t saved_err;
@@ -2535,7 +2535,7 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 		saved_err = __libc_geterrno();
 @@pp_endif@@
 		/* fcntl(F_NEXT) returns the next valid  (i.e.
-		 * currently open) FD that is >= the given FD. */
+		 * currently open) fd that is >= the given fd. */
 		fd = fcntl(fd, __F_NEXT);
 		if (fd < 0) {
 @@pp_ifdef __libc_geterrno@@

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7aa34ac */
+/* HASH CRC-32:0x66b433d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -356,8 +356,8 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,unshare,(__STDC_INT_AS_UINT_T __flags),(__flag
  * as a hint */
 __CDECLARE_OPT(,__STDC_INT_AS_UINT_T,__NOTHROW_NCX,sched_getcpu,(void),())
 /* >> setns(2)
- * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
- * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
+ * With `fd' referring to a namespace, reassociate the calling thread with that namespace.
+ * For this purpose, `fd' was opened for one of the files in `/proc/[pid]/ns/'
  * @param: nstype: The type of namespace to re-associate (either 0 to allow any
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',

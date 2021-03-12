@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe910d0fd */
+/* HASH CRC-32:0x8f0bd25c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_ctime32_s from time */
 #ifndef __local___localdep_dos_ctime32_s_defined
 #define __local___localdep_dos_ctime32_s_defined 1
-/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
+/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime32_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time32_t const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
 #endif /* !__local___localdep_dos_ctime32_s_defined */
-/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
+/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
 __LOCAL_LIBC(dos_ctime64_s) __ATTR_NONNULL((1, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_ctime64_s))(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer) {
 	__time32_t __tm32 = *__timer;

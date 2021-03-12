@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34b6b074 */
+/* HASH CRC-32:0x4843914b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include <libm/matherr.h>
 #include <libm/sqrt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the square root of X */
+/* Return the square root of `x' */
 __LOCAL_LIBC(sqrt) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrt))(double __x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(isless, __x, 0.0))

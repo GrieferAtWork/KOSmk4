@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0063f0f */
+/* HASH CRC-32:0x40d152b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <libm/finite.h>
 #include <libm/ldexp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* X times (two to the EXP power) */
+/* `x' times (two to the `exponent' power) */
 __LOCAL_LIBC(ldexp) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x, int __exponent) {
 	double __result;

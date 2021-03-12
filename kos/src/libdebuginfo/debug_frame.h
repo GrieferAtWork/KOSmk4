@@ -42,10 +42,10 @@ NOTHROW_NCX(CC libdi_unwind_fde_load_df)(byte_t const **__restrict pdebug_frame_
                                          uint8_t sizeof_address);
 
 /* Same as `unwind_fde_load_df()', but quickly search for and return the
- * FDE  descriptor  containing  the  given  `ABSOLUTE_PC'  text address.
- * @assume(!return || RESULT->f_pcstart <= ABSOLUTE_PC);
- * @assume(!return || RESULT->f_pcend > ABSOLUTE_PC);
- * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
+ * FDE  descriptor  containing  the  given  `absolute_pc'  text address.
+ * @assume(!return || result->f_pcstart <= absolute_pc);
+ * @assume(!return || result->f_pcend > absolute_pc);
+ * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTDEF NONNULL((1, 2, 4)) unsigned int
 NOTHROW_NCX(CC libdi_unwind_fde_scan_df)(byte_t const *__restrict debug_frame_start,

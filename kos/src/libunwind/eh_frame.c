@@ -417,8 +417,8 @@ err:
 
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 /* For use with `unwind_fde_landing_exec()': Apply register rules previously calculated.
- * @param: SELF:        The CFA state to-be used when applying registers
- * @param: ABSOLUTE_PC: Same value as was previously used to calculate `FDE' from `SELF'
+ * @param: self:        The CFA state to-be used when applying registers
+ * @param: absolute_pc: Same value as was previously used to calculate `fde' from `self'
  * @return: UNWIND_SUCCESS:               ...
  * @return: UNWIND_INVALID_REGISTER:      ...
  * @return: UNWIND_SEGFAULT:              ...
@@ -800,13 +800,13 @@ err:
 
 /* Behaves  similar  to `unwind_fde_exec()',  but must  be used  to calculate  the CFA
  * for the purpose  of jumping  to a  custom `LANDINGPAD_PC'  as part  of handling  an
- * exceptions  which  originates  from  `ABSOLUTE_PC'  within  the  current  cfi-proc.
- * This function is calculates the relative CFI-capsule offset between  `ABSOLUTE_PC',
+ * exceptions  which  originates  from  `absolute_pc'  within  the  current  cfi-proc.
+ * This function is calculates the relative CFI-capsule offset between  `absolute_pc',
  * and `LANDINGPAD_PC', as  well as  the GNU-argsize  adjustment. Once  this is  done,
  * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
  * onto some given register state, which may then be used to resume execution.
- * @param: SELF:   The FDE to execute in search of `__absolute_pc'
- * @param: RESULT: CFA state descriptor, to-be filled with restore information upon success.
+ * @param: self:   The FDE to execute in search of `__absolute_pc'
+ * @param: result: CFA state descriptor, to-be filled with restore information upon success.
  * @return: UNWIND_SUCCESS:                 ...
  * @return: UNWIND_INVALID_REGISTER:        ...
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
@@ -1023,8 +1023,8 @@ err_illegal_instruction:
 
 
 /* For use with `unwind_fde_landing_exec()': Apply register rules previously calculated.
- * @param: SELF:        The CFA state to-be used when applying registers
- * @param: ABSOLUTE_PC: Same value as was previously used to calculate `FDE' from `SELF'
+ * @param: self:        The CFA state to-be used when applying registers
+ * @param: absolute_pc: Same value as was previously used to calculate `fde' from `self'
  * @return: UNWIND_SUCCESS:               ...
  * @return: UNWIND_INVALID_REGISTER:      ...
  * @return: UNWIND_SEGFAULT:              ...

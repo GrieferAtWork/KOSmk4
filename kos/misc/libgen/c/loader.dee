@@ -2804,6 +2804,69 @@ again_parse_annotations:
 					self.skip(")");
 					break;
 
+				case "dos_only_export_as":
+				case "dos_only_export_alias":
+				case "dos_only_export_raw_alias":
+				case "preferred_dos_only_export_alias":
+				case "preferred_dos_only_export_raw_alias": {
+					/* >> [[dos_only_export_as("foo")]]
+					 * Same as:
+					 * >> [[dos_export_as("DOS$foo")]]
+					 * >> [[if(defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("foo")]]
+					 *
+					 * May be used to export a symbol alias that (may) only visible within
+					 * the DOS namespace, unless DOS uses the same calling convention as
+					 * the regular libc, in which case the behavior is the same as normal
+					 * use of `[[export_as("foo")]]'
+					 *
+					 * WARNING: Don't use this tag for [[wchar]] functions! Because those
+					 *          function _always_ have a dedicated dos-variant, you have
+					 *          to use the normal `[[dos_export_as("foo")]]' instead! */
+					local mode = tok;
+					if (currentDosLibraryFunction is none)
+						currentDosLibraryFunction = LibraryFunction();
+					if (currentKosLibraryFunction is none)
+						currentKosLibraryFunction = LibraryFunction();
+					self.next();
+					tok = self.skip("(");
+					while (tok !in ["", ")"]) {
+						for (local name: context.parseAliasNameOrList()) {
+							if (mode.endswith("alias")) {
+								local ppCond = currentConditions;
+								if (!mode.endswith("raw_alias"))
+									ppCond = constructAliasConditions(ppCond, name);
+								if (ppCond is none)
+									ppCond = "1";
+								local binding = FunctionBinding(
+									ppCond:     ppCond,
+									prototypes: currentPrototypes,
+									binding:    name);
+								if (mode.startswith("preferred_")) {
+									current.bindings.insert(numPreferredBindings, binding);
+									++numPreferredBindings;
+								} else {
+									current.bindings.append(binding);
+								}
+							}
+							currentDosLibraryFunction.exportSymbolNames.append((
+								currentConditions is none
+									? "1"
+									: currentConditions,
+								"DOS$" + name));
+							currentKosLibraryFunction.exportSymbolNames.append((
+								currentConditions is none
+									? "defined(__LIBCCALL_IS_LIBDCALL)"
+									: "defined(__LIBCCALL_IS_LIBDCALL) && ({})"
+										.format({ currentConditions }),
+								name));
+						}
+						if (self.tok != ",")
+							break;
+						tok = self.next();
+					}
+					self.skip(")");
+				}	break;
+
 				case "export_alias":
 				case "dos_export_alias":
 				case "kos_export_alias":

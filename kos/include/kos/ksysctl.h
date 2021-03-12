@@ -320,7 +320,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #ifdef __CC__
 
 /* Perform a handle operation specified by `cmd'
- * @param: CMD: One of `KSYSCTL_*' (see above) */
+ * @param: cmd: One of `KSYSCTL_*' (see above) */
 #ifndef __ksysctl_defined
 #ifdef __CRT_HAVE_ksysctl
 #define __ksysctl_defined 1

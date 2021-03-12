@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xced030e3 */
+/* HASH CRC-32:0x487e6668 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrend_defined
 #define __local___localdep_memrend_defined 1
 #ifdef __CRT_HAVE_memrend
-/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrend,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memrend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memrend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_memrend __LIBC_LOCAL_NAME(memrend)
 #endif /* !__CRT_HAVE_memrend */
 #endif /* !__local___localdep_memrend_defined */
-/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1' if the given `NEEDLE' wasn't found */
+/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1' if the given `needle' wasn't found */
 __LOCAL_LIBC(memrlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrlen))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_memrend(__haystack, __needle, __n_bytes) - (__BYTE_TYPE__ *)__haystack);

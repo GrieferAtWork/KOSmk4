@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc69574d6 */
+/* HASH CRC-32:0xe99c75e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,8 +49,8 @@ NOTHROW_NCX(LIBCCALL libc_sl_init)(void) {
 	return result;
 }
 /* >> sl_add(3)
- * Append a given `NAME' to `SL'. `NAME' is considered
- * inherited if the StringList is destroyed with `1' */
+ * Append a given `name' to `sl'. `name' is considered
+ * inherited if the StringList is destroyed with `freeit=1' */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl,
                                   char *name) {
@@ -69,16 +69,16 @@ NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl,
 	return 0;
 }
 /* >> sl_free(3)
- * Free a given string list. When `ALL' is non-zero, all contained
- * string pointers (as previously added with `sl_add()') will also
- * be `free(3)'ed. */
+ * Free a given string list. When `freeit' is non-zero, all contained
+ * string pointers (as previously added with `sl_add()') will also be
+ * `free(3)'d. */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") void
 NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl,
-                                   int all) {
+                                   int freeit) {
 	if unlikely(!sl)
 		return;
 	if likely(sl->sl_str) {
-		if (all) {
+		if (freeit) {
 			size_t i;
 			for (i = 0; i < sl->sl_cur; ++i)
 				libc_free(sl->sl_str[i]);
@@ -88,10 +88,10 @@ NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl,
 	libc_free(sl);
 }
 /* >> sl_find(3)
- * Search for `NAME' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `SL' (i.e. the
+ * Search for `name' within the given StringList. Upon success,
+ * return a pointer to the equivalent string within `sl' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
- * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
+ * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") ATTR_PURE NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl,
                                    char const *name) {

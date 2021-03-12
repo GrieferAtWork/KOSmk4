@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdad08225 */
+/* HASH CRC-32:0x834a6719 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,8 +57,8 @@ INTDEF NONNULL((1)) pid_t NOTHROW_NCX(VLIBDCALL libd_clone)(__clone_func_t fn, v
  *                 - CLONE_SIGHAND:   Unshare signal handlers (KOS extension) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_unshare)(__STDC_INT_AS_UINT_T flags);
 /* >> setns(2)
- * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
- * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
+ * With `fd' referring to a namespace, reassociate the calling thread with that namespace.
+ * For this purpose, `fd' was opened for one of the files in `/proc/[pid]/ns/'
  * @param: nstype: The type of namespace to re-associate (either 0 to allow any
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',

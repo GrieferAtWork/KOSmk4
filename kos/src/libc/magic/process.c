@@ -42,7 +42,7 @@
 
 __SYSDECL_BEGIN
 
-/* `MODE' argument values for spawn() functions. */
+/* `mode' argument values for spawn() functions. */
 #ifdef __P_WAIT
 #define P_WAIT    __P_WAIT    /* Wait for the process to terminate, and return its exit status */
 #endif /* __P_WAIT */
@@ -59,7 +59,7 @@ __SYSDECL_BEGIN
 #define P_DETACH  __P_DETACH  /* Create the new process as detached and return `0' */
 #endif /* __P_DETACH */
 
-/* `ACTION' argument values for cwait() functions. */
+/* `action' argument values for cwait() functions. */
 #ifdef __WAIT_CHILD
 #define WAIT_CHILD      __WAIT_CHILD      /* Ignored */
 #endif /* __WAIT_CHILD */

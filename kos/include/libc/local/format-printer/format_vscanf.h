@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb863985e */
+/* HASH CRC-32:0xc7e2e83d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,35 +32,40 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_scanf,(char const *__restrict __format, ...),scanf,{ return __builtin_scanf(__format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_scanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf_unlocked");
 #elif defined(__CRT_HAVE_scanf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf");
 #elif defined(__CRT_HAVE_scanf_unlocked)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf_unlocked");
 #elif defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/scanf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Scan data from `stdin', following `FORMAT'
+/* >> scanf(3), vscanf(3)
+ * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
 #define __localdep_scanf __LIBC_LOCAL_NAME(scanf)
 #else /* ... */
@@ -76,14 +81,14 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> format_scanf(3), format_vscanf(3)
  * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
- * functions will call the given `SCANNER' function which in
+ * functions will call the given `pgetc' function which in
  * return should successively yield a character at a time from
  * some kind of input source.
- *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
  *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `SCANNER' to track the last read character to get
+ *  - The user may use `pgetc' to track the last read character to get
  *    additional information about what character caused the scan to fail.
- *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
  *  - This implementation supports the following extensions:
  *    - `%[A-Z]'   -- Character ranges in scan patterns
  *    - `%[^abc]'  -- Inversion of a scan pattern

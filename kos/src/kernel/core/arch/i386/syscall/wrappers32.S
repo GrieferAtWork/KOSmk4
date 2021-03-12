@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7efad765 */
+/* HASH CRC-32:0x43f9c987 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,8 +147,8 @@ END(__x86_asm32_int80_fork)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
@@ -189,9 +189,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_read)
 END(__x86_asm32_int80_read)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
@@ -231,7 +231,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_write)
 	.cfi_endproc
 END(__x86_asm32_int80_write)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -281,7 +281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open)
 	.cfi_endproc
 END(__x86_asm32_int80_open)
 
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 /* errno_t close(fd_t fd) */
 .section .text.x86.asm32_syscall_int80.close
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_close)
@@ -473,8 +473,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlink)
 	.cfi_endproc
 END(__x86_asm32_int80_unlink)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 .section .text.x86.asm32_syscall_int80.execve
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_execve)
@@ -3413,9 +3413,9 @@ END(__x86_asm32_int80_readdir)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.x86.asm32_syscall_int80.mmap
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
@@ -5523,8 +5523,8 @@ END(__x86_asm32_int80_msync)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
@@ -5568,7 +5568,7 @@ END(__x86_asm32_int80_readv)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -11146,7 +11146,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_migrate_pages)
 	.cfi_endproc
 END(__x86_asm32_int80_migrate_pages)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -13685,8 +13685,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	.cfi_endproc
 END(__x86_asm32_int80_bpf)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.execveat
@@ -17573,7 +17573,7 @@ END(__x86_asm32_int80_ksysctl)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -17620,8 +17620,8 @@ END(__x86_asm32_int80_writevf)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
@@ -17823,9 +17823,9 @@ END(__x86_asm32_int80_setitimer64)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
+ *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
+ *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -18977,18 +18977,18 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
 END(__x86_asm32_int80_debugtrap)
 
 /* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 .section .text.x86.asm32_syscall_int80.get_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
@@ -19032,11 +19032,11 @@ END(__x86_asm32_int80_get_exception_handler)
  *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
+ * @return: -1:EINVAL: The given `mode' is invalid */
 /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.x86.asm32_syscall_int80.set_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
@@ -19491,9 +19491,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 END(__x86_asm32_int80_detach)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
@@ -19537,8 +19537,8 @@ END(__x86_asm32_int80_writef)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
@@ -19773,8 +19773,8 @@ END(__x86_asm32_sysenter_fork)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
@@ -19815,9 +19815,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_read)
 END(__x86_asm32_sysenter_read)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
@@ -19857,7 +19857,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_write)
 	.cfi_endproc
 END(__x86_asm32_sysenter_write)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -19907,7 +19907,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_open)
 	.cfi_endproc
 END(__x86_asm32_sysenter_open)
 
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 /* errno_t close(fd_t fd) */
 .section .text.x86.asm32_syscall_sysenter.close
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_close)
@@ -20099,8 +20099,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_unlink)
 	.cfi_endproc
 END(__x86_asm32_sysenter_unlink)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 .section .text.x86.asm32_syscall_sysenter.execve
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execve)
@@ -23041,9 +23041,9 @@ END(__x86_asm32_sysenter_readdir)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.x86.asm32_syscall_sysenter.mmap
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap)
@@ -25161,8 +25161,8 @@ END(__x86_asm32_sysenter_msync)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
@@ -25206,7 +25206,7 @@ END(__x86_asm32_sysenter_readv)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -30810,7 +30810,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_migrate_pages)
 	.cfi_endproc
 END(__x86_asm32_sysenter_migrate_pages)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -33379,8 +33379,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_bpf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_bpf)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.execveat
@@ -37309,7 +37309,7 @@ END(__x86_asm32_sysenter_ksysctl)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -37356,8 +37356,8 @@ END(__x86_asm32_sysenter_writevf)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
@@ -37559,9 +37559,9 @@ END(__x86_asm32_sysenter_setitimer64)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
+ *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
+ *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -38725,18 +38725,18 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_debugtrap)
 END(__x86_asm32_sysenter_debugtrap)
 
 /* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 .section .text.x86.asm32_syscall_sysenter.get_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_exception_handler)
@@ -38780,11 +38780,11 @@ END(__x86_asm32_sysenter_get_exception_handler)
  *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
+ * @return: -1:EINVAL: The given `mode' is invalid */
 /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.x86.asm32_syscall_sysenter.set_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_exception_handler)
@@ -39243,9 +39243,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_detach)
 END(__x86_asm32_sysenter_detach)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
@@ -39289,8 +39289,8 @@ END(__x86_asm32_sysenter_writef)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */

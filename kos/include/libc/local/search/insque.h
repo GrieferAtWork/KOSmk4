@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b8571a5 */
+/* HASH CRC-32:0x32173fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_link_defined 1
 #ifdef __CRT_HAVE_link
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
 #else /* __CRT_HAVE_link */
 __NAMESPACE_LOCAL_END
@@ -38,14 +38,15 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/link.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 #define __localdep_link __LIBC_LOCAL_NAME(link)
 #else /* __AT_FDCWD && __CRT_HAVE_linkat */
 #undef __local___localdep_link_defined
 #endif /* !__AT_FDCWD || !__CRT_HAVE_linkat */
 #endif /* !__CRT_HAVE_link */
 #endif /* !__local___localdep_link_defined */
-/* Insert ELEM into a doubly-linked list, after PREV */
+/* >> insque(3)
+ * Insert ELEM into a doubly-linked list, after PREV */
 __LOCAL_LIBC(insque) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(insque))(void *__restrict __elem, void *__prev) {
 	struct __localdep_link {

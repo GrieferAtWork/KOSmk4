@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd67c6c3b */
+/* HASH CRC-32:0x64926b37 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cos_defined
 #define __local___localdep_cos_defined 1
 #if __has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)
-/* Cosine of X */
+/* Cosine of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),cos,{ return __builtin_cos(__x); })
 #elif defined(__CRT_HAVE_cos)
-/* Cosine of X */
+/* Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),cos,(__x))
 #elif defined(__CRT_HAVE___cos)
-/* Cosine of X */
+/* Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),__cos,(__x))
 #else /* ... */
 #undef __local___localdep_cos_defined
 #endif /* !... */
 #endif /* !__local___localdep_cos_defined */
-/* Cosine of X */
+/* Cosine of `x' */
 __LOCAL_LIBC(cosf) __ATTR_WUNUSED __DECL_SIMD_cosf float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosf))(float __x) {
 	return (float)__localdep_cos((double)__x);

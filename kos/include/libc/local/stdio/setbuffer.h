@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9df88f01 */
+/* HASH CRC-32:0xde6702ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,26 +30,31 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setvbuf_defined
 #define __local___localdep_setvbuf_defined 1
 #if defined(__CRT_HAVE_setvbuf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+/* >> setvbuf(3)
+ * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #elif defined(__CRT_HAVE_setvbuf)
-/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+/* >> setvbuf(3)
+ * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),setvbuf,(__stream,__buf,__modes,__bufsize))
 #elif defined(__CRT_HAVE__IO_setvbuf)
-/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+/* >> setvbuf(3)
+ * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),_IO_setvbuf,(__stream,__buf,__modes,__bufsize))
 #elif defined(__CRT_HAVE_setvbuf_unlocked)
-/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+/* >> setvbuf(3)
+ * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #else /* ... */
 #undef __local___localdep_setvbuf_defined
 #endif /* !... */
 #endif /* !__local___localdep_setvbuf_defined */
-/* Specify the location and size for the buffer to-be used by `STREAM' */
+/* >> setbuffer(3)
+ * Specify the location and size for the buffer to-be used by `stream' */
 __LOCAL_LIBC(setbuffer) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuffer))(__FILE *__restrict __stream, char *__buf, __SIZE_TYPE__ __bufsize) {
 	__localdep_setvbuf(__stream,

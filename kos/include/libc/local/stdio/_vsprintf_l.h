@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91a6c8d2 */
+/* HASH CRC-32:0xf67c6050 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,22 +27,26 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsprintf_defined
 #define __local___localdep_vsprintf_defined 1
 #if __has_builtin(__builtin_vsprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsprintf)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),vsprintf,{ return __builtin_vsprintf(__dest, __format, __args); })
 #elif defined(__CRT_HAVE_vsprintf)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),vsprintf,(__dest,__format,__args))
 #elif defined(__CRT_HAVE__IO_vsprintf)
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),_IO_vsprintf,(__dest,__format,__args))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vsprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Print a formatted string to a given in-member string buffer `BUF'
+/* >> sprintf(3), vsprintf(3)
+ * Print a formatted string to a given in-member string buffer `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 #define __localdep_vsprintf __LIBC_LOCAL_NAME(vsprintf)
 #endif /* !... */

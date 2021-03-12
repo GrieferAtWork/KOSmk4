@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x719351f2 */
+/* HASH CRC-32:0x58955516 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,73 +31,116 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Open and return a new directory stream for reading, referring to `name' */
+/* >> opendir(3)
+ * Open and return a new directory stream for reading, referring to `name' */
 INTDEF WUNUSED NONNULL((1)) DIR *NOTHROW_RPC(LIBCCALL libc_opendir)(char const *name);
-/* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+/* >> fopendirat(3)
+ * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBCCALL libc_fopendirat)(fd_t dirfd, char const *name, oflag_t oflags);
-/* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+/* >> opendirat(3)
+ * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd, char const *name);
-/* Close a directory stream previously returned by `opendir(3)' and friends */
+/* >> closedir(3)
+ * Close a directory stream previously returned by `opendir(3)' and friends */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_closedir)(DIR *dirp);
-/* Same as `closedir()', but instead of closing the underlying file descriptor, return it */
+/* >> fdclosedir(3)
+ * Same as `closedir()', but instead of also closing the underlying file descriptor, return it */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_fdclosedir)(DIR *dirp);
-/* Read and return the next pending directory entry of the given directory stream `DIRP'
- * @EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong */
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
 INTDEF NONNULL((1)) struct dirent *NOTHROW_RPC(LIBCCALL libc_readdir)(DIR *__restrict dirp);
-/* Rewind the given directory stream in such a way that the next call
+/* >> rewinddir(3)
+ * Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again return the first directory entry */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp);
-/* Create a new directory stream by inheriting the given `FD' as stream handle */
+/* >> fdopendir(3)
+ * Create a new directory stream by inheriting the given `fd' as stream handle */
 INTDEF WUNUSED DIR *NOTHROW_NCX(LIBCCALL libc_fdopendir)(fd_t fd);
-/* 64-bit equivalent of `readdir(3)'
- * @EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong */
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
 INTDEF NONNULL((1)) struct dirent64 *NOTHROW_RPC(LIBCCALL libc_readdir64)(DIR *__restrict dirp);
-/* Reentrant version of `readdir(3)' (Using this is not recommended in KOS) */
+/* >> readdir_r(3), readdir64_r(3)
+ * Reentrant version of `readdir(3)'
+ * NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
+ *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
+ * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
+ *    per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT') */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp, struct dirent *__restrict entry, struct dirent **__restrict result);
-/* NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
+/* >> readdir_r(3), readdir64_r(3)
+ * Reentrant version of `readdir(3)'
+ * NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT') */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp, struct dirent64 *__restrict entry, struct dirent64 **__restrict result);
-/* Get the directory stream position */
+/* >> seekdir(3)
+ * Get the directory stream position */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp, longptr_t pos);
-/* Get the directory stream position */
+/* >> telldir(3)
+ * Get the directory stream position */
 INTDEF NONNULL((1)) longptr_t NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict dirp);
-/* Return the underlying file descriptor of the given directory stream */
+/* >> dirfd(3)
+ * Return the underlying file descriptor of the given directory stream */
 INTDEF ATTR_PURE NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp);
-/* Scan a directory `DIR' for all contained directory entries */
+/* >> scandir(3), scandir64(3)
+ * Scan a directory `dir' for all contained directory entries */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir, struct dirent ***__restrict namelist, __scandir_selector_t selector, __scandir_cmp_t cmp);
-/* Scan a directory `DIRFD:DIR' for all contained directory entries */
+/* >> scandirat(3), scandirat64(3)
+ * Scan a directory `dirfd:dir' for all contained directory entries */
 INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd, char const *__restrict dir, struct dirent ***__restrict namelist, __scandir_selector_t selector, __scandir_cmp_t cmp);
-/* 64-bit variant of `scandir()' */
+/* >> scandir(3), scandir64(3)
+ * Scan a directory `dir' for all contained directory entries */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandir64)(char const *__restrict dir, struct dirent64 ***__restrict namelist, __scandir64_selector_t selector, __scandir64_cmp_t cmp);
-/* 64-bit variant of `scandirat()' */
+/* >> scandirat(3), scandirat64(3)
+ * Scan a directory `dirfd:dir' for all contained directory entries */
 INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandirat64)(fd_t dirfd, char const *__restrict dir, struct dirent64 ***__restrict namelist, __scandir64_selector_t selector, __scandir64_cmp_t cmp);
-/* Linux's underlying system call for reading the entries of a directory */
+/* >> getdirentries(2), getdirentries64(2)
+ * Linux's underlying system call for reading the entries of a directory */
 INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep);
-/* 64-bit variant of `getdirentries()' */
+/* >> getdirentries(2), getdirentries64(2)
+ * Linux's underlying system call for reading the entries of a directory */
 INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBCCALL libc_getdirentries64)(fd_t fd, char *__restrict buf, size_t nbytes, off64_t *__restrict basep);
-/* The KOS-specific system call for reading a single directory entry
+/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
+ * The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
- * @param: MODE: One of `READDIR_*' (See below)
+ * @param: mode: One of `READDIR_*' (See below)
  * @return: * : The actually required buffer size for the directory entry (in bytes)
- *              NOTE: When `READDIR_DEFAULT' was passed for `MODE', the directory
- *                    stream will only be advanced when this value is >= 'BUFSIZE'
+ *              NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+ *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode);
-/* The KOS-specific system call for reading a single directory entry
+/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
+ * The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
- * @param: MODE: One of `READDIR_*' (See below)
+ * @param: mode: One of `READDIR_*' (See below)
  * @return: * : The actually required buffer size for the directory entry (in bytes)
- *              NOTE: When `READDIR_DEFAULT' was passed for `MODE', the directory
- *                    stream will only be advanced when this value is >= 'BUFSIZE'
+ *              NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+ *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, oflag_t flags);
-/* 64-bit variant of `kreaddir()' */
+/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
+ * The KOS-specific system call for reading a single directory entry
+ * from a file descriptor referring to an open directory stream.
+ * @param: mode: One of `READDIR_*' (See below)
+ * @return: * : The actually required buffer size for the directory entry (in bytes)
+ *              NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+ *                    stream will only be advanced when this value is >= 'bufsize'
+ * @return: 0 : The end of the directory has been reached.
+ * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_kreaddir64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode);
-/* 64-bit variant of `kreaddirf()' */
+/* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
+ * The KOS-specific system call for reading a single directory entry
+ * from a file descriptor referring to an open directory stream.
+ * @param: mode: One of `READDIR_*' (See below)
+ * @return: * : The actually required buffer size for the directory entry (in bytes)
+ *              NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+ *                    stream will only be advanced when this value is >= 'bufsize'
+ * @return: 0 : The end of the directory has been reached.
+ * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_kreaddirf64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode, oflag_t flags);
 #endif /* !__KERNEL__ */
 

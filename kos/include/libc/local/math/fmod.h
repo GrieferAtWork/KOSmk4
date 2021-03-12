@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aacd246 */
+/* HASH CRC-32:0x481d4289 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include <libm/matherr.h>
 #include <libm/fmod.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Floating-point modulo remainder of X/Y */
+/* Floating-point modulo remainder of `x / y' */
 __LOCAL_LIBC(fmod) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmod))(double __x, double __y) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&

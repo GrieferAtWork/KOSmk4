@@ -166,8 +166,8 @@ err:
 }
 
 
-/*[[[head:libc_fgetpwent,hash:CRC-32=0x314e17d]]]*/
-/* Read an entry from STREAM
+/*[[[head:libc_fgetpwent,hash:CRC-32=0xf5bee682]]]*/
+/* Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
@@ -294,8 +294,8 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name,
 }
 /*[[[end:libc_getpwnam_r]]]*/
 
-/*[[[head:libc_getpwent_r,hash:CRC-32=0xf09bcc03]]]*/
-/* Read an entry from the password-file stream, opening it if necessary
+/*[[[head:libc_getpwent_r,hash:CRC-32=0xfdecbb84]]]*/
+/* Read an entry from the password-file stream, opening it if necessary.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
  * @return: ENOENT: The last entry has already been read (use `setpwent()' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)

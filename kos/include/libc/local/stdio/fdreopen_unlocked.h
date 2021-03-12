@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4261c985 */
+/* HASH CRC-32:0xeba5db50 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,31 +28,39 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fdreopen_defined
 #define __local___localdep_fdreopen_defined 1
 #if defined(__CRT_HAVE_fdreopen64_unlocked) && defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen64_unlocked,(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen_unlocked,(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen64) && defined(__USE_FILE_OFFSET64)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen64,(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen,(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen64)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen64,(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen_unlocked)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen_unlocked,(__fd,__modes,__stream))
 #elif defined(__CRT_HAVE_fdreopen64_unlocked)
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen64_unlocked,(__fd,__modes,__stream))
 #else /* ... */
 #undef __local___localdep_fdreopen_defined
 #endif /* !... */
 #endif /* !__local___localdep_fdreopen_defined */
-/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+/* >> fdreopen(3)
+ * Re-open the given `stream' as a file-stream for accessing `fd' */
 __LOCAL_LIBC(fdreopen_unlocked) __ATTR_NONNULL((2, 3)) __FILE *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fdreopen_unlocked))(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream) {
 	return __localdep_fdreopen(__fd, __modes, __stream);

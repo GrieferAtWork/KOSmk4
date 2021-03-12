@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac42456e */
+/* HASH CRC-32:0x723faa0e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_hypot_defined
 #define __local___localdep_hypot_defined 1
 #if __has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)
-/* Return `sqrt(X*X + Y*Y)' */
+/* Return `sqrt(x*x + y*y)' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),hypot,{ return __builtin_hypot(__x, __y); })
 #elif defined(__CRT_HAVE_hypot)
-/* Return `sqrt(X*X + Y*Y)' */
+/* Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),hypot,(__x,__y))
 #elif defined(__CRT_HAVE___hypot)
-/* Return `sqrt(X*X + Y*Y)' */
+/* Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),__hypot,(__x,__y))
 #else /* ... */
 #undef __local___localdep_hypot_defined
 #endif /* !... */
 #endif /* !__local___localdep_hypot_defined */
-/* Return `sqrt(X*X + Y*Y)' */
+/* Return `sqrt(x*x + y*y)' */
 __LOCAL_LIBC(hypotf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotf))(float __x, float __y) {
 	return (float)__localdep_hypot((double)__x, (double)__y);

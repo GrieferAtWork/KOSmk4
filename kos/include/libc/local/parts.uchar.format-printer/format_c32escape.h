@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf55f8956 */
+/* HASH CRC-32:0xf3efe98e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,8 +69,8 @@ __NAMESPACE_LOCAL_BEGIN
  * preferring octal encoding for control characters and hex-encoding
  * for other non-ascii characters, a behavior that may be modified
  * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+ * @param: printer: A function called for all quoted portions of the text
+ * @param: textlen: The total number of bytes to escape, starting at `text' */
 __LOCAL_LIBC(format_c32escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBKCALL __LIBC_LOCAL_NAME(format_c32escape))(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
 #define __escape_tooct(__c) ('0' + (__CHAR32_TYPE__)(__CHAR32_TYPE__)(__c))

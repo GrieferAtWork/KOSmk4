@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3763ee9e */
+/* HASH CRC-32:0x6749227d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,12 +50,13 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
  * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
  * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 __LOCAL_LIBC(fdwalk) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(__fdwalk_func_t __func, void *__cookie) {
+	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int __result = 0;
 #ifdef __libc_geterrno
 	__errno_t __saved_err;
@@ -66,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(__fdwalk_func_t __func, void
 		__saved_err = __libc_geterrno();
 #endif /* __libc_geterrno */
 		/* fcntl(F_NEXT) returns the next valid  (i.e.
-		 * currently open) FD that is >= the given FD. */
+		 * currently open) fd that is >= the given fd. */
 		__fd = __localdep_fcntl(__fd, __F_NEXT);
 		if (__fd < 0) {
 #ifdef __libc_geterrno

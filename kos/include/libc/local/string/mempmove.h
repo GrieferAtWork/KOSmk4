@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b70df92 */
+/* HASH CRC-32:0xd70c2cd5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmove __LIBC_LOCAL_NAME(memmove)
 #endif /* !__CRT_HAVE_memmove */
 #endif /* !__local___localdep_memmove_defined */
-/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 __LOCAL_LIBC(mempmove) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmove))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
 	return (void *)((__BYTE_TYPE__ *)__localdep_memmove(__dst, __src, __n_bytes) + __n_bytes);

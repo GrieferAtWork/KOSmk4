@@ -76,8 +76,8 @@ struct _stringlist *sl_init() {
 
 
 @@>> sl_add(3)
-@@Append a given `NAME' to `SL'. `NAME' is considered
-@@inherited if the StringList is destroyed with `1'
+@@Append a given `name' to `sl'. `name' is considered
+@@inherited if the StringList is destroyed with `freeit=1'
 [[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(realloc)]]
 int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
@@ -97,16 +97,16 @@ int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 }
 
 @@>> sl_free(3)
-@@Free a given string list. When `ALL' is non-zero, all contained
-@@string pointers (as previously added with `sl_add()') will also
-@@be `free(3)'ed.
+@@Free a given string list. When `freeit' is non-zero, all contained
+@@string pointers (as previously added with `sl_add()') will also be
+@@`free(3)'d.
 [[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(free)]]
-void sl_free([[nullable]] struct _stringlist *sl, int all) {
+void sl_free([[nullable]] struct _stringlist *sl, int freeit) {
 	if unlikely(!sl)
 		return;
 	if likely(sl->@sl_str@) {
-		if (all) {
+		if (freeit) {
 			size_t i;
 			for (i = 0; i < sl->@sl_cur@; ++i)
 				free(sl->@sl_str@[i]);
@@ -119,10 +119,10 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 @@>> sl_find(3)
-@@Search for `NAME' within the given StringList. Upon success,
-@@return a pointer to the equivalent string within `SL' (i.e. the
+@@Search for `name' within the given StringList. Upon success,
+@@return a pointer to the equivalent string within `sl' (i.e. the
 @@pointer originally passed to `sl_add()' to insert that string).
-@@If `SL' doesn't contain an equivalent string, return `NULL' instead.
+@@If `sl' doesn't contain an equivalent string, return `NULL' instead.
 [[decl_include("<features.h>")]]
 [[ATTR_PURE, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[nullable]] char *sl_find([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,

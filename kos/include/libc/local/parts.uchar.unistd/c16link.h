@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb736c9b1 */
+/* HASH CRC-32:0x9b86ec47 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,21 +32,21 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+ * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_c16linkat,(__fd_t __fromfd, __CHAR16_TYPE__ const *__from, __fd_t __tofd, __CHAR16_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
 #elif defined(__CRT_HAVE_DOS$wlinkat)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+ * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CREDIRECT_DOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_c16linkat,(__fd_t __fromfd, __CHAR16_TYPE__ const *__from, __fd_t __tofd, __CHAR16_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
 #else /* ... */
 #undef __local___localdep_c16linkat_defined
 #endif /* !... */
 #endif /* !__local___localdep_c16linkat_defined */
 /* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
+ * Create a hard link from `from', leading to `to' */
 __LOCAL_LIBC(c16link) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16link))(__CHAR16_TYPE__ const *__from, __CHAR16_TYPE__ const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */

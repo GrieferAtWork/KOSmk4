@@ -28,146 +28,135 @@
 
 DECL_BEGIN
 
-
-
-
-
-
-
-/*[[[head:libc___fbufsize,hash:CRC-32=0xa7687e05]]]*/
-/* Return the size of the buffer of FP in bytes currently in use by the given stream */
+/*[[[head:libc___fbufsize,hash:CRC-32=0x7304eb39]]]*/
+/* >> __fbufsize(3)
+ * Return the size of the buffer of `stream' in
+ * bytes currently in use by the given stream */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE *stream)
 /*[[[body:libc___fbufsize]]]*/
 {
-	assert(fp);
-	assert(fp->if_exdata);
-	return (size_t)fp->if_bufsiz;
+	return (size_t)stream->if_bufsiz;
 }
 /*[[[end:libc___fbufsize]]]*/
 
-/*[[[head:libc___freading,hash:CRC-32=0xb7673689]]]*/
-/* Return non-zero value iff the stream FP is opened readonly,
- * or if the last operation on the stream was a read operation */
+/*[[[head:libc___freading,hash:CRC-32=0xca225fc5]]]*/
+/* >> __freading(3)
+ * Return non-zero value when `stream' is opened readonly,
+ * or if the last operation on `stream' was a read operation */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc___freading)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___freading)(FILE *stream)
 /*[[[body:libc___freading]]]*/
 {
-	assert(fp);
-	assert(fp->if_exdata);
-	return (fp->if_flag & __IO_FILE_IORW) ||
-	       (fp->if_exdata->io_chsz == 0);
+	return (stream->if_flag & __IO_FILE_IORW) ||
+	       (stream->if_exdata->io_chsz == 0);
 }
 /*[[[end:libc___freading]]]*/
 
-/*[[[head:libc___fwriting,hash:CRC-32=0x73604f24]]]*/
-/* Return non-zero value iff the stream FP is opened write-only or
- * append-only, or if the last operation on the stream was a write
+/*[[[head:libc___fwriting,hash:CRC-32=0xf7f5bbba]]]*/
+/* >> __fwriting(3)
+ * Return non-zero value when `stream' is opened write-only or
+ * append-only, or if the last operation on `stream' was a write
  * operation */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc___fwriting)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___fwriting)(FILE *stream)
 /*[[[body:libc___fwriting]]]*/
 {
-	assert(fp);
-	assert(fp->if_exdata);
-	return (fp->if_exdata->io_chsz != 0);
+	return (stream->if_exdata->io_chsz != 0);
 }
 /*[[[end:libc___fwriting]]]*/
 
-/*[[[head:libc___freadable,hash:CRC-32=0xe5c33448]]]*/
-/* Return non-zero value iff stream FP is not opened write-only or append-only */
+/*[[[head:libc___freadable,hash:CRC-32=0xc8ba1a78]]]*/
+/* >> __freadable(3)
+ * Return non-zero value when `stream' is not opened write-only or append-only */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc___freadable)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___freadable)(FILE *stream)
 /*[[[body:libc___freadable]]]*/
 {
-	assert(fp);
-	assert(fp->if_exdata);
-	(void)fp;
 	/* KOS's   stdio   itself  always   allows  reads.
 	 * It's up to the kernel to stop us from doing so. */
+	(void)stream;
+	COMPILER_IMPURE();
 	return 1;
 }
 /*[[[end:libc___freadable]]]*/
 
-/*[[[head:libc___fwritable,hash:CRC-32=0x568f4f55]]]*/
-/* Return non-zero value iff stream FP is not opened read-only */
+/*[[[head:libc___fwritable,hash:CRC-32=0x5dfe5011]]]*/
+/* >> __fwritable(3)
+ * Return non-zero value when `stream' is not opened read-only */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc___fwritable)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___fwritable)(FILE *stream)
 /*[[[body:libc___fwritable]]]*/
 {
-	assert(fp);
-	assert(fp->if_exdata);
-	return (fp->if_flag & __IO_FILE_IORW) != 0;
+	return (stream->if_flag & __IO_FILE_IORW) != 0;
 }
 /*[[[end:libc___fwritable]]]*/
 
-/*[[[head:libc___flbf,hash:CRC-32=0x425b258c]]]*/
-/* Return non-zero value iff the stream FP is line-buffered */
+/*[[[head:libc___flbf,hash:CRC-32=0x6ee65875]]]*/
+/* >> __flbf(3)
+ * Return non-zero value when `stream' is line-buffered */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc___flbf)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___flbf)(FILE *stream)
 /*[[[body:libc___flbf]]]*/
 {
-	assert(fp);
-	assert(fp->if_exdata);
-	if (fp->if_flag & IO_LNIFTYY) {
-		if (FMUSTLOCK(fp)) {
-			file_lock_write(fp);
-			file_determine_isatty(fp);
-			file_lock_endwrite(fp);
+	if (stream->if_flag & IO_LNIFTYY) {
+		if (FMUSTLOCK(stream)) {
+			file_lock_write(stream);
+			file_determine_isatty(stream);
+			file_lock_endwrite(stream);
 		} else {
-			file_determine_isatty(fp);
+			file_determine_isatty(stream);
 		}
 	}
-	return (fp->if_flag & IO_LNBUF) != 0;
+	return (stream->if_flag & IO_LNBUF) != 0;
 }
 /*[[[end:libc___flbf]]]*/
 
-/*[[[head:libc___fpurge,hash:CRC-32=0x4ef865fb]]]*/
-/* Discard all pending buffered I/O on the stream FP */
+/*[[[head:libc___fpurge,hash:CRC-32=0xfa2958a0]]]*/
+/* >> __fpurge(3)
+ * Discard all pending buffered I/O on `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) void
-NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream)
 /*[[[body:libc___fpurge]]]*/
 {
 	struct iofile_data *ex;
-	assert(fp);
-	ex = fp->if_exdata;
-	assert(ex);
-	if (FMUSTLOCK(fp)) {
-		file_lock_write(fp);
-		fp->if_ptr += fp->if_cnt;
-		fp->if_cnt  = 0;
-		ex->io_chng = fp->if_base;
+	ex = stream->if_exdata;
+	if (FMUSTLOCK(stream)) {
+		file_lock_write(stream);
+		stream->if_ptr += stream->if_cnt;
+		stream->if_cnt  = 0;
+		ex->io_chng = stream->if_base;
 		ex->io_chsz = 0;
 		ex->io_mbs.__word = 0;
-		file_lock_endwrite(fp);
+		file_lock_endwrite(stream);
 	} else {
-		fp->if_ptr += fp->if_cnt;
-		fp->if_cnt  = 0;
-		ex->io_chng = fp->if_base;
+		stream->if_ptr += stream->if_cnt;
+		stream->if_cnt  = 0;
+		ex->io_chng = stream->if_base;
 		ex->io_chsz = 0;
 		ex->io_mbs.__word = 0;
 	}
 }
 /*[[[end:libc___fpurge]]]*/
 
-/*[[[head:libc___fpending,hash:CRC-32=0xc5ccb8c3]]]*/
-/* Return amount of output in bytes pending on a stream FP */
+/*[[[head:libc___fpending,hash:CRC-32=0x9add9fa3]]]*/
+/* >> __fpending(3)
+ * Return amount of output in bytes pending on a `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(LIBCCALL libc___fpending)(FILE *fp)
+NOTHROW_NCX(LIBCCALL libc___fpending)(FILE *stream)
 /*[[[body:libc___fpending]]]*/
 {
 	size_t result;
 	struct iofile_data *ex;
-	assert(fp);
-	ex = fp->if_exdata;
-	assert(ex);
+	ex     = stream->if_exdata;
 	result = ATOMIC_READ(ex->io_chsz);
 	return result;
 }
 /*[[[end:libc___fpending]]]*/
 
-/*[[[head:libc__flushlbf,hash:CRC-32=0x8baf5ba3]]]*/
-/* Flush all line-buffered files */
+/*[[[head:libc__flushlbf,hash:CRC-32=0x44e31e48]]]*/
+/* >> _flushlbf(3)
+ * Flush all line-buffered files */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") void
 (LIBCCALL libc__flushlbf)(void) THROWS(...)
 /*[[[body:libc__flushlbf]]]*/
@@ -176,26 +165,25 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") void
 }
 /*[[[end:libc__flushlbf]]]*/
 
-/*[[[head:libc___fsetlocking,hash:CRC-32=0x75ded10a]]]*/
-/* Set locking status of stream FP to TYPE */
+/*[[[head:libc___fsetlocking,hash:CRC-32=0x3a13898]]]*/
+/* >> __fsetlocking(3)
+ * Set locking status of `stream' to `type' */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *fp,
+NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
                                          int type)
 /*[[[body:libc___fsetlocking]]]*/
 {
 	int result;
-	assert(fp);
-	assert(fp->if_exdata);
 	(void)type;
-	result = FMUSTLOCK(fp)
+	result = FMUSTLOCK(stream)
 	         ? FSETLOCKING_INTERNAL
 	         : FSETLOCKING_BYCALLER;
 #ifdef IO_NOLOCK
 	if (type != FSETLOCKING_QUERY) {
 		if (type == FSETLOCKING_BYCALLER) {
-			ATOMIC_OR(fp->if_flag, IO_NOLOCK);
+			ATOMIC_OR(stream->if_flag, IO_NOLOCK);
 		} else {
-			ATOMIC_AND(fp->if_flag, ~IO_NOLOCK);
+			ATOMIC_AND(stream->if_flag, ~IO_NOLOCK);
 		}
 	}
 #endif /* IO_NOLOCK */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b69058e */
+/* HASH CRC-32:0xad7b8474 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tan_defined
 #define __local___localdep_tan_defined 1
 #if __has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)
-/* Tangent of X */
+/* Tangent of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tan,(double __x),tan,{ return __builtin_tan(__x); })
 #elif defined(__CRT_HAVE_tan)
-/* Tangent of X */
+/* Tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tan,(double __x),tan,(__x))
 #elif defined(__CRT_HAVE___tan)
-/* Tangent of X */
+/* Tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tan,(double __x),__tan,(__x))
 #else /* ... */
 #undef __local___localdep_tan_defined
 #endif /* !... */
 #endif /* !__local___localdep_tan_defined */
-/* Tangent of X */
+/* Tangent of `x' */
 __LOCAL_LIBC(tanl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanl))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_tan((double)__x);

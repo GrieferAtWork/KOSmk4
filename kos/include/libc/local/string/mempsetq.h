@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf883af59 */
+/* HASH CRC-32:0x8411dfa9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memsetq __LIBC_LOCAL_NAME(memsetq)
 #endif /* !__CRT_HAVE_memsetq */
 #endif /* !__local___localdep_memsetq_defined */
-/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 __LOCAL_LIBC(mempsetq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempsetq))(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	return (__UINT64_TYPE__ *)__localdep_memsetq(__dst, __qword, __n_qwords) + __n_qwords;

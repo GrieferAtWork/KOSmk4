@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61ff54d0 */
+/* HASH CRC-32:0xae1d1a7f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,8 +68,8 @@ enum {
 	FSETLOCKING_QUERY    = __FSETLOCKING_QUERY,    /* Query current state of the locking status. */
 #endif /* __FSETLOCKING_QUERY */
 #ifdef __FSETLOCKING_INTERNAL
-	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects  all uses  of the stream  functions, except  for
-	                                                * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects all uses of the stream functions, except for uses
+	                                                * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
 #endif /* __FSETLOCKING_INTERNAL */
 #ifdef __FSETLOCKING_BYCALLER
 	FSETLOCKING_BYCALLER = __FSETLOCKING_BYCALLER  /* The user will take care of locking.
@@ -83,8 +83,8 @@ enum {
 #define FSETLOCKING_QUERY    FSETLOCKING_QUERY    /* Query current state of the locking status. */
 #endif /* __FSETLOCKING_QUERY */
 #ifdef __FSETLOCKING_INTERNAL
-#define FSETLOCKING_INTERNAL FSETLOCKING_INTERNAL /* The library protects  all uses  of the stream  functions, except  for
-                                                   * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+#define FSETLOCKING_INTERNAL FSETLOCKING_INTERNAL /* The library protects all uses of the stream functions, except for uses
+                                                   * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
 #endif /* __FSETLOCKING_INTERNAL */
 #ifdef __FSETLOCKING_BYCALLER
 #define FSETLOCKING_BYCALLER FSETLOCKING_BYCALLER /* The user will take care of locking.
@@ -95,8 +95,8 @@ enum {
 #define FSETLOCKING_QUERY    __FSETLOCKING_QUERY    /* Query current state of the locking status. */
 #endif /* __FSETLOCKING_QUERY */
 #ifdef __FSETLOCKING_INTERNAL
-#define FSETLOCKING_INTERNAL __FSETLOCKING_INTERNAL /* The library protects  all uses  of the stream  functions, except  for
-                                                     * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+#define FSETLOCKING_INTERNAL __FSETLOCKING_INTERNAL /* The library protects all uses of the stream functions, except for uses
+                                                     * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
 #endif /* __FSETLOCKING_INTERNAL */
 #ifdef __FSETLOCKING_BYCALLER
 #define FSETLOCKING_BYCALLER __FSETLOCKING_BYCALLER /* The user will take care of locking.
@@ -109,39 +109,52 @@ enum {
 
 #ifdef __CC__
 
-/* Return the size of the buffer of FP in bytes currently in use by the given stream */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE *__fp),(__fp))
-/* Return non-zero value iff the stream FP is opened readonly,
- * or if the last operation on the stream was a read operation */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freading,(__FILE *__fp),(__fp))
-/* Return non-zero value iff the stream FP is opened write-only or
- * append-only, or if the last operation on the stream was a write
+/* >> __fbufsize(3)
+ * Return the size of the buffer of `stream' in
+ * bytes currently in use by the given stream */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE *__stream),(__stream))
+/* >> __freading(3)
+ * Return non-zero value when `stream' is opened readonly,
+ * or if the last operation on `stream' was a read operation */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freading,(__FILE *__stream),(__stream))
+/* >> __fwriting(3)
+ * Return non-zero value when `stream' is opened write-only or
+ * append-only, or if the last operation on `stream' was a write
  * operation */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwriting,(__FILE *__fp),(__fp))
-/* Return non-zero value iff stream FP is not opened write-only or append-only */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freadable,(__FILE *__fp),(__fp))
-/* Return non-zero value iff stream FP is not opened read-only */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwritable,(__FILE *__fp),(__fp))
-/* Return non-zero value iff the stream FP is line-buffered */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__flbf,(__FILE *__fp),(__fp))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwriting,(__FILE *__stream),(__stream))
+/* >> __freadable(3)
+ * Return non-zero value when `stream' is not opened write-only or append-only */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freadable,(__FILE *__stream),(__stream))
+/* >> __fwritable(3)
+ * Return non-zero value when `stream' is not opened read-only */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwritable,(__FILE *__stream),(__stream))
+/* >> __flbf(3)
+ * Return non-zero value when `stream' is line-buffered */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__flbf,(__FILE *__stream),(__stream))
 #ifdef __CRT_HAVE___fpurge
-/* Discard all pending buffered I/O on the stream FP */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__fp),(__fp))
+/* >> __fpurge(3)
+ * Discard all pending buffered I/O on `stream' */
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE_fpurge)
-/* Discard all pending buffered I/O on the stream FP */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__fp),fpurge,(__fp))
+/* >> __fpurge(3)
+ * Discard all pending buffered I/O on `stream' */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__stream),fpurge,(__stream))
 #endif /* ... */
-/* Return amount of output in bytes pending on a stream FP */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fpending,(__FILE *__fp),(__fp))
+/* >> __fpending(3)
+ * Return amount of output in bytes pending on a `stream' */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fpending,(__FILE *__stream),(__stream))
 #ifdef __CRT_HAVE__flushlbf
-/* Flush all line-buffered files */
+/* >> _flushlbf(3)
+ * Flush all line-buffered files */
 __CDECLARE_VOID(,__THROWING,_flushlbf,(void),())
 #elif defined(__CRT_HAVE__IO_flush_all_linebuffere)
-/* Flush all line-buffered files */
+/* >> _flushlbf(3)
+ * Flush all line-buffered files */
 __CREDIRECT_VOID(,__THROWING,_flushlbf,(void),_IO_flush_all_linebuffere,())
 #endif /* ... */
-/* Set locking status of stream FP to TYPE */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__fp, int __type),(__fp,__type))
+/* >> __fsetlocking(3)
+ * Set locking status of `stream' to `type' */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__stream, int __type),(__stream,__type))
 #endif /* __CC__ */
 
 /* Never actually needed */

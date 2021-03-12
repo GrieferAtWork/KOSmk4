@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1475ecf8 */
+/* HASH CRC-32:0xa27878e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,28 +29,35 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputc_unlocked_defined
 #define __local___localdep_fputc_unlocked_defined 1
 #if __has_builtin(__builtin_fputc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc_unlocked)
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),fputc_unlocked,{ return __builtin_fputc_unlocked(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputc_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+/* >> fputc_unlocked(3)
+ * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 #define __localdep_fputc_unlocked __LIBC_LOCAL_NAME(fputc_unlocked)
 #else /* ... */
 #undef __local___localdep_fputc_unlocked_defined
@@ -60,19 +67,23 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputs_unlocked_defined
 #define __local___localdep_fputs_unlocked_defined 1
 #if __has_builtin(__builtin_fputs_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs_unlocked)
-/* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fputs_unlocked(3)
+ * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
 __CEIREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,{ return __builtin_fputs_unlocked(__string, __stream); })
 #elif defined(__CRT_HAVE_fputs_unlocked)
-/* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fputs_unlocked(3)
+ * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_fputs)
-/* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fputs_unlocked(3)
+ * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs,(__string,__stream))
 #elif defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputs_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+/* >> fputs_unlocked(3)
+ * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
 #define __localdep_fputs_unlocked __LIBC_LOCAL_NAME(fputs_unlocked)
 #else /* ... */
 #undef __local___localdep_fputs_unlocked_defined

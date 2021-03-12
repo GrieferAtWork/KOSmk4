@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd886ee98 */
+/* HASH CRC-32:0x2dae59bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: removeat from stdio */
 #ifndef __local___localdep_removeat_defined
 #define __local___localdep_removeat_defined 1
-/* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
+/* >> removeat(3)
+ * Remove a file or directory `filename' relative to a given base directory `dirfd' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
 #endif /* !__local___localdep_removeat_defined */
-/* Remove a file or directory `FILENAME' */
+/* >> remove(3)
+ * Remove a file or directory `filename' */
 __LOCAL_LIBC(remove) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(remove))(char const *__filename) {
 	return __localdep_removeat(__AT_FDCWD, __filename);

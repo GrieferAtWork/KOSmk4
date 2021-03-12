@@ -35,9 +35,9 @@
 DECL_BEGIN
 
 /* Lookup and return a reference to a video font, given its name.
- * @param: NAME: The font's name (the name of a file in `/lib/fonts/')
+ * @param: name: The font's name (the name of a file in `/lib/fonts/')
  *               When `NULL', (try to) return the default system font.
- * @return: NULL:errno=ENOENT: Unknown font `NAME' */
+ * @return: NULL:errno=ENOENT: Unknown font `name' */
 INTDEF WUNUSED __REF struct video_font *CC
 libvideo_font_lookup(char const *name);
 

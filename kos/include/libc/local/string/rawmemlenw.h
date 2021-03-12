@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cca4647 */
+/* HASH CRC-32:0xeef3e3c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_rawmemchrw __LIBC_LOCAL_NAME(rawmemchrw)
 #endif /* !__CRT_HAVE_rawmemchrw */
 #endif /* !__local___localdep_rawmemchrw_defined */
-/* Same as `rawmemchrw', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemchrw', but return the offset from `haystack', rather than the actual address. */
 __LOCAL_LIBC(rawmemlenw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemlenw))(void const *__restrict __haystack, __UINT16_TYPE__ __needle) {
 	return (__SIZE_TYPE__)(__localdep_rawmemchrw(__haystack, __needle) - (__UINT16_TYPE__ *)__haystack);

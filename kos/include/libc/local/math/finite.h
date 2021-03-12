@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc46b8d14 */
+/* HASH CRC-32:0x5d7f2b4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,19 +29,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isinf_defined
 #define __local___localdep_isinf_defined 1
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+/* Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),isinf,{ return __builtin_isinf(__x); })
 #elif defined(__CRT_HAVE_isinf)
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+/* Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),isinf,(__x))
 #elif defined(__CRT_HAVE___isinf)
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+/* Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),__isinf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/isinf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+/* Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 #define __localdep_isinf __LIBC_LOCAL_NAME(isinf)
 #else /* ... */
 #undef __local___localdep_isinf_defined
@@ -51,22 +51,22 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isnan_defined
 #define __local___localdep_isnan_defined 1
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),isnan,{ return __builtin_isnan(__x); })
 #elif defined(__CRT_HAVE_isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),isnan,(__x))
 #elif defined(__CRT_HAVE___isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan)
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),_isnan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/isnan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return nonzero if VALUE is not a number */
+/* Return nonzero if `value' is not a number */
 #define __localdep_isnan __LIBC_LOCAL_NAME(isnan)
 #else /* ... */
 #undef __local___localdep_isnan_defined
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/finite.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return nonzero if VALUE is finite and not NaN */
+/* Return nonzero if `value' is finite and not NaN */
 __LOCAL_LIBC(finite) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finite))(double __x) {
 #ifdef __LIBM_MATHFUNI

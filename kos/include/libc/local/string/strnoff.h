@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d06984f */
+/* HASH CRC-32:0xd551734a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,17 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strnchrnul_defined
 #define __local___localdep_strnchrnul_defined 1
 #ifdef __CRT_HAVE_strnchrnul
-/* Same as `strnchr', but return `strnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strnchr', but return `strnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnchrnul,(__haystack,__needle,__maxlen))
 #else /* __CRT_HAVE_strnchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strnchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `strnchr', but return `strnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strnchr', but return `strnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_strnchrnul __LIBC_LOCAL_NAME(strnchrnul)
 #endif /* !__CRT_HAVE_strnchrnul */
 #endif /* !__local___localdep_strnchrnul_defined */
-/* Same as `strnchrnul', but return the offset from `STR', rather than the actual address */
+/* Same as `strnchrnul', but return the offset from `str', rather than the actual address */
 __LOCAL_LIBC(strnoff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnoff))(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)(__localdep_strnchrnul(__haystack, __needle, __maxlen) - __haystack);

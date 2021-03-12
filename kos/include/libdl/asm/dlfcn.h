@@ -35,7 +35,7 @@ __DECL_BEGIN
 #define __RTLD_BINDING_MASK 0x00003 /* Mask of binding time value. */
 #define __RTLD_NOLOAD       0x00004 /* Do not load the object. */
 #define __RTLD_DEEPBIND     0x00008 /* Use deep binding. */
-#define __RTLD_GLOBAL       0x00100 /* If the following bit is set  in the MODE argument to  `dlopen',
+#define __RTLD_GLOBAL       0x00100 /* If the following bit is set in the `mode' argument to `dlopen',
                                      * the  symbols of the loaded object and its dependencies are made
                                      * visible as if the object were linked directly into the program. */
 #define __RTLD_LOCAL        0x00000 /* Unix98 demands the following flag which is the inverse to RTLD_GLOBAL. */
@@ -131,7 +131,7 @@ __DECL_BEGIN
 #define __RTLD_NODELETE     0x00008 /* Do not delete object when closed. */
 #define __RTLD_NOLOAD       0x00010 /* Do not load the object. */
 #define __RTLD_DEEPBIND     0x00020 /* Use deep binding. */
-#define __RTLD_GLOBAL       0x00100 /* If the following bit is set  in the MODE argument to  `dlopen',
+#define __RTLD_GLOBAL       0x00100 /* If the following bit is set in the `mode' argument to `dlopen',
                                      * the  symbols of the loaded object and its dependencies are made
                                      * visible as if the object were linked directly into the program. */
 #define __RTLD_LOCAL        0x00000 /* Unix98 demands the following flag which is the inverse to RTLD_GLOBAL. */

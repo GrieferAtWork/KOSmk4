@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0b22e08 */
+/* HASH CRC-32:0xe377b531 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_LSeek32_defined
 #define __local___localdep_LSeek32_defined 1
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #endif /* !__local___localdep_LSeek32_defined */
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __LOCAL_LIBC(LSeek64) __pos64_t
 (__LIBCCALL __LIBC_LOCAL_NAME(LSeek64))(__fd_t __fd, __off64_t __offset, int __whence) __THROWS(...) {
 	return __localdep_LSeek32(__fd, (__off32_t)__offset, __whence);

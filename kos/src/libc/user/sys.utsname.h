@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d7fcde6 */
+/* HASH CRC-32:0x12b2bb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> uname(2)
- * Put information about the system in NAME
+ * Put information about the system in `name'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name);

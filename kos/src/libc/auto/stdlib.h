@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55cd4460 */
+/* HASH CRC-32:0xd87b3be5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -460,18 +460,18 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `FD' */
+ * associated with the master descriptor `fd' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `FD' */
+ * associated with the master descriptor `fd' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `FD' */
+ * associated with the master descriptor `fd' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_strtol_l)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -599,14 +599,14 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_freezero)(void *mallptr, size_t num_bytes)
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
  * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
  * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fdwalk)(__fdwalk_func_t func, void *cookie);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
  * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
  * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */

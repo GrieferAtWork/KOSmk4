@@ -1832,13 +1832,13 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unico
 #define UNICODE_FOLDED_MAX 3
 
 /* >> unicode_fold(3)
- * Fold the given unicode character CH */
+ * Fold the given unicode character `ch' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]),(__ch,__buf))
 #else /* __CRT_HAVE_unicode_fold */
 /* The max number of characters ever written by `unicode_fold' */
 #define UNICODE_FOLDED_MAX 1
 
-/* Fold the given unicode character CH */
+/* Fold the given unicode character `ch' */
 __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]) {
 	__buf[0] = __ch;

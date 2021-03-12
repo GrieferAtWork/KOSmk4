@@ -51,7 +51,7 @@ __ATTR_NONNULL((1)) void (freea)(void *__restrict __ptr);
 
 extern "C++" {
 
-/* Allocate a malloca-like data block with `NUM_BYTES' bytes */
+/* Allocate a malloca-like data block with `num_bytes' bytes */
 __ATTR_WUNUSED __ATTR_MALLOC void *(malloca)(__SIZE_TYPE__ __num_bytes);
 __ATTR_WUNUSED __ATTR_MALLOC void *(malloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 __ATTR_WUNUSED __ATTR_MALLOC void *(calloca)(__SIZE_TYPE__ __num_bytes);

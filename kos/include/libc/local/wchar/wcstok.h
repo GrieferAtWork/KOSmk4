@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4fc1544 */
+/* HASH CRC-32:0xf6f79c1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcscspn
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #else /* __CRT_HAVE_wcscspn */
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_wcscspn __LIBC_LOCAL_NAME(wcscspn)
 #endif /* !__CRT_HAVE_wcscspn */
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcsspn
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #else /* __CRT_HAVE_wcsspn */
@@ -58,33 +58,33 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 #define __localdep_wcsspn __LIBC_LOCAL_NAME(wcsspn)
 #endif /* !__CRT_HAVE_wcsspn */
 #endif /* !__local___localdep_wcsspn_defined */
 __LOCAL_LIBC(wcstok) __ATTR_NONNULL((2, 3)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstok))(__WCHAR_TYPE__ *__string, __WCHAR_TYPE__ const *__restrict __delim, __WCHAR_TYPE__ **__restrict __save_ptr) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstok))(__WCHAR_TYPE__ *__str, __WCHAR_TYPE__ const *__restrict __delim, __WCHAR_TYPE__ **__restrict __save_ptr) {
 	__WCHAR_TYPE__ *__end;
-	if (!__string)
-		__string = *__save_ptr;
-	if (!*__string) {
-		*__save_ptr = __string;
+	if (!__str)
+		__str = *__save_ptr;
+	if (!*__str) {
+		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__string += __localdep_wcsspn(__string, __delim);
-	if (!*__string) {
-		*__save_ptr = __string;
+	__str += __localdep_wcsspn(__str, __delim);
+	if (!*__str) {
+		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__end = __string + __localdep_wcscspn(__string, __delim);
+	__end = __str + __localdep_wcscspn(__str, __delim);
 	if (!*__end) {
 		*__save_ptr = __end;
-		return __string;
+		return __str;
 	}
 	*__end = '\0';
 	*__save_ptr = __end + 1;
-	return __string;
+	return __str;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstok_defined

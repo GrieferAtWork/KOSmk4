@@ -32,7 +32,7 @@ __DECL_BEGIN
 
 __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(stat_to_linux_oldstat)(struct __kos_stat const *__restrict __self,
-                                         struct linux_oldstat *__restrict __result) {
+                                     struct linux_oldstat *__restrict __result) {
 	__result->st_dev   = (__UINT16_TYPE__)__self->st_dev;
 	__result->st_ino   = (__UINT16_TYPE__)__self->st_ino;
 	__result->st_mode  = (__UINT16_TYPE__)__self->st_mode;

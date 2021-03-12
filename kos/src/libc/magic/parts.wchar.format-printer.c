@@ -99,16 +99,16 @@ __SYSDECL_BEGIN
 #define __pwformatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pwformatprinter' usually returns the number of characters printed, but isn't required to.
- * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
- * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
- * @param: DATALEN: The  amount  of  characters  that  should  be  printed,  starting  at  `data'.
+ * @param: arg:     The user-defined closure parameter passed alongside this function pointer.
+ * @param: data:    The base address of a `datalen' bytes long character vector that should be printed.
+ * @param: datalen: The  amount  of  characters  that  should  be  printed,  starting  at  `data'.
  *                  Note  that  this is  an exact  value, meaning  that a  NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually,  the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success is 'DATALEN'. */
+ *                  usual return value used to indicate success is `datalen'. */
 typedef __pwformatprinter pwformatprinter;
 #endif /* !__pwformatprinter_defined */
 
@@ -222,8 +222,9 @@ struct format_wsnprintf_data {
 
 @@Format-printer implementation for printing to a string buffer like `wsnprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
-@@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
-@@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
+@@NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
+@@NOTE: The number of required characters is `arg->sd_buffer - <orig_buf>', or
+@@      alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)'
 [[wchar]]
 $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ void *arg,
                                   [[nonnull]] wchar_t const *__restrict data,
@@ -254,10 +255,11 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 @@pp_else@@
 	(void)arg;
 	(void)data;
-	/* XXX: Not   necessarily   correct,   as   the   32-bit   variant   is   actually   ATTR_CONST.
-	 *      However, magic  headers  don't support  conditional  attributes,  so we  can't  just  do
-	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 *      [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
+	 *
+	 * However, magic  headers  don't support  conditional  attributes,  so we  can't  just  do
+	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
+	 * [if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
 	COMPILER_IMPURE();
 	return (ssize_t)datalen;
 @@pp_endif@@
@@ -393,6 +395,7 @@ wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restric
 }
 
 
+@@>> format_waprintf_alloc(3)
 @@Allocate a buffer of `num_wchars' wide-characters at the end of `self'
 @@The returned pointer remains valid until the next time this function is called,
 @@the format_aprintf buffer `self' is finalized, or some other function is used
@@ -431,7 +434,8 @@ err:
 	return NULL;
 }
 
-@@Print data to a dynamically allocated heap buffer. On error, -1 is returned
+@@>> format_waprintf_printer(3)
+@@Print data to a dynamically allocated heap buffer. On error, `-1' is returned
 [[wchar, wunused, requires_function(format_waprintf_alloc)]]
 $ssize_t format_waprintf_printer([[nonnull]] /*struct format_waprintf_data **/ void *arg,
                                  [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {

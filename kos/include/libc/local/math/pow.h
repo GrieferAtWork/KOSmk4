@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x990fc82b */
+/* HASH CRC-32:0x5ccca132 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #include <libm/matherr.h>
 #include <libm/pow.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return X to the Y power */
+/* Return `x' to the `y' power */
 __LOCAL_LIBC(pow) __ATTR_WUNUSED __DECL_SIMD_pow double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x, double __y) {
 	double __result;

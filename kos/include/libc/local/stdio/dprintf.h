@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2332542 */
+/* HASH CRC-32:0x975905ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vdprintf_defined
 #define __local___localdep_vdprintf_defined 1
 #ifdef __CRT_HAVE_vdprintf
+/* >> dprintf(3), vdprintf(3) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),vdprintf,(__fd,__format,__args))
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vdprintf.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> dprintf(3), vdprintf(3) */
 #define __localdep_vdprintf __LIBC_LOCAL_NAME(vdprintf)
 #else /* ... */
 #undef __local___localdep_vdprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vdprintf_defined */
+/* >> dprintf(3), vdprintf(3) */
 __LOCAL_LIBC(dprintf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(dprintf))(__fd_t __fd, char const *__restrict __format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7835bf58 */
+/* HASH CRC-32:0x4c420bdb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,22 +27,27 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopen_defined
 #define __local___localdep_fopen_defined 1
 #if defined(__CRT_HAVE_fopen64) && defined(__USE_FILE_OFFSET64)
-/* Create and return a new file-stream for accessing `FILENAME' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen)
-/* Create and return a new file-stream for accessing `FILENAME' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
 #elif defined(__CRT_HAVE__IO_fopen)
-/* Create and return a new file-stream for accessing `FILENAME' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),_IO_fopen,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen64)
-/* Create and return a new file-stream for accessing `FILENAME' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
 #else /* ... */
 #undef __local___localdep_fopen_defined
 #endif /* !... */
 #endif /* !__local___localdep_fopen_defined */
-/* 64-bit variant of `fopen' */
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
 __LOCAL_LIBC(fopen64) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopen64))(char const *__restrict __filename, char const *__restrict __modes) {
 	return __localdep_fopen(__filename, __modes);

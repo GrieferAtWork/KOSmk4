@@ -200,10 +200,6 @@
 #define __extension__
 #endif /* !__DCC_VERSION__ */
 
-#if __has_builtin(__builtin_va_list)
-#define __builtin_va_list __builtin_va_list
-#endif /* __has_builtin(__builtin_va_list) */
-
 #if !__has_builtin(__builtin_LINE)
 #define __builtin_LINE() __LINE__
 #endif /* !__has_builtin(__builtin_LINE) */
@@ -946,7 +942,9 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 
 /* Define varargs macros expected by system headers. */
 #if __has_builtin(__builtin_va_list) || __has_builtin(__builtin_va_start)
+#ifndef __builtin_va_list
 #define __builtin_va_list __builtin_va_list
+#endif /* !__builtin_va_list */
 #elif defined(__TINYC__)
 #ifdef __x86_64__
 #ifndef _WIN64

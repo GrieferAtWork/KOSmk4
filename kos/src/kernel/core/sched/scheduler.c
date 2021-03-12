@@ -1148,8 +1148,8 @@ again:
 	/* Check the timeouts of sleeping threads. */
 	FOREACH_thiscpu_waiting(thread, me) {
 		assert(!(thread->t_flags & TASK_FRUNNING));
-		/* Must compare `TIMEOUT >= NOW' such that TIMEOUT=-1 isn't
-		 * considered as something  that could  actually time  out. */
+		/* Must  compare  `<timeout> >= now' such  that `<timeout>=-1'
+		 * isn't considered as something that could actually time out. */
 		if (sched_timeout(thread) >= now)
 			break; /* No more threads that have timed out. */
 		if unlikely(sched_stoptime(thread) > next_priority)

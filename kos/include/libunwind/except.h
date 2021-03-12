@@ -22,6 +22,7 @@
 
 #include "api.h"
 
+#include <__crt.h>
 #include <features.h>
 
 #include <kos/except.h>

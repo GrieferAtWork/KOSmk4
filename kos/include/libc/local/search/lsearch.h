@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89a5c965 */
+/* HASH CRC-32:0xc2fdec1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,13 +34,15 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
 __CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,__localdep_lfind,(void const *__key, void const *__base, __SIZE_TYPE__ __KOS_FIXED_CONST *__nmemb, __SIZE_TYPE__ __size, __compar_fn_t __compar),lfind,(__key,__base,__nmemb,__size,__compar))
 #else /* __CRT_HAVE_lfind */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/lfind.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
 #define __localdep_lfind __LIBC_LOCAL_NAME(lfind)
 #endif /* !__CRT_HAVE_lfind */
 #endif /* !__local___localdep_lfind_defined */
@@ -62,8 +64,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* Perform linear search for KEY by comparing by COMPAR function
- * in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found */
+/* >> lsearch(3)
+ * Perform linear search for `key' by comparing by `compar' function
+ * in array [base, base+nmemb*size) and insert entry if not found */
 __LOCAL_LIBC(lsearch) __ATTR_NONNULL((2, 3, 5)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lsearch))(void const *__key, void *__base, __SIZE_TYPE__ *__nmemb, __SIZE_TYPE__ __size, __compar_fn_t __compar) {
 	void *__result;

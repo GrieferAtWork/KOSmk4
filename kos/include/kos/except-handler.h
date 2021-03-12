@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1976569e */
+/* HASH CRC-32:0x4fd69e12 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,12 +208,13 @@
 #define EXCEPT_HANDLER_MODE_SIGHAND    0x0003 /* MODE: Enable exceptions for non-syscall exceptions (s.a. mode #3) */
 #define EXCEPT_HANDLER_MODE_MASK       0x000f /* Mask for the mode */
 #define EXCEPT_HANDLER_FLAG_ONESHOT    0x2000 /* FLAG: Before execution of the handler is started, set the mode to `EXCEPT_HANDLER_MODE_DISABLED' */
-#define EXCEPT_HANDLER_FLAG_SETHANDLER 0x4000 /* FLAG: Set the given `HANDLER' as the new exception handler called by the kernel. */
-#define EXCEPT_HANDLER_FLAG_SETSTACK   0x8000 /* FLAG: Set the given `HANDLER_SP' as the stack used for handling exceptions. */
+#define EXCEPT_HANDLER_FLAG_SETHANDLER 0x4000 /* FLAG: Set the given `handler' as the new exception handler called by the kernel. */
+#define EXCEPT_HANDLER_FLAG_SETSTACK   0x8000 /* FLAG: Set the given `handler_sp' as the stack used for handling exceptions. */
 
 
-/* Special value for `HANDLER_SP': Re-use the previous user-space stack for storing
- *                                 exceptions.   (iow.:   Don't   switch    stacks) */
+/* Special value for `handler_sp':
+ * Re-use  the  previous   user-space  stack   for
+ * storing exceptions. (iow.: Don't switch stacks) */
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 #define EXCEPT_HANDLER_SP_CURRENT (__CCAST(void *)0)
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
@@ -239,7 +240,8 @@ __SYSDECL_BEGIN
 typedef __except_handler_t except_handler_t;
 #endif /* !__except_handler_t_defined */
 
-/* Set the exception handler mode for the calling thread.
+/* >> set_exception_handler(2)
+ * Set the exception handler mode for the calling thread.
  * Examples:
  *     Set mode #1: set_exception_handler(EXCEPT_HANDLER_MODE_DISABLED, NULL, NULL)
  *     Set mode #2: set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &except_handler3, NULL)
@@ -249,25 +251,26 @@ typedef __except_handler_t except_handler_t;
  *          as other modes may not allow for exceptions such as E_SEGFAULT to
  *          be handled using the TRY-EXCEPT model.
  *          Examples for these include: `libinstrlen:instruction_trysucc()'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
+ * @return: -1:EINVAL: The given `mode' is invalid */
 __CDECLARE_OPT(,int,__NOTHROW,set_exception_handler,(unsigned int __mode, except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+/* >> get_exception_handler(2)
+ * Get the current exception handler mode for the calling thread.
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ * @param: phandler:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ * @param: phandler_sp: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,get_exception_handler,(unsigned int *__pmode, except_handler_t *__phandler, void **__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #ifdef __CRT_HAVE_except_handler3
 /* Mode #2 / #3 exception handler (see description above) */

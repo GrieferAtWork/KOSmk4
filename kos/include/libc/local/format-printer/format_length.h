@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35632f8 */
+/* HASH CRC-32:0xfcdba1ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
- * Both the `ARG' and `DATA' arguments are simply ignored */
+ * Both the `arg' and `data' arguments are simply ignored */
 __LOCAL_LIBC(format_length) __ATTR_CONST __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_length))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	(void)__arg;

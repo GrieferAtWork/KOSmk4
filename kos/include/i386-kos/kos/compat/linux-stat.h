@@ -40,7 +40,7 @@
 __DECL_BEGIN
 
 /* Compatibility mode structures for linux's `stat' system calls. (which KOS emulates)
- * NOTE: KOS uses  different names  for these  system calls,  but  they
+ * NOTE: KOS  uses different  names for  these system  calls, but their
  *       numbers, as well as their behavior share binary compatibility:
  *
  *    - linux:`struct __old_kernel_stat' --> kos:`struct linux_oldstat'
@@ -145,7 +145,7 @@ struct linux_statx64 {
 	__ULONG64_TYPE__ st_rdev;
 	__LONG64_TYPE__  st_size;
 	__LONG64_TYPE__  st_blksize;
-	__LONG64_TYPE__  st_blocks; /* Number 512-byte blocks allocated. */
+	__LONG64_TYPE__  st_blocks; /* Number of 512-byte blocks allocated. */
 	__ULONG64_TYPE__ st_atime;
 	__ULONG64_TYPE__ st_atime_nsec;
 	__ULONG64_TYPE__ st_mtime;

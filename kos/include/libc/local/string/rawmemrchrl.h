@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6718f04 */
+/* HASH CRC-32:0xe5541c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK - 4' */
+/* Same as `memrchrl' without a search limit, starting at `(byte_t *)haystack - 4' */
 __LOCAL_LIBC(rawmemrchrl) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrchrl))(void const *__restrict __haystack, __UINT32_TYPE__ __needle) {
 	__UINT32_TYPE__ *__iter = (__UINT32_TYPE__ *)__haystack;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd508df70 */
+/* HASH CRC-32:0xa1d86fb0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,61 +30,79 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fseeko64_defined
 #define __local___localdep_fseeko64_defined 1
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseek,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock)
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fseeko64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* 64-bit variant of `fseeko' */
+/* >> fseeko(3), fseeko64(3)
+ * Change the current in-file position of `stream' */
 #define __localdep_fseeko64 __LIBC_LOCAL_NAME(fseeko64)
 #else /* ... */
 #undef __local___localdep_fseeko64_defined

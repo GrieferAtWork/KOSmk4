@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3721b6d4 */
+/* HASH CRC-32:0xd249edf7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_atanh_defined
 #define __local___localdep_atanh_defined 1
 #if __has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)
-/* Hyperbolic arc tangent of X */
+/* Hyperbolic arc tangent of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),atanh,{ return __builtin_atanh(__x); })
 #elif defined(__CRT_HAVE_atanh)
-/* Hyperbolic arc tangent of X */
+/* Hyperbolic arc tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),atanh,(__x))
 #elif defined(__CRT_HAVE___atanh)
-/* Hyperbolic arc tangent of X */
+/* Hyperbolic arc tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),__atanh,(__x))
 #else /* ... */
 #undef __local___localdep_atanh_defined
 #endif /* !... */
 #endif /* !__local___localdep_atanh_defined */
-/* Hyperbolic arc tangent of X */
+/* Hyperbolic arc tangent of `x' */
 __LOCAL_LIBC(atanhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanhf))(float __x) {
 	return (float)__localdep_atanh((double)__x);

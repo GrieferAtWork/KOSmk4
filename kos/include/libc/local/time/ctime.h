@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd730a9f8 */
+/* HASH CRC-32:0x6daf282b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,13 +63,13 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ctime_r,(__TM_TYPE(time) const *__restrict __timer, char __buf[26]),ctime_r,(__timer,__buf))
 #else /* __CRT_HAVE_ctime_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/ctime_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
 #define __localdep_ctime_r __LIBC_LOCAL_NAME(ctime_r)
 #endif /* !__CRT_HAVE_ctime_r */
 #endif /* !__local___localdep_ctime_r_defined */

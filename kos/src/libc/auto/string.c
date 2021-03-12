@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa59b8294 */
+/* HASH CRC-32:0x158069d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,8 +105,8 @@ NOTHROW_NCX(LIBCCALL libc_memcmp)(void const *s1,
 #endif /* !LIBC_ARCH_HAVE_MEMCMP */
 #ifndef LIBC_ARCH_HAVE_MEMCHR
 /* >> memchr(3)
- * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
- * Return `NULL' if `NEEDLE' wasn't found. */
+ * Ascendingly search for `needle', starting at `haystack'.
+ * Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack,
                                   int needle,
@@ -121,15 +121,15 @@ NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack,
 #endif /* !LIBC_ARCH_HAVE_MEMCHR */
 #ifndef LIBC_ARCH_HAVE_STRLEN
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(LIBCCALL libc_strlen)(char const *__restrict string) {
-	return (size_t)(libc_strend(string) - string);
+NOTHROW_NCX(LIBCCALL libc_strlen)(char const *__restrict str) {
+	return (size_t)(libc_strend(str) - str);
 }
 #endif /* !LIBC_ARCH_HAVE_STRLEN */
 #ifndef LIBC_ARCH_HAVE_STRCHR
 /* >> strchr(3)
- * Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+ * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strchr)(char const *__restrict haystack,
                                   int needle) {
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBCCALL libc_strchr)(char const *__restrict haystack,
 #endif /* !LIBC_ARCH_HAVE_STRCHR */
 #ifndef LIBC_ARCH_HAVE_STRRCHR
 /* >> strrchr(3)
- * Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+ * Return the pointer of the last instance of `needle', or `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strrchr)(char const *__restrict haystack,
                                    int needle) {
@@ -171,7 +171,7 @@ NOTHROW_NCX(LIBCCALL libc_strcmp)(char const *s1,
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STRNCMP
 /* >> strncmp(3)
- * Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+ * Same as `strcmp', but compare at most `maxlen' characters from either string */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strncmp)(char const *s1,
                                    char const *s2,
@@ -188,7 +188,7 @@ NOTHROW_NCX(LIBCCALL libc_strncmp)(char const *s1,
 #endif /* !LIBC_ARCH_HAVE_STRNCMP */
 #ifndef LIBC_ARCH_HAVE_STRSTR
 /* >> strstr(3)
- * Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
+ * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_strstr)(char const *haystack,
@@ -269,7 +269,7 @@ NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf,
 #include <hybrid/typecore.h>
 /* >> strcspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) != NULL'.
+ * character for which `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
@@ -283,7 +283,7 @@ NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
 #ifndef LIBC_ARCH_HAVE_STRSPN
 /* >> strspn(3)
  * Return the offset from `haystack' to the first
- * character for which `strchr(reject, CH) == NULL'.
+ * character for which `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack,
@@ -314,10 +314,10 @@ NOTHROW_NCX(LIBCCALL libc_strpbrk)(char const *haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRPBRK */
 INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((2)) char *
-NOTHROW_NCX(LIBCCALL libc_strtok)(char *string,
+NOTHROW_NCX(LIBCCALL libc_strtok)(char *str,
                                   char const *delim) {
 	static char *save_ptr = NULL;
-	return libc_strtok_r(string, delim, &save_ptr);
+	return libc_strtok_r(str, delim, &save_ptr);
 }
 #ifndef LIBC_ARCH_HAVE_STRCOLL
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
@@ -372,17 +372,17 @@ NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRNLEN
 /* >> strnlen(3)
- * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+ * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(LIBCCALL libc_strnlen)(char const *__restrict string,
+NOTHROW_NCX(LIBCCALL libc_strnlen)(char const *__restrict str,
                                    size_t maxlen) {
-	return (size_t)(libc_strnend(string, maxlen) - string);
+	return (size_t)(libc_strnend(str, maxlen) - str);
 }
 #endif /* !LIBC_ARCH_HAVE_STRNLEN */
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STPCPY
 /* >> stpcpy(3)
- * Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
+ * Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´ */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf,
                                   char const *__restrict src) {
@@ -453,12 +453,12 @@ NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo) {
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict string,
+NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict str,
                                    size_t max_chars) {
-	size_t resultsize = libc_strnlen(string, max_chars) * sizeof(char);
+	size_t resultsize = libc_strnlen(str, max_chars) * sizeof(char);
 	char *result = (char *)libc_malloc(resultsize + sizeof(char));
 	if likely(result) {
-		*(char *)libc_mempcpy(result, string, resultsize) = '\0';
+		*(char *)libc_mempcpy(result, str, resultsize) = '\0';
 	}
 	return result;
 }
@@ -472,33 +472,33 @@ NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string) {
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((2, 3)) char *
-NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *string,
+NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *str,
                                     char const *delim,
                                     char **__restrict save_ptr) {
 	char *end;
-	if (!string)
-		string = *save_ptr;
-	if (!*string) {
-		*save_ptr = string;
+	if (!str)
+		str = *save_ptr;
+	if (!*str) {
+		*save_ptr = str;
 		return NULL;
 	}
-	string += libc_strspn(string, delim);
-	if (!*string) {
-		*save_ptr = string;
+	str += libc_strspn(str, delim);
+	if (!*str) {
+		*save_ptr = str;
 		return NULL;
 	}
-	end = string + libc_strcspn(string, delim);
+	end = str + libc_strcspn(str, delim);
 	if (!*end) {
 		*save_ptr = end;
-		return string;
+		return str;
 	}
 	*end = '\0';
 	*save_ptr = end + 1;
-	return string;
+	return str;
 }
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_MEMRCHR
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack,
                                    int needle,
@@ -526,7 +526,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
 #ifndef LIBC_ARCH_HAVE_STRCHRNUL
-/* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
                                      int needle) {
@@ -674,7 +674,7 @@ NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
 }
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_MEMPCPY
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
                                    void const *__restrict src,
@@ -689,18 +689,18 @@ NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string) {
-	size_t i, count = libc_strlen(string);
+NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict str) {
+	size_t i, count = libc_strlen(str);
 	for (i = 0; i < count; ++i) {
 		char temp;
 		size_t j = libc_rand();
 		j = i + (j % (count - i));
 		/* Swap these 2 characters. */
-		temp = string[i];
-		string[i] = string[j];
-		string[j] = temp;
+		temp = str[i];
+		str[i] = str[j];
+		str[j] = temp;
 	}
-	return string;
+	return str;
 }
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
@@ -1054,7 +1054,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpyw)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCPYW */
 #ifndef LIBC_ARCH_HAVE_MEMPCPYW
-/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempcpyw)(void *__restrict dst,
                                     void const *__restrict src,
@@ -1076,7 +1076,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpyl)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCPYL */
 #ifndef LIBC_ARCH_HAVE_MEMPCPYL
-/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `dst + N_DWORDS', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempcpyl)(void *__restrict dst,
                                     void const *__restrict src,
@@ -1107,7 +1107,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovew)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEW */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEW
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempmovew)(void *dst,
                                      void const *src,
@@ -1138,7 +1138,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovel)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEL */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEL
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempmovel)(void *dst,
                                      void const *src,
@@ -1149,7 +1149,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmovel)(void *dst,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUPW
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_WORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveupw)(void *dst,
                                       void const *src,
@@ -1171,7 +1171,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupw)(void *dst,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNW
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_WORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memmovedownw)(void *dst,
                                         void const *src,
@@ -1191,7 +1191,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownw)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWNW */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEUPW
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst >= src || !N_WORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempmoveupw)(void *dst,
                                        void const *src,
@@ -1200,7 +1200,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveupw)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPW */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNW
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempmovedownw)(void *dst,
                                          void const *src,
@@ -1211,7 +1211,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmovedownw)(void *dst,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUPL
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_DWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveupl)(void *dst,
                                       void const *src,
@@ -1233,7 +1233,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupl)(void *dst,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNL
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memmovedownl)(void *dst,
                                         void const *src,
@@ -1253,7 +1253,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownl)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWNL */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEUPL
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst >= src || !N_DWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempmoveupl)(void *dst,
                                        void const *src,
@@ -1262,7 +1262,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveupl)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPL */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNL
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempmovedownl)(void *dst,
                                          void const *src,
@@ -1283,7 +1283,7 @@ NOTHROW_NCX(LIBCCALL libc_memsetw)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMSETW */
 #ifndef LIBC_ARCH_HAVE_MEMPSETW
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempsetw)(void *__restrict dst,
                                     uint16_t word,
@@ -1304,7 +1304,7 @@ NOTHROW_NCX(LIBCCALL libc_memsetl)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMSETL */
 #ifndef LIBC_ARCH_HAVE_MEMPSETL
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempsetl)(void *__restrict dst,
                                     uint32_t dword,
@@ -1341,7 +1341,7 @@ NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPL */
 #ifndef LIBC_ARCH_HAVE_MEMCHRW
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memchrw)(void const *__restrict haystack,
                                    uint16_t needle,
@@ -1355,7 +1355,7 @@ NOTHROW_NCX(LIBCCALL libc_memchrw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCHRW */
 #ifndef LIBC_ARCH_HAVE_MEMCHRL
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memchrl)(void const *__restrict haystack,
                                    uint32_t needle,
@@ -1369,7 +1369,7 @@ NOTHROW_NCX(LIBCCALL libc_memchrl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCHRL */
 #ifndef LIBC_ARCH_HAVE_MEMRCHRW
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + N_WORDS * 2'. - Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrw)(void const *__restrict haystack,
                                     uint16_t needle,
@@ -1383,7 +1383,7 @@ NOTHROW_NCX(LIBCCALL libc_memrchrw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRCHRW */
 #ifndef LIBC_ARCH_HAVE_MEMRCHRL
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + N_DWORDS * 4'. - Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrl)(void const *__restrict haystack,
                                     uint32_t needle,
@@ -1423,7 +1423,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchrl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHRL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRCHRW
-/* Same as `memrchrw' without a search limit, starting at `(byte_t *)HAYSTACK - 2' */
+/* Same as `memrchrw' without a search limit, starting at `(byte_t *)haystack - 2' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrw)(void const *__restrict haystack,
                                        uint16_t needle) {
@@ -1436,7 +1436,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrchrw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRCHRW */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRCHRL
-/* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK - 4' */
+/* Same as `memrchrl' without a search limit, starting at `(byte_t *)haystack - 4' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrl)(void const *__restrict haystack,
                                        uint32_t needle) {
@@ -1449,7 +1449,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrchrl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRCHRL */
 #ifndef LIBC_ARCH_HAVE_MEMENDW
-/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrw', but return `haystack + N_WORDS * 2', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memendw)(void const *__restrict haystack,
                                    uint16_t needle,
@@ -1463,7 +1463,7 @@ NOTHROW_NCX(LIBCCALL libc_memendw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMENDW */
 #ifndef LIBC_ARCH_HAVE_MEMENDL
-/* Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrl', but return `haystack + N_DWORDS * 4', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memendl)(void const *__restrict haystack,
                                    uint32_t needle,
@@ -1477,7 +1477,7 @@ NOTHROW_NCX(LIBCCALL libc_memendl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMENDL */
 #ifndef LIBC_ARCH_HAVE_MEMRENDW
-/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `haystack - 2', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrendw)(void const *__restrict haystack,
                                     uint16_t needle,
@@ -1495,7 +1495,7 @@ NOTHROW_NCX(LIBCCALL libc_memrendw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRENDW */
 #ifndef LIBC_ARCH_HAVE_MEMRENDL
-/* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrl', but return `haystack - 4', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrendl)(void const *__restrict haystack,
                                     uint32_t needle,
@@ -1513,8 +1513,8 @@ NOTHROW_NCX(LIBCCALL libc_memrendl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRENDL */
 #ifndef LIBC_ARCH_HAVE_MEMLENW
-/* Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found */
+/* Same as `memendw', but return the offset from `haystack', rather than the actual address.
+ * Returns `haystack + N_DWORDS * 2' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memlenw)(void const *__restrict haystack,
                                    uint16_t needle,
@@ -1523,8 +1523,8 @@ NOTHROW_NCX(LIBCCALL libc_memlenw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMLENW */
 #ifndef LIBC_ARCH_HAVE_MEMLENL
-/* Same as `memendl', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `HAYSTACK + N_DWORDS * 4' if the given `NEEDLE' wasn't found */
+/* Same as `memendl', but return the offset from `haystack', rather than the actual address.
+ * Returns `haystack + N_DWORDS * 4' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memlenl)(void const *__restrict haystack,
                                    uint32_t needle,
@@ -1533,8 +1533,8 @@ NOTHROW_NCX(LIBCCALL libc_memlenl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMLENL */
 #ifndef LIBC_ARCH_HAVE_MEMRLENW
-/* Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1 / 2' if the given `NEEDLE' wasn't found */
+/* Same as `memrendw', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1 / 2' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenw)(void const *__restrict haystack,
                                     uint16_t needle,
@@ -1543,8 +1543,8 @@ NOTHROW_NCX(LIBCCALL libc_memrlenw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRLENW */
 #ifndef LIBC_ARCH_HAVE_MEMRLENL
-/* Same as `memrendl', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1 / 4' if the given `NEEDLE' wasn't found */
+/* Same as `memrendl', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1 / 4' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenl)(void const *__restrict haystack,
                                     uint32_t needle,
@@ -1553,7 +1553,7 @@ NOTHROW_NCX(LIBCCALL libc_memrlenl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRLENL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMLENW
-/* Same as `rawmemchrw', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemchrw', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenw)(void const *__restrict haystack,
                                       uint16_t needle) {
@@ -1561,7 +1561,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemlenw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMLENW */
 #ifndef LIBC_ARCH_HAVE_RAWMEMLENL
-/* Same as `rawmemchrl', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemchrl', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenl)(void const *__restrict haystack,
                                       uint32_t needle) {
@@ -1569,7 +1569,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemlenl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMLENL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRLENW
-/* Same as `rawmemrchrw', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemrchrw', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenw)(void const *__restrict haystack,
                                        uint16_t needle) {
@@ -1577,7 +1577,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrlenw)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRLENW */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRLENL
-/* Same as `rawmemrchrl', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemrchrl', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(void const *__restrict haystack,
                                        uint32_t needle) {
@@ -1608,7 +1608,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpyq)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCPYQ */
 #ifndef LIBC_ARCH_HAVE_MEMPCPYQ
-/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `dst + n_qwords', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempcpyq)(void *__restrict dst,
                                     void const *__restrict src,
@@ -1660,7 +1660,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEQ */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEQ
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempmoveq)(void *__restrict dst,
                                      void const *__restrict src,
@@ -1672,7 +1672,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveq)(void *__restrict dst,
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !n_qwords') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
                                       void const *src,
@@ -1711,7 +1711,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
 #include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !n_qwords') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
                                         void const *src,
@@ -1747,7 +1747,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWNQ */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEUPQ
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst >= src || !n_qwords') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempmoveupq)(void *__restrict dst,
                                        void const *__restrict src,
@@ -1756,7 +1756,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveupq)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPQ */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNQ
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempmovedownq)(void *__restrict dst,
                                          void const *__restrict src,
@@ -1777,7 +1777,7 @@ NOTHROW_NCX(LIBCCALL libc_memsetq)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMSETQ */
 #ifndef LIBC_ARCH_HAVE_MEMPSETQ
-/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempsetq)(void *__restrict dst,
                                     uint64_t qword,
@@ -1800,7 +1800,7 @@ NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPQ */
 #ifndef LIBC_ARCH_HAVE_MEMCHRQ
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memchrq)(void const *__restrict haystack,
                                    uint64_t needle,
@@ -1814,7 +1814,7 @@ NOTHROW_NCX(LIBCCALL libc_memchrq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCHRQ */
 #ifndef LIBC_ARCH_HAVE_MEMRCHRQ
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack+n_qwords'. - Return `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrq)(void const *__restrict haystack,
                                     uint64_t needle,
@@ -1841,7 +1841,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchrq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHRQ */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRCHRQ
-/* Same as `memrchrq' without a search limit, starting at `(byte_t *)HAYSTACK - 8' */
+/* Same as `memrchrq' without a search limit, starting at `(byte_t *)haystack - 8' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrq)(void const *__restrict haystack,
                                        uint64_t needle) {
@@ -1854,7 +1854,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrchrq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRCHRQ */
 #ifndef LIBC_ARCH_HAVE_MEMENDQ
-/* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrq', but return `haystack+n_qwords', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memendq)(void const *__restrict haystack,
                                    uint64_t needle,
@@ -1868,7 +1868,7 @@ NOTHROW_NCX(LIBCCALL libc_memendq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMENDQ */
 #ifndef LIBC_ARCH_HAVE_MEMRENDQ
-/* Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrq', but return `haystack - 8', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrendq)(void const *__restrict haystack,
                                     uint64_t needle,
@@ -1886,8 +1886,8 @@ NOTHROW_NCX(LIBCCALL libc_memrendq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRENDQ */
 #ifndef LIBC_ARCH_HAVE_MEMLENQ
-/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
+/* Same as `memendq', but return the offset from `haystack', rather than the actual address.
+ * Returns `n_qwords' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memlenq)(void const *__restrict haystack,
                                    uint64_t needle,
@@ -1896,8 +1896,8 @@ NOTHROW_NCX(LIBCCALL libc_memlenq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMLENQ */
 #ifndef LIBC_ARCH_HAVE_MEMRLENQ
-/* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found */
+/* Same as `memrendq', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1 / 8' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenq)(void const *__restrict haystack,
                                     uint64_t needle,
@@ -1906,7 +1906,7 @@ NOTHROW_NCX(LIBCCALL libc_memrlenq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRLENQ */
 #ifndef LIBC_ARCH_HAVE_RAWMEMLENQ
-/* Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemchrq', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenq)(void const *__restrict haystack,
                                       uint64_t needle) {
@@ -1914,7 +1914,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemlenq)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMLENQ */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRLENQ
-/* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemrchrq', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenq)(void const *__restrict haystack,
                                        uint64_t needle) {
@@ -2408,7 +2408,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrxlenq)(void const *__restrict haystack,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUP
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_memmoveup)(void *dst,
@@ -2431,7 +2431,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveup)(void *dst,
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWN
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_memmovedown)(void *dst,
@@ -2482,7 +2482,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpyc)(void *__restrict dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memcpy(dst, src, elem_count * elem_size);
 }
-/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempcpyc)(void *__restrict dst,
                                     void const *__restrict src,
@@ -2541,7 +2541,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovec)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memmove(dst, src, elem_count * elem_size);
 }
-/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+/* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmovec)(void *dst,
                                      void const *src,
@@ -2570,7 +2570,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmovec)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_mempmove(dst, src, elem_count * elem_size);
 }
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_memmoveupc)(void *dst,
@@ -2600,8 +2600,8 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupc)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memmoveup(dst, src, elem_count * elem_size);
 }
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
- * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst,
                                        void const *src,
@@ -2630,7 +2630,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_mempmoveup(dst, src, elem_count * elem_size);
 }
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_memmovedownc)(void *dst,
@@ -2660,7 +2660,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownc)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memmovedown(dst, src, elem_count * elem_size);
 }
-/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmovedownc)(void *dst,
                                          void const *src,
@@ -2691,27 +2691,27 @@ NOTHROW_NCX(LIBCCALL libc_mempmovedownc)(void *dst,
 }
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STREND
-/* Same as `STR + strlen(STR)' */
+/* Same as `str + strlen(str)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_strend)(char const *__restrict string) {
-	while (*string)
-		++string;
-	return (char *)string;
+NOTHROW_NCX(LIBCCALL libc_strend)(char const *__restrict str) {
+	while (*str)
+		++str;
+	return (char *)str;
 }
 #endif /* !LIBC_ARCH_HAVE_STREND */
 #ifndef LIBC_ARCH_HAVE_STRNEND
-/* Same as `STR + strnlen(STR, MAX_CHARS)' */
+/* Same as `str + strnlen(str, max_chars)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_strnend)(char const *__restrict string,
+NOTHROW_NCX(LIBCCALL libc_strnend)(char const *__restrict str,
                                    size_t maxlen) {
-	for (; maxlen && *string; ++string, --maxlen)
+	for (; maxlen && *str; ++str, --maxlen)
 		;
-	return (char *)string;
+	return (char *)str;
 }
 #endif /* !LIBC_ARCH_HAVE_STRNEND */
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STRNCHR
-/* Same as `strchr', but don't exceed `MAX_CHARS' characters. */
+/* Same as `strchr', but don't exceed `max_chars' characters. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strnchr)(char const *__restrict haystack,
                                    int needle,
@@ -2724,7 +2724,7 @@ NOTHROW_NCX(LIBCCALL libc_strnchr)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNCHR */
 #ifndef LIBC_ARCH_HAVE_STRNRCHR
-/* Same as `strrchr', but don't exceed `MAX_CHARS' characters. */
+/* Same as `strrchr', but don't exceed `max_chars' characters. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strnrchr)(char const *__restrict haystack,
                                     int needle,
@@ -2738,7 +2738,7 @@ NOTHROW_NCX(LIBCCALL libc_strnrchr)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNRCHR */
 #ifndef LIBC_ARCH_HAVE_STRRCHRNUL
-/* Same as `strrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strrchr', but return `str - 1', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strrchrnul)(char const *__restrict haystack,
                                       int needle) {
@@ -2751,7 +2751,7 @@ NOTHROW_NCX(LIBCCALL libc_strrchrnul)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRRCHRNUL */
 #ifndef LIBC_ARCH_HAVE_STRNCHRNUL
-/* Same as `strnchr', but return `strnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strnchr', but return `strnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strnchrnul)(char const *__restrict haystack,
                                       int needle,
@@ -2762,7 +2762,7 @@ NOTHROW_NCX(LIBCCALL libc_strnchrnul)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNCHRNUL */
 #ifndef LIBC_ARCH_HAVE_STRNRCHRNUL
-/* Same as `strnrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strnrchr', but return `str - 1', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strnrchrnul)(char const *__restrict haystack,
                                        int needle,
@@ -2776,7 +2776,7 @@ NOTHROW_NCX(LIBCCALL libc_strnrchrnul)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNRCHRNUL */
 #ifndef LIBC_ARCH_HAVE_STROFF
-/* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
+/* Same as `strchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_stroff)(char const *__restrict haystack,
                                   int needle) {
@@ -2784,7 +2784,7 @@ NOTHROW_NCX(LIBCCALL libc_stroff)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STROFF */
 #ifndef LIBC_ARCH_HAVE_STRROFF
-/* Same as `strrchrnul', but return the offset from `STR', rather than the actual address */
+/* Same as `strrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_strroff)(char const *__restrict haystack,
                                    int needle) {
@@ -2792,7 +2792,7 @@ NOTHROW_NCX(LIBCCALL libc_strroff)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRROFF */
 #ifndef LIBC_ARCH_HAVE_STRNOFF
-/* Same as `strnchrnul', but return the offset from `STR', rather than the actual address */
+/* Same as `strnchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_strnoff)(char const *__restrict haystack,
                                    int needle,
@@ -2801,7 +2801,7 @@ NOTHROW_NCX(LIBCCALL libc_strnoff)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNOFF */
 #ifndef LIBC_ARCH_HAVE_STRNROFF
-/* Same as `strnrchrnul', but return the offset from `STR', rather than the actual address */
+/* Same as `strnrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_strnroff)(char const *__restrict haystack,
                                     int needle,
@@ -2811,7 +2811,7 @@ NOTHROW_NCX(LIBCCALL libc_strnroff)(char const *__restrict haystack,
 #endif /* !LIBC_ARCH_HAVE_STRNROFF */
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_MEMPSET
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_mempset)(void *__restrict dst,
                                    int byte,
@@ -2820,7 +2820,7 @@ NOTHROW_NCX(LIBCCALL libc_mempset)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPSET */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVE
-/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmove)(void *dst,
                                     void const *src,
@@ -2829,7 +2829,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmove)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVE */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEUP
-/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmoveup)(void *dst,
                                       void const *src,
@@ -2838,7 +2838,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveup)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEUP */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWN
-/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmovedown)(void *dst,
                                         void const *src,
@@ -2848,7 +2848,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmovedown)(void *dst,
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWN */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRCHR
 #include <hybrid/typecore.h>
-/* Same as `memrchr' without a search limit, starting at `HAYSTACK - 1' */
+/* Same as `memrchr' without a search limit, starting at `haystack - 1' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchr)(void const *__restrict haystack,
                                       int needle) {
@@ -2861,7 +2861,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRCHR */
 #ifndef LIBC_ARCH_HAVE_MEMEND
-/* Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memend)(void const *__restrict haystack,
                                   int needle,
@@ -2875,7 +2875,7 @@ NOTHROW_NCX(LIBCCALL libc_memend)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMEND */
 #ifndef LIBC_ARCH_HAVE_MEMREND
-/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memrend)(void const *__restrict haystack,
                                    int needle,
@@ -2893,8 +2893,8 @@ NOTHROW_NCX(LIBCCALL libc_memrend)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMREND */
 #ifndef LIBC_ARCH_HAVE_MEMLEN
-/* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `n_bytes' if the given `NEEDLE' wasn't found */
+/* Same as `memend', but return the offset from `haystack', rather than the actual address.
+ * Returns `n_bytes' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memlen)(void const *__restrict haystack,
                                   int needle,
@@ -2903,8 +2903,8 @@ NOTHROW_NCX(LIBCCALL libc_memlen)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMLEN */
 #ifndef LIBC_ARCH_HAVE_MEMRLEN
-/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1' if the given `NEEDLE' wasn't found */
+/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1' if the given `needle' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrlen)(void const *__restrict haystack,
                                    int needle,
@@ -2913,7 +2913,7 @@ NOTHROW_NCX(LIBCCALL libc_memrlen)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRLEN */
 #ifndef LIBC_ARCH_HAVE_RAWMEMLEN
-/* Same as `rawmemchr', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemchr', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlen)(void const *__restrict haystack,
                                      int needle) {
@@ -2921,7 +2921,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemlen)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMLEN */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRLEN
-/* Same as `rawmemrchr', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemrchr', but return the offset from `haystack', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlen)(void const *__restrict haystack,
                                       int needle) {
@@ -3136,7 +3136,7 @@ NOTHROW_NCX(LIBCCALL libc_strcasestr_l)(char const *haystack,
 	}
 	return NULL;
 }
-/* Print the given `FORMAT' into a newly allocated, heap-allocated string */
+/* Print the given `format' into a newly allocated, heap-allocated string */
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
 NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
                                     va_list args) {
@@ -3145,7 +3145,7 @@ NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print the given `FORMAT' into a newly allocated, heap-allocated string */
+/* Print the given `format' into a newly allocated, heap-allocated string */
 INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
 NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
                                     ...) {
@@ -3158,7 +3158,7 @@ NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print the given `FORMAT' into a newly allocated, heap-allocated string */
+/* Print the given `format' into a newly allocated, heap-allocated string */
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
 NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format,
                                     ...) {

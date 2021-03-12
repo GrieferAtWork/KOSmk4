@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e0ca619 */
+/* HASH CRC-32:0xd4089845 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_significand_defined
 #define __local___localdep_significand_defined 1
 #if __has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)
-/* Return the fractional part of X after dividing out `ilogb(X)' */
+/* Return the fractional part of `x' after dividing out `ilogb(x)' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,(double __x),significand,{ return __builtin_significand(__x); })
 #elif defined(__CRT_HAVE_significand)
-/* Return the fractional part of X after dividing out `ilogb(X)' */
+/* Return the fractional part of `x' after dividing out `ilogb(x)' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,(double __x),significand,(__x))
 #elif defined(__CRT_HAVE___significand)
-/* Return the fractional part of X after dividing out `ilogb(X)' */
+/* Return the fractional part of `x' after dividing out `ilogb(x)' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,(double __x),__significand,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/significand.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the fractional part of X after dividing out `ilogb(X)' */
+/* Return the fractional part of `x' after dividing out `ilogb(x)' */
 #define __localdep_significand __LIBC_LOCAL_NAME(significand)
 #else /* ... */
 #undef __local___localdep_significand_defined
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/significand.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the fractional part of X after dividing out `ilogb(X)' */
+/* Return the fractional part of `x' after dividing out `ilogb(x)' */
 __LOCAL_LIBC(significandl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significandl))(__LONGDOUBLE __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)

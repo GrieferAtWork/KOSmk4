@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c11e00d */
+/* HASH CRC-32:0x744026e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `STR + strlen(STR)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
+/* Same as `str + strlen(str)' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `STR + strlen(STR)' */
+/* Same as `str + strlen(str)' */
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
 /* >> argz_next(3)
- * Iterate the individual strings that make up a given ARGZ vector.
+ * Iterate the individual strings that make up a given argz-vector.
  * This function is intended to be used in one of 2 ways:
  * >> char *my_entry = NULL;
  * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
@@ -50,14 +50,15 @@ __NAMESPACE_LOCAL_BEGIN
  * >>     handle_entry(my_entry);
  * Note that GLibc documents the second usage case slightly different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
- * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL' (which isn't something consistently enforced, or
- * required by any of the other APIs, so I'd just suggest you use the first variant)
+ * required by any of the other APIs, so I'd just suggest you always use the
+ * first variant)
  *
  * Behavior:
  *  - When entry is `NULL', `return argz_len ? argz : NULL'
- *  - If `entry' points at, or past the end of ARGZ, return NULL
- *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - If `entry' points at, or past the end of `argz', return `NULL'
+ *  - If the successor of `entry' points at, or past the end of `argz', return `NULL'
  *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __LOCAL_LIBC(argz_next) __ATTR_PURE __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_next))(char const *__restrict __argz, __SIZE_TYPE__ __argz_len, char const *__restrict __entry) {

@@ -32,17 +32,17 @@ DECL_BEGIN
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *ATTR_FASTCALL
 libdl_dltlsbase(DlModule *__restrict self)
 #else /* FAIL_ON_ERROR */
-/* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
+/* Return the calling thread's base address of the TLS segment associated with `tls_handle'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
  *       passed  to `dltlsalloc()' will be called by this function upon the first use of
  *       that  segment within each  individual thread, also causing  the finalizer to be
  *       enqueued for invocation when the calling thread exits.
  * WARNING: The order in which TLS finalizers are invoked is entirely UNDEFINED!
- * NOTE: the  given  `TLS_HANDLE' may  also  be a  module  handle, as  returned  by `dlopen()',
+ * NOTE: the  given  `tls_handle' may  also  be a  module  handle, as  returned  by `dlopen()',
  *       in which case this function  returns a pointer to the  TLS segment of that module  for
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
- * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
- * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
+ * @return: * :   Pointer to the base of the TLS segment associated with `tls_handle' within the calling thread.
+ * @return: NULL: Invalid `tls_handle', or allocation/initialization failed. (s.a. `dlerror()') */
 INTERN WUNUSED NONNULL((1, 2)) void *__DLFCN_DLTLSADDR2_CC
 libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 #endif /* !FAIL_ON_ERROR */

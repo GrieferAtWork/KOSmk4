@@ -71,9 +71,9 @@ NOTHROW_NCX(LIBCCALL libc_tzset)(void)
 
 
 
-/*[[[head:libc_clock,hash:CRC-32=0xfee125c9]]]*/
+/*[[[head:libc_clock,hash:CRC-32=0xafe2726c]]]*/
 /* Time used by the program so far (user time + system time)
- * The result / CLOCKS_PER_SECOND is program time in seconds */
+ * The `result / CLOCKS_PER_SECOND' is program time in seconds */
 INTERN ATTR_SECTION(".text.crt.time") WUNUSED clock_t
 NOTHROW_NCX(LIBCCALL libc_clock)(void)
 /*[[[body:libc_clock]]]*/
@@ -84,10 +84,10 @@ NOTHROW_NCX(LIBCCALL libc_clock)(void)
 }
 /*[[[end:libc_clock]]]*/
 
-/*[[[head:libc_getdate,hash:CRC-32=0x6c3d4c52]]]*/
+/*[[[head:libc_getdate,hash:CRC-32=0x2736b92a]]]*/
 /* Parse the given string as a date specification and return a value
- * representing the value.  The templates from the file identified by
- * the environment variable DATEMSK are used.  In case of an error
+ * representing the value. The templates from the file identified by
+ * the environment variable `$DATEMSK' are used. In case of an error
  * `getdate_err' is set */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
@@ -133,8 +133,8 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id,
 /*[[[end:libc_clock_adjtime64]]]*/
 
 
-/*[[[head:libc_timespec_get,hash:CRC-32=0xa4d83ba3]]]*/
-/* Set TS to calendar time based in time base BASE */
+/*[[[head:libc_timespec_get,hash:CRC-32=0xaf6d8410]]]*/
+/* Set `ts' to calendar time based in time base `base' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
                                         __STDC_INT_AS_UINT_T base)
@@ -148,8 +148,8 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
 }
 /*[[[end:libc_timespec_get]]]*/
 
-/*[[[head:libc_time,hash:CRC-32=0x30ecd375]]]*/
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
+/*[[[head:libc_time,hash:CRC-32=0xa7d7a8d1]]]*/
+/* Return the current time and put it in `*timer' if `timer' is not `NULL' */
 INTERN ATTR_SECTION(".text.crt.time") time_t
 NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer)
 /*[[[body:libc_time]]]*/
@@ -173,11 +173,11 @@ NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer)
 }
 /*[[[end:libc_time]]]*/
 
-/*[[[head:libc_time64,hash:CRC-32=0xef326569]]]*/
+/*[[[head:libc_time64,hash:CRC-32=0x5d1785ab]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_time64, libc_time);
 #else /* MAGIC:alias */
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
+/* Return the current time and put it in `*timer' if `timer' is not `NULL' */
 INTERN ATTR_SECTION(".text.crt.time") time64_t
 NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer)
 /*[[[body:libc_time64]]]*/
@@ -275,11 +275,11 @@ NOTHROW_RPC(LIBCCALL libc_nanosleep64)(struct timespec64 const *__restrict reque
 #endif /* MAGIC:alias */
 /*[[[end:libc_nanosleep64]]]*/
 
-/*[[[head:libc_clock_settime64,hash:CRC-32=0xb1ca6bc9]]]*/
+/*[[[head:libc_clock_settime64,hash:CRC-32=0x8e972749]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_settime64, libc_clock_settime);
 #else /* MAGIC:alias */
-/* Set clock CLOCK_ID to value TP */
+/* Set clock `clock_id' to value `tp' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id,
                                            struct timespec64 const *tp)
@@ -292,8 +292,8 @@ NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_settime64]]]*/
 
-/*[[[head:libc_clock_settime,hash:CRC-32=0x38b64b92]]]*/
-/* Set clock CLOCK_ID to value TP */
+/*[[[head:libc_clock_settime,hash:CRC-32=0x3ec1585b]]]*/
+/* Set clock `clock_id' to value `tp' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_clock_settime)(clockid_t clock_id,
                                          struct timespec const *tp)
@@ -320,8 +320,8 @@ NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
 }
 /*[[[end:libc_clock_getcpuclockid]]]*/
 
-/*[[[head:libc_clock_gettime,hash:CRC-32=0xe8fee769]]]*/
-/* Get current value of clock CLOCK_ID and store it in TP */
+/*[[[head:libc_clock_gettime,hash:CRC-32=0x887d8dc0]]]*/
+/* Get current value of clock `clock_id' and store it in `tp' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_clock_gettime)(clockid_t clock_id,
                                          struct timespec *tp)
@@ -333,11 +333,11 @@ NOTHROW_NCX(LIBCCALL libc_clock_gettime)(clockid_t clock_id,
 }
 /*[[[end:libc_clock_gettime]]]*/
 
-/*[[[head:libc_clock_gettime64,hash:CRC-32=0x347e0759]]]*/
+/*[[[head:libc_clock_gettime64,hash:CRC-32=0x4b51e6fb]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_gettime64, libc_clock_gettime);
 #else /* MAGIC:alias */
-/* Get current value of clock CLOCK_ID and store it in TP */
+/* Get current value of clock `clock_id' and store it in `tp' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_clock_gettime64)(clockid_t clock_id,
                                            struct timespec64 *tp)
@@ -432,8 +432,8 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_nanosleep64]]]*/
 
-/*[[[head:libc_timer_create,hash:CRC-32=0x5714465e]]]*/
-/* Create new per-process timer using CLOCK_ID */
+/*[[[head:libc_timer_create,hash:CRC-32=0xbb7baeb1]]]*/
+/* Create new per-process timer using `clock_id' */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_timer_create)(clockid_t clock_id,
                                         struct sigevent *__restrict evp,
@@ -446,8 +446,8 @@ NOTHROW_NCX(LIBCCALL libc_timer_create)(clockid_t clock_id,
 }
 /*[[[end:libc_timer_create]]]*/
 
-/*[[[head:libc_timer_delete,hash:CRC-32=0x32582c8e]]]*/
-/* Delete timer TIMERID */
+/*[[[head:libc_timer_delete,hash:CRC-32=0x3946ca6b]]]*/
+/* Delete timer `timerid' */
 INTERN ATTR_SECTION(".text.crt.timer") int
 NOTHROW_NCX(LIBCCALL libc_timer_delete)(timer_t timerid)
 /*[[[body:libc_timer_delete]]]*/
@@ -458,8 +458,8 @@ NOTHROW_NCX(LIBCCALL libc_timer_delete)(timer_t timerid)
 }
 /*[[[end:libc_timer_delete]]]*/
 
-/*[[[head:libc_timer_getoverrun,hash:CRC-32=0x2c7c508a]]]*/
-/* Get expiration overrun for timer TIMERID */
+/*[[[head:libc_timer_getoverrun,hash:CRC-32=0x7cbe0208]]]*/
+/* Get expiration overrun for timer `timerid' */
 INTERN ATTR_SECTION(".text.crt.timer") int
 NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid)
 /*[[[body:libc_timer_getoverrun]]]*/
@@ -470,8 +470,8 @@ NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid)
 }
 /*[[[end:libc_timer_getoverrun]]]*/
 
-/*[[[head:libc_timer_gettime,hash:CRC-32=0x8e60ba37]]]*/
-/* Get current value of timer TIMERID and store it in VALUE */
+/*[[[head:libc_timer_gettime,hash:CRC-32=0xc91cf4df]]]*/
+/* Get current value of timer `timerid' and store it in `value' */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_timer_gettime)(timer_t timerid,
                                          struct itimerspec *value)
@@ -483,11 +483,11 @@ NOTHROW_NCX(LIBCCALL libc_timer_gettime)(timer_t timerid,
 }
 /*[[[end:libc_timer_gettime]]]*/
 
-/*[[[head:libc_timer_gettime64,hash:CRC-32=0xb3484657]]]*/
+/*[[[head:libc_timer_gettime64,hash:CRC-32=0x7f04288b]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timer_gettime64, libc_timer_gettime);
 #else /* MAGIC:alias */
-/* Get current value of timer TIMERID and store it in VALUE */
+/* Get current value of timer `timerid' and store it in `value' */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timerid,
                                            struct itimerspec64 *value)
@@ -500,8 +500,8 @@ NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timerid,
 #endif /* MAGIC:alias */
 /*[[[end:libc_timer_gettime64]]]*/
 
-/*[[[head:libc_timer_settime,hash:CRC-32=0x123033ad]]]*/
-/* Set timer TIMERID to VALUE, returning old value in OVALUE */
+/*[[[head:libc_timer_settime,hash:CRC-32=0x7061c884]]]*/
+/* Set timer `timerid' to `value', returning old value in `ovalue' */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_timer_settime)(timer_t timerid,
                                          __STDC_INT_AS_UINT_T flags,
@@ -517,11 +517,11 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime)(timer_t timerid,
 }
 /*[[[end:libc_timer_settime]]]*/
 
-/*[[[head:libc_timer_settime64,hash:CRC-32=0x7be61ba6]]]*/
+/*[[[head:libc_timer_settime64,hash:CRC-32=0x7580e503]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timer_settime64, libc_timer_settime);
 #else /* MAGIC:alias */
-/* Set timer TIMERID to VALUE, returning old value in OVALUE */
+/* Set timer `timerid' to `value', returning old value in `ovalue' */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
                                            __STDC_INT_AS_UINT_T flags,

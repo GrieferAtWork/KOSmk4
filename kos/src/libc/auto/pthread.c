@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f26860 */
+/* HASH CRC-32:0xc6de6e2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,10 +44,10 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
 /* >> pthread_once(3)
- * Guarantee that the initialization function INIT_ROUTINE will be called
+ * Guarantee that the initialization function `init_routine' will be called
  * only once, even if pthread_once is executed several times with the
- * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT.
+ * same `once_control' argument. `once_control' must point to a static or
+ * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 (LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
@@ -82,8 +82,8 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 }
 #include <hybrid/__atomic.h>
 /* >> pthread_spin_init(3)
- * Initialize the spinlock LOCK. If PSHARED is nonzero the
- * spinlock can be shared between different processes
+ * Initialize the spinlock `lock'. If `pshared' is nonzero
+ * the spinlock can be shared between different processes
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
@@ -93,7 +93,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
 	return 0;
 }
 /* >> pthread_spin_destroy(3)
- * Destroy the spinlock LOCK
+ * Destroy the spinlock `lock'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
@@ -104,7 +104,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
 /* >> pthread_spin_lock(3)
- * Wait until spinlock LOCK is retrieved
+ * Wait until spinlock `lock' is retrieved
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
@@ -115,7 +115,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 #include <hybrid/__atomic.h>
 #include <libc/errno.h>
 /* >> pthread_spin_trylock(3)
- * Try to lock spinlock LOCK
+ * Try to lock spinlock `lock'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1)) errno_t
@@ -134,7 +134,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 /* >> pthread_spin_unlock(3)
- * Release spinlock LOCK
+ * Release spinlock `lock'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {

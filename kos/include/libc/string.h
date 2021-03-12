@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x627348cc */
+/* HASH CRC-32:0x843f339e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,32 +80,32 @@
 #endif /* !__fast_memcmp_defined */
 #ifdef __fast_memchr_defined
 /* >> memchr(3)
- * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
- * Return `NULL' if `NEEDLE' wasn't found. */
+ * Ascendingly search for `needle', starting at `haystack'.
+ * Return `NULL' if `needle' wasn't found. */
 #define __libc_memchr (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))
 #else /* __fast_memchr_defined */
 /* >> memchr(3)
- * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
- * Return `NULL' if `NEEDLE' wasn't found. */
+ * Ascendingly search for `needle', starting at `haystack'.
+ * Return `NULL' if `needle' wasn't found. */
 #define __libc_memchr __libc_core_memchr
 #endif /* !__fast_memchr_defined */
 #if defined(__LIBC_BIND_OPTIMIZATIONS) && !defined(__NO_builtin_constant_p) && (__has_builtin(__builtin_strlen) && defined(__CRT_HAVE_strlen))
-#define __libc_strlen(string) (__builtin_constant_p(string) ? __builtin_strlen(string) : __libc_core_strlen(string))
+#define __libc_strlen(str) (__builtin_constant_p(str) ? __builtin_strlen(str) : __libc_core_strlen(str))
 #else /* __LIBC_BIND_OPTIMIZATIONS && !__NO_builtin_constant_p && __builtin_strlen && __CRT_HAVE_strlen */
 /* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __libc_strlen __libc_core_strlen
 #endif /* !__LIBC_BIND_OPTIMIZATIONS || __NO_builtin_constant_p || !__builtin_strlen || !__CRT_HAVE_strlen */
 /* >> strchr(3)
- * Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+ * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 #define __libc_strchr __libc_core_strchr
 /* >> strcmp(3)
  * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_strcmp __libc_core_strcmp
 /* >> strnlen(3)
- * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+ * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __libc_strnlen __libc_core_strnlen
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchr __libc_core_memrchr
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
@@ -116,10 +116,10 @@
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __libc_memmem __libc_core_memmem
 #ifdef __fast_mempcpy_defined
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
 #else /* __fast_mempcpy_defined */
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempcpy __libc_core_mempcpy
 #endif /* !__fast_mempcpy_defined */
 #ifdef __fast_bzero_defined
@@ -155,10 +155,10 @@
 #define __libc_memcpyw __libc_core_memcpyw
 #endif /* !__fast_memcpyw_defined */
 #ifdef __fast_mempcpyw_defined
-/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
 #define __libc_mempcpyw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyw))
 #else /* __fast_mempcpyw_defined */
-/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
 #define __libc_mempcpyw __libc_core_mempcpyw
 #endif /* !__fast_mempcpyw_defined */
 #ifdef __fast_memcpyl_defined
@@ -169,10 +169,10 @@
 #define __libc_memcpyl __libc_core_memcpyl
 #endif /* !__fast_memcpyl_defined */
 #ifdef __fast_mempcpyl_defined
-/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `dst + N_DWORDS', rather than `dst' */
 #define __libc_mempcpyl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyl))
 #else /* __fast_mempcpyl_defined */
-/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `dst + N_DWORDS', rather than `dst' */
 #define __libc_mempcpyl __libc_core_mempcpyl
 #endif /* !__fast_mempcpyl_defined */
 #ifdef __fast_memmovew_defined
@@ -183,10 +183,10 @@
 #define __libc_memmovew __libc_core_memmovew
 #endif /* !__fast_memmovew_defined */
 #ifdef __fast_mempmovew_defined
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' */
 #define __libc_mempmovew (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovew))
 #else /* __fast_mempmovew_defined */
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' */
 #define __libc_mempmovew __libc_core_mempmovew
 #endif /* !__fast_mempmovew_defined */
 #ifdef __fast_memmovel_defined
@@ -197,66 +197,66 @@
 #define __libc_memmovel __libc_core_memmovel
 #endif /* !__fast_memmovel_defined */
 #ifdef __fast_mempmovel_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' */
 #define __libc_mempmovel (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovel))
 #else /* __fast_mempmovel_defined */
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' */
 #define __libc_mempmovel __libc_core_mempmovel
 #endif /* !__fast_mempmovel_defined */
 #ifdef __fast_memmoveupw_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_WORDS') */
 #define __libc_memmoveupw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupw))
 #else /* __fast_memmoveupw_defined */
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_WORDS') */
 #define __libc_memmoveupw __libc_core_memmoveupw
 #endif /* !__fast_memmoveupw_defined */
 #ifdef __fast_memmovedownw_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_WORDS') */
 #define __libc_memmovedownw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownw))
 #else /* __fast_memmovedownw_defined */
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_WORDS') */
 #define __libc_memmovedownw __libc_core_memmovedownw
 #endif /* !__fast_memmovedownw_defined */
 #ifdef __fast_mempmoveupw_defined
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst >= src || !N_WORDS') */
 #define __libc_mempmoveupw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupw))
 #else /* __fast_mempmoveupw_defined */
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst >= src || !N_WORDS') */
 #define __libc_mempmoveupw __libc_core_mempmoveupw
 #endif /* !__fast_mempmoveupw_defined */
 #ifdef __fast_mempmovedownw_defined
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 #define __libc_mempmovedownw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownw))
 #else /* __fast_mempmovedownw_defined */
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 #define __libc_mempmovedownw __libc_core_mempmovedownw
 #endif /* !__fast_mempmovedownw_defined */
 #ifdef __fast_memmoveupl_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_DWORDS') */
 #define __libc_memmoveupl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupl))
 #else /* __fast_memmoveupl_defined */
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_DWORDS') */
 #define __libc_memmoveupl __libc_core_memmoveupl
 #endif /* !__fast_memmoveupl_defined */
 #ifdef __fast_memmovedownl_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 #define __libc_memmovedownl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownl))
 #else /* __fast_memmovedownl_defined */
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 #define __libc_memmovedownl __libc_core_memmovedownl
 #endif /* !__fast_memmovedownl_defined */
 #ifdef __fast_mempmoveupl_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst >= src || !N_DWORDS') */
 #define __libc_mempmoveupl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupl))
 #else /* __fast_mempmoveupl_defined */
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst >= src || !N_DWORDS') */
 #define __libc_mempmoveupl __libc_core_mempmoveupl
 #endif /* !__fast_mempmoveupl_defined */
 #ifdef __fast_mempmovedownl_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 #define __libc_mempmovedownl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownl))
 #else /* __fast_mempmovedownl_defined */
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 #define __libc_mempmovedownl __libc_core_mempmovedownl
 #endif /* !__fast_mempmovedownl_defined */
 #ifdef __fast_memsetw_defined
@@ -267,10 +267,10 @@
 #define __libc_memsetw __libc_core_memsetw
 #endif /* !__fast_memsetw_defined */
 #ifdef __fast_mempsetw_defined
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 #define __libc_mempsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))
 #else /* __fast_mempsetw_defined */
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
 #define __libc_mempsetw __libc_core_mempsetw
 #endif /* !__fast_mempsetw_defined */
 #ifdef __fast_memsetl_defined
@@ -281,10 +281,10 @@
 #define __libc_memsetl __libc_core_memsetl
 #endif /* !__fast_memsetl_defined */
 #ifdef __fast_mempsetl_defined
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 #define __libc_mempsetl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetl))
 #else /* __fast_mempsetl_defined */
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 #define __libc_mempsetl __libc_core_mempsetl
 #endif /* !__fast_mempsetl_defined */
 #ifdef __fast_memcmpw_defined
@@ -302,59 +302,59 @@
 #define __libc_memcmpl __libc_core_memcmpl
 #endif /* !__fast_memcmpl_defined */
 #ifdef __fast_memchrw_defined
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memchrw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrw))
 #else /* __fast_memchrw_defined */
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memchrw __libc_core_memchrw
 #endif /* !__fast_memchrw_defined */
 #ifdef __fast_memchrl_defined
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memchrl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrl))
 #else /* __fast_memchrl_defined */
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memchrl __libc_core_memchrl
 #endif /* !__fast_memchrl_defined */
 #ifdef __fast_memrchrw_defined
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + N_WORDS * 2'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchrw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrw))
 #else /* __fast_memrchrw_defined */
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + N_WORDS * 2'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchrw __libc_core_memrchrw
 #endif /* !__fast_memrchrw_defined */
 #ifdef __fast_memrchrl_defined
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + N_DWORDS * 4'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchrl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrl))
 #else /* __fast_memrchrl_defined */
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack + N_DWORDS * 4'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchrl __libc_core_memrchrl
 #endif /* !__fast_memrchrl_defined */
 #ifdef __fast_memendw_defined
-/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrw', but return `haystack + N_WORDS * 2', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memendw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memendw))
 #else /* __fast_memendw_defined */
-/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrw', but return `haystack + N_WORDS * 2', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memendw __libc_core_memendw
 #endif /* !__fast_memendw_defined */
 #ifdef __fast_memendl_defined
-/* Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrl', but return `haystack + N_DWORDS * 4', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memendl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memendl))
 #else /* __fast_memendl_defined */
-/* Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrl', but return `haystack + N_DWORDS * 4', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memendl __libc_core_memendl
 #endif /* !__fast_memendl_defined */
 #ifdef __fast_memrendw_defined
-/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `haystack - 2', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrendw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendw))
 #else /* __fast_memrendw_defined */
-/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrw', but return `haystack - 2', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrendw __libc_core_memrendw
 #endif /* !__fast_memrendw_defined */
 #ifdef __fast_memrendl_defined
-/* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrl', but return `haystack - 4', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrendl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendl))
 #else /* __fast_memrendl_defined */
-/* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrl', but return `haystack - 4', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrendl __libc_core_memrendl
 #endif /* !__fast_memrendl_defined */
 #ifdef __fast_memcpyq_defined
@@ -365,10 +365,10 @@
 #define __libc_memcpyq __libc_core_memcpyq
 #endif /* !__fast_memcpyq_defined */
 #ifdef __fast_mempcpyq_defined
-/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `dst + n_qwords', rather than `dst' */
 #define __libc_mempcpyq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyq))
 #else /* __fast_mempcpyq_defined */
-/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `dst + n_qwords', rather than `dst' */
 #define __libc_mempcpyq __libc_core_mempcpyq
 #endif /* !__fast_mempcpyq_defined */
 #ifdef __fast_memmoveq_defined
@@ -379,38 +379,38 @@
 #define __libc_memmoveq __libc_core_memmoveq
 #endif /* !__fast_memmoveq_defined */
 #ifdef __fast_mempmoveq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' */
 #define __libc_mempmoveq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveq))
 #else /* __fast_mempmoveq_defined */
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' */
 #define __libc_mempmoveq __libc_core_mempmoveq
 #endif /* !__fast_mempmoveq_defined */
 #ifdef __fast_memmoveupq_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !n_qwords') */
 #define __libc_memmoveupq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupq))
 #else /* __fast_memmoveupq_defined */
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !n_qwords') */
 #define __libc_memmoveupq __libc_core_memmoveupq
 #endif /* !__fast_memmoveupq_defined */
 #ifdef __fast_memmovedownq_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !n_qwords') */
 #define __libc_memmovedownq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownq))
 #else /* __fast_memmovedownq_defined */
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !n_qwords') */
 #define __libc_memmovedownq __libc_core_memmovedownq
 #endif /* !__fast_memmovedownq_defined */
 #ifdef __fast_mempmoveupq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst >= src || !n_qwords') */
 #define __libc_mempmoveupq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupq))
 #else /* __fast_mempmoveupq_defined */
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst >= src || !n_qwords') */
 #define __libc_mempmoveupq __libc_core_mempmoveupq
 #endif /* !__fast_mempmoveupq_defined */
 #ifdef __fast_mempmovedownq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 #define __libc_mempmovedownq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownq))
 #else /* __fast_mempmovedownq_defined */
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 #define __libc_mempmovedownq __libc_core_mempmovedownq
 #endif /* !__fast_mempmovedownq_defined */
 #ifdef __fast_memsetq_defined
@@ -421,10 +421,10 @@
 #define __libc_memsetq __libc_core_memsetq
 #endif /* !__fast_memsetq_defined */
 #ifdef __fast_mempsetq_defined
-/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 #define __libc_mempsetq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetq))
 #else /* __fast_mempsetq_defined */
-/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 #define __libc_mempsetq __libc_core_mempsetq
 #endif /* !__fast_mempsetq_defined */
 #ifdef __fast_memcmpq_defined
@@ -435,80 +435,80 @@
 #define __libc_memcmpq __libc_core_memcmpq
 #endif /* !__fast_memcmpq_defined */
 #ifdef __fast_memchrq_defined
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memchrq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrq))
 #else /* __fast_memchrq_defined */
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memchrq __libc_core_memchrq
 #endif /* !__fast_memchrq_defined */
 #ifdef __fast_memrchrq_defined
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack+n_qwords'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchrq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrq))
 #else /* __fast_memrchrq_defined */
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* Descendingly search for `needle', starting at `haystack+n_qwords'. - Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchrq __libc_core_memrchrq
 #endif /* !__fast_memrchrq_defined */
 #ifdef __fast_memendq_defined
-/* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrq', but return `haystack+n_qwords', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memendq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memendq))
 #else /* __fast_memendq_defined */
-/* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchrq', but return `haystack+n_qwords', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memendq __libc_core_memendq
 #endif /* !__fast_memendq_defined */
 #ifdef __fast_memrendq_defined
-/* Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrq', but return `haystack - 8', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrendq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendq))
 #else /* __fast_memrendq_defined */
-/* Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchrq', but return `haystack - 8', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrendq __libc_core_memrendq
 #endif /* !__fast_memrendq_defined */
 #ifdef __fast_memlenq_defined
-/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
+/* Same as `memendq', but return the offset from `haystack', rather than the actual address.
+ * Returns `n_qwords' if the given `needle' wasn't found */
 #define __libc_memlenq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memlenq))
 #else /* __fast_memlenq_defined */
-/* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
+/* Same as `memendq', but return the offset from `haystack', rather than the actual address.
+ * Returns `n_qwords' if the given `needle' wasn't found */
 #define __libc_memlenq __libc_core_memlenq
 #endif /* !__fast_memlenq_defined */
 #ifdef __fast_memrlenq_defined
-/* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found */
+/* Same as `memrendq', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1 / 8' if the given `needle' wasn't found */
 #define __libc_memrlenq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrlenq))
 #else /* __fast_memrlenq_defined */
-/* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found */
+/* Same as `memrendq', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1 / 8' if the given `needle' wasn't found */
 #define __libc_memrlenq __libc_core_memrlenq
 #endif /* !__fast_memrlenq_defined */
 #ifdef __fast_rawmemlenq_defined
-/* Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemchrq', but return the offset from `haystack', rather than the actual address. */
 #define __libc_rawmemlenq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(rawmemlenq))
 #else /* __fast_rawmemlenq_defined */
-/* Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemchrq', but return the offset from `haystack', rather than the actual address. */
 #define __libc_rawmemlenq __libc_core_rawmemlenq
 #endif /* !__fast_rawmemlenq_defined */
 #ifdef __fast_rawmemrlenq_defined
-/* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemrchrq', but return the offset from `haystack', rather than the actual address. */
 #define __libc_rawmemrlenq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(rawmemrlenq))
 #else /* __fast_rawmemrlenq_defined */
-/* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
+/* Same as `rawmemrchrq', but return the offset from `haystack', rather than the actual address. */
 #define __libc_rawmemrlenq __libc_core_rawmemrlenq
 #endif /* !__fast_rawmemrlenq_defined */
 #ifdef __fast_memmoveup_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveup (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveup))
 #else /* __fast_memmoveup_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveup __libc_core_memmoveup
 #endif /* !__fast_memmoveup_defined */
 #ifdef __fast_memmovedown_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedown (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedown))
 #else /* __fast_memmovedown_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedown __libc_core_memmovedown
 #endif /* !__fast_memmovedown_defined */
@@ -522,10 +522,10 @@
 #define __libc_memcpyc __libc_core_memcpyc
 #endif /* !__fast_memcpyc_defined */
 #ifdef __fast_mempcpyc_defined
-/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))
 #else /* __fast_mempcpyc_defined */
-/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempcpyc __libc_core_mempcpyc
 #endif /* !__fast_mempcpyc_defined */
 #ifdef __fast_memmovec_defined
@@ -538,108 +538,108 @@
 #define __libc_memmovec __libc_core_memmovec
 #endif /* !__fast_memmovec_defined */
 #ifdef __fast_mempmovec_defined
-/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+/* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempmovec (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovec))
 #else /* __fast_mempmovec_defined */
-/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+/* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempmovec __libc_core_mempmovec
 #endif /* !__fast_mempmovec_defined */
 #ifdef __fast_memmoveupc_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveupc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupc))
 #else /* __fast_memmoveupc_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveupc __libc_core_memmoveupc
 #endif /* !__fast_memmoveupc_defined */
 #ifdef __fast_mempmoveupc_defined
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
- * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmoveupc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))
 #else /* __fast_mempmoveupc_defined */
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
- * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmoveupc __libc_core_mempmoveupc
 #endif /* !__fast_mempmoveupc_defined */
 #ifdef __fast_memmovedownc_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedownc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownc))
 #else /* __fast_memmovedownc_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedownc __libc_core_memmovedownc
 #endif /* !__fast_memmovedownc_defined */
 #ifdef __fast_mempmovedownc_defined
-/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmovedownc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownc))
 #else /* __fast_mempmovedownc_defined */
-/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmovedownc __libc_core_mempmovedownc
 #endif /* !__fast_mempmovedownc_defined */
-/* Same as `STR + strlen(STR)' */
+/* Same as `str + strlen(str)' */
 #define __libc_strend __libc_core_strend
-/* Same as `STR + strnlen(STR, MAX_CHARS)' */
+/* Same as `str + strnlen(str, max_chars)' */
 #define __libc_strnend __libc_core_strnend
 #ifdef __fast_mempset_defined
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))
 #else /* __fast_mempset_defined */
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempset __libc_core_mempset
 #endif /* !__fast_mempset_defined */
 #ifdef __fast_mempmove_defined
-/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))
 #else /* __fast_mempmove_defined */
-/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempmove __libc_core_mempmove
 #endif /* !__fast_mempmove_defined */
 #ifdef __fast_mempmoveup_defined
-/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 #define __libc_mempmoveup (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup))
 #else /* __fast_mempmoveup_defined */
-/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 #define __libc_mempmoveup __libc_core_mempmoveup
 #endif /* !__fast_mempmoveup_defined */
 #ifdef __fast_mempmovedown_defined
-/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 #define __libc_mempmovedown (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedown))
 #else /* __fast_mempmovedown_defined */
-/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 #define __libc_mempmovedown __libc_core_mempmovedown
 #endif /* !__fast_mempmovedown_defined */
 #ifdef __fast_memend_defined
-/* Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memend))
 #else /* __fast_memend_defined */
-/* Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memend __libc_core_memend
 #endif /* !__fast_memend_defined */
 #ifdef __fast_memrend_defined
-/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrend))
 #else /* __fast_memrend_defined */
-/* Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrend __libc_core_memrend
 #endif /* !__fast_memrend_defined */
 #ifdef __fast_memlen_defined
-/* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `n_bytes' if the given `NEEDLE' wasn't found */
+/* Same as `memend', but return the offset from `haystack', rather than the actual address.
+ * Returns `n_bytes' if the given `needle' wasn't found */
 #define __libc_memlen (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memlen))
 #else /* __fast_memlen_defined */
-/* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `n_bytes' if the given `NEEDLE' wasn't found */
+/* Same as `memend', but return the offset from `haystack', rather than the actual address.
+ * Returns `n_bytes' if the given `needle' wasn't found */
 #define __libc_memlen __libc_core_memlen
 #endif /* !__fast_memlen_defined */
 #ifdef __fast_memrlen_defined
-/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1' if the given `NEEDLE' wasn't found */
+/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1' if the given `needle' wasn't found */
 #define __libc_memrlen (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrlen))
 #else /* __fast_memrlen_defined */
-/* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
- * Returns `(size_t)-1' if the given `NEEDLE' wasn't found */
+/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+ * Returns `(size_t)-1' if the given `needle' wasn't found */
 #define __libc_memrlen __libc_core_memrlen
 #endif /* !__fast_memrlen_defined */
 /* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'

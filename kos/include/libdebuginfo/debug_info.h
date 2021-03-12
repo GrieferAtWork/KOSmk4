@@ -637,21 +637,21 @@ typedef __ATTR_NONNULL((2)) __ssize_t
  * >>     buffer = malloca(typ.t_sizeof);
  * >>     size_t num_written_bits;
  * >>     debuginfo_location_getvalue(&var.v_location,
- * >>                                 SECTIONS,
- * >>                                 &GET_REGISTER,
- * >>                                 &REGISTERS,
- * >>                                 &CU,
- * >>                                 MODULE_RELATIVE_PC,
+ * >>                                 <sections>,
+ * >>                                 &<get_register>,
+ * >>                                 &<registers>,
+ * >>                                 &<cu>,
+ * >>                                 module_relative_pc,
  * >>                                 buffer,
  * >>                                 typ.t_sizeof,
  * >>                                 &num_written_bits,
- * >>                                 &SP->sp_frame_base,
+ * >>                                 &<sp>->sp_frame_base,
  * >>                                 NULL,
  * >>                                 parser->dup_addrsize,
  * >>                                 parser->dup_ptrsize);
  * >>
  * >>     // Print a representation of the variable, and its data.
- * >>     debuginfo_print_value(PRINTER, ARG, &pp, &type, v.v_name, buffer, typ.t_sizeof);
+ * >>     debuginfo_print_value(printer, arg, &pp, &type, v.v_name, buffer, typ.t_sizeof);
  * >> }
  * @param: varname: Name of the value (when NULL, print as a cast-like expression;
  *                  otherwise, print as an declaration)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cd47252 */
+/* HASH CRC-32:0xe8741f42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_LSeek32_defined) && defined(__CRT_HAVE_LSeek)
 #define __local___localdep_LSeek32_defined 1
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #endif /* !__local___localdep_LSeek32_defined && __CRT_HAVE_LSeek */
 /* Dependency: LSeek64 from kos.unistd */
@@ -37,25 +37,25 @@ __CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __o
 #define __local___localdep_LSeek64_defined 1
 #ifdef __CRT_HAVE_LSeek64
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/LSeek64.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 #define __localdep_LSeek64 __LIBC_LOCAL_NAME(LSeek64)
 #else /* ... */
 #undef __local___localdep_LSeek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_LSeek64_defined */
 /* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
+ * Change the position of the file read/write pointer within a file referred to by `fd' */
 __LOCAL_LIBC(LSeek) __FS_TYPE(pos)
 (__LIBCCALL __LIBC_LOCAL_NAME(LSeek))(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) {
 #ifdef __CRT_HAVE_LSeek

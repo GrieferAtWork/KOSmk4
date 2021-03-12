@@ -33,8 +33,8 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_acos,hash:CRC-32=0x13b77ecc]]]*/
-/* Arc cosine of X */
+/*[[[head:libc_acos,hash:CRC-32=0x2aab0512]]]*/
+/* Arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_acos)(double x)
 /*[[[body:libc_acos]]]*/
@@ -46,8 +46,8 @@ NOTHROW(LIBCCALL libc_acos)(double x)
 }
 /*[[[end:libc_acos]]]*/
 
-/*[[[head:libc_asin,hash:CRC-32=0x5af051d3]]]*/
-/* Arc sine of X */
+/*[[[head:libc_asin,hash:CRC-32=0xff077015]]]*/
+/* Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_asin)(double x)
 /*[[[body:libc_asin]]]*/
@@ -59,8 +59,8 @@ NOTHROW(LIBCCALL libc_asin)(double x)
 }
 /*[[[end:libc_asin]]]*/
 
-/*[[[head:libc_cos,hash:CRC-32=0xf2db800f]]]*/
-/* Cosine of X */
+/*[[[head:libc_cos,hash:CRC-32=0x423dc7d6]]]*/
+/* Cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cos double
 NOTHROW(LIBCCALL libc_cos)(double x)
 /*[[[body:libc_cos]]]*/
@@ -72,8 +72,8 @@ NOTHROW(LIBCCALL libc_cos)(double x)
 }
 /*[[[end:libc_cos]]]*/
 
-/*[[[head:libc_sin,hash:CRC-32=0x2f2f363]]]*/
-/* Sine of X */
+/*[[[head:libc_sin,hash:CRC-32=0x99c2e142]]]*/
+/* Sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sin double
 NOTHROW(LIBCCALL libc_sin)(double x)
 /*[[[body:libc_sin]]]*/
@@ -85,8 +85,8 @@ NOTHROW(LIBCCALL libc_sin)(double x)
 }
 /*[[[end:libc_sin]]]*/
 
-/*[[[head:libc_tan,hash:CRC-32=0x4f3c1c73]]]*/
-/* Tangent of X */
+/*[[[head:libc_tan,hash:CRC-32=0x482155e3]]]*/
+/* Tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_tan)(double x)
 /*[[[body:libc_tan]]]*/
@@ -98,8 +98,8 @@ NOTHROW(LIBCCALL libc_tan)(double x)
 }
 /*[[[end:libc_tan]]]*/
 
-/*[[[head:libc_cosh,hash:CRC-32=0x901ee029]]]*/
-/* Hyperbolic cosine of X */
+/*[[[head:libc_cosh,hash:CRC-32=0x8896d0db]]]*/
+/* Hyperbolic cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_cosh)(double x)
 /*[[[body:libc_cosh]]]*/
@@ -111,8 +111,8 @@ NOTHROW(LIBCCALL libc_cosh)(double x)
 }
 /*[[[end:libc_cosh]]]*/
 
-/*[[[head:libc_sinh,hash:CRC-32=0x535bfc45]]]*/
-/* Hyperbolic sine of X */
+/*[[[head:libc_sinh,hash:CRC-32=0x26b05af6]]]*/
+/* Hyperbolic sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_sinh)(double x)
 /*[[[body:libc_sinh]]]*/
@@ -124,8 +124,8 @@ NOTHROW(LIBCCALL libc_sinh)(double x)
 }
 /*[[[end:libc_sinh]]]*/
 
-/*[[[head:libc_tanh,hash:CRC-32=0xd28c3a56]]]*/
-/* Hyperbolic tangent of X */
+/*[[[head:libc_tanh,hash:CRC-32=0x168c3e]]]*/
+/* Hyperbolic tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_tanh)(double x)
 /*[[[body:libc_tanh]]]*/
@@ -137,8 +137,8 @@ NOTHROW(LIBCCALL libc_tanh)(double x)
 }
 /*[[[end:libc_tanh]]]*/
 
-/*[[[head:libc_acosh,hash:CRC-32=0x9b1422a2]]]*/
-/* Hyperbolic arc cosine of X */
+/*[[[head:libc_acosh,hash:CRC-32=0x4ad1db6f]]]*/
+/* Hyperbolic arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_acosh)(double x)
 /*[[[body:libc_acosh]]]*/
@@ -150,8 +150,8 @@ NOTHROW(LIBCCALL libc_acosh)(double x)
 }
 /*[[[end:libc_acosh]]]*/
 
-/*[[[head:libc_asinh,hash:CRC-32=0x26dd6d96]]]*/
-/* Hyperbolic arc sine of X */
+/*[[[head:libc_asinh,hash:CRC-32=0x64f7f8dc]]]*/
+/* Hyperbolic arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_asinh)(double x)
 /*[[[body:libc_asinh]]]*/
@@ -163,8 +163,8 @@ NOTHROW(LIBCCALL libc_asinh)(double x)
 }
 /*[[[end:libc_asinh]]]*/
 
-/*[[[head:libc_atanh,hash:CRC-32=0x4668a03c]]]*/
-/* Hyperbolic arc tangent of X */
+/*[[[head:libc_atanh,hash:CRC-32=0xe084030f]]]*/
+/* Hyperbolic arc tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_atanh)(double x)
 /*[[[body:libc_atanh]]]*/
@@ -176,8 +176,8 @@ NOTHROW(LIBCCALL libc_atanh)(double x)
 }
 /*[[[end:libc_atanh]]]*/
 
-/*[[[head:libc_log,hash:CRC-32=0x89e1cfe9]]]*/
-/* Natural logarithm of X */
+/*[[[head:libc_log,hash:CRC-32=0xfcd1b54a]]]*/
+/* Natural logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_log double
 NOTHROW(LIBCCALL libc_log)(double x)
 /*[[[body:libc_log]]]*/
@@ -189,8 +189,8 @@ NOTHROW(LIBCCALL libc_log)(double x)
 }
 /*[[[end:libc_log]]]*/
 
-/*[[[head:libc_log10,hash:CRC-32=0xf639555a]]]*/
-/* Base-ten logarithm of X */
+/*[[[head:libc_log10,hash:CRC-32=0xf4920ff2]]]*/
+/* Base-ten logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log10)(double x)
 /*[[[body:libc_log10]]]*/
@@ -202,8 +202,8 @@ NOTHROW(LIBCCALL libc_log10)(double x)
 }
 /*[[[end:libc_log10]]]*/
 
-/*[[[head:libc_log1p,hash:CRC-32=0xc1845469]]]*/
-/* Return log(1 + X) */
+/*[[[head:libc_log1p,hash:CRC-32=0x727cd93e]]]*/
+/* Return `log(1 + x)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log1p)(double x)
 /*[[[body:libc_log1p]]]*/
@@ -215,8 +215,8 @@ NOTHROW(LIBCCALL libc_log1p)(double x)
 }
 /*[[[end:libc_log1p]]]*/
 
-/*[[[head:libc_logb,hash:CRC-32=0xaa9c4ccb]]]*/
-/* Return the base 2 signed integral exponent of X */
+/*[[[head:libc_logb,hash:CRC-32=0x53738df8]]]*/
+/* Return the base 2 signed integral exponent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_logb)(double x)
 /*[[[body:libc_logb]]]*/
@@ -228,8 +228,8 @@ NOTHROW(LIBCCALL libc_logb)(double x)
 }
 /*[[[end:libc_logb]]]*/
 
-/*[[[head:libc_exp2,hash:CRC-32=0x36d02e97]]]*/
-/* Compute base-2 exponential of X */
+/*[[[head:libc_exp2,hash:CRC-32=0xb4abe3cc]]]*/
+/* Compute base-2 exponential of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_exp2)(double x)
 /*[[[body:libc_exp2]]]*/
@@ -241,8 +241,8 @@ NOTHROW(LIBCCALL libc_exp2)(double x)
 }
 /*[[[end:libc_exp2]]]*/
 
-/*[[[head:libc_log2,hash:CRC-32=0xcc594a46]]]*/
-/* Compute base-2 logarithm of X */
+/*[[[head:libc_log2,hash:CRC-32=0xb32e7b4d]]]*/
+/* Compute base-2 logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log2)(double x)
 /*[[[body:libc_log2]]]*/
@@ -254,8 +254,8 @@ NOTHROW(LIBCCALL libc_log2)(double x)
 }
 /*[[[end:libc_log2]]]*/
 
-/*[[[head:libc_hypot,hash:CRC-32=0x7d9588de]]]*/
-/* Return `sqrt(X*X + Y*Y)' */
+/*[[[head:libc_hypot,hash:CRC-32=0x287788c0]]]*/
+/* Return `sqrt(x*x + y*y)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_hypot)(double x,
                              double y)
@@ -318,8 +318,8 @@ NOTHROW(LIBCCALL libc_tgamma)(double x)
 }
 /*[[[end:libc_tgamma]]]*/
 
-/*[[[head:libc_remquo,hash:CRC-32=0xe4022176]]]*/
-/* Compute remainder of X and Y and put in *QUO a value with sign
+/*[[[head:libc_remquo,hash:CRC-32=0x8fa636d0]]]*/
+/* Compute remainder of `x' and `y' and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
@@ -337,8 +337,8 @@ NOTHROW(LIBCCALL libc_remquo)(double x,
 }
 /*[[[end:libc_remquo]]]*/
 
-/*[[[head:libc_sincos,hash:CRC-32=0x732403ee]]]*/
-/* Cosine and sine of X */
+/*[[[head:libc_sincos,hash:CRC-32=0x4268bebd]]]*/
+/* Cosine and sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincos NONNULL((2, 3)) void
 NOTHROW(LIBCCALL libc_sincos)(double x,
                               double *psinx,

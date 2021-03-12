@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x257807cb */
+/* HASH CRC-32:0x7201a3b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1603,8 +1603,8 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCC
 /* Change the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
  * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such szenarios.
- * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * states that this function behaves undefined in such scenarios.
+ * However, on KOS, `pthread_sigmask()' is simply an alias for this
  * function, and `sigprocmask()' always operates thread-local.
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the
@@ -1617,8 +1617,8 @@ __CDECLARE(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t 
 /* Change the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
  * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such szenarios.
- * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * states that this function behaves undefined in such scenarios.
+ * However, on KOS, `pthread_sigmask()' is simply an alias for this
  * function, and `sigprocmask()' always operates thread-local.
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the

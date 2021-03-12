@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9e604b6 */
+/* HASH CRC-32:0x58ba8d59 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_exp2_defined
 #define __local___localdep_exp2_defined 1
 #if __has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)
-/* Compute base-2 exponential of X */
+/* Compute base-2 exponential of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),exp2,{ return __builtin_exp2(__x); })
 #elif defined(__CRT_HAVE_exp2)
-/* Compute base-2 exponential of X */
+/* Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),exp2,(__x))
 #elif defined(__CRT_HAVE___exp2)
-/* Compute base-2 exponential of X */
+/* Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),__exp2,(__x))
 #else /* ... */
 #undef __local___localdep_exp2_defined
 #endif /* !... */
 #endif /* !__local___localdep_exp2_defined */
-/* Compute base-2 exponential of X */
+/* Compute base-2 exponential of `x' */
 __LOCAL_LIBC(exp2f) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp2f))(float __x) {
 	return (float)__localdep_exp2((double)__x);

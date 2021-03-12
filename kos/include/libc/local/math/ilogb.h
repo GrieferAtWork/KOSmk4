@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf337ef6 */
+/* HASH CRC-32:0x377fa826 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <libm/matherr.h>
 #include <bits/crt/mathdef.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the binary exponent of X, which must be nonzero */
+/* Return the binary exponent of `x', which must be nonzero */
 __LOCAL_LIBC(ilogb) __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogb))(double __x) {
 	int __result;

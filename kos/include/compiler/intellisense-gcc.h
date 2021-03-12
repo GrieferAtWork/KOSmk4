@@ -50,7 +50,6 @@
 #define __STDC_UTF_32__                    1
 #define __STDC__                           1
 #define __GNUC_STDC_INLINE__               1
-#define __GXX_ABI_VERSION                  1013
 #define __HAVE_SPECULATION_SAFE_VALUE      1
 #define __GCC_IEC_559                      2
 #define __GCC_IEC_559_COMPLEX              2

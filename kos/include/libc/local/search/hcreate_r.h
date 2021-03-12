@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a9971f4 */
+/* HASH CRC-32:0x3a3a1ca4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__isprime))(unsigned int __number) {
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* Reentrant versions which can handle multiple hashing tables at the same time */
+/* >> hcreate_r(3) */
 __LOCAL_LIBC(hcreate_r) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, struct hsearch_data *__htab) {
 	typedef struct {

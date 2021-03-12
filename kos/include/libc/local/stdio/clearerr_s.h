@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffbed504 */
+/* HASH CRC-32:0xf928a380 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clearerr_defined
 #define __local___localdep_clearerr_defined 1
 #if defined(__CRT_HAVE_clearerr_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Clear the error state of `STREAM', returning the stream to normal operations mode */
+/* >> clearerr(3)
+ * Clear the error state of `stream', returning the stream to normal operations mode */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #elif defined(__CRT_HAVE_clearerr)
-/* Clear the error state of `STREAM', returning the stream to normal operations mode */
+/* >> clearerr(3)
+ * Clear the error state of `stream', returning the stream to normal operations mode */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr,(__stream))
 #elif defined(__CRT_HAVE_clearerr_unlocked)
-/* Clear the error state of `STREAM', returning the stream to normal operations mode */
+/* >> clearerr(3)
+ * Clear the error state of `stream', returning the stream to normal operations mode */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_clearerr_defined

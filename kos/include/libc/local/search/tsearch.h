@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef2c88f7 */
+/* HASH CRC-32:0x8a901a99 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,12 +51,12 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_malloc_defined */
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* Possibly "split" a  node with two  red successors, and/or  fix up two  red
- * edges  in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
- * and  GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
- * comparison values that determined which way was taken in the tree to reach
- * ROOTP. MODE is 1 if we need not  do the split, but must check for two  red
- * edges between GPARENTP and ROOTP */
+/* Possibly  "split" a node with two red  successors, and/or fix up two red
+ * edges in a  row. `rootp' is  a pointer  to the lowest  node we  visited,
+ * `parentp' and `gparentp' pointers  to its parent/grandparent. `p_r'  and
+ * `gp_r' contain the comparison values that determined which way was taken
+ * in  the tree to reach `rootp'. `mode' is  1 if we need not do the split,
+ * but must check for two red edges between `gparentp' and `rootp' */
 __LOCAL_LIBC(__maybe_split_for_insert) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__maybe_split_for_insert))(void **__rootp, /*nullable*/ void **__parentp,
                                                                     void **__gparentp, int __p_r, int __gp_r, int __mode) {
@@ -115,8 +115,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__maybe_split_for_insert))(void **__r
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* Search for an entry matching the given KEY in the tree
- * pointed to by *ROOTP and insert a new element if not found */
+/* >> tsearch(3)
+ * Search for an entry matching the given `key' in the tree
+ * pointed to by `*rootp' and insert a new element if not found */
 __LOCAL_LIBC(tsearch) __ATTR_NONNULL((3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key, void **__vrootp, __compar_fn_t __compar) {
 	typedef struct __node_struct {

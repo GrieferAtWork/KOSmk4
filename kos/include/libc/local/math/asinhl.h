@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf973180 */
+/* HASH CRC-32:0x21395680 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_asinh_defined
 #define __local___localdep_asinh_defined 1
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
-/* Hyperbolic arc sine of X */
+/* Hyperbolic arc sine of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),asinh,{ return __builtin_asinh(__x); })
 #elif defined(__CRT_HAVE_asinh)
-/* Hyperbolic arc sine of X */
+/* Hyperbolic arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),asinh,(__x))
 #elif defined(__CRT_HAVE___asinh)
-/* Hyperbolic arc sine of X */
+/* Hyperbolic arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),__asinh,(__x))
 #else /* ... */
 #undef __local___localdep_asinh_defined
 #endif /* !... */
 #endif /* !__local___localdep_asinh_defined */
-/* Hyperbolic arc sine of X */
+/* Hyperbolic arc sine of `x' */
 __LOCAL_LIBC(asinhl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinhl))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_asinh((double)__x);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbef781b0 */
+/* HASH CRC-32:0x2e14d754 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,14 +35,14 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> format_scanf(3), format_vscanf(3)
  * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
- * functions will call the given `SCANNER' function which in
+ * functions will call the given `pgetc' function which in
  * return should successively yield a character at a time from
  * some kind of input source.
- *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
  *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `SCANNER' to track the last read character to get
+ *  - The user may use `pgetc' to track the last read character to get
  *    additional information about what character caused the scan to fail.
- *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
  *  - This implementation supports the following extensions:
  *    - `%[A-Z]'   -- Character ranges in scan patterns
  *    - `%[^abc]'  -- Inversion of a scan pattern
@@ -64,14 +64,14 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> format_scanf(3), format_vscanf(3)
  * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
- * functions will call the given `SCANNER' function which in
+ * functions will call the given `pgetc' function which in
  * return should successively yield a character at a time from
  * some kind of input source.
- *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
  *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `SCANNER' to track the last read character to get
+ *  - The user may use `pgetc' to track the last read character to get
  *    additional information about what character caused the scan to fail.
- *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
  *  - This implementation supports the following extensions:
  *    - `%[A-Z]'   -- Character ranges in scan patterns
  *    - `%[^abc]'  -- Inversion of a scan pattern
@@ -148,7 +148,8 @@ __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
 __NAMESPACE_LOCAL_END
 #endif /* !____vsscanf_getc_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Scan data from a given `INPUT' string, following `FORMAT'
+/* >> sscanf(3), vsscanf(3)
+ * Scan data from a given `input' string, following `format'
  * Return the number of successfully scanned data items */
 __LOCAL_LIBC(vsscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsscanf))(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) {

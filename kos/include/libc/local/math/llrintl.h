@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x265747a3 */
+/* HASH CRC-32:0x72668967 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,22 +26,22 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rintl_defined
 #define __local___localdep_rintl_defined 1
 #if __has_builtin(__builtin_rintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintl)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
+/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),rintl,{ return __builtin_rintl(__x); })
 #elif __has_builtin(__builtin_nearbyintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyintl)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
+/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),nearbyintl,{ return __builtin_nearbyintl(__x); })
 #elif defined(__CRT_HAVE_rintl)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
+/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),rintl,(__x))
 #elif defined(__CRT_HAVE_nearbyintl)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
+/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),nearbyintl,(__x))
 #elif defined(__CRT_HAVE___rintl)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
+/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),__rintl,(__x))
 #elif defined(__CRT_HAVE___nearbyintl)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
+/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_rintl,(__LONGDOUBLE __x),__nearbyintl,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/rintl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
+/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 #define __localdep_rintl __LIBC_LOCAL_NAME(rintl)
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local___localdep_rintl_defined
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value according to current rounding direction */
+/* Round `x' to nearest integral value according to current rounding direction */
 __LOCAL_LIBC(llrintl) __ATTR_CONST __ATTR_WUNUSED __LONGLONG
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llrintl))(__LONGDOUBLE __x) {
 #ifdef __LIBM_MATHFUNIL

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5514748 */
+/* HASH CRC-32:0xc797a271 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,8 @@ typedef void (__LIBKCALL *__action_fn_t)(void const *__nodep, int __value, int _
 #endif /* !__ACTION_FN_T */
 __NAMESPACE_LOCAL_BEGIN
 /* Walk the nodes of a tree.
- * ROOT is the root of the tree to be walked, ACTION the function to be
- * called at each node. LEVEL  is the level of  ROOT in the whole  tree */
+ * `root' is the root of the tree to be walked, `action' the function to be
+ * called at each node. `level'  is the level of  `root' in the whole  tree */
 __LOCAL_LIBC(__trecurse) __ATTR_NONNULL((1, 2)) void
 __LIBC_LOCAL_NAME(__trecurse)(void const *__root, __action_fn_t __action, int __level) {
 	void *__l, *__r;
@@ -48,7 +48,8 @@ __LIBC_LOCAL_NAME(__trecurse)(void const *__root, __action_fn_t __action, int __
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* Walk through the whole tree and call the ACTION callback for every node or leaf */
+/* >> twalk(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
 __LOCAL_LIBC(twalk) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, __action_fn_t __action) {
 	if (__root && __action)

@@ -397,8 +397,8 @@ setns:(fd_t fd, [tostr(CLONE_FLAGS_SETNS)] syscall_ulong_t nstype) -> errno_t; /
 /* Exec                                                                 */
 /************************************************************************/
 %[startgroup]
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [cp]
 execve:([tostr(FILENAME)] char const *path,
         [tostr(STRING_VECTOR)] char const *const *argv,
@@ -414,8 +414,8 @@ execvex64:(char const *path,
 %[endgroup]
 
 %[startgroup]
-@@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+@@Replace the calling process with the application image referred to by `path' / `file'
+@@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 @@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] execveat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
                [tostr(STRING_VECTOR)] char const *const *argv,
@@ -442,17 +442,17 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 /************************************************************************/
 @@Read up to `bufsize' bytes from `fd' into `buf'
 @@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
-@@available at the time the call was made, and throw E_WOULDBLOCK if no data
-@@was available at the time.
+@@available at the time the call was made, and throw `E_WOULDBLOCK' if no
+@@data was available at the time.
 @@@return: <= bufsize: The actual amount of read bytes
 @@@return: 0         : EOF
 [cp] read:(fd_t fd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize) -> ssize_t;
 [cp][doc_alias(read)] readf:(fd_t fd, [tostr(out:BUFFER:bufsize:return)] void *buf, size_t bufsize, iomode_t mode) -> ssize_t;
 
 @@Write up to `bufsize' bytes from `buf' into `fd'
-@@When `fd' has the `O_NONBLOCK' flag set, only write as much data
-@@as possible at the time the call was made, and throw E_WOULDBLOCK
-@@if no data could be written at the time.
+@@When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+@@possible at the time the call was made, and throw `E_WOULDBLOCK' if
+@@no data could be written at the time.
 @@@return: <= bufsize: The actual amount of written bytes
 @@@return: 0         : No more data can be written
 [cp] write:(fd_t fd, [tostr(BUFFER:bufsize)] void const *buf, size_t bufsize) -> ssize_t;
@@ -469,8 +469,8 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 @@read data into `count' separate buffers, though still return the actual
 @@number of read bytes.
 @@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
-@@available at the time the call was made, and throw E_WOULDBLOCK if no data
-@@was available at the time.
+@@available at the time the call was made, and throw `E_WOULDBLOCK' 
+@@no data was available at the time.
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
 @@@return: 0                     : EOF
 [cp] readv:(fd_t fd, [tostr(STRUCT_IOVEC:count)] struct iovec const *iovec, size_t count) -> ssize_t;
@@ -518,7 +518,7 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 @@write data from `count' separate buffers, though still return the actual
 @@number of written bytes.
 @@When `fd' has the `O_NONBLOCK' flag set, only write as much data
-@@as possible at the time the call was made, and throw E_WOULDBLOCK
+@@as possible at the time the call was made, and throw `E_WOULDBLOCK'
 @@if no data could be written at the time.
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 @@@return: 0                     : No more data can be written
@@ -596,12 +596,13 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 /************************************************************************/
 /* FD-related functions                                                 */
 /************************************************************************/
-@@Close a given file descriptor/handle `FD'
+@@Close a given file descriptor/handle `fd'
 //[cp] /* Even though pthread allows this, I thing this would be a _really_ bad idea... */
 [restart(must)] close:(fd_t fd) -> errno_t;
 
 dup:(fd_t fd) -> fd_t;
 dup2:(fd_t oldfd, fd_t newfd) -> fd_t;
+
 @@@param: flags:  Set of `O_CLOEXEC | O_CLOFORK'
 dup3:(fd_t oldfd, fd_t newfd, [tostr(OFLAG__CLOEXEC__CLOFORK)] oflag_t flags) -> fd_t;
 
@@ -733,9 +734,9 @@ userviofd:(size_t initial_size, [tostr(OFLAG__CLOEXEC__CLOFORK__NONBLOCK)] sysca
 /************************************************************************/
 @@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
 @@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
-@@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
-@@              MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
-@@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER'
+@@              with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+@@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+@@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER'
 mmap:(void *addr, size_t len,
 	[tostr(MMAP_PROT)] syscall_ulong_t prot,
 	[tostr(MMAP_FLAGS)] syscall_ulong_t flags,
@@ -752,9 +753,9 @@ mmap2:(void *addr, size_t len, [tostr(MMAP_PROT)] syscall_ulong_t prot,
 %[startgroup]
 @@Map the segments of a given library into memory
 @@@param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
-@@@param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
-@@                      MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
-@@                      MAP_FIXED_NOREPLACE'
+@@@param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
+@@                      MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
+@@                      MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
 @@@param: fd:    A handle for the library file being mapped
 @@               (must be a file or vm_datablock/inode)
 @@@param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -954,7 +955,7 @@ brk:(void *addr) -> errno_t; /* UNIMPLEMENTED! */
 /************************************************************************/
 /* Filesystem functions                                                 */
 /************************************************************************/
-@@Open a new file handle to the file specified by `FILENAME'
+@@Open a new file handle to the file specified by `filename'
 @@When `oflags & O_CREAT', then `mode' specifies the initial
 @@file access permissions with which the file should be opened.
 @@On KOS, the returned handle can be anything, but is usually one of:
@@ -2757,29 +2758,29 @@ getrandom:(void *buf, size_t num_bytes,
 @@  Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
 @@                                                        EXCEPT_HANDLER_FLAG_SETHANDLER,
 @@                                                        &except_handler4, NULL)'
-@@@param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
-@@@param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
-@@@param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+@@@param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+@@@param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+@@@param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
 @@@return: 0 :        Success.
-@@@return: -1:EINVAL: The given MODE is invalid
+@@@return: -1:EINVAL: The given `mode' is invalid
 [restart(must)]
 set_exception_handler:([tostr(EXCEPTION_HANDLER_MODE)] syscall_ulong_t mode,
                        except_handler_t handler, void *handler_sp) -> errno_t;
 
 %[startgroup]
 @@Get the current exception handler mode for the calling thread.
-@@@param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+@@@param: pmode:       When non-`NULL', store the current mode, which is encoded as:
 @@                      - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
 @@                      - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
-@@@param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
-@@                     Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+@@@param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+@@                     Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
 @@                     then this pointer is set to `NULL'.
-@@@param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
-@@                     Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+@@@param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+@@                     Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
 @@                     or when the stack was defined to re-use the previous stack,
 @@                     then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
 @@@return: 0 :         Success.
-@@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
+@@@return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty
 [restart(must)]
 get_exception_handler:([tostr(out:EXCEPTION_HANDLER_MODE)] syscall_ulong_t *pmode,
                        [tostr(out:EXCEPT_HANDLER_T)] except_handler_t *phandler,

@@ -107,7 +107,8 @@ __SYSDECL_BEGIN
 
 }
 
-@@Apply or remove an advisory lock, according to OPERATION, on the file FD refers to
+@@>> flock(2)
+@@Apply or remove an advisory lock, according to `operation', on the file `fd' refers to
 [[cp, decl_include("<features.h>", "<bits/types.h>")]]
 int flock($fd_t fd, __STDC_INT_AS_UINT_T operation);
 

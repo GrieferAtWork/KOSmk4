@@ -183,7 +183,7 @@
 #define TIOCCBRK    __TIOCCBRK      /* BSD compatibility */
 #endif /* !TIOCCBRK && __TIOCCBRK */
 #if !defined(TIOCGSID) && defined(__TIOCGSID)
-#define TIOCGSID    __TIOCGSID      /* [pid_t *arg] Return the session ID of FD */
+#define TIOCGSID    __TIOCGSID      /* [pid_t *arg] Return the session ID of a tty */
 #endif /* !TIOCGSID && __TIOCGSID */
 #if !defined(TCGETS2) && defined(__TCGETS2)
 #define TCGETS2     __TCGETS2       /* ... */

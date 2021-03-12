@@ -249,7 +249,7 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
 /* Top-level function for unwinding the specific register state, automatically
  * locating the associated FDE entry, before using it to unwind the  specified
  * register state.
- * NOTE: The given `ABSOLUTE_PC' should point _to_ or _into_ the instruction that
+ * NOTE: The given `absolute_pc' should point _to_ or _into_ the instruction that
  *       should be  unwound; Not  after it.  - i.e.  range checking  is done  as:
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */

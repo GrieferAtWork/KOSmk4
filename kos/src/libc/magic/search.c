@@ -147,6 +147,7 @@ struct qelem {
 
 }
 
+@@>> insque(3)
 @@Insert ELEM into a doubly-linked list, after PREV
 void insque([[nonnull]] void *__restrict elem, void *prev) {
 	struct link {
@@ -167,6 +168,7 @@ void insque([[nonnull]] void *__restrict elem, void *prev) {
 	}
 }
 
+@@>> remque(3)
 @@Unlink ELEM from the doubly-linked list that it is in
 void remque([[nonnull]] void *__restrict elem) {
 	struct link {
@@ -241,7 +243,7 @@ struct hsearch_data {
 @@pp_ifndef __local_htab_defined@@
 #define __local_htab_defined 1
 @@push_namespace(local)@@
-__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = { NULL, 0, 0 };
 @@pop_namespace@@
 @@pp_endif@@
 )]
@@ -256,9 +258,10 @@ typedef struct entry {
 @@pp_endif@@
 )]
 
-@@Search for entry matching ITEM.key in internal hash table.
-@@If ACTION is `FIND' return found entry or signal error by returning NULL.
-@@If ACTION is `ENTER' replace existing data (if any) with ITEM.data
+@@>> hsearch(3)
+@@Search for entry matching `item.key' in internal hash table.
+@@If `action' is `FIND' return found entry or signal error by returning `NULL'.
+@@If `action' is `ENTER' replace existing data (if any) with `item.data'
 [[decl_prefix(struct entry;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
 [[requires_function(hsearch_r)]]
@@ -268,13 +271,15 @@ ENTRY *hsearch(ENTRY item, ACTION action) {
 	return result;
 }
 
-@@Create a new hashing table which will at most contain NEL elements
+@@>> hcreate(3)
+@@Create a new hashing table which will at most contain `nel' elements
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
 [[requires_function(hcreate_r), decl_include("<hybrid/typecore.h>")]]
 int hcreate(size_t nel) {
 	return hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
 }
 
+@@>> hdestroy(3)
 @@Destroy current internal hashing table
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
 [[requires_function(hdestroy_r)]]
@@ -295,6 +300,7 @@ struct hsearch_data {
 #endif /* !__hsearch_data_defined */
 }
 
+@@>> hsearch_r(3)
 @@Reentrant versions which can handle multiple hashing tables at the same time
 [[decl_prefix(struct entry;)]]
 [[decl_prefix(struct hsearch_data;)]]
@@ -362,11 +368,12 @@ int hsearch_r(ENTRY item, ACTION action,
 	return 0;
 }
 
+@@>> hcreate_r(3)
 [[decl_prefix(struct hsearch_data;)]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[impl_prefix(DEFINE_SEARCH_ENTRY)]]
-[[requires_function(calloc), doc_alias("hsearch_r")]]
+[[requires_function(calloc)]]
 [[impl_include("<hybrid/limitcore.h>", "<libc/errno.h>")]]
 [[impl_prefix(
 @@push_namespace(local)@@
@@ -419,10 +426,10 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	return 1;
 }
 
+@@>> hdestroy_r(3)
 [[decl_prefix(struct hsearch_data;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
-[[doc_alias("hsearch_r"), impl_include("<libc/errno.h>")]]
-[[requires_function(free)]]
+[[impl_include("<libc/errno.h>")]]
 void hdestroy_r(struct hsearch_data *htab) {
 	if (htab == NULL) {
 @@pp_ifdef EINVAL@@
@@ -430,7 +437,9 @@ void hdestroy_r(struct hsearch_data *htab) {
 @@pp_endif@@
 		return;
 	}
+@@pp_if $has_function(free)@@
 	free(htab->@table@);
+@@pp_endif@@
 	htab->@table@ = NULL;
 }
 %#endif /* __USE_GNU */
@@ -451,18 +460,19 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 @@pp_endif@@
 )]
 
-@@Search for an entry matching the given KEY in the tree
-@@pointed to by *ROOTP and insert a new element if not found
+@@>> tsearch(3)
+@@Search for an entry matching the given `key' in the tree
+@@pointed to by `*rootp' and insert a new element if not found
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[requires_function(malloc), export_alias("__tsearch")]]
 [[impl_prefix(
 @@push_namespace(local)@@
-/* Possibly "split" a  node with two  red successors, and/or  fix up two  red
- * edges  in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
- * and  GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
- * comparison values that determined which way was taken in the tree to reach
- * ROOTP. MODE is 1 if we need not  do the split, but must check for two  red
- * edges between GPARENTP and ROOTP */
+/* Possibly  "split" a node with two red  successors, and/or fix up two red
+ * edges in a  row. `rootp' is  a pointer  to the lowest  node we  visited,
+ * `parentp' and `gparentp' pointers  to its parent/grandparent. `p_r'  and
+ * `gp_r' contain the comparison values that determined which way was taken
+ * in  the tree to reach `rootp'. `mode' is  1 if we need not do the split,
+ * but must check for two red edges between `gparentp' and `rootp' */
 __LOCAL_LIBC(maybe_split_for_insert) NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp, /*nullable*/ void **parentp,
                                                                     void **gparentp, int p_r, int gp_r, int mode) {
@@ -577,8 +587,9 @@ void *tsearch(void const *key,
 	return q;
 }
 
-@@Search for an entry matching the given KEY in the tree pointed
-@@to by *ROOTP. If no matching entry is available return NULL
+@@>> tfind(3)
+@@Search for an entry matching the given `key' in the tree pointed
+@@to by `*rootp'. If no matching entry is available return `NULL'
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[export_alias("__tfind")]]
 void *tfind(void const *key,
@@ -603,11 +614,11 @@ void *tfind(void const *key,
 	return NULL;
 }
 
-@@Remove the element matching KEY from the tree pointed to by *ROOTP
+@@>> tdelete(3)
+@@Remove the element matching `key' from the tree pointed to by `*rootp'
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[export_alias("__tdelete")]]
 [[impl_include("<hybrid/typecore.h>", "<parts/malloca.h>")]]
-[[requires_function(free)]]
 void *tdelete(void const *__restrict key,
               [[nullable]] void **__restrict vrootp,
               [[nonnull]] __compar_fn_t compar) {
@@ -779,7 +790,9 @@ void *tdelete(void const *__restrict key,
 		if (r != NULL)
 			r->is_red = 0;
 	}
+@@pp_if $has_function(free)@@
 	free(unchained);
+@@pp_endif@@
 done:
 	__freea(nodestack);
 	return retval;
@@ -801,12 +814,13 @@ typedef void (__LIBKCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 )]
 
 
-@@Walk through the whole tree and call the ACTION callback for every node or leaf
+@@>> twalk(3)
+@@Walk through the whole tree and call the `action' callback for every node or leaf
 [[decl_prefix(DEFINE_ACTION_FN_T), export_alias("__twalk"), impl_prefix(
 @@push_namespace(local)@@
 /* Walk the nodes of a tree.
- * ROOT is the root of the tree to be walked, ACTION the function to be
- * called at each node. LEVEL  is the level of  ROOT in the whole  tree */
+ * `root' is the root of the tree to be walked, `action' the function to be
+ * called at each node. `level'  is the level of  `root' in the whole  tree */
 __LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
 __LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	void *l, *r;
@@ -852,8 +866,9 @@ typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
 
 
 
-@@Destroy the whole tree, call FREEFCT for each node or leaf
-[[decl_prefix(DEFINE_FREE_FN_T), requires_function(free)]]
+@@>> tdestroy(3)
+@@Destroy the whole tree, call `freefct' for each node or leaf
+[[decl_prefix(DEFINE_FREE_FN_T)]]
 void tdestroy([[nullable]] void *root,
               [[nonnull]] __free_fn_t freefct) {
 again:
@@ -862,7 +877,9 @@ again:
 		l = ((void **)root)[1];
 		r = ((void **)root)[2];
 		(*freefct)(((void **)root)[0]);
+@@pp_if $has_function(free)@@
 		free(root);
+@@pp_endif@@
 		if (l) {
 			if (r)
 				tdestroy(r, freefct);
@@ -879,7 +896,8 @@ again:
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
-@@Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE)
+@@>> lfind(3)
+@@Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size)
 [[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 void *lfind(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar)
 	[(void const *key, [[nonnull]] void *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar): void *]
@@ -895,8 +913,9 @@ void *lfind(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __
 	return NULL;
 }
 
-@@Perform linear search for KEY by comparing by COMPAR function
-@@in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found
+@@>> lsearch(3)
+@@Perform linear search for `key' by comparing by `compar' function
+@@in array [base, base+nmemb*size) and insert entry if not found
 [[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
 void *lsearch(void const *key, [[nonnull]] void *base,
               [[nonnull]] size_t *nmemb,

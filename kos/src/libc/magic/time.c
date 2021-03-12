@@ -407,7 +407,7 @@ $errno_t dos_gmtime32_s([[nonnull]] struct $tm *__restrict tp,
 $errno_t dos_localtime32_s([[nonnull]] struct $tm *__restrict tp,
                            [[nonnull]] $time32_t const *__restrict timer);
 
-@@Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))'
+@@Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))'
 [[decl_include("<bits/types.h>")]]
 [[ignore, nocrt, alias("_ctime32_s")]]
 $errno_t dos_ctime32_s([[nonnull]] char buf[26], $size_t bufsize,
@@ -521,10 +521,10 @@ $time32_t mktime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
 %[insert:std]
 
 @@Time used by the program so far (user time + system time)
-@@The result / CLOCKS_PER_SECOND is program time in seconds
+@@The `result / CLOCKS_PER_SECOND' is program time in seconds
 [[std, wunused]] clock_t clock();
 
-@@Return the current time and put it in *TIMER if TIMER is not NULL
+@@Return the current time and put it in `*timer' if `timer' is not `NULL'
 [[decl_include("<bits/types.h>")]]
 [[std, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("time64", "_time64")]]
@@ -566,7 +566,7 @@ double difftime(time_t time1, time_t time0) {
 
 
 
-@@Return the `time_t' representation of TP and normalize TP
+@@Return the `time_t' representation of `tp' and normalize `tp'
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[wunused, ATTR_PURE, std]]
 [[decl_include("<bits/crt/tm.h>"), impl_prefix(DEFINE_YEARSTODAYS), no_crt_self_import]]
@@ -645,7 +645,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 )]
 
 
-@@Return the `struct tm' representation of *TIMER
+@@Return the `struct tm' representation of `*timer'
 @@in Universal Coordinated Time (aka Greenwich Mean Time)
 [[decl_include("<bits/types.h>")]]
 [[std, decl_include("<bits/crt/tm.h>")]]
@@ -671,7 +671,7 @@ DEFINE_GMTIME_BUFFER
 }
 
 
-@@Return the `struct tm' representation of *TIMER in the local timezone
+@@Return the `struct tm' representation of `*timer' in the local timezone
 [[decl_include("<bits/types.h>")]]
 [[std, decl_include("<bits/crt/tm.h>")]]
 [[impl_prefix(
@@ -696,9 +696,7 @@ DEFINE_GMTIME_BUFFER
 }
 
 
-@@Similar to `strftime' but take the information from
-@@the provided locale and not the global locale
-[[decl_include("<bits/crt/tm.h>")]]
+[[decl_include("<bits/crt/tm.h>"), doc_alias("strftime_l")]]
 [[ignore, nocrt, alias("strftime_l", "_strftime_l", "__strftime_l")]]
 $size_t crt_strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
                        [[nonnull]] char const *__restrict format,
@@ -706,9 +704,10 @@ $size_t crt_strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
                        $locale_t locale);
 
 
-@@Format TP into S according to FORMAT.
-@@Write no more than MAXSIZE characters and return the number
-@@of characters written, or 0 if it would exceed MAXSIZE
+@@>> strftime(3)
+@@Format `tp' into `s' according to `format'.
+@@Write no more than `maxsize' characters and return the number
+@@of characters written, or 0 if it would exceed `maxsize'
 [[std, decl_include("<bits/crt/tm.h>"), crtbuiltin, alias("_Strftime")]]
 size_t strftime([[outp(bufsize)]] char *__restrict buf, size_t bufsize,
                 [[nonnull]] char const *__restrict format,
@@ -744,7 +743,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 )]
 
 @@Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
-@@that is the representation of TP in this format
+@@that is the representation of `tp' in this format
 [[std, wunused, impl_prefix(DEFINE_CTIME_BUFFER)]]
 [[nonnull]] char *asctime([[nonnull]] struct tm const *tp) {
 	return asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
@@ -1031,7 +1030,7 @@ int stime([[nonnull]] $time_t const *when) {
 @@pp_endif@@
 }
 
-@@Like `mktime', but TP represents Universal Time (UTC), not local time
+@@Like `mktime', but `tp' represents Universal Time (UTC), not local time
 [[decl_include("<bits/types.h>"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timegm64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timegm")]]
@@ -1195,7 +1194,7 @@ int clock_getres(clockid_t clock_id, [[nonnull]] struct timespec *res) {
 [[doc_alias("clock_gettime"), ignore, nocrt, alias("clock_gettime", "__clock_gettime")]]
 int clock_gettime32(clockid_t clock_id, [[nonnull]] struct $timespec32 *tp);
 
-@@Get current value of clock CLOCK_ID and store it in TP
+@@Get current value of clock `clock_id' and store it in `tp'
 [[decl_include("<bits/os/timespec.h>")]]
 [[no_crt_self_import, export_as("__clock_gettime")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("clock_gettime64")]]
@@ -1229,7 +1228,7 @@ int clock_gettime(clockid_t clock_id, [[nonnull]] struct timespec *tp) {
 [[doc_alias(clock_settime), ignore, nocrt, alias("clock_settime", "__clock_settime")]]
 int clock_settime32(clockid_t clock_id, [[nonnull]] struct $timespec32 const *tp);
 
-@@Set clock CLOCK_ID to value TP
+@@Set clock `clock_id' to value `tp'
 [[no_crt_self_import, export_as(__clock_settime), decl_include("<bits/os/timespec.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("clock_settime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("clock_settime", "__clock_settime")]]
@@ -1249,26 +1248,25 @@ int clock_settime(clockid_t clock_id, [[nonnull]] struct timespec const *tp) {
 }
 
 
-@@Create new per-process timer using CLOCK_ID
+@@Create new per-process timer using `clock_id'
 [[decl_include("<bits/os/sigevent.h>", "<bits/types.h>")]]
 [[section(".text.crt{|.dos}.timer")]]
 int timer_create(clockid_t clock_id,
                  [[nullable]] struct sigevent *__restrict evp,
                  [[nonnull]] timer_t *__restrict timerid);
 
-@@Delete timer TIMERID
+@@Delete timer `timerid'
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.timer")]]
 int timer_delete(timer_t timerid);
 
-@@Set timer TIMERID to VALUE, returning old value in OVALUE
 [[decl_include("<features.h>", "<bits/os/itimerspec.h>", "<bits/types.h>")]]
-[[ignore, nocrt, alias("timer_settime")]]
+[[ignore, nocrt, alias("timer_settime"), doc_alias("timer_settime")]]
 int timer_settime32(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                     [[nonnull]] struct $itimerspec32 const *__restrict value,
                     [[nullable]] struct $itimerspec32 *ovalue);
 
-@@Set timer TIMERID to VALUE, returning old value in OVALUE
+@@Set timer `timerid' to `value', returning old value in `ovalue'
 [[no_crt_self_import]]
 [[decl_include("<features.h>", "<bits/os/itimerspec.h>", "<bits/types.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timer_settime64")]]
@@ -1315,7 +1313,7 @@ int timer_settime(timer_t timerid, __STDC_INT_AS_UINT_T flags,
 [[doc_alias("timer_gettime"), ignore, nocrt, alias("timer_gettime")]]
 int timer_gettime32(timer_t timerid, [[nonnull]] struct itimerspec *value);
 
-@@Get current value of timer TIMERID and store it in VALUE
+@@Get current value of timer `timerid' and store it in `value'
 [[no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timer_gettime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timer_gettime")]]
@@ -1347,7 +1345,7 @@ int timer_gettime(timer_t timerid, [[nonnull]] struct itimerspec *value) {
 @@pp_endif@@
 }
 
-@@Get expiration overrun for timer TIMERID
+@@Get expiration overrun for timer `timerid'
 [[section(".text.crt{|.dos}.timer"), decl_include("<bits/types.h>")]]
 int timer_getoverrun(timer_t timerid);
 
@@ -1520,7 +1518,7 @@ int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 
 %
 %(c,std)#ifdef __USE_ISOCXX17
-@@Set TS to calendar time based in time base BASE
+@@Set `ts' to calendar time based in time base `base'
 [[std, guard, decl_include("<features.h>", "<bits/os/timespec.h>")]]
 int timespec_get([[nonnull]] struct timespec *ts,
                  __STDC_INT_AS_UINT_T base);
@@ -1553,8 +1551,8 @@ int timespec_get([[nonnull]] struct timespec *ts,
 
 %
 @@Parse the given string as a date specification and return a value
-@@representing the value.  The templates from the file identified by
-@@the environment variable DATEMSK are used.  In case of an error
+@@representing the value. The templates from the file identified by
+@@the environment variable `$DATEMSK' are used. In case of an error
 @@`getdate_err' is set
 [[decl_include("<bits/crt/tm.h>")]]
 struct $tm *getdate([[nonnull]] const char *string);
@@ -1581,7 +1579,8 @@ INTDEF longptr_t libc_timezone;
 %
 %#ifdef __USE_XOPEN2K8
 
-@@Similar to `strftime' but take the information from
+@@>> strftime_l(3)
+@@Similar to `strftime(3)' but take the information from
 @@the provided locale and not the global locale
 [[decl_include("<bits/crt/tm.h>"), export_alias("_strftime_l", "__strftime_l")]]
 $size_t strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
@@ -1593,7 +1592,8 @@ $size_t strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
 %#endif /* __USE_XOPEN2K8 */
 
 
-[[decl_include("<bits/crt/tm.h>"), doc_alias("strptime_l"), ignore, nocrt, alias("strptime_l")]]
+[[ignore, nocrt, alias("strptime_l")]]
+[[decl_include("<bits/crt/tm.h>"), doc_alias("strptime_l")]]
 char *crt_strptime_l([[nonnull]] char const *__restrict s,
                      [[nonnull]] char const *__restrict format,
                      [[nonnull]] struct $tm *__restrict tp,
@@ -1602,8 +1602,8 @@ char *crt_strptime_l([[nonnull]] char const *__restrict s,
 
 %
 %#ifdef __USE_XOPEN
-@@Parse S according to FORMAT and store binary time information in TP.
-@@The return value is a pointer to the first unparsed character in S
+@@Parse `s' according to `format' and store binary time information in `tp'.
+@@The return value is a pointer to the first unparsed character in `s'
 [[decl_include("<bits/crt/tm.h>")]]
 char *strptime([[nonnull]] char const *__restrict s,
                [[nonnull]] char const *__restrict format,
@@ -1645,7 +1645,7 @@ char *strptime_l([[nonnull]] char const *__restrict s,
 @@Since `getdate' is not reentrant because of the use of `getdate_err'
 @@and the static buffer to return the result in, we provide a thread-safe
 @@variant.  The functionality is the same.  The result is returned in
-@@the buffer pointed to by RESBUFP and in case of an error the return
+@@the buffer pointed to by `resbufp' and in case of an error the return
 @@value is != 0 with the same values as given above for `getdate_err'.
 [[guard, decl_include("<bits/crt/tm.h>")]]
 int getdate_r([[nonnull]] char const *__restrict string,
@@ -1692,7 +1692,7 @@ __UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
 %
 %#ifdef __USE_POSIX
 
-@@Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result
+@@Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result
 [[decl_include("<bits/types.h>")]]
 [[decl_include("<bits/crt/tm.h>")]]
 [[impl_prefix(
@@ -1756,7 +1756,7 @@ struct $tm *gmtime_r([[nonnull]] $time_t const *__restrict timer,
 @@pp_endif@@
 }
 
-@@Return the `struct tm' representation of *TIMER in local time, using *TP to store the result
+@@Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result
 [[decl_include("<bits/types.h>"), decl_include("<bits/crt/tm.h>")]]
 struct $tm *localtime_r([[nonnull]] $time_t const *__restrict timer,
                         [[nonnull]] struct $tm *__restrict tp) {
@@ -1773,7 +1773,7 @@ struct $tm *localtime_r([[nonnull]] $time_t const *__restrict timer,
 @@pp_endif@@
 }
 
-@@Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)'
+@@Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)'
 [[decl_include("<bits/types.h>"), decl_include("<bits/crt/tm.h>")]]
 char *ctime_r([[nonnull]] $time_t const *__restrict timer,
               [[nonnull]] char buf[26]) {
@@ -1947,8 +1947,9 @@ __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4]
 )]
 
 
-@@Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
-@@that is the representation of TP in this format
+@@>> asctime_r(3)
+@@Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
+@@that is the representation of `tp' in this format
 [[decl_include("<bits/crt/tm.h>")]]
 [[impl_prefix(
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(crt_asctime_s)@@

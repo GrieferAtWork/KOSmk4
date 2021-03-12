@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b7f7368 */
+/* HASH CRC-32:0x1927b70b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -201,7 +201,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_crt_ftello64,(__
 #undef __local___localdep_crt_ftello64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_ftello64_defined */
-/* Return the current in-file position of `STREAM' */
+/* >> ftello(3), ftello64(3)
+ * Return the current in-file position of `stream' */
 __LOCAL_LIBC(ftello) __ATTR_WUNUSED __ATTR_NONNULL((1)) __FS_TYPE(off)
 (__LIBCCALL __LIBC_LOCAL_NAME(ftello))(__FILE *__restrict __stream) __THROWS(...) {
 #if defined(__USE_FILE_OFFSET64) && ((defined(__CRT_HAVE_fgetpos) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || (defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fgetpos64_unlocked))

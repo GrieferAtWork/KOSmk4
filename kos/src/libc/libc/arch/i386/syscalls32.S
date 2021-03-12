@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30ded5b5 */
+/* HASH CRC-32:0xc4a7f4df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -561,8 +561,8 @@ DEFINE_PUBLIC_ALIAS(sys_fork, libc_sys_fork)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
@@ -573,9 +573,9 @@ END(libc_sys_read)
 DEFINE_PUBLIC_ALIAS(sys_read, libc_sys_read)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
@@ -585,7 +585,7 @@ INTERN_FUNCTION(libc_sys_write)
 END(libc_sys_write)
 DEFINE_PUBLIC_ALIAS(sys_write, libc_sys_write)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -605,7 +605,7 @@ INTERN_FUNCTION(libc_sys_open)
 END(libc_sys_open)
 DEFINE_PUBLIC_ALIAS(sys_open, libc_sys_open)
 
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 /* errno_t close(fd_t fd) */
 INTERN_FUNCTION(libc_sys_close)
 	movl   $(0x6), %eax
@@ -647,8 +647,8 @@ INTERN_FUNCTION(libc_sys_unlink)
 END(libc_sys_unlink)
 DEFINE_PUBLIC_ALIAS(sys_unlink, libc_sys_unlink)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 INTERN_FUNCTION(libc_sys_execve)
 	movl   $(0xb), %eax
@@ -1247,9 +1247,9 @@ DEFINE_PUBLIC_ALIAS(sys_readdir, libc_sys_readdir)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 INTERN_FUNCTION(libc_sys_mmap)
 	movl   $(0x5a), %eax
@@ -1689,8 +1689,8 @@ DEFINE_PUBLIC_ALIAS(sys_msync, libc_sys_msync)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
@@ -1704,7 +1704,7 @@ DEFINE_PUBLIC_ALIAS(sys_readv, libc_sys_readv)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -2881,7 +2881,7 @@ INTERN_FUNCTION(libc_sys_migrate_pages)
 END(libc_sys_migrate_pages)
 DEFINE_PUBLIC_ALIAS(sys_migrate_pages, libc_sys_migrate_pages)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -3432,8 +3432,8 @@ INTERN_FUNCTION(libc_sys_bpf)
 END(libc_sys_bpf)
 DEFINE_PUBLIC_ALIAS(sys_bpf, libc_sys_bpf)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_execveat)
@@ -4325,7 +4325,7 @@ DEFINE_PUBLIC_ALIAS(sys_ksysctl, libc_sys_ksysctl)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -4340,8 +4340,8 @@ DEFINE_PUBLIC_ALIAS(sys_writevf, libc_sys_writevf)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
@@ -4387,9 +4387,9 @@ DEFINE_PUBLIC_ALIAS(sys_setitimer64, libc_sys_setitimer64)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
+ *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
+ *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -4769,18 +4769,18 @@ END(libc_sys_debugtrap)
 DEFINE_PUBLIC_ALIAS(sys_debugtrap, libc_sys_debugtrap)
 
 /* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 INTERN_FUNCTION(libc_sys_get_exception_handler)
 	movl   $(0xfffffff1), %eax
@@ -4794,11 +4794,11 @@ DEFINE_PUBLIC_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
  *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
+ * @return: -1:EINVAL: The given `mode' is invalid */
 /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 INTERN_FUNCTION(libc_sys_set_exception_handler)
 	movl   $(0xfffffff2), %eax
@@ -4975,9 +4975,9 @@ END(libc_sys_detach)
 DEFINE_PUBLIC_ALIAS(sys_detach, libc_sys_detach)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
@@ -4989,8 +4989,8 @@ DEFINE_PUBLIC_ALIAS(sys_writef, libc_sys_writef)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
@@ -5048,8 +5048,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xfork, libc_sys_Xfork)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
@@ -5060,9 +5060,9 @@ END(libc_sys_Xread)
 DEFINE_PUBLIC_ALIAS(sys_Xread, libc_sys_Xread)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
@@ -5072,7 +5072,7 @@ INTERN_FUNCTION(libc_sys_Xwrite)
 END(libc_sys_Xwrite)
 DEFINE_PUBLIC_ALIAS(sys_Xwrite, libc_sys_Xwrite)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -5092,7 +5092,7 @@ INTERN_FUNCTION(libc_sys_Xopen)
 END(libc_sys_Xopen)
 DEFINE_PUBLIC_ALIAS(sys_Xopen, libc_sys_Xopen)
 
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 /* errno_t close(fd_t fd) */
 INTERN_FUNCTION(libc_sys_Xclose)
 	movl   $(0x6), %eax
@@ -5134,8 +5134,8 @@ INTERN_FUNCTION(libc_sys_Xunlink)
 END(libc_sys_Xunlink)
 DEFINE_PUBLIC_ALIAS(sys_Xunlink, libc_sys_Xunlink)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 INTERN_FUNCTION(libc_sys_Xexecve)
 	movl   $(0xb), %eax
@@ -5734,9 +5734,9 @@ DEFINE_PUBLIC_ALIAS(sys_Xreaddir, libc_sys_Xreaddir)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 INTERN_FUNCTION(libc_sys_Xmmap)
 	movl   $(0x5a), %eax
@@ -6163,8 +6163,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xmsync, libc_sys_Xmsync)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
@@ -6178,7 +6178,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xreadv, libc_sys_Xreadv)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -7342,7 +7342,7 @@ INTERN_FUNCTION(libc_sys_Xmigrate_pages)
 END(libc_sys_Xmigrate_pages)
 DEFINE_PUBLIC_ALIAS(sys_Xmigrate_pages, libc_sys_Xmigrate_pages)
 
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -7893,8 +7893,8 @@ INTERN_FUNCTION(libc_sys_Xbpf)
 END(libc_sys_Xbpf)
 DEFINE_PUBLIC_ALIAS(sys_Xbpf, libc_sys_Xbpf)
 
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xexecveat)
@@ -8786,7 +8786,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -8801,8 +8801,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xwritevf, libc_sys_Xwritevf)
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
@@ -8848,9 +8848,9 @@ DEFINE_PUBLIC_ALIAS(sys_Xsetitimer64, libc_sys_Xsetitimer64)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
+ *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
+ *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -9230,18 +9230,18 @@ END(libc_sys_Xdebugtrap)
 DEFINE_PUBLIC_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
 
 /* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 INTERN_FUNCTION(libc_sys_Xget_exception_handler)
 	movl   $(0xfffffff1), %eax
@@ -9255,11 +9255,11 @@ DEFINE_PUBLIC_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
  *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
+ * @return: -1:EINVAL: The given `mode' is invalid */
 /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 INTERN_FUNCTION(libc_sys_Xset_exception_handler)
 	movl   $(0xfffffff2), %eax
@@ -9436,9 +9436,9 @@ END(libc_sys_Xdetach)
 DEFINE_PUBLIC_ALIAS(sys_Xdetach, libc_sys_Xdetach)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
@@ -9450,8 +9450,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xwritef, libc_sys_Xwritef)
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */

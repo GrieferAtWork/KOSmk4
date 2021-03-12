@@ -197,25 +197,25 @@ void uint128_set(int128_t &__var, unsigned __int64 __value);
 void uint128_set(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* ++VAR */
+/* `++var' */
 void uint128_inc(uint128_t &__var);
 void int128_inc(int128_t &__var);
 
-/* --VAR */
+/* `--var' */
 void uint128_dec(uint128_t &__var);
 void int128_dec(int128_t &__var);
 
-/* VAR = ~VAR */
+/* `var = ~var' */
 void uint128_inv(uint128_t &__var);
 void int128_inv(int128_t &__var);
 
-/* VAR = -VAR */
+/* `var = -var' */
 void int128_neg(int128_t &__var);
 
-/* VAR < 0 */
+/* `var < 0' */
 __ATTR_PURE __ATTR_WUNUSED bool int128_isneg(int128_t const &__var);
 
-/* VAR &= VALUE */
+/* `var &= value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_and(int128_t &__var, char __value);
 void uint128_and(uint128_t &__var, char __value);
@@ -302,7 +302,7 @@ void uint128_and(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
 
-/* VAR |= VALUE */
+/* `var |= value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_or(int128_t &__var, char __value);
 void uint128_or(uint128_t &__var, char __value);
@@ -388,7 +388,7 @@ void uint128_or(int128_t &__var, unsigned __int64 __value);
 void uint128_or(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR ^= VALUE */
+/* `var ^= value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_xor(int128_t &__var, char __value);
 void uint128_xor(uint128_t &__var, char __value);
@@ -474,7 +474,7 @@ void uint128_xor(int128_t &__var, unsigned __int64 __value);
 void uint128_xor(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR += VALUE */
+/* `var += value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_add(int128_t &__var, char __value);
 void uint128_add(uint128_t &__var, char __value);
@@ -560,7 +560,7 @@ void uint128_add(int128_t &__var, unsigned __int64 __value);
 void uint128_add(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR -= VALUE */
+/* `var -= value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_sub(int128_t &__var, char __value);
 void uint128_sub(uint128_t &__var, char __value);
@@ -646,7 +646,7 @@ void uint128_sub(int128_t &__var, unsigned __int64 __value);
 void uint128_sub(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR *= VALUE */
+/* `var *= value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_mul(int128_t &__var, char __value);
 void uint128_mul(uint128_t &__var, char __value);
@@ -732,7 +732,7 @@ void uint128_mul(int128_t &__var, unsigned __int64 __value);
 void uint128_mul(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR /= VALUE */
+/* `var /= value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_div(int128_t &__var, char __value);
 void uint128_div(uint128_t &__var, char __value);
@@ -818,7 +818,7 @@ void uint128_div(int128_t &__var, unsigned __int64 __value);
 void uint128_div(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR %= VALUE */
+/* `var %= value' */
 #ifdef __CHAR_UNSIGNED__
 void uint128_mod(int128_t &__var, char __value);
 void uint128_mod(uint128_t &__var, char __value);
@@ -904,7 +904,7 @@ void uint128_mod(int128_t &__var, unsigned __int64 __value);
 void uint128_mod(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR == VALUE */
+/* `var == value' */
 #ifdef __CHAR_UNSIGNED__
 __ATTR_PURE __ATTR_WUNUSED bool uint128_eq(int128_t const &__var, char __value);
 __ATTR_PURE __ATTR_WUNUSED bool uint128_eq(uint128_t const &__var, char __value);
@@ -990,7 +990,7 @@ __ATTR_PURE __ATTR_WUNUSED void uint128_eq(int128_t const &__var, unsigned __int
 __ATTR_PURE __ATTR_WUNUSED void uint128_eq(uint128_t const &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR != VALUE */
+/* `var != value' */
 #ifdef __CHAR_UNSIGNED__
 __ATTR_PURE __ATTR_WUNUSED bool uint128_ne(int128_t const &__var, char __value);
 __ATTR_PURE __ATTR_WUNUSED bool uint128_ne(uint128_t const &__var, char __value);
@@ -1076,7 +1076,7 @@ __ATTR_PURE __ATTR_WUNUSED void uint128_ne(int128_t const &__var, unsigned __int
 __ATTR_PURE __ATTR_WUNUSED void uint128_ne(uint128_t const &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR < VALUE */
+/* `var < value' */
 #ifdef __CHAR_UNSIGNED__
 __ATTR_PURE __ATTR_WUNUSED bool uint128_lo(int128_t const &__var, char __value);
 __ATTR_PURE __ATTR_WUNUSED bool uint128_lo(uint128_t const &__var, char __value);
@@ -1162,7 +1162,7 @@ __ATTR_PURE __ATTR_WUNUSED void uint128_lo(int128_t const &__var, unsigned __int
 __ATTR_PURE __ATTR_WUNUSED void uint128_lo(uint128_t const &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR <= VALUE */
+/* `var <= value' */
 #ifdef __CHAR_UNSIGNED__
 __ATTR_PURE __ATTR_WUNUSED bool uint128_le(int128_t const &__var, char __value);
 __ATTR_PURE __ATTR_WUNUSED bool uint128_le(uint128_t const &__var, char __value);
@@ -1248,7 +1248,7 @@ __ATTR_PURE __ATTR_WUNUSED void uint128_le(int128_t const &__var, unsigned __int
 __ATTR_PURE __ATTR_WUNUSED void uint128_le(uint128_t const &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR > VALUE */
+/* `var > value' */
 #ifdef __CHAR_UNSIGNED__
 __ATTR_PURE __ATTR_WUNUSED bool uint128_gr(int128_t const &__var, char __value);
 __ATTR_PURE __ATTR_WUNUSED bool uint128_gr(uint128_t const &__var, char __value);
@@ -1334,7 +1334,7 @@ __ATTR_PURE __ATTR_WUNUSED void uint128_gr(int128_t const &__var, unsigned __int
 __ATTR_PURE __ATTR_WUNUSED void uint128_gr(uint128_t const &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
-/* VAR >= VALUE */
+/* `var >= value' */
 #ifdef __CHAR_UNSIGNED__
 __ATTR_PURE __ATTR_WUNUSED bool uint128_ge(int128_t const &__var, char __value);
 __ATTR_PURE __ATTR_WUNUSED bool uint128_ge(uint128_t const &__var, char __value);
@@ -1453,38 +1453,38 @@ __ATTR_PURE __ATTR_WUNUSED bool uint128_shr_overflows(uint128_t const &__var, un
 __ATTR_PURE __ATTR_WUNUSED bool int128_shr_overflows(int128_t const &__var, unsigned int __shift /*<128*/);
 
 /* Assign special value to the given 128-bit integer */
-void int128_setzero(int128_t &__var);           /* VAR = 0 */
-void uint128_setzero(uint128_t &__var);         /* VAR = 0 */
-void int128_setone(int128_t &__var);            /* VAR = 1 */
-void uint128_setone(uint128_t &__var);          /* VAR = 1 */
-void int128_setminusone(int128_t &__var);       /* VAR = -1 */
-void int128_setmin(int128_t &__var);            /* VAR = INT128_MIN */
-void int128_setmax(int128_t &__var);            /* VAR = INT128_MAX */
-void int128_setzero_minus_min(int128_t &__var); /* VAR = 0 - INT128_MIN */
-void uint128_setmin(uint128_t &__var);          /* VAR = UINT128_MIN (== 0) */
-void uint128_setmax(uint128_t &__var);          /* VAR = UINT128_MAX */
+void int128_setzero(int128_t &__var);           /* `var = 0' */
+void uint128_setzero(uint128_t &__var);         /* `var = 0' */
+void int128_setone(int128_t &__var);            /* `var = 1' */
+void uint128_setone(uint128_t &__var);          /* `var = 1' */
+void int128_setminusone(int128_t &__var);       /* `var = -1' */
+void int128_setmin(int128_t &__var);            /* `var = int128_min' */
+void int128_setmax(int128_t &__var);            /* `var = int128_max' */
+void int128_setzero_minus_min(int128_t &__var); /* `var = 0 - int128_min' */
+void uint128_setmin(uint128_t &__var);          /* `var = uint128_min (== 0)' */
+void uint128_setmax(uint128_t &__var);          /* `var = uint128_max' */
 
 /* Test for special values within a 128-bit integer */
-__ATTR_PURE __ATTR_WUNUSED bool int128_iszero(int128_t const &__var);           /* VAR == 0 */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_iszero(uint128_t const &__var);         /* VAR == 0 */
-__ATTR_PURE __ATTR_WUNUSED bool int128_isone(int128_t const &__var);            /* VAR == 1 */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_isone(uint128_t const &__var);          /* VAR == 1 */
-__ATTR_PURE __ATTR_WUNUSED bool int128_isminusone(int128_t const &__var);       /* VAR == -1 */
-__ATTR_PURE __ATTR_WUNUSED bool int128_ismin(int128_t const &__var);            /* VAR == INT128_MIN */
-__ATTR_PURE __ATTR_WUNUSED bool int128_ismax(int128_t const &__var);            /* VAR == INT128_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool int128_iszero_minus_min(int128_t const &__var); /* VAR == 0 - INT128_MIN */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_ismin(uint128_t const &__var);          /* VAR == UINT128_MIN (== 0) */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_ismax(uint128_t const &__var);          /* VAR == UINT128_MAX */
+__ATTR_PURE __ATTR_WUNUSED bool int128_iszero(int128_t const &__var);           /* `var == 0' */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_iszero(uint128_t const &__var);         /* `var == 0' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_isone(int128_t const &__var);            /* `var == 1' */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_isone(uint128_t const &__var);          /* `var == 1' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_isminusone(int128_t const &__var);       /* `var == -1' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_ismin(int128_t const &__var);            /* `var == int128_min' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_ismax(int128_t const &__var);            /* `var == int128_max' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_iszero_minus_min(int128_t const &__var); /* `var == 0 - int128_min' */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_ismin(uint128_t const &__var);          /* `var == uint128_min (== 0)' */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_ismax(uint128_t const &__var);          /* `var == uint128_max' */
 
 /* Test is the given 128-bit integer can fit into a smaller data-word without being truncated. */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_is8bit(uint128_t const &__var);  /* VAR <= UINT8_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_is16bit(uint128_t const &__var); /* VAR <= UINT16_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_is32bit(uint128_t const &__var); /* VAR <= UINT32_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool uint128_is64bit(uint128_t const &__var); /* VAR <= UINT64_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool int128_is8bit(int128_t const &__var);    /* VAR >= INT8_MIN && VAR <= INT8_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool int128_is16bit(int128_t const &__var);   /* VAR >= INT16_MIN && VAR <= INT16_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool int128_is32bit(int128_t const &__var);   /* VAR >= INT32_MIN && VAR <= INT32_MAX */
-__ATTR_PURE __ATTR_WUNUSED bool int128_is64bit(int128_t const &__var);   /* VAR >= INT64_MIN && VAR <= INT64_MAX */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_is8bit(uint128_t const &__var);  /* `var <= uint8_max' */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_is16bit(uint128_t const &__var); /* `var <= uint16_max' */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_is32bit(uint128_t const &__var); /* `var <= uint32_max' */
+__ATTR_PURE __ATTR_WUNUSED bool uint128_is64bit(uint128_t const &__var); /* `var <= uint64_max' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_is8bit(int128_t const &__var);    /* `var >= int8_min && var <= int8_max' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_is16bit(int128_t const &__var);   /* `var >= int16_min && var <= int16_max' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_is32bit(int128_t const &__var);   /* `var >= int32_min && var <= int32_max' */
+__ATTR_PURE __ATTR_WUNUSED bool int128_is64bit(int128_t const &__var);   /* `var >= int64_min && var <= int64_max' */
 
 }
 #else /* __INTELLISENSE__ && __cplusplus */

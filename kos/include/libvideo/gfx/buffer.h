@@ -99,8 +99,8 @@ struct video_buffer_ops {
 	                             video_color_t __colorkey,
 	                             struct video_buffer_rect const *__clip);
 
-	/* Clip the given `GFX', given a set of coords relative to the current clip state `GFX',
-	 * and store the newly created  GFX context in `*RESULT'  (note that `GFX' and  `RESULT'
+	/* Clip the given `gfx', given a set of coords relative to the current clip state `gfx',
+	 * and store the newly created  GFX context in `*result'  (note that `gfx' and  `result'
 	 * may be identical for this purpose!) */
 	__ATTR_NONNULL((1, 2)) void
 	(LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,

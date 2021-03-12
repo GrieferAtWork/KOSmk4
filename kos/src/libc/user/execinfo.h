@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4bb9b7b */
+/* HASH CRC-32:0x9f39a359 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,17 +32,17 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> backtrace(3)
- * Create a traceback of up to `SIZE' instruction pointers from
+ * Create a traceback of up to `size' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
  * and the functions from `<libunwind/...>'. However, on other
  * systems, this function is fairly dump and relies on all traversed
  * code having been compiled with function frames enabled.
- * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
+ * @return: * : The actual number of pointers written to `array' (always `<= size') */
 INTDEF NONNULL((1)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array, __STDC_INT_AS_SIZE_T size);
 /* >> backtrace_symbols(3)
  * Return an array of exactly `size' elements that contains the
- * names associated with program-counters from the given `ARRAY'
+ * names associated with program-counters from the given `array'
  * This function is meant to be used together with `backtrace(3)'.
  * On KOS, the names of functions are gathered with the help of
  * functions from `<libdebuginfo/...>', meaning that many sources of
@@ -60,7 +60,7 @@ INTDEF NONNULL((1)) char **NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *co
 /* >> backtrace_symbols_fd(3)
  * Same as `backtrace_symbols()', but rather than return a vector
  * of symbol names, print the names directly to `fd', such that
- * one function NAME will be written per line, with `size' lines
+ * one function name will be written per line, with `size' lines
  * written in total. */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd);
 #endif /* !__KERNEL__ */

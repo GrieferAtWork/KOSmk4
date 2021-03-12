@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37f5bab2 */
+/* HASH CRC-32:0xefc98325 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_fminl_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return minimum numeric value from X and Y */
+/* Return minimum numeric value from `x' and `y' */
 __LOCAL_LIBC(fminl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fminl))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 	/* TODO: ieee754-specific function */

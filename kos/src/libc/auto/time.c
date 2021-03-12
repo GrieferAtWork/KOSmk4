@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b77bfe */
+/* HASH CRC-32:0x67cb0828 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
-/* Return the `time_t' representation of TP and normalize TP */
+/* Return the `time_t' representation of `tp' and normalize `tp' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(struct tm __KOS_FIXED_CONST *tp) {
 
@@ -105,7 +105,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC */
-/* Return the `struct tm' representation of *TIMER
+/* Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
@@ -129,7 +129,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC */
-/* Return the `struct tm' representation of *TIMER in the local timezone */
+/* Return the `struct tm' representation of `*timer' in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
 
@@ -144,9 +144,10 @@ NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
 
 
 }
-/* Format TP into S according to FORMAT.
- * Write no more than MAXSIZE characters and return the number
- * of characters written, or 0 if it would exceed MAXSIZE */
+/* >> strftime(3)
+ * Format `tp' into `s' according to `format'.
+ * Write no more than `maxsize' characters and return the number
+ * of characters written, or 0 if it would exceed `maxsize' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
                                     size_t bufsize,
@@ -179,7 +180,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of TP in this format */
+ * that is the representation of `tp' in this format */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp) {
 	return libc_asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
@@ -216,7 +217,7 @@ DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
-/* Return the `time_t' representation of TP and normalize TP */
+/* Return the `time_t' representation of `tp' and normalize `tp' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm __KOS_FIXED_CONST *tp) {
 
@@ -277,7 +278,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_gmtime && !__CRT_HAVE__gmtime32) */
-/* Return the `struct tm' representation of *TIMER
+/* Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
@@ -302,7 +303,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_localtime && !__CRT_HAVE__localtime32) */
-/* Return the `struct tm' representation of *TIMER in the local timezone */
+/* Return the `struct tm' representation of `*timer' in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 
@@ -315,7 +316,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-/* Like `mktime', but TP represents Universal Time (UTC), not local time */
+/* Like `mktime', but `tp' represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
 
@@ -339,7 +340,7 @@ NOTHROW_NCX(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year) {
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-/* Like `mktime', but TP represents Universal Time (UTC), not local time */
+/* Like `mktime', but `tp' represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
 NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
 
@@ -353,7 +354,8 @@ NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
 
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-/* Similar to `strftime' but take the information from
+/* >> strftime_l(3)
+ * Similar to `strftime(3)' but take the information from
  * the provided locale and not the global locale */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf,
@@ -364,8 +366,8 @@ NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf,
 	(void)locale;
 	return libc_strftime(buf, bufsize, format, tp);
 }
-/* Parse S according to FORMAT and store binary time information in TP.
- * The return value is a pointer to the first unparsed character in S */
+/* Parse `s' according to `format' and store binary time information in `tp'.
+ * The return value is a pointer to the first unparsed character in `s' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2, 3)) char *
 NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s,
                                     char const *__restrict format,
@@ -401,7 +403,7 @@ NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s,
 /* Since `getdate' is not reentrant because of the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The functionality is the same.  The result is returned in
- * the buffer pointed to by RESBUFP and in case of an error the return
+ * the buffer pointed to by `resbufp' and in case of an error the return
  * value is != 0 with the same values as given above for `getdate_err'. */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string,
@@ -434,7 +436,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____TIME_MONTHSTART_YDAY_DEFINED */
 
 #endif /* __BUILDING_LIBC */
-/* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
+/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
                                     struct tm *__restrict tp) {
@@ -488,7 +490,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 
 
 }
-/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
+/* Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer,
                                        struct tm *__restrict tp) {
@@ -504,7 +506,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer,
 
 
 }
-/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer,
                                    char buf[26]) {
@@ -543,7 +545,7 @@ __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
-/* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
+/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
                                       struct tm *__restrict tp) {
@@ -637,7 +639,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_localtime64_r, libc_localtime_r);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
+/* Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer,
                                          struct tm *__restrict tp) {
@@ -655,7 +657,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ctime64_r, libc_ctime_r);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-/* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
+/* Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_ctime64_r)(time64_t const *__restrict timer,
                                      char buf[26]) {
@@ -686,8 +688,9 @@ __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4]
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
-/* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of TP in this format */
+/* >> asctime_r(3)
+ * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
+ * that is the representation of `tp' in this format */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_asctime_r)(struct tm const *__restrict tp,
                                      char buf[26]) {

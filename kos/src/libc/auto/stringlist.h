@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9448a89 */
+/* HASH CRC-32:0x1c4166ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,44 +36,44 @@ INTDEF WUNUSED struct _stringlist *NOTHROW_NCX(LIBCCALL libc_sl_init)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sl_add(3)
- * Append a given `NAME' to `SL'. `NAME' is considered
- * inherited if the StringList is destroyed with `1' */
+ * Append a given `name' to `sl'. `name' is considered
+ * inherited if the StringList is destroyed with `freeit=1' */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_sl_add)(struct _stringlist *sl, char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sl_add(3)
- * Append a given `NAME' to `SL'. `NAME' is considered
- * inherited if the StringList is destroyed with `1' */
+ * Append a given `name' to `sl'. `name' is considered
+ * inherited if the StringList is destroyed with `freeit=1' */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl, char *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sl_free(3)
- * Free a given string list. When `ALL' is non-zero, all contained
- * string pointers (as previously added with `sl_add()') will also
- * be `free(3)'ed. */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_sl_free)(struct _stringlist *sl, int all);
+ * Free a given string list. When `freeit' is non-zero, all contained
+ * string pointers (as previously added with `sl_add()') will also be
+ * `free(3)'d. */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_sl_free)(struct _stringlist *sl, int freeit);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sl_free(3)
- * Free a given string list. When `ALL' is non-zero, all contained
- * string pointers (as previously added with `sl_add()') will also
- * be `free(3)'ed. */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl, int all);
+ * Free a given string list. When `freeit' is non-zero, all contained
+ * string pointers (as previously added with `sl_add()') will also be
+ * `free(3)'d. */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl, int freeit);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sl_find(3)
- * Search for `NAME' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `SL' (i.e. the
+ * Search for `name' within the given StringList. Upon success,
+ * return a pointer to the equivalent string within `sl' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
- * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
+ * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
 INTDEF ATTR_PURE NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sl_find(3)
- * Search for `NAME' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `SL' (i.e. the
+ * Search for `name' within the given StringList. Upon success,
+ * return a pointer to the equivalent string within `sl' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
- * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
+ * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
 INTDEF ATTR_PURE NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

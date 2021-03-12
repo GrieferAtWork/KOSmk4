@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2f94b40 */
+/* HASH CRC-32:0x72489a72 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,18 +28,21 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_renameat_defined
 #define __local___localdep_renameat_defined 1
 #ifdef __CRT_HAVE_renameat
+/* >> renameat(2) */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),renameat,(__oldfd,__oldname,__newfd,__newname_or_path))
 #elif defined(__CRT_HAVE_frenameat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/renameat.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> renameat(2) */
 #define __localdep_renameat __LIBC_LOCAL_NAME(renameat)
 #else /* ... */
 #undef __local___localdep_renameat_defined
 #endif /* !... */
 #endif /* !__local___localdep_renameat_defined */
-/* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
- * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
+/* >> rename(3)
+ * Rename a given file `oldname' to `newname_or_path', or in the event
+ * that `newname_or_path' refers to a directory, place the file within. */
 __LOCAL_LIBC(rename) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rename))(char const *__oldname, char const *__newname_or_path) {
 	return __localdep_renameat(__AT_FDCWD, __oldname, __AT_FDCWD, __newname_or_path);

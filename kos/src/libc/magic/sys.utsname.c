@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
 }
 
 @@>> uname(2)
-@@Put information about the system in NAME
+@@Put information about the system in `name'
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/os/utsname.h>")]]

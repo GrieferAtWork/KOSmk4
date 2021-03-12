@@ -109,10 +109,10 @@ struct usb_device
 	char                     *ud_str_serial;   /* [0..1][const][owned] Device serial number (NUL-terminated utf-8 string) */
 	struct usb_configuration *ud_config;       /* [1..1][const] Used configuration. (WARNING: May be NULL for strange devices; s.a. `USB_ENDPOINT_FLAG_STRANGE') */
 	struct usb_configuration  ud_configv[16];  /* [1..ud_configc] Vector of possible configurations.
-	                                            * Each entry in this vector has  a total size of `ENT->uc_total_len'  bytes,
+	                                            * Each entry in this vector has  a total size of `ent->uc_total_len'  bytes,
 	                                            * with the main descriptor being followed by a variable number of additional
-	                                            * descriptors,  starting at `(byte_t *)ENT + ENT->uc_size', each of which is
-	                                            * lead by a 2-byte pair `byte_t SIZE, TYPE;' */
+	                                            * descriptors,  starting at `(byte_t *)ent + ent->uc_size', each of which is
+	                                            * lead by a 2-byte pair `byte_t size, type;' */
 	u16                       ud_lang_used;    /* [const] Language code used for strings (or 0 if unsupported). */
 	u8                        ud_dev;          /* [const] Device address (usually equals `ue_dev', except during the address-assign phase).
 	                                            * Essentially,   when  it   comes  to  checking   which  addresses  are   already  in  use,

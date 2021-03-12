@@ -857,14 +857,19 @@
 #define __CRT_HAVE__execvpe
 #define __CRT_HAVE__exit
 #define __CRT_HAVE__expand_dbg
+#define __CRT_HAVE__fclose_nolock
+#define __CRT_HAVE__fcloseall
 #define __CRT_HAVE__fcvt
 #define __CRT_HAVE__fcvt_s
 #define __CRT_HAVE__fdclass
+#define __CRT_HAVE__fdopen
 #define __CRT_HAVE__fdsign
 #define __CRT_HAVE__fflush_nolock
+#define __CRT_HAVE__fgetchar
 #define __CRT_HAVE__filbuf
 #define __CRT_HAVE__filelength
 #define __CRT_HAVE__filelengthi64
+#define __CRT_HAVE__fileno
 #define __CRT_HAVE__findclose
 #define __CRT_HAVE__findfirst
 #define __CRT_HAVE__findfirst32
@@ -888,6 +893,7 @@
 #define __CRT_HAVE__fprintf_p
 #define __CRT_HAVE__fprintf_p_l
 #define __CRT_HAVE__fprintf_s_l
+#define __CRT_HAVE__fputchar
 #define __CRT_HAVE__fread_nolock
 #define __CRT_HAVE__fread_nolock_s
 #define __CRT_HAVE__free_dbg
@@ -942,6 +948,7 @@
 #define __CRT_HAVE__getdrives
 #define __CRT_HAVE__getmaxstdio
 #define __CRT_HAVE__getpid
+#define __CRT_HAVE__getw
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__gmtime64
 #define __CRT_HAVE__i64toa
@@ -976,6 +983,7 @@
 #define __CRT_HAVE__ldsign
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__localtime64
+#define __CRT_HAVE__lock_file
 #define __CRT_HAVE__locking
 #define __CRT_HAVE__logb
 #define __CRT_HAVE__longjmp
@@ -1010,14 +1018,17 @@
 #define __CRT_HAVE__nextafter
 #define __CRT_HAVE__onexit
 #define __CRT_HAVE__open_osfhandle
+#define __CRT_HAVE__pclose
 #define __CRT_HAVE__pgmptr
 #define __CRT_HAVE__pipe
+#define __CRT_HAVE__popen
 #define __CRT_HAVE__printf_l
 #define __CRT_HAVE__printf_p
 #define __CRT_HAVE__printf_p_l
 #define __CRT_HAVE__printf_s_l
 #define __CRT_HAVE__putenv
 #define __CRT_HAVE__putenv_s
+#define __CRT_HAVE__putw
 #define __CRT_HAVE__putws
 #define __CRT_HAVE__read
 #define __CRT_HAVE__realloc_dbg
@@ -1157,6 +1168,7 @@
 #define __CRT_HAVE__sysconf
 #define __CRT_HAVE__tell
 #define __CRT_HAVE__telli64
+#define __CRT_HAVE__tempnam
 #define __CRT_HAVE__tempnam_dbg
 #define __CRT_HAVE__time64
 #define __CRT_HAVE__tolower
@@ -1178,6 +1190,7 @@
 #define __CRT_HAVE__unlink
 #define __CRT_HAVE__unloaddll
 #define __CRT_HAVE__unlock_fhandle
+#define __CRT_HAVE__unlock_file
 #define __CRT_HAVE__utime32
 #define __CRT_HAVE__utime64
 #define __CRT_HAVE__vfprintf_l
@@ -1741,6 +1754,7 @@
 #define __CRT_HAVE_fpclassifyl
 #define __CRT_HAVE_fpreset
 #define __CRT_HAVE_fprintf
+#define __CRT_HAVE_fprintf_s
 #define __CRT_HAVE_fprintf_unlocked
 #define __CRT_HAVE_fpurge
 #define __CRT_HAVE_fputc
@@ -3322,7 +3336,6 @@
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtoq
-#define __CRT_HAVE_strtoq_l
 #define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
@@ -3335,7 +3348,6 @@
 #define __CRT_HAVE_strtoumax
 #define __CRT_HAVE_strtoumax_l
 #define __CRT_HAVE_strtouq
-#define __CRT_HAVE_strtouq_l
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
 #define __CRT_HAVE_strverscmp
@@ -4521,6 +4533,7 @@
 #define __CRT_HAVE_vhangup
 #define __CRT_HAVE_vmsplice
 #define __CRT_HAVE_vprintf
+#define __CRT_HAVE_vprintf_s
 #define __CRT_HAVE_vprintf_unlocked
 #define __CRT_HAVE_vscanf
 #define __CRT_HAVE_vscanf_unlocked
@@ -4899,6 +4912,7 @@
 #define __CRT_HAVE__wcstoui64
 #define __CRT_HAVE__wcstoui64_l
 #define __CRT_HAVE__wcstoul_l
+#define __CRT_HAVE__wcstoull_l
 #define __CRT_HAVE__wcstoumax_l
 #define __CRT_HAVE__wcsupr
 #define __CRT_HAVE__wcsupr_l
@@ -5395,6 +5409,7 @@
 #define __CRT_HAVE_DOS$_wcstoui64
 #define __CRT_HAVE_DOS$_wcstoui64_l
 #define __CRT_HAVE_DOS$_wcstoul_l
+#define __CRT_HAVE_DOS$_wcstoull_l
 #define __CRT_HAVE_DOS$_wcstoumax_l
 #define __CRT_HAVE_DOS$_wcsupr
 #define __CRT_HAVE_DOS$_wcsupr_l

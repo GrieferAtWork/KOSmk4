@@ -369,8 +369,8 @@ int unshare(__STDC_INT_AS_UINT_T flags);
 __STDC_INT_AS_UINT_T sched_getcpu();
 
 @@>> setns(2)
-@@With `FD' referring to a namespace, reassociate the calling thread with that namespace.
-@@For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
+@@With `fd' referring to a namespace, reassociate the calling thread with that namespace.
+@@For this purpose, `fd' was opened for one of the files in `/proc/[pid]/ns/'
 @@@param: nstype: The type of namespace to re-associate (either 0 to allow any
 @@                type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
 @@               `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',

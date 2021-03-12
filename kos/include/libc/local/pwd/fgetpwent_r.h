@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cfbc96a */
+/* HASH CRC-32:0xe9a27aef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: * :     Error (one of `E*' from `<errno.h>') */
 #define __localdep_fgetpwfiltered_r __LIBC_LOCAL_NAME(fgetpwfiltered_r)
 #endif /* !__local___localdep_fgetpwfiltered_r_defined */
-/* Read an entry from STREAM. This function is not standardized and probably never will
+/* Read an entry from `stream'. This function is not standardized and probably never will be.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
  * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)

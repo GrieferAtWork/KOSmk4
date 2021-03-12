@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6388486 */
+/* HASH CRC-32:0xc6eb3c4f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -256,7 +256,7 @@ __CDECLARE_SC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __
 __CDECLARE_SC(,__errno_t,clone3,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(clone3) */
 #if __CRT_HAVE_SC(close)
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 __CDECLARE_SC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(close) */
 #if __CRT_HAVE_SC(close_range)
@@ -547,13 +547,13 @@ __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_SC(eventfd2) */
 #if __CRT_HAVE_SC(execve)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_SC(,__errno_t,execve,(char const *__path, __HYBRID_PTR64(char const) const *___argv, __HYBRID_PTR64(char const) const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_SC(execve) */
 #if __CRT_HAVE_SC(execveat)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *___argv, __HYBRID_PTR64(char const) const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
 #endif /* __CRT_HAVE_SC(execveat) */
@@ -731,18 +731,18 @@ __CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, stru
 #endif /* __CRT_HAVE_SC(futimesat) */
 #if __CRT_HAVE_SC(get_exception_handler)
 /* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 __CDECLARE_SC(,__errno_t,get_exception_handler,(__ULONG64_TYPE__ *__pmode, __except_handler64_t *__phandler, __HYBRID_PTR64(void) *__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #endif /* __CRT_HAVE_SC(get_exception_handler) */
 #if __CRT_HAVE_SC(get_kernel_syms)
@@ -1161,9 +1161,9 @@ __CDECLARE_SC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_
 #if __CRT_HAVE_SC(maplibrary)
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
+ *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
+ *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -1219,9 +1219,9 @@ __CDECLARE_SC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #if __CRT_HAVE_SC(mmap)
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 __CDECLARE_SC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_SC(mmap) */
 #if __CRT_HAVE_SC(modify_ldt)
@@ -1300,7 +1300,7 @@ __CDECLARE_SC(,__errno_t,newfstatat,(__fd_t __dirfd, char const *__filename, str
 __CDECLARE_SC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(nfsservctl) */
 #if __CRT_HAVE_SC(open)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -1322,7 +1322,7 @@ __CDECLARE_SC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle
 __CDECLARE_SC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(open_tree) */
 #if __CRT_HAVE_SC(openat)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -1509,8 +1509,8 @@ __CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate64 const *__state, struct __si
 #if __CRT_HAVE_SC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CDECLARE_SC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -1521,8 +1521,8 @@ __CDECLARE_SC(,__ssize_t,readahead,(__fd_t __fd, __uint64_t __offset, __size_t _
 #if __CRT_HAVE_SC(readf)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CDECLARE_SC(,__ssize_t,readf,(__fd_t __fd, void *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
@@ -1538,8 +1538,8 @@ __CDECLARE_SC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *_
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 __CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count),(__fd,__iovec,__count))
@@ -1549,8 +1549,8 @@ __CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx64 const *__iovec, _
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 __CDECLARE_SC(,__ssize_t,readvf,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
@@ -1841,11 +1841,11 @@ __CDECLARE_SC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __
  *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
+ * @return: -1:EINVAL: The given `mode' is invalid */
 __CDECLARE_SC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_SC(set_exception_handler) */
 #if __CRT_HAVE_SC(set_mempolicy)
@@ -2272,18 +2272,18 @@ __CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(write)
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CDECLARE_SC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(write) */
 #if __CRT_HAVE_SC(writef)
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CDECLARE_SC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
@@ -2293,7 +2293,7 @@ __CDECLARE_SC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufs
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -2304,7 +2304,7 @@ __CDECLARE_SC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx64 const *__iovec, 
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -2424,7 +2424,7 @@ __CDECLARE_XSC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, _
 __CDECLARE_XSC(,__errno_t,clone3,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(clone3) */
 #if __CRT_HAVE_XSC(close)
-/* Close a given file descriptor/handle `FD' */
+/* Close a given file descriptor/handle `fd' */
 __CDECLARE_XSC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(close) */
 #if __CRT_HAVE_XSC(close_range)
@@ -2715,13 +2715,13 @@ __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_XSC(eventfd2) */
 #if __CRT_HAVE_XSC(execve)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_XSC(,__errno_t,execve,(char const *__path, __HYBRID_PTR64(char const) const *___argv, __HYBRID_PTR64(char const) const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_XSC(execve) */
 #if __CRT_HAVE_XSC(execveat)
-/* Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+/* Replace the calling process with the application image referred to by `path' / `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *___argv, __HYBRID_PTR64(char const) const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
 #endif /* __CRT_HAVE_XSC(execveat) */
@@ -2899,18 +2899,18 @@ __CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, str
 #endif /* __CRT_HAVE_XSC(futimesat) */
 #if __CRT_HAVE_XSC(get_exception_handler)
 /* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 __CDECLARE_XSC(,__errno_t,get_exception_handler,(__ULONG64_TYPE__ *__pmode, __except_handler64_t *__phandler, __HYBRID_PTR64(void) *__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #endif /* __CRT_HAVE_XSC(get_exception_handler) */
 #if __CRT_HAVE_XSC(get_kernel_syms)
@@ -3329,9 +3329,9 @@ __CDECLARE_XSC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong
 #if __CRT_HAVE_XSC(maplibrary)
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
+ *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
+ *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
  * @param: fd:    A handle for the library file being mapped
  *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
@@ -3387,9 +3387,9 @@ __CDECLARE_XSC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #if __CRT_HAVE_XSC(mmap)
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_FIXED_NOREPLACE|MAP_OFFSET64_POINTER' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 __CDECLARE_XSC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_XSC(mmap) */
 #if __CRT_HAVE_XSC(modify_ldt)
@@ -3468,7 +3468,7 @@ __CDECLARE_XSC(,__errno_t,newfstatat,(__fd_t __dirfd, char const *__filename, st
 __CDECLARE_XSC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(nfsservctl) */
 #if __CRT_HAVE_XSC(open)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -3490,7 +3490,7 @@ __CDECLARE_XSC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handl
 __CDECLARE_XSC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(open_tree) */
 #if __CRT_HAVE_XSC(openat)
-/* Open a new file handle to the file specified by `FILENAME'
+/* Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
@@ -3677,8 +3677,8 @@ __CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate64 const *__state, struct __s
 #if __CRT_HAVE_XSC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CDECLARE_XSC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -3689,8 +3689,8 @@ __CDECLARE_XSC(,__ssize_t,readahead,(__fd_t __fd, __uint64_t __offset, __size_t 
 #if __CRT_HAVE_XSC(readf)
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CDECLARE_XSC(,__ssize_t,readf,(__fd_t __fd, void *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
@@ -3706,8 +3706,8 @@ __CDECLARE_XSC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 __CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count),(__fd,__iovec,__count))
@@ -3717,8 +3717,8 @@ __CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx64 const *__iovec, 
  * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
+ * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 __CDECLARE_XSC(,__ssize_t,readvf,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
@@ -3992,11 +3992,11 @@ __CDECLARE_XSC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t _
  *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
+ * @return: -1:EINVAL: The given `mode' is invalid */
 __CDECLARE_XSC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_XSC(set_exception_handler) */
 #if __CRT_HAVE_XSC(set_mempolicy)
@@ -4423,18 +4423,18 @@ __CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struc
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(write)
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CDECLARE_XSC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(write) */
 #if __CRT_HAVE_XSC(writef)
 /* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CDECLARE_XSC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
@@ -4444,7 +4444,7 @@ __CDECLARE_XSC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __buf
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
@@ -4455,7 +4455,7 @@ __CDECLARE_XSC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx64 const *__iovec,
  * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */

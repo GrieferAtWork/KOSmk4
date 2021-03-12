@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcb01885 */
+/* HASH CRC-32:0x1edd84c0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko64,(__FILE *
 #undef __local___localdep_crt_fseeko64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseeko64_defined */
-/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+/* >> fseek(3)
+ * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __LOCAL_LIBC(fseek) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fseek))(__FILE *__restrict __stream, long int __off, int __whence) __THROWS(...) {
 #if __SIZEOF_OFF64_T__ == __SIZEOF_LONG__ && (defined(__CRT_HAVE_fseek) || (defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock) || (defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock))
