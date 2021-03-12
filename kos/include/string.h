@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40f832e */
+/* HASH CRC-32:0x3fee66b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1061,90 +1061,117 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtok_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifdef __CRT_HAVE_memrchr
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrchr,(void *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrchr,(__haystack,__needle,__n_bytes))
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,memrchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrchr,(__haystack,__needle,__n_bytes))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),(__haystack,__needle,__n_bytes))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* __CRT_HAVE_memrchr */
 #include <libc/local/string/memrchr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL memrchr)(void *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))(__haystack, __needle, __n_bytes); }
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) void const *__NOTHROW_NCX(__LIBCCALL memrchr)(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))(__haystack, __needle, __n_bytes); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memrchr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL memrchr)(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))(__haystack, __needle, __n_bytes); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !__CRT_HAVE_memrchr */
 #ifdef __CRT_HAVE_rawmemchr
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,rawmemchr,(void *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #elif defined(__CRT_HAVE___rawmemchr)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,rawmemchr,(void *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* ... */
 #include <libc/local/string/rawmemchr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL rawmemchr)(void *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemchr))(__haystack, __needle); }
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void const *__NOTHROW_NCX(__LIBCCALL rawmemchr)(void const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemchr))(__haystack, __needle); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rawmemchr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL rawmemchr)(void const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemchr))(__haystack, __needle); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_strchrnul
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strchrnul,(char *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strchrnul,(char const *__restrict __haystack, int __needle),(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* __CRT_HAVE_strchrnul */
 #include <libc/local/string/strchrnul.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strchrnul)(char *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchrnul))(__haystack, __needle); }
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL strchrnul)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchrnul))(__haystack, __needle); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strchrnul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strchrnul)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchrnul))(__haystack, __needle); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !__CRT_HAVE_strchrnul */
@@ -1153,7 +1180,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strchrnul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE_basename
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -1175,7 +1203,8 @@ extern "C++" {
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),basename,(__filename))
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -1199,7 +1228,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),basename,(__filename))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -1226,7 +1256,8 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,b
 #include <libc/local/string/basename.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -1248,7 +1279,8 @@ extern "C++" {
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -1272,7 +1304,8 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ch
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -1300,45 +1333,56 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifdef __CRT_HAVE_strcasestr
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcasestr,(char *__haystack, char const *__needle),strcasestr,(__haystack,__needle))
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),strcasestr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #elif defined(__CRT_HAVE___strcasestr)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcasestr,(char *__haystack, char const *__needle),__strcasestr,(__haystack,__needle))
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),__strcasestr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),__strcasestr,(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* ... */
 #include <libc/local/string/strcasestr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strcasestr)(char *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasestr))(__haystack, __needle); }
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strcasestr)(char const *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasestr))(__haystack, __needle); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strcasestr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strcasestr)(char const *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasestr))(__haystack, __needle); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !... */
 #if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1346,7 +1390,9 @@ extern "C++" {
  * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,memmem,(void *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem0,(__haystack,__haystacklen,__needle,__needlelen))
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1356,7 +1402,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void const *,__NOTHROW_NCX,memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem0,(__haystack,__haystacklen,__needle,__needlelen))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1368,7 +1416,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
 #elif defined(__CRT_HAVE_memmem) && !defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1376,7 +1426,9 @@ extern "C++" {
  * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,memmem,(void *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem,(__haystack,__haystacklen,__needle,__needlelen))
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1386,7 +1438,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void const *,__NOTHROW_NCX,memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem,(__haystack,__haystacklen,__needle,__needlelen))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1399,7 +1453,9 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NC
 #include <libc/local/string/memmem.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1407,7 +1463,9 @@ extern "C++" {
  * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *__NOTHROW_NCX(__LIBCCALL memmem)(void *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem))(__haystack, __haystacklen, __needle, __needlelen); }
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1417,7 +1475,9 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3))
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void const *__NOTHROW_NCX(__LIBCCALL memmem)(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem))(__haystack, __haystacklen, __needle, __needlelen); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1436,45 +1496,57 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __NAMESPACE_LOCAL_USING_OR_IMPL(strverscmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strverscmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strverscmp))(__s1, __s2); })
 #endif /* !... */
 #if defined(__fast_mempcpy_defined) && defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); })
 #elif defined(__fast_mempcpy_defined) && defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CEIDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); })
 #elif defined(__fast_mempcpy_defined)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); }
 #elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
 #else /* ... */
 #include <libc/local/string/mempcpy.h>
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))(__dst, __src, __n_bytes); }
 #endif /* !... */
 #ifndef __mempcpy_defined
 #define __mempcpy_defined 1
 #if defined(__fast_mempcpy_defined) && defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CEIDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); })
 #elif defined(__fast_mempcpy_defined) && defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CEIREDIRECT_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); })
 #elif defined(__fast_mempcpy_defined)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); }
 #elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */
 #include <libc/local/string/mempcpy.h>
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))(__dst, __src, __n_bytes); })
 #endif /* !... */
 #endif /* !__mempcpy_defined */
@@ -1830,10 +1902,10 @@ __CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTH
 __CDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strnicmp)
 __CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strnicmp,(__s1,__s2,__maxlen))
-#elif defined(__CRT_HAVE_strnicmp)
-__CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strncmpi)
 __CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strncmpi,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_strnicmp)
+__CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_strncmpi)
 __CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmpi,(__s1,__s2,__maxlen))
 #else /* ... */
@@ -7195,10 +7267,10 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NC
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strnicmp)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),(__s1,__s2,__maxlen))
-#elif defined(__CRT_HAVE_strnicmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strncmpi)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strncmpi,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_strnicmp)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_strncmpi)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmpi,(__s1,__s2,__maxlen))
 #else /* ... */
@@ -7283,10 +7355,10 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NC
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strnicmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strnicmp,(__s1,__s2,__maxlen))
-#elif defined(__CRT_HAVE_strnicmp)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strncmpi)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strncmpi,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_strnicmp)
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_strncmpi)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strnicmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmpi,(__s1,__s2,__maxlen))
 #else /* ... */
@@ -7299,10 +7371,10 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NC
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strnicmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strnicmp,(__s1,__s2,__maxlen))
-#elif defined(__CRT_HAVE_strnicmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strncmpi)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_strnicmp)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_strncmpi)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmpi,(__s1,__s2,__maxlen))
 #else /* ... */
@@ -7327,10 +7399,10 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NC
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strnicmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strnicmp,(__s1,__s2,__maxlen))
-#elif defined(__CRT_HAVE_strnicmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strncmpi)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strncmpi,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_strnicmp)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_strncmpi)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncmpi,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),(__s1,__s2,__maxlen))
 #else /* ... */

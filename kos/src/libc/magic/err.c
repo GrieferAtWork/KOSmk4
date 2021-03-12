@@ -54,7 +54,7 @@ __SYSDECL_BEGIN
 void warn(char const *format, ...)
 	%{printf("vwarn")}
 
-[[cp_stdio, doc_alias(warn), ATTR_LIBC_PRINTF(1, 0)]]
+[[cp_stdio, doc_alias("warn"), ATTR_LIBC_PRINTF(1, 0)]]
 [[requires_function(vwarnc), impl_include("<libc/errno.h>")]]
 void vwarn(char const *format, $va_list args) {
 	vwarnc(__libc_geterrno_or(0), format, args);

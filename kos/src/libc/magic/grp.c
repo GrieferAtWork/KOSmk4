@@ -114,12 +114,12 @@ int putgrent([[nonnull]] struct group const *__restrict entry,
 
 %
 %#ifdef __USE_POSIX
-[[cp, doc_alias(getgrgid), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp, doc_alias("getgrgid"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrgid_r($gid_t gid, [[nonnull]] struct group *__restrict resultbuf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct group **__restrict result);
 
-[[cp, doc_alias(getgrnam), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp, doc_alias("getgrnam"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrnam_r([[nonnull]] char const *__restrict name,
                [[nonnull]] struct group *__restrict resultbuf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
@@ -127,7 +127,7 @@ int getgrnam_r([[nonnull]] char const *__restrict name,
 
 %
 %#ifdef __USE_GNU
-[[cp, doc_alias(getgrent), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp, doc_alias("getgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrent_r([[nonnull]] struct group *__restrict resultbuf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct group **__restrict result);
@@ -135,7 +135,7 @@ int getgrent_r([[nonnull]] struct group *__restrict resultbuf,
 
 %
 %#ifdef __USE_MISC
-[[cp, doc_alias(fgetgrent), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp, doc_alias("fgetgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
                 [[nonnull]] struct group *__restrict resultbuf,
                 [[outp(buflen)]] char *__restrict buffer, size_t buflen,

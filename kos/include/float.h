@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8032116e */
+/* HASH CRC-32:0xb71f4794 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -392,12 +392,12 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),s
 #elif defined(__CRT_HAVE_scalb)
 /* Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),scalb,(__x,__fn))
-#elif defined(__CRT_HAVE___scalb)
-/* Return `x' times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),__scalb,(__x,__fn))
 #elif defined(__CRT_HAVE__scalb)
 /* Return `x' times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),(__x,__fn))
+#elif defined(__CRT_HAVE___scalb)
+/* Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),__scalb,(__x,__fn))
 #else /* ... */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -463,11 +463,11 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __x),(__x))
 #else /* ... */
 #include <ieee754.h>
 #include <bits/math-constants.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__INFINITY) || defined(__HUGE_VAL)) && (defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)))
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__INFINITY) || defined(__HUGE_VAL)) && (defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan)))
 #include <libc/local/math/finite.h>
 /* Return nonzero if `value' is finite and not NaN */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__x); }
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || ((__CRT_HAVE_isinf || __CRT_HAVE___isinf || __INFINITY || __HUGE_VAL) && (__CRT_HAVE_isnan || __CRT_HAVE___isnan || __CRT_HAVE__isnan)) */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || ((__CRT_HAVE_isinf || __CRT_HAVE___isinf || __INFINITY || __HUGE_VAL) && (__CRT_HAVE_isnan || __CRT_HAVE__isnan || __CRT_HAVE___isnan)) */
 #endif /* !... */
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if `value' is not a number */
@@ -475,12 +475,12 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),isna
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),isnan,(__x))
-#elif defined(__CRT_HAVE___isnan)
-/* Return nonzero if `value' is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if `value' is not a number */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),(__x))
+#elif defined(__CRT_HAVE___isnan)
+/* Return nonzero if `value' is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),__isnan,(__x))
 #else /* ... */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -498,19 +498,19 @@ __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),sca
 #elif defined(__CRT_HAVE_scalbf)
 /* Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),scalbf,(__x,__fn))
-#elif defined(__CRT_HAVE___scalbf)
-/* Return `x' times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),__scalbf,(__x,__fn))
 #elif defined(__CRT_HAVE__scalbf)
 /* Return `x' times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),(__x,__fn))
+#elif defined(__CRT_HAVE___scalbf)
+/* Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),__scalbf,(__x,__fn))
 #else /* ... */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE__scalb) || defined(__CRT_HAVE___scalb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/scalbf.h>
 /* Return `x' times (2 to the Nth power) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __fn); }
-#endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_scalb || __CRT_HAVE___scalb || __CRT_HAVE__scalb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_scalb || __CRT_HAVE__scalb || __CRT_HAVE___scalb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
 #endif /* __x86_64__ || __i386__ */
 #endif /* __CC__ */

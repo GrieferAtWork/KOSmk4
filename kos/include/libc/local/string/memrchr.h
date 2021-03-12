@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cc493e7 */
+/* HASH CRC-32:0x205c8d67 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,9 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 __LOCAL_LIBC(memrchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrchr))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__haystack + __n_bytes;

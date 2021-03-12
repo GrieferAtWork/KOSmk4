@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x533fa0df */
+/* HASH CRC-32:0x658feff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,18 +38,6 @@ __NAMESPACE_LOCAL_BEGIN
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__STDC_INT_AS_UINT_T __name),sysconf,(__name))
-#elif defined(__CRT_HAVE__sysconf)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> sysconf(2)
- * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
- * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
- *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-__CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__STDC_INT_AS_UINT_T __name),_sysconf,(__name))
 #elif defined(__CRT_HAVE___sysconf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -73,12 +61,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> thr_min_stack(3) */
 __LOCAL_LIBC(thr_min_stack) __ATTR_CONST __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_min_stack))(void) {
-#if (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE__sysconf) || defined(__CRT_HAVE___sysconf)) && defined(_SC_THREAD_STACK_MIN)
+#if (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE___sysconf)) && defined(_SC_THREAD_STACK_MIN)
 	__LONGPTR_TYPE__ __result;
 	__result = __localdep_sysconf(_SC_THREAD_STACK_MIN);
 	if (__result != -1)
 		return (__SIZE_TYPE__)__result;
-#endif /* (__CRT_HAVE_sysconf || __CRT_HAVE__sysconf || __CRT_HAVE___sysconf) && _SC_THREAD_STACK_MIN */
+#endif /* (__CRT_HAVE_sysconf || __CRT_HAVE___sysconf) && _SC_THREAD_STACK_MIN */
 #ifdef __PTHREAD_STACK_MIN
 	return __PTHREAD_STACK_MIN;
 #else /* __PTHREAD_STACK_MIN */

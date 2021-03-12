@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x893b52b0 */
+/* HASH CRC-32:0x777d5ff2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 __LOCAL_LIBC(mktemp) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktemp))(char *__template_) {

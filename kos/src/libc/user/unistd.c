@@ -3617,17 +3617,23 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3bbada63]]]*/
+/*[[[start:exports,hash:CRC-32=0x1a71a7b]]]*/
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execve, libc_execve);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_getpid, libc_getpid);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__getpid, libc_getpid);
 DEFINE_PUBLIC_ALIAS(getpid, libc_getpid);
 DEFINE_PUBLIC_ALIAS(gettid, libc_gettid);
 DEFINE_PUBLIC_ALIAS(__pipe, libc_pipe);
 DEFINE_PUBLIC_ALIAS(pipe, libc_pipe);
 DEFINE_PUBLIC_ALIAS(sleep, libc_sleep);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_commit, libc_fsync);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fsync, libc_fsync);
 DEFINE_PUBLIC_ALIAS(getppid, libc_getppid);
 DEFINE_PUBLIC_ALIAS(getpgrp, libc_getpgrp);
@@ -3653,36 +3659,60 @@ DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
 DEFINE_PUBLIC_ALIAS(chown, libc_chown);
 DEFINE_PUBLIC_ALIAS(pathconf, libc_pathconf);
 DEFINE_PUBLIC_ALIAS(link, libc_link);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_read, libc_read);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__read, libc_read);
 DEFINE_PUBLIC_ALIAS(read, libc_read);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_write, libc_write);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__write, libc_write);
 DEFINE_PUBLIC_ALIAS(write, libc_write);
 DEFINE_PUBLIC_ALIAS(readall, libc_readall);
 DEFINE_PUBLIC_ALIAS(writeall, libc_writeall);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_lseek, libc_lseek);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__lseek, libc_lseek);
 DEFINE_PUBLIC_ALIAS(lseek, libc_lseek);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_isatty, libc_isatty);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(isatty, libc_isatty);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_dup2, libc_dup2);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__dup2, libc_dup2);
 DEFINE_PUBLIC_ALIAS(dup2, libc_dup2);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_dup, libc_dup);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(dup, libc_dup);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_close, libc_close);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__close, libc_close);
 DEFINE_PUBLIC_ALIAS(close, libc_close);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_access, libc_access);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(access, libc_access);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chdir, libc_chdir);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(chdir, libc_chdir);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_getcwd, libc_getcwd);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(getcwd, libc_getcwd);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_unlink, libc_unlink);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(unlink, libc_unlink);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_rmdir, libc_rmdir);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(eaccess, libc_euidaccess);
 DEFINE_PUBLIC_ALIAS(euidaccess, libc_euidaccess);
@@ -3693,7 +3723,9 @@ DEFINE_PUBLIC_ALIAS(symlinkat, libc_symlinkat);
 DEFINE_PUBLIC_ALIAS(readlinkat, libc_readlinkat);
 DEFINE_PUBLIC_ALIAS(freadlinkat, libc_freadlinkat);
 DEFINE_PUBLIC_ALIAS(unlinkat, libc_unlinkat);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_lseeki64, libc_lseek64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(lseek64, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(pread, libc_pread);
 DEFINE_PUBLIC_ALIAS(pwrite, libc_pwrite);
@@ -3753,17 +3785,20 @@ DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(revoke, libc_revoke);
 DEFINE_PUBLIC_ALIAS(chroot, libc_chroot);
 DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chsize, libc_ftruncate);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(chsize, libc_ftruncate);
 DEFINE_PUBLIC_ALIAS(ftruncate, libc_ftruncate);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chsize_s, libc_ftruncate64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(ftruncate64, libc_ftruncate64);
 DEFINE_PUBLIC_ALIAS(brk, libc_brk);
 DEFINE_PUBLIC_ALIAS(__sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
-DEFINE_PUBLIC_ALIAS(_sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(__sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(sysconf, libc_sysconf);
 /*[[[end:exports]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd6b6bdc */
+/* HASH CRC-32:0x96c63261 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -440,7 +440,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),(__template_))
 #elif defined(__CRT_HAVE__mktemp)
@@ -451,7 +451,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(ch
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),_mktemp,(__template_))
 #elif defined(__CRT_HAVE___mktemp)
@@ -462,7 +462,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(c
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),__mktemp,(__template_))
 #else /* ... */
@@ -476,7 +476,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(c
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mktemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL mktemp)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mktemp))(__template_); })
 #else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64) */

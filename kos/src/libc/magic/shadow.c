@@ -93,19 +93,19 @@ int getspent_r([[nonnull]] struct spwd *__restrict result_buf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias(getspent_r), decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>")]]
 int getspnam_r([[nonnull]] char const *__restrict name,
                [[nonnull]] struct spwd *__restrict result_buf,
                [[nonnull]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias(getspent_r), decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>")]]
 int sgetspent_r([[nonnull]] char const *__restrict string,
                 [[nonnull]] struct spwd *__restrict result_buf,
                 [[nonnull]] char *__restrict buffer, size_t buflen,
                 [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias(getspent_r), decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>")]]
 int fgetspent_r([[nonnull]] $FILE *__restrict stream,
                 [[nonnull]] struct spwd *__restrict result_buf,
                 [[nonnull]] char *__restrict buffer, size_t buflen,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd63b1d2a */
+/* HASH CRC-32:0xeea608ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,8 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __LOCAL_LIBC(mempcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpy))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__pdst = (__BYTE_TYPE__ *)__dst;

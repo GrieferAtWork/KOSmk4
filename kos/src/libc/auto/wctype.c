@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb7724ef */
+/* HASH CRC-32:0xbb41bc2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -304,49 +304,79 @@ DEFINE_PUBLIC_ALIAS(iswblank, libc_iswblank);
 DEFINE_PUBLIC_ALIAS(towlower, libc_towlower);
 DEFINE_PUBLIC_ALIAS(towupper, libc_towupper);
 DEFINE_PUBLIC_ALIAS(iswascii, libc_iswascii);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswalnum_l, libc_iswalnum_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswalnum_l, libc_iswalnum_l);
 DEFINE_PUBLIC_ALIAS(iswalnum_l, libc_iswalnum_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswalpha_l, libc_iswalpha_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswalpha_l, libc_iswalpha_l);
 DEFINE_PUBLIC_ALIAS(iswalpha_l, libc_iswalpha_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswcntrl_l, libc_iswcntrl_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswcntrl_l, libc_iswcntrl_l);
 DEFINE_PUBLIC_ALIAS(iswcntrl_l, libc_iswcntrl_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswdigit_l, libc_iswdigit_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswdigit_l, libc_iswdigit_l);
 DEFINE_PUBLIC_ALIAS(iswdigit_l, libc_iswdigit_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswgraph_l, libc_iswgraph_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswgraph_l, libc_iswgraph_l);
 DEFINE_PUBLIC_ALIAS(iswgraph_l, libc_iswgraph_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswlower_l, libc_iswlower_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswlower_l, libc_iswlower_l);
 DEFINE_PUBLIC_ALIAS(iswlower_l, libc_iswlower_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswprint_l, libc_iswprint_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswprint_l, libc_iswprint_l);
 DEFINE_PUBLIC_ALIAS(iswprint_l, libc_iswprint_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswpunct_l, libc_iswpunct_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswpunct_l, libc_iswpunct_l);
 DEFINE_PUBLIC_ALIAS(iswpunct_l, libc_iswpunct_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswspace_l, libc_iswspace_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswspace_l, libc_iswspace_l);
 DEFINE_PUBLIC_ALIAS(iswspace_l, libc_iswspace_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswupper_l, libc_iswupper_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswupper_l, libc_iswupper_l);
 DEFINE_PUBLIC_ALIAS(iswupper_l, libc_iswupper_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswxdigit_l, libc_iswxdigit_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswxdigit_l, libc_iswxdigit_l);
 DEFINE_PUBLIC_ALIAS(iswxdigit_l, libc_iswxdigit_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswblank_l, libc_iswblank_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswblank_l, libc_iswblank_l);
 DEFINE_PUBLIC_ALIAS(iswblank_l, libc_iswblank_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswctype_l, libc_iswctype_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswctype_l, libc_iswctype_l);
 DEFINE_PUBLIC_ALIAS(iswctype_l, libc_iswctype_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_towupper_l, libc_towupper_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__towupper_l, libc_towupper_l);
 DEFINE_PUBLIC_ALIAS(towupper_l, libc_towupper_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_towlower_l, libc_towlower_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__towlower_l, libc_towlower_l);
 DEFINE_PUBLIC_ALIAS(towlower_l, libc_towlower_l);
 DEFINE_PUBLIC_ALIAS(__wctype_l, libc_wctype_l);

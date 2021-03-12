@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa85b5ed */
+/* HASH CRC-32:0x64207e07 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -647,25 +647,34 @@ INTDEF ATTR_LEAF NONNULL((2, 3)) char *NOTHROW_NCX(LIBDCALL libd_strtok_r)(char 
 INTDEF ATTR_LEAF NONNULL((2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *str, char const *delim, char **__restrict save_ptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBDCALL libd_memrchr)(void const *__restrict haystack, int needle, size_t n_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack, int needle, size_t n_bytes);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBDCALL libd_rawmemchr)(void const *__restrict haystack, int needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack, int needle);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_strchrnul)(char const *__restrict haystack, int needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack, int needle);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -689,7 +698,8 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_basename)(char const *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU
@@ -713,15 +723,19 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_basename)(
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strcasestr)(char const *haystack, char const *needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack, char const *needle);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -731,7 +745,9 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcase
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) void *NOTHROW_NCX(LIBDCALL libd_memmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -747,10 +763,12 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strverscm
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1, char const *s2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBDCALL libd_mempcpy)(void *__restrict dst, void const *__restrict src, size_t n_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst, void const *__restrict src, size_t n_bytes);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_strfry)(char *__restrict str);

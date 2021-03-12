@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53551d00 */
+/* HASH CRC-32:0xee70205b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2158,7 +2158,6 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key,
 #define __encrypt_defined 1
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, __STDC_INT_AS_UINT_T __edflag),(__glibc_block,__edflag))
 #endif /* !__encrypt_defined && __CRT_HAVE_encrypt */
-
 #ifndef __swab_defined
 #define __swab_defined 1
 #ifdef __CRT_HAVE_swab
@@ -2284,15 +2283,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS_UINT_T __name),(__name))
-#elif defined(__CRT_HAVE__sysconf)
-/* >> sysconf(2)
- * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
- * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
- *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-__CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS_UINT_T __name),_sysconf,(__name))
 #elif defined(__CRT_HAVE___sysconf)
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>

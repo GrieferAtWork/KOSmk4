@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3646f1f */
+/* HASH CRC-32:0x360cc40 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,7 +168,9 @@
 #define __stub_fgetspent
 #define __stub_fgetspent_r
 #define __stub_fmtcheck
+#ifdef __LIBCCALL_IS_LIBDCALL
 #define __stub__fpreset
+#endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub_fpreset
 #define __stub_freeaddrinfo
 #define __stub_freeifaddrs
@@ -345,7 +347,9 @@
 #define __stub___log2
 #define __stub_log2
 #define __stub___logb
+#ifdef __LIBCCALL_IS_LIBDCALL
 #define __stub__logb
+#endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub_logb
 #define __stub_login
 #define __stub_logout

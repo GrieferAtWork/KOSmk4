@@ -439,7 +439,8 @@ double expm1(double x) {
 double log1p(double x); /* TODO */
 
 @@Return the base 2 signed integral exponent of `x'
-[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__logb", "_logb")]]
+[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin]]
+[[export_alias("__logb"), dos_only_export_alias("_logb")]]
 double logb(double x); /* TODO */
 
 
@@ -759,7 +760,9 @@ double rint(double x) {
 
 @@Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y'
 [[std, wunused, nothrow, const, crtbuiltin, export_alias("nexttoward")]]
-[[export_alias("__nextafter", "_nextafter", "__nexttoward")]]
+[[export_alias("__nextafter")]]
+[[dos_only_export_alias("_nextafter")]]
+[[export_alias("__nexttoward")]]
 [[if(__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nexttoward", { return __builtin_nexttoward(x); })]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/nextafter.h>")]]
@@ -1061,7 +1064,7 @@ float scalbnf(float x, int n) %{generate(double2float("scalbn"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnf")]]
 float scalblnf(float x, long int n) %{generate(double2float("scalbln"))}
 
-[[std, wunused, nothrow, const, doc_alias(nearbyint)]]
+[[std, wunused, nothrow, const, doc_alias("nearbyint")]]
 [[nocrt, alias("nearbyintf", "__nearbyintf", "rintf", "__rintf")]]
 [[if(__has_builtin(__builtin_nearbyintf) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nearbyintf", { return __builtin_nearbyintf(x); })]]
@@ -1112,7 +1115,7 @@ __LONGDOUBLE scalbnl(__LONGDOUBLE x, int n) %{generate(double2ldouble("scalbn"))
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnl")]]
 __LONGDOUBLE scalblnl(__LONGDOUBLE x, long int n) %{generate(double2ldouble("scalbln"))}
 
-[[std, wunused, nothrow, const, doc_alias(nearbyint)]]
+[[std, wunused, nothrow, const, doc_alias("nearbyint")]]
 [[nocrt, alias("nearbyintl", "__nearbyintl", "rintl", "__rintl")]]
 [[if(__has_builtin(__builtin_nearbyintl) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nearbyintl", { return __builtin_nearbyintl(x); })]]
@@ -1319,7 +1322,7 @@ double pow10(double x) {
 	return pow(10.0, x);
 }
 
-[[crtbuiltin, export_alias("__sincosf"), nothrow, doc_alias(sincos)]]
+[[crtbuiltin, export_alias("__sincosf"), nothrow, doc_alias("sincos")]]
 [[attribute("__DECL_SIMD_sincosf"), decl_include("<bits/crt/math-vector.h>")]]
 [[requires_function(sincos)]]
 void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
@@ -1333,7 +1336,7 @@ void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 [[crtbuiltin, export_alias("__pow10f")]] pow10f(*) %{generate(double2float("pow10"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[nothrow, crtbuiltin, export_alias("__sincosl"), doc_alias(sincos)]]
+[[nothrow, crtbuiltin, export_alias("__sincosl"), doc_alias("sincos")]]
 [[attribute("__DECL_SIMD_sincosl"), decl_include("<bits/crt/math-vector.h>")]]
 [[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__sincos", "sincos")]]
 [[requires_function(sincos)]]
@@ -1428,7 +1431,8 @@ significandl(*) %{generate(double2ldouble("significand"))}
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 @@Return nonzero if `value' is not a number
-[[wunused, nothrow, const, crtbuiltin, export_alias("__isnan", "_isnan")]]
+[[wunused, nothrow, const, crtbuiltin]]
+[[dos_only_export_alias("_isnan"), export_alias("__isnan")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/isnan.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1517,7 +1521,8 @@ double lgamma_r(double x, int *signgamp); /* TODO */
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 @@Return `x' times (2 to the Nth power)
-[[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__scalb", "_scalb")]]
+[[wunused, ATTR_MCONST, nothrow, crtbuiltin]]
+[[dos_only_export_alias("_scalb"), export_alias("__scalb")]]
 [[impl_include("<libm/isnan.h>", "<libm/finite.h>", "<libm/isinf.h>")]]
 [[impl_include("<libm/matherr.h>", "<libc/errno.h>", "<libm/scalb.h>")]]
 [[requires_include("<ieee754.h>")]]
@@ -1569,7 +1574,8 @@ double scalb(double x, double fn) {
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 
 %#ifdef __USE_MISC
-[[crtbuiltin, export_alias("__scalbf", "_scalbf")]] scalbf(*) %{generate(double2float("scalb"))}
+[[crtbuiltin, dos_only_export_alias("_scalbf")]]
+[[export_alias("__scalbf")]]             scalbf(*) %{generate(double2float("scalb"))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[crtbuiltin, export_alias("__scalbl")]] scalbl(*) %{generate(double2ldouble("scalb"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1942,7 +1948,8 @@ double scalb(double x, double fn) {
 %
 %/* Floating point classification */
 %#ifdef __USE_ISOC99
-[[wunused, nothrow, const, export_alias("_dclass", "fpclassify")]]
+[[wunused, nothrow, const]]
+[[export_alias("fpclassify"), dos_only_export_alias("_dclass")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/fpclassify.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1958,7 +1965,7 @@ int __fpclassify(double x) {
 }
 
 
-[[wunused, nothrow, const, export_alias("_dsign")]]
+[[wunused, nothrow, const, dos_only_export_alias("_dsign")]]
 [[impl_include("<libm/signbit.h>")]]
 int __signbit(double x) {
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
@@ -1973,11 +1980,13 @@ int __signbit(double x) {
 }
 
 
-[[export_alias("_fdclass", "fpclassifyf")]] __fpclassifyf(*) %{generate(double2float("__fpclassify"))}
-[[export_alias("_fdsign")]]                 __signbitf(*) %{generate(double2float("__signbit"))}
+[[export_alias("fpclassifyf")]]
+[[dos_only_export_alias("_fdclass")]]       __fpclassifyf(*) %{generate(double2float("__fpclassify"))}
+[[dos_only_export_alias("_fdsign")]]        __signbitf(*) %{generate(double2float("__signbit"))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[export_alias("_ldclass", "fpclassifyl")]] __fpclassifyl(*) %{generate(double2ldouble("__fpclassify"))}
-[[export_alias("_ldsign")]]                 __signbitl(*) %{generate(double2ldouble("__signbit"))}
+[[export_alias("fpclassifyl")]]
+[[dos_only_export_alias("_ldclass")]]       __fpclassifyl(*) %{generate(double2ldouble("__fpclassify"))}
+[[dos_only_export_alias("_ldsign")]]        __signbitl(*) %{generate(double2ldouble("__signbit"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
@@ -2039,9 +2048,9 @@ __LIBC int (signgam);
 #define __FPFUNC(x, f, d, l)      _Generic(x, float: f(x), default: d(x))
 #define __FPFUNC2(x, y, f, d, l)  _Generic((x) + (y), float: f(x, y), default: d(x, y))
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */
-#elif !defined(__NO_builtin_choose_expr) &&        \
-      !defined(__NO_builtin_types_compatible_p) && \
-       defined(__COMPILER_HAVE_TYPEOF)
+#elif (!defined(__NO_builtin_choose_expr) &&        \
+       !defined(__NO_builtin_types_compatible_p) && \
+       defined(__COMPILER_HAVE_TYPEOF))
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #define __FPFUNC(x, f, d, l)                                                                     \
 	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (float)0), float), f(x), \
@@ -2283,43 +2292,43 @@ typedef __double_t double_t;
 #endif /* !isunordered */
 
 #ifndef isgreater
-#ifdef __NO_XBLOCK
+#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define isgreater(x, y) (!isunordered(x, y) && (x) > (y))
-#else /* __NO_XBLOCK */
+#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 #define isgreater(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x > __y; })
-#endif /* !__NO_XBLOCK */
+#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !isgreater */
 
 #ifndef isgreaterequal
-#ifdef __NO_XBLOCK
+#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define isgreaterequal(x, y) (!isunordered(x, y) && (x) >= (y))
-#else /* __NO_XBLOCK */
+#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 #define isgreaterequal(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x >= __y; })
-#endif /* !__NO_XBLOCK */
+#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !isgreaterequal */
 
 #ifndef isless
-#ifdef __NO_XBLOCK
+#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define isless(x, y) (!isunordered(x, y) && (x) < (y))
-#else /* __NO_XBLOCK */
+#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 #define isless(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x < __y; })
-#endif /* !__NO_XBLOCK */
+#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !isless */
 
 #ifndef islessequal
-#ifdef __NO_XBLOCK
+#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define islessequal(x, y) (!isunordered(x, y) && (x) <= (y))
-#else /* __NO_XBLOCK */
+#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 #define islessequal(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x <= __y; })
-#endif /* !__NO_XBLOCK */
+#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !islessequal */
 
 #ifndef islessgreater
-#ifdef __NO_XBLOCK
+#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define islessgreater(x, y) (!isunordered(x, y) && ((x) < (y) || (y) < (x)))
-#else /* __NO_XBLOCK */
+#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 #define islessgreater(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && (__x < __y || __y < __x); })
-#endif /* !__NO_XBLOCK */
+#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !islessgreater */
 #endif /* __USE_ISOC99 */
 

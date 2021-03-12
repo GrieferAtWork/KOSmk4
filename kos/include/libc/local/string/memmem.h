@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ddae634 */
+/* HASH CRC-32:0x753eb655 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.

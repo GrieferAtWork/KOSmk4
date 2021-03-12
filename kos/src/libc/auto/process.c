@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20343fb1 */
+/* HASH CRC-32:0x69f3bc8a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -445,15 +445,25 @@ DEFINE_PUBLIC_ALIAS(_c_exit, libc__c_exit);
 DEFINE_PUBLIC_ALIAS(_loaddll, libc__loaddll);
 DEFINE_PUBLIC_ALIAS(_unloaddll, libc__unloaddll);
 DEFINE_PUBLIC_ALIAS(_getdllprocaddr, libc__getdllprocaddr);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_cwait, libc_cwait);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(cwait, libc_cwait);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnv, libc_spawnv);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnv, libc_spawnv);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnvp, libc_spawnvp);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnvp, libc_spawnvp);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnve, libc_spawnve);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnve, libc_spawnve);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnvpe, libc_spawnvpe);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnvpe, libc_spawnvpe);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -461,7 +471,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_spawnl, libd_spawnl);
 DEFINE_PUBLIC_ALIAS(DOS$spawnl, libd_spawnl);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnl, libc_spawnl);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnl, libc_spawnl);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -469,7 +481,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_spawnlp, libd_spawnlp);
 DEFINE_PUBLIC_ALIAS(DOS$spawnlp, libd_spawnlp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnlp, libc_spawnlp);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnlp, libc_spawnlp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -477,7 +491,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_spawnle, libd_spawnle);
 DEFINE_PUBLIC_ALIAS(DOS$spawnle, libd_spawnle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnle, libc_spawnle);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnle, libc_spawnle);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -485,9 +501,13 @@ DEFINE_PUBLIC_ALIAS(DOS$_spawnlpe, libd_spawnlpe);
 DEFINE_PUBLIC_ALIAS(DOS$spawnlpe, libd_spawnlpe);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnlpe, libc_spawnlpe);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(spawnlpe, libc_spawnlpe);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_spawnve, libc_fspawnve);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fspawnve, libc_fspawnve);
 #endif /* !__KERNEL__ */
 

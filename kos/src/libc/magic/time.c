@@ -508,7 +508,7 @@ double difftime32($time32_t time1, $time32_t time0);
 
 [[decl_include("<features.h>")]]
 [[decl_include("<bits/crt/tm.h>")]]
-[[wunused, ATTR_PURE, doc_alias(mktime)]]
+[[wunused, ATTR_PURE, doc_alias("mktime")]]
 [[ignore, nocrt, alias("mktime", "_mktime32", "timelocal")]]
 $time32_t mktime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
 
@@ -765,7 +765,8 @@ $errno_t asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
 
 %#ifdef __USE_TIME64
 [[decl_include("<bits/types.h>")]]
-[[doc_alias("time"), time64_variant_of(time), export_alias("_time64")]]
+[[doc_alias("time"), time64_variant_of(time)]]
+[[dos_only_export_alias("_time64")]]
 [[userimpl, requires_function(time32)]]
 $time64_t time64($time64_t *timer) {
 	time32_t tm32 = time32(NULL);
@@ -777,7 +778,7 @@ $time64_t time64($time64_t *timer) {
 %#ifndef __NO_FPU
 [[decl_include("<bits/types.h>")]]
 [[wunused, ATTR_CONST, guard, doc_alias("difftime"), time64_variant_of(difftime)]]
-[[export_alias("_difftime64", "__difftime64")]]
+[[dos_only_export_alias("_difftime64"), export_alias("__difftime64")]]
 double difftime64($time64_t time1, $time64_t time0) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return time1 > time0 ? time1 - time0 : time0 - time1;
@@ -797,7 +798,7 @@ double difftime64($time64_t time1, $time64_t time0) {
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
-), export_alias("_mktime64", "timelocal64")]]
+), dos_only_export_alias("_mktime64"), export_alias("timelocal64")]]
 [[wunused, ATTR_PURE]]
 $time64_t mktime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -828,7 +829,7 @@ $time64_t mktime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp) {
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(ctime32)@@
 DEFINE_CTIME_BUFFER
 @@pp_endif@@
-), wunused, export_alias("_ctime64")]]
+), wunused, dos_only_export_alias("_ctime64")]]
 [[nonnull]] char *ctime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
@@ -847,7 +848,7 @@ DEFINE_CTIME_BUFFER
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(gmtime32)@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), wunused, export_alias("_gmtime64")]]
+), wunused, dos_only_export_alias("_gmtime64")]]
 [[nonnull]] struct $tm *gmtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
@@ -867,7 +868,7 @@ DEFINE_GMTIME_BUFFER
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(localtime32)@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), wunused, export_alias("_localtime64")]]
+), wunused, dos_only_export_alias("_localtime64")]]
 [[nonnull]] struct $tm *localtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
@@ -1225,11 +1226,11 @@ int clock_gettime(clockid_t clock_id, [[nonnull]] struct timespec *tp) {
 
 
 [[decl_include("<bits/os/timespec.h>")]]
-[[doc_alias(clock_settime), ignore, nocrt, alias("clock_settime", "__clock_settime")]]
+[[doc_alias("clock_settime"), ignore, nocrt, alias("clock_settime", "__clock_settime")]]
 int clock_settime32(clockid_t clock_id, [[nonnull]] struct $timespec32 const *tp);
 
 @@Set clock `clock_id' to value `tp'
-[[no_crt_self_import, export_as(__clock_settime), decl_include("<bits/os/timespec.h>")]]
+[[no_crt_self_import, export_as("__clock_settime"), decl_include("<bits/os/timespec.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("clock_settime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("clock_settime", "__clock_settime")]]
 [[userimpl, requires($has_function(clock_settime32) || $has_function(clock_settime64))]]
@@ -1582,7 +1583,8 @@ INTDEF longptr_t libc_timezone;
 @@>> strftime_l(3)
 @@Similar to `strftime(3)' but take the information from
 @@the provided locale and not the global locale
-[[decl_include("<bits/crt/tm.h>"), export_alias("_strftime_l", "__strftime_l")]]
+[[decl_include("<bits/crt/tm.h>")]]
+[[dos_only_export_alias("_strftime_l"), export_alias("__strftime_l")]]
 $size_t strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
                    [[nonnull]] char const *__restrict format,
                    [[nonnull]] struct $tm const *__restrict tp, $locale_t locale) {

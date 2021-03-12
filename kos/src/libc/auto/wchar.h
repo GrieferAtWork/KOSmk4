@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x782c040 */
+/* HASH CRC-32:0x4b8f6a77 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -301,9 +301,11 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL lib
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsnlwr)(char32_t *__restrict str, size_t maxlen);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsnupr)(char16_t *__restrict str, size_t maxlen);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str, size_t maxlen);
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack, char16_t const *needle);
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack, char32_t const *needle);
 /* Same as wcscpy, but return a pointer after the last written character */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcspcpy)(char16_t *__restrict buf, char16_t const *__restrict src);

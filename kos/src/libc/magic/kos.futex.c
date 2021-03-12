@@ -243,7 +243,8 @@ typedef __uintptr_t lfutex_t;
 //}
 
 
-[[cp, doc_alias(lfutex), ignore, vartypes($uintptr_t, $uintptr_t), decl_include("<bits/types.h>"), nocrt, alias(lfutex)]]
+[[cp, doc_alias("lfutex"), ignore, vartypes($uintptr_t, $uintptr_t)]]
+[[decl_include("<bits/types.h>"), nocrt, alias("lfutex")]]
 $ssize_t lfutex32([[nonnull]] lfutex_t *uaddr, $syscall_ulong_t futex_op,
                   lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...);
 
@@ -539,8 +540,8 @@ int futex_waitwhile_allbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) {
 @@@return: -1:EINTR:     Operation was interrupted
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile")]]
 [[impl_include("<kos/bits/futex.h>")]]
 [[userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile:([[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec const *rel_timeout) -> int {
@@ -554,8 +555,8 @@ futex_timedwaitwhile:([[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value, stru
 @@@return: -1:EINTR:     Operation was interrupted
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>"), decl_include("<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaituntil64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaituntil)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaituntil64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaituntil")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaituntil:([[nonnull]] lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_UNTIL@, not_equal_to_value, rel_timeout);
@@ -571,8 +572,8 @@ futex_timedwaitwhile_notequal(*) = futex_timedwaituntil;
 @@@return: -1:EINTR:     Operation was interrupted
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_above64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_above)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_above64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_above")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_above:([[nonnull]] lfutex_t *uaddr, lfutex_t above_value, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_value, rel_timeout);
@@ -585,8 +586,8 @@ futex_timedwaitwhile_above:([[nonnull]] lfutex_t *uaddr, lfutex_t above_value, s
 @@@return: -1:EINTR:     Operation was interrupted
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_below64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_below)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_below64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_below")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_below:([[nonnull]] lfutex_t *uaddr, lfutex_t below_value, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_value, rel_timeout);
@@ -599,8 +600,8 @@ futex_timedwaitwhile_below:([[nonnull]] lfutex_t *uaddr, lfutex_t below_value, s
 @@@return: -1:EINTR:     Operation was interrupted
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_aboveequal64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_aboveequal)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_aboveequal64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_aboveequal")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_aboveequal:([[nonnull]] lfutex_t *uaddr, lfutex_t above_equal_value, struct timespec const *rel_timeout) -> int {
 	if unlikely(!above_equal_value)
@@ -615,8 +616,8 @@ futex_timedwaitwhile_aboveequal:([[nonnull]] lfutex_t *uaddr, lfutex_t above_equ
 @@@return: -1:EINTR:     Operation was interrupted
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_belowequal64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_belowequal)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_belowequal64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_belowequal")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_belowequal:([[nonnull]] lfutex_t *uaddr, lfutex_t below_equal_value, struct timespec const *rel_timeout) -> int {
 	if unlikely(below_equal_value == (lfutex_t)-1)
@@ -631,8 +632,8 @@ futex_timedwaitwhile_belowequal:([[nonnull]] lfutex_t *uaddr, lfutex_t below_equ
 @@@return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_cmpxch64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_cmpxch)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_cmpxch64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_cmpxch")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_CMPXCH@, old_value, rel_timeout, new_value);
@@ -645,8 +646,8 @@ futex_timedwaitwhile_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lf
 @@@return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaituntil_cmpxch64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaituntil_cmpxch)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaituntil_cmpxch64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaituntil_cmpxch")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaituntil_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_UNTIL_CMPXCH@, old_value, rel_timeout, new_value);
@@ -659,8 +660,8 @@ futex_timedwaituntil_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lf
 @@@return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
 @@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitlock64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitlock)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitlock64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitlock")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitlock:([[nonnull]] lfutex_t *uaddr, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_LOCK@, 0, rel_timeout);
@@ -673,8 +674,8 @@ futex_timedwaitlock:([[nonnull]] lfutex_t *uaddr, struct timespec const *rel_tim
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_exactbits64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_exactbits)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_exactbits64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_exactbits")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, setmask);
@@ -686,8 +687,8 @@ futex_timedwaitwhile_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, l
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaituntil_exactbits64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaituntil_exactbits)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaituntil_exactbits64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaituntil_exactbits")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaituntil_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, setmask);
@@ -699,8 +700,8 @@ futex_timedwaituntil_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, l
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_anybit64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_anybit)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_anybit64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_anybit")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_anybit:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, 0);
@@ -712,8 +713,8 @@ futex_timedwaitwhile_anybit:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, stru
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_allbits64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futex_timedwaitwhile_allbits)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_allbits64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futex_timedwaitwhile_allbits")]]
 [[impl_include("<kos/bits/futex.h>"), userimpl, requires_function(lfutex)]]
 futex_timedwaitwhile_allbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout) -> int {
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, bitmask);

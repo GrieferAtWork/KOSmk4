@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa91ce83f */
+/* HASH CRC-32:0x12b4a34f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,12 +45,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_system_mktemp __LIBC_LOCAL_NAME(system_mktemp)
 #endif /* !__local___localdep_system_mktemp_defined */
 /* >> mkdtemp(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the pathname described by `TEMPLATE'
+ * with random characters such that the pathname described by `template_'
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
- * On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined. */
+ * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
 __LOCAL_LIBC(mkdtemp) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdtemp))(char *__template_) {
 	if (__localdep_system_mktemp(1, __template_, 0, 0) )

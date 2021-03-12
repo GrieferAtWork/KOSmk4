@@ -123,12 +123,12 @@ ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_S
 %
 %#ifdef __USE_MISC
 
-[[cp, ignore, nocrt, alias("preadv"), doc_alias(preadv)]]
+[[cp, ignore, nocrt, alias("preadv"), doc_alias("preadv")]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 ssize_t preadv32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
-[[cp, ignore, nocrt, alias("pwritev"), doc_alias(pwritev)]]
+[[cp, ignore, nocrt, alias("pwritev"), doc_alias("pwritev")]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off32_t offset);
@@ -157,8 +157,8 @@ ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 [[cp, no_crt_self_import]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev)]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwritev64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwritev")]]
 [[userimpl, requires($has_function(pwritev32) || $has_function(pwritev64))]]
 ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
                 __STDC_INT_AS_SIZE_T count, $off_t offset) {
@@ -171,7 +171,7 @@ ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
 
 %
 %#ifdef __USE_LARGEFILE64
-[[cp, wunused, off64_variant_of(preadv), doc_alias(preadv)]]
+[[cp, wunused, off64_variant_of(preadv), doc_alias("preadv")]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[userimpl, requires_function(preadv32)]]
 ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
@@ -179,7 +179,7 @@ ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
 	return preadv32(fd, iov, count, (off32_t)offset);
 }
 
-[[cp, off64_variant_of(pwritev), doc_alias(pwritev)]]
+[[cp, off64_variant_of(pwritev), doc_alias("pwritev")]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[userimpl, requires_function(pwritev32)]]
 ssize_t pwritev64($fd_t fd, [[inp(count)]] struct iovec const *iov,

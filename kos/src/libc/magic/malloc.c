@@ -157,7 +157,7 @@ cfree(*) = free;
 
 
 %
-[[ignore, nocrt, alias(_heapmin)]]
+[[ignore, nocrt, alias("_heapmin")]]
 int _heapmin();
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67cb0828 */
+/* HASH CRC-32:0x6a0cc449 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -737,22 +737,34 @@ DEFINE_PUBLIC_ALIAS(localtime, libc_localtime);
 DEFINE_PUBLIC_ALIAS(strftime, libc_strftime);
 DEFINE_PUBLIC_ALIAS(asctime, libc_asctime);
 DEFINE_PUBLIC_ALIAS(asctime_s, libc_asctime_s);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_difftime64, libc_difftime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__difftime64, libc_difftime64);
 DEFINE_PUBLIC_ALIAS(difftime64, libc_difftime64);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mktime64, libc_mktime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(timelocal64, libc_mktime64);
 DEFINE_PUBLIC_ALIAS(mktime64, libc_mktime64);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_ctime64, libc_ctime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(ctime64, libc_ctime64);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_gmtime64, libc_gmtime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(gmtime64, libc_gmtime64);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_localtime64, libc_localtime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(localtime64, libc_localtime64);
 DEFINE_PUBLIC_ALIAS(timegm, libc_timegm);
 DEFINE_PUBLIC_ALIAS(dysize, libc_dysize);
 DEFINE_PUBLIC_ALIAS(timegm64, libc_timegm64);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strftime_l, libc_strftime_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strftime_l, libc_strftime_l);
 DEFINE_PUBLIC_ALIAS(strftime_l, libc_strftime_l);
 DEFINE_PUBLIC_ALIAS(strptime, libc_strptime);

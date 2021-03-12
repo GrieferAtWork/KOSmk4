@@ -232,7 +232,7 @@ $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ 
 	%{generate(str2wcs("format_snprintf_printer"))}
 
 [[wchar, doc_alias("format_width"), ATTR_PURE]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_alias("format_length")]]
 /* Don't export in KOS-mode (in that mode, we're an alias for `libc_format_length') */
 [[crt_kos_impl_if(0), crt_dos_impl_if(!defined(__KERNEL__))]]
 $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {

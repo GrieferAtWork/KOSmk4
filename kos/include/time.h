@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd49ecab7 */
+/* HASH CRC-32:0xb682f3d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -294,15 +294,6 @@ __SYSDECL_BEGIN
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__os_sysconf,(__STDC_INT_AS_UINT_T __name),sysconf,(__name))
-#elif defined(__CRT_HAVE__sysconf)
-/* >> sysconf(2)
- * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
- * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
- *                                 limit, and that limit is indeterminate
- * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-__CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__os_sysconf,(__STDC_INT_AS_UINT_T __name),_sysconf,(__name))
 #elif defined(__CRT_HAVE___sysconf)
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>

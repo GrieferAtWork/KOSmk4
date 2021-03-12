@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95f926c2 */
+/* HASH CRC-32:0x577c7036 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rawmemchr_defined
 #define __local___localdep_rawmemchr_defined 1
 #ifdef __CRT_HAVE_rawmemchr
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
 #elif defined(__CRT_HAVE___rawmemchr)
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/rawmemchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memchr' with a search limit of `(size_t)-1' */
+/* >> rawmemchr(3)
+ * Same as `memchr' with a search limit of `(size_t)-1' */
 #define __localdep_rawmemchr __LIBC_LOCAL_NAME(rawmemchr)
 #endif /* !... */
 #endif /* !__local___localdep_rawmemchr_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x128dfa5e */
+/* HASH CRC-32:0xa07d05a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1775,7 +1775,7 @@ NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie,
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-DEFINE_INTERN_ALIAS(libc_funopen64, funopen);
+DEFINE_INTERN_ALIAS(libc_funopen64, libc_funopen);
 #else /* __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__ */
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_funopen2)))
 #ifndef ____funopen2_types_defined

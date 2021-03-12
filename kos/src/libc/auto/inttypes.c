@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37dfde7f */
+/* HASH CRC-32:0x95716839 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,9 +164,13 @@ DEFINE_PUBLIC_ALIAS(DOS$wcstoimax, libd_wcstoimax);
 DEFINE_PUBLIC_ALIAS(wcstoimax, libc_wcstoimax);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoumax, libd_wcstoumax);
 DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstoumax);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strtoimax_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strtoimax_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtoumax_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtoumax_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcstoimax_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcstoimax_l);

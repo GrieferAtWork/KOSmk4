@@ -699,7 +699,8 @@ int system([[nullable]] char const *command) {
 
 %[default:section(".text.crt{|.dos}.application.exit")]
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
-[[export_alias("_ZSt9terminatev", "?terminate@@YAXXZ")]]
+[[export_alias("_ZSt9terminatev")]]
+[[dos_only_export_alias("?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
 [[requires_function(_Exit), impl_include("<asm/os/stdlib.h>")]]
 void abort() {
@@ -1475,10 +1476,10 @@ int clearenv();
 %[default:section(".text.crt{|.dos}.fs.utility")]
 
 @@>> mkstemps(3), mkstemps64(3)
-@@Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+@@Replace the last 6 characters of `template_' (which are followed by exactly
 @@`suffixlen' more characters that are left alone), which must be filled with
 @@all 'X'-characters before the call (else errno=EINVAL + return -1), with
-@@random characters such that the filename described by `TEMPLATE' will not
+@@random characters such that the filename described by `template_' will not
 @@already exists. Then, create a new file with `O_RDWR' and return the file
 @@descriptor of that file.
 @@@param: suffixlen: The # of trailing characters to-be ignored
@@ -1596,7 +1597,7 @@ void lcong48([[nonnull]] unsigned short param[7]);
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
 %[default:section(".text.crt{|.dos}.fs.environ")]
-[[export_alias("_putenv")]]
+[[dos_only_export_alias("_putenv")]]
 int putenv([[nonnull]] char *string);
 %#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
@@ -1739,9 +1740,9 @@ int unsetenv([[nonnull]] char const *varname) {
 @@created it.
 @@Also: when no temporary filename can be created, rather than
 @@      returning something sensible like `NULL', this function
-@@      will instead set `TEMPLATE' to an empty string, and still
+@@      will instead set `template_' to an empty string, and still
 @@      re-return it like it would if everything had worked!
-[[guard, alias("_mktemp"), export_alias("__mktemp")]]
+[[guard, dos_only_export_alias("_mktemp"), export_alias("__mktemp")]]
 [[requires(($has_function(open) || $has_function(stat)) && $has_function(system_mktemp))]]
 [[nonnull]] char *mktemp([[nonnull]] char *template_) {
 	if (system_mktemp(2, template_, 0, 0) )
@@ -1830,9 +1831,9 @@ int getsubopt([[nonnull]] char **__restrict optionp,
 %[default:section(".text.crt{|.dos}.fs.utility")]
 
 @@>> mkstemp(3), mkstemp64(3)
-@@Replace the last 6 characters of `TEMPLATE', which must be filled with
+@@Replace the last 6 characters of `template_', which must be filled with
 @@all 'X'-characters before the call (else errno=EINVAL + return -1),
-@@with random characters such that the filename described by `TEMPLATE'
+@@with random characters such that the filename described by `template_'
 @@will not already exists. Then, create a new file with `O_RDWR' and return
 @@the file descriptor of that file.
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemp64")]]
@@ -1855,12 +1856,12 @@ $fd_t mkstemp64([[nonnull]] char *template_) {
 %
 %#ifdef __USE_XOPEN2K8
 @@>> mkdtemp(3)
-@@Replace the last 6 characters of `TEMPLATE', which must be filled with
+@@Replace the last 6 characters of `template_', which must be filled with
 @@all 'X'-characters before the call (else errno=EINVAL + return -1),
-@@with random characters such that the pathname described by `TEMPLATE'
+@@with random characters such that the pathname described by `template_'
 @@will not already exists. Then, create a new directory with `mode=0700',
 @@and re-return `template_' to indicate success.
-@@On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined.
+@@On error, `NULL' will be returned, and the contents of `template_' are undefined.
 [[cp, wunused, requires_function(mkdir, system_mktemp)]]
 char *mkdtemp([[nonnull]] char *template_) {
 	if (system_mktemp(1, template_, 0, 0) )
@@ -2020,10 +2021,10 @@ char *canonicalize_file_name([[nonnull]] char const *filename);
 %[default:section(".text.crt{|.dos}.fs.utility")]
 
 @@>> mkostemp(3), mkostemp64(3)
-@@Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+@@Replace the last 6 characters of `template_' (which are followed by exactly
 @@`suffixlen' more characters that are left alone), which must be filled with
 @@all 'X'-characters before the call (else errno=EINVAL + return -1), with
-@@random characters such that the filename described by `TEMPLATE' will not
+@@random characters such that the filename described by `template_' will not
 @@already exists. Then, create a new file with `O_RDWR | flags' and return the file
 @@descriptor of that file.
 @@@param: flags: Additional flags to pass to `open(2)',
@@ -2593,7 +2594,7 @@ char *devname(dev_t dev, mode_t type) {
 	return devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
 }
 
-[[doc_alias(devname)]]
+[[doc_alias("devname")]]
 int devname_r(dev_t dev, mode_t type, [[outp(len)]] char *buf, size_t len);
 
 
@@ -3053,12 +3054,12 @@ unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);
 %#else /* _MSC_VER && __LIBCCALL_IS_LIBDCALL */
 %[default:section(".text.crt.dos.math.utility")]
 [[ATTR_CONST, wunused, nothrow]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), crt_intern_kos_alias("libc_abs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       crt_intern_kos_alias("libc_abs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), crt_intern_kos_alias("libc_llabs")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("abs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("abs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_llabs...)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("imaxabs")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), bind_local_function(abs)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias("imaxabs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       bind_local_function(abs)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(llabs)]]
 __INT64_TYPE__ _abs64(__INT64_TYPE__ x) {
 	return x < 0 ? -x : x;
@@ -3076,7 +3077,7 @@ double _atof_l([[nonnull]] char const *__restrict nptr, $locale_t locale) {
 %#endif /* !__NO_FPU */
 
 [[wunused, ATTR_PURE]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_atol_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),      alias("_atol_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("_atoll_l")]]
 int _atoi_l([[nonnull]] char const *__restrict nptr, $locale_t locale) {
 	return (int)strtol_l(nptr, NULL, 10, locale);
@@ -4196,7 +4197,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 %
 %
 
-[[export_alias("_itoa")]]
+[[dos_only_export_alias("_itoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa", "ltoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_i64toa")]]
 char *itoa(int val, [[nonnull]] char *buf, int radix) {
@@ -4204,7 +4205,7 @@ char *itoa(int val, [[nonnull]] char *buf, int radix) {
 	return buf;
 }
 
-[[export_alias("_ltoa")]]
+[[dos_only_export_alias("_ltoa")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, "itoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_itoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_i64toa")]]
@@ -4213,7 +4214,7 @@ char *ltoa(long val, [[nonnull]] char *buf, int radix) {
 	return buf;
 }
 
-[[export_alias("_ultoa")]]
+[[dos_only_export_alias("_ultoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ui64toa")]]
 char *ultoa(unsigned long val, [[nonnull]] char *buf, int radix) {
 	_ultoa_s(val, buf, ($size_t)-1, radix);
@@ -4234,7 +4235,7 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 %[define_type_class(onexit_t  = "TP")]
 %[define_type_class(_onexit_t = "TP")]
 
-[[export_alias("_onexit"), decl_prefix(DEFINE_ONEXIT_T)]]
+[[dos_only_export_alias("_onexit"), decl_prefix(DEFINE_ONEXIT_T)]]
 onexit_t onexit(onexit_t func);
 
 
@@ -4306,8 +4307,8 @@ double _wtof_l([[nonnull]] wchar_t const *nptr,
 %[insert:guarded_function(_wtol = wtol)]
 
 [[guard, wchar]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_wtoi")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_wtol")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("_wtoi")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias("_wtol")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_wtoll")]]
 _wtoi64(*) %{generate(str2wcs("_atoi64"))}
 
@@ -4316,15 +4317,15 @@ _wtoi64(*) %{generate(str2wcs("_atoi64"))}
 
 %[default:section(".text.crt.dos.wchar.unicode.locale.convert")]
 [[guard, wchar]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_wtol_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),      alias("_wtol_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("_wtoll_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_wtoi64_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),                    alias("_wtoi64_l")]]
 _wtoi_l(*) %{generate(str2wcs("_atoi_l"))}
 
 [[guard, wchar]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, _wtoi_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("_wtoll_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_wtoi64_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                    alias("_wtoi64_l")]]
 _wtol_l(*) %{generate(str2wcs("_atol_l"))}
 
 [[guard, wchar]]

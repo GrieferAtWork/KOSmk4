@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc6d69dd */
+/* HASH CRC-32:0x4dd78573 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,10 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR' and return the file
  * descriptor of that file.
  * @param: suffixlen: The # of trailing characters to-be ignored
@@ -47,10 +47,10 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR' and return the file
  * descriptor of that file.
  * @param: suffixlen: The # of trailing characters to-be ignored
@@ -61,10 +61,10 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR' and return the file
  * descriptor of that file.
  * @param: suffixlen: The # of trailing characters to-be ignored
@@ -75,10 +75,10 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/mkstemps.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR' and return the file
  * descriptor of that file.
  * @param: suffixlen: The # of trailing characters to-be ignored
@@ -89,9 +89,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_mkstemps_defined */
 /* >> mkstemp(3), mkstemp64(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the filename described by `TEMPLATE'
+ * with random characters such that the filename described by `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 __LOCAL_LIBC(mkstemp) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t

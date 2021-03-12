@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d7981e3 */
+/* HASH CRC-32:0x6fba524c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2772,7 +2772,8 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str,
 		*iter = (char32_t)libc_towupper(ch);
 	return str;
 }
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
                                       char16_t const *needle) {
@@ -2782,7 +2783,8 @@ NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
 	}
 	return NULL;
 }
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
                                       char32_t const *needle) {

@@ -2211,7 +2211,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(const char *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x11de7e81]]]*/
+/*[[[start:exports,hash:CRC-32=0xcae5f71e]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2247,7 +2247,9 @@ DEFINE_PUBLIC_ALIAS(jrand48, libc_jrand48);
 DEFINE_PUBLIC_ALIAS(srand48, libc_srand48);
 DEFINE_PUBLIC_ALIAS(seed48, libc_seed48);
 DEFINE_PUBLIC_ALIAS(lcong48, libc_lcong48);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_putenv, libc_putenv);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(putenv, libc_putenv);
 DEFINE_PUBLIC_ALIAS(random, libc_random);
 DEFINE_PUBLIC_ALIAS(srandom, libc_srandom);
@@ -2309,7 +2311,9 @@ DEFINE_PUBLIC_ALIAS(_searchenv_s, libc__searchenv_s);
 DEFINE_PUBLIC_ALIAS(_seterrormode, libc__seterrormode);
 DEFINE_PUBLIC_ALIAS(_set_error_mode, libc__set_error_mode);
 DEFINE_PUBLIC_ALIAS(_beep, libc__beep);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_onexit, libc_onexit);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(onexit, libc_onexit);
 DEFINE_PUBLIC_ALIAS(DOS$_wgetenv, libd__wgetenv);
 DEFINE_PUBLIC_ALIAS(_wgetenv, libc__wgetenv);

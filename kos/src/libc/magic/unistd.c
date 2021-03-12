@@ -337,7 +337,7 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 @@>> execv(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, export_alias("_execv"), argument_names(path, ___argv)]]
+[[cp, guard, dos_only_export_alias("_execv"), argument_names(path, ___argv)]]
 [[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execv, { return __builtin_execv(path, (char *const *)___argv); })]]
 [[requires_include("<libc/local/environ.h>"), requires($has_function(execve) && defined(__LOCAL_environ))]]
@@ -350,7 +350,7 @@ int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 @@>> execve(2)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, export_alias("_execve"), argument_names(path, ___argv, ___envp)]]
+[[cp, guard, dos_only_export_alias("_execve"), argument_names(path, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[if(__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execve, { return __builtin_execve(path, (char *const *)___argv, (char *const *)___envp); })]]
@@ -359,7 +359,7 @@ int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnu
 @@>> execvp(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, export_alias("_execvp"), argument_names(file, ___argv)]]
+[[cp, guard, dos_only_export_alias("_execvp"), argument_names(file, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execvp, { return __builtin_execvp(file, (char *const *)___argv); })]]
@@ -373,7 +373,7 @@ int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 @@>> execl(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the list of NULL-terminated `args'-list
-[[cp, guard, ATTR_SENTINEL, export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
+[[cp, guard, ATTR_SENTINEL, dos_only_export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(execv), crtbuiltin]]
 int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execv, path, args)
@@ -383,7 +383,7 @@ int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (ch
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
-[[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execle"), crtbuiltin]]
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execle"), crtbuiltin]]
 [[requires_dependent_function(execve), ATTR_SENTINEL_O(1)]]
 int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execve, path, args)
@@ -392,7 +392,7 @@ int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (c
 @@>> execlp(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the list of NULL-terminated `args'-list
-[[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlp")]]
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execlp")]]
 [[requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin]]
 int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execvp, file, args)
@@ -403,7 +403,7 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 @@>> execvpe(3)
 @@Replace the calling process with the application image referred to by `file' and
 @@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
+[[cp, guard, dos_only_export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
 [[requires_include("<hybrid/__alloca.h>"), dependency(mempcpyc)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires($has_function(getenv) && $has_function(execve) && defined(__hybrid_alloca))]]
@@ -482,7 +482,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
-[[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlpe")]]
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execlpe")]]
 [[requires_dependent_function(execvpe), ATTR_SENTINEL_O(1)]]
 int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execvpe, file, args)
@@ -495,7 +495,7 @@ int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (
 @@Return the PID of the calling process (that is the TID of the calling thread group's leader)
 @@THIS_THREAD->LEADER->PID
 [[guard, wunused, const, nothrow]]
-[[export_alias("_getpid", "__getpid")]]
+[[dos_only_export_alias("_getpid"), export_alias("__getpid")]]
 $pid_t getpid();
 
 %#ifdef __USE_KOS
@@ -533,7 +533,7 @@ unsigned int sleep(unsigned int seconds) {
 @@>> fsync(2)
 @@Synchronize a file (including its descriptor which contains timestamps, and its size),
 @@meaning that changes to its data and/or descriptor are written to disk
-[[cp, export_alias("_commit"), alias("fdatasync")]]
+[[cp, dos_only_export_alias("_commit"), alias("fdatasync")]]
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
 [[decl_include("<bits/types.h>")]]
 int fsync($fd_t fd) {
@@ -761,8 +761,8 @@ int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 @@was available at the time.
 @@@return: <= bufsize: The actual amount of read bytes
 @@@return: 0         : EOF
-[[decl_include("<bits/types.h>")]]
-[[cp, guard, export_alias(_read, __read), section(".text.crt{|.dos}.io.read")]]
+[[dos_only_export_alias("_read"), export_alias("__read")]]
+[[cp, guard, decl_include("<bits/types.h>"), section(".text.crt{|.dos}.io.read")]]
 ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 
 @@>> write(2)
@@ -772,8 +772,8 @@ ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 @@if no data could be written at the time.
 @@@return: <= bufsize: The actual amount of written bytes
 @@@return: 0         : No more data can be written
-[[decl_include("<bits/types.h>")]]
-[[cp, guard, export_alias(_write, __write), section(".text.crt{|.dos}.io.write")]]
+[[dos_only_export_alias("_write"), export_alias("__write")]]
+[[cp, guard, decl_include("<bits/types.h>"), section(".text.crt{|.dos}.io.write")]]
 ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 
 %#ifdef __USE_KOS
@@ -845,7 +845,7 @@ ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 %#endif /* __USE_KOS */
 %
 
-[[doc_alias(lseek), ignore, nocrt, alias("lseek", "_lseek", "__lseek")]]
+[[doc_alias("lseek"), ignore, nocrt, alias("lseek", "_lseek", "__lseek")]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
 $off32_t lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 
@@ -855,7 +855,8 @@ $off32_t lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lseek64", "_lseeki64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lseek", "_lseek", "__lseek")]]
 [[userimpl, requires($has_function(lseek32) || $has_function(lseek64))]]
-[[section(".text.crt{|.dos}.io.seek"), export_as("_lseek", "__lseek")]]
+[[section(".text.crt{|.dos}.io.seek")]]
+[[dos_only_export_as("_lseek"), export_as("__lseek")]]
 $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 @@pp_if $has_function(lseek32)@@
 	return lseek32(fd, ($off32_t)offset, whence);
@@ -869,34 +870,36 @@ $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 @@@return: 0: Not a tty
 @@Check if the given file handle `fd' refers to a TTY
 [[guard, wunused, decl_include("<bits/types.h>")]]
-[[section(".text.crt{|.dos}.io.tty"), export_alias("_isatty")]]
+[[section(".text.crt{|.dos}.io.tty"), dos_only_export_alias("_isatty")]]
 int isatty($fd_t fd);
 
 @@>> dup2(2)
 @@@return: newfd: Returns the new handle upon success.
 @@Duplicate a file referred to by `oldfd' into `newfd'
 [[guard, decl_include("<bits/types.h>")]]
-[[section(".text.crt{|.dos}.io.access"), export_alias("_dup2", "__dup2")]]
+[[section(".text.crt{|.dos}.io.access")]]
+[[dos_only_export_alias("_dup2"), export_alias("__dup2")]]
 $fd_t dup2($fd_t oldfd, $fd_t newfd);
 
 @@>> dup(2)
 @@@return: * : Returns the new handle upon success.
 @@Duplicate a file referred to by `fd' and return its duplicated handle number
 [[guard, wunused, decl_include("<bits/types.h>")]]
-[[section(".text.crt{|.dos}.io.access"), export_alias("_dup")]]
+[[section(".text.crt{|.dos}.io.access"), dos_only_export_alias("_dup")]]
 $fd_t dup($fd_t fd);
 
 @@>> close(2)
 @@Close a given file descriptor/handle `fd'
 [[guard, decl_include("<bits/types.h>")]]
-[[section(".text.crt{|.dos}.io.access"), export_alias("_close", "__close")]]
+[[section(".text.crt{|.dos}.io.access")]]
+[[dos_only_export_alias("_close"), export_alias("__close")]]
 int close($fd_t fd);
 
 @@>> access(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `file', testing for `type'
 [[cp, guard, wunused, decl_include("<features.h>")]]
-[[export_alias("_access"), section(".text.crt{|.dos}.fs.property")]]
+[[dos_only_export_alias("_access"), section(".text.crt{|.dos}.fs.property")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(faccessat))]]
 int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
@@ -905,20 +908,20 @@ int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 
 @@>> chdir(2)
 @@Change the current working directory to `path'
-[[cp, guard, export_alias("_chdir")]]
+[[cp, guard, dos_only_export_alias("_chdir")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
 int chdir([[nonnull]] char const *path);
 
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
-[[cp, guard, export_alias("_getcwd"), section(".text.crt{|.dos}.fs.basic_property")]]
+[[cp, guard, dos_only_export_alias("_getcwd"), section(".text.crt{|.dos}.fs.basic_property")]]
 char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
 @@>> unlink(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `file'
-[[cp, guard, export_alias("_unlink")]]
+[[cp, guard, dos_only_export_alias("_unlink")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int unlink([[nonnull]] char const *file) {
@@ -927,7 +930,7 @@ int unlink([[nonnull]] char const *file) {
 
 @@>> rmdir(2)
 @@Remove a directory referred to by `path'
-[[cp, guard, export_alias("_rmdir")]]
+[[cp, guard, dos_only_export_alias("_rmdir")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int rmdir([[nonnull]] char const *path) {
@@ -1022,7 +1025,7 @@ int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#ifdef __USE_LARGEFILE64
 @@>> lseek64(2)
 @@Change the position of the file read/write pointer within a file referred to by `fd'
-[[off64_variant_of(lseek), export_alias("_lseeki64"), decl_include("<bits/types.h>")]]
+[[off64_variant_of(lseek), dos_only_export_alias("_lseeki64"), decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.large.seek"), userimpl, requires_function(lseek32)]]
 [[decl_include("<bits/types.h>")]]
 $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
@@ -1503,7 +1506,7 @@ int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 #endif /* !__PIO_OFFSET */
 }
 
-[[doc_alias(truncate), ignore, nocrt, alias("truncate")]]
+[[doc_alias("truncate"), ignore, nocrt, alias("truncate")]]
 [[decl_include("<bits/types.h>")]]
 int truncate32([[nonnull]] char const *file, $pos32_t length);
 
@@ -1621,7 +1624,7 @@ __LIBC int optopt;
 
 
 [[guard, wunused, no_crt_impl, crt_name("getopt"), exposed_name("getopt")]]
-[[if(defined(__USE_POSIX2) && !defined(__USE_POSIX_IMPLICITLY) && !defined(__USE_GNU)), preferred_alias(__posix_getopt)]]
+[[if(defined(__USE_POSIX2) && !defined(__USE_POSIX_IMPLICITLY) && !defined(__USE_GNU)), preferred_alias("__posix_getopt")]]
 int unistd_getopt(int argc, char *const argv[], char const *shortopts);
 
 %#endif /* __USE_POSIX2 */
@@ -1885,7 +1888,7 @@ $longptr_t syscall($longptr_t sysno, ...);
 
 %
 %#ifdef __USE_KOS
-[[cp, libc, section(".text.crt{|.dos}.system.utility"), doc_alias(syscall)]]
+[[cp, libc, section(".text.crt{|.dos}.system.utility"), doc_alias("syscall")]]
 [[preferred_alias("syscall"), decl_include("<bits/types.h>")]]
 [[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
            $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
@@ -1912,7 +1915,7 @@ char *getpass([[nonnull]] char const *__restrict prompt);
 %
 %#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
-[[doc_alias(ftruncate), ignore, nocrt, alias("ftruncate")]]
+[[doc_alias("ftruncate"), ignore, nocrt, alias("ftruncate")]]
 [[decl_include("<bits/types.h>")]]
 int ftruncate32($fd_t fd, $pos32_t length);
 
@@ -1923,7 +1926,8 @@ int ftruncate32($fd_t fd, $pos32_t length);
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate64", "_chsize_s")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate", "_chsize", "chsize")]]
 [[userimpl, requires($has_function(ftruncate32) || $has_function(ftruncate64))]]
-[[export_as("_chsize", "chsize"), section(".text.crt{|.dos}.io.write")]]
+[[dos_only_export_as("_chsize"), export_as("chsize")]]
+[[section(".text.crt{|.dos}.io.write")]]
 int ftruncate($fd_t fd, __PIO_OFFSET length) {
 @@pp_if $has_function(ftruncate32)@@
 	return ftruncate32(fd, (pos32_t)length);
@@ -1934,9 +1938,9 @@ int ftruncate($fd_t fd, __PIO_OFFSET length) {
 
 %
 %#ifdef __USE_LARGEFILE64
-[[off64_variant_of(ftruncate), doc_alias(ftruncate)]]
+[[off64_variant_of(ftruncate), doc_alias("ftruncate")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
-[[export_alias("_chsize_s"), section(".text.crt{|.dos}.io.large.write")]]
+[[dos_only_export_alias("_chsize_s"), section(".text.crt{|.dos}.io.large.write")]]
 [[userimpl, requires_function(ftruncate32), decl_include("<bits/types.h>")]]
 int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
 	return ftruncate32(fd, (pos32_t)length);
@@ -1953,7 +1957,7 @@ int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
 int brk(void *addr);
 
 [[section(".text.crt{|.dos}.heap.utility")]]
-[[export_alias("__sbrk"), doc_alias(brk)]]
+[[export_alias("__sbrk"), doc_alias("brk")]]
 void *sbrk(intptr_t delta);
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) || __USE_MISC */
 
@@ -1962,8 +1966,8 @@ void *sbrk(intptr_t delta);
 @@>> fdatasync(2)
 @@Synchronize only the data of a file (not its descriptor which contains
 @@timestamps, and its size), meaning that changes are written to disk
-[[decl_include("<bits/types.h>")]]
-[[cp, alias("fsync", "_commit"), userimpl, section(".text.crt{|.dos}.io.sync")]]
+[[cp, decl_include("<bits/types.h>"), alias("fsync", "_commit")]]
+[[userimpl, section(".text.crt{|.dos}.io.sync")]]
 int fdatasync($fd_t fd) {
 	(void)fd;
 	/* NO-OP */
@@ -1976,13 +1980,13 @@ int fdatasync($fd_t fd) {
 %[insert:extern(crypt)]
 %[insert:extern(encrypt)]
 
-%
 @@>> swab(3)
 @@Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
 @@exchanging the order of even and odd bytes ("123456" --> "214365")
 @@When `n_bytes <= 1', don't do anything and return immediately
-[[decl_include("<features.h>")]]
-[[guard, export_alias("_swab"), section(".text.crt{|.dos}.string.memory")]]
+[[guard, decl_include("<features.h>")]]
+[[dos_only_export_alias("_swab")]]
+[[section(".text.crt{|.dos}.string.memory")]]
 void swab([[nonnull]] void const *__restrict from,
           [[nonnull]] void *__restrict to,
           __STDC_INT_AS_SSIZE_T n_bytes) {
@@ -2072,7 +2076,7 @@ char *ctermid_r([[nullable]] char *s) {
 @@                                limit, and that limit is indeterminate
 @@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
 [[cp, wunused, section(".text.crt{|.dos}.system.configuration")]]
-[[export_alias("_sysconf", "__sysconf"), decl_include("<features.h>")]]
+[[export_alias("__sysconf"), decl_include("<features.h>")]]
 $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 
 
@@ -2222,16 +2226,16 @@ __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("tell", "_tell")]]
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek) && defined(__SEEK_CUR))]]
-[[impl_include("<asm/os/stdio.h>"), export_as("_tell")]]
+[[impl_include("<asm/os/stdio.h>"), dos_only_export_as("_tell")]]
 $off_t tell($fd_t fd) {
 	return lseek(fd, 0, SEEK_CUR);
 }
 
 %#ifdef __USE_LARGEFILE64
 [[wunused, guard, decl_include("<bits/types.h>")]]
-[[requires_include("<asm/os/stdio.h>"), doc_alias(tell)]]
+[[requires_include("<asm/os/stdio.h>"), doc_alias("tell")]]
 [[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
-[[impl_include("<asm/os/stdio.h>"), export_alias("_telli64")]]
+[[impl_include("<asm/os/stdio.h>"), dos_only_export_alias("_telli64")]]
 $off64_t tell64($fd_t fd) {
 	return lseek64(fd, 0, __SEEK_CUR);
 }

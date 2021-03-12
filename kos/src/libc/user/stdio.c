@@ -2202,9 +2202,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off_
 }
 /*[[[end:libc_ftello]]]*/
 
-/*[[[head:libc_ftello64,hash:CRC-32=0x9b7b6a1c]]]*/
+/*[[[head:libc_ftello64,hash:CRC-32=0xbf5392fd]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_ftello64, ftello);
+DEFINE_INTERN_ALIAS(libc_ftello64, libc_ftello);
 #else /* MAGIC:alias */
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
@@ -2251,9 +2251,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 }
 /*[[[end:libc_fseeko]]]*/
 
-/*[[[head:libc_fseeko64,hash:CRC-32=0x755959aa]]]*/
+/*[[[head:libc_fseeko64,hash:CRC-32=0x8ab8b0cf]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_fseeko64, fseeko);
+DEFINE_INTERN_ALIAS(libc_fseeko64, libc_fseeko);
 #else /* MAGIC:alias */
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
@@ -2311,9 +2311,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fsetpos]]]*/
 
-/*[[[head:libc_fgetpos64,hash:CRC-32=0x8c5330d4]]]*/
+/*[[[head:libc_fgetpos64,hash:CRC-32=0x43beaf6f]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
-DEFINE_INTERN_ALIAS(libc_fgetpos64, fgetpos);
+DEFINE_INTERN_ALIAS(libc_fgetpos64, libc_fgetpos);
 #else /* MAGIC:alias */
 /* >> fgetpos(3), fgetpos64(3)
  * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
@@ -2333,9 +2333,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fgetpos64]]]*/
 
-/*[[[head:libc_fsetpos64,hash:CRC-32=0xf636a493]]]*/
+/*[[[head:libc_fsetpos64,hash:CRC-32=0xabf1ad77]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
-DEFINE_INTERN_ALIAS(libc_fsetpos64, fsetpos);
+DEFINE_INTERN_ALIAS(libc_fsetpos64, libc_fsetpos);
 #else /* MAGIC:alias */
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
@@ -2382,9 +2382,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) of
 }
 /*[[[end:libc_ftello_unlocked]]]*/
 
-/*[[[head:libc_ftello64_unlocked,hash:CRC-32=0xc2a7438a]]]*/
+/*[[[head:libc_ftello64_unlocked,hash:CRC-32=0xced139e4]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_ftello64_unlocked, ftello_unlocked);
+DEFINE_INTERN_ALIAS(libc_ftello64_unlocked, libc_ftello_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) off64_t
 (LIBCCALL libc_ftello64_unlocked)(FILE *__restrict stream) THROWS(...)
@@ -2433,9 +2433,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
 }
 /*[[[end:libc_fseeko_unlocked]]]*/
 
-/*[[[head:libc_fseeko64_unlocked,hash:CRC-32=0x2269f3f8]]]*/
+/*[[[head:libc_fseeko64_unlocked,hash:CRC-32=0x8fc0ea17]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_fseeko64_unlocked, fseeko_unlocked);
+DEFINE_INTERN_ALIAS(libc_fseeko64_unlocked, libc_fseeko_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
 (LIBCCALL libc_fseeko64_unlocked)(FILE *__restrict stream,
@@ -2478,9 +2478,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fsetpos_unlocked]]]*/
 
-/*[[[head:libc_fgetpos64_unlocked,hash:CRC-32=0x561312e5]]]*/
+/*[[[head:libc_fgetpos64_unlocked,hash:CRC-32=0x211fbe47]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
-DEFINE_INTERN_ALIAS(libc_fgetpos64_unlocked, fgetpos_unlocked);
+DEFINE_INTERN_ALIAS(libc_fgetpos64_unlocked, libc_fgetpos_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fgetpos64_unlocked)(FILE *__restrict stream,
@@ -2497,9 +2497,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fgetpos64_unlocked]]]*/
 
-/*[[[head:libc_fsetpos64_unlocked,hash:CRC-32=0x60afbbab]]]*/
+/*[[[head:libc_fsetpos64_unlocked,hash:CRC-32=0x522733b2]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
-DEFINE_INTERN_ALIAS(libc_fsetpos64_unlocked, fsetpos_unlocked);
+DEFINE_INTERN_ALIAS(libc_fsetpos64_unlocked, libc_fsetpos_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fsetpos64_unlocked)(FILE *__restrict stream,
@@ -2640,9 +2640,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 }
 /*[[[end:libc_fftruncate_unlocked]]]*/
 
-/*[[[head:libc_fftruncate64,hash:CRC-32=0x7a44434d]]]*/
+/*[[[head:libc_fftruncate64,hash:CRC-32=0xe11de6f3]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_fftruncate64, fftruncate);
+DEFINE_INTERN_ALIAS(libc_fftruncate64, libc_fftruncate);
 #else /* MAGIC:alias */
 /* >> fftruncate64(3)
  * Truncate the given file `stream' to a length of `length' */
@@ -2668,9 +2668,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64]]]*/
 
-/*[[[head:libc_fftruncate64_unlocked,hash:CRC-32=0x7c1ffbbf]]]*/
+/*[[[head:libc_fftruncate64_unlocked,hash:CRC-32=0x490955b1]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_fftruncate64_unlocked, fftruncate_unlocked);
+DEFINE_INTERN_ALIAS(libc_fftruncate64_unlocked, libc_fftruncate_unlocked);
 #else /* MAGIC:alias */
 /* >> fftruncate64_unlocked(3)
  * Truncate the given file `stream' to a length of `length' */
@@ -2857,9 +2857,9 @@ NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie,
 }
 /*[[[end:libc_funopen2]]]*/
 
-/*[[[head:libc_funopen2_64,hash:CRC-32=0x15e3587d]]]*/
+/*[[[head:libc_funopen2_64,hash:CRC-32=0x4a1b9dc7]]]*/
 #if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-DEFINE_INTERN_ALIAS(libc_funopen2_64, funopen2);
+DEFINE_INTERN_ALIAS(libc_funopen2_64, libc_funopen2);
 #else /* MAGIC:alias */
 /* >> funopen2(3), funopen2_64(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
@@ -3776,7 +3776,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6840f9aa]]]*/
+/*[[[start:exports,hash:CRC-32=0x22e3ad77]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3831,8 +3831,10 @@ DEFINE_PUBLIC_ALIAS(renameat, libc_renameat);
 DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
 DEFINE_PUBLIC_ALIAS(frenameat, libc_frenameat);
 DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);
-DEFINE_PUBLIC_ALIAS(fflush_unlocked, libc_fflush_unlocked);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fflush_nolock, libc_fflush_unlocked);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(fflush_unlocked, libc_fflush_unlocked);
 DEFINE_PUBLIC_ALIAS(fread_unlocked, libc_fread_unlocked);
 DEFINE_PUBLIC_ALIAS(_fread_nolock, libc_fread_unlocked);
 DEFINE_PUBLIC_ALIAS(fwrite_unlocked, libc_fwrite_unlocked);

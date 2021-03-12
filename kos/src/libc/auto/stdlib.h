@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd87b3be5 */
+/* HASH CRC-32:0x6670c396 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -289,10 +289,10 @@ INTDEF NONNULL((2, 4)) int NOTHROW_NCX(LIBDCALL libd_initstate_r)(unsigned int s
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setstate_r)(char *__restrict statebuf, struct random_data *__restrict buf);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(__on_exit_func_t func, void *arg);
 /* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR' and return the file
  * descriptor of that file.
  * @param: suffixlen: The # of trailing characters to-be ignored
@@ -301,10 +301,10 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *templ
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR' and return the file
  * descriptor of that file.
  * @param: suffixlen: The # of trailing characters to-be ignored
@@ -379,7 +379,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mktemp)(char *template_);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -391,7 +391,7 @@ INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mktemp)(char
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_);
 #endif /* !__KERNEL__ */
@@ -415,40 +415,40 @@ INTDEF WUNUSED NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_getsubopt)(char 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkstemp(3), mkstemp64(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the filename described by `TEMPLATE'
+ * with random characters such that the filename described by `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_mkstemp)(char *template_);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkstemp(3), mkstemp64(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the filename described by `TEMPLATE'
+ * with random characters such that the filename described by `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkdtemp(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the pathname described by `TEMPLATE'
+ * with random characters such that the pathname described by `template_'
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
- * On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined. */
+ * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_mkdtemp)(char *template_);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkdtemp(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the pathname described by `TEMPLATE'
+ * with random characters such that the pathname described by `template_'
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
- * On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined. */
+ * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -520,10 +520,10 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char 
  * Upon error, `NULL' is returned instead */
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename);
 /* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR | flags' and return the file
  * descriptor of that file.
  * @param: flags: Additional flags to pass to `open(2)',
@@ -532,10 +532,10 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkostemp)(char *templ
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR | flags' and return the file
  * descriptor of that file.
  * @param: flags: Additional flags to pass to `open(2)',

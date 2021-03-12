@@ -1200,7 +1200,7 @@ int sendmmsg($fd_t sockfd, [[nonnull]] struct mmsghdr *vmessages,
              __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 
 [[decl_include("<features.h>")]]
-[[cp, doc_alias(recvmmsg), ignore, nocrt, alias("recvmmsg")]]
+[[cp, doc_alias("recvmmsg"), ignore, nocrt, alias("recvmmsg")]]
 int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
                [[nullable]] struct $timespec32 *tmo);
@@ -1240,7 +1240,7 @@ int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 
 %#ifdef __USE_TIME64
 [[decl_include("<features.h>")]]
-[[cp, doc_alias(recvmmsg), time64_variant_of(recvmmsg)]]
+[[cp, doc_alias("recvmmsg"), time64_variant_of(recvmmsg)]]
 [[userimpl, requires_function(recvmmsg32)]]
 int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,

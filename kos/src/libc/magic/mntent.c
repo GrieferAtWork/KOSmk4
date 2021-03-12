@@ -100,7 +100,7 @@ struct mntent *getmntent([[nonnull]] $FILE *stream) {
 %
 %#ifdef __USE_MISC
 [[decl_include("<features.h>", "<bits/crt/db/mntent.h>")]]
-[[cp, doc_alias(getmntent), export_alias("__getmntent_r")]]
+[[cp, doc_alias("getmntent"), export_alias("__getmntent_r")]]
 [[requires_function(fgets)]]
 struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
                            [[nonnull]] struct mntent *__restrict result,

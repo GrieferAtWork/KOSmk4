@@ -55,35 +55,35 @@ typedef __pos64_t pos64_t; /* File/device position */
 
 %[default:section(".text.crt{|.dos}.except.fs.exec.exec")];
 
-[[cp, throws, ATTR_NORETURN, doc_alias(execv), argument_names(path, ___argv)]]
+[[cp, throws, ATTR_NORETURN, doc_alias("execv"), argument_names(path, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 void Execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
-[[cp, throws, ATTR_NORETURN, doc_alias(execve), argument_names(path, ___argv, ___envp)]]
+[[cp, throws, ATTR_NORETURN, doc_alias("execve"), argument_names(path, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 void Execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
-[[cp, throws, ATTR_NORETURN, doc_alias(execvp), argument_names(file, ___argv)]]
+[[cp, throws, ATTR_NORETURN, doc_alias("execvp"), argument_names(file, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 void Execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
 
-[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execl)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias("execl")]]
 [[requires_dependent_function(Execv), ATTR_SENTINEL, ATTR_NORETURN]]
 void Execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execv, path, args)
 }
 
-[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execle)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias("execle")]]
 [[requires_dependent_function(Execve), ATTR_SENTINEL_O(1), ATTR_NORETURN]]
 void Execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execve, path, args)
 }
 
-[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execlp)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias("execlp")]]
 [[requires_dependent_function(Execvp), ATTR_SENTINEL, ATTR_NORETURN]]
 void Execpl([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execvp, file, args)
 }
 
-[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execle)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias("execle")]]
 [[requires_dependent_function(Execvpe), ATTR_SENTINEL_O(1), ATTR_NORETURN]]
 void Execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execvpe, file, args)
@@ -190,7 +190,7 @@ size_t ReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 $pos32_t LSeek32($fd_t fd, $off32_t offset, int whence);
 
 [[throws, decl_include("<bits/types.h>")]]
-[[doc_alias(lseek), no_crt_self_import]]
+[[doc_alias("lseek"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek")]]
 [[userimpl, requires($has_function(LSeek32) || $has_function(LSeek64))]]
@@ -495,7 +495,7 @@ void Truncate64([[nonnull]] char const *file, pos64_t length) {
 
 %#ifdef __USE_XOPEN2K8
 
-[[guard, ATTR_NORETURN, doc_alias(fexecve)]]
+[[guard, ATTR_NORETURN, doc_alias("fexecve")]]
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[argument_names(fd, ___argv, ___envp), section(".text.crt{|.dos}.except.fs.exec.exec")]]
@@ -504,7 +504,7 @@ void FExecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 %#endif /* __USE_XOPEN2K8 */
 
 %#ifdef __USE_GNU
-[[cp, throws, ATTR_NORETURN, doc_alias(execvpe)]]
+[[cp, throws, ATTR_NORETURN, doc_alias("execvpe")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[argument_names(file, ___argv, ___envp), section(".text.crt{|.dos}.except.fs.exec.exec")]]
 void Execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
@@ -523,25 +523,25 @@ int Nice(int inc) {
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-[[throws, doc_alias(setpgrp), section(".text.crt{|.dos}.except.sched.process")]]
+[[throws, doc_alias("setpgrp"), section(".text.crt{|.dos}.except.sched.process")]]
 void SetPGrp();
 
-[[doc_alias(setreuid), section(".text.crt{|.dos}.except.sched.user")]]
+[[doc_alias("setreuid"), section(".text.crt{|.dos}.except.sched.user")]]
 [[throws, decl_include("<bits/types.h>")]]
 void SetReUid($uid_t ruid, $uid_t euid);
 
-[[doc_alias(setregid), section(".text.crt{|.dos}.except.sched.user")]]
+[[doc_alias("setregid"), section(".text.crt{|.dos}.except.sched.user")]]
 [[throws, decl_include("<bits/types.h>")]]
 void SetReGid($gid_t rgid, $gid_t egid);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %
 %#ifdef __USE_XOPEN2K
-[[doc_alias(seteuid), section(".text.crt{|.dos}.except.sched.user")]]
+[[doc_alias("seteuid"), section(".text.crt{|.dos}.except.sched.user")]]
 [[throws, decl_include("<bits/types.h>")]]
 void SetEUid($uid_t euid);
 
-[[doc_alias(setegid), section(".text.crt{|.dos}.except.sched.user")]]
+[[doc_alias("setegid"), section(".text.crt{|.dos}.except.sched.user")]]
 [[throws, decl_include("<bits/types.h>")]]
 void SetEGid($gid_t egid);
 %#endif /* __USE_XOPEN2K */

@@ -187,7 +187,7 @@ NOTHROW_NCX(LIBCCALL libc_fpreset)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc596b74e]]]*/
+/*[[[start:exports,hash:CRC-32=0x1270b0b8]]]*/
 DEFINE_PUBLIC_ALIAS(_clearfp, libc__clearfp);
 DEFINE_PUBLIC_ALIAS(_controlfp, libc__controlfp);
 DEFINE_PUBLIC_ALIAS(_set_controlfp, libc__set_controlfp);
@@ -198,7 +198,9 @@ DEFINE_PUBLIC_ALIAS(_control87, libc__control87);
 DEFINE_PUBLIC_ALIAS(__control87_2, libc___control87_2);
 DEFINE_PUBLIC_ALIAS(__fpecode, libc___fpecode);
 DEFINE_PUBLIC_ALIAS(_fpclass, libc__fpclass);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fpreset, libc_fpreset);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fpreset, libc_fpreset);
 /*[[[end:exports]]]*/
 

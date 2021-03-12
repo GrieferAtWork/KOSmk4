@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96bfa733 */
+/* HASH CRC-32:0x14dffdb6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1796,102 +1796,126 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #if defined(__CRT_HAVE_wcscasestr) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t *,__NOTHROW_NCX,c16scasestr,(char16_t *__haystack, char16_t *__needle),wcscasestr,(__haystack,__needle))
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t const *,__NOTHROW_NCX,c16scasestr,(char16_t const *__haystack, char16_t const *__needle),wcscasestr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16scasestr,(char16_t const *__haystack, char16_t const *__needle),wcscasestr,(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #elif defined(__CRT_HAVE_DOS$wcscasestr)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t *,__NOTHROW_NCX,c16scasestr,(char16_t *__haystack, char16_t *__needle),wcscasestr,(__haystack,__needle))
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t const *,__NOTHROW_NCX,c16scasestr,(char16_t const *__haystack, char16_t const *__needle),wcscasestr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16scasestr,(char16_t const *__haystack, char16_t const *__needle),wcscasestr,(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcscasestr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char16_t *__NOTHROW_NCX(__LIBDCALL c16scasestr)(char16_t *__haystack, char16_t *__needle) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle); }
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char16_t const *__NOTHROW_NCX(__LIBDCALL c16scasestr)(char16_t const *__haystack, char16_t const *__needle) { return (__CHAR16_TYPE__ const *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16scasestr)(char16_t const *__haystack, char16_t const *__needle) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #else /* ... */
 #include <libc/local/parts.uchar.string/c16scasestr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char16_t *__NOTHROW_NCX(__LIBDCALL c16scasestr)(char16_t *__haystack, char16_t *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16scasestr))(__haystack, __needle); }
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char16_t const *__NOTHROW_NCX(__LIBDCALL c16scasestr)(char16_t const *__haystack, char16_t const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16scasestr))(__haystack, __needle); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16scasestr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16scasestr)(char16_t const *__haystack, char16_t const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16scasestr))(__haystack, __needle); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscasestr) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,c32scasestr,(char32_t *__haystack, char32_t *__needle),wcscasestr,(__haystack,__needle))
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t const *,__NOTHROW_NCX,c32scasestr,(char32_t const *__haystack, char32_t const *__needle),wcscasestr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32scasestr,(char32_t const *__haystack, char32_t const *__needle),wcscasestr,(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #elif defined(__CRT_HAVE_KOS$wcscasestr)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,c32scasestr,(char32_t *__haystack, char32_t *__needle),wcscasestr,(__haystack,__needle))
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t const *,__NOTHROW_NCX,c32scasestr,(char32_t const *__haystack, char32_t const *__needle),wcscasestr,(__haystack,__needle))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32scasestr,(char32_t const *__haystack, char32_t const *__needle),wcscasestr,(__haystack,__needle))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcscasestr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char32_t *__NOTHROW_NCX(__LIBKCALL c32scasestr)(char32_t *__haystack, char32_t *__needle) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle); }
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char32_t const *__NOTHROW_NCX(__LIBKCALL c32scasestr)(char32_t const *__haystack, char32_t const *__needle) { return (__CHAR32_TYPE__ const *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32scasestr)(char32_t const *__haystack, char32_t const *__needle) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #else /* ... */
 #include <libc/local/parts.uchar.string/c32scasestr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_WCHAR_H_PROTO)
 extern "C++" {
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char32_t *__NOTHROW_NCX(__LIBKCALL c32scasestr)(char32_t *__haystack, char32_t *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32scasestr))(__haystack, __needle); }
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char32_t const *__NOTHROW_NCX(__LIBKCALL c32scasestr)(char32_t const *__haystack, char32_t const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32scasestr))(__haystack, __needle); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_WCHAR_H_PROTO */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32scasestr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32scasestr)(char32_t const *__haystack, char32_t const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32scasestr))(__haystack, __needle); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #endif /* !... */

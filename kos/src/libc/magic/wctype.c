@@ -309,120 +309,120 @@ int iswascii($wint_t wc) {
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.locale.ctype")];
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswalnum_l", "__iswalnum_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswalnum_l"), export_alias("__iswalnum_l")]]
 int iswalnum_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswalnum(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswalpha_l", "__iswalpha_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswalpha_l"), export_alias("__iswalpha_l")]]
 int iswalpha_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswalpha(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswcntrl_l", "__iswcntrl_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswcntrl_l"), export_alias("__iswcntrl_l")]]
 int iswcntrl_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswcntrl(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswdigit_l", "__iswdigit_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswdigit_l"), export_alias("__iswdigit_l")]]
 int iswdigit_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswdigit(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswgraph_l", "__iswgraph_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswgraph_l"), export_alias("__iswgraph_l")]]
 int iswgraph_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswgraph(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswlower_l", "__iswlower_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswlower_l"), export_alias("__iswlower_l")]]
 int iswlower_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswlower(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswprint_l", "__iswprint_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswprint_l"), export_alias("__iswprint_l")]]
 int iswprint_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswprint(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswpunct_l", "__iswpunct_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswpunct_l"), export_alias("__iswpunct_l")]]
 int iswpunct_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswpunct(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswspace_l", "__iswspace_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswspace_l"), export_alias("__iswspace_l")]]
 int iswspace_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswspace(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswupper_l", "__iswupper_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswupper_l"), export_alias("__iswupper_l")]]
 int iswupper_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswupper(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswxdigit_l", "__iswxdigit_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswxdigit_l"), export_alias("__iswxdigit_l")]]
 int iswxdigit_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswxdigit(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswblank_l", "__iswblank_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_iswblank_l"), export_alias("__iswblank_l")]]
 int iswblank_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswblank(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
-[[wunused, ATTR_PURE, export_alias("_iswctype_l", "__iswctype_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
+[[dos_only_export_alias("_iswctype_l"), export_alias("__iswctype_l")]]
 int iswctype_l($wint_t wc, $wctype_t type, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswctype(wc, type);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_towupper_l", "__towupper_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_towupper_l"), export_alias("__towupper_l")]]
 $wint_t towupper_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return towupper(wc);
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wunused, ATTR_PURE, export_alias("_towlower_l", "__towlower_l")]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_towlower_l"), export_alias("__towlower_l")]]
 $wint_t towlower_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();

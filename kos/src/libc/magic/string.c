@@ -925,8 +925,8 @@ stpncpy:([[nonnull]] char *__restrict buf,
 %[insert:function(__stpcpy = stpcpy)]
 %[insert:function(__stpncpy = stpncpy)]
 
-[[wunused, pure, export_alias("_strcoll_l", "__strcoll_l")]]
-[[section(".text.crt{|.dos}.unicode.locale.memory")]]
+[[wunused, pure, section(".text.crt{|.dos}.unicode.locale.memory")]]
+[[dos_only_export_alias("_strcoll_l"), export_alias("__strcoll_l")]]
 int strcoll_l([[nonnull]] char const *s1,
               [[nonnull]] char const *s2,
               $locale_t locale) {
@@ -935,8 +935,8 @@ int strcoll_l([[nonnull]] char const *s1,
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[export_alias("_strxfrm_l", "__strxfrm_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
+[[dos_only_export_alias("_strxfrm_l"), export_alias("__strxfrm_l")]]
 $size_t strxfrm_l(char *dst, [[nonnull]] char const *__restrict src,
                   $size_t maxlen, $locale_t locale) {
 	(void)locale;
@@ -989,8 +989,8 @@ strndup([[nonnull]] char const *__restrict str, $size_t max_chars)
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 }
 
-[[impl_include("<hybrid/typecore.h>")]]
-[[crtbuiltin, export_alias("_strdup", "__strdup")]]
+[[crtbuiltin, impl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_strdup"), export_alias("__strdup")]]
 [[section(".text.crt{|.dos}.heap.strdup"), requires_function(malloc)]]
 strdup([[nonnull]] char const *__restrict string)
 	-> [[malloc/*((strlen(string) + 1) * sizeof(char))*/]] char *
@@ -1037,7 +1037,9 @@ char *strtok_r([[nullable]] char *str,
 %
 %#ifdef __USE_GNU
 
-@@Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found.
+@@>> memrchr(3)
+@@Descendingly search for `needle', starting at `haystack + n_bytes'.
+@@Return `NULL' if `needle' wasn't found.
 [[libc, kernel, wunused, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRCHR))]]
@@ -1054,6 +1056,7 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 }
 
 
+@@>> rawmemchr(3)
 @@Same as `memchr' with a search limit of `(size_t)-1'
 [[impl_include("<hybrid/typecore.h>")]]
 [[kernel, wunused, pure, alias("__rawmemchr")]]
@@ -1071,6 +1074,7 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 	return iter;
 }
 
+@@>> strchrnul(3)
 @@Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found.
 [[kernel, wunused, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCHRNUL))]]
@@ -1085,6 +1089,7 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 	return (char *)haystack;
 }
 
+@@>> basename(3)
 @@Alternate `basename(3)' function that doesn't modify its `filename' argument
 @@For a version that is allowed to modify its argument, but is also allowed to
 @@strip trailing slashes, include <libgen.h> instead, which will override this
@@ -1132,6 +1137,7 @@ char *basename([[nonnull]] char const *filename)
 }
 
 
+@@>> strcasestr(3)
 @@Same as `strstr', but ignore casing
 [[wunused, pure, export_alias("__strcasestr")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
@@ -1146,7 +1152,9 @@ char *basename([[nonnull]] char const *filename)
 	return NULL;
 }
 
-@@Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+@@>> memmem(3)
+@@Return the first address of a sub-string `needle...+=needlelen'
+@@stored within `haystack...+=haystacklen'
 @@If no such sub-string exists, return `NULL' instead.
 @@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1235,6 +1243,7 @@ int strverscmp([[nonnull]] char const *s1,
 
 %[insert:function(__mempcpy = mempcpy)]
 
+@@>> mempcpy(3)
 @@Same as `memcpy', but return `dst + n_bytes', rather than `dst'
 [[decl_include("<hybrid/typecore.h>")]]
 [[guard, libc, kernel, ATTR_LEAF, alias("__mempcpy")]]
@@ -1280,9 +1289,8 @@ memfrob:([[nonnull]] void *buf, $size_t num_bytes) -> [[== buf]] void * {
 	return buf;
 }
 
-[[guard, wunused, pure]]
-[[export_alias("_stricmp_l", "__strcasecmp_l")]]
-[[section(".text.crt{|.dos}.unicode.locale.memory")]]
+[[guard, wunused, pure, section(".text.crt{|.dos}.unicode.locale.memory")]]
+[[dos_only_export_alias("_stricmp_l"), export_alias("__strcasecmp_l")]]
 int strcasecmp_l([[nonnull]] char const *s1,
                  [[nonnull]] char const *s2,
                  $locale_t locale) {
@@ -1292,7 +1300,8 @@ int strcasecmp_l([[nonnull]] char const *s1,
 
 [[guard, wunused, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[export_alias("_strnicmp_l", "_strncmpi_l", "__strncasecmp_l")]]
+[[dos_only_export_alias("_strnicmp_l", "_strncmpi_l")]]
+[[export_alias("__strncasecmp_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 int strncasecmp_l([[nonnull]] char const *s1,
                   [[nonnull]] char const *s2,
@@ -1561,7 +1570,8 @@ char *rindex([[nonnull]] char const *__restrict haystack, int needle)
 	return (char *)result;
 }
 
-[[guard, export_alias("_stricmp", "_strcmpi", "stricmp", "strcmpi", "__strcasecmp")]]
+[[guard, dos_only_export_alias("_stricmp", "_strcmpi")]]
+[[export_alias("stricmp", "strcmpi", "__strcasecmp")]]
 [[wunused, pure, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
 int strcasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	char c1, c2;
@@ -1572,8 +1582,9 @@ int strcasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	return 0;
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[guard, export_alias("_strnicmp", "strnicmp", "_strncmpi", "strncmpi")]]
+[[guard, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_strnicmp", "_strncmpi")]]
+[[export_alias("strnicmp", "strncmpi")]]
 [[wunused, pure, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
 int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) {
 	char c1, c2;
@@ -1589,10 +1600,10 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 
 [[decl_include("<features.h>")]]
 [[guard, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)), crt_intern_kos_alias(libc_ffsl)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ffsl")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)),       crt_intern_kos_alias("libc_ffsl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias("libc_ffsll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),                                        alias("ffsl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__),                                   alias("ffsll")]]
 [[impl_include("<hybrid/__bit.h>"), export_alias("__ffs")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFS))]]
 __STDC_INT_AS_UINT_T ffs(int i) {
@@ -1615,9 +1626,9 @@ __STDC_INT_AS_UINT_T ffs(int i) {
 %#ifdef __USE_GNU
 [[decl_include("<features.h>")]]
 [[wunused, nothrow, ATTR_CONST, crtbuiltin]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("ffs")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias("libc_ffsll")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__),                                         alias("ffs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__),                                   alias("ffsll")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSL))]]
 __STDC_INT_AS_UINT_T ffsl(long i) {
@@ -1627,7 +1638,7 @@ __STDC_INT_AS_UINT_T ffsl(long i) {
 [[decl_include("<features.h>")]]
 [[wunused, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("ffs")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__),  alias("ffs")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ffsl")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSLL))]]
 __STDC_INT_AS_UINT_T ffsll(__LONGLONG i) {
@@ -1667,7 +1678,7 @@ $size_t strlcpy([[nonnull]] char *__restrict dst,
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[ATTR_LEAF, export_alias("_memccpy")]]
+[[ATTR_LEAF, dos_only_export_alias("_memccpy")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCCPY))]]
 void *memccpy([[nonnull]] void *__restrict dst,
               [[nonnull]] void const *__restrict src,
@@ -4270,7 +4281,8 @@ void *__NOTHROW_NCX(mempsetc)(void *__restrict __dst, __T __byte, size_t __word_
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[kernel, wunused, pure, alias("memicmp", "_memicmp")]]
-[[if(!defined(__KERNEL__)), export_as("memicmp", "_memicmp")]]
+[[if(!defined(__KERNEL__)), export_as("memicmp")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_memicmp")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 int memcasecmp([[nonnull]] void const *s1,
                [[nonnull]] void const *s2, $size_t n_bytes) {
@@ -4335,7 +4347,7 @@ got_candidate:
 
 %#ifdef __USE_XOPEN2K8
 [[decl_include("<hybrid/typecore.h>")]]
-[[wunused, pure, export_alias("_memicmp_l")]]
+[[wunused, pure, dos_only_export_alias("_memicmp_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 int memcasecmp_l([[nonnull]] void const *s1,
                  [[nonnull]] void const *s2,
@@ -6150,20 +6162,21 @@ $size_t fuzzy_memcmpq([[nonnull]] void const *s1, $size_t s1_qwords,
 
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[wunused, pure, export_alias("_strncoll")]]
+[[wunused, pure, dos_only_export_alias("_strncoll")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 int strncoll([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) {
 	return strncmp(s1, s2, maxlen);
 }
 
-[[export_alias("_stricoll"), alias("strcasecmp", "_stricmp", "stricmp", "_strcmpi", "strcmpi")]]
+[[dos_only_export_alias("_stricoll")]]
+[[alias("strcasecmp", "_stricmp", "stricmp", "_strcmpi", "strcmpi")]]
 [[wunused, pure, section(".text.crt{|.dos}.unicode.static.memory")]]
 int strcasecoll([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	return strcasecmp(s1, s2);
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[export_alias("_strnicoll"), alias("strncasecmp")]]
+[[dos_only_export_alias("_strnicoll"), alias("strncasecmp")]]
 [[wunused, pure, section(".text.crt{|.dos}.unicode.static.memory")]]
 int strncasecoll([[nonnull]] char const *s1,
                  [[nonnull]] char const *s2,
@@ -6197,7 +6210,7 @@ strnupr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * 
 
 %#ifdef __USE_XOPEN2K8
 [[decl_include("<hybrid/typecore.h>")]]
-[[wunused, pure, export_alias("_strncoll_l")]]
+[[wunused, pure, dos_only_export_alias("_strncoll_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 int strncoll_l([[nonnull]] char const *s1,
                [[nonnull]] char const *s2,
@@ -6206,14 +6219,14 @@ int strncoll_l([[nonnull]] char const *s1,
 	return strncoll(s1, s2, maxlen);
 }
 
-[[wunused, pure, export_alias("_stricoll_l")]]
+[[wunused, pure, dos_only_export_alias("_stricoll_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 int strcasecoll_l([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) {
 	return strcasecmp_l(s1, s2, locale);
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[wunused, pure, export_alias("_strnicoll_l")]]
+[[wunused, pure, dos_only_export_alias("_strnicoll_l")]]
 [[alias("strncasecmp_l", "_strnicmp_l", "_strncmpi_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 int strncasecoll_l([[nonnull]] char const *s1,
@@ -6223,7 +6236,7 @@ int strncasecoll_l([[nonnull]] char const *s1,
 	return strncasecoll(s1, s2, maxlen);
 }
 
-[[ATTR_LEAF, export_alias("_strlwr_l")]]
+[[ATTR_LEAF, dos_only_export_alias("_strlwr_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 strlwr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [[== str]] char * {
 	char *iter, ch;
@@ -6232,7 +6245,7 @@ strlwr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [[== str]] char
 	return str;
 }
 
-[[ATTR_LEAF, export_alias("_strupr_l")]]
+[[ATTR_LEAF, dos_only_export_alias("_strupr_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 strupr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [[== str]] char * {
 	char *iter, ch;
@@ -6404,7 +6417,8 @@ int strstartcmpz([[nonnull]] char const *str,
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS)
 
-[[export_alias("_strlwr"), section(".text.crt{|.dos}.unicode.static.memory")]]
+[[dos_only_export_alias("_strlwr")]]
+[[section(".text.crt{|.dos}.unicode.static.memory")]]
 strlwr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -6412,7 +6426,8 @@ strlwr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	return str;
 }
 
-[[export_alias("_strupr"), section(".text.crt{|.dos}.unicode.static.memory")]]
+[[dos_only_export_alias("_strupr")]]
+[[section(".text.crt{|.dos}.unicode.static.memory")]]
 strupr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -6420,7 +6435,7 @@ strupr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	return str;
 }
 
-[[export_alias("_strset"), ATTR_LEAF]]
+[[ATTR_LEAF, dos_only_export_alias("_strset")]]
 strset:([[nonnull]] char *__restrict str, int ch) -> [[== str]] char * {
 	char *iter;
 	for (iter = str; *iter; ++iter)
@@ -6428,7 +6443,8 @@ strset:([[nonnull]] char *__restrict str, int ch) -> [[== str]] char * {
 	return str;
 }
 
-[[export_alias("_strnset"), ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_strnset")]]
+[[ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
 strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [[== str]] char * {
 	char *iter;
 	for (iter = str; maxlen-- && *iter; ++iter)
@@ -6436,7 +6452,7 @@ strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [[== str]]
 	return str;
 }
 
-[[export_alias("_strrev"), ATTR_LEAF]]
+[[ATTR_LEAF, dos_only_export_alias("_strrev")]]
 strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	return (char *)memrev(str, strlen(str));
 }

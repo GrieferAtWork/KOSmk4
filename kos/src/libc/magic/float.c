@@ -417,7 +417,7 @@ int _fpclass(double x);
 #ifdef __CC__
 }
 
-[[export_alias("_fpreset")]]
+[[dos_only_export_alias("_fpreset")]]
 void fpreset();
 
 %{

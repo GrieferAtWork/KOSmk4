@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb595e857 */
+/* HASH CRC-32:0xbe762b2c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32scasecmp __LIBC_LOCAL_NAME(c32scasecmp)
 #endif /* !... */
 #endif /* !__local___localdep_c32scasecmp_defined */
-/* Same as `strstr', but ignore casing */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
 __LOCAL_LIBC(c32scasestr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32scasestr))(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__needle) {
 	for (; *__haystack; ++__haystack) {

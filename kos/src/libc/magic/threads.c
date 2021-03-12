@@ -598,8 +598,8 @@ int cnd_wait([[nonnull]] cnd_t *__restrict cond,
 @@@return: thrd_timedout: Timeout
 @@@return: thrd_error:    Error
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait")]]
 [[decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[impl_include("<asm/os/errno.h>")]]

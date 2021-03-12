@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc940d58d */
+/* HASH CRC-32:0xfbd6cec6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,13 +54,15 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined 1
 #ifdef __CRT_HAVE_strchrnul
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
 #endif /* !__CRT_HAVE_strchrnul */
 #endif /* !__local___localdep_strchrnul_defined */

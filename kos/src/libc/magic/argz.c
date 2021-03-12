@@ -214,7 +214,7 @@ size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 @@Extend pointers to individual string from `argz', and sequentially write them to
 @@`argv', for which the caller is responsivle to provide sufficient space to hold them
 @@all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements)
-[[export_alias(__argz_extract), decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__argz_extract"), decl_include("<hybrid/typecore.h>")]]
 void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)
 	[[([inp(argz_len)] char *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)]]
 	[[([inp(argz_len)] char const *__restrict argz, size_t argz_len, [[nonnull]] char const **__restrict argv)]]

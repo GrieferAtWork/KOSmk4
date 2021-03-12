@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x843f339e */
+/* HASH CRC-32:0xbad3cab4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,9 +105,13 @@
 /* >> strnlen(3)
  * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __libc_strnlen __libc_core_strnlen
-/* Descendingly search for `needle', starting at `haystack + n_bytes'. - Return `NULL' if `needle' wasn't found. */
+/* >> memrchr(3)
+ * Descendingly search for `needle', starting at `haystack + n_bytes'.
+ * Return `NULL' if `needle' wasn't found. */
 #define __libc_memrchr __libc_core_memrchr
-/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -116,10 +120,12 @@
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __libc_memmem __libc_core_memmem
 #ifdef __fast_mempcpy_defined
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
 #else /* __fast_mempcpy_defined */
-/* Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
+/* >> mempcpy(3)
+ * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempcpy __libc_core_mempcpy
 #endif /* !__fast_mempcpy_defined */
 #ifdef __fast_bzero_defined

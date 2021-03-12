@@ -463,7 +463,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x90ae552d]]]*/
+/*[[[start:exports,hash:CRC-32=0x93d4c6be]]]*/
 DEFINE_PUBLIC_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_ALIAS(__asin, libc_asin);
@@ -493,7 +493,9 @@ DEFINE_PUBLIC_ALIAS(log10, libc_log10);
 DEFINE_PUBLIC_ALIAS(__log1p, libc_log1p);
 DEFINE_PUBLIC_ALIAS(log1p, libc_log1p);
 DEFINE_PUBLIC_ALIAS(__logb, libc_logb);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_logb, libc_logb);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(logb, libc_logb);
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2b71b8f */
+/* HASH CRC-32:0x2729c927 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -664,13 +664,13 @@ DEFINE_PUBLIC_ALIAS(isalnum, libc_isalnum);
 DEFINE_PUBLIC_ALIAS(ispunct, libc_ispunct);
 DEFINE_PUBLIC_ALIAS(isgraph, libc_isgraph);
 DEFINE_PUBLIC_ALIAS(isprint, libc_isprint);
-#ifndef __KERNEL__
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_tolower, libc_tolower);
-#endif /* !__KERNEL__ */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(tolower, libc_tolower);
-#ifndef __KERNEL__
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_toupper, libc_toupper);
-#endif /* !__KERNEL__ */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(toupper, libc_toupper);
 DEFINE_PUBLIC_ALIAS(isblank, libc_isblank);
 #ifndef __KERNEL__
@@ -698,10 +698,14 @@ DEFINE_PUBLIC_ALIAS(__isprint_l, libc_isprint_l);
 DEFINE_PUBLIC_ALIAS(isprint_l, libc_isprint_l);
 DEFINE_PUBLIC_ALIAS(__isblank_l, libc_isblank_l);
 DEFINE_PUBLIC_ALIAS(isblank_l, libc_isblank_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_tolower_l, libc_tolower_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__tolower_l, libc_tolower_l);
 DEFINE_PUBLIC_ALIAS(tolower_l, libc_tolower_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_toupper_l, libc_toupper_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__toupper_l, libc_toupper_l);
 DEFINE_PUBLIC_ALIAS(toupper_l, libc_toupper_l);
 DEFINE_PUBLIC_ALIAS(isascii, libc_isascii);

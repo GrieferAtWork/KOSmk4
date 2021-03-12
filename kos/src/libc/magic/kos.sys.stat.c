@@ -43,20 +43,20 @@ __SYSDECL_BEGIN
 
 %[default:section(".text.crt{|.dos}.except.fs.stat")]
 
-[[throws, nocrt, doc_alias(stat), no_crt_self_import]]
+[[throws, nocrt, doc_alias("stat"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KStat")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KStat64")]]
 void Stat([[nonnull]] char const *__restrict filename, [[nonnull]] struct stat *__restrict buf);
 
 %
-[[throws, nocrt, doc_alias(fstat), no_crt_self_import]]
+[[throws, nocrt, doc_alias("fstat"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KFStat")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KFStat64")]]
 void FStat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-[[throws, nocrt, doc_alias(lstat), no_crt_self_import]]
+[[throws, nocrt, doc_alias("lstat"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KLStat")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KLStat64")]]
 void LStat([[nonnull]] char const *__restrict filename,
@@ -87,7 +87,7 @@ void LStat64([[nonnull]] char const *__restrict filename,
 %
 %#ifdef __USE_ATFILE
 
-[[throws, nocrt, doc_alias(fstatat), no_crt_self_import]]
+[[throws, nocrt, doc_alias("fstatat"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KFStatAt")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KFStatAt64")]]
 void FStatAt($fd_t dirfd, [[nonnull]] char const *__restrict filename,
@@ -167,7 +167,7 @@ void UTimensAt32($fd_t dirfd, [[nonnull]] char const *filename,
 
 %
 %#ifdef __USE_ATFILE
-[[cp, throws, doc_alias(utimensat), no_crt_self_import]]
+[[cp, throws, doc_alias("utimensat"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt")]]
 [[userimpl, requires($has_function(UTimensAt32) || $has_function(UTimensAt64))]]

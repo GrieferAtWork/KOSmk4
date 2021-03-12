@@ -875,12 +875,16 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4107dd50]]]*/
+/*[[[start:exports,hash:CRC-32=0x16c7a139]]]*/
 DEFINE_PUBLIC_ALIAS(mkdir, libc_mkdir);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chmod, libc_chmod);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(chmod, libc_chmod);
 DEFINE_PUBLIC_ALIAS(lchmod, libc_lchmod);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_umask, libc_umask);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(umask, libc_umask);
 DEFINE_PUBLIC_ALIAS(getumask, libc_getumask);
 DEFINE_PUBLIC_ALIAS(fmkdirat, libc_fmkdirat);

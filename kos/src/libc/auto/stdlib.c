@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdf22147 */
+/* HASH CRC-32:0x416a11ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1041,10 +1041,10 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
 	return qcvt_buffer;
 }
 /* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR' and return the file
  * descriptor of that file.
  * @param: suffixlen: The # of trailing characters to-be ignored
@@ -1070,7 +1070,7 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
  * created it.
  * Also: when no temporary filename can be created, rather than
  *       returning something sensible like `NULL', this function
- *       will instead set `TEMPLATE' to an empty string, and still
+ *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_) {
@@ -1141,9 +1141,9 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 	return -1;
 }
 /* >> mkstemp(3), mkstemp64(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the filename described by `TEMPLATE'
+ * with random characters such that the filename described by `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
@@ -1151,12 +1151,12 @@ NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_) {
 	return libc_mkstemps(template_, 0);
 }
 /* >> mkdtemp(3)
- * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * Replace the last 6 characters of `template_', which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the pathname described by `TEMPLATE'
+ * with random characters such that the pathname described by `template_'
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
- * On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined. */
+ * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_) {
 	if (libc_system_mktemp(1, template_, 0, 0) )
@@ -1261,10 +1261,10 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 }
 #endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
 /* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
  * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `TEMPLATE' will not
+ * random characters such that the filename described by `template_' will not
  * already exists. Then, create a new file with `O_RDWR | flags' and return the file
  * descriptor of that file.
  * @param: flags: Additional flags to pass to `open(2)',
@@ -3640,7 +3640,9 @@ DEFINE_PUBLIC_ALIAS(system, libc_system);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORT)
 DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(abort, libc_abort);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_ABORT */
 #ifndef __KERNEL__
@@ -3693,6 +3695,9 @@ DEFINE_PUBLIC_ALIAS(qfcvt, libc_qfcvt);
 DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_mktemp, libc_mktemp);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__mktemp, libc_mktemp);
 DEFINE_PUBLIC_ALIAS(mktemp, libc_mktemp);
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -3835,11 +3840,17 @@ DEFINE_PUBLIC_ALIAS(_makepath, libc__makepath);
 DEFINE_PUBLIC_ALIAS(_splitpath, libc__splitpath);
 DEFINE_PUBLIC_ALIAS(_makepath_s, libc__makepath_s);
 DEFINE_PUBLIC_ALIAS(_splitpath_s, libc__splitpath_s);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_itoa, libc_itoa);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(itoa, libc_itoa);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_ltoa, libc_ltoa);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(ltoa, libc_ltoa);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_ultoa, libc_ultoa);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(ultoa, libc_ultoa);
 DEFINE_PUBLIC_ALIAS(DOS$_wtof, libd__wtof);
 DEFINE_PUBLIC_ALIAS(_wtof, libc__wtof);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ea750df */
+/* HASH CRC-32:0x9d780709 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 #define __local_basename_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
  * GNU-specific basename() function (you can explicitly make use of this GNU

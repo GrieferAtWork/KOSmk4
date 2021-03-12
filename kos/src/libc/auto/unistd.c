@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb735d27 */
+/* HASH CRC-32:0xee2a1ab3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -405,9 +405,13 @@ NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd) {
 DECL_END
 
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execv, libc_execv);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execv, libc_execv);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execvp, libc_execvp);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execvp, libc_execvp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -415,7 +419,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_execl, libd_execl);
 DEFINE_PUBLIC_ALIAS(DOS$execl, libd_execl);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execl, libc_execl);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execl, libc_execl);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -423,7 +429,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_execle, libd_execle);
 DEFINE_PUBLIC_ALIAS(DOS$execle, libd_execle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execle, libc_execle);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execle, libc_execle);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -431,9 +439,13 @@ DEFINE_PUBLIC_ALIAS(DOS$_execlp, libd_execlp);
 DEFINE_PUBLIC_ALIAS(DOS$execlp, libd_execlp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execlp, libc_execlp);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execlp, libc_execlp);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execvpe, libc_execvpe);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execvpe, libc_execvpe);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -441,23 +453,31 @@ DEFINE_PUBLIC_ALIAS(DOS$_execlpe, libd_execlpe);
 DEFINE_PUBLIC_ALIAS(DOS$execlpe, libd_execlpe);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execlpe, libc_execlpe);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(swab, libc_swab);
 DEFINE_PUBLIC_ALIAS(ctermid, libc_ctermid);
 DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
 DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_tell, libc_tell);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(tell, libc_tell);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_telli64, libc_tell64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(tell64, libc_tell64);
 #endif /* !__KERNEL__ */
 

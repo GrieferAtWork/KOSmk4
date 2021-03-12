@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbb7a0b1 */
+/* HASH CRC-32:0x8d82ac58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_scalbl_defined 1
 #include <__crt.h>
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE__scalb) || defined(__CRT_HAVE___scalb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: scalb from math */
 #ifndef __local___localdep_scalb_defined
@@ -33,12 +33,12 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, doub
 #elif defined(__CRT_HAVE_scalb)
 /* Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),scalb,(__x,__fn))
-#elif defined(__CRT_HAVE___scalb)
-/* Return `x' times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),__scalb,(__x,__fn))
 #elif defined(__CRT_HAVE__scalb)
 /* Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),_scalb,(__x,__fn))
+#elif defined(__CRT_HAVE___scalb)
+/* Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),__scalb,(__x,__fn))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/scalb.h>
@@ -112,7 +112,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_scalbl_defined 1
 #define __localdep_scalbl __LIBC_LOCAL_NAME(scalbl)
 #endif /* !__local___localdep_scalbl_defined */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_scalb || __CRT_HAVE___scalb || __CRT_HAVE__scalb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_scalb || __CRT_HAVE__scalb || __CRT_HAVE___scalb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_scalbl_defined
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_scalb && !__CRT_HAVE___scalb && !__CRT_HAVE__scalb && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_scalb && !__CRT_HAVE__scalb && !__CRT_HAVE___scalb && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_scalbl_defined */

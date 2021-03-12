@@ -369,7 +369,7 @@ int isprint(int ch) {
 
 [[ATTR_CONST, wunused, nothrow, crtbuiltin]]
 [[libc, std, kernel, alias("_tolower")]]
-[[if(!defined(__KERNEL__)), export_as("_tolower")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_tolower")]]
 int tolower(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return isupper(ch) ? ((u8)ch+0x20) : ch;
@@ -384,7 +384,7 @@ int tolower(int ch) {
 
 [[ATTR_CONST, wunused, nothrow, crtbuiltin]]
 [[libc, std, kernel, alias("_toupper")]]
-[[if(!defined(__KERNEL__)), export_as("_toupper")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("_toupper")]]
 int toupper(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return islower(ch) ? ((u8)ch-0x20) : ch;
@@ -739,7 +739,8 @@ int isblank_l(int ch, __locale_t locale) {
 }
 
 
-[[wunused, ATTR_PURE, export_alias("_tolower_l", "__tolower_l")]]
+[[wunused, ATTR_PURE]]
+[[dos_only_export_alias("_tolower_l"), export_alias("__tolower_l")]]
 int tolower_l(int ch, __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
@@ -747,7 +748,8 @@ int tolower_l(int ch, __locale_t locale) {
 	return tolower(ch);
 }
 
-[[wunused, ATTR_PURE, export_alias("_toupper_l", "__toupper_l")]]
+[[wunused, ATTR_PURE]]
+[[dos_only_export_alias("_toupper_l"), export_alias("__toupper_l")]]
 int toupper_l(int ch, __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
@@ -824,7 +826,6 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isblank)
 #if (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)) && !defined(__CXX_SYSTEM_HEADER)
 
 #if defined(__CRT_GLC) && defined(__CRT_HAVE___ctype_b_loc)  /* ---- GLIBC */
-#include <hybrid/byteorder.h>
 __NAMESPACE_INT_BEGIN
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__ctype_b_loc,(void),())
 #ifndef __NO_XBLOCK
@@ -836,6 +837,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **
 #endif /* __CRT_HAVE___ctype_toupper_loc */
 #endif /* !__NO_XBLOCK */
 __NAMESPACE_INT_END
+#include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __inline_isupper(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 0))
 #define __inline_islower(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 1))

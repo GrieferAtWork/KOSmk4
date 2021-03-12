@@ -175,7 +175,7 @@ __NAMESPACE_INT_END
 
 
 [[decl_include("<bits/os/timespec.h>", "<kos/bits/futex-expr.h>")]]
-[[cp, doc_alias(lfutexexpr), ignore, nocrt, alias(lfutexexpr)]]
+[[cp, doc_alias("lfutexexpr"), ignore, nocrt, alias("lfutexexpr")]]
 int lfutexexpr32(void *base, $size_t exprc,
                  [[nonnull]] struct lfutexexpr const *exprv,
                  struct timespec64 const *timeout,
@@ -184,7 +184,7 @@ int lfutexexpr32(void *base, $size_t exprc,
 
 
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>", "<kos/bits/futex-expr.h>")]]
-[[cp, doc_alias(lfutexlockexpr), ignore, nocrt, alias(lfutexlockexpr)]]
+[[cp, doc_alias("lfutexlockexpr"), ignore, nocrt, alias("lfutexlockexpr")]]
 int lfutexlockexpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
                      $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
                      struct timespec64 const *timeout,

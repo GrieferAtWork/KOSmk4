@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c03af54 */
+/* HASH CRC-32:0xcb96f1cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -428,7 +428,6 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isblank)
 #if (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)) && !defined(__CXX_SYSTEM_HEADER)
 
 #if defined(__CRT_GLC) && defined(__CRT_HAVE___ctype_b_loc)  /* ---- GLIBC */
-#include <hybrid/byteorder.h>
 __NAMESPACE_INT_BEGIN
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__ctype_b_loc,(void),())
 #ifndef __NO_XBLOCK
@@ -440,6 +439,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **
 #endif /* __CRT_HAVE___ctype_toupper_loc */
 #endif /* !__NO_XBLOCK */
 __NAMESPACE_INT_END
+#include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __inline_isupper(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 0))
 #define __inline_islower(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 1))

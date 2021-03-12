@@ -635,7 +635,7 @@ int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 %
 ;
 
-[[cp, guard, export_alias("_chmod"), decl_include("<bits/types.h>")]]
+[[cp, guard, dos_only_export_alias("_chmod"), decl_include("<bits/types.h>")]]
 int chmod([[nonnull]] char const *filename, $mode_t mode);
 
 
@@ -653,7 +653,7 @@ int lchmod([[nonnull]] char const *filename, $mode_t mode);
 %
 ;
 
-[[guard, export_alias("_umask")]]
+[[guard, dos_only_export_alias("_umask")]]
 [[decl_include("<bits/types.h>")]]
 $mode_t umask($mode_t mode);
 
@@ -837,8 +837,8 @@ int futimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
 %
 %#ifdef __USE_XOPEN2K8
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(futimens64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futimens)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futimens64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futimens")]]
 [[userimpl, requires($has_function(futimens32) || $has_function(futimens64))]]
 [[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
