@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcffc8708 */
+/* HASH CRC-32:0x4b654a05 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1623,6 +1623,12 @@ DFUN(".text.crt.dos.heap.rare_helpers", libd_reallocf, libc_reallocf, TP, 2, TP,
 DFUN(".text.crt.dos.heap.rare_helpers", libd_recallocarray, libc_recallocarray, TP, 4, TP, TI, TI, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_freezero, libc_freezero, TV, 2, TP, TI)
 DFUN(".text.crt.dos.solaris", libd_fdwalk, libc_fdwalk, TD, 2, TP, TP)
+DFUN(".text.crt.dos.bsd", libd_strtonum, libc_strtonum, TLL, 4, TP, TLL, TLL, TP)
+DFUN(".text.crt.dos.bsd", libd_heapsort, libc_heapsort, TD, 4, TP, TI, TI, TP)
+DFUN(".text.crt.dos.bsd", libd_mergesort, libc_mergesort, TD, 4, TP, TI, TI, TP)
+DFUN(".text.crt.dos.bsd", libd_radixsort, libc_radixsort, TD, 4, TP, TD, TP, TD)
+DFUN(".text.crt.dos.bsd", libd_sradixsort, libc_sradixsort, TD, 4, TP, TD, TP, TD)
+DFUN(".text.crt.dos.bsd", libd_getbsize, libc_getbsize, TP, 2, TP, TP)
 DFUN(".text.crt.dos.bsd", libd_devname, libc_devname, TP, 2, TIn(__SIZEOF_DEV_T__), TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.bsd", libd_devname_r, libc_devname_r, TD, 4, TIn(__SIZEOF_DEV_T__), TIn(__SIZEOF_MODE_T__), TP, TI)
 DFUN(".text.crt.dos.bsd", libd_setprogname, libc_setprogname, TV, 1, TP)

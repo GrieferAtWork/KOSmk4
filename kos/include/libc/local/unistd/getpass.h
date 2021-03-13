@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9646cf1b */
+/* HASH CRC-32:0xab137bba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,10 +52,11 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/readpassphrase.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpass(3) */
+/* >> getpass(3), getpassphrase(3) */
 __LOCAL_LIBC(getpass) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass))(char const *__restrict __prompt) {
-	static char __buf[129]; /* 129 == _PASSWORD_LEN + 1 */
+	static char __buf[257]; /* `getpassphrase()' requires passwords at least this long! */
+//	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
 #ifdef __RPP_ECHO_OFF
 	return __localdep_readpassphrase(__prompt, __buf, sizeof(__buf), __RPP_ECHO_OFF);
 #else /* __RPP_ECHO_OFF */

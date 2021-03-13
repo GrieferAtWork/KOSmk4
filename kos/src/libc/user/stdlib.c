@@ -2162,6 +2162,56 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 }
 /*[[[end:libc_freezero]]]*/
 
+/*[[[head:libc_radixsort,hash:CRC-32=0xfedeeb47]]]*/
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base,
+                                     int item_count,
+                                     unsigned char const *table,
+                                     unsigned endbyte)
+/*[[[body:libc_radixsort]]]*/
+/*AUTO*/{
+	(void)base;
+	(void)item_count;
+	(void)table;
+	(void)endbyte;
+	CRT_UNIMPLEMENTEDF("radixsort(%p, %x, %p, %x)", base, item_count, table, endbyte); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_radixsort]]]*/
+
+/*[[[head:libc_sradixsort,hash:CRC-32=0xd2fec85]]]*/
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base,
+                                      int item_count,
+                                      unsigned char const *table,
+                                      unsigned endbyte)
+/*[[[body:libc_sradixsort]]]*/
+/*AUTO*/{
+	(void)base;
+	(void)item_count;
+	(void)table;
+	(void)endbyte;
+	CRT_UNIMPLEMENTEDF("sradixsort(%p, %x, %p, %x)", base, item_count, table, endbyte); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_sradixsort]]]*/
+
+/*[[[head:libc_getbsize,hash:CRC-32=0x7815d4f]]]*/
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 2)) char *
+NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp,
+                                    __LONGPTR_TYPE__ *blocksizep)
+/*[[[body:libc_getbsize]]]*/
+/*AUTO*/{
+	(void)headerlenp;
+	(void)blocksizep;
+	CRT_UNIMPLEMENTEDF("getbsize(%p, %p)", headerlenp, blocksizep); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_getbsize]]]*/
+
 /*[[[head:libc_devname_r,hash:CRC-32=0x4bcc89ac]]]*/
 /* >> devname(3), devname_r(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((3)) int
@@ -2211,7 +2261,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(const char *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xcae5f71e]]]*/
+/*[[[start:exports,hash:CRC-32=0xe98f779a]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2273,6 +2323,9 @@ DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);
 DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
 DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
 DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);
+DEFINE_PUBLIC_ALIAS(radixsort, libc_radixsort);
+DEFINE_PUBLIC_ALIAS(sradixsort, libc_sradixsort);
+DEFINE_PUBLIC_ALIAS(getbsize, libc_getbsize);
 DEFINE_PUBLIC_ALIAS(devname_r, libc_devname_r);
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$setproctitle, libd_setproctitle);

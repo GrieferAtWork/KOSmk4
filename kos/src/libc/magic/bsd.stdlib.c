@@ -49,18 +49,18 @@ __SYSDECL_BEGIN
 %[insert:extern(getprogname)]
 %[insert:extern(setprogname)]
 
-//TODO:%[insert:extern(heapsort)]
-//TODO:%[insert:extern(mergesort)]
-//TODO:%[insert:extern(radixsort)]
-//TODO:%[insert:extern(sradixsort)]
+%[insert:extern(heapsort)]
+%[insert:extern(mergesort)]
+%[insert:extern(radixsort)]
+%[insert:extern(sradixsort)]
 
 %[insert:extern(reallocf)]
 %[insert:extern(reallocarray)]
 %[insert:extern(recallocarray)]
 %[insert:extern(freezero)]
 
-//TODO:%[insert:extern(strtonum)]
-//TODO:%[insert:extern(getbsize)]
+%[insert:extern(strtonum)]
+%[insert:extern(getbsize)]
 
 %{
 

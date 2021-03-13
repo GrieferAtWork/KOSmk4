@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65462ccf */
+/* HASH CRC-32:0x36e3f23f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,6 +136,9 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_N
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr, size_t num_bytes);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
 /* >> devname(3), devname_r(3) */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
 #endif /* !__KERNEL__ */

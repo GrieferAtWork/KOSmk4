@@ -2275,9 +2275,9 @@ $fd_t mkostemps64([[nonnull]] char *template_,
 %#endif /* __USE_GNU */
 
 %
-%#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_BSD)
+%#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_OPENBSD)
 %[insert:extern(reallocarray)]
-%#endif /* __USE_KOS || __USE_MISC || __USE_BSD */
+%#endif /* __USE_KOS || __USE_MISC || __USE_OPENBSD */
 
 %
 %#ifdef __USE_KOS
@@ -2552,20 +2552,80 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 	return result;
 }
 
-//TODO: char *getpassphrase(const char *);
+%[insert:function(getpassphrase = getpass)]
+
 //TODO: char *lltostr(long long, char *);
 //TODO: char *ulltostr(unsigned long long, char *);
 %#endif /* __USE_SOLARIS */
 
+%[default:section(".text.crt{|.dos}.bsd")]
+
+%
+%#if defined(__USE_OPENBSD) && defined(__LONGLONG)
+@@>> strtonum(3)
+@@Similar to `strtoi()' with `base=10', but return human-
+@@readable error messages in `*p_errstr' on error (alongside
+@@`return==0') (or `NULL' on success).
+@@The following messages are defined:
+@@  - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+@@  - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+@@  - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+@@@return: 0 : [*p_errstr != NULL] Error
+@@@return: 0 : [*p_errstr == NULL] Success
+@@@return: * : [*p_errstr == NULL] Success
+[[wunused, impl_include("<bits/types.h>")]]
+__LONGLONG strtonum([[nonnull]] char const *nptr,
+                    __LONGLONG lo, __LONGLONG hi,
+                    [[nonnull]] char const **p_errstr) {
+	errno_t error;
+	__LONGLONG result;
+	result = (__LONGLONG)strtoi(nptr, NULL, 10, lo, hi, &error);
+	if (error == 0) {
+		if (p_errstr)
+			*p_errstr = NULL;
+		return result;
+	}
+	if (p_errstr) {
+@@pp_ifdef ERANGE@@
+		if (error == ERANGE) {
+			*p_errstr = "too large";
+			if (result == lo)
+				*p_errstr = "too small";
+		} else
+@@pp_endif@@
+		{
+			*p_errstr = "invalid";
+		}
+	}
+	return 0;
+}
+%#endif /* __USE_OPENBSD && __LONGLONG */
+
 
 %
 %#ifdef __USE_NETBSD
-%[default:section(".text.crt{|.dos}.bsd")]
+[[throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
+int heapsort([[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp) {
+	/* TODO: Actually do heap-sort! */
+	qsort(pbase, item_count, item_size, cmp);
+	return 0;
+}
 
-//TODO:int heapsort(void *, size_t, size_t, int (*)(const void *, const void *));
-//TODO:int mergesort(void *, size_t, size_t, int (*)(const void *, const void *));
-//TODO:int radixsort(const unsigned char **, int, const unsigned char *, unsigned);
-//TODO:int sradixsort(const unsigned char **, int, const unsigned char *, unsigned);
+[[throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
+int mergesort([[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp) {
+	/* TODO: Actually do merge-sort! */
+	qsort(pbase, item_count, item_size, cmp);
+	return 0;
+}
+
+
+int radixsort([[nonnull]] unsigned char const **base, int item_count,
+              [[nullable]] unsigned char const *table, unsigned endbyte);
+/* TODO: `radixsort()' can be implemented via magic! */
+
+int sradixsort([[nonnull]] unsigned char const **base, int item_count,
+               [[nullable]] unsigned char const *table, unsigned endbyte);
+/* TODO: `sradixsort()' can be implemented via magic! */
 
 //TODO:uint32_t arc4random(void);
 //TODO:void arc4random_stir(void);
@@ -2585,7 +2645,11 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 //TODO:int cgetustr(char *, const char *, char **);
 //TODO:void csetexpandtc(int);
 
-//TODO:char *getbsize(int *headerlenp, long *blocksizep);
+[[wunused, decl_include("<hybrid/typecore.h>")]]
+char *getbsize([[nonnull]] int *headerlenp,
+               [[nonnull]] __LONGPTR_TYPE__ *blocksizep);
+/* TODO: `getbsize()' can be implemented via magic! */
+
 
 @@>> devname(3), devname_r(3)
 [[const, alias("__devname50"), requires_function(devname_r)]]

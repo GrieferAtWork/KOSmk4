@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79e585b4 */
+/* HASH CRC-32:0x14e615a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2379,7 +2379,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
 
-#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_BSD)
+#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_OPENBSD)
 #ifndef __reallocarray_defined
 #define __reallocarray_defined 1
 #ifdef __CRT_HAVE_reallocarray
@@ -2393,7 +2393,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #undef __reallocarray_defined
 #endif /* !... */
 #endif /* !__reallocarray_defined */
-#endif /* __USE_KOS || __USE_MISC || __USE_BSD */
+#endif /* __USE_KOS || __USE_MISC || __USE_OPENBSD */
 
 #ifdef __USE_KOS
 #ifndef __recalloc_defined
@@ -2680,18 +2680,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef __getpass_defined
 #define __getpass_defined 1
 #ifdef __CRT_HAVE_getpass
-/* >> getpass(3) */
+/* >> getpass(3), getpassphrase(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
-#else /* __CRT_HAVE_getpass */
+#elif defined(__CRT_HAVE_getpassphrase)
+/* >> getpass(3), getpassphrase(3) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),getpassphrase,(__prompt))
+#else /* ... */
 #include <asm/os/stdio.h>
 #if defined(__CRT_HAVE_readpassphrase) || (defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)))
 #include <libc/local/unistd/getpass.h>
-/* >> getpass(3) */
+/* >> getpass(3), getpassphrase(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getpass)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); })
 #else /* __CRT_HAVE_readpassphrase || (__STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read)) */
 #undef __getpass_defined
 #endif /* !__CRT_HAVE_readpassphrase && (!__STDIN_FILENO || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read)) */
-#endif /* !__CRT_HAVE_getpass */
+#endif /* !... */
 #endif /* !__getpass_defined */
 #ifndef __getpw_defined
 #define __getpw_defined 1
@@ -2781,9 +2784,69 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fdwalk,(__fdwalk_func_t __func,
 __NAMESPACE_LOCAL_USING_OR_IMPL(fdwalk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fdwalk)(__fdwalk_func_t __func, void *__cookie) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdwalk))(__func, __cookie); })
 #endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_NEXT */
 #endif /* !__CRT_HAVE_fdwalk */
+#ifdef __CRT_HAVE_getpass
+/* >> getpass(3), getpassphrase(3) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpassphrase,(char const *__restrict __prompt),getpass,(__prompt))
+#elif defined(__CRT_HAVE_getpassphrase)
+/* >> getpass(3), getpassphrase(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpassphrase,(char const *__restrict __prompt),(__prompt))
+#else /* ... */
+#include <asm/os/stdio.h>
+#if defined(__CRT_HAVE_readpassphrase) || (defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)))
+#include <libc/local/unistd/getpass.h>
+/* >> getpass(3), getpassphrase(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getpassphrase)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); }
+#endif /* __CRT_HAVE_readpassphrase || (__STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read)) */
+#endif /* !... */
 #endif /* __USE_SOLARIS */
 
+#if defined(__USE_OPENBSD) && defined(__LONGLONG)
+#ifdef __CRT_HAVE_strtonum
+/* >> strtonum(3)
+ * Similar to `strtoi()' with `base=10', but return human-
+ * readable error messages in `*p_errstr' on error (alongside
+ * `return==0') (or `NULL' on success).
+ * The following messages are defined:
+ *   - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+ *   - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+ *   - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+ * @return: 0 : [*p_errstr != NULL] Error
+ * @return: 0 : [*p_errstr == NULL] Success
+ * @return: * : [*p_errstr == NULL] Success */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__LONGLONG,__NOTHROW_NCX,strtonum,(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr),(__nptr,__lo,__hi,__p_errstr))
+#else /* __CRT_HAVE_strtonum */
+#include <libc/local/stdlib/strtonum.h>
+/* >> strtonum(3)
+ * Similar to `strtoi()' with `base=10', but return human-
+ * readable error messages in `*p_errstr' on error (alongside
+ * `return==0') (or `NULL' on success).
+ * The following messages are defined:
+ *   - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+ *   - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+ *   - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+ * @return: 0 : [*p_errstr != NULL] Error
+ * @return: 0 : [*p_errstr == NULL] Success
+ * @return: * : [*p_errstr == NULL] Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtonum)(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtonum))(__nptr, __lo, __hi, __p_errstr); })
+#endif /* !__CRT_HAVE_strtonum */
+#endif /* __USE_OPENBSD && __LONGLONG */
+
 #ifdef __USE_NETBSD
+#ifdef __CRT_HAVE_heapsort
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+#else /* __CRT_HAVE_heapsort */
+#include <libc/local/stdlib/heapsort.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
+#endif /* !__CRT_HAVE_heapsort */
+#ifdef __CRT_HAVE_mergesort
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+#else /* __CRT_HAVE_mergesort */
+#include <libc/local/stdlib/mergesort.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
+#endif /* !__CRT_HAVE_mergesort */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
 #ifdef __CRT_HAVE_devname
 /* >> devname(3), devname_r(3) */
 __CDECLARE(__ATTR_CONST,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __type),(__dev,__type))

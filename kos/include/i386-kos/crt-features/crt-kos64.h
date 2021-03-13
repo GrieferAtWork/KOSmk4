@@ -1909,6 +1909,7 @@
 #define __CRT_HAVE_getaliasent
 #define __CRT_HAVE_getaliasent_r
 #define __CRT_HAVE_getauxval
+#define __CRT_HAVE_getbsize
 #define __CRT_HAVE_getc
 #define __CRT_HAVE_getc_unlocked
 #define __CRT_HAVE_getchar
@@ -1974,6 +1975,7 @@
 #define __CRT_HAVE_getopt_long_only
 #define __CRT_HAVE_getpagesize
 #define __CRT_HAVE_getpass
+#define __CRT_HAVE_getpassphrase
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid
 #define __CRT_HAVE_getpgrp
@@ -2073,6 +2075,7 @@
 #define __CRT_HAVE_hcreate_r
 #define __CRT_HAVE_hdestroy
 #define __CRT_HAVE_hdestroy_r
+#define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
 #define __CRT_HAVE_hop
 #define __CRT_HAVE_hopf
@@ -2469,6 +2472,7 @@
 #define __CRT_HAVE_memxlenl
 #define __CRT_HAVE_memxlenq
 #define __CRT_HAVE_memxlenw
+#define __CRT_HAVE_mergesort
 #define __CRT_HAVE_mincore
 #define __CRT_HAVE_mkdir
 #define __CRT_HAVE_mkdirat
@@ -2825,6 +2829,7 @@
 #define __CRT_HAVE_qsort_r
 #define __CRT_HAVE_qsort_s
 #define __CRT_HAVE_quick_exit
+#define __CRT_HAVE_radixsort
 #define __CRT_HAVE_raise
 #define __CRT_HAVE_rand
 #define __CRT_HAVE_rand_r
@@ -3144,6 +3149,7 @@
 #define __CRT_HAVE_sqrt
 #define __CRT_HAVE_sqrtf
 #define __CRT_HAVE_sqrtl
+#define __CRT_HAVE_sradixsort
 #define __CRT_HAVE_srand
 #define __CRT_HAVE_srand48
 #define __CRT_HAVE_srand48_r
@@ -3270,6 +3276,7 @@
 #define __CRT_HAVE_strtold_l
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
+#define __CRT_HAVE_strtonum
 #define __CRT_HAVE_strtoq
 #define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou
@@ -6341,6 +6348,7 @@
 #define __CRT_HAVE_KOS$getaliasbyname_r
 #define __CRT_HAVE_KOS$getaliasent_r
 #define __CRT_HAVE_KOS$getauxval
+#define __CRT_HAVE_KOS$getbsize
 #define __CRT_HAVE_KOS$getc
 #define __CRT_HAVE_KOS$getc_unlocked
 #define __CRT_HAVE_KOS$getcwd
@@ -6392,6 +6400,7 @@
 #define __CRT_HAVE_KOS$getopt_long
 #define __CRT_HAVE_KOS$getopt_long_only
 #define __CRT_HAVE_KOS$getpass
+#define __CRT_HAVE_KOS$getpassphrase
 #define __CRT_HAVE_KOS$getpeername
 #define __CRT_HAVE_KOS$getpgid
 #define __CRT_HAVE_KOS$getpmsg
@@ -6472,6 +6481,7 @@
 #define __CRT_HAVE_KOS$hcreate
 #define __CRT_HAVE_KOS$hcreate_r
 #define __CRT_HAVE_KOS$hdestroy_r
+#define __CRT_HAVE_KOS$heapsort
 #define __CRT_HAVE_KOS$herror
 #define __CRT_HAVE_KOS$hop
 #define __CRT_HAVE_KOS$hopf
@@ -6841,6 +6851,7 @@
 #define __CRT_HAVE_KOS$memxlenl
 #define __CRT_HAVE_KOS$memxlenq
 #define __CRT_HAVE_KOS$memxlenw
+#define __CRT_HAVE_KOS$mergesort
 #define __CRT_HAVE_KOS$mincore
 #define __CRT_HAVE_KOS$mkdir
 #define __CRT_HAVE_KOS$mkdirat
@@ -7182,6 +7193,7 @@
 #define __CRT_HAVE_KOS$qsort_r
 #define __CRT_HAVE_KOS$qsort_s
 #define __CRT_HAVE_KOS$quick_exit
+#define __CRT_HAVE_KOS$radixsort
 #define __CRT_HAVE_KOS$raise
 #define __CRT_HAVE_KOS$rand_r
 #define __CRT_HAVE_KOS$rand_s
@@ -7475,6 +7487,7 @@
 #define __CRT_HAVE_KOS$sqrt
 #define __CRT_HAVE_KOS$sqrtf
 #define __CRT_HAVE_KOS$sqrtl
+#define __CRT_HAVE_KOS$sradixsort
 #define __CRT_HAVE_KOS$srand
 #define __CRT_HAVE_KOS$srand48
 #define __CRT_HAVE_KOS$srand48_r
@@ -7598,6 +7611,7 @@
 #define __CRT_HAVE_KOS$strtold_l
 #define __CRT_HAVE_KOS$strtoll
 #define __CRT_HAVE_KOS$strtoll_l
+#define __CRT_HAVE_KOS$strtonum
 #define __CRT_HAVE_KOS$strtoq
 #define __CRT_HAVE_KOS$strtosigno
 #define __CRT_HAVE_KOS$strtou
@@ -9852,6 +9866,7 @@
 #define __CRT_HAVE_DOS$getaliasbyname_r
 #define __CRT_HAVE_DOS$getaliasent_r
 #define __CRT_HAVE_DOS$getauxval
+#define __CRT_HAVE_DOS$getbsize
 #define __CRT_HAVE_DOS$getc
 #define __CRT_HAVE_DOS$getc_unlocked
 #define __CRT_HAVE_DOS$getcwd
@@ -9903,6 +9918,7 @@
 #define __CRT_HAVE_DOS$getopt_long
 #define __CRT_HAVE_DOS$getopt_long_only
 #define __CRT_HAVE_DOS$getpass
+#define __CRT_HAVE_DOS$getpassphrase
 #define __CRT_HAVE_DOS$getpeername
 #define __CRT_HAVE_DOS$getpgid
 #define __CRT_HAVE_DOS$getpmsg
@@ -9983,6 +9999,7 @@
 #define __CRT_HAVE_DOS$hcreate
 #define __CRT_HAVE_DOS$hcreate_r
 #define __CRT_HAVE_DOS$hdestroy_r
+#define __CRT_HAVE_DOS$heapsort
 #define __CRT_HAVE_DOS$herror
 #define __CRT_HAVE_DOS$hop
 #define __CRT_HAVE_DOS$hopf
@@ -10352,6 +10369,7 @@
 #define __CRT_HAVE_DOS$memxlenl
 #define __CRT_HAVE_DOS$memxlenq
 #define __CRT_HAVE_DOS$memxlenw
+#define __CRT_HAVE_DOS$mergesort
 #define __CRT_HAVE_DOS$mincore
 #define __CRT_HAVE_DOS$mkdir
 #define __CRT_HAVE_DOS$mkdirat
@@ -10693,6 +10711,7 @@
 #define __CRT_HAVE_DOS$qsort_r
 #define __CRT_HAVE_DOS$qsort_s
 #define __CRT_HAVE_DOS$quick_exit
+#define __CRT_HAVE_DOS$radixsort
 #define __CRT_HAVE_DOS$raise
 #define __CRT_HAVE_DOS$rand_r
 #define __CRT_HAVE_DOS$rand_s
@@ -10986,6 +11005,7 @@
 #define __CRT_HAVE_DOS$sqrt
 #define __CRT_HAVE_DOS$sqrtf
 #define __CRT_HAVE_DOS$sqrtl
+#define __CRT_HAVE_DOS$sradixsort
 #define __CRT_HAVE_DOS$srand
 #define __CRT_HAVE_DOS$srand48
 #define __CRT_HAVE_DOS$srand48_r
@@ -11109,6 +11129,7 @@
 #define __CRT_HAVE_DOS$strtold_l
 #define __CRT_HAVE_DOS$strtoll
 #define __CRT_HAVE_DOS$strtoll_l
+#define __CRT_HAVE_DOS$strtonum
 #define __CRT_HAVE_DOS$strtoq
 #define __CRT_HAVE_DOS$strtosigno
 #define __CRT_HAVE_DOS$strtou

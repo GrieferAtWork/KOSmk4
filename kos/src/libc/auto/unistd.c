@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7696159 */
+/* HASH CRC-32:0x626b5bf0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -291,10 +291,11 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 	return 0;
 }
 #include <asm/crt/readpassphrase.h>
-/* >> getpass(3) */
+/* >> getpass(3), getpassphrase(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt) {
-	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
+	static char buf[257]; /* `getpassphrase()' requires passwords at least this long! */
+//	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
 #ifdef __RPP_ECHO_OFF
 	return libc_readpassphrase(prompt, buf, sizeof(buf), __RPP_ECHO_OFF);
 #else /* __RPP_ECHO_OFF */
@@ -474,6 +475,7 @@ DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
+DEFINE_PUBLIC_ALIAS(getpassphrase, libc_getpass);
 DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_swab, libc_swab);

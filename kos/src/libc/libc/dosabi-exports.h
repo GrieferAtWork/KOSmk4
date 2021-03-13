@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0275f0 */
+/* HASH CRC-32:0x1d713142 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2056,6 +2056,12 @@ DEFINE_PUBLIC_ALIAS(DOS$reallocf, libd_reallocf);
 DEFINE_PUBLIC_ALIAS(DOS$recallocarray, libd_recallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$freezero, libd_freezero);
 DEFINE_PUBLIC_ALIAS(DOS$fdwalk, libd_fdwalk);
+DEFINE_PUBLIC_ALIAS(DOS$strtonum, libd_strtonum);
+DEFINE_PUBLIC_ALIAS(DOS$heapsort, libd_heapsort);
+DEFINE_PUBLIC_ALIAS(DOS$mergesort, libd_mergesort);
+DEFINE_PUBLIC_ALIAS(DOS$radixsort, libd_radixsort);
+DEFINE_PUBLIC_ALIAS(DOS$sradixsort, libd_sradixsort);
+DEFINE_PUBLIC_ALIAS(DOS$getbsize, libd_getbsize);
 DEFINE_PUBLIC_ALIAS(DOS$devname, libd_devname);
 DEFINE_PUBLIC_ALIAS(DOS$devname_r, libd_devname_r);
 DEFINE_PUBLIC_ALIAS(DOS$setprogname, libd_setprogname);
@@ -3054,6 +3060,7 @@ DEFINE_PUBLIC_ALIAS(DOS$revoke, libd_revoke);
 DEFINE_PUBLIC_ALIAS(DOS$syscall, libd_syscall);
 DEFINE_PUBLIC_ALIAS(DOS$syscall64, libd_syscall64);
 DEFINE_PUBLIC_ALIAS(DOS$chroot, libd_chroot);
+DEFINE_PUBLIC_ALIAS(DOS$getpassphrase, libd_getpass);
 DEFINE_PUBLIC_ALIAS(DOS$getpass, libd_getpass);
 DEFINE_PUBLIC_ALIAS(DOS$_chsize, libd_ftruncate);
 DEFINE_PUBLIC_ALIAS(DOS$chsize, libd_ftruncate);

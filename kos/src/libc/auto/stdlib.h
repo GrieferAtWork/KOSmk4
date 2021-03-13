@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6670c396 */
+/* HASH CRC-32:0xf19517a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -613,6 +613,49 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fdwalk)(__fdwalk_func_t func, 
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func, void *cookie);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strtonum(3)
+ * Similar to `strtoi()' with `base=10', but return human-
+ * readable error messages in `*p_errstr' on error (alongside
+ * `return==0') (or `NULL' on success).
+ * The following messages are defined:
+ *   - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+ *   - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+ *   - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+ * @return: 0 : [*p_errstr != NULL] Error
+ * @return: 0 : [*p_errstr == NULL] Success
+ * @return: * : [*p_errstr == NULL] Success */
+INTDEF WUNUSED NONNULL((1, 4)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_strtonum)(char const *nptr, __LONGLONG lo, __LONGLONG hi, char const **p_errstr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strtonum(3)
+ * Similar to `strtoi()' with `base=10', but return human-
+ * readable error messages in `*p_errstr' on error (alongside
+ * `return==0') (or `NULL' on success).
+ * The following messages are defined:
+ *   - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+ *   - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+ *   - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+ * @return: 0 : [*p_errstr != NULL] Error
+ * @return: 0 : [*p_errstr == NULL] Success
+ * @return: * : [*p_errstr == NULL] Success */
+INTDEF WUNUSED NONNULL((1, 4)) __LONGLONG NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr, __LONGLONG lo, __LONGLONG hi, char const **p_errstr);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1, 4)) int (LIBDCALL libd_heapsort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1, 4)) int (LIBCCALL libc_heapsort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1, 4)) int (LIBDCALL libd_mergesort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1, 4)) int (LIBCCALL libc_mergesort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
 /* >> devname(3), devname_r(3) */
 INTDEF ATTR_CONST char *NOTHROW_NCX(LIBDCALL libd_devname)(dev_t dev, mode_t type);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

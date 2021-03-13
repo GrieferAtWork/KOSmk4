@@ -1909,12 +1909,13 @@ __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 [[cp, section(".text.crt{|.dos}.fs.utility")]]
 int chroot([[nonnull]] char const *__restrict path);
 
-@@>> getpass(3)
+@@>> getpass(3), getpassphrase(3)
 [[guard, cp, wunused, section(".text.crt{|.dos}.io.tty")]]
-[[requires_function(readpassphrase)]]
+[[requires_function(readpassphrase), export_alias("getpassphrase")]]
 [[impl_include("<asm/crt/readpassphrase.h>")]]
 char *getpass([[nonnull]] char const *__restrict prompt) {
-	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
+	static char buf[257]; /* `getpassphrase()' requires passwords at least this long! */
+//	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
 @@pp_ifdef __RPP_ECHO_OFF@@
 	return readpassphrase(prompt, buf, sizeof(buf), __RPP_ECHO_OFF);
 @@pp_else@@

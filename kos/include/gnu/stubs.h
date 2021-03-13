@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x143fa318 */
+/* HASH CRC-32:0x356747ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -268,6 +268,7 @@
 #define __stub_getaliasbyname_r
 #define __stub_getaliasent
 #define __stub_getaliasent_r
+#define __stub_getbsize
 #define __stub_getdate
 #define __stub_getenv_s
 #define __stub_getgrent
@@ -484,6 +485,7 @@
 #define __stub_putspent
 #define __stub_pututline
 #define __stub_pututxline
+#define __stub_radixsort
 #define __stub_random_r
 #define __stub_rcmd
 #define __stub_rcmd_af
@@ -544,6 +546,7 @@
 #define __stub_sincos
 #define __stub___sinh
 #define __stub_sinh
+#define __stub_sradixsort
 #define __stub_srand48
 #define __stub_srand48_r
 #define __stub_srandom_r

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x416a11ca */
+/* HASH CRC-32:0x2946c1fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include "../user/stdlib.h"
 #include "../user/fcntl.h"
 #include "format-printer.h"
+#include "inttypes.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
 #include "../user/sys.ioctl.h"
@@ -1553,6 +1554,63 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 		++fd;
 	}
 	return result;
+}
+#include <bits/types.h>
+/* >> strtonum(3)
+ * Similar to `strtoi()' with `base=10', but return human-
+ * readable error messages in `*p_errstr' on error (alongside
+ * `return==0') (or `NULL' on success).
+ * The following messages are defined:
+ *   - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+ *   - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+ *   - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+ * @return: 0 : [*p_errstr != NULL] Error
+ * @return: 0 : [*p_errstr == NULL] Success
+ * @return: * : [*p_errstr == NULL] Success */
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 4)) __LONGLONG
+NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr,
+                                    __LONGLONG lo,
+                                    __LONGLONG hi,
+                                    char const **p_errstr) {
+	errno_t error;
+	__LONGLONG result;
+	result = (__LONGLONG)libc_strtoi(nptr, NULL, 10, lo, hi, &error);
+	if (error == 0) {
+		if (p_errstr)
+			*p_errstr = NULL;
+		return result;
+	}
+	if (p_errstr) {
+#ifdef ERANGE
+		if (error == ERANGE) {
+			*p_errstr = "too large";
+			if (result == lo)
+				*p_errstr = "too small";
+		} else
+#endif /* ERANGE */
+		{
+			*p_errstr = "invalid";
+		}
+	}
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
+(LIBCCALL libc_heapsort)(void *pbase,
+                         size_t item_count,
+                         size_t item_size,
+                         __compar_fn_t cmp) THROWS(...) {
+	/* TODO: Actually do heap-sort! */
+	libc_qsort(pbase, item_count, item_size, cmp);
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
+(LIBCCALL libc_mergesort)(void *pbase,
+                          size_t item_count,
+                          size_t item_size,
+                          __compar_fn_t cmp) THROWS(...) {
+	/* TODO: Actually do merge-sort! */
+	libc_qsort(pbase, item_count, item_size, cmp);
+	return 0;
 }
 /* >> devname(3), devname_r(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST char *
@@ -3756,6 +3814,9 @@ DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
+DEFINE_PUBLIC_ALIAS(strtonum, libc_strtonum);
+DEFINE_PUBLIC_ALIAS(heapsort, libc_heapsort);
+DEFINE_PUBLIC_ALIAS(mergesort, libc_mergesort);
 DEFINE_PUBLIC_ALIAS(devname, libc_devname);
 DEFINE_PUBLIC_ALIAS(getprogname, libc_getprogname);
 DEFINE_PUBLIC_ALIAS(setprogname, libc_setprogname);

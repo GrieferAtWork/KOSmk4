@@ -2055,6 +2055,7 @@
 #define __CRT_HAVE_getaliasent
 #define __CRT_HAVE_getaliasent_r
 #define __CRT_HAVE_getauxval
+#define __CRT_HAVE_getbsize
 #define __CRT_HAVE_getc
 #define __CRT_HAVE_getc_unlocked
 #define __CRT_HAVE_getchar
@@ -2120,6 +2121,7 @@
 #define __CRT_HAVE_getopt_long_only
 #define __CRT_HAVE_getpagesize
 #define __CRT_HAVE_getpass
+#define __CRT_HAVE_getpassphrase
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid
 #define __CRT_HAVE_getpgrp
@@ -2219,6 +2221,7 @@
 #define __CRT_HAVE_hcreate_r
 #define __CRT_HAVE_hdestroy
 #define __CRT_HAVE_hdestroy_r
+#define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
 #define __CRT_HAVE_hop
 #define __CRT_HAVE_hopf
@@ -2615,6 +2618,7 @@
 #define __CRT_HAVE_memxlenl
 #define __CRT_HAVE_memxlenq
 #define __CRT_HAVE_memxlenw
+#define __CRT_HAVE_mergesort
 #define __CRT_HAVE_mincore
 #define __CRT_HAVE_mkdir
 #define __CRT_HAVE_mkdirat
@@ -2971,6 +2975,7 @@
 #define __CRT_HAVE_qsort_r
 #define __CRT_HAVE_qsort_s
 #define __CRT_HAVE_quick_exit
+#define __CRT_HAVE_radixsort
 #define __CRT_HAVE_raise
 #define __CRT_HAVE_rand
 #define __CRT_HAVE_rand_r
@@ -3290,6 +3295,7 @@
 #define __CRT_HAVE_sqrt
 #define __CRT_HAVE_sqrtf
 #define __CRT_HAVE_sqrtl
+#define __CRT_HAVE_sradixsort
 #define __CRT_HAVE_srand
 #define __CRT_HAVE_srand48
 #define __CRT_HAVE_srand48_r
@@ -3416,6 +3422,7 @@
 #define __CRT_HAVE_strtold_l
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
+#define __CRT_HAVE_strtonum
 #define __CRT_HAVE_strtoq
 #define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou

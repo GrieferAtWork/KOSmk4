@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42e89cf1 */
+/* HASH CRC-32:0x9e57a5a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1282,6 +1282,7 @@
 #define __CRT_HAVE_DOS$getaliasbyname_r
 #define __CRT_HAVE_DOS$getaliasent_r
 #define __CRT_HAVE_DOS$getauxval
+#define __CRT_HAVE_DOS$getbsize
 #define __CRT_HAVE_DOS$getcwd
 #define __CRT_HAVE_DOS$getdate
 #define __CRT_HAVE_DOS$getdate_r
@@ -1418,6 +1419,7 @@
 #define __CRT_HAVE_DOS$hcreate
 #define __CRT_HAVE_DOS$hcreate_r
 #define __CRT_HAVE_DOS$hdestroy_r
+#define __CRT_HAVE_DOS$heapsort
 #define __CRT_HAVE_DOS$herror
 #define __CRT_HAVE_DOS$hop
 #define __CRT_HAVE_DOS$hopf
@@ -1793,6 +1795,7 @@
 #define __CRT_HAVE_DOS$memxlenl
 #define __CRT_HAVE_DOS$memxlenq
 #define __CRT_HAVE_DOS$memxlenw
+#define __CRT_HAVE_DOS$mergesort
 #define __CRT_HAVE_DOS$mincore
 #define __CRT_HAVE_DOS$mkdir
 #define __CRT_HAVE_DOS$mkdirat
@@ -2127,6 +2130,7 @@
 #define __CRT_HAVE_DOS$qsort_r
 #define __CRT_HAVE_DOS$qsort_s
 #define __CRT_HAVE_DOS$quick_exit
+#define __CRT_HAVE_DOS$radixsort
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$raise
@@ -2430,6 +2434,7 @@
 #define __CRT_HAVE_DOS$sqrt
 #define __CRT_HAVE_DOS$sqrtf
 #define __CRT_HAVE_DOS$sqrtl
+#define __CRT_HAVE_DOS$sradixsort
 #define __CRT_HAVE_DOS$srand
 #define __CRT_HAVE_DOS$srand48
 #define __CRT_HAVE_DOS$srand48_r
@@ -2564,6 +2569,7 @@
 #define __CRT_HAVE_DOS$strtold_l
 #define __CRT_HAVE_DOS$strtoll
 #define __CRT_HAVE_DOS$strtoll_l
+#define __CRT_HAVE_DOS$strtonum
 #define __CRT_HAVE_DOS$strtosigno
 #define __CRT_HAVE_DOS$strtou
 #define __CRT_HAVE_DOS$strtou32
@@ -4353,6 +4359,7 @@
 #define __CRT_HAVE_getaliasent
 #define __CRT_HAVE_getaliasent_r
 #define __CRT_HAVE_getauxval
+#define __CRT_HAVE_getbsize
 #define __CRT_HAVE_getchar
 #define __CRT_HAVE_getchar_unlocked
 #define __CRT_HAVE_getcontext
@@ -4514,6 +4521,7 @@
 #define __CRT_HAVE_hcreate_r
 #define __CRT_HAVE_hdestroy
 #define __CRT_HAVE_hdestroy_r
+#define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
 #define __CRT_HAVE_hop
 #define __CRT_HAVE_hopf
@@ -4945,6 +4953,7 @@
 #define __CRT_HAVE_memxlenl
 #define __CRT_HAVE_memxlenq
 #define __CRT_HAVE_memxlenw
+#define __CRT_HAVE_mergesort
 #define __CRT_HAVE_mincore
 #define __CRT_HAVE_mkdir
 #define __CRT_HAVE_mkdirat
@@ -5280,6 +5289,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_qsort_s
 #define __CRT_HAVE_quick_exit
+#define __CRT_HAVE_radixsort
 #define __CRT_HAVE_raise
 #define __CRT_HAVE_rand
 #define __CRT_HAVE_rand_r
@@ -5612,6 +5622,7 @@
 #define __CRT_HAVE_sqrt
 #define __CRT_HAVE_sqrtf
 #define __CRT_HAVE_sqrtl
+#define __CRT_HAVE_sradixsort
 #define __CRT_HAVE_srand
 #define __CRT_HAVE_srand48
 #define __CRT_HAVE_srand48_r
@@ -5746,6 +5757,7 @@
 #define __CRT_HAVE_strtold_l
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
+#define __CRT_HAVE_strtonum
 #define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou
 #endif /* !__KERNEL__ */

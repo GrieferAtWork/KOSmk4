@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa305dfe3 */
+/* HASH CRC-32:0xcac61cf5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,6 +70,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setprogname, __FORCELOCAL __ATTR_ARTIFICIAL void
 #endif /* !__LOCAL_program_invocation_short_name_p */
 #endif /* !__CRT_HAVE_setprogname */
 #endif /* !__setprogname_defined */
+#ifndef __heapsort_defined
+#define __heapsort_defined 1
+#ifdef __CRT_HAVE_heapsort
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+#else /* __CRT_HAVE_heapsort */
+#include <libc/local/stdlib/heapsort.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
+#endif /* !__CRT_HAVE_heapsort */
+#endif /* !__heapsort_defined */
+#ifndef __mergesort_defined
+#define __mergesort_defined 1
+#ifdef __CRT_HAVE_mergesort
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+#else /* __CRT_HAVE_mergesort */
+#include <libc/local/stdlib/mergesort.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
+#endif /* !__CRT_HAVE_mergesort */
+#endif /* !__mergesort_defined */
+#if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
+#define __radixsort_defined 1
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+#endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
+#if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
+#define __sradixsort_defined 1
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+#endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
 #ifndef __reallocf_defined
 #define __reallocf_defined 1
 #ifdef __CRT_HAVE_reallocf
@@ -130,6 +156,41 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __
 #undef __freezero_defined
 #endif /* !... */
 #endif /* !__freezero_defined */
+#ifndef __strtonum_defined
+#define __strtonum_defined 1
+#ifdef __CRT_HAVE_strtonum
+/* >> strtonum(3)
+ * Similar to `strtoi()' with `base=10', but return human-
+ * readable error messages in `*p_errstr' on error (alongside
+ * `return==0') (or `NULL' on success).
+ * The following messages are defined:
+ *   - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+ *   - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+ *   - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+ * @return: 0 : [*p_errstr != NULL] Error
+ * @return: 0 : [*p_errstr == NULL] Success
+ * @return: * : [*p_errstr == NULL] Success */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__LONGLONG,__NOTHROW_NCX,strtonum,(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr),(__nptr,__lo,__hi,__p_errstr))
+#else /* __CRT_HAVE_strtonum */
+#include <libc/local/stdlib/strtonum.h>
+/* >> strtonum(3)
+ * Similar to `strtoi()' with `base=10', but return human-
+ * readable error messages in `*p_errstr' on error (alongside
+ * `return==0') (or `NULL' on success).
+ * The following messages are defined:
+ *   - "too large": Numeric value is too great (`ERANGE' && greater than `hi')
+ *   - "too small": Numeric value is too small (`ERANGE' && less than `lo')
+ *   - "invalid":   Any other error (`ENOTSUP' or `ECANCELED')
+ * @return: 0 : [*p_errstr != NULL] Error
+ * @return: 0 : [*p_errstr == NULL] Success
+ * @return: * : [*p_errstr == NULL] Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtonum)(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtonum))(__nptr, __lo, __hi, __p_errstr); })
+#endif /* !__CRT_HAVE_strtonum */
+#endif /* !__strtonum_defined */
+#if !defined(__getbsize_defined) && defined(__CRT_HAVE_getbsize)
+#define __getbsize_defined 1
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
+#endif /* !__getbsize_defined && __CRT_HAVE_getbsize */
 
 __SYSDECL_END
 #endif /* __CC__ */

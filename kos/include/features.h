@@ -242,6 +242,12 @@
 #endif /* ... */
 
 
+#ifdef _OPENBSD_SOURCE
+#define __USE_OPENBSD 1
+#undef _BSD_SOURCE
+#define _BSD_SOURCE 1
+#endif /* _OPENBSD_SOURCE */
+
 #ifdef _NETBSD_SOURCE
 #define __USE_NETBSD 1
 #undef _BSD_SOURCE
@@ -668,6 +674,7 @@
 #undef __USE_ISOC_PURE
 #undef __USE_BSD
 #undef __USE_CYGWIN
+#undef __USE_OPENBSD
 #undef __USE_NETBSD
 #undef __USE_SOLARIS
 
@@ -706,6 +713,7 @@
 #define __USE_UTF 1
 #define __USE_BSD 1
 #define __USE_CYGWIN 1
+#define __USE_OPENBSD 1
 #define __USE_NETBSD 1
 #define __USE_SOLARIS 1
 #endif /* _EVERY_SOURCE */
