@@ -2677,7 +2677,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 @@>> signalname(3)
 @@Same as `strsignal_s(3)', but don't include the leading
 @@`SIG*' prefix normally prepended before the signal name.
-[[wunused, nothrow, const]]
+[[crt_dos_variant, wunused, nothrow, const]]
 char const *signalname($signo_t signum) {
 	char const *result;
 	result = strsignal_s(signum);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fba524c */
+/* HASH CRC-32:0xe139e937 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2897,6 +2897,7 @@ NOTHROW_NCX(LIBKCALL libc_wcssep)(char32_t **__restrict stringp,
 	return result;
 }
 #include <hybrid/typecore.h>
+/* >> strfry(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict str) {
 	size_t i, count = libd_wcslen(str);
@@ -2912,6 +2913,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict str) {
 	return str;
 }
 #include <hybrid/typecore.h>
+/* >> strfry(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsfry)(char32_t *__restrict str) {
 	size_t i, count = libc_wcslen(str);
@@ -3414,6 +3416,7 @@ next:
 	}
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
+/* >> strverscmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
                                       char16_t const *s2) {
@@ -3460,6 +3463,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
 	} while (c1);
 	return 0;
 }
+/* >> strverscmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
                                       char32_t const *s2) {

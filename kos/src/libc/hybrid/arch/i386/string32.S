@@ -50,6 +50,7 @@
 DEFINE_PUBLIC_ALIAS(bcmp, libc_memcmp)
 DEFINE_PUBLIC_ALIAS(__bzero, libc_bzero)
 DEFINE_PUBLIC_ALIAS(explicit_bzero, libc_bzero)
+DEFINE_PUBLIC_ALIAS(explicit_memset, libc_memset)
 
 /* Implement a couple of wchar functions */
 DEFINE_PUBLIC_ALIAS(wmemcmp, libc_memcmpl)

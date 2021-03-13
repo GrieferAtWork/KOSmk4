@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd235cb7f */
+/* HASH CRC-32:0xa487db3c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1191,7 +1191,6 @@ DFUN(".text.crt.dos.sched.signal", libd_sigignore, libc_sigignore, TD, 1, TIn(__
 DFUN(".text.crt.dos.sched.signal", libd_sigset, libc_sigset, TP, 2, TIn(__SIZEOF_SIGNO_T__), TP)
 DFUN(".text.crt.dos.sched.signal", libd_pthread_kill, libc_pthread_kill, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_pthread_sigqueue, libc_pthread_sigqueue, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__), TS(__SIZEOF_SIGVAL CONST))
-DFUN(".text.crt.dos.sched.signal", libd_signalname, libc_signalname, TP, 1, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_signalnumber, libc_signalnumber, TIn(__SIZEOF_SIGNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.signal", libd_signalnext, libc_signalnext, TIn(__SIZEOF_SIGNO_T__), 1, TIn(__SIZEOF_SIGNO_T__))
 
@@ -1658,11 +1657,11 @@ DFUN(".text.crt.dos.heap.strdup", libd_strndup, libc_strndup, TP, 2, TP, TI)
 DFUN(".text.crt.dos.heap.strdup", libd_strdup, libc_strdup, TP, 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_strtok_r, libc_strtok_r, TP, 3, TP, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_memrchr, libc_memrchr, TP, 3, TP, TD, TI)
-DFUN(".text.crt.dos.string.memory", libd_rawmemchr, libc_rawmemchr, TP, 2, TP, TD)
-DFUN(".text.crt.dos.string.memory", libd_strchrnul, libc_strchrnul, TP, 2, TP, TD)
-DFUN(".text.crt.dos.string.memory", libd_basename, libc_basename, TP, 1, TP)
-DFUN(".text.crt.dos.unicode.static.memory", libd_strcasestr, libc_strcasestr, TP, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_memmem, libc_memmem, TP, 4, TP, TI, TP, TI)
+DFUN(".text.crt.dos.unicode.static.memory", libd_strcasestr, libc_strcasestr, TP, 2, TP, TP)
+DFUN(".text.crt.dos.string.memory", libd_strchrnul, libc_strchrnul, TP, 2, TP, TD)
+DFUN(".text.crt.dos.string.memory", libd_rawmemchr, libc_rawmemchr, TP, 2, TP, TD)
+DFUN(".text.crt.dos.string.memory", libd_basename, libc_basename, TP, 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_strverscmp, libc_strverscmp, TD, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_mempcpy, libc_mempcpy, TP, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_strfry, libc_strfry, TP, 1, TP)
@@ -1888,7 +1887,10 @@ DFUN(".text.crt.dos.unicode.locale.memory", libd__strupr_s_l, libc__strupr_s_l, 
 DFUN(".text.crt.dos.string.memory", libd__strnset_s, libc__strnset_s, TIn(__SIZEOF_ERRNO_T__), 4, TP, TI, TD, TI)
 DFUN(".text.crt.dos.string.memory", libd_strnstr, libc_strnstr, TP, 3, TP, TP, TI)
 DFUN(".text.crt.dos.bsd.strstat", libd_strmode, libc_strmode, TV, 2, TIn(__SIZEOF_MODE_T__), TP)
+DFUN(".text.crt.dos.bsd", libd_timingsafe_memcmp, libc_timingsafe_memcmp, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_strtosigno, libc_strtosigno, TIn(__SIZEOF_SIGNO_T__), 1, TP)
+DFUN(".text.crt.dos.string.memory", libd_stresep, libc_stresep, TP, 3, TP, TP, TD)
+DFUN(".text.crt.dos.bsd", libd_consttime_memequal, libc_consttime_memequal, TD, 3, TP, TP, TI)
 
 /* stringlist */
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_add, libc_sl_add, TD, 2, TP, TP)

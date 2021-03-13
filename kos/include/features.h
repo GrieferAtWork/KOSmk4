@@ -264,6 +264,8 @@
 
 /* Make available some BSD-specific extensions such as `cfmakesane()' */
 #ifdef _BSD_SOURCE
+#undef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
 #define __USE_BSD 1
 /* BSD  name (not used in headers, but may be checked by
  * applications as a sort-of ACK that the system headers
@@ -844,5 +846,7 @@
 #define __GNU_LIBRARY__ 6
 #define __GLIBC__       2
 #define __GLIBC_MINOR__ 23
+#define __GLIBC_PREREQ(major, minor) \
+	((major) > __GLIBC__ || ((major) == __GLIBC__ && (minor) >= __GLIBC_MINOR__))
 
 #endif /* !_FEATURES_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa823ec10 */
+/* HASH CRC-32:0x9e7aa3d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,37 +18,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_versionsort_defined
-#define __local_versionsort_defined 1
+#ifndef __local_explicit_memset_defined
+#define __local_explicit_memset_defined 1
 #include <__crt.h>
-#include <bits/os/dirent.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strverscmp from string */
-#ifndef __local___localdep_strverscmp_defined
-#define __local___localdep_strverscmp_defined 1
-#ifdef __CRT_HAVE_strverscmp
-/* >> strverscmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),strverscmp,(__s1,__s2))
-#elif defined(__CRT_HAVE___strverscmp)
-/* >> strverscmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),__strverscmp,(__s1,__s2))
-#else /* ... */
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
+#ifdef __CRT_HAVE_memset
+/* >> memset(3)
+ * Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
+#else /* __CRT_HAVE_memset */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strverscmp.h>
+#include <libc/local/string/memset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strverscmp(3) */
-#define __localdep_strverscmp __LIBC_LOCAL_NAME(strverscmp)
-#endif /* !... */
-#endif /* !__local___localdep_strverscmp_defined */
-/* >> versionsort(3), versionsort64(3)
- * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__LOCAL_LIBC(versionsort) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(versionsort))(struct dirent const **__e1, struct dirent const **__e2) {
-	return __localdep_strverscmp((*__e1)->d_name, (*__e2)->d_name);
+/* >> memset(3)
+ * Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !__CRT_HAVE_memset */
+#endif /* !__local___localdep_memset_defined */
+__LOCAL_LIBC(explicit_memset) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(explicit_memset))(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) {
+	void *volatile __vdst = __dst;
+	return __localdep_memset(__vdst, __byte, __n_bytes);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_versionsort_defined
-#define __local___localdep_versionsort_defined 1
-#define __localdep_versionsort __LIBC_LOCAL_NAME(versionsort)
-#endif /* !__local___localdep_versionsort_defined */
-#endif /* !__local_versionsort_defined */
+#ifndef __local___localdep_explicit_memset_defined
+#define __local___localdep_explicit_memset_defined 1
+#define __localdep_explicit_memset __LIBC_LOCAL_NAME(explicit_memset)
+#endif /* !__local___localdep_explicit_memset_defined */
+#endif /* !__local_explicit_memset_defined */

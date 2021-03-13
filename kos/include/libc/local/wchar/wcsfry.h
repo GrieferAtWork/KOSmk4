@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c2b515b */
+/* HASH CRC-32:0xec4285b1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,6 +63,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strfry(3) */
 __LOCAL_LIBC(wcsfry) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsfry))(__WCHAR_TYPE__ *__restrict __str) {
 	__SIZE_TYPE__ __i, __count = __localdep_wcslen(__str);

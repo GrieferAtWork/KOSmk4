@@ -1438,6 +1438,7 @@
 #define __CRT_HAVE_cnd_wait
 #define __CRT_HAVE_confstr
 #define __CRT_HAVE_connect
+#define __CRT_HAVE_consttime_memequal
 #define __CRT_HAVE_copysign
 #define __CRT_HAVE_copysignf
 #define __CRT_HAVE_copysignl
@@ -1593,6 +1594,7 @@
 #define __CRT_HAVE_expf
 #define __CRT_HAVE_expl
 #define __CRT_HAVE_explicit_bzero
+#define __CRT_HAVE_explicit_memset
 #define __CRT_HAVE_expm1
 #define __CRT_HAVE_expm1f
 #define __CRT_HAVE_expm1l
@@ -3262,6 +3264,7 @@
 #define __CRT_HAVE_strerror_r
 #define __CRT_HAVE_strerror_s
 #define __CRT_HAVE_strerrorname_s
+#define __CRT_HAVE_stresep
 #define __CRT_HAVE_strfmon
 #define __CRT_HAVE_strfmon_l
 #define __CRT_HAVE_strfry
@@ -4431,6 +4434,8 @@
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
 #define __CRT_HAVE_timezone
+#define __CRT_HAVE_timingsafe_bcmp
+#define __CRT_HAVE_timingsafe_memcmp
 #define __CRT_HAVE_tmpfile
 #define __CRT_HAVE_tmpfile64
 #define __CRT_HAVE_tmpfile_s

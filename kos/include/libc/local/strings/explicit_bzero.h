@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf06e3b3f */
+/* HASH CRC-32:0x1c636e20 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,14 +48,14 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
 /* >> explicit_bzero(3)
- * Same as `bzero(buf, num_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)', however compilers will not optimize
  * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __LOCAL_LIBC(explicit_bzero) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(explicit_bzero))(void *__buf, __SIZE_TYPE__ __num_bytes) {
-	void *volatile __vbuf = __buf;
-	__localdep_bzero(__vbuf, __num_bytes);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(explicit_bzero))(void *__dst, __SIZE_TYPE__ __n_bytes) {
+	void *volatile __vdst = __dst;
+	__localdep_bzero(__vdst, __n_bytes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_explicit_bzero_defined

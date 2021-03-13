@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14dffdb6 */
+/* HASH CRC-32:0x8587c1e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2436,25 +2436,33 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32sndup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32sndup)(char32_t const *__restrict __str, __SIZE_TYPE__ __max_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sndup))(__str, __max_chars); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wcsfry) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> strfry(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16sfry,(char16_t *__restrict __str),wcsfry,(__str))
 #elif defined(__CRT_HAVE_DOS$wcsfry)
+/* >> strfry(3) */
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16sfry,(char16_t *__restrict __str),wcsfry,(__str))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsfry.h>
+/* >> strfry(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16sfry)(char16_t *__restrict __str) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsfry))((__WCHAR_TYPE__ *)__str); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c16sfry.h>
+/* >> strfry(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16sfry, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16sfry)(char16_t *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sfry))(__str); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsfry) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> strfry(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32sfry,(char32_t *__restrict __str),wcsfry,(__str))
 #elif defined(__CRT_HAVE_KOS$wcsfry)
+/* >> strfry(3) */
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32sfry,(char32_t *__restrict __str),wcsfry,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsfry.h>
+/* >> strfry(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32sfry)(char32_t *__restrict __str) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsfry))((__WCHAR_TYPE__ *)__str); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c32sfry.h>
+/* >> strfry(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32sfry, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32sfry)(char32_t *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sfry))(__str); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscasecmp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
@@ -3084,25 +3092,33 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2))
 __NAMESPACE_LOCAL_USING_OR_IMPL(wildc32scasecmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL wildc32scasecmp)(char32_t const *__pattern, char32_t const *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wildc32scasecmp))(__pattern, __string); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsverscmp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> strverscmp(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sverscmp,(char16_t const *__s1, char16_t const *__s2),wcsverscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcsverscmp)
+/* >> strverscmp(3) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sverscmp,(char16_t const *__s1, char16_t const *__s2),wcsverscmp,(__s1,__s2))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsverscmp.h>
+/* >> strverscmp(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16sverscmp)(char16_t const *__s1, char16_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsverscmp))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c16sverscmp.h>
+/* >> strverscmp(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16sverscmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16sverscmp)(char16_t const *__s1, char16_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sverscmp))(__s1, __s2); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsverscmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> strverscmp(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sverscmp,(char32_t const *__s1, char32_t const *__s2),wcsverscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_KOS$wcsverscmp)
+/* >> strverscmp(3) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sverscmp,(char32_t const *__s1, char32_t const *__s2),wcsverscmp,(__s1,__s2))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsverscmp.h>
+/* >> strverscmp(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32sverscmp)(char32_t const *__s1, char32_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsverscmp))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c32sverscmp.h>
+/* >> strverscmp(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32sverscmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32sverscmp)(char32_t const *__s1, char32_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sverscmp))(__s1, __s2); })
 #endif /* !... */
 #ifdef __USE_XOPEN2K8

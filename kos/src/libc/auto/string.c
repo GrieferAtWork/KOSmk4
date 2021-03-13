@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42ae73e1 */
+/* HASH CRC-32:0x1ca2bbcc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -513,6 +513,70 @@ NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack,
 	return NULL;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRCHR */
+#ifndef __KERNEL__
+#ifndef LIBC_ARCH_HAVE_MEMMEM
+#include <features.h>
+/* >> memmem(3)
+ * Return the first address of a sub-string `needle...+=needlelen'
+ * stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) void *
+NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack,
+                                  size_t haystacklen,
+                                  void const *needle,
+                                  size_t needlelen) {
+	byte_t *candidate, marker;
+#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	if unlikely(!needlelen)
+		return (void *)haystack;
+	if unlikely(needlelen > haystacklen)
+		return NULL;
+#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
+	haystacklen -= (needlelen - 1);
+	marker       = *(byte_t *)needle;
+	while ((candidate = (byte_t *)libc_memchr(haystack, marker, haystacklen)) != NULL) {
+		if (libc_memcmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
+	}
+	return NULL;
+}
+#endif /* !LIBC_ARCH_HAVE_MEMMEM */
+/* >> strcasestr(3)
+ * Same as `strstr', but ignore casing */
+INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char *
+NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack,
+                                      char const *needle) {
+	for (; *haystack; ++haystack) {
+		if (libc_strcasecmp(haystack, needle) == 0)
+			return (char *)haystack;
+	}
+	return NULL;
+}
+#endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_STRCHRNUL
+/* >> strchrnul(3)
+ * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
+                                     int needle) {
+	for (; *haystack; ++haystack) {
+		if ((unsigned char)*haystack == (unsigned char)needle)
+			break;
+	}
+	return (char *)haystack;
+}
+#endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMCHR
 #include <hybrid/typecore.h>
 /* >> rawmemchr(3)
@@ -528,19 +592,6 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack,
 	return iter;
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
-#ifndef LIBC_ARCH_HAVE_STRCHRNUL
-/* >> strchrnul(3)
- * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
-                                     int needle) {
-	for (; *haystack; ++haystack) {
-		if ((unsigned char)*haystack == (unsigned char)needle)
-			break;
-	}
-	return (char *)haystack;
-}
-#endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef __KERNEL__
 /* >> basename(3)
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
@@ -585,55 +636,7 @@ NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
 	}
 	return result;
 }
-/* >> strcasestr(3)
- * Same as `strstr', but ignore casing */
-INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack,
-                                      char const *needle) {
-	for (; *haystack; ++haystack) {
-		if (libc_strcasecmp(haystack, needle) == 0)
-			return (char *)haystack;
-	}
-	return NULL;
-}
-#ifndef LIBC_ARCH_HAVE_MEMMEM
-#include <features.h>
-/* >> memmem(3)
- * Return the first address of a sub-string `needle...+=needlelen'
- * stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack,
-                                  size_t haystacklen,
-                                  void const *needle,
-                                  size_t needlelen) {
-	byte_t *candidate, marker;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
-	if unlikely(!needlelen)
-		return (void *)haystack;
-	if unlikely(needlelen > haystacklen)
-		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
-	haystacklen -= (needlelen - 1);
-	marker       = *(byte_t *)needle;
-	while ((candidate = (byte_t *)libc_memchr(haystack, marker, haystacklen)) != NULL) {
-		if (libc_memcmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-#endif /* !LIBC_ARCH_HAVE_MEMMEM */
+/* >> strverscmp(3) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
                                       char const *s2) {
@@ -697,6 +700,7 @@ NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
 #endif /* !LIBC_ARCH_HAVE_MEMPCPY */
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
+/* >> strfry(3) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict str) {
 	size_t i, count = libc_strlen(str);
@@ -712,6 +716,9 @@ NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict str) {
 	return str;
 }
 #include <hybrid/typecore.h>
+/* >> memfrob(3)
+ * Xor every byte in `buf...+=num_bytes' with decimal `42' (yeah...)
+ * Always re-return the given `buf' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memfrob)(void *buf,
                                    size_t num_bytes) {
@@ -4447,6 +4454,66 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	/* NUL-terminate */
 	*p = '\0';
 }
+#include <hybrid/typecore.h>
+/* >> timingsafe_memcmp(3)
+ * Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
+ * @return: <  0: Block `s1' should be considered less than `s2'
+ * @return: == 0: Memory blocks are equal.
+ * @return: >  0: Block `s1' should be considered greater than `s2' */
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(void const *s1,
+                                             void const *s2,
+                                             size_t n_bytes) {
+	int result = 0, finished = 0;
+	/* Suppress warnings about ATTR_PURE. Even though they're correct,
+	 * don't mark  this function  as `pure'  to prevent  any  compiler
+	 * optimizations which  may result  in  the `timingsafe'  part  of
+	 * this function's purpose no longer being correct. */
+	COMPILER_IMPURE();
+	while (n_bytes) {
+		int a_le_b, a_gr_b, diff;
+		__SBYTE_TYPE__ a, b;
+		a = *(__SBYTE_TYPE__ const *)s1;
+		b = *(__SBYTE_TYPE__ const *)s2;
+
+		/* a_le_b:
+		 *    0  <=> a <= b
+		 *   -1  <=> a > b
+		 *
+		 * >> a_le_b = a <= b ? 0 : -1; */
+		a_le_b = (int)((b - a) >> (__CHAR_BIT__ - 1));
+
+		/* a_gr_b:
+		 *    0  <=> a >= b
+		 *   -1  <=> a < b
+		 *
+		 * >> a_gr_b = a >= b ? 0 : -1; */
+		a_gr_b = (int)((a - b) >> (__CHAR_BIT__ - 1));
+
+		/* a <  b  <=>  [a_le_b= 0,a_gr_b=-1]   -> diff=-1
+		 * a == b  <=>  [a_le_b= 0,a_gr_b= 0]   -> diff= 0
+		 * a >  b  <=>  [a_le_b=-1,a_gr_b= 0]   -> diff=1 */
+		diff = a_gr_b - a_le_b;
+
+		/* (finished == 0) <=> (~finished != 0)
+		 * (finished == 0) <=> {All preceding bytes were equal}
+		 *
+		 * >> if ({All preceding bytes were equal})
+		 * >>     result = diff; */
+		result |= diff & ~finished;
+
+		/* ((a_gr_b | a_le_b) != 0)  <=>  {a != b}
+		 *
+		 * >> if (a != b)
+		 * >>     finished = -1; */
+		finished |= a_gr_b | a_le_b;
+
+		s1 = (__SBYTE_TYPE__ const *)s1 + 1;
+		s2 = (__SBYTE_TYPE__ const *)s2 + 1;
+		--n_bytes;
+	}
+	return result;
+}
 #include <asm/os/signal.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
@@ -4463,6 +4530,48 @@ NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name) {
 		}
 	}
 	return result;
+}
+/* >> stresep(3)
+ * Same as `strsep(3)', but allow the specification of an additional `escape'
+ * character that will cause the following character from `*stringp' to be
+ * escaped, and not be considered as a separator, even if it is included
+ * within `delim'. Note that `escape'-characters (if present) are not removed
+ * from the input string, meaning that they will still appear in returned
+ * strings, should they have been present in the original input string. */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1, 2)) char *
+NOTHROW_NCX(LIBCCALL libc_stresep)(char **__restrict stringp,
+                                   char const *__restrict delim,
+                                   int escape) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result;; ++iter) {
+		char ch = *iter;
+		if (!ch)
+			break;
+		if ((int)(unsigned int)(unsigned char)ch == escape) {
+			/* Escape the next character. */
+			ch = *++iter;
+			if (!ch)
+				break;
+		}
+		if (libc_strchr(delim, ch))
+			break;
+	}
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+/* >> consttime_memequal(3)
+ * Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
+ * @return: == 0: Memory blocks are non-equal.
+ * @return: != 0: Memory blocks are equal. */
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_consttime_memequal)(void const *s1,
+                                              void const *s2,
+                                              size_t n_bytes) {
+	return libc_timingsafe_memcmp(s1, s2, n_bytes) == 0;
 }
 #endif /* !__KERNEL__ */
 
@@ -4577,24 +4686,24 @@ DEFINE_PUBLIC_ALIAS(strtok_r, libc_strtok_r);
 #ifndef LIBC_ARCH_HAVE_MEMRCHR
 DEFINE_PUBLIC_ALIAS(memrchr, libc_memrchr);
 #endif /* !LIBC_ARCH_HAVE_MEMRCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMMEM)
+DEFINE_PUBLIC_ALIAS(memmem, libc_memmem);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMMEM */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__strcasestr, libc_strcasestr);
+DEFINE_PUBLIC_ALIAS(strcasestr, libc_strcasestr);
+#endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_STRCHRNUL
+DEFINE_PUBLIC_ALIAS(strchrnul, libc_strchrnul);
+#endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMCHR
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__rawmemchr, libc_rawmemchr);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(rawmemchr, libc_rawmemchr);
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
-#ifndef LIBC_ARCH_HAVE_STRCHRNUL
-DEFINE_PUBLIC_ALIAS(strchrnul, libc_strchrnul);
-#endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(basename, libc_basename);
-DEFINE_PUBLIC_ALIAS(__strcasestr, libc_strcasestr);
-DEFINE_PUBLIC_ALIAS(strcasestr, libc_strcasestr);
-#endif /* !__KERNEL__ */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMMEM)
-DEFINE_PUBLIC_ALIAS(memmem, libc_memmem);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMMEM */
-#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__strverscmp, libc_strverscmp);
 DEFINE_PUBLIC_ALIAS(strverscmp, libc_strverscmp);
 #endif /* !__KERNEL__ */
@@ -5259,7 +5368,11 @@ DEFINE_PUBLIC_ALIAS(_strupr_s_l, libc__strupr_s_l);
 DEFINE_PUBLIC_ALIAS(_strnset_s, libc__strnset_s);
 DEFINE_PUBLIC_ALIAS(strnstr, libc_strnstr);
 DEFINE_PUBLIC_ALIAS(strmode, libc_strmode);
+DEFINE_PUBLIC_ALIAS(timingsafe_bcmp, libc_timingsafe_memcmp);
+DEFINE_PUBLIC_ALIAS(timingsafe_memcmp, libc_timingsafe_memcmp);
 DEFINE_PUBLIC_ALIAS(strtosigno, libc_strtosigno);
+DEFINE_PUBLIC_ALIAS(stresep, libc_stresep);
+DEFINE_PUBLIC_ALIAS(consttime_memequal, libc_consttime_memequal);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STRING_C */

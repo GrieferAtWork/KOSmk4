@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76ef193b */
+/* HASH CRC-32:0x670c8ac9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -724,6 +724,7 @@
 #define __CRT_HAVE_DOS$cnd_wait
 #define __CRT_HAVE_DOS$confstr
 #define __CRT_HAVE_DOS$connect
+#define __CRT_HAVE_DOS$consttime_memequal
 #define __CRT_HAVE_DOS$copysign
 #define __CRT_HAVE_DOS$copysignf
 #define __CRT_HAVE_DOS$copysignl
@@ -2303,7 +2304,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$signalfd
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$signalname
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$signalnext
 #define __CRT_HAVE_DOS$signalnumber
 #define __CRT_HAVE_DOS$signandset
@@ -2411,6 +2416,7 @@
 #define __CRT_HAVE_DOS$strerrorname_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$stresep
 #define __CRT_HAVE_DOS$strfmon
 #define __CRT_HAVE_DOS$strfmon_l
 #define __CRT_HAVE_DOS$strfry
@@ -2585,6 +2591,7 @@
 #define __CRT_HAVE_DOS$timerfd_settime64
 #define __CRT_HAVE_DOS$times
 #define __CRT_HAVE_DOS$timespec_get
+#define __CRT_HAVE_DOS$timingsafe_memcmp
 #define __CRT_HAVE_DOS$tmpfile_s
 #define __CRT_HAVE_DOS$tmpnam
 #define __CRT_HAVE_DOS$tmpnam_r
@@ -3694,6 +3701,7 @@
 #define __CRT_HAVE_cnd_wait
 #define __CRT_HAVE_confstr
 #define __CRT_HAVE_connect
+#define __CRT_HAVE_consttime_memequal
 #define __CRT_HAVE_copysign
 #define __CRT_HAVE_copysignf
 #define __CRT_HAVE_copysignl
@@ -5514,6 +5522,7 @@
 #define __CRT_HAVE_strerror_r
 #define __CRT_HAVE_strerror_s
 #define __CRT_HAVE_strerrorname_s
+#define __CRT_HAVE_stresep
 #define __CRT_HAVE_strfmon
 #define __CRT_HAVE_strfmon_l
 #define __CRT_HAVE_strfry
@@ -5697,6 +5706,7 @@
 #define __CRT_HAVE_timerfd_settime64
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
+#define __CRT_HAVE_timingsafe_memcmp
 #define __CRT_HAVE_tmpfile
 #define __CRT_HAVE_tmpfile64
 #define __CRT_HAVE_tmpfile_s

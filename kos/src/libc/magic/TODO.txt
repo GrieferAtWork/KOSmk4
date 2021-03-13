@@ -74,8 +74,6 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 
 
 Functions:
-	- timingsafe_bcmp()
-	- timingsafe_memcmp()
 	- walkcontext()
 
 

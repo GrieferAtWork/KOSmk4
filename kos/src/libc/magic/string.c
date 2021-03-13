@@ -1034,9 +1034,10 @@ char *strtok_r([[nullable]] char *str,
 }
 
 %#endif /* __USE_POSIX */
-%
-%#ifdef __USE_GNU
 
+
+%
+%#if defined(__USE_GNU) || defined(__USE_BSD)
 @@>> memrchr(3)
 @@Descendingly search for `needle', starting at `haystack + n_bytes'.
 @@Return `NULL' if `needle' wasn't found.
@@ -1055,6 +1056,86 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 	return NULL;
 }
 
+@@>> memmem(3)
+@@Return the first address of a sub-string `needle...+=needlelen'
+@@stored within `haystack...+=haystacklen'
+@@If no such sub-string exists, return `NULL' instead.
+@@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+@@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+@@When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+@@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+[[decl_include("<hybrid/typecore.h>")]]
+[[libc, wunused, pure, no_crt_self_import]]
+[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem0")]]
+[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMEM))]]
+[[impl_include("<features.h>")]]
+[[nullable]] void *memmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
+	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): [[nullable]] void *]
+	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): [[nullable]] void const *]
+{
+	byte_t *candidate, marker;
+#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	if unlikely(!needlelen)
+		return (void *)haystack;
+	if unlikely(needlelen > haystacklen)
+		return NULL;
+#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
+	haystacklen -= (needlelen - 1);
+	marker       = *(byte_t *)needle;
+	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
+		if (memcmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
+	}
+	return NULL;
+}
+
+@@>> strcasestr(3)
+@@Same as `strstr', but ignore casing
+[[wunused, pure, export_alias("__strcasestr")]]
+[[section(".text.crt{|.dos}.unicode.static.memory")]]
+[[nullable]] char *strcasestr([[nonnull]] char const *haystack, [[nonnull]] char const *needle)
+	[([[nonnull]] char *haystack, [[nonnull]] char const *needle): [[nullable]] char *]
+	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle): [[nullable]] char const *]
+{
+	for (; *haystack; ++haystack) {
+		if (strcasecmp(haystack, needle) == 0)
+			return (char *)haystack;
+	}
+	return NULL;
+}
+%#endif /* __USE_GNU || __USE_BSD */
+
+
+%
+%#if defined(__USE_GNU) || defined(__USE_NETBSD)
+@@>> strchrnul(3)
+@@Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found.
+[[kernel, wunused, pure]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCHRNUL))]]
+[[nonnull]] char *strchrnul([[nonnull]] char const *__restrict haystack, int needle)
+	[([[nonnull]] char *__restrict haystack, int needle): [[nonnull]] char *]
+	[([[nonnull]] char const *__restrict haystack, int needle): [[nonnull]] char const *]
+{
+	for (; *haystack; ++haystack) {
+		if ((unsigned char)*haystack == (unsigned char)needle)
+			break;
+	}
+	return (char *)haystack;
+}
+%#endif /* __USE_GNU || __USE_NETBSD */
+
+
+
+%
+%#ifdef __USE_GNU
 
 @@>> rawmemchr(3)
 @@Same as `memchr' with a search limit of `(size_t)-1'
@@ -1072,21 +1153,6 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 			break;
 	}
 	return iter;
-}
-
-@@>> strchrnul(3)
-@@Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found.
-[[kernel, wunused, pure]]
-[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCHRNUL))]]
-[[nonnull]] char *strchrnul([[nonnull]] char const *__restrict haystack, int needle)
-	[([[nonnull]] char *__restrict haystack, int needle): [[nonnull]] char *]
-	[([[nonnull]] char const *__restrict haystack, int needle): [[nonnull]] char const *]
-{
-	for (; *haystack; ++haystack) {
-		if ((unsigned char)*haystack == (unsigned char)needle)
-			break;
-	}
-	return (char *)haystack;
 }
 
 @@>> basename(3)
@@ -1137,62 +1203,7 @@ char *basename([[nonnull]] char const *filename)
 }
 
 
-@@>> strcasestr(3)
-@@Same as `strstr', but ignore casing
-[[wunused, pure, export_alias("__strcasestr")]]
-[[section(".text.crt{|.dos}.unicode.static.memory")]]
-[[nullable]] char *strcasestr([[nonnull]] char const *haystack, [[nonnull]] char const *needle)
-	[([[nonnull]] char *haystack, [[nonnull]] char const *needle): [[nullable]] char *]
-	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle): [[nullable]] char const *]
-{
-	for (; *haystack; ++haystack) {
-		if (strcasecmp(haystack, needle) == 0)
-			return (char *)haystack;
-	}
-	return NULL;
-}
-
-@@>> memmem(3)
-@@Return the first address of a sub-string `needle...+=needlelen'
-@@stored within `haystack...+=haystacklen'
-@@If no such sub-string exists, return `NULL' instead.
-@@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
-@@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-@@When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
-@@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[[decl_include("<hybrid/typecore.h>")]]
-[[libc, wunused, pure, no_crt_self_import]]
-[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem0")]]
-[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem")]]
-[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMEM))]]
-[[impl_include("<features.h>")]]
-[[nullable]] void *memmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
-	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): [[nullable]] void *]
-	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): [[nullable]] void const *]
-{
-	byte_t *candidate, marker;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
-	if unlikely(!needlelen)
-		return (void *)haystack;
-	if unlikely(needlelen > haystacklen)
-		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
-	haystacklen -= (needlelen - 1);
-	marker       = *(byte_t *)needle;
-	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
-		if (memcmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-
+@@>> strverscmp(3)
 [[wunused, pure, export_alias("__strverscmp")]]
 int strverscmp([[nonnull]] char const *s1,
                [[nonnull]] char const *s2) {
@@ -1265,6 +1276,7 @@ mempcpy:([[nonnull]] void *__restrict dst,
 %#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 
 
+@@>> strfry(3)
 [[ATTR_LEAF]]
 [[impl_include("<hybrid/typecore.h>")]]
 strfry:([[nonnull]] char *__restrict str) -> [[== str]] char * {
@@ -1281,6 +1293,9 @@ strfry:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	return str;
 }
 
+@@>> memfrob(3)
+@@Xor every byte in `buf...+=num_bytes' with decimal `42' (yeah...)
+@@Always re-return the given `buf'
 [[ATTR_LEAF, impl_include("<hybrid/typecore.h>")]]
 memfrob:([[nonnull]] void *buf, $size_t num_bytes) -> [[== buf]] void * {
 	byte_t *iter = (byte_t *)buf;
@@ -7314,6 +7329,76 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	*p = '\0';
 }
 
+@@>> timingsafe_bcmp(3)
+@@Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
+@@@return: == 0: Memory blocks are equal.
+@@@return: != 0: Memory blocks are non-equal.
+[[nocrt, no_crt_self_import, wunused/*, pure*/]]
+[[alias("timingsafe_bcmp", "timingsafe_memcmp")]]
+[[bind_local_function(timingsafe_memcmp)]]
+int timingsafe_bcmp([[nonnull]] void const *s1,
+                    [[nonnull]] void const *s2, size_t n_bytes);
+
+@@>> timingsafe_memcmp(3)
+@@Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
+@@@return: <  0: Block `s1' should be considered less than `s2'
+@@@return: == 0: Memory blocks are equal.
+@@@return: >  0: Block `s1' should be considered greater than `s2'
+[[section(".text.crt{|.dos}.bsd"), wunused/*, pure*/]]
+[[impl_include("<hybrid/typecore.h>"), export_as("timingsafe_bcmp")]]
+int timingsafe_memcmp([[nonnull]] void const *s1,
+                      [[nonnull]] void const *s2, size_t n_bytes) {
+	int result = 0, finished = 0;
+	/* Suppress warnings about ATTR_PURE. Even though they're correct,
+	 * don't mark  this function  as `pure'  to prevent  any  compiler
+	 * optimizations which  may result  in  the `timingsafe'  part  of
+	 * this function's purpose no longer being correct. */
+	COMPILER_IMPURE();
+	while (n_bytes) {
+		int a_le_b, a_gr_b, diff;
+		__SBYTE_TYPE__ a, b;
+		a = *(__SBYTE_TYPE__ const *)s1;
+		b = *(__SBYTE_TYPE__ const *)s2;
+
+		/* a_le_b:
+		 *    0  <=> a <= b
+		 *   -1  <=> a > b
+		 *
+		 * >> a_le_b = a <= b ? 0 : -1; */
+		a_le_b = (int)((b - a) >> (__CHAR_BIT__ - 1));
+
+		/* a_gr_b:
+		 *    0  <=> a >= b
+		 *   -1  <=> a < b
+		 *
+		 * >> a_gr_b = a >= b ? 0 : -1; */
+		a_gr_b = (int)((a - b) >> (__CHAR_BIT__ - 1));
+
+		/* a <  b  <=>  [a_le_b= 0,a_gr_b=-1]   -> diff=-1
+		 * a == b  <=>  [a_le_b= 0,a_gr_b= 0]   -> diff= 0
+		 * a >  b  <=>  [a_le_b=-1,a_gr_b= 0]   -> diff=1 */
+		diff = a_gr_b - a_le_b;
+
+		/* (finished == 0) <=> (~finished != 0)
+		 * (finished == 0) <=> {All preceding bytes were equal}
+		 *
+		 * >> if ({All preceding bytes were equal})
+		 * >>     result = diff; */
+		result |= diff & ~finished;
+
+		/* ((a_gr_b | a_le_b) != 0)  <=>  {a != b}
+		 *
+		 * >> if (a != b)
+		 * >>     finished = -1; */
+		finished |= a_gr_b | a_le_b;
+
+		s1 = (__SBYTE_TYPE__ const *)s1 + 1;
+		s2 = (__SBYTE_TYPE__ const *)s2 + 1;
+		--n_bytes;
+	}
+	return result;
+}
+
 %#endif /* __USE_BSD */
 
 
@@ -7336,6 +7421,64 @@ $signo_t strtosigno([[nonnull]] const char *name) {
 	return result;
 }
 %#endif /* __USE_CYGWIN */
+
+
+%
+%#ifdef __USE_NETBSD
+
+[[nocrt, no_crt_self_import, guard, ATTR_LEAF]]
+[[alias("memset", "explicit_memset")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[nonnull]] void *explicit_memset([[nonnull]] void *__restrict dst,
+                                  int byte, size_t n_bytes) {
+	void *volatile vdst = dst;
+	return memset(vdst, byte, n_bytes);
+}
+
+@@>> stresep(3)
+@@Same as `strsep(3)', but allow the specification of an additional `escape'
+@@character that will cause the following character from `*stringp' to be
+@@escaped, and not be considered as a separator, even if it is included
+@@within `delim'. Note that `escape'-characters (if present) are not removed
+@@from the input string, meaning that they will still appear in returned
+@@strings, should they have been present in the original input string.
+[[ATTR_LEAF]]
+char *stresep([[nonnull]] char **__restrict stringp,
+              [[nonnull]] char const *__restrict delim,
+              int escape) {
+	char *result, *iter;
+	if ((result = *stringp) == NULL || !*result)
+		return NULL;
+	for (iter = result;; ++iter) {
+		char ch = *iter;
+		if (!ch)
+			break;
+		if ((int)(unsigned int)(unsigned char)ch == escape) {
+			/* Escape the next character. */
+			ch = *++iter;
+			if (!ch)
+				break;
+		}
+		if (strchr(delim, ch))
+			break;
+	}
+	if (*iter)
+		*iter++ = '\0';
+	*stringp = iter;
+	return result;
+}
+
+@@>> consttime_memequal(3)
+@@Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
+@@@return: == 0: Memory blocks are non-equal.
+@@@return: != 0: Memory blocks are equal.
+[[section(".text.crt{|.dos}.bsd"), wunused/*, pure*/]]
+int consttime_memequal([[nonnull]] void const *s1,
+                       [[nonnull]] void const *s2, size_t n_bytes) {
+	return timingsafe_memcmp(s1, s2, n_bytes) == 0;
+}
+
+%#endif /* __USE_NETBSD */
 
 
 %(libc_fast){

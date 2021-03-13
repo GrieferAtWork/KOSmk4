@@ -1293,6 +1293,7 @@
 #define __CRT_HAVE_cnd_wait
 #define __CRT_HAVE_confstr
 #define __CRT_HAVE_connect
+#define __CRT_HAVE_consttime_memequal
 #define __CRT_HAVE_copysign
 #define __CRT_HAVE_copysignf
 #define __CRT_HAVE_copysignl
@@ -1448,6 +1449,7 @@
 #define __CRT_HAVE_expf
 #define __CRT_HAVE_expl
 #define __CRT_HAVE_explicit_bzero
+#define __CRT_HAVE_explicit_memset
 #define __CRT_HAVE_expm1
 #define __CRT_HAVE_expm1f
 #define __CRT_HAVE_expm1l
@@ -3116,6 +3118,7 @@
 #define __CRT_HAVE_strerror_r
 #define __CRT_HAVE_strerror_s
 #define __CRT_HAVE_strerrorname_s
+#define __CRT_HAVE_stresep
 #define __CRT_HAVE_strfmon
 #define __CRT_HAVE_strfmon_l
 #define __CRT_HAVE_strfry
@@ -4096,6 +4099,8 @@
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
 #define __CRT_HAVE_timezone
+#define __CRT_HAVE_timingsafe_bcmp
+#define __CRT_HAVE_timingsafe_memcmp
 #define __CRT_HAVE_tmpfile
 #define __CRT_HAVE_tmpfile64
 #define __CRT_HAVE_tmpfile_s
@@ -5718,6 +5723,7 @@
 #define __CRT_HAVE_KOS$cnd_wait
 #define __CRT_HAVE_KOS$confstr
 #define __CRT_HAVE_KOS$connect
+#define __CRT_HAVE_KOS$consttime_memequal
 #define __CRT_HAVE_KOS$copysign
 #define __CRT_HAVE_KOS$copysignf
 #define __CRT_HAVE_KOS$copysignl
@@ -7368,6 +7374,7 @@
 #define __CRT_HAVE_KOS$strerror_r
 #define __CRT_HAVE_KOS$strerror_s
 #define __CRT_HAVE_KOS$strerrorname_s
+#define __CRT_HAVE_KOS$stresep
 #define __CRT_HAVE_KOS$strfmon
 #define __CRT_HAVE_KOS$strfmon_l
 #define __CRT_HAVE_KOS$strfry
@@ -7540,6 +7547,8 @@
 #define __CRT_HAVE_KOS$timerfd_settime64
 #define __CRT_HAVE_KOS$times
 #define __CRT_HAVE_KOS$timespec_get
+#define __CRT_HAVE_KOS$timingsafe_bcmp
+#define __CRT_HAVE_KOS$timingsafe_memcmp
 #define __CRT_HAVE_KOS$tmpfile_s
 #define __CRT_HAVE_KOS$tmpnam
 #define __CRT_HAVE_KOS$tmpnam_r
@@ -9153,6 +9162,7 @@
 #define __CRT_HAVE_DOS$cnd_wait
 #define __CRT_HAVE_DOS$confstr
 #define __CRT_HAVE_DOS$connect
+#define __CRT_HAVE_DOS$consttime_memequal
 #define __CRT_HAVE_DOS$copysign
 #define __CRT_HAVE_DOS$copysignf
 #define __CRT_HAVE_DOS$copysignl
@@ -10803,6 +10813,7 @@
 #define __CRT_HAVE_DOS$strerror_r
 #define __CRT_HAVE_DOS$strerror_s
 #define __CRT_HAVE_DOS$strerrorname_s
+#define __CRT_HAVE_DOS$stresep
 #define __CRT_HAVE_DOS$strfmon
 #define __CRT_HAVE_DOS$strfmon_l
 #define __CRT_HAVE_DOS$strfry
@@ -10975,6 +10986,8 @@
 #define __CRT_HAVE_DOS$timerfd_settime64
 #define __CRT_HAVE_DOS$times
 #define __CRT_HAVE_DOS$timespec_get
+#define __CRT_HAVE_DOS$timingsafe_bcmp
+#define __CRT_HAVE_DOS$timingsafe_memcmp
 #define __CRT_HAVE_DOS$tmpfile_s
 #define __CRT_HAVE_DOS$tmpnam
 #define __CRT_HAVE_DOS$tmpnam_r

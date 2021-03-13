@@ -104,15 +104,15 @@ typedef __SIZE_TYPE__ size_t;
 %
 %#if defined(__USE_KOS) || defined(__USE_GNU) || defined(__USE_BSD)
 @@>> explicit_bzero(3)
-@@Same as `bzero(buf, num_bytes)', however compilers will not optimize
+@@Same as `bzero(dst, n_bytes)', however compilers will not optimize
 @@away uses of this function when they (think) that clearing the memory
 @@wouldn't have any visible side-effects (though those side-effects
 @@may be a security-concious application trying to wipe sensitive data)
 [[nocrt, no_crt_self_import, guard]]
 [[alias("bzero", "explicit_bzero", "__bzero")]]
-void explicit_bzero(void *buf, size_t num_bytes) {
-	void *volatile vbuf = buf;
-	bzero(vbuf, num_bytes);
+void explicit_bzero(void *dst, size_t n_bytes) {
+	void *volatile vdst = dst;
+	bzero(vdst, n_bytes);
 }
 %#endif /* __USE_KOS || __USE_GNU || __USE_BSD */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8057d3fe */
+/* HASH CRC-32:0xa5cc8273 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1504,7 +1504,6 @@ DEFINE_PUBLIC_ALIAS(DOS$sigignore, libd_sigignore);
 DEFINE_PUBLIC_ALIAS(DOS$sigset, libd_sigset);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_kill, libd_pthread_kill);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_sigqueue, libd_pthread_sigqueue);
-DEFINE_PUBLIC_ALIAS(DOS$signalname, libd_signalname);
 DEFINE_PUBLIC_ALIAS(DOS$signalnumber, libd_signalnumber);
 DEFINE_PUBLIC_ALIAS(DOS$signalnext, libd_signalnext);
 
@@ -2102,12 +2101,12 @@ DEFINE_PUBLIC_ALIAS(DOS$strtok_s, libd_strtok_r);
 DEFINE_PUBLIC_ALIAS(DOS$__strtok_r, libd_strtok_r);
 DEFINE_PUBLIC_ALIAS(DOS$strtok_r, libd_strtok_r);
 DEFINE_PUBLIC_ALIAS(DOS$memrchr, libd_memrchr);
-DEFINE_PUBLIC_ALIAS(DOS$rawmemchr, libd_rawmemchr);
-DEFINE_PUBLIC_ALIAS(DOS$strchrnul, libd_strchrnul);
-DEFINE_PUBLIC_ALIAS(DOS$basename, libd_basename);
+DEFINE_PUBLIC_ALIAS(DOS$memmem, libd_memmem);
 DEFINE_PUBLIC_ALIAS(DOS$__strcasestr, libd_strcasestr);
 DEFINE_PUBLIC_ALIAS(DOS$strcasestr, libd_strcasestr);
-DEFINE_PUBLIC_ALIAS(DOS$memmem, libd_memmem);
+DEFINE_PUBLIC_ALIAS(DOS$strchrnul, libd_strchrnul);
+DEFINE_PUBLIC_ALIAS(DOS$rawmemchr, libd_rawmemchr);
+DEFINE_PUBLIC_ALIAS(DOS$basename, libd_basename);
 DEFINE_PUBLIC_ALIAS(DOS$__strverscmp, libd_strverscmp);
 DEFINE_PUBLIC_ALIAS(DOS$strverscmp, libd_strverscmp);
 DEFINE_PUBLIC_ALIAS(DOS$mempcpy, libd_mempcpy);
@@ -2378,7 +2377,11 @@ DEFINE_PUBLIC_ALIAS(DOS$_strupr_s_l, libd__strupr_s_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strnset_s, libd__strnset_s);
 DEFINE_PUBLIC_ALIAS(DOS$strnstr, libd_strnstr);
 DEFINE_PUBLIC_ALIAS(DOS$strmode, libd_strmode);
+DEFINE_PUBLIC_ALIAS(DOS$timingsafe_bcmp, libd_timingsafe_memcmp);
+DEFINE_PUBLIC_ALIAS(DOS$timingsafe_memcmp, libd_timingsafe_memcmp);
 DEFINE_PUBLIC_ALIAS(DOS$strtosigno, libd_strtosigno);
+DEFINE_PUBLIC_ALIAS(DOS$stresep, libd_stresep);
+DEFINE_PUBLIC_ALIAS(DOS$consttime_memequal, libd_consttime_memequal);
 
 /* stringlist */
 DEFINE_PUBLIC_ALIAS(DOS$sl_add, libd_sl_add);
