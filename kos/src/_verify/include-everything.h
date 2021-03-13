@@ -140,6 +140,7 @@ incdir("");
 #include <asm/crt/posix_spawn.h>
 #include <asm/crt/process.h>
 #include <asm/crt/pthreadvalues.h>
+#include <asm/crt/readpassphrase.h>
 #include <asm/crt/semaphore.h>
 #include <asm/crt/stdio.h>
 #include <asm/crt/stdio_ext.h>
@@ -366,6 +367,7 @@ incdir("");
 #include <bsd/inttypes.h>
 #include <bsd/libutil.h>
 #include <bsd/pwd.h>
+#include <bsd/readpassphrase.h>
 #include <bsd/stdio.h>
 #include <bsd/stdlib.h>
 #include <bsd/string.h>
@@ -945,10 +947,12 @@ incdir("");
 #include <poll.h>
 #include <process.h>
 #include <pthread.h>
+#include <pthread_np.h>
 #include <pty.h>
 #include <pwd.h>
 #include <random.h>
 #include <re_comp.h>
+#include <readpassphrase.h>
 #include <regex.h>
 #include <rpc/netdb.h>
 #include <sal.h>

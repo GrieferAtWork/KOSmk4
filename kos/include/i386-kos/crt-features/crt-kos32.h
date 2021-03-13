@@ -3029,6 +3029,7 @@
 #define __CRT_HAVE_readdir_r
 #define __CRT_HAVE_readlink
 #define __CRT_HAVE_readlinkat
+#define __CRT_HAVE_readpassphrase
 #define __CRT_HAVE_readv
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place

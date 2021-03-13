@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_OFLAGS_H
-#define _ASM_OFLAGS_H 1
+#ifndef _ASM_OS_KOS_OFLAGS_H
+#define _ASM_OS_KOS_OFLAGS_H 1
 
 #include <__stdinc.h>
 
@@ -70,4 +70,4 @@
 #define __O_ANYTHING __O_SYMLINK
 #endif /* __KOS__ */
 
-#endif /* !_ASM_OFLAGS_H */
+#endif /* !_ASM_OS_KOS_OFLAGS_H */

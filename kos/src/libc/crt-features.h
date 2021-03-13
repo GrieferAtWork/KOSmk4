@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80d547f6 */
+/* HASH CRC-32:0x42e89cf1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2186,6 +2186,7 @@
 #define __CRT_HAVE_DOS$readdir_r
 #define __CRT_HAVE_DOS$readlink
 #define __CRT_HAVE_DOS$readlinkat
+#define __CRT_HAVE_DOS$readpassphrase
 #define __CRT_HAVE_DOS$readv
 #define __CRT_HAVE_DOS$realloc
 #define __CRT_HAVE_DOS$realloc_in_place
@@ -5338,6 +5339,7 @@
 #define __CRT_HAVE_readdir_r
 #define __CRT_HAVE_readlink
 #define __CRT_HAVE_readlinkat
+#define __CRT_HAVE_readpassphrase
 #define __CRT_HAVE_readv
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place

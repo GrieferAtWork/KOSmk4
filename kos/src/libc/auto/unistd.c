@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee2a1ab3 */
+/* HASH CRC-32:0xf7696159 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include "../user/unistd.h"
 #include "../user/fcntl.h"
 #include "../user/pwd.h"
+#include "readpassphrase.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 
@@ -289,6 +290,17 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 	}
 	return 0;
 }
+#include <asm/crt/readpassphrase.h>
+/* >> getpass(3) */
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED NONNULL((1)) char *
+NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt) {
+	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
+#ifdef __RPP_ECHO_OFF
+	return libc_readpassphrase(prompt, buf, sizeof(buf), __RPP_ECHO_OFF);
+#else /* __RPP_ECHO_OFF */
+	return libc_readpassphrase(prompt, buf, sizeof(buf), 0);
+#endif /* !__RPP_ECHO_OFF */
+}
 /* >> swab(3)
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
@@ -462,6 +474,7 @@ DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
+DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
 #endif /* __LIBCCALL_IS_LIBDCALL */

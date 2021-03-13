@@ -1856,18 +1856,6 @@ NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
 }
 /*[[[end:libc_chroot]]]*/
 
-/*[[[head:libc_getpass,hash:CRC-32=0xce218dd2]]]*/
-/* >> getpass(3) */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED NONNULL((1)) char *
-NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
-/*[[[body:libc_getpass]]]*/
-/*AUTO*/{
-	(void)prompt;
-	CRT_UNIMPLEMENTEDF("getpass(%q)", prompt); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_getpass]]]*/
 
 /*[[[head:libc_ftruncate,hash:CRC-32=0xcd4e0d6b]]]*/
 /* >> ftruncate(2), ftruncate64(2)
@@ -3617,7 +3605,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1a71a7b]]]*/
+/*[[[start:exports,hash:CRC-32=0xc3701544]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -3784,7 +3772,6 @@ DEFINE_PUBLIC_ALIAS(setusershell, libc_setusershell);
 DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(revoke, libc_revoke);
 DEFINE_PUBLIC_ALIAS(chroot, libc_chroot);
-DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_chsize, libc_ftruncate);
 #endif /* __LIBCCALL_IS_LIBDCALL */

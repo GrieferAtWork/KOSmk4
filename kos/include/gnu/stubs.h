@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7da0ed22 */
+/* HASH CRC-32:0x143fa318 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -298,7 +298,6 @@
 #define __stub_getnetent_r
 #define __stub_getnetgrent
 #define __stub_getnetgrent_r
-#define __stub_getpass
 #define __stub_getpmsg
 #define __stub_getprotobyname
 #define __stub_getprotobyname_r

@@ -4,7 +4,6 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <a.out.h>              (GLibc!)
 <argp.h>               (GLibc!)
 <bsd/[...].h>          (all of those libbsd headers should be magic-generated and contain `%[insert:extern()]' decls!)
-<bsd/readpassphrase.h> (alias for readpassphrase.h) (https://linux.die.net/man/3/readpassphrase)
 <conio.h>
 <corecrt_wstdlib.h>
 <cthreads.h>
@@ -22,7 +21,6 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <mkdev.h>
 <nl_types.h>           (GLibc!)
 <obstack.h>            (GLibc!)
-<readpassphrase.h>     (contains a single function: https://man.bsd.lv/readpassphrase.3)
 <regexp.h>
 <resolv.h>             (GLibc!)
 <rpc/auth.h>

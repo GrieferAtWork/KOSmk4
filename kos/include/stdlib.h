@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58fb570f */
+/* HASH CRC-32:0x79e585b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2677,11 +2677,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #undef __getlogin_defined
 #endif /* !... */
 #endif /* !__getlogin_defined */
-#if !defined(__getpass_defined) && defined(__CRT_HAVE_getpass)
+#ifndef __getpass_defined
 #define __getpass_defined 1
+#ifdef __CRT_HAVE_getpass
 /* >> getpass(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
-#endif /* !__getpass_defined && __CRT_HAVE_getpass */
+#else /* __CRT_HAVE_getpass */
+#include <asm/os/stdio.h>
+#if defined(__CRT_HAVE_readpassphrase) || (defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)))
+#include <libc/local/unistd/getpass.h>
+/* >> getpass(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getpass)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); })
+#else /* __CRT_HAVE_readpassphrase || (__STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read)) */
+#undef __getpass_defined
+#endif /* !__CRT_HAVE_readpassphrase && (!__STDIN_FILENO || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read)) */
+#endif /* !__CRT_HAVE_getpass */
+#endif /* !__getpass_defined */
 #ifndef __getpw_defined
 #define __getpw_defined 1
 #ifdef __CRT_HAVE_getpw

@@ -2883,6 +2883,7 @@
 #define __CRT_HAVE_readdir_r
 #define __CRT_HAVE_readlink
 #define __CRT_HAVE_readlinkat
+#define __CRT_HAVE_readpassphrase
 #define __CRT_HAVE_readv
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place
@@ -7236,6 +7237,7 @@
 #define __CRT_HAVE_KOS$readdir_r
 #define __CRT_HAVE_KOS$readlink
 #define __CRT_HAVE_KOS$readlinkat
+#define __CRT_HAVE_KOS$readpassphrase
 #define __CRT_HAVE_KOS$readv
 #define __CRT_HAVE_KOS$realloc
 #define __CRT_HAVE_KOS$realloc_in_place
@@ -10746,6 +10748,7 @@
 #define __CRT_HAVE_DOS$readdir_r
 #define __CRT_HAVE_DOS$readlink
 #define __CRT_HAVE_DOS$readlinkat
+#define __CRT_HAVE_DOS$readpassphrase
 #define __CRT_HAVE_DOS$readv
 #define __CRT_HAVE_DOS$realloc
 #define __CRT_HAVE_DOS$realloc_in_place

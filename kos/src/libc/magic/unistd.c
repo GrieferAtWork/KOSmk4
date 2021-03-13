@@ -1911,7 +1911,16 @@ int chroot([[nonnull]] char const *__restrict path);
 
 @@>> getpass(3)
 [[guard, cp, wunused, section(".text.crt{|.dos}.io.tty")]]
-char *getpass([[nonnull]] char const *__restrict prompt);
+[[requires_function(readpassphrase)]]
+[[impl_include("<asm/crt/readpassphrase.h>")]]
+char *getpass([[nonnull]] char const *__restrict prompt) {
+	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
+@@pp_ifdef __RPP_ECHO_OFF@@
+	return readpassphrase(prompt, buf, sizeof(buf), __RPP_ECHO_OFF);
+@@pp_else@@
+	return readpassphrase(prompt, buf, sizeof(buf), 0);
+@@pp_endif@@
+}
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 %
