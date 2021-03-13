@@ -5,7 +5,6 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <argp.h>               (GLibc!)
 <bsd/[...].h>          (all of those libbsd headers should be magic-generated and contain `%[insert:extern()]' decls!)
 <bsd/readpassphrase.h> (alias for readpassphrase.h) (https://linux.die.net/man/3/readpassphrase)
-<complex.h>            (GLibc!)
 <conio.h>
 <corecrt_wstdlib.h>
 <cthreads.h>
@@ -61,7 +60,6 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <sys/vlimit.h>
 <sys/vtimes.h>
 <sysmacros.h>
-<tgmath.h>             (GLibc!)
 <timeconv.h>
 <thread_db.h>          (GLibc!)
 <wordexp.h>            (GLibc!)

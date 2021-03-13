@@ -55,8 +55,7 @@ KOS_VALID_BUILD_CONFIGS="OD nOD OnD nOnD"
 CXX_COMPAT_HEADER_NAMES="\
 assert ctype errno fenv float inttypes iso646 limits locale math setjmp \
 signal stdalign stdarg stdbool stddef stdint stdio stdlib string time \
-uchar wchar wctype"
-#CXX_COMPAT_HEADER_NAMES="$CXX_COMPAT_HEADER_NAMES tgmath complex"
+uchar wchar wctype tgmath complex"
 
 
 BINUTILS_VERSION="binutils-${BINUTILS_VERSION_NUMBER}"

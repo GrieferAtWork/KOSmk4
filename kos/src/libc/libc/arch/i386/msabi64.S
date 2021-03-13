@@ -54,6 +54,9 @@
 #define TI64   R
 #define TIn(s) R
 #define TS(n)  R /* ??? */
+#define TCF    FF /* ??? */
+#define TCFD   FF /* ??? */
+#define TCFL   FF /* ??? */
 
 
 #define MSABI64_CONVERTER_FOR_1(a)                         libd_msabi64_##a
@@ -77,6 +80,7 @@
 #define libd_msabi64_F      libd_msabi64_R
 #define libd_msabi64_FF     libd_msabi64_R
 #define libd_msabi64_FFF    libd_msabi64_R
+#define libd_msabi64_FFFF   libd_msabi64_R
 #define libd_msabi64_FFR    libd_msabi64_R
 #define libd_msabi64_FR     libd_msabi64_R
 #define libd_msabi64_FRR    libd_msabi64_RR

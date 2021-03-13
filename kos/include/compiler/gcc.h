@@ -852,6 +852,16 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #define __builtin_va_start __builtin_stdarg_start
 #endif /* __GCC_VERSION_NUM < 40402 */
 
+/* Support for complex numbers (test for with `#ifdef _Complex_I') */
+#if __GCC_VERSION_NUM >= 29700
+#define _Complex_I (__extension__ 1.0iF)
+#elif __GCC_VERSION_NUM >= 20700
+#define _Complex __complex__
+#define _Complex_I (__extension__ 1.0iF)
+#endif
+
+
+
 #ifdef __cplusplus
 
 #ifndef __INTELLISENSE__
@@ -864,8 +874,6 @@ __extension__ typedef unsigned long long __ulonglong_t;
  * when in actuality they are _very_ _much_ able to do exactly that! */
 #define __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 #endif /* !__INTELLISENSE__ */
-
-
 
 /* `__builtin_choose_expr()' is only available in C, but not in C++ */
 #undef __builtin_choose_expr

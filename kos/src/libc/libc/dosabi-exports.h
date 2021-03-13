@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5cc8273 */
+/* HASH CRC-32:0x73fdf4fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,6 +70,74 @@ DEFINE_PUBLIC_ALIAS(DOS$inet_nsap_addr, libd_inet_nsap_addr);
 DEFINE_PUBLIC_ALIAS(DOS$inet_nsap_ntoa, libd_inet_nsap_ntoa);
 DEFINE_PUBLIC_ALIAS(DOS$inet_pton, libd_inet_pton);
 DEFINE_PUBLIC_ALIAS(DOS$inet_ntop, libd_inet_ntop);
+
+/* complex */
+DEFINE_PUBLIC_ALIAS(DOS$cabsf, libd_cabsf);
+DEFINE_PUBLIC_ALIAS(DOS$cexpf, libd_cexpf);
+DEFINE_PUBLIC_ALIAS(DOS$clogf, libd_clogf);
+DEFINE_PUBLIC_ALIAS(DOS$cpowf, libd_cpowf);
+DEFINE_PUBLIC_ALIAS(DOS$csqrtf, libd_csqrtf);
+DEFINE_PUBLIC_ALIAS(DOS$csinf, libd_csinf);
+DEFINE_PUBLIC_ALIAS(DOS$ccosf, libd_ccosf);
+DEFINE_PUBLIC_ALIAS(DOS$ctanf, libd_ctanf);
+DEFINE_PUBLIC_ALIAS(DOS$casinf, libd_casinf);
+DEFINE_PUBLIC_ALIAS(DOS$cacosf, libd_cacosf);
+DEFINE_PUBLIC_ALIAS(DOS$catanf, libd_catanf);
+DEFINE_PUBLIC_ALIAS(DOS$csinhf, libd_csinhf);
+DEFINE_PUBLIC_ALIAS(DOS$ccoshf, libd_ccoshf);
+DEFINE_PUBLIC_ALIAS(DOS$ctanhf, libd_ctanhf);
+DEFINE_PUBLIC_ALIAS(DOS$casinhf, libd_casinhf);
+DEFINE_PUBLIC_ALIAS(DOS$cacoshf, libd_cacoshf);
+DEFINE_PUBLIC_ALIAS(DOS$catanhf, libd_catanhf);
+DEFINE_PUBLIC_ALIAS(DOS$cargf, libd_cargf);
+DEFINE_PUBLIC_ALIAS(DOS$conjf, libd_conjf);
+DEFINE_PUBLIC_ALIAS(DOS$crealf, libd_crealf);
+DEFINE_PUBLIC_ALIAS(DOS$cimagf, libd_cimagf);
+DEFINE_PUBLIC_ALIAS(DOS$cprojf, libd_cprojf);
+DEFINE_PUBLIC_ALIAS(DOS$cabs, libd_cabs);
+DEFINE_PUBLIC_ALIAS(DOS$cexp, libd_cexp);
+DEFINE_PUBLIC_ALIAS(DOS$clog, libd_clog);
+DEFINE_PUBLIC_ALIAS(DOS$cpow, libd_cpow);
+DEFINE_PUBLIC_ALIAS(DOS$csqrt, libd_csqrt);
+DEFINE_PUBLIC_ALIAS(DOS$csin, libd_csin);
+DEFINE_PUBLIC_ALIAS(DOS$ccos, libd_ccos);
+DEFINE_PUBLIC_ALIAS(DOS$ctan, libd_ctan);
+DEFINE_PUBLIC_ALIAS(DOS$casin, libd_casin);
+DEFINE_PUBLIC_ALIAS(DOS$cacos, libd_cacos);
+DEFINE_PUBLIC_ALIAS(DOS$catan, libd_catan);
+DEFINE_PUBLIC_ALIAS(DOS$csinh, libd_csinh);
+DEFINE_PUBLIC_ALIAS(DOS$ccosh, libd_ccosh);
+DEFINE_PUBLIC_ALIAS(DOS$ctanh, libd_ctanh);
+DEFINE_PUBLIC_ALIAS(DOS$casinh, libd_casinh);
+DEFINE_PUBLIC_ALIAS(DOS$cacosh, libd_cacosh);
+DEFINE_PUBLIC_ALIAS(DOS$catanh, libd_catanh);
+DEFINE_PUBLIC_ALIAS(DOS$carg, libd_carg);
+DEFINE_PUBLIC_ALIAS(DOS$conj, libd_conj);
+DEFINE_PUBLIC_ALIAS(DOS$creal, libd_creal);
+DEFINE_PUBLIC_ALIAS(DOS$cimag, libd_cimag);
+DEFINE_PUBLIC_ALIAS(DOS$cproj, libd_cproj);
+DEFINE_PUBLIC_ALIAS(DOS$cabsl, libd_cabsl);
+DEFINE_PUBLIC_ALIAS(DOS$cexpl, libd_cexpl);
+DEFINE_PUBLIC_ALIAS(DOS$clogl, libd_clogl);
+DEFINE_PUBLIC_ALIAS(DOS$cpowl, libd_cpowl);
+DEFINE_PUBLIC_ALIAS(DOS$csqrtl, libd_csqrtl);
+DEFINE_PUBLIC_ALIAS(DOS$csinl, libd_csinl);
+DEFINE_PUBLIC_ALIAS(DOS$ccosl, libd_ccosl);
+DEFINE_PUBLIC_ALIAS(DOS$ctanl, libd_ctanl);
+DEFINE_PUBLIC_ALIAS(DOS$casinl, libd_casinl);
+DEFINE_PUBLIC_ALIAS(DOS$cacosl, libd_cacosl);
+DEFINE_PUBLIC_ALIAS(DOS$catanl, libd_catanl);
+DEFINE_PUBLIC_ALIAS(DOS$csinhl, libd_csinhl);
+DEFINE_PUBLIC_ALIAS(DOS$ccoshl, libd_ccoshl);
+DEFINE_PUBLIC_ALIAS(DOS$ctanhl, libd_ctanhl);
+DEFINE_PUBLIC_ALIAS(DOS$casinhl, libd_casinhl);
+DEFINE_PUBLIC_ALIAS(DOS$cacoshl, libd_cacoshl);
+DEFINE_PUBLIC_ALIAS(DOS$catanhl, libd_catanhl);
+DEFINE_PUBLIC_ALIAS(DOS$cargl, libd_cargl);
+DEFINE_PUBLIC_ALIAS(DOS$conjl, libd_conjl);
+DEFINE_PUBLIC_ALIAS(DOS$creall, libd_creall);
+DEFINE_PUBLIC_ALIAS(DOS$cimagl, libd_cimagl);
+DEFINE_PUBLIC_ALIAS(DOS$cprojl, libd_cprojl);
 
 /* crypt */
 DEFINE_PUBLIC_ALIAS(DOS$setkey, libd_setkey);

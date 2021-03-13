@@ -24,6 +24,7 @@ _Noreturn
 _Thread_local
 __float128
 __float80
+complex
 _Complex
 _Decimal32
 _Decimal64

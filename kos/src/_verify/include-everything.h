@@ -244,6 +244,7 @@ incdir("");
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadtypesizes.h>
 #include <bits/crt/semaphore.h>
+#include <bits/crt/setjmp.h>
 #include <bits/crt/stdio.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/crt/threads.h>
@@ -426,6 +427,7 @@ incdir("");
 #include <compat/pointer.h>
 #include <compat/signal.h>
 #include <compat/sys/ucontext.h>
+#include <complex.h>
 #include <corecrt.h>
 #include <cpio.h>
 #include <crtdbg.h>
@@ -842,9 +844,11 @@ incdir("");
 #include <linux/limits.h>
 #include <linux/magic.h>
 #include <linux/msdos_fs.h>
+#include <linux/net.h>
 #include <linux/param.h>
 #include <linux/pci.h>
 #include <linux/posix_types.h>
+#include <linux/socket.h>
 #include <linux/sockios.h>
 #include <linux/stddef.h>
 #include <linux/sysinfo.h>
@@ -1109,6 +1113,7 @@ incdir("");
 #include <tar.h>
 #include <termio.h>
 #include <termios.h>
+#include <tgmath.h>
 #include <threads.h>
 #include <time.h>
 #include <ttyent.h>

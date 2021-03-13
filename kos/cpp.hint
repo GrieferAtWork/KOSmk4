@@ -13,6 +13,7 @@
 #define typeof decltype
 #define __typeof decltype
 #define __typeof__ decltype
+#define complex
 #define _Complex
 #define __complex
 #define __complex__
