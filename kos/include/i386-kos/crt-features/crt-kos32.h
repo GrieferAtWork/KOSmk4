@@ -3324,6 +3324,8 @@
 #define __CRT_HAVE_strtod_l
 #define __CRT_HAVE_strtof
 #define __CRT_HAVE_strtof_l
+#define __CRT_HAVE_strtoi
+#define __CRT_HAVE_strtoi_l
 #define __CRT_HAVE_strtoimax
 #define __CRT_HAVE_strtoimax_l
 #define __CRT_HAVE_strtok
@@ -3337,10 +3339,12 @@
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtoq
 #define __CRT_HAVE_strtosigno
+#define __CRT_HAVE_strtou
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
 #define __CRT_HAVE_strtou64
 #define __CRT_HAVE_strtou64_l
+#define __CRT_HAVE_strtou_l
 #define __CRT_HAVE_strtoul
 #define __CRT_HAVE_strtoul_l
 #define __CRT_HAVE_strtoull

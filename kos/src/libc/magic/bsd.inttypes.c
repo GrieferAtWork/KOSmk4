@@ -32,8 +32,8 @@ __SYSDECL_BEGIN
 
 }
 
-//TODO:%[insert:extern(strtoi)]
-//TODO:%[insert:extern(strtou)]
+%[insert:extern(strtoi)]
+%[insert:extern(strtou)]
 
 %{
 

@@ -252,8 +252,14 @@
 #define _ATFILE_SOURCE 1
 #undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
+#if !defined(_POSIX_C_SOURCE) || (_POSIX_C_SOURCE + 0 < 200809L)
+#undef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif /* _POSIX_C_SOURCE < 200809L */
+#if !defined(_XOPEN_SOURCE) || (_XOPEN_SOURCE + 0 < 700)
 #undef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
+#endif /* _XOPEN_SOURCE < 200809L */
 #endif /* _NETBSD_SOURCE */
 
 /* Make available some BSD-specific extensions such as `cfmakesane()' */
@@ -303,11 +309,11 @@
 #define _ISOC11_SOURCE 1
 #undef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
-#if !defined(_POSIX_C_SOURCE) || ((_POSIX_C_SOURCE + 0) < 200809L)
+#if !defined(_POSIX_C_SOURCE) || (_POSIX_C_SOURCE + 0 < 200809L)
 #undef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #endif /* _POSIX_C_SOURCE < 200809L */
-#if !defined(_XOPEN_SOURCE) || ((_XOPEN_SOURCE + 0) < 700)
+#if !defined(_XOPEN_SOURCE) || (_XOPEN_SOURCE + 0 < 700)
 #undef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
 #endif /* _XOPEN_SOURCE < 200809L */

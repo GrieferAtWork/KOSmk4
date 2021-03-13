@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ceeb9ef */
+/* HASH CRC-32:0x9c344d63 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,6 +72,110 @@ INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBDCALL libd_wcstoimax_l)(ch
 INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBDCALL libd_wcstoumax_l)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBDCALL libd_strtoi)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, intmax_t lo, intmax_t hi, errno_t *rstatus);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBCCALL libc_strtoi)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, intmax_t lo, intmax_t hi, errno_t *rstatus);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBDCALL libd_strtou)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, uintmax_t lo, uintmax_t hi, errno_t *rstatus);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBCCALL libc_strtou)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, uintmax_t lo, uintmax_t hi, errno_t *rstatus);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBDCALL libd_strtoi_l)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, intmax_t lo, intmax_t hi, errno_t *rstatus, locale_t locale);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBCCALL libc_strtoi_l)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, intmax_t lo, intmax_t hi, errno_t *rstatus, locale_t locale);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBDCALL libd_strtou_l)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, uintmax_t lo, uintmax_t hi, errno_t *rstatus, locale_t locale);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBCCALL libc_strtou_l)(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, uintmax_t lo, uintmax_t hi, errno_t *rstatus, locale_t locale);
 #endif /* !__KERNEL__ */
 
 DECL_END

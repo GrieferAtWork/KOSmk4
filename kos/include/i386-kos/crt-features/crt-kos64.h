@@ -3178,6 +3178,8 @@
 #define __CRT_HAVE_strtod_l
 #define __CRT_HAVE_strtof
 #define __CRT_HAVE_strtof_l
+#define __CRT_HAVE_strtoi
+#define __CRT_HAVE_strtoi_l
 #define __CRT_HAVE_strtoimax
 #define __CRT_HAVE_strtoimax_l
 #define __CRT_HAVE_strtok
@@ -3191,10 +3193,12 @@
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtoq
 #define __CRT_HAVE_strtosigno
+#define __CRT_HAVE_strtou
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
 #define __CRT_HAVE_strtou64
 #define __CRT_HAVE_strtou64_l
+#define __CRT_HAVE_strtou_l
 #define __CRT_HAVE_strtoul
 #define __CRT_HAVE_strtoul_l
 #define __CRT_HAVE_strtoull
@@ -7422,6 +7426,8 @@
 #define __CRT_HAVE_KOS$strtod_l
 #define __CRT_HAVE_KOS$strtof
 #define __CRT_HAVE_KOS$strtof_l
+#define __CRT_HAVE_KOS$strtoi
+#define __CRT_HAVE_KOS$strtoi_l
 #define __CRT_HAVE_KOS$strtoimax
 #define __CRT_HAVE_KOS$strtoimax_l
 #define __CRT_HAVE_KOS$strtok
@@ -7435,10 +7441,12 @@
 #define __CRT_HAVE_KOS$strtoll_l
 #define __CRT_HAVE_KOS$strtoq
 #define __CRT_HAVE_KOS$strtosigno
+#define __CRT_HAVE_KOS$strtou
 #define __CRT_HAVE_KOS$strtou32
 #define __CRT_HAVE_KOS$strtou32_l
 #define __CRT_HAVE_KOS$strtou64
 #define __CRT_HAVE_KOS$strtou64_l
+#define __CRT_HAVE_KOS$strtou_l
 #define __CRT_HAVE_KOS$strtoul
 #define __CRT_HAVE_KOS$strtoul_l
 #define __CRT_HAVE_KOS$strtoull
@@ -10849,6 +10857,8 @@
 #define __CRT_HAVE_DOS$strtod_l
 #define __CRT_HAVE_DOS$strtof
 #define __CRT_HAVE_DOS$strtof_l
+#define __CRT_HAVE_DOS$strtoi
+#define __CRT_HAVE_DOS$strtoi_l
 #define __CRT_HAVE_DOS$strtoimax
 #define __CRT_HAVE_DOS$strtoimax_l
 #define __CRT_HAVE_DOS$strtok
@@ -10862,10 +10872,12 @@
 #define __CRT_HAVE_DOS$strtoll_l
 #define __CRT_HAVE_DOS$strtoq
 #define __CRT_HAVE_DOS$strtosigno
+#define __CRT_HAVE_DOS$strtou
 #define __CRT_HAVE_DOS$strtou32
 #define __CRT_HAVE_DOS$strtou32_l
 #define __CRT_HAVE_DOS$strtou64
 #define __CRT_HAVE_DOS$strtou64_l
+#define __CRT_HAVE_DOS$strtou_l
 #define __CRT_HAVE_DOS$strtoul
 #define __CRT_HAVE_DOS$strtoul_l
 #define __CRT_HAVE_DOS$strtoull

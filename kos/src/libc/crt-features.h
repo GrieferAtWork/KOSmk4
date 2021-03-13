@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98c4f5b6 */
+/* HASH CRC-32:0x591e60ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2474,6 +2474,8 @@
 #define __CRT_HAVE_DOS$strtod_l
 #define __CRT_HAVE_DOS$strtof
 #define __CRT_HAVE_DOS$strtof_l
+#define __CRT_HAVE_DOS$strtoi
+#define __CRT_HAVE_DOS$strtoi_l
 #define __CRT_HAVE_DOS$strtoimax
 #define __CRT_HAVE_DOS$strtoimax_l
 #define __CRT_HAVE_DOS$strtok
@@ -2485,10 +2487,12 @@
 #define __CRT_HAVE_DOS$strtoll
 #define __CRT_HAVE_DOS$strtoll_l
 #define __CRT_HAVE_DOS$strtosigno
+#define __CRT_HAVE_DOS$strtou
 #define __CRT_HAVE_DOS$strtou32
 #define __CRT_HAVE_DOS$strtou32_l
 #define __CRT_HAVE_DOS$strtou64
 #define __CRT_HAVE_DOS$strtou64_l
+#define __CRT_HAVE_DOS$strtou_l
 #define __CRT_HAVE_DOS$strtoul
 #define __CRT_HAVE_DOS$strtoul_l
 #define __CRT_HAVE_DOS$strtoull
@@ -5577,6 +5581,8 @@
 #define __CRT_HAVE_strtod_l
 #define __CRT_HAVE_strtof
 #define __CRT_HAVE_strtof_l
+#define __CRT_HAVE_strtoi
+#define __CRT_HAVE_strtoi_l
 #define __CRT_HAVE_strtoimax
 #define __CRT_HAVE_strtoimax_l
 #define __CRT_HAVE_strtok
@@ -5588,6 +5594,7 @@
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtosigno
+#define __CRT_HAVE_strtou
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strtou32
 #ifndef __KERNEL__
@@ -5596,6 +5603,7 @@
 #define __CRT_HAVE_strtou64
 #ifndef __KERNEL__
 #define __CRT_HAVE_strtou64_l
+#define __CRT_HAVE_strtou_l
 #define __CRT_HAVE_strtoul
 #define __CRT_HAVE_strtoul_l
 #define __CRT_HAVE_strtoull

@@ -1057,10 +1057,10 @@ socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
  *       are still allowed to throw anything (which may be necessary in  case
  *       reading/writing buffer sizes requires a lock, meaning that acquiring
  *       said lock might result in E_WOULDBLOCK) */
-FUNDEF size_t KCALL socket_getrcvbuf(struct socket *__restrict self);
-FUNDEF void KCALL socket_setrcvbuf(struct socket *__restrict self, size_t bufsiz);
-FUNDEF size_t KCALL socket_getsndbuf(struct socket *__restrict self);
-FUNDEF void KCALL socket_setsndbuf(struct socket *__restrict self, size_t bufsiz);
+FUNDEF NONNULL((1)) size_t KCALL socket_getrcvbuf(struct socket *__restrict self);
+FUNDEF NONNULL((1)) void KCALL socket_setrcvbuf(struct socket *__restrict self, size_t bufsiz);
+FUNDEF NONNULL((1)) size_t KCALL socket_getsndbuf(struct socket *__restrict self);
+FUNDEF NONNULL((1)) void KCALL socket_setsndbuf(struct socket *__restrict self, size_t bufsiz);
 
 
 

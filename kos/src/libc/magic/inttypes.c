@@ -57,9 +57,9 @@
 #include <stdint.h>
 )]%{
 
-#ifdef __USE_DOS
+#if defined(__USE_DOS) || defined(__USE_NETBSD)
 #include <xlocale.h>
-#endif /* __USE_DOS */
+#endif /* __USE_DOS || __USE_NETBSD */
 
 
 /* printf(): (u)int8_t */
@@ -589,7 +589,6 @@ $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
 %
 %
 
-%#ifdef __USE_KOS
 %#ifdef __USE_XOPEN2K8
 
 [[ATTR_LEAF, dos_only_export_alias("_strtoimax_l"), section(".text.crt{|.dos}.unicode.locale.convert")]]
@@ -651,7 +650,236 @@ $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
 
 
 %#endif /* __USE_XOPEN2K8 */
-%#endif /* __USE_KOS */
+
+
+%
+%
+%
+%#ifdef __USE_NETBSD
+
+@@>> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+@@Safely convert `nptr' to an integer which is then returned.
+@@If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+@@If non-`NULL', `*endptr' is made to point past the read integer, and if
+@@it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+@@Also make sure that the returned integer lies within the
+@@bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+@@to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+@@@param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+@@@param: rstatus: When non-`NULL', set to a conversion error (if any)
+[[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[guard, impl_include("<libc/errno.h>")]]
+$intmax_t strtoi([[nonnull]] char const *__restrict nptr,
+                 [[nullable]] char **__restrict endptr,
+                 __STDC_INT_AS_UINT_T base,
+                 $intmax_t lo, $intmax_t hi,
+                 [[nullable]] $errno_t *rstatus) {
+	char *used_endptr;
+	intmax_t result;
+	result = strtoimax(nptr, &used_endptr, base);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+@@pp_ifdef ECANCELED@@
+			*rstatus = ECANCELED;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (*used_endptr != '\0') {
+@@pp_ifdef ENOTSUP@@
+			*rstatus = ENOTSUP;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (result < lo) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = lo;
+		} else if (result > hi) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
+
+[[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>"), doc_alias("strtoi")]]
+[[guard, impl_include("<libc/errno.h>")]]
+$uintmax_t strtou([[nonnull]] char const *__restrict nptr,
+                  [[nullable]] char **__restrict endptr,
+                  __STDC_INT_AS_UINT_T base,
+                  $uintmax_t lo, $uintmax_t hi,
+                  [[nullable]] $errno_t *rstatus) {
+	char *used_endptr;
+	uintmax_t result;
+	result = strtoumax(nptr, &used_endptr, base);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+@@pp_ifdef ECANCELED@@
+			*rstatus = ECANCELED;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (*used_endptr != '\0') {
+@@pp_ifdef ENOTSUP@@
+			*rstatus = ENOTSUP;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (result < lo) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = lo;
+		} else if (result > hi) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
+
+[[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>"), doc_alias("strtoi")]]
+[[impl_include("<libc/errno.h>")]]
+$intmax_t strtoi_l([[nonnull]] char const *__restrict nptr,
+                   [[nullable]] char **__restrict endptr,
+                   __STDC_INT_AS_UINT_T base,
+                   $intmax_t lo, $intmax_t hi,
+                   [[nullable]] $errno_t *rstatus, $locale_t locale) {
+	char *used_endptr;
+	intmax_t result;
+	result = strtoimax_l(nptr, &used_endptr, base, locale);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+@@pp_ifdef ECANCELED@@
+			*rstatus = ECANCELED;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (*used_endptr != '\0') {
+@@pp_ifdef ENOTSUP@@
+			*rstatus = ENOTSUP;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (result < lo) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = lo;
+		} else if (result > hi) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
+
+[[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>"), doc_alias("strtoi")]]
+[[impl_include("<libc/errno.h>")]]
+$uintmax_t strtou_l([[nonnull]] char const *__restrict nptr,
+                    [[nullable]] char **__restrict endptr,
+                    __STDC_INT_AS_UINT_T base,
+                    $uintmax_t lo, $uintmax_t hi,
+                    [[nullable]] $errno_t *rstatus, $locale_t locale) {
+	char *used_endptr;
+	uintmax_t result;
+	result = strtoumax_l(nptr, &used_endptr, base, locale);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+@@pp_ifdef ECANCELED@@
+			*rstatus = ECANCELED;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (*used_endptr != '\0') {
+@@pp_ifdef ENOTSUP@@
+			*rstatus = ENOTSUP;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+		} else if (result < lo) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = lo;
+		} else if (result > hi) {
+@@pp_ifdef ERANGE@@
+			*rstatus = ERANGE;
+@@pp_else@@
+			*rstatus = 1;
+@@pp_endif@@
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
+%#endif /* __USE_NETBSD */
+
 
 
 %

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95716839 */
+/* HASH CRC-32:0x649ab98f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,6 +151,256 @@ NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstoumax(nptr, endptr, base);
 }
+#include <libc/errno.h>
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBCCALL libc_strtoi)(char const *__restrict nptr,
+                                  char **__restrict endptr,
+                                  __STDC_INT_AS_UINT_T base,
+                                  intmax_t lo,
+                                  intmax_t hi,
+                                  errno_t *rstatus) {
+	char *used_endptr;
+	intmax_t result;
+	result = libc_strtoimax(nptr, &used_endptr, base);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+#ifdef ECANCELED
+			*rstatus = ECANCELED;
+#else /* ECANCELED */
+			*rstatus = 1;
+#endif /* !ECANCELED */
+		} else if (*used_endptr != '\0') {
+#ifdef ENOTSUP
+			*rstatus = ENOTSUP;
+#else /* ENOTSUP */
+			*rstatus = 1;
+#endif /* !ENOTSUP */
+		} else if (result < lo) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = lo;
+		} else if (result > hi) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
+#include <libc/errno.h>
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBCCALL libc_strtou)(char const *__restrict nptr,
+                                  char **__restrict endptr,
+                                  __STDC_INT_AS_UINT_T base,
+                                  uintmax_t lo,
+                                  uintmax_t hi,
+                                  errno_t *rstatus) {
+	char *used_endptr;
+	uintmax_t result;
+	result = libc_strtoumax(nptr, &used_endptr, base);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+#ifdef ECANCELED
+			*rstatus = ECANCELED;
+#else /* ECANCELED */
+			*rstatus = 1;
+#endif /* !ECANCELED */
+		} else if (*used_endptr != '\0') {
+#ifdef ENOTSUP
+			*rstatus = ENOTSUP;
+#else /* ENOTSUP */
+			*rstatus = 1;
+#endif /* !ENOTSUP */
+		} else if (result < lo) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = lo;
+		} else if (result > hi) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
+#include <libc/errno.h>
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBCCALL libc_strtoi_l)(char const *__restrict nptr,
+                                    char **__restrict endptr,
+                                    __STDC_INT_AS_UINT_T base,
+                                    intmax_t lo,
+                                    intmax_t hi,
+                                    errno_t *rstatus,
+                                    locale_t locale) {
+	char *used_endptr;
+	intmax_t result;
+	result = libc_strtoimax_l(nptr, &used_endptr, base, locale);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+#ifdef ECANCELED
+			*rstatus = ECANCELED;
+#else /* ECANCELED */
+			*rstatus = 1;
+#endif /* !ECANCELED */
+		} else if (*used_endptr != '\0') {
+#ifdef ENOTSUP
+			*rstatus = ENOTSUP;
+#else /* ENOTSUP */
+			*rstatus = 1;
+#endif /* !ENOTSUP */
+		} else if (result < lo) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = lo;
+		} else if (result > hi) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
+#include <libc/errno.h>
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBCCALL libc_strtou_l)(char const *__restrict nptr,
+                                    char **__restrict endptr,
+                                    __STDC_INT_AS_UINT_T base,
+                                    uintmax_t lo,
+                                    uintmax_t hi,
+                                    errno_t *rstatus,
+                                    locale_t locale) {
+	char *used_endptr;
+	uintmax_t result;
+	result = libc_strtoumax_l(nptr, &used_endptr, base, locale);
+	if (endptr)
+		*endptr = used_endptr;
+	if (rstatus) {
+		if (used_endptr == nptr) {
+#ifdef ECANCELED
+			*rstatus = ECANCELED;
+#else /* ECANCELED */
+			*rstatus = 1;
+#endif /* !ECANCELED */
+		} else if (*used_endptr != '\0') {
+#ifdef ENOTSUP
+			*rstatus = ENOTSUP;
+#else /* ENOTSUP */
+			*rstatus = 1;
+#endif /* !ENOTSUP */
+		} else if (result < lo) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = lo;
+		} else if (result > hi) {
+#ifdef ERANGE
+			*rstatus = ERANGE;
+#else /* ERANGE */
+			*rstatus = 1;
+#endif /* !ERANGE */
+			result = hi;
+		} else {
+			*rstatus = 0;
+		}
+	} else {
+		if (result < lo) {
+			result = lo;
+		} else if (result > hi) {
+			result = hi;
+		}
+	}
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -178,6 +428,10 @@ DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcstoimax_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstoumax_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstoumax_l);
 DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstoumax_l);
+DEFINE_PUBLIC_ALIAS(strtoi, libc_strtoi);
+DEFINE_PUBLIC_ALIAS(strtou, libc_strtou);
+DEFINE_PUBLIC_ALIAS(strtoi_l, libc_strtoi_l);
+DEFINE_PUBLIC_ALIAS(strtou_l, libc_strtou_l);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_INTTYPES_C */

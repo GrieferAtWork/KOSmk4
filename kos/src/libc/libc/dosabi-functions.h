@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x330a7ba1 */
+/* HASH CRC-32:0x5df358e1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -303,6 +303,10 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_strtoimax, libc_strtoimax, TIn
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoumax, libc_strtoumax, TIn(__SIZEOF_INTMAX_T__), 3, TP, TP, TD)
 DFUN(".text.crt.dos.unicode.locale.convert", libd_strtoimax_l, libc_strtoimax_l, TIn(__SIZEOF_INTMAX_T__), 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.locale.convert", libd_strtoumax_l, libc_strtoumax_l, TIn(__SIZEOF_INTMAX_T__), 4, TP, TP, TD, TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtoi, libc_strtoi, TIn(__SIZEOF_INTMAX_T__), 6, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtou, libc_strtou, TIn(__SIZEOF_INTMAX_T__), 6, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtoi_l, libc_strtoi_l, TIn(__SIZEOF_INTMAX_T__), 7, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP, TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtou_l, libc_strtou_l, TIn(__SIZEOF_INTMAX_T__), 7, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP, TP)
 
 /* io */
 DFUN(".text.crt.dos.fs.property", libd__access_s, libc__access_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TD)

@@ -1940,7 +1940,7 @@ socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
  *       are still allowed to throw anything (which may be necessary in  case
  *       reading/writing buffer sizes requires a lock, meaning that acquiring
  *       said lock might result in E_WOULDBLOCK) */
-PUBLIC size_t KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 socket_getrcvbuf(struct socket *__restrict self) {
 	size_t result = SOCKET_RCVBUFMIN;
 	if (self->sk_ops->so_getrcvbuf)
@@ -1948,7 +1948,7 @@ socket_getrcvbuf(struct socket *__restrict self) {
 	return result;
 }
 
-PUBLIC void KCALL
+PUBLIC NONNULL((1)) void KCALL
 socket_setrcvbuf(struct socket *__restrict self, size_t bufsiz) {
 	if (self->sk_ops->so_setrcvbuf) {
 		assertf(self->sk_ops->so_getrcvbuf, "Setter, but no getter?");
@@ -1956,7 +1956,7 @@ socket_setrcvbuf(struct socket *__restrict self, size_t bufsiz) {
 	}
 }
 
-PUBLIC size_t KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 socket_getsndbuf(struct socket *__restrict self) {
 	size_t result = 0;
 	if (self->sk_ops->so_getsndbuf)
@@ -1964,7 +1964,7 @@ socket_getsndbuf(struct socket *__restrict self) {
 	return result;
 }
 
-PUBLIC void KCALL
+PUBLIC NONNULL((1)) void KCALL
 socket_setsndbuf(struct socket *__restrict self, size_t bufsiz) {
 	if (self->sk_ops->so_setsndbuf) {
 		assertf(self->sk_ops->so_getsndbuf, "Setter, but no getter?");
