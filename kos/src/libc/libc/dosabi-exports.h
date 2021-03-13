@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d8b93a6 */
+/* HASH CRC-32:0xdcce55af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1504,6 +1504,7 @@ DEFINE_PUBLIC_ALIAS(DOS$sigignore, libd_sigignore);
 DEFINE_PUBLIC_ALIAS(DOS$sigset, libd_sigset);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_kill, libd_pthread_kill);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_sigqueue, libd_pthread_sigqueue);
+DEFINE_PUBLIC_ALIAS(DOS$signalnext, libd_signalnext);
 
 /* spawn */
 DEFINE_PUBLIC_ALIAS(DOS$posix_fspawn_np, libd_posix_fspawn_np);
@@ -2374,6 +2375,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_strupr_s_l, libd__strupr_s_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strnset_s, libd__strnset_s);
 DEFINE_PUBLIC_ALIAS(DOS$strnstr, libd_strnstr);
 DEFINE_PUBLIC_ALIAS(DOS$strmode, libd_strmode);
+DEFINE_PUBLIC_ALIAS(DOS$signalnumber, libd_strtosigno);
 DEFINE_PUBLIC_ALIAS(DOS$strtosigno, libd_strtosigno);
 
 /* stringlist */

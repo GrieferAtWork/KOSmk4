@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7201a3b */
+/* HASH CRC-32:0xd8675e32 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2310,6 +2310,48 @@ __LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigdelset)(struct __s
 #define __sigmask(sig) __sigset_mask(sig)
 #define __sigword(sig) __sigset_word(sig)
 #endif /* __USE_GLIBC */
+
+#ifdef __USE_NETBSD
+#ifdef __CRT_HAVE_strsignal_s
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,signalname,(__signo_t __signum),strsignal_s,(__signum))
+#elif defined(__CRT_HAVE_signalname)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,signalname,(__signo_t __signum),(__signum))
+#else /* ... */
+#include <libc/local/string/strsignal_s.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL signalname)(__signo_t __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal_s))(__signum); }
+#endif /* !... */
+#ifdef __CRT_HAVE_strtosigno
+/* >> strtosigno(3)
+ * Return the signal number for a given name.
+ * e.g. `strtosigno("SIGINT") == SIGINT' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,signalnumber,(const char *__name),strtosigno,(__name))
+#elif defined(__CRT_HAVE_signalnumber)
+/* >> strtosigno(3)
+ * Return the signal number for a given name.
+ * e.g. `strtosigno("SIGINT") == SIGINT' */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,signalnumber,(const char *__name),(__name))
+#else /* ... */
+#include <libc/local/string/strtosigno.h>
+/* >> strtosigno(3)
+ * Return the signal number for a given name.
+ * e.g. `strtosigno("SIGINT") == SIGINT' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t __NOTHROW_NCX(__LIBCCALL signalnumber)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); }
+#endif /* !... */
+#ifdef __CRT_HAVE_signalnext
+/* >> signalnext(3)
+ * Return the next-greater signal number that comes after `signo'
+ * When no such signal number exists, return `0'. When the given
+ * `signo' is `0', return the lowest valid signal number. */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,signalnext,(__signo_t __signo),(__signo))
+#else /* __CRT_HAVE_signalnext */
+#include <libc/local/signal/signalnext.h>
+/* >> signalnext(3)
+ * Return the next-greater signal number that comes after `signo'
+ * When no such signal number exists, return `0'. When the given
+ * `signo' is `0', return the lowest valid signal number. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(signalnext, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL signalnext)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signalnext))(__signo); })
+#endif /* !__CRT_HAVE_signalnext */
+#endif /* __USE_NETBSD */
 
 #endif /* __CC__ */
 

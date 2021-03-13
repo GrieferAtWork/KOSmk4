@@ -3159,6 +3159,9 @@
 #define __CRT_HAVE_siglongjmp
 #define __CRT_HAVE_signal
 #define __CRT_HAVE_signalfd
+#define __CRT_HAVE_signalname
+#define __CRT_HAVE_signalnext
+#define __CRT_HAVE_signalnumber
 #define __CRT_HAVE_signandset
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
@@ -5057,6 +5060,7 @@
 #define __CRT_HAVE_KOS$putwchar_unlocked
 #define __CRT_HAVE_KOS$raise
 #define __CRT_HAVE_KOS$signal
+#define __CRT_HAVE_KOS$signalname
 #define __CRT_HAVE_KOS$ssignal
 #define __CRT_HAVE_KOS$stat
 #define __CRT_HAVE_KOS$stat64
@@ -5554,6 +5558,7 @@
 #define __CRT_HAVE_DOS$putwchar_unlocked
 #define __CRT_HAVE_DOS$raise
 #define __CRT_HAVE_DOS$signal
+#define __CRT_HAVE_DOS$signalname
 #define __CRT_HAVE_DOS$ssignal
 #define __CRT_HAVE_DOS$stat
 #define __CRT_HAVE_DOS$stat64

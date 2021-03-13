@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42c236dc */
+/* HASH CRC-32:0xc2b9d539 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,12 +160,17 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),strsignal_s,(__signum))
-#else /* __CRT_HAVE_strsignal_s */
+#elif defined(__CRT_HAVE_signalname)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),signalname,(__signum))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strsignal_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !__CRT_HAVE_strsignal_s */
+#endif /* !... */
 #endif /* !__local___localdep_strsignal_s_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/inttypes.h>

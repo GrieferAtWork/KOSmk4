@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6459a8a6 */
+/* HASH CRC-32:0xb710804b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5260,6 +5260,7 @@ DEFINE_PUBLIC_ALIAS(_strupr_s_l, libc__strupr_s_l);
 DEFINE_PUBLIC_ALIAS(_strnset_s, libc__strnset_s);
 DEFINE_PUBLIC_ALIAS(strnstr, libc_strnstr);
 DEFINE_PUBLIC_ALIAS(strmode, libc_strmode);
+DEFINE_PUBLIC_ALIAS(signalnumber, libc_strtosigno);
 DEFINE_PUBLIC_ALIAS(strtosigno, libc_strtosigno);
 #endif /* !__KERNEL__ */
 

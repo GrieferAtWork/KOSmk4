@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xede1f5a8 */
+/* HASH CRC-32:0x9323722c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -927,6 +927,16 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
 	return __SIGRTMAX;
 }
+/* >> signalnext(3)
+ * Return the next-greater signal number that comes after `signo'
+ * When no such signal number exists, return `0'. When the given
+ * `signo' is `0', return the lowest valid signal number. */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
+NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {
+	if (signo >= (__NSIG - 1))
+		return 0;
+	return signo + 1;
+}
 #endif /* !__KERNEL__ */
 #undef __libc_current_sigrtmin
 #undef __libc_current_sigrtmax
@@ -974,6 +984,7 @@ DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
 DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
+DEFINE_PUBLIC_ALIAS(signalnext, libc_signalnext);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SIGNAL_C */

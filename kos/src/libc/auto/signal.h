@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5d4919d */
+/* HASH CRC-32:0x1d7a2465 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -544,7 +544,19 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t pthread, signo_
  * @return: EINVAL: The given `signo' is invalid
  * @return: ESRCH:  The given `pthread' has already terminated, and could no longer handle the signal */
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t pthread, signo_t signo, union sigval const val);
+/* >> signalnext(3)
+ * Return the next-greater signal number that comes after `signo'
+ * When no such signal number exists, return `0'. When the given
+ * `signo' is `0', return the lowest valid signal number. */
+INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBDCALL libd_signalnext)(signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> signalnext(3)
+ * Return the next-greater signal number that comes after `signo'
+ * When no such signal number exists, return `0'. When the given
+ * `signo' is `0', return the lowest valid signal number. */
+INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

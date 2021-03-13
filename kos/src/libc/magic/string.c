@@ -5324,7 +5324,7 @@ char const *strerrorname_s($errno_t errnum) {
 	return result;
 }
 
-[[decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>"), export_alias("signalname")]]
 [[wunused, nothrow, ATTR_CONST, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
@@ -7323,6 +7323,7 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 @@Return the signal number for a given name.
 @@e.g. `strtosigno("SIGINT") == SIGINT'
 [[wunused, pure, impl_include("<asm/os/signal.h>")]]
+[[export_alias("signalnumber")]]
 $signo_t strtosigno([[nonnull]] const char *name) {
 	$signo_t i, result = 0;
 	if likely(name) {

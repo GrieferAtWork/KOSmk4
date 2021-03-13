@@ -2671,6 +2671,25 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 #endif /* __USE_GLIBC */
 }
 
+
+%
+%#ifdef __USE_NETBSD
+%[insert:function(signalname = strsignal_s)]
+%[insert:function(signalnumber = strtosigno)]
+
+@@>> signalnext(3)
+@@Return the next-greater signal number that comes after `signo'
+@@When no such signal number exists, return `0'. When the given
+@@`signo' is `0', return the lowest valid signal number.
+[[wunused, const, impl_include("<asm/os/signal.h>")]]
+$signo_t signalnext($signo_t signo) {
+	if (signo >= (__NSIG - 1))
+		return 0;
+	return signo + 1;
+}
+%#endif /* __USE_NETBSD */
+
+
 %
 %#endif /* __CC__ */
 %{
