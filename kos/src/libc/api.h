@@ -55,6 +55,7 @@
 #define _BSD_SOURCE             1
 #define _SVID_SOURCE            1
 #define _GNU_SOURCE             1
+#define _NETBSD_SOURCE          1
 #define _LARGEFILE_SOURCE       1
 #define __EXTENSIONS__          1
 

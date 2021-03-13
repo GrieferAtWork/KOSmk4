@@ -1914,6 +1914,43 @@ int pclose([[nonnull]] $FILE *stream);
 %#endif /* __USE_POSIX2 */
 
 %
+%#ifdef __USE_NETBSD
+%{
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
+}
+
+%[define(DEFINE_TARGV =
+@@pp_ifndef __TARGV@@
+@@pp_ifdef __USE_DOS@@
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+@@pp_else@@
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+@@pp_endif@@
+@@pp_endif@@
+)]
+
+@@>> popenve(3)
+@@Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
+@@this function will `execve(path, argv, envp)'. The returned FILE must still be
+@@closed using `pclose(3)', rather than `fclose(3)'
+[[cp, wunused, argument_names(path, ___argv, ___envp, modes)]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+FILE *popenve([[nonnull]] char const *path,
+              [[nonnull]] __TARGV, [[nonnull]] __TENVP,
+              [[nonnull]] char const *modes);
+%#endif /* __USE_NETBSD */
+
+%
 %#if (defined(__USE_MISC) || defined(__USE_DOS) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 

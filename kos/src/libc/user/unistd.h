@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdeb3d7a */
+/* HASH CRC-32:0x1ae2b807 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,9 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_environ)(void);
+#endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execve(2)
  * Replace the calling process with the application image referred to by `path' / `file'

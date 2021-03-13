@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2806c8fe */
+/* HASH CRC-32:0xa0aaae02 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2756,6 +2756,23 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pclose,(__FILE *__stream),(__st
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pclose,(__FILE *__stream),_pclose,(__stream))
 #endif /* ... */
 #endif /* __USE_POSIX2 */
+
+#ifdef __USE_NETBSD
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
+/* >> popenve(3)
+ * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
+ * this function will `execve(path, argv, envp)'. The returned FILE must still be
+ * closed using `pclose(3)', rather than `fclose(3)' */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3, 4)),FILE *,__NOTHROW_RPC,popenve,(char const *__path, __TARGV, __TENVP, char const *__modes),(__path,___argv,___envp,__modes))
+#endif /* __USE_NETBSD */
 
 #if (defined(__USE_MISC) || defined(__USE_DOS) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))

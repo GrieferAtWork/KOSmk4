@@ -2660,6 +2660,7 @@
 #define __CRT_HAVE_popcountl
 #define __CRT_HAVE_popcountll
 #define __CRT_HAVE_popen
+#define __CRT_HAVE_popenve
 #define __CRT_HAVE_posix_fadvise
 #define __CRT_HAVE_posix_fadvise64
 #define __CRT_HAVE_posix_fallocate

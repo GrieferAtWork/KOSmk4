@@ -3152,6 +3152,28 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
 }
 /*[[[end:libc_popen]]]*/
 
+/*[[[head:libc_popenve,hash:CRC-32=0x48cd2d34]]]*/
+/* >> popenve(3)
+ * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
+ * this function will `execve(path, argv, envp)'. The returned FILE must still be
+ * closed using `pclose(3)', rather than `fclose(3)' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2, 3, 4)) FILE *
+NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path,
+                                   __TARGV,
+                                   __TENVP,
+                                   char const *modes)
+/*[[[body:libc_popenve]]]*/
+/*AUTO*/{
+	(void)path;
+	(void)___argv;
+	(void)___envp;
+	(void)modes;
+	CRT_UNIMPLEMENTEDF("popenve(%q, %p, %p, %q)", path, ___argv, ___envp, modes); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_popenve]]]*/
+
 /*[[[impl:libc_pclose]]]*/
 DEFINE_INTERN_ALIAS(libc_pclose, libc_fclose);
 
@@ -3776,7 +3798,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x22e3ad77]]]*/
+/*[[[start:exports,hash:CRC-32=0x815dd6e0]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3880,6 +3902,7 @@ DEFINE_PUBLIC_ALIAS(popen, libc_popen);
 DEFINE_PUBLIC_ALIAS(_pclose, libc_pclose);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(pclose, libc_pclose);
+DEFINE_PUBLIC_ALIAS(popenve, libc_popenve);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fcloseall, libc_fcloseall);
 #endif /* __LIBCCALL_IS_LIBDCALL */

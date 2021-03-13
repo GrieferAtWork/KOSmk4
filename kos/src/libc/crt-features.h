@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa666603d */
+/* HASH CRC-32:0x6e2cf589 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1836,6 +1836,7 @@
 #define __CRT_HAVE_DOS$popcountl
 #define __CRT_HAVE_DOS$popcountll
 #define __CRT_HAVE_DOS$popen
+#define __CRT_HAVE_DOS$popenve
 #define __CRT_HAVE_DOS$posix_fadvise
 #define __CRT_HAVE_DOS$posix_fadvise64
 #define __CRT_HAVE_DOS$posix_fallocate
@@ -4904,6 +4905,7 @@
 #define __CRT_HAVE_popcountl
 #define __CRT_HAVE_popcountll
 #define __CRT_HAVE_popen
+#define __CRT_HAVE_popenve
 #define __CRT_HAVE_posix_fadvise
 #define __CRT_HAVE_posix_fadvise64
 #define __CRT_HAVE_posix_fallocate

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30fd6050 */
+/* HASH CRC-32:0x69db1a2a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -468,6 +468,11 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_popen)(char const
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pclose)(FILE *stream);
+/* >> popenve(3)
+ * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
+ * this function will `execve(path, argv, envp)'. The returned FILE must still be
+ * closed using `pclose(3)', rather than `fclose(3)' */
+INTDEF WUNUSED NONNULL((1, 2, 3, 4)) FILE *NOTHROW_RPC(LIBDCALL libd_popenve)(char const *path, __TARGV, __TENVP, char const *modes);
 /* >> getw(3)
  * Similar to `getc()', but read 2 bytes */
 INTDEF NONNULL((1)) int (LIBDCALL libd_getw)(FILE *__restrict stream) THROWS(...);

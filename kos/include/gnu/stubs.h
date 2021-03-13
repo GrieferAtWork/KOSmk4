@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x360cc40 */
+/* HASH CRC-32:0x6dbae44c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -382,6 +382,7 @@
 #endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub__IO_popen
 #define __stub_popen
+#define __stub_popenve
 #define __stub_posix_fadvise64
 #define __stub_posix_fallocate64
 #define __stub_posix_openpt

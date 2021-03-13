@@ -2514,6 +2514,7 @@
 #define __CRT_HAVE_popcountl
 #define __CRT_HAVE_popcountll
 #define __CRT_HAVE_popen
+#define __CRT_HAVE_popenve
 #define __CRT_HAVE_posix_fadvise
 #define __CRT_HAVE_posix_fadvise64
 #define __CRT_HAVE_posix_fallocate
@@ -6802,6 +6803,7 @@
 #define __CRT_HAVE_KOS$popcountl
 #define __CRT_HAVE_KOS$popcountll
 #define __CRT_HAVE_KOS$popen
+#define __CRT_HAVE_KOS$popenve
 #define __CRT_HAVE_KOS$posix_fadvise
 #define __CRT_HAVE_KOS$posix_fadvise64
 #define __CRT_HAVE_KOS$posix_fallocate
@@ -10236,6 +10238,7 @@
 #define __CRT_HAVE_DOS$popcountl
 #define __CRT_HAVE_DOS$popcountll
 #define __CRT_HAVE_DOS$popen
+#define __CRT_HAVE_DOS$popenve
 #define __CRT_HAVE_DOS$posix_fadvise
 #define __CRT_HAVE_DOS$posix_fadvise64
 #define __CRT_HAVE_DOS$posix_fallocate
