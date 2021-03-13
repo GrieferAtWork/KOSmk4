@@ -861,13 +861,46 @@ $errno_t pthread_attr_getscope([[nonnull]] pthread_attr_t const *__restrict attr
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_setscope([[nonnull]] pthread_attr_t *attr, int scope);
 
+
+/************************************************************************/
+/* Non-subsitutable CRT-variants used for local implementations         */
+/************************************************************************/
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[ignore, nocrt, alias("pthread_attr_getstackaddr"), doc_alias("pthread_attr_getstackaddr")]]
+$errno_t crt_pthread_attr_getstackaddr([[nonnull]] pthread_attr_t const *__restrict attr,
+                                       [[nonnull]] void **__restrict stackaddr);
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[ignore, nocrt, alias("pthread_attr_setstackaddr"), doc_alias("pthread_attr_setstackaddr")]]
+$errno_t crt_pthread_attr_setstackaddr([[nonnull]] pthread_attr_t *attr, void *stackaddr);
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[ignore, nocrt, alias("pthread_attr_getstacksize"), doc_alias("pthread_attr_getstacksize")]]
+$errno_t crt_pthread_attr_getstacksize([[nonnull]] pthread_attr_t const *__restrict attr,
+                                       [[nonnull]] size_t *__restrict stacksize);
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[ignore, nocrt, alias("pthread_attr_setstacksize"), doc_alias("pthread_attr_setstacksize")]]
+$errno_t crt_pthread_attr_setstacksize([[nonnull]] pthread_attr_t *attr, size_t stacksize);
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[ignore, nocrt, alias("pthread_attr_getstack"), doc_alias("pthread_attr_getstack")]]
+$errno_t crt_pthread_attr_getstack([[nonnull]] pthread_attr_t const *__restrict attr,
+                                   [[nonnull]] void **__restrict stackaddr,
+                                   [[nonnull]] size_t *__restrict stacksize);
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[ignore, nocrt, alias("pthread_attr_setstack"), doc_alias("pthread_attr_setstack")]]
+$errno_t crt_pthread_attr_setstack([[nonnull]] pthread_attr_t *attr, void *stackaddr, size_t stacksize);
+/************************************************************************/
+
+
 @@>> pthread_attr_getstackaddr(3)
 @@Return the previously set address for the stack
 @@@return: EOK: Success
 [[deprecated("Use pthread_attr_getstack()")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[userimpl, requires_function(crt_pthread_attr_getstack)]]
 $errno_t pthread_attr_getstackaddr([[nonnull]] pthread_attr_t const *__restrict attr,
-                                   [[nonnull]] void **__restrict stackaddr);
+                                   [[nonnull]] void **__restrict stackaddr) {
+	size_t stacksize;
+	return crt_pthread_attr_getstack(attr, stackaddr, &stacksize);
+}
 
 
 @@>> pthread_attr_setstackaddr(3)
@@ -879,14 +912,31 @@ $errno_t pthread_attr_getstackaddr([[nonnull]] pthread_attr_t const *__restrict 
 @@@return: EINVAL: The stack isn't suitably aligned
 [[deprecated("Use pthread_attr_setstack()")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setstackaddr([[nonnull]] pthread_attr_t *attr, void *stackaddr);
+[[userimpl, requires_function(pthread_attr_getstack, crt_pthread_attr_setstack)]]
+$errno_t pthread_attr_setstackaddr([[nonnull]] pthread_attr_t *attr, void *stackaddr) {
+	errno_t result;
+	size_t stacksize;
+@@pp_if $has_function(crt_pthread_attr_getstacksize)@@
+	result = crt_pthread_attr_getstacksize(attr, &stacksize);
+@@pp_else@@
+	void *_old_stackaddr;
+	result = pthread_attr_getstack(attr, &_old_stackaddr, &stacksize);
+@@pp_endif@@
+	if likely(result == 0)
+		result = crt_pthread_attr_setstack(attr, stackaddr, stacksize);
+	return result;
+}
 
 @@>> pthread_attr_getstacksize(3)
 @@Return the currently used minimal stack size
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[userimpl, requires_function(crt_pthread_attr_getstack)]]
 $errno_t pthread_attr_getstacksize([[nonnull]] pthread_attr_t const *__restrict attr,
-                                   [[nonnull]] size_t *__restrict stacksize);
+                                   [[nonnull]] size_t *__restrict stacksize) {
+	void *stackaddr;
+	return crt_pthread_attr_getstack(attr, &stackaddr, stacksize);
+}
 
 @@>> pthread_attr_setstacksize(3)
 @@Add information about the minimum stack size needed for the thread
@@ -895,16 +945,37 @@ $errno_t pthread_attr_getstacksize([[nonnull]] pthread_attr_t const *__restrict 
 @@@return: EOK:    Success
 @@@return: EINVAL: `stacksize' is too small
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setstacksize([[nonnull]] pthread_attr_t *attr, size_t stacksize);
+[[userimpl, requires_function(pthread_attr_getstack, crt_pthread_attr_setstack)]]
+$errno_t pthread_attr_setstacksize([[nonnull]] pthread_attr_t *attr, size_t stacksize) {
+	errno_t result;
+	void *stackaddr;
+@@pp_if $has_function(crt_pthread_attr_getstackaddr)@@
+	result = crt_pthread_attr_getstackaddr(attr, &stackaddr);
+@@pp_else@@
+	size_t _old_stacksize;
+	result = pthread_attr_getstack(attr, &stackaddr, &_old_stacksize);
+@@pp_endif@@
+	if likely(result == 0)
+		result = crt_pthread_attr_setstack(attr, stackaddr, stacksize);
+	return result;
+}
 
 %#ifdef __USE_XOPEN2K
 @@>> pthread_attr_getstack(3)
 @@Return the previously set address for the stack
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[userimpl, requires_function(crt_pthread_attr_getstackaddr, crt_pthread_attr_getstacksize)]]
 $errno_t pthread_attr_getstack([[nonnull]] pthread_attr_t const *__restrict attr,
                                [[nonnull]] void **__restrict stackaddr,
-                               [[nonnull]] size_t *__restrict stacksize);
+                               [[nonnull]] size_t *__restrict stacksize) {
+	errno_t result;
+	result = crt_pthread_attr_getstackaddr(attr, stackaddr);
+	if likely(result == 0)
+		result = crt_pthread_attr_getstacksize(attr, stacksize);
+	return result;
+}
+
 
 @@>> pthread_attr_setstack(3)
 @@The following two interfaces are intended to replace the last two. They
@@ -913,7 +984,15 @@ $errno_t pthread_attr_getstack([[nonnull]] pthread_attr_t const *__restrict attr
 @@@return: EOK:    Success
 @@@return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setstack([[nonnull]] pthread_attr_t *attr, void *stackaddr, size_t stacksize);
+[[userimpl, requires_function(crt_pthread_attr_setstackaddr, crt_pthread_attr_setstacksize)]]
+$errno_t pthread_attr_setstack([[nonnull]] pthread_attr_t *attr,
+                               void *stackaddr, size_t stacksize) {
+	errno_t result;
+	result = crt_pthread_attr_setstackaddr(attr, stackaddr);
+	if likely(result == 0)
+		result = crt_pthread_attr_setstacksize(attr, stacksize);
+	return result;
+}
 %#endif /* __USE_XOPEN2K */
 
 %#ifdef __USE_GNU
@@ -997,6 +1076,7 @@ $errno_t pthread_setschedprio(pthread_t target_thread, int prio);
 @@Get thread name visible in the kernel and its interfaces
 @@@return: EOK:    Success
 @@@return: ERANGE: The given `buflen' is too small
+[[export_alias("pthread_get_name_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_getname_np(pthread_t target_thread,
                             [[outp(buflen)]] char *buf,
@@ -1006,6 +1086,7 @@ $errno_t pthread_getname_np(pthread_t target_thread,
 @@Set thread name visible in the kernel and its interfaces
 @@@return: EOK:    Success
 @@@return: ERANGE: The given `name' is too long
+[[export_alias("pthread_set_name_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_setname_np(pthread_t target_thread,
                             [[nonnull]] const char *name);
@@ -1631,6 +1712,7 @@ $errno_t pthread_mutexattr_setpshared([[nonnull]] pthread_mutexattr_t *attr, int
 @@>> pthread_mutexattr_gettype(3)
 @@Return in `*kind' the mutex kind attribute in `*attr'
 @@@return: EOK: Success
+[[export_alias("pthread_mutexattr_getkind_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_mutexattr_gettype([[nonnull]] pthread_mutexattr_t const *__restrict attr,
                                    [[nonnull]] int *__restrict kind);
@@ -1640,6 +1722,7 @@ $errno_t pthread_mutexattr_gettype([[nonnull]] pthread_mutexattr_t const *__rest
 @@`PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `kind'
+[[export_alias("pthread_mutexattr_setkind_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_mutexattr_settype([[nonnull]] pthread_mutexattr_t *attr, int kind);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
@@ -2579,7 +2662,7 @@ $errno_t pthread_set_num_processors_np(int n) {
 @@calling program), and 0 otherwise. Additionally, -1 is returned
 @@if the calling thread "hasn't been initialized", though this
 @@isn't a case that can actually happen under KOS's implementation.
-[[const, nothrow, export_alias("thr_main")]]
+[[const, nothrow, guard, export_alias("thr_main")]]
 [[requires_function(gettid, getpid)]]
 int pthread_main_np() {
 	return gettid() == getpid();

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73fdf4fc */
+/* HASH CRC-32:0xbd843710 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1313,7 +1313,9 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_getattr_np, libd_pthread_getattr_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setschedparam, libd_pthread_setschedparam);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getschedparam, libd_pthread_getschedparam);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setschedprio, libd_pthread_setschedprio);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_get_name_np, libd_pthread_getname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getname_np, libd_pthread_getname_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_set_name_np, libd_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setname_np, libd_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_gettid_np, libd_pthread_gettid_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setconcurrency, libd_pthread_setconcurrency);
@@ -1348,7 +1350,9 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_init, libd_pthread_mutexattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_destroy, libd_pthread_mutexattr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getpshared, libd_pthread_mutexattr_getpshared);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setpshared, libd_pthread_mutexattr_setpshared);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getkind_np, libd_pthread_mutexattr_gettype);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_gettype, libd_pthread_mutexattr_gettype);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setkind_np, libd_pthread_mutexattr_settype);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_settype, libd_pthread_mutexattr_settype);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getprotocol, libd_pthread_mutexattr_getprotocol);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setprotocol, libd_pthread_mutexattr_setprotocol);
@@ -1417,6 +1421,9 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_setspecific, libd_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getcpuclockid, libd_pthread_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_atfork, libd_pthread_atfork);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_set_num_processors_np, libd_pthread_set_num_processors_np);
+
+/* pthread_np */
+DEFINE_PUBLIC_ALIAS(DOS$pthread_stackseg_np, libd_pthread_stackseg_np);
 
 /* pty */
 DEFINE_PUBLIC_ALIAS(DOS$openpty, libd_openpty);

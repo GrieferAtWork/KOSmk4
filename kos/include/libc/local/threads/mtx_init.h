@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1d20be9 */
+/* HASH CRC-32:0xa0c4810e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,8 +63,9 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutexattr_init,(__pthread_mutexattr_t *__attr),pthread_mutexattr_init,(__attr))
 #endif /* !__local___localdep_pthread_mutexattr_init_defined && __CRT_HAVE_pthread_mutexattr_init */
 /* Dependency: pthread_mutexattr_settype from pthread */
-#if !defined(__local___localdep_pthread_mutexattr_settype_defined) && defined(__CRT_HAVE_pthread_mutexattr_settype)
+#ifndef __local___localdep_pthread_mutexattr_settype_defined
 #define __local___localdep_pthread_mutexattr_settype_defined 1
+#ifdef __CRT_HAVE_pthread_mutexattr_settype
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -75,7 +76,21 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutexattr_settype,(__pthread_mutexattr_t *__attr, int __kind),pthread_mutexattr_settype,(__attr,__kind))
-#endif /* !__local___localdep_pthread_mutexattr_settype_defined && __CRT_HAVE_pthread_mutexattr_settype */
+#elif defined(__CRT_HAVE_pthread_mutexattr_setkind_np)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> pthread_mutexattr_settype(3)
+ * Set the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `kind' */
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutexattr_settype,(__pthread_mutexattr_t *__attr, int __kind),pthread_mutexattr_setkind_np,(__attr,__kind))
+#else /* ... */
+#undef __local___localdep_pthread_mutexattr_settype_defined
+#endif /* !... */
+#endif /* !__local___localdep_pthread_mutexattr_settype_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <asm/crt/pthreadvalues.h>

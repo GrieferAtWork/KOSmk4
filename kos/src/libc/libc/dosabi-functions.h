@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcdf1da3 */
+/* HASH CRC-32:0xdbdd1ee4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1120,6 +1120,9 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_setspecific, libc_pthread_setsp
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_getcpuclockid, libc_pthread_getcpuclockid, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_atfork, libc_pthread_atfork, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
 DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_set_num_processors_np, libc_pthread_set_num_processors_np, TIn(__SIZEOF_ERRNO_T__), 1, TD)
+
+/* pthread_np */
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_stackseg_np, libc_pthread_stackseg_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
 
 /* pty */
 DFUN(".text.crt.dos.io.tty", libd_openpty, libc_openpty, TD, 5, TP, TP, TP, TP, TP)

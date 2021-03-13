@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9aa9fdfb */
+/* HASH CRC-32:0x99acffb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -811,10 +811,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getsc
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `scope' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setscope,(pthread_attr_t *__attr, int __scope),(__attr,__scope))
+#ifdef __CRT_HAVE_pthread_attr_getstackaddr
 /* >> pthread_attr_getstackaddr(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getstackaddr,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr),(__attr,__stackaddr))
+__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getstackaddr,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr),(__attr,__stackaddr))
+#elif defined(__CRT_HAVE_pthread_attr_getstack)
+#include <libc/local/pthread/pthread_attr_getstackaddr.h>
+/* >> pthread_attr_getstackaddr(3)
+ * Return the previously set address for the stack
+ * @return: EOK: Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstackaddr)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstackaddr))(__attr, __stackaddr); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_attr_setstackaddr
 /* >> pthread_attr_setstackaddr(3)
  * Set the starting address of the stack of the thread to be created.
  * Depending on whether the stack grows up or down the value must either
@@ -822,30 +831,79 @@ __CDECLARE_OPT(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstackaddr,(pthread_attr_t *__attr, void *__stackaddr),(__attr,__stackaddr))
+__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstackaddr,(pthread_attr_t *__attr, void *__stackaddr),(__attr,__stackaddr))
+#elif (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
+#include <libc/local/pthread/pthread_attr_setstackaddr.h>
+/* >> pthread_attr_setstackaddr(3)
+ * Set the starting address of the stack of the thread to be created.
+ * Depending on whether the stack grows up or down the value must either
+ * be higher or lower than all the address in the memory block. The
+ * minimal size of the block must be `PTHREAD_STACK_MIN'
+ * @return: EOK:    Success
+ * @return: EINVAL: The stack isn't suitably aligned */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstackaddr)(pthread_attr_t *__attr, void *__stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstackaddr))(__attr, __stackaddr); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_attr_getstacksize
 /* >> pthread_attr_getstacksize(3)
  * Return the currently used minimal stack size
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getstacksize,(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize),(__attr,__stacksize))
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getstacksize,(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize),(__attr,__stacksize))
+#elif defined(__CRT_HAVE_pthread_attr_getstack)
+#include <libc/local/pthread/pthread_attr_getstacksize.h>
+/* >> pthread_attr_getstacksize(3)
+ * Return the currently used minimal stack size
+ * @return: EOK: Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstacksize)(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstacksize))(__attr, __stacksize); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_attr_setstacksize
 /* >> pthread_attr_setstacksize(3)
  * Add information about the minimum stack size needed for the thread
  * to be started. This size must never be less than `PTHREAD_STACK_MIN'
  * and must also not exceed the system limits
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstacksize,(pthread_attr_t *__attr, size_t __stacksize),(__attr,__stacksize))
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstacksize,(pthread_attr_t *__attr, size_t __stacksize),(__attr,__stacksize))
+#elif (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
+#include <libc/local/pthread/pthread_attr_setstacksize.h>
+/* >> pthread_attr_setstacksize(3)
+ * Add information about the minimum stack size needed for the thread
+ * to be started. This size must never be less than `PTHREAD_STACK_MIN'
+ * and must also not exceed the system limits
+ * @return: EOK:    Success
+ * @return: EINVAL: `stacksize' is too small */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstacksize)(pthread_attr_t *__attr, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstacksize))(__attr, __stacksize); })
+#endif /* ... */
 #ifdef __USE_XOPEN2K
+#ifdef __CRT_HAVE_pthread_attr_getstack
 /* >> pthread_attr_getstack(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,pthread_attr_getstack,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, size_t *__restrict __stacksize),(__attr,__stackaddr,__stacksize))
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,pthread_attr_getstack,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, size_t *__restrict __stacksize),(__attr,__stackaddr,__stacksize))
+#elif defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)
+#include <libc/local/pthread/pthread_attr_getstack.h>
+/* >> pthread_attr_getstack(3)
+ * Return the previously set address for the stack
+ * @return: EOK: Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstack)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstack))(__attr, __stackaddr, __stacksize); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_attr_setstack
 /* >> pthread_attr_setstack(3)
  * The following two interfaces are intended to replace the last two. They
  * require setting the address as well as the size since only setting the
  * address will make the implementation on some architectures impossible
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstack,(pthread_attr_t *__attr, void *__stackaddr, size_t __stacksize),(__attr,__stackaddr,__stacksize))
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstack,(pthread_attr_t *__attr, void *__stackaddr, size_t __stacksize),(__attr,__stackaddr,__stacksize))
+#elif defined(__CRT_HAVE_pthread_attr_setstackaddr) && defined(__CRT_HAVE_pthread_attr_setstacksize)
+#include <libc/local/pthread/pthread_attr_setstack.h>
+/* >> pthread_attr_setstack(3)
+ * The following two interfaces are intended to replace the last two. They
+ * require setting the address as well as the size since only setting the
+ * address will make the implementation on some architectures impossible
+ * @return: EOK:    Success
+ * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstack)(pthread_attr_t *__attr, void *__stackaddr, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstack))(__attr, __stackaddr, __stacksize); })
+#endif /* ... */
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_GNU
 /* >> pthread_attr_setaffinity_np(3)
@@ -902,16 +960,32 @@ __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),__errno_t,__NOTHROW_NCX,pthread_getschedpa
  * @return: EINVAL: Invalid/unsupported `prio' */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setschedprio,(pthread_t __target_thread, int __prio),(__target_thread,__prio))
 #ifdef __USE_GNU
+#ifdef __CRT_HAVE_pthread_getname_np
 /* >> pthread_getname_np(3)
  * Get thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `buflen' is too small */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __target_thread, char *__buf, size_t __buflen),(__target_thread,__buf,__buflen))
+__CDECLARE(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __target_thread, char *__buf, size_t __buflen),(__target_thread,__buf,__buflen))
+#elif defined(__CRT_HAVE_pthread_get_name_np)
+/* >> pthread_getname_np(3)
+ * Get thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `buflen' is too small */
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __target_thread, char *__buf, size_t __buflen),pthread_get_name_np,(__target_thread,__buf,__buflen))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_setname_np
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),(__target_thread,__name))
+__CDECLARE(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),(__target_thread,__name))
+#elif defined(__CRT_HAVE_pthread_set_name_np)
+/* >> pthread_setname_np(3)
+ * Set thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `name' is too long */
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),pthread_set_name_np,(__target_thread,__name))
+#endif /* ... */
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
 #if !defined(__pthread_gettid_np_defined) && defined(__CRT_HAVE_pthread_gettid_np)
@@ -1468,16 +1542,32 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_
  * @return: EINVAL: Invalid/unsupported `pshared' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setpshared,(pthread_mutexattr_t *__attr, int __pshared),(__attr,__pshared))
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+#ifdef __CRT_HAVE_pthread_mutexattr_gettype
 /* >> pthread_mutexattr_gettype(3)
  * Return in `*kind' the mutex kind attribute in `*attr'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __kind),(__attr,__kind))
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __kind),(__attr,__kind))
+#elif defined(__CRT_HAVE_pthread_mutexattr_getkind_np)
+/* >> pthread_mutexattr_gettype(3)
+ * Return in `*kind' the mutex kind attribute in `*attr'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __kind),pthread_mutexattr_getkind_np,(__attr,__kind))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_mutexattr_settype
 /* >> pthread_mutexattr_settype(3)
  * Set the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
  * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__attr, int __kind),(__attr,__kind))
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__attr, int __kind),(__attr,__kind))
+#elif defined(__CRT_HAVE_pthread_mutexattr_setkind_np)
+/* >> pthread_mutexattr_settype(3)
+ * Set the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `kind' */
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__attr, int __kind),pthread_mutexattr_setkind_np,(__attr,__kind))
+#endif /* ... */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 /* >> pthread_mutexattr_getprotocol(3)
  * Return in `*protocol' the mutex protocol attribute in `*attr'
@@ -2270,6 +2360,8 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_set_num_processors_np,(int __n),(__n
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(__n); })
 #endif /* ... */
 #ifdef __USE_BSD
+#ifndef __pthread_main_np_defined
+#define __pthread_main_np_defined 1
 #ifdef __CRT_HAVE_pthread_main_np
 /* >> pthread_main_np(3)
  * Returns 1 if the calling thread is the main() thread (i.e. the
@@ -2295,7 +2387,10 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
  * if the calling thread "hasn't been initialized", though this
  * isn't a case that can actually happen under KOS's implementation. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
-#endif /* ... */
+#else /* ... */
+#undef __pthread_main_np_defined
+#endif /* !... */
+#endif /* !__pthread_main_np_defined */
 #endif /* __USE_BSD */
 #endif /* __CC__ */
 

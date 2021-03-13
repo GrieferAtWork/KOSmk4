@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34710e5a */
+/* HASH CRC-32:0x80d547f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2085,6 +2085,7 @@
 #define __CRT_HAVE_DOS$pthread_spin_lock
 #define __CRT_HAVE_DOS$pthread_spin_trylock
 #define __CRT_HAVE_DOS$pthread_spin_unlock
+#define __CRT_HAVE_DOS$pthread_stackseg_np
 #define __CRT_HAVE_DOS$pthread_timedjoin64_np
 #define __CRT_HAVE_DOS$pthread_timedjoin_np
 #define __CRT_HAVE_DOS$pthread_tryjoin_np
@@ -5236,6 +5237,7 @@
 #define __CRT_HAVE_pthread_spin_lock
 #define __CRT_HAVE_pthread_spin_trylock
 #define __CRT_HAVE_pthread_spin_unlock
+#define __CRT_HAVE_pthread_stackseg_np
 #define __CRT_HAVE_pthread_testcancel
 #define __CRT_HAVE_pthread_timedjoin64_np
 #define __CRT_HAVE_pthread_timedjoin_np

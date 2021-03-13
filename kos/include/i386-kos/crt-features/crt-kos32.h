@@ -2838,6 +2838,7 @@
 #define __CRT_HAVE_pthread_detach
 #define __CRT_HAVE_pthread_equal
 #define __CRT_HAVE_pthread_exit
+#define __CRT_HAVE_pthread_get_name_np
 #define __CRT_HAVE_pthread_getaffinity_np
 #define __CRT_HAVE_pthread_getattr_default_np
 #define __CRT_HAVE_pthread_getattr_np
@@ -2867,6 +2868,7 @@
 #define __CRT_HAVE_pthread_mutex_trylock
 #define __CRT_HAVE_pthread_mutex_unlock
 #define __CRT_HAVE_pthread_mutexattr_destroy
+#define __CRT_HAVE_pthread_mutexattr_getkind_np
 #define __CRT_HAVE_pthread_mutexattr_getprioceiling
 #define __CRT_HAVE_pthread_mutexattr_getprotocol
 #define __CRT_HAVE_pthread_mutexattr_getpshared
@@ -2874,6 +2876,7 @@
 #define __CRT_HAVE_pthread_mutexattr_getrobust_np
 #define __CRT_HAVE_pthread_mutexattr_gettype
 #define __CRT_HAVE_pthread_mutexattr_init
+#define __CRT_HAVE_pthread_mutexattr_setkind_np
 #define __CRT_HAVE_pthread_mutexattr_setprioceiling
 #define __CRT_HAVE_pthread_mutexattr_setprotocol
 #define __CRT_HAVE_pthread_mutexattr_setpshared
@@ -2904,6 +2907,7 @@
 #define __CRT_HAVE_pthread_rwlockattr_setkind_np
 #define __CRT_HAVE_pthread_rwlockattr_setpshared
 #define __CRT_HAVE_pthread_self
+#define __CRT_HAVE_pthread_set_name_np
 #define __CRT_HAVE_pthread_set_num_processors_np
 #define __CRT_HAVE_pthread_setaffinity_np
 #define __CRT_HAVE_pthread_setattr_default_np
@@ -2921,6 +2925,7 @@
 #define __CRT_HAVE_pthread_spin_lock
 #define __CRT_HAVE_pthread_spin_trylock
 #define __CRT_HAVE_pthread_spin_unlock
+#define __CRT_HAVE_pthread_stackseg_np
 #define __CRT_HAVE_pthread_testcancel
 #define __CRT_HAVE_pthread_timedjoin64_np
 #define __CRT_HAVE_pthread_timedjoin_np
