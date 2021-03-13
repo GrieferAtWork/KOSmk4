@@ -2674,8 +2674,43 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 
 %
 %#ifdef __USE_NETBSD
-%[insert:function(signalname = strsignal_s)]
-%[insert:function(signalnumber = strtosigno)]
+@@>> signalname(3)
+@@Same as `strsignal_s(3)', but don't include the leading
+@@`SIG*' prefix normally prepended before the signal name.
+[[wunused, nothrow, const]]
+char const *signalname($signo_t signum) {
+	char const *result;
+	result = strsignal_s(signum);
+	if (result) {
+		if (result[0] == 'S' &&
+		    result[1] == 'I' &&
+		    result[2] == 'G')
+			result += 3;
+	}
+	return result;
+}
+
+@@>> signalnumber(3)
+@@Similar to `strtosigno(3)', however ignore any leading `SIG*'
+@@prefix of `name', and do a case-insensitive compare between
+@@the given `name', and the signal's actual name.
+@@When `name' isn't recognized, return `0' instead.
+[[wunused, pure, impl_include("<asm/os/signal.h>")]]
+$signo_t signalnumber([[nonnull]] const char *name) {
+	$signo_t i, result = 0;
+	if ((name[0] == 'S' || name[0] == 's') &&
+	    (name[1] == 'I' || name[1] == 'i') &&
+	    (name[2] == 'G' || name[2] == 'g'))
+		name += 3;
+	for (i = 1; i < __NSIG; ++i) {
+		char const *s = signalname(i);
+		if (likely(s) && strcasecmp(s, name) == 0) {
+			result = i;
+			break;
+		}
+	}
+	return result;
+}
 
 @@>> signalnext(3)
 @@Return the next-greater signal number that comes after `signo'

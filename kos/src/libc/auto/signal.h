@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d7a2465 */
+/* HASH CRC-32:0xa4c8e1de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -544,6 +544,34 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t pthread, signo_
  * @return: EINVAL: The given `signo' is invalid
  * @return: ESRCH:  The given `pthread' has already terminated, and could no longer handle the signal */
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t pthread, signo_t signo, union sigval const val);
+/* >> signalname(3)
+ * Same as `strsignal_s(3)', but don't include the leading
+ * `SIG*' prefix normally prepended before the signal name. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_signalname)(signo_t signum);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> signalname(3)
+ * Same as `strsignal_s(3)', but don't include the leading
+ * `SIG*' prefix normally prepended before the signal name. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_signalname)(signo_t signum);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> signalnumber(3)
+ * Similar to `strtosigno(3)', however ignore any leading `SIG*'
+ * prefix of `name', and do a case-insensitive compare between
+ * the given `name', and the signal's actual name.
+ * When `name' isn't recognized, return `0' instead. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumber)(const char *name);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> signalnumber(3)
+ * Similar to `strtosigno(3)', however ignore any leading `SIG*'
+ * prefix of `name', and do a case-insensitive compare between
+ * the given `name', and the signal's actual name.
+ * When `name' isn't recognized, return `0' instead. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> signalnext(3)
  * Return the next-greater signal number that comes after `signo'
  * When no such signal number exists, return `0'. When the given

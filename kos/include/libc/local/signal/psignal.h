@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcdd7b3d */
+/* HASH CRC-32:0xd064925f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,14 +93,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strsignal_s_defined 1
 #ifdef __CRT_HAVE_strsignal_s
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),strsignal_s,(__signum))
-#elif defined(__CRT_HAVE_signalname)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),signalname,(__signum))
-#else /* ... */
+#else /* __CRT_HAVE_strsignal_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strsignal_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !... */
+#endif /* !__CRT_HAVE_strsignal_s */
 #endif /* !__local___localdep_strsignal_s_defined */
 /* >> psignal(3)
  * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'

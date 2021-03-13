@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9323722c */
+/* HASH CRC-32:0x343c5bef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -927,6 +927,42 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
 	return __SIGRTMAX;
 }
+/* >> signalname(3)
+ * Same as `strsignal_s(3)', but don't include the leading
+ * `SIG*' prefix normally prepended before the signal name. */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBCCALL libc_signalname)(signo_t signum) {
+	char const *result;
+	result = libc_strsignal_s(signum);
+	if (result) {
+		if (result[0] == 'S' &&
+		    result[1] == 'I' &&
+		    result[2] == 'G')
+			result += 3;
+	}
+	return result;
+}
+/* >> signalnumber(3)
+ * Similar to `strtosigno(3)', however ignore any leading `SIG*'
+ * prefix of `name', and do a case-insensitive compare between
+ * the given `name', and the signal's actual name.
+ * When `name' isn't recognized, return `0' instead. */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) signo_t
+NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name) {
+	signo_t i, result = 0;
+	if ((name[0] == 'S' || name[0] == 's') &&
+	    (name[1] == 'I' || name[1] == 'i') &&
+	    (name[2] == 'G' || name[2] == 'g'))
+		name += 3;
+	for (i = 1; i < __NSIG; ++i) {
+		char const *s = libc_signalname(i);
+		if (likely(s) && libc_strcasecmp(s, name) == 0) {
+			result = i;
+			break;
+		}
+	}
+	return result;
+}
 /* >> signalnext(3)
  * Return the next-greater signal number that comes after `signo'
  * When no such signal number exists, return `0'. When the given
@@ -984,6 +1020,8 @@ DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
 DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
+DEFINE_PUBLIC_ALIAS(signalname, libc_signalname);
+DEFINE_PUBLIC_ALIAS(signalnumber, libc_signalnumber);
 DEFINE_PUBLIC_ALIAS(signalnext, libc_signalnext);
 #endif /* !__KERNEL__ */
 

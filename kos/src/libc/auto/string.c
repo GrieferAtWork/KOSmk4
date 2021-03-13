@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb710804b */
+/* HASH CRC-32:0x42ae73e1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4450,17 +4450,16 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 #include <asm/os/signal.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT' */
+ * e.g. `strtosigno("SIGINT") == SIGINT'
+ * When `name' isn't recognized, return `0' instead. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) signo_t
 NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name) {
 	signo_t i, result = 0;
-	if likely(name) {
-		for (i = 1; i < __NSIG; ++i) {
-			char const *s = libc_strsignal_s(i);
-			if (likely(s) && libc_strcmp(s, name) == 0) {
-				result = i;
-				break;
-			}
+	for (i = 1; i < __NSIG; ++i) {
+		char const *s = libc_strsignal_s(i);
+		if (likely(s) && libc_strcmp(s, name) == 0) {
+			result = i;
+			break;
 		}
 	}
 	return result;
@@ -5260,7 +5259,6 @@ DEFINE_PUBLIC_ALIAS(_strupr_s_l, libc__strupr_s_l);
 DEFINE_PUBLIC_ALIAS(_strnset_s, libc__strnset_s);
 DEFINE_PUBLIC_ALIAS(strnstr, libc_strnstr);
 DEFINE_PUBLIC_ALIAS(strmode, libc_strmode);
-DEFINE_PUBLIC_ALIAS(signalnumber, libc_strtosigno);
 DEFINE_PUBLIC_ALIAS(strtosigno, libc_strtosigno);
 #endif /* !__KERNEL__ */
 

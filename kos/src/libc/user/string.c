@@ -289,14 +289,12 @@ NOTHROW(LIBDCALL libd_strsignal_s)(signo_t signum)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf6ef7074]]]*/
+/*[[[start:exports,hash:CRC-32=0xd90888cf]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$strerror_s, libd_strerror_s);
 DEFINE_PUBLIC_ALIAS(strerror_s, libc_strerror_s);
 DEFINE_PUBLIC_ALIAS(DOS$strerrorname_s, libd_strerrorname_s);
 DEFINE_PUBLIC_ALIAS(strerrorname_s, libc_strerrorname_s);
-DEFINE_PUBLIC_ALIAS(DOS$signalname, libd_strsignal_s);
 DEFINE_PUBLIC_ALIAS(DOS$strsignal_s, libd_strsignal_s);
-DEFINE_PUBLIC_ALIAS(signalname, libc_strsignal_s);
 DEFINE_PUBLIC_ALIAS(strsignal_s, libc_strsignal_s);
 /*[[[end:exports]]]*/
 

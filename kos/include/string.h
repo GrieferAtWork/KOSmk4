@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3589cb6 */
+/* HASH CRC-32:0xbd18840b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6478,12 +6478,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_s, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE_strerrorname_s */
 #ifdef __CRT_HAVE_strsignal_s
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsignal_s,(__signo_t __signum),(__signum))
-#elif defined(__CRT_HAVE_signalname)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsignal_s,(__signo_t __signum),signalname,(__signum))
-#else /* ... */
+#else /* __CRT_HAVE_strsignal_s */
 #include <libc/local/string/strsignal_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strsignal_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strsignal_s)(__signo_t __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal_s))(__signum); })
-#endif /* !... */
+#endif /* !__CRT_HAVE_strsignal_s */
 #ifdef __CRT_HAVE_vstrdupf
 /* Print the given `format' into a newly allocated, heap-allocated string */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0),char *,__NOTHROW_NCX,vstrdupf,(char const *__restrict __format, __builtin_va_list __args),(__format,__args))
@@ -8725,20 +8723,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #ifdef __CRT_HAVE_strtosigno
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT' */
+ * e.g. `strtosigno("SIGINT") == SIGINT'
+ * When `name' isn't recognized, return `0' instead. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,strtosigno,(const char *__name),(__name))
-#elif defined(__CRT_HAVE_signalnumber)
-/* >> strtosigno(3)
- * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,strtosigno,(const char *__name),signalnumber,(__name))
-#else /* ... */
+#else /* __CRT_HAVE_strtosigno */
 #include <libc/local/string/strtosigno.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT' */
+ * e.g. `strtosigno("SIGINT") == SIGINT'
+ * When `name' isn't recognized, return `0' instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtosigno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t __NOTHROW_NCX(__LIBCCALL strtosigno)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); })
-#endif /* !... */
+#endif /* !__CRT_HAVE_strtosigno */
 #endif /* __USE_CYGWIN */
 
 #endif /* __CC__ */

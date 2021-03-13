@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64207e07 */
+/* HASH CRC-32:0x76047c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2375,13 +2375,15 @@ INTDEF NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode, char p[
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT' */
+ * e.g. `strtosigno("SIGINT") == SIGINT'
+ * When `name' isn't recognized, return `0' instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_strtosigno)(const char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT' */
+ * e.g. `strtosigno("SIGINT") == SIGINT'
+ * When `name' isn't recognized, return `0' instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name);
 #endif /* !__KERNEL__ */
 

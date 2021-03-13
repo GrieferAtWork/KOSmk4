@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d5dad4e */
+/* HASH CRC-32:0xaa17e97f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_strtosigno_defined
-#define __local_strtosigno_defined 1
+#ifndef __local_signalname_defined
+#define __local_signalname_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strcmp from string */
-#ifndef __local___localdep_strcmp_defined
-#define __local___localdep_strcmp_defined 1
-#if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
-#elif defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/strcmp.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-#define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
-#endif /* !... */
-#endif /* !__local___localdep_strcmp_defined */
 /* Dependency: strsignal_s from string */
 #ifndef __local___localdep_strsignal_s_defined
 #define __local___localdep_strsignal_s_defined 1
@@ -57,28 +37,24 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
 #endif /* !__CRT_HAVE_strsignal_s */
 #endif /* !__local___localdep_strsignal_s_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/os/signal.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> strtosigno(3)
- * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT'
- * When `name' isn't recognized, return `0' instead. */
-__LOCAL_LIBC(strtosigno) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtosigno))(const char *__name) {
-	__signo_t __i, __result = 0;
-	for (__i = 1; __i < __NSIG; ++__i) {
-		char const *__s = __localdep_strsignal_s(__i);
-		if (__likely(__s) && __localdep_strcmp(__s, __name) == 0) {
-			__result = __i;
-			break;
-		}
+/* >> signalname(3)
+ * Same as `strsignal_s(3)', but don't include the leading
+ * `SIG*' prefix normally prepended before the signal name. */
+__LOCAL_LIBC(signalname) __ATTR_CONST __ATTR_WUNUSED char const *
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(signalname))(__signo_t __signum) {
+	char const *__result;
+	__result = __localdep_strsignal_s(__signum);
+	if (__result) {
+		if (__result[0] == 'S' &&
+		    __result[1] == 'I' &&
+		    __result[2] == 'G')
+			__result += 3;
 	}
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_strtosigno_defined
-#define __local___localdep_strtosigno_defined 1
-#define __localdep_strtosigno __LIBC_LOCAL_NAME(strtosigno)
-#endif /* !__local___localdep_strtosigno_defined */
-#endif /* !__local_strtosigno_defined */
+#ifndef __local___localdep_signalname_defined
+#define __local___localdep_signalname_defined 1
+#define __localdep_signalname __LIBC_LOCAL_NAME(signalname)
+#endif /* !__local___localdep_signalname_defined */
+#endif /* !__local_signalname_defined */

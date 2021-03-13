@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ff69a9f */
+/* HASH CRC-32:0x67980f28 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,14 +100,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strsignal_s_defined 1
 #ifdef __CRT_HAVE_strsignal_s
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),strsignal_s,(__signum))
-#elif defined(__CRT_HAVE_signalname)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),signalname,(__signum))
-#else /* ... */
+#else /* __CRT_HAVE_strsignal_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strsignal_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !... */
+#endif /* !__CRT_HAVE_strsignal_s */
 #endif /* !__local___localdep_strsignal_s_defined */
 __LOCAL_LIBC(strsignal) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(__signo_t __signo) {
