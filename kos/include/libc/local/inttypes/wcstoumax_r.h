@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1b821a5 */
+/* HASH CRC-32:0x48cd1492 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_wcstoumax_r_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcstou32_r from wchar */
 #ifndef __local___localdep_wcstou32_r_defined
@@ -118,7 +119,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_wcstou64_r */
 #endif /* !__local___localdep_wcstou64_r_defined */
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <hybrid/limitcode.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN

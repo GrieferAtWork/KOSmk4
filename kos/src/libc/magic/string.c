@@ -1461,7 +1461,7 @@ void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 %#ifdef __USE_STRING_BWLQ
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[ATTR_LEAF, nocrt, alias("bzero", "__bzero", "explicit_bzero")]]
+[[nocrt, ATTR_LEAF, alias("bzero", "__bzero", "explicit_bzero")]]
 [[preferred_fastbind(bzero, ["bzero", "__bzero", "explicit_bzero"])]]
 [[bind_local_function("bzero")]]
 void bzerob([[nonnull]] void *__restrict dst, $size_t num_bytes);
@@ -1720,7 +1720,7 @@ void *memccpy([[nonnull]] void *__restrict dst,
 
 @@Copy memory between non-overlapping memory blocks.
 [[decl_include("<hybrid/typecore.h>")]]
-[[ATTR_LEAF, nocrt, alias("memcpy")]]
+[[nocrt, ATTR_LEAF, alias("memcpy")]]
 [[preferred_fastbind(($uint8_t *)memcpy(dst, src, n_bytes))]]
 [[bind_local_function("memcpy")]]
 memcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
@@ -1729,7 +1729,7 @@ memcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
 
 @@Same as `memcpyb', but return `dst + n_bytes', rather than `dst'
 [[decl_include("<hybrid/typecore.h>")]]
-[[ATTR_LEAF, nocrt, alias("mempcpy", "__mempcpy")]]
+[[nocrt, ATTR_LEAF, alias("mempcpy", "__mempcpy")]]
 [[preferred_fastbind(($uint8_t *)mempcpy(dst, src, n_bytes), ["mempcpy", "__mempcpy"])]]
 [[bind_local_function("mempcpy")]]
 mempcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
@@ -1813,7 +1813,7 @@ mempcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 
 
 @@Move memory between potentially overlapping memory blocks.
-[[ATTR_LEAF, nocrt, alias("memmove"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("memmove"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)memmove(dst, src, n_bytes))]]
 [[bind_local_function("memmove")]]
 memmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
@@ -1821,7 +1821,7 @@ memmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
           $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Same as `memmoveb', but return `dst + n_bytes', rather than `dst'
-[[ATTR_LEAF, nocrt, alias("mempmove"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("mempmove"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)mempmove(dst, src, n_bytes))]]
 [[bind_local_function("mempmove")]]
 mempmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
@@ -1922,7 +1922,7 @@ mempmovel:([[nonnull]] /*aligned(4)*/ void *dst,
 
 %#ifdef __USE_KOS
 @@Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !n_bytes')
-[[ATTR_LEAF, nocrt, alias("memmoveup"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("memmoveup"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)memmoveup(dst, src, n_bytes))]]
 [[bind_local_function("memmoveup")]]
 memmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
@@ -1930,7 +1930,7 @@ memmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
             $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !n_bytes')
-[[ATTR_LEAF, nocrt, alias("memmovedown"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("memmovedown"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)memmovedown(dst, src, n_bytes))]]
 [[bind_local_function("memmovedown")]]
 memmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
@@ -1938,7 +1938,7 @@ memmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
               $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Same as `memmoveb', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes')
-[[ATTR_LEAF, nocrt, alias("mempmoveup"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("mempmoveup"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)mempmoveup(dst, src, n_bytes))]]
 [[bind_local_function("mempmoveup")]]
 mempmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
@@ -1946,7 +1946,7 @@ mempmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
              $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t *;
 
 @@Same as `memmoveb', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes')
-[[ATTR_LEAF, nocrt, alias("mempmovedown"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("mempmovedown"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)mempmovedown(dst, src, n_bytes))]]
 [[bind_local_function("mempmovedown")]]
 mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
@@ -2133,14 +2133,14 @@ mempmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 
 @@Fill memory with a given byte
-[[ATTR_LEAF, nocrt, alias("memset"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("memset"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)memset(dst, byte, n_bytes))]]
 [[bind_local_function("memset")]]
 memsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
          int byte, $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Same as `memsetb', but return `dst + n_bytes', rather than `dst'
-[[ATTR_LEAF, nocrt, alias("mempset"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("mempset"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)mempset(dst, byte, n_bytes))]]
 [[bind_local_function("mempset")]]
 mempsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
@@ -4158,7 +4158,7 @@ void *memrmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]]
 
 
 @@Same as `memsetb', but repeat a 1-byte pattern on aligned addresses.
-[[ATTR_LEAF, nocrt, alias("memset"), decl_include("<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, alias("memset"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(memset(dst, pattern, n_bytes))]]
 [[bind_local_function("memset")]]
 mempatb:([[nonnull]] void *__restrict dst,

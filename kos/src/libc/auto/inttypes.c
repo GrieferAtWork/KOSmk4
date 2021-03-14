@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x649ab98f */
+/* HASH CRC-32:0x8534e7b5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -171,22 +171,18 @@ NOTHROW_NCX(LIBCCALL libc_strtoi)(char const *__restrict nptr,
                                   errno_t *rstatus) {
 	char *used_endptr;
 	intmax_t result;
-	result = libc_strtoimax(nptr, &used_endptr, base);
+	result = strtoimax_r(nptr, &used_endptr, base, rstatus);
 	if (endptr)
 		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-#ifdef ECANCELED
-			*rstatus = ECANCELED;
-#else /* ECANCELED */
-			*rstatus = 1;
-#endif /* !ECANCELED */
-		} else if (*used_endptr != '\0') {
+	if (rstatus && *rstatus == 0) {
+		if (*used_endptr != '\0') {
 #ifdef ENOTSUP
 			*rstatus = ENOTSUP;
-#else /* ENOTSUP */
+#elif defined(EINVAL)
+			*rstatus = EINVAL;
+#else /* ... */
 			*rstatus = 1;
-#endif /* !ENOTSUP */
+#endif /* !... */
 		} else if (result < lo) {
 #ifdef ERANGE
 			*rstatus = ERANGE;
@@ -233,22 +229,18 @@ NOTHROW_NCX(LIBCCALL libc_strtou)(char const *__restrict nptr,
                                   errno_t *rstatus) {
 	char *used_endptr;
 	uintmax_t result;
-	result = libc_strtoumax(nptr, &used_endptr, base);
+	result = strtoumax_r(nptr, &used_endptr, base, rstatus);
 	if (endptr)
 		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-#ifdef ECANCELED
-			*rstatus = ECANCELED;
-#else /* ECANCELED */
-			*rstatus = 1;
-#endif /* !ECANCELED */
-		} else if (*used_endptr != '\0') {
+	if (rstatus && *rstatus == 0) {
+		if (*used_endptr != '\0') {
 #ifdef ENOTSUP
 			*rstatus = ENOTSUP;
-#else /* ENOTSUP */
+#elif defined(EINVAL)
+			*rstatus = EINVAL;
+#else /* ... */
 			*rstatus = 1;
-#endif /* !ENOTSUP */
+#endif /* !... */
 		} else if (result < lo) {
 #ifdef ERANGE
 			*rstatus = ERANGE;
@@ -294,49 +286,8 @@ NOTHROW_NCX(LIBCCALL libc_strtoi_l)(char const *__restrict nptr,
                                     intmax_t hi,
                                     errno_t *rstatus,
                                     locale_t locale) {
-	char *used_endptr;
-	intmax_t result;
-	result = libc_strtoimax_l(nptr, &used_endptr, base, locale);
-	if (endptr)
-		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-#ifdef ECANCELED
-			*rstatus = ECANCELED;
-#else /* ECANCELED */
-			*rstatus = 1;
-#endif /* !ECANCELED */
-		} else if (*used_endptr != '\0') {
-#ifdef ENOTSUP
-			*rstatus = ENOTSUP;
-#else /* ENOTSUP */
-			*rstatus = 1;
-#endif /* !ENOTSUP */
-		} else if (result < lo) {
-#ifdef ERANGE
-			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
-			result = lo;
-		} else if (result > hi) {
-#ifdef ERANGE
-			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
-			result = hi;
-		} else {
-			*rstatus = 0;
-		}
-	} else {
-		if (result < lo) {
-			result = lo;
-		} else if (result > hi) {
-			result = hi;
-		}
-	}
-	return result;
+	(void)locale;
+	return libc_strtoi(nptr, endptr, base, lo, hi, rstatus);
 }
 #include <libc/errno.h>
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
@@ -357,49 +308,8 @@ NOTHROW_NCX(LIBCCALL libc_strtou_l)(char const *__restrict nptr,
                                     uintmax_t hi,
                                     errno_t *rstatus,
                                     locale_t locale) {
-	char *used_endptr;
-	uintmax_t result;
-	result = libc_strtoumax_l(nptr, &used_endptr, base, locale);
-	if (endptr)
-		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-#ifdef ECANCELED
-			*rstatus = ECANCELED;
-#else /* ECANCELED */
-			*rstatus = 1;
-#endif /* !ECANCELED */
-		} else if (*used_endptr != '\0') {
-#ifdef ENOTSUP
-			*rstatus = ENOTSUP;
-#else /* ENOTSUP */
-			*rstatus = 1;
-#endif /* !ENOTSUP */
-		} else if (result < lo) {
-#ifdef ERANGE
-			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
-			result = lo;
-		} else if (result > hi) {
-#ifdef ERANGE
-			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
-			result = hi;
-		} else {
-			*rstatus = 0;
-		}
-	} else {
-		if (result < lo) {
-			result = lo;
-		} else if (result > hi) {
-			result = hi;
-		}
-	}
-	return result;
+	(void)locale;
+	return libc_strtou(nptr, endptr, base, lo, hi, rstatus);
 }
 #endif /* !__KERNEL__ */
 

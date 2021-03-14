@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6699166c */
+/* HASH CRC-32:0x6e5f2687 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,66 +24,33 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtoumax from inttypes */
-#ifndef __local___localdep_strtoumax_defined
-#define __local___localdep_strtoumax_defined 1
-#ifdef __CRT_HAVE_strtoumax
+/* Dependency: strtoumax_r from inttypes */
+#ifndef __local___localdep_strtoumax_r_defined
+#define __local___localdep_strtoumax_r_defined 1
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoul) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoull) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtouq) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtouq,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtou64) && __SIZEOF_INTMAX_T__ == 8
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE__strtoui64) && __SIZEOF_INTMAX_T__ == 8
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoui64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtou32) && __SIZEOF_INTMAX_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou32,(__nptr,__endptr,__base))
+#if defined(__CRT_HAVE_strtou64_r) && __SIZEOF_INTMAX_T__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_strtou32_r) && __SIZEOF_INTMAX_T__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
 #elif __SIZEOF_INTMAX_T__ == 8
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/strtou64.h>
+#include <libc/local/stdlib/strtou64_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoumax (*(__UINTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou64))
+#define __localdep_strtoumax_r (*(__UINTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __errno_t *))&__LIBC_LOCAL_NAME(strtou64_r))
+#elif __SIZEOF_INTMAX_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/strtou32_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtoumax_r (*(__UINTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __errno_t *))&__LIBC_LOCAL_NAME(strtou32_r))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
+#include <libc/local/inttypes/strtoumax_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#if __SIZEOF_INTMAX_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/strtou32.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoumax (*(__UINTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou32))
-#else /* __SIZEOF_INTMAX_T__ == 4 */
-__NAMESPACE_LOCAL_END
-#include <libc/local/inttypes/strtoumax.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoumax __LIBC_LOCAL_NAME(strtoumax)
-#endif /* __SIZEOF_INTMAX_T__ != 4 */
+#define __localdep_strtoumax_r __LIBC_LOCAL_NAME(strtoumax_r)
 #endif /* !... */
-#endif /* !__local___localdep_strtoumax_defined */
+#endif /* !__local___localdep_strtoumax_r_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -101,22 +68,18 @@ __LOCAL_LIBC(strtou) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou))(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __UINTMAX_TYPE__ __lo, __UINTMAX_TYPE__ __hi, __errno_t *__rstatus) {
 	char *__used_endptr;
 	__UINTMAX_TYPE__ __result;
-	__result = __localdep_strtoumax(__nptr, &__used_endptr, __base);
+	__result = __localdep_strtoumax_r(__nptr, &__used_endptr, __base, __rstatus);
 	if (__endptr)
 		*__endptr = __used_endptr;
-	if (__rstatus) {
-		if (__used_endptr == __nptr) {
-#ifdef __ECANCELED
-			*__rstatus = __ECANCELED;
-#else /* __ECANCELED */
-			*__rstatus = 1;
-#endif /* !__ECANCELED */
-		} else if (*__used_endptr != '\0') {
+	if (__rstatus && *__rstatus == 0) {
+		if (*__used_endptr != '\0') {
 #ifdef __ENOTSUP
 			*__rstatus = __ENOTSUP;
-#else /* __ENOTSUP */
+#elif defined(__EINVAL)
+			*__rstatus = __EINVAL;
+#else /* ... */
 			*__rstatus = 1;
-#endif /* !__ENOTSUP */
+#endif /* !... */
 		} else if (__result < __lo) {
 #ifdef __ERANGE
 			*__rstatus = __ERANGE;

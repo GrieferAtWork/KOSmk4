@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a744f00 */
+/* HASH CRC-32:0x76deafe4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,86 +24,38 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtoimax_l from inttypes */
-#ifndef __local___localdep_strtoimax_l_defined
-#define __local___localdep_strtoimax_l_defined 1
-#ifdef __CRT_HAVE_strtoimax_l
+/* Dependency: strtoi from inttypes */
+#ifndef __local___localdep_strtoi_defined
+#define __local___localdep_strtoi_defined 1
+#ifdef __CRT_HAVE_strtoi
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoi,(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus),strtoi,(__nptr,__endptr,__base,__lo,__hi,__rstatus))
+#else /* __CRT_HAVE_strtoi */
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
+#include <libc/local/inttypes/strtoi.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtoimax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__strtoimax_l)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_strtoimax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_strtol_l) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtol_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__strtol_l) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_strtol_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___strtol_l) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtol_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_strtoll_l) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__strtoll_l) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_strtoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___strtoll_l) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_strto64_l) && __SIZEOF_INTMAX_T__ == 8
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strto64_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__strtoi64_l) && __SIZEOF_INTMAX_T__ == 8
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_strtoi64_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_strto32_l) && __SIZEOF_INTMAX_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strto32_l,(__nptr,__endptr,__base,__locale))
-#elif __SIZEOF_INTMAX_T__ == 8
-__NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/strto64_l.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoimax_l (*(__INTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __locale_t))&__LIBC_LOCAL_NAME(strto64_l))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-#if __SIZEOF_INTMAX_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/strto32_l.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoimax_l (*(__INTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __locale_t))&__LIBC_LOCAL_NAME(strto32_l))
-#else /* __SIZEOF_INTMAX_T__ == 4 */
-__NAMESPACE_LOCAL_END
-#include <libc/local/inttypes/strtoimax_l.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoimax_l __LIBC_LOCAL_NAME(strtoimax_l)
-#endif /* __SIZEOF_INTMAX_T__ != 4 */
-#endif /* !... */
-#endif /* !__local___localdep_strtoimax_l_defined */
+/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
+ * Safely convert `nptr' to an integer which is then returned.
+ * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
+ * If non-`NULL', `*endptr' is made to point past the read integer, and if
+ * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * Also make sure that the returned integer lies within the
+ * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
+ * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
+ * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
+#define __localdep_strtoi __LIBC_LOCAL_NAME(strtoi)
+#endif /* !__CRT_HAVE_strtoi */
+#endif /* !__local___localdep_strtoi_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -119,49 +71,8 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
 __LOCAL_LIBC(strtoi_l) __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoi_l))(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus, __locale_t __locale) {
-	char *__used_endptr;
-	__INTMAX_TYPE__ __result;
-	__result = __localdep_strtoimax_l(__nptr, &__used_endptr, __base, __locale);
-	if (__endptr)
-		*__endptr = __used_endptr;
-	if (__rstatus) {
-		if (__used_endptr == __nptr) {
-#ifdef __ECANCELED
-			*__rstatus = __ECANCELED;
-#else /* __ECANCELED */
-			*__rstatus = 1;
-#endif /* !__ECANCELED */
-		} else if (*__used_endptr != '\0') {
-#ifdef __ENOTSUP
-			*__rstatus = __ENOTSUP;
-#else /* __ENOTSUP */
-			*__rstatus = 1;
-#endif /* !__ENOTSUP */
-		} else if (__result < __lo) {
-#ifdef __ERANGE
-			*__rstatus = __ERANGE;
-#else /* __ERANGE */
-			*__rstatus = 1;
-#endif /* !__ERANGE */
-			__result = __lo;
-		} else if (__result > __hi) {
-#ifdef __ERANGE
-			*__rstatus = __ERANGE;
-#else /* __ERANGE */
-			*__rstatus = 1;
-#endif /* !__ERANGE */
-			__result = __hi;
-		} else {
-			*__rstatus = 0;
-		}
-	} else {
-		if (__result < __lo) {
-			__result = __lo;
-		} else if (__result > __hi) {
-			__result = __hi;
-		}
-	}
-	return __result;
+	(void)__locale;
+	return __localdep_strtoi(__nptr, __endptr, __base, __lo, __hi, __rstatus);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoi_l_defined

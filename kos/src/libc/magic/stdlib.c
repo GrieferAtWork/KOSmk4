@@ -1588,7 +1588,7 @@ handle_overflow:
 /************************************************************************/
 /* WARNING: The following functions aren't exported by-name from libc!  */
 /************************************************************************/
-[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strto32_r)]]
@@ -1626,7 +1626,7 @@ long strtol_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strtou32_r)]]
@@ -1656,7 +1656,7 @@ unsigned long strtoul_r([[nonnull]] char const *__restrict nptr,
 }
 
 %#ifdef __LONGLONG
-[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strto64_r)]]
@@ -1694,7 +1694,7 @@ __LONGLONG strtoll_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strtou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strtou64_r)]]

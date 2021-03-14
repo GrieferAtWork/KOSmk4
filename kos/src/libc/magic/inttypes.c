@@ -593,7 +593,7 @@ $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
 /************************************************************************/
 /* WARNING: The following functions aren't exported by-name from libc!  */
 /************************************************************************/
-[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64_r)]]
@@ -631,7 +631,7 @@ $intmax_t strtoimax_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strtou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64_r)]]
@@ -660,19 +660,25 @@ $uintmax_t strtoumax_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[wchar, nocrt]]
+[[wchar, nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcsto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcsto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcsto64_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcsto32_r)]]
-wcstoimax_r(*) %{generate(str2wcs("strtoimax_r"))}
+$intmax_t wcstoimax_r([[nonnull]] $wchar_t const *__restrict nptr,
+                      [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base,
+                      [[nullable]] $errno_t *error)
+	%{generate(str2wcs("strtoimax_r"))}
 
-[[wchar, nocrt]]
+[[wchar, nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcstou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcstou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcstou64_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcstou32_r)]]
-wcstoumax_r(*) %{generate(str2wcs("strtoumax_r"))}
+$uintmax_t wcstoumax_r([[nonnull]] $wchar_t const *__restrict nptr,
+                       [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base,
+                       [[nullable]] $errno_t *error)
+	%{generate(str2wcs("strtoumax_r"))}
 /************************************************************************/
 %#endif /* __USE_KOS */
 
@@ -765,19 +771,15 @@ $intmax_t strtoi([[nonnull]] char const *__restrict nptr,
                  [[nullable]] $errno_t *rstatus) {
 	char *used_endptr;
 	intmax_t result;
-	result = strtoimax(nptr, &used_endptr, base);
+	result = strtoimax_r(nptr, &used_endptr, base, rstatus);
 	if (endptr)
 		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-@@pp_ifdef ECANCELED@@
-			*rstatus = ECANCELED;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-		} else if (*used_endptr != '\0') {
+	if (rstatus && *rstatus == 0) {
+		if (*used_endptr != '\0') {
 @@pp_ifdef ENOTSUP@@
 			*rstatus = ENOTSUP;
+@@pp_elif defined(EINVAL)@@
+			*rstatus = EINVAL;
 @@pp_else@@
 			*rstatus = 1;
 @@pp_endif@@
@@ -818,19 +820,15 @@ $uintmax_t strtou([[nonnull]] char const *__restrict nptr,
                   [[nullable]] $errno_t *rstatus) {
 	char *used_endptr;
 	uintmax_t result;
-	result = strtoumax(nptr, &used_endptr, base);
+	result = strtoumax_r(nptr, &used_endptr, base, rstatus);
 	if (endptr)
 		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-@@pp_ifdef ECANCELED@@
-			*rstatus = ECANCELED;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-		} else if (*used_endptr != '\0') {
+	if (rstatus && *rstatus == 0) {
+		if (*used_endptr != '\0') {
 @@pp_ifdef ENOTSUP@@
 			*rstatus = ENOTSUP;
+@@pp_elif defined(EINVAL)@@
+			*rstatus = EINVAL;
 @@pp_else@@
 			*rstatus = 1;
 @@pp_endif@@
@@ -869,49 +867,8 @@ $intmax_t strtoi_l([[nonnull]] char const *__restrict nptr,
                    __STDC_INT_AS_UINT_T base,
                    $intmax_t lo, $intmax_t hi,
                    [[nullable]] $errno_t *rstatus, $locale_t locale) {
-	char *used_endptr;
-	intmax_t result;
-	result = strtoimax_l(nptr, &used_endptr, base, locale);
-	if (endptr)
-		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-@@pp_ifdef ECANCELED@@
-			*rstatus = ECANCELED;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-		} else if (*used_endptr != '\0') {
-@@pp_ifdef ENOTSUP@@
-			*rstatus = ENOTSUP;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-		} else if (result < lo) {
-@@pp_ifdef ERANGE@@
-			*rstatus = ERANGE;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-			result = lo;
-		} else if (result > hi) {
-@@pp_ifdef ERANGE@@
-			*rstatus = ERANGE;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-			result = hi;
-		} else {
-			*rstatus = 0;
-		}
-	} else {
-		if (result < lo) {
-			result = lo;
-		} else if (result > hi) {
-			result = hi;
-		}
-	}
-	return result;
+	(void)locale;
+	return strtoi(nptr, endptr, base, lo, hi, rstatus);
 }
 
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
@@ -922,49 +879,8 @@ $uintmax_t strtou_l([[nonnull]] char const *__restrict nptr,
                     __STDC_INT_AS_UINT_T base,
                     $uintmax_t lo, $uintmax_t hi,
                     [[nullable]] $errno_t *rstatus, $locale_t locale) {
-	char *used_endptr;
-	uintmax_t result;
-	result = strtoumax_l(nptr, &used_endptr, base, locale);
-	if (endptr)
-		*endptr = used_endptr;
-	if (rstatus) {
-		if (used_endptr == nptr) {
-@@pp_ifdef ECANCELED@@
-			*rstatus = ECANCELED;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-		} else if (*used_endptr != '\0') {
-@@pp_ifdef ENOTSUP@@
-			*rstatus = ENOTSUP;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-		} else if (result < lo) {
-@@pp_ifdef ERANGE@@
-			*rstatus = ERANGE;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-			result = lo;
-		} else if (result > hi) {
-@@pp_ifdef ERANGE@@
-			*rstatus = ERANGE;
-@@pp_else@@
-			*rstatus = 1;
-@@pp_endif@@
-			result = hi;
-		} else {
-			*rstatus = 0;
-		}
-	} else {
-		if (result < lo) {
-			result = lo;
-		} else if (result > hi) {
-			result = hi;
-		}
-	}
-	return result;
+	(void)locale;
+	return strtou(nptr, endptr, base, lo, hi, rstatus);
 }
 %#endif /* __USE_NETBSD */
 
