@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59dd399 */
+/* HASH CRC-32:0x5c544c59 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -592,7 +592,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
  * @return: buf:  Success
  * @return: NULL: Error (s.a. `errno') */
-__LOCAL_LIBC(readpassphrase) __ATTR_NONNULL((1, 2)) char *
+__LOCAL_LIBC(readpassphrase) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readpassphrase))(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags) {
 #if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
 	__BOOL __must_restart;
@@ -679,9 +679,6 @@ __again:
 #endif /* ... */
 		}
 #ifdef __VSTATUS
-#ifndef __VDISABLE
-#define __VDISABLE '\0'
-#endif /* !__VDISABLE */
 		if (__term.__c_cc[__VSTATUS] != __VDISABLE)
 			__term.__c_cc[__VSTATUS] = __VDISABLE;
 #endif /* __VSTATUS */
@@ -741,7 +738,7 @@ __again:
 	/* XXX: I don't really understand why the prompt is only printed
 	 *      when using /dev/tty as output,  but that's how BSD  does
 	 *      this, too... */
-	if (*__prompt && !(__flags & __RPP_STDIN)) {
+	if (__prompt && *__prompt && !(__flags & __RPP_STDIN)) {
 		if (__localdep_write(__outfd, __prompt, __localdep_strlen(__prompt)) == -1)
 			goto __err_infd_oldsact_oldios;
 	}
@@ -768,9 +765,9 @@ __again:
 				if (__flags & __RPP_SEVENBIT)
 					__ch &= 0x7f;
 				if (__flags & __RPP_FORCELOWER)
-					__ch = (unsigned char)__localdep_tolower(__ch);
+					__ch = (unsigned char)__localdep_tolower((char)__ch);
 				if (__flags & __RPP_FORCEUPPER)
-					__ch = (unsigned char)__localdep_toupper(__ch);
+					__ch = (unsigned char)__localdep_toupper((char)__ch);
 				*__dst++ = __ch;
 			}
 		}

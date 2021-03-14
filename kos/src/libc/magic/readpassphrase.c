@@ -124,7 +124,7 @@ static void __LIBCCALL rpp_handler(int signo) {
 @@pop_namespace@@
 @@pp_endif@@
 )]]
-char *readpassphrase([[nonnull]] char const *prompt,
+char *readpassphrase([[nullable]] char const *prompt,
                      [[nonnull]] char *buf, $size_t bufsize,
                      __STDC_INT_AS_UINT_T flags) {
 @@pp_if $has_function(sigaction)@@
@@ -212,9 +212,6 @@ again:
 @@pp_endif@@
 		}
 @@pp_ifdef __VSTATUS@@
-@@pp_ifndef __VDISABLE@@
-#define __VDISABLE '\0'
-@@pp_endif@@
 		if (term.c_cc[__VSTATUS] != __VDISABLE)
 			term.c_cc[__VSTATUS] = __VDISABLE;
 @@pp_endif@@
@@ -274,7 +271,7 @@ again:
 	/* XXX: I don't really understand why the prompt is only printed
 	 *      when using /dev/tty as output,  but that's how BSD  does
 	 *      this, too... */
-	if (*prompt && !(flags & __RPP_STDIN)) {
+	if (prompt && *prompt && !(flags & __RPP_STDIN)) {
 		if (write(outfd, prompt, strlen(prompt)) == -1)
 			goto err_infd_oldsact_oldios;
 	}
@@ -301,9 +298,9 @@ again:
 				if (flags & __RPP_SEVENBIT)
 					ch &= 0x7f;
 				if (flags & __RPP_FORCELOWER)
-					ch = (unsigned char)tolower(ch);
+					ch = (unsigned char)tolower((char)ch);
 				if (flags & __RPP_FORCEUPPER)
-					ch = (unsigned char)toupper(ch);
+					ch = (unsigned char)toupper((char)ch);
 				*dst++ = ch;
 			}
 		}

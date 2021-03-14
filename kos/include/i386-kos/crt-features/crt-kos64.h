@@ -1976,6 +1976,8 @@
 #define __CRT_HAVE_getopt_long_only
 #define __CRT_HAVE_getpagesize
 #define __CRT_HAVE_getpass
+#define __CRT_HAVE_getpass_r
+#define __CRT_HAVE_getpassfd
 #define __CRT_HAVE_getpassphrase
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid
@@ -6412,6 +6414,8 @@
 #define __CRT_HAVE_KOS$getopt_long
 #define __CRT_HAVE_KOS$getopt_long_only
 #define __CRT_HAVE_KOS$getpass
+#define __CRT_HAVE_KOS$getpass_r
+#define __CRT_HAVE_KOS$getpassfd
 #define __CRT_HAVE_KOS$getpassphrase
 #define __CRT_HAVE_KOS$getpeername
 #define __CRT_HAVE_KOS$getpgid
@@ -9941,6 +9945,8 @@
 #define __CRT_HAVE_DOS$getopt_long
 #define __CRT_HAVE_DOS$getopt_long_only
 #define __CRT_HAVE_DOS$getpass
+#define __CRT_HAVE_DOS$getpass_r
+#define __CRT_HAVE_DOS$getpassfd
 #define __CRT_HAVE_DOS$getpassphrase
 #define __CRT_HAVE_DOS$getpeername
 #define __CRT_HAVE_DOS$getpgid

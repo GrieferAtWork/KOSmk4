@@ -33,7 +33,7 @@
 /* c_cc characters */
 #define __VINTR    0  /* ^C: Send SIGINT to the foreground process (requires `ISIG') */
 #define __VQUIT    1  /* ^\: Send SIGQUIT to the foreground process (requires `ISIG') */
-#define __VERASE   2  /* \b: Erase the last character from the input canon (requires `ECHOE') */
+#define __VERASE   2  /* ^H (aka. \b): Erase the last character from the input canon (requires `ECHOE') */
 #define __VKILL    3  /* ^U: Clear the entire input canon (requires `ECHOK') */
 #define __VEOF     4  /* ^D: Cause read(2) from the TTY to return 0 once (thus indicating input EOF) */
 #define __VTIME    5  /* ... */

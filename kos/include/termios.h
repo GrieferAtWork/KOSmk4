@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6abe0204 */
+/* HASH CRC-32:0xb6c274d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@
 #define VQUIT    __VQUIT    /* ^\: Send SIGQUIT to the foreground process (requires `ISIG') */
 #endif /* !VQUIT && __VQUIT */
 #if !defined(VERASE) && defined(__VERASE)
-#define VERASE   __VERASE   /* \b: Erase the last character from the input canon (requires `ECHOE') */
+#define VERASE   __VERASE   /* ^H (aka. \b): Erase the last character from the input canon (requires `ECHOE') */
 #endif /* !VERASE && __VERASE */
 #if !defined(VKILL) && defined(__VKILL)
 #define VKILL    __VKILL    /* ^U: Clear the entire input canon (requires `ECHOK') */

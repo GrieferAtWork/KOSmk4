@@ -3273,7 +3273,7 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 @@@return: 0 : [*p_errstr != NULL] Error
 @@@return: 0 : [*p_errstr == NULL] Success
 @@@return: * : [*p_errstr == NULL] Success
-[[guard, wunused, impl_include("<bits/types.h>")]]
+[[guard, wunused, impl_include("<bits/types.h>", "<asm/os/errno.h>")]]
 __LONGLONG strtonum([[nonnull]] char const *nptr,
                     __LONGLONG lo, __LONGLONG hi,
                     [[nonnull]] char const **p_errstr) {

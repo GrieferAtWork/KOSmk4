@@ -79,7 +79,7 @@
 #define VQUIT    __VQUIT    /* ^\: Send SIGQUIT to the foreground process (requires `ISIG') */
 #endif /* !VQUIT && __VQUIT */
 #if !defined(VERASE) && defined(__VERASE)
-#define VERASE   __VERASE   /* \b: Erase the last character from the input canon (requires `ECHOE') */
+#define VERASE   __VERASE   /* ^H (aka. \b): Erase the last character from the input canon (requires `ECHOE') */
 #endif /* !VERASE && __VERASE */
 #if !defined(VKILL) && defined(__VKILL)
 #define VKILL    __VKILL    /* ^U: Clear the entire input canon (requires `ECHOK') */

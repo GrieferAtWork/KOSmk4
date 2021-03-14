@@ -2122,6 +2122,8 @@
 #define __CRT_HAVE_getopt_long_only
 #define __CRT_HAVE_getpagesize
 #define __CRT_HAVE_getpass
+#define __CRT_HAVE_getpass_r
+#define __CRT_HAVE_getpassfd
 #define __CRT_HAVE_getpassphrase
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid

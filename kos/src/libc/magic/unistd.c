@@ -95,6 +95,10 @@
 #include <asm/os/fcntl.h> /* __F_ULOCK, __F_LOCK, __F_TLOCK, __F_TEST */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
 
+#ifdef __USE_NETBSD
+#include <asm/crt/getpassfd.h> /* __GETPASS_* */
+#endif /* __USE_NETBSD */
+
 #ifdef __USE_SOLARIS
 #include <getopt.h>
 #define GF_PATH "/etc/group"
@@ -1916,16 +1920,12 @@ int chroot([[nonnull]] char const *__restrict path);
 
 @@>> getpass(3), getpassphrase(3)
 [[guard, cp, wunused, section(".text.crt{|.dos}.io.tty")]]
-[[requires_function(readpassphrase), export_alias("getpassphrase")]]
+[[requires_function(getpass_r), export_alias("getpassphrase")]]
 [[impl_include("<asm/crt/readpassphrase.h>")]]
-char *getpass([[nonnull]] char const *__restrict prompt) {
+char *getpass([[nullable]] char const *__restrict prompt) {
 	static char buf[257]; /* `getpassphrase()' requires passwords at least this long! */
 //	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
-@@pp_ifdef __RPP_ECHO_OFF@@
-	return readpassphrase(prompt, buf, sizeof(buf), __RPP_ECHO_OFF);
-@@pp_else@@
-	return readpassphrase(prompt, buf, sizeof(buf), 0);
-@@pp_endif@@
+	return getpass_r(prompt, buf, sizeof(buf));
 }
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
@@ -2105,19 +2105,655 @@ typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 %[insert:extern(strsignal)]
 %[insert:extern(rcmd_af)]
 
-//TODO:char *getpassfd(char const *, char *, size_t, int *, int, int);
-//TODO:#define GETPASS_NEED_TTY    0x001 /* RPP_REQUIRE_TTY: Error out if `!isatty()' */
-//TODO:#define GETPASS_FAIL_EOF    0x002 /* Input EOF is an error */
-//TODO:#define GETPASS_BUF_LIMIT   0x004 /* BEEP when typing after buffer limit is reached */
-//TODO:#define GETPASS_NO_SIGNAL   0x008 /* ??? */
-//TODO:#define GETPASS_NO_BEEP     0x010 /* Don't BEEP */
-//TODO:#define GETPASS_ECHO        0x020 /* RPP_ECHO_ON: Don't disable echo (but leave it on). */
-//TODO:#define GETPASS_ECHO_STAR   0x040 /* Print '*' instead for typed characters */
-//TODO:#define GETPASS_7BIT        0x080 /* RPP_SEVENBIT: Mask input with `0x7f' */
-//TODO:#define GETPASS_FORCE_LOWER 0x100 /* RPP_FORCELOWER: Force all input to be lower-case. */
-//TODO:#define GETPASS_FORCE_UPPER 0x200 /* RPP_FORCEUPPER: Force all input to be upper-case. */
-//TODO:#define GETPASS_ECHO_NL     0x400 /* Print a '\n' after the password was read */
-//TODO:char *getpass_r(char const *, char *, size_t);
+%{
+
+/* Flags for NetBSD's `getpassfd(3)' function */
+#if !defined(GETPASS_NEED_TTY) && defined(__GETPASS_NEED_TTY)
+#define GETPASS_NEED_TTY    __GETPASS_NEED_TTY    /* RPP_REQUIRE_TTY: Error out if `!isatty()' */
+#endif /* !GETPASS_NEED_TTY && __GETPASS_NEED_TTY */
+#if !defined(GETPASS_FAIL_EOF) && defined(__GETPASS_FAIL_EOF)
+#define GETPASS_FAIL_EOF    __GETPASS_FAIL_EOF    /* Input EOF is an error */
+#endif /* !GETPASS_FAIL_EOF && __GETPASS_FAIL_EOF */
+#if !defined(GETPASS_BUF_LIMIT) && defined(__GETPASS_BUF_LIMIT)
+#define GETPASS_BUF_LIMIT   __GETPASS_BUF_LIMIT   /* BEEP when typing after buffer limit is reached */
+#endif /* !GETPASS_BUF_LIMIT && __GETPASS_BUF_LIMIT */
+#if !defined(GETPASS_NO_SIGNAL) && defined(__GETPASS_NO_SIGNAL)
+#define GETPASS_NO_SIGNAL   __GETPASS_NO_SIGNAL   /* When a control character (such as ^C) causes password
+                                                   * reading  to  be aborted  (with  `errno=EINTR'), don't
+                                                   * raise(3) the  signal associated  with that  character
+                                                   * before returning from `getpassfd()' */
+#endif /* !GETPASS_NO_SIGNAL && __GETPASS_NO_SIGNAL */
+#if !defined(GETPASS_NO_BEEP) && defined(__GETPASS_NO_BEEP)
+#define GETPASS_NO_BEEP     __GETPASS_NO_BEEP     /* Don't BEEP */
+#endif /* !GETPASS_NO_BEEP && __GETPASS_NO_BEEP */
+#if !defined(GETPASS_ECHO) && defined(__GETPASS_ECHO)
+#define GETPASS_ECHO        __GETPASS_ECHO        /* RPP_ECHO_ON: Don't disable echo (but leave it on). */
+#endif /* !GETPASS_ECHO && __GETPASS_ECHO */
+#if !defined(GETPASS_ECHO_STAR) && defined(__GETPASS_ECHO_STAR)
+#define GETPASS_ECHO_STAR   __GETPASS_ECHO_STAR   /* Print '*' instead for typed characters */
+#endif /* !GETPASS_ECHO_STAR && __GETPASS_ECHO_STAR */
+#if !defined(GETPASS_7BIT) && defined(__GETPASS_7BIT)
+#define GETPASS_7BIT        __GETPASS_7BIT        /* RPP_SEVENBIT: Mask input with `0x7f' */
+#endif /* !GETPASS_7BIT && __GETPASS_7BIT */
+#if !defined(GETPASS_FORCE_LOWER) && defined(__GETPASS_FORCE_LOWER)
+#define GETPASS_FORCE_LOWER __GETPASS_FORCE_LOWER /* RPP_FORCELOWER: Force all input to be lower-case. */
+#endif /* !GETPASS_FORCE_LOWER && __GETPASS_FORCE_LOWER */
+#if !defined(GETPASS_FORCE_UPPER) && defined(__GETPASS_FORCE_UPPER)
+#define GETPASS_FORCE_UPPER __GETPASS_FORCE_UPPER /* RPP_FORCEUPPER: Force all input to be upper-case. */
+#endif /* !GETPASS_FORCE_UPPER && __GETPASS_FORCE_UPPER */
+#if !defined(GETPASS_ECHO_NL) && defined(__GETPASS_ECHO_NL)
+#define GETPASS_ECHO_NL     __GETPASS_ECHO_NL     /* Print a '\n' after the password was read */
+#endif /* !GETPASS_ECHO_NL && __GETPASS_ECHO_NL */
+}
+
+@@>> getpassfd(3)
+@@This function behaves similar to `readpassphrase(3)', but is still
+@@quite distinct from that function in how this one behaves, vs. how
+@@that other function behaves. In general, this function is a bit more
+@@user-friendly, in that it offers more (but different) `flags' to
+@@control how the password prompt is generated, with the main advantage
+@@of this function being that it implements some "advanced" readline
+@@functionality, such as deleting typed characters without relying on
+@@the system TTY canonical buffer (which `readpassphrase(3)' needs,
+@@since it doesn't include support for _any_ control characters other
+@@that CR/LF as indicators to stop reading text)
+@@Which of the 2 functions should be used is a matter of taste, but
+@@personally, I prefer this one over `readpassphrase(3)'.
+@@@param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
+@@@param: buf:     [0..buflen] Buffer that will receive the user's password.
+@@                             When set to `NULL', a dynamically allocated
+@@                             buffer will be used and returned.
+@@@param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
+@@@param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+@@                             of files, used for [read,write,beep] operations.
+@@                             When `NULL', try to use `/dev/tty' instead, and
+@@                             if that fails, use `STDIN_FILENO,STDERR_FILENO,
+@@                             STDERR_FILENO' as final fallback.
+@@                             When `GETPASS_NEED_TTY' is set, the function
+@@                             will fail with `errno=ENOTTY' if the actually
+@@                             used `fds[0]' (iow: stdin) isn't a TTY device
+@@                             s.a. `isatty(3)'
+@@@param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
+@@@param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+@@                             user to type each character of their password. If
+@@                             this timeout expires, fail with `errno=ETIMEDOUT'
+@@                             Negative values result in weak undefined behavior.
+@@@return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
+@@@return: buf:                Success
+@@@return: NULL: [ETIMEDOUT]   The given `timeout_in_seconds' has expired.
+@@@return: NULL: [EINVAL]      `buf' is non-`NULL', but `buflen' is `0'
+@@@return: NULL: [ENOTTY]      `GETPASS_NEED_TTY' was given, but not a tty
+@@@return: NULL: [ENOMEM]      Insufficient memory
+@@@return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
+@@@return: NULL: [*]           Error
+[[cp, wunused, decl_include("<features.h>", "<bits/types>")]]
+[[impl_include("<bits/types.h>", "<asm/os/stdio.h>", "<asm/os/oflags.h>")]]
+[[impl_include("<libc/errno.h>", "<paths.h>", "<asm/crt/getpassfd.h>")]]
+[[impl_include("<asm/os/termios.h>", "<bits/os/termios.h>")]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/pollfd.h>")]]
+[[impl_include("<asm/os/poll.h>", "<libc/strings.h>")]]
+[[requires_function(read)]]
+char *getpassfd([[nullable]] char const *prompt,
+                [[nullable]] char *buf, size_t buflen,
+                [[nullable]] $fd_t fds[3],
+                __STDC_INT_AS_UINT_T flags,
+                int timeout_in_seconds) {
+#ifndef __STDIN_FILENO
+#define __STDIN_FILENO 0
+#endif /* !__STDIN_FILENO */
+#ifndef __STDERR_FILENO
+#define __STDERR_FILENO 2
+#endif /* !__STDERR_FILENO */
+
+@@pp_if $has_function(malloc)@@
+	bool heap_buf;
+@@pp_endif@@
+	char *result;
+	fd_t default_fds[3];
+	signo_t interrupt_signo;
+
+	/* Initialize locals. */
+@@pp_if $has_function(tcgetattr) && $has_function(tcsetattr)@@
+	struct termios old_ios, new_ios;
+	memset(&old_ios, -1, sizeof(old_ios));
+	memset(&new_ios, -1, sizeof(new_ios));
+@@pp_endif@@
+	result          = NULL;
+	interrupt_signo = 0;
+	default_fds[0]  = __STDIN_FILENO;
+
+	/* Allocate a dynamic buffer if none was given by the caller. */
+@@pp_if $has_function(malloc)@@
+	heap_buf = false;
+	if (!buf) {
+		buflen = 512;
+		buf = (char *)malloc(buflen * sizeof(char));
+		if unlikely(!buf) {
+			buflen = 1;
+			buf = (char *)malloc(buflen * sizeof(char));
+			if unlikely(!buf)
+				goto out;
+		}
+		heap_buf = true;
+	} else
+@@pp_endif@@
+	if (buflen < 1) {
+		/* Invalid buffer length */
+@@pp_ifdef EINVAL@@
+		__libc_seterrno(EINVAL);
+@@pp_endif@@
+		goto out;
+	}
+
+	/* Open input files if not provided by the caller. */
+	if (!fds) {
+		fds = default_fds;
+@@pp_if $has_function(open)@@
+#ifdef __O_CLOEXEC
+#define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
+#else /* __O_CLOEXEC */
+#define __PRIVATE_GETPASSFD_O_CLOEXEC 0
+#endif /* !__O_CLOEXEC */
+#ifdef __O_CLOFORK
+#define __PRIVATE_GETPASSFD_O_CLOFORK __O_CLOFORK
+#else /* __O_CLOFORK */
+#define __PRIVATE_GETPASSFD_O_CLOFORK 0
+#endif /* !__O_CLOFORK */
+#ifdef __O_RDONLY
+#define __PRIVATE_GETPASSFD_O_RDONLY __O_RDONLY
+#else /* __O_RDONLY */
+#define __PRIVATE_GETPASSFD_O_RDONLY 0
+#endif /* !__O_RDONLY */
+@@pp_if defined(__O_NONBLOCK) && $has_function(poll)@@
+#define __PRIVATE_GETPASSFD_O_NONBLOCK __O_NONBLOCK
+@@pp_else@@
+#define __PRIVATE_GETPASSFD_O_NONBLOCK 0
+@@pp_endif@@
+#ifdef _PATH_TTY
+#define __PRIVATE_GETPASSFD_PATH_TTY _PATH_TTY
+#else /* _PATH_TTY */
+#define __PRIVATE_GETPASSFD_PATH_TTY "/dev/tty"
+#endif /* !_PATH_TTY */
+#if __PRIVATE_GETPASSFD_O_NONBLOCK != 0
+		default_fds[2] = open(__PRIVATE_GETPASSFD_PATH_TTY,
+		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
+		                      __PRIVATE_GETPASSFD_O_CLOFORK |
+		                      __PRIVATE_GETPASSFD_O_RDONLY |
+		                      (timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
+#else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
+		default_fds[2] = open(__PRIVATE_GETPASSFD_PATH_TTY,
+		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
+		                      __PRIVATE_GETPASSFD_O_CLOFORK |
+		                      __PRIVATE_GETPASSFD_O_RDONLY);
+#endif /* __PRIVATE_GETPASSFD_O_NONBLOCK == 0 */
+		if (default_fds[2] != -1) {
+			default_fds[0] = default_fds[2];
+			default_fds[1] = default_fds[2];
+		} else
+@@pp_endif@@
+		{
+			default_fds[1] = __STDERR_FILENO;
+			default_fds[2] = __STDERR_FILENO;
+		}
+	}
+
+	/* Load terminal settings. */
+@@pp_if $has_function(tcgetattr) && $has_function(tcsetattr)@@
+	if (tcgetattr(fds[0], &old_ios) == 0) {
+		memcpy(&new_ios, &old_ios, sizeof(struct termios));
+
+		/* Configure new settings. */
+@@pp_ifdef __ECHO@@
+		new_ios.@c_lflag@ &= ~__ECHO;
+@@pp_endif@@
+@@pp_ifdef __ECHOK@@
+		new_ios.@c_lflag@ &= ~__ECHOK;
+@@pp_endif@@
+@@pp_ifdef __ECHOE@@
+		new_ios.@c_lflag@ &= ~__ECHOE;
+@@pp_endif@@
+@@pp_ifdef __ECHOKE@@
+		new_ios.@c_lflag@ &= ~__ECHOKE;
+@@pp_endif@@
+@@pp_ifdef __ECHOCTL@@
+		new_ios.@c_lflag@ &= ~__ECHOCTL;
+@@pp_endif@@
+@@pp_ifdef __ISIG@@
+		new_ios.@c_lflag@ &= ~__ISIG;
+@@pp_endif@@
+@@pp_ifdef __ICANON@@
+		new_ios.@c_lflag@ &= ~__ICANON;
+@@pp_endif@@
+
+@@pp_ifdef __VMIN@@
+		new_ios.@c_cc@[__VMIN] = 1;
+@@pp_endif@@
+@@pp_ifdef __VTIME@@
+		new_ios.@c_cc@[__VTIME] = 0;
+@@pp_endif@@
+
+@@pp_if defined(__TCSAFLUSH) && defined(__TCSASOFT)@@
+		if (tcsetattr(fds[0], __TCSAFLUSH | __TCSASOFT, &new_ios) != 0)
+@@pp_elif defined(__TCSAFLUSH)@@
+		if (tcsetattr(fds[0], __TCSAFLUSH, &new_ios) != 0)
+@@pp_else@@
+		if (tcsetattr(fds[0], 0, &new_ios) != 0)
+@@pp_endif@@
+		{
+			goto out;
+		}
+	} else {
+		if (flags & __GETPASS_NEED_TTY)
+			goto out; /* tcgetattr() should have already set errno=ENOTTY */
+	}
+@@pp_elif $has_function(isatty)@@
+	if ((flags & __GETPASS_NEED_TTY) && !isatty(fds[0]))
+		goto out; /* isatty() should have already set errno=ENOTTY */
+@@pp_endif@@
+
+	/* Print the given prompt */
+@@pp_if $has_function(write)@@
+	if (prompt && *prompt) {
+		if (write(fds[1], prompt, strlen(prompt)) == -1)
+			goto out;
+	}
+@@pp_else@@
+	(void)prompt;
+@@pp_endif@@
+
+	/* The actual interpreter loop for the password reader: */
+	{
+		unsigned char ch, *dst, *bufend;
+@@pp_if $has_function(tcgetattr) && $has_function(tcsetattr) && defined(__VLNEXT)@@
+		bool escape; /* Set to `true' if the next character is escaped. */
+		escape = false;
+@@pp_endif@@
+		dst    = (unsigned char *)buf;
+		bufend = (unsigned char *)buf + buflen - 1;
+		for (;;) {
+
+@@pp_if $has_function(poll)@@
+			if (timeout_in_seconds != 0) {
+				int status;
+				struct pollfd pfd;
+				pfd.@fd@      = fds[0];
+@@pp_if defined(__POLLIN) && defined(__POLLRDNORM)@@
+				pfd.@events@  = __POLLIN | __POLLRDNORM;
+@@pp_elif defined(__POLLIN)@@
+				pfd.@events@  = __POLLIN;
+@@pp_else@@
+				pfd.@events@  = 0;
+@@pp_endif@@
+				status = poll(&pfd, 1, timeout_in_seconds * 1000);
+				if unlikely(status == -1)
+					goto out; /* Error... */
+				if unlikely(status == 0) {
+@@pp_ifdef ETIMEDOUT@@
+					__libc_seterrno(ETIMEDOUT);
+@@pp_else@@
+					__libc_seterrno(1);
+@@pp_endif@@
+					goto out; /* Timeout... */
+				}
+				/* Assume that data can be read now! */
+			}
+@@pp_else@@
+			(void)timeout_in_seconds;
+@@pp_endif@@
+
+			/* Actually read the next character. */
+			{
+				ssize_t status;
+				status = read(fds[0], &ch, sizeof(ch));
+				if (status < (ssize_t)sizeof(char)) {
+					if (status < 0)
+						goto out; /* Error */
+@@pp_ifdef __VEOF@@
+handle_eof:
+@@pp_endif@@
+					if (flags & __GETPASS_FAIL_EOF) {
+						/* Error out on regular, old EOF */
+@@pp_ifdef ENODATA@@
+						__libc_seterrno(ENODATA);
+@@pp_endif@@
+						goto out;
+					}
+					break;
+				}
+			}
+
+@@pp_if $has_function(tcgetattr) && $has_function(tcsetattr) && defined(__VLNEXT)@@
+			if (escape) {
+				/* Unconditionally add `ch' */
+				escape = false;
+			} else
+@@pp_endif@@
+			{
+@@pp_if $has_function(tcgetattr) && $has_function(tcsetattr)@@
+@@pp_if __VDISABLE == '\0'@@
+#define __PRIVATE_GETPASSFD_CTRL(index, defl) \
+	(new_ios.@c_cc@[index] != '\0' ? new_ios.@c_cc@[index] : __CTRL(defl))
+@@pp_else@@
+#define __PRIVATE_GETPASSFD_CTRL(index, defl) \
+	((new_ios.@c_cc@[index] != '\0' && new_ios.@c_cc@[index] != __VDISABLE) ? new_ios.@c_cc@[index] : __CTRL(defl))
+@@pp_endif@@
+
+				/* Check for control characters that should be ignored. */
+@@pp_ifdef __VREPRINT@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VREPRINT, 'R'))
+					continue;
+@@pp_endif@@
+
+@@pp_ifdef __VSTART@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VSTART, 'Q'))
+					continue;
+@@pp_endif@@
+
+@@pp_ifdef __VSTOP@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VSTOP, 'S'))
+					continue;
+@@pp_endif@@
+
+@@pp_ifdef __VSTATUS@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VSTATUS, 'T'))
+					continue;
+@@pp_endif@@
+
+@@pp_ifdef __VDISCARD@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VDISCARD, 'O'))
+					continue;
+@@pp_endif@@
+
+				/* Check for ^V */
+@@pp_ifdef __VLNEXT@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VLNEXT, 'V')) {
+					escape = true;
+					continue;
+				}
+@@pp_endif@@
+
+				/* Both line- and word-kill are treated as a full reset. */
+@@pp_if defined(__VKILL) || defined(__VWERASE)@@
+				if (
+@@pp_ifdef __VKILL@@
+				    ch == __PRIVATE_GETPASSFD_CTRL(__VKILL, 'U')
+@@pp_endif@@
+@@pp_if defined(__VKILL) && defined(__VWERASE)@@
+				    ||
+@@pp_endif@@
+@@pp_ifdef __VWERASE@@
+				    ch == __PRIVATE_GETPASSFD_CTRL(__VWERASE, 'W')
+@@pp_endif@@
+				    )
+				{
+					__libc_explicit_bzero(buf, buflen * sizeof(char));
+@@pp_if $has_function(write)@@
+					if (flags & (__GETPASS_ECHO | __GETPASS_ECHO_STAR)) {
+						while (dst > (unsigned char *)buf) {
+							if (write(fds[1], "\b \b", 3 * sizeof(char)) == -1)
+								goto out;
+							--dst;
+						}
+					}
+@@pp_endif@@
+					dst = (unsigned char *)buf;
+					continue;
+				}
+@@pp_endif@@
+
+				/* Check for end-of-file (via ^D) */
+@@pp_ifdef __VEOF@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VEOF, 'D'))
+					goto handle_eof;
+@@pp_endif@@
+
+				/* Check for TTY signal characters. */
+@@pp_if defined(__VINTR) && defined(__SIGINT)@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VINTR, 'C')) {
+					interrupt_signo = __SIGINT;
+					goto out;
+				}
+@@pp_endif@@
+
+@@pp_if defined(__VQUIT) && defined(__SIGQUIT)@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VQUIT, '\\')) {
+					interrupt_signo = __SIGQUIT;
+					goto out;
+				}
+@@pp_endif@@
+
+@@pp_if (defined(__VSUSP) || defined(__VDSUSP)) && defined(__SIGTSTP)@@
+				if (
+@@pp_ifdef __VSUSP@@
+				    ch == __PRIVATE_GETPASSFD_CTRL(__VSUSP, 'Z')
+@@pp_endif@@
+@@pp_if defined(__VSUSP) && defined(__VDSUSP)@@
+				    ||
+@@pp_endif@@
+@@pp_ifdef __VDSUSP@@
+				    ch == __PRIVATE_GETPASSFD_CTRL(__VDSUSP, 'Y')
+@@pp_endif@@
+				    ) {
+					interrupt_signo = __SIGTSTP;
+					goto out;
+				}
+@@pp_endif@@
+
+				/* Check for custom newline characters. */
+@@pp_ifdef __VEOL@@
+				if (new_ios.@c_cc@[__VEOL] != __VDISABLE && ch == new_ios.@c_cc@[__VEOL])
+					break;
+@@pp_endif@@
+@@pp_ifdef __VEOL2@@
+				if (new_ios.@c_cc@[__VEOL2] != __VDISABLE && ch == new_ios.@c_cc@[__VEOL2])
+					break;
+@@pp_endif@@
+@@pp_endif@@
+
+				/* Check for single-character erase (backspace) */
+@@pp_if $has_function(tcgetattr) && $has_function(tcsetattr) && defined(__VERASE)@@
+				if (ch == __PRIVATE_GETPASSFD_CTRL(__VERASE, 'H'))
+@@pp_else@@
+				if (ch == '\b')
+@@pp_endif@@
+				{
+					if (dst > (unsigned char *)buf) {
+						--dst;
+						__libc_explicit_bzero(dst, sizeof(char));
+@@pp_if $has_function(write)@@
+						if (flags & (__GETPASS_ECHO | __GETPASS_ECHO_STAR)) {
+							if (write(fds[1], "\b \b", 3 * sizeof(char)) == -1)
+								goto out;
+						}
+@@pp_endif@@
+						continue;
+					}
+maybe_beep:
+@@pp_if $has_function(write)@@
+					if (!(flags & __GETPASS_NO_BEEP)) {
+						if (write(fds[2], "\7" /*BEL*/, sizeof(char)) == -1)
+							goto out;
+					}
+@@pp_endif@@
+					continue;
+				}
+
+				/* Check for generic newline characters. */
+				if (ch == '\r' || ch == '\n')
+					break;
+
+			} /* if (!escape) */
+
+			/* Special case: _always_ stop when a NUL-character would be appended.
+			 * Note  that this is  undocumented behavior, but  is also mirrored by
+			 * what is done by NetBSD's implementation in this case. */
+			if (ch == '\0')
+				break;
+
+			/* Check if the buffer is full. */
+			if (dst >= bufend) {
+@@pp_if $has_function(malloc)@@
+				if (heap_buf) {
+					/* Allocate more space. */
+					size_t new_buflen;
+					char *new_buf;
+					new_buflen = buflen * 2;
+					new_buf = (char *)malloc(new_buflen * sizeof(char));
+					if unlikely(!new_buf) {
+						new_buflen = buflen + 1;
+						new_buf = (char *)malloc(new_buflen * sizeof(char));
+						if unlikely(!new_buf)
+							goto out;
+					}
+					memcpyc(new_buf, buf, buflen, sizeof(char));
+					__libc_explicit_bzero(buf, buflen * sizeof(char));
+@@pp_if $has_function(free)@@
+					free(buf);
+@@pp_endif@@
+					dst    = (unsigned char *)new_buf + (size_t)(dst - (unsigned char *)buf);
+					bufend = (unsigned char *)new_buf + new_buflen - 1;
+					buf    = new_buf;
+				} else
+@@pp_endif@@
+				{
+					if (flags & __GETPASS_BUF_LIMIT)
+						goto maybe_beep;
+					continue;
+				}
+			}
+
+			/* Deal with special character conversions. */
+			if (flags & __GETPASS_7BIT)
+				ch &= 0x7f;
+			if (flags & __GETPASS_FORCE_LOWER)
+				ch = (unsigned char)tolower((char)ch);
+			if (flags & __GETPASS_FORCE_UPPER)
+				ch = (unsigned char)toupper((char)ch);
+
+			/* Append to the result buffer. */
+			*dst++ = ch;
+
+@@pp_if $has_function(write)@@
+			if (flags & __GETPASS_ECHO_STAR) {
+				if (write(fds[1], "*", sizeof(char)) == -1)
+					goto out;
+			} else if (flags & __GETPASS_ECHO) {
+				if (!isprint((char)ch))
+					ch = (unsigned char)'?';
+				if (write(fds[1], &ch, sizeof(char)) == -1)
+					goto out;
+			}
+@@pp_endif@@
+
+		} /* for (;;) */
+
+		/* If requested to do so by the caller, write a trailing '\n' upon success. */
+@@pp_if $has_function(write)@@
+		if (flags & __GETPASS_ECHO_NL) {
+			if (write(fds[1], "\n", 1) == -1)
+				goto out;
+		}
+@@pp_endif@@
+
+		/* Force NUL-termination of the password buffer. */
+		*dst = '\0';
+
+@@pp_if $has_function(malloc)@@
+		if (heap_buf && dst < bufend) {
+			/* Try to release unused buffer memory. */
+			size_t new_buflen;
+			char *new_buf;
+			new_buflen = (size_t)((dst + 1) - (unsigned char *)buf);
+			new_buf    = (char *)malloc(new_buflen * sizeof(char));
+			if likely(new_buf) {
+				memcpyc(new_buf, buf, buflen, sizeof(char));
+				__libc_explicit_bzero(buf, buflen * sizeof(char));
+@@pp_if $has_function(free)@@
+				free(buf);
+@@pp_endif@@
+				buf    = new_buf;
+				buflen = new_buflen;
+			}
+		}
+@@pp_endif@@
+
+		/* Indicate success! */
+		result = buf;
+	}
+out:
+
+	/* Restore old terminal settings. */
+@@pp_if $has_function(tcgetattr) && $has_function(tcsetattr)@@
+	if (memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+@@pp_if defined(__TCSAFLUSH) && defined(__TCSASOFT)@@
+		(void)tcsetattr(fds[0], __TCSAFLUSH | __TCSASOFT, &old_ios);
+@@pp_elif defined(__TCSAFLUSH)@@
+		(void)tcsetattr(fds[0], __TCSAFLUSH, &old_ios);
+@@pp_else@@
+		(void)tcsetattr(fds[0], 0, &old_ios);
+@@pp_endif@@
+	}
+@@pp_endif@@
+
+	/* Close our file handle to /dev/tty */
+@@pp_if $has_function(close)@@
+	if (default_fds[0] != __STDIN_FILENO)
+		close(default_fds[0]);
+@@pp_endif@@
+
+	/* Error-only cleanup... */
+	if (!result) {
+
+		/* Don't leave a (possibly incomplete) password dangling in-memory! */
+		__libc_explicit_bzero(buf, buflen * sizeof(char));
+
+		/* Free a dynamically allocated password buffer. */
+@@pp_if $has_function(malloc) && $has_function(free)@@
+		if (heap_buf)
+			free(buf);
+@@pp_endif@@
+
+		/* Raise the signal of a given control character, and/or set
+		 * `errno'  to indicate that the password-read operation was
+		 * interrupted. */
+		if (interrupt_signo != 0) {
+@@pp_if $has_function(raise)@@
+			if (!(flags & __GETPASS_NO_SIGNAL))
+				(void)raise(interrupt_signo);
+@@pp_endif@@
+@@pp_ifdef EINTR@@
+			__libc_seterrno(EINTR);
+@@pp_endif@@
+		}
+	}
+	return result;
+}
+
+
+
+@@>> getpass_r(3)
+[[cp, wunused]]
+[[requires($has_function(getpassfd) || $has_function(readpassphrase))]]
+[[impl_include("<asm/crt/getpassfd.h>")]]
+[[impl_include("<asm/crt/readpassphrase.h>")]]
+char *getpass_r([[nullable]] char const *prompt, char *buf, size_t bufsize) {
+@@pp_if $has_function(getpassfd)@@
+	/* Prefer using `getpassfd(3)' because I feel like that one's more
+	 * user-friendly.  - But it it's not available, fall back on using
+	 * the regular, old `readpassphrase(3)' */
+@@pp_ifdef __GETPASS_ECHO_NL@@
+	return getpassfd(prompt, buf, bufsize, NULL, __GETPASS_ECHO_NL, 0);
+@@pp_else@@
+	return getpassfd(prompt, buf, bufsize, NULL, 0, 0);
+@@pp_endif@@
+@@pp_else@@
+@@pp_ifdef __RPP_ECHO_OFF@@
+	return readpassphrase(prompt, buf, bufsize, __RPP_ECHO_OFF);
+@@pp_else@@
+	return readpassphrase(prompt, buf, bufsize, 0);
+@@pp_endif@@
+@@pp_endif@@
+}
 
 //TODO:int des_cipher(char const *, char *, long, int);
 //TODO:int des_setkey(char const *);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ca59b8d */
+/* HASH CRC-32:0x26e36fa0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,6 +66,10 @@
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
 #include <asm/os/fcntl.h> /* __F_ULOCK, __F_LOCK, __F_TLOCK, __F_TEST */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
+
+#ifdef __USE_NETBSD
+#include <asm/crt/getpassfd.h> /* __GETPASS_* */
+#endif /* __USE_NETBSD */
 
 #ifdef __USE_SOLARIS
 #include <getopt.h>
@@ -2059,14 +2063,14 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chroot,(char const *__restr
 #define __getpass_defined 1
 #ifdef __CRT_HAVE_getpass
 /* >> getpass(3), getpassphrase(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
 #elif defined(__CRT_HAVE_getpassphrase)
 /* >> getpass(3), getpassphrase(3) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),getpassphrase,(__prompt))
-#elif defined(__CRT_HAVE_readpassphrase) || (defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)))
+__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),getpassphrase,(__prompt))
+#elif defined(__CRT_HAVE_getpass_r) || defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
 #include <libc/local/unistd/getpass.h>
 /* >> getpass(3), getpassphrase(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getpass)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL getpass)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); })
 #else /* ... */
 #undef __getpass_defined
 #endif /* !... */
@@ -2469,6 +2473,138 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strsignal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p,__af))
 #endif /* !__rcmd_af_defined && __CRT_HAVE_rcmd_af */
+
+/* Flags for NetBSD's `getpassfd(3)' function */
+#if !defined(GETPASS_NEED_TTY) && defined(__GETPASS_NEED_TTY)
+#define GETPASS_NEED_TTY    __GETPASS_NEED_TTY    /* RPP_REQUIRE_TTY: Error out if `!isatty()' */
+#endif /* !GETPASS_NEED_TTY && __GETPASS_NEED_TTY */
+#if !defined(GETPASS_FAIL_EOF) && defined(__GETPASS_FAIL_EOF)
+#define GETPASS_FAIL_EOF    __GETPASS_FAIL_EOF    /* Input EOF is an error */
+#endif /* !GETPASS_FAIL_EOF && __GETPASS_FAIL_EOF */
+#if !defined(GETPASS_BUF_LIMIT) && defined(__GETPASS_BUF_LIMIT)
+#define GETPASS_BUF_LIMIT   __GETPASS_BUF_LIMIT   /* BEEP when typing after buffer limit is reached */
+#endif /* !GETPASS_BUF_LIMIT && __GETPASS_BUF_LIMIT */
+#if !defined(GETPASS_NO_SIGNAL) && defined(__GETPASS_NO_SIGNAL)
+#define GETPASS_NO_SIGNAL   __GETPASS_NO_SIGNAL   /* When a control character (such as ^C) causes password
+                                                   * reading  to  be aborted  (with  `errno=EINTR'), don't
+                                                   * raise(3) the  signal associated  with that  character
+                                                   * before returning from `getpassfd()' */
+#endif /* !GETPASS_NO_SIGNAL && __GETPASS_NO_SIGNAL */
+#if !defined(GETPASS_NO_BEEP) && defined(__GETPASS_NO_BEEP)
+#define GETPASS_NO_BEEP     __GETPASS_NO_BEEP     /* Don't BEEP */
+#endif /* !GETPASS_NO_BEEP && __GETPASS_NO_BEEP */
+#if !defined(GETPASS_ECHO) && defined(__GETPASS_ECHO)
+#define GETPASS_ECHO        __GETPASS_ECHO        /* RPP_ECHO_ON: Don't disable echo (but leave it on). */
+#endif /* !GETPASS_ECHO && __GETPASS_ECHO */
+#if !defined(GETPASS_ECHO_STAR) && defined(__GETPASS_ECHO_STAR)
+#define GETPASS_ECHO_STAR   __GETPASS_ECHO_STAR   /* Print '*' instead for typed characters */
+#endif /* !GETPASS_ECHO_STAR && __GETPASS_ECHO_STAR */
+#if !defined(GETPASS_7BIT) && defined(__GETPASS_7BIT)
+#define GETPASS_7BIT        __GETPASS_7BIT        /* RPP_SEVENBIT: Mask input with `0x7f' */
+#endif /* !GETPASS_7BIT && __GETPASS_7BIT */
+#if !defined(GETPASS_FORCE_LOWER) && defined(__GETPASS_FORCE_LOWER)
+#define GETPASS_FORCE_LOWER __GETPASS_FORCE_LOWER /* RPP_FORCELOWER: Force all input to be lower-case. */
+#endif /* !GETPASS_FORCE_LOWER && __GETPASS_FORCE_LOWER */
+#if !defined(GETPASS_FORCE_UPPER) && defined(__GETPASS_FORCE_UPPER)
+#define GETPASS_FORCE_UPPER __GETPASS_FORCE_UPPER /* RPP_FORCEUPPER: Force all input to be upper-case. */
+#endif /* !GETPASS_FORCE_UPPER && __GETPASS_FORCE_UPPER */
+#if !defined(GETPASS_ECHO_NL) && defined(__GETPASS_ECHO_NL)
+#define GETPASS_ECHO_NL     __GETPASS_ECHO_NL     /* Print a '\n' after the password was read */
+#endif /* !GETPASS_ECHO_NL && __GETPASS_ECHO_NL */
+#ifdef __CRT_HAVE_getpassfd
+/* >> getpassfd(3)
+ * This function behaves similar to `readpassphrase(3)', but is still
+ * quite distinct from that function in how this one behaves, vs. how
+ * that other function behaves. In general, this function is a bit more
+ * user-friendly, in that it offers more (but different) `flags' to
+ * control how the password prompt is generated, with the main advantage
+ * of this function being that it implements some "advanced" readline
+ * functionality, such as deleting typed characters without relying on
+ * the system TTY canonical buffer (which `readpassphrase(3)' needs,
+ * since it doesn't include support for _any_ control characters other
+ * that CR/LF as indicators to stop reading text)
+ * Which of the 2 functions should be used is a matter of taste, but
+ * personally, I prefer this one over `readpassphrase(3)'.
+ * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
+ * @param: buf:     [0..buflen] Buffer that will receive the user's password.
+ *                              When set to `NULL', a dynamically allocated
+ *                              buffer will be used and returned.
+ * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
+ * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ *                              of files, used for [read,write,beep] operations.
+ *                              When `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              STDERR_FILENO' as final fallback.
+ *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              will fail with `errno=ENOTTY' if the actually
+ *                              used `fds[0]' (iow: stdin) isn't a TTY device
+ *                              s.a. `isatty(3)'
+ * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ *                              user to type each character of their password. If
+ *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ *                              Negative values result in weak undefined behavior.
+ * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
+ * @return: buf:                Success
+ * @return: NULL: [ETIMEDOUT]   The given `timeout_in_seconds' has expired.
+ * @return: NULL: [EINVAL]      `buf' is non-`NULL', but `buflen' is `0'
+ * @return: NULL: [ENOTTY]      `GETPASS_NEED_TTY' was given, but not a tty
+ * @return: NULL: [ENOMEM]      Insufficient memory
+ * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
+ * @return: NULL: [*]           Error */
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpassfd,(char const *__prompt, char *__buf, size_t __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds),(__prompt,__buf,__buflen,__fds,__flags,__timeout_in_seconds))
+#elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
+#include <libc/local/unistd/getpassfd.h>
+/* >> getpassfd(3)
+ * This function behaves similar to `readpassphrase(3)', but is still
+ * quite distinct from that function in how this one behaves, vs. how
+ * that other function behaves. In general, this function is a bit more
+ * user-friendly, in that it offers more (but different) `flags' to
+ * control how the password prompt is generated, with the main advantage
+ * of this function being that it implements some "advanced" readline
+ * functionality, such as deleting typed characters without relying on
+ * the system TTY canonical buffer (which `readpassphrase(3)' needs,
+ * since it doesn't include support for _any_ control characters other
+ * that CR/LF as indicators to stop reading text)
+ * Which of the 2 functions should be used is a matter of taste, but
+ * personally, I prefer this one over `readpassphrase(3)'.
+ * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
+ * @param: buf:     [0..buflen] Buffer that will receive the user's password.
+ *                              When set to `NULL', a dynamically allocated
+ *                              buffer will be used and returned.
+ * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
+ * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ *                              of files, used for [read,write,beep] operations.
+ *                              When `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              STDERR_FILENO' as final fallback.
+ *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              will fail with `errno=ENOTTY' if the actually
+ *                              used `fds[0]' (iow: stdin) isn't a TTY device
+ *                              s.a. `isatty(3)'
+ * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ *                              user to type each character of their password. If
+ *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ *                              Negative values result in weak undefined behavior.
+ * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
+ * @return: buf:                Success
+ * @return: NULL: [ETIMEDOUT]   The given `timeout_in_seconds' has expired.
+ * @return: NULL: [EINVAL]      `buf' is non-`NULL', but `buflen' is `0'
+ * @return: NULL: [ENOTTY]      `GETPASS_NEED_TTY' was given, but not a tty
+ * @return: NULL: [ENOMEM]      Insufficient memory
+ * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
+ * @return: NULL: [*]           Error */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpassfd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL getpassfd)(char const *__prompt, char *__buf, size_t __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpassfd))(__prompt, __buf, __buflen, __fds, __flags, __timeout_in_seconds); })
+#endif /* ... */
+#ifdef __CRT_HAVE_getpass_r
+/* >> getpass_r(3) */
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpass_r,(char const *__prompt, char *__buf, size_t __bufsize),(__prompt,__buf,__bufsize))
+#elif defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
+#include <libc/local/unistd/getpass_r.h>
+/* >> getpass_r(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpass_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL getpass_r)(char const *__prompt, char *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass_r))(__prompt, __buf, __bufsize); })
+#endif /* ... */
 #endif /* __USE_NETBSD */
 
 

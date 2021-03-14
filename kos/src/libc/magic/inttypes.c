@@ -762,7 +762,7 @@ $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
 @@@param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
 @@@param: rstatus: When non-`NULL', set to a conversion error (if any)
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
 [[guard, impl_include("<libc/errno.h>")]]
 $intmax_t strtoi([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **__restrict endptr,
@@ -811,8 +811,8 @@ $intmax_t strtoi([[nonnull]] char const *__restrict nptr,
 }
 
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<bits/types.h>"), doc_alias("strtoi")]]
-[[guard, impl_include("<libc/errno.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
+[[doc_alias("strtoi"), guard, impl_include("<libc/errno.h>")]]
 $uintmax_t strtou([[nonnull]] char const *__restrict nptr,
                   [[nullable]] char **__restrict endptr,
                   __STDC_INT_AS_UINT_T base,
@@ -860,8 +860,8 @@ $uintmax_t strtou([[nonnull]] char const *__restrict nptr,
 }
 
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<bits/types.h>"), doc_alias("strtoi")]]
-[[impl_include("<libc/errno.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
+[[doc_alias("strtoi"), impl_include("<libc/errno.h>")]]
 $intmax_t strtoi_l([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **__restrict endptr,
                    __STDC_INT_AS_UINT_T base,
@@ -872,8 +872,8 @@ $intmax_t strtoi_l([[nonnull]] char const *__restrict nptr,
 }
 
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<bits/types.h>"), doc_alias("strtoi")]]
-[[impl_include("<libc/errno.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
+[[doc_alias("strtoi"), impl_include("<libc/errno.h>")]]
 $uintmax_t strtou_l([[nonnull]] char const *__restrict nptr,
                     [[nullable]] char **__restrict endptr,
                     __STDC_INT_AS_UINT_T base,

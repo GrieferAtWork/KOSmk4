@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f4902e3 */
+/* HASH CRC-32:0xa63de29d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_END
  * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
  * @return: buf:  Success
  * @return: NULL: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt,
                                           char *buf,
                                           size_t bufsize,
@@ -185,9 +185,6 @@ again:
 #endif /* ... */
 		}
 #ifdef __VSTATUS
-#ifndef __VDISABLE
-#define __VDISABLE '\0'
-#endif /* !__VDISABLE */
 		if (term.c_cc[__VSTATUS] != __VDISABLE)
 			term.c_cc[__VSTATUS] = __VDISABLE;
 #endif /* __VSTATUS */
@@ -247,7 +244,7 @@ again:
 	/* XXX: I don't really understand why the prompt is only printed
 	 *      when using /dev/tty as output,  but that's how BSD  does
 	 *      this, too... */
-	if (*prompt && !(flags & __RPP_STDIN)) {
+	if (prompt && *prompt && !(flags & __RPP_STDIN)) {
 		if (libc_write(outfd, prompt, libc_strlen(prompt)) == -1)
 			goto err_infd_oldsact_oldios;
 	}
@@ -274,9 +271,9 @@ again:
 				if (flags & __RPP_SEVENBIT)
 					ch &= 0x7f;
 				if (flags & __RPP_FORCELOWER)
-					ch = (unsigned char)libc_tolower(ch);
+					ch = (unsigned char)libc_tolower((char)ch);
 				if (flags & __RPP_FORCEUPPER)
-					ch = (unsigned char)libc_toupper(ch);
+					ch = (unsigned char)libc_toupper((char)ch);
 				*dst++ = ch;
 			}
 		}

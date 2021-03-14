@@ -108,7 +108,7 @@ typedef __SIZE_TYPE__ size_t;
 @@away uses of this function when they (think) that clearing the memory
 @@wouldn't have any visible side-effects (though those side-effects
 @@may be a security-concious application trying to wipe sensitive data)
-[[nocrt, no_crt_self_import, guard]]
+[[libc, nocrt, no_crt_self_import, guard]]
 [[alias("bzero", "explicit_bzero", "__bzero")]]
 void explicit_bzero(void *dst, size_t n_bytes) {
 	void *volatile vdst = dst;

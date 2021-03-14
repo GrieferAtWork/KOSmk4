@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c01e2db */
+/* HASH CRC-32:0x55fee2ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,32 +18,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_READPASSPHRASE_H
-#define GUARD_LIBC_AUTO_READPASSPHRASE_H 1
+#ifndef _LIBC_STRINGS_H
+#define _LIBC_STRINGS_H 1
 
-#include "../api.h"
+#include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <readpassphrase.h>
+#ifdef __CC__
+#include <__crt.h>
+#include "core/strings.h"
 
-DECL_BEGIN
+/* >> explicit_bzero(3)
+ * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * away uses of this function when they (think) that clearing the memory
+ * wouldn't have any visible side-effects (though those side-effects
+ * may be a security-concious application trying to wipe sensitive data) */
+#define __libc_explicit_bzero __libc_core_explicit_bzero
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> readpassphrase(3)
- * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
- * @return: buf:  Success
- * @return: NULL: Error (s.a. `errno') */
-INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_readpassphrase)(char const *prompt, char *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> readpassphrase(3)
- * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
- * @return: buf:  Success
- * @return: NULL: Error (s.a. `errno') */
-INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt, char *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
-#endif /* !__KERNEL__ */
+#endif /* __CC__ */
 
-DECL_END
-
-#endif /* !GUARD_LIBC_AUTO_READPASSPHRASE_H */
+#endif /* !_LIBC_STRINGS_H */

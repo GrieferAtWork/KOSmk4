@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c3dda62 */
+/* HASH CRC-32:0xee9ff09f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1332,6 +1332,8 @@
 #define __CRT_HAVE_DOS$getopt_long
 #define __CRT_HAVE_DOS$getopt_long_only
 #define __CRT_HAVE_DOS$getpass
+#define __CRT_HAVE_DOS$getpass_r
+#define __CRT_HAVE_DOS$getpassfd
 #define __CRT_HAVE_DOS$getpeername
 #define __CRT_HAVE_DOS$getpgid
 #define __CRT_HAVE_DOS$getpmsg
@@ -4433,6 +4435,8 @@
 #define __CRT_HAVE_getopt_long_only
 #define __CRT_HAVE_getpagesize
 #define __CRT_HAVE_getpass
+#define __CRT_HAVE_getpass_r
+#define __CRT_HAVE_getpassfd
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid
 #define __CRT_HAVE_getpgrp

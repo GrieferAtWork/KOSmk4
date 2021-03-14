@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2a26878 */
+/* HASH CRC-32:0xcf59bdf1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_strtoi
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
@@ -60,6 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strtoi_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
+#include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strtonum(3)
  * Similar to `strtoi()' with `base=10', but return human-

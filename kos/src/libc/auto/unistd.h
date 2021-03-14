@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8b8f3ea */
+/* HASH CRC-32:0x3796d69a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -486,11 +486,11 @@ INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBDCALL libd_syscall64)(syscall_ulong_t sys
  * (usually the process) to a path that was previously address by `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path);
 /* >> getpass(3), getpassphrase(3) */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_getpass)(char const *__restrict prompt);
+INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_getpass)(char const *__restrict prompt);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getpass(3), getpassphrase(3) */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt);
+INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ftruncate(2), ftruncate64(2)
@@ -555,6 +555,100 @@ INTDEF char *NOTHROW_NCX(LIBDCALL libd_cuserid)(char *s);
  * that wish to support longer usernames should make use of `getlogin_r()' instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> getpassfd(3)
+ * This function behaves similar to `readpassphrase(3)', but is still
+ * quite distinct from that function in how this one behaves, vs. how
+ * that other function behaves. In general, this function is a bit more
+ * user-friendly, in that it offers more (but different) `flags' to
+ * control how the password prompt is generated, with the main advantage
+ * of this function being that it implements some "advanced" readline
+ * functionality, such as deleting typed characters without relying on
+ * the system TTY canonical buffer (which `readpassphrase(3)' needs,
+ * since it doesn't include support for _any_ control characters other
+ * that CR/LF as indicators to stop reading text)
+ * Which of the 2 functions should be used is a matter of taste, but
+ * personally, I prefer this one over `readpassphrase(3)'.
+ * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
+ * @param: buf:     [0..buflen] Buffer that will receive the user's password.
+ *                              When set to `NULL', a dynamically allocated
+ *                              buffer will be used and returned.
+ * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
+ * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ *                              of files, used for [read,write,beep] operations.
+ *                              When `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              STDERR_FILENO' as final fallback.
+ *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              will fail with `errno=ENOTTY' if the actually
+ *                              used `fds[0]' (iow: stdin) isn't a TTY device
+ *                              s.a. `isatty(3)'
+ * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ *                              user to type each character of their password. If
+ *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ *                              Negative values result in weak undefined behavior.
+ * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
+ * @return: buf:                Success
+ * @return: NULL: [ETIMEDOUT]   The given `timeout_in_seconds' has expired.
+ * @return: NULL: [EINVAL]      `buf' is non-`NULL', but `buflen' is `0'
+ * @return: NULL: [ENOTTY]      `GETPASS_NEED_TTY' was given, but not a tty
+ * @return: NULL: [ENOMEM]      Insufficient memory
+ * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
+ * @return: NULL: [*]           Error */
+INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_getpassfd)(char const *prompt, char *buf, size_t buflen, fd_t fds[3], __STDC_INT_AS_UINT_T flags, int timeout_in_seconds);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getpassfd(3)
+ * This function behaves similar to `readpassphrase(3)', but is still
+ * quite distinct from that function in how this one behaves, vs. how
+ * that other function behaves. In general, this function is a bit more
+ * user-friendly, in that it offers more (but different) `flags' to
+ * control how the password prompt is generated, with the main advantage
+ * of this function being that it implements some "advanced" readline
+ * functionality, such as deleting typed characters without relying on
+ * the system TTY canonical buffer (which `readpassphrase(3)' needs,
+ * since it doesn't include support for _any_ control characters other
+ * that CR/LF as indicators to stop reading text)
+ * Which of the 2 functions should be used is a matter of taste, but
+ * personally, I prefer this one over `readpassphrase(3)'.
+ * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
+ * @param: buf:     [0..buflen] Buffer that will receive the user's password.
+ *                              When set to `NULL', a dynamically allocated
+ *                              buffer will be used and returned.
+ * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
+ * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ *                              of files, used for [read,write,beep] operations.
+ *                              When `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              STDERR_FILENO' as final fallback.
+ *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              will fail with `errno=ENOTTY' if the actually
+ *                              used `fds[0]' (iow: stdin) isn't a TTY device
+ *                              s.a. `isatty(3)'
+ * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ *                              user to type each character of their password. If
+ *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ *                              Negative values result in weak undefined behavior.
+ * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
+ * @return: buf:                Success
+ * @return: NULL: [ETIMEDOUT]   The given `timeout_in_seconds' has expired.
+ * @return: NULL: [EINVAL]      `buf' is non-`NULL', but `buflen' is `0'
+ * @return: NULL: [ENOTTY]      `GETPASS_NEED_TTY' was given, but not a tty
+ * @return: NULL: [ENOMEM]      Insufficient memory
+ * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
+ * @return: NULL: [*]           Error */
+INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt, char *buf, size_t buflen, fd_t fds[3], __STDC_INT_AS_UINT_T flags, int timeout_in_seconds);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> getpass_r(3) */
+INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_getpass_r)(char const *prompt, char *buf, size_t bufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getpass_r(3) */
+INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt, char *buf, size_t bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ctermid_r(3)

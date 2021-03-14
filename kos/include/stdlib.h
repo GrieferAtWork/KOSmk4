@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8216f7ad */
+/* HASH CRC-32:0x4f4e0d30 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3278,19 +3278,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #define __getpass_defined 1
 #ifdef __CRT_HAVE_getpass
 /* >> getpass(3), getpassphrase(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
 #elif defined(__CRT_HAVE_getpassphrase)
 /* >> getpass(3), getpassphrase(3) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),getpassphrase,(__prompt))
+__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),getpassphrase,(__prompt))
 #else /* ... */
 #include <asm/os/stdio.h>
-#if defined(__CRT_HAVE_readpassphrase) || (defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)))
+#if defined(__CRT_HAVE_getpass_r) || defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
 #include <libc/local/unistd/getpass.h>
 /* >> getpass(3), getpassphrase(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getpass)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); })
-#else /* __CRT_HAVE_readpassphrase || (__STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read)) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL getpass)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); })
+#else /* __CRT_HAVE_getpass_r || __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE_readpassphrase */
 #undef __getpass_defined
-#endif /* !__CRT_HAVE_readpassphrase && (!__STDIN_FILENO || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read)) */
+#endif /* !__CRT_HAVE_getpass_r && !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE_readpassphrase */
 #endif /* !... */
 #endif /* !__getpass_defined */
 #ifndef __getpw_defined
@@ -3383,17 +3383,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fdwalk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !__CRT_HAVE_fdwalk */
 #ifdef __CRT_HAVE_getpass
 /* >> getpass(3), getpassphrase(3) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpassphrase,(char const *__restrict __prompt),getpass,(__prompt))
+__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpassphrase,(char const *__restrict __prompt),getpass,(__prompt))
 #elif defined(__CRT_HAVE_getpassphrase)
 /* >> getpass(3), getpassphrase(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpassphrase,(char const *__restrict __prompt),(__prompt))
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpassphrase,(char const *__restrict __prompt),(__prompt))
 #else /* ... */
 #include <asm/os/stdio.h>
-#if defined(__CRT_HAVE_readpassphrase) || (defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)))
+#if defined(__CRT_HAVE_getpass_r) || defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
 #include <libc/local/unistd/getpass.h>
 /* >> getpass(3), getpassphrase(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getpassphrase)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); }
-#endif /* __CRT_HAVE_readpassphrase || (__STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read)) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL getpassphrase)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); }
+#endif /* __CRT_HAVE_getpass_r || __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE_readpassphrase */
 #endif /* !... */
 #endif /* __USE_SOLARIS */
 
