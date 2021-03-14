@@ -150,17 +150,17 @@ int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
 struct group *fgetgrent([[nonnull]] $FILE *__restrict stream);
 
 @@>> setgroups(2)
-[[cp, decl_include("<bits/types.h>")]]
+[[cp, guard, decl_include("<bits/types.h>")]]
 int setgroups(size_t count, [[inp_opt(count)]] $gid_t const *groups);
 
 @@>> getgrouplist(3)
-[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp, guard, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrouplist([[nonnull]] char const *user, $gid_t group,
                  [[outp(*ngroups)]] $gid_t *groups,
                  [[nonnull]] int *ngroups);
 
 @@>> initgroups(3)
-[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[cp, guard, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int initgroups([[nonnull]] char const *user, $gid_t group);
 %#endif /* __USE_MISC */
 

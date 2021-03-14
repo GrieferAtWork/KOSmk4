@@ -709,6 +709,7 @@
 #define __CRT_HAVE___strxfrm_l
 #define __CRT_HAVE___sys_errlist
 #define __CRT_HAVE___sys_nerr
+#define __CRT_HAVE___syscall
 #define __CRT_HAVE___sysconf
 #define __CRT_HAVE___sysv_signal
 #define __CRT_HAVE___tan
@@ -3401,6 +3402,8 @@
 #define __CRT_HAVE_strstartcmp
 #define __CRT_HAVE_strstartcmpz
 #define __CRT_HAVE_strstr
+#define __CRT_HAVE_strsuftoll
+#define __CRT_HAVE_strsuftollx
 #define __CRT_HAVE_strto32
 #define __CRT_HAVE_strto32_l
 #define __CRT_HAVE_strto64

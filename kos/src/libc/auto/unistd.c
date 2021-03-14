@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x626b5bf0 */
+/* HASH CRC-32:0x49930647 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,7 +363,7 @@ NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTERN ATTR_SECTION(".text.crt.solaris") int
+INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
 	fd_t result;
 	result = libc_dup2(fd, __AT_FDROOT);

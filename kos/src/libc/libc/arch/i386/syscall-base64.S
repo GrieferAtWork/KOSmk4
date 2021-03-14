@@ -50,6 +50,7 @@ END(libc_syscall)
 DEFINE_INTERN_ALIAS(libc_syscall64, libc_syscall)
 DEFINE_PUBLIC_ALIAS(syscall, libc_syscall)
 DEFINE_PUBLIC_ALIAS(syscall64, libc_syscall64)
+DEFINE_PUBLIC_ALIAS(__syscall, libc_syscall64)
 
 .section .text.crt.except.system.utility.Syscall
 INTERN_FUNCTION(libc_Syscall)

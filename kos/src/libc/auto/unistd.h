@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f9eb41c */
+/* HASH CRC-32:0xd8b8f3ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -329,8 +329,8 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void 
 /* >> pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe2)(fd_t pipedes[2], oflag_t flags);
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe2)(fd_t pipedes[2], oflag_t flags);
 INTDEF int NOTHROW_RPC(LIBDCALL libd_syncfs)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_group_member)(gid_t gid);
 /* >> getresuid(2)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc65ad7b */
+/* HASH CRC-32:0xf3911508 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,20 +63,24 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,__localdep_strtoull,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #elif __SIZEOF_LONG__ == 8
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <libc/local/stdlib/strtou64.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoull (*(__ULONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou64))
-#elif __SIZEOF_LONG__ == 4
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if __SIZEOF_LONG__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou32.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoull (*(__ULONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou32))
-#else /* ... */
+#else /* __SIZEOF_LONG__ == 4 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtoull.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoull __LIBC_LOCAL_NAME(strtoull)
+#endif /* __SIZEOF_LONG__ != 4 */
 #endif /* !... */
 #endif /* !__local___localdep_strtoull_defined */
 __LOCAL_LIBC(strtoull_l) __ATTR_NONNULL((1)) __ULONGLONG

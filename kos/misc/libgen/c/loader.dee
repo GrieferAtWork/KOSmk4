@@ -3668,8 +3668,8 @@ again_skip_annotation_rbracket:
 		 * that certain attributes that would affect its export  behavior
 		 * havn't been set. */
 		if (currentFeatures.crt_noImpl) {
-			if (currentFeatures.crt_kosSection != context.defaultFeatures.crt_kosSection ||
-			    currentFeatures.crt_dosSection != context.defaultFeatures.crt_dosSection) {
+			if (currentFeatures.crt_kosSection !== context.defaultFeatures.crt_kosSection ||
+			    currentFeatures.crt_dosSection !== context.defaultFeatures.crt_dosSection) {
 				self.errAt(currentNameTokStart,
 					"[section({!r})] used with [nocrt] or [crt_no_impl]"
 					.format({ currentFeatures.crt_kosSection }));

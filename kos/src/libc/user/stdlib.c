@@ -1461,8 +1461,8 @@ NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 }
 /*[[[end:libc_posix_openpt]]]*/
 
-/*[[[head:libc_getpt,hash:CRC-32=0xa0920e89]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") int
+/*[[[head:libc_getpt,hash:CRC-32=0x3ef69a1d]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 /*[[[body:libc_getpt]]]*/
 /*AUTO*/{
@@ -1544,9 +1544,9 @@ char **libc___p___initenv_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init.__p___initenv.initialized")
 struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
 
-/*[[[head:libc___p___initenv,hash:CRC-32=0xb551ec82]]]*/
+/*[[[head:libc___p___initenv,hash:CRC-32=0x2f3a191d]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
+INTERN ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
 NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 /*[[[body:libc___p___initenv]]]*/
 {
@@ -1557,8 +1557,8 @@ NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 }
 /*[[[end:libc___p___initenv]]]*/
 
-/*[[[head:libd___p__wenviron,hash:CRC-32=0x876527b4]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+/*[[[head:libd___p__wenviron,hash:CRC-32=0xf111074f]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 /*[[[body:libd___p__wenviron]]]*/
 /*AUTO*/{
@@ -1568,8 +1568,8 @@ NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 }
 /*[[[end:libd___p__wenviron]]]*/
 
-/*[[[head:libc___p__wenviron,hash:CRC-32=0x19797235]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
+/*[[[head:libc___p__wenviron,hash:CRC-32=0x6f0d52ce]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
 NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void)
 /*[[[body:libc___p__wenviron]]]*/
 /*AUTO*/{
@@ -1579,9 +1579,9 @@ NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void)
 }
 /*[[[end:libc___p__wenviron]]]*/
 
-/*[[[head:libd___p___winitenv,hash:CRC-32=0x90b2aec9]]]*/
+/*[[[head:libd___p___winitenv,hash:CRC-32=0xbaabf17d]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 /*[[[body:libd___p___winitenv]]]*/
 /*AUTO*/{
@@ -1591,9 +1591,9 @@ NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 }
 /*[[[end:libd___p___winitenv]]]*/
 
-/*[[[head:libc___p___winitenv,hash:CRC-32=0xa93012a]]]*/
+/*[[[head:libc___p___winitenv,hash:CRC-32=0x208a5e9e]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
 NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
 /*[[[body:libc___p___winitenv]]]*/
 /*AUTO*/{
@@ -1603,8 +1603,8 @@ NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
 }
 /*[[[end:libc___p___winitenv]]]*/
 
-/*[[[head:libd___p___wargv,hash:CRC-32=0x1611f440]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+/*[[[head:libd___p___wargv,hash:CRC-32=0x61c5fc73]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 /*[[[body:libd___p___wargv]]]*/
 /*AUTO*/{
@@ -1614,8 +1614,8 @@ NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 }
 /*[[[end:libd___p___wargv]]]*/
 
-/*[[[head:libc___p___wargv,hash:CRC-32=0xd1fa5108]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
+/*[[[head:libc___p___wargv,hash:CRC-32=0xa62e593b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
 NOTHROW_NCX(LIBKCALL libc___p___wargv)(void)
 /*[[[body:libc___p___wargv]]]*/
 /*AUTO*/{
@@ -1625,8 +1625,8 @@ NOTHROW_NCX(LIBKCALL libc___p___wargv)(void)
 }
 /*[[[end:libc___p___wargv]]]*/
 
-/*[[[head:libd___p__wpgmptr,hash:CRC-32=0xa88e3e57]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
+/*[[[head:libd___p__wpgmptr,hash:CRC-32=0xdf5a3664]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
 NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 /*[[[body:libd___p__wpgmptr]]]*/
 /*AUTO*/{
@@ -1636,8 +1636,8 @@ NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 }
 /*[[[end:libd___p__wpgmptr]]]*/
 
-/*[[[head:libc___p__wpgmptr,hash:CRC-32=0xb1874881]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t **
+/*[[[head:libc___p__wpgmptr,hash:CRC-32=0xc65340b2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t **
 NOTHROW_NCX(LIBKCALL libc___p__wpgmptr)(void)
 /*[[[body:libc___p__wpgmptr]]]*/
 /*AUTO*/{
@@ -2106,8 +2106,9 @@ NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
 }
 /*[[[end:libc_reallocf]]]*/
 
-/*[[[head:libc_recallocarray,hash:CRC-32=0x15c974db]]]*/
-/* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+/*[[[head:libc_recallocarray,hash:CRC-32=0x7b1f23e9]]]*/
+/* >> recallocarray(3)
+ * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *
@@ -2231,10 +2232,10 @@ NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev,
 }
 /*[[[end:libc_devname_r]]]*/
 
-/*[[[head:libd_setproctitle,hash:CRC-32=0x1f9f6c1a]]]*/
+/*[[[head:libd_setproctitle,hash:CRC-32=0x6c890fc]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 INTERN ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) void
-NOTHROW_NCX(VLIBDCALL libd_setproctitle)(const char *format,
+NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
                                          ...)
 /*[[[body:libd_setproctitle]]]*/
 /*AUTO*/{
@@ -2245,9 +2246,9 @@ NOTHROW_NCX(VLIBDCALL libd_setproctitle)(const char *format,
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_setproctitle]]]*/
 
-/*[[[head:libc_setproctitle,hash:CRC-32=0x973df151]]]*/
+/*[[[head:libc_setproctitle,hash:CRC-32=0x8e6a0db7]]]*/
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) void
-NOTHROW_NCX(VLIBCCALL libc_setproctitle)(const char *format,
+NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
                                          ...)
 /*[[[body:libc_setproctitle]]]*/
 /*AUTO*/{
@@ -2261,7 +2262,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(const char *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe98f779a]]]*/
+/*[[[start:exports,hash:CRC-32=0x288d7b46]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2271,6 +2272,7 @@ DEFINE_PUBLIC_ALIAS(_exit, libc__Exit);
 DEFINE_PUBLIC_ALIAS(_Exit, libc__Exit);
 DEFINE_PUBLIC_ALIAS(srand, libc_srand);
 DEFINE_PUBLIC_ALIAS(rand, libc_rand);
+DEFINE_PUBLIC_ALIAS(rand_r, libc_rand_r);
 DEFINE_PUBLIC_ALIAS(drand48_r, libc_drand48_r);
 DEFINE_PUBLIC_ALIAS(erand48_r, libc_erand48_r);
 DEFINE_PUBLIC_ALIAS(lrand48_r, libc_lrand48_r);
@@ -2286,8 +2288,9 @@ DEFINE_PUBLIC_ALIAS(initstate_r, libc_initstate_r);
 DEFINE_PUBLIC_ALIAS(setstate_r, libc_setstate_r);
 DEFINE_PUBLIC_ALIAS(on_exit, libc_on_exit);
 DEFINE_PUBLIC_ALIAS(clearenv, libc_clearenv);
-DEFINE_PUBLIC_ALIAS(rand_r, libc_rand_r);
 DEFINE_PUBLIC_ALIAS(getloadavg, libc_getloadavg);
+DEFINE_PUBLIC_ALIAS(setenv, libc_setenv);
+DEFINE_PUBLIC_ALIAS(unsetenv, libc_unsetenv);
 DEFINE_PUBLIC_ALIAS(drand48, libc_drand48);
 DEFINE_PUBLIC_ALIAS(lrand48, libc_lrand48);
 DEFINE_PUBLIC_ALIAS(mrand48, libc_mrand48);
@@ -2311,8 +2314,6 @@ DEFINE_PUBLIC_ALIAS(realpath, libc_realpath);
 DEFINE_PUBLIC_ALIAS(frealpath, libc_frealpath);
 DEFINE_PUBLIC_ALIAS(frealpath4, libc_frealpath4);
 DEFINE_PUBLIC_ALIAS(frealpathat, libc_frealpathat);
-DEFINE_PUBLIC_ALIAS(setenv, libc_setenv);
-DEFINE_PUBLIC_ALIAS(unsetenv, libc_unsetenv);
 DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
 DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
 DEFINE_PUBLIC_ALIAS(ptsname_r, libc_ptsname_r);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d713142 */
+/* HASH CRC-32:0x5b03848f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1962,6 +1962,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_strtoi64_l, libd_strto64_l);
 DEFINE_PUBLIC_ALIAS(DOS$strto64_l, libd_strto64_l);
 DEFINE_PUBLIC_ALIAS(DOS$_gcvt, libd_gcvt);
 DEFINE_PUBLIC_ALIAS(DOS$gcvt, libd_gcvt);
+DEFINE_PUBLIC_ALIAS(DOS$rand_r, libd_rand_r);
 DEFINE_PUBLIC_ALIAS(DOS$ecvt_r, libd_ecvt_r);
 DEFINE_PUBLIC_ALIAS(DOS$fcvt_r, libd_fcvt_r);
 DEFINE_PUBLIC_ALIAS(DOS$qgcvt, libd_qgcvt);
@@ -1986,8 +1987,9 @@ DEFINE_PUBLIC_ALIAS(DOS$on_exit, libd_on_exit);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps64, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$rpmatch, libd_rpmatch);
-DEFINE_PUBLIC_ALIAS(DOS$rand_r, libd_rand_r);
 DEFINE_PUBLIC_ALIAS(DOS$getloadavg, libd_getloadavg);
+DEFINE_PUBLIC_ALIAS(DOS$setenv, libd_setenv);
+DEFINE_PUBLIC_ALIAS(DOS$unsetenv, libd_unsetenv);
 DEFINE_PUBLIC_ALIAS(DOS$erand48, libd_erand48);
 DEFINE_PUBLIC_ALIAS(DOS$nrand48, libd_nrand48);
 DEFINE_PUBLIC_ALIAS(DOS$jrand48, libd_jrand48);
@@ -2005,8 +2007,6 @@ DEFINE_PUBLIC_ALIAS(DOS$realpath, libd_realpath);
 DEFINE_PUBLIC_ALIAS(DOS$frealpath, libd_frealpath);
 DEFINE_PUBLIC_ALIAS(DOS$frealpath4, libd_frealpath4);
 DEFINE_PUBLIC_ALIAS(DOS$frealpathat, libd_frealpathat);
-DEFINE_PUBLIC_ALIAS(DOS$setenv, libd_setenv);
-DEFINE_PUBLIC_ALIAS(DOS$unsetenv, libd_unsetenv);
 DEFINE_PUBLIC_ALIAS(DOS$_mktemp, libd_mktemp);
 DEFINE_PUBLIC_ALIAS(DOS$__mktemp, libd_mktemp);
 DEFINE_PUBLIC_ALIAS(DOS$mktemp, libd_mktemp);
@@ -2065,6 +2065,8 @@ DEFINE_PUBLIC_ALIAS(DOS$getbsize, libd_getbsize);
 DEFINE_PUBLIC_ALIAS(DOS$devname, libd_devname);
 DEFINE_PUBLIC_ALIAS(DOS$devname_r, libd_devname_r);
 DEFINE_PUBLIC_ALIAS(DOS$setprogname, libd_setprogname);
+DEFINE_PUBLIC_ALIAS(DOS$strsuftoll, libd_strsuftoll);
+DEFINE_PUBLIC_ALIAS(DOS$strsuftollx, libd_strsuftollx);
 DEFINE_PUBLIC_ALIAS(DOS$_set_doserrno, libd__set_doserrno);
 DEFINE_PUBLIC_ALIAS(DOS$_set_purecall_handler, libd__set_purecall_handler);
 DEFINE_PUBLIC_ALIAS(DOS$_set_invalid_parameter_handler, libd__set_invalid_parameter_handler);
@@ -3019,8 +3021,8 @@ DEFINE_PUBLIC_ALIAS(DOS$__pwrite64, libd_pwrite64);
 DEFINE_PUBLIC_ALIAS(DOS$pwrite64, libd_pwrite64);
 DEFINE_PUBLIC_ALIAS(DOS$preadall64, libd_preadall64);
 DEFINE_PUBLIC_ALIAS(DOS$pwriteall64, libd_pwriteall64);
-DEFINE_PUBLIC_ALIAS(DOS$pipe2, libd_pipe2);
 DEFINE_PUBLIC_ALIAS(DOS$dup3, libd_dup3);
+DEFINE_PUBLIC_ALIAS(DOS$pipe2, libd_pipe2);
 DEFINE_PUBLIC_ALIAS(DOS$syncfs, libd_syncfs);
 DEFINE_PUBLIC_ALIAS(DOS$group_member, libd_group_member);
 DEFINE_PUBLIC_ALIAS(DOS$getresuid, libd_getresuid);
@@ -3058,6 +3060,7 @@ DEFINE_PUBLIC_ALIAS(DOS$profil, libd_profil);
 DEFINE_PUBLIC_ALIAS(DOS$daemon, libd_daemon);
 DEFINE_PUBLIC_ALIAS(DOS$revoke, libd_revoke);
 DEFINE_PUBLIC_ALIAS(DOS$syscall, libd_syscall);
+DEFINE_PUBLIC_ALIAS(DOS$__syscall, libd_syscall64);
 DEFINE_PUBLIC_ALIAS(DOS$syscall64, libd_syscall64);
 DEFINE_PUBLIC_ALIAS(DOS$chroot, libd_chroot);
 DEFINE_PUBLIC_ALIAS(DOS$getpassphrase, libd_getpass);

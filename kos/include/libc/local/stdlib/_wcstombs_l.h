@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd15eb56a */
+/* HASH CRC-32:0x2d79f859 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,12 @@
 #ifndef __local__wcstombs_l_defined
 #define __local__wcstombs_l_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcstombs from stdlib */
 #ifndef __local___localdep_wcstombs_defined
 #define __local___localdep_wcstombs_defined 1
 #ifdef __CRT_HAVE_wcstombs
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
 #else /* __CRT_HAVE_wcstombs */
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe139e937 */
+/* HASH CRC-32:0xf8443785 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2368,52 +2368,132 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
 	return (char32_t *)str;
 }
 #endif /* !LIBC_ARCH_HAVE_C32SNEND */
+#include <libc/errno.h>
+#include <hybrid/limitcore.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u32 result;
 	char16_t sign = *nptr;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (sign == '-') {
 		++nptr;
 		result = libd_wcstou32(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (result > (u32)((u32)0 - (u32)__INT32_MIN__)) {
+			__libc_seterrno(ERANGE);
+			return __INT32_MIN__;
+		}
+#endif /* __libc_geterrno && ERANGE */
 		return -(s32)result;
 	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libd_wcstou32(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+	if (result > (u32)__INT32_MAX__) {
+		__libc_seterrno(ERANGE);
+		return __INT32_MAX__;
+	}
+#endif /* __libc_geterrno && ERANGE */
 	return (s32)result;
 }
+#include <libc/errno.h>
+#include <hybrid/limitcore.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u32 result;
 	char32_t sign = *nptr;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (sign == '-') {
 		++nptr;
 		result = libc_wcstou32(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (result > (u32)((u32)0 - (u32)__INT32_MIN__)) {
+			__libc_seterrno(ERANGE);
+			return __INT32_MIN__;
+		}
+#endif /* __libc_geterrno && ERANGE */
 		return -(s32)result;
 	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libc_wcstou32(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+	if (result > (u32)__INT32_MAX__) {
+		__libc_seterrno(ERANGE);
+		return __INT32_MAX__;
+	}
+#endif /* __libc_geterrno && ERANGE */
 	return (s32)result;
 }
+#include <libc/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
 	u32 result, temp;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (!base) {
 		if (*nptr == '0') {
 			char16_t ch = *++nptr;
 			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
+				/* TODO: Require that at least 1 more character be read! */
 			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
+				/* TODO: Require that at least 1 more character be read! */
 			} else {
 				base = 8;
 			}
@@ -2439,28 +2519,76 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		    __hybrid_overflow_uadd(result, temp, &result)) {
+			if (endptr) {
+				for (;;) {
+					char16_t ch = *nptr;
+					if (ch >= '0' && ch <= '9')
+						temp = (u64)(ch - '0');
+					else if (ch >= 'a' && ch <= 'z')
+						temp = (u64)10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						temp = (u64)10 + (ch - 'A');
+					else {
+						/* TODO: Support for unicode decimals, and multi-byte characters.
+						 *       But only do this if libc supports it (i.e. don't do this
+						 *       in kernel-space) */
+						break;
+					}
+					if (temp >= (unsigned int)base)
+						break;
+					++nptr;
+				}
+				*endptr = (char16_t *)nptr;
+			}
+			return (u32)(s32)__libc_seterrno(ERANGE);
+		}
+#else /* __libc_geterrno && ERANGE */
 		result *= (unsigned int)base;
 		result += temp;
+#endif /* !__libc_geterrno || !ERANGE */
 	}
 	if (endptr)
 		*endptr = (char16_t *)nptr;
 	return result;
 }
+#include <libc/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
 	u32 result, temp;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (!base) {
 		if (*nptr == '0') {
 			char32_t ch = *++nptr;
 			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
+				/* TODO: Require that at least 1 more character be read! */
 			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
+				/* TODO: Require that at least 1 more character be read! */
 			} else {
 				base = 8;
 			}
@@ -2486,28 +2614,76 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		    __hybrid_overflow_uadd(result, temp, &result)) {
+			if (endptr) {
+				for (;;) {
+					char32_t ch = *nptr;
+					if (ch >= '0' && ch <= '9')
+						temp = (u64)(ch - '0');
+					else if (ch >= 'a' && ch <= 'z')
+						temp = (u64)10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						temp = (u64)10 + (ch - 'A');
+					else {
+						/* TODO: Support for unicode decimals, and multi-byte characters.
+						 *       But only do this if libc supports it (i.e. don't do this
+						 *       in kernel-space) */
+						break;
+					}
+					if (temp >= (unsigned int)base)
+						break;
+					++nptr;
+				}
+				*endptr = (char32_t *)nptr;
+			}
+			return (u32)(s32)__libc_seterrno(ERANGE);
+		}
+#else /* __libc_geterrno && ERANGE */
 		result *= (unsigned int)base;
 		result += temp;
+#endif /* !__libc_geterrno || !ERANGE */
 	}
 	if (endptr)
 		*endptr = (char32_t *)nptr;
 	return result;
 }
+#include <libc/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
 	u64 result, temp;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (!base) {
 		if (*nptr == '0') {
 			char16_t ch = *++nptr;
 			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
+				/* TODO: Require that at least 1 more character be read! */
 			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
+				/* TODO: Require that at least 1 more character be read! */
 			} else {
 				base = 8;
 			}
@@ -2533,28 +2709,55 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+
+		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		    __hybrid_overflow_uadd(result, temp, &result))
+			__libc_seterrno(ERANGE);
+#else /* __libc_geterrno && ERANGE */
 		result *= (unsigned int)base;
 		result += temp;
+#endif /* !__libc_geterrno || !ERANGE */
 	}
 	if (endptr)
 		*endptr = (char16_t *)nptr;
 	return result;
 }
+#include <libc/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
 	u64 result, temp;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (!base) {
 		if (*nptr == '0') {
 			char32_t ch = *++nptr;
 			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
+				/* TODO: Require that at least 1 more character be read! */
 			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
+				/* TODO: Require that at least 1 more character be read! */
 			} else {
 				base = 8;
 			}
@@ -2580,44 +2783,111 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+
+		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		    __hybrid_overflow_uadd(result, temp, &result))
+			__libc_seterrno(ERANGE);
+#else /* __libc_geterrno && ERANGE */
 		result *= (unsigned int)base;
 		result += temp;
+#endif /* !__libc_geterrno || !ERANGE */
 	}
 	if (endptr)
 		*endptr = (char32_t *)nptr;
 	return result;
 }
+#include <libc/errno.h>
+#include <hybrid/limitcore.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u64 result;
 	char16_t sign = *nptr;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (sign == '-') {
 		++nptr;
 		result = libd_wcstou64(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (result > (u64)((u64)0 - (u64)__INT64_MIN__)) {
+			__libc_seterrno(ERANGE);
+			return __INT64_MIN__;
+		}
+#endif /* __libc_geterrno && ERANGE */
 		return -(s64)result;
 	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libd_wcstou64(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+	if (result > (u64)__INT64_MAX__) {
+		__libc_seterrno(ERANGE);
+		return __INT64_MAX__;
+	}
+#endif /* __libc_geterrno && ERANGE */
 	return (s64)result;
 }
+#include <libc/errno.h>
+#include <hybrid/limitcore.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u64 result;
 	char32_t sign = *nptr;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (sign == '-') {
 		++nptr;
 		result = libc_wcstou64(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+		if (result > (u64)((u64)0 - (u64)__INT64_MIN__)) {
+			__libc_seterrno(ERANGE);
+			return __INT64_MIN__;
+		}
+#endif /* __libc_geterrno && ERANGE */
 		return -(s64)result;
 	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libc_wcstou64(nptr, endptr, base);
+#if defined(__libc_geterrno) && defined(ERANGE)
+	if (result > (u64)__INT64_MAX__) {
+		__libc_seterrno(ERANGE);
+		return __INT64_MAX__;
+	}
+#endif /* __libc_geterrno && ERANGE */
 	return (s64)result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t

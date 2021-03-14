@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa13cfd3f */
+/* HASH CRC-32:0xbcaca21 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,7 +163,8 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_recallocv_defined
 #endif /* !... */
 #endif /* !__local___localdep_recallocv_defined */
-/* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+/* >> recallocarray(3)
+ * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 __LOCAL_LIBC(recallocarray) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *

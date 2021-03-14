@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20973fca */
+/* HASH CRC-32:0x9ca59b8d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -508,7 +508,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #endif /* !... */
 #endif /* !__execlp_defined */
 
-#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU)
+#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU) || defined(__USE_NETBSD)
 #ifndef __execvpe_defined
 #define __execvpe_defined 1
 #ifdef __CRT_HAVE_execvpe
@@ -535,9 +535,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca */
 #endif /* !... */
 #endif /* !__execvpe_defined */
-#endif /* __USE_KOS || __USE_DOS || __USE_GNU */
+#endif /* __USE_KOS || __USE_DOS || __USE_GNU || __USE_NETBSD */
 
-#if defined(__USE_KOS) || defined(__USE_DOS)
+#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_NETBSD)
 #ifndef __execlpe_defined
 #define __execlpe_defined 1
 #ifdef __CRT_HAVE_execlpe
@@ -571,7 +571,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_S
 #endif /* !__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca) */
 #endif /* !... */
 #endif /* !__execlpe_defined */
-#endif /* __USE_KOS || __USE_DOS */
+#endif /* __USE_KOS || __USE_DOS || __USE_NETBSD */
 #ifndef __getpid_defined
 #define __getpid_defined 1
 #ifdef __CRT_HAVE_getpid
@@ -1456,6 +1456,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwriteall64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
+#if defined(__USE_GNU) || defined(__USE_NETBSD)
+#ifdef __CRT_HAVE_dup3
+__CDECLARE(,__fd_t,__NOTHROW_NCX,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
+#elif defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
+#include <libc/local/unistd/dup3.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(dup3, __FORCELOCAL __ATTR_ARTIFICIAL __fd_t __NOTHROW_NCX(__LIBCCALL dup3)(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dup3))(__oldfd, __newfd, __flags); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pipe2
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
+#elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
+#include <libc/local/unistd/pipe2.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pipe2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pipe2)(__fd_t __pipedes[2], __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe2))(__pipedes, __flags); })
+#endif /* ... */
+#endif /* __USE_GNU || __USE_NETBSD */
+
 #ifdef __USE_GNU
 #ifndef __environ_defined
 #define __environ_defined 1
@@ -1493,18 +1508,6 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #undef __environ_defined
 #endif /* !... */
 #endif /* !__environ_defined */
-#ifdef __CRT_HAVE_pipe2
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
-#elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
-#include <libc/local/unistd/pipe2.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(pipe2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pipe2)(__fd_t __pipedes[2], __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe2))(__pipedes, __flags); })
-#endif /* ... */
-#ifdef __CRT_HAVE_dup3
-__CDECLARE(,__fd_t,__NOTHROW_NCX,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
-#elif defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
-#include <libc/local/unistd/dup3.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(dup3, __FORCELOCAL __ATTR_ARTIFICIAL __fd_t __NOTHROW_NCX(__LIBCCALL dup3)(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dup3))(__oldfd, __newfd, __flags); })
-#endif /* ... */
 #ifdef __CRT_HAVE_get_current_dir_name
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_RPC,get_current_dir_name,(void),())
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
@@ -2001,6 +2004,9 @@ __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,syscall64,(__syscall_ulong_t __sysno
 #elif defined(__CRT_HAVE_syscall64)
 /* >> syscall(2), syscall64(2) */
 __LIBC __LONG64_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall64)(__syscall_ulong_t __sysno, ...) __CASMNAME_SAME("syscall64");
+#elif defined(__CRT_HAVE___syscall)
+/* >> syscall(2), syscall64(2) */
+__CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,syscall64,(__syscall_ulong_t __sysno),__syscall,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #endif /* ... */
 #endif /* __USE_KOS */
 
@@ -2241,6 +2247,230 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL char *__
 #endif /* !__cuserid_defined */
 #endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
 
+#ifdef __USE_NETBSD
+#ifndef sys_siglist
+#ifdef _sys_siglist
+#define sys_siglist _sys_siglist
+#else /* _sys_siglist */
+#if !defined(____p_sys_siglist_defined) && defined(__CRT_HAVE___p_sys_siglist)
+#define ____p_sys_siglist_defined 1
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__p_sys_siglist,(void),())
+#endif /* !____p_sys_siglist_defined && __CRT_HAVE___p_sys_siglist */
+#ifdef ____p_sys_siglist_defined
+#define sys_siglist  __p_sys_siglist()
+#define _sys_siglist __p_sys_siglist()
+#endif /* ____p_sys_siglist_defined */
+#ifndef _sys_siglist
+#ifdef __CRT_HAVE_sys_siglist
+__LIBC char const *const sys_siglist[_NSIG];
+#define sys_siglist  sys_siglist
+#define _sys_siglist sys_siglist
+#elif defined(__CRT_HAVE__sys_siglist)
+__LIBC char const *const _sys_siglist[_NSIG];
+#define sys_siglist  _sys_siglist
+#define _sys_siglist _sys_siglist
+#endif /* sys_siglist... */
+#endif /* !_sys_siglist */
+#endif /* !_sys_siglist */
+#endif /* !sys_siglist */
+
+#ifndef __sa_family_t_defined
+#define __sa_family_t_defined 1
+typedef __sa_family_t sa_family_t; /* One of `AF_*' */
+#endif /* !__sa_family_t_defined */
+#if !defined(__getgrouplist_defined) && defined(__CRT_HAVE_getgrouplist)
+#define __getgrouplist_defined 1
+/* >> getgrouplist(3) */
+__CDECLARE(__ATTR_NONNULL((1, 3, 4)),int,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, int *__ngroups),(__user,__group,__groups,__ngroups))
+#endif /* !__getgrouplist_defined && __CRT_HAVE_getgrouplist */
+#if !defined(__initgroups_defined) && defined(__CRT_HAVE_initgroups)
+#define __initgroups_defined 1
+/* >> initgroups(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
+#endif /* !__initgroups_defined && __CRT_HAVE_initgroups */
+#ifndef __mkstemps_defined
+#define __mkstemps_defined 1
+#if defined(__CRT_HAVE_mkstemps64) && defined(__USE_FILE_OFFSET64)
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The # of trailing characters to-be ignored
+ *                    after the required 6 trailing 'X'-characters. */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
+#elif defined(__CRT_HAVE_mkstemps)
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The # of trailing characters to-be ignored
+ *                    after the required 6 trailing 'X'-characters. */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),(__template_,__suffixlen))
+#elif defined(__CRT_HAVE_mkstemps64)
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The # of trailing characters to-be ignored
+ *                    after the required 6 trailing 'X'-characters. */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <libc/local/stdlib/mkstemps.h>
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The # of trailing characters to-be ignored
+ *                    after the required 6 trailing 'X'-characters. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkstemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps))(__template_, __suffixlen); })
+#else /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#undef __mkstemps_defined
+#endif /* !__CRT_HAVE_mkostemps && !__CRT_HAVE_mkostemps64 && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
+#endif /* !... */
+#endif /* !__mkstemps_defined */
+#ifndef __psignal_defined
+#define __psignal_defined 1
+#ifdef __CRT_HAVE_psignal
+/* >> psignal(3)
+ * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
+__CDECLARE_VOID(,__NOTHROW_NCX,psignal,(__signo_t __signo, char const *__s),(__signo,__s))
+#else /* __CRT_HAVE_psignal */
+#include <__crt.h>
+#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
+#include <libc/local/signal/psignal.h>
+/* >> psignal(3)
+ * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(psignal, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL psignal)(__signo_t __signo, char const *__s) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(psignal))(__signo, __s); })
+#else /* !__NO_STDSTREAMS && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */
+#undef __psignal_defined
+#endif /* __NO_STDSTREAMS || (!__CRT_HAVE_fprintf && !__CRT_HAVE__IO_fprintf && !__CRT_HAVE_fprintf_s && !__CRT_HAVE_fprintf_unlocked && !__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock) */
+#endif /* !__CRT_HAVE_psignal */
+#endif /* !__psignal_defined */
+#if !defined(__rcmd_defined) && defined(__CRT_HAVE_rcmd)
+#define __rcmd_defined 1
+/* Call `rshd' at port `rport' on remote machine `*ahost' to execute `cmd'.
+ * The local user is `locuser', on the remote machine the command is
+ * executed as `remuser'. In `*fd2p' the descriptor to the socket for the
+ * connection is returned. The caller must have the right to use a
+ * reserved port. When the function returns `*ahost' contains the
+ * official host name.
+ * This function is not part of POSIX and therefore no official
+ * cancellation point */
+__CDECLARE(,int,__NOTHROW_RPC,rcmd,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p))
+#endif /* !__rcmd_defined && __CRT_HAVE_rcmd */
+#if !defined(__rresvport_defined) && defined(__CRT_HAVE_rresvport)
+#define __rresvport_defined 1
+/* Try to allocate reserved port, returning a descriptor for a socket opened
+ * at this port or -1 if unsuccessful. The search for an available port
+ * will start at `alport' and continues with lower numbers.
+ * This function is not part of POSIX and therefore no official
+ * cancellation point */
+__CDECLARE(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
+#endif /* !__rresvport_defined && __CRT_HAVE_rresvport */
+#if !defined(__setgroups_defined) && defined(__CRT_HAVE_setgroups)
+#define __setgroups_defined 1
+/* >> setgroups(2) */
+__CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
+#endif /* !__setgroups_defined && __CRT_HAVE_setgroups */
+#if !defined(__ruserok_defined) && defined(__CRT_HAVE_ruserok)
+#define __ruserok_defined 1
+/* Check whether user `remuser' on system `rhost' is allowed to login
+ * as `locuser'. If `suser' is not zero the user tries to become
+ * superuser. Return 0 if it is possible.
+ * This function is not part of POSIX and therefore no official
+ * cancellation point */
+__CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser),(__rhost,__suser,__remuser,__locuser))
+#endif /* !__ruserok_defined && __CRT_HAVE_ruserok */
+#ifndef __strmode_defined
+#define __strmode_defined 1
+#ifdef __CRT_HAVE_strmode
+/* Generate a file mode representation similar to what's printed by `ls -l'
+ * The representation is written to `p', and `mode' is the value as returned
+ * by `stat(2)' in `struct stat::st_mode'
+ * The format written is:
+ *    p[0]  = <mode & S_IFMT>: { S_IFDIR: 'd', S_IFCHR: 'c', S_IFBLK:  'b',
+ *                               S_IFREG: '-', S_IFLNK: 'l', S_IFSOCK: 's',
+ *                               S_IFIFO: 'p' }, else: '?';
+ *    p[1]  = mode & S_IRUSR ? 'r' : '-';
+ *    p[2]  = mode & S_IWUSR ? 'w' : '-';
+ *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
+ *                                          S_IXUSR | S_ISUID: 's' };
+ *    p[4]  = mode & S_IRGRP ? 'r' : '-';
+ *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
+ *                                          S_IXGRP | S_ISGID: 's' };
+ *    p[7]  = mode & S_IROTH ? 'r' : '-';
+ *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
+ *                                          S_IXOTH | S_ISVTX: 't' };
+ *    p[10] = ' '; // '+', if "alternate or additional access control
+ *                 //          methods associated with the inode"
+ *    p[11] = '\0'; */
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char __p[12]),(__mode,__p))
+#else /* __CRT_HAVE_strmode */
+#include <libc/local/string/strmode.h>
+/* Generate a file mode representation similar to what's printed by `ls -l'
+ * The representation is written to `p', and `mode' is the value as returned
+ * by `stat(2)' in `struct stat::st_mode'
+ * The format written is:
+ *    p[0]  = <mode & S_IFMT>: { S_IFDIR: 'd', S_IFCHR: 'c', S_IFBLK:  'b',
+ *                               S_IFREG: '-', S_IFLNK: 'l', S_IFSOCK: 's',
+ *                               S_IFIFO: 'p' }, else: '?';
+ *    p[1]  = mode & S_IRUSR ? 'r' : '-';
+ *    p[2]  = mode & S_IWUSR ? 'w' : '-';
+ *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
+ *                                          S_IXUSR | S_ISUID: 's' };
+ *    p[4]  = mode & S_IRGRP ? 'r' : '-';
+ *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
+ *                                          S_IXGRP | S_ISGID: 's' };
+ *    p[7]  = mode & S_IROTH ? 'r' : '-';
+ *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
+ *                                          S_IXOTH | S_ISVTX: 't' };
+ *    p[10] = ' '; // '+', if "alternate or additional access control
+ *                 //          methods associated with the inode"
+ *    p[11] = '\0'; */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL strmode)(__mode_t __mode, char __p[12]) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strmode))(__mode, __p); })
+#endif /* !__CRT_HAVE_strmode */
+#endif /* !__strmode_defined */
+#ifndef __strsignal_defined
+#define __strsignal_defined 1
+#ifdef __std_strsignal_defined
+__NAMESPACE_STD_USING(strsignal)
+#elif defined(__CRT_HAVE_strsignal)
+__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(__signo_t __signo),(__signo))
+#else /* ... */
+#include <libc/local/string/strsignal.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(strsignal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strsignal)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal))(__signo); })
+#endif /* !... */
+#endif /* !__strsignal_defined */
+#if !defined(__rcmd_af_defined) && defined(__CRT_HAVE_rcmd_af)
+#define __rcmd_af_defined 1
+/* This is the equivalent function where the protocol can be selected
+ * and which therefore can be used for IPv6.
+ * This function is not part of POSIX and therefore no official
+ * cancellation point */
+__CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p,__af))
+#endif /* !__rcmd_af_defined && __CRT_HAVE_rcmd_af */
+#endif /* __USE_NETBSD */
+
 
 #if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K))
 #ifndef ____pthread_atfork_func_t_defined
@@ -2407,6 +2637,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #endif /* !__closefrom_defined */
 #endif /* __USE_BSD */
 
+#if defined(__USE_SOLARIS) || defined(__USE_NETBSD)
+#ifdef __CRT_HAVE_fchroot
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+ * and referrs to a directory, then this function can be used to escape a chroot() jail.
+ * No special permissions are required to use this function, since a malicious application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+__CDECLARE(,int,__NOTHROW_NCX,fchroot,(__fd_t __fd),(__fd))
+#else /* __CRT_HAVE_fchroot */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && defined(__AT_FDROOT)
+#include <libc/local/unistd/fchroot.h>
+/* >> fchroot(2)
+ * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+ * and referrs to a directory, then this function can be used to escape a chroot() jail.
+ * No special permissions are required to use this function, since a malicious application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fchroot, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fchroot)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fchroot))(__fd); })
+#endif /* (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && __AT_FDROOT */
+#endif /* !__CRT_HAVE_fchroot */
+#if !defined(__rresvport_af_defined) && defined(__CRT_HAVE_rresvport_af)
+#define __rresvport_af_defined 1
+/* This is the equivalent function where the protocol can be selected
+ * and which therefore can be used for IPv6.
+ * This function is not part of POSIX and therefore no official
+ * cancellation point */
+__CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, __UINT16_TYPE__ __af),(__alport,__af))
+#endif /* !__rresvport_af_defined && __CRT_HAVE_rresvport_af */
+#endif /* __USE_SOLARIS || __USE_NETBSD */
+
 #ifdef __USE_SOLARIS
 #if !defined(__fattach_defined) && defined(__CRT_HAVE_fattach)
 #define __fattach_defined 1
@@ -2437,14 +2697,6 @@ __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULO
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, __UINT16_TYPE__ __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
 #endif /* !__rexec_af_defined && __CRT_HAVE_rexec_af */
-#if !defined(__rresvport_af_defined) && defined(__CRT_HAVE_rresvport_af)
-#define __rresvport_af_defined 1
-/* This is the equivalent function where the protocol can be selected
- * and which therefore can be used for IPv6.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, __UINT16_TYPE__ __af),(__alport,__af))
-#endif /* !__rresvport_af_defined && __CRT_HAVE_rresvport_af */
 #ifndef __stime_defined
 #define __stime_defined 1
 #if defined(__CRT_HAVE_stime64) && defined(__USE_TIME_BITS64)
@@ -2509,25 +2761,6 @@ __CREDIRECT_VOID(,__NOTHROW,yield,(void),__sched_yield,())
  * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CDECLARE_VOID(,__NOTHROW,yield,(void),())
 #endif /* ... */
-#ifdef __CRT_HAVE_fchroot
-/* >> fchroot(2)
- * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
- * and referrs to a directory, then this function can be used to escape a chroot() jail.
- * No special permissions are required to use this function, since a malicious application
- * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-__CDECLARE(,int,__NOTHROW_NCX,fchroot,(__fd_t __fd),(__fd))
-#else /* __CRT_HAVE_fchroot */
-#include <asm/os/fcntl.h>
-#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && defined(__AT_FDROOT)
-#include <libc/local/unistd/fchroot.h>
-/* >> fchroot(2)
- * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
- * and referrs to a directory, then this function can be used to escape a chroot() jail.
- * No special permissions are required to use this function, since a malicious application
- * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fchroot, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fchroot)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fchroot))(__fd); })
-#endif /* (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && __AT_FDROOT */
-#endif /* !__CRT_HAVE_fchroot */
 #ifdef __CRT_HAVE_resolvepath
 /* >> resolvepath(3)
  * Similar to `frealpathat(2)' (though use the later for more options)

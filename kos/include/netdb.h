@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e19dc76 */
+/* HASH CRC-32:0x17c884 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -440,6 +440,8 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getnetgrent_r,(char **__restrict __hostp, char
 #endif /* __USE_MISC */
 
 #ifdef __USE_MISC
+#if !defined(__rcmd_defined) && defined(__CRT_HAVE_rcmd)
+#define __rcmd_defined 1
 /* Call `rshd' at port `rport' on remote machine `*ahost' to execute `cmd'.
  * The local user is `locuser', on the remote machine the command is
  * executed as `remuser'. In `*fd2p' the descriptor to the socket for the
@@ -448,12 +450,16 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getnetgrent_r,(char **__restrict __hostp, char
  * official host name.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,rcmd,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p))
+__CDECLARE(,int,__NOTHROW_RPC,rcmd,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p))
+#endif /* !__rcmd_defined && __CRT_HAVE_rcmd */
+#if !defined(__rcmd_af_defined) && defined(__CRT_HAVE_rcmd_af)
+#define __rcmd_af_defined 1
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p,__af))
+__CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p,__af))
+#endif /* !__rcmd_af_defined && __CRT_HAVE_rcmd_af */
 /* Call `rexecd' at port `rport' on remote machine `*ahost' to execute
  * `cmd'. The process runs at the remote machine using the ID of user
  * `name' whose cleartext password is `passwd'. In `*fd2p' the descriptor
@@ -470,12 +476,15 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rexec,(char **__restrict __ahost, int __rport,
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, __UINT16_TYPE__ __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
 #endif /* !__rexec_af_defined && __CRT_HAVE_rexec_af */
+#if !defined(__ruserok_defined) && defined(__CRT_HAVE_ruserok)
+#define __ruserok_defined 1
 /* Check whether user `remuser' on system `rhost' is allowed to login
  * as `locuser'. If `suser' is not zero the user tries to become
  * superuser. Return 0 if it is possible.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser),(__rhost,__suser,__remuser,__locuser))
+__CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser),(__rhost,__suser,__remuser,__locuser))
+#endif /* !__ruserok_defined && __CRT_HAVE_ruserok */
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
@@ -494,12 +503,15 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok,(uint32_t __raddr, int __suser, char 
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__raddr,__suser,__remuser,__locuser,__af))
+#if !defined(__rresvport_defined) && defined(__CRT_HAVE_rresvport)
+#define __rresvport_defined 1
 /* Try to allocate reserved port, returning a descriptor for a socket opened
  * at this port or -1 if unsuccessful. The search for an available port
  * will start at `alport' and continues with lower numbers.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
+__CDECLARE(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
+#endif /* !__rresvport_defined && __CRT_HAVE_rresvport */
 #if !defined(__rresvport_af_defined) && defined(__CRT_HAVE_rresvport_af)
 #define __rresvport_af_defined 1
 /* This is the equivalent function where the protocol can be selected

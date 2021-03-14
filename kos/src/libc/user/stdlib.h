@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36e3f23f */
+/* HASH CRC-32:0x9ca7724c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,7 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(
 INTDEF void NOTHROW_NCX(LIBCCALL libc_free)(void *mallptr);
 INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
 INTDEF int NOTHROW(LIBCCALL libc_rand)(void);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3], struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_lrand48_r)(struct drand48_data *__restrict buffer, long *__restrict result);
@@ -58,8 +59,9 @@ INTDEF NONNULL((2, 4)) int NOTHROW_NCX(LIBCCALL libc_initstate_r)(unsigned int s
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setstate_r)(char *__restrict statebuf, struct random_data *__restrict buf);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func, void *arg);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clearenv)(void);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname);
 INTDEF double NOTHROW_NCX(LIBCCALL libc_drand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_lrand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_mrand48)(void);
@@ -114,8 +116,6 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolv
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
@@ -127,7 +127,8 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);
  * Upon error, `NULL' is returned instead */
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr, size_t num_bytes);
-/* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+/* >> recallocarray(3)
+ * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size);
@@ -143,10 +144,10 @@ INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_getbsize)(int *he
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBDCALL libd_setproctitle)(const char *format, ...);
+INTDEF ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBCCALL libc_setproctitle)(const char *format, ...);
+INTDEF ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format, ...);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_errno)(errno_t err);

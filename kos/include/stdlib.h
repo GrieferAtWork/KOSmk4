@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14e615a4 */
+/* HASH CRC-32:0xa25e84f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1249,118 +1249,456 @@ __NAMESPACE_STD_USING(strtold)
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* !__NO_FPU */
 
-#ifdef __USE_MISC
-#ifdef __ULONGLONG
-#ifdef __CRT_HAVE_strtoll
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoll,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoq)
-__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strto64) && __SIZEOF_LONG_LONG__ == 8
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strto32) && __SIZEOF_LONG_LONG__ == 4
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto32,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtol) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtol,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE__strtoi64) && __SIZEOF_LONG_LONG__ == 8
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoi64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoimax) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
-#elif __SIZEOF_LONG__ == 8
-#include <libc/local/stdlib/strto64.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
-#elif __SIZEOF_LONG__ == 4
-#include <libc/local/stdlib/strto32.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
-#else /* ... */
-#include <libc/local/stdlib/strtoll.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll))(__nptr, __endptr, __base); }
-#endif /* !... */
-#ifdef __CRT_HAVE_strtoull
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtouq)
-__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtou64) && __SIZEOF_LONG_LONG__ == 8
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtou32) && __SIZEOF_LONG_LONG__ == 4
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou32,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE__strtoui64) && __SIZEOF_LONG_LONG__ == 8
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoui64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
-#elif __SIZEOF_LONG__ == 8
-#include <libc/local/stdlib/strtou64.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
-#elif __SIZEOF_LONG__ == 4
-#include <libc/local/stdlib/strtou32.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); }
-#else /* ... */
-#include <libc/local/stdlib/strtoull.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull))(__nptr, __endptr, __base); }
-#endif /* !... */
-#endif /* __ULONGLONG */
-#endif /* __USE_MISC */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_strtou32
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoull) && __SIZEOF_LONG_LONG__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtouq) && __SIZEOF_LONG_LONG__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_INTMAX_T__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/stdlib/strtou32.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtou32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou32)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto32
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtol) && __SIZEOF_LONG__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoll) && __SIZEOF_LONG_LONG__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoq) && __SIZEOF_LONG_LONG__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoimax) && __SIZEOF_INTMAX_T__ == 4
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/stdlib/strto32.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strto32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strto32)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __UINT64_TYPE__
 #ifdef __CRT_HAVE_strtou64
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoui64)
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoui64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoull) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtouq) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_INTMAX_T__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/stdlib/strtou64.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtou64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto64
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoi64)
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoi64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtol) && __SIZEOF_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoll) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoq) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoimax) && __SIZEOF_INTMAX_T__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/stdlib/strto64.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strto64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strto64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
@@ -1479,9 +1817,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strto64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* __USE_XOPEN2K8 */
 #endif /* __USE_KOS */
 
-
-#if defined(__USE_MISC) || defined(__USE_DOS) || \
-   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
+#if (defined(__USE_MISC) || defined(__USE_DOS) || \
+     (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE_gcvt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,gcvt,(double __val, int __ndigit, char *__buf),(__val,__ndigit,__buf))
@@ -1494,7 +1831,66 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* !__NO_FPU */
 #endif /* ... */
 
+#ifdef __USE_POSIX
+#ifdef __CRT_HAVE_rand_r
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,rand_r,(unsigned int *__restrict __pseed),(__pseed))
+#else /* __CRT_HAVE_rand_r */
+#include <libc/local/stdlib/rand_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(rand_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rand_r)(unsigned int *__restrict __pseed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand_r))(__pseed); })
+#endif /* !__CRT_HAVE_rand_r */
+#endif /* __USE_POSIX */
+
 #ifdef __USE_MISC
+#ifdef __ULONGLONG
+#ifdef __CRT_HAVE_strtoll
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoll,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtoq)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strto64) && __SIZEOF_LONG_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto64,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strto32) && __SIZEOF_LONG_LONG__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto32,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtol) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtol,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE__strtoi64) && __SIZEOF_LONG_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoi64,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtoimax) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
+#elif __SIZEOF_LONG__ == 8
+#include <libc/local/stdlib/strto64.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
+#elif __SIZEOF_LONG__ == 4
+#include <libc/local/stdlib/strto32.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
+#else /* ... */
+#include <libc/local/stdlib/strtoll.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll))(__nptr, __endptr, __base); }
+#endif /* !... */
+#ifdef __CRT_HAVE_strtoull
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtouq)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtou64) && __SIZEOF_LONG_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou64,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtou32) && __SIZEOF_LONG_LONG__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou32,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoul,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE__strtoui64) && __SIZEOF_LONG_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoui64,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
+#elif __SIZEOF_LONG__ == 8
+#include <libc/local/stdlib/strtou64.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
+#elif __SIZEOF_LONG__ == 4
+#include <libc/local/stdlib/strtou32.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); }
+#else /* ... */
+#include <libc/local/stdlib/strtoull.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull))(__nptr, __endptr, __base); }
+#endif /* !... */
+#endif /* __ULONGLONG */
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE_ecvt_r
 __CDECLARE(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,ecvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),(__val,__ndigit,__decptr,__sign,__buf,__len))
@@ -1612,6 +2008,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__rest
 typedef void (__LIBKCALL *__on_exit_func_t)(int __status, void *__arg);
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(__on_exit_func_t __func, void *__arg),(__func,__arg))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,clearenv,(void),())
+#ifndef __mkstemps_defined
+#define __mkstemps_defined 1
 #if defined(__CRT_HAVE_mkstemps64) && defined(__USE_FILE_OFFSET64)
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
@@ -1659,41 +2057,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(ch
  * @param: suffixlen: The # of trailing characters to-be ignored
  *                    after the required 6 trailing 'X'-characters. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkstemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps))(__template_, __suffixlen); })
-#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#else /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#undef __mkstemps_defined
+#endif /* !__CRT_HAVE_mkostemps && !__CRT_HAVE_mkostemps64 && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 #endif /* !... */
+#endif /* !__mkstemps_defined */
 #ifdef __CRT_HAVE_rpmatch
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,rpmatch,(char const *__response),(__response))
 #else /* __CRT_HAVE_rpmatch */
 #include <libc/local/stdlib/rpmatch.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(rpmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rpmatch)(char const *__response) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rpmatch))(__response); })
 #endif /* !__CRT_HAVE_rpmatch */
-#ifdef __USE_LARGEFILE64
-#ifdef __CRT_HAVE_mkstemps64
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),(__template_,__suffixlen))
-#elif defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps,(__template_,__suffixlen))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-#include <libc/local/stdlib/mkstemps64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkstemps64)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps64))(__template_, __suffixlen); })
-#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
-#endif /* __USE_LARGEFILE64 */
-#endif /* __USE_MISC */
-
-
-#ifdef __USE_POSIX
-#ifdef __CRT_HAVE_rand_r
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,rand_r,(unsigned int *__restrict __pseed),(__pseed))
-#else /* __CRT_HAVE_rand_r */
-#include <libc/local/stdlib/rand_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(rand_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rand_r)(unsigned int *__restrict __pseed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand_r))(__pseed); })
-#endif /* !__CRT_HAVE_rand_r */
-#endif /* __USE_POSIX */
-
-
-#ifdef __USE_MISC
 #ifndef __cfree_defined
 #define __cfree_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -1712,8 +2086,20 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),(__mallptr))
 __CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], __STDC_INT_AS_SIZE_T __nelem),(__loadavg,__nelem))
 #endif /* !__getloadavg_defined && __CRT_HAVE_getloadavg */
 #endif /* !__NO_FPU */
+#ifdef __USE_LARGEFILE64
+#ifdef __CRT_HAVE_mkstemps64
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),(__template_,__suffixlen))
+#elif defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps,(__template_,__suffixlen))
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <libc/local/stdlib/mkstemps64.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkstemps64)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps64))(__template_, __suffixlen); })
+#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
+#endif /* __USE_LARGEFILE64 */
 #endif /* __USE_MISC */
-
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K))
 #ifndef __valloc_defined
@@ -1729,7 +2115,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 #endif /* !__valloc_defined */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) */
 
-
 #ifdef __USE_XOPEN2K
 #ifndef __posix_memalign_defined
 #define __posix_memalign_defined 1
@@ -1744,8 +2129,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_memalign, __FORCELOCAL __ATTR_ARTIFICIAL _
 #undef __posix_memalign_defined
 #endif /* !... */
 #endif /* !__posix_memalign_defined */
+#ifdef __CRT_HAVE_setenv
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setenv,(char const *__varname, char const *__val, int __replace),(__varname,__val,__replace))
+#elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
+#include <libc/local/stdlib/setenv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(setenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL setenv)(char const *__varname, char const *__val, int __replace) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setenv))(__varname, __val, __replace); })
+#endif /* ... */
+#ifdef __CRT_HAVE_unsetenv
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,unsetenv,(char const *__varname),(__varname))
+#elif defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
+#include <libc/local/stdlib/unsetenv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(unsetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL unsetenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unsetenv))(__varname); })
+#endif /* ... */
 #endif /* __USE_XOPEN2K */
-
 
 #ifdef __USE_ISOCXX17
 #ifndef __CXX_SYSTEM_HEADER
@@ -1801,6 +2197,7 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,srand48,(long __seedval),(__seedval))
 __CDECLARE_OPT(__ATTR_NONNULL((1)),unsigned short *,__NOTHROW_NCX,seed48,(unsigned short __seed16v[3]),(__seed16v))
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,lcong48,(unsigned short __param[7]),(__param))
 #endif /* __USE_MISC || __USE_XOPEN */
+
 #if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
 #ifdef __CRT_HAVE_putenv
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,putenv,(char *__string),(__string))
@@ -1808,6 +2205,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,putenv,(char *__string),(__stri
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,putenv,(char *__string),_putenv,(__string))
 #endif /* ... */
 #endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
+
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 #ifdef __CRT_HAVE_random
 __CDECLARE(,long,__NOTHROW_NCX,random,(void),())
@@ -1878,22 +2276,6 @@ __CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__dirfd,__filename,__resolved,__buflen,__flags))
 #endif /* __USE_KOS */
-
-
-#ifdef __USE_XOPEN2K
-#ifdef __CRT_HAVE_setenv
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setenv,(char const *__varname, char const *__val, int __replace),(__varname,__val,__replace))
-#elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
-#include <libc/local/stdlib/setenv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(setenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL setenv)(char const *__varname, char const *__val, int __replace) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setenv))(__varname, __val, __replace); })
-#endif /* ... */
-#ifdef __CRT_HAVE_unsetenv
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,unsetenv,(char const *__varname),(__varname))
-#elif defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
-#include <libc/local/stdlib/unsetenv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(unsetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL unsetenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unsetenv))(__varname); })
-#endif /* ... */
-#endif /* __USE_XOPEN2K */
 
 
 #if (defined(__USE_MISC) || \
@@ -2568,13 +2950,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef __recallocarray_defined
 #define __recallocarray_defined 1
 #ifdef __CRT_HAVE_recallocarray
-/* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+/* >> recallocarray(3)
+ * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)),void *,__NOTHROW_NCX,recallocarray,(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__old_elem_count,__new_elem_count,__elem_size))
 #elif (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 #include <libc/local/stdlib/recallocarray.h>
-/* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+/* >> recallocarray(3)
+ * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 __NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
@@ -2602,6 +2986,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __
 #endif /* !... */
 #endif /* !__freezero_defined */
 #endif /* __USE_BSD */
+
 #ifdef __USE_SOLARIS
 #ifndef __uid_t_defined
 #define __uid_t_defined 1
@@ -2833,16 +3218,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 
 #ifdef __USE_NETBSD
 #ifdef __CRT_HAVE_heapsort
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
 #else /* __CRT_HAVE_heapsort */
 #include <libc/local/stdlib/heapsort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
 #endif /* !__CRT_HAVE_heapsort */
 #ifdef __CRT_HAVE_mergesort
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
 #else /* __CRT_HAVE_mergesort */
 #include <libc/local/stdlib/mergesort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
 #endif /* !__CRT_HAVE_mergesort */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
@@ -2859,9 +3244,9 @@ __CREDIRECT(__ATTR_CONST,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __typ
 __NAMESPACE_LOCAL_USING_OR_IMPL(devname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST char *__NOTHROW_NCX(__LIBCCALL devname)(dev_t __dev, mode_t __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(devname))(__dev, __type); })
 #endif /* ... */
 /* >> devname(3), devname_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,devname_r,(dev_t __dev, mode_t __type, char *__buf, size_t __len),(__dev,__type,__buf,__len))
+__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,devname_r,(dev_t __dev, mode_t __type, char *__buf, __SIZE_TYPE__ __len),(__dev,__type,__buf,__len))
 #ifdef __CRT_HAVE_setproctitle
-__LIBC __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(const char *__format, ...) __CASMNAME_SAME("setproctitle");
+__LIBC __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) __CASMNAME_SAME("setproctitle");
 #endif /* __CRT_HAVE_setproctitle */
 #ifndef __getprogname_defined
 #define __getprogname_defined 1
@@ -2909,6 +3294,32 @@ __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __A
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarr)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
 #endif /* ... */
 #ifdef __ULONGLONG
+#ifdef __CRT_HAVE_strsuftoll
+/* >> strsuftoll(3)
+ * Same as `strsuftollx(3)', but if an error happens, make
+ * use of `errx(3)' to terminate the program, rather than
+ * return to the caller. */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__LONGLONG,__NOTHROW_NCX,strsuftoll,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi),(__desc,__val,__lo,__hi))
+#else /* __CRT_HAVE_strsuftoll */
+#include <__crt.h>
+#include <libc/local/program_invocation_name.h>
+#if defined(__CRT_HAVE_errx) || defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)))
+#include <libc/local/stdlib/strsuftoll.h>
+/* >> strsuftoll(3)
+ * Same as `strsuftollx(3)', but if an error happens, make
+ * use of `errx(3)' to terminate the program, rather than
+ * return to the caller. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strsuftoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strsuftoll)(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsuftoll))(__desc, __val, __lo, __hi); })
+#endif /* __CRT_HAVE_errx || __CRT_HAVE_verrx || ((__CRT_HAVE_vwarnx || (!__NO_STDSTREAMS && __LOCAL_program_invocation_short_name && (__CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock))) && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit)) */
+#endif /* !__CRT_HAVE_strsuftoll */
+#ifdef __CRT_HAVE_strsuftollx
+/* >> strsuftollx(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__LONGLONG,__NOTHROW_NCX,strsuftollx,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen),(__desc,__val,__lo,__hi,__errbuf,__errbuflen))
+#else /* __CRT_HAVE_strsuftollx */
+#include <libc/local/stdlib/strsuftollx.h>
+/* >> strsuftollx(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strsuftollx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strsuftollx)(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsuftollx))(__desc, __val, __lo, __hi, __errbuf, __errbuflen); })
+#endif /* !__CRT_HAVE_strsuftollx */
 typedef struct __lldiv_struct qdiv_t;
 #if __has_builtin(__builtin_llabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llabs)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,qabs,(__LONGLONG __x),llabs,{ return __builtin_llabs(__x); })
@@ -3088,7 +3499,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_errno,(errno_t *__perr),(__perr))
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_errno,(errno_t __err),(__err))
 #endif /* !_CRT_ERRNO_DEFINED */
-
 #if !defined(____doserrno_defined) && defined(__CRT_HAVE___doserrno)
 #define ____doserrno_defined 1
 __CDECLARE(__ATTR_CONST,__UINT32_TYPE__ *,__NOTHROW_NCX,__doserrno,(void),())
@@ -3312,7 +3722,6 @@ typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t c
 #endif /* !___invalid_parameter_handler_defined */
 __CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_set_invalid_parameter_handler,(_invalid_parameter_handler __handler),(__handler))
 __CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_get_invalid_parameter_handler,(void),())
-
 #ifdef __CRT_HAVE__get_pgmptr
 __CDECLARE(,errno_t,__NOTHROW_NCX,_get_pgmptr,(char **__pvalue),(__pvalue))
 #else /* __CRT_HAVE__get_pgmptr */
@@ -3328,7 +3737,6 @@ __CDECLARE(,errno_t,__NOTHROW_NCX,_get_wpgmptr,(wchar_t **__pvalue),(__pvalue))
 #include <libc/local/stdlib/_get_wpgmptr.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_get_wpgmptr, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _get_wpgmptr)(wchar_t **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_wpgmptr))(__pvalue); })
 #endif /* ... */
-
 #ifdef __CRT_HAVE__fmode
 __LIBC int _fmode;
 #else /* ... */
@@ -3342,9 +3750,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p
 #endif /* !... */
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_fmode,(int __mode),(__mode))
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_fmode,(int *__pmode),(__pmode))
-
 __CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,_set_abort_behavior,(unsigned int __flags, unsigned int __mask),(__flags,__mask))
-
 #ifdef __INT64_TYPE__
 #if defined(_MSC_VER) && defined(__LIBCCALL_IS_LIBDCALL)
 extern __ATTR_CONST __INT64_TYPE__ (__LIBDCALL _abs64)(__INT64_TYPE__ __x);
@@ -3476,7 +3882,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,getenv_s,(__SIZE_TYPE__ *__psize, char *__buf, rsize_t __buflen, char const *__varname),(__psize,__buf,__buflen,__varname))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),(__pbuf,__pbuflen,__varname))
 #endif /* __USE_DOS_SLIB */
-
 #ifdef __CRT_HAVE_itoa
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_itoa,(int __val, char *__buf, int __radix),itoa,(__val,__buf,__radix))
 #elif defined(__CRT_HAVE__itoa)
@@ -3588,35 +3993,245 @@ __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ui64toa_s,(__UINT64_TYPE_
 __NAMESPACE_LOCAL_USING_OR_IMPL(_ui64toa_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ui64toa_s)(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64toa_s))(__val, __buf, __buflen, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto64
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoi64)
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtol) && __SIZEOF_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoll) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoq) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoimax) && __SIZEOF_INTMAX_T__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/stdlib/strto64.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoi64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtou64
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoui64)
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoull) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtouq) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_INTMAX_T__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/stdlib/strtou64.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoui64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strto64_l
@@ -4306,10 +4921,8 @@ __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_splitpath_s,(char const *_
 #include <libc/local/stdlib/_splitpath_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_splitpath_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _splitpath_s)(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_splitpath_s))(__abspath, __drive, __drivelen, __dir, __dirlen, __file, __filelen, __ext, __extlen); })
 #endif /* !__CRT_HAVE__splitpath_s */
-
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_seterrormode,(int __mode),(__mode))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,_set_error_mode,(int __mode),(__mode))
-
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_beep,(unsigned int __freq, unsigned int __duration),(__freq,__duration))
 #ifdef __CRT_HAVE_sleep
 /* >> sleep(3)
@@ -4819,38 +5432,248 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #ifndef ___wcstoi64_defined
 #define ___wcstoi64_defined 1
 #ifdef __CRT_HAVE_wcsto64
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoi64)
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoll) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoq) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoimax) && __SIZEOF_INTMAX_T__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcsto64.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoi64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #endif /* !___wcstoi64_defined */
 #ifndef ___wcstoui64_defined
 #define ___wcstoui64_defined 1
 #ifdef __CRT_HAVE_wcstou64
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoui64)
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_LONG_LONG__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoumax) && __SIZEOF_INTMAX_T__ == 8
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcstou64.h>
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoui64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #endif /* !___wcstoui64_defined */

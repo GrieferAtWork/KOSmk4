@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9dfa118 */
+/* HASH CRC-32:0x789bdee5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,12 +116,21 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetgrent_r,(__FIL
 #ifdef __USE_MISC
 /* >> fgetgrent(3), fgetgrent_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,fgetgrent,(__FILE *__restrict __stream),(__stream))
+#if !defined(__setgroups_defined) && defined(__CRT_HAVE_setgroups)
+#define __setgroups_defined 1
 /* >> setgroups(2) */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
+__CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
+#endif /* !__setgroups_defined && __CRT_HAVE_setgroups */
+#if !defined(__getgrouplist_defined) && defined(__CRT_HAVE_getgrouplist)
+#define __getgrouplist_defined 1
 /* >> getgrouplist(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 3, 4)),int,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, int *__ngroups),(__user,__group,__groups,__ngroups))
+__CDECLARE(__ATTR_NONNULL((1, 3, 4)),int,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, int *__ngroups),(__user,__group,__groups,__ngroups))
+#endif /* !__getgrouplist_defined && __CRT_HAVE_getgrouplist */
+#if !defined(__initgroups_defined) && defined(__CRT_HAVE_initgroups)
+#define __initgroups_defined 1
 /* >> initgroups(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
+#endif /* !__initgroups_defined && __CRT_HAVE_initgroups */
 #endif /* __USE_MISC */
 
 __SYSDECL_END

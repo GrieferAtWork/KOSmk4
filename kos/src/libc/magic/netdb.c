@@ -552,7 +552,7 @@ int getnetgrent_r(char **__restrict hostp,
 @@official host name.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, guard]]
 int rcmd(char **__restrict ahost, $uint16_t rport,
          char const *__restrict locuser,
          char const *__restrict remuser,
@@ -563,7 +563,7 @@ int rcmd(char **__restrict ahost, $uint16_t rport,
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, guard]]
 int rcmd_af(char **__restrict ahost, $uint16_t rport,
             char const *__restrict locuser,
             char const *__restrict remuser,
@@ -588,7 +588,7 @@ int rexec(char **__restrict ahost, int rport,
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[guard, cp]]
+[[cp, guard]]
 int rexec_af(char **__restrict ahost, int rport,
              char const *__restrict name,
              char const *__restrict pass,
@@ -601,7 +601,7 @@ int rexec_af(char **__restrict ahost, int rport,
 @@superuser. Return 0 if it is possible.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, guard]]
 int ruserok(char const *rhost, int suser,
             char const *remuser,
             char const *locuser);
@@ -643,7 +643,7 @@ int iruserok_af(void const *raddr, int suser,
 @@will start at `alport' and continues with lower numbers.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, guard]]
 int rresvport(int *alport);
 
 @@This is the equivalent function where the protocol can be selected

@@ -706,6 +706,7 @@
 #define __CRT_HAVE___strxfrm_l
 #define __CRT_HAVE___sys_errlist
 #define __CRT_HAVE___sys_nerr
+#define __CRT_HAVE___syscall
 #define __CRT_HAVE___sysconf
 #define __CRT_HAVE___sysv_signal
 #define __CRT_HAVE___tan
@@ -3255,6 +3256,8 @@
 #define __CRT_HAVE_strstartcmp
 #define __CRT_HAVE_strstartcmpz
 #define __CRT_HAVE_strstr
+#define __CRT_HAVE_strsuftoll
+#define __CRT_HAVE_strsuftollx
 #define __CRT_HAVE_strto32
 #define __CRT_HAVE_strto32_l
 #define __CRT_HAVE_strto64
@@ -5076,6 +5079,7 @@
 #define __CRT_HAVE_KOS$__strxfrm_l
 #define __CRT_HAVE_KOS$__sys_errlist
 #define __CRT_HAVE_KOS$__sys_nerr
+#define __CRT_HAVE_KOS$__syscall
 #define __CRT_HAVE_KOS$__sysconf
 #define __CRT_HAVE_KOS$__sysv_signal
 #define __CRT_HAVE_KOS$__tan
@@ -7590,6 +7594,8 @@
 #define __CRT_HAVE_KOS$strstartcmp
 #define __CRT_HAVE_KOS$strstartcmpz
 #define __CRT_HAVE_KOS$strstr
+#define __CRT_HAVE_KOS$strsuftoll
+#define __CRT_HAVE_KOS$strsuftollx
 #define __CRT_HAVE_KOS$strto32
 #define __CRT_HAVE_KOS$strto32_l
 #define __CRT_HAVE_KOS$strto64
@@ -8594,6 +8600,7 @@
 #define __CRT_HAVE_DOS$__strxfrm_l
 #define __CRT_HAVE_DOS$__sys_errlist
 #define __CRT_HAVE_DOS$__sys_nerr
+#define __CRT_HAVE_DOS$__syscall
 #define __CRT_HAVE_DOS$__sysconf
 #define __CRT_HAVE_DOS$__sysv_signal
 #define __CRT_HAVE_DOS$__tan
@@ -11108,6 +11115,8 @@
 #define __CRT_HAVE_DOS$strstartcmp
 #define __CRT_HAVE_DOS$strstartcmpz
 #define __CRT_HAVE_DOS$strstr
+#define __CRT_HAVE_DOS$strsuftoll
+#define __CRT_HAVE_DOS$strsuftollx
 #define __CRT_HAVE_DOS$strto32
 #define __CRT_HAVE_DOS$strto32_l
 #define __CRT_HAVE_DOS$strto64

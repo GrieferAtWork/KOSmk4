@@ -950,7 +950,7 @@ char *strerror_l(int errnum, $locale_t locale) {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[std, wunused, ATTR_COLD, crt_dos_variant]]
+[[std, wunused, ATTR_COLD, crt_dos_variant, guard]]
 [[nonnull, section(".text.crt{|.dos}.string.memory.strsignal")]]
 [[decl_include("<bits/types.h>")]]
 char *strsignal($signo_t signo) {

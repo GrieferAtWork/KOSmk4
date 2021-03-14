@@ -401,7 +401,7 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 }
 
 %
-%#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU)
+%#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU) || defined(__USE_NETBSD)
 @@>> execvpe(3)
 @@Replace the calling process with the application image referred to by `file' and
 @@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
@@ -476,10 +476,10 @@ int execvpe([[nonnull]] char const *__restrict file,
 	return -1;
 }
 
-%#endif /* __USE_KOS || __USE_DOS || __USE_GNU */
+%#endif /* __USE_KOS || __USE_DOS || __USE_GNU || __USE_NETBSD */
 
 %
-%#if defined(__USE_KOS) || defined(__USE_DOS)
+%#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_NETBSD)
 @@>> execlpe(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
@@ -489,7 +489,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execvpe, file, args)
 }
-%#endif /* __USE_KOS || __USE_DOS */
+%#endif /* __USE_KOS || __USE_DOS || __USE_NETBSD */
 
 %[default:section(".text.crt{|.dos}.sched.process")]
 
@@ -1290,7 +1290,28 @@ ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, __PIO_
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 %
+%#if defined(__USE_GNU) || defined(__USE_NETBSD)
+[[section(".text.crt{|.dos}.io.access")]]
+[[userimpl, requires_function(dup2)]]
+[[decl_include("<bits/types.h>")]]
+$fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
+	(void)flags;
+	return newfd != oldfd ? dup2(oldfd, newfd) : -1;
+}
+
+[[section(".text.crt{|.dos}.io.access")]]
+[[userimpl, requires_function(pipe)]]
+[[decl_include("<bits/types.h>")]]
+int pipe2([[nonnull]] $fd_t pipedes[2], $oflag_t flags) {
+	(void)flags;
+	return pipe(pipedes);
+}
+%#endif /* __USE_GNU || __USE_NETBSD */
+
+
+%
 %#ifdef __USE_GNU
+
 %{
 #ifndef __environ_defined
 #define __environ_defined 1
@@ -1330,22 +1351,6 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #endif /* !__environ_defined */
 }
 
-
-[[section(".text.crt{|.dos}.io.access")]]
-[[userimpl, requires_function(pipe)]]
-[[decl_include("<bits/types.h>")]]
-int pipe2([[nonnull]] $fd_t pipedes[2], $oflag_t flags) {
-	(void)flags;
-	return pipe(pipedes);
-}
-
-[[section(".text.crt{|.dos}.io.access")]]
-[[userimpl, requires_function(dup2)]]
-[[decl_include("<bits/types.h>")]]
-$fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
-	(void)flags;
-	return newfd != oldfd ? dup2(oldfd, newfd) : -1;
-}
 
 [[cp, wunused, ATTR_MALLOC]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
@@ -1891,7 +1896,7 @@ $longptr_t syscall($longptr_t sysno, ...);
 %
 %#ifdef __USE_KOS
 [[cp, libc, section(".text.crt{|.dos}.system.utility"), doc_alias("syscall")]]
-[[preferred_alias("syscall"), decl_include("<bits/types.h>")]]
+[[preferred_alias("syscall"), decl_include("<bits/types.h>"), export_alias("__syscall")]]
 [[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
            $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
 __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
@@ -2055,6 +2060,92 @@ char *cuserid(char *s) {
 
 
 %
+%#ifdef __USE_NETBSD
+%{
+#ifndef sys_siglist
+#ifdef _sys_siglist
+#define sys_siglist _sys_siglist
+#else /* _sys_siglist */
+}
+%[insert:extern(__p_sys_siglist)]
+%{
+#ifdef ____p_sys_siglist_defined
+#define sys_siglist  __p_sys_siglist()
+#define _sys_siglist __p_sys_siglist()
+#endif /* ____p_sys_siglist_defined */
+#ifndef _sys_siglist
+#ifdef __CRT_HAVE_sys_siglist
+__LIBC char const *const sys_siglist[_NSIG];
+#define sys_siglist  sys_siglist
+#define _sys_siglist sys_siglist
+#elif defined(__CRT_HAVE__sys_siglist)
+__LIBC char const *const _sys_siglist[_NSIG];
+#define sys_siglist  _sys_siglist
+#define _sys_siglist _sys_siglist
+#endif /* sys_siglist... */
+#endif /* !_sys_siglist */
+#endif /* !_sys_siglist */
+#endif /* !sys_siglist */
+
+#ifndef __sa_family_t_defined
+#define __sa_family_t_defined 1
+typedef __sa_family_t sa_family_t; /* One of `AF_*' */
+#endif /* !__sa_family_t_defined */
+}
+
+%[insert:extern(getgrouplist)]
+%[insert:extern(initgroups)]
+%[insert:extern(mkstemps)]
+%[insert:extern(psignal)]
+%[insert:extern(rcmd)]
+%[insert:extern(rresvport)]
+%[insert:extern(setgroups)]
+%[insert:extern(ruserok)]
+%[insert:extern(strmode)]
+%[insert:extern(strsignal)]
+%[insert:extern(rcmd_af)]
+
+//TODO:char *getpassfd(char const *, char *, size_t, int *, int, int);
+//TODO:#define GETPASS_NEED_TTY    0x001 /* RPP_REQUIRE_TTY: Error out if `!isatty()' */
+//TODO:#define GETPASS_FAIL_EOF    0x002 /* Input EOF is an error */
+//TODO:#define GETPASS_BUF_LIMIT   0x004 /* BEEP when typing after buffer limit is reached */
+//TODO:#define GETPASS_NO_SIGNAL   0x008 /* ??? */
+//TODO:#define GETPASS_NO_BEEP     0x010 /* Don't BEEP */
+//TODO:#define GETPASS_ECHO        0x020 /* RPP_ECHO_ON: Don't disable echo (but leave it on). */
+//TODO:#define GETPASS_ECHO_STAR   0x040 /* Print '*' instead for typed characters */
+//TODO:#define GETPASS_7BIT        0x080 /* RPP_SEVENBIT: Mask input with `0x7f' */
+//TODO:#define GETPASS_FORCE_LOWER 0x100 /* RPP_FORCELOWER: Force all input to be lower-case. */
+//TODO:#define GETPASS_FORCE_UPPER 0x200 /* RPP_FORCEUPPER: Force all input to be upper-case. */
+//TODO:#define GETPASS_ECHO_NL     0x400 /* Print a '\n' after the password was read */
+//TODO:char *getpass_r(char const *, char *, size_t);
+
+//TODO:int des_cipher(char const *, char *, long, int);
+//TODO:int des_setkey(char const *);
+//TODO:int exect(char const *, char *const *, char *const *);
+//TODO:int fdiscard(int, off_t, off_t);
+//TODO:int fsync_range(int, int, off_t, off_t);
+//TODO:int getgroupmembership(char const *, gid_t, gid_t *, int, int *);
+//TODO:mode_t getmode(const void *, mode_t);
+//TODO:void *setmode(char const *);
+//TODO:int getpeereid(int, uid_t *, gid_t *);
+//TODO:int iruserok(uint32_t, int, char const *, char const *);
+//TODO:long lpathconf(char const *, int);
+//TODO:int nfssvc(int, void *);
+//TODO:int setrgid(gid_t);
+//TODO:int setruid(uid_t);
+//TODO:int swapctl(int, void *, int);
+//TODO:int undelete(char const *);
+//TODO:int rresvport_af_addr(int *, int, void *);
+//TODO:int iruserok_sa(const void *, int, int, char const *, char const *);
+//TODO:extern int optreset;
+//TODO:extern char *suboptarg;
+
+//int reboot(int, char *); // Incompatible w/ linux: int reboot(int)
+//int swapon(char const *); // Incompatible w/ linux: int swapon(char const *, int)
+%#endif /* __USE_NETBSD */
+
+
+%
 %
 %#if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K))
 %#ifndef ____pthread_atfork_func_t_defined
@@ -2167,24 +2258,8 @@ void closefrom($fd_t lowfd) {
 %{
 #endif /* __USE_BSD */
 
-#ifdef __USE_SOLARIS
+#if defined(__USE_SOLARIS) || defined(__USE_NETBSD)
 }
-%[default:section(".text.crt{|.dos}.solaris")]
-
-%[insert:extern(fattach)]
-%[insert:extern(fdetach)]
-%[insert:extern(ioctl)]
-%[insert:extern(rexec_af)]
-%[insert:extern(rresvport_af)]
-%[insert:extern(stime)]
-%[insert:extern(tell)]
-%[insert:function(yield = thrd_yield)]
-
-// TODO: char *gettxt(char const *, char const *);
-// TODO: int issetugid(void);
-// TODO: int isaexec(char const *, char *const *, char *const *);
-// TODO: offset_t llseek($fd_t fd, offset_t offset, __STDC_INT_AS_UINT_T whence);
-
 
 @@>> fchroot(2)
 @@Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
@@ -2200,6 +2275,30 @@ int fchroot($fd_t fd) {
 		result = 0;
 	return result;
 }
+
+%[insert:extern(rresvport_af)]
+
+// TODO: int issetugid(void);
+
+%{
+#endif /* __USE_SOLARIS || __USE_NETBSD */
+
+#ifdef __USE_SOLARIS
+}
+%[default:section(".text.crt{|.dos}.solaris")]
+
+%[insert:extern(fattach)]
+%[insert:extern(fdetach)]
+%[insert:extern(ioctl)]
+%[insert:extern(rexec_af)]
+%[insert:extern(stime)]
+%[insert:extern(tell)]
+%[insert:function(yield = thrd_yield)]
+
+// TODO: char *gettxt(char const *, char const *);
+// TODO: int isaexec(char const *, char *const *, char *const *);
+// TODO: offset_t llseek($fd_t fd, offset_t offset, __STDC_INT_AS_UINT_T whence);
+
 
 @@>> resolvepath(3)
 @@Similar to `frealpathat(2)' (though use the later for more options)

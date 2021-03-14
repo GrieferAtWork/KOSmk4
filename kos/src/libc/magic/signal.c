@@ -1864,7 +1864,7 @@ int killpg($pid_t pgrp, $signo_t signo) {
 @@>> psignal(3)
 @@Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
 @@When `s' is `NULL' or an empty string, omit the leading "%s: " from the format.
-[[decl_include("<bits/types.h>")]]
+[[guard, decl_include("<bits/types.h>")]]
 [[requires_include("<__crt.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fprintf))]]
 void psignal($signo_t signo, [[nullable]] char const *s) {

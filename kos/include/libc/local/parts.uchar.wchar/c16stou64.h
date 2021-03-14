@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb48c74f3 */
+/* HASH CRC-32:0x8bc6c9e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,40 @@
 #define __local_c16stou64_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
+#include <libc/errno.h>
+#include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the end of the number in `*endptr'.
+ * If `errno(3)' support is available, integer overflow is handled
+ * by setting `errno=ERANGE', and returning the greatest or lowest
+ * valid integer (`U?INTn_(MIN|MAX))'. (though note that
+ * `endptr' (if non-NULL) is still updated in this case!)
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * will not have been modified.
+ * @return: * :         Success: The parsed integer
+ * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
+ * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+ * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __LOCAL_LIBC(c16stou64) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou64))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base) {
 	__UINT64_TYPE__ __result, __temp;
+	/* TODO: STDC says that we should skip leading space characters! */
 	if (!__base) {
 		if (*__nptr == '0') {
 			__CHAR16_TYPE__ __ch = *++__nptr;
 			if (__ch == 'x' || __ch == 'X') {
 				++__nptr;
 				__base = 16;
+				/* TODO: Require that at least 1 more character be read! */
 			} else if (__ch == 'b' || __ch == 'B') {
 				++__nptr;
 				__base = 2;
+				/* TODO: Require that at least 1 more character be read! */
 			} else {
 				__base = 8;
 			}
@@ -60,9 +81,16 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou64))(__CHAR16_TYPE__ const *__
 		if (__temp >= (unsigned int)__base)
 			break;
 		++__nptr;
-		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+
+		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
+#if defined(__libc_geterrno) && defined(__ERANGE)
+		if (__hybrid_overflow_umul(__result, (unsigned int)__base, &__result) ||
+		    __hybrid_overflow_uadd(__result, __temp, &__result))
+			__libc_seterrno(__ERANGE);
+#else /* __libc_geterrno && __ERANGE */
 		__result *= (unsigned int)__base;
 		__result += __temp;
+#endif /* !__libc_geterrno || !__ERANGE */
 	}
 	if (__endptr)
 		*__endptr = (__CHAR16_TYPE__ *)__nptr;

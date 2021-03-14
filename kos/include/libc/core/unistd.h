@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc71a3d56 */
+/* HASH CRC-32:0xf6bf9111 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,6 +69,10 @@ __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,__libc_core_syscall64,(__syscall_ulo
 #include <bits/types.h>
 /* >> syscall(2), syscall64(2) */
 __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,__libc_core_syscall64,(__syscall_ulong_t __sysno),syscall64,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
+#elif defined(__CRT_HAVE___syscall)
+#include <bits/types.h>
+/* >> syscall(2), syscall64(2) */
+__CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,__libc_core_syscall64,(__syscall_ulong_t __sysno),__syscall,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #else /* ... */
 #undef ____libc_core_syscall64_defined
 #endif /* !... */
