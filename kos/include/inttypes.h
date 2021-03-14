@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ada0937 */
+/* HASH CRC-32:0xef49067 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -664,6 +664,65 @@ __NAMESPACE_STD_USING(wcstoumax)
 
 
 
+
+#ifdef __USE_KOS
+#if defined(__CRT_HAVE_strto64_r) && __SIZEOF_INTMAX_T__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,strtoimax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_strto32_r) && __SIZEOF_INTMAX_T__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,strtoimax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto32_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_INTMAX_T__ == 8
+#include <libc/local/stdlib/strto64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoimax_r)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__INTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_INTMAX_T__ == 4
+#include <libc/local/stdlib/strto32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoimax_r)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__INTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/inttypes/strtoimax_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoimax_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoimax_r)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoimax_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#if defined(__CRT_HAVE_strtou64_r) && __SIZEOF_INTMAX_T__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_strtou32_r) && __SIZEOF_INTMAX_T__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_INTMAX_T__ == 8
+#include <libc/local/stdlib/strtou64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoumax_r)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_INTMAX_T__ == 4
+#include <libc/local/stdlib/strtou32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoumax_r)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/inttypes/strtoumax_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoumax_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoumax_r)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoumax_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcsto64_r) && __SIZEOF_INTMAX_T__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,wcstoimax_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcsto64_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_wcsto32_r) && __SIZEOF_INTMAX_T__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,wcstoimax_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcsto32_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_INTMAX_T__ == 8
+#include <libc/local/wchar/wcsto64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstoimax_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__INTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_INTMAX_T__ == 4
+#include <libc/local/wchar/wcsto32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstoimax_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__INTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/inttypes/wcstoimax_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoimax_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstoimax_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcstou64_r) && __SIZEOF_INTMAX_T__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,wcstoumax_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcstou64_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_wcstou32_r) && __SIZEOF_INTMAX_T__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,wcstoumax_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcstou32_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_INTMAX_T__ == 8
+#include <libc/local/wchar/wcstou64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstoumax_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_INTMAX_T__ == 4
+#include <libc/local/wchar/wcstou32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstoumax_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/inttypes/wcstoumax_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoumax_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstoumax_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#endif /* __USE_KOS */
 
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_strtoimax_l

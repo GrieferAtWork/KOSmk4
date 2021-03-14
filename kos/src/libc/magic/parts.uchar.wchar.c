@@ -128,6 +128,19 @@ c16stou64(*) %{uchar16("wcstou64")}
 c32stou64(*) %{uchar32("wcstou64")}
 %#endif /* __UINT64_TYPE__ */
 
+c16stol_r(*) %{uchar16("wcstol_r")}
+c32stol_r(*) %{uchar32("wcstol_r")}
+c16stoul_r(*) %{uchar16("wcstoul_r")}
+c32stoul_r(*) %{uchar32("wcstoul_r")}
+
+%#ifdef __LONGLONG
+c16stoll_r(*) %{uchar16("wcstoll_r")}
+c32stoll_r(*) %{uchar32("wcstoll_r")}
+c16stoull_r(*) %{uchar16("wcstoull_r")}
+c32stoull_r(*) %{uchar32("wcstoull_r")}
+%#endif /* __LONGLONG */
+
+
 %
 %#ifdef __USE_XOPEN2K8
 c16sto32_l(*) %{uchar16("wcsto32_l")}

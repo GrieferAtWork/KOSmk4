@@ -1441,6 +1441,41 @@ wcstou64(*) %{generate(str2wcs("strtou64"))}
 wcsto64(*) %{generate(str2wcs("strto64"))}
 %#endif /* __UINT64_TYPE__ */
 
+/************************************************************************/
+/* WARNING: The following functions aren't exported by-name from libc!  */
+/************************************************************************/
+[[wchar, nocrt]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcsto32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcsto64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(wcsto32_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(wcsto64_r)]]
+wcstol_r(*) %{generate(str2wcs("strtol_r"))}
+
+[[wchar, nocrt]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcstou32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcstou64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(wcstou32_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(wcstou64_r)]]
+wcstoul_r(*) %{generate(str2wcs("strtoul_r"))}
+
+%#ifdef __LONGLONG
+[[wchar, nocrt]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcsto64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcsto32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(wcsto64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(wcsto32_r)]]
+wcstoll_r(*) %{generate(str2wcs("strtoll_r"))}
+
+[[wchar, nocrt]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcstou64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcstou32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(wcstou64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(wcstou32_r)]]
+wcstoull_r(*) %{generate(str2wcs("strtoull_r"))}
+%#endif /* __LONGLONG */
+/************************************************************************/
+
+
 %
 %#ifdef __USE_XOPEN2K8
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]

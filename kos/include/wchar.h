@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa619b05 */
+/* HASH CRC-32:0xd1874c11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3078,6 +3078,64 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,wcsto64
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcsto64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsto64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
+#if defined(__CRT_HAVE_wcsto32_r) && __SIZEOF_LONG__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcsto32_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_wcsto64_r) && __SIZEOF_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcsto64_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_LONG__ == 4
+#include <libc/local/wchar/wcsto32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wcstol_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_LONG__ == 8
+#include <libc/local/wchar/wcsto64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wcstol_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/wchar/wcstol_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstol_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wcstol_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcstou32_r) && __SIZEOF_LONG__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcstou32_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_wcstou64_r) && __SIZEOF_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcstou64_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_LONG__ == 4
+#include <libc/local/wchar/wcstou32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL wcstoul_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_LONG__ == 8
+#include <libc/local/wchar/wcstou64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL wcstoul_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/wchar/wcstoul_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoul_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL wcstoul_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoul_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#ifdef __LONGLONG
+#if defined(__CRT_HAVE_wcsto64_r) && __SIZEOF_LONG_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcsto64_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_wcsto32_r) && __SIZEOF_LONG_LONG__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcsto32_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_LONG_LONG__ == 8
+#include <libc/local/wchar/wcsto64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wcstoll_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_LONG_LONG__ == 4
+#include <libc/local/wchar/wcsto32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wcstoll_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/wchar/wcstoll_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoll_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wcstoll_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoll_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcstou64_r) && __SIZEOF_LONG_LONG__ == 8
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcstou64_r,(__nptr,__endptr,__base,__error))
+#elif defined(__CRT_HAVE_wcstou32_r) && __SIZEOF_LONG_LONG__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcstou32_r,(__nptr,__endptr,__base,__error))
+#elif __SIZEOF_LONG_LONG__ == 8
+#include <libc/local/wchar/wcstou64_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstoull_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_r))(__nptr, __endptr, __base, __error); }
+#elif __SIZEOF_LONG_LONG__ == 4
+#include <libc/local/wchar/wcstou32_r.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstoull_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32_r))(__nptr, __endptr, __base, __error); }
+#else /* ... */
+#include <libc/local/wchar/wcstoull_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoull_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstoull_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull_r))(__nptr, __endptr, __base, __error); })
+#endif /* !... */
+#endif /* __LONGLONG */
 
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_wcsto32_l

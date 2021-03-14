@@ -589,6 +589,94 @@ $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
 %
 %
 
+%#ifdef __USE_KOS
+/************************************************************************/
+/* WARNING: The following functions aren't exported by-name from libc!  */
+/************************************************************************/
+[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strto64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strto32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(strto32_r)]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+$intmax_t strtoimax_r([[nonnull]] char const *__restrict nptr,
+                      [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                      [[nullable]] $errno_t *error) {
+@@pp_if __SIZEOF_INTMAX_T__ >= 8@@
+	return (intmax_t)strto64_r(nptr, endptr, base, error);
+@@pp_elif __SIZEOF_INTMAX_T__ >= 4@@
+	return (intmax_t)strto32_r(nptr, endptr, base, error);
+@@pp_else@@
+	s32 result = strto32_r(nptr, endptr, base, error);
+	if (result > __INTMAX_MAX__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __INTMAX_MAX__;
+	} else if (result < __INTMAX_MIN__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __INTMAX_MIN__;
+	}
+	return (intmax_t)result;
+@@pp_endif@@
+}
+
+[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strtou64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtou32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(strtou32_r)]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+$uintmax_t strtoumax_r([[nonnull]] char const *__restrict nptr,
+                       [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                       [[nullable]] $errno_t *error) {
+@@pp_if __SIZEOF_INTMAX_T__ >= 8@@
+	return (uintmax_t)strtou64_r(nptr, endptr, base, error);
+@@pp_elif __SIZEOF_INTMAX_T__ >= 4@@
+	return (uintmax_t)strtou32_r(nptr, endptr, base, error);
+@@pp_else@@
+	u32 result = strtou32_r(nptr, endptr, base, error);
+	if (result > __UINTMAX_MAX__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __UINTMAX_MAX__;
+	}
+	return (uintmax_t)result;
+@@pp_endif@@
+}
+
+[[wchar, nocrt]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcsto64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcsto32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcsto64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcsto32_r)]]
+wcstoimax_r(*) %{generate(str2wcs("strtoimax_r"))}
+
+[[wchar, nocrt]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcstou64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcstou32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcstou64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcstou32_r)]]
+wcstoumax_r(*) %{generate(str2wcs("strtoumax_r"))}
+/************************************************************************/
+%#endif /* __USE_KOS */
+
+%
 %#ifdef __USE_XOPEN2K8
 
 [[ATTR_LEAF, dos_only_export_alias("_strtoimax_l"), section(".text.crt{|.dos}.unicode.locale.convert")]]

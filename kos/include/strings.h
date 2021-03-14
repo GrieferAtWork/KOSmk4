@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac9c32c6 */
+/* HASH CRC-32:0x8cb3f18c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -528,7 +528,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHRO
  * POPulationCOUNT. Return the number of 1-bits in `i' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(popcountl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountl)(unsigned long __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcountl))(__i); })
 #endif /* !... */
-#ifdef __ULONGLONG
+#ifdef __LONGLONG
 #if __has_builtin(__builtin_popcountll) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_popcountll)
 /* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
  * POPulationCOUNT. Return the number of 1-bits in `i' */
@@ -569,7 +569,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHRO
  * POPulationCOUNT. Return the number of 1-bits in `i' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(popcountll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountll)(__ULONGLONG __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcountll))(__i); })
 #endif /* !... */
-#endif /* __ULONGLONG */
+#endif /* __LONGLONG */
 #if __has_builtin(__builtin_popcount32) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_popcount32)
 /* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
  * POPulationCOUNT. Return the number of 1-bits in `i' */

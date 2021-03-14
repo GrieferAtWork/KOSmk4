@@ -893,7 +893,7 @@ long strtol([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-%(std)#ifdef __ULONGLONG
+%(std)#ifdef __LONGLONG
 %(std)#ifdef __USE_ISOC99
 [[std, guard, ATTR_LEAF]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
@@ -935,7 +935,7 @@ __LONGLONG strtoll([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 %(std)#endif /* __USE_ISOC99 */
-%(std)#endif /* __ULONGLONG */
+%(std)#endif /* __LONGLONG */
 
 %(std, c, ccompat)#ifndef __NO_FPU
 [[std, ATTR_LEAF, wunused]]
@@ -1585,6 +1585,148 @@ handle_overflow:
 %#endif /* __UINT64_TYPE__ */
 
 
+/************************************************************************/
+/* WARNING: The following functions aren't exported by-name from libc!  */
+/************************************************************************/
+[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strto32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strto64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strto32_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strto64_r)]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+long strtol_r([[nonnull]] char const *__restrict nptr,
+              [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+              [[nullable]] $errno_t *error) {
+@@pp_if __SIZEOF_LONG__ >= 8@@
+	return (long)strto64_r(nptr, endptr, base, error);
+@@pp_elif __SIZEOF_LONG__ >= 4@@
+	return (long)strto32_r(nptr, endptr, base, error);
+@@pp_else@@
+	s32 result = strto32_r(nptr, endptr, base, error);
+	if (result > __LONG_MAX__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __LONG_MAX__;
+	} else if (result < __LONG_MIN__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __LONG_MIN__;
+	}
+	return (long)result;
+@@pp_endif@@
+}
+
+[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strtou32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtou64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strtou32_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strtou64_r)]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+unsigned long strtoul_r([[nonnull]] char const *__restrict nptr,
+                        [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                        [[nullable]] $errno_t *error) {
+@@pp_if __SIZEOF_LONG__ >= 8@@
+	return (unsigned long)strtou64_r(nptr, endptr, base, error);
+@@pp_elif __SIZEOF_LONG__ >= 4@@
+	return (unsigned long)strtou32_r(nptr, endptr, base, error);
+@@pp_else@@
+	u32 result = strtou32_r(nptr, endptr, base, error);
+	if (result > __ULONG_MAX__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __ULONG_MAX__;
+	}
+	return (unsigned long)result;
+@@pp_endif@@
+}
+
+%#ifdef __LONGLONG
+[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strto64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strto32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strto64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(strto32_r)]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+__LONGLONG strtoll_r([[nonnull]] char const *__restrict nptr,
+                     [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                     [[nullable]] $errno_t *error) {
+@@pp_if __SIZEOF_LONG_LONG__ >= 8@@
+	return (__LONGLONG)strto64_r(nptr, endptr, base, error);
+@@pp_elif __SIZEOF_LONG_LONG__ >= 4@@
+	return (__LONGLONG)strto32_r(nptr, endptr, base, error);
+@@pp_else@@
+	s32 result = strto32_r(nptr, endptr, base, error);
+	if (result > __LONG_LONG_MAX__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __LONG_LONG_MAX__;
+	} else if (result < __LONG_LONG_MIN__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __LONG_LONG_MIN__;
+	}
+	return (__LONGLONG)result;
+@@pp_endif@@
+}
+
+[[ATTR_LEAF, nocrt, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strtou64_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtou32_r")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strtou64_r)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(strtou32_r)]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+__ULONGLONG strtoull_r([[nonnull]] char const *__restrict nptr,
+                       [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                       [[nullable]] $errno_t *error) {
+@@pp_if __SIZEOF_LONG_LONG__ >= 8@@
+	return (__ULONGLONG)strtou64_r(nptr, endptr, base, error);
+@@pp_elif __SIZEOF_LONG_LONG__ >= 4@@
+	return (__ULONGLONG)strtou32_r(nptr, endptr, base, error);
+@@pp_else@@
+	u32 result = strtou32_r(nptr, endptr, base, error);
+	if (result > __ULONG_LONG_MAX__) {
+		if (error) {
+@@pp_ifdef __ERANGE@@
+			*error = __ERANGE;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		result = __ULONG_LONG_MAX__;
+	}
+	return (__ULONGLONG)result;
+@@pp_endif@@
+}
+%#endif /* __LONGLONG */
+/************************************************************************/
+
+
+
 
 @@>> strto32(3), strto64(3), strtou32(3), strtou64(3)
 @@Convert a string (radix=`base') from `nptr' into an integer,
@@ -1787,10 +1929,10 @@ int rand_r([[nonnull]] unsigned int *__restrict pseed) {
 %
 %#ifdef __USE_MISC
 
-%#ifdef __ULONGLONG
+%#ifdef __LONGLONG
 %[insert:function(strtoq = strtoll)]
 %[insert:function(strtouq = strtoull)]
-%#endif /* __ULONGLONG */
+%#endif /* __LONGLONG */
 
 %#ifndef __NO_FPU
 
@@ -3262,7 +3404,7 @@ void setprogname(char const *name) {
 
 %[insert:extern(daemon)]
 %[insert:function(reallocarr = reallocarray)]
-%#ifdef __ULONGLONG
+%#ifdef __LONGLONG
 @@>> strsuftoll(3)
 @@Same as `strsuftollx(3)', but if an error happens, make
 @@use of `errx(3)' to terminate the program, rather than
@@ -3308,7 +3450,7 @@ __LONGLONG strsuftollx([[nonnull]] char const *desc,
 %[insert:function(qdiv = lldiv)]
 %[insert:function(strtoq_l = strtoll_l)]
 %[insert:function(strtouq_l = strtoull_l)]
-%#endif /* __ULONGLONG */
+%#endif /* __LONGLONG */
 %#endif /* __USE_NETBSD */
 
 

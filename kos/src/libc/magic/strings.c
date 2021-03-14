@@ -195,7 +195,7 @@ unsigned int popcountl(unsigned long i) {
 	return __hybrid_popcount(i);
 }
 
-%#ifdef __ULONGLONG
+%#ifdef __LONGLONG
 [[wunused, nothrow, ATTR_CONST, crtbuiltin, doc_alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4),                                        alias("popcount32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                                        alias("popcount64")]]
@@ -210,7 +210,7 @@ unsigned int popcountl(unsigned long i) {
 unsigned int popcountll(__ULONGLONG i) {
 	return __hybrid_popcount(i);
 }
-%#endif /* __ULONGLONG */
+%#endif /* __LONGLONG */
 
 [[wunused, nothrow, ATTR_CONST, crtbuiltin, doc_alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4),       alias("popcount")]]
