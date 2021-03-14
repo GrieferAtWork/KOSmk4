@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdad64217 */
+/* HASH CRC-32:0x9b70f3df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_getpassfd
 __NAMESPACE_LOCAL_END
 #include <features.h>
-#include <bits/types>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getpassfd(3)
  * This function behaves similar to `readpassphrase(3)', but is still

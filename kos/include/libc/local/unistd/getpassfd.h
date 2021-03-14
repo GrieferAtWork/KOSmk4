@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82e34e40 */
+/* HASH CRC-32:0xc5c8c187 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,29 +23,20 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #include <features.h>
-#include <bits/types>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: close from unistd */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> close(2)
  * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
@@ -70,18 +61,12 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #ifndef __local___localdep_isatty_defined
 #define __local___localdep_isatty_defined 1
 #ifdef __CRT_HAVE_isatty
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),isatty,(__fd))
 #elif defined(__CRT_HAVE__isatty)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
@@ -241,9 +226,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
 #if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -260,9 +242,6 @@ __NAMESPACE_LOCAL_BEGIN
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -279,9 +258,6 @@ __NAMESPACE_LOCAL_BEGIN
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -298,9 +274,6 @@ __NAMESPACE_LOCAL_BEGIN
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -367,9 +340,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd
 #ifndef __local___localdep_raise_defined
 #define __local___localdep_raise_defined 1
 #ifdef __CRT_HAVE_raise
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> raise(3)
  * Raise a signal within the current thread.
  * In a *-theaded process this is same as:
@@ -398,9 +368,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_read_defined
 #define __local___localdep_read_defined 1
 #ifdef __CRT_HAVE_read
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
@@ -410,9 +377,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
@@ -422,9 +386,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___read)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
@@ -541,9 +502,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_write_defined
 #define __local___localdep_write_defined 1
 #ifdef __CRT_HAVE_write
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
@@ -553,9 +511,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
@@ -565,9 +520,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),_write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___write)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
@@ -581,7 +533,6 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 #endif /* !... */
 #endif /* !__local___localdep_write_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <asm/os/stdio.h>
 #include <asm/os/oflags.h>
 #include <libc/errno.h>

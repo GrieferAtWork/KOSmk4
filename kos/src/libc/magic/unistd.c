@@ -2196,7 +2196,7 @@ typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 @@@return: NULL: [ENOMEM]      Insufficient memory
 @@@return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
 @@@return: NULL: [*]           Error
-[[cp, wunused, decl_include("<features.h>", "<bits/types>")]]
+[[cp, wunused, decl_include("<features.h>", "<bits/types.h>")]]
 [[impl_include("<bits/types.h>", "<asm/os/stdio.h>", "<asm/os/oflags.h>")]]
 [[impl_include("<libc/errno.h>", "<paths.h>", "<asm/crt/getpassfd.h>")]]
 [[impl_include("<asm/os/termios.h>", "<bits/os/termios.h>")]]
