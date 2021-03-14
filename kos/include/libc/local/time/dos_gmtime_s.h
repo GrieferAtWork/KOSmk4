@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcaabf983 */
+/* HASH CRC-32:0xb8b0e4c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_gmtime32_s from time */
 #if !defined(__local___localdep_dos_gmtime32_s_defined) && defined(__CRT_HAVE__gmtime32_s)
 #define __local___localdep_dos_gmtime32_s_defined 1
-/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime32_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time32_t const *__restrict __timer),_gmtime32_s,(__tp,__timer))
 #endif /* !__local___localdep_dos_gmtime32_s_defined && __CRT_HAVE__gmtime32_s */
 /* Dependency: dos_gmtime64_s from time */
@@ -45,7 +46,8 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_dos_gmtime64_s_defined
 #endif /* !... */
 #endif /* !__local___localdep_dos_gmtime64_s_defined */
-/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 __LOCAL_LIBC(dos_gmtime_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_gmtime_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __TM_TYPE(time) const *__restrict __timer) {
 

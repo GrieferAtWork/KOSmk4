@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86e65583 */
+/* HASH CRC-32:0xda5a4e91 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,19 +33,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Get current value of clock `clock_id' and store it in `tp' */
+/* >> clock_gettime(2), clock_gettime64(2)
+ * Get current value of clock `clock_id' and store it in `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clockid_t __clock_id, struct __timespec64 *__tp),clock_gettime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Get current value of clock `clock_id' and store it in `tp' */
+/* >> clock_gettime(2), clock_gettime64(2)
+ * Get current value of clock `clock_id' and store it in `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clockid_t __clock_id, struct __timespec64 *__tp),clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_gettime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Get current value of clock `clock_id' and store it in `tp' */
+/* >> clock_gettime(2), clock_gettime64(2)
+ * Get current value of clock `clock_id' and store it in `tp' */
 #define __localdep_clock_gettime64 __LIBC_LOCAL_NAME(clock_gettime64)
 #else /* ... */
 #undef __local___localdep_clock_gettime64_defined

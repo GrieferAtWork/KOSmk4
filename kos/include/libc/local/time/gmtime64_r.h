@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb42de955 */
+/* HASH CRC-32:0x87459764 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,8 @@ __NAMESPACE_LOCAL_END
 #define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
-/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp) {
 

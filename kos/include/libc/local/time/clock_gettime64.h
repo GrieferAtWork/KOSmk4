@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d74ae9a */
+/* HASH CRC-32:0x7a5c9e6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,16 +29,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_gettime32_defined
 #define __local___localdep_clock_gettime32_defined 1
 #ifdef __CRT_HAVE_clock_gettime
-/* Get current value of clock `clock_id' and store it in `tp' */
+/* >> clock_gettime(2), clock_gettime64(2)
+ * Get current value of clock `clock_id' and store it in `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_gettime)
-/* Get current value of clock `clock_id' and store it in `tp' */
+/* >> clock_gettime(2), clock_gettime64(2)
+ * Get current value of clock `clock_id' and store it in `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),__clock_gettime,(__clock_id,__tp))
 #else /* ... */
 #undef __local___localdep_clock_gettime32_defined
 #endif /* !... */
 #endif /* !__local___localdep_clock_gettime32_defined */
-/* Get current value of clock `clock_id' and store it in `tp' */
+/* >> clock_gettime(2), clock_gettime64(2)
+ * Get current value of clock `clock_id' and store it in `tp' */
 __LOCAL_LIBC(clock_gettime64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime64))(__clockid_t __clock_id, struct __timespec64 *__tp) {
 	int __result;

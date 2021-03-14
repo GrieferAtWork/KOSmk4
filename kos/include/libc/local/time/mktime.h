@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86fce35b */
+/* HASH CRC-32:0xfe96befc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mktime32_defined
 #define __local___localdep_mktime32_defined 1
 #ifdef __CRT_HAVE_mktime
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime32)
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
 #elif defined(__CRT_HAVE_timelocal)
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
 #else /* ... */
 #undef __local___localdep_mktime32_defined
@@ -45,22 +48,27 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_
 #ifndef __local___localdep_mktime64_defined
 #define __local___localdep_mktime64_defined 1
 #ifdef __CRT_HAVE_mktime64
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime64,(__tp))
 #elif defined(__CRT_HAVE_mktime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime64)
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime64,(__tp))
 #elif defined(__CRT_HAVE_timelocal64)
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/mktime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 #define __localdep_mktime64 __LIBC_LOCAL_NAME(mktime64)
 #endif /* !... */
 #endif /* !__local___localdep_mktime64_defined */
@@ -69,7 +77,8 @@ __NAMESPACE_LOCAL_END
 #define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
-/* Return the `time_t' representation of `tp' and normalize `tp' */
+/* >> mktime(3), mktime64(3)
+ * Return the `time_t' representation of `tp' and normalize `tp' */
 __LOCAL_LIBC(mktime) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) {
 

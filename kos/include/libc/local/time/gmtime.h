@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63908d74 */
+/* HASH CRC-32:0x9af6abc9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gmtime32_defined
 #define __local___localdep_gmtime32_defined 1
 #ifdef __CRT_HAVE_gmtime
-/* Return the `struct tm' representation of `*timer'
+/* >> gmtime(3), gmtime64(3)
+ * Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime32,(__time32_t const *__timer),gmtime,(__timer))
 #elif defined(__CRT_HAVE__gmtime32)
-/* Return the `struct tm' representation of `*timer'
+/* >> gmtime(3), gmtime64(3)
+ * Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime32,(__time32_t const *__timer),_gmtime32,(__timer))
 #else /* ... */
@@ -43,22 +45,26 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESP
 #ifndef __local___localdep_gmtime64_defined
 #define __local___localdep_gmtime64_defined 1
 #ifdef __CRT_HAVE_gmtime64
-/* Return the `struct tm' representation of `*timer'
+/* >> gmtime(3), gmtime64(3)
+ * Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64,(__time64_t const *__timer),gmtime64,(__timer))
 #elif defined(__CRT_HAVE_gmtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Return the `struct tm' representation of `*timer'
+/* >> gmtime(3), gmtime64(3)
+ * Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64,(__time64_t const *__timer),gmtime,(__timer))
 #elif defined(__CRT_HAVE__gmtime64)
-/* Return the `struct tm' representation of `*timer'
+/* >> gmtime(3), gmtime64(3)
+ * Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64,(__time64_t const *__timer),_gmtime64,(__timer))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/gmtime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the `struct tm' representation of `*timer'
+/* >> gmtime(3), gmtime64(3)
+ * Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 #define __localdep_gmtime64 __LIBC_LOCAL_NAME(gmtime64)
 #endif /* !... */
@@ -67,16 +73,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gmtime_r_defined
 #define __local___localdep_gmtime_r_defined 1
 #ifdef __CRT_HAVE_gmtime_r
-/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE___gmtime_r)
-/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),__gmtime_r,(__timer,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/gmtime_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 #define __localdep_gmtime_r __LIBC_LOCAL_NAME(gmtime_r)
 #endif /* !... */
 #endif /* !__local___localdep_gmtime_r_defined */
@@ -90,7 +99,8 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC */
 __NAMESPACE_LOCAL_BEGIN
-/* Return the `struct tm' representation of `*timer'
+/* >> gmtime(3), gmtime64(3)
+ * Return the `struct tm' representation of `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __LOCAL_LIBC(gmtime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime))(__TM_TYPE(time) const *__timer) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32e2db93 */
+/* HASH CRC-32:0x439030e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_difftime32_defined
 #define __local___localdep_difftime32_defined 1
 #ifdef __CRT_HAVE_difftime
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime32)
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),_difftime32,(__time1,__time0))
 #else /* ... */
 #undef __local___localdep_difftime32_defined
@@ -40,26 +42,32 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(
 #ifndef __local___localdep_difftime64_defined
 #define __local___localdep_difftime64_defined 1
 #ifdef __CRT_HAVE_difftime64
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE_difftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64)
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE___difftime64)
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/difftime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 #define __localdep_difftime64 __LIBC_LOCAL_NAME(difftime64)
 #endif /* !... */
 #endif /* !__local___localdep_difftime64_defined */
-/* Return the difference between TIME1 and TIME0 */
+/* >> difftime(3), difftime64(3)
+ * Return the difference between `time1' and `time0' */
 __LOCAL_LIBC(difftime) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime))(__TM_TYPE(time) __time1, __TM_TYPE(time) __time0) {
 

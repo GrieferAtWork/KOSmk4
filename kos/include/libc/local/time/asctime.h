@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8680555 */
+/* HASH CRC-32:0xc036e624 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,8 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 __NAMESPACE_LOCAL_BEGIN
-/* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
+/* >> asctime(3)
+ * Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of `tp' in this format */
 __LOCAL_LIBC(asctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {

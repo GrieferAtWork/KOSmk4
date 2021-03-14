@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f4fa341 */
+/* HASH CRC-32:0x61d85e49 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,26 +27,30 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_ctime32_s from time */
 #if !defined(__local___localdep_dos_ctime32_s_defined) && defined(__CRT_HAVE__ctime32_s)
 #define __local___localdep_dos_ctime32_s_defined 1
-/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
+/* >> _ctime32_s(3)
+ * Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime32_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time32_t const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
 #endif /* !__local___localdep_dos_ctime32_s_defined && __CRT_HAVE__ctime32_s */
 /* Dependency: dos_ctime64_s from time */
 #ifndef __local___localdep_dos_ctime64_s_defined
 #define __local___localdep_dos_ctime64_s_defined 1
 #ifdef __CRT_HAVE__ctime64_s
-/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
+/* >> _ctime32_s(3)
+ * Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime64_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__ctime32_s)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/dos_ctime64_s.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
+/* >> _ctime32_s(3)
+ * Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, <tmp>))' */
 #define __localdep_dos_ctime64_s __LIBC_LOCAL_NAME(dos_ctime64_s)
 #else /* ... */
 #undef __local___localdep_dos_ctime64_s_defined
 #endif /* !... */
 #endif /* !__local___localdep_dos_ctime64_s_defined */
-/* Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
+/* >> ctime_r(3), ctime64_r(3)
+ * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
 __LOCAL_LIBC(dos_ctime_s) __ATTR_NONNULL((1, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_ctime_s))(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer) {
 

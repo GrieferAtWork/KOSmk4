@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e8cb904 */
+/* HASH CRC-32:0x1169f822 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2846,14 +2846,17 @@ __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, 
 #ifndef __stime_defined
 #define __stime_defined 1
 #if defined(__CRT_HAVE_stime64) && defined(__USE_TIME_BITS64)
-/* Set the system time to *WHEN. This call is restricted to the superuser */
+/* >> stime(3), stime64(3)
+ * Set the system time to `*when'. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),stime64,(__when))
 #elif defined(__CRT_HAVE_stime) && !defined(__USE_TIME_BITS64)
-/* Set the system time to *WHEN. This call is restricted to the superuser */
+/* >> stime(3), stime64(3)
+ * Set the system time to `*when'. This call is restricted to the superuser */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),(__when))
 #elif defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime)
 #include <libc/local/time/stime.h>
-/* Set the system time to *WHEN. This call is restricted to the superuser */
+/* >> stime(3), stime64(3)
+ * Set the system time to `*when'. This call is restricted to the superuser */
 __NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL stime)(__TM_TYPE(time) const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime))(__when); })
 #else /* ... */
 #undef __stime_defined
