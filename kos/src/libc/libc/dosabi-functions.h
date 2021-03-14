@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40c0b72a */
+/* HASH CRC-32:0xbaed68ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2366,6 +2366,7 @@ DFUN(".text.crt.dos.timer", libd_timer_settime64, libc_timer_settime64, TD, 4, T
 DFUN(".text.crt.dos.timer", libd_timer_gettime64, libc_timer_gettime64, TD, 2, TIn(__SIZEOF_TIMER_T__), TP)
 DFUN(".text.crt.dos.time", libd_clock_nanosleep64, libc_clock_nanosleep64, TD, 4, TIn(__SIZEOF_CLOCKID_T__), TD, TP, TP)
 DFUN(".text.crt.dos.time", libd_timespec_get, libc_timespec_get, TD, 2, TP, TD)
+DFUN(".text.crt.dos.time", libd_timespec_get64, libc_timespec_get64, TD, 2, TP, TD)
 DFUN(".text.crt.dos.time", libd_getdate, libc_getdate, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd_strftime_l, libc_strftime_l, TI, 5, TP, TI, TP, TP, TP)
 DFUN(".text.crt.dos.time", libd_strptime, libc_strptime, TP, 3, TP, TP, TP)

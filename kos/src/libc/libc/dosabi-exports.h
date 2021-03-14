@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42ddb9d3 */
+/* HASH CRC-32:0x147d826a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2893,6 +2893,7 @@ DEFINE_PUBLIC_ALIAS(DOS$timer_settime64, libd_timer_settime64);
 DEFINE_PUBLIC_ALIAS(DOS$timer_gettime64, libd_timer_gettime64);
 DEFINE_PUBLIC_ALIAS(DOS$clock_nanosleep64, libd_clock_nanosleep64);
 DEFINE_PUBLIC_ALIAS(DOS$timespec_get, libd_timespec_get);
+DEFINE_PUBLIC_ALIAS(DOS$timespec_get64, libd_timespec_get64);
 DEFINE_PUBLIC_ALIAS(DOS$getdate, libd_getdate);
 DEFINE_PUBLIC_ALIAS(DOS$_strftime_l, libd_strftime_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strftime_l, libd_strftime_l);

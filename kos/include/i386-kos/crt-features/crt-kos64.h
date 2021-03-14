@@ -4186,6 +4186,7 @@
 #define __CRT_HAVE_timerfd_settime64
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
+#define __CRT_HAVE_timespec_get64
 #define __CRT_HAVE_timezone
 #define __CRT_HAVE_timingsafe_bcmp
 #define __CRT_HAVE_timingsafe_memcmp
@@ -7727,6 +7728,7 @@
 #define __CRT_HAVE_KOS$timerfd_settime64
 #define __CRT_HAVE_KOS$times
 #define __CRT_HAVE_KOS$timespec_get
+#define __CRT_HAVE_KOS$timespec_get64
 #define __CRT_HAVE_KOS$timingsafe_bcmp
 #define __CRT_HAVE_KOS$timingsafe_memcmp
 #define __CRT_HAVE_KOS$tmpfile_s
@@ -11258,6 +11260,7 @@
 #define __CRT_HAVE_DOS$timerfd_settime64
 #define __CRT_HAVE_DOS$times
 #define __CRT_HAVE_DOS$timespec_get
+#define __CRT_HAVE_DOS$timespec_get64
 #define __CRT_HAVE_DOS$timingsafe_bcmp
 #define __CRT_HAVE_DOS$timingsafe_memcmp
 #define __CRT_HAVE_DOS$tmpfile_s

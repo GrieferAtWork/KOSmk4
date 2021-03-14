@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7d9b5a0 */
+/* HASH CRC-32:0xd609a621 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -212,8 +212,26 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_timer_settime64)(timer_t timer
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_timer_gettime64)(timer_t timerid, struct itimerspec64 *value);
 /* High-resolution sleep with the specified clock */
 INTDEF NONNULL((3)) int NOTHROW_RPC(LIBDCALL libd_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
-/* Set `ts' to calendar time based in time base `base' */
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_timespec_get)(struct timespec *ts, __STDC_INT_AS_UINT_T base);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts, __STDC_INT_AS_UINT_T base);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_timespec_get64)(struct timespec64 *ts, __STDC_INT_AS_UINT_T base);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts, __STDC_INT_AS_UINT_T base);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Parse the given string as a date specification and return a value
  * representing the value. The templates from the file identified by
  * the environment variable `$DATEMSK' are used. In case of an error

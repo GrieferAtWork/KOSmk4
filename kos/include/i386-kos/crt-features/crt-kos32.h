@@ -4521,6 +4521,7 @@
 #define __CRT_HAVE_timerfd_settime64
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
+#define __CRT_HAVE_timespec_get64
 #define __CRT_HAVE_timezone
 #define __CRT_HAVE_timingsafe_bcmp
 #define __CRT_HAVE_timingsafe_memcmp

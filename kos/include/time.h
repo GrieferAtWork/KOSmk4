@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb682f3d5 */
+/* HASH CRC-32:0x77fd3b2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,6 +93,7 @@ __NAMESPACE_STD_USING(timespec_get)
 #include <features.h>
 
 #include <bits/crt/tm.h>
+#include <asm/crt/time.h>
 #include <asm/os/clock.h>
 #include <bits/types.h>
 #include <hybrid/typecore.h>
@@ -253,8 +254,11 @@ __NAMESPACE_STD_USING(timespec_get)
 #define FSEC_PER_SEC  __UINT64_C(1000000000000000)
 #endif /* __USE_KOS */
 
+/* Values for `timespec_get(3)::base' */
 #ifdef __USE_ISOC11
-#define TIME_UTC 1
+#if !defined(TIME_UTC) && defined(__TIME_UTC)
+#define TIME_UTC __TIME_UTC /* s.a. `CLOCK_REALTIME' */
+#endif /* !TIME_UTC && __TIME_UTC */
 #endif /* __USE_ISOC11 */
 
 #ifndef __isleap
@@ -632,11 +636,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifndef __std_timespec_get_defined
 #define __std_timespec_get_defined 1
 #ifdef __timespec_get_defined
-/* Set `ts' to calendar time based in time base `base' */
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
 __NAMESPACE_GLB_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) { return (:: timespec_get)(__ts, __base); })
-#elif defined(__CRT_HAVE_timespec_get)
-/* Set `ts' to calendar time based in time base `base' */
+#elif defined(__CRT_HAVE_timespec_get64) && defined(__USE_TIME_BITS64)
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),timespec_get64,(__ts,__base))
+#elif defined(__CRT_HAVE_timespec_get) && !defined(__USE_TIME_BITS64)
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
+#elif defined(__CLOCK_REALTIME) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+__NAMESPACE_STD_END
+#include <libc/local/time/timespec_get.h>
+__NAMESPACE_STD_BEGIN
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get))(__ts, __base); })
 #else /* ... */
 #undef __std_timespec_get_defined
 #endif /* !... */
@@ -1186,6 +1203,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep64, __FORCELOCAL __ATTR_ARTIFICIA
 __NAMESPACE_STD_USING(timespec_get)
 #endif /* !__timespec_get_defined && __std_timespec_get_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_TIME64
+#ifdef __CRT_HAVE_timespec_get64
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
+#elif defined(__CRT_HAVE_timespec_get) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),timespec_get,(__ts,__base))
+#elif defined(__CLOCK_REALTIME) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+#include <libc/local/time/timespec_get64.h>
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL timespec_get64)(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get64))(__ts, __base); })
+#endif /* ... */
+#endif /* __USE_TIME64 */
 #endif /* __USE_ISOCXX17 */
 
 /* timespec_get() is defined by both c11 and c++17 */
@@ -1193,11 +1226,22 @@ __NAMESPACE_STD_USING(timespec_get)
 #ifndef __timespec_get_defined
 #define __timespec_get_defined 1
 #ifdef __std_timespec_get_defined
-/* Set `ts' to calendar time based in time base `base' */
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
 __NAMESPACE_STD_USING(timespec_get)
-#elif defined(__CRT_HAVE_timespec_get)
-/* Set `ts' to calendar time based in time base `base' */
+#elif defined(__CRT_HAVE_timespec_get64) && defined(__USE_TIME_BITS64)
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),timespec_get64,(__ts,__base))
+#elif defined(__CRT_HAVE_timespec_get) && !defined(__USE_TIME_BITS64)
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
+#elif defined(__CLOCK_REALTIME) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+#include <libc/local/time/timespec_get.h>
+/* >> timespec_get(3), timespec_get64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get))(__ts, __base); })
 #else /* ... */
 #undef __timespec_get_defined
 #endif /* !... */

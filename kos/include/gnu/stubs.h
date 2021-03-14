@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x356747ad */
+/* HASH CRC-32:0x4e05fe7a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -564,7 +564,6 @@
 #define __stub_tempnam
 #define __stub___tgamma
 #define __stub_tgamma
-#define __stub_timespec_get
 #define __stub_tmpfile
 #define __stub_tmpnam
 #define __stub_ttyslot

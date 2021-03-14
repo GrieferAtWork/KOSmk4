@@ -60,6 +60,8 @@
 }%[insert:prefix(
 #include <bits/crt/tm.h>
 )]%[insert:prefix(
+#include <asm/crt/time.h>
+)]%[insert:prefix(
 #include <asm/os/clock.h>
 )]%[insert:prefix(
 #include <bits/types.h>
@@ -223,8 +225,11 @@
 #define FSEC_PER_SEC  __UINT64_C(1000000000000000)
 #endif /* __USE_KOS */
 
+/* Values for `timespec_get(3)::base' */
 #ifdef __USE_ISOC11
-#define TIME_UTC 1
+#if !defined(TIME_UTC) && defined(__TIME_UTC)
+#define TIME_UTC __TIME_UTC /* s.a. `CLOCK_REALTIME' */
+#endif /* !TIME_UTC && __TIME_UTC */
 #endif /* __USE_ISOC11 */
 
 #ifndef __isleap
@@ -1519,10 +1524,41 @@ int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 
 %
 %(c,std)#ifdef __USE_ISOCXX17
+@@>> timespec_get(3), timespec_get64(3)
 @@Set `ts' to calendar time based in time base `base'
-[[std, guard, decl_include("<features.h>", "<bits/os/timespec.h>")]]
+[[std, guard, no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/os/timespec.h>")]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("timespec_get64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("timespec_get")]]
+[[requires_include("<asm/os/clock.h>")]]
+[[requires(defined(__CLOCK_REALTIME) && $has_function(clock_gettime))]]
+[[impl_include("<asm/crt/time.h>")]]
 int timespec_get([[nonnull]] struct timespec *ts,
-                 __STDC_INT_AS_UINT_T base);
+                 __STDC_INT_AS_UINT_T base) {
+	if (base == __TIME_UTC) {
+		if (clock_gettime(__CLOCK_REALTIME, ts) == 0)
+			return __TIME_UTC;
+	}
+	/* Unsupported base... */
+	return 0;
+}
+
+%#ifdef __USE_TIME64
+[[decl_include("<features.h>", "<bits/os/timespec.h>")]]
+[[doc_alias("timespec_get"), requires_include("<asm/os/clock.h>")]]
+[[requires(defined(__CLOCK_REALTIME) && $has_function(clock_gettime64))]]
+[[impl_include("<asm/crt/time.h>"), time64_variant_of(timespec_get)]]
+int timespec_get64([[nonnull]] struct timespec64 *ts,
+                   __STDC_INT_AS_UINT_T base) {
+	if (base == __TIME_UTC) {
+		if (clock_gettime64(__CLOCK_REALTIME, ts) == 0)
+			return __TIME_UTC;
+	}
+	/* Unsupported base... */
+	return 0;
+}
+%#endif /* __USE_TIME64 */
+
 %(c,std)#endif /* __USE_ISOCXX17 */
 
 %

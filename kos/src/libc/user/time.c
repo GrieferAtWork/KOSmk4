@@ -133,20 +133,6 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id,
 /*[[[end:libc_clock_adjtime64]]]*/
 
 
-/*[[[head:libc_timespec_get,hash:CRC-32=0xaf6d8410]]]*/
-/* Set `ts' to calendar time based in time base `base' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
-                                        __STDC_INT_AS_UINT_T base)
-/*[[[body:libc_timespec_get]]]*/
-/*AUTO*/{
-	(void)ts;
-	(void)base;
-	CRT_UNIMPLEMENTEDF("timespec_get(%p, %x)", ts, base); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_timespec_get]]]*/
 
 /*[[[head:libc_time,hash:CRC-32=0xa7d7a8d1]]]*/
 /* Return the current time and put it in `*timer' if `timer' is not `NULL' */
@@ -542,7 +528,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2195e4ce]]]*/
+/*[[[start:exports,hash:CRC-32=0xa6442b3f]]]*/
 DEFINE_PUBLIC_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_ALIAS(time, libc_time);
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -576,7 +562,6 @@ DEFINE_PUBLIC_ALIAS(clock_settime64, libc_clock_settime64);
 DEFINE_PUBLIC_ALIAS(timer_settime64, libc_timer_settime64);
 DEFINE_PUBLIC_ALIAS(timer_gettime64, libc_timer_gettime64);
 DEFINE_PUBLIC_ALIAS(clock_nanosleep64, libc_clock_nanosleep64);
-DEFINE_PUBLIC_ALIAS(timespec_get, libc_timespec_get);
 DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
 DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
 DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
