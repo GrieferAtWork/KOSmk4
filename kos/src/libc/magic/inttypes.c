@@ -598,7 +598,7 @@ $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(strto32_r)]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcore.h>", "<asm/os/errno.h>")]]
 $intmax_t strtoimax_r([[nonnull]] char const *__restrict nptr,
                       [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                       [[nullable]] $errno_t *error) {
@@ -636,7 +636,7 @@ $intmax_t strtoimax_r([[nonnull]] char const *__restrict nptr,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), bind_local_function(strtou32_r)]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcore.h>", "<asm/os/errno.h>")]]
 $uintmax_t strtoumax_r([[nonnull]] char const *__restrict nptr,
                        [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                        [[nullable]] $errno_t *error) {

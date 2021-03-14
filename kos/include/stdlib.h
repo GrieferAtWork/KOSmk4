@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ef34ddb */
+/* HASH CRC-32:0x8216f7ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3398,6 +3398,8 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHRO
 #endif /* __USE_SOLARIS */
 
 #if defined(__USE_OPENBSD) && defined(__LONGLONG)
+#ifndef __strtonum_defined
+#define __strtonum_defined 1
 #ifdef __CRT_HAVE_strtonum
 /* >> strtonum(3)
  * Similar to `strtoi()' with `base=10', but return human-
@@ -3426,24 +3428,40 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__LONGLONG,__NOTHROW_NCX,strton
  * @return: * : [*p_errstr == NULL] Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtonum)(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtonum))(__nptr, __lo, __hi, __p_errstr); })
 #endif /* !__CRT_HAVE_strtonum */
+#endif /* !__strtonum_defined */
 #endif /* __USE_OPENBSD && __LONGLONG */
 
 #ifdef __USE_NETBSD
+#ifndef __heapsort_defined
+#define __heapsort_defined 1
 #ifdef __CRT_HAVE_heapsort
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
 #else /* __CRT_HAVE_heapsort */
 #include <libc/local/stdlib/heapsort.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
 #endif /* !__CRT_HAVE_heapsort */
+#endif /* !__heapsort_defined */
+#ifndef __mergesort_defined
+#define __mergesort_defined 1
 #ifdef __CRT_HAVE_mergesort
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
 #else /* __CRT_HAVE_mergesort */
 #include <libc/local/stdlib/mergesort.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
 #endif /* !__CRT_HAVE_mergesort */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
+#endif /* !__mergesort_defined */
+#if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
+#define __radixsort_defined 1
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+#endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
+#if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
+#define __sradixsort_defined 1
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+#endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
+#if !defined(__getbsize_defined) && defined(__CRT_HAVE_getbsize)
+#define __getbsize_defined 1
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
+#endif /* !__getbsize_defined && __CRT_HAVE_getbsize */
 #ifdef __CRT_HAVE_devname
 /* >> devname(3), devname_r(3) */
 __CDECLARE(__ATTR_CONST,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __type),(__dev,__type))

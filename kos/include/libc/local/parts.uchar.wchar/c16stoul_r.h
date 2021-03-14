@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77a2716f */
+/* HASH CRC-32:0xa32656c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,7 +203,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_c16stou64_r_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
-#include <hybrid/limitcode.h>
+#include <hybrid/limitcore.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16stoul_r) __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long

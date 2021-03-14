@@ -1593,7 +1593,7 @@ handle_overflow:
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strto32_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strto64_r)]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcore.h>", "<asm/os/errno.h>")]]
 long strtol_r([[nonnull]] char const *__restrict nptr,
               [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
               [[nullable]] $errno_t *error) {
@@ -1631,7 +1631,7 @@ long strtol_r([[nonnull]] char const *__restrict nptr,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strtou32_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(strtou64_r)]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcore.h>", "<asm/os/errno.h>")]]
 unsigned long strtoul_r([[nonnull]] char const *__restrict nptr,
                         [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                         [[nullable]] $errno_t *error) {
@@ -1661,7 +1661,7 @@ unsigned long strtoul_r([[nonnull]] char const *__restrict nptr,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strto64_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(strto32_r)]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcore.h>", "<asm/os/errno.h>")]]
 __LONGLONG strtoll_r([[nonnull]] char const *__restrict nptr,
                      [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                      [[nullable]] $errno_t *error) {
@@ -1699,7 +1699,7 @@ __LONGLONG strtoll_r([[nonnull]] char const *__restrict nptr,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strtou64_r)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(strtou32_r)]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcode.h>", "<asm/os/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/limitcore.h>", "<asm/os/errno.h>")]]
 __ULONGLONG strtoull_r([[nonnull]] char const *__restrict nptr,
                        [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                        [[nullable]] $errno_t *error) {
@@ -3273,7 +3273,7 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 @@@return: 0 : [*p_errstr != NULL] Error
 @@@return: 0 : [*p_errstr == NULL] Success
 @@@return: * : [*p_errstr == NULL] Success
-[[wunused, impl_include("<bits/types.h>")]]
+[[guard, wunused, impl_include("<bits/types.h>")]]
 __LONGLONG strtonum([[nonnull]] char const *nptr,
                     __LONGLONG lo, __LONGLONG hi,
                     [[nonnull]] char const **p_errstr) {
@@ -3304,7 +3304,7 @@ __LONGLONG strtonum([[nonnull]] char const *nptr,
 %#ifdef __USE_NETBSD
 %[default:section(".text.crt{|.dos}.bsd")]
 
-[[throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
+[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
 int heapsort([[nonnull]] void *pbase,
              $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_fn_t cmp) {
@@ -3313,7 +3313,7 @@ int heapsort([[nonnull]] void *pbase,
 	return 0;
 }
 
-[[throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
+[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
 int mergesort([[nonnull]] void *pbase,
               $size_t item_count, $size_t item_size,
               [[nonnull]] __compar_fn_t cmp) {
@@ -3323,10 +3323,12 @@ int mergesort([[nonnull]] void *pbase,
 }
 
 
+[[guard]]
 int radixsort([[nonnull]] unsigned char const **base, int item_count,
               [[nullable]] unsigned char const *table, unsigned endbyte);
 /* TODO: `radixsort()' can be implemented via magic! */
 
+[[guard]]
 int sradixsort([[nonnull]] unsigned char const **base, int item_count,
                [[nullable]] unsigned char const *table, unsigned endbyte);
 /* TODO: `sradixsort()' can be implemented via magic! */
@@ -3349,7 +3351,7 @@ int sradixsort([[nonnull]] unsigned char const **base, int item_count,
 //TODO:int cgetustr(char *, char const *, char **);
 //TODO:void csetexpandtc(int);
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[guard, wunused, decl_include("<hybrid/typecore.h>")]]
 char *getbsize([[nonnull]] int *headerlenp,
                [[nonnull]] __LONGPTR_TYPE__ *blocksizep);
 /* TODO: `getbsize()' can be implemented via magic! */

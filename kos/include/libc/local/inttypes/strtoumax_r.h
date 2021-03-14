@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69fc18a9 */
+/* HASH CRC-32:0x4c368306 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strtou64_r */
 #endif /* !__local___localdep_strtou64_r_defined */
 __NAMESPACE_LOCAL_END
-#include <hybrid/limitcode.h>
+#include <hybrid/limitcore.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtoumax_r) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
