@@ -80,8 +80,6 @@
 #define _PATH_DEVDB    "/var/run/dev.db"
 #endif /* __linux__ */
 
-#define _PATH_BSHELL  "/bin/sh"
-
 #define _PATH_DEV     "/dev/"
 #define _PATH_CONSOLE "/dev/console"
 #define _PATH_MEM     "/dev/mem"
