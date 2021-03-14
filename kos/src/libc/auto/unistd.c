@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cfc8068 */
+/* HASH CRC-32:0x288df06b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -471,11 +471,11 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 #else /* __O_CLOFORK */
 #define __PRIVATE_GETPASSFD_O_CLOFORK 0
 #endif /* !__O_CLOFORK */
-#ifdef __O_RDONLY
-#define __PRIVATE_GETPASSFD_O_RDONLY __O_RDONLY
-#else /* __O_RDONLY */
-#define __PRIVATE_GETPASSFD_O_RDONLY 0
-#endif /* !__O_RDONLY */
+#ifdef __O_RDWR
+#define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
+#else /* __O_RDWR */
+#define __PRIVATE_GETPASSFD_O_RDWR 0
+#endif /* !__O_RDWR */
 #if defined(__O_NONBLOCK) && (defined(__CRT_HAVE_poll) || defined(__CRT_HAVE___poll))
 #define __PRIVATE_GETPASSFD_O_NONBLOCK __O_NONBLOCK
 #else /* __O_NONBLOCK && (__CRT_HAVE_poll || __CRT_HAVE___poll) */
@@ -490,13 +490,13 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 		default_fds[2] = libc_open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDONLY |
+		                      __PRIVATE_GETPASSFD_O_RDWR |
 		                      (timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
 #else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
 		default_fds[2] = libc_open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDONLY);
+		                      __PRIVATE_GETPASSFD_O_RDWR);
 #endif /* __PRIVATE_GETPASSFD_O_NONBLOCK == 0 */
 		if (default_fds[2] != -1) {
 			default_fds[0] = default_fds[2];
@@ -878,7 +878,7 @@ maybe_beep:
 			new_buflen = (size_t)((dst + 1) - (unsigned char *)buf);
 			new_buf    = (char *)libc_malloc(new_buflen * sizeof(char));
 			if likely(new_buf) {
-				libc_memcpyc(new_buf, buf, buflen, sizeof(char));
+				libc_memcpyc(new_buf, buf, new_buflen, sizeof(char));
 				__libc_explicit_bzero(buf, buflen * sizeof(char));
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 				libc_free(buf);

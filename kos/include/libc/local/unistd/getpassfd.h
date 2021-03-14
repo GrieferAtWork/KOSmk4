@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x787705c5 */
+/* HASH CRC-32:0x2f4554aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -683,11 +683,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 #else /* __O_CLOFORK */
 #define __PRIVATE_GETPASSFD_O_CLOFORK 0
 #endif /* !__O_CLOFORK */
-#ifdef __O_RDONLY
-#define __PRIVATE_GETPASSFD_O_RDONLY __O_RDONLY
-#else /* __O_RDONLY */
-#define __PRIVATE_GETPASSFD_O_RDONLY 0
-#endif /* !__O_RDONLY */
+#ifdef __O_RDWR
+#define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
+#else /* __O_RDWR */
+#define __PRIVATE_GETPASSFD_O_RDWR 0
+#endif /* !__O_RDWR */
 #if defined(__O_NONBLOCK) && (defined(__CRT_HAVE_poll) || defined(__CRT_HAVE___poll))
 #define __PRIVATE_GETPASSFD_O_NONBLOCK __O_NONBLOCK
 #else /* __O_NONBLOCK && (__CRT_HAVE_poll || __CRT_HAVE___poll) */
@@ -702,13 +702,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 		__default_fds[2] = __localdep_open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDONLY |
+		                      __PRIVATE_GETPASSFD_O_RDWR |
 		                      (__timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
 #else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
 		__default_fds[2] = __localdep_open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDONLY);
+		                      __PRIVATE_GETPASSFD_O_RDWR);
 #endif /* __PRIVATE_GETPASSFD_O_NONBLOCK == 0 */
 		if (__default_fds[2] != -1) {
 			__default_fds[0] = __default_fds[2];
@@ -1090,7 +1090,7 @@ __maybe_beep:
 			__new_buflen = (__SIZE_TYPE__)((__dst + 1) - (unsigned char *)__buf);
 			__new_buf    = (char *)__localdep_malloc(__new_buflen * sizeof(char));
 			if __likely(__new_buf) {
-				__localdep_memcpyc(__new_buf, __buf, __buflen, sizeof(char));
+				__localdep_memcpyc(__new_buf, __buf, __new_buflen, sizeof(char));
 				__libc_explicit_bzero(__buf, __buflen * sizeof(char));
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 				__localdep_free(__buf);

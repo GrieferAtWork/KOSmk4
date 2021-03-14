@@ -2259,11 +2259,11 @@ char *getpassfd([[nullable]] char const *prompt,
 #else /* __O_CLOFORK */
 #define __PRIVATE_GETPASSFD_O_CLOFORK 0
 #endif /* !__O_CLOFORK */
-#ifdef __O_RDONLY
-#define __PRIVATE_GETPASSFD_O_RDONLY __O_RDONLY
-#else /* __O_RDONLY */
-#define __PRIVATE_GETPASSFD_O_RDONLY 0
-#endif /* !__O_RDONLY */
+#ifdef __O_RDWR
+#define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
+#else /* __O_RDWR */
+#define __PRIVATE_GETPASSFD_O_RDWR 0
+#endif /* !__O_RDWR */
 @@pp_if defined(__O_NONBLOCK) && $has_function(poll)@@
 #define __PRIVATE_GETPASSFD_O_NONBLOCK __O_NONBLOCK
 @@pp_else@@
@@ -2278,13 +2278,13 @@ char *getpassfd([[nullable]] char const *prompt,
 		default_fds[2] = open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDONLY |
+		                      __PRIVATE_GETPASSFD_O_RDWR |
 		                      (timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
 #else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
 		default_fds[2] = open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDONLY);
+		                      __PRIVATE_GETPASSFD_O_RDWR);
 #endif /* __PRIVATE_GETPASSFD_O_NONBLOCK == 0 */
 		if (default_fds[2] != -1) {
 			default_fds[0] = default_fds[2];
@@ -2666,7 +2666,7 @@ maybe_beep:
 			new_buflen = (size_t)((dst + 1) - (unsigned char *)buf);
 			new_buf    = (char *)malloc(new_buflen * sizeof(char));
 			if likely(new_buf) {
-				memcpyc(new_buf, buf, buflen, sizeof(char));
+				memcpyc(new_buf, buf, new_buflen, sizeof(char));
 				__libc_explicit_bzero(buf, buflen * sizeof(char));
 @@pp_if $has_function(free)@@
 				free(buf);

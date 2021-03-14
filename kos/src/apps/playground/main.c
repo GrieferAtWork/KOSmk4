@@ -876,6 +876,32 @@ int main_bigfile(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_pass(int argc, char *argv[], char *envp[]) {
+	char *user, *pass;
+	(void)argc, (void)argv, (void)envp;
+	printf("===FAKE LOGIN===\n");
+	user = getpassfd("user: ", NULL, 0, NULL,
+	                 GETPASS_NEED_TTY | GETPASS_FAIL_EOF |
+	                 GETPASS_ECHO | GETPASS_ECHO_NL,
+	                 0);
+	if (!user)
+		err(1, "getpassfd() failed");
+	pass = getpassfd("pass: ", NULL, 0, NULL,
+	                 GETPASS_NEED_TTY | GETPASS_FAIL_EOF |
+	                 GETPASS_ECHO_STAR | GETPASS_ECHO_NL,
+	                 0);
+	if (!pass)
+		err(1, "getpassfd() failed");
+	printf("you entered: %q, %q\n", user, pass);
+	free(user);
+	free(pass);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -911,6 +937,7 @@ PRIVATE DEF defs[] = {
 	{ "vfork", &main_vfork },
 	{ "sigbounce", &main_sigbounce },
 	{ "bigfile", &main_bigfile },
+	{ "pass", &main_pass },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall
