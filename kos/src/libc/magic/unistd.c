@@ -872,12 +872,22 @@ $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 }
 
 @@>> isatty(2)
-@@@return: 1: Is a tty
-@@@return: 0: Not a tty
 @@Check if the given file handle `fd' refers to a TTY
+@@@return: 1: Is a tty
+@@@return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY')
 [[guard, wunused, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.tty"), dos_only_export_alias("_isatty")]]
-int isatty($fd_t fd);
+[[requires_include("<asm/os/tty.h>")]] /* __TCGETA */
+[[requires($has_function(tcgetattr) || ($has_function(ioctl) && defined(__TCGETA)))]]
+[[impl_include("<bits/os/termios.h>")]]
+int isatty($fd_t fd) {
+	struct termios ios;
+@@pp_if $has_function(ioctl) && defined(__TCGETA)@@
+	return ioctl(fd, __TCGETA, &ios) < 0 ? 0 : 1;
+@@pp_else@@
+	return tcgetattr(fd, &ios) != 0 ? 0 : 1;
+@@pp_endif@@
+}
 
 @@>> dup2(2)
 @@@return: newfd: Returns the new handle upon success.

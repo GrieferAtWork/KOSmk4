@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x288df06b */
+/* HASH CRC-32:0x11aa3221 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 #include "../user/signal.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
+#include "../user/sys.ioctl.h"
 #include "../user/sys.poll.h"
 #include "termios.h"
 
@@ -241,6 +242,20 @@ NOTHROW_NCX(LIBCCALL libc_getlogin)(void) {
 #else /* __CRT_HAVE_getenv || __LOCAL_environ */
 	return libc_cuserid(NULL);
 #endif /* !__CRT_HAVE_getenv && !__LOCAL_environ */
+}
+#include <bits/os/termios.h>
+/* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
+	struct termios ios;
+#if defined(__CRT_HAVE_ioctl) && defined(__TCGETA)
+	return libc_ioctl(fd, __TCGETA, &ios) < 0 ? 0 : 1;
+#else /* __CRT_HAVE_ioctl && __TCGETA */
+	return libc_tcgetattr(fd, &ios) != 0 ? 0 : 1;
+#endif /* !__CRT_HAVE_ioctl || !__TCGETA */
 }
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
@@ -558,7 +573,7 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 		if (flags & __GETPASS_NEED_TTY)
 			goto out; /* tcgetattr() should have already set errno=ENOTTY */
 	}
-#elif defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty)
+#elif defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
 	if ((flags & __GETPASS_NEED_TTY) && !libc_isatty(fds[0]))
 		goto out; /* isatty() should have already set errno=ENOTTY */
 #endif /* ... */
@@ -1084,6 +1099,10 @@ DEFINE_PUBLIC_ALIAS(_execlpe, libc_execlpe);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isatty, libc_isatty);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(isatty, libc_isatty);
 DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);

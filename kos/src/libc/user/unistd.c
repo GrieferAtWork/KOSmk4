@@ -633,20 +633,6 @@ NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
 }
 /*[[[end:libc_lseek]]]*/
 
-/*[[[head:libc_isatty,hash:CRC-32=0xf1b04f0]]]*/
-/* >> isatty(2)
- * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `fd' refers to a TTY */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd)
-/*[[[body:libc_isatty]]]*/
-{
-	struct termios ios;
-	return ioctl(fd, TCGETA, &ios) < 0 ? 0 : 1;
-}
-/*[[[end:libc_isatty]]]*/
-
 /*[[[head:libc_dup2,hash:CRC-32=0x7ac90214]]]*/
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
@@ -3605,7 +3591,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa0185896]]]*/
+/*[[[start:exports,hash:CRC-32=0x8b27901b]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -3664,10 +3650,6 @@ DEFINE_PUBLIC_ALIAS(_lseek, libc_lseek);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__lseek, libc_lseek);
 DEFINE_PUBLIC_ALIAS(lseek, libc_lseek);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isatty, libc_isatty);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(isatty, libc_isatty);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_dup2, libc_dup2);
 #endif /* __LIBCCALL_IS_LIBDCALL */

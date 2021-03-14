@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96c63261 */
+/* HASH CRC-32:0x12045b03 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -385,18 +385,28 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(
 #define __isatty_defined 1
 #ifdef __CRT_HAVE_isatty
 /* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `fd' refers to a TTY */
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__isatty)
 /* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `fd' refers to a TTY */
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),_isatty,(__fd))
 #else /* ... */
+#include <asm/os/tty.h>
+#if defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
+#include <libc/local/unistd/isatty.h>
+/* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(isatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isatty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isatty))(__fd); })
+#else /* __CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA) */
 #undef __isatty_defined
+#endif /* !__CRT_HAVE_tcgetattr && (!__CRT_HAVE_ioctl || !__TCGETA) */
 #endif /* !... */
 #endif /* !__isatty_defined */
 #ifndef __lseek_defined
@@ -960,17 +970,27 @@ __CDECLARE(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),(__mode))
 #endif /* ... */
 #ifdef __CRT_HAVE_isatty
 /* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `fd' refers to a TTY */
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),isatty,(__fd))
 #elif defined(__CRT_HAVE__isatty)
 /* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `fd' refers to a TTY */
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),(__fd))
-#endif /* ... */
+#else /* ... */
+#include <asm/os/tty.h>
+#if defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
+#include <libc/local/unistd/isatty.h>
+/* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isatty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isatty))(__fd); }
+#endif /* __CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA) */
+#endif /* !... */
 
 
 __CDECLARE_OPT(,int,__NOTHROW_NCX,_findclose,(intptr_t __findfd),(__findfd))

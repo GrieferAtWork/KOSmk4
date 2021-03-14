@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3796d69a */
+/* HASH CRC-32:0x74704400 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -235,10 +235,19 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void co
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off_t NOTHROW_NCX(LIBDCALL libd_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `fd' refers to a TTY */
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_isatty)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> isatty(2)
+ * Check if the given file handle `fd' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */

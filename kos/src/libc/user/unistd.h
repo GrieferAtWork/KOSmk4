@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e1130dd */
+/* HASH CRC-32:0x22ab009a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,11 +194,6 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void co
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
-/* >> isatty(2)
- * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `fd' refers to a TTY */
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd);
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
