@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc76eaea6 */
+/* HASH CRC-32:0x57b101a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,27 +53,28 @@ __NAMESPACE_LOCAL_BEGIN
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 __LOCAL_LIBC(cfmakesane) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restrict __termios_p) {
-	/* Set sane values. */
+	/* Default everything to ZERO */
 	__localdep_memset(__termios_p, 0, sizeof(*__termios_p));
-#ifdef __TTYDEF_CFLAG
+
+	/* Set sane flag values. */
+#if defined(__TTYDEF_CFLAG) && __TTYDEF_CFLAG
 	__termios_p->c_cflag  = __TTYDEF_CFLAG;
-#endif /* __TTYDEF_CFLAG */
-#ifdef __TTYDEF_IFLAG
+#endif /* __TTYDEF_CFLAG && __TTYDEF_CFLAG */
+#if defined(__TTYDEF_IFLAG) && __TTYDEF_IFLAG
 	__termios_p->c_iflag  = __TTYDEF_IFLAG;
-#endif /* __TTYDEF_IFLAG */
-#ifdef __TTYDEF_LFLAG
+#endif /* __TTYDEF_IFLAG && __TTYDEF_IFLAG */
+#if defined(__TTYDEF_LFLAG) && __TTYDEF_LFLAG
 	__termios_p->c_lflag  = __TTYDEF_LFLAG;
-#endif /* __TTYDEF_LFLAG */
-#ifdef __TTYDEF_OFLAG
+#endif /* __TTYDEF_LFLAG && __TTYDEF_LFLAG */
+#if defined(__TTYDEF_OFLAG) && __TTYDEF_OFLAG
 	__termios_p->c_oflag  = __TTYDEF_OFLAG;
-#endif /* __TTYDEF_OFLAG */
-#ifdef __TTYDEF_SPEED
+#endif /* __TTYDEF_OFLAG && __TTYDEF_OFLAG */
+#if defined(__TTYDEF_SPEED) && __TTYDEF_SPEED
 	__termios_p->c_ispeed = __TTYDEF_SPEED;
 	__termios_p->c_ospeed = __TTYDEF_SPEED;
-#endif /* __TTYDEF_SPEED */
-#ifndef __VDISABLE
-#define __VDISABLE '\0'
-#endif /* !__VDISABLE */
+#endif /* __TTYDEF_SPEED && __TTYDEF_SPEED */
+
+	/* ^C: Send SIGINT to the foreground process (requires `ISIG') */
 #ifdef __VINTR
 #ifdef __CINTR
 	__termios_p->c_cc[__VINTR] = __CINTR;
@@ -81,6 +82,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VINTR] = __VDISABLE;
 #endif /* ... */
 #endif /* __VINTR */
+
+	/* ^\: Send SIGQUIT to the foreground process (requires `ISIG') */
 #ifdef __VQUIT
 #ifdef __CQUIT
 	__termios_p->c_cc[__VQUIT] = __CQUIT;
@@ -88,6 +91,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VQUIT] = __VDISABLE;
 #endif /* ... */
 #endif /* __VQUIT */
+
+	/* ^H (aka. \b): Erase the last character from the input canon (requires `ECHOE') */
 #ifdef __VERASE
 #ifdef __CERASE
 	__termios_p->c_cc[__VERASE] = __CERASE;
@@ -95,6 +100,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VERASE] = __VDISABLE;
 #endif /* ... */
 #endif /* __VERASE */
+
+	/* ^U: Clear the entire input canon (requires `ECHOK') */
 #ifdef __VKILL
 #ifdef __CKILL
 	__termios_p->c_cc[__VKILL] = __CKILL;
@@ -102,6 +109,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VKILL] = __VDISABLE;
 #endif /* ... */
 #endif /* __VKILL */
+
+	/* ^D: Cause read(2) from the TTY to return 0 once (thus indicating input EOF) */
 #ifdef __VEOF
 #ifdef __CEOF
 	__termios_p->c_cc[__VEOF] = __CEOF;
@@ -109,6 +118,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VEOF] = __VDISABLE;
 #endif /* ... */
 #endif /* __VEOF */
+
+	/* ... */
 #ifdef __VTIME
 #ifdef __CTIME
 	__termios_p->c_cc[__VTIME] = __CTIME;
@@ -116,6 +127,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VTIME] = __VDISABLE;
 #endif /* ... */
 #endif /* __VTIME */
+
+	/* Minimum number of input bytes to-be returned by read(2) from the TTY */
 #ifdef __VMIN
 #ifdef __CMIN
 	__termios_p->c_cc[__VMIN] = __CMIN;
@@ -123,6 +136,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VMIN] = __VDISABLE;
 #endif /* ... */
 #endif /* __VMIN */
+
+	/* ... */
 #ifdef __VSWTCH
 #ifdef __CSWTCH
 	__termios_p->c_cc[__VSWTCH] = __CSWTCH;
@@ -130,6 +145,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VSWTCH] = __VDISABLE;
 #endif /* ... */
 #endif /* __VSWTCH */
+
+	/* ^Q: Restart stopped output (After VSTOP; causes pending TTY output to be flushed) */
 #ifdef __VSTART
 #ifdef __CSTART
 	__termios_p->c_cc[__VSTART] = __CSTART;
@@ -137,6 +154,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VSTART] = __VDISABLE;
 #endif /* ... */
 #endif /* __VSTART */
+
+	/* ^S: Suspend TTY display output until `VSTART' */
 #ifdef __VSTOP
 #ifdef __CSTOP
 	__termios_p->c_cc[__VSTOP] = __CSTOP;
@@ -144,6 +163,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VSTOP] = __VDISABLE;
 #endif /* ... */
 #endif /* __VSTOP */
+
+	/* ^Z: Send SIGTSTP to the foreground process (requires `ISIG') */
 #ifdef __VSUSP
 #ifdef __CSUSP
 	__termios_p->c_cc[__VSUSP] = __CSUSP;
@@ -151,6 +172,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VSUSP] = __VDISABLE;
 #endif /* ... */
 #endif /* __VSUSP */
+
+	/* \0: An additional end-of-line character used to flush the canon (by default, only \n is recognized) */
 #ifdef __VEOL
 #ifdef __CEOL
 	__termios_p->c_cc[__VEOL] = __CEOL;
@@ -158,6 +181,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VEOL] = __VDISABLE;
 #endif /* ... */
 #endif /* __VEOL */
+
+	/* ^R: Re-echo the current contents of the input canon (requires `IEXTEN') */
 #ifdef __VREPRINT
 #ifdef __CREPRINT
 	__termios_p->c_cc[__VREPRINT] = __CREPRINT;
@@ -165,6 +190,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VREPRINT] = __VDISABLE;
 #endif /* ... */
 #endif /* __VREPRINT */
+
+	/* <UNSUPPORTED> */
 #ifdef __VDISCARD
 #ifdef __CDISCARD
 	__termios_p->c_cc[__VDISCARD] = __CDISCARD;
@@ -172,6 +199,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VDISCARD] = __VDISABLE;
 #endif /* ... */
 #endif /* __VDISCARD */
+
+	/* ^W: Erase the last-written word (while (isspace(last)) erase(); while (!isspace(last)) erase()) (Requires `ECHOE' and `IEXTEN') */
 #ifdef __VWERASE
 #ifdef __CWERASE
 	__termios_p->c_cc[__VWERASE] = __CWERASE;
@@ -179,6 +208,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VWERASE] = __VDISABLE;
 #endif /* ... */
 #endif /* __VWERASE */
+
+	/* ^V: The next input character is escaped, in that any special meaning it would normally have is dismissed */
 #ifdef __VLNEXT
 #ifdef __CLNEXT
 	__termios_p->c_cc[__VLNEXT] = __CLNEXT;
@@ -186,6 +217,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VLNEXT] = __VDISABLE;
 #endif /* ... */
 #endif /* __VLNEXT */
+
+	/* \0: An additional end-of-line character used to flush the canon (by default, only \n is recognized) */
 #ifdef __VEOL2
 #ifdef __CEOL2
 	__termios_p->c_cc[__VEOL2] = __CEOL2;
@@ -193,6 +226,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VEOL2] = __VDISABLE;
 #endif /* ... */
 #endif /* __VEOL2 */
+
+	/* ... */
 #ifdef __VDSUSP
 #ifdef __CDSUSP
 	__termios_p->c_cc[__VDSUSP] = __CDSUSP;
@@ -200,6 +235,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 	__termios_p->c_cc[__VDSUSP] = __VDISABLE;
 #endif /* ... */
 #endif /* __VDSUSP */
+
+	/* ... */
 #ifdef __VSTATUS
 #ifdef __CSTATUS
 	__termios_p->c_cc[__VSTATUS] = __CSTATUS;

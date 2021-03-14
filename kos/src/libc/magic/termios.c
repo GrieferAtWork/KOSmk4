@@ -802,177 +802,104 @@ for (local field, add, flags: ops) {
 	print("	/" "* ", field, " (", add ? "addend" : "remove", ")", " *" "/");
 	print("@@pp_if "),;
 	print(" || ".join(for (local f: flags) "defined(__" + f + ")"), "@@");
+	local head = "termios_p->@{}@ {}(" .format({ field, add ? "|= " : "&= ~" });
+	print("	", head, "0");
+	head = " " * #head;
 	for (local f: flags) {
-		print("@@pp_ifndef __PRIVATE_", f, "@@");
 		print("@@pp_ifdef __", f, "@@");
-		print("#define __PRIVATE_", f, " __", f);
-		print("@@pp_else@@");
-		print("#define __PRIVATE_", f, " 0");
-		print("@@pp_endif@@");
+		print("	", head, "| __", f);
 		print("@@pp_endif@@");
 	}
-	print("	termios_p->@", field, "@ ", add ? "|= " : "&= ~", "("),;
-	print(" | ".join(for (local f: flags) "__PRIVATE_" + f), ");");
+	print("	", head, ");");
 	print("@@pp_endif@@");
 	print;
 }
 ]]]*/
 	/* c_iflag (remove) */
 @@pp_if defined(__IGNBRK) || defined(__BRKINT) || defined(__PARMRK) || defined(__ISTRIP) || defined(__INLCR) || defined(__IGNCR) || defined(__ICRNL) || defined(__IXON) || defined(__IXOFF)@@
-@@pp_ifndef __PRIVATE_IGNBRK@@
+	termios_p->@c_iflag@ &= ~(0
 @@pp_ifdef __IGNBRK@@
-#define __PRIVATE_IGNBRK __IGNBRK
-@@pp_else@@
-#define __PRIVATE_IGNBRK 0
+	                          | __IGNBRK
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_BRKINT@@
 @@pp_ifdef __BRKINT@@
-#define __PRIVATE_BRKINT __BRKINT
-@@pp_else@@
-#define __PRIVATE_BRKINT 0
+	                          | __BRKINT
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_PARMRK@@
 @@pp_ifdef __PARMRK@@
-#define __PRIVATE_PARMRK __PARMRK
-@@pp_else@@
-#define __PRIVATE_PARMRK 0
+	                          | __PARMRK
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_ISTRIP@@
 @@pp_ifdef __ISTRIP@@
-#define __PRIVATE_ISTRIP __ISTRIP
-@@pp_else@@
-#define __PRIVATE_ISTRIP 0
+	                          | __ISTRIP
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_INLCR@@
 @@pp_ifdef __INLCR@@
-#define __PRIVATE_INLCR __INLCR
-@@pp_else@@
-#define __PRIVATE_INLCR 0
+	                          | __INLCR
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_IGNCR@@
 @@pp_ifdef __IGNCR@@
-#define __PRIVATE_IGNCR __IGNCR
-@@pp_else@@
-#define __PRIVATE_IGNCR 0
+	                          | __IGNCR
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_ICRNL@@
 @@pp_ifdef __ICRNL@@
-#define __PRIVATE_ICRNL __ICRNL
-@@pp_else@@
-#define __PRIVATE_ICRNL 0
+	                          | __ICRNL
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_IXON@@
 @@pp_ifdef __IXON@@
-#define __PRIVATE_IXON __IXON
-@@pp_else@@
-#define __PRIVATE_IXON 0
+	                          | __IXON
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_IXOFF@@
 @@pp_ifdef __IXOFF@@
-#define __PRIVATE_IXOFF __IXOFF
-@@pp_else@@
-#define __PRIVATE_IXOFF 0
+	                          | __IXOFF
 @@pp_endif@@
-@@pp_endif@@
-	termios_p->@c_iflag@ &= ~(__PRIVATE_IGNBRK | __PRIVATE_BRKINT | __PRIVATE_PARMRK | __PRIVATE_ISTRIP | __PRIVATE_INLCR | __PRIVATE_IGNCR | __PRIVATE_ICRNL | __PRIVATE_IXON | __PRIVATE_IXOFF);
+	                          );
 @@pp_endif@@
 
 	/* c_oflag (remove) */
 @@pp_if defined(__OPOST)@@
-@@pp_ifndef __PRIVATE_OPOST@@
+	termios_p->@c_oflag@ &= ~(0
 @@pp_ifdef __OPOST@@
-#define __PRIVATE_OPOST __OPOST
-@@pp_else@@
-#define __PRIVATE_OPOST 0
+	                          | __OPOST
 @@pp_endif@@
-@@pp_endif@@
-	termios_p->@c_oflag@ &= ~(__PRIVATE_OPOST);
+	                          );
 @@pp_endif@@
 
 	/* c_lflag (remove) */
 @@pp_if defined(__ECHO) || defined(__ECHONL) || defined(__ICANON) || defined(__ISIG) || defined(__IEXTEN)@@
-@@pp_ifndef __PRIVATE_ECHO@@
+	termios_p->@c_lflag@ &= ~(0
 @@pp_ifdef __ECHO@@
-#define __PRIVATE_ECHO __ECHO
-@@pp_else@@
-#define __PRIVATE_ECHO 0
+	                          | __ECHO
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_ECHONL@@
 @@pp_ifdef __ECHONL@@
-#define __PRIVATE_ECHONL __ECHONL
-@@pp_else@@
-#define __PRIVATE_ECHONL 0
+	                          | __ECHONL
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_ICANON@@
 @@pp_ifdef __ICANON@@
-#define __PRIVATE_ICANON __ICANON
-@@pp_else@@
-#define __PRIVATE_ICANON 0
+	                          | __ICANON
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_ISIG@@
 @@pp_ifdef __ISIG@@
-#define __PRIVATE_ISIG __ISIG
-@@pp_else@@
-#define __PRIVATE_ISIG 0
+	                          | __ISIG
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_IEXTEN@@
 @@pp_ifdef __IEXTEN@@
-#define __PRIVATE_IEXTEN __IEXTEN
-@@pp_else@@
-#define __PRIVATE_IEXTEN 0
+	                          | __IEXTEN
 @@pp_endif@@
-@@pp_endif@@
-	termios_p->@c_lflag@ &= ~(__PRIVATE_ECHO | __PRIVATE_ECHONL | __PRIVATE_ICANON | __PRIVATE_ISIG | __PRIVATE_IEXTEN);
+	                          );
 @@pp_endif@@
 
 	/* c_cflag (remove) */
 @@pp_if defined(__CSIZE) || defined(__PARENB)@@
-@@pp_ifndef __PRIVATE_CSIZE@@
+	termios_p->@c_cflag@ &= ~(0
 @@pp_ifdef __CSIZE@@
-#define __PRIVATE_CSIZE __CSIZE
-@@pp_else@@
-#define __PRIVATE_CSIZE 0
+	                          | __CSIZE
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_PARENB@@
 @@pp_ifdef __PARENB@@
-#define __PRIVATE_PARENB __PARENB
-@@pp_else@@
-#define __PRIVATE_PARENB 0
+	                          | __PARENB
 @@pp_endif@@
-@@pp_endif@@
-	termios_p->@c_cflag@ &= ~(__PRIVATE_CSIZE | __PRIVATE_PARENB);
+	                          );
 @@pp_endif@@
 
 	/* c_cflag (addend) */
 @@pp_if defined(__CS8) || defined(__CREAD)@@
-@@pp_ifndef __PRIVATE_CS8@@
+	termios_p->@c_cflag@ |= (0
 @@pp_ifdef __CS8@@
-#define __PRIVATE_CS8 __CS8
-@@pp_else@@
-#define __PRIVATE_CS8 0
+	                         | __CS8
 @@pp_endif@@
-@@pp_endif@@
-@@pp_ifndef __PRIVATE_CREAD@@
 @@pp_ifdef __CREAD@@
-#define __PRIVATE_CREAD __CREAD
-@@pp_else@@
-#define __PRIVATE_CREAD 0
+	                         | __CREAD
 @@pp_endif@@
-@@pp_endif@@
-	termios_p->@c_cflag@ |= (__PRIVATE_CS8 | __PRIVATE_CREAD);
+	                         );
 @@pp_endif@@
 /*[[[end]]]*/
 
@@ -1004,29 +931,30 @@ for (local field, add, flags: ops) {
 [[kernel, impl_include("<bits/posix_opt.h>")]]
 [[impl_include("<asm/os/termios.h>"), decl_include("<bits/os/termios.h>")]]
 void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
-	/* Set sane values. */
+	/* Default everything to ZERO */
 	memset(termios_p, 0, sizeof(*termios_p));
-@@pp_ifdef __TTYDEF_CFLAG@@
+
+	/* Set sane flag values. */
+@@pp_if defined(__TTYDEF_CFLAG) && __TTYDEF_CFLAG != 0@@
 	termios_p->@c_cflag@  = @__TTYDEF_CFLAG@;
 @@pp_endif@@
-@@pp_ifdef __TTYDEF_IFLAG@@
+@@pp_if defined(__TTYDEF_IFLAG) && __TTYDEF_IFLAG != 0@@
 	termios_p->@c_iflag@  = @__TTYDEF_IFLAG@;
 @@pp_endif@@
-@@pp_ifdef __TTYDEF_LFLAG@@
+@@pp_if defined(__TTYDEF_LFLAG) && __TTYDEF_LFLAG != 0@@
 	termios_p->@c_lflag@  = @__TTYDEF_LFLAG@;
 @@pp_endif@@
-@@pp_ifdef __TTYDEF_OFLAG@@
+@@pp_if defined(__TTYDEF_OFLAG) && __TTYDEF_OFLAG != 0@@
 	termios_p->@c_oflag@  = @__TTYDEF_OFLAG@;
 @@pp_endif@@
-@@pp_ifdef __TTYDEF_SPEED@@
+@@pp_if defined(__TTYDEF_SPEED) && __TTYDEF_SPEED != 0@@
 	termios_p->@c_ispeed@ = @__TTYDEF_SPEED@;
 @@pp_endif@@
-@@pp_ifdef __TTYDEF_SPEED@@
+@@pp_if defined(__TTYDEF_SPEED) && __TTYDEF_SPEED != 0@@
 	termios_p->@c_ospeed@ = @__TTYDEF_SPEED@;
 @@pp_endif@@
-@@pp_ifndef __VDISABLE@@
-#define __VDISABLE '\0'
-@@pp_endif@@
+
+	/* ^C: Send SIGINT to the foreground process (requires `ISIG') */
 @@pp_ifdef __VINTR@@
 @@pp_ifdef __CINTR@@
 	termios_p->@c_cc@[__VINTR] = __CINTR;
@@ -1034,6 +962,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VINTR] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^\: Send SIGQUIT to the foreground process (requires `ISIG') */
 @@pp_ifdef __VQUIT@@
 @@pp_ifdef __CQUIT@@
 	termios_p->@c_cc@[__VQUIT] = __CQUIT;
@@ -1041,6 +971,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VQUIT] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^H (aka. \b): Erase the last character from the input canon (requires `ECHOE') */
 @@pp_ifdef __VERASE@@
 @@pp_ifdef __CERASE@@
 	termios_p->@c_cc@[__VERASE] = __CERASE;
@@ -1048,6 +980,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VERASE] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^U: Clear the entire input canon (requires `ECHOK') */
 @@pp_ifdef __VKILL@@
 @@pp_ifdef __CKILL@@
 	termios_p->@c_cc@[__VKILL] = __CKILL;
@@ -1055,6 +989,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VKILL] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^D: Cause read(2) from the TTY to return 0 once (thus indicating input EOF) */
 @@pp_ifdef __VEOF@@
 @@pp_ifdef __CEOF@@
 	termios_p->@c_cc@[__VEOF] = __CEOF;
@@ -1062,6 +998,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VEOF] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ... */
 @@pp_ifdef __VTIME@@
 @@pp_ifdef __CTIME@@
 	termios_p->@c_cc@[__VTIME] = __CTIME;
@@ -1069,6 +1007,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VTIME] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* Minimum number of input bytes to-be returned by read(2) from the TTY */
 @@pp_ifdef __VMIN@@
 @@pp_ifdef __CMIN@@
 	termios_p->@c_cc@[__VMIN] = __CMIN;
@@ -1076,6 +1016,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VMIN] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ... */
 @@pp_ifdef __VSWTCH@@
 @@pp_ifdef __CSWTCH@@
 	termios_p->@c_cc@[__VSWTCH] = __CSWTCH;
@@ -1083,6 +1025,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VSWTCH] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^Q: Restart stopped output (After VSTOP; causes pending TTY output to be flushed) */
 @@pp_ifdef __VSTART@@
 @@pp_ifdef __CSTART@@
 	termios_p->@c_cc@[__VSTART] = __CSTART;
@@ -1090,6 +1034,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VSTART] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^S: Suspend TTY display output until `VSTART' */
 @@pp_ifdef __VSTOP@@
 @@pp_ifdef __CSTOP@@
 	termios_p->@c_cc@[__VSTOP] = __CSTOP;
@@ -1097,6 +1043,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VSTOP] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^Z: Send SIGTSTP to the foreground process (requires `ISIG') */
 @@pp_ifdef __VSUSP@@
 @@pp_ifdef __CSUSP@@
 	termios_p->@c_cc@[__VSUSP] = __CSUSP;
@@ -1104,6 +1052,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VSUSP] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* \0: An additional end-of-line character used to flush the canon (by default, only \n is recognized) */
 @@pp_ifdef __VEOL@@
 @@pp_ifdef __CEOL@@
 	termios_p->@c_cc@[__VEOL] = __CEOL;
@@ -1111,6 +1061,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VEOL] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^R: Re-echo the current contents of the input canon (requires `IEXTEN') */
 @@pp_ifdef __VREPRINT@@
 @@pp_ifdef __CREPRINT@@
 	termios_p->@c_cc@[__VREPRINT] = __CREPRINT;
@@ -1118,6 +1070,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VREPRINT] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* <UNSUPPORTED> */
 @@pp_ifdef __VDISCARD@@
 @@pp_ifdef __CDISCARD@@
 	termios_p->@c_cc@[__VDISCARD] = __CDISCARD;
@@ -1125,6 +1079,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VDISCARD] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^W: Erase the last-written word (while (isspace(last)) erase(); while (!isspace(last)) erase()) (Requires `ECHOE' and `IEXTEN') */
 @@pp_ifdef __VWERASE@@
 @@pp_ifdef __CWERASE@@
 	termios_p->@c_cc@[__VWERASE] = __CWERASE;
@@ -1132,6 +1088,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VWERASE] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ^V: The next input character is escaped, in that any special meaning it would normally have is dismissed */
 @@pp_ifdef __VLNEXT@@
 @@pp_ifdef __CLNEXT@@
 	termios_p->@c_cc@[__VLNEXT] = __CLNEXT;
@@ -1139,6 +1097,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VLNEXT] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* \0: An additional end-of-line character used to flush the canon (by default, only \n is recognized) */
 @@pp_ifdef __VEOL2@@
 @@pp_ifdef __CEOL2@@
 	termios_p->@c_cc@[__VEOL2] = __CEOL2;
@@ -1146,6 +1106,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VEOL2] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ... */
 @@pp_ifdef __VDSUSP@@
 @@pp_ifdef __CDSUSP@@
 	termios_p->@c_cc@[__VDSUSP] = __CDSUSP;
@@ -1153,6 +1115,8 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	termios_p->@c_cc@[__VDSUSP] = __VDISABLE;
 @@pp_endif@@
 @@pp_endif@@
+
+	/* ... */
 @@pp_ifdef __VSTATUS@@
 @@pp_ifdef __CSTATUS@@
 	termios_p->@c_cc@[__VSTATUS] = __CSTATUS;

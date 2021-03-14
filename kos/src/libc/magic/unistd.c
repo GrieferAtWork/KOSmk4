@@ -2313,26 +2313,30 @@ char *getpassfd([[nullable]] char const *prompt,
 		memcpy(&new_ios, &old_ios, sizeof(struct termios));
 
 		/* Configure new settings. */
+@@pp_if defined(__ECHO) || defined(__ECHOK) || defined(__ECHOE) || defined(__ECHOKE) || defined(__ECHOCTL) || defined(__ISIG) || defined(__ICANON)@@
+		new_ios.@c_lflag@ &= ~(0 |
 @@pp_ifdef __ECHO@@
-		new_ios.@c_lflag@ &= ~__ECHO;
+		                       __ECHO |
 @@pp_endif@@
 @@pp_ifdef __ECHOK@@
-		new_ios.@c_lflag@ &= ~__ECHOK;
+		                       __ECHOK |
 @@pp_endif@@
 @@pp_ifdef __ECHOE@@
-		new_ios.@c_lflag@ &= ~__ECHOE;
+		                       __ECHOE |
 @@pp_endif@@
 @@pp_ifdef __ECHOKE@@
-		new_ios.@c_lflag@ &= ~__ECHOKE;
+		                       __ECHOKE |
 @@pp_endif@@
 @@pp_ifdef __ECHOCTL@@
-		new_ios.@c_lflag@ &= ~__ECHOCTL;
+		                       __ECHOCTL |
 @@pp_endif@@
 @@pp_ifdef __ISIG@@
-		new_ios.@c_lflag@ &= ~__ISIG;
+		                       __ISIG |
 @@pp_endif@@
 @@pp_ifdef __ICANON@@
-		new_ios.@c_lflag@ &= ~__ICANON;
+		                       __ICANON
+@@pp_endif@@
+		                       );
 @@pp_endif@@
 
 @@pp_ifdef __VMIN@@

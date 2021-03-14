@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5c8c187 */
+/* HASH CRC-32:0xd03a35ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -692,27 +692,31 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 		__localdep_memcpy(&__new_ios, &__old_ios, sizeof(struct termios));
 
 		/* Configure new settings. */
+#if defined(__ECHO) || defined(__ECHOK) || defined(__ECHOE) || defined(__ECHOKE) || defined(__ECHOCTL) || defined(__ISIG) || defined(__ICANON)
+		__new_ios.c_lflag &= ~(0 |
 #ifdef __ECHO
-		__new_ios.c_lflag &= ~__ECHO;
+		                       __ECHO |
 #endif /* __ECHO */
 #ifdef __ECHOK
-		__new_ios.c_lflag &= ~__ECHOK;
+		                       __ECHOK |
 #endif /* __ECHOK */
 #ifdef __ECHOE
-		__new_ios.c_lflag &= ~__ECHOE;
+		                       __ECHOE |
 #endif /* __ECHOE */
 #ifdef __ECHOKE
-		__new_ios.c_lflag &= ~__ECHOKE;
+		                       __ECHOKE |
 #endif /* __ECHOKE */
 #ifdef __ECHOCTL
-		__new_ios.c_lflag &= ~__ECHOCTL;
+		                       __ECHOCTL |
 #endif /* __ECHOCTL */
 #ifdef __ISIG
-		__new_ios.c_lflag &= ~__ISIG;
+		                       __ISIG |
 #endif /* __ISIG */
 #ifdef __ICANON
-		__new_ios.c_lflag &= ~__ICANON;
+		                       __ICANON
 #endif /* __ICANON */
+		                       );
+#endif /* __ECHO || __ECHOK || __ECHOE || __ECHOKE || __ECHOCTL || __ISIG || __ICANON */
 
 #ifdef __VMIN
 		__new_ios.c_cc[__VMIN] = 1;

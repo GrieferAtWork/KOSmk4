@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbab399e4 */
+/* HASH CRC-32:0x44d3bffa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,177 +47,104 @@ for (local field, add, flags: ops) {
 	print("	/" "* ", field, " (", add ? "addend" : "remove", ")", " *" "/");
 	print("@@pp_if "),;
 	print(" || ".join(for (local f: flags) "defined(__" + f + ")"), "@@");
+	local head = "termios_p->@{}@ {}(" .format({ field, add ? "|= " : "&= ~" });
+	print("	", head, "0");
+	head = " " * #head;
 	for (local f: flags) {
-		print("@@pp_ifndef __PRIVATE_", f, "@@");
 		print("@@pp_ifdef __", f, "@@");
-		print("#define __PRIVATE_", f, " __", f);
-		print("@@pp_else@@");
-		print("#define __PRIVATE_", f, " 0");
-		print("@@pp_endif@@");
+		print("	", head, "| __", f);
 		print("@@pp_endif@@");
 	}
-	print("	termios_p->@", field, "@ ", add ? "|= " : "&= ~", "("),;
-	print(" | ".join(for (local f: flags) "__PRIVATE_" + f), ");");
+	print("	", head, ");");
 	print("@@pp_endif@@");
 	print;
 }
 ]]]*/
 	/* c_iflag (remove) */
 #if defined(__IGNBRK) || defined(__BRKINT) || defined(__PARMRK) || defined(__ISTRIP) || defined(__INLCR) || defined(__IGNCR) || defined(__ICRNL) || defined(__IXON) || defined(__IXOFF)
-#ifndef __PRIVATE_IGNBRK
+	__termios_p->c_iflag &= ~(0
 #ifdef __IGNBRK
-#define __PRIVATE_IGNBRK __IGNBRK
-#else /* __IGNBRK */
-#define __PRIVATE_IGNBRK 0
-#endif /* !__IGNBRK */
-#endif /* !__PRIVATE_IGNBRK */
-#ifndef __PRIVATE_BRKINT
+	                          | __IGNBRK
+#endif /* __IGNBRK */
 #ifdef __BRKINT
-#define __PRIVATE_BRKINT __BRKINT
-#else /* __BRKINT */
-#define __PRIVATE_BRKINT 0
-#endif /* !__BRKINT */
-#endif /* !__PRIVATE_BRKINT */
-#ifndef __PRIVATE_PARMRK
+	                          | __BRKINT
+#endif /* __BRKINT */
 #ifdef __PARMRK
-#define __PRIVATE_PARMRK __PARMRK
-#else /* __PARMRK */
-#define __PRIVATE_PARMRK 0
-#endif /* !__PARMRK */
-#endif /* !__PRIVATE_PARMRK */
-#ifndef __PRIVATE_ISTRIP
+	                          | __PARMRK
+#endif /* __PARMRK */
 #ifdef __ISTRIP
-#define __PRIVATE_ISTRIP __ISTRIP
-#else /* __ISTRIP */
-#define __PRIVATE_ISTRIP 0
-#endif /* !__ISTRIP */
-#endif /* !__PRIVATE_ISTRIP */
-#ifndef __PRIVATE_INLCR
+	                          | __ISTRIP
+#endif /* __ISTRIP */
 #ifdef __INLCR
-#define __PRIVATE_INLCR __INLCR
-#else /* __INLCR */
-#define __PRIVATE_INLCR 0
-#endif /* !__INLCR */
-#endif /* !__PRIVATE_INLCR */
-#ifndef __PRIVATE_IGNCR
+	                          | __INLCR
+#endif /* __INLCR */
 #ifdef __IGNCR
-#define __PRIVATE_IGNCR __IGNCR
-#else /* __IGNCR */
-#define __PRIVATE_IGNCR 0
-#endif /* !__IGNCR */
-#endif /* !__PRIVATE_IGNCR */
-#ifndef __PRIVATE_ICRNL
+	                          | __IGNCR
+#endif /* __IGNCR */
 #ifdef __ICRNL
-#define __PRIVATE_ICRNL __ICRNL
-#else /* __ICRNL */
-#define __PRIVATE_ICRNL 0
-#endif /* !__ICRNL */
-#endif /* !__PRIVATE_ICRNL */
-#ifndef __PRIVATE_IXON
+	                          | __ICRNL
+#endif /* __ICRNL */
 #ifdef __IXON
-#define __PRIVATE_IXON __IXON
-#else /* __IXON */
-#define __PRIVATE_IXON 0
-#endif /* !__IXON */
-#endif /* !__PRIVATE_IXON */
-#ifndef __PRIVATE_IXOFF
+	                          | __IXON
+#endif /* __IXON */
 #ifdef __IXOFF
-#define __PRIVATE_IXOFF __IXOFF
-#else /* __IXOFF */
-#define __PRIVATE_IXOFF 0
-#endif /* !__IXOFF */
-#endif /* !__PRIVATE_IXOFF */
-	__termios_p->c_iflag &= ~(__PRIVATE_IGNBRK | __PRIVATE_BRKINT | __PRIVATE_PARMRK | __PRIVATE_ISTRIP | __PRIVATE_INLCR | __PRIVATE_IGNCR | __PRIVATE_ICRNL | __PRIVATE_IXON | __PRIVATE_IXOFF);
+	                          | __IXOFF
+#endif /* __IXOFF */
+	                          );
 #endif /* __IGNBRK || __BRKINT || __PARMRK || __ISTRIP || __INLCR || __IGNCR || __ICRNL || __IXON || __IXOFF */
 
 	/* c_oflag (remove) */
 #ifdef __OPOST
-#ifndef __PRIVATE_OPOST
+	__termios_p->c_oflag &= ~(0
 
-#define __PRIVATE_OPOST __OPOST
+	                          | __OPOST
 
-
-
-#endif /* !__PRIVATE_OPOST */
-	__termios_p->c_oflag &= ~(__PRIVATE_OPOST);
+	                          );
 #endif /* __OPOST */
 
 	/* c_lflag (remove) */
 #if defined(__ECHO) || defined(__ECHONL) || defined(__ICANON) || defined(__ISIG) || defined(__IEXTEN)
-#ifndef __PRIVATE_ECHO
+	__termios_p->c_lflag &= ~(0
 #ifdef __ECHO
-#define __PRIVATE_ECHO __ECHO
-#else /* __ECHO */
-#define __PRIVATE_ECHO 0
-#endif /* !__ECHO */
-#endif /* !__PRIVATE_ECHO */
-#ifndef __PRIVATE_ECHONL
+	                          | __ECHO
+#endif /* __ECHO */
 #ifdef __ECHONL
-#define __PRIVATE_ECHONL __ECHONL
-#else /* __ECHONL */
-#define __PRIVATE_ECHONL 0
-#endif /* !__ECHONL */
-#endif /* !__PRIVATE_ECHONL */
-#ifndef __PRIVATE_ICANON
+	                          | __ECHONL
+#endif /* __ECHONL */
 #ifdef __ICANON
-#define __PRIVATE_ICANON __ICANON
-#else /* __ICANON */
-#define __PRIVATE_ICANON 0
-#endif /* !__ICANON */
-#endif /* !__PRIVATE_ICANON */
-#ifndef __PRIVATE_ISIG
+	                          | __ICANON
+#endif /* __ICANON */
 #ifdef __ISIG
-#define __PRIVATE_ISIG __ISIG
-#else /* __ISIG */
-#define __PRIVATE_ISIG 0
-#endif /* !__ISIG */
-#endif /* !__PRIVATE_ISIG */
-#ifndef __PRIVATE_IEXTEN
+	                          | __ISIG
+#endif /* __ISIG */
 #ifdef __IEXTEN
-#define __PRIVATE_IEXTEN __IEXTEN
-#else /* __IEXTEN */
-#define __PRIVATE_IEXTEN 0
-#endif /* !__IEXTEN */
-#endif /* !__PRIVATE_IEXTEN */
-	__termios_p->c_lflag &= ~(__PRIVATE_ECHO | __PRIVATE_ECHONL | __PRIVATE_ICANON | __PRIVATE_ISIG | __PRIVATE_IEXTEN);
+	                          | __IEXTEN
+#endif /* __IEXTEN */
+	                          );
 #endif /* __ECHO || __ECHONL || __ICANON || __ISIG || __IEXTEN */
 
 	/* c_cflag (remove) */
 #if defined(__CSIZE) || defined(__PARENB)
-#ifndef __PRIVATE_CSIZE
+	__termios_p->c_cflag &= ~(0
 #ifdef __CSIZE
-#define __PRIVATE_CSIZE __CSIZE
-#else /* __CSIZE */
-#define __PRIVATE_CSIZE 0
-#endif /* !__CSIZE */
-#endif /* !__PRIVATE_CSIZE */
-#ifndef __PRIVATE_PARENB
+	                          | __CSIZE
+#endif /* __CSIZE */
 #ifdef __PARENB
-#define __PRIVATE_PARENB __PARENB
-#else /* __PARENB */
-#define __PRIVATE_PARENB 0
-#endif /* !__PARENB */
-#endif /* !__PRIVATE_PARENB */
-	__termios_p->c_cflag &= ~(__PRIVATE_CSIZE | __PRIVATE_PARENB);
+	                          | __PARENB
+#endif /* __PARENB */
+	                          );
 #endif /* __CSIZE || __PARENB */
 
 	/* c_cflag (addend) */
 #if defined(__CS8) || defined(__CREAD)
-#ifndef __PRIVATE_CS8
+	__termios_p->c_cflag |= (0
 #ifdef __CS8
-#define __PRIVATE_CS8 __CS8
-#else /* __CS8 */
-#define __PRIVATE_CS8 0
-#endif /* !__CS8 */
-#endif /* !__PRIVATE_CS8 */
-#ifndef __PRIVATE_CREAD
+	                         | __CS8
+#endif /* __CS8 */
 #ifdef __CREAD
-#define __PRIVATE_CREAD __CREAD
-#else /* __CREAD */
-#define __PRIVATE_CREAD 0
-#endif /* !__CREAD */
-#endif /* !__PRIVATE_CREAD */
-	__termios_p->c_cflag |= (__PRIVATE_CS8 | __PRIVATE_CREAD);
+	                         | __CREAD
+#endif /* __CREAD */
+	                         );
 #endif /* __CS8 || __CREAD */
 /*[[[end]]]*/
 
