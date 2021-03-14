@@ -31,6 +31,11 @@
 #include <__crt.h>
 #include <__stdinc.h>
 
+/* NOTES:
+ *  - _PATH_STDPATH: Standard system utility paths (for root login)
+ *  - _PATH_DEFPATH: Standard system utility paths (for normal login)
+ */
+
 #ifdef __CRT_CYG
 #define _PATH_DEFPATH "/bin"
 #define _PATH_STDPATH "/bin:/usr/sbin:/sbin"
