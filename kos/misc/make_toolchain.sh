@@ -551,7 +551,7 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 		# This is a bit hacky:
 		#   - In order to build libgcc_s.so, we already need to have libc.so.
 		#   - In order to build libc.so, we need to have libgcc.a
-		#   - Even though the above make failed, it did already create `libgcc.a'
+		#   - Even though the above make failed, it (should have) already created `libgcc.a'
 		# With that in mind:
 		#   - Temporarily install the libgcc.a it build above,
 		#   - Create our libc.so
@@ -616,7 +616,7 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 	echo "    Making $GCC_VERSION:libstdc++"
 	cmd cd "$PREFIX/gcc"
 	if ! make -j $MAKE_PARALLEL_COUNT all-target-libstdc++-v3; then
-		# Yet another place where we need to be hacky with fixing up headers
+		# Yet another place where we need to be hacky with fixing up headers.
 		# This time around, it's libstdc++ that only half-heartedly understands
 		# the fact that KOS's system headers already define c++ functions, and
 		# already place all of the required function prototypes into the `std'
@@ -629,7 +629,7 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 		# Sadly, we can only do this once the make already failed once, since
 		# the framework surrounding those headers only gets created by said
 		# make command!
-		# Even more importantly, libstdc++ need `__USE_BROKEN_CCOMPAT' (s.a. <features.h>)
+		# Even more importantly, libstdc++ needs `__USE_BROKEN_CCOMPAT' (s.a. <features.h>)
 
 		# $1: header name (e.g. `stdlib')
 		use_real_header() {

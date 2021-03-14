@@ -86,32 +86,6 @@
 
 DECL_BEGIN
 
-/* TODO: Add support for `int ungetchar(int ch)' (same as `ungetc(ch, stdin)') */
-
-/* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_LINUX_FUTEX' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_MACHINE_ENDIAN_H' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_STRERROR_L' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_STRXFRM_L' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_SCHED_YIELD' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_NANOSLEEP' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_SENDFILE' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_GETTIME_SYSCALL' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_MONOTONIC' properly */
-/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_REALTIME' properly */
-/* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT' */
-/* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT_IMPL' */
-/* TODO: Implement `timespec_get()' so that `_GLIBCXX_HAVE_TIMESPEC_GET'
- *       can  be  detected (__stub_timespec_get  currently  breaks that) */
-/* TODO: Add system header <sys/machine.h> */
-/* TODO: Add system header <sys/sdt.h> */
-/* TODO: Add system header <fp.h> */
-/* TODO: Add system header <libintl.h> */
-/* TODO: Add system header <nan.h> */
-/* TODO: Add system header <ftw.h> */
-
-
-
 /************************************************************************/
 int main_rawterm(int argc, char *argv[], char *envp[]) {
 #define PRINTSTR(s) write(STDOUT_FILENO, s, sizeof(s) - sizeof(char))

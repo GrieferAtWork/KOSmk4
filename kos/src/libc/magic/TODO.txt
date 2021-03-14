@@ -9,6 +9,7 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <cthreads.h>
 <fmtmsg.h>             (GLibc!)
 <fstab.h>              (GLibc!)
+<fp.h>
 <gnu-versions.h>       (GLibc!)
 <gnu/libc-version.h>   (GLibc!)
 <gshadow.h>            (GLibc!)
@@ -19,6 +20,7 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <mbstring.h>
 <mcheck.h>             (GLibc!)
 <mkdev.h>
+<nan.h>
 <nl_types.h>           (GLibc!)
 <obstack.h>            (GLibc!)
 <regexp.h>
@@ -46,6 +48,7 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <sys/gmon_out.h>       (Only some macros, and structs)
 <sys/inotify.h>
 <sys/kdaemon.h>
+<sys/machine.h>
 <sys/mtio.h>           (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 <sys/personality.h>
 <sys/prctl.h>
@@ -53,6 +56,7 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <sys/quota.h>
 <sys/raw.h>            (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 <sys/reg.h>
+<sys/sdt.h>
 <sys/soundcard.h>
 <sys/sysctl.h>
 <sys/vlimit.h>
@@ -71,6 +75,22 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 
 Functions:
 	- walkcontext()
+	- int ungetchar(int ch)     (same as `ungetc(ch, stdin)')
+
+
+TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection...
+TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_LINUX_FUTEX' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_MACHINE_ENDIAN_H' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_STRERROR_L' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_STRXFRM_L' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_USE_SCHED_YIELD' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_USE_NANOSLEEP' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_USE_SENDFILE' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_GETTIME_SYSCALL' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_MONOTONIC' properly
+TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_REALTIME' properly
+TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT'
+TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT_IMPL'
 
 
 TODO: Expand generate_headers.dee and magic.dee to:
