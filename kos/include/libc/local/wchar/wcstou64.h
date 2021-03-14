@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x383dfa6c */
+/* HASH CRC-32:0x305016bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,13 +36,13 @@ __NAMESPACE_LOCAL_BEGIN
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -57,13 +57,13 @@ __NAMESPACE_LOCAL_BEGIN
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.

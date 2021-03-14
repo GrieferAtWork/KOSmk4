@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e89523b */
+/* HASH CRC-32:0x783b80d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2376,13 +2376,13 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2521,13 +2521,13 @@ handle_overflow:
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2665,13 +2665,13 @@ handle_overflow:
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2796,13 +2796,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -3052,13 +3052,13 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -3197,13 +3197,13 @@ handle_overflow:
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -3341,13 +3341,13 @@ handle_overflow:
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -3472,13 +3472,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.

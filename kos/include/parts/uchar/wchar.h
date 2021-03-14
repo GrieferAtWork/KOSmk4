@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac670877 */
+/* HASH CRC-32:0x6e8f7d63 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1108,13 +1108,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32width, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1126,13 +1126,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c16sto3
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1145,13 +1145,13 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c16
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1164,13 +1164,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1183,13 +1183,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16sto32_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1201,13 +1201,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c32sto3
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1220,13 +1220,13 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c32
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1239,13 +1239,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1258,13 +1258,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sto32_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1276,13 +1276,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c16sto
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1295,13 +1295,13 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c1
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1314,13 +1314,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ _
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1333,13 +1333,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16stou32_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1351,13 +1351,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c32sto
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1370,13 +1370,13 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c3
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -1389,13 +1389,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ _
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2249,13 +2249,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32stou32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2267,13 +2267,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c16sto6
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2286,13 +2286,13 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c16
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2305,13 +2305,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2324,13 +2324,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16sto64_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2342,13 +2342,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c32sto6
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2361,13 +2361,13 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c32
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2380,13 +2380,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2399,13 +2399,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sto64_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2417,13 +2417,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c16sto
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2436,13 +2436,13 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c1
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2455,13 +2455,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ _
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2474,13 +2474,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16stou64_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2492,13 +2492,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c32sto
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2511,13 +2511,13 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c3
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
@@ -2530,13 +2530,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ _
  * errors in `*error' (if non-NULL). The following errors are defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to original `nptr' (iow:
- *               leading spaces are _not_ skipped in `*endptr'), and the
- *               returned integer is `0'
+ *               In this case, `*endptr' is set to the original `nptr'
+ *               (iow: leading spaces are _not_ skipped in `*endptr'),
+ *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
  *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is closest representable value to
- *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               the returned integer is the closest representable value
+ *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by at least 1 additional non-whitespace character.
