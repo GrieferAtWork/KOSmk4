@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae95e7e9 */
+/* HASH CRC-32:0x28fe0847 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,56 @@
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtou64_r from stdlib */
+#ifndef __local___localdep_strtou64_r_defined
+#define __local___localdep_strtou64_r_defined 1
+#ifdef __CRT_HAVE_strtou64_r
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
+#else /* __CRT_HAVE_strtou64_r */
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/strtou64_r.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+#define __localdep_strtou64_r __LIBC_LOCAL_NAME(strtou64_r)
+#endif /* !__CRT_HAVE_strtou64_r */
+#endif /* !__local___localdep_strtou64_r_defined */
+__NAMESPACE_LOCAL_END
 #include <libc/errno.h>
-#include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
@@ -43,58 +91,16 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __LOCAL_LIBC(strtou64) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou64))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) {
-	__UINT64_TYPE__ __result, __temp;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (!__base) {
-		if (*__nptr == '0') {
-			char __ch = *++__nptr;
-			if (__ch == 'x' || __ch == 'X') {
-				++__nptr;
-				__base = 16;
-				/* TODO: Require that at least 1 more character be read! */
-			} else if (__ch == 'b' || __ch == 'B') {
-				++__nptr;
-				__base = 2;
-				/* TODO: Require that at least 1 more character be read! */
-			} else {
-				__base = 8;
-			}
-		} else {
-			__base = 10;
-		}
-	}
-	__result = 0;
-	for (;;) {
-		char __ch = *__nptr;
-		if (__ch >= '0' && __ch <= '9')
-			__temp = (__UINT64_TYPE__)(__ch - '0');
-		else if (__ch >= 'a' && __ch <= 'z')
-			__temp = (__UINT64_TYPE__)10 + (__ch - 'a');
-		else if (__ch >= 'A' && __ch <= 'Z')
-			__temp = (__UINT64_TYPE__)10 + (__ch - 'A');
-		else {
-			/* TODO: Support for unicode decimals, and multi-byte characters.
-			 *       But only do this if libc supports it (i.e. don't do this
-			 *       in kernel-space) */
-			break;
-		}
-		if (__temp >= (unsigned int)__base)
-			break;
-		++__nptr;
-
-		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 #if defined(__libc_geterrno) && defined(__ERANGE)
-		if (__hybrid_overflow_umul(__result, (unsigned int)__base, &__result) ||
-		    __hybrid_overflow_uadd(__result, __temp, &__result))
-			__libc_seterrno(__ERANGE);
-#else /* __libc_geterrno && __ERANGE */
-		__result *= (unsigned int)__base;
-		__result += __temp;
-#endif /* !__libc_geterrno || !__ERANGE */
-	}
-	if (__endptr)
-		*__endptr = (char *)__nptr;
+	__UINT64_TYPE__ __result;
+	__errno_t __error;
+	__result = __localdep_strtou64_r(__nptr, __endptr, __base, &__error);
+	if (__error == __ERANGE)
+		__libc_seterrno(__ERANGE);
 	return __result;
+#else /* __libc_geterrno && __ERANGE */
+	return __localdep_strtou64_r(__nptr, __endptr, __base, __NULLPTR);
+#endif /* !__libc_geterrno || !__ERANGE */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtou64_defined

@@ -106,12 +106,22 @@ c32width(*) %{uchar32("wcwidth")}
 
 %
 %#ifdef __USE_KOS
+c16sto32_r(*) %{uchar16("wcsto32_r")}
+c32sto32_r(*) %{uchar32("wcsto32_r")}
+c16stou32_r(*) %{uchar16("wcstou32_r")}
+c32stou32_r(*) %{uchar32("wcstou32_r")}
+
 c16sto32(*) %{uchar16("wcsto32")}
 c32sto32(*) %{uchar32("wcsto32")}
 c16stou32(*) %{uchar16("wcstou32")}
 c32stou32(*) %{uchar32("wcstou32")}
 
 %#ifdef __UINT64_TYPE__
+c16sto64_r(*) %{uchar16("wcsto64_r")}
+c32sto64_r(*) %{uchar32("wcsto64_r")}
+c16stou64_r(*) %{uchar16("wcstou64_r")}
+c32stou64_r(*) %{uchar32("wcstou64_r")}
+
 c16sto64(*) %{uchar16("wcsto64")}
 c32sto64(*) %{uchar32("wcsto64")}
 c16stou64(*) %{uchar16("wcstou64")}

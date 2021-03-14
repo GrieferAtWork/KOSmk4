@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f9e030b */
+/* HASH CRC-32:0x78c75062 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1544,6 +1544,10 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_atof, libc_atof, TFD, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtod, libc_strtod, TFD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtof, libc_strtof, TF, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtold, libc_strtold, TFL, 2, TP, TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtou32_r, libc_strtou32_r, TI32, 4, TP, TP, TD, TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strto32_r, libc_strto32_r, TI32, 4, TP, TP, TD, TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtou64_r, libc_strtou64_r, TI64, 4, TP, TP, TD, TP)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strto64_r, libc_strto64_r, TI64, 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtou32, libc_strtou32, TI32, 3, TP, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strto32, libc_strto32, TI32, 3, TP, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtou64, libc_strtou64, TI64, 3, TP, TP, TD)

@@ -3406,8 +3406,10 @@
 #define __CRT_HAVE_strsuftollx
 #define __CRT_HAVE_strto32
 #define __CRT_HAVE_strto32_l
+#define __CRT_HAVE_strto32_r
 #define __CRT_HAVE_strto64
 #define __CRT_HAVE_strto64_l
+#define __CRT_HAVE_strto64_r
 #define __CRT_HAVE_strtod
 #define __CRT_HAVE_strtod_l
 #define __CRT_HAVE_strtof
@@ -3431,8 +3433,10 @@
 #define __CRT_HAVE_strtou
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
+#define __CRT_HAVE_strtou32_r
 #define __CRT_HAVE_strtou64
 #define __CRT_HAVE_strtou64_l
+#define __CRT_HAVE_strtou64_r
 #define __CRT_HAVE_strtou_l
 #define __CRT_HAVE_strtoul
 #define __CRT_HAVE_strtoul_l
@@ -4730,8 +4734,10 @@
 #define __CRT_HAVE_wcsstr
 #define __CRT_HAVE_wcsto32
 #define __CRT_HAVE_wcsto32_l
+#define __CRT_HAVE_wcsto32_r
 #define __CRT_HAVE_wcsto64
 #define __CRT_HAVE_wcsto64_l
+#define __CRT_HAVE_wcsto64_r
 #define __CRT_HAVE_wcstod
 #define __CRT_HAVE_wcstod_l
 #define __CRT_HAVE_wcstof
@@ -4750,8 +4756,10 @@
 #define __CRT_HAVE_wcstoq
 #define __CRT_HAVE_wcstou32
 #define __CRT_HAVE_wcstou32_l
+#define __CRT_HAVE_wcstou32_r
 #define __CRT_HAVE_wcstou64
 #define __CRT_HAVE_wcstou64_l
+#define __CRT_HAVE_wcstou64_r
 #define __CRT_HAVE_wcstoul
 #define __CRT_HAVE_wcstoul_l
 #define __CRT_HAVE_wcstoull
@@ -5248,8 +5256,10 @@
 #define __CRT_HAVE_KOS$wcsstr
 #define __CRT_HAVE_KOS$wcsto32
 #define __CRT_HAVE_KOS$wcsto32_l
+#define __CRT_HAVE_KOS$wcsto32_r
 #define __CRT_HAVE_KOS$wcsto64
 #define __CRT_HAVE_KOS$wcsto64_l
+#define __CRT_HAVE_KOS$wcsto64_r
 #define __CRT_HAVE_KOS$wcstod
 #define __CRT_HAVE_KOS$wcstod_l
 #define __CRT_HAVE_KOS$wcstof
@@ -5269,8 +5279,10 @@
 #define __CRT_HAVE_KOS$wcstoq
 #define __CRT_HAVE_KOS$wcstou32
 #define __CRT_HAVE_KOS$wcstou32_l
+#define __CRT_HAVE_KOS$wcstou32_r
 #define __CRT_HAVE_KOS$wcstou64
 #define __CRT_HAVE_KOS$wcstou64_l
+#define __CRT_HAVE_KOS$wcstou64_r
 #define __CRT_HAVE_KOS$wcstoul
 #define __CRT_HAVE_KOS$wcstoul_l
 #define __CRT_HAVE_KOS$wcstoull
@@ -5746,8 +5758,10 @@
 #define __CRT_HAVE_DOS$wcsstr
 #define __CRT_HAVE_DOS$wcsto32
 #define __CRT_HAVE_DOS$wcsto32_l
+#define __CRT_HAVE_DOS$wcsto32_r
 #define __CRT_HAVE_DOS$wcsto64
 #define __CRT_HAVE_DOS$wcsto64_l
+#define __CRT_HAVE_DOS$wcsto64_r
 #define __CRT_HAVE_DOS$wcstod
 #define __CRT_HAVE_DOS$wcstod_l
 #define __CRT_HAVE_DOS$wcstof
@@ -5767,8 +5781,10 @@
 #define __CRT_HAVE_DOS$wcstoq
 #define __CRT_HAVE_DOS$wcstou32
 #define __CRT_HAVE_DOS$wcstou32_l
+#define __CRT_HAVE_DOS$wcstou32_r
 #define __CRT_HAVE_DOS$wcstou64
 #define __CRT_HAVE_DOS$wcstou64_l
+#define __CRT_HAVE_DOS$wcstou64_r
 #define __CRT_HAVE_DOS$wcstoul
 #define __CRT_HAVE_DOS$wcstoul_l
 #define __CRT_HAVE_DOS$wcstoull

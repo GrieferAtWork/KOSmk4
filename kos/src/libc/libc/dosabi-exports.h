@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b03848f */
+/* HASH CRC-32:0xe4efa466 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1948,6 +1948,10 @@ DEFINE_PUBLIC_ALIAS(DOS$atof, libd_atof);
 DEFINE_PUBLIC_ALIAS(DOS$strtod, libd_strtod);
 DEFINE_PUBLIC_ALIAS(DOS$strtof, libd_strtof);
 DEFINE_PUBLIC_ALIAS(DOS$strtold, libd_strtold);
+DEFINE_PUBLIC_ALIAS(DOS$strtou32_r, libd_strtou32_r);
+DEFINE_PUBLIC_ALIAS(DOS$strto32_r, libd_strto32_r);
+DEFINE_PUBLIC_ALIAS(DOS$strtou64_r, libd_strtou64_r);
+DEFINE_PUBLIC_ALIAS(DOS$strto64_r, libd_strto64_r);
 DEFINE_PUBLIC_ALIAS(DOS$strtou32, libd_strtou32);
 DEFINE_PUBLIC_ALIAS(DOS$strto32, libd_strto32);
 DEFINE_PUBLIC_ALIAS(DOS$_strtoui64, libd_strtou64);

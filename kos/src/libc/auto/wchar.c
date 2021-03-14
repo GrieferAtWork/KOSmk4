@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8443785 */
+/* HASH CRC-32:0x1e89523b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2368,8 +2368,559 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
 	return (char32_t *)str;
 }
 #endif /* !LIBC_ARCH_HAVE_C32SNEND */
-#include <libc/errno.h>
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
+NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
+                                     char16_t **endptr,
+                                     __STDC_INT_AS_UINT_T base,
+                                     errno_t *error) {
+	int32_t result;
+	char16_t sign;
+	char16_t const *num_start = nptr;
+	char16_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	sign = *num_start;
+	if (sign == '-' || sign == '+')
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char16_t ch;
+		ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_sadd(result, digit, &result)) {
+handle_overflow:
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char16_t *)num_iter;
+			}
+			if (sign == '-')
+				return __INT32_MIN__;
+			return __INT32_MAX__;
+		}
+	}
+	if (sign == '-') {
+		result = -result;
+		if unlikely(result > 0)
+			goto handle_overflow; /* Overflow... */
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char16_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char16_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
+	return result;
+}
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
+#include <hybrid/limitcore.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
+NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
+                                     char32_t **endptr,
+                                     __STDC_INT_AS_UINT_T base,
+                                     errno_t *error) {
+	int32_t result;
+	char32_t sign;
+	char32_t const *num_start = nptr;
+	char32_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	sign = *num_start;
+	if (sign == '-' || sign == '+')
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char32_t ch;
+		ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_sadd(result, digit, &result)) {
+handle_overflow:
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char32_t *)num_iter;
+			}
+			if (sign == '-')
+				return __INT32_MIN__;
+			return __INT32_MAX__;
+		}
+	}
+	if (sign == '-') {
+		result = -result;
+		if unlikely(result > 0)
+			goto handle_overflow; /* Overflow... */
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char32_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char32_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
+	return result;
+}
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
+NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
+                                      char16_t **endptr,
+                                      __STDC_INT_AS_UINT_T base,
+                                      errno_t *error) {
+	uint32_t result;
+	char16_t const *num_start = nptr;
+	char16_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char16_t ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_uadd(result, digit, &result)) {
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char16_t *)num_iter;
+			}
+			return (uint32_t)-1;
+		}
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char16_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char16_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
+	return result;
+}
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
+NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
+                                      char32_t **endptr,
+                                      __STDC_INT_AS_UINT_T base,
+                                      errno_t *error) {
+	uint32_t result;
+	char32_t const *num_start = nptr;
+	char32_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char32_t ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_uadd(result, digit, &result)) {
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char32_t *)num_iter;
+			}
+			return (uint32_t)-1;
+		}
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char32_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char32_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
+	return result;
+}
+#include <libc/errno.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2389,33 +2940,18 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-	u32 result;
-	char16_t sign = *nptr;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (sign == '-') {
-		++nptr;
-		result = libd_wcstou32(nptr, endptr, base);
 #if defined(__libc_geterrno) && defined(ERANGE)
-		if (result > (u32)((u32)0 - (u32)__INT32_MIN__)) {
-			__libc_seterrno(ERANGE);
-			return __INT32_MIN__;
-		}
-#endif /* __libc_geterrno && ERANGE */
-		return -(s32)result;
-	} else if (sign == '+') {
-		++nptr;
-	}
-	result = libd_wcstou32(nptr, endptr, base);
-#if defined(__libc_geterrno) && defined(ERANGE)
-	if (result > (u32)__INT32_MAX__) {
+	int32_t result;
+	errno_t error;
+	result = libd_wcsto32_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
 		__libc_seterrno(ERANGE);
-		return __INT32_MAX__;
-	}
-#endif /* __libc_geterrno && ERANGE */
-	return (s32)result;
+	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libd_wcsto32_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-#include <hybrid/limitcore.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2435,33 +2971,18 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-	u32 result;
-	char32_t sign = *nptr;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (sign == '-') {
-		++nptr;
-		result = libc_wcstou32(nptr, endptr, base);
 #if defined(__libc_geterrno) && defined(ERANGE)
-		if (result > (u32)((u32)0 - (u32)__INT32_MIN__)) {
-			__libc_seterrno(ERANGE);
-			return __INT32_MIN__;
-		}
-#endif /* __libc_geterrno && ERANGE */
-		return -(s32)result;
-	} else if (sign == '+') {
-		++nptr;
-	}
-	result = libc_wcstou32(nptr, endptr, base);
-#if defined(__libc_geterrno) && defined(ERANGE)
-	if (result > (u32)__INT32_MAX__) {
+	int32_t result;
+	errno_t error;
+	result = libc_wcsto32_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
 		__libc_seterrno(ERANGE);
-		return __INT32_MAX__;
-	}
-#endif /* __libc_geterrno && ERANGE */
-	return (s32)result;
+	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libc_wcsto32_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-#include <hybrid/__overflow.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2481,82 +3002,18 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-	u32 result, temp;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (!base) {
-		if (*nptr == '0') {
-			char16_t ch = *++nptr;
-			if (ch == 'x' || ch == 'X') {
-				++nptr;
-				base = 16;
-				/* TODO: Require that at least 1 more character be read! */
-			} else if (ch == 'b' || ch == 'B') {
-				++nptr;
-				base = 2;
-				/* TODO: Require that at least 1 more character be read! */
-			} else {
-				base = 8;
-			}
-		} else {
-			base = 10;
-		}
-	}
-	result = 0;
-	for (;;) {
-		char16_t ch = *nptr;
-		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)10 + (ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)10 + (ch - 'A');
-		else {
-			/* TODO: Support for unicode decimals, and multi-byte characters.
-			 *       But only do this if libc supports it (i.e. don't do this
-			 *       in kernel-space) */
-			break;
-		}
-		if (temp >= (unsigned int)base)
-			break;
-		++nptr;
-		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 #if defined(__libc_geterrno) && defined(ERANGE)
-		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		    __hybrid_overflow_uadd(result, temp, &result)) {
-			if (endptr) {
-				for (;;) {
-					char16_t ch = *nptr;
-					if (ch >= '0' && ch <= '9')
-						temp = (u64)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						temp = (u64)10 + (ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						temp = (u64)10 + (ch - 'A');
-					else {
-						/* TODO: Support for unicode decimals, and multi-byte characters.
-						 *       But only do this if libc supports it (i.e. don't do this
-						 *       in kernel-space) */
-						break;
-					}
-					if (temp >= (unsigned int)base)
-						break;
-					++nptr;
-				}
-				*endptr = (char16_t *)nptr;
-			}
-			return (u32)(s32)__libc_seterrno(ERANGE);
-		}
-#else /* __libc_geterrno && ERANGE */
-		result *= (unsigned int)base;
-		result += temp;
-#endif /* !__libc_geterrno || !ERANGE */
-	}
-	if (endptr)
-		*endptr = (char16_t *)nptr;
+	uint32_t result;
+	errno_t error;
+	result = libd_wcstou32_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		__libc_seterrno(ERANGE);
 	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libd_wcstou32_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-#include <hybrid/__overflow.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2576,82 +3033,570 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-	u32 result, temp;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (!base) {
-		if (*nptr == '0') {
-			char32_t ch = *++nptr;
-			if (ch == 'x' || ch == 'X') {
-				++nptr;
+#if defined(__libc_geterrno) && defined(ERANGE)
+	uint32_t result;
+	errno_t error;
+	result = libc_wcstou32_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		__libc_seterrno(ERANGE);
+	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libc_wcstou32_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
+}
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
+#include <hybrid/limitcore.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
+NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
+                                     char16_t **endptr,
+                                     __STDC_INT_AS_UINT_T base,
+                                     errno_t *error) {
+	int64_t result;
+	char16_t sign;
+	char16_t const *num_start = nptr;
+	char16_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	sign = *num_start;
+	if (sign == '-' || sign == '+')
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
 				base = 16;
-				/* TODO: Require that at least 1 more character be read! */
-			} else if (ch == 'b' || ch == 'B') {
-				++nptr;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
 				base = 2;
-				/* TODO: Require that at least 1 more character be read! */
+				++num_start;
 			} else {
 				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
 			}
 		} else {
 			base = 10;
 		}
 	}
-	result = 0;
+	num_iter = num_start;
+	result   = 0;
 	for (;;) {
-		char32_t ch = *nptr;
+		uint8_t digit;
+		char16_t ch;
+		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch - '0');
+			digit = ch - '0';
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)10 + (ch - 'a');
+			digit = 10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)10 + (ch - 'A');
+			digit = 10 + (ch - 'A');
 		else {
-			/* TODO: Support for unicode decimals, and multi-byte characters.
-			 *       But only do this if libc supports it (i.e. don't do this
-			 *       in kernel-space) */
 			break;
 		}
-		if (temp >= (unsigned int)base)
+		if (digit >= base)
 			break;
-		++nptr;
-		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
-#if defined(__libc_geterrno) && defined(ERANGE)
-		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		    __hybrid_overflow_uadd(result, temp, &result)) {
+		++num_iter;
+		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_sadd(result, digit, &result)) {
+handle_overflow:
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
 			if (endptr) {
 				for (;;) {
-					char32_t ch = *nptr;
+					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						temp = (u64)(ch - '0');
+						digit = ch - '0';
 					else if (ch >= 'a' && ch <= 'z')
-						temp = (u64)10 + (ch - 'a');
+						digit = 10 + (ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						temp = (u64)10 + (ch - 'A');
+						digit = 10 + (ch - 'A');
 					else {
-						/* TODO: Support for unicode decimals, and multi-byte characters.
-						 *       But only do this if libc supports it (i.e. don't do this
-						 *       in kernel-space) */
 						break;
 					}
-					if (temp >= (unsigned int)base)
+					if (digit >= base)
 						break;
-					++nptr;
+					++num_iter;
 				}
-				*endptr = (char32_t *)nptr;
+				*endptr = (char16_t *)num_iter;
 			}
-			return (u32)(s32)__libc_seterrno(ERANGE);
+			if (sign == '-')
+				return __INT64_MIN__;
+			return __INT64_MAX__;
 		}
-#else /* __libc_geterrno && ERANGE */
-		result *= (unsigned int)base;
-		result += temp;
-#endif /* !__libc_geterrno || !ERANGE */
 	}
-	if (endptr)
-		*endptr = (char32_t *)nptr;
+	if (sign == '-') {
+		result = -result;
+		if unlikely(result > 0)
+			goto handle_overflow; /* Overflow... */
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char16_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char16_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
+	return result;
+}
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
+#include <hybrid/limitcore.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
+NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
+                                     char32_t **endptr,
+                                     __STDC_INT_AS_UINT_T base,
+                                     errno_t *error) {
+	int64_t result;
+	char32_t sign;
+	char32_t const *num_start = nptr;
+	char32_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	sign = *num_start;
+	if (sign == '-' || sign == '+')
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char32_t ch;
+		ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_sadd(result, digit, &result)) {
+handle_overflow:
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char32_t *)num_iter;
+			}
+			if (sign == '-')
+				return __INT64_MIN__;
+			return __INT64_MAX__;
+		}
+	}
+	if (sign == '-') {
+		result = -result;
+		if unlikely(result > 0)
+			goto handle_overflow; /* Overflow... */
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char32_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char32_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
+	return result;
+}
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
+NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
+                                      char16_t **endptr,
+                                      __STDC_INT_AS_UINT_T base,
+                                      errno_t *error) {
+	uint64_t result;
+	char16_t const *num_start = nptr;
+	char16_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char16_t ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_uadd(result, digit, &result)) {
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char16_t *)num_iter;
+			}
+			return (uint64_t)-1;
+		}
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char16_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char16_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
+	return result;
+}
+#include <asm/os/errno.h>
+#include <hybrid/__overflow.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
+NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
+                                      char32_t **endptr,
+                                      __STDC_INT_AS_UINT_T base,
+                                      errno_t *error) {
+	uint64_t result;
+	char32_t const *num_start = nptr;
+	char32_t const *num_iter;
+	while (libc_iswspace(*num_start))
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char32_t ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_uadd(result, digit, &result)) {
+			/* Integer overflow. */
+			if (error) {
+#ifdef __ERANGE
+				*error = __ERANGE;
+#else /* __ERANGE */
+				*error = 1;
+#endif /* !__ERANGE */
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char32_t *)num_iter;
+			}
+			return (uint64_t)-1;
+		}
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+#ifdef __ECANCELED
+			*error = __ECANCELED;
+#else /* __ECANCELED */
+			*error = 1;
+#endif /* !__ECANCELED */
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char32_t *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char32_t *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (libc_iswspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+#ifdef __EINVAL
+					*error = __EINVAL;
+#else /* __EINVAL */
+					*error = 1;
+#endif /* !__EINVAL */
+				}
+			}
+		}
+	}
 	return result;
 }
 #include <libc/errno.h>
-#include <hybrid/__overflow.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2671,61 +3616,18 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-	u64 result, temp;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (!base) {
-		if (*nptr == '0') {
-			char16_t ch = *++nptr;
-			if (ch == 'x' || ch == 'X') {
-				++nptr;
-				base = 16;
-				/* TODO: Require that at least 1 more character be read! */
-			} else if (ch == 'b' || ch == 'B') {
-				++nptr;
-				base = 2;
-				/* TODO: Require that at least 1 more character be read! */
-			} else {
-				base = 8;
-			}
-		} else {
-			base = 10;
-		}
-	}
-	result = 0;
-	for (;;) {
-		char16_t ch = *nptr;
-		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)10 + (ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)10 + (ch - 'A');
-		else {
-			/* TODO: Support for unicode decimals, and multi-byte characters.
-			 *       But only do this if libc supports it (i.e. don't do this
-			 *       in kernel-space) */
-			break;
-		}
-		if (temp >= (unsigned int)base)
-			break;
-		++nptr;
-
-		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 #if defined(__libc_geterrno) && defined(ERANGE)
-		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		    __hybrid_overflow_uadd(result, temp, &result))
-			__libc_seterrno(ERANGE);
-#else /* __libc_geterrno && ERANGE */
-		result *= (unsigned int)base;
-		result += temp;
-#endif /* !__libc_geterrno || !ERANGE */
-	}
-	if (endptr)
-		*endptr = (char16_t *)nptr;
+	uint64_t result;
+	errno_t error;
+	result = libd_wcstou64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		__libc_seterrno(ERANGE);
 	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libd_wcstou64_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-#include <hybrid/__overflow.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2745,61 +3647,18 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-	u64 result, temp;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (!base) {
-		if (*nptr == '0') {
-			char32_t ch = *++nptr;
-			if (ch == 'x' || ch == 'X') {
-				++nptr;
-				base = 16;
-				/* TODO: Require that at least 1 more character be read! */
-			} else if (ch == 'b' || ch == 'B') {
-				++nptr;
-				base = 2;
-				/* TODO: Require that at least 1 more character be read! */
-			} else {
-				base = 8;
-			}
-		} else {
-			base = 10;
-		}
-	}
-	result = 0;
-	for (;;) {
-		char32_t ch = *nptr;
-		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)10 + (ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)10 + (ch - 'A');
-		else {
-			/* TODO: Support for unicode decimals, and multi-byte characters.
-			 *       But only do this if libc supports it (i.e. don't do this
-			 *       in kernel-space) */
-			break;
-		}
-		if (temp >= (unsigned int)base)
-			break;
-		++nptr;
-
-		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 #if defined(__libc_geterrno) && defined(ERANGE)
-		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		    __hybrid_overflow_uadd(result, temp, &result))
-			__libc_seterrno(ERANGE);
-#else /* __libc_geterrno && ERANGE */
-		result *= (unsigned int)base;
-		result += temp;
-#endif /* !__libc_geterrno || !ERANGE */
-	}
-	if (endptr)
-		*endptr = (char32_t *)nptr;
+	uint64_t result;
+	errno_t error;
+	result = libc_wcstou64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		__libc_seterrno(ERANGE);
 	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libc_wcstou64_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-#include <hybrid/limitcore.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2819,33 +3678,18 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-	u64 result;
-	char16_t sign = *nptr;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (sign == '-') {
-		++nptr;
-		result = libd_wcstou64(nptr, endptr, base);
 #if defined(__libc_geterrno) && defined(ERANGE)
-		if (result > (u64)((u64)0 - (u64)__INT64_MIN__)) {
-			__libc_seterrno(ERANGE);
-			return __INT64_MIN__;
-		}
-#endif /* __libc_geterrno && ERANGE */
-		return -(s64)result;
-	} else if (sign == '+') {
-		++nptr;
-	}
-	result = libd_wcstou64(nptr, endptr, base);
-#if defined(__libc_geterrno) && defined(ERANGE)
-	if (result > (u64)__INT64_MAX__) {
+	int64_t result;
+	errno_t error;
+	result = libd_wcsto64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
 		__libc_seterrno(ERANGE);
-		return __INT64_MAX__;
-	}
-#endif /* __libc_geterrno && ERANGE */
-	return (s64)result;
+	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libd_wcsto64_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-#include <hybrid/limitcore.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
  * and store a pointer to the end of the number in `*endptr'.
@@ -2865,30 +3709,16 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-	u64 result;
-	char32_t sign = *nptr;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (sign == '-') {
-		++nptr;
-		result = libc_wcstou64(nptr, endptr, base);
 #if defined(__libc_geterrno) && defined(ERANGE)
-		if (result > (u64)((u64)0 - (u64)__INT64_MIN__)) {
-			__libc_seterrno(ERANGE);
-			return __INT64_MIN__;
-		}
-#endif /* __libc_geterrno && ERANGE */
-		return -(s64)result;
-	} else if (sign == '+') {
-		++nptr;
-	}
-	result = libc_wcstou64(nptr, endptr, base);
-#if defined(__libc_geterrno) && defined(ERANGE)
-	if (result > (u64)__INT64_MAX__) {
+	int64_t result;
+	errno_t error;
+	result = libc_wcsto64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
 		__libc_seterrno(ERANGE);
-		return __INT64_MAX__;
-	}
-#endif /* __libc_geterrno && ERANGE */
-	return (s64)result;
+	return result;
+#else /* __libc_geterrno && ERANGE */
+	return libc_wcsto64_r(nptr, endptr, base, NULL);
+#endif /* !__libc_geterrno || !ERANGE */
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,
@@ -6064,10 +6894,18 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsnend, libd_wcsnend);
 DEFINE_PUBLIC_ALIAS(wcsnend, libc_wcsnend);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32SNEND */
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$wcsto32_r, libd_wcsto32_r);
+DEFINE_PUBLIC_ALIAS(wcsto32_r, libc_wcsto32_r);
+DEFINE_PUBLIC_ALIAS(DOS$wcstou32_r, libd_wcstou32_r);
+DEFINE_PUBLIC_ALIAS(wcstou32_r, libc_wcstou32_r);
 DEFINE_PUBLIC_ALIAS(DOS$wcsto32, libd_wcsto32);
 DEFINE_PUBLIC_ALIAS(wcsto32, libc_wcsto32);
 DEFINE_PUBLIC_ALIAS(DOS$wcstou32, libd_wcstou32);
 DEFINE_PUBLIC_ALIAS(wcstou32, libc_wcstou32);
+DEFINE_PUBLIC_ALIAS(DOS$wcsto64_r, libd_wcsto64_r);
+DEFINE_PUBLIC_ALIAS(wcsto64_r, libc_wcsto64_r);
+DEFINE_PUBLIC_ALIAS(DOS$wcstou64_r, libd_wcstou64_r);
+DEFINE_PUBLIC_ALIAS(wcstou64_r, libc_wcstou64_r);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoui64, libd_wcstou64);
 DEFINE_PUBLIC_ALIAS(DOS$wcstou64, libd_wcstou64);
 DEFINE_PUBLIC_ALIAS(wcstou64, libc_wcstou64);

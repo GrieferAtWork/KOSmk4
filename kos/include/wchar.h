@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x327888d0 */
+/* HASH CRC-32:0x8dd1ba03 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2473,6 +2473,82 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __AT
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcsnend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL wcsnend)(wchar_t const *__restrict __str, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend))(__str, __maxlen); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_WCHAR_H_PROTO */
 #endif /* !__CRT_HAVE_wcsnend */
+#ifdef __CRT_HAVE_wcsto32_r
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,wcsto32_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),(__nptr,__endptr,__base,__error))
+#else /* __CRT_HAVE_wcsto32_r */
+#include <libc/local/wchar/wcsto32_r.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcsto32_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsto32_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32_r))(__nptr, __endptr, __base, __error); })
+#endif /* !__CRT_HAVE_wcsto32_r */
+#ifdef __CRT_HAVE_wcstou32_r
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,wcstou32_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),(__nptr,__endptr,__base,__error))
+#else /* __CRT_HAVE_wcstou32_r */
+#include <libc/local/wchar/wcstou32_r.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstou32_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstou32_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32_r))(__nptr, __endptr, __base, __error); })
+#endif /* !__CRT_HAVE_wcstou32_r */
 #ifdef __CRT_HAVE_wcsto32
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
@@ -2683,6 +2759,82 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstou32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 
 #ifdef __UINT64_TYPE__
+#ifdef __CRT_HAVE_wcsto64_r
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,wcsto64_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),(__nptr,__endptr,__base,__error))
+#else /* __CRT_HAVE_wcsto64_r */
+#include <libc/local/wchar/wcsto64_r.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcsto64_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsto64_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64_r))(__nptr, __endptr, __base, __error); })
+#endif /* !__CRT_HAVE_wcsto64_r */
+#ifdef __CRT_HAVE_wcstou64_r
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64_r,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),(__nptr,__endptr,__base,__error))
+#else /* __CRT_HAVE_wcstou64_r */
+#include <libc/local/wchar/wcstou64_r.h>
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstou64_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstou64_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_r))(__nptr, __endptr, __base, __error); })
+#endif /* !__CRT_HAVE_wcstou64_r */
 #ifdef __CRT_HAVE_wcstou64
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,

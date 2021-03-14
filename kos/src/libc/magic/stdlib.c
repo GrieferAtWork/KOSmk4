@@ -1072,225 +1072,619 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 %
 %#ifdef __USE_KOS
 
-
-
-
-[[kernel, ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtoul...)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoull...)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoumax...)]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<libc/errno.h>", "<hybrid/__overflow.h>")]]
-$uint32_t strtou32([[nonnull]] char const *__restrict nptr,
-                   [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
-	u32 result, temp;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (!base) {
-		if (*nptr == '0') {
-			char ch = *++nptr;
-			if (ch == 'x' || ch == 'X') {
-				++nptr;
+@@>> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+@@Safely parse & return an integer from `nptr', and store any potential
+@@errors in `*error' (if non-NULL). The following errors are defined:
+@@ - 0:         Success
+@@ - ECANCELED: Nothing was parsed.
+@@              In this case, `*endptr' is set to original `nptr' (iow:
+@@              leading spaces are _not_ skipped in `*endptr'), and the
+@@              returned integer is `0'
+@@ - ERANGE:    Integer over- or under-flow while parsing.
+@@              In this case, `*endptr' is still updated correctly, and
+@@              the returned integer is closest representable value to
+@@              the integer given in `nptr' (U?INTn_(MIN|MAX))
+@@              This error supercedes `EINVAL' if both conditions apply.
+@@ - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+@@              by at least 1 additional non-whitespace character.
+@@              The returned integer value is not affected by this error.
+[[kernel, ATTR_LEAF]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
+$uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
+                     [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                     [[nullable]] $errno_t *error) {
+	uint32_t result;
+	char const *num_start = nptr;
+	char const *num_iter;
+	while (isspace(*num_start))
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
 				base = 16;
-				/* TODO: Require that at least 1 more character be read! */
-			} else if (ch == 'b' || ch == 'B') {
-				++nptr;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
 				base = 2;
-				/* TODO: Require that at least 1 more character be read! */
+				++num_start;
 			} else {
 				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
 			}
 		} else {
 			base = 10;
 		}
 	}
-	result = 0;
+	num_iter = num_start;
+	result   = 0;
 	for (;;) {
-		char ch = *nptr;
+		uint8_t digit;
+		char ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch - '0');
+			digit = ch - '0';
 		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)10 + (ch - 'a');
+			digit = 10 + (ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)10 + (ch - 'A');
+			digit = 10 + (ch - 'A');
 		else {
-			/* TODO: Support for unicode decimals, and multi-byte characters.
-			 *       But only do this if libc supports it (i.e. don't do this
-			 *       in kernel-space) */
 			break;
 		}
-		if (temp >= (unsigned int)base)
+		if (digit >= base)
 			break;
-		++nptr;
-		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
-@@pp_if defined(__libc_geterrno) && defined(ERANGE)@@
-		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		    __hybrid_overflow_uadd(result, temp, &result)) {
+		++num_iter;
+		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_uadd(result, digit, &result)) {
+			/* Integer overflow. */
+			if (error) {
+@@pp_ifdef __ERANGE@@
+				*error = __ERANGE;
+@@pp_else@@
+				*error = 1;
+@@pp_endif@@
+			}
 			if (endptr) {
 				for (;;) {
-					char ch = *nptr;
+					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						temp = (u64)(ch - '0');
+						digit = ch - '0';
 					else if (ch >= 'a' && ch <= 'z')
-						temp = (u64)10 + (ch - 'a');
+						digit = 10 + (ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						temp = (u64)10 + (ch - 'A');
+						digit = 10 + (ch - 'A');
 					else {
-						/* TODO: Support for unicode decimals, and multi-byte characters.
-						 *       But only do this if libc supports it (i.e. don't do this
-						 *       in kernel-space) */
 						break;
 					}
-					if (temp >= (unsigned int)base)
+					if (digit >= base)
 						break;
-					++nptr;
+					++num_iter;
 				}
-				*endptr = (char *)nptr;
+				*endptr = (char *)num_iter;
 			}
-			return (u32)(s32)__libc_seterrno(ERANGE);
+			return (uint32_t)-1;
 		}
-@@pp_else@@
-		result *= (unsigned int)base;
-		result += temp;
-@@pp_endif@@
 	}
-	if (endptr)
-		*endptr = (char *)nptr;
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+@@pp_ifdef __ECANCELED@@
+			*error = __ECANCELED;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (isspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+@@pp_ifdef __EINVAL@@
+					*error = __EINVAL;
+@@pp_else@@
+					*error = 1;
+@@pp_endif@@
+				}
+			}
+		}
+	}
 	return result;
 }
 
-[[doc_alias("strtou32"), section(".text.crt{|.dos}.unicode.static.convert")]]
-[[kernel, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[kernel, ATTR_LEAF, doc_alias("strtou32_r")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
+[[impl_include("<hybrid/limitcore.h>")]]
+$int32_t strto32_r([[nonnull]] char const *__restrict nptr,
+                   [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                   [[nullable]] $errno_t *error) {
+	int32_t result;
+	char sign;
+	char const *num_start = nptr;
+	char const *num_iter;
+	while (isspace(*num_start))
+		++num_start;
+	sign = *num_start;
+	if (sign == '-' || sign == '+')
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char ch;
+		ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_sadd(result, digit, &result)) {
+handle_overflow:
+			/* Integer overflow. */
+			if (error) {
+@@pp_ifdef __ERANGE@@
+				*error = __ERANGE;
+@@pp_else@@
+				*error = 1;
+@@pp_endif@@
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char *)num_iter;
+			}
+			if (sign == '-')
+				return __INT32_MIN__;
+			return __INT32_MAX__;
+		}
+	}
+	if (sign == '-') {
+		result = -result;
+		if unlikely(result > 0)
+			goto handle_overflow; /* Overflow... */
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+@@pp_ifdef __ECANCELED@@
+			*error = __ECANCELED;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (isspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+@@pp_ifdef __EINVAL@@
+					*error = __EINVAL;
+@@pp_else@@
+					*error = 1;
+@@pp_endif@@
+				}
+			}
+		}
+	}
+	return result;
+}
+
+
+
+%#ifdef __UINT64_TYPE__
+[[kernel, ATTR_LEAF, doc_alias("strtou32_r")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
+$uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
+                     [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                     [[nullable]] $errno_t *error) {
+	uint64_t result;
+	char const *num_start = nptr;
+	char const *num_iter;
+	while (isspace(*num_start))
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_uadd(result, digit, &result)) {
+			/* Integer overflow. */
+			if (error) {
+@@pp_ifdef __ERANGE@@
+				*error = __ERANGE;
+@@pp_else@@
+				*error = 1;
+@@pp_endif@@
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char *)num_iter;
+			}
+			return (uint64_t)-1;
+		}
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+@@pp_ifdef __ECANCELED@@
+			*error = __ECANCELED;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (isspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+@@pp_ifdef __EINVAL@@
+					*error = __EINVAL;
+@@pp_else@@
+					*error = 1;
+@@pp_endif@@
+				}
+			}
+		}
+	}
+	return result;
+}
+
+[[kernel, ATTR_LEAF, doc_alias("strtou32_r")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
+[[impl_include("<hybrid/limitcore.h>")]]
+$int64_t strto64_r([[nonnull]] char const *__restrict nptr,
+                   [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
+                   [[nullable]] $errno_t *error) {
+	int64_t result;
+	char sign;
+	char const *num_start = nptr;
+	char const *num_iter;
+	while (isspace(*num_start))
+		++num_start;
+	sign = *num_start;
+	if (sign == '-' || sign == '+')
+		++num_start;
+	if (base == 0) {
+		/* Automatically deduce base. */
+		if (*num_start == '0') {
+			++num_start;
+			if (*num_start == 'x' || *num_start == 'X') {
+				base = 16;
+				++num_start;
+			} else if (*num_start == 'b' || *num_start == 'B') {
+				base = 2;
+				++num_start;
+			} else {
+				base = 8;
+				/* Don't  consume the `0',  but handle it implicitly.
+				 * That way, we can just always check that the number
+				 * part of the integer is non-empty! */
+			}
+		} else {
+			base = 10;
+		}
+	}
+	num_iter = num_start;
+	result   = 0;
+	for (;;) {
+		uint8_t digit;
+		char ch;
+		ch = *num_iter;
+		if (ch >= '0' && ch <= '9')
+			digit = ch - '0';
+		else if (ch >= 'a' && ch <= 'z')
+			digit = 10 + (ch - 'a');
+		else if (ch >= 'A' && ch <= 'Z')
+			digit = 10 + (ch - 'A');
+		else {
+			break;
+		}
+		if (digit >= base)
+			break;
+		++num_iter;
+		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
+		            __hybrid_overflow_sadd(result, digit, &result)) {
+handle_overflow:
+			/* Integer overflow. */
+			if (error) {
+@@pp_ifdef __ERANGE@@
+				*error = __ERANGE;
+@@pp_else@@
+				*error = 1;
+@@pp_endif@@
+			}
+			if (endptr) {
+				for (;;) {
+					ch = *num_iter;
+					if (ch >= '0' && ch <= '9')
+						digit = ch - '0';
+					else if (ch >= 'a' && ch <= 'z')
+						digit = 10 + (ch - 'a');
+					else if (ch >= 'A' && ch <= 'Z')
+						digit = 10 + (ch - 'A');
+					else {
+						break;
+					}
+					if (digit >= base)
+						break;
+					++num_iter;
+				}
+				*endptr = (char *)num_iter;
+			}
+			if (sign == '-')
+				return __INT64_MIN__;
+			return __INT64_MAX__;
+		}
+	}
+	if (sign == '-') {
+		result = -result;
+		if unlikely(result > 0)
+			goto handle_overflow; /* Overflow... */
+	}
+	if unlikely(num_iter == num_start) {
+		/* Empty number... */
+		if (error) {
+@@pp_ifdef __ECANCELED@@
+			*error = __ECANCELED;
+@@pp_else@@
+			*error = 1;
+@@pp_endif@@
+		}
+		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
+		if (endptr)
+			*endptr = (char *)nptr;
+	} else {
+		if (endptr) {
+			*endptr = (char *)num_iter;
+			if (error)
+				*error = 0;
+		} else if (error) {
+			*error = 0;
+			/* Check for `EINVAL' */
+			if unlikely(*num_iter) {
+				while (isspace(*num_iter))
+					++num_iter;
+				if (*num_iter) {
+@@pp_ifdef __EINVAL@@
+					*error = __EINVAL;
+@@pp_else@@
+					*error = 1;
+@@pp_endif@@
+				}
+			}
+		}
+	}
+	return result;
+}
+%#endif /* __UINT64_TYPE__ */
+
+
+
+@@>> strto32(3), strto64(3), strtou32(3), strtou64(3)
+@@Convert a string (radix=`base') from `nptr' into an integer,
+@@and store a pointer to the end of the number in `*endptr'.
+@@If `errno(3)' support is available, integer overflow is handled
+@@by setting `errno=ERANGE', and returning the greatest or lowest
+@@valid integer (`U?INTn_(MIN|MAX))'. (though note that
+@@`endptr' (if non-NULL) is still updated in this case!)
+@@Upon success, `errno' is left unchanged, and the integer repr
+@@of the parsed number is returned. When no integer was parsed,
+@@then `0' is returned, `*endptr' is set to `nptr', but `errno'
+@@will not have been modified.
+@@@return: * :         Success: The parsed integer
+@@@return: 0 :         [*endptr=nptr] error: Nothing was parsed
+@@@return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
+@@@return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent
+[[kernel, ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtoul...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoull...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoumax...)]]
+[[impl_include("<libc/errno.h>")]]
+$uint32_t strtou32([[nonnull]] char const *__restrict nptr,
+                   [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
+@@pp_if defined(__libc_geterrno) && defined(ERANGE)@@
+	uint32_t result;
+	errno_t error;
+	result = strtou32_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		__libc_seterrno(ERANGE);
+	return result;
+@@pp_else@@
+	return strtou32_r(nptr, endptr, base, NULL);
+@@pp_endif@@
+}
+
+[[kernel, ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoimax...)]]
-[[impl_include("<libc/errno.h>", "<hybrid/limitcore.h>")]]
+[[doc_alias("strtou32"), impl_include("<libc/errno.h>")]]
 $int32_t strto32([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
-	u32 result;
-	char sign = *nptr;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (sign == '-') {
-		++nptr;
-		result = strtou32(nptr, endptr, base);
 @@pp_if defined(__libc_geterrno) && defined(ERANGE)@@
-		if (result > (u32)((u32)0 - (u32)__INT32_MIN__)) {
-			__libc_seterrno(ERANGE);
-			return __INT32_MIN__;
-		}
-@@pp_endif@@
-		return -(s32)result;
-	} else if (sign == '+') {
-		++nptr;
-	}
-	result = strtou32(nptr, endptr, base);
-@@pp_if defined(__libc_geterrno) && defined(ERANGE)@@
-	if (result > (u32)__INT32_MAX__) {
+	int32_t result;
+	errno_t error;
+	result = strto32_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
 		__libc_seterrno(ERANGE);
-		return __INT32_MAX__;
-	}
+	return result;
+@@pp_else@@
+	return strto32_r(nptr, endptr, base, NULL);
 @@pp_endif@@
-	return (s32)result;
 }
 
 %#ifdef __UINT64_TYPE__
 [[kernel, ATTR_LEAF, alias("_strtoui64")]]
-[[doc_alias("strtou32"), section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if(!defined(__KERNEL__)), dos_only_export_as("_strtoui64")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoull...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoumax...)]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<libc/errno.h>", "<hybrid/__overflow.h>")]]
+[[doc_alias("strtou32"), impl_include("<libc/errno.h>")]]
 $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
-	u64 result, temp;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (!base) {
-		if (*nptr == '0') {
-			char ch = *++nptr;
-			if (ch == 'x' || ch == 'X') {
-				++nptr;
-				base = 16;
-				/* TODO: Require that at least 1 more character be read! */
-			} else if (ch == 'b' || ch == 'B') {
-				++nptr;
-				base = 2;
-				/* TODO: Require that at least 1 more character be read! */
-			} else {
-				base = 8;
-			}
-		} else {
-			base = 10;
-		}
-	}
-	result = 0;
-	for (;;) {
-		char ch = *nptr;
-		if (ch >= '0' && ch <= '9')
-			temp = (u64)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			temp = (u64)10 + (ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			temp = (u64)10 + (ch - 'A');
-		else {
-			/* TODO: Support for unicode decimals, and multi-byte characters.
-			 *       But only do this if libc supports it (i.e. don't do this
-			 *       in kernel-space) */
-			break;
-		}
-		if (temp >= (unsigned int)base)
-			break;
-		++nptr;
-
-		/* Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 @@pp_if defined(__libc_geterrno) && defined(ERANGE)@@
-		if (__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		    __hybrid_overflow_uadd(result, temp, &result))
-			__libc_seterrno(ERANGE);
-@@pp_else@@
-		result *= (unsigned int)base;
-		result += temp;
-@@pp_endif@@
-	}
-	if (endptr)
-		*endptr = (char *)nptr;
+	uint64_t result;
+	errno_t error;
+	result = strtou64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		__libc_seterrno(ERANGE);
 	return result;
+@@pp_else@@
+	return strtou64_r(nptr, endptr, base, NULL);
+@@pp_endif@@
 }
 
 [[kernel, ATTR_LEAF, alias("_strtoi64")]]
-[[doc_alias("strtou32"), section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if(!defined(__KERNEL__)), dos_only_export_as("_strtoi64")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_strtoimax...)]]
-[[impl_include("<libc/errno.h>", "<hybrid/limitcore.h>")]]
+[[doc_alias("strtou32"), impl_include("<libc/errno.h>")]]
 $int64_t strto64([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
-	u64 result;
-	char sign = *nptr;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (sign == '-') {
-		++nptr;
-		result = strtou64(nptr, endptr, base);
 @@pp_if defined(__libc_geterrno) && defined(ERANGE)@@
-		if (result > (u64)((u64)0 - (u64)__INT64_MIN__)) {
-			__libc_seterrno(ERANGE);
-			return __INT64_MIN__;
-		}
-@@pp_endif@@
-		return -(s64)result;
-	} else if (sign == '+') {
-		++nptr;
-	}
-	result = strtou64(nptr, endptr, base);
-@@pp_if defined(__libc_geterrno) && defined(ERANGE)@@
-	if (result > (u64)__INT64_MAX__) {
+	int64_t result;
+	errno_t error;
+	result = strto64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
 		__libc_seterrno(ERANGE);
-		return __INT64_MAX__;
-	}
+	return result;
+@@pp_else@@
+	return strto64_r(nptr, endptr, base, NULL);
 @@pp_endif@@
-	return (s64)result;
 }
 %#endif /* __UINT64_TYPE__ */
 

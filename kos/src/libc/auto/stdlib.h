@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x733104e4 */
+/* HASH CRC-32:0x17f90046 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,6 +185,150 @@ INTDEF ATTR_LEAF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_strtold)(ch
 #ifndef __KERNEL__
 INTDEF ATTR_LEAF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr, char **endptr);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_strtou32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_strto32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_strtou64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd_strto64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,

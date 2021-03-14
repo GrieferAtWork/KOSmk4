@@ -1403,6 +1403,11 @@ __STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict forma
 
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
+wcsto32_r(*) %{generate(str2wcs("strto32_r"))}
+[[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
+wcstou32_r(*) %{generate(str2wcs("strtou32_r"))}
+
+[[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_wcstol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_wcstoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_wcstoimax...)]]
@@ -1416,6 +1421,11 @@ wcstou32(*) %{generate(str2wcs("strtou32"))}
 
 %
 %#ifdef __UINT64_TYPE__
+[[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
+wcsto64_r(*) %{generate(str2wcs("strto64_r"))}
+[[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
+wcstou64_r(*) %{generate(str2wcs("strtou64_r"))}
+
 [[wchar, dos_export_alias("_wcstoui64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_wcstoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_wcstoull...)]]

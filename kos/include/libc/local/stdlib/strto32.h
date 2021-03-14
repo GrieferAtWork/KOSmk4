@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc7225a */
+/* HASH CRC-32:0xf6c3fc1f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,119 +24,55 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtou32 from stdlib */
-#ifndef __local___localdep_strtou32_defined
-#define __local___localdep_strtou32_defined 1
-#ifdef __CRT_HAVE_strtou32
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou32,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG__ == 4
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoull) && __SIZEOF_LONG_LONG__ == 4
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtouq) && __SIZEOF_LONG_LONG__ == 4
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtouq,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_INTMAX_T__ == 4
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
-#else /* ... */
+/* Dependency: strto32_r from stdlib */
+#ifndef __local___localdep_strto32_r_defined
+#define __local___localdep_strto32_r_defined 1
+#ifdef __CRT_HAVE_strto32_r
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/strtou32.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-#define __localdep_strtou32 __LIBC_LOCAL_NAME(strtou32)
-#endif /* !... */
-#endif /* !__local___localdep_strtou32_defined */
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto32_r,(__nptr,__endptr,__base,__error))
+#else /* __CRT_HAVE_strto32_r */
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/strto32_r.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
+ * Safely parse & return an integer from `nptr', and store any potential
+ * errors in `*error' (if non-NULL). The following errors are defined:
+ *  - 0:         Success
+ *  - ECANCELED: Nothing was parsed.
+ *               In this case, `*endptr' is set to original `nptr' (iow:
+ *               leading spaces are _not_ skipped in `*endptr'), and the
+ *               returned integer is `0'
+ *  - ERANGE:    Integer over- or under-flow while parsing.
+ *               In this case, `*endptr' is still updated correctly, and
+ *               the returned integer is closest representable value to
+ *               the integer given in `nptr' (U?INTn_(MIN|MAX))
+ *               This error supercedes `EINVAL' if both conditions apply.
+ *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
+ *               by at least 1 additional non-whitespace character.
+ *               The returned integer value is not affected by this error. */
+#define __localdep_strto32_r __LIBC_LOCAL_NAME(strto32_r)
+#endif /* !__CRT_HAVE_strto32_r */
+#endif /* !__local___localdep_strto32_r_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
-#include <hybrid/limitcore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
  * Convert a string (radix=`base') from `nptr' into an integer,
@@ -155,30 +91,16 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __LOCAL_LIBC(strto32) __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto32))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) {
-	__UINT32_TYPE__ __result;
-	char __sign = *__nptr;
-	/* TODO: STDC says that we should skip leading space characters! */
-	if (__sign == '-') {
-		++__nptr;
-		__result = __localdep_strtou32(__nptr, __endptr, __base);
 #if defined(__libc_geterrno) && defined(__ERANGE)
-		if (__result > (__UINT32_TYPE__)((__UINT32_TYPE__)0 - (__UINT32_TYPE__)__INT32_MIN__)) {
-			__libc_seterrno(__ERANGE);
-			return __INT32_MIN__;
-		}
-#endif /* __libc_geterrno && __ERANGE */
-		return -(__INT32_TYPE__)__result;
-	} else if (__sign == '+') {
-		++__nptr;
-	}
-	__result = __localdep_strtou32(__nptr, __endptr, __base);
-#if defined(__libc_geterrno) && defined(__ERANGE)
-	if (__result > (__UINT32_TYPE__)__INT32_MAX__) {
+	__INT32_TYPE__ __result;
+	__errno_t __error;
+	__result = __localdep_strto32_r(__nptr, __endptr, __base, &__error);
+	if (__error == __ERANGE)
 		__libc_seterrno(__ERANGE);
-		return __INT32_MAX__;
-	}
-#endif /* __libc_geterrno && __ERANGE */
-	return (__INT32_TYPE__)__result;
+	return __result;
+#else /* __libc_geterrno && __ERANGE */
+	return __localdep_strto32_r(__nptr, __endptr, __base, __NULLPTR);
+#endif /* !__libc_geterrno || !__ERANGE */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strto32_defined
