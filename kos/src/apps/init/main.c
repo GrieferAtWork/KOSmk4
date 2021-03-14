@@ -38,6 +38,7 @@
 
 #include <errno.h>   /* errno */
 #include <fcntl.h>   /* AT_FDDRIVE_ROOT() */
+#include <paths.h>   /* _PATH_DEFPATH */
 #include <sched.h>   /* sched_yield() */
 #include <signal.h>  /* signal() */
 #include <stddef.h>  /* NULL */
@@ -53,7 +54,7 @@ DECL_BEGIN
 
 PRIVATE char const *init_envp[] = {
 	"HOME=/",
-	"PATH=/bin",
+	"PATH=" _PATH_STDPATH,
 	"PWD=/",
 	"TERM=xterm",
 	NULL
