@@ -25,7 +25,6 @@
 <regexp.h>             (GLibc!)
 <resolv.h>             (GLibc!)
 <stab.h>               (GLibc!)
-<sys/bsdtypes.h>       (mingwrt)
 <sys/capability.h>     (linux: found in /usr/include/sys/capability.h; aka not in arch-headers!)
 <sys/fanotify.h>       (linux)
 <sys/gmon.h>           (linux)
