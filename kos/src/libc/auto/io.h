@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5090c155 */
+/* HASH CRC-32:0x550271e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,12 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename, int type);
+INTDEF oflag_t NOTHROW_NCX(LIBDCALL libd__setmode)(fd_t fd, oflag_t mode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF oflag_t NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd, oflag_t mode);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd__findclose)(intptr_t findfd);
 INTDEF WUNUSED NONNULL((1, 2)) intptr_t NOTHROW_RPC(LIBDCALL libd__findfirst32)(char const *__restrict filename, struct _finddata32_t *__restrict finddata);
 INTDEF WUNUSED NONNULL((1, 2)) intptr_t NOTHROW_RPC(LIBDCALL libd__findfirst32i64)(char const *__restrict filename, struct _finddata32i64_t *__restrict finddata);
@@ -80,12 +86,6 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd__open_osfhandle)(intptr_t osfd, of
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd, oflag_t flags);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF oflag_t NOTHROW_NCX(LIBDCALL libd_setmode)(fd_t fd, oflag_t mode);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF oflag_t NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd, oflag_t mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(VLIBDCALL libd_sopen)(char const *filename, oflag_t oflags, int sflags, ...);

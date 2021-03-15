@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73128d72 */
+/* HASH CRC-32:0x5c5f195d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,16 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#if !defined(__getmode_defined) && defined(__CRT_HAVE_getmode)
+#define __getmode_defined 1
+/* >> setmode(3), getmode(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__mode_t,__NOTHROW_NCX,getmode,(void const *__bbox, __mode_t __mode),(__bbox,__mode))
+#endif /* !__getmode_defined && __CRT_HAVE_getmode */
+#if !defined(__setmode_defined) && defined(__CRT_HAVE_setmode)
+#define __setmode_defined 1
+/* >> setmode(3), getmode(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,setmode,(char const *__mode_str),(__mode_str))
+#endif /* !__setmode_defined && __CRT_HAVE_setmode */
 #ifndef __closefrom_defined
 #define __closefrom_defined 1
 #ifdef __CRT_HAVE_closefrom
@@ -56,6 +66,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #define __setproctitle_defined 1
 __LIBC __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) __CASMNAME_SAME("setproctitle");
 #endif /* !__setproctitle_defined && __CRT_HAVE_setproctitle */
+#ifndef __getpeereid_defined
+#define __getpeereid_defined 1
+#ifdef __CRT_HAVE_getpeereid
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+__CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd, uid_t *__euid, gid_t *__egid),(__sockfd,__euid,__egid))
+#else /* __CRT_HAVE_getpeereid */
+#include <asm/os/socket.h>
+#if defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
+#include <libc/local/unistd/getpeereid.h>
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
+#else /* __CRT_HAVE_getsockopt && __SOL_SOCKET && __SO_PEERCRED */
+#undef __getpeereid_defined
+#endif /* !__CRT_HAVE_getsockopt || !__SOL_SOCKET || !__SO_PEERCRED */
+#endif /* !__CRT_HAVE_getpeereid */
+#endif /* !__getpeereid_defined */
 
 __SYSDECL_END
 #endif /* __CC__ */

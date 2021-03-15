@@ -2108,6 +2108,7 @@
 #define __CRT_HAVE_getlogin_r
 #define __CRT_HAVE_getmntent
 #define __CRT_HAVE_getmntent_r
+#define __CRT_HAVE_getmode
 #define __CRT_HAVE_getmsg
 #define __CRT_HAVE_getnameinfo
 #define __CRT_HAVE_getnetbyaddr
@@ -2126,6 +2127,7 @@
 #define __CRT_HAVE_getpass_r
 #define __CRT_HAVE_getpassfd
 #define __CRT_HAVE_getpassphrase
+#define __CRT_HAVE_getpeereid
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid
 #define __CRT_HAVE_getpgrp

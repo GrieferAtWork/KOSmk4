@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7815d1a */
+/* HASH CRC-32:0xc9b43838 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,19 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.unsorted") oflag_t
+NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
+                                    oflag_t mode) {
+#ifdef __F_SETFL_XCH
+	return libc_fcntl(fd, __F_SETFL_XCH, mode);
+#else /* __F_SETFL_XCH */
+	oflag_t result;
+	result = libc_fcntl(fd, __F_GETFL);
+	if unlikely(result < 0)
+		return -1;
+	return libc_fcntl(fd, __F_SETFL, mode);
+#endif /* !__F_SETFL_XCH */
+}
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
                                  uint32_t pipesize,
@@ -90,19 +103,6 @@ NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd,
 	COMPILER_IMPURE();
 	return (fd_t)osfd;
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") oflag_t
-NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd,
-                                   oflag_t mode) {
-#ifdef __F_SETFL_XCH
-	return libc_fcntl(fd, __F_SETFL_XCH, mode);
-#else /* __F_SETFL_XCH */
-	oflag_t result;
-	result = libc_fcntl(fd, __F_GETFL);
-	if unlikely(result < 0)
-		return -1;
-	return libc_fcntl(fd, __F_SETFL, mode);
-#endif /* !__F_SETFL_XCH */
-}
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
                                   oflag_t oflags,
@@ -147,6 +147,7 @@ NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_setmode, libc__setmode);
 DEFINE_PUBLIC_ALIAS(_pipe, libc__pipe);
 DEFINE_PUBLIC_ALIAS(_filelengthi64, libc__filelengthi64);
 DEFINE_PUBLIC_ALIAS(umask_s, libc_umask_s);
@@ -154,8 +155,6 @@ DEFINE_PUBLIC_ALIAS(__lock_fhandle, libc___lock_fhandle);
 DEFINE_PUBLIC_ALIAS(_unlock_fhandle, libc__unlock_fhandle);
 DEFINE_PUBLIC_ALIAS(_get_osfhandle, libc__get_osfhandle);
 DEFINE_PUBLIC_ALIAS(_open_osfhandle, libc__open_osfhandle);
-DEFINE_PUBLIC_ALIAS(_setmode, libc_setmode);
-DEFINE_PUBLIC_ALIAS(setmode, libc_setmode);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_sopen, libc_sopen);
 #endif /* __LIBCCALL_IS_LIBDCALL */

@@ -73,9 +73,13 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <printf.h>             (GLibc!)
 
 
-Functions:
+Functions/Globals:
 	- walkcontext()
 	- int ungetchar(int ch)     (same as `ungetc(ch, stdin)')
+	- int optreset
+	- bsd_getopt()
+	- setmode()
+	- getmode()
 
 
 TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection...

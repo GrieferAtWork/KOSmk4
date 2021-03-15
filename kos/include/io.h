@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12045b03 */
+/* HASH CRC-32:0x1658cdbd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -952,17 +952,6 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char
 #define _open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))
 #endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #endif /* !... */
-#ifdef __CRT_HAVE_setmode
-__CREDIRECT(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),setmode,(__fd,__mode))
-#elif defined(__CRT_HAVE__setmode)
-__CDECLARE(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
-#include <libc/local/io/setmode.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __oflag_t __NOTHROW_NCX(__LIBCCALL _setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setmode))(__fd, __mode); }
-#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
-#endif /* !... */
 #ifdef __CRT_HAVE_umask
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),umask,(__mode))
 #elif defined(__CRT_HAVE__umask)
@@ -991,6 +980,15 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),(__fd))
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isatty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isatty))(__fd); }
 #endif /* __CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA) */
 #endif /* !... */
+#ifdef __CRT_HAVE__setmode
+__CDECLARE(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
+#else /* __CRT_HAVE__setmode */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
+#include <libc/local/io/_setmode.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_setmode, __FORCELOCAL __ATTR_ARTIFICIAL __oflag_t __NOTHROW_NCX(__LIBCCALL _setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_setmode))(__fd, __mode); })
+#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
+#endif /* !__CRT_HAVE__setmode */
 
 
 __CDECLARE_OPT(,int,__NOTHROW_NCX,_findclose,(intptr_t __findfd),(__findfd))
@@ -1172,17 +1170,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_open_osfhandle, __FORCELOCAL __ATTR_ARTIFICIAL 
 
 /* Weird, new functions not apart of any well-established standard. */
 
-#ifdef __CRT_HAVE_setmode
-__CDECLARE(,__oflag_t,__NOTHROW_NCX,setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
-#elif defined(__CRT_HAVE__setmode)
+
+/* WARNING: `setmode(3)' is also a completely different BSD-specific function in <unistd.h>! */
+#ifndef __setmode_defined
+#define __setmode_defined 1
+#ifdef __CRT_HAVE__setmode
 __CREDIRECT(,__oflag_t,__NOTHROW_NCX,setmode,(__fd_t __fd, __oflag_t __mode),_setmode,(__fd,__mode))
-#else /* ... */
+#else /* __CRT_HAVE__setmode */
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
-#include <libc/local/io/setmode.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(setmode, __FORCELOCAL __ATTR_ARTIFICIAL __oflag_t __NOTHROW_NCX(__LIBCCALL setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setmode))(__fd, __mode); })
-#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
-#endif /* !... */
+#include <libc/local/io/_setmode.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __oflag_t __NOTHROW_NCX(__LIBCCALL setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_setmode))(__fd, __mode); }
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
+#undef __setmode_defined
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || (!__F_SETFL_XCH && (!__F_GETFL || !__F_SETFL)) */
+#endif /* !__CRT_HAVE__setmode */
+#endif /* !__setmode_defined */
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */

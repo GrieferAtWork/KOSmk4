@@ -1962,6 +1962,7 @@
 #define __CRT_HAVE_getlogin_r
 #define __CRT_HAVE_getmntent
 #define __CRT_HAVE_getmntent_r
+#define __CRT_HAVE_getmode
 #define __CRT_HAVE_getmsg
 #define __CRT_HAVE_getnameinfo
 #define __CRT_HAVE_getnetbyaddr
@@ -1980,6 +1981,7 @@
 #define __CRT_HAVE_getpass_r
 #define __CRT_HAVE_getpassfd
 #define __CRT_HAVE_getpassphrase
+#define __CRT_HAVE_getpeereid
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid
 #define __CRT_HAVE_getpgrp
@@ -6406,6 +6408,7 @@
 #define __CRT_HAVE_KOS$getlogin_r
 #define __CRT_HAVE_KOS$getmntent
 #define __CRT_HAVE_KOS$getmntent_r
+#define __CRT_HAVE_KOS$getmode
 #define __CRT_HAVE_KOS$getmsg
 #define __CRT_HAVE_KOS$getnameinfo
 #define __CRT_HAVE_KOS$getnetbyaddr
@@ -6422,6 +6425,7 @@
 #define __CRT_HAVE_KOS$getpass_r
 #define __CRT_HAVE_KOS$getpassfd
 #define __CRT_HAVE_KOS$getpassphrase
+#define __CRT_HAVE_KOS$getpeereid
 #define __CRT_HAVE_KOS$getpeername
 #define __CRT_HAVE_KOS$getpgid
 #define __CRT_HAVE_KOS$getpmsg
@@ -9941,6 +9945,7 @@
 #define __CRT_HAVE_DOS$getlogin_r
 #define __CRT_HAVE_DOS$getmntent
 #define __CRT_HAVE_DOS$getmntent_r
+#define __CRT_HAVE_DOS$getmode
 #define __CRT_HAVE_DOS$getmsg
 #define __CRT_HAVE_DOS$getnameinfo
 #define __CRT_HAVE_DOS$getnetbyaddr
@@ -9957,6 +9962,7 @@
 #define __CRT_HAVE_DOS$getpass_r
 #define __CRT_HAVE_DOS$getpassfd
 #define __CRT_HAVE_DOS$getpassphrase
+#define __CRT_HAVE_DOS$getpeereid
 #define __CRT_HAVE_DOS$getpeername
 #define __CRT_HAVE_DOS$getpgid
 #define __CRT_HAVE_DOS$getpmsg

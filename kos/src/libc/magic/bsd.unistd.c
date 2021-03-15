@@ -35,14 +35,14 @@ __SYSDECL_BEGIN
 //TODO:optreset
 //TODO:%[insert:extern(bsd_getopt)]
 
-//TODO:%[insert:extern(getmode)]
-//TODO:%[insert:extern(setmode)]
+%[insert:extern(getmode)]
+%[insert:extern(setmode)]
 
 %[insert:extern(closefrom)]
 
 %[insert:extern(setproctitle)]
 
-//TODO:%[insert:extern(getpeereid)]
+%[insert:extern(getpeereid)]
 
 %{
 

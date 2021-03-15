@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x886643ac */
+/* HASH CRC-32:0xe38a59c9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,6 +290,7 @@
 #define __stub_getifaddrs
 #define __stub_getipv4sourcefilter
 #define __stub_getloadavg
+#define __stub_getmode
 #define __stub_getmsg
 #define __stub_getnameinfo
 #define __stub_getnetbyaddr
@@ -519,6 +520,7 @@
 #define __stub_setkey_r
 #define __stub_setlogin
 #define __stub_setlogmask
+#define __stub_setmode
 #define __stub_setnetent
 #define __stub_setnetgrent
 #define __stub_setproctitle

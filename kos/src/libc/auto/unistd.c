@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a41942d */
+/* HASH CRC-32:0x89ceed72 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@
 #include "../user/string.h"
 #include "../user/sys.ioctl.h"
 #include "../user/sys.poll.h"
+#include "../user/sys.socket.h"
 #include "termios.h"
 
 DECL_BEGIN
@@ -983,6 +984,36 @@ NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
 #endif /* !__RPP_ECHO_OFF */
 #endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read */
 }
+#include <bits/os/ucred.h>
+#include <libc/errno.h>
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+INTERN ATTR_SECTION(".text.crt.sched.user") NONNULL((2, 3)) int
+NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
+                                      uid_t *euid,
+                                      gid_t *egid) {
+	int result;
+	struct ucred cred;
+	socklen_t len = sizeof(cred);
+	result = libc_getsockopt(sockfd, __SOL_SOCKET, __SO_PEERCRED, &cred, &len);
+	if (result == 0) {
+		/* Safety check that enough data was read... */
+		if (len < (__COMPILER_OFFSETAFTER(struct ucred, uid) >
+		           __COMPILER_OFFSETAFTER(struct ucred, gid)
+		           ? __COMPILER_OFFSETAFTER(struct ucred, uid)
+		           : __COMPILER_OFFSETAFTER(struct ucred, gid))) {
+#ifdef ENOPROTOOPT
+			result = __libc_seterrno(ENOPROTOOPT);
+#else /* ENOPROTOOPT */
+			result = __libc_seterrno(1);
+#endif /* !ENOPROTOOPT */
+		} else {
+			*euid = cred.uid;
+			*egid = cred.gid;
+		}
+	}
+	return result;
+}
 /* >> closefrom(2)
  * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
@@ -1121,6 +1152,7 @@ DEFINE_PUBLIC_ALIAS(ctermid, libc_ctermid);
 DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_ALIAS(getpassfd, libc_getpassfd);
 DEFINE_PUBLIC_ALIAS(getpass_r, libc_getpass_r);
+DEFINE_PUBLIC_ALIAS(getpeereid, libc_getpeereid);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
 DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);

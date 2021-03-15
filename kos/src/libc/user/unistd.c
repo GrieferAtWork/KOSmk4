@@ -3575,6 +3575,34 @@ NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 }
 /*[[[end:libc_fdatasync]]]*/
 
+/*[[[head:libc_setmode,hash:CRC-32=0x5440ef72]]]*/
+/* >> setmode(3), getmode(3) */
+INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED NONNULL((1)) void *
+NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str)
+/*[[[body:libc_setmode]]]*/
+/*AUTO*/{
+	(void)mode_str;
+	CRT_UNIMPLEMENTEDF("setmode(%q)", mode_str); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_setmode]]]*/
+
+/*[[[head:libc_getmode,hash:CRC-32=0xd63cf099]]]*/
+/* >> setmode(3), getmode(3) */
+INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED NONNULL((1)) mode_t
+NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
+                                   mode_t mode)
+/*[[[body:libc_getmode]]]*/
+/*AUTO*/{
+	(void)bbox;
+	(void)mode;
+	CRT_UNIMPLEMENTEDF("getmode(%p, %" PRIxN(__SIZEOF_MODE_T__) ")", bbox, mode); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_getmode]]]*/
+
 /*[[[head:libc_ctermid_r,hash:CRC-32=0x4e77dd5c]]]*/
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
@@ -3591,7 +3619,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8b27901b]]]*/
+/*[[[start:exports,hash:CRC-32=0xc1427a34]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -3767,6 +3795,8 @@ DEFINE_PUBLIC_ALIAS(brk, libc_brk);
 DEFINE_PUBLIC_ALIAS(__sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(fdatasync, libc_fdatasync);
+DEFINE_PUBLIC_ALIAS(setmode, libc_setmode);
+DEFINE_PUBLIC_ALIAS(getmode, libc_getmode);
 DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_ALIAS(__sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(sysconf, libc_sysconf);

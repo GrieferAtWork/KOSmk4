@@ -120,12 +120,12 @@ struct _finddata64i32_t;
 [[decl_include("<bits/types.h>")]]
 errno_t _access_s([[nonnull]] char const *filename, int type);
 
-%[insert:function(_chsize = chsize)]
+%[insert:function(_chsize = ftruncate)]
 %[insert:function(_chsize_s = ftruncate64)]
 %[insert:function(_commit = fsync)]
 %[insert:function(_lseek = lseek)]
 %[insert:function(_lseeki64 = lseek64)]
-%[insert:function(_locking = locking)]
+%[insert:function(_locking = lockf)]
 %[insert:guarded_function(_unlink = unlink)]
 %[insert:function(_close = close)]
 %[insert:function(_dup = dup)]
@@ -133,9 +133,23 @@ errno_t _access_s([[nonnull]] char const *filename, int type);
 %[insert:function(_read = read)]
 %[insert:function(_write = write)]
 %[insert:function(_open = open)]
-%[insert:function(_setmode = setmode)]
 %[insert:function(_umask = umask)]
 %[insert:function(_isatty = isatty)]
+
+[[requires_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
+[[requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
+$oflag_t _setmode($fd_t fd, $oflag_t mode) {
+@@pp_ifdef __F_SETFL_XCH@@
+	return fcntl(fd, __F_SETFL_XCH, mode);
+@@pp_else@@
+	oflag_t result;
+	result = fcntl(fd, __F_GETFL);
+	if unlikely(result < 0)
+		return -1;
+	return fcntl(fd, __F_SETFL, mode);
+@@pp_endif@@
+}
+
 
 
 %
@@ -302,25 +316,14 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 %/* Weird, new functions not apart of any well-established standard. */
 %
 
+%
+%/* WARNING: `setmode(3)' is also a completely different BSD-specific function in <unistd.h>! */
+%[insert:guarded_function(setmode = _setmode)]
+%[insert:function(chsize = ftruncate)]
+%[insert:function(locking = lockf)]
+
+
 %[default:section(".text.crt.dos.fs.io")]
-
-[[export_alias("_setmode"), requires_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
-[[requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
-$oflag_t setmode($fd_t fd, $oflag_t mode) {
-@@pp_ifdef __F_SETFL_XCH@@
-	return fcntl(fd, __F_SETFL_XCH, mode);
-@@pp_else@@
-	oflag_t result;
-	result = fcntl(fd, __F_GETFL);
-	if unlikely(result < 0)
-		return -1;
-	return fcntl(fd, __F_SETFL, mode);
-@@pp_endif@@
-}
-
-
-chsize(*) = ftruncate;
-locking(*) = lockf;
 
 [[decl_include("<bits/types.h>")]]
 [[cp, vartypes($mode_t), wunused, dos_only_export_alias("_sopen")]]

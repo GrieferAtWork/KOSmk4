@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x147d826a */
+/* HASH CRC-32:0x1ca086a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -383,6 +383,7 @@ DEFINE_PUBLIC_ALIAS(DOS$strtou_l, libd_strtou_l);
 
 /* io */
 DEFINE_PUBLIC_ALIAS(DOS$_access_s, libd__access_s);
+DEFINE_PUBLIC_ALIAS(DOS$_setmode, libd__setmode);
 DEFINE_PUBLIC_ALIAS(DOS$_findclose, libd__findclose);
 DEFINE_PUBLIC_ALIAS(DOS$_findfirst, libd__findfirst32);
 DEFINE_PUBLIC_ALIAS(DOS$_findfirst32, libd__findfirst32);
@@ -406,8 +407,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__lock_fhandle, libd___lock_fhandle);
 DEFINE_PUBLIC_ALIAS(DOS$_unlock_fhandle, libd__unlock_fhandle);
 DEFINE_PUBLIC_ALIAS(DOS$_get_osfhandle, libd__get_osfhandle);
 DEFINE_PUBLIC_ALIAS(DOS$_open_osfhandle, libd__open_osfhandle);
-DEFINE_PUBLIC_ALIAS(DOS$_setmode, libd_setmode);
-DEFINE_PUBLIC_ALIAS(DOS$setmode, libd_setmode);
 DEFINE_PUBLIC_ALIAS(DOS$_sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$_filelength, libd__filelength);
@@ -3085,6 +3084,9 @@ DEFINE_PUBLIC_ALIAS(DOS$ctermid, libd_ctermid);
 DEFINE_PUBLIC_ALIAS(DOS$cuserid, libd_cuserid);
 DEFINE_PUBLIC_ALIAS(DOS$getpassfd, libd_getpassfd);
 DEFINE_PUBLIC_ALIAS(DOS$getpass_r, libd_getpass_r);
+DEFINE_PUBLIC_ALIAS(DOS$setmode, libd_setmode);
+DEFINE_PUBLIC_ALIAS(DOS$getmode, libd_getmode);
+DEFINE_PUBLIC_ALIAS(DOS$getpeereid, libd_getpeereid);
 DEFINE_PUBLIC_ALIAS(DOS$ctermid_r, libd_ctermid_r);
 DEFINE_PUBLIC_ALIAS(DOS$__sysconf, libd_sysconf);
 DEFINE_PUBLIC_ALIAS(DOS$sysconf, libd_sysconf);

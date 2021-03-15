@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1169f822 */
+/* HASH CRC-32:0x647409ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2615,6 +2615,28 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpass_r,(char const *__prompt, 
 /* >> getpass_r(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpass_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL getpass_r)(char const *__prompt, char *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass_r))(__prompt, __buf, __bufsize); })
 #endif /* ... */
+
+/* WARNING: `setmode(3)' is also a completely different DOS-specific function in <io.h>! */
+#if !defined(__setmode_defined) && defined(__CRT_HAVE_setmode)
+#define __setmode_defined 1
+/* >> setmode(3), getmode(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,setmode,(char const *__mode_str),(__mode_str))
+#endif /* !__setmode_defined && __CRT_HAVE_setmode */
+/* >> setmode(3), getmode(3) */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__mode_t,__NOTHROW_NCX,getmode,(void const *__bbox, __mode_t __mode),(__bbox,__mode))
+#ifdef __CRT_HAVE_getpeereid
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+__CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd, uid_t *__euid, gid_t *__egid),(__sockfd,__euid,__egid))
+#else /* __CRT_HAVE_getpeereid */
+#include <asm/os/socket.h>
+#if defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
+#include <libc/local/unistd/getpeereid.h>
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
+#endif /* __CRT_HAVE_getsockopt && __SOL_SOCKET && __SO_PEERCRED */
+#endif /* !__CRT_HAVE_getpeereid */
 #endif /* __USE_NETBSD */
 
 

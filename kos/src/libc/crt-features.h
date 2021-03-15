@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4b97a5b */
+/* HASH CRC-32:0x4caa0a9f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -429,6 +429,7 @@
 #define __CRT_HAVE_DOS$_set_purecall_handler
 #define __CRT_HAVE_DOS$_seterrormode
 #define __CRT_HAVE_DOS$_setmaxstdio
+#define __CRT_HAVE_DOS$_setmode
 #define __CRT_HAVE_DOS$_snprintf
 #define __CRT_HAVE_DOS$_snprintf_c
 #define __CRT_HAVE_DOS$_snprintf_c_l
@@ -1320,6 +1321,7 @@
 #define __CRT_HAVE_DOS$getlogin_r
 #define __CRT_HAVE_DOS$getmntent
 #define __CRT_HAVE_DOS$getmntent_r
+#define __CRT_HAVE_DOS$getmode
 #define __CRT_HAVE_DOS$getmsg
 #define __CRT_HAVE_DOS$getnameinfo
 #define __CRT_HAVE_DOS$getnetbyaddr
@@ -1335,6 +1337,7 @@
 #define __CRT_HAVE_DOS$getpass
 #define __CRT_HAVE_DOS$getpass_r
 #define __CRT_HAVE_DOS$getpassfd
+#define __CRT_HAVE_DOS$getpeereid
 #define __CRT_HAVE_DOS$getpeername
 #define __CRT_HAVE_DOS$getpgid
 #define __CRT_HAVE_DOS$getpmsg
@@ -3507,6 +3510,7 @@
 #define __CRT_HAVE__set_purecall_handler
 #define __CRT_HAVE__seterrormode
 #define __CRT_HAVE__setmaxstdio
+#define __CRT_HAVE__setmode
 #define __CRT_HAVE__snprintf
 #define __CRT_HAVE__snprintf_c
 #define __CRT_HAVE__snprintf_c_l
@@ -4425,6 +4429,7 @@
 #define __CRT_HAVE_getlogin_r
 #define __CRT_HAVE_getmntent
 #define __CRT_HAVE_getmntent_r
+#define __CRT_HAVE_getmode
 #define __CRT_HAVE_getmsg
 #define __CRT_HAVE_getnameinfo
 #define __CRT_HAVE_getnetbyaddr
@@ -4442,6 +4447,7 @@
 #define __CRT_HAVE_getpass
 #define __CRT_HAVE_getpass_r
 #define __CRT_HAVE_getpassfd
+#define __CRT_HAVE_getpeereid
 #define __CRT_HAVE_getpeername
 #define __CRT_HAVE_getpgid
 #define __CRT_HAVE_getpgrp

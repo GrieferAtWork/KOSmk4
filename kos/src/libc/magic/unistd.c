@@ -2769,15 +2769,54 @@ char *getpass_r([[nullable]] char const *prompt, char *buf, size_t bufsize) {
 @@pp_endif@@
 }
 
+%
+%/* WARNING: `setmode(3)' is also a completely different DOS-specific function in <io.h>! */
+
+@@>> setmode(3), getmode(3)
+[[guard, wunused]]
+void *setmode([[nonnull]] char const *mode_str); /* TODO: Implement here! */
+
+[[wunused, doc_alias("setmode")]]
+$mode_t getmode([[nonnull]] void const *bbox, $mode_t mode); /* TODO: Implement here! */
+
+@@>> getpeereid(3)
+@@Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)'
+[[requires_include("<asm/os/socket.h>")]]
+[[requires($has_function(getsockopt) &&
+           (defined(__SOL_SOCKET) && defined(__SO_PEERCRED)))]]
+[[impl_include("<bits/os/ucred.h>", "<libc/errno.h>")]]
+int getpeereid($fd_t sockfd,
+               [[nonnull]] uid_t *euid,
+               [[nonnull]] gid_t *egid) {
+	int result;
+	struct ucred cred;
+	socklen_t len = sizeof(cred);
+	result = getsockopt(sockfd, __SOL_SOCKET, __SO_PEERCRED, &cred, &len);
+	if (result == 0) {
+		/* Safety check that enough data was read... */
+		if (len < (__COMPILER_OFFSETAFTER(struct ucred, @uid@) >
+		           __COMPILER_OFFSETAFTER(struct ucred, @gid@)
+		           ? __COMPILER_OFFSETAFTER(struct ucred, @uid@)
+		           : __COMPILER_OFFSETAFTER(struct ucred, @gid@))) {
+@@pp_ifdef ENOPROTOOPT@@
+			result = __libc_seterrno(ENOPROTOOPT);
+@@pp_else@@
+			result = __libc_seterrno(1);
+@@pp_endif@@
+		} else {
+			*euid = cred.@uid@;
+			*egid = cred.@gid@;
+		}
+	}
+	return result;
+}
+
 //TODO:int des_cipher(char const *, char *, long, int);
 //TODO:int des_setkey(char const *);
 //TODO:int exect(char const *, char *const *, char *const *);
 //TODO:int fdiscard(int, off_t, off_t);
 //TODO:int fsync_range(int, int, off_t, off_t);
 //TODO:int getgroupmembership(char const *, gid_t, gid_t *, int, int *);
-//TODO:mode_t getmode(const void *, mode_t);
-//TODO:void *setmode(char const *);
-//TODO:int getpeereid(int, uid_t *, gid_t *);
 //TODO:int iruserok(uint32_t, int, char const *, char const *);
 //TODO:long lpathconf(char const *, int);
 //TODO:int nfssvc(int, void *);

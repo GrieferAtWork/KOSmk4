@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22ab009a */
+/* HASH CRC-32:0x3b88086d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -486,6 +486,10 @@ INTDEF void *NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta);
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps, and its size), meaning that changes are written to disk */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
+/* >> setmode(3), getmode(3) */
+INTDEF WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str);
+/* >> setmode(3), getmode(3) */
+INTDEF WUNUSED NONNULL((1)) mode_t NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox, mode_t mode);
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74704400 */
+/* HASH CRC-32:0xadf74ae8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -658,6 +658,20 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_getpass_r)(char const *prompt, ch
 #ifndef __KERNEL__
 /* >> getpass_r(3) */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt, char *buf, size_t bufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> setmode(3), getmode(3) */
+INTDEF WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBDCALL libd_setmode)(char const *mode_str);
+/* >> setmode(3), getmode(3) */
+INTDEF WUNUSED NONNULL((1)) mode_t NOTHROW_NCX(LIBDCALL libd_getmode)(void const *bbox, mode_t mode);
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBDCALL libd_getpeereid)(fd_t sockfd, uid_t *euid, gid_t *egid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getpeereid(3)
+ * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
+INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd, uid_t *euid, gid_t *egid);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ctermid_r(3)
