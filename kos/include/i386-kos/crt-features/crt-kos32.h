@@ -1529,6 +1529,7 @@
 #define __CRT_HAVE_cwait
 #define __CRT_HAVE_daemon
 #define __CRT_HAVE_daylight
+#define __CRT_HAVE_dehumanize_number
 #define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
 #define __CRT_HAVE_devname
@@ -2237,6 +2238,7 @@
 #define __CRT_HAVE_htonl
 #define __CRT_HAVE_htonq
 #define __CRT_HAVE_htons
+#define __CRT_HAVE_humanize_number
 #define __CRT_HAVE_hypot
 #define __CRT_HAVE_hypotf
 #define __CRT_HAVE_hypotl

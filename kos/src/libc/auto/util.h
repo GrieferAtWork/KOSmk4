@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfffe4821 */
+/* HASH CRC-32:0xe15430c0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,11 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
+/* >> opendev(3)
+ * @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *path, oflag_t oflags, __STDC_INT_AS_UINT_T dflags, char **realpath);
-/* Parse one line of text from `stream', whilst accounting for
+/* >> fparseln(3)
+ * Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
  * @param: plen:    When non-NULL, store `strlen(return)' here
  * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'
@@ -51,7 +53,8 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Parse one line of text from `stream', whilst accounting for
+/* >> fparseln(3)
+ * Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
  * @param: plen:    When non-NULL, store `strlen(return)' here
  * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'

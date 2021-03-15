@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4da244fa */
+/* HASH CRC-32:0x127c3df6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,38 +34,38 @@
 
 #include <asm/crt/util.h>
 #include <bits/types.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <pwd.h>
+#include <termios.h>
 
-/*#include <sys/types.h>*/
-/*#include <stdio.h>*/
-/*#include <pwd.h>*/
-/*#include <termios.h>*/
 
 __SYSDECL_BEGIN
 
 /* Options for the `dflags' argument to `opendev(3)' */
-#ifdef __OPENDEV_PART
+#if !defined(OPENDEV_PART) && defined(__OPENDEV_PART)
 #define OPENDEV_PART __OPENDEV_PART /* Attempt to open a raw partition during expansion. */
-#endif /* __OPENDEV_PART */
-#ifdef __OPENDEV_BLCK
+#endif /* !OPENDEV_PART && __OPENDEV_PART */
+#if !defined(OPENDEV_BLCK) && defined(__OPENDEV_BLCK)
 #define OPENDEV_BLCK __OPENDEV_BLCK /* Open a block device (rather than a character device). */
-#endif /* __OPENDEV_BLCK */
+#endif /* !OPENDEV_BLCK && __OPENDEV_BLCK */
 
 /* Options for the `flags' argument to `fparseln(3)' */
-#ifdef __FPARSELN_UNESCESC
+#if !defined(FPARSELN_UNESCESC) && defined(__FPARSELN_UNESCESC)
 #define FPARSELN_UNESCESC  __FPARSELN_UNESCESC  /* Remove escape before an escaped escape. */
-#endif /* __FPARSELN_UNESCESC */
-#ifdef __FPARSELN_UNESCCONT
+#endif /* !FPARSELN_UNESCESC && __FPARSELN_UNESCESC */
+#if !defined(FPARSELN_UNESCCONT) && defined(__FPARSELN_UNESCCONT)
 #define FPARSELN_UNESCCONT __FPARSELN_UNESCCONT /* Remove escape before an escaped continuation. */
-#endif /* __FPARSELN_UNESCCONT */
-#ifdef __FPARSELN_UNESCCOMM
+#endif /* !FPARSELN_UNESCCONT && __FPARSELN_UNESCCONT */
+#if !defined(FPARSELN_UNESCCOMM) && defined(__FPARSELN_UNESCCOMM)
 #define FPARSELN_UNESCCOMM __FPARSELN_UNESCCOMM /* Remove escape before an escaped comment. */
-#endif /* __FPARSELN_UNESCCOMM */
-#ifdef __FPARSELN_UNESCREST
+#endif /* !FPARSELN_UNESCCOMM && __FPARSELN_UNESCCOMM */
+#if !defined(FPARSELN_UNESCREST) && defined(__FPARSELN_UNESCREST)
 #define FPARSELN_UNESCREST __FPARSELN_UNESCREST /* Remove escape before some other character.*/
-#endif /* __FPARSELN_UNESCREST */
-#ifdef __FPARSELN_UNESCALL
+#endif /* !FPARSELN_UNESCREST && __FPARSELN_UNESCREST */
+#if !defined(FPARSELN_UNESCALL) && defined(__FPARSELN_UNESCALL)
 #define FPARSELN_UNESCALL __FPARSELN_UNESCALL /* Remove all escape prefixes */
-#endif /* __FPARSELN_UNESCALL */
+#endif /* !FPARSELN_UNESCALL && __FPARSELN_UNESCALL */
 
 #ifdef __CC__
 struct utmp;
@@ -128,7 +128,8 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_li
 /* >> logwtmp(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
 #endif /* !__logwtmp_defined && __CRT_HAVE_logwtmp */
-/* @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
+/* >> opendev(3)
+ * @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,opendev,(char const *__path, __oflag_t __oflags, __STDC_INT_AS_UINT_T __dflags, char **__realpath),(__path,__oflags,__dflags,__realpath))
 #if !defined(__openpty_defined) && defined(__CRT_HAVE_openpty)
 #define __openpty_defined 1
@@ -183,7 +184,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #ifndef __fparseln_defined
 #define __fparseln_defined 1
 #ifdef __CRT_HAVE_fparseln
-/* Parse one line of text from `stream', whilst accounting for
+/* >> fparseln(3)
+ * Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
  * @param: plen:    When non-NULL, store `strlen(return)' here
  * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'
@@ -202,7 +204,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,fparseln,(FILE *__stream, size_t *__plen, size_t *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags),(__stream,__plen,__plineno,__delim,__flags))
 #elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)
 #include <libc/local/util/fparseln.h>
-/* Parse one line of text from `stream', whilst accounting for
+/* >> fparseln(3)
+ * Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
  * @param: plen:    When non-NULL, store `strlen(return)' here
  * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'

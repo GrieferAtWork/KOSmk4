@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xb3221094 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,24 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/libutil.h) */
-#ifndef _BSD_LIBUTIL_H
-#define _BSD_LIBUTIL_H 1
+}
 
-#include <__stdinc.h>
-#include <__crt.h>
+%[define_replacement(errno_t = __errno_t)]
 
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
+%[insert:prefix(
 #include <asm/crt/humanize_number.h>
+)]%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <libutil.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <sys/types.h>
+)]%[insert:prefix(
 #include <stdint.h>
+)]%[insert:prefix(
 #include <stdio.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -66,15 +68,27 @@ __SYSDECL_BEGIN
 #define HN_AUTOSCALE    __HN_AUTOSCALE
 #endif /* !HN_AUTOSCALE && __HN_AUTOSCALE */
 
-#if !defined(__humanize_number_defined) && defined(__CRT_HAVE_humanize_number)
-#define __humanize_number_defined 1
-/* >> humanize_number(3), dehumanize_number(3)
- * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
- * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
-__CDECLARE(,int,__NOTHROW_NCX,humanize_number,(char *__buf, __SIZE_TYPE__ __len, __INT64_TYPE__ __bytes, char const *__suffix, int __scale, int __flags),(__buf,__len,__bytes,__suffix,__scale,__flags))
-#endif /* !__humanize_number_defined && __CRT_HAVE_humanize_number */
+}
+
+/* Already unconditionally declared in `<libutil.h>' (aka. `<util.h>') */
+//%[insert:extern(fparseln)]
+
+%[insert:extern(humanize_number)]
+
+//TODO:int expand_number(const char *_buf, uint64_t *_num);
+
+//TODO:int flopen(const char *_path, int _flags, ...);
+//TODO:int flopenat(int dirfd, const char *path, int flags, ...);
+
+//TODO:struct pidfh *pidfile_open(const char *path, mode_t mode, pid_t *pidptr);
+//TODO:int pidfile_fileno(const struct pidfh *pfh);
+//TODO:int pidfile_write(struct pidfh *pfh);
+//TODO:int pidfile_close(struct pidfh *pfh);
+//TODO:int pidfile_remove(struct pidfh *pfh);
+
+%{
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_BSD_LIBUTIL_H */
+}

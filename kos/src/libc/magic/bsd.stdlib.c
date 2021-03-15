@@ -44,7 +44,7 @@ __SYSDECL_BEGIN
 //TODO:%[insert:extern(arc4random_buf)]
 //TODO:%[insert:extern(arc4random_uniform)]
 
-//TODO:%[insert:extern(dehumanize_number)]
+%[insert:extern(dehumanize_number)]
 
 %[insert:extern(getprogname)]
 %[insert:extern(setprogname)]

@@ -2232,8 +2232,51 @@ NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev,
 }
 /*[[[end:libc_devname_r]]]*/
 
-/*[[[head:libd_setproctitle,hash:CRC-32=0x6c890fc]]]*/
+/*[[[head:libc_humanize_number,hash:CRC-32=0xa3c253da]]]*/
+/* >> humanize_number(3), dehumanize_number(3)
+ * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
+ * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
+INTERN ATTR_SECTION(".text.crt.bsd") int
+NOTHROW_NCX(LIBCCALL libc_humanize_number)(char *buf,
+                                           size_t len,
+                                           int64_t bytes,
+                                           char const *suffix,
+                                           int scale,
+                                           int flags)
+/*[[[body:libc_humanize_number]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)len;
+	(void)bytes;
+	(void)suffix;
+	(void)scale;
+	(void)flags;
+	CRT_UNIMPLEMENTEDF("humanize_number(%q, %Ix, %" PRIx64 ", %q, %x, %x)", buf, len, bytes, suffix, scale, flags); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_humanize_number]]]*/
+
+/*[[[head:libc_dehumanize_number,hash:CRC-32=0x535f46a0]]]*/
+/* >> humanize_number(3), dehumanize_number(3)
+ * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
+ * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
+INTERN ATTR_SECTION(".text.crt.bsd") int
+NOTHROW_NCX(LIBCCALL libc_dehumanize_number)(char const *str,
+                                             int64_t *size)
+/*[[[body:libc_dehumanize_number]]]*/
+/*AUTO*/{
+	(void)str;
+	(void)size;
+	CRT_UNIMPLEMENTEDF("dehumanize_number(%q, %p)", str, size); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_dehumanize_number]]]*/
+
+/*[[[head:libd_setproctitle,hash:CRC-32=0x1916f1eb]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
+/* >> setproctitle(3) */
 INTERN ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) void
 NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
                                          ...)
@@ -2246,7 +2289,8 @@ NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_setproctitle]]]*/
 
-/*[[[head:libc_setproctitle,hash:CRC-32=0x8e6a0db7]]]*/
+/*[[[head:libc_setproctitle,hash:CRC-32=0x935ea57]]]*/
+/* >> setproctitle(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) void
 NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
                                          ...)
@@ -2262,7 +2306,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x288d7b46]]]*/
+/*[[[start:exports,hash:CRC-32=0xdde8318a]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2328,6 +2372,8 @@ DEFINE_PUBLIC_ALIAS(radixsort, libc_radixsort);
 DEFINE_PUBLIC_ALIAS(sradixsort, libc_sradixsort);
 DEFINE_PUBLIC_ALIAS(getbsize, libc_getbsize);
 DEFINE_PUBLIC_ALIAS(devname_r, libc_devname_r);
+DEFINE_PUBLIC_ALIAS(humanize_number, libc_humanize_number);
+DEFINE_PUBLIC_ALIAS(dehumanize_number, libc_dehumanize_number);
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$setproctitle, libd_setproctitle);
 #endif /* !__LIBCCALL_IS_LIBDCALL */

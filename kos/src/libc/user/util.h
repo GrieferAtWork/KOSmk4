@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2129fe7d */
+/* HASH CRC-32:0x8cd3c201 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
+/* >> opendev(3)
+ * @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_opendev)(char const *path, oflag_t oflags, __STDC_INT_AS_UINT_T dflags, char **realpath);
 #endif /* !__KERNEL__ */
 

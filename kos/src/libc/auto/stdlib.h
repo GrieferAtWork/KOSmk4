@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f97d9e9 */
+/* HASH CRC-32:0x657d13b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -931,6 +931,14 @@ INTDEF ATTR_CONST char *NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev, mode_t typ
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> devname(3), devname_r(3) */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
+/* >> humanize_number(3), dehumanize_number(3)
+ * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
+ * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_humanize_number)(char *buf, size_t len, int64_t bytes, char const *suffix, int scale, int flags);
+/* >> humanize_number(3), dehumanize_number(3)
+ * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
+ * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_dehumanize_number)(char const *str, int64_t *size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getprogname(3), setprogname(3) */

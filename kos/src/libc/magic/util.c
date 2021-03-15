@@ -33,39 +33,43 @@
 #include <asm/crt/util.h>
 )]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
+#include <sys/types.h>
+)]%[insert:prefix(
+#include <stdio.h>
+)]%[insert:prefix(
+#include <pwd.h>
+)]%[insert:prefix(
+#include <termios.h>
 )]%{
 
-/*#include <sys/types.h>*/
-/*#include <stdio.h>*/
-/*#include <pwd.h>*/
-/*#include <termios.h>*/
 
 __SYSDECL_BEGIN
 
 /* Options for the `dflags' argument to `opendev(3)' */
-#ifdef __OPENDEV_PART
+#if !defined(OPENDEV_PART) && defined(__OPENDEV_PART)
 #define OPENDEV_PART __OPENDEV_PART /* Attempt to open a raw partition during expansion. */
-#endif /* __OPENDEV_PART */
-#ifdef __OPENDEV_BLCK
+#endif /* !OPENDEV_PART && __OPENDEV_PART */
+#if !defined(OPENDEV_BLCK) && defined(__OPENDEV_BLCK)
 #define OPENDEV_BLCK __OPENDEV_BLCK /* Open a block device (rather than a character device). */
-#endif /* __OPENDEV_BLCK */
+#endif /* !OPENDEV_BLCK && __OPENDEV_BLCK */
 
 /* Options for the `flags' argument to `fparseln(3)' */
-#ifdef __FPARSELN_UNESCESC
+#if !defined(FPARSELN_UNESCESC) && defined(__FPARSELN_UNESCESC)
 #define FPARSELN_UNESCESC  __FPARSELN_UNESCESC  /* Remove escape before an escaped escape. */
-#endif /* __FPARSELN_UNESCESC */
-#ifdef __FPARSELN_UNESCCONT
+#endif /* !FPARSELN_UNESCESC && __FPARSELN_UNESCESC */
+#if !defined(FPARSELN_UNESCCONT) && defined(__FPARSELN_UNESCCONT)
 #define FPARSELN_UNESCCONT __FPARSELN_UNESCCONT /* Remove escape before an escaped continuation. */
-#endif /* __FPARSELN_UNESCCONT */
-#ifdef __FPARSELN_UNESCCOMM
+#endif /* !FPARSELN_UNESCCONT && __FPARSELN_UNESCCONT */
+#if !defined(FPARSELN_UNESCCOMM) && defined(__FPARSELN_UNESCCOMM)
 #define FPARSELN_UNESCCOMM __FPARSELN_UNESCCOMM /* Remove escape before an escaped comment. */
-#endif /* __FPARSELN_UNESCCOMM */
-#ifdef __FPARSELN_UNESCREST
+#endif /* !FPARSELN_UNESCCOMM && __FPARSELN_UNESCCOMM */
+#if !defined(FPARSELN_UNESCREST) && defined(__FPARSELN_UNESCREST)
 #define FPARSELN_UNESCREST __FPARSELN_UNESCREST /* Remove escape before some other character.*/
-#endif /* __FPARSELN_UNESCREST */
-#ifdef __FPARSELN_UNESCALL
+#endif /* !FPARSELN_UNESCREST && __FPARSELN_UNESCREST */
+#if !defined(FPARSELN_UNESCALL) && defined(__FPARSELN_UNESCALL)
 #define FPARSELN_UNESCALL __FPARSELN_UNESCALL /* Remove all escape prefixes */
-#endif /* __FPARSELN_UNESCALL */
+#endif /* !FPARSELN_UNESCALL && __FPARSELN_UNESCALL */
 
 #ifdef __CC__
 struct utmp;
@@ -97,15 +101,18 @@ typedef __SIZE_TYPE__ size_t;
 %[insert:extern(logout)]
 %[insert:extern(logwtmp)]
 
+@@>> opendev(3)
 @@@param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
               __STDC_INT_AS_UINT_T dflags,
               [[nullable]] char **realpath);
+
 %[insert:extern(openpty)]
 %[insert:extern(forkpty)]
 
 
+@@>> fparseln(3)
 @@Parse one line of text from `stream', whilst accounting for
 @@special character escapes, as well as custom line-comments.
 @@@param: plen:    When non-NULL, store `strlen(return)' here

@@ -1384,6 +1384,7 @@
 #define __CRT_HAVE_cwait
 #define __CRT_HAVE_daemon
 #define __CRT_HAVE_daylight
+#define __CRT_HAVE_dehumanize_number
 #define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
 #define __CRT_HAVE_devname
@@ -2091,6 +2092,7 @@
 #define __CRT_HAVE_htonl
 #define __CRT_HAVE_htonq
 #define __CRT_HAVE_htons
+#define __CRT_HAVE_humanize_number
 #define __CRT_HAVE_hypot
 #define __CRT_HAVE_hypotf
 #define __CRT_HAVE_hypotl
@@ -5911,6 +5913,7 @@
 #define __CRT_HAVE_KOS$cuserid
 #define __CRT_HAVE_KOS$cwait
 #define __CRT_HAVE_KOS$daemon
+#define __CRT_HAVE_KOS$dehumanize_number
 #define __CRT_HAVE_KOS$delay
 #define __CRT_HAVE_KOS$detach
 #define __CRT_HAVE_KOS$devname
@@ -6516,6 +6519,7 @@
 #define __CRT_HAVE_KOS$htonl
 #define __CRT_HAVE_KOS$htonq
 #define __CRT_HAVE_KOS$htons
+#define __CRT_HAVE_KOS$humanize_number
 #define __CRT_HAVE_KOS$hypot
 #define __CRT_HAVE_KOS$hypotf
 #define __CRT_HAVE_KOS$hypotl
@@ -9448,6 +9452,7 @@
 #define __CRT_HAVE_DOS$cuserid
 #define __CRT_HAVE_DOS$cwait
 #define __CRT_HAVE_DOS$daemon
+#define __CRT_HAVE_DOS$dehumanize_number
 #define __CRT_HAVE_DOS$delay
 #define __CRT_HAVE_DOS$detach
 #define __CRT_HAVE_DOS$devname
@@ -10053,6 +10058,7 @@
 #define __CRT_HAVE_DOS$htonl
 #define __CRT_HAVE_DOS$htonq
 #define __CRT_HAVE_DOS$htons
+#define __CRT_HAVE_DOS$humanize_number
 #define __CRT_HAVE_DOS$hypot
 #define __CRT_HAVE_DOS$hypotf
 #define __CRT_HAVE_DOS$hypotl

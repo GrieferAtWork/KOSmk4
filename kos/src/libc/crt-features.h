@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4caa0a9f */
+/* HASH CRC-32:0xe53d750b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -818,6 +818,7 @@
 #define __CRT_HAVE_DOS$cuserid
 #define __CRT_HAVE_DOS$cwait
 #define __CRT_HAVE_DOS$daemon
+#define __CRT_HAVE_DOS$dehumanize_number
 #define __CRT_HAVE_DOS$delay
 #define __CRT_HAVE_DOS$detach
 #define __CRT_HAVE_DOS$devname
@@ -1435,6 +1436,7 @@
 #define __CRT_HAVE_DOS$htonl
 #define __CRT_HAVE_DOS$htonq
 #define __CRT_HAVE_DOS$htons
+#define __CRT_HAVE_DOS$humanize_number
 #define __CRT_HAVE_DOS$hypot
 #define __CRT_HAVE_DOS$hypotf
 #define __CRT_HAVE_DOS$hypotl
@@ -3884,6 +3886,7 @@
 #define __CRT_HAVE_cuserid
 #define __CRT_HAVE_cwait
 #define __CRT_HAVE_daemon
+#define __CRT_HAVE_dehumanize_number
 #define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
 #define __CRT_HAVE_devname
@@ -4556,6 +4559,7 @@
 #define __CRT_HAVE_htonl
 #define __CRT_HAVE_htonq
 #define __CRT_HAVE_htons
+#define __CRT_HAVE_humanize_number
 #define __CRT_HAVE_hypot
 #define __CRT_HAVE_hypotf
 #define __CRT_HAVE_hypotl

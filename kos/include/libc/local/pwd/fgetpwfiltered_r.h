@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bec3695 */
+/* HASH CRC-32:0x45890ea9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Parse one line of text from `stream', whilst accounting for
+/* >> fparseln(3)
+ * Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
  * @param: plen:    When non-NULL, store `strlen(return)' here
  * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'
@@ -134,7 +135,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,__localdep_f
 __NAMESPACE_LOCAL_END
 #include <libc/local/util/fparseln.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Parse one line of text from `stream', whilst accounting for
+/* >> fparseln(3)
+ * Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
  * @param: plen:    When non-NULL, store `strlen(return)' here
  * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'

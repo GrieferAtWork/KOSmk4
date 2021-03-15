@@ -103,6 +103,10 @@
 #include <getopt.h>
 #endif /* __USE_SOLARIS */
 
+#ifdef __USE_NETBSD
+#include <asm/crt/humanize_number.h>
+#endif /* __USE_NETBSD */
+
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
@@ -3368,22 +3372,50 @@ char *devname(dev_t dev, mode_t type) {
 int devname_r(dev_t dev, mode_t type, [[outp(len)]] char *buf, $size_t len);
 
 
-//TODO:#define HN_DECIMAL      0x01
-//TODO:#define HN_NOSPACE      0x02
-//TODO:#define HN_B            0x04
-//TODO:#define HN_DIVISOR_1000 0x08
-//TODO:#define HN_GETSCALE     0x10
-//TODO:#define HN_AUTOSCALE    0x20
-//TODO:int humanize_number(char *, $size_t, int64_t, char const *, int, int);
-//TODO:int dehumanize_number(char const *, int64_t *);
+%{
 
-//TODO:ssize_t hmac(char const *, const void *, $size_t, const void *, $size_t, void *, $size_t);
-//TODO:devmajor_t getdevmajor(char const *, mode_t);
-//TODO:int getenv_r(char const *, char *, $size_t);
-//TODO:void mi_vector_hash(const void *__restrict, $size_t, uint32_t, uint32_t[3]);
+/* Flags for `humanize_number(3)::flags' */
+#if !defined(HN_DECIMAL) && defined(__HN_DECIMAL)
+#define HN_DECIMAL      __HN_DECIMAL
+#endif /* !HN_DECIMAL && __HN_DECIMAL */
+#if !defined(HN_NOSPACE) && defined(__HN_NOSPACE)
+#define HN_NOSPACE      __HN_NOSPACE
+#endif /* !HN_NOSPACE && __HN_NOSPACE */
+#if !defined(HN_B) && defined(__HN_B)
+#define HN_B            __HN_B
+#endif /* !HN_B && __HN_B */
+#if !defined(HN_DIVISOR_1000) && defined(__HN_DIVISOR_1000)
+#define HN_DIVISOR_1000 __HN_DIVISOR_1000
+#endif /* !HN_DIVISOR_1000 && __HN_DIVISOR_1000 */
+#if !defined(HN_IEC_PREFIXES) && defined(__HN_IEC_PREFIXES)
+#define HN_IEC_PREFIXES __HN_IEC_PREFIXES
+#endif /* !HN_IEC_PREFIXES && __HN_IEC_PREFIXES */
 
+/* Flags for `humanize_number(3)::scale' */
+#if !defined(HN_GETSCALE) && defined(__HN_GETSCALE)
+#define HN_GETSCALE     __HN_GETSCALE
+#endif /* !HN_GETSCALE && __HN_GETSCALE */
+#if !defined(HN_AUTOSCALE) && defined(__HN_AUTOSCALE)
+#define HN_AUTOSCALE    __HN_AUTOSCALE
+#endif /* !HN_AUTOSCALE && __HN_AUTOSCALE */
+
+}
+
+@@>> humanize_number(3), dehumanize_number(3)
+@@@param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
+@@@param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES'
+[[guard, decl_include("<hybrid/typecore.h>")]]
+int humanize_number(char *buf, $size_t len, $int64_t bytes,
+                    char const *suffix, int scale, int flags); /* TODO: Implement here */
+
+[[guard, decl_include("<hybrid/typecore.h>"), doc_alias("humanize_number")]]
+int dehumanize_number(char const *str, $int64_t *size); /* TODO: Implement here */
+
+
+@@>> setproctitle(3)
 [[guard, ATTR_LIBC_PRINTF(1, 2)]]
 void setproctitle(char const *format, ...);
+
 
 @@>> getprogname(3), setprogname(3)
 [[guard, wunused, const]]
@@ -3400,12 +3432,19 @@ void setprogname(char const *name) {
 	__LOCAL_program_invocation_short_name_p = (char *)name;
 }
 
+%[insert:extern(daemon)]
+%[insert:function(reallocarr = reallocarray)]
+
+//TODO:ssize_t hmac(char const *, const void *, $size_t, const void *, $size_t, void *, $size_t);
+//TODO:devmajor_t getdevmajor(char const *, mode_t);
+//TODO:int getenv_r(char const *, char *, $size_t);
+//TODO:void mi_vector_hash(const void *__restrict, $size_t, uint32_t, uint32_t[3]);
+
 //TODO:int l64a_r(long, char *, int);
 //TODO:$size_t shquote(char const *, char *, $size_t);
 //TODO:$size_t shquotev(int, char *const *, char *, $size_t);
 
-%[insert:extern(daemon)]
-%[insert:function(reallocarr = reallocarray)]
+
 %#ifdef __LONGLONG
 @@>> strsuftoll(3)
 @@Same as `strsuftollx(3)', but if an error happens, make

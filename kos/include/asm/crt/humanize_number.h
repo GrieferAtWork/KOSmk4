@@ -17,38 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_UTIL_C
-#define GUARD_LIBC_USER_UTIL_C 1
+#ifndef _ASM_CRT_HUMANIZE_NUMBER_H
+#define _ASM_CRT_HUMANIZE_NUMBER_H 1
 
-#include "../api.h"
-#include "util.h"
+/* Flags for `humanize_number(3)::flags' */
+#define __HN_DECIMAL      0x01
+#define __HN_NOSPACE      0x02
+#define __HN_B            0x04
+#define __HN_DIVISOR_1000 0x08
+#define __HN_IEC_PREFIXES 0x10
 
-DECL_BEGIN
+/* Flags for `humanize_number(3)::scale' */
+#define __HN_GETSCALE     0x10
+#define __HN_AUTOSCALE    0x20
 
-/*[[[head:libc_opendev,hash:CRC-32=0xb9c10740]]]*/
-/* >> opendev(3)
- * @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED NONNULL((1)) fd_t
-NOTHROW_RPC(LIBCCALL libc_opendev)(char const *path,
-                                   oflag_t oflags,
-                                   __STDC_INT_AS_UINT_T dflags,
-                                   char **realpath)
-/*[[[body:libc_opendev]]]*/
-/*AUTO*/{
-	(void)path;
-	(void)oflags;
-	(void)dflags;
-	(void)realpath;
-	CRT_UNIMPLEMENTEDF("opendev(%q, %" PRIxN(__SIZEOF_OFLAG_T__) ", %x, %p)", path, oflags, dflags, realpath); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_opendev]]]*/
-
-/*[[[start:exports,hash:CRC-32=0x631bf773]]]*/
-DEFINE_PUBLIC_ALIAS(opendev, libc_opendev);
-/*[[[end:exports]]]*/
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_UTIL_C */
+#endif /* !_ASM_CRT_HUMANIZE_NUMBER_H */

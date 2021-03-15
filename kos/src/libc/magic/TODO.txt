@@ -80,6 +80,8 @@ Functions/Globals:
 	- bsd_getopt()
 	- setmode()
 	- getmode()
+	- humanize_number()
+	- dehumanize_number()
 
 
 TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection...

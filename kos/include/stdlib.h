@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a8f929 */
+/* HASH CRC-32:0xc45e319f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,6 +191,10 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #ifdef __USE_SOLARIS
 #include <getopt.h>
 #endif /* __USE_SOLARIS */
+
+#ifdef __USE_NETBSD
+#include <asm/crt/humanize_number.h>
+#endif /* __USE_NETBSD */
 
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
@@ -3485,8 +3489,49 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(devname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_C
 #endif /* ... */
 /* >> devname(3), devname_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,devname_r,(dev_t __dev, mode_t __type, char *__buf, __SIZE_TYPE__ __len),(__dev,__type,__buf,__len))
+
+/* Flags for `humanize_number(3)::flags' */
+#if !defined(HN_DECIMAL) && defined(__HN_DECIMAL)
+#define HN_DECIMAL      __HN_DECIMAL
+#endif /* !HN_DECIMAL && __HN_DECIMAL */
+#if !defined(HN_NOSPACE) && defined(__HN_NOSPACE)
+#define HN_NOSPACE      __HN_NOSPACE
+#endif /* !HN_NOSPACE && __HN_NOSPACE */
+#if !defined(HN_B) && defined(__HN_B)
+#define HN_B            __HN_B
+#endif /* !HN_B && __HN_B */
+#if !defined(HN_DIVISOR_1000) && defined(__HN_DIVISOR_1000)
+#define HN_DIVISOR_1000 __HN_DIVISOR_1000
+#endif /* !HN_DIVISOR_1000 && __HN_DIVISOR_1000 */
+#if !defined(HN_IEC_PREFIXES) && defined(__HN_IEC_PREFIXES)
+#define HN_IEC_PREFIXES __HN_IEC_PREFIXES
+#endif /* !HN_IEC_PREFIXES && __HN_IEC_PREFIXES */
+
+/* Flags for `humanize_number(3)::scale' */
+#if !defined(HN_GETSCALE) && defined(__HN_GETSCALE)
+#define HN_GETSCALE     __HN_GETSCALE
+#endif /* !HN_GETSCALE && __HN_GETSCALE */
+#if !defined(HN_AUTOSCALE) && defined(__HN_AUTOSCALE)
+#define HN_AUTOSCALE    __HN_AUTOSCALE
+#endif /* !HN_AUTOSCALE && __HN_AUTOSCALE */
+
+#if !defined(__humanize_number_defined) && defined(__CRT_HAVE_humanize_number)
+#define __humanize_number_defined 1
+/* >> humanize_number(3), dehumanize_number(3)
+ * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
+ * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
+__CDECLARE(,int,__NOTHROW_NCX,humanize_number,(char *__buf, __SIZE_TYPE__ __len, __INT64_TYPE__ __bytes, char const *__suffix, int __scale, int __flags),(__buf,__len,__bytes,__suffix,__scale,__flags))
+#endif /* !__humanize_number_defined && __CRT_HAVE_humanize_number */
+#if !defined(__dehumanize_number_defined) && defined(__CRT_HAVE_dehumanize_number)
+#define __dehumanize_number_defined 1
+/* >> humanize_number(3), dehumanize_number(3)
+ * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
+ * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
+__CDECLARE(,int,__NOTHROW_NCX,dehumanize_number,(char const *__str, __INT64_TYPE__ *__size),(__str,__size))
+#endif /* !__dehumanize_number_defined && __CRT_HAVE_dehumanize_number */
 #if !defined(__setproctitle_defined) && defined(__CRT_HAVE_setproctitle)
 #define __setproctitle_defined 1
+/* >> setproctitle(3) */
 __LIBC __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) __CASMNAME_SAME("setproctitle");
 #endif /* !__setproctitle_defined && __CRT_HAVE_setproctitle */
 #ifndef __getprogname_defined
