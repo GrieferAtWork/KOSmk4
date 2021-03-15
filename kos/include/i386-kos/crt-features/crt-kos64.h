@@ -1596,6 +1596,7 @@
 #define __CRT_HAVE_fgetspent_r
 #define __CRT_HAVE_fgetwc
 #define __CRT_HAVE_fgetwc_unlocked
+#define __CRT_HAVE_fgetwln
 #define __CRT_HAVE_fgetws
 #define __CRT_HAVE_fgetws_unlocked
 #define __CRT_HAVE_fgetxattr
@@ -4356,6 +4357,8 @@
 #define __CRT_HAVE_wcsfry
 #define __CRT_HAVE_wcsftime
 #define __CRT_HAVE_wcsftime_l
+#define __CRT_HAVE_wcslcat
+#define __CRT_HAVE_wcslcpy
 #define __CRT_HAVE_wcslen
 #define __CRT_HAVE_wcslwr
 #define __CRT_HAVE_wcslwr_l
@@ -6065,6 +6068,7 @@
 #define __CRT_HAVE_KOS$fgetspent_r
 #define __CRT_HAVE_KOS$fgetwc
 #define __CRT_HAVE_KOS$fgetwc_unlocked
+#define __CRT_HAVE_KOS$fgetwln
 #define __CRT_HAVE_KOS$fgetws
 #define __CRT_HAVE_KOS$fgetws_unlocked
 #define __CRT_HAVE_KOS$fgetxattr
@@ -7888,6 +7892,8 @@
 #define __CRT_HAVE_KOS$wcsfry
 #define __CRT_HAVE_KOS$wcsftime
 #define __CRT_HAVE_KOS$wcsftime_l
+#define __CRT_HAVE_KOS$wcslcat
+#define __CRT_HAVE_KOS$wcslcpy
 #define __CRT_HAVE_KOS$wcslen
 #define __CRT_HAVE_KOS$wcslwr
 #define __CRT_HAVE_KOS$wcslwr_l
@@ -9597,6 +9603,7 @@
 #define __CRT_HAVE_DOS$fgetspent_r
 #define __CRT_HAVE_DOS$fgetwc
 #define __CRT_HAVE_DOS$fgetwc_unlocked
+#define __CRT_HAVE_DOS$fgetwln
 #define __CRT_HAVE_DOS$fgetws
 #define __CRT_HAVE_DOS$fgetws_unlocked
 #define __CRT_HAVE_DOS$fgetxattr
@@ -11420,6 +11427,8 @@
 #define __CRT_HAVE_DOS$wcsfry
 #define __CRT_HAVE_DOS$wcsftime
 #define __CRT_HAVE_DOS$wcsftime_l
+#define __CRT_HAVE_DOS$wcslcat
+#define __CRT_HAVE_DOS$wcslcpy
 #define __CRT_HAVE_DOS$wcslen
 #define __CRT_HAVE_DOS$wcslwr
 #define __CRT_HAVE_DOS$wcslwr_l

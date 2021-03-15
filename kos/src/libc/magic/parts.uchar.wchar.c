@@ -166,6 +166,17 @@ c16toll(*) %{uchar16("wtoll")}
 c32toll(*) %{uchar32("wtoll")}
 %#endif /* __USE_KOS */
 
+%
+%#ifdef __USE_BSD
+fgetc16ln(*) %{uchar16("fgetwln")}
+fgetc32ln(*) %{uchar32("fgetwln")}
+
+c16lcat(*) %{uchar16("wcslcat")}
+c32lcat(*) %{uchar32("wcslcat")}
+c16lcpy(*) %{uchar16("wcslcpy")}
+c32lcpy(*) %{uchar32("wcslcpy")}
+%#endif /* __USE_BSD */
+
 
 [[ignore]] _vscc16printf(*) %{uchar16("_vscwprintf")}
 [[ignore]] _vscc32printf(*) %{uchar32("_vscwprintf")}

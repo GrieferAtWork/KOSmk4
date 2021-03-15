@@ -3382,7 +3382,7 @@ int devname_r(dev_t dev, mode_t type, [[outp(len)]] char *buf, $size_t len);
 //TODO:int getenv_r(char const *, char *, $size_t);
 //TODO:void mi_vector_hash(const void *__restrict, $size_t, uint32_t, uint32_t[3]);
 
-[[ATTR_LIBC_PRINTF(1, 2)]]
+[[guard, ATTR_LIBC_PRINTF(1, 2)]]
 void setproctitle(char const *format, ...);
 
 @@>> getprogname(3), setprogname(3)

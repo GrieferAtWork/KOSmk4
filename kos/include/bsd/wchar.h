@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe934027b */
+/* HASH CRC-32:0x24e2e6db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,29 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#if !defined(__fgetwln_defined) && defined(__CRT_HAVE_fgetwln)
+#define __fgetwln_defined 1
+/* >> fgetwln(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),wchar_t *,__NOTHROW_NCX,fgetwln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),(__fp,__lenp))
+#endif /* !__fgetwln_defined && __CRT_HAVE_fgetwln */
+#ifndef __wcslcat_defined
+#define __wcslcat_defined 1
+#ifdef __CRT_HAVE_wcslcat
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,wcslcat,(wchar_t *__restrict __dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __bufsize),(__dst,__src,__bufsize))
+#else /* __CRT_HAVE_wcslcat */
+#include <libc/local/wchar/wcslcat.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcslcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcslcat)(wchar_t *__restrict __dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcat))(__dst, __src, __bufsize); })
+#endif /* !__CRT_HAVE_wcslcat */
+#endif /* !__wcslcat_defined */
+#ifndef __wcslcpy_defined
+#define __wcslcpy_defined 1
+#ifdef __CRT_HAVE_wcslcpy
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,wcslcpy,(wchar_t *__restrict __dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __bufsize),(__dst,__src,__bufsize))
+#else /* __CRT_HAVE_wcslcpy */
+#include <libc/local/wchar/wcslcpy.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcslcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcslcpy)(wchar_t *__restrict __dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcpy))(__dst, __src, __bufsize); })
+#endif /* !__CRT_HAVE_wcslcpy */
+#endif /* !__wcslcpy_defined */
 
 __SYSDECL_END
 #endif /* __CC__ */

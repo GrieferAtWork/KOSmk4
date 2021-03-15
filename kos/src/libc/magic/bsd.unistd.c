@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
 
 %[insert:extern(closefrom)]
 
-//TODO:%[insert:extern(setproctitle)]
+%[insert:extern(setproctitle)]
 
 //TODO:%[insert:extern(getpeereid)]
 

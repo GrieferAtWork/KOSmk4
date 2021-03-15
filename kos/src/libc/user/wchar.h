@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x140ee402 */
+/* HASH CRC-32:0x62dd8223 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,6 +65,10 @@ INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint_t ch
 INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint_t ch, FILE *__restrict stream);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) THROWS(...);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) THROWS(...);
+/* >> fgetwln(3) */
+INTDEF WUNUSED NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
+/* >> fgetwln(3) */
+INTDEF WUNUSED NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
 INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wcserror)(int errno_value);
 INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wcserror)(int errno_value);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf, size_t bufsize, int errno_value);

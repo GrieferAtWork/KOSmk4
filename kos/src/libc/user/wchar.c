@@ -298,6 +298,36 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIB
 }
 /*[[[end:libc_vfwscanf_unlocked]]]*/
 
+/*[[[head:libd_fgetwln,hash:CRC-32=0xb2994bf0]]]*/
+/* >> fgetwln(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") WUNUSED NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp,
+                                   size_t *__restrict lenp)
+/*[[[body:libd_fgetwln]]]*/
+/*AUTO*/{
+	(void)fp;
+	(void)lenp;
+	CRT_UNIMPLEMENTEDF("DOS$fgetwln(%p, %p)", fp, lenp); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libd_fgetwln]]]*/
+
+/*[[[head:libc_fgetwln,hash:CRC-32=0xde0af731]]]*/
+/* >> fgetwln(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") WUNUSED NONNULL((1, 2)) char32_t *
+NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
+                                   size_t *__restrict lenp)
+/*[[[body:libc_fgetwln]]]*/
+/*AUTO*/{
+	(void)fp;
+	(void)lenp;
+	CRT_UNIMPLEMENTEDF("fgetwln(%p, %p)", fp, lenp); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_fgetwln]]]*/
+
 /*[[[head:libd_vfwscanf_unlocked,hash:CRC-32=0x85c4de16]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream,
@@ -806,7 +836,7 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x75e56266]]]*/
+/*[[[start:exports,hash:CRC-32=0xbdbcfd2f]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -840,6 +870,8 @@ DEFINE_PUBLIC_ALIAS(DOS$ungetwc_unlocked, libd_ungetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(ungetwc_unlocked, libc_ungetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$vfwscanf_unlocked, libd_vfwscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(vfwscanf_unlocked, libc_vfwscanf_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$fgetwln, libd_fgetwln);
+DEFINE_PUBLIC_ALIAS(fgetwln, libc_fgetwln);
 DEFINE_PUBLIC_ALIAS(DOS$_wcserror, libd__wcserror);
 DEFINE_PUBLIC_ALIAS(_wcserror, libc__wcserror);
 DEFINE_PUBLIC_ALIAS(DOS$_wcserror_s, libd__wcserror_s);

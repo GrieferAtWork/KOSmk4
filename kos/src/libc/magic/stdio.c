@@ -3193,8 +3193,8 @@ __STDC_INT_AS_SIZE_T scanf_unlocked([[nonnull]] char const *__restrict format, .
 
 @@>> fgetln(3)
 [[guard, wunused]] char *
-fgetln([[nonnull]] FILE *__restrict fp,
-       [[nonnull]] size_t *__restrict lenp);
+fgetln([[nonnull]] $FILE *__restrict fp,
+       [[nonnull]] $size_t *__restrict lenp);
 
 @@>> fmtcheck(3)
 @@Check if `user_format' may be used as a drop-in replacement for `good_format'
@@ -3291,20 +3291,20 @@ typedef __off32_t (__LIBKCALL *__funopen2_32_seekfn_t)(void *__cookie, __off32_t
 
 [[ignore, guard, wunused, doc_alias("funopen"), nocrt, alias("funopen")]]
 [[decl_prefix(DEFINE_FUNOPEN_TYPES), decl_prefix(DEFINE_FUNOPEN32_TYPES)]]
-FILE *funopen32(void const *cookie,
-                __funopen_readfn_t readfn,
-                __funopen_writefn_t writefn,
-                __funopen_seekfn_t seekfn,
-                __funopen_closefn_t closefn);
+$FILE *funopen32(void const *cookie,
+                 __funopen_readfn_t readfn,
+                 __funopen_writefn_t writefn,
+                 __funopen_seekfn_t seekfn,
+                 __funopen_closefn_t closefn);
 
 [[ignore, guard, wunused, doc_alias("funopen2"), nocrt, alias("funopen2")]]
 [[decl_prefix(DEFINE_FUNOPEN2_TYPES), decl_prefix(DEFINE_FUNOPEN2_32_TYPES)]]
-FILE *funopen2_32(void const *cookie,
-                  __funopen2_readfn_t readfn,
-                  __funopen2_writefn_t writefn,
-                  __funopen2_seekfn_t seekfn,
-                  __funopen2_flushfn_t flushfn,
-                  __funopen2_closefn_t closefn);
+$FILE *funopen2_32(void const *cookie,
+                   __funopen2_readfn_t readfn,
+                   __funopen2_writefn_t writefn,
+                   __funopen2_seekfn_t seekfn,
+                   __funopen2_flushfn_t flushfn,
+                   __funopen2_closefn_t closefn);
 
 
 
@@ -3524,11 +3524,11 @@ DEFINE_FUNOPEN_TO_FUNOPEN64_SEEKFN
 @@pp_endif@@
 @@pp_endif@@
 )]]
-FILE *funopen(void const *cookie,
-              __funopen_readfn_t readfn,
-              __funopen_writefn_t writefn,
-              __funopen_seekfn_t seekfn,
-              __funopen_closefn_t closefn) {
+$FILE *funopen(void const *cookie,
+               __funopen_readfn_t readfn,
+               __funopen_writefn_t writefn,
+               __funopen_seekfn_t seekfn,
+               __funopen_closefn_t closefn) {
 @@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2)@@
 	return funopen2(cookie,
 	                (__funopen2_readfn_t)readfn,
@@ -3683,12 +3683,12 @@ DEFINE_FUNOPEN2_TO_FUNOPEN2_64_READFN
 DEFINE_FUNOPEN2_TO_FUNOPEN2_64_WRITEFN
 @@pp_endif@@
 )]]
-FILE *funopen2(void const *cookie,
-               __funopen2_readfn_t readfn,
-               __funopen2_writefn_t writefn,
-               __funopen2_seekfn_t seekfn,
-               __funopen2_flushfn_t flushfn,
-               __funopen2_closefn_t closefn) {
+$FILE *funopen2(void const *cookie,
+                __funopen2_readfn_t readfn,
+                __funopen2_writefn_t writefn,
+                __funopen2_seekfn_t seekfn,
+                __funopen2_flushfn_t flushfn,
+                __funopen2_closefn_t closefn) {
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen2_holder *holder;
 	if (!seekfn)
@@ -3882,11 +3882,11 @@ DEFINE_FUNOPEN64_TO_FUNOPEN_SEEKFN
 @@pp_endif@@
 @@pp_endif@@
 )]]
-FILE *funopen64(void const *cookie,
-                __funopen_readfn_t readfn,
-                __funopen_writefn_t writefn,
-                __funopen64_seekfn_t seekfn,
-                __funopen_closefn_t closefn) {
+$FILE *funopen64(void const *cookie,
+                 __funopen_readfn_t readfn,
+                 __funopen_writefn_t writefn,
+                 __funopen64_seekfn_t seekfn,
+                 __funopen_closefn_t closefn) {
 @@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2_64)@@
 	return funopen2_64(cookie,
 	                   (__funopen2_readfn_t)readfn,
@@ -4045,12 +4045,12 @@ DEFINE_FUNOPEN2_TO_FUNOPEN2_64_READFN
 DEFINE_FUNOPEN2_TO_FUNOPEN2_64_WRITEFN
 @@pp_endif@@
 )]]
-FILE *funopen2_64(void const *cookie,
-                 __funopen2_readfn_t readfn,
-                 __funopen2_writefn_t writefn,
-                 __funopen2_64_seekfn_t seekfn,
-                 __funopen2_flushfn_t flushfn,
-                 __funopen2_closefn_t closefn) {
+$FILE *funopen2_64(void const *cookie,
+                  __funopen2_readfn_t readfn,
+                  __funopen2_writefn_t writefn,
+                  __funopen2_64_seekfn_t seekfn,
+                  __funopen2_flushfn_t flushfn,
+                  __funopen2_closefn_t closefn) {
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen2_64_holder *holder;
 	if (!seekfn)

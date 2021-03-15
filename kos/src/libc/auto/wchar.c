@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x783b80d3 */
+/* HASH CRC-32:0x5ec33c31 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4990,6 +4990,52 @@ next:
 	}
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
+NOTHROW_NCX(LIBDCALL libd_wcslcat)(char16_t *__restrict dst,
+                                   char16_t const *__restrict src,
+                                   size_t bufsize) {
+	size_t result = libd_wcslen(src);
+	char16_t *new_dst = dst + libd_wcsnlen(dst, bufsize);
+	size_t copy_size;
+	bufsize -= (new_dst - dst);
+	copy_size = result < bufsize ? result : bufsize - 1;
+	libc_memcpy(new_dst, src, copy_size*sizeof(char16_t));
+	new_dst[copy_size] = '\0';
+	return result + (new_dst - dst);
+}
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
+NOTHROW_NCX(LIBKCALL libc_wcslcat)(char32_t *__restrict dst,
+                                   char32_t const *__restrict src,
+                                   size_t bufsize) {
+	size_t result = libc_wcslen(src);
+	char32_t *new_dst = dst + libc_wcsnlen(dst, bufsize);
+	size_t copy_size;
+	bufsize -= (new_dst - dst);
+	copy_size = result < bufsize ? result : bufsize - 1;
+	libc_memcpy(new_dst, src, copy_size*sizeof(char32_t));
+	new_dst[copy_size] = '\0';
+	return result + (new_dst - dst);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
+NOTHROW_NCX(LIBDCALL libd_wcslcpy)(char16_t *__restrict dst,
+                                   char16_t const *__restrict src,
+                                   size_t bufsize) {
+	size_t result = libd_wcslen(src);
+	size_t copy_size = result < bufsize ? result : bufsize - 1;
+	libc_memcpy(dst, src, copy_size*sizeof(char16_t));
+	dst[copy_size] = '\0';
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
+NOTHROW_NCX(LIBKCALL libc_wcslcpy)(char32_t *__restrict dst,
+                                   char32_t const *__restrict src,
+                                   size_t bufsize) {
+	size_t result = libc_wcslen(src);
+	size_t copy_size = result < bufsize ? result : bufsize - 1;
+	libc_memcpy(dst, src, copy_size*sizeof(char32_t));
+	dst[copy_size] = '\0';
+	return result;
+}
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcscat_s)(char16_t *dst,
@@ -7012,6 +7058,10 @@ DEFINE_PUBLIC_ALIAS(DOS$fuzzy_wcsncasecmp_l, libd_fuzzy_wcsncasecmp_l);
 DEFINE_PUBLIC_ALIAS(fuzzy_wcsncasecmp_l, libc_fuzzy_wcsncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$wildwcscasecmp_l, libd_wildwcscasecmp_l);
 DEFINE_PUBLIC_ALIAS(wildwcscasecmp_l, libc_wildwcscasecmp_l);
+DEFINE_PUBLIC_ALIAS(DOS$wcslcat, libd_wcslcat);
+DEFINE_PUBLIC_ALIAS(wcslcat, libc_wcslcat);
+DEFINE_PUBLIC_ALIAS(DOS$wcslcpy, libd_wcslcpy);
+DEFINE_PUBLIC_ALIAS(wcslcpy, libc_wcslcpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcscat_s, libd_wcscat_s);
 DEFINE_PUBLIC_ALIAS(wcscat_s, libc_wcscat_s);
 DEFINE_PUBLIC_ALIAS(DOS$wcscpy_s, libd_wcscpy_s);

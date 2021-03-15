@@ -1771,9 +1771,19 @@ $size_t fuzzy_wmemcasecmp_l([[nonnull]] wchar_t const *s1, $size_t s1_bytes,
 [[wchar]] wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
 
 %#endif /* __USE_XOPEN2K8 */
-
-
 %#endif /* __USE_KOS */
+
+
+%
+%#ifdef __USE_BSD
+@@>> fgetwln(3)
+[[wchar, guard, wunused]] wchar_t *
+fgetwln([[nonnull]] FILE *__restrict fp,
+        [[nonnull]] $size_t *__restrict lenp);
+
+[[wchar, guard]] wcslcat(*) %{generate(str2wcs("strlcat"))}
+[[wchar, guard]] wcslcpy(*) %{generate(str2wcs("strlcpy"))}
+%#endif /* __USE_BSD */
 
 
 

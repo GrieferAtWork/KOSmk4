@@ -32,9 +32,9 @@ __SYSDECL_BEGIN
 
 }
 
-//TODO:%[insert:extern(fgetwln)]
-//TODO:%[insert:extern(wcslcat)]
-//TODO:%[insert:extern(wcslcpy)]
+%[insert:extern(fgetwln)]
+%[insert:extern(wcslcat)]
+%[insert:extern(wcslcpy)]
 
 %{
 

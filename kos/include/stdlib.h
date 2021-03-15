@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbfacae */
+/* HASH CRC-32:0x6a8f929 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3485,9 +3485,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(devname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_C
 #endif /* ... */
 /* >> devname(3), devname_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,devname_r,(dev_t __dev, mode_t __type, char *__buf, __SIZE_TYPE__ __len),(__dev,__type,__buf,__len))
-#ifdef __CRT_HAVE_setproctitle
+#if !defined(__setproctitle_defined) && defined(__CRT_HAVE_setproctitle)
+#define __setproctitle_defined 1
 __LIBC __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) __CASMNAME_SAME("setproctitle");
-#endif /* __CRT_HAVE_setproctitle */
+#endif /* !__setproctitle_defined && __CRT_HAVE_setproctitle */
 #ifndef __getprogname_defined
 #define __getprogname_defined 1
 #ifdef __CRT_HAVE_getprogname

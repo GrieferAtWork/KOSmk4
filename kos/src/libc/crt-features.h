@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb590c72d */
+/* HASH CRC-32:0xb4b97a5b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -970,6 +970,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fgetwc
 #define __CRT_HAVE_DOS$fgetwc_unlocked
+#define __CRT_HAVE_DOS$fgetwln
 #define __CRT_HAVE_DOS$fgetws
 #define __CRT_HAVE_DOS$fgetws_unlocked
 #endif /* !__KERNEL__ */
@@ -2847,6 +2848,8 @@
 #define __CRT_HAVE_DOS$wcsfry
 #define __CRT_HAVE_DOS$wcsftime
 #define __CRT_HAVE_DOS$wcsftime_l
+#define __CRT_HAVE_DOS$wcslcat
+#define __CRT_HAVE_DOS$wcslcpy
 #define __CRT_HAVE_DOS$wcslen
 #define __CRT_HAVE_DOS$wcslwr
 #define __CRT_HAVE_DOS$wcslwr_l
@@ -4070,6 +4073,7 @@
 #define __CRT_HAVE_fgetspent_r
 #define __CRT_HAVE_fgetwc
 #define __CRT_HAVE_fgetwc_unlocked
+#define __CRT_HAVE_fgetwln
 #define __CRT_HAVE_fgetws
 #define __CRT_HAVE_fgetws_unlocked
 #define __CRT_HAVE_fgetxattr
@@ -6058,6 +6062,8 @@
 #define __CRT_HAVE_wcsfry
 #define __CRT_HAVE_wcsftime
 #define __CRT_HAVE_wcsftime_l
+#define __CRT_HAVE_wcslcat
+#define __CRT_HAVE_wcslcpy
 #define __CRT_HAVE_wcslen
 #define __CRT_HAVE_wcslwr
 #define __CRT_HAVE_wcslwr_l

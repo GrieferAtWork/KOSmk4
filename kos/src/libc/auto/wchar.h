@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8ebdcc3 */
+/* HASH CRC-32:0xcbae1fd1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -657,6 +657,10 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBDCALL libd_fuzzy_
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp_l)(char32_t const *s1, size_t s1_maxlen, char32_t const *s2, size_t s2_maxlen, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern, char16_t const *string, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern, char32_t const *string, locale_t locale);
+INTDEF ATTR_LEAF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_wcslcat)(char16_t *__restrict dst, char16_t const *__restrict src, size_t bufsize);
+INTDEF ATTR_LEAF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBKCALL libc_wcslcat)(char32_t *__restrict dst, char32_t const *__restrict src, size_t bufsize);
+INTDEF ATTR_LEAF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_wcslcpy)(char16_t *__restrict dst, char16_t const *__restrict src, size_t bufsize);
+INTDEF ATTR_LEAF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBKCALL libc_wcslcpy)(char32_t *__restrict dst, char32_t const *__restrict src, size_t bufsize);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_wcscat_s)(char16_t *dst, size_t dstsize, char16_t const *src);
 INTDEF errno_t NOTHROW_NCX(LIBKCALL libc_wcscat_s)(char32_t *dst, size_t dstsize, char32_t const *src);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_wcscpy_s)(char16_t *dst, size_t dstsize, char16_t const *src);
