@@ -39,18 +39,26 @@
 #elif defined(__cplusplus)
 #include <atomic>
 
-__DECL_BEGIN
+/* For compatibility with C... */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __COMPILER_ATOMIC(...)  __NAMESPACE_STD_SYM atomic< __VA_ARGS__ >
+#define _Atomic(...)            __NAMESPACE_STD_SYM atomic< __VA_ARGS__ >
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __COMPILER_ATOMIC(T...) __NAMESPACE_STD_SYM atomic< T >
+#define _Atomic(T...)           __NAMESPACE_STD_SYM atomic< T >
+#else /* ... */
+#define __COMPILER_ATOMIC(T)    __NAMESPACE_STD_SYM atomic<T>
+#define _Atomic(T)              __NAMESPACE_STD_SYM atomic<T>
+#endif /* !... */
+
 
 #ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
-typedef enum {
-	memory_order_relaxed = __ATOMIC_RELAXED,
-	memory_order_consume = __ATOMIC_CONSUME,
-	memory_order_acquire = __ATOMIC_ACQUIRE,
-	memory_order_release = __ATOMIC_RELEASE,
-	memory_order_acq_rel = __ATOMIC_ACQ_REL,
-	memory_order_seq_cst = __ATOMIC_SEQ_CST
-} memory_order;
+/* Everything's already implicitly imported by the `using namespace std;'
+ * that's used when the `__COMPILER_HAVE_BUG_BLOATY_CXX_USING' bug-check
+ * is enabled. */
 #else /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
+__DECL_BEGIN
+
 __NAMESPACE_STD_USING(memory_order)
 __NAMESPACE_STD_USING(memory_order_relaxed)
 __NAMESPACE_STD_USING(memory_order_consume)
@@ -58,7 +66,6 @@ __NAMESPACE_STD_USING(memory_order_acquire)
 __NAMESPACE_STD_USING(memory_order_release)
 __NAMESPACE_STD_USING(memory_order_acq_rel)
 __NAMESPACE_STD_USING(memory_order_seq_cst)
-#endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 
 __NAMESPACE_STD_USING(atomic_bool)
 __NAMESPACE_STD_USING(atomic_char)
@@ -142,7 +149,10 @@ __NAMESPACE_STD_USING(atomic_flag_test_and_set_explicit)
 __NAMESPACE_STD_USING(atomic_flag_test_and_set)
 __NAMESPACE_STD_USING(atomic_flag_clear_explicit)
 __NAMESPACE_STD_USING(atomic_flag_clear)
+
 __DECL_END
+#endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
+
 
 #else /* __cplusplus */
 
@@ -160,7 +170,7 @@ typedef enum {
 #if 1 /* ??? */
 #define __atomic_var_field(x)   *(x)
 #define ATOMIC_VAR_INIT(x)      (x)
-#define __COMPILER_ATOMIC(T)    _Atomic T
+#define __COMPILER_ATOMIC(T)    _Atomic(T)
 #elif 0
 #define __atomic_var_field(x)   (x)->__std_atom
 #define ATOMIC_VAR_INIT(x)      { x }
