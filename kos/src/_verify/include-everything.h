@@ -132,6 +132,7 @@ incdir("");
 #include <asm/asmword.h>
 #include <asm/cacheline.h>
 #include <asm/crt/confname.h>
+#include <asm/crt/getpassfd.h>
 #include <asm/crt/glob.h>
 #include <asm/crt/limits.h>
 #include <asm/crt/malloc.h>
@@ -146,6 +147,7 @@ incdir("");
 #include <asm/crt/stdio_ext.h>
 #include <asm/crt/stdlib.h>
 #include <asm/crt/threads.h>
+#include <asm/crt/time.h>
 #include <asm/crt/ttyent.h>
 #include <asm/crt/ucontext.h>
 #include <asm/crt/util.h>
@@ -442,6 +444,7 @@ incdir("");
 #include <dlfcn.h>
 #include <dos.h>
 #include <elf.h>
+#include <elf_abi.h>
 #include <endian.h>
 #include <envz.h>
 #include <err.h>
@@ -656,6 +659,7 @@ incdir("");
 #include <libc/core/ssp.string.h>
 #include <libc/core/stdlib.h>
 #include <libc/core/string.h>
+#include <libc/core/strings.h>
 #include <libc/core/unicode.h>
 #include <libc/core/unistd.h>
 #include <libc/ctype.h>
@@ -668,6 +672,7 @@ incdir("");
 #include <libc/ssp.string.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
+#include <libc/strings.h>
 #include <libc/unicode.h>
 #include <libc/unistd.h>
 #include <libcmdline/api.h>
@@ -1026,6 +1031,7 @@ incdir("");
 #include <sys/epoll.h>
 #include <sys/errno.h>
 #include <sys/eventfd.h>
+#include <sys/exec_elf.h>
 #include <sys/fcntl.h>
 #include <sys/feature_tests.h>
 #include <sys/features.h>
