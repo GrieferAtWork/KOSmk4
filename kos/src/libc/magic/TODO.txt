@@ -1,30 +1,66 @@
 
-Add support for (more) *_chk variants (using __builtin_object_size())
-
+### Missing headers
 <a.out.h>              (GLibc!)
 <argp.h>               (GLibc!)
-<bsd/[...].h>          (all of those libbsd headers should be magic-generated and contain `%[insert:extern()]' decls!)
-<conio.h>
-<corecrt_wstdlib.h>
-<cthreads.h>
+<bsd/netinet/ip_icmp.h>(libbsd)
+<bsd/md5.h>            (libbsd)
+<bsd/sys/tree.h>       (libbsd)
+<bsd/timeconv.h>       (libbsd)
+<bsd/vis.h>            (libbsd)
+<conio.h>              (dos)
+<corecrt_wstdlib.h>    (msvcrt)
 <fmtmsg.h>             (GLibc!)
 <fstab.h>              (GLibc!)
-<fp.h>
 <gnu-versions.h>       (GLibc!)
 <gnu/libc-version.h>   (GLibc!)
 <gshadow.h>            (GLibc!)
 <iconv.h>              (GLibc!)
 <langinfo.h>           (GLibc!)
 <libintl.h>            (GLibc!)
-<mbctype.h>
-<mbstring.h>
+<mbctype.h>            (msvcrt)
+<mbstring.h>           (msvcrt)
 <mcheck.h>             (GLibc!)
-<mkdev.h>
-<nan.h>
 <nl_types.h>           (GLibc!)
 <obstack.h>            (GLibc!)
-<regexp.h>
+<regexp.h>             (GLibc!)
 <resolv.h>             (GLibc!)
+<stab.h>               (GLibc!)
+<sys/bsdtypes.h>       (mingwrt)
+<sys/capability.h>     (linux: found in /usr/include/sys/capability.h; aka not in arch-headers!)
+<sys/fanotify.h>       (linux)
+<sys/gmon.h>           (linux)
+<sys/gmon_out.h>       (linux: Only some macros, and structs)
+<sys/inotify.h>        (linux)
+<sys/kdaemon.h>        (uClibc)
+<sys/machine.h>        (AIX???)
+<sys/mtio.h>           (linux: Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+<sys/personality.h>    (linux)
+<sys/prctl.h>          (linux)
+<sys/profil.h>         (linux)
+<sys/quota.h>          (linux)
+<sys/raw.h>            (linux: Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+<sys/reg.h>            (linux)
+<sys/sdt.h>            (NetBSD, OpenSolaris)
+<sys/soundcard.h>      (linux)
+<sys/sysctl.h>         (linux)
+<sys/vlimit.h>         (GLibc!)
+<sys/vtimes.h>         (linux)
+<timeconv.h>           (libbsd)
+<thread_db.h>          (GLibc!)
+<wordexp.h>            (GLibc!)
+
+### Referenced, but origin unknown
+<cthreads.h>           (Python ./configure)
+<fp.h>                 (libstdc++ ./configure)
+<nan.h>                (libstdc++ ./configure)
+
+### Unlikely to ever be added
+<nlist.h>              (libbsd)
+<bsd/nlist.h>          (libbsd)
+<_G_config.h>          (GLibc!)
+<gconv.h>              (GLibc!)
+<nss.h>                (GLibc!)
+<printf.h>             (GLibc!)
 <rpc/auth.h>
 <rpc/auth_des.h>
 <rpc/auth_unix.h>
@@ -40,37 +76,6 @@ Add support for (more) *_chk variants (using __builtin_object_size())
 <rpc/svc_auth.h>
 <rpc/types.h>
 <rpc/xdr.h>
-<stab.h>               (GLibc!)
-<sys/bsdtypes.h>
-<sys/capability.h>     (found in /usr/include/sys/capability.h; aka not in arch-headers!)
-<sys/fanotify.h>
-<sys/gmon.h>
-<sys/gmon_out.h>       (Only some macros, and structs)
-<sys/inotify.h>
-<sys/kdaemon.h>
-<sys/machine.h>
-<sys/mtio.h>           (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
-<sys/personality.h>
-<sys/prctl.h>
-<sys/profil.h>
-<sys/quota.h>
-<sys/raw.h>            (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
-<sys/reg.h>
-<sys/sdt.h>
-<sys/soundcard.h>
-<sys/sysctl.h>
-<sys/vlimit.h>
-<sys/vtimes.h>
-<sysmacros.h>
-<timeconv.h>
-<thread_db.h>          (GLibc!)
-<wordexp.h>            (GLibc!)
-
-### Unlikely to ever be added
-<_G_config.h>          (GLibc!)
-<gconv.h>              (GLibc!)
-<nss.h>                (GLibc!)
-<printf.h>             (GLibc!)
 
 
 Functions/Globals:
@@ -98,6 +103,8 @@ TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_REALTIME' properly
 TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT'
 TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT_IMPL'
 
+
+TODO: Add support for (more) *_chk variants (using __builtin_object_size())
 
 TODO: Expand generate_headers.dee and magic.dee to:
 	- Wrap function declarations from auto/foo.c with #if defined(WANT_xxx
