@@ -60,9 +60,9 @@ struct link_map {
 	ElfW(Addr)       l_addr; /* [const] Load address (offset added to `p_vaddr' in `dlpi_phdr') of this module. */
 	char            *l_name; /* [1..1][const] Absolute file name of the module. */
 	ElfW(Dyn)       *l_ld;   /* [0..1][const] Dynamic section of the shared object. */
-	/* WARNING: These  link  fields are  protected  by an  internal  lock, so
-	 *          you'll run  into problems  if some  other thread  is  loading
-	 *          or unloading modules... (why did these have to be exposed...) */
+	/* WARNING: These  link fields  are protected  by an  internal lock, so
+	 *          you'll run into  problems if some  other thread is  loading
+	 *          or unloading modules... (why did these have to be exposed?) */
 	struct link_map *l_next; /* [0..1] Next loaded object. */
 	struct link_map *l_prev; /* [0..1] Previous loaded object. */
 };
@@ -73,11 +73,11 @@ struct dl_phdr_info {
 	char const       *dlpi_name;      /* [1..1] File name of this module. */
 	ElfW(Phdr) const *dlpi_phdr;      /* [1..dlpi_phnum] Vector of program headers. */
 	ElfW(Half)        dlpi_phnum;     /* # of program headers. */
-	/* NOTE: Everything that follows may only be available if `size' passed by
-	 *      `dl_iterate_phdr()' to the given callback is >= offsetafter(...) */
-	__uint64_t        dlpi_adds;      /* Incremented when a new object may have been added.  */
-	__uint64_t        dlpi_subs;      /* Incremented when an object may have been removed.  */
-	__size_t          dlpi_tls_modid; /* If there is a PT_TLS segment, its module ID as used in TLS relocations, else zero.  */
+	/* NOTE: Everything that follows may only be available if `info_size' passed
+	 *       by `dl_iterate_phdr()' to the given callback is >= offsetafter(...) */
+	__uint64_t        dlpi_adds;      /* Incremented when a new object may have been added. */
+	__uint64_t        dlpi_subs;      /* Incremented when an object may have been removed. */
+	__size_t          dlpi_tls_modid; /* If there is a PT_TLS segment, its module ID as used in TLS relocations, else zero. */
 	void             *dlpi_tls_data;  /* [0..1] The address of the calling thread's instance of this module's
 	                                   *        PT_TLS segment, if it has one and it has been allocated in the
 	                                   *        calling thread, otherwise a null pointer. */

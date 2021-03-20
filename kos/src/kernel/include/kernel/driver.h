@@ -811,8 +811,8 @@ driver_local_symbol(struct driver *__restrict self,
 
 #define DRIVER_SECTION_LOCK_FNORMAL   0x0000 /* Normal section locking flags. */
 #define DRIVER_SECTION_LOCK_FINDEX    0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
-#define DRIVER_SECTION_LOCK_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
-                                              * been loaded, then this flag is simply ignored. */
+#define DRIVER_SECTION_LOCK_FNODATA   0x0002 /* Do not lock section data into memory, though if section data
+                                              * had already been loaded, then  this flag is simply  ignored. */
 /* Lock a  named section  of  a given  driver  into
  * memory and return a descriptor for that section.
  * @throws: E_SEGFAULT: Only here because `name' is USER

@@ -322,8 +322,8 @@ libdl_dltlsbase(DlModule *__restrict self);
 
 /* DL-based TLS memory management API.
  * These functions may be used to dynamically allocate TLS memory that works everywhere where
- * ATTR_THREAD-based  TLS memory also works. - However  using these functions, TLS memory can
- * be  allocated dynamically at  runtime (behaving the same  as a call  to dlopen() loading a
+ * ATTR_THREAD-based TLS memory also works. - However, using these functions, TLS memory  can
+ * be  allocated dynamically at runtime (behaving the same  as a call to `dlopen()' loading a
  * module containing a TLS segment would).
  * @param: num_bytes:      The size of the TLS segment (in bytes)
  * @param: min_alignment:  The minimum alignment requirements for the TLS segment base address.
@@ -332,28 +332,34 @@ libdl_dltlsbase(DlModule *__restrict self);
  *                         that gets allocated will be initialized to the contents of these
  *                         values before `perthread_init' is optionally invoked in order to
  *                         perform additional initialization.
+ *                         This template is copied by this function and does not need to keep
+ *                         pointing at a valid memory location after `dltlsalloc()'  returns!
  * @param: template_size:  The size of `template_data' in bytes, indicating the number  of
  *                         leading bytes within the TLS segment that should be pre-defined
  *                         to mirror the contents of `template_data' at the time of a call
- *                         to this  function (`template_data'  need  not remain  valid  or
- *                         accessible after this function returns)
- *                         Any memory after `template_size', but before `num_bytes' is initialized
- *                         to  all  ZEROes,  however  `template_size'  must  not  be  greater than
- *                        `num_bytes', and if it is, this function returns `NULL' and sets
- *                        `dlerror()' accordingly.
+ *                         to this function (`template_data' itself need not remain  valid
+ *                         or accessible after this function returns)
+ *                         Any memory after `template_size', but before `num_bytes' is
+ *                         initialized to all ZEROes, however `template_size' must not
+ *                         be greater than  `num_bytes', and if  it is, this  function
+ *                         returns `NULL' and sets `dlerror()' accordingly.
  * @param: perthread_init: An optional callback that will be invoked on a per-thread basis
  *                         in order to perform additional initialization of the associated
  *                         TLS segment within the associated thread.
  *                         This function will be called upon first access of the segment
  *                         within   the  thread  using  the  data  (s.a.  `dltlsaddr()')
  *                         @param: arg:  The value of `perthread_callback_arg' passed to `dltlsalloc'
- *                         @param: base: The base address of the associated segment within the calling
- *                                       thread   (same   as  the   return  value   of  `dltlsaddr()')
- * @param: perthread_fini: An optional callback that behaves similar to `perthread_init',
- *                         but called by `pthread_exit()'  or any other thread  finalizer
- *                        (more specifically: by `dltlsfreeseg()') within any thread that
- *                         has been seen using the associated segment, and causing it to
+ *                         @param: base: The base  address of  the  associated segment  within  the
+ *                                       calling thread (same as the return value of `dltlsaddr()')
+ * @param: perthread_fini: An  optional callback that behaves similar to `perthread_init',
+ *                         but called by  `pthread_exit()' or any  other thread  finalizer
+ *                         (more specifically: by `dltlsfreeseg()') within any thread that
+ *                         has been seen using the  associated segment, and causing it  to
  *                         be allocated and initialized for that thread.
+ *                         Note that the actual thread calling this function may not necessarily
+ *                         be the same thread that originally called `perthread_init', only that
+ *                         any  call to `perthread_init' will always be followed by another call
+ *                         to this function at some later point in time!
  * @param: perthread_callback_arg: A user-specified argument passed to the init/fini callbacks.
  * @return: * :            An opaque handle for the newly created TLS segment.
  *                         This handle may be used in future calls to `dltlsaddr()', and can be

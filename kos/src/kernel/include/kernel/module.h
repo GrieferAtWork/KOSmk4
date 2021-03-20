@@ -36,8 +36,8 @@
 /* Flags for `module_locksection()' */
 #define MODULE_LOCKSECTION_FNORMAL DRIVER_SECTION_LOCK_FNORMAL /* Normal section locking flags. */
 #define MODULE_LOCKSECTION_FINDEX  DRIVER_SECTION_LOCK_FINDEX  /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
-#define MODULE_LOCKSECTION_FNODATA DRIVER_SECTION_LOCK_FNODATA /* Do not lock section data into memory, though if the section had already
-                                                                * been loaded, then this flag is simply ignored. */
+#define MODULE_LOCKSECTION_FNODATA DRIVER_SECTION_LOCK_FNODATA /* Do not lock section data into memory, though if section data
+                                                                * had already been loaded, then  this flag is simply  ignored. */
 
 
 

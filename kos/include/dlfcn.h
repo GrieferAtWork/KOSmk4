@@ -104,7 +104,7 @@
 
 /* The mode-argument to `dlopen(3)' must contain one of the following: */
 #ifdef __RTLD_GLOBAL
-#define RTLD_GLOBAL __RTLD_GLOBAL /* If the following bit is set  in the mode-argument to  `dlopen',
+#define RTLD_GLOBAL __RTLD_GLOBAL /* If the following bit is  set in the mode-argument to  `dlopen',
                                    * the  symbols of the loaded object and its dependencies are made
                                    * visible as if the object were linked directly into the program. */
 #endif /* __RTLD_GLOBAL */
@@ -195,9 +195,8 @@
 
 
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -456,10 +455,10 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulename)(void *__handle);
  *          and call `dlerror()' again when NULL is returned to check if an error really occurred.
  *          Or alternatively, you  can simply  make sure that  `handle' isn't  invalid, since  the
  *          only  case when this  function can ever fail  is when `handle'  was already closed, is
- *         `NULL', or isn't a pointer returned by `dlopen()', `dlgetmodule()' or `dlgethandle()'
+ *          `NULL',  or isn't a pointer returned by `dlopen()', `dlgetmodule()' or `dlgethandle()'
  * @param: handle: A handle returned by `dlopen()'.
  * @return: * :    The load address / module base for the given `handle'.
- * @return: NULL:  Error (s.a. `dlerror()') */
+ * @return: NULL:  Error (s.a. `dlerror()'), or load-address of ZERO */
 #ifdef __CRT_HAVE_dlmodulebase
 #ifndef __dlmodulebase_defined
 #define __dlmodulebase_defined 1
@@ -490,16 +489,17 @@ struct dl_section {
 #ifndef DLLOCKSECTION_FNORMAL
 #define DLLOCKSECTION_FNORMAL   0x0000 /* Normal section locking flags. */
 #define DLLOCKSECTION_FINDEX    0x0001 /* The given `name' is actually the `(uintptr_t)name' index of the section */
-#define DLLOCKSECTION_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
-                                        * been loaded, then this flag is simply ignored. */
+#define DLLOCKSECTION_FNODATA   0x0002 /* Do not lock section data into memory, though if section data
+                                        * had already been loaded, then  this flag is simply  ignored. */
 #endif /* !DLLOCKSECTION_FNORMAL */
 
 /* Lock a named section of a given dynamic library into memory.
  * @param: handle: Handle for the library who's section `name' should be locked & loaded.
  * @param: name:   Name of the section to load into memory.
- * @return: * :    A reference to a locked section object  (s.a. exposed portion of the section  above),
- *                 and allows the user to access the contents of the section, as it is loaded in memory.
- *                 Note however that the actual section data is usually mapped as read-only!
+ * @return: * :    A reference to a locked section object (s.a. the exposed portion of the struct above),
+ *                 and allows the user to access the contents of the section, as it is loaded in  memory.
+ *                 Note however that the actual  section data is usually mapped  as read-only, or at  the
+ *                 very least `MAP_PRIVATE', meaning that writes aren't written back to the library file!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
 #ifndef __dllocksection_defined
 #define __dllocksection_defined 1
@@ -513,7 +513,7 @@ __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
 /* Unlock a locked section, as previously returned by `dllocksection()'
  * HINT: Think of this function as a decref(), where `dllocksection()'
  *       returns a reference you inherit as the caller
- * @return: 0 : Successfully unlocked the given section `SECT'
+ * @return: 0 : Successfully unlocked the given section `sect'
  * @return: * : Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlunlocksection
 #ifndef __dlunlocksection_defined
@@ -525,12 +525,12 @@ __NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
 
 /* Return the name of a given section, or NULL on error
  * WARNING: The name of a section can no longer be queried after the associated
- *          module  has been unloaded!  If this has  happened, NULL is returned
+ *          module  has been unloaded! If this has happened, `NULL' is returned
  *          and dlerror() is set accordingly.
- *          Because  the  names  of  sections   are  stored  alongside  the  module,   if
- *          you  can't  guaranty  that the  module  associated with  the  section doesn't
- *          get  unloaded  while  you're accessing  the  section's name,  you  must first
- *          acquire your own reference to that module through use of `dlsectionmodule()':
+ *          Because the names  of sections  are stored  alongside the  module, if  you
+ *          can't guaranty that  the module  associated with the  section doesn't  get
+ *          unloaded while you're accessing the section's name, you must first acquire
+ *          your own  reference to  that module  through use  of  `dlsectionmodule()':
  *          >> void *mod = dlsectionmodule(my_sect, DLGETHANDLE_FINCREF);
  *          >> char const *name = dlsectionname(my_sect);
  *          >> // Make use of `name' (also check if `name' is NULL; if it is, `mod'
@@ -542,13 +542,13 @@ __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
 __NOTHROW_NCX(__DLFCN_CC dlsectionname)(struct dl_section *__sect);
 #endif /* __CRT_HAVE_dlsectionname */
 
-/* Returns the index of a given section, or (size_t)-1 on error. */
+/* Returns the index of a given section, or `(size_t)-1' on error. */
 #ifdef __CRT_HAVE_dlsectionindex
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 __NOTHROW_NCX(__DLFCN_CC dlsectionindex)(struct dl_section *__sect);
 #endif /* __CRT_HAVE_dlsectionindex */
 
-/* Return the module associated with a given section, or NULL on error.
+/* Return the module associated with a given section, or `NULL' on error.
  * @param: flags: Set of `DLGETHANDLE_F*'
  * @return: * :   A pointer, or reference to the module handle (when `DLGETHANDLE_FINCREF' was given)
  * @return: NULL: Error (s.a. `dlerror()'; usually, the module was already unloaded) */
@@ -558,28 +558,28 @@ __NOTHROW_NCX(__DLFCN_CC dlsectionmodule)(struct dl_section *__sect,
                                           unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
 #endif /* __CRT_HAVE_dlsectionmodule */
 
-/* Try to inflate compressed module sections (`SHF_COMPRESSED'), returning a
- * pointer to a decompressed data blob that is lazily allocated for  `SECT',
- * and  will   be  freed   once  the   section  ends   up  being   unloaded.
- * The given `SECT' may not  have been loaded with  `DLLOCKSECTION_FNODATA'.
- * If  the (compressed)  data used for  backing `SECT' has  not been loaded,
- * this function will fail.
- * When the given `SECT' isn't actually compressed, this function will simply
- * return  a pointer to `SECT->ds_data', and fill `*PSIZE' (if non-NULL) with
+/* Try to inflate compressed  module sections (`SHF_COMPRESSED'), returning  a
+ * pointer  to a decompressed  data blob that is  lazily allocated for `sect',
+ * and will be freed once the section ends up being unloaded. The given `sect'
+ * may  not be loaded  with `DLLOCKSECTION_FNODATA' if  this function shall be
+ * used  later; if the (compressed) data used  for backing `sect' has not been
+ * loaded, this function will fail.
+ * When the given `sect' isn't actually compressed, this function will simply
+ * return  a pointer to `sect->ds_data', and fill `*psize' (if non-NULL) with
  * `ds_size'. Otherwise, inflated data and its size are returned.
- * NOTE: This function requires  libdl to  lazily load the  KOS system  library
- *       `libzlib.so',  as  found apart  of the  KOS  source tree.  Should that
- *       library  not  be loaded  already, or  should  loading of  said library
- *       fail  for  any reason,  this function  will  also fail,  and dlerror()
- *       will reflect what went wrong when trying to load said support library.
+ * NOTE: This function requires libdl to lazily load the KOS system library
+ *       `libzlib.so', as found apart of  the KOS source tree. Should  that
+ *       library not be loaded already,  or should loading of said  library
+ *       fail for any reason, this function will also fail, and `dlerror()'
+ *       will reflect what went wrong when trying to load said library.
  * NOTE: The backing memory for the deflated data blob is allocated lazily and
- *       will not be freed before  `SECT' is `dlunlocksection()'ed the same  #
+ *       will not be freed before  `sect' is `dlunlocksection()'ed the same  #
  *       of times that it was `dllocksection()'ed.
- * @param: PSIZE: When non-NULL, store the size of the inflated (decompressed)
+ * @param: psize: When non-NULL, store the size of the inflated (decompressed)
  *                data blob that is returned.
- * @return: * :   A  pointer  to  the  inflated  data  that  is  backing  `SECT'
- *                When  `SECT'  isn't  compressed,  this  function  will  simply
- *                return the section's normal data blob, that is `SECT->ds_data'
+ * @return: * :   A pointer to the inflated data that is backing `sect'. When
+ *                `sect'  isn't compressed, this  function will simply return
+ *                the section's normal data blob, that is `sect->ds_data'
  * @return: NULL: Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlinflatesection
 #ifndef __dlinflatesection_defined
@@ -592,10 +592,10 @@ __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
 #endif /* ... */
 
 
-/* Clear internal caches used by loaded modules in order to free up available memory.
- * This function  is automatically  called by  libc  when mmap()  fails due  to  lack
- * of available virtual or physical memory.
- * For more information, see `DL_REGISTER_CACHE()'
+/* Clear internal caches used by loaded modules in order to free up
+ * available memory. This function is automatically called by  libc
+ * when `mmap()' fails due to lack of available virtual or physical
+ * memory. For more information, see `DL_REGISTER_CACHE()'
  * @return: 0: No optional memory could be released.
  * @return: 1: Some optional memory was released. */
 #ifdef __CRT_HAVE_dlclearcaches
@@ -603,16 +603,19 @@ __IMPDEF int __NOTHROW_NCX(__DLFCN_CC dlclearcaches)(void);
 #endif /* __CRT_HAVE_dlclearcaches */
 
 /* Allocate/Free a static TLS segment
- * These functions are called by by libc in  order to safely create a new thread, such  that
- * all current and future modules are able to store thread-local storage within that thread.
- * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
+ * These functions are called by by libc in order to safely create
+ * a new thread, such that all current and future modules are able
+ * to store thread-local storage within that thread.
+ * NOTE: The caller is responsible to store the returned segment
+ *       pointer in the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
 #ifdef __CRT_HAVE_dltlsallocseg
 __IMPDEF void *__NOTHROW_NCX(__DLFCN_CC dltlsallocseg)(void);
 #endif /* __CRT_HAVE_dltlsallocseg */
 
-/* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
+/* Free a previously allocated static TLS segment (usually called
+ * by `pthread_exit()' and friends). */
 #ifdef __CRT_HAVE_dltlsfreeseg
 __IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
@@ -620,8 +623,8 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
 
 /* DL-based TLS memory management API.
  * These functions may be used to dynamically allocate TLS memory that works everywhere where
- * ATTR_THREAD-based  TLS memory also works. - However  using these functions, TLS memory can
- * be  allocated dynamically at  runtime (behaving the same  as a call  to dlopen() loading a
+ * ATTR_THREAD-based TLS memory also works. - However, using these functions, TLS memory  can
+ * be  allocated dynamically at runtime (behaving the same  as a call to `dlopen()' loading a
  * module containing a TLS segment would).
  * @param: num_bytes:      The size of the TLS segment (in bytes)
  * @param: min_alignment:  The minimum alignment requirements for the TLS segment base address.
@@ -630,28 +633,34 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
  *                         that gets allocated will be initialized to the contents of these
  *                         values before `perthread_init' is optionally invoked in order to
  *                         perform additional initialization.
+ *                         This template is copied by this function and does not need to keep
+ *                         pointing at a valid memory location after `dltlsalloc()'  returns!
  * @param: template_size:  The size of `template_data' in bytes, indicating the number  of
  *                         leading bytes within the TLS segment that should be pre-defined
  *                         to mirror the contents of `template_data' at the time of a call
- *                         to this  function (`template_data'  need  not remain  valid  or
- *                         accessible after this function returns)
- *                         Any memory after `template_size', but before `num_bytes' is initialized
- *                         to  all  ZEROes,  however  `template_size'  must  not  be  greater than
- *                        `num_bytes', and if it is, this function returns `NULL' and sets
- *                        `dlerror()' accordingly.
+ *                         to this function (`template_data' itself need not remain  valid
+ *                         or accessible after this function returns)
+ *                         Any memory after `template_size', but before `num_bytes' is
+ *                         initialized to all ZEROes, however `template_size' must not
+ *                         be greater than  `num_bytes', and if  it is, this  function
+ *                         returns `NULL' and sets `dlerror()' accordingly.
  * @param: perthread_init: An optional callback that will be invoked on a per-thread basis
  *                         in order to perform additional initialization of the associated
  *                         TLS segment within the associated thread.
  *                         This function will be called upon first access of the segment
  *                         within   the  thread  using  the  data  (s.a.  `dltlsaddr()')
  *                         @param: arg:  The value of `perthread_callback_arg' passed to `dltlsalloc'
- *                         @param: base: The base address of the associated segment within the calling
- *                                       thread   (same   as  the   return  value   of  `dltlsaddr()')
- * @param: perthread_fini: An optional callback that behaves similar to `perthread_init',
- *                         but called by `pthread_exit()'  or any other thread  finalizer
- *                        (more specifically: by `dltlsfreeseg()') within any thread that
- *                         has been seen using the associated segment, and causing it to
+ *                         @param: base: The base  address of  the  associated segment  within  the
+ *                                       calling thread (same as the return value of `dltlsaddr()')
+ * @param: perthread_fini: An  optional callback that behaves similar to `perthread_init',
+ *                         but called by  `pthread_exit()' or any  other thread  finalizer
+ *                         (more specifically: by `dltlsfreeseg()') within any thread that
+ *                         has been seen using the  associated segment, and causing it  to
  *                         be allocated and initialized for that thread.
+ *                         Note that the actual thread calling this function may not necessarily
+ *                         be the same thread that originally called `perthread_init', only that
+ *                         any  call to `perthread_init' will always be followed by another call
+ *                         to this function at some later point in time!
  * @param: perthread_callback_arg: A user-specified argument passed to the init/fini callbacks.
  * @return: * :            An opaque handle for the newly created TLS segment.
  *                         This handle may be used in future calls to `dltlsaddr()', and can be
@@ -738,8 +747,8 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
 #define DLAUXCTRL_MOD_NOTDESTROYED   0xa006 /* check if the module wasdestroyed() (re-returns `handle' if not, or `NULL' if so) */
 #define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `handle' is ignored but should be any valid module handle, or `NULL',
                                              * and  all  other arguments  are also  ignored; always  returns  `NULL', but  doesn't set  an error */
-#define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `handle' is ignored but should be any
-                                             * valid   module  handle,   or  `NULL',  and   all  other  arguments   are  also  ignored.
+#define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `handle' is ignored but should
+                                             * be  any valid module handle, or `NULL', and all other arguments are also ignored.
                                              * Always returns `NULL', but doesn't set an error */
 #define DLAUXCTRL_ADD_FINALIZER      0xd103 /* Register a dynamic finalizer callback for `handle':
                                              * >> callback = va_arg(void(__DLFCN_CC *)(void *));
@@ -877,7 +886,7 @@ __NOTHROW_NCX(__DLFCN_CC dladdr1)(void const *__address, Dl_info *__info,
  * loader has no chance to find out when the function is called. The
  * macro applies the necessary magic so that profiling is  possible.
  * Rewrite
- *  foo = (*fctp)(arg1, arg2);
+ *      foo = (*fctp)(arg1, arg2);
  * into
  *      foo = DL_CALL_FCT(fctp, (arg1, arg2));
  */
@@ -891,8 +900,7 @@ __IMPDEF void __NOTHROW_NCX(__DLFCN_CC _dl_mcount_wrapper_check)(void *__selfpc)
 #endif /* !DL_CALL_FCT */
 #endif /* __USE_GNU */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_DLFCN_H */
