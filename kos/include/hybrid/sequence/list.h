@@ -103,7 +103,7 @@
  * [  N N          ]  void [*]_REMOVE(self, elem, [type], key)
  * [1         1    ]  void [*]_REMOVE_R(lo_elem, hi_elem, key)                (Remove all elements `lo_elem...hi_elem' inclusively; links between removed elements remain valid)
  * [      1 1   1  ]  void [*]_REMOVE_R(self, lo_elem, hi_elem, key)
- * [  1            ]  void [*]_REMOVE_AFTER(elem, key)                        (Remove successor of `elem'; undef if no successor)
+ * [1 1            ]  void [*]_REMOVE_AFTER(elem, key)                        (Remove successor of `elem'; undef if no successor)
  * [    1          ]  void [*]_REMOVE_AFTER(self, elem, key)
  * [  1            ]  void [*]_REMOVE_PREVPTR(p_elem, elem, key)              (libbsd-specific; for use with `SLIST_FOREACH_PREVPTR()')
  * [1 1            ]  void [*]_P_REMOVE(p_elem, key)
@@ -309,6 +309,8 @@
 #define LIST_P_REPLACE_P(p_old_elem, new_elem, getpath)                                   __HYBRID_LIST_P_REPLACE(p_old_elem, new_elem, __HYBRID_Q_PTH, getpath)
 #define LIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)       __HYBRID_LIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_KEY, key)
 #define LIST_P_REPLACE_R_P(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath) __HYBRID_LIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_PTH, getpath)
+#define LIST_REMOVE_AFTER(elem, key)                                                      __HYBRID_LIST_REMOVE_AFTER(elem, __HYBRID_Q_KEY, key)
+#define LIST_REMOVE_AFTER_P(elem, getpath)                                                __HYBRID_LIST_REMOVE_AFTER(elem, __HYBRID_Q_PTH, getpath)
 #define LIST_REMOVE_HEAD(self, key)                                                       __HYBRID_LIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
 #define LIST_REMOVE_HEAD_P(self, getpath)                                                 __HYBRID_LIST_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define LIST_REMOVE_P(elem, getpath)                                                      __HYBRID_LIST_REMOVE(elem, __HYBRID_Q_PTH, getpath)
@@ -491,6 +493,11 @@
 	 : (void)0,                                                                               \
 	 __HYBRID_Q_BADPTR(X(_, *(p_old_lo_elem)).le_prev),                                       \
 	 __HYBRID_Q_BADPTR(X(_, old_hi_elem).le_next))
+#define __HYBRID_LIST_REMOVE_AFTER(elem, X, _)                            \
+	(__HYBRID_Q_BADPTR(X(_, X(_, elem).le_next).le_prev),                 \
+	 (X(_, elem).le_next = X(_, X(_, elem).le_next).le_next) != __NULLPTR \
+	 ? (void)(X(_, X(_, elem).le_next).le_prev = &X(_, elem).le_next)     \
+	 : (void)0)
 #define __HYBRID_LIST_REMOVE_HEAD(self, X, _)                         \
 	(__HYBRID_Q_BADPTR(X(_, (self)->lh_first).le_prev),               \
 	 ((self)->lh_first = X(_, (self)->lh_first).le_next) != __NULLPTR \
@@ -3125,7 +3132,6 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define LIST_REMOVE_AFTER(elem, key)
 //TODO:#define LIST_P_PREV(p_elem, self, [type], key)
 //TODO:#define LIST_P_PREV_UNSAFE(p_elem, [type], key)
 //TODO:#define SLIST_MOVE(dst, src, key)
