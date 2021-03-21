@@ -130,11 +130,16 @@
  * [  N N          ]  void [*]_TRYREPLACE(self, old_elem, new_elem, [type], key, on_failure)
  * [  N N          ]  void [*]_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_failure)
  * [N N N N N   N  ]  CODE [*]_FOREACH(elem, self, key)
+ * [N N N N N   N  ]  CODE [*]_FOREACH_FROM(elem, self, key)                  (If non-NULL, start enumeration with `IN(elem)'; else start w/ `[*]_FIRST(self)')
  * [N N N N N   N  ]  CODE [*]_FOREACH_SAFE(elem, self, key, [tvar])          (Same as [*]_FOREACH, but the loop body may safely remove `elem')
+ * [N N N N N   N  ]  CODE [*]_FOREACH_FROM_SAFE(elem, self, key, [tvar])     (Same as [*]_FOREACH_FROM, but the loop body may safely remove `elem')
  * [N N N          ]  CODE [*]_P_FOREACH(p_elem, self, key)
  * [        N      ]  CODE [*]_FOREACH_REVERSE(elem, self, key)
+ * [        N      ]  CODE [*]_FOREACH_REVERSE_FROM(elem, self, key)
  * [      N        ]  CODE [*]_FOREACH_REVERSE(elem, self, [headname], key)
+ * [      N        ]  CODE [*]_FOREACH_REVERSE_FROM(elem, self, [headname], key)
  * [      N        ]  CODE [*]_FOREACH_REVERSE_SAFE(elem, self, [headname], key, [tvar])
+ * [      N        ]  CODE [*]_FOREACH_REVERSE_FROM_SAFE(elem, self, [headname], key, [tvar])
  * [===============]  -- Sub-API: Check if an element is contained within a list,
  * [===============]              but removal requires *_UNBIND instead of *_REMOVE
  * [1     1 1 1    ]  CODE [*]_ENTRY_UNBOUND_INITIALIZER         -- Static initializer for unbound elements
@@ -218,6 +223,7 @@
 #define LIST_EMPTY(self)                          ((self)->lh_first == __NULLPTR)
 #define LIST_END(self)                            __NULLPTR
 #define LIST_FOREACH(elem, self, key)             __HYBRID_LIST_FOREACH(elem, self, __HYBRID_Q_KEY, key)
+#define LIST_FOREACH_FROM(elem, self, key)        __HYBRID_LIST_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
 #define LIST_HEAD_INITIALIZER(self)               { __NULLPTR }
 #define LIST_INIT(self)                           (void)((self)->lh_first = __NULLPTR)
 #define LIST_INSERT_AFTER(predecessor, elem, key) __HYBRID_LIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_KEY, key)
@@ -232,22 +238,27 @@
 #define LIST_FIRST(self)                          (self)->lh_first
 #endif /* !__INTELLISENSE__ || !__COMPILER_HAVE_TYPEOF */
 #if !defined(__HYBRID_LIST_RESTRICT_API) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_LIST_CONCAT_3(dst, src, key)               __HYBRID_LIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_CONCAT_4(dst, src, type, key)         __HYBRID_LIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_FOREACH_SAFE_3(elem, self, key)       __HYBRID_LIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_FOREACH_SAFE_4(elem, self, key, tvar) __HYBRID_LIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_LIST_SWAP_3(l1, l2, key)                   __HYBRID_LIST_SWAP(l1, l2, __typeof__(*(l2)->lh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_LIST_SWAP_4(l1, l2, type, key)             __HYBRID_LIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_CONCAT_3(dst, src, key)                    __HYBRID_LIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_CONCAT_4(dst, src, type, key)              __HYBRID_LIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_FOREACH_FROM_SAFE_3(elem, self, key)       __HYBRID_LIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_FOREACH_FROM_SAFE_4(elem, self, key, tvar) __HYBRID_LIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_LIST_FOREACH_SAFE_3(elem, self, key)            __HYBRID_LIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_FOREACH_SAFE_4(elem, self, key, tvar)      __HYBRID_LIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_LIST_SWAP_3(l1, l2, key)                        __HYBRID_LIST_SWAP(l1, l2, __typeof__(*(l2)->lh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_LIST_SWAP_4(l1, l2, type, key)                  __HYBRID_LIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #undef LIST_CONCAT
+#undef LIST_FOREACH_FROM_SAFE
 #undef LIST_FOREACH_SAFE
 #undef LIST_SWAP
-#define LIST_CONCAT(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_CONCAT_, (__VA_ARGS__))(__VA_ARGS__)       /* LIST_CONCAT(dst, src, [type], key) */
-#define LIST_FOREACH_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_FOREACH_SAFE(elem, self, key, [tvar]) */
-#define LIST_SWAP(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_SWAP_, (__VA_ARGS__))(__VA_ARGS__)         /* LIST_SWAP(l1, l2, [type], key) */
+#define LIST_CONCAT(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_CONCAT_, (__VA_ARGS__))(__VA_ARGS__)            /* LIST_CONCAT(dst, src, [type], key) */
+#define LIST_FOREACH_FROM_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
+#define LIST_FOREACH_SAFE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_FOREACH_SAFE(elem, self, key, [tvar]) */
+#define LIST_SWAP(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_SWAP_, (__VA_ARGS__))(__VA_ARGS__)              /* LIST_SWAP(l1, l2, [type], key) */
 #else /* ... */
-#define LIST_CONCAT(dst, src, type, key)         __HYBRID_LIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define LIST_FOREACH_SAFE(elem, self, key, tvar) __HYBRID_LIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define LIST_SWAP(l1, l2, type, key)             __HYBRID_LIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define LIST_CONCAT(dst, src, type, key)              __HYBRID_LIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define LIST_FOREACH_FROM_SAFE(elem, self, key, tvar) __HYBRID_LIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define LIST_FOREACH_SAFE(elem, self, key, tvar)      __HYBRID_LIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define LIST_SWAP(l1, l2, type, key)                  __HYBRID_LIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #endif /* !... */
 #ifndef __HYBRID_LIST_RESTRICT_API
 #define LIST_HEAD_P(T) struct { T *lh_first; /* [0..1] List head */ }
@@ -260,6 +271,7 @@
 #define LIST_ENTRY_UNBOUND_INIT(entry)                                                    (void)(__HYBRID_Q_BADPTR((entry)->le_next), (entry)->le_prev = __NULLPTR)
 #define LIST_ENTRY_UNBOUND_INITIALIZER                                                    { __NULLPTR, __NULLPTR }
 #define LIST_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
+#define LIST_FOREACH_FROM_P(elem, self, getpath)                                          __HYBRID_LIST_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define LIST_FOREACH_P(elem, self, getpath)                                               __HYBRID_LIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
 #define LIST_INSERT_AFTER_P(predecessor, elem, getpath)                                   __HYBRID_LIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define LIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)                           __HYBRID_LIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -303,6 +315,8 @@
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_LIST_CONCAT_P_3(dst, src, getpath)                                        __HYBRID_LIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_PTH, getpath)
 #define __HYBRID_LIST_CONCAT_P_4(dst, src, type, getpath)                                  __HYBRID_LIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                           __HYBRID_LIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_LIST_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                     __HYBRID_LIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_LIST_FOREACH_SAFE_P_3(elem, self, getpath)                                __HYBRID_LIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_LIST_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                          __HYBRID_LIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_LIST_INSERT_TAIL_3(self, elem, key)                                       __HYBRID_LIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
@@ -343,27 +357,29 @@
 #define __HYBRID_LIST_UNBIND_IF_5(self, out_pelem, type, key, condition)                   __HYBRID_LIST_UNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
 #define __HYBRID_LIST_UNBIND_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_LIST_UNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition)
 #define __HYBRID_LIST_UNBIND_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
-#define LIST_CONCAT_P(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_CONCAT_P_, (__VA_ARGS__))(__VA_ARGS__)        /* LIST_CONCAT_P(dst, src, [type], getpath) */
-#define LIST_FOREACH_SAFE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)  /* LIST_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
-#define LIST_INSERT_TAIL(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)     /* LIST_INSERT_TAIL(self, elem, [type], key) */
-#define LIST_INSERT_TAIL_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)   /* LIST_INSERT_TAIL_P(self, elem, [T], getpath) */
-#define LIST_INSERT_TAIL_R(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_R_, (__VA_ARGS__))(__VA_ARGS__)   /* LIST_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key) */
-#define LIST_INSERT_TAIL_R_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_R_P_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_INSERT_TAIL_R_P(self, lo_elem, hi_elem, [T], getpath) */
-#define LIST_PREV(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_PREV_, (__VA_ARGS__))(__VA_ARGS__)            /* LIST_PREV(elem, [type], key) */
-#define LIST_PREV_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)          /* LIST_PREV_P(elem, [T], getpath) */
-#define LIST_REMOVEALL(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)    /* LIST_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
-#define LIST_REMOVEALL_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)  /* LIST_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
-#define LIST_REMOVE_IF(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)       /* LIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
-#define LIST_REMOVE_IF_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)     /* LIST_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
-#define LIST_SWAP_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_SWAP_P_, (__VA_ARGS__))(__VA_ARGS__)          /* LIST_SWAP_P(l1, l2, [type], getpath) */
-#define LIST_TRYREMOVE_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)    /* LIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
-#define LIST_TRYREMOVE_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)  /* LIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
-#define LIST_TRYUNBIND_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)    /* LIST_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure) */
-#define LIST_TRYUNBIND_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)  /* LIST_TRYUNBIND_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
-#define LIST_UNBINDALL(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)    /* LIST_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
-#define LIST_UNBINDALL_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)  /* LIST_UNBINDALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define LIST_CONCAT_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_CONCAT_P_, (__VA_ARGS__))(__VA_ARGS__)            /* LIST_CONCAT_P(dst, src, [type], getpath) */
+#define LIST_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define LIST_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define LIST_INSERT_TAIL(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)         /* LIST_INSERT_TAIL(self, elem, [type], key) */
+#define LIST_INSERT_TAIL_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)       /* LIST_INSERT_TAIL_P(self, elem, [T], getpath) */
+#define LIST_INSERT_TAIL_R(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_R_, (__VA_ARGS__))(__VA_ARGS__)       /* LIST_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key) */
+#define LIST_INSERT_TAIL_R_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_INSERT_TAIL_R_P_, (__VA_ARGS__))(__VA_ARGS__)     /* LIST_INSERT_TAIL_R_P(self, lo_elem, hi_elem, [T], getpath) */
+#define LIST_PREV(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_PREV_, (__VA_ARGS__))(__VA_ARGS__)                /* LIST_PREV(elem, [type], key) */
+#define LIST_PREV_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)              /* LIST_PREV_P(elem, [T], getpath) */
+#define LIST_REMOVEALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* LIST_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define LIST_REMOVEALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define LIST_REMOVE_IF(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)           /* LIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define LIST_REMOVE_IF_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)         /* LIST_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
+#define LIST_SWAP_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_SWAP_P_, (__VA_ARGS__))(__VA_ARGS__)              /* LIST_SWAP_P(l1, l2, [type], getpath) */
+#define LIST_TRYREMOVE_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* LIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define LIST_TRYREMOVE_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define LIST_TRYUNBIND_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* LIST_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define LIST_TRYUNBIND_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_TRYUNBIND_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define LIST_UNBINDALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* LIST_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
+#define LIST_UNBINDALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_UNBINDALL_P(self, out_pelem, [T], getpath, condition, on_match) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define LIST_CONCAT_P(dst, src, type, getpath)                                     __HYBRID_LIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define LIST_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                        __HYBRID_LIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define LIST_FOREACH_SAFE_P(elem, self, getpath, tvar)                             __HYBRID_LIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define LIST_INSERT_TAIL(self, elem, type, key)                                    __HYBRID_LIST_INSERT_TAIL(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #define LIST_INSERT_TAIL_P(self, elem, T, getpath)                                 __HYBRID_LIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_KEY, getpath)
@@ -593,6 +609,8 @@
 	}	__WHILE0
 #define __HYBRID_LIST_FOREACH(elem, self, X, _) \
 	for ((elem) = (self)->lh_first; (elem); (elem) = X(_, elem).le_next)
+#define __HYBRID_LIST_FOREACH_FROM(elem, self, X, _) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->lh_first); (elem); (elem) = X(_, elem).le_next)
 #define __HYBRID_LIST_P_FOREACH(p_elem, self, X, _) \
 	for ((p_elem) = &(self)->lh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).le_next)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
@@ -603,10 +621,21 @@
 		for (__typeof__(elem) __hlfs_tvar;                    \
 		     (elem) && (__hlfs_tvar = X(_, elem).le_next, 1); \
 		     (elem) = __hlfs_tvar)
+#define __HYBRID_LIST_FOREACH_FROM_SAFE3(elem, self, X, _)         \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->lh_first), 0)) \
+		;                                                          \
+	else                                                           \
+		for (__typeof__(elem) __hlfs_tvar;                         \
+		     (elem) && (__hlfs_tvar = X(_, elem).le_next, 1);      \
+		     (elem) = __hlfs_tvar)
 #endif /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define __HYBRID_LIST_FOREACH_SAFE4(elem, self, X, _, tvar) \
 	for ((elem) = (self)->lh_first;                         \
 	     (elem) && ((tvar) = X(_, elem).le_next, 1);        \
+	     (elem) = (tvar))
+#define __HYBRID_LIST_FOREACH_FROM_SAFE4(elem, self, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->lh_first);   \
+	     (elem) && ((tvar) = X(_, elem).le_next, 1);             \
 	     (elem) = (tvar))
 
 
@@ -635,6 +664,7 @@
 #define SLIST_END(self)                            __NULLPTR
 #define SLIST_FIRST(self)                          (self)->slh_first
 #define SLIST_FOREACH(elem, self, key)             __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_KEY, key)
+#define SLIST_FOREACH_FROM(elem, self, key)        __HYBRID_SLIST_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
 #define SLIST_HEAD_INITIALIZER(self)               { __NULLPTR }
 #define SLIST_INIT(self)                           (void)((self)->slh_first = __NULLPTR)
 #define SLIST_INSERT(self, elem, key)              __HYBRID_SLIST_INSERT(self, elem, __HYBRID_Q_KEY, key)
@@ -644,27 +674,32 @@
 #define SLIST_REMOVE_AFTER(elem, key)              __HYBRID_SLIST_REMOVE_AFTER(elem, __HYBRID_Q_KEY, key)
 #define SLIST_REMOVE_HEAD(self, key)               __HYBRID_SLIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
 #if !defined(__HYBRID_LIST_RESTRICT_API) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_SLIST_CONCAT_3(dst, src, key)               __HYBRID_SLIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_CONCAT_4(dst, src, type, key)         __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_FOREACH_SAFE_3(elem, self, key)       __HYBRID_SLIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_FOREACH_SAFE_4(elem, self, key, tvar) __HYBRID_SLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_SLIST_REMOVE_3(self, elem, key)             __HYBRID_SLIST_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_REMOVE_4(self, elem, type, key)       __HYBRID_SLIST_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_SLIST_SWAP_2(l1, l2)                        __HYBRID_SLIST_SWAP(l1, l2, __typeof__(*(l1)->slh_first))
-#define __HYBRID_SLIST_SWAP_3(l1, l2, type)                  __HYBRID_SLIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
+#define __HYBRID_SLIST_CONCAT_3(dst, src, key)                    __HYBRID_SLIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_CONCAT_4(dst, src, type, key)              __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_FOREACH_FROM_SAFE_3(elem, self, key)       __HYBRID_SLIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_FOREACH_FROM_SAFE_4(elem, self, key, tvar) __HYBRID_SLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_SLIST_FOREACH_SAFE_3(elem, self, key)            __HYBRID_SLIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_FOREACH_SAFE_4(elem, self, key, tvar)      __HYBRID_SLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_SLIST_REMOVE_3(self, elem, key)                  __HYBRID_SLIST_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_REMOVE_4(self, elem, type, key)            __HYBRID_SLIST_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_SLIST_SWAP_2(l1, l2)                             __HYBRID_SLIST_SWAP(l1, l2, __typeof__(*(l1)->slh_first))
+#define __HYBRID_SLIST_SWAP_3(l1, l2, type)                       __HYBRID_SLIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
 #undef SLIST_CONCAT
+#undef SLIST_FOREACH_FROM_SAFE
 #undef SLIST_FOREACH_SAFE
 #undef SLIST_REMOVE
 #undef SLIST_SWAP
-#define SLIST_CONCAT(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONCAT_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_CONCAT(dst, src, [type], key) */
-#define SLIST_FOREACH_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_FOREACH_SAFE(elem, self, key, [tvar]) */
-#define SLIST_REMOVE(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_REMOVE(self, elem, [type], key) */
-#define SLIST_SWAP(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_SWAP_, (__VA_ARGS__))(__VA_ARGS__)   /* SLIST_SWAP(l1, l2, [type]) */
+#define SLIST_CONCAT(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONCAT_, (__VA_ARGS__))(__VA_ARGS__)            /* SLIST_CONCAT(dst, src, [type], key) */
+#define SLIST_FOREACH_FROM_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
+#define SLIST_FOREACH_SAFE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)      /* SLIST_FOREACH_SAFE(elem, self, key, [tvar]) */
+#define SLIST_REMOVE(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_, (__VA_ARGS__))(__VA_ARGS__)            /* SLIST_REMOVE(self, elem, [type], key) */
+#define SLIST_SWAP(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_SWAP_, (__VA_ARGS__))(__VA_ARGS__)              /* SLIST_SWAP(l1, l2, [type]) */
 #else /* !__HYBRID_LIST_RESTRICT_API && __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define SLIST_CONCAT(dst, src, type, key)          __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define SLIST_FOREACH_SAFE(elem, self, key, tvar)  __HYBRID_SLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define SLIST_REMOVE(self, elem, type, key)        __HYBRID_SLIST_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define SLIST_SWAP(l1, l2, type)                   __HYBRID_SLIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
+#define SLIST_CONCAT(dst, src, type, key)              __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define SLIST_FOREACH_FROM_SAFE(elem, self, key, tvar) __HYBRID_SLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define SLIST_FOREACH_SAFE(elem, self, key, tvar)      __HYBRID_SLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define SLIST_REMOVE(self, elem, type, key)            __HYBRID_SLIST_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define SLIST_SWAP(l1, l2, type)                       __HYBRID_SLIST_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
 #endif /* !... */
 #ifndef __HYBRID_LIST_RESTRICT_API
 #define SLIST_HEAD_P(T)  struct { T *slh_first; /* [0..1] List head */ }
@@ -675,6 +710,7 @@
 #define SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)                                 __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define SLIST_ATOMIC_INSERT_R_P(self, lo_elem, hi_elem, getpath)                           __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_CLEAR(self)                                                                  (void)((self)->slh_first = __NULLPTR)
+#define SLIST_FOREACH_FROM_P(elem, self, getpath)                                          __HYBRID_SLIST_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define SLIST_FOREACH_P(elem, self, getpath)                                               __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
 #define SLIST_INSERT_AFTER_P(predecessor, elem, getpath)                                   __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)                           __HYBRID_SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -709,6 +745,8 @@
 #define __HYBRID_SLIST_CONTAINS_5(self, elem, type, key, on_success)                                                      __HYBRID_SLIST_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_success)
 #define __HYBRID_SLIST_CONTAINS_P_4(self, elem, getpath, on_success)                                                      __HYBRID_SLIST_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
 #define __HYBRID_SLIST_CONTAINS_P_5(self, elem, T, getpath, on_success)                                                   __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_SLIST_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                                                         __HYBRID_SLIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SLIST_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                                                   __HYBRID_SLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_SLIST_FOREACH_SAFE_P_3(elem, self, getpath)                                                              __HYBRID_SLIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_SLIST_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                                                        __HYBRID_SLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_SLIST_INSERT_TAIL_3(self, elem, key)                                                                     __HYBRID_SLIST_INSERT_TAIL(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
@@ -757,37 +795,39 @@
 #define __HYBRID_SLIST_TRYREPLACE_R_6(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, type, key, on_failure)    __HYBRID_SLIST_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_failure)
 #define __HYBRID_SLIST_TRYREPLACE_R_P_5(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath, on_failure)    __HYBRID_SLIST_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
 #define __HYBRID_SLIST_TRYREPLACE_R_P_6(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, getpath, on_failure) __HYBRID_SLIST_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define SLIST_CONCAT_P(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONCAT_P_, (__VA_ARGS__))(__VA_ARGS__)        /* SLIST_CONCAT_P(dst, src, [type], getpath) */
-#define SLIST_CONTAINS(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)        /* SLIST_CONTAINS(self, elem, [type], key, on_success) */
-#define SLIST_CONTAINS_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SLIST_CONTAINS_P(self, elem, [T], getpath, on_success) */
-#define SLIST_FOREACH_SAFE_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)  /* SLIST_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
-#define SLIST_INSERT_TAIL(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)     /* SLIST_INSERT_TAIL(self, elem, [type], key) */
-#define SLIST_INSERT_TAIL_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)   /* SLIST_INSERT_TAIL_P(self, elem, [T], getpath) */
-#define SLIST_INSERT_TAIL_R(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_R_, (__VA_ARGS__))(__VA_ARGS__)   /* SLIST_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key) */
-#define SLIST_INSERT_TAIL_R_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_R_P_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_INSERT_TAIL_R_P(self, lo_elem, hi_elem, [T], getpath) */
-#define SLIST_P_PREV(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_P_PREV_, (__VA_ARGS__))(__VA_ARGS__)          /* SLIST_P_PREV(p_elem, [type], key) */
-#define SLIST_P_PREV_P(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_P_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)        /* SLIST_P_PREV_P(p_elem, [T], getpath) */
-#define SLIST_REMOVEALL(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
-#define SLIST_REMOVEALL_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)     /* SLIST_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
-#define SLIST_REMOVE_IF(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
-#define SLIST_REMOVE_IF_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)     /* SLIST_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
-#define SLIST_REMOVE_P(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)        /* SLIST_REMOVE_P(self, elem, [T], getpath) */
-#define SLIST_REPLACE(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)         /* SLIST_REPLACE(self, old_elem, new_elem, [type], key) */
-#define SLIST_REPLACE_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_REPLACE_P(self, old_elem, new_elem, [T], getpath) */
-#define SLIST_REPLACE_R(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
-#define SLIST_REPLACE_R_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)     /* SLIST_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
-#define SLIST_TRYREMOVE(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_TRYREMOVE(self, elem, [type], key, on_failure) */
-#define SLIST_TRYREMOVE_IF(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)    /* SLIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
-#define SLIST_TRYREMOVE_IF_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)  /* SLIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
-#define SLIST_TRYREMOVE_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)     /* SLIST_TRYREMOVE_P(self, elem, [T], getpath, on_failure) */
-#define SLIST_TRYREPLACE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)      /* SLIST_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
-#define SLIST_TRYREPLACE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)    /* SLIST_TRYREPLACE_P(self, old_elem, new_elem, [T], getpath, on_success) */
-#define SLIST_TRYREPLACE_R(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)    /* SLIST_TRYREPLACE(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_success) */
-#define SLIST_TRYREPLACE_R_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)  /* SLIST_TRYREPLACE_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath, on_success) */
+#define SLIST_CONCAT_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONCAT_P_, (__VA_ARGS__))(__VA_ARGS__)            /* SLIST_CONCAT_P(dst, src, [type], getpath) */
+#define SLIST_CONTAINS(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)            /* SLIST_CONTAINS(self, elem, [type], key, on_success) */
+#define SLIST_CONTAINS_P(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)          /* SLIST_CONTAINS_P(self, elem, [T], getpath, on_success) */
+#define SLIST_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define SLIST_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SLIST_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define SLIST_INSERT_TAIL(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)         /* SLIST_INSERT_TAIL(self, elem, [type], key) */
+#define SLIST_INSERT_TAIL_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_INSERT_TAIL_P(self, elem, [T], getpath) */
+#define SLIST_INSERT_TAIL_R(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_R_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key) */
+#define SLIST_INSERT_TAIL_R_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_INSERT_TAIL_R_P_, (__VA_ARGS__))(__VA_ARGS__)     /* SLIST_INSERT_TAIL_R_P(self, lo_elem, hi_elem, [T], getpath) */
+#define SLIST_P_PREV(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_P_PREV_, (__VA_ARGS__))(__VA_ARGS__)              /* SLIST_P_PREV(p_elem, [type], key) */
+#define SLIST_P_PREV_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_P_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)            /* SLIST_P_PREV_P(p_elem, [T], getpath) */
+#define SLIST_REMOVEALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)           /* SLIST_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define SLIST_REMOVEALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SLIST_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define SLIST_REMOVE_IF(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)           /* SLIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define SLIST_REMOVE_IF_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SLIST_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
+#define SLIST_REMOVE_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)            /* SLIST_REMOVE_P(self, elem, [T], getpath) */
+#define SLIST_REPLACE(...)             __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)             /* SLIST_REPLACE(self, old_elem, new_elem, [type], key) */
+#define SLIST_REPLACE_P(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)           /* SLIST_REPLACE_P(self, old_elem, new_elem, [T], getpath) */
+#define SLIST_REPLACE_R(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)           /* SLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
+#define SLIST_REPLACE_R_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SLIST_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
+#define SLIST_TRYREMOVE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)           /* SLIST_TRYREMOVE(self, elem, [type], key, on_failure) */
+#define SLIST_TRYREMOVE_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* SLIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define SLIST_TRYREMOVE_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SLIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define SLIST_TRYREMOVE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SLIST_TRYREMOVE_P(self, elem, [T], getpath, on_failure) */
+#define SLIST_TRYREPLACE(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)          /* SLIST_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
+#define SLIST_TRYREPLACE_P(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)        /* SLIST_TRYREPLACE_P(self, old_elem, new_elem, [T], getpath, on_success) */
+#define SLIST_TRYREPLACE_R(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)        /* SLIST_TRYREPLACE(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_success) */
+#define SLIST_TRYREPLACE_R_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_TRYREPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SLIST_TRYREPLACE_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath, on_success) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define SLIST_CONCAT_P(dst, src, type, getpath)                                                                __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #define SLIST_CONTAINS(self, elem, type, key, on_success)                                                      __HYBRID_SLIST_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath, on_success)
 #define SLIST_CONTAINS_P(self, elem, T, getpath, on_success)                                                   __HYBRID_SLIST_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define SLIST_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                                                   __HYBRID_SLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define SLIST_FOREACH_SAFE_P(elem, self, getpath, tvar)                                                        __HYBRID_SLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define SLIST_INSERT_TAIL(self, elem, type, key)                                                               __HYBRID_SLIST_INSERT_TAIL(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #define SLIST_INSERT_TAIL_P(self, elem, T, getpath)                                                            __HYBRID_SLIST_INSERT_TAIL(self, elem, T, __HYBRID_Q_PTH, getpath)
@@ -996,6 +1036,8 @@
 	((T *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&X(_, (T *)0).sle_next))
 #define __HYBRID_SLIST_FOREACH(elem, self, X, _) \
 	for ((elem) = (self)->slh_first; (elem); (elem) = X(_, elem).sle_next)
+#define __HYBRID_SLIST_FOREACH_FROM(elem, self, X, _) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->slh_first); (elem); (elem) = X(_, elem).sle_next)
 #define __HYBRID_SLIST_P_FOREACH(p_elem, self, X, _) \
 	for ((p_elem) = &(self)->slh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).sle_next)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
@@ -1006,10 +1048,21 @@
 		for (__typeof__(elem) __hslfs_tvar;                     \
 		     (elem) && (__hslfs_tvar = X(_, elem).sle_next, 1); \
 		     (elem) = __hslfs_tvar)
+#define __HYBRID_SLIST_FOREACH_FROM_SAFE3(elem, self, X, _)         \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->slh_first), 0)) \
+		;                                                           \
+	else                                                            \
+		for (__typeof__(elem) __hslfs_tvar;                         \
+		     (elem) && (__hslfs_tvar = X(_, elem).sle_next, 1);     \
+		     (elem) = __hslfs_tvar)
 #endif /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define __HYBRID_SLIST_FOREACH_SAFE4(elem, self, X, _, tvar) \
 	for ((elem) = (head)->slh_first;                         \
 	     (elem) && ((tvar) = X(_, elem).sle_next, 1);        \
+	     (elem) = (tvar))
+#define __HYBRID_SLIST_FOREACH_FROM_SAFE4(elem, self, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (head)->slh_first);   \
+	     (elem) && ((tvar) = X(_, elem).sle_next, 1);             \
 	     (elem) = (tvar))
 
 
@@ -1069,6 +1122,7 @@
 #define STAILQ_END(self)                                  __NULLPTR
 #define STAILQ_FIRST(self)                                (self)->stqh_first
 #define STAILQ_FOREACH(elem, self, key)                   __HYBRID_STAILQ_FOREACH(elem, self, __HYBRID_Q_KEY, key)
+#define STAILQ_FOREACH_FROM(elem, self, key)              __HYBRID_STAILQ_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
 #define STAILQ_HEAD_INITIALIZER(self)                     { __NULLPTR, &(self).stqh_first }
 #define STAILQ_INIT(self)                                 (void)(*((self)->stqh_last = &(self)->stqh_first) = __NULLPTR)
 #define STAILQ_INSERT_AFTER(self, predecessor, elem, key) __HYBRID_STAILQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_KEY, key)
@@ -1078,27 +1132,32 @@
 #define STAILQ_REMOVE_AFTER(self, elem, key)              __HYBRID_STAILQ_REMOVE_AFTER(self, elem, __HYBRID_Q_KEY, key)
 #define STAILQ_REMOVE_HEAD(self, key)                     __HYBRID_STAILQ_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
 #if !defined(__HYBRID_LIST_RESTRICT_API) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_STAILQ_FOREACH_SAFE_3(elem, self, key)       __HYBRID_STAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_FOREACH_SAFE_4(elem, self, key, tvar) __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_STAILQ_LAST_2(self, key)                     __HYBRID_STAILQ_LAST(self, __typeof__(*(self)->stqh_first), key)
-#define __HYBRID_STAILQ_LAST_3(self, type, key)               __HYBRID_STAILQ_LAST(self, __HYBRID_Q_STRUCT type, key)
-#define __HYBRID_STAILQ_REMOVE_3(self, elem, key)             __HYBRID_STAILQ_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_REMOVE_4(self, elem, type, key)       __HYBRID_STAILQ_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_STAILQ_SWAP_2(l1, l2)                        __HYBRID_STAILQ_SWAP(l1, l2, __typeof__(*(l1)->stqh_first))
-#define __HYBRID_STAILQ_SWAP_3(l1, l2, type)                  __HYBRID_STAILQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
+#define __HYBRID_STAILQ_FOREACH_FROM_SAFE_3(elem, self, key)       __HYBRID_STAILQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_FOREACH_FROM_SAFE_4(elem, self, key, tvar) __HYBRID_STAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_STAILQ_FOREACH_SAFE_3(elem, self, key)            __HYBRID_STAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_FOREACH_SAFE_4(elem, self, key, tvar)      __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_STAILQ_LAST_2(self, key)                          __HYBRID_STAILQ_LAST(self, __typeof__(*(self)->stqh_first), key)
+#define __HYBRID_STAILQ_LAST_3(self, type, key)                    __HYBRID_STAILQ_LAST(self, __HYBRID_Q_STRUCT type, key)
+#define __HYBRID_STAILQ_REMOVE_3(self, elem, key)                  __HYBRID_STAILQ_REMOVE(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_REMOVE_4(self, elem, type, key)            __HYBRID_STAILQ_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_STAILQ_SWAP_2(l1, l2)                             __HYBRID_STAILQ_SWAP(l1, l2, __typeof__(*(l1)->stqh_first))
+#define __HYBRID_STAILQ_SWAP_3(l1, l2, type)                       __HYBRID_STAILQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
+#undef STAILQ_FOREACH_FROM_SAFE
 #undef STAILQ_FOREACH_SAFE
 #undef STAILQ_LAST
 #undef STAILQ_REMOVE
 #undef STAILQ_SWAP
-#define STAILQ_FOREACH_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_FOREACH_SAFE(elem, self, key, [tvar]) */
-#define STAILQ_LAST(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_LAST_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_LAST(self, [type], key) */
-#define STAILQ_REMOVE(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_, (__VA_ARGS__))(__VA_ARGS__)       /* STAILQ_REMOVE(self, elem, [type], key) */
-#define STAILQ_SWAP(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_SWAP_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_SWAP(l1, l2, [type]) */
+#define STAILQ_FOREACH_FROM_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
+#define STAILQ_FOREACH_SAFE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_FOREACH_SAFE(elem, self, key, [tvar]) */
+#define STAILQ_LAST(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_LAST_, (__VA_ARGS__))(__VA_ARGS__)              /* STAILQ_LAST(self, [type], key) */
+#define STAILQ_REMOVE(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_, (__VA_ARGS__))(__VA_ARGS__)            /* STAILQ_REMOVE(self, elem, [type], key) */
+#define STAILQ_SWAP(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_SWAP_, (__VA_ARGS__))(__VA_ARGS__)              /* STAILQ_SWAP(l1, l2, [type]) */
 #else /* !__HYBRID_LIST_RESTRICT_API && __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define STAILQ_FOREACH_SAFE(elem, self, key, tvar) __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define STAILQ_LAST(self, type, key)               __HYBRID_STAILQ_LAST(self, __HYBRID_Q_STRUCT type, key)
-#define STAILQ_REMOVE(self, elem, type, key)       __HYBRID_STAILQ_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define STAILQ_SWAP(l1, l2, type)                  __HYBRID_STAILQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
+#define STAILQ_FOREACH_FROM_SAFE(elem, self, key, tvar) __HYBRID_STAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define STAILQ_FOREACH_SAFE(elem, self, key, tvar)      __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define STAILQ_LAST(self, type, key)                    __HYBRID_STAILQ_LAST(self, __HYBRID_Q_STRUCT type, key)
+#define STAILQ_REMOVE(self, elem, type, key)            __HYBRID_STAILQ_REMOVE(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define STAILQ_SWAP(l1, l2, type)                       __HYBRID_STAILQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type)
 #endif /* __HYBRID_LIST_RESTRICT_API || !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #ifndef __HYBRID_LIST_RESTRICT_API
 #define STAILQ_ENTRY_P(T) struct { T *stqe_next; /* [0..1] Next element */ }
@@ -1108,6 +1167,7 @@
 		**stqh_last;   /* [0..1][1..1] Pointer to last-element-pointer. */ \
 	}
 #define STAILQ_CLEAR(self)                                                    (void)(*((self)->stqh_last = &(self)->stqh_first) = __NULLPTR)
+#define STAILQ_FOREACH_FROM_P(elem, self, getpath)                            __HYBRID_STAILQ_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define STAILQ_FOREACH_P(elem, self, getpath)                                 __HYBRID_STAILQ_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
 #define STAILQ_INSERT_AFTER_P(self, predecessor, elem, getpath)               __HYBRID_STAILQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, getpath)   __HYBRID_STAILQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -1136,6 +1196,8 @@
 #define __HYBRID_STAILQ_CONTAINS_5(self, elem, type, key, on_success)                                                      __HYBRID_STAILQ_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_success)
 #define __HYBRID_STAILQ_CONTAINS_P_4(self, elem, getpath, on_success)                                                      __HYBRID_STAILQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
 #define __HYBRID_STAILQ_CONTAINS_P_5(self, elem, T, getpath, on_success)                                                   __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_STAILQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                                                         __HYBRID_STAILQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                                                   __HYBRID_STAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_STAILQ_FOREACH_SAFE_P_3(elem, self, getpath)                                                              __HYBRID_STAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_STAILQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                                                        __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_STAILQ_LAST_P_2(self, getpath)                                                                            __HYBRID_STAILQ_LAST_P(self, __typeof__(*(self)->stqh_first), getpath)
@@ -1180,34 +1242,36 @@
 #define __HYBRID_STAILQ_TRYREPLACE_R_6(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, type, key, on_failure)    __HYBRID_STAILQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_failure)
 #define __HYBRID_STAILQ_TRYREPLACE_R_P_5(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath, on_failure)    __HYBRID_STAILQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
 #define __HYBRID_STAILQ_TRYREPLACE_R_P_6(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, getpath, on_failure) __HYBRID_STAILQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define STAILQ_CONTAINS(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)       /* STAILQ_CONTAINS(self, elem, [type], key, on_success) */
-#define STAILQ_CONTAINS_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)     /* STAILQ_CONTAINS_P(self, elem, [T], getpath, on_success) */
-#define STAILQ_FOREACH_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
-#define STAILQ_LAST_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_LAST_P(self, [T], getpath) */
-#define STAILQ_P_REPLACE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_P_REPLACE(self, p_old_elem, new_elem, [type], key) */
-#define STAILQ_P_REPLACE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)    /* STAILQ_P_REPLACE_P(self, p_old_elem, new_elem, [T], getpath) */
-#define STAILQ_P_REPLACE_R(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)    /* STAILQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
-#define STAILQ_P_REPLACE_R_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)  /* STAILQ_P_REPLACE_R_P(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
-#define STAILQ_REMOVEALL(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
-#define STAILQ_REMOVEALL_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)    /* STAILQ_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
-#define STAILQ_REMOVE_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
-#define STAILQ_REMOVE_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)    /* STAILQ_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
-#define STAILQ_REMOVE_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)       /* STAILQ_REMOVE_P(self, elem, [T], getpath) */
-#define STAILQ_REPLACE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)        /* STAILQ_REPLACE(self, old_elem, new_elem, [type], key) */
-#define STAILQ_REPLACE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_REPLACE_P(self, old_elem, new_elem, [T], getpath) */
-#define STAILQ_REPLACE_R(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
-#define STAILQ_REPLACE_R_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)    /* STAILQ_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
-#define STAILQ_TRYREMOVE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_TRYREMOVE(self, elem, [type], key, on_failure) */
-#define STAILQ_TRYREMOVE_IF(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)   /* STAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
-#define STAILQ_TRYREMOVE_IF_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
-#define STAILQ_TRYREMOVE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)    /* STAILQ_TRYREMOVE_P(self, elem, [T], getpath, on_failure) */
-#define STAILQ_TRYREPLACE(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)     /* STAILQ_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
-#define STAILQ_TRYREPLACE_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)   /* STAILQ_TRYREPLACE_P(self, old_elem, new_elem, [T], getpath, on_success) */
-#define STAILQ_TRYREPLACE_R(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)   /* STAILQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_success) */
-#define STAILQ_TRYREPLACE_R_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath, on_success) */
+#define STAILQ_CONTAINS(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)            /* STAILQ_CONTAINS(self, elem, [type], key, on_success) */
+#define STAILQ_CONTAINS_P(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)          /* STAILQ_CONTAINS_P(self, elem, [T], getpath, on_success) */
+#define STAILQ_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define STAILQ_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define STAILQ_LAST_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)              /* STAILQ_LAST_P(self, [T], getpath) */
+#define STAILQ_P_REPLACE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)           /* STAILQ_P_REPLACE(self, p_old_elem, new_elem, [type], key) */
+#define STAILQ_P_REPLACE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_P_REPLACE_P(self, p_old_elem, new_elem, [T], getpath) */
+#define STAILQ_P_REPLACE_R(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
+#define STAILQ_P_REPLACE_R_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)       /* STAILQ_P_REPLACE_R_P(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
+#define STAILQ_REMOVEALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)           /* STAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define STAILQ_REMOVEALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define STAILQ_REMOVE_IF(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)           /* STAILQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define STAILQ_REMOVE_IF_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
+#define STAILQ_REMOVE_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)            /* STAILQ_REMOVE_P(self, elem, [T], getpath) */
+#define STAILQ_REPLACE(...)             __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)             /* STAILQ_REPLACE(self, old_elem, new_elem, [type], key) */
+#define STAILQ_REPLACE_P(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)           /* STAILQ_REPLACE_P(self, old_elem, new_elem, [T], getpath) */
+#define STAILQ_REPLACE_R(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)           /* STAILQ_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
+#define STAILQ_REPLACE_R_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
+#define STAILQ_TRYREMOVE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)           /* STAILQ_TRYREMOVE(self, elem, [type], key, on_failure) */
+#define STAILQ_TRYREMOVE_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* STAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define STAILQ_TRYREMOVE_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define STAILQ_TRYREMOVE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_TRYREMOVE_P(self, elem, [T], getpath, on_failure) */
+#define STAILQ_TRYREPLACE(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)          /* STAILQ_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
+#define STAILQ_TRYREPLACE_P(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)        /* STAILQ_TRYREPLACE_P(self, old_elem, new_elem, [T], getpath, on_success) */
+#define STAILQ_TRYREPLACE_R(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)        /* STAILQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_success) */
+#define STAILQ_TRYREPLACE_R_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_TRYREPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath, on_success) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define STAILQ_CONTAINS(self, elem, type, key, on_success)                                                      __HYBRID_STAILQ_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath, on_success)
 #define STAILQ_CONTAINS_P(self, elem, T, getpath, on_success)                                                   __HYBRID_STAILQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define STAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                                                   __HYBRID_STAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define STAILQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                                                        __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define STAILQ_LAST_P(self, T, getpath)                                                                         __HYBRID_STAILQ_LAST_P(self, T, getpath)
 #define STAILQ_P_REPLACE(self, p_old_elem, new_elem, type, key)                                                 __HYBRID_STAILQ_P_REPLACE(self, p_old_elem, new_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -1412,6 +1476,8 @@
 	}	__WHILE0
 #define __HYBRID_STAILQ_FOREACH(elem, self, X, _) \
 	for ((elem) = (self)->stqh_first; (elem); (elem) = X(_, elem).stqe_next)
+#define __HYBRID_STAILQ_FOREACH_FROM(elem, self, X, _) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->stqh_first); (elem); (elem) = X(_, elem).stqe_next)
 #define __HYBRID_STAILQ_P_FOREACH(p_elem, self, X, _) \
 	for ((p_elem) = &(self)->stqh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).stqe_next)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
@@ -1422,10 +1488,21 @@
 		for (__typeof__(elem) __hstqfs_tvar;                      \
 		     (elem) && (__hstqfs_tvar = X(_, elem).stqe_next, 1); \
 		     (elem) = __hstqfs_tvar)
+#define __HYBRID_STAILQ_FOREACH_FROM_SAFE3(elem, self, X, _)         \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->stqh_first), 0)) \
+		;                                                            \
+	else                                                             \
+		for (__typeof__(elem) __hstqfs_tvar;                         \
+		     (elem) && (__hstqfs_tvar = X(_, elem).stqe_next, 1);    \
+		     (elem) = __hstqfs_tvar)
 #endif /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, X, _, tvar) \
 	for ((elem) = (head)->stqh_first;                         \
 	     (elem) && ((tvar) = X(_, elem).stqe_next, 1);        \
+	     (elem) = (tvar))
+#define __HYBRID_STAILQ_FOREACH_FROM_SAFE4(elem, self, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (head)->stqh_first);   \
+	     (elem) && ((tvar) = X(_, elem).stqe_next, 1);             \
 	     (elem) = (tvar))
 
 
@@ -1524,6 +1601,8 @@
 		**sqh_last;   /* [0..1][1..1] Pointer to last-element-pointer. */ \
 	}
 #define SIMPLEQ_CLEAR(self)                                                    (void)(*((self)->sqh_last = &(self)->sqh_first) = __NULLPTR)
+#define SIMPLEQ_FOREACH_FROM(elem, self, key)                                  __HYBRID_SIMPLEQ_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
+#define SIMPLEQ_FOREACH_FROM_P(elem, self, getpath)                            __HYBRID_SIMPLEQ_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_FOREACH_P(elem, self, getpath)                                 __HYBRID_SIMPLEQ_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_INSERT_AFTER_P(self, predecessor, elem, getpath)               __HYBRID_SIMPLEQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, getpath)   __HYBRID_SIMPLEQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -1552,6 +1631,10 @@
 #define __HYBRID_SIMPLEQ_CONTAINS_5(self, elem, type, key, on_success)                                                      __HYBRID_SIMPLEQ_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_success)
 #define __HYBRID_SIMPLEQ_CONTAINS_P_4(self, elem, getpath, on_success)                                                      __HYBRID_SIMPLEQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath, on_success)
 #define __HYBRID_SIMPLEQ_CONTAINS_P_5(self, elem, T, getpath, on_success)                                                   __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE_3(elem, self, key)                                                               __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE_4(elem, self, key, tvar)                                                         __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                                                         __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                                                   __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_SIMPLEQ_FOREACH_SAFE_P_3(elem, self, getpath)                                                              __HYBRID_SIMPLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_SIMPLEQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                                                        __HYBRID_SIMPLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_SIMPLEQ_LAST_P_2(self, getpath)                                                                            __HYBRID_SIMPLEQ_LAST_P(self, __typeof__(*(self)->sqh_first), getpath)
@@ -1596,34 +1679,38 @@
 #define __HYBRID_SIMPLEQ_TRYREPLACE_R_6(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, type, key, on_failure)    __HYBRID_SIMPLEQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_failure)
 #define __HYBRID_SIMPLEQ_TRYREPLACE_R_P_5(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath, on_failure)    __HYBRID_SIMPLEQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath, on_failure)
 #define __HYBRID_SIMPLEQ_TRYREPLACE_R_P_6(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, getpath, on_failure) __HYBRID_SIMPLEQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, __HYBRID_Q_PTH, getpath, on_failure)
-#define SIMPLEQ_CONTAINS(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)       /* SIMPLEQ_CONTAINS(self, elem, [type], key, on_success) */
-#define SIMPLEQ_CONTAINS_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)     /* SIMPLEQ_CONTAINS_P(self, elem, [T], getpath, on_success) */
-#define SIMPLEQ_FOREACH_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
-#define SIMPLEQ_LAST_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_LAST_P(self, [T], getpath) */
-#define SIMPLEQ_P_REPLACE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, [type], key) */
-#define SIMPLEQ_P_REPLACE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)    /* SIMPLEQ_P_REPLACE_P(self, p_old_elem, new_elem, [T], getpath) */
-#define SIMPLEQ_P_REPLACE_R(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)    /* SIMPLEQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
-#define SIMPLEQ_P_REPLACE_R_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)  /* SIMPLEQ_P_REPLACE_R_P(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
-#define SIMPLEQ_REMOVEALL(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
-#define SIMPLEQ_REMOVEALL_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)    /* SIMPLEQ_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
-#define SIMPLEQ_REMOVE_IF(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
-#define SIMPLEQ_REMOVE_IF_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)    /* SIMPLEQ_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
-#define SIMPLEQ_REMOVE_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)       /* SIMPLEQ_REMOVE_P(self, elem, [T], getpath) */
-#define SIMPLEQ_REPLACE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)        /* SIMPLEQ_REPLACE(self, old_elem, new_elem, [type], key) */
-#define SIMPLEQ_REPLACE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_REPLACE_P(self, old_elem, new_elem, [T], getpath) */
-#define SIMPLEQ_REPLACE_R(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
-#define SIMPLEQ_REPLACE_R_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)    /* SIMPLEQ_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
-#define SIMPLEQ_TRYREMOVE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_TRYREMOVE(self, elem, [type], key, on_failure) */
-#define SIMPLEQ_TRYREMOVE_IF(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)   /* SIMPLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
-#define SIMPLEQ_TRYREMOVE_IF_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
-#define SIMPLEQ_TRYREMOVE_P(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)    /* SIMPLEQ_TRYREMOVE_P(self, elem, [T], getpath, on_failure) */
-#define SIMPLEQ_TRYREPLACE(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)     /* SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
-#define SIMPLEQ_TRYREPLACE_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)   /* SIMPLEQ_TRYREPLACE_P(self, old_elem, new_elem, [T], getpath, on_success) */
-#define SIMPLEQ_TRYREPLACE_R(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)   /* SIMPLEQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_success) */
-#define SIMPLEQ_TRYREPLACE_R_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath, on_success) */
+#define SIMPLEQ_CONTAINS(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_, (__VA_ARGS__))(__VA_ARGS__)            /* SIMPLEQ_CONTAINS(self, elem, [type], key, on_success) */
+#define SIMPLEQ_CONTAINS_P(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CONTAINS_P_, (__VA_ARGS__))(__VA_ARGS__)          /* SIMPLEQ_CONTAINS_P(self, elem, [T], getpath, on_success) */
+#define SIMPLEQ_FOREACH_FROM_SAFE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)   /* SIMPLEQ_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
+#define SIMPLEQ_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define SIMPLEQ_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define SIMPLEQ_LAST_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)              /* SIMPLEQ_LAST_P(self, [T], getpath) */
+#define SIMPLEQ_P_REPLACE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)           /* SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, [type], key) */
+#define SIMPLEQ_P_REPLACE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_P_REPLACE_P(self, p_old_elem, new_elem, [T], getpath) */
+#define SIMPLEQ_P_REPLACE_R(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
+#define SIMPLEQ_P_REPLACE_R_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)       /* SIMPLEQ_P_REPLACE_R_P(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
+#define SIMPLEQ_REMOVEALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVEALL_, (__VA_ARGS__))(__VA_ARGS__)           /* SIMPLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define SIMPLEQ_REMOVEALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVEALL_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define SIMPLEQ_REMOVE_IF(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)           /* SIMPLEQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define SIMPLEQ_REMOVE_IF_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
+#define SIMPLEQ_REMOVE_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)            /* SIMPLEQ_REMOVE_P(self, elem, [T], getpath) */
+#define SIMPLEQ_REPLACE(...)             __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)             /* SIMPLEQ_REPLACE(self, old_elem, new_elem, [type], key) */
+#define SIMPLEQ_REPLACE_P(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)           /* SIMPLEQ_REPLACE_P(self, old_elem, new_elem, [T], getpath) */
+#define SIMPLEQ_REPLACE_R(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)           /* SIMPLEQ_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
+#define SIMPLEQ_REPLACE_R_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_REPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath) */
+#define SIMPLEQ_TRYREMOVE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_, (__VA_ARGS__))(__VA_ARGS__)           /* SIMPLEQ_TRYREMOVE(self, elem, [type], key, on_failure) */
+#define SIMPLEQ_TRYREMOVE_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* SIMPLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define SIMPLEQ_TRYREMOVE_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define SIMPLEQ_TRYREMOVE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREMOVE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_TRYREMOVE_P(self, elem, [T], getpath, on_failure) */
+#define SIMPLEQ_TRYREPLACE(...)          __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_, (__VA_ARGS__))(__VA_ARGS__)          /* SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, [type], key, on_success) */
+#define SIMPLEQ_TRYREPLACE_P(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)        /* SIMPLEQ_TRYREPLACE_P(self, old_elem, new_elem, [T], getpath, on_success) */
+#define SIMPLEQ_TRYREPLACE_R(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)        /* SIMPLEQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_success) */
+#define SIMPLEQ_TRYREPLACE_R_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_TRYREPLACE_R_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_TRYREPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [T], getpath, on_success) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define SIMPLEQ_CONTAINS(self, elem, type, key, on_success)                                                      __HYBRID_SIMPLEQ_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath, on_success)
 #define SIMPLEQ_CONTAINS_P(self, elem, T, getpath, on_success)                                                   __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, __HYBRID_Q_PTH, getpath, on_success)
+#define SIMPLEQ_FOREACH_FROM_SAFE(elem, self, key, tvar)                                                         __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define SIMPLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                                                   __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define SIMPLEQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                                                        __HYBRID_SIMPLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define SIMPLEQ_LAST_P(self, T, getpath)                                                                         __HYBRID_SIMPLEQ_LAST_P(self, T, getpath)
 #define SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, type, key)                                                 __HYBRID_SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -1819,6 +1906,8 @@
 	}	__WHILE0
 #define __HYBRID_SIMPLEQ_FOREACH(elem, self, X, _) \
 	for ((elem) = (self)->sqh_first; (elem); (elem) = X(_, elem).sqe_next)
+#define __HYBRID_SIMPLEQ_FOREACH_FROM(elem, self, X, _) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->sqh_first); (elem); (elem) = X(_, elem).sqe_next)
 #define __HYBRID_SIMPLEQ_P_FOREACH(p_elem, self, X, _) \
 	for ((p_elem) = &(self)->sqh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).sqe_next)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
@@ -1829,10 +1918,21 @@
 		for (__typeof__(elem) __hsqfs_tvar;                     \
 		     (elem) && (__hsqfs_tvar = X(_, elem).sqe_next, 1); \
 		     (elem) = __hsqfs_tvar)
+#define __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE3(elem, self, X, _)       \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->sqh_first), 0)) \
+		;                                                           \
+	else                                                            \
+		for (__typeof__(elem) __hsqfs_tvar;                         \
+		     (elem) && (__hsqfs_tvar = X(_, elem).sqe_next, 1);     \
+		     (elem) = __hsqfs_tvar)
 #endif /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define __HYBRID_SIMPLEQ_FOREACH_SAFE4(elem, self, X, _, tvar) \
 	for ((elem) = (head)->sqh_first;                           \
 	     (elem) && ((tvar) = X(_, elem).sqe_next, 1);          \
+	     (elem) = (tvar))
+#define __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE4(elem, self, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (head)->sqh_first);     \
+	     (elem) && ((tvar) = X(_, elem).sqe_next, 1);               \
 	     (elem) = (tvar))
 
 
@@ -1872,6 +1972,7 @@
 #define TAILQ_ENTRY(type)                                _TAILQ_ENTRY(__HYBRID_Q_STRUCT type, )
 #define TAILQ_FIRST(self)                                (self)->tqh_first
 #define TAILQ_FOREACH(elem, self, key)                   __HYBRID_TAILQ_FOREACH(elem, self, __HYBRID_Q_KEY, key)
+#define TAILQ_FOREACH_FROM(elem, self, key)              __HYBRID_TAILQ_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
 #define TAILQ_HEAD_INITIALIZER(self)                     { __NULLPTR, &(self).tqh_first }
 #define TAILQ_INIT(self)                                 (void)(*((self)->tqh_last = &(self)->tqh_first) = __NULLPTR)
 #define TAILQ_INSERT_AFTER(self, predecessor, elem, key) __HYBRID_TAILQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_KEY, key)
@@ -1881,33 +1982,49 @@
 #define TAILQ_NEXT(elem, key)                            (elem)->key.tqe_next
 #define TAILQ_REMOVE(self, elem, key)                    __HYBRID_TAILQ_REMOVE(self, elem, __HYBRID_Q_KEY, key)
 #if !defined(__HYBRID_LIST_RESTRICT_API) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_3(elem, self, key)                      __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_4(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, struct headname, __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_3(elem, self, key)                 __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_4(elem, self, headname, key)       __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, struct headname, __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_5(elem, self, headname, key, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, struct headname, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_TAILQ_FOREACH_SAFE_3(elem, self, key)        __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_SAFE_4(elem, self, key, tvar)  __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_TAILQ_LAST_1(self)                                            (*(((__typeof__(*(self)) *)((self)->tqh_last))->tqh_last))
-#define __HYBRID_TAILQ_LAST_2(self, headname)                                  (*(((__HYBRID_Q_STRUCT headname *)((self)->tqh_last))->tqh_last))
-#define __HYBRID_TAILQ_PREV_2(elem, key)                                       __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_PREV_3(elem, headname, key)                             __HYBRID_TAILQ_PREV(elem, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_3(elem, self, key)                         __HYBRID_TAILQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_4(elem, self, key, tvar)                   __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_3(elem, self, key)                           __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_4(elem, self, headname, key)                 __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_3(elem, self, key)                      __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_4(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_3(elem, self, key)                 __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3T(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_4(elem, self, headname, key)       __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_5(elem, self, headname, key, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, struct headname, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_3(elem, self, key)                      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_4(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_5(elem, self, headname, key, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, struct headname, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_TAILQ_FOREACH_SAFE_3(elem, self, key)                              __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_SAFE_4(elem, self, key, tvar)                        __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_TAILQ_LAST_1(self)                                                 (*(((__typeof__(*(self)) *)((self)->tqh_last))->tqh_last))
+#define __HYBRID_TAILQ_LAST_2(self, headname)                                       (*(((__HYBRID_Q_STRUCT headname *)((self)->tqh_last))->tqh_last))
+#define __HYBRID_TAILQ_PREV_2(elem, key)                                            __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_PREV_3(elem, headname, key)                                  __HYBRID_TAILQ_PREV(elem, struct headname, __HYBRID_Q_KEY, key)
+#undef TAILQ_FOREACH_FROM_SAFE
 #undef TAILQ_FOREACH_REVERSE
+#undef TAILQ_FOREACH_REVERSE_FROM
+#undef TAILQ_FOREACH_REVERSE_FROM_SAFE
 #undef TAILQ_FOREACH_REVERSE_SAFE
 #undef TAILQ_FOREACH_SAFE
 #undef TAILQ_LAST
 #undef TAILQ_PREV
-#define TAILQ_FOREACH_REVERSE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_, (__VA_ARGS__))(__VA_ARGS__)      /* TAILQ_FOREACH_REVERSE(elem, self, [headname], key) */
-#define TAILQ_FOREACH_REVERSE_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_FOREACH_REVERSE_SAFE(elem, self, [headname], key, [tvar]) */
-#define TAILQ_FOREACH_SAFE(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)         /* TAILQ_FOREACH_SAFE(elem, self, key, [tvar]) */
-#define TAILQ_LAST(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_LAST_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_LAST(self, [headname]) */
-#define TAILQ_PREV(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_PREV(elem, [headname], key) */
+#define TAILQ_FOREACH_FROM_SAFE(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)         /* TAILQ_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
+#define TAILQ_FOREACH_REVERSE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_, (__VA_ARGS__))(__VA_ARGS__)           /* TAILQ_FOREACH_REVERSE(elem, self, [headname], key) */
+#define TAILQ_FOREACH_REVERSE_FROM(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_FROM_, (__VA_ARGS__))(__VA_ARGS__)      /* TAILQ_FOREACH_REVERSE_FROM(elem, self, [headname], key) */
+#define TAILQ_FOREACH_REVERSE_FROM_SAFE(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_FOREACH_REVERSE_FROM_SAFE(elem, self, [headname], key, [tvar]) */
+#define TAILQ_FOREACH_REVERSE_SAFE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_SAFE_, (__VA_ARGS__))(__VA_ARGS__)      /* TAILQ_FOREACH_REVERSE_SAFE(elem, self, [headname], key, [tvar]) */
+#define TAILQ_FOREACH_SAFE(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)              /* TAILQ_FOREACH_SAFE(elem, self, key, [tvar]) */
+#define TAILQ_LAST(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_LAST_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_LAST(self, [headname]) */
+#define TAILQ_PREV(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_PREV(elem, [headname], key) */
 #else /* !__HYBRID_LIST_RESTRICT_API && __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define TAILQ_FOREACH_REVERSE(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
-#define TAILQ_FOREACH_REVERSE_SAFE(elem, self, headname, key, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key, tvar)
-#define TAILQ_FOREACH_SAFE(elem, self, key, tvar)                   __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define TAILQ_LAST(self, headname)                                  (*(((__HYBRID_Q_STRUCT headname *)((self)->tqh_last))->tqh_last))
-#define TAILQ_PREV(elem, headname, key)                             __HYBRID_TAILQ_PREV(elem, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
+#define TAILQ_FOREACH_FROM_SAFE(elem, self, key, tvar)                   __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define TAILQ_FOREACH_REVERSE(elem, self, headname, key)                 __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
+#define TAILQ_FOREACH_REVERSE_FROM(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
+#define TAILQ_FOREACH_REVERSE_FROM_SAFE(elem, self, headname, key, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key, tvar)
+#define TAILQ_FOREACH_REVERSE_SAFE(elem, self, headname, key, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key, tvar)
+#define TAILQ_FOREACH_SAFE(elem, self, key, tvar)                        __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define TAILQ_LAST(self, headname)                                       (*(((__HYBRID_Q_STRUCT headname *)((self)->tqh_last))->tqh_last))
+#define TAILQ_PREV(elem, headname, key)                                  __HYBRID_TAILQ_PREV(elem, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
 #endif /* __HYBRID_LIST_RESTRICT_API || !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #ifndef __HYBRID_LIST_RESTRICT_API
 #define _TAILQ_HEAD_P(T, qual)                                                 \
@@ -1927,7 +2044,9 @@
 #define TAILQ_ENTRY_UNBOUND_INIT(entry)                                                      (void)(__HYBRID_Q_BADPTR((entry)->tqe_next), (entry)->tqe_prev = __NULLPTR)
 #define TAILQ_ENTRY_UNBOUND_INITIALIZER                                                      { __NULLPTR, __NULLPTR }
 #define TAILQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
+#define TAILQ_FOREACH_FROM_P(elem, self, getpath)                                            __HYBRID_TAILQ_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define TAILQ_FOREACH_P(elem, self, getpath)                                                 __HYBRID_TAILQ_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
+#define TAILQ_FOREACH_REVERSE_FROM_P(elem, self, HEAD_T, getpath)                            __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
 #define TAILQ_FOREACH_REVERSE_P(elem, self, HEAD_T, getpath)                                 __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
 #define TAILQ_INSERT_AFTER_P(self, predecessor, elem, getpath)                               __HYBRID_TAILQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, key)                       __HYBRID_TAILQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -1955,20 +2074,29 @@
 #define TAILQ_UNBIND(self, elem, key)                                                        __HYBRID_TAILQ_UNBIND(self, elem, __HYBRID_Q_KEY, key)
 #define TAILQ_UNBIND_P(self, elem, getpath)                                                  __HYBRID_TAILQ_UNBIND(self, elem, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)               __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_4(elem, self, HEAD_T, getpath)       __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_5(elem, self, HEAD_T, getpath, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_TAILQ_FOREACH_SAFE_P_3(elem, self, getpath)                       __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                 __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_TAILQ_PREV_P_2(elem, getpath)                                     __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_PREV_P_3(elem, HEAD_T, getpath)                             __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
-#define TAILQ_FOREACH_REVERSE_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, [HEAD_T], getpath, [tvar]) */
-#define TAILQ_FOREACH_SAFE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* TAILQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
-#define TAILQ_PREV_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_PREV_P(elem, [HEAD_T], getpath) */
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                       __HYBRID_TAILQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                 __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_3(elem, self, getpath)               __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3T(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_4(elem, self, HEAD_T, getpath)       __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_5(elem, self, HEAD_T, getpath, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)                    __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_4(elem, self, HEAD_T, getpath)            __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_5(elem, self, HEAD_T, getpath, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_FOREACH_SAFE_P_3(elem, self, getpath)                            __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                      __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_PREV_P_2(elem, getpath)                                          __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_PREV_P_3(elem, HEAD_T, getpath)                                  __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define TAILQ_FOREACH_FROM_SAFE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* TAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define TAILQ_FOREACH_REVERSE_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, [HEAD_T], getpath, [tvar]) */
+#define TAILQ_FOREACH_REVERSE_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, [HEAD_T], getpath, [tvar]) */
+#define TAILQ_FOREACH_SAFE_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)              /* TAILQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define TAILQ_PREV_P(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_PREV_P(elem, [HEAD_T], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, HEAD_T, getpath, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
-#define TAILQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                 __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define TAILQ_PREV_P(elem, HEAD_T, getpath)                             __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define TAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                 __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, HEAD_T, getpath, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, HEAD_T, getpath, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                      __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_PREV_P(elem, HEAD_T, getpath)                                  __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
@@ -2021,11 +2149,15 @@
 	       __HYBRID_Q_BADPTR(X(_, elem).tqe_next),                            \
 	       X(_, elem).tqe_prev = __NULLPTR)
 #define __HYBRID_TAILQ_FOREACH(elem, self, X, _) \
-	for ((elem) = (self)->tqh_first; (elem);     \
-	     (elem) = X(_, elem).tqe_next)
+	for ((elem) = (self)->tqh_first; (elem); (elem) = X(_, elem).tqe_next)
+#define __HYBRID_TAILQ_FOREACH_FROM(elem, self, X, _) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->tqh_first); (elem); (elem) = X(_, elem).tqe_next)
 #define __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, HEAD_T, X, _)       \
 	for ((elem) = *(((HEAD_T *)((self)->tqh_last))->tqh_last); (elem); \
 	     (elem) = *(((HEAD_T *)(X(_, elem).tqe_prev))->tqh_last))
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, HEAD_T, X, _)                     \
+	for ((elem) ? (void)0 : (void)((elem) = *(((HEAD_T *)((self)->tqh_last))->tqh_last)); \
+	     (elem); (elem) = *(((HEAD_T *)(X(_, elem).tqe_prev))->tqh_last))
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, X, _)          \
 	if (((elem) = (self)->tqh_first, 0))                        \
@@ -2034,12 +2166,26 @@
 		for (__typeof__(elem) __htqfs_tvar;                     \
 		     (elem) && (__htqfs_tvar = X(_, elem).tqe_next, 1); \
 		     (elem) = __htqfs_tvar)
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE3(elem, self, X, _)         \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->tqh_first), 0)) \
+		;                                                           \
+	else                                                            \
+		for (__typeof__(elem) __htqfs_tvar;                         \
+		     (elem) && (__htqfs_tvar = X(_, elem).tqe_next, 1);     \
+		     (elem) = __htqfs_tvar)
 #define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, self, T, X, _)            \
 	if (((elem) = *((T ***)(self)->tqh_last[1]), 0))                          \
 		;                                                                     \
 	else                                                                      \
 		for (__typeof__(elem) __htqfrs_tvar;                                  \
 		     (elem) && (__htqfrs_tvar = *((T ***)X(_, elem).tqe_prev)[1], 1); \
+		     (elem) = __htqfrs_tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3T(elem, self, T, X, _)         \
+	if (((elem) ? (void)0 : (void)((elem) = *((T ***)(self)->tqh_last[1])), 0)) \
+		;                                                                       \
+	else                                                                        \
+		for (__typeof__(elem) __htqfrs_tvar;                                    \
+		     (elem) && (__htqfrs_tvar = *((T ***)X(_, elem).tqe_prev)[1], 1);   \
 		     (elem) = __htqfrs_tvar)
 #define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, HEAD_T, X, _)                    \
 	if (((elem) = *(((HEAD_T *)((self)->tqh_last))->tqh_last), 0))                        \
@@ -2048,14 +2194,29 @@
 		for (__typeof__(elem) __htqfrs_tvar;                                              \
 		     (elem) && (__htqfrs_tvar = *(((HEAD_T *)X(_, elem).tqe_prev)->tqh_last), 1); \
 		     (elem) = __htqfrs_tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, HEAD_T, X, _)                   \
+	if (((elem) ? (void)0 : (void)((elem) = *(((HEAD_T *)((self)->tqh_last))->tqh_last), 0))) \
+		;                                                                                     \
+	else                                                                                      \
+		for (__typeof__(elem) __htqfrs_tvar;                                                  \
+		     (elem) && (__htqfrs_tvar = *(((HEAD_T *)X(_, elem).tqe_prev)->tqh_last), 1);     \
+		     (elem) = __htqfrs_tvar)
 #endif /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, X, _, tvar) \
 	for ((elem) = (head)->tqh_first;                         \
 	     (elem) && ((tvar) = X(_, elem).tqe_next, 1);        \
 	     (elem) = (tvar))
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (head)->tqh_first);   \
+	     (elem) && ((tvar) = X(_, elem).tqe_next, 1);             \
+	     (elem) = (tvar))
 #define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, X, _, tvar)   \
 	for ((elem) = *(((HEAD_T *)((self)->tqh_last))->tqh_last);                 \
 	     (elem) && ((tvar) = *(((HEAD_T *)X(_, elem).tqe_prev)->tqh_last), 1); \
+	     (elem) = (tvar))
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, X, _, tvar)         \
+	for ((elem) ? (void)0 : (void)((elem) = *(((HEAD_T *)((self)->tqh_last))->tqh_last)); \
+	     (elem) && ((tvar) = *(((HEAD_T *)X(_, elem).tqe_prev)->tqh_last), 1);            \
 	     (elem) = (tvar))
 #define __HYBRID_TAILQ_CONCAT(dst, src, X, _)                                       \
 	((src)->tqh_first != __NULLPTR                                                  \
@@ -2250,7 +2411,11 @@
 #define CIRCLEQ_ENTRY_UNBOUND_INIT(entry)                                                      (void)(__HYBRID_Q_BADPTR((entry)->cqe_next), (entry)->cqe_prev = __NULLPTR)
 #define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER                                                      { __NULLPTR, __NULLPTR }
 #define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
+#define CIRCLEQ_FOREACH_FROM(elem, self, key)                                                  __HYBRID_CIRCLEQ_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_FOREACH_FROM_P(elem, self, getpath)                                            __HYBRID_CIRCLEQ_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_FOREACH_P(elem, self, getpath)                                                 __HYBRID_CIRCLEQ_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
+#define CIRCLEQ_FOREACH_REVERSE_FROM(elem, self, key)                                          __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM(elem, self, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_FOREACH_REVERSE_FROM_P(elem, self, getpath)                                    __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_FOREACH_REVERSE_P(elem, self, getpath)                                         __HYBRID_CIRCLEQ_FOREACH_REVERSE(elem, self, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_INSERT_AFTER_P(self, predecessor, elem, getpath)                               __HYBRID_CIRCLEQ_INSERT_AFTER(self, predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, key)                       __HYBRID_CIRCLEQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -2280,23 +2445,39 @@
 #define CIRCLEQ_UNBIND(self, elem, key)                                                        __HYBRID_CIRCLEQ_UNBIND(self, elem, __HYBRID_Q_KEY, key)
 #define CIRCLEQ_UNBIND_P(self, elem, getpath)                                                  __HYBRID_CIRCLEQ_UNBIND(self, elem, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_3(elem, self, key)             __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_4(elem, self, key, tvar)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_4(elem, self, getpath, tvar) __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_3(elem, self, key)                     __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_4(elem, self, key, tvar)               __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_3(elem, self, getpath)               __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)         __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define CIRCLEQ_FOREACH_REVERSE_SAFE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_, (__VA_ARGS__))(__VA_ARGS__)   /* CIRCLEQ_FOREACH_REVERSE_SAFE(elem, self, key, [tvar]) */
-#define CIRCLEQ_FOREACH_REVERSE_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, [tvar]) */
-#define CIRCLEQ_FOREACH_SAFE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)           /* CIRCLEQ_FOREACH_SAFE(elem, self, key, [tvar]) */
-#define CIRCLEQ_FOREACH_SAFE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_3(elem, self, key)                     __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_4(elem, self, key, tvar)               __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)               __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)         __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_3(elem, self, key)             __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_4(elem, self, key, tvar)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P_3(elem, self, getpath)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P_4(elem, self, getpath, tvar) __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_3(elem, self, key)                  __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_4(elem, self, key, tvar)            __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)            __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_4(elem, self, getpath, tvar)      __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_3(elem, self, key)                          __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_4(elem, self, key, tvar)                    __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_3(elem, self, getpath)                    __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)              __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_FROM_SAFE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)           /* CIRCLEQ_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
+#define CIRCLEQ_FOREACH_FROM_SAFE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* CIRCLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)   /* CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(elem, self, key, [tvar]) */
+#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define CIRCLEQ_FOREACH_REVERSE_SAFE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_, (__VA_ARGS__))(__VA_ARGS__)        /* CIRCLEQ_FOREACH_REVERSE_SAFE(elem, self, key, [tvar]) */
+#define CIRCLEQ_FOREACH_REVERSE_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, [tvar]) */
+#define CIRCLEQ_FOREACH_SAFE(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)                /* CIRCLEQ_FOREACH_SAFE(elem, self, key, [tvar]) */
+#define CIRCLEQ_FOREACH_SAFE_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)              /* CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define CIRCLEQ_FOREACH_REVERSE_SAFE(elem, self, key, tvar)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, tvar) __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define CIRCLEQ_FOREACH_SAFE(elem, self, key, tvar)               __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, tvar)         __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_FROM_SAFE(elem, self, key, tvar)               __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)         __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(elem, self, key, tvar)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, getpath, tvar) __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_SAFE(elem, self, key, tvar)            __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, tvar)      __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_SAFE(elem, self, key, tvar)                    __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, tvar)              __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
@@ -2379,9 +2560,17 @@
 	for ((elem) = (self)->cqh_first;                   \
 	     (void const *)(elem) != (void const *)(self); \
 	     (elem) = X(_, elem).cqe_next)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM(elem, self, X, _)         \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->cqh_first); \
+	     (void const *)(elem) != (void const *)(self);          \
+	     (elem) = X(_, elem).cqe_next)
 #define __HYBRID_CIRCLEQ_FOREACH_REVERSE(elem, self, X, _) \
 	for ((elem) = (self)->cqh_last;                        \
 	     (void const *)(elem) != (void const *)(self);     \
+	     (elem) = (X(_, elem).cqe_prev))
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM(elem, self, X, _) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->cqh_last);  \
+	     (void const *)(elem) != (void const *)(self);          \
 	     (elem) = (X(_, elem).cqe_prev))
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, X, _)        \
@@ -2391,6 +2580,13 @@
 		for (__typeof__(elem) __hcqfs_tvar;                     \
 		     (elem) && (__hcqfs_tvar = X(_, elem).cqe_next, 1); \
 		     (elem) = __hcqfs_tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE3(elem, self, X, _)       \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->cqh_first), 0)) \
+		;                                                           \
+	else                                                            \
+		for (__typeof__(elem) __hcqfs_tvar;                         \
+		     (elem) && (__hcqfs_tvar = X(_, elem).cqe_next, 1);     \
+		     (elem) = __hcqfs_tvar)
 #define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, HEAD_T, X, _) \
 	if (((elem) = (self)->cqh_last, 0))                                  \
 		;                                                                \
@@ -2398,14 +2594,29 @@
 		for (__typeof__(elem) __hcqfrs_tvar;                             \
 		     (elem) && (__hcqfrs_tvar = X(_, elem).cqe_prev, 1);         \
 		     (elem) = __hcqfrs_tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, HEAD_T, X, _) \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->cqh_last), 0))            \
+		;                                                                     \
+	else                                                                      \
+		for (__typeof__(elem) __hcqfrs_tvar;                                  \
+		     (elem) && (__hcqfrs_tvar = X(_, elem).cqe_prev, 1);              \
+		     (elem) = __hcqfrs_tvar)
 #endif /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, X, _, tvar) \
 	for ((elem) = (head)->cqh_first;                           \
 	     (elem) && ((tvar) = X(_, elem).cqe_next, 1);          \
 	     (elem) = (tvar))
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (head)->cqh_first);     \
+	     (elem) && ((tvar) = X(_, elem).cqe_next, 1);               \
+	     (elem) = (tvar))
 #define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, X, _, tvar) \
 	for ((elem) = (head)->cqh_last;                                            \
 	     (elem) && ((tvar) = X(_, elem).cqe_prev, 1);                          \
+	     (elem) = (tvar))
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_REVERSE_SAFE4(elem, self, HEAD_T, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (head)->cqh_last);                      \
+	     (elem) && ((tvar) = X(_, elem).cqe_prev, 1);                               \
 	     (elem) = (tvar))
 
 
@@ -2540,6 +2751,8 @@
 #define DLIST_END(self)                                                                      __NULLPTR
 #define DLIST_FIRST(self)                                                                    (self)->dlh_first
 #define DLIST_FOREACH(elem, self, key)                                                       __HYBRID_DLIST_FOREACH(elem, self, __HYBRID_Q_KEY, key)
+#define DLIST_FOREACH_FROM(elem, self, key)                                                  __HYBRID_DLIST_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
+#define DLIST_FOREACH_FROM_P(elem, self, getpath)                                            __HYBRID_DLIST_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define DLIST_FOREACH_P(elem, self, getpath)                                                 __HYBRID_DLIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
 #define DLIST_HEAD_INITIALIZER(self)                                                         { __NULLPTR }
 #define DLIST_HEAD_INITIALIZER_IS_NULL
@@ -2569,6 +2782,10 @@
 #define DLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)       __HYBRID_DLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_KEY, key)
 #define DLIST_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath) __HYBRID_DLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_PTH, getpath)
 #if defined(__HYBRID_PP_VA_OVERLOAD) && defined(__COMPILER_HAVE_TYPEOF)
+#define __HYBRID_DLIST_FOREACH_FROM_SAFE_3(elem, self, key)                                 __HYBRID_DLIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_DLIST_FOREACH_FROM_SAFE_4(elem, self, key, tvar)                           __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_DLIST_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                           __HYBRID_DLIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_DLIST_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                     __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_DLIST_FOREACH_SAFE_3(elem, self, key)                                      __HYBRID_DLIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
 #define __HYBRID_DLIST_FOREACH_SAFE_4(elem, self, key, tvar)                                __HYBRID_DLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define __HYBRID_DLIST_FOREACH_SAFE_P_3(elem, self, getpath)                                __HYBRID_DLIST_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
@@ -2593,19 +2810,23 @@
 #define __HYBRID_DLIST_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure)    __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
 #define __HYBRID_DLIST_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
 #define __HYBRID_DLIST_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
-#define DLIST_FOREACH_SAFE(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)    /* DLIST_FOREACH_SAFE(elem, self, key, [tvar]) */
-#define DLIST_FOREACH_SAFE_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)  /* DLIST_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
-#define DLIST_INSERT_TAIL(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)     /* DLIST_INSERT_TAIL(self, elem, [type], key) */
-#define DLIST_INSERT_TAIL_P(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)   /* DLIST_INSERT_TAIL_P(self, elem, [T], getpath) */
-#define DLIST_INSERT_TAIL_R(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_R_, (__VA_ARGS__))(__VA_ARGS__)   /* DLIST_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key) */
-#define DLIST_INSERT_TAIL_R_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_R_P_, (__VA_ARGS__))(__VA_ARGS__) /* DLIST_INSERT_TAIL_R_P(self, lo_elem, hi_elem, [T], getpath) */
-#define DLIST_REMOVEALL(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)    /* DLIST_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
-#define DLIST_REMOVEALL_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)  /* DLIST_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
-#define DLIST_REMOVE_IF(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)       /* DLIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
-#define DLIST_REMOVE_IF_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)     /* DLIST_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
-#define DLIST_TRYREMOVE_IF(...)    __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)    /* DLIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
-#define DLIST_TRYREMOVE_IF_P(...)  __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)  /* DLIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define DLIST_FOREACH_FROM_SAFE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)   /* DLIST_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
+#define DLIST_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* DLIST_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
+#define DLIST_FOREACH_SAFE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)        /* DLIST_FOREACH_SAFE(elem, self, key, [tvar]) */
+#define DLIST_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* DLIST_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define DLIST_INSERT_TAIL(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_, (__VA_ARGS__))(__VA_ARGS__)         /* DLIST_INSERT_TAIL(self, elem, [type], key) */
+#define DLIST_INSERT_TAIL_P(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_P_, (__VA_ARGS__))(__VA_ARGS__)       /* DLIST_INSERT_TAIL_P(self, elem, [T], getpath) */
+#define DLIST_INSERT_TAIL_R(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_R_, (__VA_ARGS__))(__VA_ARGS__)       /* DLIST_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key) */
+#define DLIST_INSERT_TAIL_R_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_INSERT_TAIL_R_P_, (__VA_ARGS__))(__VA_ARGS__)     /* DLIST_INSERT_TAIL_R_P(self, lo_elem, hi_elem, [T], getpath) */
+#define DLIST_REMOVEALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* DLIST_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define DLIST_REMOVEALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* DLIST_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define DLIST_REMOVE_IF(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)           /* DLIST_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define DLIST_REMOVE_IF_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)         /* DLIST_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
+#define DLIST_TRYREMOVE_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* DLIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define DLIST_TRYREMOVE_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* DLIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
 #else /* __HYBRID_PP_VA_OVERLOAD && __COMPILER_HAVE_TYPEOF */
+#define DLIST_FOREACH_FROM_SAFE(elem, self, key, tvar)                              __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define DLIST_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                        __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define DLIST_FOREACH_SAFE(elem, self, key, tvar)                                   __HYBRID_DLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define DLIST_FOREACH_SAFE_P(elem, self, getpath, tvar)                             __HYBRID_DLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define DLIST_INSERT_TAIL(self, elem, type, key)                                    __HYBRID_DLIST_INSERT_TAIL(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -2727,8 +2948,8 @@
 	       __HYBRID_Q_BADPTR(X(_, old_hi_elem).dle_next))
 #define __HYBRID_DLIST_FOREACH(elem, self, X, _) \
 	for ((elem) = (self)->dlh_first; (elem); (elem) = X(_, elem).dle_next)
-#define __HYBRID_DLIST_FOREACH_SAFE3(elem, self, X, _) \
-	for ((elem) = (self)->dlh_first; (elem); (elem) = X(_, elem).dle_next)
+#define __HYBRID_DLIST_FOREACH_FROM(elem, self, X, _) \
+	for ((elem) ? (void)0 : (void)((elem) = (self)->dlh_first); (elem); (elem) = X(_, elem).dle_next)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_DLIST_FOREACH_SAFE3(elem, self, X, _)          \
 	if (((elem) = (self)->dlh_first, 0))                        \
@@ -2737,10 +2958,21 @@
 		for (__typeof__(elem) __hdlfs_tvar;                     \
 		     (elem) && (__hdlfs_tvar = X(_, elem).dle_next, 1); \
 		     (elem) = __hdlfs_tvar)
+#define __HYBRID_DLIST_FOREACH_FROM_SAFE3(elem, self, X, _)         \
+	if (((elem) ? (void)0 : (void)((elem) = (self)->dlh_first), 0)) \
+		;                                                           \
+	else                                                            \
+		for (__typeof__(elem) __hdlfs_tvar;                         \
+		     (elem) && (__hdlfs_tvar = X(_, elem).dle_next, 1);     \
+		     (elem) = __hdlfs_tvar)
 #endif /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define __HYBRID_DLIST_FOREACH_SAFE4(elem, self, X, _, tvar) \
 	for ((elem) = (head)->dlh_first;                         \
 	     (elem) && ((tvar) = X(_, elem).dle_next, 1);        \
+	     (elem) = (tvar))
+#define __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, X, _, tvar) \
+	for ((elem) ? (void)0 : (void)((elem) = (head)->dlh_first);   \
+	     (elem) && ((tvar) = X(_, elem).dle_next, 1);             \
 	     (elem) = (tvar))
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
@@ -2843,18 +3075,8 @@
 
 
 /* TODO: Missing macros from libbsd: */
-//TODO:#define SLIST_FOREACH_FROM(elem, self, key)
-//TODO:#define SLIST_FOREACH_FROM_SAFE(elem, self, key, tvar)
 //TODO:#define SLIST_FOREACH_PREVPTR(elem, p_elem, self, key)
 //TODO:#define SLIST_REMOVE_PREVPTR(prevp, elem, key)
-//TODO:#define STAILQ_FOREACH_FROM(elem, self, key)
-//TODO:#define STAILQ_FOREACH_FROM_SAFE(elem, self, key, tvar)
-//TODO:#define LIST_FOREACH_FROM(elem, self, key)
-//TODO:#define LIST_FOREACH_FROM_SAFE(elem, self, key, tvar)
-//TODO:#define TAILQ_FOREACH_FROM(elem, self, key)
-//TODO:#define TAILQ_FOREACH_FROM_SAFE(elem, self, key, tvar)
-//TODO:#define TAILQ_FOREACH_REVERSE_FROM(elem, self, headname, key)
-//TODO:#define TAILQ_FOREACH_REVERSE_FROM_SAFE(elem, self, headname, key, tvar)
 //TODO:#define TAILQ_LAST_FAST(self, type, key)
 //TODO:#define TAILQ_PREV_FAST(elem, self, type, key)
 //TODO:#define TAILQ_SWAP(l1, l2, type, key)
