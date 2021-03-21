@@ -67,10 +67,12 @@
  * [1 1 1          ]  T**  [*]_P_FIRST(self)                                  (Return pointer to the pointer to the first item; use with *_P_* functions)
  * [      1 1      ]  T*   [*]_LAST(self)
  * [    1          ]  T*   [*]_LAST(self, [type], key)
+ * [      1        ]  T*   [*]_LAST_FAST(self, [type], key)
  * [1 1 1 1 1 1 1  ]  T*   [*]_NEXT(elem, key)                                (Return successor (NULL if no prev-elem exists))
  * [1 1 1          ]  T**  [*]_P_NEXT(elem, key)                              (Return pointer to the pointer to the next item; use with *_P_* functions)
  * [        1 1 1  ]  T*   [*]_PREV(elem, key)                                (Return predecessor (NULL if no prev-elem exists))
  * [      1        ]  T*   [*]_PREV(elem, [headname], key)                    (Return predecessor (NULL if no prev-elem exists))
+ * [      1        ]  T*   [*]_PREV_FAST(elem, self, [type], key)             (Return predecessor (NULL if no prev-elem exists))
  * [1              ]  T*   [*]_PREV(elem, [type], key)                        (Return predecessor (undef if no prev-elem exists))
  * [  1            ]  T*   [*]_P_PREV(p_elem, [type], key)                    (Return predecessor (undef if no prev-elem exists))
  * [        1      ]  T*   [*]_LOOP_NEXT(self, elem, key)                     (NOTE: *_NEXT(elem, key) for RINGQ)
@@ -1985,21 +1987,25 @@
 #define __HYBRID_TAILQ_FOREACH_FROM_SAFE_3(elem, self, key)                         __HYBRID_TAILQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
 #define __HYBRID_TAILQ_FOREACH_FROM_SAFE_4(elem, self, key, tvar)                   __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define __HYBRID_TAILQ_FOREACH_REVERSE_3(elem, self, key)                           __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_4(elem, self, headname, key)                 __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_4(elem, self, headname, key)                 __HYBRID_TAILQ_FOREACH_REVERSE(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
 #define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_3(elem, self, key)                      __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_4(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_4(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE_FROM(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
 #define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_3(elem, self, key)                 __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3T(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_4(elem, self, headname, key)       __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, struct headname, __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_5(elem, self, headname, key, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, struct headname, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_4(elem, self, headname, key)       __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_5(elem, self, headname, key, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key, tvar)
 #define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_3(elem, self, key)                      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, self, __typeof__(*(self)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_4(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, struct headname, __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_5(elem, self, headname, key, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, struct headname, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_4(elem, self, headname, key)            __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_5(elem, self, headname, key, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key, tvar)
 #define __HYBRID_TAILQ_FOREACH_SAFE_3(elem, self, key)                              __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
 #define __HYBRID_TAILQ_FOREACH_SAFE_4(elem, self, key, tvar)                        __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define __HYBRID_TAILQ_LAST_1(self)                                                 (*(((__typeof__(*(self)) *)((self)->tqh_last))->tqh_last))
 #define __HYBRID_TAILQ_LAST_2(self, headname)                                       (*(((__HYBRID_Q_STRUCT headname *)((self)->tqh_last))->tqh_last))
+#define __HYBRID_TAILQ_LAST_FAST_2(self, key)                                       (TAILQ_EMPTY(self) ? __NULLPTR : __COMPILER_CONTAINER_OF((self)->tqh_last, __typeof__(*(self)->tqh_first), key.tqe_next))
+#define __HYBRID_TAILQ_LAST_FAST_3(self, type, key)                                 (TAILQ_EMPTY(self) ? __NULLPTR : __COMPILER_CONTAINER_OF((self)->tqh_last, __HYBRID_Q_STRUCT type, key.tqe_next))
 #define __HYBRID_TAILQ_PREV_2(elem, key)                                            __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key)
-#define __HYBRID_TAILQ_PREV_3(elem, headname, key)                                  __HYBRID_TAILQ_PREV(elem, struct headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_PREV_3(elem, headname, key)                                  __HYBRID_TAILQ_PREV(elem, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
+#define __HYBRID_TAILQ_PREV_FAST_3(elem, self, key)                                 ((elem)->key.tqe_prev == &(self)->tqh_first ? __NULLPTR : __COMPILER_CONTAINER_OF((elem)->key.tqe_prev, __typeof__((self)->tqh_first), key.tqe_next))
+#define __HYBRID_TAILQ_PREV_FAST_4(elem, self, type, key)                           ((elem)->key.tqe_prev == &(self)->tqh_first ? __NULLPTR : __COMPILER_CONTAINER_OF((elem)->key.tqe_prev, __HYBRID_Q_STRUCT type, key.tqe_next))
 #define __HYBRID_TAILQ_SWAP_3(l1, l2, key)                                          __HYBRID_TAILQ_SWAP(l1, l2, __typeof__(*(l1)->tqh_first), __HYBRID_Q_KEY, key)
 #define __HYBRID_TAILQ_SWAP_4(l1, l2, type, key)                                    __HYBRID_TAILQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #undef TAILQ_FOREACH_FROM_SAFE
@@ -2009,7 +2015,9 @@
 #undef TAILQ_FOREACH_REVERSE_SAFE
 #undef TAILQ_FOREACH_SAFE
 #undef TAILQ_LAST
+#undef TAILQ_LAST_FAST
 #undef TAILQ_PREV
+#undef TAILQ_PREV_FAST
 #undef TAILQ_SWAP
 #define TAILQ_FOREACH_FROM_SAFE(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)         /* TAILQ_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
 #define TAILQ_FOREACH_REVERSE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_, (__VA_ARGS__))(__VA_ARGS__)           /* TAILQ_FOREACH_REVERSE(elem, self, [headname], key) */
@@ -2018,7 +2026,9 @@
 #define TAILQ_FOREACH_REVERSE_SAFE(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_SAFE_, (__VA_ARGS__))(__VA_ARGS__)      /* TAILQ_FOREACH_REVERSE_SAFE(elem, self, [headname], key, [tvar]) */
 #define TAILQ_FOREACH_SAFE(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)              /* TAILQ_FOREACH_SAFE(elem, self, key, [tvar]) */
 #define TAILQ_LAST(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_LAST_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_LAST(self, [headname]) */
+#define TAILQ_LAST_FAST(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_LAST_FAST_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_LAST_FAST(self, [type], key) */
 #define TAILQ_PREV(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_PREV(elem, [headname], key) */
+#define TAILQ_PREV_FAST(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_FAST_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_PREV_FAST(elem, self, [type], key) */
 #define TAILQ_SWAP(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_SWAP_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_SWAP(l1, l2, [type], key) */
 #else /* !__HYBRID_LIST_RESTRICT_API && __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define TAILQ_FOREACH_FROM_SAFE(elem, self, key, tvar)                   __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
@@ -2028,7 +2038,9 @@
 #define TAILQ_FOREACH_REVERSE_SAFE(elem, self, headname, key, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key, tvar)
 #define TAILQ_FOREACH_SAFE(elem, self, key, tvar)                        __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define TAILQ_LAST(self, headname)                                       (*(((__HYBRID_Q_STRUCT headname *)((self)->tqh_last))->tqh_last))
+#define TAILQ_LAST_FAST(self, type, key)                                 (TAILQ_EMPTY(self) ? __NULLPTR : __COMPILER_CONTAINER_OF((self)->tqh_last, __HYBRID_Q_STRUCT type, key.tqe_next))
 #define TAILQ_PREV(elem, headname, key)                                  __HYBRID_TAILQ_PREV(elem, __HYBRID_Q_STRUCT headname, __HYBRID_Q_KEY, key)
+#define TAILQ_PREV_FAST(elem, self, type, key)                           ((elem)->key.tqe_prev == &(self)->tqh_first ? __NULLPTR : __COMPILER_CONTAINER_OF((elem)->key.tqe_prev, __HYBRID_Q_STRUCT type, key.tqe_next))
 #define TAILQ_SWAP(l1, l2, type, key)                                    __HYBRID_TAILQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #endif /* __HYBRID_LIST_RESTRICT_API || !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #ifndef __HYBRID_LIST_RESTRICT_API
@@ -2089,6 +2101,10 @@
 #define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_5(elem, self, HEAD_T, getpath, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_TAILQ_FOREACH_SAFE_P_3(elem, self, getpath)                            __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_TAILQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                      __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_LAST_FAST_P_2(self, getpath)                                     (TAILQ_EMPTY(self) ? __NULLPTR : (__typeof__((self)->tqh_first))((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((__typeof__((self)->tqh_first))0).tqe_next))
+#define __HYBRID_TAILQ_LAST_FAST_P_3(self, T, getpath)                                  (TAILQ_EMPTY(self) ? __NULLPTR : (T *)((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
+#define __HYBRID_TAILQ_PREV_FAST_P_3(elem, self, getpath)                               ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (__typeof__((self)->tqh_first))((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((__typeof__((self)->tqh_first))0).tqe_next))
+#define __HYBRID_TAILQ_PREV_FAST_P_4(elem, self, T, getpath)                            ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
 #define __HYBRID_TAILQ_PREV_P_2(elem, getpath)                                          __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
 #define __HYBRID_TAILQ_PREV_P_3(elem, HEAD_T, getpath)                                  __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_TAILQ_SWAP_P_2(l1, l2, getpath)                                        __HYBRID_TAILQ_SWAP(l1, l2, __typeof__(*(l1)->tqh_first), __HYBRID_Q_PTH, getpath)
@@ -2097,6 +2113,8 @@
 #define TAILQ_FOREACH_REVERSE_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, [HEAD_T], getpath, [tvar]) */
 #define TAILQ_FOREACH_REVERSE_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, [HEAD_T], getpath, [tvar]) */
 #define TAILQ_FOREACH_SAFE_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)              /* TAILQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define TAILQ_LAST_FAST_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_LAST_FAST_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_LAST_FAST_P(self, [T], getpath) */
+#define TAILQ_PREV_FAST_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_FAST_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_PREV_FAST_P(elem, self, [T], getpath) */
 #define TAILQ_PREV_P(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_PREV_P(elem, [HEAD_T], getpath) */
 #define TAILQ_SWAP_P(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_SWAP_P_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_SWAP_P(l1, l2, [T], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
@@ -2104,6 +2122,8 @@
 #define TAILQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, HEAD_T, getpath, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
 #define TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, HEAD_T, getpath, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
 #define TAILQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                      __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_LAST_FAST_P(self, T, getpath)                                  (TAILQ_EMPTY(self) ? __NULLPTR : (T *)((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
+#define TAILQ_PREV_FAST_P(elem, self, T, getpath)                            ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
 #define TAILQ_PREV_P(elem, HEAD_T, getpath)                                  __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
 #define TAILQ_SWAP_P(l1, l2, T, getpath)                                     __HYBRID_TAILQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
@@ -3081,6 +3101,7 @@
 //TODO:#define DLIST_CONCAT(dst, src, [type], key)
 //TODO:#define DLIST_REMOVE_HEAD(self, key)
 //TODO:#define DLIST_REMOVE_AFTER(elem, key)
+/*TODO: Rename LIST_PREV() to LIST_PREV_UNSAFE() */
 
 
 /* TODO: Missing macros from OpenBSD: */
@@ -3104,8 +3125,6 @@
 /* TODO: Missing macros from libbsd: */
 //TODO:#define SLIST_FOREACH_PREVPTR(elem, p_elem, self, key)
 //TODO:#define SLIST_REMOVE_PREVPTR(prevp, elem, key)
-//TODO:#define TAILQ_LAST_FAST(self, type, key)
-//TODO:#define TAILQ_PREV_FAST(elem, self, type, key)
 
 
 #endif /* !__GUARD_HYBRID_SEQUENCE_LIST_H */
