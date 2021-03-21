@@ -471,9 +471,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	 * somewhere else... */
 	assert(mpart_isanon(part));
 	assert(node->mn_flags & MNODE_F_SHARED
-	       ? part->mp_share.lh_first == node
-	       : part->mp_copy.lh_first == node);
-	assert(node->mn_link.le_next == NULL);
+	       ? LIST_FIRST(&part->mp_share) == node
+	       : LIST_FIRST(&part->mp_copy) == node);
+	assert(LIST_NEXT(node, mn_link) == NULL);
 
 	unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 	freefun    = freefun_for_mpart(part);

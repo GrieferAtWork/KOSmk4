@@ -802,7 +802,7 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 	        ? &part->mp_share.lh_first
 	        : &part->mp_copy.lh_first));
 	assert(*self->mn_link.le_prev == self);
-	assert(self->mn_link.le_next == NULL);
+	assert(LIST_NEXT(self, mn_link) == NULL);
 	assert((self->mn_flags & MNODE_F_SHARED) ? LIST_EMPTY(&part->mp_copy)
 	                                         : LIST_EMPTY(&part->mp_share));
 

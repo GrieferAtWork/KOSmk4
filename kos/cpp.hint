@@ -1104,19 +1104,27 @@
 #define MY_ElfW(x) ELF64_##x
 #define MY_ELFW(x) Elf64_##x
 
-#define LIST_FOREACH(...) for(;;)
-#define LIST_FOREACH_P(...) for(;;)
 #define LIST_HEAD(n,t) struct n{struct t *lh_first;}
 #define LIST_HEAD_P(T) struct{T*lh_first;}
 #define LIST_ENTRY(t) struct{struct t*le_next,**le_prev;}
 #define LIST_ENTRY_P(T) struct{T*le_next,**le_prev;}
+#define LIST_FOREACH(...) for(;;)
+#define LIST_FOREACH_P(...) for(;;)
+#define LIST_FOREACH_SAFE(...) for(;;)
+#define LIST_FOREACH_SAFE_P(...) for(;;)
+#define LIST_P_FOREACH(...) for(;;)
+#define LIST_P_FOREACH_P(...) for(;;)
 
-#define SLIST_FOREACH(...) for(;;)
-#define SLIST_FOREACH_P(...) for(;;)
 #define SLIST_HEAD(n,t) struct n{struct t *slh_first;}
 #define SLIST_HEAD_P(T) struct{T*slh_first;}
 #define SLIST_ENTRY(t) struct{struct t*sle_next;}
 #define SLIST_ENTRY_P(T) struct{T*sle_next;}
+#define SLIST_FOREACH(...) for(;;)
+#define SLIST_FOREACH_P(...) for(;;)
+#define SLIST_FOREACH_SAFE(...) for(;;)
+#define SLIST_FOREACH_SAFE_P(...) for(;;)
+#define SLIST_P_FOREACH(...) for(;;)
+#define SLIST_P_FOREACH_P(...) for(;;)
 
 #define STAILQ_HEAD(n,t) struct n{struct t*stqh_first,**stqh_last;}
 #define STAILQ_ENTRY(t) struct{struct t*stqe_next;}
@@ -1124,6 +1132,8 @@
 #define STAILQ_ENTRY_P(T) struct{T*stqe_next;}
 #define STAILQ_FOREACH(...) for(;;)
 #define STAILQ_FOREACH_P(...) for(;;)
+#define STAILQ_FOREACH_SAFE(...) for(;;)
+#define STAILQ_FOREACH_SAFE_P(...) for(;;)
 
 #define SIMPLEQ_HEAD(n,t) struct n{struct t*sqh_first,**sqh_last;}
 #define SIMPLEQ_ENTRY(t) struct{struct t*sqe_next;}
@@ -1131,6 +1141,8 @@
 #define SIMPLEQ_ENTRY_P(T) struct{T*sqe_next;}
 #define SIMPLEQ_FOREACH(...) for(;;)
 #define SIMPLEQ_FOREACH_P(...) for(;;)
+#define SIMPLEQ_FOREACH_SAFE(...) for(;;)
+#define SIMPLEQ_FOREACH_SAFE_P(...) for(;;)
 
 #define _TAILQ_HEAD(n,T,q) struct n{T q*tqh_first,*q*tqh_last;}
 #define _TAILQ_ENTRY(T,q) struct{T q*tqe_next,*q*tqe_prev;}
@@ -1142,6 +1154,10 @@
 #define TAILQ_FOREACH_P(...) for(;;)
 #define TAILQ_FOREACH_REVERSE(...) for(;;)
 #define TAILQ_FOREACH_REVERSE_P(...) for(;;)
+#define TAILQ_FOREACH_SAFE(...) for(;;)
+#define TAILQ_FOREACH_SAFE_P(...) for(;;)
+#define TAILQ_FOREACH_REVERSE_SAFE(...) for(;;)
+#define TAILQ_FOREACH_REVERSE_SAFE_P(...) for(;;)
 
 #define CIRCLEQ_HEAD(n,t) struct n{struct t*cqh_first,*cqh_last;}
 #define CIRCLEQ_HEAD_P(T) struct{T*cqh_first,*cqh_last;}
@@ -1151,6 +1167,10 @@
 #define CIRCLEQ_FOREACH_P(...) for(;;)
 #define CIRCLEQ_FOREACH_REVERSE(...) for(;;)
 #define CIRCLEQ_FOREACH_REVERSE_P(...) for(;;)
+#define CIRCLEQ_FOREACH_SAFE(...) for(;;)
+#define CIRCLEQ_FOREACH_SAFE_P(...) for(;;)
+#define CIRCLEQ_FOREACH_REVERSE_SAFE(...) for(;;)
+#define CIRCLEQ_FOREACH_REVERSE_SAFE_P(...) for(;;)
 
 #define RINGQ_ENTRY(t) struct{struct t*rqe_next,*rqe_prev;}
 #define RINGQ_ENTRY_P(T) struct{T*rqe_next,*rqe_prev;}
@@ -1160,6 +1180,8 @@
 #define DLIST_ENTRY_P(T) struct{T*dle_next,*dle_prev;}
 #define DLIST_FOREACH(...) for(;;)
 #define DLIST_FOREACH_P(...) for(;;)
+#define DLIST_FOREACH_SAFE(...) for(;;)
+#define DLIST_FOREACH_SAFE_P(...) for(;;)
 
 #define LIST_TRYREMOVE_IF(...)
 #define LIST_TRYREMOVE_IF_P(...)

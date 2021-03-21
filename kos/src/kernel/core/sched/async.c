@@ -250,8 +250,8 @@ PRIVATE struct lockop_slist /*  */ async_tmo_lops; /* Pending lock operations fo
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_tmo_insert)(REF struct async *__restrict job, ktime_t timeout) {
 	struct async **p_next, *next;
-	for (p_next = &async_tmo_list.lh_first; (next = *p_next) != NULL;
-	     p_next = &next->a_tmolnk.le_next) {
+	for (p_next = LIST_P_FIRST(&async_tmo_list); (next = *p_next) != NULL;
+	     p_next = LIST_P_NEXT(next, a_tmolnk)) {
 		ktime_t next_timeout;
 
 		COMPILER_READ_BARRIER();
@@ -268,9 +268,7 @@ NOTHROW(FCALL async_tmo_insert)(REF struct async *__restrict job, ktime_t timeou
 	}
 
 	/* Actually insert the new job into the list. */
-	if ((job->a_tmolnk.le_next = next) != NULL)
-		next->a_tmolnk.le_prev = &job->a_tmolnk.le_next;
-	job->a_tmolnk.le_prev = p_next;
+	LIST_P_INSERT_BEFORE(p_next, job, a_tmolnk);
 }
 
 
