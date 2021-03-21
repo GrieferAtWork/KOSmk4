@@ -144,6 +144,7 @@
  * [      N        ]  CODE [*]_FOREACH_REVERSE_FROM(elem, self, [headname], key)
  * [      N        ]  CODE [*]_FOREACH_REVERSE_SAFE(elem, self, [headname], key, [tvar])
  * [      N        ]  CODE [*]_FOREACH_REVERSE_FROM_SAFE(elem, self, [headname], key, [tvar])
+ * [  N            ]  CODE [*]_FOREACH_PREVPTR(elem, p_elem, self, key)
  * [===============]  -- Sub-API: Check if an element is contained within a list,
  * [===============]              but removal requires *_UNBIND instead of *_REMOVE
  * [1     1 1 1    ]  CODE [*]_ENTRY_UNBOUND_INITIALIZER         -- Static initializer for unbound elements
@@ -674,19 +675,20 @@
 #endif /* __HYBRID_LIST_RESTRICT_API || !__HYBRID_PP_VA_OVERLOAD */
 #define SLIST_ENTRY(type)       struct { __HYBRID_Q_STRUCT type *sle_next; /* [0..1] Next-link */ }
 #define SLIST_CLASS_ENTRY(type) struct { __HYBRID_Q_CLASS  type *sle_next; /* [0..1] Next-link */ }
-#define SLIST_EMPTY(self)                          ((self)->slh_first == __NULLPTR)
-#define SLIST_END(self)                            __NULLPTR
-#define SLIST_FIRST(self)                          (self)->slh_first
-#define SLIST_FOREACH(elem, self, key)             __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_KEY, key)
-#define SLIST_FOREACH_FROM(elem, self, key)        __HYBRID_SLIST_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
-#define SLIST_HEAD_INITIALIZER(self)               { __NULLPTR }
-#define SLIST_INIT(self)                           (void)((self)->slh_first = __NULLPTR)
-#define SLIST_INSERT(self, elem, key)              __HYBRID_SLIST_INSERT(self, elem, __HYBRID_Q_KEY, key)
-#define SLIST_INSERT_AFTER(predecessor, elem, key) __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_KEY, key)
-#define SLIST_INSERT_HEAD(self, elem, key)         __HYBRID_SLIST_INSERT(self, elem, __HYBRID_Q_KEY, key)
-#define SLIST_NEXT(elem, key)                      (elem)->key.sle_next
-#define SLIST_REMOVE_AFTER(elem, key)              __HYBRID_SLIST_REMOVE_AFTER(elem, __HYBRID_Q_KEY, key)
-#define SLIST_REMOVE_HEAD(self, key)               __HYBRID_SLIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
+#define SLIST_EMPTY(self)                              ((self)->slh_first == __NULLPTR)
+#define SLIST_END(self)                                __NULLPTR
+#define SLIST_FIRST(self)                              (self)->slh_first
+#define SLIST_FOREACH(elem, self, key)                 __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_KEY, key)
+#define SLIST_FOREACH_FROM(elem, self, key)            __HYBRID_SLIST_FOREACH_FROM(elem, self, __HYBRID_Q_KEY, key)
+#define SLIST_FOREACH_PREVPTR(elem, p_elem, self, key) __HYBRID_SLIST_FOREACH_PREVPTR(elem, p_elem, self, __HYBRID_Q_KEY, key)
+#define SLIST_HEAD_INITIALIZER(self)                   { __NULLPTR }
+#define SLIST_INIT(self)                               (void)((self)->slh_first = __NULLPTR)
+#define SLIST_INSERT(self, elem, key)                  __HYBRID_SLIST_INSERT(self, elem, __HYBRID_Q_KEY, key)
+#define SLIST_INSERT_AFTER(predecessor, elem, key)     __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_KEY, key)
+#define SLIST_INSERT_HEAD(self, elem, key)             __HYBRID_SLIST_INSERT(self, elem, __HYBRID_Q_KEY, key)
+#define SLIST_NEXT(elem, key)                          (elem)->key.sle_next
+#define SLIST_REMOVE_AFTER(elem, key)                  __HYBRID_SLIST_REMOVE_AFTER(elem, __HYBRID_Q_KEY, key)
+#define SLIST_REMOVE_HEAD(self, key)                   __HYBRID_SLIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
 #if !defined(__HYBRID_LIST_RESTRICT_API) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_SLIST_CONCAT_3(dst, src, key)                    __HYBRID_SLIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_KEY, key)
 #define __HYBRID_SLIST_CONCAT_4(dst, src, type, key)              __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -725,6 +727,7 @@
 #define SLIST_ATOMIC_INSERT_R_P(self, lo_elem, hi_elem, getpath)                           __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_CLEAR(self)                                                                  (void)((self)->slh_first = __NULLPTR)
 #define SLIST_FOREACH_FROM_P(elem, self, getpath)                                          __HYBRID_SLIST_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
+#define SLIST_FOREACH_PREVPTR_P(elem, p_elem, self, getpath)                               __HYBRID_SLIST_FOREACH_PREVPTR(elem, p_elem, self, __HYBRID_Q_PTH, getpath)
 #define SLIST_FOREACH_P(elem, self, getpath)                                               __HYBRID_SLIST_FOREACH(elem, self, __HYBRID_Q_PTH, getpath)
 #define SLIST_INSERT_AFTER_P(predecessor, elem, getpath)                                   __HYBRID_SLIST_INSERT_AFTER(predecessor, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)                           __HYBRID_SLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -1064,6 +1067,9 @@
 	for ((elem) = (self)->slh_first; (elem); (elem) = X(_, elem).sle_next)
 #define __HYBRID_SLIST_FOREACH_FROM(elem, self, X, _) \
 	for ((elem) ? (void)0 : (void)((elem) = (self)->slh_first); (elem); (elem) = X(_, elem).sle_next)
+#define __HYBRID_SLIST_FOREACH_PREVPTR(elem, p_elem, self, X, _) \
+	for ((p_elem) = &(self); ((elem) = *(p_elem)) != __NULLPTR;  \
+	     (p_elem) = &X(_, elem).sle_next)
 #define __HYBRID_SLIST_P_FOREACH(p_elem, self, X, _) \
 	for ((p_elem) = &(self)->slh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).sle_next)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
@@ -3148,7 +3154,6 @@
 
 
 /* TODO: Missing macros from libbsd: */
-//TODO:#define SLIST_FOREACH_PREVPTR(elem, p_elem, self, key)
 //TODO:#define SLIST_REMOVE_PREVPTR(prevp, elem, key)
 
 
