@@ -97,7 +97,7 @@
  * [N N         N  ]  void [*]_INSERT_TAIL(self, elem, [type], key)
  * [    1 1 1      ]  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, key)
  * [N N         N  ]  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key)
- * [  1 1          ]  void [*]_REMOVE_HEAD(self, key)
+ * [1 1 1          ]  void [*]_REMOVE_HEAD(self, key)
  * [1         1    ]  void [*]_REMOVE(elem, key)
  * [      1 1   1  ]  void [*]_REMOVE(self, elem, key)
  * [  N N          ]  void [*]_REMOVE(self, elem, [type], key)
@@ -309,6 +309,8 @@
 #define LIST_P_REPLACE_P(p_old_elem, new_elem, getpath)                                   __HYBRID_LIST_P_REPLACE(p_old_elem, new_elem, __HYBRID_Q_PTH, getpath)
 #define LIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)       __HYBRID_LIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_KEY, key)
 #define LIST_P_REPLACE_R_P(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath) __HYBRID_LIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_PTH, getpath)
+#define LIST_REMOVE_HEAD(self, key)                                                       __HYBRID_LIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
+#define LIST_REMOVE_HEAD_P(self, getpath)                                                 __HYBRID_LIST_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define LIST_REMOVE_P(elem, getpath)                                                      __HYBRID_LIST_REMOVE(elem, __HYBRID_Q_PTH, getpath)
 #define LIST_REMOVE_R(lo_elem, hi_elem, key)                                              __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define LIST_REMOVE_R_P(lo_elem, hi_elem, getpath)                                        __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
@@ -489,6 +491,11 @@
 	 : (void)0,                                                                               \
 	 __HYBRID_Q_BADPTR(X(_, *(p_old_lo_elem)).le_prev),                                       \
 	 __HYBRID_Q_BADPTR(X(_, old_hi_elem).le_next))
+#define __HYBRID_LIST_REMOVE_HEAD(self, X, _)                         \
+	(__HYBRID_Q_BADPTR(X(_, (self)->lh_first).le_prev),               \
+	 ((self)->lh_first = X(_, (self)->lh_first).le_next) != __NULLPTR \
+	 ? (void)(X(_, (self)->lh_first).le_prev = &(self)->lh_first)     \
+	 : (void)0)
 #define __HYBRID_LIST_REMOVE(elem, X, _) \
 	__HYBRID_LIST_REMOVE_R(elem, elem, X, _)
 #define __HYBRID_LIST_REMOVE_R(lo_elem, hi_elem, X, _)                     \
@@ -3118,10 +3125,9 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define LIST_REMOVE_HEAD(self, key)
 //TODO:#define LIST_REMOVE_AFTER(elem, key)
-//TODO:#define LIST_P_PREV(p_elem, self)
-//TODO:#define LIST_P_PREV_UNSAFE(p_elem)
+//TODO:#define LIST_P_PREV(p_elem, self, [type], key)
+//TODO:#define LIST_P_PREV_UNSAFE(p_elem, [type], key)
 //TODO:#define SLIST_MOVE(dst, src, key)
 //TODO:#define STAILQ_MOVE(dst, src, key)
 //TODO:#define TAILQ_MOVE(dst, src, key)
