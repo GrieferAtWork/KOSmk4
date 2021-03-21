@@ -105,6 +105,7 @@
  * [      1 1   1  ]  void [*]_REMOVE_R(self, lo_elem, hi_elem, key)
  * [  1            ]  void [*]_REMOVE_AFTER(elem, key)                        (Remove successor of `elem'; undef if no successor)
  * [    1          ]  void [*]_REMOVE_AFTER(self, elem, key)
+ * [  1            ]  void [*]_REMOVE_PREVPTR(p_elem, elem, key)              (libbsd-specific; for use with `SLIST_FOREACH_PREVPTR()')
  * [1 1            ]  void [*]_P_REMOVE(p_elem, key)
  * [    1          ]  void [*]_P_REMOVE(self, p_elem, key)
  * [1 1            ]  void [*]_P_REMOVE_R(p_lo_elem, hi_elem, key)
@@ -689,6 +690,7 @@
 #define SLIST_NEXT(elem, key)                          (elem)->key.sle_next
 #define SLIST_REMOVE_AFTER(elem, key)                  __HYBRID_SLIST_REMOVE_AFTER(elem, __HYBRID_Q_KEY, key)
 #define SLIST_REMOVE_HEAD(self, key)                   __HYBRID_SLIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
+#define SLIST_REMOVE_PREVPTR(p_elem, elem, key)        __HYBRID_SLIST_REMOVE_PREVPTR(p_elem, elem, __HYBRID_Q_KEY, key)
 #if !defined(__HYBRID_LIST_RESTRICT_API) && defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_SLIST_CONCAT_3(dst, src, key)                    __HYBRID_SLIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_KEY, key)
 #define __HYBRID_SLIST_CONCAT_4(dst, src, type, key)              __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -755,6 +757,7 @@
 #define SLIST_P_REPLACE_R_P(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath) __HYBRID_SLIST_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_REMOVE_AFTER_P(elem, getpath)                                                __HYBRID_SLIST_REMOVE_AFTER(elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_REMOVE_HEAD_P(self, getpath)                                                 __HYBRID_SLIST_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
+#define SLIST_REMOVE_PREVPTR_P(p_elem, elem, getpath)                                      __HYBRID_SLIST_REMOVE_PREVPTR(p_elem, elem, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_SLIST_CONCAT_P_3(dst, src, getpath)                                                                      __HYBRID_SLIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_PTH, getpath)
 #define __HYBRID_SLIST_CONCAT_P_4(dst, src, type, getpath)                                                                __HYBRID_SLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
@@ -919,6 +922,14 @@
 	                                 __ATOMIC_RELEASE, __ATOMIC_RELAXED))
 #define __HYBRID_SLIST_REMOVE_HEAD(self, X, _) \
 	(void)((self)->slh_first = X(_, (self)->slh_first).sle_next)
+#ifdef NDEBUG
+#define __HYBRID_SLIST_REMOVE_PREVPTR(p_elem, elem, X, _) \
+	(void)(*(p_elem) = X(_, elem).sle_next)
+#else /* NDEBUG */
+#include "../__assert.h"
+#define __HYBRID_SLIST_REMOVE_PREVPTR(p_elem, elem, X, _) \
+	(void)(__hybrid_assert(*(p_elem) == (elem)), *(p_elem) = X(_, elem).sle_next)
+#endif /* !NDEBUG */
 #define __HYBRID_SLIST_REMOVE_AFTER(elem, X, _) \
 	(void)(X(_, elem).sle_next = X(_, X(_, elem).sle_next).sle_next)
 #define __HYBRID_SLIST_REMOVE(self, elem, T, X, _) \
@@ -3151,10 +3162,6 @@
 //TODO:#define XSIMPLEQ_INSERT_AFTER(self, predecessor, elem, key)
 //TODO:#define XSIMPLEQ_REMOVE_HEAD(self, key)
 //TODO:#define XSIMPLEQ_REMOVE_AFTER(self, elem, key)
-
-
-/* TODO: Missing macros from libbsd: */
-//TODO:#define SLIST_REMOVE_PREVPTR(prevp, elem, key)
 
 
 #endif /* !__GUARD_HYBRID_SEQUENCE_LIST_H */
