@@ -199,7 +199,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 			struct mman *blocking_mm = mm;
 			/* Cannot be lock immediately. */
 			while (node != LIST_FIRST(&self->mp_copy)) {
-				node = LIST_PREV(node, mn_link);
+				node = LIST_PREV_UNSAFE(node, mn_link);
 				mm   = node->mn_mman;
 				if unlikely(wasdestroyed(mm))
 					continue;
@@ -223,7 +223,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 			struct mman *blocking_mm = mm;
 			/* Unlock all share-nodes (that have already been locked). */
 			while (node != LIST_FIRST(&self->mp_share)) {
-				node = LIST_PREV(node, mn_link);
+				node = LIST_PREV_UNSAFE(node, mn_link);
 				mm   = node->mn_mman;
 				if unlikely(wasdestroyed(mm))
 					continue;

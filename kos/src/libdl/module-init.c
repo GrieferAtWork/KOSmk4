@@ -162,7 +162,7 @@ again_search_noinit:
 			atomic_rwlock_endread(&DlModule_GlobalLock);
 			goto done;
 		}
-		last = LIST_PREV(last, dm_globals);
+		last = LIST_PREV_UNSAFE(last, dm_globals);
 	}
 	assert(last != &dl_rtld_module);
 	last->dm_flags &= ~RTLD_NOINIT;
