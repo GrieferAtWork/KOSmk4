@@ -1104,6 +1104,8 @@
 #define MY_ElfW(x) ELF64_##x
 #define MY_ELFW(x) Elf64_##x
 
+#define __HYBRID_Q_STRUCT struct
+#define __HYBRID_Q_CLASS class
 #define LIST_HEAD(n,t) struct n{struct t *lh_first;}
 #define LIST_HEAD_P(T) struct{T*lh_first;}
 #define LIST_ENTRY(t) struct{struct t*le_next,**le_prev;}
