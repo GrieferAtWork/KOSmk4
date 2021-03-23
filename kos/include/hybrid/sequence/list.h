@@ -33,8 +33,9 @@
  *       macros from  `__HYBRID_LIST_RESTRICT_API' only  getting exposed  when
  *       `_KOS_SOURCE' is enabled. Functions not restricted to this  extension
  *       namespace are those  declared by the  union of <sys/queue.h>  headers
- *       found in NetBSD, OpenBSD, GLibC, and libbsd. (iow: Any macro provided
- *       by any of these systems is always defined as far as possible!)
+ *       found in NetBSD, OpenBSD, OpenSolaris, uClibc, GLibC, and libbsd.
+ *       iow: Any macro provided by any of these systems is always defined as
+ *            far as possible!)
  *
  *  +--------------- LIST_*:     Single-head, doubly-linked list (via element self-pointers)
  *  | +------------- SLIST_*:    Single-head, singly-linked list
