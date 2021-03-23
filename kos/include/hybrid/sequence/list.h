@@ -111,15 +111,15 @@
  * [    1          ]  void [*]_P_REMOVE(self, p_elem, key)
  * [1 1            ]  void [*]_P_REMOVE_R(p_lo_elem, hi_elem, key)
  * [    1          ]  void [*]_P_REMOVE_R(self, p_lo_elem, hi_elem, key)
- * [N N N       N  ]  void [*]_REMOVE_IF(self, out_pelem, [type], key, condition)
+ * [N N N N     N  ]  void [*]_REMOVE_IF(self, out_pelem, [type], key, condition)
  * |               |             NOTE: `*out_pelem' is written to before `condition' is
  * |               |                   evaluated to test is `*out_pelem' should be removed
  * |               |             Assumes that `condition' is true for at least 1 element.
  * [  N N          ]  void [*]_TRYREMOVE(self, elem, [type], key, on_failure)
- * [N N N       N  ]  void [*]_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
+ * [N N N N     N  ]  void [*]_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
  * |               |             Same as *_REMOVE_IF, but allow `condition' to be false for all elements, or
  * |               |             the list itself to be empty. (if this happens, `on_failure' is evaluated)
- * [N N N       N  ]  void [*]_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
+ * [N N N N     N  ]  void [*]_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
  * |               |             Remove all elements for which `condition' is true, and evaluate `on_match'
  * |               |             every time such a match is confirmed. The associated element is `*out_pelem'
  * [  N N          ]  void [*]_CONTAINS(self, elem, [type], key, on_success)
@@ -154,9 +154,9 @@
  * [1     1 1 1    ]  bool [*]_ISBOUND(elem, key)                -- Returns non-zero if element is bound (to a list)
  * [1         1    ]  void [*]_UNBIND(elem, key)                 -- Remove element and mark as unbound
  * [      1 1      ]  void [*]_UNBIND(self, elem, key)           -- *ditto*
- * [N              ]  void [*]_UNBIND_IF(self, out_pelem, [type], key, condition)
- * [N              ]  void [*]_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
- * [N              ]  void [*]_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
+ * [N     N        ]  void [*]_UNBIND_IF(self, out_pelem, [type], key, condition)
+ * [N     N        ]  void [*]_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
+ * [N     N        ]  void [*]_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
  * \---------------/
  *     Runtime
  *    (in O(x))
@@ -402,6 +402,8 @@
 #define LIST_TRYUNBIND_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_TRYUNBIND_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
 #define LIST_UNBINDALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_UNBINDALL_, (__VA_ARGS__))(__VA_ARGS__)           /* LIST_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
 #define LIST_UNBINDALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_UNBINDALL_P_, (__VA_ARGS__))(__VA_ARGS__)         /* LIST_UNBINDALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define LIST_UNBIND_IF(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_UNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)           /* LIST_UNBIND_IF(self, out_pelem, [type], key, condition) */
+#define LIST_UNBIND_IF_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_UNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)         /* LIST_UNBIND_IF_P(self, out_pelem, [T], getpath, condition) */
 #define LIST_P_PREV(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_P_PREV_, (__VA_ARGS__))(__VA_ARGS__)              /* LIST_P_PREV(p_elem, self, [type], key) */
 #define LIST_P_PREV_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_P_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)            /* LIST_P_PREV_P(p_elem, self, [T], getpath) */
 #define LIST_P_PREV_UNSAFE(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_P_PREV_UNSAFE_, (__VA_ARGS__))(__VA_ARGS__)       /* LIST_P_PREV_UNSAFE(p_elem, [type], key) */
@@ -2196,24 +2198,48 @@
 #define TAILQ_UNBIND(self, elem, key)                                                        __HYBRID_TAILQ_UNBIND(self, elem, __HYBRID_Q_KEY, key)
 #define TAILQ_UNBIND_P(self, elem, getpath)                                                  __HYBRID_TAILQ_UNBIND(self, elem, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                       __HYBRID_TAILQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                 __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_3(elem, self, getpath)               __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3T(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_4(elem, self, HEAD_T, getpath)       __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_5(elem, self, HEAD_T, getpath, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)                    __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_4(elem, self, HEAD_T, getpath)            __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_5(elem, self, HEAD_T, getpath, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_TAILQ_FOREACH_SAFE_P_3(elem, self, getpath)                            __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                      __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_TAILQ_LAST_FAST_P_2(self, getpath)                                     (TAILQ_EMPTY(self) ? __NULLPTR : (__typeof__((self)->tqh_first))((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((__typeof__((self)->tqh_first))0).tqe_next))
-#define __HYBRID_TAILQ_LAST_FAST_P_3(self, T, getpath)                                  (TAILQ_EMPTY(self) ? __NULLPTR : (T *)((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
-#define __HYBRID_TAILQ_PREV_FAST_P_3(elem, self, getpath)                               ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (__typeof__((self)->tqh_first))((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((__typeof__((self)->tqh_first))0).tqe_next))
-#define __HYBRID_TAILQ_PREV_FAST_P_4(elem, self, T, getpath)                            ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
-#define __HYBRID_TAILQ_PREV_P_2(elem, getpath)                                          __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_PREV_P_3(elem, HEAD_T, getpath)                                  __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_SWAP_P_2(l1, l2, getpath)                                        __HYBRID_TAILQ_SWAP(l1, l2, __typeof__(*(l1)->tqh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_TAILQ_SWAP_P_3(l1, l2, T, getpath)                                     __HYBRID_TAILQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                           __HYBRID_TAILQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                     __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_3(elem, self, getpath)                   __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3T(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_4(elem, self, HEAD_T, getpath)           __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_5(elem, self, HEAD_T, getpath, tvar)     __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)                        __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3T(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_4(elem, self, HEAD_T, getpath)                __HYBRID_TAILQ_FOREACH_REVERSE_SAFE3(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_5(elem, self, HEAD_T, getpath, tvar)          __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_FOREACH_SAFE_P_3(elem, self, getpath)                                __HYBRID_TAILQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                          __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_TAILQ_LAST_FAST_P_2(self, getpath)                                         (TAILQ_EMPTY(self) ? __NULLPTR : (__typeof__((self)->tqh_first))((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((__typeof__((self)->tqh_first))0).tqe_next))
+#define __HYBRID_TAILQ_LAST_FAST_P_3(self, T, getpath)                                      (TAILQ_EMPTY(self) ? __NULLPTR : (T *)((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
+#define __HYBRID_TAILQ_PREV_FAST_P_3(elem, self, getpath)                                   ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (__typeof__((self)->tqh_first))((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((__typeof__((self)->tqh_first))0).tqe_next))
+#define __HYBRID_TAILQ_PREV_FAST_P_4(elem, self, T, getpath)                                ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
+#define __HYBRID_TAILQ_PREV_P_2(elem, getpath)                                              __HYBRID_TAILQ_PREV4(elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_PREV_P_3(elem, HEAD_T, getpath)                                      __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_REMOVEALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_TAILQ_REMOVEALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_TAILQ_REMOVEALL_6(self, out_pelem, type, key, condition, on_match)         __HYBRID_TAILQ_REMOVEALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_TAILQ_REMOVEALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_TAILQ_REMOVEALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_TAILQ_REMOVEALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_TAILQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_TAILQ_REMOVE_IF_4(self, out_pelem, key, condition)                         __HYBRID_TAILQ_REMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_TAILQ_REMOVE_IF_5(self, out_pelem, type, key, condition)                   __HYBRID_TAILQ_REMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_TAILQ_REMOVE_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_TAILQ_REMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_TAILQ_REMOVE_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_TAILQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_TAILQ_SWAP_P_2(l1, l2, getpath)                                            __HYBRID_TAILQ_SWAP(l1, l2, __typeof__(*(l1)->tqh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_SWAP_P_3(l1, l2, T, getpath)                                         __HYBRID_TAILQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_TAILQ_TRYREMOVE_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_TAILQ_TRYREMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_TAILQ_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure)    __HYBRID_TAILQ_TRYREMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_TAILQ_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_TAILQ_TRYREMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_TAILQ_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_TAILQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_TAILQ_TRYUNBIND_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_TAILQ_TRYUNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_TAILQ_TRYUNBIND_IF_6(self, out_pelem, type, key, condition, on_failure)    __HYBRID_TAILQ_TRYUNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_TAILQ_TRYUNBIND_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_TAILQ_TRYUNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_TAILQ_TRYUNBIND_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_TAILQ_TRYUNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_TAILQ_UNBINDALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_TAILQ_UNBINDALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_TAILQ_UNBINDALL_6(self, out_pelem, type, key, condition, on_match)         __HYBRID_TAILQ_UNBINDALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_TAILQ_UNBINDALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_TAILQ_UNBINDALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_TAILQ_UNBINDALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_TAILQ_UNBINDALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_TAILQ_UNBIND_IF_4(self, out_pelem, key, condition)                         __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_TAILQ_UNBIND_IF_5(self, out_pelem, type, key, condition)                   __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_TAILQ_UNBIND_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_TAILQ_UNBIND_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
 #define TAILQ_FOREACH_FROM_SAFE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* TAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
 #define TAILQ_FOREACH_REVERSE_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* TAILQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, [HEAD_T], getpath, [tvar]) */
 #define TAILQ_FOREACH_REVERSE_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, [HEAD_T], getpath, [tvar]) */
@@ -2221,16 +2247,40 @@
 #define TAILQ_LAST_FAST_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_LAST_FAST_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_LAST_FAST_P(self, [T], getpath) */
 #define TAILQ_PREV_FAST_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_FAST_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_PREV_FAST_P(elem, self, [T], getpath) */
 #define TAILQ_PREV_P(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_PREV_P(elem, [HEAD_T], getpath) */
+#define TAILQ_REMOVEALL(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)                /* TAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define TAILQ_REMOVEALL_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)              /* TAILQ_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define TAILQ_REMOVE_IF(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)                   /* TAILQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define TAILQ_REMOVE_IF_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
 #define TAILQ_SWAP_P(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_SWAP_P_, (__VA_ARGS__))(__VA_ARGS__)                      /* TAILQ_SWAP_P(l1, l2, [T], getpath) */
+#define TAILQ_TRYREMOVE_IF(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)                /* TAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define TAILQ_TRYREMOVE_IF_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)              /* TAILQ_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define TAILQ_TRYUNBIND_IF(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)                /* TAILQ_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define TAILQ_TRYUNBIND_IF_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)              /* TAILQ_TRYUNBIND_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define TAILQ_UNBINDALL(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_UNBINDALL_, (__VA_ARGS__))(__VA_ARGS__)                   /* TAILQ_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
+#define TAILQ_UNBINDALL_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_UNBINDALL_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_UNBINDALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define TAILQ_UNBIND_IF(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_UNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)                   /* TAILQ_UNBIND_IF(self, out_pelem, [type], key, condition) */
+#define TAILQ_UNBIND_IF_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_TAILQ_UNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* TAILQ_UNBIND_IF_P(self, out_pelem, [T], getpath, condition) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define TAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                 __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define TAILQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, HEAD_T, getpath, tvar) __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
-#define TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, HEAD_T, getpath, tvar)      __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
-#define TAILQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                      __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define TAILQ_LAST_FAST_P(self, T, getpath)                                  (TAILQ_EMPTY(self) ? __NULLPTR : (T *)((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
-#define TAILQ_PREV_FAST_P(elem, self, T, getpath)                            ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
-#define TAILQ_PREV_P(elem, HEAD_T, getpath)                                  __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
-#define TAILQ_SWAP_P(l1, l2, T, getpath)                                     __HYBRID_TAILQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define TAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                        __HYBRID_TAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, HEAD_T, getpath, tvar)        __HYBRID_TAILQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_FOREACH_REVERSE_SAFE_P(elem, self, HEAD_T, getpath, tvar)             __HYBRID_TAILQ_FOREACH_REVERSE_SAFE4(elem, self, HEAD_T, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                             __HYBRID_TAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define TAILQ_LAST_FAST_P(self, T, getpath)                                         (TAILQ_EMPTY(self) ? __NULLPTR : (T *)((__SIZE_TYPE__)(self)->tqh_last - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
+#define TAILQ_PREV_FAST_P(elem, self, T, getpath)                                   ((elem)->field.tqe_prev == &(self)->tqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(elem)->field.tqe_prev - (__SIZE_TYPE__)&getpath((T *)0).tqe_next))
+#define TAILQ_PREV_P(elem, HEAD_T, getpath)                                         __HYBRID_TAILQ_PREV(elem, HEAD_T, __HYBRID_Q_PTH, getpath)
+#define TAILQ_REMOVEALL(self, out_pelem, type, key, condition, on_match)            __HYBRID_TAILQ_REMOVEALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define TAILQ_REMOVEALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_TAILQ_REMOVEALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define TAILQ_REMOVE_IF(self, out_pelem, type, key, condition)                      __HYBRID_TAILQ_REMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define TAILQ_REMOVE_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_TAILQ_REMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define TAILQ_SWAP_P(l1, l2, T, getpath)                                            __HYBRID_TAILQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define TAILQ_TRYREMOVE_IF(self, out_pelem, type, key, condition, on_failure)       __HYBRID_TAILQ_TRYREMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define TAILQ_TRYREMOVE_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_TAILQ_TRYREMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define TAILQ_TRYUNBIND_IF(self, out_pelem, type, key, condition, on_failure)       __HYBRID_TAILQ_TRYUNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define TAILQ_TRYUNBIND_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_TAILQ_TRYUNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define TAILQ_UNBINDALL(self, out_pelem, type, key, condition, on_match)            __HYBRID_TAILQ_UNBINDALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define TAILQ_UNBINDALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_TAILQ_UNBINDALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define TAILQ_UNBIND_IF(self, out_pelem, type, key, condition)                      __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define TAILQ_UNBIND_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
@@ -2291,6 +2341,124 @@
 	       *X(_, elem).tqe_prev = X(_, elem).tqe_next,                        \
 	       __HYBRID_Q_BADPTR(X(_, elem).tqe_next),                            \
 	       X(_, elem).tqe_prev = __NULLPTR)
+#define __HYBRID_TAILQ_REMOVEALL(self, out_pelem, T, X, _, condition, on_match)  \
+	/* Sorry, this one must be a statement */                                    \
+	do {                                                                         \
+		T **__htqra_piter = &(self)->tqh_first;                                  \
+		while ((*(out_pelem) = *__htqra_piter) != __NULLPTR) {                   \
+			if (condition) {                                                     \
+				if ((*__htqra_piter = X(_, *(out_pelem)).tqe_next) != __NULLPTR) \
+					X(_, X(_, *(out_pelem)).tqe_next).tqe_prev = __htqra_piter;  \
+				else {                                                           \
+					(self)->tqh_last = __htqra_piter;                            \
+				}                                                                \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_next);                  \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_prev);                  \
+				on_match;                                                        \
+			} else {                                                             \
+				__htqra_piter = &X(_, *(out_pelem)).tqe_next;                    \
+			}                                                                    \
+		}                                                                        \
+	}	__WHILE0
+#define __HYBRID_TAILQ_UNBINDALL(self, out_pelem, T, X, _, condition, on_match)  \
+	/* Sorry, this one must be a statement */                                    \
+	do {                                                                         \
+		T **__htqra_piter = &(self)->tqh_first;                                  \
+		while ((*(out_pelem) = *__htqra_piter) != __NULLPTR) {                   \
+			if (condition) {                                                     \
+				if ((*__htqra_piter = X(_, *(out_pelem)).tqe_next) != __NULLPTR) \
+					X(_, X(_, *(out_pelem)).tqe_next).tqe_prev = __htqra_piter;  \
+				else {                                                           \
+					(self)->tqh_last = __htqra_piter;                            \
+				}                                                                \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_next);                  \
+				X(_, *(out_pelem)).tqe_prev = __NULLPTR;                         \
+				on_match;                                                        \
+			} else {                                                             \
+				__htqra_piter = &X(_, *(out_pelem)).tqe_next;                    \
+			}                                                                    \
+		}                                                                        \
+	}	__WHILE0
+#define __HYBRID_TAILQ_REMOVE_IF(self, out_pelem, T, X, _, condition)    \
+	/* Sorry, this one must be a statement */                            \
+	do {                                                                 \
+		T **__htqri_piter = &(self)->tqh_first;                          \
+		for (;;) {                                                       \
+			*(out_pelem) = *__htqri_piter;                               \
+			if (condition)                                               \
+				break;                                                   \
+			__htqri_piter = &X(_, *(out_pelem)).tqe_next;                \
+		}                                                                \
+		if ((*__htqri_piter = X(_, *(out_pelem)).tqe_next) != __NULLPTR) \
+			X(_, X(_, *(out_pelem)).tqe_next).tqe_prev = __htqri_piter;  \
+		else {                                                           \
+			(self)->tqh_last = __htqri_piter;                            \
+		}                                                                \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_next);                  \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_prev);                  \
+	}	__WHILE0
+#define __HYBRID_TAILQ_UNBIND_IF(self, out_pelem, T, X, _, condition)    \
+	/* Sorry, this one must be a statement */                            \
+	do {                                                                 \
+		T **__htqri_piter = &(self)->tqh_first;                          \
+		for (;;) {                                                       \
+			*(out_pelem) = *__htqri_piter;                               \
+			if (condition)                                               \
+				break;                                                   \
+			__htqri_piter = &X(_, *(out_pelem)).tqe_next;                \
+		}                                                                \
+		if ((*__htqri_piter = X(_, *(out_pelem)).tqe_next) != __NULLPTR) \
+			X(_, X(_, *(out_pelem)).tqe_next).tqe_prev = __htqri_piter;  \
+		else {                                                           \
+			(self)->tqh_last = __htqri_piter;                            \
+		}                                                                \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_next);                  \
+		X(_, *(out_pelem)).tqe_prev = __NULLPTR;                         \
+	}	__WHILE0
+#define __HYBRID_TAILQ_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
+	/* Sorry, this one must be a statement */                                        \
+	do {                                                                             \
+		T **__htqtri_piter = &(self)->tqh_first;                                     \
+		for (;;) {                                                                   \
+			if ((*(out_pelem) = *__htqtri_piter) == __NULLPTR) {                     \
+				on_failure;                                                          \
+				break;                                                               \
+			}                                                                        \
+			if (condition) {                                                         \
+				if ((*__htqtri_piter = X(_, *(out_pelem)).tqe_next) != __NULLPTR)    \
+					X(_, X(_, *(out_pelem)).tqe_next).tqe_prev = __htqtri_piter;     \
+				else {                                                               \
+					(self)->tqh_last = __htqtri_piter;                               \
+				}                                                                    \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_next);                      \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_prev);                      \
+				break;                                                               \
+			}                                                                        \
+			__htqtri_piter = &X(_, *(out_pelem)).tqe_next;                           \
+		}                                                                            \
+	}	__WHILE0
+#define __HYBRID_TAILQ_TRYUNBIND_IF(self, out_pelem, T, X, _, condition, on_failure) \
+	/* Sorry, this one must be a statement */                                        \
+	do {                                                                             \
+		T **__htqtri_piter = &(self)->tqh_first;                                     \
+		for (;;) {                                                                   \
+			if ((*(out_pelem) = *__htqtri_piter) == __NULLPTR) {                     \
+				on_failure;                                                          \
+				break;                                                               \
+			}                                                                        \
+			if (condition) {                                                         \
+				if ((*__htqtri_piter = X(_, *(out_pelem)).tqe_next) != __NULLPTR)    \
+					X(_, X(_, *(out_pelem)).tqe_next).tqe_prev = __htqtri_piter;     \
+				else {                                                               \
+					(self)->tqh_last = __htqtri_piter;                               \
+				}                                                                    \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).tqe_next);                      \
+				X(_, *(out_pelem)).tqe_prev = __NULLPTR;                             \
+				break;                                                               \
+			}                                                                        \
+			__htqtri_piter = &X(_, *(out_pelem)).tqe_next;                           \
+		}                                                                            \
+	}	__WHILE0
 #define __HYBRID_TAILQ_FOREACH(elem, self, X, _) \
 	for ((elem) = (self)->tqh_first; (elem); (elem) = X(_, elem).tqe_next)
 #define __HYBRID_TAILQ_FOREACH_FROM(elem, self, X, _) \
@@ -3310,9 +3478,6 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define TAILQ_REMOVE_IF(self, out_pelem, [type], key, condition)
-//TODO:#define TAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
-//TODO:#define TAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
 //TODO:#define CIRCLEQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define CIRCLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
