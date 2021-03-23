@@ -98,7 +98,7 @@
  * [N N         N  ]  void [*]_INSERT_TAIL(self, elem, [type], key)
  * [    1 1 1      ]  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, key)
  * [N N         N  ]  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key)
- * [1 1 1 1        ]  void [*]_REMOVE_HEAD(self, key)
+ * [1 1 1 1     1  ]  void [*]_REMOVE_HEAD(self, key)
  * [1         1    ]  void [*]_REMOVE(elem, key)
  * [      1 1   1  ]  void [*]_REMOVE(self, elem, key)
  * [  N N          ]  void [*]_REMOVE(self, elem, [type], key)
@@ -2943,6 +2943,8 @@
 #define DLIST_PREV_P(elem, getpath)                                                          getpath(elem).dle_prev
 #define DLIST_REMOVE_AFTER(elem, key)                                                        __HYBRID_DLIST_REMOVE_AFTER(elem, __HYBRID_Q_KEY, key)
 #define DLIST_REMOVE_AFTER_P(elem, getpath)                                                  __HYBRID_DLIST_REMOVE_AFTER(elem, __HYBRID_Q_PTH, getpath)
+#define DLIST_REMOVE_HEAD(self, key)                                                         __HYBRID_DLIST_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
+#define DLIST_REMOVE_HEAD_P(self, getpath)                                                   __HYBRID_DLIST_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define DLIST_REMOVE(self, elem, key)                                                        __HYBRID_DLIST_REMOVE(self, elem, __HYBRID_Q_KEY, key)
 #define DLIST_REMOVE_P(self, elem, getpath)                                                  __HYBRID_DLIST_REMOVE(self, elem, __HYBRID_Q_PTH, getpath)
 #define DLIST_REMOVE_R(self, lo_elem, hi_elem, key)                                          __HYBRID_DLIST_REMOVE_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -3137,6 +3139,11 @@
 	 (X(_, elem).dle_next = X(_, X(_, elem).dle_next).dle_next) != __NULLPTR \
 	 ? (void)(X(_, X(_, elem).dle_next).dle_prev = (elem))                   \
 	 : (void)0)
+#define __HYBRID_DLIST_REMOVE_HEAD(self, X, _)                           \
+	(__HYBRID_Q_BADPTR(X(_, (self)->dlh_first).dle_prev),                \
+	 ((self)->dlh_first = X(_, (self)->dlh_first).dle_next) != __NULLPTR \
+	 ? (void)(X(_, (self)->dlh_first).dle_prev = __NULLPTR)              \
+	 : (void)0)
 #define __HYBRID_DLIST_REMOVE(self, elem, X, _) \
 	__HYBRID_DLIST_REMOVE_R(self, elem, elem, X, _)
 #define __HYBRID_DLIST_REMOVE_R(self, lo_elem, hi_elem, X, _)                       \
@@ -3254,7 +3261,6 @@
 //TODO:#define CIRCLEQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define CIRCLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
-//TODO:#define DLIST_REMOVE_HEAD(self, key)
 //TODO:*_REMOVE_TAIL() ?
 
 
