@@ -679,9 +679,9 @@ __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(__T *__self) {
 
 #else /* __cplusplus && __CC__ */
 
-#define __DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_)           /* nothing */
+#define __DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_)          /* nothing */
 #define __DEFINE_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)     /* nothing */
-#define __DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)       /* nothing */
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)      /* nothing */
 #define __DEFINE_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_) /* nothing */
 
 #endif /* !__cplusplus || !__CC__ */

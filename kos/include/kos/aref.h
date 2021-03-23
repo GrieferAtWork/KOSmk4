@@ -158,6 +158,8 @@
  * >> void   axref_set_nopr                (AXREF(T) *self, REF T *newobj, typename T);
  * >> void   axref_set                     (AXREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
  * >> void   axref_set_nopr                (AXREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
+ * >> void   axref_clear                   (AXREF(T) *self);
+ * >> void   axref_clear_nopr              (AXREF(T) *self);
  * >> void   axref_clear                   (AXREF(T) *self, typename T);
  * >> void   axref_clear_nopr              (AXREF(T) *self, typename T);
  * >> void   axref_clear                   (AXREF(T) *self, typename T, void decref(T *));

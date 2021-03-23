@@ -250,7 +250,7 @@ mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
 
 
 #define STEAL_FREE_NODE_LIST(dst, src) \
-	((dst) = (src), SLIST_INIT(&(src)))
+	((dst) = (src), SLIST_INIT(&(src))) /* TODO: SLIST_MOVE() */
 
 /* Map a given file into the specified mbuilder.
  * Behaves  exactly  the  same  as  `mman_map()' */

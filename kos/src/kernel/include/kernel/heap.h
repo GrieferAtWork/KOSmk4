@@ -52,12 +52,10 @@ struct mfree {
 	LIST_ENTRY(mfree)           mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
 	LLRBTREE_NODE(struct mfree) mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
 	size_t                      mf_size;    /* Size of this block (in bytes; aligned by `HEAP_ALIGNMENT'; including this header) */
-#define MFREE_FUNDEFINED        0x00        /* Memory    initialization    is     undefined.
-                                             * In  debug  mode,  this means  that  memory is
-                                             * initialized  using  `DEBUGHEAP_NO_MANS_LAND',
-                                             * with portions that haven't been allocated yet
-                                             * pending initialization  for either  `DEBUGHEAP_FRESH_MEMORY'
-                                             * or ZERO(0), depending on how they were originally allocated. */
+#define MFREE_FUNDEFINED        0x00        /* Memory initialization is undefined. In debug mode, this means that memory is
+                                             * initialized  using `DEBUGHEAP_NO_MANS_LAND', with portions that haven't been
+                                             * allocated  yet pending initialization for either `DEBUGHEAP_FRESH_MEMORY' or
+                                             * ZERO(0), depending on how they were originally allocated. */
 #define MFREE_FZERO             GFP_CALLOC  /* Memory is ZERO-initialized. */
 #define MFREE_FMASK             MFREE_FZERO /* Mask of known flags. */
 #define MFREE_FRED              0x80        /* This is a red node. */
@@ -75,7 +73,7 @@ struct mfree {
 
 
 /* Heap configuration:
- * Index offset for the first bucket that should be search for a given size. */
+ * Index offset for the first bucket that should be searched for a given size. */
 #if HEAP_ALIGNMENT == 1
 #   define HEAP_BUCKET_OFFSET     0 /* FFS(HEAP_ALIGNMENT) */
 #elif HEAP_ALIGNMENT == 2
@@ -98,12 +96,12 @@ struct mfree {
 #   define HEAP_BUCKET_OFFSET     __hybrid_ffs(HEAP_ALIGNMENT)
 #endif /* HEAP_ALIGNMENT != ... */
 
-#define HEAP_BUCKET_OF(size)   (((__SIZEOF_SIZE_T__*8)-__hybrid_clz(size))-HEAP_BUCKET_OFFSET)
-#define HEAP_BUCKET_MINSIZE(i)   (1 << ((i)+HEAP_BUCKET_OFFSET-1))
-#define HEAP_BUCKET_COUNT       ((__SIZEOF_SIZE_T__*8)-(HEAP_BUCKET_OFFSET-1))
+#define HEAP_BUCKET_OF(size)   (((__SIZEOF_SIZE_T__ * 8) - __hybrid_clz(size)) - HEAP_BUCKET_OFFSET)
+#define HEAP_BUCKET_MINSIZE(i) (1 << ((i) + HEAP_BUCKET_OFFSET - 1))
+#define HEAP_BUCKET_COUNT      ((__SIZEOF_SIZE_T__ * 8) - (HEAP_BUCKET_OFFSET - 1))
 
 #define HEAP_INIT(overalloc, freethresh, hintaddr, hintmode) \
-	{ ATOMIC_LOCK_INIT, __NULLPTR, { }, overalloc, freethresh, hintaddr, hintmode }
+	{ ATOMIC_LOCK_INIT, __NULLPTR, {}, overalloc, freethresh, hintaddr, hintmode }
 
 struct heap_pending_free {
 	struct heap_pending_free *hpf_next;  /* [0..1] Next pending free block. */
@@ -122,7 +120,7 @@ struct heap {
 	struct mfree_list         h_size[HEAP_BUCKET_COUNT];
 	                                        /* [lock(h_lock)][0..1][*] Heap sorted by free range size. */
 	WEAK size_t               h_overalloc;  /* Amount (in bytes) by which to over-allocate memory in heaps.
-	                                         * NOTE:    Set   to   ZERO(0)   to   disable   overallocation. */
+	                                         * NOTE: Set to ZERO(0) to disable overallocation. */
 	WEAK size_t               h_freethresh; /* Threshold  that must be  reached before any  continuous block of free
 	                                         * data is unmapped from the kernel VM. (Should always be `>= PAGESIZE') */
 	WEAK void                *h_hintaddr;   /* Address to use as next allocation hint. */
@@ -133,15 +131,16 @@ struct heap {
 	                                         *    the time. */
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 	WEAK size_t               h_dangle;     /* [lock(INCREMENT(h_lock),DECREMENT(atomic),READ(atomic))]
-	                                         * Amount of  dangling bytes  of memory  (memory  that was  allocated, but  may  be
-	                                         * release again  shortly) When  new memory  would have  to be  requested from  the
-	                                         * core,  this  field is  checked to  see if  it  is likely  that some  large block
-	                                         * of memory  will  be  released  soon, preventing  a  race  condition  that  would
-	                                         * unnecessarily allocate more memory when `heap_free_untraced()' is merging a data
-	                                         * block  with  another,  larger  data   block,  for  which  it  must   temporarily
-	                                         * allocate that  larger  data  block.  Another thread  allocating  memory  at  the
-	                                         * same  time may then think that the cache  has grown too small for the allocation
-	                                         * and unnecessarily request more memory from the core. */
+	                                         * Amount  of dangling bytes  of memory (memory that  was allocated, but may
+	                                         * be release again  shortly) When  new memory  would have  to be  requested
+	                                         * from  the core, this  field is checked to  see if it  is likely that some
+	                                         * large block of memory will be released soon, preventing a race  condition
+	                                         * that would unnecessarily allocate more memory when `heap_free_untraced()'
+	                                         * is merging a  data block with  another, larger data  block, for which  it
+	                                         * must  temporarily  allocate  that  larger  data  block.  Another   thread
+	                                         * allocating memory at  the same  time may then  think that  the cache  has
+	                                         * grown  too small for the allocation and unnecessarily request more memory
+	                                         * from the core. */
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 };
 
@@ -211,11 +210,11 @@ FUNDEF WUNUSED NONNULL((1)) struct heapptr NOTHROW(KCALL __os_heap_realign_nx)(s
  *     is  the  same as  passing `HEAP_ALIGNMENT'  for `min_alignment'
  *   - The `offset' parameter is a delta added to the returned pointer
  *     where the given `min_alignment' applies:
- *     >> assert(IS_ALIGNED((uintptr_t)return.hp_ptr + offset,min_alignment));
+ *     >> assert(IS_ALIGNED((uintptr_t)return.hp_ptr + offset, min_alignment));
  *     However, it doesn't guaranty that memory at `(uintptr_t)return.hp_ptr + offset'
  *     is actually part of the allocation.
  *     HINT: `offset' is internally truncated by `min_alignment':
- *           `offset = offset & (min_alignment-1)'
+ *           `offset = offset & (min_alignment - 1)'
  *   - These functions are written to be able to deal with _ANY_ `num_bytes'
  *     value, including unaligned value, or absurdly large values that  were
  *     designed only to cause internal overflow errors.
@@ -228,18 +227,19 @@ FUNDEF WUNUSED NONNULL((1)) struct heapptr NOTHROW(KCALL __os_heap_realign_nx)(s
  *       - GFP_NOCLRC|GFP_NOSWAP -- Behavioral modifiers for swapping memory
  *    heap_free_untraced:
  *       - GFP_CALLOC            -- The given memory block is ZERO-initialized (allows for some internal optimizations)
- *       - GFP_NOTRIM            -- Do not `vm_unmap()' free memory blocks larger than
- *                                 `h_freethresh', but keep them in cache instead.
- * NOTE: `heap_free_untraced()' always completes without blocking.
- *        If `vm_unmap()' needs to  be called, the free()  operation
- *        is either postponed until the next call to a heap function
- *        that is allowed to block, or  is simply kept in cache,  as
- *        though `GFP_NOMAP' has been passed.
- * NOTE:  The `*_traced' family of functions will automatically call `mall_trace' / `mall_untrace'
- *        in order to  register /  unregister the  data blocks  as a  MALL GC  search data  block.
- *        When  building without  `CONFIG_TRACE_MALLOC', they  are aliasing  the regular versions.
+ *       - GFP_NOTRIM            -- Do not `mman_unmap()' free memory blocks larger than
+ *                                  `h_freethresh', but keep them in cache instead.
+ * NOTE: `heap_free_untraced()' always completes without  blocking.
+ *       If `mman_unmap()' needs to be called, the free() operation
+ *       is either postponed until the next call to a heap function
+ *       that is allowed to block, or  is simply kept in cache,  as
+ *       though `GFP_NOMAP' has been passed.
+ * NOTE: The `*_traced' family of functions will automatically call `kmalloc_trace'  /
+ *       `kmalloc_untrace' in order to register / unregister the data blocks as a MALL
+ *       GC search data block. When  building without `CONFIG_TRACE_MALLOC', they  are
+ *       aliasing the regular versions.
  * @param: flags: Set of `GFP_*' flags used for allocation.
- * @throw: E_BADALLOC:    Failed to allocate memory.
+ * @throw: E_BADALLOC:   Failed to allocate memory.
  * @throw: E_WOULDBLOCK: `GFP_NOMAP' was specified and new memory would have had to be mapped.
  * @throw: E_WOULDBLOCK: `GFP_ATOMIC' was specified and a lock could not be acquired immediately. */
 #ifndef __OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS
@@ -355,7 +355,7 @@ NOTHROW(KCALL heap_align_untraced_nx)(struct heap *__restrict self,
  * @return: 0 : Memory at the given address has already been allocated.
  * @assume(return == 0 || return >= num_bytes)
  * @param: flags: GFP flags used for allocation.
- * @throw: E_BADALLOC:    Failed to allocate sufficient memory for the operation.
+ * @throw: E_BADALLOC:   Failed to allocate sufficient memory for the operation.
  * @throw: E_WOULDBLOCK: `GFP_NOMAP' was specified and new memory would have had to be mapped.
  * @throw: E_WOULDBLOCK: `GFP_ATOMIC' was specified and a lock could not be acquired immediately. */
 #ifndef __OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS
@@ -407,17 +407,17 @@ NOTHROW(KCALL heap_allat_untraced_nx)(struct heap *__restrict self,
 
 /* A convenience wrapper for `heap_alloc_untraced()', `heap_allat_untraced()' and
  * `heap_free_untraced()', implementing the following realloc()-style  semantics:
- *   - realloc(ptr,0)                         --> Realloc to minimal size
- *   - realloc(ptr,malloc_usable_size(ptr)-x) --> Free unused memory at the end (always succeeds)
- *   - realloc(ptr,malloc_usable_size(ptr)+x) --> Try to `heap_allat_untraced()' at the old end, or move to new memory
- *   - realloc(0,x)                           --> Same as `heap_alloc_untraced()'
+ *   - realloc(ptr, 0)                           --> Realloc to minimal size
+ *   - realloc(ptr, malloc_usable_size(ptr) - x) --> Free unused memory at the end (always succeeds)
+ *   - realloc(ptr, malloc_usable_size(ptr) + x) --> Try to `heap_allat_untraced()' at the old end, or move to new memory
+ *   - realloc(0, x)                             --> Same as `heap_alloc_untraced()'
  *
- * Additionally, `GFP_NOMOVE' may be specified, in which case the base address of the
- * returned   pointer   will  always   be  `old_ptr,x >= new_bytes && x <= old_bytes'
+ * Additionally, `GFP_NOMOVE' may be specified, in which case the base address  of
+ * the returned pointer will always be `old_ptr, x >= new_bytes && x <= old_bytes'
  * or `NULL,0' (when `new_bytes > old_bytes'):
- *   - realloc_in_place(ptr,malloc_usable_size(ptr)-x) --> Free unused memory at the end (always succeeds)
- *   - realloc_in_place(ptr,malloc_usable_size(ptr)+x) --> Try to `heap_allat_untraced()' at the old end, or return (NULL,0) (ignoring NX-mode)
- *   - realloc_in_place(0,x)                           --> Always return (NULL,0) (ignoring NX-mode)
+ *   - realloc_in_place(ptr, malloc_usable_size(ptr) - x) --> Free unused memory at the end (always succeeds)
+ *   - realloc_in_place(ptr, malloc_usable_size(ptr) + x) --> Try to `heap_allat_untraced()' at the old end, or return (NULL, 0) (ignoring NX-mode)
+ *   - realloc_in_place(0, x)                             --> Always return (NULL, 0) (ignoring NX-mode)
  *
  * NOTE: These functions always return a fully allocated heap data block.
  * NOTE: Alignment arguments passed to `heap_realign_untraced()' are ignored
@@ -435,11 +435,11 @@ NOTHROW(KCALL heap_allat_untraced_nx)(struct heap *__restrict self,
  *       If you want to extend a heap data block, simply use `heap_allat_untraced()'
  * @assume(return.hp_siz >= new_bytes);
  * @param: old_ptr:      [valid_if(old_bytes != 0)] Base address of the old data block.
- * @param: old_bytes:     The old size of the data block (can be ZERO(0); must be aligned to `HEAP_ALIGNMENT' by the caller)
- * @param: alloc_flags:   Set of `GFP_*' flags used for allocating data.
- * @param: free_flags:    Set of `GFP_*' flags used for freeing data.
- * @param: new_bytes:     The new size of the data block (will be aligned by `HEAP_ALIGNMENT').
- * @throw: E_BADALLOC:    Failed to allocate memory.
+ * @param: old_bytes:    The old size of the data block (can be ZERO(0); must be aligned to `HEAP_ALIGNMENT' by the caller)
+ * @param: alloc_flags:  Set of `GFP_*' flags used for allocating data.
+ * @param: free_flags:   Set of `GFP_*' flags used for freeing data.
+ * @param: new_bytes:    The new size of the data block (will be aligned by `HEAP_ALIGNMENT').
+ * @throw: E_BADALLOC:   Failed to allocate memory.
  * @throw: E_WOULDBLOCK: `GFP_NOMAP' was specified and new memory would have had to be mapped.
  * @throw: E_WOULDBLOCK: `GFP_ATOMIC' was specified and a lock could not be acquired immediately. */
 #ifndef __OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS

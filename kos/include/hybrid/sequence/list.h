@@ -682,8 +682,8 @@
 #define __HYBRID_SLIST_CLASS_HEAD_2(name, type) struct name { __HYBRID_Q_CLASS  type *slh_first; /* [0..1] List head */ }
 #undef SLIST_HEAD
 #undef SLIST_CLASS_HEAD
-#define SLIST_HEAD(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_HEAD_, (__VA_ARGS__))(__VA_ARGS__)
-#define SLIST_CLASS_HEAD(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CLASS_HEAD_, (__VA_ARGS__))(__VA_ARGS__)
+#define SLIST_HEAD(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_HEAD_, (__VA_ARGS__))(__VA_ARGS__)       /* SLIST_HEAD([name], type) */
+#define SLIST_CLASS_HEAD(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SLIST_CLASS_HEAD_, (__VA_ARGS__))(__VA_ARGS__) /* SLIST_CLASS_HEAD([name], type) */
 #else /* !__HYBRID_LIST_RESTRICT_API && __HYBRID_PP_VA_OVERLOAD */
 #define SLIST_HEAD(name, type)       struct name { __HYBRID_Q_STRUCT type *slh_first; /* [0..1] List head */ }
 #define SLIST_CLASS_HEAD(name, type) struct name { __HYBRID_Q_CLASS  type *slh_first; /* [0..1] List head */ }
@@ -1593,8 +1593,8 @@
 		__HYBRID_Q_CLASS type *sqh_first, /* [0..1] Head element */                           \
 		**sqh_last;                       /* [0..1][1..1] Pointer to last-element-pointer. */ \
 	}
-#define SIMPLEQ_HEAD(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_HEAD_, (__VA_ARGS__))(__VA_ARGS__)
-#define SIMPLEQ_CLASS_HEAD(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CLASS_HEAD_, (__VA_ARGS__))(__VA_ARGS__)
+#define SIMPLEQ_HEAD(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_HEAD_, (__VA_ARGS__))(__VA_ARGS__)       /* SIMPLEQ_HEAD([name], type) */
+#define SIMPLEQ_CLASS_HEAD(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_CLASS_HEAD_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_CLASS_HEAD([name], type) */
 #else /* !__HYBRID_LIST_RESTRICT_API && __HYBRID_PP_VA_OVERLOAD */
 #define SIMPLEQ_HEAD(name, type)                                                               \
 	struct name {                                                                              \
@@ -2384,8 +2384,8 @@
 			__HYBRID_Q_CLASS type *cqh_last; /* [1..1] Last element */   \
 		};                                                               \
 	}
-#define CIRCLEQ_HEAD(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_HEAD_, (__VA_ARGS__))(__VA_ARGS__)
-#define CIRCLEQ_CLASS_HEAD(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_CLASS_HEAD_, (__VA_ARGS__))(__VA_ARGS__)
+#define CIRCLEQ_HEAD(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_HEAD_, (__VA_ARGS__))(__VA_ARGS__)       /* CIRCLEQ_HEAD([name], type) */
+#define CIRCLEQ_CLASS_HEAD(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_CLASS_HEAD_, (__VA_ARGS__))(__VA_ARGS__) /* CIRCLEQ_CLASS_HEAD([name], type) */
 #else /* __HYBRID_PP_VA_OVERLOAD */
 #define CIRCLEQ_HEAD(name, type)                                          \
 	struct name {                                                         \
@@ -3156,6 +3156,14 @@
 //TODO:#define DLIST_CONCAT(dst, src, [type], key)
 //TODO:#define DLIST_REMOVE_HEAD(self, key)
 //TODO:#define DLIST_REMOVE_AFTER(elem, key)
+/* TODO: Rename LIST_P_FIRST()    -> LIST_PFIRST() */
+/* TODO: Rename LIST_P_NEXT()     -> LIST_PNEXT() */
+/* TODO: Rename SLIST_P_FIRST()   -> SLIST_PFIRST() */
+/* TODO: Rename SLIST_P_NEXT()    -> SLIST_PNEXT() */
+/* TODO: Rename STAILQ_P_FIRST()  -> STAILQ_PFIRST() */
+/* TODO: Rename STAILQ_P_NEXT()   -> STAILQ_PNEXT() */
+/* TODO: Rename SIMPLEQ_P_FIRST() -> SIMPLEQ_PFIRST() */
+/* TODO: Rename SIMPLEQ_P_NEXT()  -> SIMPLEQ_PNEXT() */
 
 
 /* TODO: Missing macros from OpenBSD: */
