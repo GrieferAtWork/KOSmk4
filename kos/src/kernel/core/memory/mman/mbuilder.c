@@ -285,7 +285,12 @@ mbuilder_map(struct mbuilder *__restrict self,
 	fm.mfm_prot  = prot;
 	fm.mfm_flags = flags;
 	SLIST_MOVE(&fm.mfm_flist, &self->_mb_fnodes);
-	_mfile_map_init(&fm);
+	TRY {
+		_mfile_map_init(&fm);
+	} EXCEPT {
+		SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
+		RETHROW();
+	}
 	SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
 
 	/* Convert the node list into a `struct mbnode' */
@@ -416,7 +421,12 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 			fm.mfm_prot  = prot;
 			fm.mfm_flags = flags;
 			SLIST_MOVE(&fm.mfm_flist, &self->_mb_fnodes);
-			_mfile_map_init(&fm);
+			TRY {
+				_mfile_map_init(&fm);
+			} EXCEPT {
+				SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
+				RETHROW();
+			}
 			SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
 
 			/* Convert the node list into a `struct mbnode' */
