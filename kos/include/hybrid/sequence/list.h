@@ -98,7 +98,7 @@
  * [N N         N  ]  void [*]_INSERT_TAIL(self, elem, [type], key)
  * [    1 1 1      ]  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, key)
  * [N N         N  ]  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key)
- * [1 1 1          ]  void [*]_REMOVE_HEAD(self, key)
+ * [1 1 1 1        ]  void [*]_REMOVE_HEAD(self, key)
  * [1         1    ]  void [*]_REMOVE(elem, key)
  * [      1 1   1  ]  void [*]_REMOVE(self, elem, key)
  * [  N N          ]  void [*]_REMOVE(self, elem, [type], key)
@@ -2170,6 +2170,8 @@
 #define TAILQ_MOVE(dst, src, key)                                                            __HYBRID_TAILQ_MOVE(dst, src, __HYBRID_Q_KEY, key)
 #define TAILQ_MOVE_P(dst, src, getpath)                                                      __HYBRID_TAILQ_MOVE(dst, src, __HYBRID_Q_PTH, getpath)
 #define TAILQ_NEXT_P(elem, getpath)                                                          getpath(elem).tqe_next
+#define TAILQ_REMOVE_HEAD(self, key)                                                         __HYBRID_TAILQ_REMOVE_HEAD(self, __HYBRID_Q_KEY, key)
+#define TAILQ_REMOVE_HEAD_P(self, getpath)                                                   __HYBRID_TAILQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define TAILQ_REMOVE_P(self, elem, getpath)                                                  __HYBRID_TAILQ_REMOVE(self, elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_REMOVE_R(self, lo_elem, hi_elem, key)                                          __HYBRID_TAILQ_REMOVE_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define TAILQ_REMOVE_R_P(self, lo_elem, hi_elem, getpath)                                    __HYBRID_TAILQ_REMOVE_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
@@ -2251,6 +2253,11 @@
 	 *(X(_, new_lo_elem).tqe_prev = X(_, old_lo_elem).tqe_prev) = (new_lo_elem),                 \
 	 __HYBRID_Q_BADPTR(X(_, old_hi_elem).tqe_next),                                              \
 	 __HYBRID_Q_BADPTR(X(_, old_lo_elem).tqe_prev))
+#define __HYBRID_TAILQ_REMOVE_HEAD(self, X, _)                           \
+	(__HYBRID_Q_BADPTR(X(_, (self)->tqh_first).tqe_prev),                \
+	 ((self)->tqh_first = X(_, (self)->tqh_first).tqe_next) != __NULLPTR \
+	 ? (void)(X(_, (self)->tqh_first).tqe_prev = &(self)->tqh_first)     \
+	 : (void)((self)->tqh_last = X(_, (self)->tqh_first).tqe_prev))
 #define __HYBRID_TAILQ_REMOVE(self, elem, X, _) \
 	__HYBRID_TAILQ_REMOVE_R(self, elem, elem, X, _)
 #define __HYBRID_TAILQ_REMOVE_R(self, lo_elem, hi_elem, X, _)                 \
@@ -3172,12 +3179,10 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define TAILQ_REMOVE_HEAD(self, key)
 //TODO:#define TAILQ_REMOVE_AFTER(elem, key)
 //TODO:#define TAILQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define TAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define TAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
-//TODO:#define RINGQ_MOVE(dst, src, key)
 //TODO:#define CIRCLEQ_MOVE(dst, src, key)
 //TODO:#define CIRCLEQ_SWAP(l1, l2, [type], key)
 //TODO:#define CIRCLEQ_CONCAT(dst, src, [type], key)
@@ -3191,6 +3196,7 @@
 //TODO:#define DLIST_CONCAT(dst, src, [type], key)
 //TODO:#define DLIST_REMOVE_HEAD(self, key)
 //TODO:#define DLIST_REMOVE_AFTER(elem, key)
+//TODO:*_REMOVE_TAIL() ?
 
 
 /* TODO: Missing macros from OpenBSD: */
