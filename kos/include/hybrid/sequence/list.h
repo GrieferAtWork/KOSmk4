@@ -60,7 +60,7 @@
  * [1     1 1      ]  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
  * [1 1 1 1 1   1  ]  void [*]_CLEAR(self)
  * [    1          ]  void [*]_CONCAT(dst, src)
- * [      1        ]  void [*]_CONCAT(dst, src, key)
+ * [      1 1      ]  void [*]_CONCAT(dst, src, key)
  * [N N         N  ]  void [*]_CONCAT(dst, src, [type], key)
  * [1 1 1 1 1   1  ]  PTR  [*]_END(self)                                      (Pointer to 1 past the last elem; NULL-pointer, since all of these are linked lists)
  * [1 1 1 1 1   1  ]  bool [*]_EMPTY(self)
@@ -2575,6 +2575,8 @@
 #else /* __cplusplus */
 #define CIRCLEQ_CLEAR(self) (void)((self)->cqh_first = (self)->cqh_last = (void *)(self))
 #endif /* !__cplusplus */
+#define CIRCLEQ_CONCAT(dst, src, key)                                                          __HYBRID_CIRCLEQ_CONCAT(dst, src, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_CONCAT_P(dst, src, getpath)                                                    __HYBRID_CIRCLEQ_CONCAT(dst, src, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_ENTRY_UNBOUND_INIT(entry)                                                      (void)(__HYBRID_Q_BADPTR((entry)->cqe_next), (entry)->cqe_prev = __NULLPTR)
 #define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER                                                      { __NULLPTR, __NULLPTR }
 #define CIRCLEQ_ENTRY_UNBOUND_INITIALIZER_IS_ZERO
@@ -2658,6 +2660,16 @@
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
+#define __HYBRID_CIRCLEQ_CONCAT(dst, src, X, _)                                         \
+	(CIRCLEQ_EMPTY(src)                                                                 \
+	 ? (void)0                                                                          \
+	 : (CIRCLEQ_EMPTY(dst)                                                              \
+	    ? (void)(*(void **)&X(_, (dst)->cqh_first = (src)->cqh_first).cqe_prev = (dst), \
+	             *(void **)&X(_, (dst)->cqh_last = (src)->cqh_last).cqe_next   = (dst)) \
+	    : (void)(X(_, (src)->cqh_first).cqe_prev = (dst)->cqh_last,                     \
+	             X(_, (dst)->cqh_last).cqe_next  = (src)->cqh_first,                    \
+	             (dst)->cqh_last                 = (src)->cqh_last),                    \
+	    CIRCLEQ_INIT(src)))
 #define __HYBRID_CIRCLEQ_SWAP(l1, l2, T, X, _)                                  \
 	/* Sorry, this one must be a statement */                                   \
 	do {                                                                        \
@@ -3287,7 +3299,6 @@
 //TODO:#define TAILQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define TAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define TAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
-//TODO:#define CIRCLEQ_CONCAT(dst, src, [type], key)
 //TODO:#define CIRCLEQ_REMOVE_HEAD(self, key)
 //TODO:#define CIRCLEQ_REMOVE_AFTER(elem, key)
 //TODO:#define CIRCLEQ_REMOVE_IF(self, out_pelem, [type], key, condition)
