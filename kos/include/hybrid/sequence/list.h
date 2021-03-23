@@ -104,7 +104,7 @@
  * [  N N          ]  void [*]_REMOVE(self, elem, [type], key)
  * [1         1    ]  void [*]_REMOVE_R(lo_elem, hi_elem, key)                (Remove all elements `lo_elem...hi_elem' inclusively; links between removed elements remain valid)
  * [      1 1   1  ]  void [*]_REMOVE_R(self, lo_elem, hi_elem, key)
- * [1 1            ]  void [*]_REMOVE_AFTER(elem, key)                        (Remove successor of `elem'; undef if no successor)
+ * [1 1         1  ]  void [*]_REMOVE_AFTER(elem, key)                        (Remove successor of `elem'; undef if no successor)
  * [    1 1        ]  void [*]_REMOVE_AFTER(self, elem, key)
  * [  1            ]  void [*]_REMOVE_PREVPTR(p_elem, elem, key)              (libbsd-specific; for use with `SLIST_FOREACH_PREVPTR()')
  * [1 1            ]  void [*]_P_REMOVE(p_elem, key)
@@ -2941,6 +2941,8 @@
 #define DLIST_NEXT_P(elem, getpath)                                                          getpath(elem).dle_next
 #define DLIST_PREV(elem, key)                                                                (elem)->key.dle_prev
 #define DLIST_PREV_P(elem, getpath)                                                          getpath(elem).dle_prev
+#define DLIST_REMOVE_AFTER(elem, key)                                                        __HYBRID_DLIST_REMOVE_AFTER(elem, __HYBRID_Q_KEY, key)
+#define DLIST_REMOVE_AFTER_P(elem, getpath)                                                  __HYBRID_DLIST_REMOVE_AFTER(elem, __HYBRID_Q_PTH, getpath)
 #define DLIST_REMOVE(self, elem, key)                                                        __HYBRID_DLIST_REMOVE(self, elem, __HYBRID_Q_KEY, key)
 #define DLIST_REMOVE_P(self, elem, getpath)                                                  __HYBRID_DLIST_REMOVE(self, elem, __HYBRID_Q_PTH, getpath)
 #define DLIST_REMOVE_R(self, lo_elem, hi_elem, key)                                          __HYBRID_DLIST_REMOVE_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -3130,6 +3132,11 @@
 			}                                                                   \
 		}                                                                       \
 	}	__WHILE0
+#define __HYBRID_DLIST_REMOVE_AFTER(elem, X, _)                              \
+	(__HYBRID_Q_BADPTR(X(_, X(_, elem).dle_next).dle_prev),                  \
+	 (X(_, elem).dle_next = X(_, X(_, elem).dle_next).dle_next) != __NULLPTR \
+	 ? (void)(X(_, X(_, elem).dle_next).dle_prev = (elem))                   \
+	 : (void)0)
 #define __HYBRID_DLIST_REMOVE(self, elem, X, _) \
 	__HYBRID_DLIST_REMOVE_R(self, elem, elem, X, _)
 #define __HYBRID_DLIST_REMOVE_R(self, lo_elem, hi_elem, X, _)                       \
@@ -3248,7 +3255,6 @@
 //TODO:#define CIRCLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
 //TODO:#define DLIST_REMOVE_HEAD(self, key)
-//TODO:#define DLIST_REMOVE_AFTER(elem, key)
 //TODO:*_REMOVE_TAIL() ?
 
 
