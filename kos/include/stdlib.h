@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc45e319f */
+/* HASH CRC-32:0x9a949d2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,11 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdlib.h) */
 /* (#) Portability: NetBSD        (/include/stdlib.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdlib.h) */
+/* (#) Portability: OpenBSD       (/include/stdlib.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdlib.h) */
+/* (#) Portability: Windows Kits  (/ucrt/stdlib.h) */
 /* (#) Portability: diet libc     (/include/stdlib.h) */
+/* (#) Portability: libbsd        (/include/bsd/stdlib.h) */
 /* (#) Portability: musl libc     (/include/stdlib.h) */
 /* (#) Portability: uClibc        (/include/stdlib.h) */
 #ifndef _STDLIB_H

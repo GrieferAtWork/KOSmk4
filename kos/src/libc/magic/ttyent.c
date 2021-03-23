@@ -21,6 +21,7 @@
 /* (#) Portability: FreeBSD       (/include/ttyent.h) */
 /* (#) Portability: GNU C Library (/misc/ttyent.h) */
 /* (#) Portability: NetBSD        (/include/ttyent.h) */
+/* (#) Portability: OpenBSD       (/include/ttyent.h) */
 /* (#) Portability: uClibc        (/include/ttyent.h) */
 }
 

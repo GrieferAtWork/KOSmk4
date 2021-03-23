@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: libstdc++ (/include/cstdalign) */
 #ifndef _STDALIGN_H
 #include <stdalign.h>
 #endif /* !_STDALIGN_H */

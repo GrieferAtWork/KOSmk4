@@ -23,6 +23,7 @@
 /* (#) Portability: GNU C Library (/posix/cpio.h) */
 /* (#) Portability: NetBSD        (/include/cpio.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/cpio.h) */
+/* (#) Portability: OpenBSD       (/include/cpio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/cpio.h) */
 /* (#) Portability: diet libc     (/include/cpio.h) */
 /* (#) Portability: musl libc     (/include/cpio.h) */

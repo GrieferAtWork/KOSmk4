@@ -26,6 +26,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/dirent.h) */
 /* (#) Portability: NetBSD        (/include/dirent.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/dirent.h) */
+/* (#) Portability: OpenBSD       (/include/dirent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/dirent.h) */
 /* (#) Portability: diet libc     (/include/dirent.h) */
 /* (#) Portability: musl libc     (/include/dirent.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94a5822b */
+/* HASH CRC-32:0x672f19d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (#) Portability: FreeBSD       (/include/ifaddrs.h) */
 /* (#) Portability: GNU C Library (/inet/ifaddrs.h) */
 /* (#) Portability: NetBSD        (/include/ifaddrs.h) */
+/* (#) Portability: OpenBSD       (/include/ifaddrs.h) */
 /* (#) Portability: musl libc     (/include/ifaddrs.h) */
 /* (#) Portability: uClibc        (/include/ifaddrs.h) */
 #ifndef _IFADDRS_H

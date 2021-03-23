@@ -23,6 +23,7 @@
 /* (#) Portability: MinGW       (/mingw-w64-headers/crt/ieeefp.h) */
 /* (#) Portability: NetBSD      (/include/ieeefp.h) */
 /* (#) Portability: Newlib      (/newlib/libc/include/ieeefp.h) */
+/* (#) Portability: OpenBSD     (/include/ieeefp.h) */
 /* (#) Portability: OpenSolaris (/usr/src/head/ieeefp.h) */
 #ifndef _IEEEFP_H
 #define _IEEEFP_H 1

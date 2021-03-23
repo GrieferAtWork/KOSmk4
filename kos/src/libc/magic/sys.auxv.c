@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: FreeBSD       (/sys/sys/auxv.h) */
 /* (#) Portability: GNU C Library (/misc/sys/auxv.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
 /* (#) Portability: diet libc     (/include/sys/auxv.h) */

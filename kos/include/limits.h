@@ -27,6 +27,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/limits.h) */
 /* (#) Portability: NetBSD        (/include/limits.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/limits.h) */
+/* (#) Portability: OpenBSD       (/include/limits.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/limits.h) */
 /* (#) Portability: diet libc     (/include/limits.h) */
 /* (#) Portability: musl libc     (/include/limits.h) */

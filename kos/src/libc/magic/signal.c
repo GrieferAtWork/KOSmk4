@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/signal.h) */
 /* (#) Portability: NetBSD        (/include/signal.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/signal.h) */
+/* (#) Portability: OpenBSD       (/include/signal.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/signal.h) */
+/* (#) Portability: Windows Kits  (/ucrt/signal.h) */
 /* (#) Portability: diet libc     (/include/signal.h) */
 /* (#) Portability: musl libc     (/include/signal.h) */
 /* (#) Portability: uClibc        (/include/signal.h) */

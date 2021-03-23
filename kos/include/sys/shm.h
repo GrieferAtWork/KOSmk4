@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7349ec6 */
+/* HASH CRC-32:0xdbe98409 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,10 @@
  */
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/shm.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/shm.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/shm.h) */
 /* (#) Portability: NetBSD        (/sys/sys/shm.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/shm.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/shm.h) */
 /* (#) Portability: diet libc     (/include/sys/shm.h) */
 /* (#) Portability: musl libc     (/include/sys/shm.h) */

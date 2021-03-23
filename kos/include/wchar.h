@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ba4ed45 */
+/* HASH CRC-32:0x1d04f01b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,11 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/wchar.h) */
 /* (#) Portability: NetBSD        (/include/wchar.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/wchar.h) */
+/* (#) Portability: OpenBSD       (/include/wchar.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wchar.h) */
+/* (#) Portability: Windows Kits  (/ucrt/wchar.h) */
 /* (#) Portability: diet libc     (/include/wchar.h) */
+/* (#) Portability: libbsd        (/include/bsd/wchar.h) */
 /* (#) Portability: musl libc     (/include/wchar.h) */
 /* (#) Portability: uClibc        (/include/wchar.h) */
 #ifndef _WCHAR_H

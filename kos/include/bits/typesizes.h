@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/bits/typesizes.h) */
 #ifndef _BITS_TYPESIZES_H
 #define _BITS_TYPESIZES_H 1
 

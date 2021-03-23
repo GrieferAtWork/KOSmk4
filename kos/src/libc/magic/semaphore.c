@@ -24,6 +24,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/[...]/semaphore.h) */
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/semaphore.h) */
 /* (#) Portability: NetBSD        (/include/semaphore.h) */
+/* (#) Portability: OpenBSD       (/include/semaphore.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/semaphore.h) */
 /* (#) Portability: diet libc     (/include/semaphore.h) */
 /* (#) Portability: musl libc     (/include/semaphore.h) */

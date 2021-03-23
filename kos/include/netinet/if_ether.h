@@ -17,8 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/if_ether.h) */
+/* (#) Portability: FreeBSD       (/sys/netinet/if_ether.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/netinet/if_ether.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/if_ether.h) */
+/* (#) Portability: OpenBSD       (/sys/netinet/if_ether.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/if_ether.h) */
 /* (#) Portability: diet libc     (/include/netinet/if_ether.h) */
 /* (#) Portability: musl libc     (/include/netinet/if_ether.h) */

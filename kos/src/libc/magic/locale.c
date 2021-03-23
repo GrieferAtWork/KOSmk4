@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/locale.h) */
 /* (#) Portability: NetBSD        (/include/locale.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/locale.h) */
+/* (#) Portability: OpenBSD       (/include/locale.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/locale.h) */
+/* (#) Portability: Windows Kits  (/ucrt/locale.h) */
 /* (#) Portability: diet libc     (/include/locale.h) */
 /* (#) Portability: musl libc     (/include/locale.h) */
 /* (#) Portability: uClibc        (/include/locale.h) */

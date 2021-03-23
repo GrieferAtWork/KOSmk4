@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f13893d */
+/* HASH CRC-32:0x75d16562 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD (/include/readpassphrase.h) */
 /* (#) Portability: OpenBSD (/include/readpassphrase.h) */
+/* (#) Portability: libbsd  (/include/bsd/readpassphrase.h) */
 #ifndef _READPASSPHRASE_H
 #define _READPASSPHRASE_H 1
 

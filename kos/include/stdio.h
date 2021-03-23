@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1fc2246 */
+/* HASH CRC-32:0x12c4aed3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,11 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdio.h) */
 /* (#) Portability: NetBSD        (/include/stdio.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdio.h) */
+/* (#) Portability: OpenBSD       (/include/stdio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdio.h) */
+/* (#) Portability: Windows Kits  (/ucrt/stdio.h) */
 /* (#) Portability: diet libc     (/include/stdio.h) */
+/* (#) Portability: libbsd        (/include/bsd/stdio.h) */
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
 #ifndef _STDIO_H

@@ -18,8 +18,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/termios.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/termios.h) */
 /* (#) Portability: GNU C Library (/termios/sys/termios.h) */
 /* (#) Portability: NetBSD        (/sys/sys/termios.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/termios.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/termios.h) */
 /* (#) Portability: musl libc     (/include/sys/termios.h) */
 /* (#) Portability: uClibc        (/include/sys/termios.h) */

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Linux (/include/linux/param.h) */
 #ifndef _LINUX_PARAM_H
 #define _LINUX_PARAM_H 1
 

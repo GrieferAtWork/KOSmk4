@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%(c_prefix){
+/* (#) Portability: Cygwin (/newlib/libc/include/ssp/string.h) */
+/* (#) Portability: NetBSD (/include/ssp/string.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/ssp/string.h) */
+}
 
 %[default:section(".text.crt{|.dos}.ssp.string.memory")]
 

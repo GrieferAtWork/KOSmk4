@@ -22,6 +22,7 @@
 /* (#) Portability: FreeBSD     (/include/iso646.h) */
 /* (#) Portability: MSVC        (/include/iso646.h) */
 /* (#) Portability: NetBSD      (/include/iso646.h) */
+/* (#) Portability: OpenBSD     (/include/iso646.h) */
 /* (#) Portability: OpenSolaris (/usr/src/head/iso646.h) */
 /* (#) Portability: musl libc   (/include/iso646.h) */
 #ifndef _ISO646_H

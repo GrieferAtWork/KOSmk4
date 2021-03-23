@@ -26,6 +26,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/strings.h) */
 /* (#) Portability: NetBSD        (/include/strings.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/strings.h) */
+/* (#) Portability: OpenBSD       (/include/strings.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/strings.h) */
 /* (#) Portability: diet libc     (/include/strings.h) */
 /* (#) Portability: musl libc     (/include/strings.h) */

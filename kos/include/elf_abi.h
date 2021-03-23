@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenBSD (/include/elf_abi.h) */
 #ifndef _ELF_ABI_H
 #define _ELF_ABI_H 1
 

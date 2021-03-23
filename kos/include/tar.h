@@ -23,6 +23,7 @@
 /* (#) Portability: GNU C Library (/posix/tar.h) */
 /* (#) Portability: NetBSD        (/include/tar.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/tar.h) */
+/* (#) Portability: OpenBSD       (/include/tar.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/tar.h) */
 /* (#) Portability: diet libc     (/include/tar.h) */
 /* (#) Portability: musl libc     (/include/tar.h) */

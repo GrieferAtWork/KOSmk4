@@ -20,10 +20,12 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/file.h) */
 /* (#) Portability: DJGPP         (/include/sys/file.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/file.h) */
 /* (#) Portability: GNU C Library (/misc/sys/file.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/file.h) */
 /* (#) Portability: NetBSD        (/sys/sys/file.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/file.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/file.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/file.h) */
 /* (#) Portability: diet libc     (/include/sys/file.h) */
 /* (#) Portability: musl libc     (/include/sys/file.h) */

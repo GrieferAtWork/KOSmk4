@@ -17,7 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/ethernet.h) */
+/* (#) Portability: FreeBSD       (/sys/net/ethernet.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/net/ethernet.h) */
 /* (#) Portability: diet libc     (/include/net/ethernet.h) */
 /* (#) Portability: musl libc     (/include/net/ethernet.h) */
 /* (#) Portability: uClibc        (/include/net/ethernet.h) */

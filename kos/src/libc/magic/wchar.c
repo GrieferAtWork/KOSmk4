@@ -28,8 +28,11 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/wchar.h) */
 /* (#) Portability: NetBSD        (/include/wchar.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/wchar.h) */
+/* (#) Portability: OpenBSD       (/include/wchar.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wchar.h) */
+/* (#) Portability: Windows Kits  (/ucrt/wchar.h) */
 /* (#) Portability: diet libc     (/include/wchar.h) */
+/* (#) Portability: libbsd        (/include/bsd/wchar.h) */
 /* (#) Portability: musl libc     (/include/wchar.h) */
 /* (#) Portability: uClibc        (/include/wchar.h) */
 }

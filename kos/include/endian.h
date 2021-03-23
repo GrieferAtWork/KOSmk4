@@ -17,11 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin        (/newlib/libc/iconv/lib/endian.h) */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/endian.h) */
 /* (#) Portability: FreeBSD       (/sys/[...]/include/endian.h) */
 /* (#) Portability: GNU C Library (/string/endian.h) */
 /* (#) Portability: NetBSD        (/include/endian.h) */
-/* (#) Portability: Newlib        (/newlib/libc/iconv/lib/endian.h) */
+/* (#) Portability: OpenBSD       (/sys/arch/[...]/include/endian.h) */
 /* (#) Portability: diet libc     (/include/endian.h) */
 /* (#) Portability: musl libc     (/include/endian.h) */
 /* (#) Portability: uClibc        (/include/endian.h) */

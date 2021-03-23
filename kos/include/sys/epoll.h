@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabc5ee0b */
+/* HASH CRC-32:0xafefb08 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/epoll.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/epoll.h) */
 /* (#) Portability: diet libc     (/include/sys/epoll.h) */
 /* (#) Portability: musl libc     (/include/sys/epoll.h) */
 #ifndef _SYS_EPOLL_H

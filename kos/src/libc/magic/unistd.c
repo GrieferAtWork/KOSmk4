@@ -26,8 +26,10 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/unistd.h) */
 /* (#) Portability: NetBSD        (/include/unistd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/unistd.h) */
+/* (#) Portability: OpenBSD       (/include/unistd.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/unistd.h) */
 /* (#) Portability: diet libc     (/include/unistd.h) */
+/* (#) Portability: libbsd        (/include/bsd/unistd.h) */
 /* (#) Portability: musl libc     (/include/unistd.h) */
 /* (#) Portability: uClibc        (/include/unistd.h) */
 }

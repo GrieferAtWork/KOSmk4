@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x577845f0 */
+/* HASH CRC-32:0xe72da58f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin (/newlib/libc/include/ssp/string.h) */
+/* (#) Portability: NetBSD (/include/ssp/string.h) */
+/* (#) Portability: Newlib (/newlib/libc/include/ssp/string.h) */
 #ifndef _SSP_STRING_H
 #define _SSP_STRING_H 1
 

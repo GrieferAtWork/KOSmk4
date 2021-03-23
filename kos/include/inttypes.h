@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ef65067 */
+/* HASH CRC-32:0x35b7c7e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,11 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/inttypes.h) */
 /* (#) Portability: NetBSD        (/include/inttypes.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/inttypes.h) */
+/* (#) Portability: OpenBSD       (/include/inttypes.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/inttypes.h) */
+/* (#) Portability: Windows Kits  (/ucrt/inttypes.h) */
 /* (#) Portability: diet libc     (/include/inttypes.h) */
+/* (#) Portability: libbsd        (/include/bsd/inttypes.h) */
 /* (#) Portability: musl libc     (/include/inttypes.h) */
 /* (#) Portability: uClibc        (/include/inttypes.h) */
 #ifndef _INTTYPES_H

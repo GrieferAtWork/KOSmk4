@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/ctype.h) */
 /* (#) Portability: NetBSD        (/include/ctype.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/ctype.h) */
+/* (#) Portability: OpenBSD       (/include/ctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
+/* (#) Portability: Windows Kits  (/ucrt/ctype.h) */
 /* (#) Portability: diet libc     (/include/ctype.h) */
 /* (#) Portability: musl libc     (/include/ctype.h) */
 /* (#) Portability: uClibc        (/include/ctype.h) */

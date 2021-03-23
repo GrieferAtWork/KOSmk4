@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x578423a5 */
+/* HASH CRC-32:0xaab85347 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/signalfd.h) */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/signalfd.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/signalfd.h) */
 /* (#) Portability: diet libc     (/include/sys/signalfd.h) */
 /* (#) Portability: musl libc     (/include/sys/signalfd.h) */
 #ifndef _SYS_SIGNALFD_H

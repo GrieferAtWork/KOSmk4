@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/tgmath.h) */
+/* (#) Portability: FreeBSD       (/include/tgmath.h) */
+/* (#) Portability: GNU C Library (/math/tgmath.h) */
+/* (#) Portability: NetBSD        (/include/tgmath.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/tgmath.h) */
+/* (#) Portability: OpenBSD       (/include/tgmath.h) */
+/* (#) Portability: Windows Kits  (/ucrt/tgmath.h) */
+/* (#) Portability: musl libc     (/include/tgmath.h) */
+/* (#) Portability: uClibc        (/include/tgmath.h) */
 #ifndef _TGMATH_H
 #define _TGMATH_H 1
 

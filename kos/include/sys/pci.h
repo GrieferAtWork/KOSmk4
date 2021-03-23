@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/pci.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/pci.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/pci.h) */
 #ifndef _SYS_PCI_H
 #define _SYS_PCI_H 1

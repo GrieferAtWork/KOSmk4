@@ -21,8 +21,10 @@
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in.h) */
 /* (#) Portability: DJGPP         (/include/netinet/in.h) */
+/* (#) Portability: FreeBSD       (/sys/netinet/in.h) */
 /* (#) Portability: GNU C Library (/inet/netinet/in.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/in.h) */
+/* (#) Portability: OpenBSD       (/sys/netinet/in.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in.h) */
 /* (#) Portability: diet libc     (/include/netinet/in.h) */
 /* (#) Portability: musl libc     (/include/netinet/in.h) */

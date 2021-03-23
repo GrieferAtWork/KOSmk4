@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/misc/sysexits.h) */
 /* (#) Portability: NetBSD        (/include/sysexits.h) */
 /* (#) Portability: Newlib        (/newlib/libc/posix/sysexits.h) */
+/* (#) Portability: OpenBSD       (/include/sysexits.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sysexits.h) */
 /* (#) Portability: diet libc     (/include/sysexits.h) */
 /* (#) Portability: musl libc     (/include/sysexits.h) */

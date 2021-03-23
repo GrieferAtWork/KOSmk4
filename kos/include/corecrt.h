@@ -17,7 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: MinGW (/mingw-w64-headers/crt/corecrt.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/corecrt.h) */
+/* (#) Portability: Windows Kits (/ucrt/corecrt.h) */
 #ifndef _CORECRT_H
 #define _CORECRT_H 1
 

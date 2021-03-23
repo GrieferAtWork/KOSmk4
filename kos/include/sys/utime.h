@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin      (/newlib/libc/include/sys/utime.h) */
-/* (#) Portability: MSVC        (/include/sys/utime.h) */
-/* (#) Portability: MinGW       (/mingw-w64-headers/crt/sys/utime.h) */
-/* (#) Portability: Newlib      (/newlib/libc/include/sys/utime.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/utime.h) */
+/* (#) Portability: Cygwin       (/newlib/libc/include/sys/utime.h) */
+/* (#) Portability: MSVC         (/include/sys/utime.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/sys/utime.h) */
+/* (#) Portability: Newlib       (/newlib/libc/include/sys/utime.h) */
+/* (#) Portability: OpenSolaris  (/usr/src/uts/common/sys/utime.h) */
+/* (#) Portability: Windows Kits (/ucrt/sys/utime.h) */
 #ifndef _SYS_UTIME_H
 #define _SYS_UTIME_H 1
 #include <utime.h>

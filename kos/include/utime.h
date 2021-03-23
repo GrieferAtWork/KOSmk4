@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e01f6ed */
+/* HASH CRC-32:0xf291f804 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/utime.h) */
 /* (#) Portability: NetBSD        (/include/utime.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/utime.h) */
+/* (#) Portability: OpenBSD       (/include/utime.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utime.h) */
 /* (#) Portability: diet libc     (/include/utime.h) */
 /* (#) Portability: musl libc     (/include/utime.h) */

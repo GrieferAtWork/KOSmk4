@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: FreeBSD (/include/xlocale.h) */
-/* (#) Portability: Newlib  (/newlib/libc/include/xlocale.h) */
 /* (#) Portability: uClibc  (/include/xlocale.h) */
 #ifndef _XLOCALE_H
 #define _XLOCALE_H 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ff79cc */
+/* HASH CRC-32:0x9cd13cac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,15 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/time.h) */
 /* (#) Portability: DJGPP         (/include/sys/time.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/time.h) */
 /* (#) Portability: GNU C Library (/time/sys/time.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/time.h) */
 /* (#) Portability: NetBSD        (/sys/sys/time.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/time.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/time.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/time.h) */
 /* (#) Portability: diet libc     (/include/sys/time.h) */
+/* (#) Portability: libbsd        (/include/bsd/sys/time.h) */
 /* (#) Portability: musl libc     (/include/sys/time.h) */
 /* (#) Portability: uClibc        (/include/sys/time.h) */
 #ifndef _SYS_TIME_H

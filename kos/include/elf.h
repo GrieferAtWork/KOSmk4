@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/elf/elf.h) */
 /* (#) Portability: NetBSD        (/sys/arch/[...]/include/elf.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/elf.h) */
+/* (#) Portability: OpenBSD       (/include/elf.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/elf.h) */
 /* (#) Portability: diet libc     (/include/elf.h) */
 /* (#) Portability: musl libc     (/include/elf.h) */

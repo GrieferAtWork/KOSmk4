@@ -18,10 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/ip_icmp.h) */
+/* (#) Portability: FreeBSD       (/sys/netinet/ip_icmp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/ip_icmp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/ip_icmp.h) */
+/* (#) Portability: OpenBSD       (/sys/netinet/ip_icmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip_icmp.h) */
 /* (#) Portability: diet libc     (/include/netinet/ip_icmp.h) */
+/* (#) Portability: libbsd        (/include/bsd/netinet/ip_icmp.h) */
 /* (#) Portability: musl libc     (/include/netinet/ip_icmp.h) */
 /* (#) Portability: uClibc        (/include/netinet/ip_icmp.h) */
 #ifndef _NETINET_IP_ICMP_H

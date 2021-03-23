@@ -19,12 +19,15 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/param.h) */
 /* (#) Portability: DJGPP         (/include/sys/param.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/param.h) */
 /* (#) Portability: GNU C Library (/misc/sys/param.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/param.h) */
 /* (#) Portability: NetBSD        (/sys/sys/param.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/param.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/param.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/param.h) */
 /* (#) Portability: diet libc     (/include/sys/param.h) */
+/* (#) Portability: libbsd        (/include/bsd/sys/param.h) */
 /* (#) Portability: musl libc     (/include/sys/param.h) */
 /* (#) Portability: uClibc        (/include/sys/param.h) */
 #ifndef _SYS_PARAM_H

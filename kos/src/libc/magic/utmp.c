@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/login/utmp.h) */
 /* (#) Portability: NetBSD        (/include/utmp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/utmp.h) */
+/* (#) Portability: OpenBSD       (/include/utmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utmp.h) */
 /* (#) Portability: diet libc     (/include/utmp.h) */
 /* (#) Portability: musl libc     (/include/utmp.h) */

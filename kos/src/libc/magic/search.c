@@ -27,7 +27,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/search.h) */
 /* (#) Portability: NetBSD        (/include/search.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/search.h) */
+/* (#) Portability: OpenBSD       (/include/search.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/search.h) */
+/* (#) Portability: Windows Kits  (/ucrt/search.h) */
 /* (#) Portability: diet libc     (/include/search.h) */
 /* (#) Portability: musl libc     (/include/search.h) */
 /* (#) Portability: uClibc        (/include/search.h) */

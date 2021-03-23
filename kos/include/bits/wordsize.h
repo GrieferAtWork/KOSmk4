@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/bits/wordsize.h) */
+/* (#) Portability: GNU C Library (/bits/wordsize.h) */
 #ifndef __WORDSIZE
 /* NOTE: This file must _always_ be kept for GLibc compatibility! */
 

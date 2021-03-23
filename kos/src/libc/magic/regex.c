@@ -25,6 +25,7 @@
 /* (#) Portability: GNU C Library (/posix/regex.h) */
 /* (#) Portability: NetBSD        (/include/regex.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/regex.h) */
+/* (#) Portability: OpenBSD       (/include/regex.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/regex.h) */
 /* (#) Portability: diet libc     (/include/regex.h) */
 /* (#) Portability: musl libc     (/include/regex.h) */

@@ -25,6 +25,7 @@
 /* (#) Portability: GNU C Library (/io/ftw.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/ftw.h) */
 /* (#) Portability: NetBSD        (/include/ftw.h) */
+/* (#) Portability: OpenBSD       (/include/ftw.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ftw.h) */
 /* (#) Portability: diet libc     (/include/ftw.h) */
 /* (#) Portability: musl libc     (/include/ftw.h) */

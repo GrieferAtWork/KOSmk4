@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec737174 */
+/* HASH CRC-32:0xe3f0c7a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/libgen.h) */
 /* (#) Portability: NetBSD        (/include/libgen.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: OpenBSD       (/include/libgen.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/libgen.h) */
 /* (#) Portability: diet libc     (/include/libgen.h) */
 /* (#) Portability: musl libc     (/include/libgen.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fc9938d */
+/* HASH CRC-32:0x7c02d7d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/eventfd.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/eventfd.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/eventfd.h) */
 /* (#) Portability: diet libc     (/include/sys/eventfd.h) */
 /* (#) Portability: musl libc     (/include/sys/eventfd.h) */
 #ifndef _SYS_EVENTFD_H

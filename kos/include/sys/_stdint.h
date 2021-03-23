@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin (/newlib/libc/include/sys/_stdint.h) */
-/* (#) Portability: Newlib (/newlib/libc/include/sys/_stdint.h) */
+/* (#) Portability: Cygwin  (/newlib/libc/include/sys/_stdint.h) */
+/* (#) Portability: FreeBSD (/sys/sys/_stdint.h) */
+/* (#) Portability: Newlib  (/newlib/libc/include/sys/_stdint.h) */
 #ifndef _SYS__STDINT_H
 #define _SYS__STDINT_H 1
 

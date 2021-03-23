@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MSVC  (/include/intrin.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/intrin.h) */
 #ifndef _I386_KOS_INTRIN_H
 #define _I386_KOS_INTRIN_H 1
 

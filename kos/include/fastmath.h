@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin (/newlib/libc/include/fastmath.h) */
-/* (#) Portability: MinGW  (/mingw-w64-crt/math/x86/fastmath.h) */
 /* (#) Portability: Newlib (/newlib/libc/include/fastmath.h) */
 #ifndef _FASTMATH_H
 #define _FASTMATH_H 1

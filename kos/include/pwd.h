@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e7ae828 */
+/* HASH CRC-32:0xa00bd1fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,10 @@
 /* (#) Portability: GNU C Library (/pwd/pwd.h) */
 /* (#) Portability: NetBSD        (/include/pwd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/pwd.h) */
+/* (#) Portability: OpenBSD       (/include/pwd.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/pwd.h) */
 /* (#) Portability: diet libc     (/include/pwd.h) */
+/* (#) Portability: libbsd        (/include/bsd/pwd.h) */
 /* (#) Portability: musl libc     (/include/pwd.h) */
 /* (#) Portability: uClibc        (/include/pwd.h) */
 #ifndef _PWD_H

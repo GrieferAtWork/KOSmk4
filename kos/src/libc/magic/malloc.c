@@ -27,6 +27,7 @@
 /* (#) Portability: NetBSD        (/include/malloc.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/malloc.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/malloc.h) */
+/* (#) Portability: Windows Kits  (/ucrt/malloc.h) */
 /* (#) Portability: diet libc     (/include/malloc.h) */
 /* (#) Portability: musl libc     (/include/malloc.h) */
 /* (#) Portability: uClibc        (/include/malloc.h) */

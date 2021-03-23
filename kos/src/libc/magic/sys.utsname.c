@@ -21,8 +21,10 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/utsname.h) */
 /* (#) Portability: DJGPP         (/include/sys/utsname.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/utsname.h) */
 /* (#) Portability: GNU C Library (/posix/sys/utsname.h) */
 /* (#) Portability: NetBSD        (/sys/sys/utsname.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/utsname.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/utsname.h) */
 /* (#) Portability: diet libc     (/include/sys/utsname.h) */
 /* (#) Portability: musl libc     (/include/sys/utsname.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8b11065 */
+/* HASH CRC-32:0x459d3892 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,8 +19,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/syslog.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/syslog.h) */
 /* (#) Portability: GNU C Library (/misc/sys/syslog.h) */
 /* (#) Portability: NetBSD        (/sys/sys/syslog.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/syslog.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syslog.h) */
 /* (#) Portability: diet libc     (/include/sys/syslog.h) */
 /* (#) Portability: musl libc     (/include/sys/syslog.h) */

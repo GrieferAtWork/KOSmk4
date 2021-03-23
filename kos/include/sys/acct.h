@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdb54071 */
+/* HASH CRC-32:0x1fa599b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/acct.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/acct.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/acct.h) */
 /* (#) Portability: NetBSD        (/sys/sys/acct.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/acct.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/acct.h) */
 /* (#) Portability: musl libc     (/include/sys/acct.h) */
 #ifndef _SYS_ACCT_H

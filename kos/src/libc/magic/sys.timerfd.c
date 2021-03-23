@@ -19,7 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/timerfd.h) */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/timerfd.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/timerfd.h) */
 /* (#) Portability: diet libc     (/include/sys/timerfd.h) */
 /* (#) Portability: musl libc     (/include/sys/timerfd.h) */
 }

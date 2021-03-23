@@ -18,10 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/unistd.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/unistd.h) */
 /* (#) Portability: GNU C Library (/posix/sys/unistd.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/unistd.h) */
 /* (#) Portability: NetBSD        (/sys/sys/unistd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/unistd.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/unistd.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/unistd.h) */
 /* (#) Portability: uClibc        (/include/sys/unistd.h) */
 #ifndef _SYS_UNISTD_H

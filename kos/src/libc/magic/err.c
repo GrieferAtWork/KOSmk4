@@ -22,8 +22,10 @@
 /* (#) Portability: FreeBSD       (/include/err.h) */
 /* (#) Portability: GNU C Library (/misc/err.h) */
 /* (#) Portability: NetBSD        (/include/err.h) */
+/* (#) Portability: OpenBSD       (/include/err.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */
 /* (#) Portability: diet libc     (/include/err.h) */
+/* (#) Portability: libbsd        (/include/bsd/err.h) */
 /* (#) Portability: musl libc     (/include/err.h) */
 /* (#) Portability: uClibc        (/include/err.h) */
 }

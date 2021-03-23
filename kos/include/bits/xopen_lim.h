@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/include/bits/xopen_lim.h) */
 #ifndef _BITS_XOPEN_LIM_H
 #define _BITS_XOPEN_LIM_H 1
 

@@ -27,7 +27,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/errno.h) */
 /* (#) Portability: NetBSD        (/include/errno.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/errno.h) */
+/* (#) Portability: OpenBSD       (/include/errno.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/errno.h) */
+/* (#) Portability: Windows Kits  (/ucrt/errno.h) */
 /* (#) Portability: diet libc     (/include/errno.h) */
 /* (#) Portability: musl libc     (/include/errno.h) */
 /* (#) Portability: uClibc        (/include/errno.h) */

@@ -19,10 +19,12 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/fcntl.h) */
 /* (#) Portability: DJGPP         (/include/sys/fcntl.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/fcntl.h) */
 /* (#) Portability: GNU C Library (/io/sys/fcntl.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/fcntl.h) */
 /* (#) Portability: NetBSD        (/sys/sys/fcntl.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/fcntl.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/fcntl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/fcntl.h) */
 /* (#) Portability: musl libc     (/include/sys/fcntl.h) */
 /* (#) Portability: uClibc        (/include/sys/fcntl.h) */

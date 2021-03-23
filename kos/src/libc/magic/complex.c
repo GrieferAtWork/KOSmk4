@@ -18,7 +18,16 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: TODO */
+/* (#) Portability: Cygwin        (/newlib/libc/include/complex.h) */
+/* (#) Portability: FreeBSD       (/include/complex.h) */
+/* (#) Portability: GNU C Library (/math/complex.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/complex.h) */
+/* (#) Portability: NetBSD        (/include/complex.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/complex.h) */
+/* (#) Portability: OpenBSD       (/include/complex.h) */
+/* (#) Portability: Windows Kits  (/ucrt/complex.h) */
+/* (#) Portability: musl libc     (/include/complex.h) */
+/* (#) Portability: uClibc        (/include/complex.h) */
 }
 
 %[define_ccompat_header("ccomplex")]

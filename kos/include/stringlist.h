@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe8cd9bf */
+/* HASH CRC-32:0xcc3da3f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: FreeBSD (/include/stringlist.h) */
 /* (#) Portability: NetBSD  (/include/stringlist.h) */
+/* (#) Portability: libbsd  (/include/bsd/stringlist.h) */
 #ifndef _STRINGLIST_H
 #define _STRINGLIST_H 1
 

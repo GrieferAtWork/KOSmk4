@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a4186bf */
+/* HASH CRC-32:0xf03fcd50 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,10 @@
 /* (#) Portability: FreeBSD       (/include/err.h) */
 /* (#) Portability: GNU C Library (/misc/err.h) */
 /* (#) Portability: NetBSD        (/include/err.h) */
+/* (#) Portability: OpenBSD       (/include/err.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */
 /* (#) Portability: diet libc     (/include/err.h) */
+/* (#) Portability: libbsd        (/include/bsd/err.h) */
 /* (#) Portability: musl libc     (/include/err.h) */
 /* (#) Portability: uClibc        (/include/err.h) */
 #ifndef _ERR_H

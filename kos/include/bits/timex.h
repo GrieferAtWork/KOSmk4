@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/bits/timex.h) */
 #ifndef _BITS_TIMEX_H
 #define _BITS_TIMEX_H 1
 

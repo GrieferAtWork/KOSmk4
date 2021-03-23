@@ -27,7 +27,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/assert.h) */
 /* (#) Portability: NetBSD        (/include/assert.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/assert.h) */
+/* (#) Portability: OpenBSD       (/include/assert.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/assert.h) */
+/* (#) Portability: Windows Kits  (/ucrt/assert.h) */
 /* (#) Portability: diet libc     (/include/assert.h) */
 /* (#) Portability: musl libc     (/include/assert.h) */
 /* (#) Portability: uClibc        (/include/assert.h) */

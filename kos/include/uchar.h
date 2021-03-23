@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb215f2fc */
+/* HASH CRC-32:0x957e5f1a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (#) Portability: FreeBSD       (/include/uchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/uchar.h) */
+/* (#) Portability: Windows Kits  (/ucrt/uchar.h) */
 /* (#) Portability: musl libc     (/include/uchar.h) */
 /* (#) Portability: uClibc        (/include/uchar.h) */
 #ifndef _UCHAR_H

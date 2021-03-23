@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/misc/sys/dir.h) */
 /* (#) Portability: NetBSD        (/sys/sys/dir.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/dir.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/dir.h) */
 /* (#) Portability: musl libc     (/include/sys/dir.h) */
 /* (#) Portability: uClibc        (/include/sys/dir.h) */
 #ifndef _SYS_DIR_H

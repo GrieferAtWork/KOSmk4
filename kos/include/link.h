@@ -20,6 +20,7 @@
 /* (#) Portability: FreeBSD       (/include/link.h) */
 /* (#) Portability: GNU C Library (/elf/link.h) */
 /* (#) Portability: NetBSD        (/include/link.h) */
+/* (#) Portability: OpenBSD       (/include/link.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/link.h) */
 /* (#) Portability: diet libc     (/include/link.h) */
 /* (#) Portability: musl libc     (/include/link.h) */

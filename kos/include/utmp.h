@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75788f70 */
+/* HASH CRC-32:0x6c4e6cb9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/login/utmp.h) */
 /* (#) Portability: NetBSD        (/include/utmp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/utmp.h) */
+/* (#) Portability: OpenBSD       (/include/utmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utmp.h) */
 /* (#) Portability: diet libc     (/include/utmp.h) */
 /* (#) Portability: musl libc     (/include/utmp.h) */

@@ -25,8 +25,10 @@
 /* (#) Portability: GNU C Library (/grp/grp.h) */
 /* (#) Portability: NetBSD        (/include/grp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/grp.h) */
+/* (#) Portability: OpenBSD       (/include/grp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/grp.h) */
 /* (#) Portability: diet libc     (/include/grp.h) */
+/* (#) Portability: libbsd        (/include/bsd/grp.h) */
 /* (#) Portability: musl libc     (/include/grp.h) */
 /* (#) Portability: uClibc        (/include/grp.h) */
 }

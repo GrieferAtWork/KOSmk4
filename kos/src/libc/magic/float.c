@@ -26,7 +26,9 @@
 /* (#) Portability: MSVC          (/include/float.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/float.h) */
 /* (#) Portability: NetBSD        (/sys/arch/[...]/include/float.h) */
+/* (#) Portability: OpenBSD       (/include/float.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/float.h) */
+/* (#) Portability: Windows Kits  (/ucrt/float.h) */
 /* (#) Portability: diet libc     (/include/float.h) */
 /* (#) Portability: musl libc     (/include/float.h) */
 }

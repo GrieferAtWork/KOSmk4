@@ -27,6 +27,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/setjmp.h) */
 /* (#) Portability: NetBSD        (/include/setjmp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/setjmp.h) */
+/* (#) Portability: OpenBSD       (/include/setjmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/setjmp.h) */
 /* (#) Portability: diet libc     (/include/setjmp.h) */
 /* (#) Portability: musl libc     (/include/setjmp.h) */

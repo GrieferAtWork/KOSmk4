@@ -19,6 +19,7 @@
  */
 /* (#) Portability: DJGPP         (/include/values.h) */
 /* (#) Portability: GNU C Library (/include/values.h) */
+/* (#) Portability: MinGW         (/include/values.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/values.h) */
 /* (#) Portability: musl libc     (/include/values.h) */
 /* (#) Portability: uClibc        (/include/values.h) */

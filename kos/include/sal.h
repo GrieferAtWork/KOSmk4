@@ -17,9 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: MSVC   (/include/sal.h) */
-/* (#) Portability: MinGW  (/mingw-w64-headers/include/sal.h) */
-/* (#) Portability: NetBSD (/sys/arch/[...]/include/sal.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/include/sal.h) */
+/* (#) Portability: NetBSD       (/sys/arch/[...]/include/sal.h) */
+/* (#) Portability: Windows Kits (/shared/sal.h) */
 #ifndef _SAL_H
 #define _SAL_H 1
 

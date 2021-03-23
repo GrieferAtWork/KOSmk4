@@ -17,9 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: DJGPP  (/include/dir.h) */
-/* (#) Portability: MinGW  (/mingw-w64-headers/crt/dir.h) */
-/* (#) Portability: NetBSD (/sys/ufs/ufs/dir.h) */
+/* (#) Portability: DJGPP (/include/dir.h) */
+/* (#) Portability: MinGW (/mingw-w64-headers/crt/dir.h) */
 #ifndef _DIR_H
 #define _DIR_H 1
 #include <io.h>

@@ -22,6 +22,7 @@
 /* (#) Portability: FreeBSD       (/include/fts.h) */
 /* (#) Portability: GNU C Library (/io/fts.h) */
 /* (#) Portability: NetBSD        (/include/fts.h) */
+/* (#) Portability: OpenBSD       (/include/fts.h) */
 /* (#) Portability: uClibc        (/include/fts.h) */
 }
 

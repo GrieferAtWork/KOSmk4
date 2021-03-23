@@ -19,7 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/signalfd.h) */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/signalfd.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/signalfd.h) */
 /* (#) Portability: diet libc     (/include/sys/signalfd.h) */
 /* (#) Portability: musl libc     (/include/sys/signalfd.h) */
 }

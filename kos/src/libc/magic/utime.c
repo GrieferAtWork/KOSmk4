@@ -26,6 +26,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/utime.h) */
 /* (#) Portability: NetBSD        (/include/utime.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/utime.h) */
+/* (#) Portability: OpenBSD       (/include/utime.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utime.h) */
 /* (#) Portability: diet libc     (/include/utime.h) */
 /* (#) Portability: musl libc     (/include/utime.h) */

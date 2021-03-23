@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/wctype.h) */
 /* (#) Portability: NetBSD        (/include/wctype.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/wctype.h) */
+/* (#) Portability: OpenBSD       (/include/wctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wctype.h) */
+/* (#) Portability: Windows Kits  (/ucrt/wctype.h) */
 /* (#) Portability: diet libc     (/include/wctype.h) */
 /* (#) Portability: musl libc     (/include/wctype.h) */
 /* (#) Portability: uClibc        (/include/wctype.h) */

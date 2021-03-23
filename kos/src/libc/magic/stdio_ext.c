@@ -19,7 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/stdio_ext.h) */
-/* (#) Portability: GNU C Library (/stdio-common/stdio_ext.h) */
+/* (#) Portability: GNU C Library (/include/stdio_ext.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdio_ext.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdio_ext.h) */
 /* (#) Portability: diet libc     (/include/stdio_ext.h) */

@@ -19,7 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysinfo.h) */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/sysinfo.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/sysinfo.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysinfo.h) */
 /* (#) Portability: diet libc     (/include/sys/sysinfo.h) */
 /* (#) Portability: musl libc     (/include/sys/sysinfo.h) */

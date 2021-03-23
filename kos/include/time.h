@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x616f9546 */
+/* HASH CRC-32:0xfe7685f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/time.h) */
 /* (#) Portability: NetBSD        (/include/time.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/time.h) */
+/* (#) Portability: OpenBSD       (/include/time.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/time.h) */
+/* (#) Portability: Windows Kits  (/ucrt/time.h) */
 /* (#) Portability: diet libc     (/include/time.h) */
 /* (#) Portability: musl libc     (/include/time.h) */
 /* (#) Portability: uClibc        (/include/time.h) */

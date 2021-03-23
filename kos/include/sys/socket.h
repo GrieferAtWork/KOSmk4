@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6be5e4f2 */
+/* HASH CRC-32:0x653b2665 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,10 @@
  */
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/socket.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/socket.h) */
 /* (#) Portability: GNU C Library (/socket/sys/socket.h) */
 /* (#) Portability: NetBSD        (/sys/sys/socket.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/socket.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/socket.h) */
 /* (#) Portability: diet libc     (/include/sys/socket.h) */
 /* (#) Portability: musl libc     (/include/sys/socket.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf13e6b9 */
+/* HASH CRC-32:0x4cb696cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,15 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/stat.h) */
 /* (#) Portability: DJGPP         (/include/sys/stat.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/stat.h) */
 /* (#) Portability: GNU C Library (/io/sys/stat.h) */
 /* (#) Portability: MSVC          (/include/sys/stat.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/stat.h) */
 /* (#) Portability: NetBSD        (/sys/sys/stat.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/stat.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/stat.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/stat.h) */
+/* (#) Portability: Windows Kits  (/ucrt/sys/stat.h) */
 /* (#) Portability: diet libc     (/include/sys/stat.h) */
 /* (#) Portability: musl libc     (/include/sys/stat.h) */
 /* (#) Portability: uClibc        (/include/sys/stat.h) */

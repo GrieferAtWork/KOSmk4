@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: NetBSD  (/sys/sys/exec_elf.h) */
+/* (#) Portability: OpenBSD (/sys/sys/exec_elf.h) */
 #ifndef _SYS_EXEC_ELF_H
 #define _SYS_EXEC_ELF_H 1
 

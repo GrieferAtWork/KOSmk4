@@ -28,8 +28,11 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/inttypes.h) */
 /* (#) Portability: NetBSD        (/include/inttypes.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/inttypes.h) */
+/* (#) Portability: OpenBSD       (/include/inttypes.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/inttypes.h) */
+/* (#) Portability: Windows Kits  (/ucrt/inttypes.h) */
 /* (#) Portability: diet libc     (/include/inttypes.h) */
+/* (#) Portability: libbsd        (/include/bsd/inttypes.h) */
 /* (#) Portability: musl libc     (/include/inttypes.h) */
 /* (#) Portability: uClibc        (/include/inttypes.h) */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5d439e5 */
+/* HASH CRC-32:0x5f2fc7ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,10 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/mman.h) */
 /* (#) Portability: DJGPP         (/include/sys/mman.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/mman.h) */
 /* (#) Portability: GNU C Library (/misc/sys/mman.h) */
 /* (#) Portability: NetBSD        (/sys/sys/mman.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/mman.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mman.h) */
 /* (#) Portability: diet libc     (/include/sys/mman.h) */
 /* (#) Portability: musl libc     (/include/sys/mman.h) */

@@ -19,11 +19,14 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/cdefs.h) */
 /* (#) Portability: DJGPP         (/include/sys/cdefs.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/cdefs.h) */
 /* (#) Portability: GNU C Library (/misc/sys/cdefs.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/cdefs.h) */
 /* (#) Portability: NetBSD        (/sys/sys/cdefs.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/cdefs.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/cdefs.h) */
 /* (#) Portability: diet libc     (/include/sys/cdefs.h) */
+/* (#) Portability: libbsd        (/include/bsd/sys/cdefs.h) */
 /* (#) Portability: uClibc        (/include/sys/cdefs.h) */
 #ifndef _SYS_CDEFS_H
 #define _SYS_CDEFS_H 1

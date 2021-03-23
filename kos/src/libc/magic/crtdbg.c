@@ -18,8 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: MSVC  (/include/crtdbg.h) */
-/* (#) Portability: MinGW (/mingw-w64-headers/crt/crtdbg.h) */
+/* (#) Portability: MSVC         (/include/crtdbg.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/crtdbg.h) */
+/* (#) Portability: Windows Kits (/ucrt/crtdbg.h) */
 }
 
 %[define_replacement(size_t = __SIZE_TYPE__)]

@@ -22,7 +22,9 @@
 /* (#) Portability: DJGPP         (/include/dlfcn.h) */
 /* (#) Portability: FreeBSD       (/include/dlfcn.h) */
 /* (#) Portability: GNU C Library (/dlfcn/dlfcn.h) */
+/* (#) Portability: MinGW         (/include/dlfcn.h) */
 /* (#) Portability: NetBSD        (/include/dlfcn.h) */
+/* (#) Portability: OpenBSD       (/include/dlfcn.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/dlfcn.h) */
 /* (#) Portability: diet libc     (/include/dlfcn.h) */
 /* (#) Portability: musl libc     (/include/dlfcn.h) */

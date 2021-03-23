@@ -21,8 +21,10 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/mman.h) */
 /* (#) Portability: DJGPP         (/include/sys/mman.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/mman.h) */
 /* (#) Portability: GNU C Library (/misc/sys/mman.h) */
 /* (#) Portability: NetBSD        (/sys/sys/mman.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/mman.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mman.h) */
 /* (#) Portability: diet libc     (/include/sys/mman.h) */
 /* (#) Portability: musl libc     (/include/sys/mman.h) */

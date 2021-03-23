@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5a8e83d */
+/* HASH CRC-32:0xc8f50048 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/locale.h) */
 /* (#) Portability: NetBSD        (/include/locale.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/locale.h) */
+/* (#) Portability: OpenBSD       (/include/locale.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/locale.h) */
+/* (#) Portability: Windows Kits  (/ucrt/locale.h) */
 /* (#) Portability: diet libc     (/include/locale.h) */
 /* (#) Portability: musl libc     (/include/locale.h) */
 /* (#) Portability: uClibc        (/include/locale.h) */

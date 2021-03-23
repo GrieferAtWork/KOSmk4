@@ -25,6 +25,7 @@
 /* (#) Portability: GNU C Library (/posix/fnmatch.h) */
 /* (#) Portability: NetBSD        (/include/fnmatch.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/fnmatch.h) */
+/* (#) Portability: OpenBSD       (/include/fnmatch.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/fnmatch.h) */
 /* (#) Portability: diet libc     (/include/fnmatch.h) */
 /* (#) Portability: musl libc     (/include/fnmatch.h) */

@@ -18,8 +18,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/ip.h) */
+/* (#) Portability: FreeBSD       (/sys/netinet/ip.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/ip.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/ip.h) */
+/* (#) Portability: OpenBSD       (/sys/netinet/ip.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip.h) */
 /* (#) Portability: diet libc     (/include/netinet/ip.h) */
 /* (#) Portability: musl libc     (/include/netinet/ip.h) */

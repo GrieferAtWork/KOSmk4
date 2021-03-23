@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x127c3df6 */
+/* HASH CRC-32:0x1c16dd26 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD (/include/util.h) */
+/* (#) Portability: NetBSD  (/include/util.h) */
+/* (#) Portability: OpenBSD (/lib/libutil/util.h) */
 #ifndef _UTIL_H
 #define _UTIL_H 1
 

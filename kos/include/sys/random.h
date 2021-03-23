@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d632f5d */
+/* HASH CRC-32:0x7cf3c288 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/random.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/random.h) */
 /* (#) Portability: GNU C Library (/stdlib/sys/random.h) */
+/* (#) Portability: NetBSD        (/sys/sys/random.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/random.h) */
 /* (#) Portability: diet libc     (/include/sys/random.h) */
 /* (#) Portability: musl libc     (/include/sys/random.h) */

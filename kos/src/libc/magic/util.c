@@ -18,7 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: NetBSD (/include/util.h) */
+/* (#) Portability: NetBSD  (/include/util.h) */
+/* (#) Portability: OpenBSD (/lib/libutil/util.h) */
 }
 
 %[default:section(".text.crt{|.dos}.io.tty")]

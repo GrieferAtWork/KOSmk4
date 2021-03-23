@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8486f763 */
+/* HASH CRC-32:0x3473729b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/fsuid.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/fsuid.h) */
 /* (#) Portability: diet libc     (/include/sys/fsuid.h) */
 /* (#) Portability: musl libc     (/include/sys/fsuid.h) */
 /* (#) Portability: uClibc        (/include/sys/fsuid.h) */

@@ -17,7 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD (/sys/sys/endian.h) */
+/* (#) Portability: FreeBSD (/sys/sys/endian.h) */
+/* (#) Portability: NetBSD  (/sys/sys/endian.h) */
+/* (#) Portability: OpenBSD (/sys/sys/endian.h) */
+/* (#) Portability: libbsd  (/include/bsd/sys/endian.h) */
 #ifndef _SYS_ENDIAN_H
 #define _SYS_ENDIAN_H 1
 

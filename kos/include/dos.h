@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b6bf2d8 */
+/* HASH CRC-32:0x40ba6f7d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,9 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: DJGPP (/include/dos.h) */
-/* (#) Portability: MSVC  (/include/dos.h) */
-/* (#) Portability: MinGW (/mingw-w64-headers/crt/dos.h) */
+/* (#) Portability: DJGPP        (/include/dos.h) */
+/* (#) Portability: MSVC         (/include/dos.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/dos.h) */
+/* (#) Portability: Windows Kits (/ucrt/dos.h) */
 #ifndef _DOS_H
 #define _DOS_H 1
 

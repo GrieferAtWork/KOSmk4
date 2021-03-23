@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63e60a74 */
+/* HASH CRC-32:0xf8496ac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,12 +20,14 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/timeb.h) */
 /* (#) Portability: DJGPP         (/include/sys/timeb.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/timeb.h) */
 /* (#) Portability: GNU C Library (/time/sys/timeb.h) */
 /* (#) Portability: MSVC          (/include/sys/timeb.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/timeb.h) */
 /* (#) Portability: NetBSD        (/sys/sys/timeb.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/timeb.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/timeb.h) */
+/* (#) Portability: Windows Kits  (/ucrt/sys/timeb.h) */
 /* (#) Portability: diet libc     (/include/sys/timeb.h) */
 /* (#) Portability: musl libc     (/include/sys/timeb.h) */
 /* (#) Portability: uClibc        (/include/sys/timeb.h) */

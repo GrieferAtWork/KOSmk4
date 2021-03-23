@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/debugreg.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/[...]/sys/debugreg.h) */
 #ifndef _I386_KOS_SYS_DEBUGREG_H
 #define _I386_KOS_SYS_DEBUGREG_H 1
 #define _SYS_DEBUGREG_H 1

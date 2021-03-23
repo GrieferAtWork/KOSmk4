@@ -22,6 +22,7 @@
 /* (#) Portability: FreeBSD       (/include/uchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/uchar.h) */
+/* (#) Portability: Windows Kits  (/ucrt/uchar.h) */
 /* (#) Portability: musl libc     (/include/uchar.h) */
 /* (#) Portability: uClibc        (/include/uchar.h) */
 }

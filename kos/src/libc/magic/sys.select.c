@@ -20,9 +20,11 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/select.h) */
 /* (#) Portability: GNU C Library (/misc/sys/select.h) */
 /* (#) Portability: NetBSD        (/sys/sys/select.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/select.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/select.h) */
 /* (#) Portability: diet libc     (/include/sys/select.h) */
 /* (#) Portability: musl libc     (/include/sys/select.h) */

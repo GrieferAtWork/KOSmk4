@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb96f1cf */
+/* HASH CRC-32:0x253a6c5f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/ctype.h) */
 /* (#) Portability: NetBSD        (/include/ctype.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/ctype.h) */
+/* (#) Portability: OpenBSD       (/include/ctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
+/* (#) Portability: Windows Kits  (/ucrt/ctype.h) */
 /* (#) Portability: diet libc     (/include/ctype.h) */
 /* (#) Portability: musl libc     (/include/ctype.h) */
 /* (#) Portability: uClibc        (/include/ctype.h) */

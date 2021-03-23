@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78f61c17 */
+/* HASH CRC-32:0x5310da1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: TODO */
+/* (#) Portability: Cygwin        (/newlib/libc/include/complex.h) */
+/* (#) Portability: FreeBSD       (/include/complex.h) */
+/* (#) Portability: GNU C Library (/math/complex.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/complex.h) */
+/* (#) Portability: NetBSD        (/include/complex.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/complex.h) */
+/* (#) Portability: OpenBSD       (/include/complex.h) */
+/* (#) Portability: Windows Kits  (/ucrt/complex.h) */
+/* (#) Portability: musl libc     (/include/complex.h) */
+/* (#) Portability: uClibc        (/include/complex.h) */
 #ifndef _COMPLEX_H
 #define _COMPLEX_H 1
 

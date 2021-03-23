@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1658cdbd */
+/* HASH CRC-32:0xb4dd47ac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,11 +18,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin (/winsup/cygwin/include/io.h) */
-/* (#) Portability: DJGPP  (/include/io.h) */
-/* (#) Portability: MSVC   (/include/io.h) */
-/* (#) Portability: MinGW  (/mingw-w64-headers/crt/io.h) */
-/* (#) Portability: NetBSD (/sys/arch/[...]/include/io.h) */
+/* (#) Portability: Cygwin       (/winsup/cygwin/include/io.h) */
+/* (#) Portability: DJGPP        (/include/io.h) */
+/* (#) Portability: MSVC         (/include/io.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/io.h) */
+/* (#) Portability: NetBSD       (/sys/arch/[...]/include/io.h) */
+/* (#) Portability: Windows Kits (/ucrt/io.h) */
 #ifndef _IO_H
 #define _IO_H 1
 

@@ -28,8 +28,11 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdlib.h) */
 /* (#) Portability: NetBSD        (/include/stdlib.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdlib.h) */
+/* (#) Portability: OpenBSD       (/include/stdlib.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdlib.h) */
+/* (#) Portability: Windows Kits  (/ucrt/stdlib.h) */
 /* (#) Portability: diet libc     (/include/stdlib.h) */
+/* (#) Portability: libbsd        (/include/bsd/stdlib.h) */
 /* (#) Portability: musl libc     (/include/stdlib.h) */
 /* (#) Portability: uClibc        (/include/stdlib.h) */
 }

@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: FreeBSD (/include/pthread_np.h) */
 /* (#) Portability: OpenBSD (/include/pthread_np.h) */
 }
 

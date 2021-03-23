@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: FreeBSD (/include/stringlist.h) */
 /* (#) Portability: NetBSD  (/include/stringlist.h) */
+/* (#) Portability: libbsd  (/include/bsd/stringlist.h) */
 }
 
 %[define_replacement(pid_t = __pid_t)]

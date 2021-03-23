@@ -17,8 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD       (/sys/netinet/igmp.h) */
 /* (#) Portability: GNU C Library (/inet/netinet/igmp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/igmp.h) */
+/* (#) Portability: OpenBSD       (/sys/netinet/igmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/igmp.h) */
 /* (#) Portability: musl libc     (/include/netinet/igmp.h) */
 /* (#) Portability: uClibc        (/include/netinet/igmp.h) */

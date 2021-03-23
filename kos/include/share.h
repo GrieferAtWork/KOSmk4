@@ -17,9 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: DJGPP (/include/share.h) */
-/* (#) Portability: MSVC  (/include/share.h) */
-/* (#) Portability: MinGW (/mingw-w64-headers/crt/share.h) */
+/* (#) Portability: DJGPP        (/include/share.h) */
+/* (#) Portability: MSVC         (/include/share.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/share.h) */
+/* (#) Portability: Windows Kits (/ucrt/share.h) */
 #ifndef _SHARE_H
 #define _SHARE_H 1
 #include <fcntl.h>

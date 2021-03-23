@@ -23,6 +23,7 @@
 /* (#) Portability: FreeBSD       (/include/netdb.h) */
 /* (#) Portability: GNU C Library (/resolv/netdb.h) */
 /* (#) Portability: NetBSD        (/include/netdb.h) */
+/* (#) Portability: OpenBSD       (/include/netdb.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/netdb.h) */
 /* (#) Portability: diet libc     (/include/netdb.h) */
 /* (#) Portability: musl libc     (/include/netdb.h) */

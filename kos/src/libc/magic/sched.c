@@ -24,6 +24,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/sched.h) */
 /* (#) Portability: NetBSD        (/include/sched.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sched.h) */
+/* (#) Portability: OpenBSD       (/include/sched.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sched.h) */
 /* (#) Portability: diet libc     (/include/sched.h) */
 /* (#) Portability: musl libc     (/include/sched.h) */

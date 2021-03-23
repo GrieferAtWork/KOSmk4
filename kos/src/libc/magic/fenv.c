@@ -25,6 +25,9 @@
 /* (#) Portability: MSVC          (/include/fenv.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/fenv.h) */
 /* (#) Portability: NetBSD        (/include/fenv.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/fenv.h) */
+/* (#) Portability: OpenBSD       (/include/fenv.h) */
+/* (#) Portability: Windows Kits  (/ucrt/fenv.h) */
 /* (#) Portability: diet libc     (/include/fenv.h) */
 /* (#) Portability: musl libc     (/include/fenv.h) */
 /* (#) Portability: uClibc        (/include/fenv.h) */

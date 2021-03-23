@@ -23,6 +23,7 @@
 /* (#) Portability: GNU C Library (/misc/ar.h) */
 /* (#) Portability: NetBSD        (/include/ar.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/ar.h) */
+/* (#) Portability: OpenBSD       (/include/ar.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ar.h) */
 /* (#) Portability: diet libc     (/include/ar.h) */
 /* (#) Portability: musl libc     (/include/ar.h) */

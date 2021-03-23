@@ -25,8 +25,10 @@
 /* (#) Portability: GNU C Library (/pwd/pwd.h) */
 /* (#) Portability: NetBSD        (/include/pwd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/pwd.h) */
+/* (#) Portability: OpenBSD       (/include/pwd.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/pwd.h) */
 /* (#) Portability: diet libc     (/include/pwd.h) */
+/* (#) Portability: libbsd        (/include/bsd/pwd.h) */
 /* (#) Portability: musl libc     (/include/pwd.h) */
 /* (#) Portability: uClibc        (/include/pwd.h) */
 }

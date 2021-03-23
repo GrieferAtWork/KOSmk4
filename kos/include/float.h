@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb71f4794 */
+/* HASH CRC-32:0x9610b529 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,9 @@
 /* (#) Portability: MSVC          (/include/float.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/float.h) */
 /* (#) Portability: NetBSD        (/sys/arch/[...]/include/float.h) */
+/* (#) Portability: OpenBSD       (/include/float.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/float.h) */
+/* (#) Portability: Windows Kits  (/ucrt/float.h) */
 /* (#) Portability: diet libc     (/include/float.h) */
 /* (#) Portability: musl libc     (/include/float.h) */
 #ifndef _FLOAT_H

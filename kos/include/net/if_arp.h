@@ -17,8 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/if_arp.h) */
+/* (#) Portability: FreeBSD       (/sys/net/if_arp.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/net/if_arp.h) */
 /* (#) Portability: NetBSD        (/sys/net/if_arp.h) */
+/* (#) Portability: OpenBSD       (/sys/net/if_arp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/net/if_arp.h) */
 /* (#) Portability: diet libc     (/include/net/if_arp.h) */
 /* (#) Portability: musl libc     (/include/net/if_arp.h) */

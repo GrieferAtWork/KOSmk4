@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x185cfdad */
+/* HASH CRC-32:0x428f8477 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: FreeBSD       (/sys/sys/auxv.h) */
 /* (#) Portability: GNU C Library (/misc/sys/auxv.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
 /* (#) Portability: diet libc     (/include/sys/auxv.h) */

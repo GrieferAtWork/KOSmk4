@@ -18,9 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/signal.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/signal.h) */
 /* (#) Portability: GNU C Library (/signal/sys/signal.h) */
 /* (#) Portability: NetBSD        (/sys/sys/signal.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sys/signal.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/signal.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/signal.h) */
 /* (#) Portability: diet libc     (/include/sys/signal.h) */
 /* (#) Portability: musl libc     (/include/sys/signal.h) */

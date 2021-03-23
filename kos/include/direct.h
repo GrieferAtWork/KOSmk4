@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ea659b */
+/* HASH CRC-32:0xba864873 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,9 +18,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: DJGPP (/include/direct.h) */
-/* (#) Portability: MSVC  (/include/direct.h) */
-/* (#) Portability: MinGW (/mingw-w64-headers/crt/direct.h) */
+/* (#) Portability: DJGPP        (/include/direct.h) */
+/* (#) Portability: MSVC         (/include/direct.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/direct.h) */
+/* (#) Portability: Windows Kits (/ucrt/direct.h) */
 #ifndef _DIRECT_H
 #define _DIRECT_H 1
 

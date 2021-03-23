@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd348d83b */
+/* HASH CRC-32:0x5920abc0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/wctype.h) */
 /* (#) Portability: NetBSD        (/include/wctype.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/wctype.h) */
+/* (#) Portability: OpenBSD       (/include/wctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wctype.h) */
+/* (#) Portability: Windows Kits  (/ucrt/wctype.h) */
 /* (#) Portability: diet libc     (/include/wctype.h) */
 /* (#) Portability: musl libc     (/include/wctype.h) */
 /* (#) Portability: uClibc        (/include/wctype.h) */

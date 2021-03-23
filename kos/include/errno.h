@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x231daf0a */
+/* HASH CRC-32:0xbbe798f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,9 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/errno.h) */
 /* (#) Portability: NetBSD        (/include/errno.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/errno.h) */
+/* (#) Portability: OpenBSD       (/include/errno.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/errno.h) */
+/* (#) Portability: Windows Kits  (/ucrt/errno.h) */
 /* (#) Portability: diet libc     (/include/errno.h) */
 /* (#) Portability: musl libc     (/include/errno.h) */
 /* (#) Portability: uClibc        (/include/errno.h) */

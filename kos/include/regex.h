@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bd055a6 */
+/* HASH CRC-32:0xe16fc356 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: GNU C Library (/posix/regex.h) */
 /* (#) Portability: NetBSD        (/include/regex.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/regex.h) */
+/* (#) Portability: OpenBSD       (/include/regex.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/regex.h) */
 /* (#) Portability: diet libc     (/include/regex.h) */
 /* (#) Portability: musl libc     (/include/regex.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd819a69 */
+/* HASH CRC-32:0xe7eb7124 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,10 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/utsname.h) */
 /* (#) Portability: DJGPP         (/include/sys/utsname.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/utsname.h) */
 /* (#) Portability: GNU C Library (/posix/sys/utsname.h) */
 /* (#) Portability: NetBSD        (/sys/sys/utsname.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/utsname.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/utsname.h) */
 /* (#) Portability: diet libc     (/include/sys/utsname.h) */
 /* (#) Portability: musl libc     (/include/sys/utsname.h) */

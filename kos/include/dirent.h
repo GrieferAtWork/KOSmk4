@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd928430e */
+/* HASH CRC-32:0xcf5c09a9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/dirent.h) */
 /* (#) Portability: NetBSD        (/include/dirent.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/dirent.h) */
+/* (#) Portability: OpenBSD       (/include/dirent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/dirent.h) */
 /* (#) Portability: diet libc     (/include/dirent.h) */
 /* (#) Portability: musl libc     (/include/dirent.h) */

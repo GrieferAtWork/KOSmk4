@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/paths.h) */
 /* (#) Portability: NetBSD        (/include/paths.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/paths.h) */
+/* (#) Portability: OpenBSD       (/include/paths.h) */
 /* (#) Portability: diet libc     (/include/paths.h) */
 /* (#) Portability: musl libc     (/include/paths.h) */
 /* (#) Portability: uClibc        (/include/paths.h) */

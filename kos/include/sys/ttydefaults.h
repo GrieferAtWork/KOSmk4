@@ -17,8 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/ttydefaults.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/ttydefaults.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/ttydefaults.h) */
 /* (#) Portability: NetBSD        (/sys/sys/ttydefaults.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/ttydefaults.h) */
 /* (#) Portability: musl libc     (/include/sys/ttydefaults.h) */
 /* (#) Portability: uClibc        (/include/sys/ttydefaults.h) */
 #ifndef _SYS_TTYDEFAULTS_H

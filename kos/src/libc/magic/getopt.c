@@ -24,8 +24,10 @@
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/getopt.h) */
 /* (#) Portability: NetBSD        (/include/getopt.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/getopt.h) */
+/* (#) Portability: OpenBSD       (/include/getopt.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/getopt.h) */
 /* (#) Portability: diet libc     (/include/getopt.h) */
+/* (#) Portability: libbsd        (/include/bsd/getopt.h) */
 /* (#) Portability: musl libc     (/include/getopt.h) */
 /* (#) Portability: uClibc        (/include/getopt.h) */
 }

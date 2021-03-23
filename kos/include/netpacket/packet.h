@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/packet.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/netpacket/packet.h) */
 /* (#) Portability: diet libc     (/include/netpacket/packet.h) */
 /* (#) Portability: musl libc     (/include/netpacket/packet.h) */
 /* (#) Portability: uClibc        (/include/netpacket/packet.h) */

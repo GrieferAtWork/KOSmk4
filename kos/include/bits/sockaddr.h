@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: GNU C Library (/bits/sockaddr.h) */
 #ifndef _BITS_SOCKADDR_H
 #define _BITS_SOCKADDR_H 1
 

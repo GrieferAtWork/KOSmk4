@@ -17,8 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/syscall.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/syscall.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/syscall.h) */
 /* (#) Portability: NetBSD        (/sys/sys/syscall.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/syscall.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syscall.h) */
 /* (#) Portability: diet libc     (/include/sys/syscall.h) */
 /* (#) Portability: musl libc     (/include/sys/syscall.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd59debdc */
+/* HASH CRC-32:0xae19c35 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,10 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/uio.h) */
 /* (#) Portability: DJGPP         (/include/sys/uio.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/uio.h) */
 /* (#) Portability: GNU C Library (/misc/sys/uio.h) */
 /* (#) Portability: NetBSD        (/sys/sys/uio.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/uio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/uio.h) */
 /* (#) Portability: diet libc     (/include/sys/uio.h) */
 /* (#) Portability: musl libc     (/include/sys/uio.h) */

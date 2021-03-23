@@ -18,10 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: Cygwin (/winsup/cygwin/include/process.h) */
-/* (#) Portability: DJGPP  (/include/process.h) */
-/* (#) Portability: MSVC   (/include/process.h) */
-/* (#) Portability: MinGW  (/mingw-w64-headers/crt/process.h) */
+/* (#) Portability: Cygwin       (/winsup/cygwin/include/process.h) */
+/* (#) Portability: DJGPP        (/include/process.h) */
+/* (#) Portability: MSVC         (/include/process.h) */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/process.h) */
+/* (#) Portability: Windows Kits (/ucrt/process.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]

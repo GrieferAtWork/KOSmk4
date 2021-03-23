@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: libbsd (/include/bsd/getopt.h) */
+/* (#) Portability: libbsd (/include/bsd/bsd.h) */
 #ifndef _BSD_BSD_H
 #define _BSD_BSD_H 1
 

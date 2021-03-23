@@ -19,6 +19,8 @@
  */
 /* (#) Portability: FreeBSD (/include/bitstring.h) */
 /* (#) Portability: NetBSD  (/include/bitstring.h) */
+/* (#) Portability: OpenBSD (/include/bitstring.h) */
+/* (#) Portability: libbsd  (/include/bsd/bitstring.h) */
 #ifndef _BITSTRING_H
 #define _BITSTRING_H 1
 

@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/vt.h) */
+/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/vt.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/vt.h) */
 /* (#) Portability: musl libc     (/include/sys/vt.h) */
 /* (#) Portability: uClibc        (/include/sys/vt.h) */
