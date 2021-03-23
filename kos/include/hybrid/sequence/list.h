@@ -75,8 +75,8 @@
  * [      1        ]  T*   [*]_PREV(elem, [headname], key)                    (Return predecessor (NULL if no prev-elem exists))
  * [      1        ]  T*   [*]_PREV_FAST(elem, self, [type], key)             (Return predecessor (NULL if no prev-elem exists))
  * [1              ]  T*   [*]_PREV_UNSAFE(elem, self, [type], key)           (Return predecessor (undef if no prev-elem exists))
- * [  1            ]  T*   [*]_P_PREV(p_elem, self, [type], key)              (Return predecessor (NULL if no prev-elem exists))
- * [  1            ]  T*   [*]_P_PREV_UNSAFE(p_elem, [type], key)             (Return predecessor (undef if no prev-elem exists))
+ * [1 1            ]  T*   [*]_P_PREV(p_elem, self, [type], key)              (Return predecessor (NULL if no prev-elem exists))
+ * [1 1            ]  T*   [*]_P_PREV_UNSAFE(p_elem, [type], key)             (Return predecessor (undef if no prev-elem exists))
  * [        1      ]  T*   [*]_LOOP_NEXT(self, elem, key)                     (NOTE: *_NEXT(elem, key) for RINGQ)
  * [        1      ]  T*   [*]_LOOP_PREV(self, elem, key)                     (NOTE: *_PREV(elem, key) for RINGQ)
  * [1 1 1     1 1  ]  void [*]_INSERT_AFTER(predecessor, elem, key)
@@ -371,6 +371,14 @@
 #define __HYBRID_LIST_UNBIND_IF_5(self, out_pelem, type, key, condition)                   __HYBRID_LIST_UNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
 #define __HYBRID_LIST_UNBIND_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_LIST_UNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition)
 #define __HYBRID_LIST_UNBIND_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_LIST_P_PREV_3(p_elem, self, key)                                          ((p_elem) == &(self)->lh_first ? __NULLPTR : __COMPILER_CONTAINER_OF(p_elem, __typeof__(**(p_elem)), key.le_next))
+#define __HYBRID_LIST_P_PREV_4(p_elem, self, type, key)                                    ((p_elem) == &(self)->lh_first ? __NULLPTR : __COMPILER_CONTAINER_OF(p_elem, __HYBRID_Q_STRUCT type, key.le_next))
+#define __HYBRID_LIST_P_PREV_UNSAFE_2(p_elem, key)                                         __COMPILER_CONTAINER_OF(p_elem, __typeof__(**(p_elem)), key.le_next)
+#define __HYBRID_LIST_P_PREV_UNSAFE_3(p_elem, type, key)                                   __COMPILER_CONTAINER_OF(p_elem, __HYBRID_Q_STRUCT type, key.le_next)
+#define __HYBRID_LIST_P_PREV_P_3(p_elem, self, getpath)                                    ((p_elem) == &(self)->lh_first ? __NULLPTR : (__typeof__(*(p_elem)))((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next))
+#define __HYBRID_LIST_P_PREV_P_4(p_elem, self, type, getpath)                              ((p_elem) == &(self)->lh_first ? __NULLPTR : (__HYBRID_Q_STRUCT type *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next))
+#define __HYBRID_LIST_P_PREV_UNSAFE_P_2(p_elem, getpath)                                   (__typeof__(*(p_elem)))((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next)
+#define __HYBRID_LIST_P_PREV_UNSAFE_P_3(p_elem, type, getpath)                             (__HYBRID_Q_STRUCT type *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next)
 #define LIST_CONCAT_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_CONCAT_P_, (__VA_ARGS__))(__VA_ARGS__)            /* LIST_CONCAT_P(dst, src, [type], getpath) */
 #define LIST_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* LIST_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
 #define LIST_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
@@ -391,8 +399,12 @@
 #define LIST_TRYREMOVE_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
 #define LIST_TRYUNBIND_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* LIST_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure) */
 #define LIST_TRYUNBIND_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_TRYUNBIND_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
-#define LIST_UNBINDALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* LIST_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
-#define LIST_UNBINDALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* LIST_UNBINDALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define LIST_UNBINDALL(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_UNBINDALL_, (__VA_ARGS__))(__VA_ARGS__)           /* LIST_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
+#define LIST_UNBINDALL_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_UNBINDALL_P_, (__VA_ARGS__))(__VA_ARGS__)         /* LIST_UNBINDALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define LIST_P_PREV(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_P_PREV_, (__VA_ARGS__))(__VA_ARGS__)              /* LIST_P_PREV(p_elem, self, [type], key) */
+#define LIST_P_PREV_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_P_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)            /* LIST_P_PREV_P(p_elem, self, [type], getpath) */
+#define LIST_P_PREV_UNSAFE(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_P_PREV_UNSAFE_, (__VA_ARGS__))(__VA_ARGS__)       /* LIST_P_PREV_UNSAFE(p_elem, [type], key) */
+#define LIST_P_PREV_UNSAFE_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_LIST_P_PREV_UNSAFE_P_, (__VA_ARGS__))(__VA_ARGS__)     /* LIST_P_PREV_UNSAFE_P(p_elem, [type], getpath) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define LIST_CONCAT_P(dst, src, type, getpath)                                     __HYBRID_LIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #define LIST_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                        __HYBRID_LIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
@@ -418,6 +430,10 @@
 #define LIST_UNBINDALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_LIST_UNBINDALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
 #define LIST_UNBIND_IF(self, out_pelem, type, key, condition)                      __HYBRID_LIST_UNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
 #define LIST_UNBIND_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_LIST_UNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define LIST_P_PREV(p_elem, self, type, key)                                       ((p_elem) == &(self)->lh_first ? __NULLPTR : __COMPILER_CONTAINER_OF(p_elem, __HYBRID_Q_STRUCT type, key.le_next))
+#define LIST_P_PREV_UNSAFE(p_elem, type, key)                                      __COMPILER_CONTAINER_OF(p_elem, __HYBRID_Q_STRUCT type, key.le_next)
+#define LIST_P_PREV_P(p_elem, self, type, getpath)                                 ((p_elem) == &(self)->lh_first ? __NULLPTR : (__HYBRID_Q_STRUCT type *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next))
+#define LIST_P_PREV_UNSAFE_P(p_elem, type, getpath)                                (__HYBRID_Q_STRUCT type *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&getpath((T *)0).le_next)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
@@ -3132,8 +3148,6 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define LIST_P_PREV(p_elem, self, [type], key)
-//TODO:#define LIST_P_PREV_UNSAFE(p_elem, [type], key)
 //TODO:#define SLIST_MOVE(dst, src, key)
 //TODO:#define STAILQ_MOVE(dst, src, key)
 //TODO:#define TAILQ_MOVE(dst, src, key)

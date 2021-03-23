@@ -364,8 +364,8 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 		return;
 	for (i = 0; i < COMPILER_LENOF(self->h_size); ++i) {
 		struct mfree **piter, *iter;
-		piter = &self->h_size[i].lh_first;
-		for (; (iter = *piter) != NULL; piter = &iter->mf_lsize.le_next) {
+		for (piter = LIST_PFIRST(&self->h_size[i]); (iter = *piter) != NULL;
+		     piter = LIST_PNEXT(iter, mf_lsize)) {
 			void *faulting_address;
 			u32 expected_data;
 			assertf(IS_ALIGNED((uintptr_t)iter, HEAP_ALIGNMENT),
