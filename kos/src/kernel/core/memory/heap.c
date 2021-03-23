@@ -507,9 +507,9 @@ NOTHROW(KCALL heap_insert_node_unlocked)(struct heap *__restrict self,
 	/* Insert the node into the address and size trees. */
 	mfree_tree_insert(&self->h_addr, node);
 	/* Figure out where the free-slot should go in the chain of free ranges. */
-	pslot = LIST_P_FIRST(&self->h_size[HEAP_BUCKET_OF(num_bytes)]);
+	pslot = LIST_PFIRST(&self->h_size[HEAP_BUCKET_OF(num_bytes)]);
 	while ((slot = *pslot) != NULL && MFREE_SIZE(slot) < num_bytes)
-		pslot = LIST_P_NEXT(slot, mf_lsize);
+		pslot = LIST_PNEXT(slot, mf_lsize);
 	LIST_P_INSERT_BEFORE(pslot, node, mf_lsize);
 }
 

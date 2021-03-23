@@ -157,9 +157,9 @@ clear_chain:
 		return;
 	}
 	/* Find the last of the new changes. */
-	p_last = SLIST_P_NEXT(chain, mp_changed);
+	p_last = SLIST_PNEXT(chain, mp_changed);
 	while (*p_last)
-		p_last = SLIST_P_NEXT(*p_last, mp_changed);
+		p_last = SLIST_PNEXT(*p_last, mp_changed);
 	for (;;) {
 		*p_last = other_changes;
 		COMPILER_WRITE_BARRIER();

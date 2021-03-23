@@ -1074,7 +1074,7 @@ again_lock:
 		                             changed.slh_first, NULL));
 
 		/* Remove all changed parts from within the caller-given file-range. */
-		p_chng = SLIST_P_FIRST(&changed);
+		p_chng = SLIST_PFIRST(&changed);
 		while ((chng = *p_chng) != NULL) {
 			if (minaddr <= chng->mp_maxaddr &&
 			    maxaddr >= chng->mp_minaddr) {
@@ -1091,7 +1091,7 @@ again_lock:
 					SLIST_INSERT(&dead, chng, _mp_dead);
 			} else {
 				/* Keep this part! */
-				p_chng = SLIST_P_NEXT(chng, mp_changed);
+				p_chng = SLIST_PNEXT(chng, mp_changed);
 			}
 		}
 		if (!SLIST_EMPTY(&changed)) {

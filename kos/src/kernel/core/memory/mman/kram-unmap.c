@@ -1368,12 +1368,12 @@ PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL krulist_sorted_insert_byaddr)(struct mman_unmap_kram_job_slist *__restrict self,
                                             struct mman_unmap_kram_job *__restrict op) {
 	struct mman_unmap_kram_job **p_next, *next;
-	p_next = SLIST_P_FIRST(self);
+	p_next = SLIST_PFIRST(self);
 	while ((next = *p_next) != NULL) {
 		assert(next != op);
 		if (next > op)
 			break; /* Insert before this one! */
-		p_next = SLIST_P_NEXT(next, mukj_link);
+		p_next = SLIST_PNEXT(next, mukj_link);
 	}
 	SLIST_P_INSERT_BEFORE(p_next, op, mukj_link);
 }

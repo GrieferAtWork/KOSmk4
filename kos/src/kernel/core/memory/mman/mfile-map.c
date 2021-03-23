@@ -394,7 +394,7 @@ mfile_map_lockall(struct mfile_map *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_unlock_and_remove_non_overlapping_parts)(struct mfile_map *__restrict self) {
 	struct mnode **p_node, *node;
-	p_node = SLIST_P_FIRST(&self->mfm_nodes);
+	p_node = SLIST_PFIRST(&self->mfm_nodes);
 	while ((node = *p_node) != NULL) {
 		pos_t node_map_minaddr;
 		pos_t node_map_maxaddr;
@@ -414,7 +414,7 @@ NOTHROW(FCALL mfile_map_unlock_and_remove_non_overlapping_parts)(struct mfile_ma
 			mpart_lock_release(part);
 			decref(part);
 		} else {
-			p_node = SLIST_P_NEXT(node, _mn_alloc);
+			p_node = SLIST_PNEXT(node, _mn_alloc);
 		}
 	}
 }
@@ -528,7 +528,7 @@ mfile_map_fill_holes(struct mfile_map *__restrict self,
 	bool result;
 	struct mnode **p_node, *prev, *next;
 	result = true;
-	p_node = SLIST_P_FIRST(&self->mfm_nodes);
+	p_node = SLIST_PFIRST(&self->mfm_nodes);
 	prev   = NULL;
 continue_with_pnode:
 	for (;;) {
@@ -585,14 +585,14 @@ continue_with_pnode:
 				struct mnode *duplicate_node;
 				/* Set to true if `duplicate_node' is located after the gap. */
 				bool duplicate_node_is_after_gap = false;
-				p_duplicate_node = SLIST_P_FIRST(&self->mfm_nodes);
+				p_duplicate_node = SLIST_PFIRST(&self->mfm_nodes);
 				while ((duplicate_node = *p_duplicate_node) != NULL) {
 					struct mnode *removed_nodes_lo;
 					struct mnode *removed_nodes_hi;
 					if (p_duplicate_node == p_node)
 						duplicate_node_is_after_gap = true;
 					if (duplicate_node->mn_part != part) {
-						p_duplicate_node = SLIST_P_NEXT(duplicate_node, _mn_alloc);
+						p_duplicate_node = SLIST_PNEXT(duplicate_node, _mn_alloc);
 						continue;
 					}
 					decref_nokill(part); /* The reference returned by `mfile_getpart()' */
@@ -652,7 +652,7 @@ continue_with_pnode:
 					 * above! */
 					SLIST_P_INSERT_BEFORE(p_node, new_node, _mn_alloc);
 					prev   = new_node;
-					p_node = SLIST_P_NEXT(new_node, _mn_alloc);;
+					p_node = SLIST_PNEXT(new_node, _mn_alloc);;
 					goto continue_with_pnode;
 				}
 			} /* Scope... */
@@ -689,7 +689,7 @@ continue_with_pnode:
 			/* Insert the new node and continue scanning for holes afterwards. */
 			SLIST_P_INSERT_BEFORE(p_node, new_node, _mn_alloc);
 			prev   = new_node;
-			p_node = SLIST_P_NEXT(new_node, _mn_alloc);;
+			p_node = SLIST_PNEXT(new_node, _mn_alloc);;
 			goto continue_with_pnode;
 		} else {
 			/* No gap here :) */
@@ -697,7 +697,7 @@ continue_with_pnode:
 		if (!next)
 			break;
 		prev   = next;
-		p_node = SLIST_P_NEXT(next, _mn_alloc);
+		p_node = SLIST_PNEXT(next, _mn_alloc);
 	}
 	return result;
 }

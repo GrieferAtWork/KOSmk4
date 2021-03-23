@@ -64,12 +64,12 @@
  * [1 1 1 1 1   1  ]  PTR  [*]_END(self)                                      (Pointer to 1 past the last elem; NULL-pointer, since all of these are linked lists)
  * [1 1 1 1 1   1  ]  bool [*]_EMPTY(self)
  * [1 1 1 1 1   1  ]  T*   [*]_FIRST(self)
- * [1 1 1          ]  T**  [*]_P_FIRST(self)                                  (Return pointer to the pointer to the first item; use with *_P_* functions)
+ * [1 1 1          ]  T**  [*]_PFIRST(self)                                   (Return pointer to the pointer to the first item; use with *_P_* functions)
  * [      1 1      ]  T*   [*]_LAST(self)
  * [    1          ]  T*   [*]_LAST(self, [type], key)
  * [      1        ]  T*   [*]_LAST_FAST(self, [type], key)
  * [1 1 1 1 1 1 1  ]  T*   [*]_NEXT(elem, key)                                (Return successor (NULL if no prev-elem exists))
- * [1 1 1          ]  T**  [*]_P_NEXT(elem, key)                              (Return pointer to the pointer to the next item; use with *_P_* functions)
+ * [1 1 1          ]  T**  [*]_PNEXT(elem, key)                               (Return pointer to the pointer to the next item; use with *_P_* functions)
  * [        1 1 1  ]  T*   [*]_PREV(elem, key)                                (Return predecessor (NULL if no prev-elem exists))
  * [1              ]  T*   [*]_PREV(elem, self, [type], key)                  (Return predecessor (NULL if no prev-elem exists))
  * [      1        ]  T*   [*]_PREV(elem, [headname], key)                    (Return predecessor (NULL if no prev-elem exists))
@@ -238,7 +238,7 @@
 #define LIST_MOVE(dst, src, key)                  __HYBRID_LIST_MOVE(dst, src, __HYBRID_Q_KEY, key)
 #define LIST_NEXT(elem, key)                      (elem)->key.le_next
 #define LIST_REMOVE(elem, key)                    __HYBRID_LIST_REMOVE(elem, __HYBRID_Q_KEY, key)
-#if defined(__INTELLISENSE__) && defined(__COMPILER_HAVE_TYPEOF) /* Prevent code like `&LIST_FIRST()' (use `LIST_P_FIRST()' instead) */
+#if defined(__INTELLISENSE__) && defined(__COMPILER_HAVE_TYPEOF) /* Prevent code like `&LIST_FIRST()' (use `LIST_PFIRST()' instead) */
 #define LIST_FIRST(self)                          ((__typeof__((self)->lh_first))(self)->lh_first)
 #else /* __INTELLISENSE__ && __COMPILER_HAVE_TYPEOF */
 #define LIST_FIRST(self)                          (self)->lh_first
@@ -292,15 +292,15 @@
 #define LIST_ISBOUND_P(elem, getpath)                                                     (getpath(elem).le_prev != __NULLPTR)
 #define LIST_MOVE_P(dst, src, getpath)                                                    __HYBRID_LIST_MOVE(dst, src, __HYBRID_Q_PTH, getpath)
 #define LIST_NEXT_P(elem, getpath)                                                        getpath(elem).le_next
-#define LIST_P_FIRST(self)                                                                (&(self)->lh_first)
+#define LIST_PFIRST(self)                                                                 (&(self)->lh_first)
 #define LIST_P_FOREACH(p_elem, self, key)                                                 __HYBRID_LIST_P_FOREACH(p_elem, self, __HYBRID_Q_KEY, key)
 #define LIST_P_FOREACH_P(p_elem, self, getpath)                                           __HYBRID_LIST_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
 #define LIST_P_INSERT_BEFORE(p_successor, elem, key)                                      __HYBRID_LIST_P_INSERT_BEFORE(p_successor, elem, __HYBRID_Q_KEY, key)
 #define LIST_P_INSERT_BEFORE_P(p_successor, elem, getpath)                                __HYBRID_LIST_P_INSERT_BEFORE(p_successor, elem, __HYBRID_Q_PTH, getpath)
 #define LIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, key)                        __HYBRID_LIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define LIST_P_INSERT_BEFORE_R_P(p_successor, lo_elem, hi_elem, getpath)                  __HYBRID_LIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
-#define LIST_P_NEXT(elem, key)                                                            (&(elem)->key.le_next)
-#define LIST_P_NEXT_P(elem, getpath)                                                      (&getpath(elem).le_next)
+#define LIST_PNEXT(elem, key)                                                             (&(elem)->key.le_next)
+#define LIST_PNEXT_P(elem, getpath)                                                       (&getpath(elem).le_next)
 #define LIST_P_REMOVE(p_elem, key)                                                        __HYBRID_LIST_P_REMOVE(p_elem, __HYBRID_Q_KEY, key)
 #define LIST_P_REMOVE_P(p_elem, getpath)                                                  __HYBRID_LIST_P_REMOVE(p_elem, __HYBRID_Q_PTH, getpath)
 #define LIST_P_REMOVE_R(p_lo_elem, hi_elem, key)                                          __HYBRID_LIST_P_REMOVE_R(p_lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -752,15 +752,15 @@
 #define SLIST_INSERT_R(self, lo_elem, hi_elem, key)                                        __HYBRID_SLIST_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define SLIST_INSERT_R_P(self, lo_elem, hi_elem, getpath)                                  __HYBRID_SLIST_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_NEXT_P(elem, getpath)                                                        getpath(elem).sle_next
-#define SLIST_P_FIRST(self)                                                                (&(self)->slh_first)
+#define SLIST_PFIRST(self)                                                                 (&(self)->slh_first)
 #define SLIST_P_FOREACH(p_elem, self, key)                                                 __HYBRID_SLIST_P_FOREACH(p_elem, self, __HYBRID_Q_KEY, key)
 #define SLIST_P_FOREACH_P(p_elem, self, getpath)                                           __HYBRID_SLIST_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
 #define SLIST_P_INSERT_BEFORE(p_successor, elem, key)                                      __HYBRID_SLIST_P_INSERT_BEFORE(p_successor, elem, __HYBRID_Q_KEY, key)
 #define SLIST_P_INSERT_BEFORE_P(p_successor, elem, getpath)                                __HYBRID_SLIST_P_INSERT_BEFORE(p_successor, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, key)                        __HYBRID_SLIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define SLIST_P_INSERT_BEFORE_R_P(p_successor, lo_elem, hi_elem, getpath)                  __HYBRID_SLIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
-#define SLIST_P_NEXT(elem, key)                                                            (&(elem)->key.sle_next)
-#define SLIST_P_NEXT_P(elem, getpath)                                                      (&getpath(elem).sle_next)
+#define SLIST_PNEXT(elem, key)                                                             (&(elem)->key.sle_next)
+#define SLIST_PNEXT_P(elem, getpath)                                                       (&getpath(elem).sle_next)
 #define SLIST_P_REMOVE(p_elem, key)                                                        __HYBRID_SLIST_P_REMOVE(p_elem, __HYBRID_Q_KEY, key)
 #define SLIST_P_REMOVE_P(p_elem, getpath)                                                  __HYBRID_SLIST_P_REMOVE(p_elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_P_REMOVE_R(p_lo_elem, hi_elem, key)                                          __HYBRID_SLIST_P_REMOVE_R(p_lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -1236,11 +1236,11 @@
 #define STAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, key)                     __HYBRID_STAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define STAILQ_INSERT_TAIL_R_P(self, lo_elem, hi_elem, getpath)               __HYBRID_STAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_NEXT_P(elem, getpath)                                          getpath(elem).stqe_next
-#define STAILQ_P_FIRST(self)                                                  (&(self)->stqh_first)
+#define STAILQ_PFIRST(self)                                                   (&(self)->stqh_first)
 #define STAILQ_P_FOREACH(p_elem, self, key)                                   __HYBRID_STAILQ_P_FOREACH(p_elem, self, __HYBRID_Q_KEY, key)
 #define STAILQ_P_FOREACH_P(p_elem, self, getpath)                             __HYBRID_STAILQ_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
-#define STAILQ_P_NEXT(elem, key)                                              (&(elem)->key.stqe_next)
-#define STAILQ_P_NEXT_P(elem, key)                                            (&getpath(elem).stqe_next)
+#define STAILQ_PNEXT(elem, key)                                               (&(elem)->key.stqe_next)
+#define STAILQ_PNEXT_P(elem, key)                                             (&getpath(elem).stqe_next)
 #define STAILQ_P_REMOVE(self, p_elem, key)                                    __HYBRID_STAILQ_P_REMOVE(self, p_elem, __HYBRID_Q_KEY, key)
 #define STAILQ_P_REMOVE_P(self, p_elem, getpath)                              __HYBRID_STAILQ_P_REMOVE(self, p_elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_P_REMOVE_R(self, p_lo_elem, hi_elem, key)                      __HYBRID_STAILQ_P_REMOVE_R(self, p_lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -1671,11 +1671,11 @@
 #define SIMPLEQ_INSERT_TAIL_R(self, lo_elem, hi_elem, key)                     __HYBRID_SIMPLEQ_INSERT_TAIL_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define SIMPLEQ_INSERT_TAIL_R_P(self, lo_elem, hi_elem, getpath)               __HYBRID_SIMPLEQ_INSERT_TAIL_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_NEXT_P(elem, getpath)                                          getpath(elem).sqe_next
-#define SIMPLEQ_P_FIRST(self)                                                  (&(self)->sqh_first)
+#define SIMPLEQ_PFIRST(self)                                                   (&(self)->sqh_first)
 #define SIMPLEQ_P_FOREACH(p_elem, self, key)                                   __HYBRID_SIMPLEQ_P_FOREACH(p_elem, self, __HYBRID_Q_KEY, key)
 #define SIMPLEQ_P_FOREACH_P(p_elem, self, getpath)                             __HYBRID_SIMPLEQ_P_FOREACH(p_elem, self, __HYBRID_Q_PTH, getpath)
-#define SIMPLEQ_P_NEXT(elem, key)                                              (&(elem)->key.sqe_next)
-#define SIMPLEQ_P_NEXT_P(elem, getpath)                                        (&getpath(elem).sqe_next)
+#define SIMPLEQ_PNEXT(elem, key)                                               (&(elem)->key.sqe_next)
+#define SIMPLEQ_PNEXT_P(elem, getpath)                                         (&getpath(elem).sqe_next)
 #define SIMPLEQ_P_REMOVE(self, p_elem, key)                                    __HYBRID_SIMPLEQ_P_REMOVE(self, p_elem, __HYBRID_Q_KEY, key)
 #define SIMPLEQ_P_REMOVE_P(self, p_elem, getpath)                              __HYBRID_SIMPLEQ_P_REMOVE(self, p_elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_P_REMOVE_R(self, p_lo_elem, hi_elem, key)                      __HYBRID_SIMPLEQ_P_REMOVE_R(self, p_lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -3156,14 +3156,6 @@
 //TODO:#define DLIST_CONCAT(dst, src, [type], key)
 //TODO:#define DLIST_REMOVE_HEAD(self, key)
 //TODO:#define DLIST_REMOVE_AFTER(elem, key)
-/* TODO: Rename LIST_P_FIRST()    -> LIST_PFIRST() */
-/* TODO: Rename LIST_P_NEXT()     -> LIST_PNEXT() */
-/* TODO: Rename SLIST_P_FIRST()   -> SLIST_PFIRST() */
-/* TODO: Rename SLIST_P_NEXT()    -> SLIST_PNEXT() */
-/* TODO: Rename STAILQ_P_FIRST()  -> STAILQ_PFIRST() */
-/* TODO: Rename STAILQ_P_NEXT()   -> STAILQ_PNEXT() */
-/* TODO: Rename SIMPLEQ_P_FIRST() -> SIMPLEQ_PFIRST() */
-/* TODO: Rename SIMPLEQ_P_NEXT()  -> SIMPLEQ_PNEXT() */
 
 
 /* TODO: Missing macros from OpenBSD: */

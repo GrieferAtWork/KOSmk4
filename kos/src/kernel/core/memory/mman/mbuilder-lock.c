@@ -424,11 +424,11 @@ mbuilder_partlocks_acquire_or_unlock(struct mbuilder *__restrict self,
 		goto fail;
 
 	/* Go over all file mappings and re-flow them if necessary. */
-	p_fmnode = SLIST_P_FIRST(&self->mb_files);
+	p_fmnode = SLIST_PFIRST(&self->mb_files);
 	while (*p_fmnode != NULL) {
 		if (!mbuilder_reflow_filemap_or_unlock(self, p_fmnode, unlock))
 			goto fail;
-		p_fmnode = SLIST_P_NEXT(*p_fmnode, mbn_nxtfile);
+		p_fmnode = SLIST_PNEXT(*p_fmnode, mbn_nxtfile);
 	}
 
 	/* At this point, we know that all mappings are continuous,
