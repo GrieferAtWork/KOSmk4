@@ -61,7 +61,7 @@
  * [1 1 1 1 1   1  ]  void [*]_CLEAR(self)
  * [    1          ]  void [*]_CONCAT(dst, src)
  * [      1        ]  void [*]_CONCAT(dst, src, key)
- * [N N            ]  void [*]_CONCAT(dst, src, [type], key)
+ * [N N         N  ]  void [*]_CONCAT(dst, src, [type], key)
  * [1 1 1 1 1   1  ]  PTR  [*]_END(self)                                      (Pointer to 1 past the last elem; NULL-pointer, since all of these are linked lists)
  * [1 1 1 1 1   1  ]  bool [*]_EMPTY(self)
  * [1 1 1 1 1   1  ]  T*   [*]_FIRST(self)
@@ -2937,6 +2937,10 @@
 #define DLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)       __HYBRID_DLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_KEY, key)
 #define DLIST_REPLACE_R_P(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, getpath) __HYBRID_DLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_PTH, getpath)
 #if defined(__HYBRID_PP_VA_OVERLOAD) && defined(__COMPILER_HAVE_TYPEOF)
+#define __HYBRID_DLIST_CONCAT_3(dst, src, key)                                              __HYBRID_DLIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_DLIST_CONCAT_4(dst, src, type, key)                                        __HYBRID_DLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_DLIST_CONCAT_P_3(dst, src, getpath)                                        __HYBRID_DLIST_CONCAT(dst, src, __typeof__(*(src)->lh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_DLIST_CONCAT_P_4(dst, src, type, getpath)                                  __HYBRID_DLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_DLIST_FOREACH_FROM_SAFE_3(elem, self, key)                                 __HYBRID_DLIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
 #define __HYBRID_DLIST_FOREACH_FROM_SAFE_4(elem, self, key, tvar)                           __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define __HYBRID_DLIST_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                           __HYBRID_DLIST_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
@@ -2965,6 +2969,8 @@
 #define __HYBRID_DLIST_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure)    __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
 #define __HYBRID_DLIST_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
 #define __HYBRID_DLIST_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define DLIST_CONCAT(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_CONCAT_, (__VA_ARGS__))(__VA_ARGS__)              /* DLIST_CONCAT(dst, src, [type], key) */
+#define DLIST_CONCAT_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_CONCAT_P_, (__VA_ARGS__))(__VA_ARGS__)            /* DLIST_CONCAT_P(dst, src, [type], getpath) */
 #define DLIST_FOREACH_FROM_SAFE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)   /* DLIST_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
 #define DLIST_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* DLIST_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
 #define DLIST_FOREACH_SAFE(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)        /* DLIST_FOREACH_SAFE(elem, self, key, [tvar]) */
@@ -2996,6 +3002,21 @@
 #define DLIST_TRYREMOVE_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
 #endif /* !__HYBRID_PP_VA_OVERLOAD || !__COMPILER_HAVE_TYPEOF */
 
+#define __HYBRID_DLIST_CONCAT(dst, src, T, X, _)                                                  \
+	/* Sorry, this one must be a statement */                                                     \
+	do {                                                                                          \
+		if ((src)->dlh_first != __NULLPTR) {                                                      \
+			if ((dst)->dlh_first == __NULLPTR) {                                                  \
+				(dst)->dlh_first = (src)->dlh_first;                                              \
+			} else {                                                                              \
+				T *__hlc_dst_last = (dst)->dlh_first;                                             \
+				while (X(_, __hlc_dst_last).dle_next)                                             \
+					__hlc_dst_last = X(_, __hlc_dst_last).dle_next;                               \
+				X(_, X(_, __hlc_dst_last).dle_next = (src)->dlh_first).dle_prev = __hlc_dst_last; \
+			}                                                                                     \
+			(src)->dlh_first = __NULLPTR;                                                         \
+		}                                                                                         \
+	}	__WHILE0
 #define __HYBRID_DLIST_INSERT_AFTER(predecessor, elem, X, _) \
 	__HYBRID_DLIST_INSERT_AFTER_R(predecessor, elem, elem, X, _)
 #define __HYBRID_DLIST_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, X, _)    \
@@ -3198,7 +3219,6 @@
 //TODO:#define CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
 //TODO:#define DLIST_MOVE(dst, src, key)
 //TODO:#define DLIST_SWAP(l1, l2, [type], key)
-//TODO:#define DLIST_CONCAT(dst, src, [type], key)
 //TODO:#define DLIST_REMOVE_HEAD(self, key)
 //TODO:#define DLIST_REMOVE_AFTER(elem, key)
 //TODO:*_REMOVE_TAIL() ?
