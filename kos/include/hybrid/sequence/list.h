@@ -54,7 +54,7 @@
  * [1 1 1 1 1   1  ]  CODE [*]_HEAD_INITIALIZER(self)
  * [1 1 1 1 1   1  ]  void [*]_INIT(self)
  * [          1    ]  void [*]_INIT(elem, key)
- * [  1            ]  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
+ * [  1 1          ]  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
  * [1              ]  void [*]_MOVE(dst, src, key)                            (C++-style move-constructor)
  * [  1 1          ]  void [*]_SWAP(l1, l2, [type])                           (C++-style std::swap())
  * [1     1        ]  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
@@ -1266,6 +1266,13 @@
 #define STAILQ_REMOVE_AFTER_P(self, elem, getpath)                            __HYBRID_STAILQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_REMOVE_HEAD_P(self, getpath)                                   __HYBRID_STAILQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define STAILQ_SWAP_P(l1, l2, T)                                              __HYBRID_STAILQ_SWAP(l1, l2, T)
+#define STAILQ_MOVE(dst, src)                                   \
+	(void)((dst)->stqh_last = (src)->stqh_last,                 \
+	       ((dst)->stqh_first = (src)->stqh_first) == __NULLPTR \
+	       ? (void)((dst)->stqh_last = &(dst)->stqh_first)      \
+	       : (void)0,                                           \
+	       (src)->stqh_first = __NULLPTR,                       \
+	       (src)->stqh_last  = &(src)->stqh_first)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_STAILQ_CONTAINS_4(self, elem, key, on_success)                                                            __HYBRID_STAILQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
 #define __HYBRID_STAILQ_CONTAINS_5(self, elem, type, key, on_success)                                                      __HYBRID_STAILQ_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_success)
@@ -1701,6 +1708,13 @@
 #define SIMPLEQ_REMOVE_AFTER_P(self, elem, getpath)                            __HYBRID_SIMPLEQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_REMOVE_HEAD_P(self, getpath)                                   __HYBRID_SIMPLEQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_SWAP_P(l1, l2, T)                                              __HYBRID_SIMPLEQ_SWAP(l1, l2, T)
+#define SIMPLEQ_MOVE(dst, src)                                \
+	(void)((dst)->sqh_last = (src)->sqh_last,                 \
+	       ((dst)->sqh_first = (src)->sqh_first) == __NULLPTR \
+	       ? (void)((dst)->sqh_last = &(dst)->sqh_first)      \
+	       : (void)0,                                         \
+	       (src)->sqh_first = __NULLPTR,                      \
+	       (src)->sqh_last  = &(src)->sqh_first)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_SIMPLEQ_CONTAINS_4(self, elem, key, on_success)                                                            __HYBRID_SIMPLEQ_CONTAINS(self, elem, __typeof__(*(elem)), __HYBRID_Q_KEY, key, on_success)
 #define __HYBRID_SIMPLEQ_CONTAINS_5(self, elem, type, key, on_success)                                                      __HYBRID_SIMPLEQ_CONTAINS(self, elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, on_success)
@@ -3150,7 +3164,6 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define STAILQ_MOVE(dst, src, key)
 //TODO:#define TAILQ_MOVE(dst, src, key)
 //TODO:#define TAILQ_REMOVE_HEAD(self, key)
 //TODO:#define TAILQ_REMOVE_AFTER(elem, key)
