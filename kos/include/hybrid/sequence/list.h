@@ -2987,6 +2987,8 @@
 #define DLIST_TRYREMOVE_IF(...)        __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)        /* DLIST_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
 #define DLIST_TRYREMOVE_IF_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_DLIST_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)      /* DLIST_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
 #else /* __HYBRID_PP_VA_OVERLOAD && __COMPILER_HAVE_TYPEOF */
+#define DLIST_CONCAT(dst, src, type, key)                                           __HYBRID_DLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define DLIST_CONCAT_P(dst, src, type, getpath)                                     __HYBRID_DLIST_CONCAT(dst, src, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #define DLIST_FOREACH_FROM_SAFE(elem, self, key, tvar)                              __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define DLIST_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                        __HYBRID_DLIST_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define DLIST_FOREACH_SAFE(elem, self, key, tvar)                                   __HYBRID_DLIST_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
