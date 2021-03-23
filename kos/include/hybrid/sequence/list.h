@@ -54,6 +54,7 @@
  * [1 1 1 1 1   1  ]  CODE [*]_HEAD_INITIALIZER(self)
  * [1 1 1 1 1   1  ]  void [*]_INIT(self)
  * [          1    ]  void [*]_INIT(elem, key)
+ * [  1            ]  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
  * [1              ]  void [*]_MOVE(dst, src, key)                            (C++-style move-constructor)
  * [  1 1          ]  void [*]_SWAP(l1, l2, [type])                           (C++-style std::swap())
  * [1     1        ]  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
@@ -757,6 +758,7 @@
 #define SLIST_ATOMIC_INSERT_P(self, elem, getpath)                                         __HYBRID_SLIST_ATOMIC_INSERT(self, elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)                                 __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define SLIST_ATOMIC_INSERT_R_P(self, lo_elem, hi_elem, getpath)                           __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define SLIST_MOVE(dst, src)                                                               (void)((dst)->slh_first = (src)->slh_first, (src)->slh_first = __NULLPTR)
 #define SLIST_CLEAR(self)                                                                  (void)((self)->slh_first = __NULLPTR)
 #define SLIST_FOREACH_FROM_P(elem, self, getpath)                                          __HYBRID_SLIST_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define SLIST_FOREACH_PREVPTR_P(elem, p_elem, self, getpath)                               __HYBRID_SLIST_FOREACH_PREVPTR(elem, p_elem, self, __HYBRID_Q_PTH, getpath)
@@ -3148,7 +3150,6 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define SLIST_MOVE(dst, src, key)
 //TODO:#define STAILQ_MOVE(dst, src, key)
 //TODO:#define TAILQ_MOVE(dst, src, key)
 //TODO:#define TAILQ_REMOVE_HEAD(self, key)

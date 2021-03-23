@@ -249,9 +249,6 @@ mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
 
 
 
-#define STEAL_FREE_NODE_LIST(dst, src) \
-	((dst) = (src), SLIST_INIT(&(src))) /* TODO: SLIST_MOVE() */
-
 /* Map a given file into the specified mbuilder.
  * Behaves  exactly  the  same  as  `mman_map()' */
 PUBLIC NONNULL((1, 6)) void *KCALL
@@ -287,9 +284,9 @@ mbuilder_map(struct mbuilder *__restrict self,
 	fm.mfm_size  = num_bytes;
 	fm.mfm_prot  = prot;
 	fm.mfm_flags = flags;
-	STEAL_FREE_NODE_LIST(fm.mfm_flist, self->_mb_fnodes);
+	SLIST_MOVE(&fm.mfm_flist, &self->_mb_fnodes);
 	_mfile_map_init(&fm);
-	STEAL_FREE_NODE_LIST(self->_mb_fnodes, fm.mfm_flist);
+	SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
 
 	/* Convert the node list into a `struct mbnode' */
 	fmnode = (struct mbnode *)SLIST_FIRST(&fm.mfm_nodes);
@@ -418,9 +415,9 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 			fm.mfm_size  = num_bytes;
 			fm.mfm_prot  = prot;
 			fm.mfm_flags = flags;
-			STEAL_FREE_NODE_LIST(fm.mfm_flist, self->_mb_fnodes);
+			SLIST_MOVE(&fm.mfm_flist, &self->_mb_fnodes);
 			_mfile_map_init(&fm);
-			STEAL_FREE_NODE_LIST(self->_mb_fnodes, fm.mfm_flist);
+			SLIST_MOVE(&self->_mb_fnodes, &fm.mfm_flist);
 
 			/* Convert the node list into a `struct mbnode' */
 			fmnode = (struct mbnode *)SLIST_FIRST(&fm.mfm_nodes);
