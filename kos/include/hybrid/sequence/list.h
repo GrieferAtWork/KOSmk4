@@ -55,7 +55,7 @@
  * [1 1 1 1 1   1  ]  void [*]_INIT(self)
  * [          1    ]  void [*]_INIT(elem, key)
  * [  1 1          ]  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
- * [1              ]  void [*]_MOVE(dst, src, key)                            (C++-style move-constructor)
+ * [1     1        ]  void [*]_MOVE(dst, src, key)                            (C++-style move-constructor)
  * [  1 1          ]  void [*]_SWAP(l1, l2, [type])                           (C++-style std::swap())
  * [1     1        ]  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
  * [1 1 1 1 1   1  ]  void [*]_CLEAR(self)
@@ -2167,6 +2167,8 @@
 #define TAILQ_ISBOUND(elem, key)                                                             ((elem)->key.tqe_prev != __NULLPTR)
 #define TAILQ_ISBOUND_P(elem, getpath)                                                       (getpath(elem).tqe_prev != __NULLPTR)
 #define TAILQ_LAST_P(self, HEAD_T)                                                           (*(((HEAD_T *)((self)->tqh_last))->tqh_last))
+#define TAILQ_MOVE(dst, src, key)                                                            __HYBRID_TAILQ_MOVE(dst, src, __HYBRID_Q_KEY, key)
+#define TAILQ_MOVE_P(dst, src, getpath)                                                      __HYBRID_TAILQ_MOVE(dst, src, __HYBRID_Q_PTH, getpath)
 #define TAILQ_NEXT_P(elem, getpath)                                                          getpath(elem).tqe_next
 #define TAILQ_REMOVE_P(self, elem, getpath)                                                  __HYBRID_TAILQ_REMOVE(self, elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_REMOVE_R(self, lo_elem, hi_elem, key)                                          __HYBRID_TAILQ_REMOVE_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
@@ -2340,6 +2342,12 @@
 	          (dst)->tqh_last                                    = (src)->tqh_last, \
 	          TAILQ_INIT(src))                                                      \
 	 : (void)0)
+#define __HYBRID_TAILQ_MOVE(dst, src, X, _)                                         \
+	(void)((*((dst)->tqh_last = &(dst)->tqh_first) = (src)->tqh_first) != __NULLPTR \
+	       ? (void)((dst)->tqh_last                 = (src)->tqh_last,              \
+	                X(_, (dst)->tqh_first).tqe_prev = &(dst)->tqh_first)            \
+	       : (void)0,                                                               \
+	       *((src)->tqh_last = &(src)->tqh_first) = __NULLPTR)
 #define __HYBRID_TAILQ_SWAP(l1, l2, T, X, _)                    \
 	/* Sorry, this one must be a statement */                   \
 	do {                                                        \
@@ -3164,7 +3172,6 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define TAILQ_MOVE(dst, src, key)
 //TODO:#define TAILQ_REMOVE_HEAD(self, key)
 //TODO:#define TAILQ_REMOVE_AFTER(elem, key)
 //TODO:#define TAILQ_REMOVE_IF(self, out_pelem, [type], key, condition)
