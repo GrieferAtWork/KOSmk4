@@ -76,8 +76,8 @@
  * [      1        ]  T*   [*]_PREV(elem, [headname], key)                    (Return predecessor (NULL if no prev-elem exists))
  * [      1        ]  T*   [*]_PREV_FAST(elem, self, [type], key)             (Return predecessor (NULL if no prev-elem exists))
  * [1              ]  T*   [*]_PREV_UNSAFE(elem, self, [type], key)           (Return predecessor (undef if no prev-elem exists))
- * [1 1            ]  T*   [*]_P_PREV(p_elem, self, [type], key)              (Return predecessor (NULL if no prev-elem exists))
- * [1 1            ]  T*   [*]_P_PREV_UNSAFE(p_elem, [type], key)             (Return predecessor (undef if no prev-elem exists))
+ * [1 1 1          ]  T*   [*]_P_PREV(p_elem, self, [type], key)              (Return predecessor (NULL if no prev-elem exists))
+ * [1 1 1          ]  T*   [*]_P_PREV_UNSAFE(p_elem, [type], key)             (Return predecessor (undef if no prev-elem exists))
  * [        1      ]  T*   [*]_LOOP_NEXT(self, elem, key)                     (NOTE: *_NEXT(elem, key) for RINGQ)
  * [        1      ]  T*   [*]_LOOP_PREV(self, elem, key)                     (NOTE: *_PREV(elem, key) for RINGQ)
  * [1 1 1     1 1  ]  void [*]_INSERT_AFTER(predecessor, elem, key)
@@ -1290,6 +1290,14 @@
 #define __HYBRID_STAILQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                                                        __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_STAILQ_LAST_P_2(self, getpath)                                                                            __HYBRID_STAILQ_LAST_P(self, __typeof__(*(self)->stqh_first), getpath)
 #define __HYBRID_STAILQ_LAST_P_3(self, T, getpath)                                                                         __HYBRID_STAILQ_LAST_P(self, T, getpath)
+#define __HYBRID_STAILQ_P_PREV_2(p_elem, self, key)                                                                        __HYBRID_STAILQ_P_PREV3(p_elem, self, __typeof__(*(elem)), key)
+#define __HYBRID_STAILQ_P_PREV_3(p_elem, self, type, key)                                                                  __HYBRID_STAILQ_P_PREV3(p_elem, self, __HYBRID_Q_STRUCT type, key)
+#define __HYBRID_STAILQ_P_PREV_P_2(p_elem, self, getpath)                                                                  __HYBRID_STAILQ_P_PREV4(p_elem, self, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_P_PREV_P_3(p_elem, self, T, getpath)                                                               __HYBRID_STAILQ_P_PREV4(p_elem, self, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_P_PREV_UNSAFE_2(p_elem, key)                                                                       __HYBRID_STAILQ_P_PREV_UNSAFE3(p_elem, __typeof__(*(elem)), key)
+#define __HYBRID_STAILQ_P_PREV_UNSAFE_3(p_elem, type, key)                                                                 __HYBRID_STAILQ_P_PREV_UNSAFE3(p_elem, __HYBRID_Q_STRUCT type, key)
+#define __HYBRID_STAILQ_P_PREV_UNSAFE_P_2(p_elem, getpath)                                                                 __HYBRID_STAILQ_P_PREV_UNSAFE4(p_elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_STAILQ_P_PREV_UNSAFE_P_3(p_elem, T, getpath)                                                              __HYBRID_STAILQ_P_PREV_UNSAFE4(p_elem, T, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_STAILQ_P_REPLACE_4(self, p_old_elem, new_elem, key)                                                       __HYBRID_STAILQ_P_REPLACE(self, p_old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
 #define __HYBRID_STAILQ_P_REPLACE_P_4(self, p_old_elem, new_elem, getpath)                                                 __HYBRID_STAILQ_P_REPLACE(self, p_old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
 #define __HYBRID_STAILQ_P_REPLACE_P_5(self, p_old_elem, new_elem, T, getpath)                                              __HYBRID_STAILQ_P_REPLACE(self, p_old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
@@ -1337,6 +1345,10 @@
 #define STAILQ_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* STAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
 #define STAILQ_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* STAILQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
 #define STAILQ_LAST_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)              /* STAILQ_LAST_P(self, [T], getpath) */
+#define STAILQ_P_PREV(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_PREV_, (__VA_ARGS__))(__VA_ARGS__)              /* STAILQ_P_PREV(p_elem, self, [type], key) */
+#define STAILQ_P_PREV_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)            /* STAILQ_P_PREV_P(p_elem, self, [T], getpath) */
+#define STAILQ_P_PREV_UNSAFE(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_PREV_UNSAFE_, (__VA_ARGS__))(__VA_ARGS__)       /* STAILQ_P_PREV_UNSAFE(p_elem, [type], key) */
+#define STAILQ_P_PREV_UNSAFE_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_PREV_UNSAFE_P_, (__VA_ARGS__))(__VA_ARGS__)     /* STAILQ_P_PREV_UNSAFE_P(p_elem, [T], getpath) */
 #define STAILQ_P_REPLACE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)           /* STAILQ_P_REPLACE(self, p_old_elem, new_elem, [type], key) */
 #define STAILQ_P_REPLACE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_P_REPLACE_P(self, p_old_elem, new_elem, [T], getpath) */
 #define STAILQ_P_REPLACE_R(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_STAILQ_P_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)         /* STAILQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
@@ -1365,6 +1377,10 @@
 #define STAILQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                                                   __HYBRID_STAILQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define STAILQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                                                        __HYBRID_STAILQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define STAILQ_LAST_P(self, T, getpath)                                                                         __HYBRID_STAILQ_LAST_P(self, T, getpath)
+#define STAILQ_P_PREV(p_elem, self, T, key)                                                                     __HYBRID_STAILQ_P_PREV3(p_elem, self, __HYBRID_Q_STRUCT type, key)
+#define STAILQ_P_PREV_P(p_elem, self, T, getpath)                                                               __HYBRID_STAILQ_P_PREV4(p_elem, self, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define STAILQ_P_PREV_UNSAFE(p_elem, T, key)                                                                    __HYBRID_STAILQ_P_PREV_UNSAFE3(p_elem, __HYBRID_Q_STRUCT type, key)
+#define STAILQ_P_PREV_UNSAFE_P(p_elem, T, getpath)                                                              __HYBRID_STAILQ_P_PREV_UNSAFE4(p_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #define STAILQ_P_REPLACE(self, p_old_elem, new_elem, type, key)                                                 __HYBRID_STAILQ_P_REPLACE(self, p_old_elem, new_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #define STAILQ_P_REPLACE_P(self, p_old_elem, new_elem, T, getpath)                                              __HYBRID_STAILQ_REPLACE(self, p_old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
 #define STAILQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, type, key)               __HYBRID_STAILQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -1390,6 +1406,14 @@
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
+#define __HYBRID_STAILQ_P_PREV3(p_elem, self, T, key) \
+	((p_elem) == &(self)->stqh_first ? __NULLPTR : __COMPILER_CONTAINER_OF(p_elem, T, key.stqe_next))
+#define __HYBRID_STAILQ_P_PREV4(p_elem, self, T, X, _) \
+	((p_elem) == &(self)->stqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&X(_, (T *)0).stqe_next))
+#define __HYBRID_STAILQ_P_PREV_UNSAFE3(p_elem, T, key) \
+	__COMPILER_CONTAINER_OF(p_elem, T, key.stqe_next)
+#define __HYBRID_STAILQ_P_PREV_UNSAFE4(p_elem, T, X, _) \
+	((T *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&X(_, (T *)0).stqe_next))
 #define __HYBRID_STAILQ_SWAP(l1, l2, T)          \
 	/* Sorry, this one must be a statement */    \
 	do {                                         \
@@ -1738,6 +1762,14 @@
 #define __HYBRID_SIMPLEQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                                                        __HYBRID_SIMPLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define __HYBRID_SIMPLEQ_LAST_P_2(self, getpath)                                                                            __HYBRID_SIMPLEQ_LAST_P(self, __typeof__(*(self)->sqh_first), getpath)
 #define __HYBRID_SIMPLEQ_LAST_P_3(self, T, getpath)                                                                         __HYBRID_SIMPLEQ_LAST_P(self, T, getpath)
+#define __HYBRID_SIMPLEQ_P_PREV_2(p_elem, self, key)                                                                        __HYBRID_SIMPLEQ_P_PREV3(p_elem, self, __typeof__(*(elem)), key)
+#define __HYBRID_SIMPLEQ_P_PREV_3(p_elem, self, type, key)                                                                  __HYBRID_SIMPLEQ_P_PREV3(p_elem, self, __HYBRID_Q_STRUCT type, key)
+#define __HYBRID_SIMPLEQ_P_PREV_P_2(p_elem, self, getpath)                                                                  __HYBRID_SIMPLEQ_P_PREV4(p_elem, self, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_P_PREV_P_3(p_elem, self, T, getpath)                                                               __HYBRID_SIMPLEQ_P_PREV4(p_elem, self, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_P_PREV_UNSAFE_2(p_elem, key)                                                                       __HYBRID_SIMPLEQ_P_PREV_UNSAFE3(p_elem, __typeof__(*(elem)), key)
+#define __HYBRID_SIMPLEQ_P_PREV_UNSAFE_3(p_elem, type, key)                                                                 __HYBRID_SIMPLEQ_P_PREV_UNSAFE3(p_elem, __HYBRID_Q_STRUCT type, key)
+#define __HYBRID_SIMPLEQ_P_PREV_UNSAFE_P_2(p_elem, getpath)                                                                 __HYBRID_SIMPLEQ_P_PREV_UNSAFE4(p_elem, __typeof__(*(elem)), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_SIMPLEQ_P_PREV_UNSAFE_P_3(p_elem, T, getpath)                                                              __HYBRID_SIMPLEQ_P_PREV_UNSAFE4(p_elem, T, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_SIMPLEQ_P_REPLACE_4(self, p_old_elem, new_elem, key)                                                       __HYBRID_SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_KEY, key)
 #define __HYBRID_SIMPLEQ_P_REPLACE_P_4(self, p_old_elem, new_elem, getpath)                                                 __HYBRID_SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, __typeof__(*(old_elem)), __HYBRID_Q_PTH, getpath)
 #define __HYBRID_SIMPLEQ_P_REPLACE_P_5(self, p_old_elem, new_elem, T, getpath)                                              __HYBRID_SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
@@ -1786,6 +1818,10 @@
 #define SIMPLEQ_FOREACH_FROM_SAFE_P(...) __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__) /* SIMPLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
 #define SIMPLEQ_FOREACH_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* SIMPLEQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
 #define SIMPLEQ_LAST_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_LAST_P_, (__VA_ARGS__))(__VA_ARGS__)              /* SIMPLEQ_LAST_P(self, [T], getpath) */
+#define SIMPLEQ_P_PREV(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_PREV_, (__VA_ARGS__))(__VA_ARGS__)              /* SIMPLEQ_P_PREV(p_elem, self, [type], key) */
+#define SIMPLEQ_P_PREV_P(...)            __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_PREV_P_, (__VA_ARGS__))(__VA_ARGS__)            /* SIMPLEQ_P_PREV_P(p_elem, self, [T], getpath) */
+#define SIMPLEQ_P_PREV_UNSAFE(...)       __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_PREV_UNSAFE_, (__VA_ARGS__))(__VA_ARGS__)       /* SIMPLEQ_P_PREV_UNSAFE(p_elem, [type], key) */
+#define SIMPLEQ_P_PREV_UNSAFE_P(...)     __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_PREV_UNSAFE_P_, (__VA_ARGS__))(__VA_ARGS__)     /* SIMPLEQ_P_PREV_UNSAFE_P(p_elem, [T], getpath) */
 #define SIMPLEQ_P_REPLACE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_, (__VA_ARGS__))(__VA_ARGS__)           /* SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, [type], key) */
 #define SIMPLEQ_P_REPLACE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_P_REPLACE_P(self, p_old_elem, new_elem, [T], getpath) */
 #define SIMPLEQ_P_REPLACE_R(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_SIMPLEQ_P_REPLACE_R_, (__VA_ARGS__))(__VA_ARGS__)         /* SIMPLEQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key) */
@@ -1815,6 +1851,10 @@
 #define SIMPLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                                                   __HYBRID_SIMPLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define SIMPLEQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                                                        __HYBRID_SIMPLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define SIMPLEQ_LAST_P(self, T, getpath)                                                                         __HYBRID_SIMPLEQ_LAST_P(self, T, getpath)
+#define SIMPLEQ_P_PREV(p_elem, self, T, key)                                                                     __HYBRID_SIMPLEQ_P_PREV3(p_elem, self, __HYBRID_Q_STRUCT type, key)
+#define SIMPLEQ_P_PREV_P(p_elem, self, T, getpath)                                                               __HYBRID_SIMPLEQ_P_PREV4(p_elem, self, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
+#define SIMPLEQ_P_PREV_UNSAFE(p_elem, T, key)                                                                    __HYBRID_SIMPLEQ_P_PREV_UNSAFE3(p_elem, __HYBRID_Q_STRUCT type, key)
+#define SIMPLEQ_P_PREV_UNSAFE_P(p_elem, T, getpath)                                                              __HYBRID_SIMPLEQ_P_PREV_UNSAFE4(p_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, type, key)                                                 __HYBRID_SIMPLEQ_P_REPLACE(self, p_old_elem, new_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
 #define SIMPLEQ_P_REPLACE_P(self, p_old_elem, new_elem, T, getpath)                                              __HYBRID_SIMPLEQ_REPLACE(self, p_old_elem, new_elem, T, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, type, key)               __HYBRID_SIMPLEQ_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -1840,6 +1880,14 @@
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
+#define __HYBRID_SIMPLEQ_P_PREV3(p_elem, self, T, key) \
+	((p_elem) == &(self)->sqh_first ? __NULLPTR : __COMPILER_CONTAINER_OF(p_elem, T, key.sqe_next))
+#define __HYBRID_SIMPLEQ_P_PREV4(p_elem, self, T, X, _) \
+	((p_elem) == &(self)->sqh_first ? __NULLPTR : (T *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&X(_, (T *)0).sqe_next))
+#define __HYBRID_SIMPLEQ_P_PREV_UNSAFE3(p_elem, T, key) \
+	__COMPILER_CONTAINER_OF(p_elem, T, key.sqe_next)
+#define __HYBRID_SIMPLEQ_P_PREV_UNSAFE4(p_elem, T, X, _) \
+	((T *)((__SIZE_TYPE__)(p_elem) - (__SIZE_TYPE__)&X(_, (T *)0).sqe_next))
 #define __HYBRID_SIMPLEQ_SWAP(l1, l2, T)       \
 	/* Sorry, this one must be a statement */  \
 	do {                                       \
