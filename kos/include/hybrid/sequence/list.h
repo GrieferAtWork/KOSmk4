@@ -54,7 +54,7 @@
  * [1 1 1 1 1   1  ]  CODE [*]_HEAD_INITIALIZER(self)
  * [1 1 1 1 1   1  ]  void [*]_INIT(self)
  * [          1    ]  void [*]_INIT(elem, key)
- * [  1 1          ]  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
+ * [  1 1       1  ]  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
  * [1     1        ]  void [*]_MOVE(dst, src, key)                            (C++-style move-constructor)
  * [  1 1          ]  void [*]_SWAP(l1, l2, [type])                           (C++-style std::swap())
  * [1     1        ]  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
@@ -2924,6 +2924,7 @@
 #define DLIST_INSERT_HEAD_P(self, elem, getpath)                                             __HYBRID_DLIST_INSERT_HEAD(self, elem, __HYBRID_Q_PTH, getpath)
 #define DLIST_INSERT_HEAD_R(self, lo_elem, hi_elem, key)                                     __HYBRID_DLIST_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define DLIST_INSERT_HEAD_R_P(self, lo_elem, hi_elem, getpath)                               __HYBRID_DLIST_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define DLIST_MOVE(dst, src)                                                                 (void)((dst)->dlh_first = (src)->dlh_first, (src)->dlh_first = __NULLPTR)
 #define DLIST_NEXT(elem, key)                                                                (elem)->key.dle_next
 #define DLIST_NEXT_P(elem, getpath)                                                          getpath(elem).dle_next
 #define DLIST_PREV(elem, key)                                                                (elem)->key.dle_prev
@@ -3217,8 +3218,7 @@
 //TODO:#define CIRCLEQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define CIRCLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
-//TODO:#define DLIST_MOVE(dst, src, key)
-//TODO:#define DLIST_SWAP(l1, l2, [type], key)
+//TODO:#define DLIST_SWAP(l1, l2, [type])
 //TODO:#define DLIST_REMOVE_HEAD(self, key)
 //TODO:#define DLIST_REMOVE_AFTER(elem, key)
 //TODO:*_REMOVE_TAIL() ?
