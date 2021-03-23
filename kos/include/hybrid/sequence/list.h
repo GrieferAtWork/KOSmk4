@@ -548,109 +548,109 @@
 #define __HYBRID_LIST_INSERT_TAIL_R(self, lo_elem, hi_elem, T, X, _) \
 	/* Sorry, this one must be a statement */                        \
 	do {                                                             \
-		T **__piter = &(self)->lh_first;                             \
-		while (*__piter != __NULLPTR)                                \
-			__piter = &X(_, *__piter).le_next;                       \
-		*(X(_, lo_elem).le_prev = __piter) = (lo_elem);              \
+		T **__hlitr_piter = &(self)->lh_first;                       \
+		while (*__hlitr_piter != __NULLPTR)                          \
+			__hlitr_piter = &X(_, *__hlitr_piter).le_next;           \
+		*(X(_, lo_elem).le_prev = __hlitr_piter) = (lo_elem);        \
 		X(_, hi_elem).le_next              = __NULLPTR;              \
 	}	__WHILE0
-#define __HYBRID_LIST_REMOVE_IF(self, out_pelem, T, X, _, condition) \
-	/* Sorry, this one must be a statement */                        \
-	do {                                                             \
-		T **__piter = &(self)->lh_first;                             \
-		for (;;) {                                                   \
-			*(out_pelem) = *__piter;                                 \
-			if (condition)                                           \
-				break;                                               \
-			__piter = &X(_, *(out_pelem)).le_next;                   \
-		}                                                            \
-		if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)    \
-			X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;      \
-		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);               \
-		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_prev);               \
+#define __HYBRID_LIST_REMOVE_IF(self, out_pelem, T, X, _, condition)   \
+	/* Sorry, this one must be a statement */                          \
+	do {                                                               \
+		T **__hlri_piter = &(self)->lh_first;                          \
+		for (;;) {                                                     \
+			*(out_pelem) = *__hlri_piter;                              \
+			if (condition)                                             \
+				break;                                                 \
+			__hlri_piter = &X(_, *(out_pelem)).le_next;                \
+		}                                                              \
+		if ((*__hlri_piter = X(_, *(out_pelem)).le_next) != __NULLPTR) \
+			X(_, X(_, *(out_pelem)).le_next).le_prev = __hlri_piter;   \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                 \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_prev);                 \
 	}	__WHILE0
 #define __HYBRID_LIST_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
 	/* Sorry, this one must be a statement */                                       \
 	do {                                                                            \
-		T **__piter = &(self)->lh_first;                                            \
+		T **__hltri_piter = &(self)->lh_first;                                      \
 		for (;;) {                                                                  \
-			if ((*(out_pelem) = *__piter) == __NULLPTR) {                           \
+			if ((*(out_pelem) = *__hltri_piter) == __NULLPTR) {                     \
 				on_failure;                                                         \
 				break;                                                              \
 			}                                                                       \
 			if (condition) {                                                        \
-				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)           \
-					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;             \
+				if ((*__hltri_piter = X(_, *(out_pelem)).le_next) != __NULLPTR)     \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __hltri_piter;       \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                      \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_prev);                      \
 				break;                                                              \
 			}                                                                       \
-			__piter = &X(_, *(out_pelem)).le_next;                                  \
+			__hltri_piter = &X(_, *(out_pelem)).le_next;                            \
 		}                                                                           \
 	}	__WHILE0
-#define __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, X, _, condition) \
-	/* Sorry, this one must be a statement */                        \
-	do {                                                             \
-		T **__piter = &(self)->lh_first;                             \
-		for (;;) {                                                   \
-			*(out_pelem) = *__piter;                                 \
-			if (condition)                                           \
-				break;                                               \
-			__piter = &X(_, *(out_pelem)).le_next;                   \
-		}                                                            \
-		if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)    \
-			X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;      \
-		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);               \
-		X(_, *(out_pelem)).le_prev = __NULLPTR;                      \
+#define __HYBRID_LIST_UNBIND_IF(self, out_pelem, T, X, _, condition)   \
+	/* Sorry, this one must be a statement */                          \
+	do {                                                               \
+		T **__hlui_piter = &(self)->lh_first;                          \
+		for (;;) {                                                     \
+			*(out_pelem) = *__hlui_piter;                              \
+			if (condition)                                             \
+				break;                                                 \
+			__hlui_piter = &X(_, *(out_pelem)).le_next;                \
+		}                                                              \
+		if ((*__hlui_piter = X(_, *(out_pelem)).le_next) != __NULLPTR) \
+			X(_, X(_, *(out_pelem)).le_next).le_prev = __hlui_piter;   \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                 \
+		X(_, *(out_pelem)).le_prev = __NULLPTR;                        \
 	}	__WHILE0
 #define __HYBRID_LIST_TRYUNBIND_IF(self, out_pelem, T, X, _, condition, on_failure) \
 	/* Sorry, this one must be a statement */                                       \
 	do {                                                                            \
-		T **__piter = &(self)->lh_first;                                            \
+		T **__hltui_piter = &(self)->lh_first;                                      \
 		for (;;) {                                                                  \
-			if ((*(out_pelem) = *__piter) == __NULLPTR) {                           \
+			if ((*(out_pelem) = *__hltui_piter) == __NULLPTR) {                     \
 				on_failure;                                                         \
 				break;                                                              \
 			}                                                                       \
 			if (condition) {                                                        \
-				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)           \
-					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;             \
+				if ((*__hltui_piter = X(_, *(out_pelem)).le_next) != __NULLPTR)     \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __hltui_piter;       \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                      \
 				X(_, *(out_pelem)).le_prev = __NULLPTR;                             \
 				break;                                                              \
 			}                                                                       \
-			__piter = &X(_, *(out_pelem)).le_next;                                  \
+			__hltui_piter = &X(_, *(out_pelem)).le_next;                            \
 		}                                                                           \
 	}	__WHILE0
 #define __HYBRID_LIST_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
 	/* Sorry, this one must be a statement */                                  \
 	do {                                                                       \
-		T **__piter = &(self)->lh_first;                                       \
-		while ((*(out_pelem) = *__piter) != __NULLPTR) {                       \
+		T **__hlra_piter = &(self)->lh_first;                                  \
+		while ((*(out_pelem) = *__hlra_piter) != __NULLPTR) {                  \
 			if (condition) {                                                   \
-				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)      \
-					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;        \
+				if ((*__hlra_piter = X(_, *(out_pelem)).le_next) != __NULLPTR) \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __hlra_piter;   \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                 \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_prev);                 \
 				on_match;                                                      \
 			} else {                                                           \
-				__piter = &X(_, *(out_pelem)).le_next;                         \
+				__hlra_piter = &X(_, *(out_pelem)).le_next;                    \
 			}                                                                  \
 		}                                                                      \
 	}	__WHILE0
 #define __HYBRID_LIST_UNBINDALL(self, out_pelem, T, X, _, condition, on_match) \
 	/* Sorry, this one must be a statement */                                  \
 	do {                                                                       \
-		T **__piter = &(self)->lh_first;                                       \
-		while ((*(out_pelem) = *__piter) != __NULLPTR) {                       \
+		T **__hlua_piter = &(self)->lh_first;                                  \
+		while ((*(out_pelem) = *__hlua_piter) != __NULLPTR) {                  \
 			if (condition) {                                                   \
-				if ((*__piter = X(_, *(out_pelem)).le_next) != __NULLPTR)      \
-					X(_, X(_, *(out_pelem)).le_next).le_prev = __piter;        \
+				if ((*__hlua_piter = X(_, *(out_pelem)).le_next) != __NULLPTR) \
+					X(_, X(_, *(out_pelem)).le_next).le_prev = __hlua_piter;   \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).le_next);                 \
 				X(_, *(out_pelem)).le_prev = __NULLPTR;                        \
 				on_match;                                                      \
 			} else {                                                           \
-				__piter = &X(_, *(out_pelem)).le_next;                         \
+				__hlua_piter = &X(_, *(out_pelem)).le_next;                    \
 			}                                                                  \
 		}                                                                      \
 	}	__WHILE0
@@ -968,50 +968,50 @@
 #endif /* !NDEBUG */
 #define __HYBRID_SLIST_REMOVE_AFTER(elem, X, _) \
 	(void)(X(_, elem).sle_next = X(_, X(_, elem).sle_next).sle_next)
-#define __HYBRID_SLIST_REMOVE(self, elem, T, X, _) \
-	/* Sorry, this one must be a statement */      \
-	do {                                           \
-		T **__piter = &(self)->slh_first;          \
-		while (*__piter != (elem))                 \
-			__piter = &X(_, *__piter).sle_next;    \
-		*__piter = X(_, elem).sle_next;            \
-		__HYBRID_Q_BADPTR(X(_, elem).sle_next);    \
+#define __HYBRID_SLIST_REMOVE(self, elem, T, X, _)        \
+	/* Sorry, this one must be a statement */             \
+	do {                                                  \
+		T **__hslr_piter = &(self)->slh_first;            \
+		while (*__hslr_piter != (elem))                   \
+			__hslr_piter = &X(_, *__hslr_piter).sle_next; \
+		*__hslr_piter = X(_, elem).sle_next;              \
+		__HYBRID_Q_BADPTR(X(_, elem).sle_next);           \
 	}	__WHILE0
 #define __HYBRID_SLIST_REPLACE(self, old_elem, new_elem, T, X, _) \
 	__HYBRID_SLIST_REPLACE_R(self, old_elem, old_elem, new_elem, new_elem, T, X, _)
 #define __HYBRID_SLIST_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, X, _) \
 	/* Sorry, this one must be a statement */                                                       \
 	do {                                                                                            \
-		T **__piter = &(self)->slh_first;                                                           \
-		while (*__piter != (old_lo_elem))                                                           \
-			__piter = &X(_, *__piter).sle_next;                                                     \
+		T **__hslrr_piter = &(self)->slh_first;                                                     \
+		while (*__hslrr_piter != (old_lo_elem))                                                     \
+			__hslrr_piter = &X(_, *__hslrr_piter).sle_next;                                         \
 		X(_, new_hi_elem).sle_next = X(_, old_hi_elem).sle_next;                                    \
-		*__piter                   = (new_lo_elem);                                                 \
+		*__hslrr_piter                   = (new_lo_elem);                                           \
 		__HYBRID_Q_BADPTR(X(_, old_hi_elem).sle_next);                                              \
 	}	__WHILE0
-#define __HYBRID_SLIST_TRYREMOVE(self, elem, T, X, _, on_failure) \
-	/* Sorry, this one must be a statement */                     \
-	do {                                                          \
-		T **__piter = &(self)->slh_first;                         \
-		while (*__piter != __NULLPTR && *__piter != (elem))       \
-			__piter = &X(_, *__piter).sle_next;                   \
-		if (*__piter != __NULLPTR) {                              \
-			*__piter = X(_, elem).sle_next;                       \
-			__HYBRID_Q_BADPTR(X(_, elem).sle_next);               \
-		} else {                                                  \
-			on_failure;                                           \
-		}                                                         \
+#define __HYBRID_SLIST_TRYREMOVE(self, elem, T, X, _, on_failure)       \
+	/* Sorry, this one must be a statement */                           \
+	do {                                                                \
+		T **__hsltr_piter = &(self)->slh_first;                         \
+		while (*__hsltr_piter != __NULLPTR && *__hsltr_piter != (elem)) \
+			__hsltr_piter = &X(_, *__hsltr_piter).sle_next;             \
+		if (*__hsltr_piter != __NULLPTR) {                              \
+			*__hsltr_piter = X(_, elem).sle_next;                       \
+			__HYBRID_Q_BADPTR(X(_, elem).sle_next);                     \
+		} else {                                                        \
+			on_failure;                                                 \
+		}                                                               \
 	}	__WHILE0
 #define __HYBRID_SLIST_CONTAINS(self, elem, T, X, _, on_success) \
 	/* Sorry, this one must be a statement */                    \
 	do {                                                         \
-		T *__iter = (self)->slh_first;                           \
-		while (__iter != __NULLPTR) {                            \
-			if (__iter == (elem)) {                              \
+		T *__hslc_iter = (self)->slh_first;                      \
+		while (__hslc_iter != __NULLPTR) {                       \
+			if (__hslc_iter == (elem)) {                         \
 				on_success;                                      \
 				break;                                           \
 			}                                                    \
-			__iter = X(_, __iter).sle_next;                      \
+			__hslc_iter = X(_, __hslc_iter).sle_next;            \
 		}                                                        \
 	}	__WHILE0
 #define __HYBRID_SLIST_TRYREPLACE(self, old_elem, new_elem, T, X, _, on_failure) \
@@ -1019,15 +1019,15 @@
 #define __HYBRID_SLIST_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, X, _, on_failure) \
 	/* Sorry, this one must be a statement */                                                                      \
 	do {                                                                                                           \
-		T **__piter = &(self)->slh_first;                                                                          \
+		T **__hsltrr_piter = &(self)->slh_first;                                                                   \
 		for (;;) {                                                                                                 \
-			if (*__piter == __NULLPTR) {                                                                           \
+			if (*__hsltrr_piter == __NULLPTR) {                                                                    \
 				on_failure;                                                                                        \
 				break;                                                                                             \
 			}                                                                                                      \
-			if (*__piter == (old_lo_elem)) {                                                                       \
+			if (*__hsltrr_piter == (old_lo_elem)) {                                                                \
 				X(_, new_hi_elem).sle_next = X(_, old_hi_elem).sle_next;                                           \
-				*__piter                   = (new_lo_elem);                                                        \
+				*__hsltrr_piter            = (new_lo_elem);                                                        \
 				__HYBRID_Q_BADPTR(X(_, old_hi_elem).sle_next);                                                     \
 				break;                                                                                             \
 			}                                                                                                      \
@@ -1038,53 +1038,53 @@
 #define __HYBRID_SLIST_INSERT_TAIL_R(self, lo_elem, hi_elem, T, X, _) \
 	/* Sorry, this one must be a statement */                         \
 	do {                                                              \
-		T **__piter = &(self)->slh_first;                             \
-		while (*__piter != __NULLPTR)                                 \
-			__piter = &X(_, *__piter).sle_next;                       \
-		*__piter              = (lo_elem);                            \
+		T **__hslitr_piter = &(self)->slh_first;                      \
+		while (*__hslitr_piter != __NULLPTR)                          \
+			__hslitr_piter = &X(_, *__hslitr_piter).sle_next;         \
+		*__hslitr_piter              = (lo_elem);                     \
 		X(_, hi_elem).le_next = __NULLPTR;                            \
 	}	__WHILE0
 #define __HYBRID_SLIST_REMOVE_IF(self, out_pelem, T, X, _, condition) \
 	/* Sorry, this one must be a statement */                         \
 	do {                                                              \
-		T **__piter = &(self)->slh_first;                             \
+		T **__hslri_piter = &(self)->slh_first;                       \
 		for (;;) {                                                    \
-			*(out_pelem) = *__piter;                                  \
+			*(out_pelem) = *__hslri_piter;                            \
 			if (condition)                                            \
 				break;                                                \
-			__piter = &X(_, *(out_pelem)).sle_next;                   \
+			__hslri_piter = &X(_, *(out_pelem)).sle_next;             \
 		}                                                             \
-		*__piter = X(_, *(out_pelem)).sle_next;                       \
+		*__hslri_piter = X(_, *(out_pelem)).sle_next;                 \
 		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).sle_next);               \
 	}	__WHILE0
 #define __HYBRID_SLIST_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
 	/* Sorry, this one must be a statement */                                        \
 	do {                                                                             \
-		T **__piter = &(self)->slh_first;                                            \
+		T **__hsltri_piter = &(self)->slh_first;                                     \
 		for (;;) {                                                                   \
-			if ((*(out_pelem) = *__piter) == __NULLPTR) {                            \
+			if ((*(out_pelem) = *__hsltri_piter) == __NULLPTR) {                     \
 				on_failure;                                                          \
 				break;                                                               \
 			}                                                                        \
 			if (condition) {                                                         \
-				*__piter = X(_, *(out_pelem)).sle_next;                              \
+				*__hsltri_piter = X(_, *(out_pelem)).sle_next;                       \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).sle_next);                      \
 				break;                                                               \
 			}                                                                        \
-			__piter = &X(_, *(out_pelem)).sle_next;                                  \
+			__hsltri_piter = &X(_, *(out_pelem)).sle_next;                           \
 		}                                                                            \
 	}	__WHILE0
 #define __HYBRID_SLIST_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
 	/* Sorry, this one must be a statement */                                   \
 	do {                                                                        \
-		T **__piter = &(self)->slh_first;                                       \
-		while ((*(out_pelem) = *__piter) != __NULLPTR) {                        \
+		T **__hslra_piter = &(self)->slh_first;                                 \
+		while ((*(out_pelem) = *__hslra_piter) != __NULLPTR) {                  \
 			if (condition) {                                                    \
-				*__piter = X(_, *(out_pelem)).sle_next;                         \
+				*__hslra_piter = X(_, *(out_pelem)).sle_next;                   \
 				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).sle_next);                 \
 				on_match;                                                       \
 			} else {                                                            \
-				__piter = &X(_, *(out_pelem)).sle_next;                         \
+				__hslra_piter = &X(_, *(out_pelem)).sle_next;                   \
 			}                                                                   \
 		}                                                                       \
 	}	__WHILE0
@@ -1391,8 +1391,8 @@
 #define __HYBRID_STAILQ_SWAP(l1, l2, T)          \
 	/* Sorry, this one must be a statement */    \
 	do {                                         \
-		T *__hstqs_first = (l1)->stqh_first;     \
-		T **__hstqs_last = (l1)->stqh_last;      \
+		T *__hstqs_first = (l1)->stqh_first,     \
+		  **__hstqs_last = (l1)->stqh_last;      \
 		(l1)->stqh_first = (l2)->stqh_first;     \
 		(l1)->stqh_last  = (l2)->stqh_last;      \
 		(l2)->stqh_first = __hstqs_first;        \
@@ -1437,25 +1437,25 @@
 	(STAILQ_EMPTY(self) ? __NULLPTR : __COMPILER_CONTAINER_OF((head)->stqh_last, T, key.stqe_next))
 #define __HYBRID_STAILQ_LAST_P(self, T, getpath) \
 	(STAILQ_EMPTY(self) ? __NULLPTR : ((T *)((__SIZE_TYPE__)(head)->stqh_last - (__SIZE_TYPE__)&X(_, (T *)0).stqe_next)))
-#define __HYBRID_STAILQ_REMOVE(self, elem, T, X, _)         \
-	/* Sorry, this one must be a statement */               \
-	do {                                                    \
-		T **__piter = &(self)->stqh_first;                  \
-		while (*__piter != (elem))                          \
-			__piter = &X(_, *__piter).stqe_next;            \
-		if ((*__piter = X(_, elem).stqe_next) == __NULLPTR) \
-			(self)->stqh_last = __piter;                    \
-		__HYBRID_Q_BADPTR(X(_, elem).stqe_next);            \
+#define __HYBRID_STAILQ_REMOVE(self, elem, T, X, _)               \
+	/* Sorry, this one must be a statement */                     \
+	do {                                                          \
+		T **__hstqr_piter = &(self)->stqh_first;                  \
+		while (*__hstqr_piter != (elem))                          \
+			__hstqr_piter = &X(_, *__hstqr_piter).stqe_next;      \
+		if ((*__hstqr_piter = X(_, elem).stqe_next) == __NULLPTR) \
+			(self)->stqh_last = __hstqr_piter;                    \
+		__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                  \
 	}	__WHILE0
 #define __HYBRID_STAILQ_REPLACE(self, old_elem, new_elem, T, X, _) \
 	__HYBRID_STAILQ_REPLACE_R(self, old_elem, old_elem, new_elem, new_elem, T, X, _)
 #define __HYBRID_STAILQ_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, X, _) \
 	/* Sorry, this one must be a statement */                                                        \
 	do {                                                                                             \
-		T **__piter = &(self)->stqh_first;                                                           \
-		while (*__piter != (old_lo_elem))                                                            \
-			__piter = &X(_, *__piter).stqe_next;                                                     \
-		*__piter = (new_lo_elem);                                                                    \
+		T **__hstqrr_piter = &(self)->stqh_first;                                                    \
+		while (*__hstqrr_piter != (old_lo_elem))                                                     \
+			__hstqrr_piter = &X(_, *__hstqrr_piter).stqe_next;                                       \
+		*__hstqrr_piter = (new_lo_elem);                                                             \
 		if ((X(_, new_hi_elem).stqe_next = X(_, old_hi_elem).stqe_next) == __NULLPTR)                \
 			(self)->stqh_last = &X(_, new_hi_elem).stqe_next;                                        \
 		__HYBRID_Q_BADPTR(X(_, old_hi_elem).stqe_next);                                              \
@@ -1468,34 +1468,34 @@
 	       ? (void)((self)->stqh_last = &X(_, new_hi_elem).stqe_next)                                    \
 	       : (void)0,                                                                                    \
 	       __HYBRID_Q_BADPTR(X(_, old_hi_elem).stqe_next))
-#define __HYBRID_STAILQ_TRYREMOVE(self, elem, T, X, _, on_failure)  \
-	/* Sorry, this one must be a statement */                       \
-	do {                                                            \
-		T **__piter = &(self)->stqh_first;                          \
-		for (;;) {                                                  \
-			if (*__piter == __NULLPTR) {                            \
-				on_failure;                                         \
-				break;                                              \
-			}                                                       \
-			if (*__piter == (elem)) {                               \
-				if ((*__piter = X(_, elem).stqe_next) == __NULLPTR) \
-					(self)->stqh_last = __piter;                    \
-				__HYBRID_Q_BADPTR(X(_, elem).stqe_next);            \
-				break;                                              \
-			}                                                       \
-			__piter = &X(_, *__piter).stqe_next;                    \
-		}                                                           \
+#define __HYBRID_STAILQ_TRYREMOVE(self, elem, T, X, _, on_failure)         \
+	/* Sorry, this one must be a statement */                              \
+	do {                                                                   \
+		T **__hstqtr_piter = &(self)->stqh_first;                          \
+		for (;;) {                                                         \
+			if (*__hstqtr_piter == __NULLPTR) {                            \
+				on_failure;                                                \
+				break;                                                     \
+			}                                                              \
+			if (*__hstqtr_piter == (elem)) {                               \
+				if ((*__hstqtr_piter = X(_, elem).stqe_next) == __NULLPTR) \
+					(self)->stqh_last = __hstqtr_piter;                    \
+				__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                   \
+				break;                                                     \
+			}                                                              \
+			__hstqtr_piter = &X(_, *__hstqtr_piter).stqe_next;             \
+		}                                                                  \
 	}	__WHILE0
 #define __HYBRID_STAILQ_CONTAINS(self, elem, T, X, _, on_success) \
 	/* Sorry, this one must be a statement */                     \
 	do {                                                          \
-		T *__iter = (self)->stqh_first;                           \
-		while (__iter != __NULLPTR) {                             \
-			if (__iter == (elem)) {                               \
+		T *__hstqc_iter = (self)->stqh_first;                     \
+		while (__hstqc_iter != __NULLPTR) {                       \
+			if (__hstqc_iter == (elem)) {                         \
 				on_success;                                       \
 				break;                                            \
 			}                                                     \
-			__iter = X(_, __iter).stqe_next;                      \
+			__hstqc_iter = X(_, __hstqc_iter).stqe_next;          \
 		}                                                         \
 	}	__WHILE0
 #define __HYBRID_STAILQ_TRYREPLACE(self, old_elem, new_elem, T, X, _, on_failure) \
@@ -1503,64 +1503,64 @@
 #define __HYBRID_STAILQ_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, X, _, on_failure) \
 	/* Sorry, this one must be a statement */                                                                       \
 	do {                                                                                                            \
-		T **__piter = &(self)->stqh_first;                                                                          \
+		T **__hstqtrr_piter = &(self)->stqh_first;                                                                  \
 		for (;;) {                                                                                                  \
-			if (*__piter == __NULLPTR)                                                                              \
+			if (*__hstqtrr_piter == __NULLPTR)                                                                      \
 				break;                                                                                              \
-			if (*__piter == (old_lo_elem)) {                                                                        \
-				*__piter = (new_lo_elem);                                                                           \
+			if (*__hstqtrr_piter == (old_lo_elem)) {                                                                \
+				*__hstqtrr_piter = (new_lo_elem);                                                                   \
 				if ((X(_, new_hi_elem).stqe_next = X(_, old_hi_elem).stqe_next) == __NULLPTR)                       \
 					(self)->stqh_last = &X(_, new_hi_elem).stqe_next;                                               \
 				__HYBRID_Q_BADPTR(X(_, old_hi_elem).stqe_next);                                                     \
 				break;                                                                                              \
 			}                                                                                                       \
-			__piter = &X(_, *__piter).stqe_next;                                                                    \
+			__hstqtrr_piter = &X(_, *__hstqtrr_piter).stqe_next;                                                    \
 		}                                                                                                           \
 	}	__WHILE0
 #define __HYBRID_STAILQ_REMOVE_IF(self, out_pelem, T, X, _, condition) \
 	/* Sorry, this one must be a statement */                          \
 	do {                                                               \
-		T **__piter = &(self)->stqh_first;                             \
+		T **__hstqri_piter = &(self)->stqh_first;                      \
 		for (;;) {                                                     \
-			*(out_pelem) = *__piter;                                   \
+			*(out_pelem) = *__hstqri_piter;                            \
 			if (condition)                                             \
 				break;                                                 \
-			__piter = &X(_, *__piter).stqe_next;                       \
+			__hstqri_piter = &X(_, *__hstqri_piter).stqe_next;         \
 		}                                                              \
-		if ((*__piter = X(_, elem).stqe_next) == __NULLPTR)            \
-			(self)->stqh_last = __piter;                               \
+		if ((*__hstqri_piter = X(_, elem).stqe_next) == __NULLPTR)     \
+			(self)->stqh_last = __hstqri_piter;                        \
 		__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                       \
 	}	__WHILE0
 #define __HYBRID_STAILQ_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
 	/* Sorry, this one must be a statement */                                         \
 	do {                                                                              \
-		T **__piter = &(self)->stqh_first;                                            \
+		T **__hstqtri_piter = &(self)->stqh_first;                                    \
 		for (;;) {                                                                    \
-			if ((*(out_pelem) = *__piter) == __NULLPTR) {                             \
+			if ((*(out_pelem) = *__hstqtri_piter) == __NULLPTR) {                     \
 				on_failure;                                                           \
 				break;                                                                \
 			}                                                                         \
 			if (condition) {                                                          \
-				if ((*__piter = X(_, elem).stqe_next) == __NULLPTR)                   \
-					(self)->stqh_last = __piter;                                      \
+				if ((*__hstqtri_piter = X(_, elem).stqe_next) == __NULLPTR)           \
+					(self)->stqh_last = __hstqtri_piter;                              \
 				__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                              \
 				break;                                                                \
 			}                                                                         \
-			__piter = &X(_, *__piter).stqe_next;                                      \
+			__hstqtri_piter = &X(_, *__hstqtri_piter).stqe_next;                      \
 		}                                                                             \
 	}	__WHILE0
 #define __HYBRID_STAILQ_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
 	/* Sorry, this one must be a statement */                                    \
 	do {                                                                         \
-		T **__piter = &(self)->stqh_first;                                       \
-		while ((*(out_pelem) = *__piter) != __NULLPTR) {                         \
+		T **__hstqra_piter = &(self)->stqh_first;                                \
+		while ((*(out_pelem) = *__hstqra_piter) != __NULLPTR) {                  \
 			if (condition) {                                                     \
-				if ((*__piter = X(_, elem).stqe_next) == __NULLPTR)              \
-					(self)->stqh_last = __piter;                                 \
+				if ((*__hstqra_piter = X(_, elem).stqe_next) == __NULLPTR)       \
+					(self)->stqh_last = __hstqra_piter;                          \
 				__HYBRID_Q_BADPTR(X(_, elem).stqe_next);                         \
 				on_match;                                                        \
 			} else {                                                             \
-				__piter = &X(_, *__piter).stqe_next;                             \
+				__hstqra_piter = &X(_, *__hstqra_piter).stqe_next;               \
 			}                                                                    \
 		}                                                                        \
 	}	__WHILE0
@@ -1887,25 +1887,25 @@
 	(SIMPLEQ_EMPTY(self) ? __NULLPTR : __COMPILER_CONTAINER_OF((head)->sqh_last, T, key.sqe_next))
 #define __HYBRID_SIMPLEQ_LAST_P(self, T, getpath) \
 	(SIMPLEQ_EMPTY(self) ? __NULLPTR : ((T *)((__SIZE_TYPE__)(head)->sqh_last - (__SIZE_TYPE__)&X(_, (T *)0).sqe_next)))
-#define __HYBRID_SIMPLEQ_REMOVE(self, elem, T, X, _)       \
-	/* Sorry, this one must be a statement */              \
-	do {                                                   \
-		T **__piter = &(self)->sqh_first;                  \
-		while (*__piter != (elem))                         \
-			__piter = &X(_, *__piter).sqe_next;            \
-		if ((*__piter = X(_, elem).sqe_next) == __NULLPTR) \
-			(self)->sqh_last = __piter;                    \
-		__HYBRID_Q_BADPTR(X(_, elem).sqe_next);            \
+#define __HYBRID_SIMPLEQ_REMOVE(self, elem, T, X, _)            \
+	/* Sorry, this one must be a statement */                   \
+	do {                                                        \
+		T **__hsqr_piter = &(self)->sqh_first;                  \
+		while (*__hsqr_piter != (elem))                         \
+			__hsqr_piter = &X(_, *__hsqr_piter).sqe_next;       \
+		if ((*__hsqr_piter = X(_, elem).sqe_next) == __NULLPTR) \
+			(self)->sqh_last = __hsqr_piter;                    \
+		__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                 \
 	}	__WHILE0
 #define __HYBRID_SIMPLEQ_REPLACE(self, old_elem, new_elem, T, X, _) \
 	__HYBRID_SIMPLEQ_REPLACE_R(self, old_elem, old_elem, new_elem, new_elem, T, X, _)
 #define __HYBRID_SIMPLEQ_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, T, X, _) \
 	/* Sorry, this one must be a statement */                                                         \
 	do {                                                                                              \
-		T **__piter = &(self)->sqh_first;                                                             \
-		while (*__piter != (old_lo_elem))                                                             \
-			__piter = &X(_, *__piter).sqe_next;                                                       \
-		*__piter = (new_lo_elem);                                                                     \
+		T **__h_sqrr_piter = &(self)->sqh_first;                                                      \
+		while (*__h_sqrr_piter != (old_lo_elem))                                                      \
+			__h_sqrr_piter = &X(_, *__h_sqrr_piter).sqe_next;                                         \
+		*__h_sqrr_piter = (new_lo_elem);                                                              \
 		if ((X(_, new_hi_elem).sqe_next = X(_, old_hi_elem).sqe_next) == __NULLPTR)                   \
 			(self)->sqh_last = &X(_, new_hi_elem).sqe_next;                                           \
 		__HYBRID_Q_BADPTR(X(_, old_hi_elem).sqe_next);                                                \
@@ -1918,41 +1918,41 @@
 	       ? (void)((self)->sqh_last = &X(_, new_hi_elem).sqe_next)                                       \
 	       : (void)0,                                                                                     \
 	       __HYBRID_Q_BADPTR(X(_, old_hi_elem).sqe_next))
-#define __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, X, _, on_failure) \
-	/* Sorry, this one must be a statement */                       \
-	do {                                                            \
-		T **__piter = &(self)->sqh_first;                           \
-		while (*__piter != __NULLPTR && *__piter != (elem))         \
-			__piter = &X(_, *__piter).sqe_next;                     \
-		if (*__piter != __NULLPTR) {                                \
-			if ((*__piter = X(_, elem).sqe_next) == __NULLPTR)      \
-				(self)->sqh_last = __piter;                         \
-			__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                 \
-		} else {                                                    \
-			on_failure;                                             \
-		}                                                           \
+#define __HYBRID_SIMPLEQ_TRYREMOVE(self, elem, T, X, _, on_failure)     \
+	/* Sorry, this one must be a statement */                           \
+	do {                                                                \
+		T **__hsqtr_piter = &(self)->sqh_first;                         \
+		while (*__hsqtr_piter != __NULLPTR && *__hsqtr_piter != (elem)) \
+			__hsqtr_piter = &X(_, *__hsqtr_piter).sqe_next;             \
+		if (*__hsqtr_piter != __NULLPTR) {                              \
+			if ((*__hsqtr_piter = X(_, elem).sqe_next) == __NULLPTR)    \
+				(self)->sqh_last = __hsqtr_piter;                       \
+			__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                     \
+		} else {                                                        \
+			on_failure;                                                 \
+		}                                                               \
 	}	__WHILE0
 #define __HYBRID_SIMPLEQ_CONTAINS(self, elem, T, X, _, on_success) \
 	/* Sorry, this one must be a statement */                      \
 	do {                                                           \
-		T *__iter = (self)->sqh_first;                             \
-		while (__iter != __NULLPTR) {                              \
-			if (__iter == (elem)) {                                \
+		T *__hsqc_iter = (self)->sqh_first;                        \
+		while (__hsqc_iter != __NULLPTR) {                         \
+			if (__hsqc_iter == (elem)) {                           \
 				on_success;                                        \
 				break;                                             \
 			}                                                      \
-			__iter = X(_, __iter).sqe_next;                        \
+			__hsqc_iter = X(_, __hsqc_iter).sqe_next;              \
 		}                                                          \
 	}	__WHILE0
 #define __HYBRID_SIMPLEQ_TRYREPLACE(self, old_elem, new_elem, T, X, _, on_failure) \
 	/* Sorry, this one must be a statement */                                      \
 	do {                                                                           \
-		T **__piter = &(self)->sqh_first;                                          \
-		while (*__piter != __NULLPTR && *__piter != (old_elem))                    \
-			__piter = &X(_, *__piter).sqe_next;                                    \
-		if (*__piter != __NULLPTR) {                                               \
-			X(_, new_elem).sqe_next = *__piter;                                    \
-			*__piter                = (new_elem);                                  \
+		T **__hsqtrp_piter = &(self)->sqh_first;                                   \
+		while (*__hsqtrp_piter != __NULLPTR && *__hsqtrp_piter != (old_elem))      \
+			__hsqtrp_piter = &X(_, *__hsqtrp_piter).sqe_next;                      \
+		if (*__hsqtrp_piter != __NULLPTR) {                                        \
+			X(_, new_elem).sqe_next = *__hsqtrp_piter;                             \
+			*__hsqtrp_piter                = (new_elem);                           \
 			__HYBRID_Q_BADPTR(X(_, old_elem).sqe_next);                            \
 		} else {                                                                   \
 			on_failure;                                                            \
@@ -1961,47 +1961,47 @@
 #define __HYBRID_SIMPLEQ_REMOVE_IF(self, out_pelem, T, X, _, condition) \
 	/* Sorry, this one must be a statement */                           \
 	do {                                                                \
-		T **__piter = &(self)->sqh_first;                               \
+		T **__hsqri_piter = &(self)->sqh_first;                         \
 		for (;;) {                                                      \
-			*(out_pelem) = *__piter;                                    \
+			*(out_pelem) = *__hsqri_piter;                              \
 			if (condition)                                              \
 				break;                                                  \
-			__piter = &X(_, *__piter).sqe_next;                         \
+			__hsqri_piter = &X(_, *__hsqri_piter).sqe_next;             \
 		}                                                               \
-		if ((*__piter = X(_, elem).sqe_next) == __NULLPTR)              \
-			(self)->sqh_last = __piter;                                 \
+		if ((*__hsqri_piter = X(_, elem).sqe_next) == __NULLPTR)        \
+			(self)->sqh_last = __hsqri_piter;                           \
 		__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                         \
 	}	__WHILE0
 #define __HYBRID_SIMPLEQ_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure) \
 	/* Sorry, this one must be a statement */                                          \
 	do {                                                                               \
-		T **__piter = &(self)->sqh_first;                                              \
+		T **__hsqtri_piter = &(self)->sqh_first;                                       \
 		for (;;) {                                                                     \
-			if ((*(out_pelem) = *__piter) == __NULLPTR) {                              \
+			if ((*(out_pelem) = *__hsqtri_piter) == __NULLPTR) {                       \
 				on_failure;                                                            \
 				break;                                                                 \
 			}                                                                          \
 			if (condition) {                                                           \
-				if ((*__piter = X(_, elem).sqe_next) == __NULLPTR)                     \
-					(self)->sqh_last = __piter;                                        \
+				if ((*__hsqtri_piter = X(_, elem).sqe_next) == __NULLPTR)              \
+					(self)->sqh_last = __hsqtri_piter;                                 \
 				__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                                \
 				break;                                                                 \
 			}                                                                          \
-			__piter = &X(_, *__piter).sqe_next;                                        \
+			__hsqtri_piter = &X(_, *__hsqtri_piter).sqe_next;                          \
 		}                                                                              \
 	}	__WHILE0
 #define __HYBRID_SIMPLEQ_REMOVEALL(self, out_pelem, T, X, _, condition, on_match) \
 	/* Sorry, this one must be a statement */                                     \
 	do {                                                                          \
-		T **__piter = &(self)->sqh_first;                                         \
-		while ((*(out_pelem) = *__piter) != __NULLPTR) {                          \
+		T **__hsqra_piter = &(self)->sqh_first;                                   \
+		while ((*(out_pelem) = *__hsqra_piter) != __NULLPTR) {                    \
 			if (condition) {                                                      \
-				if ((*__piter = X(_, elem).sqe_next) == __NULLPTR)                \
-					(self)->sqh_last = __piter;                                   \
+				if ((*__hsqra_piter = X(_, elem).sqe_next) == __NULLPTR)          \
+					(self)->sqh_last = __hsqra_piter;                             \
 				__HYBRID_Q_BADPTR(X(_, elem).sqe_next);                           \
 				on_match;                                                         \
 			} else {                                                              \
-				__piter = &X(_, *__piter).sqe_next;                               \
+				__hsqra_piter = &X(_, *__hsqra_piter).sqe_next;                   \
 			}                                                                     \
 		}                                                                         \
 	}	__WHILE0
@@ -2376,8 +2376,8 @@
 #define __HYBRID_TAILQ_SWAP(l1, l2, T, X, _)                    \
 	/* Sorry, this one must be a statement */                   \
 	do {                                                        \
-		T *__htqs_first = (l1)->tqh_first;                      \
-		T **__htqs_last = (l1)->tqh_last;                       \
+		T *__htqs_first = (l1)->tqh_first,                      \
+		  **__htqs_last = (l1)->tqh_last;                       \
 		(l1)->tqh_last  = (l2)->tqh_last;                       \
 		(l2)->tqh_last  = __htqs_last;                          \
 		if (((l1)->tqh_first = (l2)->tqh_first) != __NULLPTR) { \
@@ -3037,20 +3037,20 @@
 #define DLIST_TRYREMOVE_IF_P(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_DLIST_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
 #endif /* !__HYBRID_PP_VA_OVERLOAD || !__COMPILER_HAVE_TYPEOF */
 
-#define __HYBRID_DLIST_CONCAT(dst, src, T, X, _)                                                  \
-	/* Sorry, this one must be a statement */                                                     \
-	do {                                                                                          \
-		if ((src)->dlh_first != __NULLPTR) {                                                      \
-			if ((dst)->dlh_first == __NULLPTR) {                                                  \
-				(dst)->dlh_first = (src)->dlh_first;                                              \
-			} else {                                                                              \
-				T *__hlc_dst_last = (dst)->dlh_first;                                             \
-				while (X(_, __hlc_dst_last).dle_next)                                             \
-					__hlc_dst_last = X(_, __hlc_dst_last).dle_next;                               \
-				X(_, X(_, __hlc_dst_last).dle_next = (src)->dlh_first).dle_prev = __hlc_dst_last; \
-			}                                                                                     \
-			(src)->dlh_first = __NULLPTR;                                                         \
-		}                                                                                         \
+#define __HYBRID_DLIST_CONCAT(dst, src, T, X, _)                                                    \
+	/* Sorry, this one must be a statement */                                                       \
+	do {                                                                                            \
+		if ((src)->dlh_first != __NULLPTR) {                                                        \
+			if ((dst)->dlh_first == __NULLPTR) {                                                    \
+				(dst)->dlh_first = (src)->dlh_first;                                                \
+			} else {                                                                                \
+				T *__hdlc_dst_last = (dst)->dlh_first;                                              \
+				while (X(_, __hdlc_dst_last).dle_next)                                              \
+					__hdlc_dst_last = X(_, __hdlc_dst_last).dle_next;                               \
+				X(_, X(_, __hdlc_dst_last).dle_next = (src)->dlh_first).dle_prev = __hdlc_dst_last; \
+			}                                                                                       \
+			(src)->dlh_first = __NULLPTR;                                                           \
+		}                                                                                           \
 	}	__WHILE0
 #define __HYBRID_DLIST_SWAP(dst, src, T)      \
 	/* Sorry, this one must be a statement */ \
@@ -3085,16 +3085,16 @@
 #define __HYBRID_DLIST_INSERT_TAIL_R(self, lo_elem, hi_elem, T, X, _) \
 	/* Sorry, this one must be a statement */                         \
 	do {                                                              \
-		T *__prev;                                                    \
+		T *__hdlitr_prev;                                             \
 		X(_, hi_elem).dle_next = __NULLPTR;                           \
-		if ((__prev = (self)->dlh_first) == __NULLPTR) {              \
+		if ((__hdlitr_prev = (self)->dlh_first) == __NULLPTR) {       \
 			X(_, lo_elem).dle_prev = __NULLPTR;                       \
 			(self)->dlh_first      = (lo_elem);                       \
 		} else {                                                      \
-			while (X(_, __prev).dle_next != __NULLPTR)                \
-				__prev = X(_, __prev).dle_next;                       \
-			X(_, __prev).dle_next  = (lo_elem);                       \
-			X(_, lo_elem).dle_prev = __prev;                          \
+			while (X(_, __hdlitr_prev).dle_next != __NULLPTR)         \
+				__hdlitr_prev = X(_, __hdlitr_prev).dle_next;         \
+			X(_, __hdlitr_prev).dle_next  = (lo_elem);                \
+			X(_, lo_elem).dle_prev = __hdlitr_prev;                   \
 		}                                                             \
 	}	__WHILE0
 #define __HYBRID_DLIST_REMOVE_IF(self, out_pelem, T, X, _, condition) \
