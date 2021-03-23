@@ -105,7 +105,7 @@
  * [1         1    ]  void [*]_REMOVE_R(lo_elem, hi_elem, key)                (Remove all elements `lo_elem...hi_elem' inclusively; links between removed elements remain valid)
  * [      1 1   1  ]  void [*]_REMOVE_R(self, lo_elem, hi_elem, key)
  * [1 1         1  ]  void [*]_REMOVE_AFTER(elem, key)                        (Remove successor of `elem'; undef if no successor)
- * [    1 1        ]  void [*]_REMOVE_AFTER(self, elem, key)
+ * [    1 1 1      ]  void [*]_REMOVE_AFTER(self, elem, key)
  * [  1            ]  void [*]_REMOVE_PREVPTR(p_elem, elem, key)              (libbsd-specific; for use with `SLIST_FOREACH_PREVPTR()')
  * [1 1            ]  void [*]_P_REMOVE(p_elem, key)
  * [    1          ]  void [*]_P_REMOVE(self, p_elem, key)
@@ -2606,6 +2606,8 @@
 #define CIRCLEQ_MOVE_P(dst, src, getpath)                                                      __HYBRID_CIRCLEQ_MOVE(dst, src, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_NEXT_P(elem, getpath)                                                          getpath(elem).cqe_next
 #define CIRCLEQ_PREV_P(elem, getpath)                                                          getpath(elem).cqe_prev
+#define CIRCLEQ_REMOVE_AFTER(self, elem, key)                                                  __HYBRID_CIRCLEQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
+#define CIRCLEQ_REMOVE_AFTER_P(self, elem, getpath)                                            __HYBRID_CIRCLEQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_REMOVE_HEAD(self, key)                                                         __HYBRID_CIRCLEQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_REMOVE_HEAD_P(self, getpath)                                                   __HYBRID_CIRCLEQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_REMOVE_P(self, elem, getpath)                                                  __HYBRID_CIRCLEQ_REMOVE(self, elem, __HYBRID_Q_PTH, getpath)
@@ -2743,6 +2745,11 @@
 	 : (void)(X(_, X(_, new_hi_elem).cqe_next).cqe_prev = (new_hi_elem)),                          \
 	 __HYBRID_Q_BADPTR(X(_, old_hi_elem).cqe_next),                                                \
 	 __HYBRID_Q_BADPTR(X(_, old_lo_elem).cqe_prev))
+#define __HYBRID_CIRCLEQ_REMOVE_AFTER(self, elem, X, _)                                   \
+	(__HYBRID_Q_BADPTR(X(_, X(_, elem).cqe_next).cqe_prev),                               \
+	 (void *)(X(_, elem).cqe_next = X(_, X(_, elem).cqe_next).cqe_next) == (void *)(self) \
+	 ? (void)((self)->cqh_last = (elem))                                                  \
+	 : (void)(X(_, X(_, elem).cqe_next).cqe_prev = (elem)))
 #define __HYBRID_CIRCLEQ_REMOVE_HEAD(self, X, _)                        \
 	(__HYBRID_Q_BADPTR(X(_, (self)->cqh_first).cqe_prev),               \
 	 (self)->cqh_first == (self)->cqh_last /* Only 1 elem remains... */ \
@@ -3306,7 +3313,6 @@
 //TODO:#define TAILQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define TAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define TAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
-//TODO:#define CIRCLEQ_REMOVE_AFTER(elem, key)
 //TODO:#define CIRCLEQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define CIRCLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
