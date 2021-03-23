@@ -57,7 +57,7 @@
  * [  1 1       1  ]  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
  * [1     1 1      ]  void [*]_MOVE(dst, src, key)                            (C++-style move-constructor)
  * [  1 1       1  ]  void [*]_SWAP(l1, l2, [type])                           (C++-style std::swap())
- * [1     1        ]  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
+ * [1     1 1      ]  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
  * [1 1 1 1 1   1  ]  void [*]_CLEAR(self)
  * [    1          ]  void [*]_CONCAT(dst, src)
  * [      1        ]  void [*]_CONCAT(dst, src, key)
@@ -2630,6 +2630,10 @@
 #define __HYBRID_CIRCLEQ_FOREACH_SAFE_4(elem, self, key, tvar)                    __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_3(elem, self, getpath)                    __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
 #define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)              __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_SWAP_3(l1, l2, key)                                      __HYBRID_CIRCLEQ_SWAP(l1, l2, __typeof__(*(l1)->cqh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_SWAP_4(l1, l2, type, key)                                __HYBRID_CIRCLEQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_SWAP_P_3(l1, l2, getpath)                                __HYBRID_CIRCLEQ_SWAP(l1, l2, __typeof__(*(l1)->cqh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_SWAP_P_4(l1, l2, T, getpath)                             __HYBRID_CIRCLEQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_FOREACH_FROM_SAFE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)           /* CIRCLEQ_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
 #define CIRCLEQ_FOREACH_FROM_SAFE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* CIRCLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
 #define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)   /* CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(elem, self, key, [tvar]) */
@@ -2638,6 +2642,8 @@
 #define CIRCLEQ_FOREACH_REVERSE_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, [tvar]) */
 #define CIRCLEQ_FOREACH_SAFE(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)                /* CIRCLEQ_FOREACH_SAFE(elem, self, key, [tvar]) */
 #define CIRCLEQ_FOREACH_SAFE_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)              /* CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define CIRCLEQ_SWAP(...)                        __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_SWAP_, (__VA_ARGS__))(__VA_ARGS__)                        /* CIRCLEQ_SWAP(l1, l2, [type], key) */
+#define CIRCLEQ_SWAP_P(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_SWAP_P_, (__VA_ARGS__))(__VA_ARGS__)                      /* CIRCLEQ_SWAP_P(l1, l2, [T], key) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
 #define CIRCLEQ_FOREACH_FROM_SAFE(elem, self, key, tvar)               __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define CIRCLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)         __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
@@ -2647,9 +2653,29 @@
 #define CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, tvar)      __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
 #define CIRCLEQ_FOREACH_SAFE(elem, self, key, tvar)                    __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
 #define CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, tvar)              __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_SWAP(l1, l2, type, key)                                __HYBRID_CIRCLEQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_SWAP_P(l1, l2, T, getpath)                             __HYBRID_CIRCLEQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
+#define __HYBRID_CIRCLEQ_SWAP(l1, l2, T, X, _)                                  \
+	/* Sorry, this one must be a statement */                                   \
+	do {                                                                        \
+		T *__hcqs_first = (l1)->cqh_first,                                      \
+		  *__hcqs_last  = (l1)->cqh_last;                                       \
+		if (CIRCLEQ_EMPTY(l2)) {                                                \
+			CIRCLEQ_INIT(l1);                                                   \
+		} else {                                                                \
+			*(void **)&X(_, (l1)->cqh_first = (l2)->cqh_first).cqe_prev = (l1); \
+			*(void **)&X(_, (l1)->cqh_last = (l2)->cqh_last).cqe_next   = (l1); \
+		}                                                                       \
+		if ((void const *)__hcqs_first == (void const *)(l1)) {                 \
+			CIRCLEQ_INIT(l2);                                                   \
+		} else {                                                                \
+			*(void **)&X(_, (l2)->cqh_first = __hcqs_first).cqe_prev = (l2);    \
+			*(void **)&X(_, (l2)->cqh_last = __hcqs_last).cqe_next   = (l2);    \
+		}                                                                       \
+	}	__WHILE0
 #define __HYBRID_CIRCLEQ_MOVE(dst, src, X, _)                                        \
 	(CIRCLEQ_EMPTY(src)                                                              \
 	 ? CIRCLEQ_INIT(dst)                                                             \
@@ -3261,7 +3287,6 @@
 //TODO:#define TAILQ_REMOVE_IF(self, out_pelem, [type], key, condition)
 //TODO:#define TAILQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
 //TODO:#define TAILQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
-//TODO:#define CIRCLEQ_SWAP(l1, l2, [type], key)
 //TODO:#define CIRCLEQ_CONCAT(dst, src, [type], key)
 //TODO:#define CIRCLEQ_REMOVE_HEAD(self, key)
 //TODO:#define CIRCLEQ_REMOVE_AFTER(elem, key)
