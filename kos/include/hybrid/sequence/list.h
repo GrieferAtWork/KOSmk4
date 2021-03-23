@@ -111,15 +111,15 @@
  * [    1          ]  void [*]_P_REMOVE(self, p_elem, key)
  * [1 1            ]  void [*]_P_REMOVE_R(p_lo_elem, hi_elem, key)
  * [    1          ]  void [*]_P_REMOVE_R(self, p_lo_elem, hi_elem, key)
- * [N N N N     N  ]  void [*]_REMOVE_IF(self, out_pelem, [type], key, condition)
+ * [N N N N N   N  ]  void [*]_REMOVE_IF(self, out_pelem, [type], key, condition)
  * |               |             NOTE: `*out_pelem' is written to before `condition' is
  * |               |                   evaluated to test is `*out_pelem' should be removed
  * |               |             Assumes that `condition' is true for at least 1 element.
  * [  N N          ]  void [*]_TRYREMOVE(self, elem, [type], key, on_failure)
- * [N N N N     N  ]  void [*]_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
+ * [N N N N N   N  ]  void [*]_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
  * |               |             Same as *_REMOVE_IF, but allow `condition' to be false for all elements, or
  * |               |             the list itself to be empty. (if this happens, `on_failure' is evaluated)
- * [N N N N     N  ]  void [*]_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
+ * [N N N N N   N  ]  void [*]_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
  * |               |             Remove all elements for which `condition' is true, and evaluate `on_match'
  * |               |             every time such a match is confirmed. The associated element is `*out_pelem'
  * [  N N          ]  void [*]_CONTAINS(self, elem, [type], key, on_success)
@@ -154,9 +154,9 @@
  * [1     1 1 1    ]  bool [*]_ISBOUND(elem, key)                -- Returns non-zero if element is bound (to a list)
  * [1         1    ]  void [*]_UNBIND(elem, key)                 -- Remove element and mark as unbound
  * [      1 1      ]  void [*]_UNBIND(self, elem, key)           -- *ditto*
- * [N     N        ]  void [*]_UNBIND_IF(self, out_pelem, [type], key, condition)
- * [N     N        ]  void [*]_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
- * [N     N        ]  void [*]_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
+ * [N     N N      ]  void [*]_UNBIND_IF(self, out_pelem, [type], key, condition)
+ * [N     N N      ]  void [*]_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
+ * [N     N N      ]  void [*]_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
  * \---------------/
  *     Runtime
  *    (in O(x))
@@ -2788,26 +2788,50 @@
 #define CIRCLEQ_UNBIND(self, elem, key)                                                        __HYBRID_CIRCLEQ_UNBIND(self, elem, __HYBRID_Q_KEY, key)
 #define CIRCLEQ_UNBIND_P(self, elem, getpath)                                                  __HYBRID_CIRCLEQ_UNBIND(self, elem, __HYBRID_Q_PTH, getpath)
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
-#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_3(elem, self, key)                     __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_4(elem, self, key, tvar)               __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)               __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)         __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_3(elem, self, key)             __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_4(elem, self, key, tvar)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P_3(elem, self, getpath)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P_4(elem, self, getpath, tvar) __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_3(elem, self, key)                  __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_4(elem, self, key, tvar)            __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)            __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_4(elem, self, getpath, tvar)      __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_3(elem, self, key)                          __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_4(elem, self, key, tvar)                    __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_3(elem, self, getpath)                    __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)              __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define __HYBRID_CIRCLEQ_SWAP_3(l1, l2, key)                                      __HYBRID_CIRCLEQ_SWAP(l1, l2, __typeof__(*(l1)->cqh_first), __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_SWAP_4(l1, l2, type, key)                                __HYBRID_CIRCLEQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define __HYBRID_CIRCLEQ_SWAP_P_3(l1, l2, getpath)                                __HYBRID_CIRCLEQ_SWAP(l1, l2, __typeof__(*(l1)->cqh_first), __HYBRID_Q_PTH, getpath)
-#define __HYBRID_CIRCLEQ_SWAP_P_4(l1, l2, T, getpath)                             __HYBRID_CIRCLEQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_3(elem, self, key)                                 __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_4(elem, self, key, tvar)                           __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_3(elem, self, getpath)                           __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_4(elem, self, getpath, tvar)                     __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_3(elem, self, key)                         __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_4(elem, self, key, tvar)                   __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P_3(elem, self, getpath)                   __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P_4(elem, self, getpath, tvar)             __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_3(elem, self, key)                              __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_4(elem, self, key, tvar)                        __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_3(elem, self, getpath)                        __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_4(elem, self, getpath, tvar)                  __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_3(elem, self, key)                                      __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_4(elem, self, key, tvar)                                __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_3(elem, self, getpath)                                __HYBRID_CIRCLEQ_FOREACH_SAFE3(elem, self, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_FOREACH_SAFE_P_4(elem, self, getpath, tvar)                          __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define __HYBRID_CIRCLEQ_REMOVEALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_CIRCLEQ_REMOVEALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_CIRCLEQ_REMOVEALL_6(self, out_pelem, type, key, condition, on_match)         __HYBRID_CIRCLEQ_REMOVEALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_CIRCLEQ_REMOVEALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_CIRCLEQ_REMOVEALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_CIRCLEQ_REMOVEALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_CIRCLEQ_REMOVEALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_CIRCLEQ_REMOVE_IF_4(self, out_pelem, key, condition)                         __HYBRID_CIRCLEQ_REMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_CIRCLEQ_REMOVE_IF_5(self, out_pelem, type, key, condition)                   __HYBRID_CIRCLEQ_REMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_CIRCLEQ_REMOVE_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_CIRCLEQ_REMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_CIRCLEQ_REMOVE_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_CIRCLEQ_REMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_CIRCLEQ_SWAP_3(l1, l2, key)                                                  __HYBRID_CIRCLEQ_SWAP(l1, l2, __typeof__(*(l1)->cqh_first), __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_SWAP_4(l1, l2, type, key)                                            __HYBRID_CIRCLEQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define __HYBRID_CIRCLEQ_SWAP_P_3(l1, l2, getpath)                                            __HYBRID_CIRCLEQ_SWAP(l1, l2, __typeof__(*(l1)->cqh_first), __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_SWAP_P_4(l1, l2, T, getpath)                                         __HYBRID_CIRCLEQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define __HYBRID_CIRCLEQ_TRYREMOVE_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_CIRCLEQ_TRYREMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_CIRCLEQ_TRYREMOVE_IF_6(self, out_pelem, type, key, condition, on_failure)    __HYBRID_CIRCLEQ_TRYREMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_CIRCLEQ_TRYREMOVE_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_CIRCLEQ_TRYREMOVE_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_CIRCLEQ_TRYREMOVE_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_CIRCLEQ_TRYREMOVE_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_CIRCLEQ_TRYUNBIND_IF_5(self, out_pelem, key, condition, on_failure)          __HYBRID_CIRCLEQ_TRYUNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_CIRCLEQ_TRYUNBIND_IF_6(self, out_pelem, type, key, condition, on_failure)    __HYBRID_CIRCLEQ_TRYUNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define __HYBRID_CIRCLEQ_TRYUNBIND_IF_P_5(self, out_pelem, getpath, condition, on_failure)    __HYBRID_CIRCLEQ_TRYUNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_CIRCLEQ_TRYUNBIND_IF_P_6(self, out_pelem, T, getpath, condition, on_failure) __HYBRID_CIRCLEQ_TRYUNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define __HYBRID_CIRCLEQ_UNBINDALL_5(self, out_pelem, key, condition, on_match)               __HYBRID_CIRCLEQ_UNBINDALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_CIRCLEQ_UNBINDALL_6(self, out_pelem, type, key, condition, on_match)         __HYBRID_CIRCLEQ_UNBINDALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define __HYBRID_CIRCLEQ_UNBINDALL_P_5(self, out_pelem, getpath, condition, on_match)         __HYBRID_CIRCLEQ_UNBINDALL(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_CIRCLEQ_UNBINDALL_P_6(self, out_pelem, T, getpath, condition, on_match)      __HYBRID_CIRCLEQ_UNBINDALL(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define __HYBRID_CIRCLEQ_UNBIND_IF_4(self, out_pelem, key, condition)                         __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_CIRCLEQ_UNBIND_IF_5(self, out_pelem, type, key, condition)                   __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define __HYBRID_CIRCLEQ_UNBIND_IF_P_4(self, out_pelem, getpath, condition)                   __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, __typeof__(**(out_pelem)), __HYBRID_Q_PTH, getpath, condition)
+#define __HYBRID_CIRCLEQ_UNBIND_IF_P_5(self, out_pelem, T, getpath, condition)                __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, T, __HYBRID_Q_PTH, getpath, condition)
 #define CIRCLEQ_FOREACH_FROM_SAFE(...)           __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)           /* CIRCLEQ_FOREACH_FROM_SAFE(elem, self, key, [tvar]) */
 #define CIRCLEQ_FOREACH_FROM_SAFE_P(...)         __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_FROM_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)         /* CIRCLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, [tvar]) */
 #define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(...)   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_, (__VA_ARGS__))(__VA_ARGS__)   /* CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(elem, self, key, [tvar]) */
@@ -2816,19 +2840,43 @@
 #define CIRCLEQ_FOREACH_REVERSE_SAFE_P(...)      __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)      /* CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, [tvar]) */
 #define CIRCLEQ_FOREACH_SAFE(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_, (__VA_ARGS__))(__VA_ARGS__)                /* CIRCLEQ_FOREACH_SAFE(elem, self, key, [tvar]) */
 #define CIRCLEQ_FOREACH_SAFE_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_FOREACH_SAFE_P_, (__VA_ARGS__))(__VA_ARGS__)              /* CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, [tvar]) */
+#define CIRCLEQ_REMOVEALL(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)                /* CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match) */
+#define CIRCLEQ_REMOVEALL_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)              /* CIRCLEQ_REMOVEALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define CIRCLEQ_REMOVE_IF(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_REMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)                   /* CIRCLEQ_REMOVE_IF(self, out_pelem, [type], key, condition) */
+#define CIRCLEQ_REMOVE_IF_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_REMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* CIRCLEQ_REMOVE_IF_P(self, out_pelem, [T], getpath, condition) */
 #define CIRCLEQ_SWAP(...)                        __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_SWAP_, (__VA_ARGS__))(__VA_ARGS__)                        /* CIRCLEQ_SWAP(l1, l2, [type], key) */
 #define CIRCLEQ_SWAP_P(...)                      __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_SWAP_P_, (__VA_ARGS__))(__VA_ARGS__)                      /* CIRCLEQ_SWAP_P(l1, l2, [T], key) */
+#define CIRCLEQ_TRYREMOVE_IF(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_TRYREMOVE_IF_, (__VA_ARGS__))(__VA_ARGS__)                /* CIRCLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define CIRCLEQ_TRYREMOVE_IF_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_TRYREMOVE_IF_P_, (__VA_ARGS__))(__VA_ARGS__)              /* CIRCLEQ_TRYREMOVE_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define CIRCLEQ_TRYUNBIND_IF(...)                __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_TRYUNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)                /* CIRCLEQ_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure) */
+#define CIRCLEQ_TRYUNBIND_IF_P(...)              __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_TRYUNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)              /* CIRCLEQ_TRYUNBIND_IF_P(self, out_pelem, [T], getpath, condition, on_failure) */
+#define CIRCLEQ_UNBINDALL(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_UNBINDALL_, (__VA_ARGS__))(__VA_ARGS__)                   /* CIRCLEQ_UNBINDALL(self, out_pelem, [type], key, condition, on_match) */
+#define CIRCLEQ_UNBINDALL_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_UNBINDALL_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* CIRCLEQ_UNBINDALL_P(self, out_pelem, [T], getpath, condition, on_match) */
+#define CIRCLEQ_UNBIND_IF(...)                   __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_UNBIND_IF_, (__VA_ARGS__))(__VA_ARGS__)                   /* CIRCLEQ_UNBIND_IF(self, out_pelem, [type], key, condition) */
+#define CIRCLEQ_UNBIND_IF_P(...)                 __HYBRID_PP_VA_OVERLOAD(__HYBRID_CIRCLEQ_UNBIND_IF_P_, (__VA_ARGS__))(__VA_ARGS__)                 /* CIRCLEQ_UNBIND_IF_P(self, out_pelem, [T], getpath, condition) */
 #else /* __COMPILER_HAVE_TYPEOF && __HYBRID_PP_VA_OVERLOAD */
-#define CIRCLEQ_FOREACH_FROM_SAFE(elem, self, key, tvar)               __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define CIRCLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)         __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(elem, self, key, tvar)       __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, getpath, tvar) __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define CIRCLEQ_FOREACH_REVERSE_SAFE(elem, self, key, tvar)            __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, tvar)      __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define CIRCLEQ_FOREACH_SAFE(elem, self, key, tvar)                    __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
-#define CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, tvar)              __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
-#define CIRCLEQ_SWAP(l1, l2, type, key)                                __HYBRID_CIRCLEQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
-#define CIRCLEQ_SWAP_P(l1, l2, T, getpath)                             __HYBRID_CIRCLEQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define CIRCLEQ_FOREACH_FROM_SAFE(elem, self, key, tvar)                              __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_FROM_SAFE_P(elem, self, getpath, tvar)                        __HYBRID_CIRCLEQ_FOREACH_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE(elem, self, key, tvar)                      __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_FROM_SAFE_P(elem, self, getpath, tvar)                __HYBRID_CIRCLEQ_FOREACH_REVERSE_FROM_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_SAFE(elem, self, key, tvar)                           __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_REVERSE_SAFE_P(elem, self, getpath, tvar)                     __HYBRID_CIRCLEQ_FOREACH_REVERSE_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_FOREACH_SAFE(elem, self, key, tvar)                                   __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_KEY, key, tvar)
+#define CIRCLEQ_FOREACH_SAFE_P(elem, self, getpath, tvar)                             __HYBRID_CIRCLEQ_FOREACH_SAFE4(elem, self, __HYBRID_Q_PTH, getpath, tvar)
+#define CIRCLEQ_REMOVEALL(self, out_pelem, type, key, condition, on_match)            __HYBRID_CIRCLEQ_REMOVEALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define CIRCLEQ_REMOVEALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_CIRCLEQ_REMOVEALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define CIRCLEQ_REMOVE_IF(self, out_pelem, type, key, condition)                      __HYBRID_CIRCLEQ_REMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define CIRCLEQ_REMOVE_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_CIRCLEQ_REMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
+#define CIRCLEQ_SWAP(l1, l2, type, key)                                               __HYBRID_CIRCLEQ_SWAP(l1, l2, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_SWAP_P(l1, l2, T, getpath)                                            __HYBRID_CIRCLEQ_SWAP(l1, l2, T, __HYBRID_Q_PTH, getpath)
+#define CIRCLEQ_TRYREMOVE_IF(self, out_pelem, type, key, condition, on_failure)       __HYBRID_CIRCLEQ_TRYREMOVE_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define CIRCLEQ_TRYREMOVE_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_CIRCLEQ_TRYREMOVE_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define CIRCLEQ_TRYUNBIND_IF(self, out_pelem, type, key, condition, on_failure)       __HYBRID_CIRCLEQ_TRYUNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_failure)
+#define CIRCLEQ_TRYUNBIND_IF_P(self, out_pelem, type, getpath, condition, on_failure) __HYBRID_CIRCLEQ_TRYUNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_failure)
+#define CIRCLEQ_UNBINDALL(self, out_pelem, type, key, condition, on_match)            __HYBRID_CIRCLEQ_UNBINDALL(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition, on_match)
+#define CIRCLEQ_UNBINDALL_P(self, out_pelem, type, getpath, condition, on_match)      __HYBRID_CIRCLEQ_UNBINDALL(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition, on_match)
+#define CIRCLEQ_UNBIND_IF(self, out_pelem, type, key, condition)                      __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key, condition)
+#define CIRCLEQ_UNBIND_IF_P(self, out_pelem, type, getpath, condition)                __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, type, __HYBRID_Q_PTH, getpath, condition)
 #endif /* !__COMPILER_HAVE_TYPEOF || !__HYBRID_PP_VA_OVERLOAD */
 #endif /* !__HYBRID_LIST_RESTRICT_API */
 
@@ -2943,6 +2991,136 @@
 	       : (void)(X(_, X(_, elem).cqe_next).cqe_prev = X(_, elem).cqe_prev), \
 	       __HYBRID_Q_BADPTR(X(_, elem).cqe_next),                             \
 	       X(_, elem).cqe_prev = __NULLPTR)
+#define __HYBRID_CIRCLEQ_REMOVEALL(self, out_pelem, T, X, _, condition, on_match)             \
+	/* Sorry, this one must be a statement */                                                 \
+	do {                                                                                      \
+		T **__htqra_piter = &(self)->cqh_first;                                               \
+		while ((*(out_pelem) = *__htqra_piter) != (void *)(self)) {                           \
+			if (condition) {                                                                  \
+				if ((void *)(*__htqra_piter = X(_, *(out_pelem)).cqe_next) != (void *)(self)) \
+					X(_, X(_, *(out_pelem)).cqe_next).cqe_prev = __htqra_piter;               \
+				else if (__htqra_piter == &(self)->cqh_first)                                 \
+					*(void **)&(self)->cqh_last = (void *)(self);                             \
+				else {                                                                        \
+					(self)->cqh_last = __htqra_piter;                                         \
+				}                                                                             \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_next);                               \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_prev);                               \
+				on_match;                                                                     \
+			} else {                                                                          \
+				__htqra_piter = &X(_, *(out_pelem)).cqe_next;                                 \
+			}                                                                                 \
+		}                                                                                     \
+	}	__WHILE0
+#define __HYBRID_CIRCLEQ_UNBINDALL(self, out_pelem, T, X, _, condition, on_match)             \
+	/* Sorry, this one must be a statement */                                                 \
+	do {                                                                                      \
+		T **__htqra_piter = &(self)->cqh_first;                                               \
+		while ((*(out_pelem) = *__htqra_piter) != (void *)(self)) {                           \
+			if (condition) {                                                                  \
+				if ((void *)(*__htqra_piter = X(_, *(out_pelem)).cqe_next) != (void *)(self)) \
+					X(_, X(_, *(out_pelem)).cqe_next).cqe_prev = __htqra_piter;               \
+				else if (__htqra_piter == &(self)->cqh_first)                                 \
+					*(void **)&(self)->cqh_last = (void *)(self);                             \
+				else {                                                                        \
+					(self)->cqh_last = __htqra_piter;                                         \
+				}                                                                             \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_next);                               \
+				X(_, *(out_pelem)).cqe_prev = __NULLPTR;                                      \
+				on_match;                                                                     \
+			} else {                                                                          \
+				__htqra_piter = &X(_, *(out_pelem)).cqe_next;                                 \
+			}                                                                                 \
+		}                                                                                     \
+	}	__WHILE0
+#define __HYBRID_CIRCLEQ_REMOVE_IF(self, out_pelem, T, X, _, condition)               \
+	/* Sorry, this one must be a statement */                                         \
+	do {                                                                              \
+		T **__htqri_piter = &(self)->cqh_first;                                       \
+		for (;;) {                                                                    \
+			*(out_pelem) = *__htqri_piter;                                            \
+			if (condition)                                                            \
+				break;                                                                \
+			__htqri_piter = &X(_, *(out_pelem)).cqe_next;                             \
+		}                                                                             \
+		if ((void *)(*__htqri_piter = X(_, *(out_pelem)).cqe_next) != (void *)(self)) \
+			X(_, X(_, *(out_pelem)).cqe_next).cqe_prev = __htqri_piter;               \
+		else if (__htqri_piter == &(self)->cqh_first)                                 \
+			*(void **)&(self)->cqh_last = (void *)(self);                             \
+		else {                                                                        \
+			(self)->cqh_last = __htqri_piter;                                         \
+		}                                                                             \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_next);                               \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_prev);                               \
+	}	__WHILE0
+#define __HYBRID_CIRCLEQ_UNBIND_IF(self, out_pelem, T, X, _, condition)               \
+	/* Sorry, this one must be a statement */                                         \
+	do {                                                                              \
+		T **__htqri_piter = &(self)->cqh_first;                                       \
+		for (;;) {                                                                    \
+			*(out_pelem) = *__htqri_piter;                                            \
+			if (condition)                                                            \
+				break;                                                                \
+			__htqri_piter = &X(_, *(out_pelem)).cqe_next;                             \
+		}                                                                             \
+		if ((void *)(*__htqri_piter = X(_, *(out_pelem)).cqe_next) != (void *)(self)) \
+			X(_, X(_, *(out_pelem)).cqe_next).cqe_prev = __htqri_piter;               \
+		else if (__htqri_piter == &(self)->cqh_first)                                 \
+			*(void **)&(self)->cqh_last = (void *)(self);                             \
+		else {                                                                        \
+			(self)->cqh_last = __htqri_piter;                                         \
+		}                                                                             \
+		__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_next);                               \
+		X(_, *(out_pelem)).cqe_prev = __NULLPTR;                                      \
+	}	__WHILE0
+#define __HYBRID_CIRCLEQ_TRYREMOVE_IF(self, out_pelem, T, X, _, condition, on_failure)         \
+	/* Sorry, this one must be a statement */                                                  \
+	do {                                                                                       \
+		T **__htqtri_piter = &(self)->cqh_first;                                               \
+		for (;;) {                                                                             \
+			if ((*(out_pelem) = *__htqtri_piter) == __NULLPTR) {                               \
+				on_failure;                                                                    \
+				break;                                                                         \
+			}                                                                                  \
+			if (condition) {                                                                   \
+				if ((void *)(*__htqtri_piter = X(_, *(out_pelem)).cqe_next) != (void *)(self)) \
+					X(_, X(_, *(out_pelem)).cqe_next).cqe_prev = __htqtri_piter;               \
+				else if (__htqtri_piter == &(self)->cqh_first)                                 \
+					*(void **)&(self)->cqh_last = (void *)(self);                              \
+				else {                                                                         \
+					(self)->cqh_last = __htqtri_piter;                                         \
+				}                                                                              \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_next);                                \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_prev);                                \
+				break;                                                                         \
+			}                                                                                  \
+			__htqtri_piter = &X(_, *(out_pelem)).cqe_next;                                     \
+		}                                                                                      \
+	}	__WHILE0
+#define __HYBRID_CIRCLEQ_TRYUNBIND_IF(self, out_pelem, T, X, _, condition, on_failure)         \
+	/* Sorry, this one must be a statement */                                                  \
+	do {                                                                                       \
+		T **__htqtri_piter = &(self)->cqh_first;                                               \
+		for (;;) {                                                                             \
+			if ((*(out_pelem) = *__htqtri_piter) == __NULLPTR) {                               \
+				on_failure;                                                                    \
+				break;                                                                         \
+			}                                                                                  \
+			if (condition) {                                                                   \
+				if ((void *)(*__htqtri_piter = X(_, *(out_pelem)).cqe_next) != (void *)(self)) \
+					X(_, X(_, *(out_pelem)).cqe_next).cqe_prev = __htqtri_piter;               \
+				else if (__htqtri_piter == &(self)->cqh_first)                                 \
+					*(void **)&(self)->cqh_last = (void *)(self);                              \
+				else {                                                                         \
+					(self)->cqh_last = __htqtri_piter;                                         \
+				}                                                                              \
+				__HYBRID_Q_BADPTR(X(_, *(out_pelem)).cqe_next);                                \
+				X(_, *(out_pelem)).cqe_prev = __NULLPTR;                                       \
+				break;                                                                         \
+			}                                                                                  \
+			__htqtri_piter = &X(_, *(out_pelem)).cqe_next;                                     \
+		}                                                                                      \
+	}	__WHILE0
 #define __HYBRID_CIRCLEQ_LOOP_NEXT(self, elem, X, _)           \
 	((void const *)X(_, elem).cqe_next == (void const *)(self) \
 	 ? (self)->cqh_first                                       \
@@ -3478,9 +3656,6 @@
 #endif /* __CC__ */
 
 /* TODO: KOS-specific extension macros */
-//TODO:#define CIRCLEQ_REMOVE_IF(self, out_pelem, [type], key, condition)
-//TODO:#define CIRCLEQ_TRYREMOVE_IF(self, out_pelem, [type], key, condition, on_failure)
-//TODO:#define CIRCLEQ_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
 //TODO:*_REMOVE_TAIL() ?
 
 
