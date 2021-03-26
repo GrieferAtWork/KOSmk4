@@ -80,7 +80,8 @@
 #define UNWIND_USER_DLERROR                 67 /* (Used internally by libc): Mode#4 unwinding failed because dl information could not be accessed (s.a. `dlerror()') */
 #define UNWIND_USER_ABORT                   68 /* (Used internally by libc): `abort()' or `std::terminate()' was called. */
 #define UNWIND_USER_ASSERT                  69 /* (Used internally by libc): `assert_failed()' was called. */
-#define UNWIND_USER_SSP                     70 /* (Used internally by libc): `__stack_chk_fail()' was called. */
+#define UNWIND_USER_ACHECK                  70 /* (Used internally by libc): Assertion check failure (restartable assertion failure; aka. the one w/ the "retry" button). */
+#define UNWIND_USER_SSP                     71 /* (Used internally by libc): `__stack_chk_fail()' was called. */
 
 
 #endif /* !_LIBUNWIND_API_H */

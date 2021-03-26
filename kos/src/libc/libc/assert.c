@@ -26,6 +26,7 @@
 /**/
 
 #include <asm/intrin.h>
+#include <kos/coredump.h>
 #include <kos/debugtrap.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -33,8 +34,10 @@
 #include <sys/ioctl.h>
 #include <sys/syslog.h>
 
+#include <ctype.h>
 #include <format-printer.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termio.h>
@@ -74,17 +77,14 @@ assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datale
 
 PRIVATE ATTR_NORETURN ATTR_COLD void LIBCCALL
 trap_application(struct kcpustate *__restrict state,
-                 syscall_ulong_t trapno,
+                 union coredump_info *info,
                  unsigned int unwind_error) {
 	struct ucpustate ustate;
-	struct debugtrap_reason r;
 	kcpustate_to_ucpustate(state, &ustate);
-	r.dtr_signo  = trapno;
-	r.dtr_reason = DEBUGTRAP_REASON_NONE;
-	/* Try to trap into a debugger */
-	sys_debugtrap(&ustate, &r);
-	/* If the debugger trap failed, try to do a coredump */
-	sys_coredump(&ustate, NULL, NULL, 0, NULL, unwind_error);
+
+	/* Try to do a coredump */
+	sys_coredump(&ustate, NULL, NULL, 0, info, unwind_error);
+
 	/* If even the coredump  failed (which it shouldn't  have,
 	 * consequently meaning that shouldn't actually get here),
 	 * simply terminate the process. */
@@ -97,7 +97,7 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 	format_printf(&assert_printer, NULL,
 	              "User-space stack check failure [pc=%p]\n",
 	              kcpustate_getpc(state));
-	trap_application(state, SIGABRT, UNWIND_USER_SSP);
+	trap_application(state, NULL, UNWIND_USER_SSP);
 }
 
 INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert.abort") void __FCALL
@@ -105,13 +105,15 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 	format_printf(&assert_printer, NULL,
 	              "abort() called [pc=%p]\n",
 	              kcpustate_getpc(state));
-	trap_application(state, SIGABRT, UNWIND_USER_ABORT);
+	trap_application(state, NULL, UNWIND_USER_ABORT);
 }
 
 
 INTERN ATTR_SECTION(".text.crt.assert.assert")
 ATTR_NOINLINE ATTR_NORETURN ATTR_COLD void LIBCCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
+	struct coredump_assert cdinfo;
+	char message_buf[COREDUMP_ASSERT_MESG_MAXLEN];
 	format_printf(&assert_printer, NULL,
 	              "Assertion Failure [pc=%p]\n",
 	              kcpustate_getpc(&args->aa_state));
@@ -121,15 +123,36 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 	              args->aa_func ? args->aa_func : "",
 	              args->aa_func ? " : " : "",
 	              args->aa_expr);
+
+	/* Fill in coredump information. */
+	cdinfo.ca_expr = args->aa_expr;
+	cdinfo.ca_file = args->aa_file;
+	cdinfo.ca_line = args->aa_line;
+	cdinfo.ca_func = args->aa_func;
+	cdinfo.ca_mesg = NULL;
 	if (args->aa_format) {
 		va_list vargs;
 		va_copy(vargs, args->aa_args);
-		format_vprintf(&assert_printer, NULL,
-		               args->aa_format, vargs);
+		vsnprintf(message_buf, sizeof(message_buf),
+		          args->aa_format, vargs);
 		va_end(vargs);
-		assert_printer(NULL, "\n", 1);
+		message_buf[COMPILER_LENOF(message_buf) - 1] = 0;
+		if (*message_buf) {
+			size_t msglen;
+			msglen = strlen(message_buf);
+			while (msglen && __ascii_isspace(message_buf[msglen - 1]))
+				--msglen;
+			if (msglen) {
+				cdinfo.ca_mesg = message_buf;
+				message_buf[msglen] = '\n';
+				assert_printer(NULL, message_buf, msglen + 1);
+				message_buf[msglen] = 0;
+			}
+		}
 	}
-	trap_application(&args->aa_state, SIGABRT, UNWIND_USER_ASSERT);
+	trap_application(&args->aa_state,
+	                 container_of(&cdinfo, union coredump_info, ci_assert),
+	                 UNWIND_USER_ASSERT);
 }
 
 #ifdef CONFIG_LOG_LIBC_UNIMPLEMENTED

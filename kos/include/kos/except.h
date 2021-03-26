@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88db4136 */
+/* HASH CRC-32:0x9f570e8a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -153,15 +153,15 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL err
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_as_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL error_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_as_signal))(__self, __result); })
 #endif /* !__CRT_HAVE_error_as_signal */
 #ifdef __CRT_HAVE_error_name
-/* Return the name of the given error, or `NULL` if unknown.
- * This name is the same as the `E_*` identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
+/* Return the name of the given error, or `NULL' if unknown.
+ * This name is the same as the `E_*' identifier.
+ * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __LIBC __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(error_code_t __code) __CASMNAME_SAME("error_name");
 #else /* __CRT_HAVE_error_name */
 #include <libc/local/kos.except/error_name.h>
-/* Return the name of the given error, or `NULL` if unknown.
- * This name is the same as the `E_*` identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
+/* Return the name of the given error, or `NULL' if unknown.
+ * This name is the same as the `E_*' identifier.
+ * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_name))(__code); })
 #endif /* !__CRT_HAVE_error_name */
 #ifdef __CRT_HAVE_error_priority

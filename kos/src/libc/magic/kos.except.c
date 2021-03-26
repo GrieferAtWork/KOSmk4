@@ -1007,9 +1007,9 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 
 
 
-@@Return the name of the given error, or `NULL` if unknown.
-@@This name is the same as the `E_*` identifier.
-@@E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC"
+@@Return the name of the given error, or `NULL' if unknown.
+@@This name is the same as the `E_*' identifier.
+@@E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC"
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[wunused, const, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<hybrid/host.h>", "<kos/except/codes.h>")]]
@@ -1561,7 +1561,7 @@ restore_saved_exception:
 		 * [10]     RETHROW();
 		 * [11] }
 		 *
-		 * Equivalent:
+		 * Equivalent[EQ]:
 		 * [ 1] foo();                                // [ 2]
 		 * [ 2] if (EXCEPTION_THROWN) {
 		 * [ 3]     __cxa_begin_catch();              // [ 3]
@@ -1585,7 +1585,7 @@ restore_saved_exception:
 		 * would normally  delete the  exception  because it  wasn't  re-thrown
 		 * from anywhere. But if you think of all of the possible constellation
 		 * where this function  might be  called, in  all cases  where we  know
-		 * that there's currently an active  exception (i.e. ei_code !=  E_OK),
+		 * that there's currently an active exception (i.e. `ei_code != E_OK'),
 		 * it's always  acceptable  to  set  the RETHROW  flag  for  the  outer
 		 * call to `__cxa_end_catch()' (on line EQ[17])
 		 */

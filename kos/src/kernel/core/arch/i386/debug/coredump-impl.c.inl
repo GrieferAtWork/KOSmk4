@@ -23,6 +23,9 @@
 //#define DEFINE_COREDUMP64 1
 #endif /* __INTELLISENSE__ */
 
+#include <alloca.h>
+#include <kos/coredump.h>
+
 #if (defined(DEFINE_COREDUMP32) + defined(DEFINE_COREDUMP64)) != 1
 #error "Must #define exactly one of DEFINE_COREDUMP32 or DEFINE_COREDUMP64"
 #endif
@@ -67,15 +70,11 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
                     USER UNCHECKED struct NAME(ucpustate) const *curr_state,
                     USER UNCHECKED struct NAME(ucpustate) const *orig_state,
                     USER UNCHECKED NAME(u) const *const *traceback_vector, size_t traceback_length,
-                    USER UNCHECKED struct NAME(__exception_data) const *exception,
+                    USER UNCHECKED union NAME(coredump_info) const *reason,
                     syscall_ulong_t unwind_error) {
 	struct ucpustate curr_ustate, orig_ustate;
 	void **utb_vector;
 	signo_t signo = SIGABRT;
-	validate_readable_opt(exception,
-	                      unwind_error == UNWIND_SUCCESS
-	                      ? sizeof(struct NAME(__exception_data))
-	                      : sizeof(struct NAME2(__siginfox, _struct)));
 	if (!curr_state && !orig_state) {
 		icpustate_user_to_ucpustate(return_state, &curr_ustate);
 		memcpy(&orig_ustate, &curr_ustate, sizeof(struct ucpustate));
@@ -104,78 +103,88 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		}
 	}
 	utb_vector = NULL;
-	if (traceback_length > CONFIG_COREDUMP_TRACEBACK_LIMIT)
-		traceback_length = CONFIG_COREDUMP_TRACEBACK_LIMIT;
+	if (traceback_length > COREDUMP_TRACEBACK_LIMIT)
+		traceback_length = COREDUMP_TRACEBACK_LIMIT;
 	if (traceback_length != 0) {
-		utb_vector = (void **)malloca(traceback_length * sizeof(void *));
-		TRY {
-			size_t i;
-			for (i = 0; i < traceback_length; ++i)
-				utb_vector[i] = (void *)(uintptr_t)traceback_vector[i];
-		} EXCEPT {
-			freea(utb_vector);
-			RETHROW();
-		}
+		size_t i;
+		utb_vector = (void **)alloca(traceback_length * sizeof(void *));
+		for (i = 0; i < traceback_length; ++i)
+			utb_vector[i] = (void *)(uintptr_t)traceback_vector[i];
 	}
-	TRY {
-		if (!exception) {
-			/* Coredump not caused by an exception or signal. */
-			coredump_create(&curr_ustate,
-			                utb_vector,
-			                traceback_length,
-			                &orig_ustate,
-			                NULL,
-			                0,
-			                NULL,
-			                NULL,
-			                NULL,
-			                unwind_error);
-		} else if (unwind_error == UNWIND_SUCCESS) {
-			/* Coredump caused by a signal. */
+	if (!reason) {
+		/* Coredump not caused by an exception or signal. */
+		coredump_create(&curr_ustate, utb_vector, traceback_length,
+		                &orig_ustate, NULL, 0, NULL, NULL,
+		                unwind_error);
+	} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
+		/* Coredump caused by a signal. */
+		siginfo_t si;
+		validate_readable(&reason->ci_signal, sizeof(reason->ci_signal));
+		(NAME2(siginfox, _to_siginfo)(&reason->ci_signal, &si));
+		COMPILER_READ_BARRIER();
+		signo = si.si_signo;
+		coredump_create(&curr_ustate, utb_vector, traceback_length,
+		                &orig_ustate, NULL, 0, NULL,
+		                container_of(&si, union NAME(coredump_info), ci_signal),
+		                unwind_error);
+	} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
+		char *dlbuf;
+		size_t errlen;
+		validate_readable(reason->ci_dlerror, 1);
+		errlen = strnlen(reason->ci_dlerror, COREDUMP_DLERROR_MAXLEN - 1);
+		dlbuf  = (char *)alloca((errlen + 1) * sizeof(char));
+		*(char *)mempcpy(dlbuf, reason->ci_dlerror, errlen, sizeof(char)) = '\0';
+		coredump_create(&curr_ustate, utb_vector, traceback_length,
+		                &orig_ustate, NULL, 0, NULL,
+		                (union NAME(coredump_info) *)dlbuf,
+		                unwind_error);
+	} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
+		struct NAME(coredump_assert) as;
+		validate_readable(&reason->ci_assert, sizeof(reason->ci_assert));
+		as.ca_expr = reason->ci_assert.ca_expr;
+		as.ca_file = reason->ci_assert.ca_file;
+		as.ca_line = reason->ci_assert.ca_line;
+		as.ca_func = reason->ci_assert.ca_func;
+		as.ca_mesg = reason->ci_assert.ca_mesg;
+		/* Copy assertion strings into kernelspace. */
+#define COPY_USERSPACE_STRING(field, maxlen)                        \
+		if (field) {                                                \
+			size_t len;                                             \
+			char *buf;                                              \
+			validate_readable(field, 1);                            \
+			len = strnlen(field, (maxlen)-1);                       \
+			buf = (char *)alloca((len + 1) * sizeof(char));         \
+			*(char *)mempcpy(buf, field, len, sizeof(char)) = '\0'; \
+			field = buf;                                            \
+		}
+		COPY_USERSPACE_STRING(as.ca_expr, COREDUMP_ASSERT_EXPR_MAXLEN);
+		COPY_USERSPACE_STRING(as.ca_file, COREDUMP_ASSERT_FILE_MAXLEN);
+		COPY_USERSPACE_STRING(as.ca_func, COREDUMP_ASSERT_FUNC_MAXLEN);
+		COPY_USERSPACE_STRING(as.ca_mesg, COREDUMP_ASSERT_MESG_MAXLEN);
+#undef COPY_USERSPACE_STRING
+		coredump_create(&curr_ustate, utb_vector, traceback_length,
+		                &orig_ustate, NULL, 0, NULL,
+		                container_of(&as, union NAME(coredump_info), ci_assert),
+		                unwind_error);
+	} else {
+		/* Coredump caused by an exception. */
+		struct exception_data exc;
+		validate_readable(&reason->ci_except, sizeof(reason->ci_except));
+		NAME2(exception_data, _to_exception_data)(&reason->ci_except, &exc);
+		COMPILER_READ_BARRIER();
+		coredump_create(&curr_ustate, utb_vector, traceback_length,
+		                &orig_ustate, NULL, 0, NULL,
+		                container_of(&exc, union NAME(coredump_info), ci_except),
+		                unwind_error);
+		/* If we get here, try to exit the application with a signo that
+		 * is based on the exception that resulted in the coredump being
+		 * created. */
+		{
 			siginfo_t si;
-			(NAME2(siginfox, _to_siginfo)((struct NAME2(__siginfox, _struct) *)(uintptr_t)exception,
-			                              &si));
-			COMPILER_READ_BARRIER();
-			signo = si.si_signo;
-			coredump_create(&curr_ustate,
-			                utb_vector,
-			                traceback_length,
-			                &orig_ustate,
-			                NULL,
-			                0,
-			                NULL,
-			                NULL,
-			                &si,
-			                UNWIND_SUCCESS);
-		} else {
-			/* Coredump caused by an exception. */
-			siginfo_t si;
-			struct exception_data exc;
-			bool has_signal;
-			NAME2(exception_data, _to_exception_data)(exception, &exc);
-			COMPILER_READ_BARRIER();
-			has_signal = error_as_signal(&exc, &si);
-			if (has_signal)
+			if (error_as_signal(&exc, &si))
 				signo = si.si_signo;
-			coredump_create(&curr_ustate,
-			                utb_vector,
-			                traceback_length,
-			                &orig_ustate,
-			                NULL,
-			                0,
-			                NULL,
-			                &exc,
-			                has_signal ? &si
-			                           : NULL,
-			                unwind_error);
 		}
-	} EXCEPT {
-		if (utb_vector)
-			freea(utb_vector);
-		RETHROW();
 	}
-	if (utb_vector)
-		freea(utb_vector);
 	assert(!task_wasconnected());
 	THROW(E_EXIT_PROCESS,
 	      W_EXITCODE(1, signo & 0x7f) | WCOREFLAG);
@@ -194,7 +203,7 @@ NAME(coredump_rpc)(void *UNUSED(arg),
 	                           (USER UNCHECKED struct NAME(ucpustate) const *)sc_info->rsi_regs[1],
 	                           (USER UNCHECKED NAME(u) const *const *)sc_info->rsi_regs[2],
 	                           (size_t)sc_info->rsi_regs[3],
-	                           (USER UNCHECKED struct NAME(__exception_data) const *)sc_info->rsi_regs[4],
+	                           (USER UNCHECKED union NAME(coredump_info) const *)sc_info->rsi_regs[4],
 	                           (syscall_ulong_t)sc_info->rsi_regs[5]);
 }
 
@@ -205,13 +214,13 @@ NAME2(DEFINE_SYSCALL, _6)(errno_t, coredump,
                           USER UNCHECKED struct NAME(ucpustate) const *, curr_state,
                           USER UNCHECKED struct NAME(ucpustate) const *, orig_state,
                           USER UNCHECKED NAME(PTR)(void) const *, traceback_vector, size_t, traceback_length,
-                          USER UNCHECKED struct NAME(__exception_data) const *, exception,
+                          USER UNCHECKED union NAME(coredump_info) const *, reason,
                           syscall_ulong_t, unwind_error) {
 	(void)curr_state;
 	(void)orig_state;
 	(void)traceback_vector;
 	(void)traceback_length;
-	(void)exception;
+	(void)reason;
 	(void)unwind_error;
 	task_schedule_user_rpc(THIS_TASK,
 	                       &NAME(coredump_rpc),

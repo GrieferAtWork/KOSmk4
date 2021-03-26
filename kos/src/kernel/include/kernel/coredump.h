@@ -24,13 +24,15 @@
 
 #include <kernel/types.h>
 
+#include <kos/bits/coredump.h>
+
 DECL_BEGIN
 
 #ifdef __CC__
 
 struct ucpustate;
-struct exception_data;
 struct __siginfo_struct;
+union coredump_info;
 
 /* Main entry point for creating coredumps of the calling process.
  * When this function returns, the caller will usually throw an `E_EXIT_PROCESS' exception
@@ -57,15 +59,8 @@ struct __siginfo_struct;
  *                            also   be   printed   when  unwinding   is   completed  for   the   purposes  of
  *                            displaying a traceback.
  * @param: traceback_length:  The number of instruction pointers within `traceback_vector'
- * @param: reason_error:      The error that brought forth the coredump.
- *                            Without any explicit error (or if the coredump was only signal-related),
- *                            this argument is `NULL'
- * @param: reason_signal:     The signal that was the reason for the coredump.
- *                            When  the coredump was  triggered by an exception,  this is the result
- *                            of `error_as_signal(reason_error)', or NULL if the exception could not
- *                            be translated into a signal.
- *                            Alternatively, if the coredump was only caused by a posix signal, this
- *                            argument   points   to   the  information   concerning   that  signal.
+ * @param: reason:            The error that brought forth the coredump. (exact interpretation depends on
+ *                            `unwind_error').  May  be set  to `NULL'  if no  additional info  is given.
  * @param: unwind_error:      The unwind error that caused user-space to halt exception handling,
  *                            or `UNWIND_SUCCESS' if the coredump  was triggered by a signal  and
  *                            never caused any unwinding to be done.
@@ -108,8 +103,7 @@ coredump_create(struct ucpustate const *curr_ustate,
                 struct ucpustate const *orig_ustate,
                 void const *const *ktraceback_vector, size_t ktraceback_length,
                 struct kcpustate const *orig_kstate,
-                struct exception_data const *reason_error,
-                struct __siginfo_struct const *reason_signal,
+                union coredump_info const *reason,
                 unsigned int unwind_error)
 		THROWS(...);
 

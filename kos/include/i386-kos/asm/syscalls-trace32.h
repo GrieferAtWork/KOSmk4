@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x228a3610 */
+/* HASH CRC-32:0x186f47d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1106,7 +1106,7 @@
 #define __NRAN1_coredump                     orig_state
 #define __NRAN2_coredump                     traceback_vector
 #define __NRAN3_coredump                     traceback_length
-#define __NRAN4_coredump                     exception
+#define __NRAN4_coredump                     reason
 #define __NRAN5_coredump                     unwind_error
 #define __NRAN0_raiseat                      state
 #define __NRAN1_raiseat                      si
@@ -2859,7 +2859,7 @@
 #define __NRATR2_coredump                     SC_REPR_VOID_VECTOR32                                                /* traceback_vector */ 
 #define __NRATL2_coredump                     3                                                                    /* traceback_vector -> traceback_length */ 
 #define __NRATR3_coredump                     SC_REPR_SIZE_T                                                       /* traceback_length */ 
-#define __NRATR4_coredump                     SC_REPR_STRUCT_EXCEPTION_DATA32                                      /* exception */ 
+#define __NRATR4_coredump                     SC_REPR_STRUCT_EXCEPTION_DATA32                                      /* reason */ 
 #define __NRATR5_coredump                     SC_REPR_UNWIND_ERROR                                                 /* unwind_error */ 
 #define __NRRTR_coredump                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_raiseat                      SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 

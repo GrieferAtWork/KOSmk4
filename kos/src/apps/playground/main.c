@@ -876,6 +876,19 @@ int main_pass(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_assert(int argc, char *argv[], char *envp[]) {
+	volatile int x;
+	(void)argc, (void)argv, (void)envp;
+	/* Demo for what happens when a user-space assert fails. */
+	x = 42;
+	assert(x == 0);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -912,6 +925,7 @@ PRIVATE DEF defs[] = {
 	{ "sigbounce", &main_sigbounce },
 	{ "bigfile", &main_bigfile },
 	{ "pass", &main_pass },
+	{ "assert", &main_assert },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

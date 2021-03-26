@@ -447,7 +447,7 @@ trigger_coredump(error_register_state_t *curr_state,
 	             &orig_ust,
 	             unwind_tracevector,
 	             unwind_tracelength,
-	             exc,
+	             container_of(exc, union coredump_info, ci_except),
 	             unwind_error);
 	/* There really shouldn't be a reason to get here, but just in case... */
 

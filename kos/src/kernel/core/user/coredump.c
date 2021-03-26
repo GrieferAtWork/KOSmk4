@@ -31,6 +31,7 @@
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 
+#include <kos/coredump.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -68,8 +69,7 @@ dbg_coredump(void const *const *traceback_vector,
              void const *const *ktraceback_vector,
              size_t ktraceback_length,
              struct kcpustate const *orig_kstate,
-             struct exception_data const *reason_error,
-             struct __siginfo_struct const *reason_signal,
+             union coredump_info const *reason,
              uintptr_t unwind_error) {
 	size_t tbi;
 	instrlen_isa_t userspace_isa;
@@ -108,69 +108,94 @@ dbg_coredump(void const *const *traceback_vector,
 	dbg_loadcolor();
 	dbg_putc('\n');
 
-	if (reason_error) {
-		unsigned int i;
-		char const *name;
-		dbg_printf(DBGSTR("exception "
-		                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-		                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__)),
-		           reason_error->e_class,
-		           reason_error->e_subclass);
-		name = error_name(reason_error->e_code);
-		if (name)
-			dbg_printf(DBGSTR(" [%s]"), name);
-		print_exception_desc_of(reason_error,
-		                        &dbg_printer,
-		                        NULL);
-		dbg_putc('\n');
-		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-			if (!reason_error->e_args.e_pointers[i])
-				continue;
-			dbg_printf(DBGSTR("\tpointer[%u] = %p\n"),
-			           i, reason_error->e_args.e_pointers[i]);
-		}
-	}
-	if (reason_signal) {
-		dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
-		           reason_signal->si_signo);
-		if (reason_signal->si_code != 0) {
-			dbg_printf(DBGSTR("\tcode:  %u\n"),
-			           (unsigned int)reason_signal->si_code);
-		}
-		if (reason_signal->si_errno != 0) {
-			dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n"),
-			           reason_signal->si_errno);
-		}
-	}
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
-	if (reason_error) {
-		dbg_addr2line_printf(reason_error->e_faultaddr,
-		                     instruction_trysucc((void *)reason_error->e_faultaddr,
-		                                         instrlen_isa_from_kcpustate(orig_ustate)),
-		                     "faultaddr");
+	if (reason) {
+		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
+			siginfo_t siginfo;
+			unsigned int i;
+			char const *name;
+			dbg_printf(DBGSTR("exception "
+			                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+			                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__)),
+			           reason->ci_except.e_class,
+			           reason->ci_except.e_subclass);
+			name = error_name(reason->ci_except.e_code);
+			if (name)
+				dbg_printf(DBGSTR(" [%s]"), name);
+			print_exception_desc_of(&reason->ci_except,
+			                        &dbg_printer,
+			                        NULL);
+			dbg_putc('\n');
+			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
+				if (!reason->ci_except.e_args.e_pointers[i])
+					continue;
+				dbg_printf(DBGSTR("\tpointer[%u] = %p\n"),
+				           i, reason->ci_except.e_args.e_pointers[i]);
+			}
+			if (error_as_signal(&reason->ci_except, &siginfo)) {
+				dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
+				           siginfo.si_signo);
+				if (siginfo.si_code != 0) {
+					dbg_printf(DBGSTR("\tcode:  %u\n"),
+					           (unsigned int)siginfo.si_code);
+				}
+				if (siginfo.si_errno != 0) {
+					dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n"),
+					           siginfo.si_errno);
+				}
+			}
+			dbg_addr2line_printf(reason->ci_except.e_faultaddr,
+			                     instruction_trysucc((void *)reason->ci_except.e_faultaddr,
+			                                         instrlen_isa_from_kcpustate(orig_ustate)),
+			                     "faultaddr");
+		} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
+			dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
+			           reason->ci_signal.si_signo);
+			if (reason->ci_signal.si_code != 0) {
+				dbg_printf(DBGSTR("\tcode:  %u\n"),
+				           (unsigned int)reason->ci_signal.si_code);
+			}
+			if (reason->ci_signal.si_errno != 0) {
+				dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n"),
+				           reason->ci_signal.si_errno);
+			}
+		} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
+			dbg_printf(DBGSTR("dlerror: %q\n"), reason->ci_dlerror);
+		} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
+			if (reason->ci_assert.ca_expr)
+				dbg_printf(DBGSTR("assert.expr: %q\n"), reason->ci_assert.ca_expr);
+			if (reason->ci_assert.ca_file)
+				dbg_printf(DBGSTR("assert.file: %q\n"), reason->ci_assert.ca_file);
+			if (reason->ci_assert.ca_line)
+				dbg_printf(DBGSTR("assert.line: %" PRIuPTR "\n"), reason->ci_assert.ca_line);
+			if (reason->ci_assert.ca_func)
+				dbg_printf(DBGSTR("assert.func: %q\n"), reason->ci_assert.ca_func);
+			if (reason->ci_assert.ca_mesg)
+				dbg_printf(DBGSTR("assert.mesg: %q\n"), reason->ci_assert.ca_mesg);
+		}
 	}
 	if (orig_kstate) {
 		dbg_addr2line_printf((void const *)kcpustate_getpc(orig_kstate),
 		                     instruction_trysucc((void *)kcpustate_getpc(orig_kstate),
 		                                         instrlen_isa_from_kcpustate(orig_kstate)),
-		                     "orig_kstate");
+		                     DBGSTR("orig_kstate"));
 	}
 	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
 		dbg_addr2line_printf(ktraceback_vector[tbi],
 		                     instruction_trysucc(ktraceback_vector[tbi],
 		                                         INSTRLEN_ISA_DEFAULT),
-		                     "ktraceback_vector[%" PRIuSIZ "]\n", tbi);
+		                     DBGSTR("ktraceback_vector[%" PRIuSIZ "]\n"), tbi);
 	}
 	userspace_isa = instrlen_isa_from_ucpustate(orig_ustate);
 	dbg_addr2line_printf((void const *)ucpustate_getpc(orig_ustate),
 	                     instruction_trysucc((void *)ucpustate_getpc(orig_ustate),
 	                                         userspace_isa),
-	                     "orig_ustate");
+	                     DBGSTR("orig_ustate"));
 	for (tbi = 0; tbi < traceback_length; ++tbi) {
 		dbg_addr2line_printf(traceback_vector[tbi],
 		                     instruction_trysucc(traceback_vector[tbi],
 		                                         userspace_isa),
-		                     "traceback_vector[%" PRIuSIZ "]\n",
+		                     DBGSTR("traceback_vector[%" PRIuSIZ "]\n"),
 		                     tbi);
 	}
 	current_pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_TRAP);
@@ -179,7 +204,7 @@ dbg_coredump(void const *const *traceback_vector,
 	     current_pc != traceback_vector[traceback_length - 1])) {
 		dbg_addr2line_printf(current_pc,
 		                     instruction_trysucc(current_pc, dbg_instrlen_isa(DBG_REGLEVEL_TRAP)),
-		                     "curr_ustate");
+		                     DBGSTR("curr_ustate"));
 	}
 
 	(void)unwind_error;
@@ -196,20 +221,18 @@ do_dbg_coredump(struct ucpustate const *curr_ustate,
                 void const *const *ktraceback_vector,
                 size_t ktraceback_length,
                 struct kcpustate const *orig_kstate,
-                struct exception_data const *reason_error,
-                struct __siginfo_struct const *reason_signal,
+                union coredump_info const *reason,
                 unsigned int unwind_error) {
-	STRUCT_DBG_ENTRY_INFO(9) entry;
-	entry.ei_argc    = 9;
+	STRUCT_DBG_ENTRY_INFO(8) entry;
+	entry.ei_argc    = 8;
 	entry.ei_argv[0] = (void *)(uintptr_t)traceback_vector;
 	entry.ei_argv[1] = (void *)(uintptr_t)traceback_length;
 	entry.ei_argv[2] = (void *)(uintptr_t)orig_ustate;
 	entry.ei_argv[3] = (void *)(uintptr_t)ktraceback_vector;
 	entry.ei_argv[4] = (void *)(uintptr_t)ktraceback_length;
 	entry.ei_argv[5] = (void *)(uintptr_t)orig_kstate;
-	entry.ei_argv[6] = (void *)(uintptr_t)reason_error;
-	entry.ei_argv[7] = (void *)(uintptr_t)reason_signal;
-	entry.ei_argv[8] = (void *)(uintptr_t)unwind_error;
+	entry.ei_argv[6] = (void *)(uintptr_t)reason;
+	entry.ei_argv[7] = (void *)(uintptr_t)unwind_error;
 	entry.ei_entry   = (dbg_entry_t)&dbg_coredump;
 	/* Enter the debugger. */
 	curr_ustate = dbg_enter_r((struct dbg_entry_info *)&entry,
@@ -244,15 +267,8 @@ do_dbg_coredump(struct ucpustate const *curr_ustate,
  *                            also   be   printed   when  unwinding   is   completed  for   the   purposes  of
  *                            displaying a traceback.
  * @param: traceback_length:  The number of instruction pointers within `traceback_vector'
- * @param: reason_error:      The error that brought forth the coredump.
- *                            Without any explicit error (or if the coredump was only signal-related),
- *                            this argument is `NULL'
- * @param: reason_signal:     The signal that was the reason for the coredump.
- *                            When  the coredump was  triggered by an exception,  this is the result
- *                            of `error_as_signal(reason_error)', or NULL if the exception could not
- *                            be translated into a signal.
- *                            Alternatively, if the coredump was only caused by a posix signal, this
- *                            argument   points   to   the  information   concerning   that  signal.
+ * @param: reason:            The error that brought forth the coredump. (exact interpretation depends on
+ *                            `unwind_error').  May  be set  to `NULL'  if no  additional info  is given.
  * @param: unwind_error:      The unwind error that caused user-space to halt exception handling,
  *                            or `UNWIND_SUCCESS' if the coredump  was triggered by a signal  and
  *                            never caused any unwinding to be done.
@@ -295,8 +311,7 @@ coredump_create(struct ucpustate const *curr_ustate,
                 struct ucpustate const *orig_ustate,
                 void const *const *ktraceback_vector, size_t ktraceback_length,
                 struct kcpustate const *orig_kstate,
-                struct exception_data const *reason_error,
-                struct __siginfo_struct const *reason_signal,
+                union coredump_info const *reason,
                 unsigned int unwind_error)
 		THROWS(...) {
 	size_t tbi;
@@ -309,40 +324,68 @@ coredump_create(struct ucpustate const *curr_ustate,
 	       ? (ktraceback_vector == NULL && ktraceback_length == 0)
 	       : true);
 	printk(KERN_ERR "[coredump] Creating coredump...\n");
-	if (reason_error) {
-		unsigned int i;
-		char const *name;
-		printk(KERN_ERR "exception "
-		                "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-		                "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
-		       reason_error->e_class, reason_error->e_subclass);
-		name = error_name(reason_error->e_code);
-		if (name)
-			printk(KERN_ERR " [%s]", name);
-		print_exception_desc_of(reason_error, &syslog_printer, SYSLOG_LEVEL_ERR);
-		printk(KERN_ERR "\n");
-		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-			if (!reason_error->e_args.e_pointers[i])
-				continue;
-			printk(KERN_ERR "\tpointer[%u] = %p\n",
-			       i, reason_error->e_args.e_pointers[i]);
-		}
-	}
-	if (reason_signal) {
-		printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
-		       reason_signal->si_signo);
-		if (reason_signal->si_code != 0) {
-			printk(KERN_ERR "\tcode:  %u\n",
-			       (unsigned int)reason_signal->si_code);
-		}
-		if (reason_signal->si_errno != 0) {
-			printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n",
-			       reason_signal->si_errno);
-		}
-	}
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
-	if (reason_error)
-		printk(KERN_RAW VINFO_FORMAT " faultaddr\n", reason_error->e_faultaddr);
+	if (reason) {
+		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
+			siginfo_t siginfo;
+			unsigned int i;
+			char const *name;
+			printk(KERN_ERR "exception "
+			                "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+			                "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
+			       reason->ci_except.e_class, reason->ci_except.e_subclass);
+			name = error_name(reason->ci_except.e_code);
+			if (name)
+				printk(KERN_ERR " [%s]", name);
+			print_exception_desc_of(&reason->ci_except,
+			                        &syslog_printer,
+			                        SYSLOG_LEVEL_ERR);
+			printk(KERN_ERR "\n");
+			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
+				if (!reason->ci_except.e_args.e_pointers[i])
+					continue;
+				printk(KERN_ERR "\tpointer[%u] = %p\n",
+				       i, reason->ci_except.e_args.e_pointers[i]);
+			}
+			if (error_as_signal(&reason->ci_except, &siginfo)) {
+				printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
+				       siginfo.si_signo);
+				if (siginfo.si_code != 0) {
+					printk(KERN_ERR "\tcode:  %u\n",
+					       (unsigned int)siginfo.si_code);
+				}
+				if (siginfo.si_errno != 0) {
+					printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n",
+					       siginfo.si_errno);
+				}
+			}
+			printk(KERN_RAW VINFO_FORMAT " faultaddr\n", reason->ci_except.e_faultaddr);
+		} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
+			printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
+			       reason->ci_signal.si_signo);
+			if (reason->ci_signal.si_code != 0) {
+				printk(KERN_ERR "\tcode:  %u\n",
+				       (unsigned int)reason->ci_signal.si_code);
+			}
+			if (reason->ci_signal.si_errno != 0) {
+				printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n",
+				       reason->ci_signal.si_errno);
+			}
+		} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
+			printk(KERN_RAW "dlerror: %q\n", reason->ci_dlerror);
+		} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
+			if (reason->ci_assert.ca_expr)
+				printk(KERN_RAW "assert.expr: %q\n", reason->ci_assert.ca_expr);
+			if (reason->ci_assert.ca_file)
+				printk(KERN_RAW "assert.file: %q\n", reason->ci_assert.ca_file);
+			if (reason->ci_assert.ca_line)
+				printk(KERN_RAW "assert.line: %" PRIuPTR "\n", reason->ci_assert.ca_line);
+			if (reason->ci_assert.ca_func)
+				printk(KERN_RAW "assert.func: %q\n", reason->ci_assert.ca_func);
+			if (reason->ci_assert.ca_mesg)
+				printk(KERN_RAW "assert.mesg: %q\n", reason->ci_assert.ca_mesg);
+		}
+	}
 	if (orig_kstate)
 		printk(KERN_RAW VINFO_FORMAT " orig_kstate\n", kcpustate_getpc(orig_kstate));
 	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
@@ -383,8 +426,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 			                              ktraceback_vector,
 			                              ktraceback_length,
 			                              orig_kstate,
-			                              reason_error,
-			                              reason_signal,
+			                              reason,
 			                              unwind_error);
 		}
 #endif /* CONFIG_HAVE_DEBUGGER */
@@ -403,22 +445,17 @@ coredump_create_for_exception(struct icpustate *__restrict state,
                               struct exception_info const *__restrict info,
                               bool originates_from_kernelspace) {
 	struct ucpustate ust;
-	siginfo_t si;
-	bool has_si;
 	icpustate_user_to_ucpustate(state, &ust);
-	has_si = error_as_signal(&info->ei_data, &si);
 	if (!originates_from_kernelspace) {
-		/* If   the  exception  doesn't   originate  from  kernel-space,  such
-		 * as an E_SEGFAULT propagated by `x86_userexcept_unwind_interrupt()',
-		 * then we mustn't include whatever  information is still dangling  in
-		 * the kernel's  exception state  descriptor (because  that info  will
-		 * still refer to the previous  thrown exception, and not the  current
-		 * one)
+		/* If the exception  doesn't originate from  kernel-space, such  as
+		 * an E_SEGFAULT propagated by `x86_userexcept_unwind_interrupt()',
+		 * then we mustn't include  whatever information is still  dangling
+		 * in the kernel's  exception state descriptor  (because that  info
+		 * will still refer to the  previous thrown exception, and not  the
+		 * current one)
 		 * Also: The current exception doesn't actually have a kernel side. */
-		coredump_create(&ust, NULL, 0, &ust,
-		                NULL, 0, NULL,
-		                &info->ei_data,
-		                has_si ? &si : NULL,
+		coredump_create(&ust, NULL, 0, &ust, NULL, 0, NULL,
+		                container_of(&info->ei_data, union coredump_info, ci_except),
 		                UNWIND_USER_DISABLED);
 	} else {
 #if EXCEPT_BACKTRACE_SIZE != 0
@@ -428,18 +465,13 @@ coredump_create_for_exception(struct icpustate *__restrict state,
 				if (info->ei_trace[i] == NULL)
 					break;
 			}
-			coredump_create(&ust, NULL, 0, &ust,
-			                i ? info->ei_trace : NULL, i,
-			                &info->ei_state,
-			                &info->ei_data,
-			                has_si ? &si : NULL,
+			coredump_create(&ust, NULL, 0, &ust, i ? info->ei_trace : NULL, i, &info->ei_state,
+			                container_of(&info->ei_data, union coredump_info, ci_except),
 			                UNWIND_USER_DISABLED);
 		}
 #else /* EXCEPT_BACKTRACE_SIZE != 0 */
-		coredump_create(&ust, NULL, 0, &ust,
-		                NULL, 0, &info->ei_state,
-		                &info->ei_data,
-		                has_si ? &si : NULL,
+		coredump_create(&ust, NULL, 0, &ust, NULL, 0, &info->ei_state,
+		                container_of(&info->ei_data, union coredump_info, ci_except),
 		                UNWIND_USER_DISABLED);
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
 	}
@@ -451,8 +483,9 @@ coredump_create_for_signal(struct icpustate *__restrict state,
                            siginfo_t const *__restrict si) {
 	struct ucpustate ust;
 	icpustate_user_to_ucpustate(state, &ust);
-	coredump_create(&ust, NULL, 0, &ust, NULL, 0,
-	                NULL, NULL, si, UNWIND_USER_DISABLED);
+	coredump_create(&ust, NULL, 0, &ust, NULL, 0, NULL,
+	                container_of(si, union coredump_info, ci_signal),
+	                UNWIND_SUCCESS);
 }
 
 

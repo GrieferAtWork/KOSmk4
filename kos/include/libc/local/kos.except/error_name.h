@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e9dba3 */
+/* HASH CRC-32:0xf9e3f2e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,9 +61,9 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the name of the given error, or `NULL` if unknown.
- * This name is the same as the `E_*` identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
+/* Return the name of the given error, or `NULL' if unknown.
+ * This name is the same as the `E_*' identifier.
+ * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __LOCAL_LIBC(error_name) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
 	__error_class_t __err_class       = ERROR_CLASS(__code);

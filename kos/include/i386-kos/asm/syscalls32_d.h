@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58fd826c */
+/* HASH CRC-32:0xd45e4fe3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1256,25 +1256,26 @@
  *                           caused the problem that escalated into a coredump, but is the last valid stack-
  *                           unwind location at which unwinding could no longer continue.
  *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
  *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
  *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
  * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           traversed when the stack was walked from `orig_state' to `curr_state'
  *                           Note that earlier entires within this vector are further up the call-stack, with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
  *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           it can be assumed that the traceback is complete and contains all traversed instruction locations.
  *                           In this case, a traceback displayed to a human should not include the text location at
  *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
  *                           unwinding is completed for the purposes of displaying a traceback.
  * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           For certain `unwind_error' values, this can also point to other things, but is always
+ *                           allowed to be `NULL' to indicate default/stub values.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-#define __NR32_coredump                     __UINT32_C(0xffffffe8) /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct __exception_data32 const *exception, syscall_ulong_t unwind_error) */
+ *                           was never actually performed, and `reason' is actually a `siginfo_t *'
+ *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
+#define __NR32_coredump                     __UINT32_C(0xffffffe8) /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
 /* Raise a signal within the calling thread alongside the given CPU state
  * This system call is used when translating exceptions into POSIX signal in error mode #4
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should

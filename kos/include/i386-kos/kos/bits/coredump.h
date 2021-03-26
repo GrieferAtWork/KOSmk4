@@ -17,54 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C
-#define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C 1
-#define _KOS_SOURCE 1
-
-#include <kernel/compiler.h>
-
-#include <kernel/coredump.h>
-#include <kernel/except.h>
-#include <kernel/syscall.h>
-#include <kernel/user.h>
-#include <sched/cred.h>
-#include <sched/rpc.h>
-#include <sched/signal.h>
+#ifndef _I386_KOS_KOS_BITS_COREDUMP_H
+#define _I386_KOS_KOS_BITS_COREDUMP_H 1
 
 #include <hybrid/host.h>
-#include <hybrid/pointer.h>
 
-#include <asm/cpu-flags.h>
-#include <asm/registers.h>
-#include <bits/os/kos/siginfo-convert.h>
-#include <kos/bits/exception_data-convert.h>
-#include <kos/bits/exception_data.h>
-#include <kos/bits/exception_data32.h>
-#include <kos/except/reason/inval.h>
-#include <kos/kernel/cpu-state-helpers.h>
-#include <kos/kernel/cpu-state-verify.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
-#include <sys/wait.h>
+#ifdef __x86_64__
+#include "coredump64.h"
+#else /* __x86_64__ */
+#include "coredump32.h"
+#endif /* !__x86_64__ */
 
-#include <assert.h>
-#include <malloca.h>
-#include <signal.h>
-#include <stddef.h>
-#include <string.h>
-
-#include <librpc/rpc.h>
-#include <libunwind/api.h>
-
-#ifndef __INTELLISENSE__
-#ifdef __ARCH_WANT_SYSCALL_COREDUMP
-#define DEFINE_COREDUMP32 1
-#include "coredump-impl.c.inl"
-#endif /* __ARCH_WANT_SYSCALL_COREDUMP */
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_COREDUMP
-#define DEFINE_COREDUMP64 1
-#include "coredump-impl.c.inl"
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_COREDUMP */
-#endif /* !__INTELLISENSE__ */
-
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C */
+#endif /* !_I386_KOS_KOS_BITS_COREDUMP_H */

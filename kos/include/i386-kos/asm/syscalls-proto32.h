@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4845c740 */
+/* HASH CRC-32:0x26a6f936 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2128,7 +2128,7 @@
 #define __NRAT1_coredump                     (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NRAT2_coredump                     (__HYBRID_PTR32(void) const *, __HYBRID_PTR32(void) const *)
 #define __NRAT3_coredump                     (size_t, __size_t)
-#define __NRAT4_coredump                     (struct __exception_data32 const *, struct __exception_data32 const *)
+#define __NRAT4_coredump                     (union coredump_info32 const *, union coredump_info32 const *)
 #define __NRAT5_coredump                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_raiseat                      (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NRAT1_raiseat                      (struct __siginfox32_struct const *, struct __siginfox32_struct const *)
@@ -2684,7 +2684,7 @@
 #define __NRAM_utime64(a, b, c, d, e, f)                      (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NRAM_userviofd(a, b, c, d, e, f)                    (__size_t)a, (__syscall_ulong_t)b
 #define __NRAM_stime64(a, b, c, d, e, f)                      (__time64_t const *)a
-#define __NRAM_coredump(a, b, c, d, e, f)                     (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct __exception_data32 const *)e, (__syscall_ulong_t)f
+#define __NRAM_coredump(a, b, c, d, e, f)                     (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (union coredump_info32 const *)e, (__syscall_ulong_t)f
 #define __NRAM_raiseat(a, b, c, d, e, f)                      (struct ucpustate32 const *)a, (struct __siginfox32_struct const *)b
 #define __NRAM_mktty(a, b, c, d, e, f)                        (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NRAM_lfutexlockexpr(a, b, c, d, e, f)               (__uint32_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx32 const *)d, (struct __timespecx32_64 const *)e, (__syscall_ulong_t)f

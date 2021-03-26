@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f1ec5b4 */
+/* HASH CRC-32:0xf61d7ba0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -783,9 +783,9 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 	result->si_errno = libc_error_as_errno(self);
 	return true;
 }
-/* Return the name of the given error, or `NULL` if unknown.
- * This name is the same as the `E_*` identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
+/* Return the name of the given error, or `NULL' if unknown.
+ * This name is the same as the `E_*' identifier.
+ * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBKCALL libc_error_name)(error_code_t code) {
 	error_class_t err_class       = ERROR_CLASS(code);
@@ -1141,7 +1141,7 @@ restore_saved_exception:
 		 * [10]     RETHROW();
 		 * [11] }
 		 *
-		 * Equivalent:
+		 * Equivalent[EQ]:
 		 * [ 1] foo();                                // [ 2]
 		 * [ 2] if (EXCEPTION_THROWN) {
 		 * [ 3]     __cxa_begin_catch();              // [ 3]
@@ -1165,7 +1165,7 @@ restore_saved_exception:
 		 * would normally  delete the  exception  because it  wasn't  re-thrown
 		 * from anywhere. But if you think of all of the possible constellation
 		 * where this function  might be  called, in  all cases  where we  know
-		 * that there's currently an active  exception (i.e. ei_code !=  E_OK),
+		 * that there's currently an active exception (i.e. `ei_code != E_OK'),
 		 * it's always  acceptable  to  set  the RETHROW  flag  for  the  outer
 		 * call to `__cxa_end_catch()' (on line EQ[17])
 		 */

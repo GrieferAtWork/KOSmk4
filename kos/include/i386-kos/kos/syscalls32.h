@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f808002 */
+/* HASH CRC-32:0x8bc156f8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,10 +47,10 @@
 #include <elf.h>
 #include <hybrid/__pointer.h>
 #include <hybrid/typecore.h>
+#include <kos/bits/coredump32.h>
 #include <kos/bits/debugtrap32.h>
 #include <kos/bits/except-handler.h>
 #include <kos/bits/except-handler32.h>
-#include <kos/bits/exception_data32.h>
 #include <kos/bits/futex-expr32.h>
 #include <kos/bits/userprocmask.h>
 #include <kos/compat/linux-dirent.h>
@@ -102,7 +102,6 @@ __SYSDECL_BEGIN
 #undef timezone
 
 struct __cpu_set_struct;
-struct __exception_data32;
 struct __fd_set_struct;
 struct __iovecx32;
 struct __itimerspecx32;
@@ -163,6 +162,8 @@ struct userprocmask;
 struct ustat;
 struct utsname;
 struct winsize;
+
+union coredump_info32;
 
 #if __CRT_HAVE_SC(_llseek)
 __CDECLARE_SC(,__errno_t,_llseek,(__fd_t __fd, __int64_t __offset, __uint64_t *__result, __syscall_ulong_t __whence),(__fd,__offset,__result,__whence))
@@ -321,25 +322,26 @@ __CDECLARE_SC(,__errno_t,copy_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
  *                           caused the problem that escalated into a coredump, but is the last valid stack-
  *                           unwind location at which unwinding could no longer continue.
  *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
  *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
  *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
  * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           traversed when the stack was walked from `orig_state' to `curr_state'
  *                           Note that earlier entires within this vector are further up the call-stack, with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
  *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           it can be assumed that the traceback is complete and contains all traversed instruction locations.
  *                           In this case, a traceback displayed to a human should not include the text location at
  *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
  *                           unwinding is completed for the purposes of displaying a traceback.
  * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           For certain `unwind_error' values, this can also point to other things, but is always
+ *                           allowed to be `NULL' to indicate default/stub values.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-__CDECLARE_SC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, struct __exception_data32 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
+ *                           was never actually performed, and `reason' is actually a `siginfo_t *'
+ *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
+__CDECLARE_SC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, union coredump_info32 const *__reason, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__reason,__unwind_error))
 #endif /* __CRT_HAVE_SC(coredump) */
 #if __CRT_HAVE_SC(creat)
 __CDECLARE_SC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -2828,25 +2830,26 @@ __CDECLARE_XSC(,__errno_t,copy_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
  *                           caused the problem that escalated into a coredump, but is the last valid stack-
  *                           unwind location at which unwinding could no longer continue.
  *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
  *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
  *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
  * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           traversed when the stack was walked from `orig_state' to `curr_state'
  *                           Note that earlier entires within this vector are further up the call-stack, with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
  *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           it can be assumed that the traceback is complete and contains all traversed instruction locations.
  *                           In this case, a traceback displayed to a human should not include the text location at
  *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
  *                           unwinding is completed for the purposes of displaying a traceback.
  * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           For certain `unwind_error' values, this can also point to other things, but is always
+ *                           allowed to be `NULL' to indicate default/stub values.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-__CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, struct __exception_data32 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
+ *                           was never actually performed, and `reason' is actually a `siginfo_t *'
+ *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
+__CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, union coredump_info32 const *__reason, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__reason,__unwind_error))
 #endif /* __CRT_HAVE_XSC(coredump) */
 #if __CRT_HAVE_XSC(creat)
 __CDECLARE_XSC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))

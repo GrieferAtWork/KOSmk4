@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87364fb6 */
+/* HASH CRC-32:0x3d5078e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,9 +59,9 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_error_as
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
-/* Return the name of the given error, or `NULL` if unknown.
- * This name is the same as the `E_*` identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
+/* Return the name of the given error, or `NULL' if unknown.
+ * This name is the same as the `E_*' identifier.
+ * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_error_name)(error_code_t code);
 /* Return the priority for a given error code, where exceptions
  * with greater priorities should take the place of ones with

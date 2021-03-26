@@ -200,8 +200,9 @@ class CType {
 
 	property escapedTypename: string = {
 		get(): string {
-			if (typename.startswith("struct ")) {
-				local s = 7;
+			if (typename.startswith("struct ") ||
+			    typename.startswith("union ")) {
+				local s = 6;
 				local len = #typename;
 				while (s < len && typename.isspace(s))
 					++s;
@@ -263,9 +264,27 @@ class CType {
 		}
 	}
 
+	function gatherUsedEscapedUnionTypes(types: HashSet with string) {
+		if (typename.startswith("union ")) {
+			local s = 6;
+			local len = #typename;
+			while (s < len && typename.isspace(s))
+				++s;
+			local e = s;
+			while (e < len && typename.issymcont(e))
+				++e;
+			if (s < e) {
+				local n = typename[s:e];
+				n = syscallTypeEscapedStructTypes.get(n, n);
+				types.insert(n);
+			}
+		}
+	}
+
 	function gatherTypeOriginHeaders(headers: HashSet with string) {
-		if (typename.startswith("struct ")) {
-			local s = 7;
+		if (typename.startswith("struct ") ||
+		    typename.startswith("union ")) {
+			local s = 6;
 			local len = #typename;
 			while (s < len && typename.isspace(s))
 				++s;
@@ -305,8 +324,9 @@ class CType {
 	}
 
 	function gatherPragmaPushMacroNames(names: HashSet with string) {
-		if (typename.startswith("struct ")) {
-			local s = 7;
+		if (typename.startswith("struct ") ||
+		    typename.startswith("union ")) {
+			local s = 6;
 			local len = #typename;
 			while (s < len && typename.isspace(s))
 				++s;
@@ -450,6 +470,11 @@ class Function {
 		returnType.gatherUsedEscapedStructTypes(types);
 		for (local t, none: args)
 			t.gatherUsedEscapedStructTypes(types);
+	}
+	gatherUsedEscapedUnionTypes(types: HashSet with string) {
+		returnType.gatherUsedEscapedUnionTypes(types);
+		for (local t, none: args)
+			t.gatherUsedEscapedUnionTypes(types);
 	}
 	gatherTypeOriginHeaders(headers: HashSet with string) {
 		returnType.gatherTypeOriginHeaders(headers);
@@ -896,6 +921,7 @@ function simpifyTypeName(x: string): string {
 	x = removeWord(x, "const");
 	x = removeWord(x, "volatile");
 	x = removeWord(x, "struct");
+	x = removeWord(x, "union");
 	x = x.replace("[]", "*");
 	for (;;) {
 		local r = x.replace("  ", "");
@@ -1668,10 +1694,12 @@ function parseSyscallDefsFile(
 function printSyscallDeclarations(
 		fp: File, decls: {Function...}) {
 	local usedStructTypes: HashSet with string = HashSet();
+	local usedUnionTypes: HashSet with string = HashSet();
 	local pragmaPushMacroNames: HashSet with string = HashSet();
 	decls = List(decls);
 	for (local x: decls) {
 		x.gatherUsedEscapedStructTypes(usedStructTypes);
+		x.gatherUsedEscapedUnionTypes(usedUnionTypes);
 		x.gatherPragmaPushMacroNames(pragmaPushMacroNames);
 		local used_name = "sys_" + x.name;
 		if (used_name in syscallTypeMustPushMacro)
@@ -1696,6 +1724,12 @@ function printSyscallDeclarations(
 		usedStructTypes = usedStructTypes.sorted();
 		for (local x: usedStructTypes)
 			fp << "struct " << x << ";\n";
+		fp << "\n";
+	}
+	if (usedUnionTypes) {
+		usedUnionTypes = usedUnionTypes.sorted();
+		for (local x: usedUnionTypes)
+			fp << "union " << x << ";\n";
 		fp << "\n";
 	}
 	decls.sort();

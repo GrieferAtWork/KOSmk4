@@ -17,54 +17,39 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C
-#define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C 1
-#define _KOS_SOURCE 1
+#ifndef _KOS_COREDUMP_H
+#define _KOS_COREDUMP_H 1
 
-#include <kernel/compiler.h>
+#include <__stdinc.h>
 
-#include <kernel/coredump.h>
-#include <kernel/except.h>
-#include <kernel/syscall.h>
-#include <kernel/user.h>
-#include <sched/cred.h>
-#include <sched/rpc.h>
-#include <sched/signal.h>
+#include <kos/bits/coredump.h> /* union coredump_info */
 
-#include <hybrid/host.h>
-#include <hybrid/pointer.h>
+#include <libunwind/api.h> /* UNWIND_* */
 
-#include <asm/cpu-flags.h>
-#include <asm/registers.h>
-#include <bits/os/kos/siginfo-convert.h>
-#include <kos/bits/exception_data-convert.h>
-#include <kos/bits/exception_data.h>
-#include <kos/bits/exception_data32.h>
-#include <kos/except/reason/inval.h>
-#include <kos/kernel/cpu-state-helpers.h>
-#include <kos/kernel/cpu-state-verify.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
-#include <sys/wait.h>
 
-#include <assert.h>
-#include <malloca.h>
-#include <signal.h>
-#include <stddef.h>
-#include <string.h>
+/* Coredump message string limits.
+ * WARNING: These values as used as alloca() limits, so don't  set
+ *          them too high, or else user-space may be able to cause
+ *          a kernel-space stack overflow... */
+#define COREDUMP_ASSERT_EXPR_MAXLEN 512  /* ci_assert.ca_expr */
+#define COREDUMP_ASSERT_FILE_MAXLEN 512  /* ci_assert.ca_file */
+#define COREDUMP_ASSERT_FUNC_MAXLEN 256  /* ci_assert.ca_func */
+#define COREDUMP_ASSERT_MESG_MAXLEN 2048 /* ci_assert.ca_mesg */
+#define COREDUMP_DLERROR_MAXLEN     2048 /* ci_dlerror */
+#define COREDUMP_TRACEBACK_LIMIT    128  /* Max # of extended traceback entries. */
 
-#include <librpc/rpc.h>
-#include <libunwind/api.h>
 
-#ifndef __INTELLISENSE__
-#ifdef __ARCH_WANT_SYSCALL_COREDUMP
-#define DEFINE_COREDUMP32 1
-#include "coredump-impl.c.inl"
-#endif /* __ARCH_WANT_SYSCALL_COREDUMP */
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_COREDUMP
-#define DEFINE_COREDUMP64 1
-#include "coredump-impl.c.inl"
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_COREDUMP */
-#endif /* !__INTELLISENSE__ */
+#define COREDUMP_INFO_ISEXCEPT(unwind_error)  \
+	((unwind_error) != UNWIND_SUCCESS &&      \
+	 (unwind_error) != UNWIND_USER_DLERROR && \
+	 (unwind_error) != UNWIND_USER_ASSERT &&  \
+	 (unwind_error) != UNWIND_USER_ACHECK)
+#define COREDUMP_INFO_ISSIGNAL(unwind_error) \
+	((unwind_error) == UNWIND_SUCCESS)
+#define COREDUMP_INFO_ISDLERROR(unwind_error) \
+	((unwind_error) == UNWIND_USER_DLERROR)
+#define COREDUMP_INFO_ISASSERT(unwind_error) \
+	((unwind_error) == UNWIND_USER_ASSERT || \
+	 (unwind_error) == UNWIND_USER_ACHECK)
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C */
+#endif /* !_KOS_COREDUMP_H */

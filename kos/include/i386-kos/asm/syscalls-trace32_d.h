@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c7cb9e6 */
+/* HASH CRC-32:0x9a73f0ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1106,7 +1106,7 @@
 #define __NR32AN1_coredump                     orig_state
 #define __NR32AN2_coredump                     traceback_vector
 #define __NR32AN3_coredump                     traceback_length
-#define __NR32AN4_coredump                     exception
+#define __NR32AN4_coredump                     reason
 #define __NR32AN5_coredump                     unwind_error
 #define __NR32AN0_raiseat                      state
 #define __NR32AN1_raiseat                      si
@@ -2859,7 +2859,7 @@
 #define __NR32ATR2_coredump                     SC_REPR_VOID_VECTOR32                                                /* traceback_vector */ 
 #define __NR32ATL2_coredump                     3                                                                    /* traceback_vector -> traceback_length */ 
 #define __NR32ATR3_coredump                     SC_REPR_SIZE_T                                                       /* traceback_length */ 
-#define __NR32ATR4_coredump                     SC_REPR_STRUCT_EXCEPTION_DATA32                                      /* exception */ 
+#define __NR32ATR4_coredump                     SC_REPR_STRUCT_EXCEPTION_DATA32                                      /* reason */ 
 #define __NR32ATR5_coredump                     SC_REPR_UNWIND_ERROR                                                 /* unwind_error */ 
 #define __NR32RTR_coredump                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_raiseat                      SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
