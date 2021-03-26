@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/threads.h) */
+/* (#) Portability: FreeBSD       (/lib/libstdthreads/threads.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/threads.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/threads.h) */
 /* (#) Portability: diet libc     (/include/threads.h) */

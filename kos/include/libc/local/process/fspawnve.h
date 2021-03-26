@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe452313a */
+/* HASH CRC-32:0x51cd109d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -293,7 +293,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
  * as the parent process, with the parent process remaining suspended until the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(2)', since the later would include
+ *                 instead of the regular `exit(3)', since the later would include
  *                 the invocation of `atexit(3)' handlers, which would then run in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process
@@ -321,7 +321,7 @@ __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep
  * as the parent process, with the parent process remaining suspended until the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(2)', since the later would include
+ *                 instead of the regular `exit(3)', since the later would include
  *                 the invocation of `atexit(3)' handlers, which would then run in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process

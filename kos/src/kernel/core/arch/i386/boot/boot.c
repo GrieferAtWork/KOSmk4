@@ -408,6 +408,23 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: In the kernel assertion check handler, add a hook that is set
+	 *       by moddbx to print additional information about the values of
+	 *       variables referenced by the assertion-expr.
+	 *       Essentially, have moddbx look at the assertion expression and
+	 *       scan it for  referenced variables/fields/array-elements,  and
+	 *       print their values right there.
+	 *       e.g.: assert(self->foo == 42);
+	 *       Will automatically display the value of `self->foo' as part of
+	 *       the initial assertion check screen.
+	 *       Recognized expression sequences should token sequences matching:
+	 *          EXPR      ::= UNARY [SUFFIX...]
+	 *          UNARY     ::= KEYWORD | '(' TYPE_EXPR ')' EXPR | '(' EXPR ')' | '*' UNARY
+	 *          SUFFIX    ::= '->' KEYWORD | '.' KEYWORD | '[' FULL_EXPR ']'
+	 *          TYPE_EXPR ::= <Full, regular C type expression>
+	 *          FULL_EXPR ::= <Full, regular C expression>
+	 */
+
 	/* TODO: Add an arch-specific <asm/signed-shift.h> file  to contain a set  of
 	 *       feature test macros that specify how the signed >>-operator behaves:
 	 *        Behavior #1: Signed divide (iow. the sign-bit is copied)

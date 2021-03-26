@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8d6e333 */
+/* HASH CRC-32:0x3b430f3f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,10 +73,6 @@ __NAMESPACE_STD_USING(strtok)
 __NAMESPACE_STD_USING(strcoll)
 __NAMESPACE_STD_USING(strxfrm)
 __NAMESPACE_STD_USING(strerror)
-#if !defined(__strsignal_defined) && defined(__std_strsignal_defined)
-#define __strsignal_defined 1
-__NAMESPACE_STD_USING(strsignal)
-#endif /* !__strsignal_defined && __std_strsignal_defined */
 #undef _CXX_STDONLY_CSTRING
 #endif /* !__CXX_SYSTEM_HEADER */
 #else /* _CXX_STDONLY_CSTRING */
@@ -871,19 +867,6 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 
 #endif /* !... */
 } /* extern "C++" */
 #endif /* __cplusplus && __USE_STRING_OVERLOADS */
-#ifndef __std_strsignal_defined
-#define __std_strsignal_defined 1
-#ifdef __strsignal_defined
-__NAMESPACE_GLB_USING_OR_IMPL(strsignal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strsignal)(__signo_t __signo) { return (:: strsignal)(__signo); })
-#elif defined(__CRT_HAVE_strsignal)
-__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(__signo_t __signo),(__signo))
-#else /* ... */
-__NAMESPACE_STD_END
-#include <libc/local/string/strsignal.h>
-__NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strsignal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strsignal)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal))(__signo); })
-#endif /* !... */
-#endif /* !__std_strsignal_defined */
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
@@ -1025,12 +1008,15 @@ __CDECLARE(__ATTR_COLD __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror_l,(int __err
 #include <libc/local/string/strerror_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strerror_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror_l)(int __errnum, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_l))(__errnum, __locale); })
 #endif /* !__CRT_HAVE_strerror_l */
-#ifndef __CXX_SYSTEM_HEADER
-#if !defined(__strsignal_defined) && defined(__std_strsignal_defined)
+#ifndef __strsignal_defined
 #define __strsignal_defined 1
-__NAMESPACE_STD_USING(strsignal)
-#endif /* !__strsignal_defined && __std_strsignal_defined */
-#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __CRT_HAVE_strsignal
+__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(__signo_t __signo),(__signo))
+#else /* __CRT_HAVE_strsignal */
+#include <libc/local/string/strsignal.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(strsignal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strsignal)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal))(__signo); })
+#endif /* !__CRT_HAVE_strsignal */
+#endif /* !__strsignal_defined */
 #if __has_builtin(__builtin_strndup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strndup)
 __CEIDECLARE_GCCNCX(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strndup,(char const *__restrict __str, __SIZE_TYPE__ __max_chars),{ return __builtin_strndup(__str, __max_chars); })
 #elif defined(__CRT_HAVE_strndup)

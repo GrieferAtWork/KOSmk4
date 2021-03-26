@@ -2076,35 +2076,6 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
 }
 /*[[[end:libd__wdupenv_s]]]*/
 
-/*[[[head:libc_reallocf,hash:CRC-32=0x79be04b8]]]*/
-INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
-NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
-                                    size_t num_bytes)
-/*[[[body:libc_reallocf]]]*/
-/*AUTO*/{
-	void *result;
-	result = realloc(mallptr, num_bytes);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-#ifdef __REALLOC_ZERO_IS_NONNULL
-	if unlikely(!result)
-#else /* __REALLOC_ZERO_IS_NONNULL */
-	/* Must check that num_bytes != 0 because if it isn't
-	 * (iow: num_bytes == 0), then realloc(mallptr, 0) may
-	 * act  the same as  `free(mallptr)'. If that happens,
-	 * then we mustn't double-free `mallptr'.
-	 * Note that realloc(<non-NULL>, 0) can't possibly fail
-	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
-	 * was guessed incorrectly, so this may of doing it  is
-	 * entirely safe! */
-	if unlikely(!result && num_bytes != 0)
-#endif /* !__REALLOC_ZERO_IS_NONNULL */
-	{
-		free(mallptr);
-	}
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-	return result;
-}
-/*[[[end:libc_reallocf]]]*/
 
 /*[[[head:libc_recallocarray,hash:CRC-32=0x7b1f23e9]]]*/
 /* >> recallocarray(3)
@@ -2306,7 +2277,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdde8318a]]]*/
+/*[[[start:exports,hash:CRC-32=0x2baf0bbf]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2365,7 +2336,6 @@ DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(getpt, libc_getpt);
 DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);
-DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
 DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
 DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);
 DEFINE_PUBLIC_ALIAS(radixsort, libc_radixsort);

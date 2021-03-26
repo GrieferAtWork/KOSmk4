@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65a6fcf */
+/* HASH CRC-32:0x9a230f9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,8 +68,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocf))(void *__mallptr, __SIZE_TY
 	 * then we mustn't double-free `mallptr'.
 	 * Note that realloc(<non-NULL>, 0) can't possibly fail
 	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
-	 * was guessed incorrectly, so this may of doing it  is
-	 * entirely safe! */
+	 * was guessed incorrectly, so we know that the realloc
+	 * can only fail when  returning `NULL' for a  non-zero
+	 * size argument! */
 	if __unlikely(!__result && __num_bytes != 0)
 #endif /* !__REALLOC_ZERO_IS_NONNULL */
 	{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fe2c113 */
+/* HASH CRC-32:0xb160df69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1583,7 +1583,7 @@ __CDECLARE_OPT(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useco
  * as the parent process, with the parent process remaining suspended until the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(2)', since the later would include
+ *                 instead of the regular `exit(3)', since the later would include
  *                 the invocation of `atexit(3)' handlers, which would then run in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process
@@ -1611,7 +1611,7 @@ __CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void
  * as the parent process, with the parent process remaining suspended until the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(2)', since the later would include
+ *                 instead of the regular `exit(3)', since the later would include
  *                 the invocation of `atexit(3)' handlers, which would then run in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process
@@ -2468,14 +2468,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__strmode_defined */
 #ifndef __strsignal_defined
 #define __strsignal_defined 1
-#ifdef __std_strsignal_defined
-__NAMESPACE_STD_USING(strsignal)
-#elif defined(__CRT_HAVE_strsignal)
+#ifdef __CRT_HAVE_strsignal
 __CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(__signo_t __signo),(__signo))
-#else /* ... */
+#else /* __CRT_HAVE_strsignal */
 #include <libc/local/string/strsignal.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strsignal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strsignal)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal))(__signo); })
-#endif /* !... */
+#endif /* !__CRT_HAVE_strsignal */
 #endif /* !__strsignal_defined */
 #if !defined(__rcmd_af_defined) && defined(__CRT_HAVE_rcmd_af)
 #define __rcmd_af_defined 1

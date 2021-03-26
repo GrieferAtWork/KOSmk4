@@ -3100,8 +3100,8 @@ int shexec([[nullable]] char const *command) {
 %#ifdef __USE_BSD
 [[section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
-[[userimpl, requires_function(realloc)]]
-[[impl_include("<asm/crt/malloc.h>"), guard]]
+[[guard, requires_function(realloc)]]
+[[impl_include("<asm/crt/malloc.h>")]]
 void *reallocf(void *mallptr, $size_t num_bytes) {
 	void *result;
 	result = realloc(mallptr, num_bytes);
@@ -3115,8 +3115,9 @@ void *reallocf(void *mallptr, $size_t num_bytes) {
 	 * then we mustn't double-free `mallptr'.
 	 * Note that realloc(<non-NULL>, 0) can't possibly fail
 	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
-	 * was guessed incorrectly, so this may of doing it  is
-	 * entirely safe! */
+	 * was guessed incorrectly, so we know that the realloc
+	 * can only fail when  returning `NULL' for a  non-zero
+	 * size argument! */
 	if unlikely(!result && num_bytes != 0)
 @@pp_endif@@
 	{

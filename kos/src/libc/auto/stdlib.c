@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f94c93f */
+/* HASH CRC-32:0xe957414b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2053,6 +2053,33 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 
 
 	return -1;
+}
+#include <asm/crt/malloc.h>
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
+NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
+                                    size_t num_bytes) {
+	void *result;
+	result = libc_realloc(mallptr, num_bytes);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#ifdef __REALLOC_ZERO_IS_NONNULL
+	if unlikely(!result)
+#else /* __REALLOC_ZERO_IS_NONNULL */
+	/* Must check that num_bytes != 0 because if it isn't
+	 * (iow: num_bytes == 0), then realloc(mallptr, 0) may
+	 * act  the same as  `free(mallptr)'. If that happens,
+	 * then we mustn't double-free `mallptr'.
+	 * Note that realloc(<non-NULL>, 0) can't possibly fail
+	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
+	 * was guessed incorrectly, so we know that the realloc
+	 * can only fail when  returning `NULL' for a  non-zero
+	 * size argument! */
+	if unlikely(!result && num_bytes != 0)
+#endif /* !__REALLOC_ZERO_IS_NONNULL */
+	{
+		libc_free(mallptr);
+	}
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return result;
 }
 #include <libc/local/program_invocation_name.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
@@ -4355,6 +4382,7 @@ DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);
 DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
+DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
 DEFINE_PUBLIC_ALIAS(strtonum, libc_strtonum);
