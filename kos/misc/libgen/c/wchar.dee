@@ -58,7 +58,7 @@ global final WCHAR_REPLACEMENT_STR:   (string, string) = { "u", "U" };
 global final WCHAR_REPLACEMENT_CC:    (string, string) = { "LIBDCALL", "LIBKCALL" };
 global final WCHAR_REPLACEMENT_VCC:   (string, string) = { "VLIBDCALL", "VLIBKCALL" };
 
-@@Mapping of all local functions ever defined (by name)
+@@Mapping of all wchar functions ever defined (by name)
 @@Duplicate entires aren't allowed
 global allWcharFunctionsByName: {string: WcharFunction} = Dict();
 

@@ -3002,8 +3002,8 @@ class LibraryFunctionBinding {
 class LibraryFunction {
 	this = default;
 
-	public operator == (other: Function): bool -> this === other;
-	public operator != (other: Function): bool -> this !== other;
+	public operator == (other: LibraryFunction): bool -> this === other;
+	public operator != (other: LibraryFunction): bool -> this !== other;
 	public operator hash (): int -> Object.id(this);
 
 	@@Name of the function in public headers (e.g. @"strlen")

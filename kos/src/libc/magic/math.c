@@ -953,11 +953,11 @@ double trunc(double x) {
 @@pp_endif@@
 }
 
-@@Compute remainder of `x' and `y' and put in *QUO a value with sign
-@@of x/y and magnitude congruent `mod 2^n' to the magnitude of
-@@the integral quotient x/y, with n >= 3
+@@Compute remainder of `x' and `y' and put in `*pquo' a value with
+@@sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+@@of the integral quotient x/y, with n >= 3
 [[std, wunused, nothrow, crtbuiltin, export_alias("__remquo")]]
-double remquo(double x, double y, int *pquo); /* TODO */
+double remquo(double x, double y, [[nonnull]] int *pquo); /* TODO */
 
 @@Round `x' to nearest integral value according to current rounding direction
 [[std, wunused, nothrow, const, crtbuiltin, export_alias("__lrint")]]

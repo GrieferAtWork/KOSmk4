@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x815e3fcd */
+/* HASH CRC-32:0xe5ab9ead */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -931,10 +931,10 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_trunc)(double x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_trunc)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTDEF WUNUSED double NOTHROW(LIBDCALL libd_remquo)(double x, double y, int *pquo);
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTDEF WUNUSED NONNULL((3)) double NOTHROW(LIBDCALL libd_remquo)(double x, double y, int *pquo);
 /* Round `x' to nearest integral value according to current rounding direction */
 INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBDCALL libd_lrint)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -1039,16 +1039,16 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_truncf)(float x);
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_truncf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTDEF WUNUSED float NOTHROW(LIBDCALL libd_remquof)(float x, float y, int *pquo);
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTDEF WUNUSED NONNULL((3)) float NOTHROW(LIBDCALL libd_remquof)(float x, float y, int *pquo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remquof)(float x, float y, int *pquo);
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTDEF WUNUSED NONNULL((3)) float NOTHROW(LIBCCALL libc_remquof)(float x, float y, int *pquo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -1149,16 +1149,16 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_truncl)(__LONGDOUBL
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_remquol)(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo);
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTDEF WUNUSED NONNULL((3)) __LONGDOUBLE NOTHROW(LIBDCALL libd_remquol)(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo);
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTDEF WUNUSED NONNULL((3)) __LONGDOUBLE NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x, __LONGDOUBLE y, int *pquo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Round `x' to nearest integral value according to current rounding direction */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddbf3478 */
+/* HASH CRC-32:0xf0f3feb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1586,10 +1586,10 @@ NOTHROW(LIBCCALL libc_truncf)(float x) {
 	return (float)(__INTMAX_TYPE__)x;
 #endif /* !__LIBM_MATHFUNF */
 }
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) float
 NOTHROW(LIBCCALL libc_remquof)(float x,
                                float y,
                                int *pquo) {
@@ -1754,10 +1754,10 @@ NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)(__INTMAX_TYPE__)x;
 #endif /* !__LIBM_MATHFUNL */
 }
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) __LONGDOUBLE
 NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
                                __LONGDOUBLE y,
                                int *pquo) {
