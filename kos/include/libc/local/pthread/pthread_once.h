@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c5e20b0 */
+/* HASH CRC-32:0x1fde7bb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/pthreadvalues.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
+#include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
@@ -79,6 +80,23 @@ __again:
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
 	} else if (__status != __PTHREAD_ONCE_INIT + 2) {
+		if __unlikely(__status != __PTHREAD_ONCE_INIT + 1) {
+			/* Quote(https://man7.org/linux/man-pages/man3/pthread_once.3p.html):
+			 * """
+			 * If  an implementation  detects that  the value  specified by the
+			 * once_control argument  to pthread_once()  does  not refer  to  a
+			 * pthread_once_t object  initialized by  PTHREAD_ONCE_INIT, it  is
+			 * recommended that the function should fail and report an [EINVAL]
+			 * error.
+			 * """
+			 */
+#ifdef __EINVAL
+			return __EINVAL;
+#else /* __EINVAL */
+			return 1;
+#endif /* !__EINVAL */
+		}
+
 		/* Wait for some other thread to finish init_routine() */
 		do {
 			__hybrid_yield();

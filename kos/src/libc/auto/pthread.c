@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa38f27c0 */
+/* HASH CRC-32:0xdf4e37c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,7 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 #include <asm/crt/pthreadvalues.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
+#include <asm/os/errno.h>
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
  * only once, even if pthread_once is executed several times with the
@@ -84,6 +85,23 @@ again:
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
 	} else if (status != __PTHREAD_ONCE_INIT + 2) {
+		if unlikely(status != __PTHREAD_ONCE_INIT + 1) {
+			/* Quote(https://man7.org/linux/man-pages/man3/pthread_once.3p.html):
+			 * """
+			 * If  an implementation  detects that  the value  specified by the
+			 * once_control argument  to pthread_once()  does  not refer  to  a
+			 * pthread_once_t object  initialized by  PTHREAD_ONCE_INIT, it  is
+			 * recommended that the function should fail and report an [EINVAL]
+			 * error.
+			 * """
+			 */
+#ifdef EINVAL
+			return EINVAL;
+#else /* EINVAL */
+			return 1;
+#endif /* !EINVAL */
+		}
+
 		/* Wait for some other thread to finish init_routine() */
 		do {
 			__hybrid_yield();

@@ -1176,7 +1176,8 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 [[throws, export_alias("call_once")]]
 [[decl_prefix(DEFINE_PTHREAD_ONCE_ROUTINE_T)]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-[[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>", "<hybrid/sched/__yield.h>")]]
+[[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>")]]
+[[impl_include("<hybrid/sched/__yield.h>", "<asm/os/errno.h>")]]
 $errno_t pthread_once([[nonnull]] pthread_once_t *once_control,
                       [[nonnull]] __pthread_once_routine_t init_routine) {
 	pthread_once_t status;
@@ -1210,6 +1211,23 @@ again:
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
 	} else if (status != __PTHREAD_ONCE_INIT + 2) {
+		if unlikely(status != __PTHREAD_ONCE_INIT + 1) {
+			/* Quote(https://man7.org/linux/man-pages/man3/pthread_once.3p.html):
+			 * """
+			 * If  an implementation  detects that  the value  specified by the
+			 * once_control argument  to pthread_once()  does  not refer  to  a
+			 * pthread_once_t object  initialized by  PTHREAD_ONCE_INIT, it  is
+			 * recommended that the function should fail and report an [EINVAL]
+			 * error.
+			 * """
+			 */
+@@pp_ifdef EINVAL@@
+			return EINVAL;
+@@pp_else@@
+			return 1;
+@@pp_endif@@
+		}
+
 		/* Wait for some other thread to finish init_routine() */
 		do {
 			__hybrid_yield();
