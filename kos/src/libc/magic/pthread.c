@@ -1180,13 +1180,32 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 $errno_t pthread_once([[nonnull]] pthread_once_t *once_control,
                       [[nonnull]] __pthread_once_routine_t init_routine) {
 	pthread_once_t status;
+again:
 	status = __hybrid_atomic_cmpxch_val(*once_control,
 	                                    __PTHREAD_ONCE_INIT,
 	                                    __PTHREAD_ONCE_INIT + 1,
 	                                    __ATOMIC_SEQ_CST,
 	                                    __ATOMIC_SEQ_CST);
 	if (status == __PTHREAD_ONCE_INIT) {
+		/* To  comply with POSIX, we must be able to roll-back once
+		 * initialization when `init_routine' "cancels" our thread. */
+@@pp_ifdef __cplusplus@@
+		@try@ {
+			(*init_routine)();
+		} @catch@ (...) {
+			/* roll-back... */
+			__hybrid_atomic_store(*once_control,
+			                      __PTHREAD_ONCE_INIT,
+			                      __ATOMIC_RELEASE);
+@@pp_if $has_function(error_rethrow)@@
+			error_rethrow();
+@@pp_else@@
+			@throw@;
+@@pp_endif@@
+		}
+@@pp_else@@
 		(*init_routine)();
+@@pp_endif@@
 		__hybrid_atomic_store(*once_control,
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
@@ -1194,8 +1213,13 @@ $errno_t pthread_once([[nonnull]] pthread_once_t *once_control,
 		/* Wait for some other thread to finish init_routine() */
 		do {
 			__hybrid_yield();
-		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) !=
-		         __PTHREAD_ONCE_INIT + 2);
+		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) ==
+		         __PTHREAD_ONCE_INIT + 1);
+		/* Must re-check the once-status, since another thread may have
+		 * rolled back completion  in case its  call to  `init_routine'
+		 * resulted in an exception being called. (or to speak in terms
+		 * of POSIX, caused its thread to be "canceled") */
+		goto again;
 	}
 	return 0;
 }

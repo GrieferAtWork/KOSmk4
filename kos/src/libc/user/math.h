@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf4d5903 */
+/* HASH CRC-32:0x253a29ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,10 +72,10 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erfc)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_lgamma)(double x);
 /* True gamma function */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
-/* Compute remainder of `x' and `y' and put in *QUO a value with sign
- * of x/y and magnitude congruent `mod 2^n' to the magnitude of
- * the integral quotient x/y, with n >= 3 */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remquo)(double x, double y, int *pquo);
+/* Compute remainder of `x' and `y' and put in `*pquo' a value with
+ * sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+ * of the integral quotient x/y, with n >= 3 */
+INTDEF WUNUSED NONNULL((3)) double NOTHROW(LIBCCALL libc_remquo)(double x, double y, int *pquo);
 /* Cosine and sine of `x' */
 INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincos)(double x, double *psinx, double *pcosx);
 /* A function missing in all standards: compute exponent to base ten */

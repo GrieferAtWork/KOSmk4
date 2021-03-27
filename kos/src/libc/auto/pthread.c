@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6de6e2e */
+/* HASH CRC-32:0xa38f27c0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/pthread.h"
+#include "../user/kos.except.h"
 #include "../user/sched.h"
 #include "../user/unistd.h"
 
@@ -53,13 +54,32 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 (LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
                              __pthread_once_routine_t init_routine) THROWS(...) {
 	pthread_once_t status;
+again:
 	status = __hybrid_atomic_cmpxch_val(*once_control,
 	                                    __PTHREAD_ONCE_INIT,
 	                                    __PTHREAD_ONCE_INIT + 1,
 	                                    __ATOMIC_SEQ_CST,
 	                                    __ATOMIC_SEQ_CST);
 	if (status == __PTHREAD_ONCE_INIT) {
+		/* To  comply with POSIX, we must be able to roll-back once
+		 * initialization when `init_routine' "cancels" our thread. */
+#ifdef __cplusplus
+		try {
+			(*init_routine)();
+		} catch (...) {
+			/* roll-back... */
+			__hybrid_atomic_store(*once_control,
+			                      __PTHREAD_ONCE_INIT,
+			                      __ATOMIC_RELEASE);
+#ifdef __CRT_HAVE_error_rethrow
+			libc_error_rethrow();
+#else /* __CRT_HAVE_error_rethrow */
+			throw;
+#endif /* !__CRT_HAVE_error_rethrow */
+		}
+#else /* __cplusplus */
 		(*init_routine)();
+#endif /* !__cplusplus */
 		__hybrid_atomic_store(*once_control,
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
@@ -67,8 +87,13 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 		/* Wait for some other thread to finish init_routine() */
 		do {
 			__hybrid_yield();
-		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) !=
-		         __PTHREAD_ONCE_INIT + 2);
+		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) ==
+		         __PTHREAD_ONCE_INIT + 1);
+		/* Must re-check the once-status, since another thread may have
+		 * rolled back completion  in case its  call to  `init_routine'
+		 * resulted in an exception being called. (or to speak in terms
+		 * of POSIX, caused its thread to be "canceled") */
+		goto again;
 	}
 	return 0;
 }

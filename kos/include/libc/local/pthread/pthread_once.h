@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c4da980 */
+/* HASH CRC-32:0x1c5e20b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,14 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 #endif /* !____pthread_once_routine_t_defined */
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: error_rethrow from kos.except */
+#if !defined(__local___localdep_error_rethrow_defined) && defined(__CRT_HAVE_error_rethrow)
+#define __local___localdep_error_rethrow_defined 1
+/* Rethrow the current exception (same as a c++ `throw;' expression) */
+__COMPILER_REDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_error_rethrow,(void),error_rethrow,())
+#endif /* !__local___localdep_error_rethrow_defined && __CRT_HAVE_error_rethrow */
+__NAMESPACE_LOCAL_END
 #include <asm/crt/pthreadvalues.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
@@ -41,13 +49,32 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_once) __ATTR_NONNULL((1, 2)) __errno_t
 (__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) {
 	__pthread_once_t __status;
+__again:
 	__status = __hybrid_atomic_cmpxch_val(*__once_control,
 	                                    __PTHREAD_ONCE_INIT,
 	                                    __PTHREAD_ONCE_INIT + 1,
 	                                    __ATOMIC_SEQ_CST,
 	                                    __ATOMIC_SEQ_CST);
 	if (__status == __PTHREAD_ONCE_INIT) {
+		/* To  comply with POSIX, we must be able to roll-back once
+		 * initialization when `init_routine' "cancels" our thread. */
+#ifdef __cplusplus
+		try {
+			(*__init_routine)();
+		} catch (...) {
+			/* roll-back... */
+			__hybrid_atomic_store(*__once_control,
+			                      __PTHREAD_ONCE_INIT,
+			                      __ATOMIC_RELEASE);
+#ifdef __CRT_HAVE_error_rethrow
+			__localdep_error_rethrow();
+#else /* __CRT_HAVE_error_rethrow */
+			throw;
+#endif /* !__CRT_HAVE_error_rethrow */
+		}
+#else /* __cplusplus */
 		(*__init_routine)();
+#endif /* !__cplusplus */
 		__hybrid_atomic_store(*__once_control,
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
@@ -55,8 +82,13 @@ __LOCAL_LIBC(pthread_once) __ATTR_NONNULL((1, 2)) __errno_t
 		/* Wait for some other thread to finish init_routine() */
 		do {
 			__hybrid_yield();
-		} while (__hybrid_atomic_load(*__once_control, __ATOMIC_ACQUIRE) !=
-		         __PTHREAD_ONCE_INIT + 2);
+		} while (__hybrid_atomic_load(*__once_control, __ATOMIC_ACQUIRE) ==
+		         __PTHREAD_ONCE_INIT + 1);
+		/* Must re-check the once-status, since another thread may have
+		 * rolled back completion  in case its  call to  `init_routine'
+		 * resulted in an exception being called. (or to speak in terms
+		 * of POSIX, caused its thread to be "canceled") */
+		goto __again;
 	}
 	return 0;
 }
