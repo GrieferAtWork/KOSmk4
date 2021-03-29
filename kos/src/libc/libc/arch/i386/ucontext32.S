@@ -99,9 +99,9 @@ PRIVATE_FUNCTION(get_fpu_flags)
 	testl  %eax, %eax
 	jz     .Lget_fpu_flags_noenv
 	cmpb   $(0), 0(%eax)
-	jz     .Lget_fpu_flags_noenv /* strlen(env) == 0 */
+	je     .Lget_fpu_flags_noenv /* strlen(env) == 0 */
 	cmpb   $(0), 1(%eax)
-	jnz    .Lget_fpu_flags_noenv /* strlen(env) != 1 */
+	jne    .Lget_fpu_flags_noenv /* strlen(env) != 1 */
 	cmpb   $('1'), 1(%eax)
 	je     .Lget_fpu_flags_XFPU
 	cmpb   $('0'), 1(%eax)
