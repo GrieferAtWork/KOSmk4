@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed08aea5 */
+/* HASH CRC-32:0x5a5b27c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> getauxval(3)
  * Return the value associated with a named `type' from the
- * auxillary information vector passed to the calling program
+ * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */
 INTDEF ulongptr_t NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type);

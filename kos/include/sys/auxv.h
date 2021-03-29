@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x428f8477 */
+/* HASH CRC-32:0x4d0a213f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,14 +41,14 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_getauxval
 /* >> getauxval(3)
  * Return the value associated with a named `type' from the
- * auxillary information vector passed to the calling program
+ * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */
 __CDECLARE(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),(__type))
 #elif defined(__CRT_HAVE___getauxval)
 /* >> getauxval(3)
  * Return the value associated with a named `type' from the
- * auxillary information vector passed to the calling program
+ * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */
 __CREDIRECT(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
