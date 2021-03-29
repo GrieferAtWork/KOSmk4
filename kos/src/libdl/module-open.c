@@ -36,6 +36,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <malloc.h>
 #include <malloca.h>
@@ -407,9 +408,9 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 
 				case DT_SYMENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Sym))) {
-						dl_seterrorf("%q: Invalid `DT_SYMENT' %Iu != %Iu",
-						                (size_t)tag.d_un.d_val,
-						                (size_t)sizeof(ElfW(Sym)));
+						dl_seterrorf("%q: Invalid `DT_SYMENT' %" PRIuSIZ " != %" PRIuSIZ,
+						             (size_t)tag.d_un.d_val,
+						             (size_t)sizeof(ElfW(Sym)));
 						goto err;
 					}
 					break;
@@ -417,9 +418,9 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 #if ELF_ARCH_USESRELA
 				case DT_RELAENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Rela))) {
-						dl_seterrorf("%q: Invalid `DT_RELAENT' %Iu != %Iu",
-						                (size_t)tag.d_un.d_val,
-						                (size_t)sizeof(ElfW(Rela)));
+						dl_seterrorf("%q: Invalid `DT_RELAENT' %" PRIuSIZ " != %" PRIuSIZ,
+						             (size_t)tag.d_un.d_val,
+						             (size_t)sizeof(ElfW(Rela)));
 						goto err;
 					}
 					break;
@@ -427,9 +428,9 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 
 				case DT_RELENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Rel))) {
-						dl_seterrorf("%q: Invalid `DT_RELENT' %Iu != %Iu",
-						                (size_t)tag.d_un.d_val,
-						                (size_t)sizeof(ElfW(Rel)));
+						dl_seterrorf("%q: Invalid `DT_RELENT' %" PRIuSIZ " != %" PRIuSIZ,
+						             (size_t)tag.d_un.d_val,
+						             (size_t)sizeof(ElfW(Rel)));
 						goto err;
 					}
 					break;
@@ -690,6 +691,7 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 	}
 	if unlikely(preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
 		goto err_io;
+
 	/* Support for formats other than ELF. */
 	if unlikely(ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
 	            ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
@@ -710,11 +712,13 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 			goto done;
 		}
 	}
+
 	/* Map the executable into memory. */
 	result = DlModule_ElfMapProgramHeaders(&ehdr, filename, fd);
 	if unlikely(!result)
 		goto done;
 	result->dm_flags = (uint32_t)mode | RTLD_LOADING;
+
 	/* Load the execute via its program headers. */
 	if unlikely(DlModule_ElfLoadLoadedProgramHeaders(result))
 		goto err_r;
@@ -771,6 +775,7 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 			continue;
 		if ((uintptr_t)static_pointer >= result->dm_loadend)
 			continue;
+
 		/* Support for formats other than ELF. */
 		if (result->dm_ops) {
 			if (!(*result->dm_ops->df_ismapped)(result,
@@ -779,6 +784,7 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 				continue;
 			goto got_result;
 		}
+
 		/* Make sure that `static_pointer' maps to some program segment. */
 		for (i = 0; i < result->dm_elf.de_phnum; ++i) {
 			uintptr_t segment_base;

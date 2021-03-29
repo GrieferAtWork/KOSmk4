@@ -58,7 +58,7 @@ extern "C++" {
 #endif /* __cplusplus */
 
 /* Decompress a new-style FTWX into an old-style FTW */
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __uint16_t
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((2)) __uint16_t
 __NOTHROW(fpustate_ftwx2ftw_long_double)(__uint8_t __ftw, union ieee854_long_double const __sti[8]) {
 	unsigned int __i;
 	__uint16_t __res = 0;
@@ -89,7 +89,7 @@ __NOTHROW(fpustate_ftwx2ftw_long_double)(__uint8_t __ftw, union ieee854_long_dou
 }
 
 /* Decompress a new-style FTWX into an old-style FTW */
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __uint16_t
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((2)) __uint16_t
 __NOTHROW(fpustate_ftwx2ftw_float80)(__uint8_t __ftw, union ieee854_float80 const __sti[8]) {
 	unsigned int __i;
 	__uint16_t __res = 0;

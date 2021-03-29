@@ -88,9 +88,9 @@ funcf:
  * but  in practice, GCC  always behaves as if  this was 8 (This
  * happens  both in KOS's  own toolchain, as  well as within the
  * standard gcc of an x86_64 linux machine)
- * In  case  this turns  out to  be a  weird  quirk of  gcc, please  make use
- * of  this  macro  within  hand-written   assembly,  such  that  your   code
- * will work with X86_64_VA_LIST_XMM_COUNT=8 and X86_64_VA_LIST_XMM_COUNT=16.
+ * In case this turns out  to be a weird quirk  of gcc, please make  use
+ * of  this macro within hand-written assembly, such that your code will
+ * work with X86_64_VA_LIST_XMM_COUNT=8 and X86_64_VA_LIST_XMM_COUNT=16.
  * Other values may be assumed to never be applicable. */
 #if 1
 #define X86_64_VA_LIST_XMM_COUNT 8
@@ -131,9 +131,9 @@ funcf:
 	__ASM_L(movaps  %xmm14, 112+dst) \
 	__ASM_L(movaps  %xmm15, 120+dst) \
 	__ASM_END
-#else
+#else /* X86_64_VA_LIST_XMM_COUNT == ... */
 #error "Unsupported `X86_64_VA_LIST_XMM_COUNT'"
-#endif
+#endif /* X86_64_VA_LIST_XMM_COUNT != ... */
 
 
 
@@ -156,9 +156,9 @@ funcf:
 #define SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA     176
 #elif X86_64_VA_LIST_XMM_COUNT == 16
 #define SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA     304
-#else
+#else /* X86_64_VA_LIST_XMM_COUNT == ... */
 #define SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA    (48 + X86_64_VA_LIST_XMM_COUNT * 16)
-#endif
+#endif /* X86_64_VA_LIST_XMM_COUNT != ... */
 
 #define OFFSET_X86_64_VA_LIST_STRUCT_GP_OFFSET         0
 #define OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET         4
@@ -182,11 +182,11 @@ struct x86_64_va_list_reg_save_area /*[PREFIX(rsa_)]*/ {
 struct x86_64_va_list_struct /*[PREFIX(vl_)]*/ {
 	/* From here:
 	 * https://stackoverflow.com/questions/4958384/what-is-the-format-of-the-x86-64-va-list-structure */
-	__UINT32_TYPE__ vl_gp_offset;         /* The element holds  the offset in  bytes from  vl_reg_save_area
+	__UINT32_TYPE__ vl_gp_offset;         /* This element holds the  offset in bytes from  vl_reg_save_area
 	                                       * to the place where the next available general purpose argument
 	                                       * register is saved.  In case all  argument registers have  been
 	                                       * exhausted, it is set to the value 48 (6 * 8). */
-	__UINT32_TYPE__ vl_fp_offset;         /* The element  holds the  offset in  bytes from  vl_reg_save_area  to
+	__UINT32_TYPE__ vl_fp_offset;         /* This  element holds  the offset  in bytes  from vl_reg_save_area to
 	                                       * the place where the next available floating point argument register
 	                                       * is  saved.  In case  all  argument registers  have  been exhausted,
 	                                       * it is set to the value 304 (6 * 8 + 16 * 16). */

@@ -21,13 +21,15 @@
 #define GUARD_LIBJSON_WRITER_C 1
 #define _KOS_SOURCE 1
 
-#include "writer.h"
-
 #include "api.h"
+/**/
+
+#include "writer.h"
 
 #include <kos/types.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -335,7 +337,7 @@ libjson_writer_putnumber(struct json_writer *__restrict self, intptr_t value) {
 	CHK_STATE();
 	if unlikely(json_print_prefixes(self))
 		goto err;
-	if unlikely(json_printf(self, "%Id", value))
+	if unlikely(json_printf(self, "%" PRIdPTR, value))
 		goto err;
 	self->jw_state = JSON_WRITER_STATE_SIBLING;
 	return 0;
@@ -351,7 +353,7 @@ libjson_writer_putint64(struct json_writer *__restrict self, int64_t value) {
 	CHK_STATE();
 	if unlikely(json_print_prefixes(self))
 		goto err;
-	if unlikely(json_printf(self, "%I64d", value))
+	if unlikely(json_printf(self, "%" PRId64, value))
 		goto err;
 	self->jw_state = JSON_WRITER_STATE_SIBLING;
 	return 0;
@@ -365,7 +367,7 @@ libjson_writer_putuint64(struct json_writer *__restrict self, uint64_t value) {
 	CHK_STATE();
 	if unlikely(json_print_prefixes(self))
 		goto err;
-	if unlikely(json_printf(self, "%I64u", value))
+	if unlikely(json_printf(self, "%" PRIu64, value))
 		goto err;
 	self->jw_state = JSON_WRITER_STATE_SIBLING;
 	return 0;

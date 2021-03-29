@@ -32,6 +32,7 @@
 
 #include <kos/syscalls.h>
 
+#include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -50,15 +51,15 @@ DECL_BEGIN
 
 struct dtls_extension {
 	/* Tree for mapping TLS extensions data tables to modules.
-		* NOTE: These extension tables are allocated lazily! */
-	LLRBTREE_NODE(struct dtls_extension) te_tree;   /* [lock(:ts_exlock)] R/B-tree node. */
+	 * NOTE: These extension tables are allocated lazily! */
+	LLRBTREE_NODE(struct dtls_extension) te_tree;     /* [lock(:ts_exlock)] R/B-tree node. */
 	union {
 		DlModule                        *te_module;   /* [0..1][lock(:ts_exlock)] The module itself.
 		                                               * The  least significant bit  of this is used
 		                                               * to indicate if this leaf is red of black! */
 		uintptr_t                        te_redblack; /* Red/black status bit at bit#0 */
 	};
-	byte_t                              *te_data;   /* [1..1][const] Pointer to the base of TLS data. */
+	byte_t                              *te_data;     /* [1..1][const] Pointer to the base of TLS data. */
 	/* The actual extension data goes here. (with proper alignment, and pointed-to by `te_data') */
 };
 #define dtls_extension_getmodule(self) ((DlModule *)((self)->te_redblack & ~1))
@@ -149,6 +150,7 @@ INTERN WUNUSED int CC
 DlModule_InitStaticTLSBindings(void) {
 	DlModule *iter;
 	ptrdiff_t endptr = 0;
+
 	/* Assign static TLS offsets to all currently loaded modules.
 	 * NOTE: Since we've yet to invoke a  user-defined code (other than IFUNC  selectors),
 	 *       we are allowed to assume that no threads other than the calling (main) thread
@@ -166,6 +168,7 @@ DlModule_InitStaticTLSBindings(void) {
 	static_tls_init = malloc(static_tls_size_no_segment);
 	if unlikely(!static_tls_init)
 		goto err_nomem;
+
 	/* Load static TLS template data */
 	DlModule_AllList_FOREACH(iter) {
 		byte_t *dst;
@@ -179,17 +182,9 @@ DlModule_InitStaticTLSBindings(void) {
 			if unlikely(fd < 0)
 				goto err;
 			if (preadall(fd, dst, iter->dm_tlsfsize, iter->dm_tlsoff) <= 0) {
-				__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
-					dl_seterrorf("%q: Failed to read %Iu bytes of TLS template data from %I64u",
-					             iter->dm_filename,
-					             iter->dm_tlsfsize,
-					             (uint64_t)iter->dm_tlsoff);
-				} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
-					dl_seterrorf("%q: Failed to read %Iu bytes of TLS template data from %I32u",
-					             iter->dm_filename,
-					             iter->dm_tlsfsize,
-					             (uint32_t)iter->dm_tlsoff);
-				}
+				dl_seterrorf("%q: Failed to read %" PRIuSIZ " bytes of TLS "
+				             "template data from %" PRIuN(__SIZEOF_ELFW(OFF__)),
+				             iter->dm_filename, iter->dm_tlsfsize, iter->dm_tlsoff);
 				goto err;
 			}
 		}
@@ -480,12 +475,12 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
                  void *perthread_callback_arg) {
 	DlModule *result;
 	if unlikely(template_size > num_bytes) {
-		dl_seterrorf("TLS template size (%Iu) is greater than TLS memory size (%Iu)",
+		dl_seterrorf("TLS template size (%" PRIuSIZ ") is greater than TLS memory size (%" PRIuSIZ ")",
 		             template_size, num_bytes);
 		goto err;
 	}
 	if unlikely(min_alignment & (min_alignment - 1)) {
-		dl_seterrorf("TLS alignment %Iu isn't a power-of-2",
+		dl_seterrorf("TLS alignment %" PRIuSIZ " isn't a power-of-2",
 		             min_alignment);
 		goto err;
 	}

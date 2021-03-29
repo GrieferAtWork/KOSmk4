@@ -29,6 +29,7 @@
 #include <hybrid/unaligned.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
@@ -49,7 +50,7 @@ DECL_BEGIN
 	do {                                \
 		if unlikely((result = (x)) < 0) \
 			goto done;                  \
-	} __WHILE0
+	}	__WHILE0
 
 
 
@@ -62,12 +63,12 @@ libjson_output_message(struct json_writer *__restrict writer,
 	va_list args;
 	va_start(args, format);
 	if (writer->jw_result >= 0) {
-#define DOPRINTER(x) \
+#define DOPRINTER(x)                      \
 		do {                              \
 			if unlikely((temp = (x)) < 0) \
 				goto err_printer;         \
 			writer->jw_result += temp;    \
-		} __WHILE0
+		}	__WHILE0
 		DOPRINTER((*writer->jw_printer)(writer->jw_arg, "/* ", 3));
 		DOPRINTER(format_vprintf(writer->jw_printer,
 		                         writer->jw_arg,
@@ -201,7 +202,7 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 		break;
 
 	default:
-		MESSAGE("Illegal type `%#.2I8x' in INTO", type);
+		MESSAGE("Illegal type `%#.2" PRIx8 "' in INTO", type);
 		result = -2;
 		break;
 	}
@@ -276,7 +277,7 @@ libjson_encode_designator(struct json_writer *__restrict writer,
 	}	break;
 
 	default:
-		MESSAGE("Illegal instruction `%#.2I8x' in DESIGNATOR", op);
+		MESSAGE("Illegal instruction `%#.2" PRIx8 "' in DESIGNATOR", op);
 		writer->jw_state = JSON_WRITER_STATE_BADUSAGE;
 		result = -2;
 		break;
@@ -325,7 +326,7 @@ again_inner:
 			goto again_inner;
 
 		default:
-			MESSAGE("Illegal instruction `%#.2I8x' in OBJECT", op);
+			MESSAGE("Illegal instruction `%#.2" PRIx8 "' in OBJECT", op);
 err_bad_usage:
 			writer->jw_state = JSON_WRITER_STATE_BADUSAGE;
 			result = -2;
@@ -411,7 +412,7 @@ again_inner:
 			goto again_inner;
 
 		default:
-			MESSAGE("Illegal instruction `%#.2I8x' in OBJECT", op);
+			MESSAGE("Illegal instruction `%#.2" PRIx8 "' in OBJECT", op);
 err_bad_usage:
 			writer->jw_state = JSON_WRITER_STATE_BADUSAGE;
 			result = -2;
@@ -454,7 +455,8 @@ again_parseop:
 require_term:
 		op = *reader++;
 		if unlikely(op != JGEN_TERM) {
-			MESSAGE("Missing JGEN_TERM (got `%#.2I8x' at offset `%Id')", op, (reader - 1) - (byte_t *)codec);
+			MESSAGE("Missing JGEN_TERM (got `%#.2" PRIx8 "' at offset `%" PRIdSIZ "')",
+			        op, (reader - 1) - (byte_t *)codec);
 			goto err_bad_usage;
 		}
 		break;
@@ -493,7 +495,7 @@ require_term:
 	}	break;
 
 	default:
-		MESSAGE("Illegal primary instruction `%#.2I8x'", op);
+		MESSAGE("Illegal primary instruction `%#.2" PRIx8 "'", op);
 err_bad_usage:
 		writer->jw_state = JSON_WRITER_STATE_BADUSAGE;
 		result = -2;

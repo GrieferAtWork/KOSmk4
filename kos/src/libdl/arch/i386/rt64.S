@@ -104,18 +104,18 @@ DEFINE_PUBLIC_ALIAS(__tls_get_addr, libdl___tls_get_addr)
 	/* The heart-piece of lazy symbol relocations:
 	 *   - This function is called by user-code the first time an R_X86_64_JMP_SLOT
 	 *     relocation  is  accessed, at  which  point the  relocation  is resolved.
-	 *   - See the explanation about `PLTGOT' below for how this actually works.
+	 *   - See the explanation about `PLTGOT' in `rt32.S' for how this actually works.
 	 */
 INTERN_FUNCTION(dl_load_lazy_relocation)
 	/* register/stack state:
 	 *  - 0(%rsp)      == MODULE
-	 *  - 8(%rsp)      == Offset added to `self->dm_elf.de_jmprel' for the associated jump relocation
+	 *  - 8(%rsp)      == Index into `self->dm_elf.de_jmprel' for the associated jump relocation
 	 *  - 16(%rsp)     == User-return-address
 	 *  - 24 + ?(%rsp) == Undefined/user-owned
 	 *
 	 * HINT: In glibc, this function's equivalent is called `_dl_runtime_resolve' */
 	.cfi_startproc
-	.cfi_adjust_cfa_offset 16 /* MODULE + JMPREL_offset */
+	.cfi_adjust_cfa_offset 16 /* MODULE + JMPREL_index */
 	/* Save registers */
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
@@ -130,7 +130,7 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	pushfq_cfi_r
 
 	movq   (80 + 0)(%rsp), %rdi /* MODULE */
-	movq   (80 + 8)(%rsp), %rsi /* JMPREL_offset */
+	movq   (80 + 8)(%rsp), %rsi /* JMPREL_index */
 
 	/* Patch the relocation. */
 	INTERN(dl_bind_lazy_relocation)
@@ -152,7 +152,7 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	.cfi_same_value %rax
 	.cfi_rel_offset %rip, 0
 	ret    $(16)        /* EIP = [ESP]; ESP += (8 + 16);
-	                     * Cleanup: RESOLVED_ADDRESS + MODULE + JMPREL_offset */
+	                     * Cleanup: RESOLVED_ADDRESS + MODULE + JMPREL_index */
 	.cfi_endproc
 END(dl_load_lazy_relocation)
 

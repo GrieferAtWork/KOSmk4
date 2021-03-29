@@ -467,7 +467,8 @@ struct icpustate64 { /* i -- Interrupts */
 	 *   - %gs.base is a bit more complicated, since it is made up of 2 different
 	 *     registers %gs.base and %gs.kernel_base that  can be exchanged for  each
 	 *     other (don't let the name %gs.kernel_base fool you; the implied meaning
-	 *     only holds true while in user-space)
+	 *     only holds true while in user-space;  a better name would be  something
+	 *     like %gs.inactive_base)
 	 *
 	 * When an icpustate is created/exited:
 	 *     >> entry:
@@ -503,15 +504,16 @@ struct icpustate64 { /* i -- Interrupts */
 #define OFFSET_SCPUSTATE64_IRREGS        168
 #define SIZEOF_SCPUSTATE64               208
 #ifdef __CC__
-struct scpustate64 { /* i -- Interrupts */
-	/* A  CPU state that  is used by  hardware interrupts (other than
-	 * those used by scheduling, which generate `scpustate' instead),
-	 * in order to describe the interrupted text location. */
+struct scpustate64 { /* s -- Scheduling */
+	/* CPU state, as used to store the state of a thread that isn't currently running. */
 	struct sgregs64    scs_sgregs;        /* Segment registers. */
 	struct sgbase64    scs_sgbase;        /* Segment base registers.
 	                                       * NOTE: These are _always_ the user-space values!
 	                                       * In other words: `sg_gsbase' mirrors `IA32_KERNEL_GS_BASE';
-	                                       * s.a. <asm/instr/kernel-gs-base.h> */
+	                                       * s.a. <asm/instr/kernel-gs-base.h>
+	                                       * The kernel-space `%gs.base' is always the address of the
+	                                       * associated `struct task *', and thus isn't considered to
+	                                       * be a register that is saved/restored. */
 	struct gpregsnsp64 scs_gpregs;        /* General purpose registers. */
 	struct irregs64    scs_irregs;        /* Interrupt return registers. */
 };

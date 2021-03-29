@@ -79,15 +79,8 @@ libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 		if unlikely(fd < 0)
 			goto err;
 		if (preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff) <= 0) {
-			__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
-				dl_seterrorf("Failed to read %Iu bytes of TLS template data from %I64u",
-				             self->dm_tlsfsize,
-				             (uint64_t)self->dm_tlsoff);
-			} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
-				dl_seterrorf("Failed to read %Iu bytes of TLS template data from %I32u",
-				             self->dm_tlsfsize,
-				             (uint32_t)self->dm_tlsoff);
-			}
+			dl_seterrorf("Failed to read %" PRIuSIZ " bytes of TLS template data from %" PRIuN(__SIZEOF_ELFW(OFF__)),
+			             self->dm_tlsfsize, self->dm_tlsoff);
 			goto err;
 		}
 		new_init = (byte_t *)ATOMIC_CMPXCH_VAL(self->dm_tlsinit,

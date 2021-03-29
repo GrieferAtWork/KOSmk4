@@ -22,9 +22,10 @@
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
-#include "parser.h"
-
 #include "api.h"
+/**/
+
+#include "parser.h"
 
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
@@ -592,7 +593,7 @@ do_digit_inner:
 			goto again; /* Whitespace */
 		}
 		/* Anything else isn't allowed and indicates a syntax error. */
-		return JSON_ERROR_SYNTAX;
+		goto syn1;
 	}
 	/* Skip trailing whitespace. */
 	json_skip_whitespace(self);
@@ -608,7 +609,7 @@ syn3:
 	json_ungetc(self);
 syn2:
 	json_ungetc(self);
-/*syn1:*/
+syn1:
 	json_ungetc(self);
 	return JSON_ERROR_SYNTAX;
 }

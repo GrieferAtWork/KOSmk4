@@ -41,7 +41,7 @@ __DECL_BEGIN
 #error "These should be identical"
 #endif /* ... */
 
-__LOCAL void
+__LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(xfpustate64_assign_xfpustate32)(struct xfpustate64 *__restrict __self,
                                               struct xfpustate32 const *__restrict __data) {
 	/* Copy data leading up the IP/DP pointers */
@@ -58,7 +58,7 @@ __NOTHROW_NCX(xfpustate64_assign_xfpustate32)(struct xfpustate64 *__restrict __s
 	              OFFSET_XFPUSTATE32_XMM(8) - OFFSET_XFPUSTATE32_MXCSR);
 }
 
-__LOCAL void
+__LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(xfpustate64_to_xfpustate32)(struct xfpustate64 const *__restrict __self,
                                           struct xfpustate32 *__restrict __result) {
 	__libc_memcpy(__result, __self, SIZEOF_XFPUSTATE32);

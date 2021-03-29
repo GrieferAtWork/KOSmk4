@@ -1170,9 +1170,8 @@ done_escape_register:
 					;
 				}	break;
 
-				{
+				case OPC_MOFFS8: {
 					uintptr_t addr;
-				case OPC_MOFFS8:
 					addr = (uintptr_t)*(u8 *)self->d_pc;
 					self->d_pc += 1;
 					goto do_print_moffs;
@@ -1556,7 +1555,7 @@ nextop_nocomma:
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
 					disasm_printf(self, "%#" PRIx16, segment);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
-					disasm_print(self, ":", 1);
+					disasm_print(self, ":$", 2);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_SYMBOL_PREFIX);
 					disasm_printf(self, "%#" PRIp32, offset);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_SYMBOL_SUFFIX);

@@ -32,6 +32,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <link.h>
 #include <malloc.h>
 #include <signal.h>
@@ -275,7 +276,7 @@ DlModule_GetFd(DlModule *__restrict self) {
 	return result;
 err:
 	return dl_seterrorf("%q: Failed to open module for reading",
-	                       self->dm_filename);
+	                    self->dm_filename);
 }
 
 /* Lazily allocate  if  necessary,  and  return  the vector  of  section  headers  for  `self'
@@ -308,8 +309,9 @@ DlModule_ElfGetShdrs(DlModule *__restrict self) {
 		if unlikely(DlModule_ElfVerifyEhdr(&ehdr, self->dm_filename, false))
 			goto err;
 		if unlikely(ehdr.e_shstrndx >= ehdr.e_shnum) {
-			dl_seterrorf("%q: Invalid `e_shstrndx=%u' is greater than or equal to `e_shnum=%u'",
-			                self->dm_filename, ehdr.e_shstrndx, ehdr.e_shnum);
+			dl_seterrorf("%q: Invalid `e_shstrndx=%" PRIuN(__SIZEOF_ELFW(HALF__)) "' "
+			             "is greater than or equal to `e_shnum=%" PRIuN(__SIZEOF_ELFW(HALF__)) "'",
+			             self->dm_filename, ehdr.e_shstrndx, ehdr.e_shnum);
 			goto err;
 		}
 		ATOMIC_CMPXCH(self->dm_shnum, (size_t)-1, ehdr.e_shnum);
@@ -341,15 +343,15 @@ DlModule_ElfGetShdrs(DlModule *__restrict self) {
 err_read_shdr:
 	free(result);
 	dl_seterrorf("%q: Failed to read section header vector",
-	                self->dm_filename);
+	             self->dm_filename);
 	goto err;
 err_nomem:
 	dl_seterrorf("%q: Failed to allocate section header vector",
-	                self->dm_filename);
+	             self->dm_filename);
 	goto err;
 err_read_ehdr:
 	dl_seterrorf("%q: Failed to read ElfW(Ehdr)",
-	                self->dm_filename);
+	             self->dm_filename);
 err:
 	return NULL;
 }
@@ -369,8 +371,8 @@ DlModule_ElfGetShstrtab(DlModule *__restrict self) {
 		goto err;
 	shdrs += self->dm_elf.de_shstrndx;
 	if unlikely(shdrs->sh_type == SHT_NOBITS) {
-		dl_seterrorf("%q: Section `e_shstrndx=%u' has type `SHT_NOBITS'",
-		                self->dm_filename, self->dm_elf.de_shstrndx);
+		dl_seterrorf("%q: Section `e_shstrndx=%" PRIuN(__SIZEOF_ELFW(HALF__)) "' has type `SHT_NOBITS'",
+		             self->dm_filename, self->dm_elf.de_shstrndx);
 		goto err;
 	}
 	/* Allocate the section header string table. */
@@ -394,8 +396,12 @@ DlModule_ElfGetShstrtab(DlModule *__restrict self) {
 	}
 	return result;
 err_read_shstrtab:
-	dl_seterrorf("%q: Failed to read contents of `e_shstrndx=%u' (`sh_offset=%I64u')",
-	             self->dm_filename, self->dm_elf.de_shstrndx, (u64)shdrs->sh_offset);
+	dl_seterrorf("%q: Failed to read contents of "
+	             "`e_shstrndx=%" PRIuN(__SIZEOF_ELFW(HALF__)) "' ("
+	             "`sh_offset=%" PRIuN(__SIZEOF_ELFW(OFF__)) "')",
+	             self->dm_filename,
+	             self->dm_elf.de_shstrndx,
+	             shdrs->sh_offset);
 	goto err;
 err_nomem:
 	dl_seterrorf("%q: Failed to allocate section header string table",
@@ -487,7 +493,7 @@ dl_seterror_nosect(DlModule *__restrict self,
 
 INTERN ATTR_COLD NONNULL((1)) int CC
 dl_seterror_nosect_index(DlModule *__restrict self, size_t index) {
-	return dl_seterrorf("%q: Section index %Iu is greater than %Iu",
+	return dl_seterrorf("%q: Section index %" PRIuSIZ " is greater than %" PRIuSIZ,
 	                    self->dm_filename, index, self->dm_shnum);
 }
 

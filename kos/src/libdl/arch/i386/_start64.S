@@ -36,7 +36,7 @@ INTERN_FUNCTION(linker_entry)
 
 	/* The current (expected) register/stack state looks like this:
 	 *   %rdi:  struct elfexec_info *info;     // Information about execution context (see the struct for more  details)
-	 *                                         // Note that this struct is actually allocated in the stack, with its end
+	 *                                         // Note that this struct is actually allocated on the stack, with its end
 	 *                                         // marking the base of the user-space stack
 	 *   %rsi:  uintptr_t            loadaddr; // Loadaddr (load offset) of the main binary (usually
 	 *                                         // 0,  since that binary probably can't be relocated)

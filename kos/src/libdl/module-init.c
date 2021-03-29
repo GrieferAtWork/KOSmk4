@@ -117,8 +117,8 @@ DlModule_ElfRunInitializers(DlModule *__restrict self) {
 		}
 	}
 done_dyntag:
-	/* Apparently, global initializer functions take the same
-	 * arguments as are also passed to main():
+	/* Apparently,  global  initializer  functions   take
+	 * the same arguments as  are also passed to  main():
 	 * >> void (*)(int argc, char *argv[], char *envp[]);
 	 *
 	 * As  such, call them like that, rather than without any arguments!
@@ -150,7 +150,7 @@ INTERN void CC DlModule_RunAllStaticInitializers(void) {
 	incref(primary);
 again_search_noinit:
 	atomic_rwlock_read(&DlModule_GlobalLock);
-	/* XXX: last     =      LIST_LAST(&DlModule_GlobalList);
+	/* XXX: >> last = LIST_LAST(&DlModule_GlobalList);
 	 *      Change this  code if  we  ever change  the  list
 	 *      type used by `DlModule_GlobalList' to  something
 	 *      that allows for O(1) lookup of the last element. */
@@ -222,8 +222,8 @@ DlModule_ElfMakeTextWritable(DlModule *__restrict self) {
 	}
 	return 0;
 err_mprotect_failed:
-	return dl_seterrorf("%q: Failed to make text writable (errno=%d)",
-	                       self->dm_filename, -error);
+	return dl_seterrorf("%q: Failed to make text writable (errno=%u)",
+	                    self->dm_filename, (unsigned int)-error);
 }
 
 PRIVATE NONNULL((1)) void CC
@@ -245,14 +245,14 @@ DlModule_ElfMakeTextReadonly(DlModule *__restrict self) {
 INTERN NONNULL((1)) int CC
 DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 #if ELF_ARCH_USESRELA
-	ElfW(Rela) *rela_base = NULL;
-	size_t rela_count   = 0;
+	ElfW(Rela) *rela_base     = NULL;
+	size_t rela_count         = 0;
 	bool jmp_rels_have_addend = false;
 #endif /* ELF_ARCH_USESRELA */
 	ElfW(Rel) *rel_base = NULL;
-	size_t rel_count  = 0;
+	size_t rel_count    = 0;
 	ElfW(Rel) *jmp_base = NULL;
-	size_t jmp_size  = 0;
+	size_t jmp_size     = 0;
 	size_t i;
 	/* Load dependencies of the module. */
 	if (self->dm_depcnt) {
@@ -305,7 +305,8 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 			}
 			if (!dependency) {
 				if (ATOMIC_READ(dl_error_message) == NULL)
-					dl_seterrorf("Failed to load dependency %q of %q", filename, self->dm_filename);
+					dl_seterrorf("Failed to load dependency %q of %q",
+					             filename, self->dm_filename);
 				goto err;
 			}
 			self->dm_depvec[self->dm_depcnt++] = dependency;

@@ -74,7 +74,7 @@ elf_symhash(char const *__restrict name) {
  *          This function merely returns the associated entry from `.dynsym'
  * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
  *       case of the error is the  result of a corrupted hash  table. */
-INTERN ElfW(Sym) const *CC
+INTERN WUNUSED NONNULL((1, 2, 3, 4)) ElfW(Sym) const *CC
 DlModule_ElfGetLocalSymbol(DlModule *__restrict self,
                            char const *__restrict name,
                            uintptr_t *__restrict phash_elf,

@@ -26,4 +26,8 @@
 
 #define CC LIBJSON_CC
 
+#if 0
+#define CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#endif
+
 #endif /* !GUARD_LIBJSON_API_H */

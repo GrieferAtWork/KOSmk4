@@ -139,9 +139,9 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 *      have pre-initialized to be equal to the module-relative  offset
 	 *      of the PLT/GOT entry to that push instruction.
 	 *  - `push   $0x20' will then store 0x20 ontop of the stack
-	 *    - This is an offset into the vector of jmp-relocations,
-	 *      which we store in `module->dm_elf.de_jmprel', and can be read from the
-	 *      module's  .dynamic section,  where it  is stored  within a `DT_JMPREL'
+	 *    - This is an  offset into  the vector of  jmp-relocations, which  we
+	 *      store in  `module->dm_elf.de_jmprel', and  can  be read  from  the
+	 *      module's .dynamic section, where it is stored within a `DT_JMPREL'
 	 *      tag.
 	 *  - Next, execution jumps to the start of the PLT, where a piece of code
 	 *    that  is common to  all jump-relocations pushes  the value stored at

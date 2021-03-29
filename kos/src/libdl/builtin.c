@@ -35,6 +35,7 @@
 
 #include <errno.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <sched.h>
 #include <signal.h> /* SIGABRT */
@@ -1128,7 +1129,7 @@ again_read_section:
 			if (E_ISERR(base)) {
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
-					dl_seterrorf("%q: Failed to map section #%Iu into memory",
+					dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
 					                self->dm_filename, (uintptr_t)name);
 				} else {
 					dl_seterrorf("%q: Failed to map section %q into memory",
@@ -1235,7 +1236,7 @@ again_read_elf_section:
 			if (E_ISERR(base)) {
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
-					dl_seterrorf("%q: Failed to map section #%Iu into memory",
+					dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
 					                self->dm_filename, (uintptr_t)name);
 				} else {
 					dl_seterrorf("%q: Failed to map section %q into memory",
@@ -1868,12 +1869,12 @@ done_add_finalizer:
 		sizeof_dlmodule_format = va_arg(args, size_t);
 		sizeof_dlcore_ops      = va_arg(args, size_t);
 		if (sizeof_dlmodule_format != sizeof(struct dlmodule_format)) {
-			dl_seterrorf("Invalid `sizeof_dlmodule_format': %Iu; current version is %Iu",
+			dl_seterrorf("Invalid `sizeof_dlmodule_format': %" PRIuSIZ "; current version is %" PRIuSIZ,
 			             sizeof_dlmodule_format, sizeof(struct dlmodule_format));
 			goto err;
 		}
 		if (sizeof_dlcore_ops != sizeof(struct dlcore_ops)) {
-			dl_seterrorf("Invalid `sizeof_dlcore_ops': %Iu; current version is %Iu",
+			dl_seterrorf("Invalid `sizeof_dlcore_ops': %" PRIuSIZ "; current version is %" PRIuSIZ,
 			             sizeof_dlcore_ops, sizeof(struct dlcore_ops));
 			goto err;
 		}

@@ -40,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/exec/module.h>
 
 #include <ctype.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -2596,15 +2597,15 @@ do_ctrl:
 
 		default:
 			if (value <= UINT8_C(0x7)) {
-				result = format_printf(printer, arg, "\\%I8x", (uint8_t)value);
+				result = format_printf(printer, arg, "\\%" PRIx8, (uint8_t)value);
 			} else if (value <= UINT8_C(0xff)) {
-				result = format_printf(printer, arg, "\\x%I8x", (uint8_t)value);
+				result = format_printf(printer, arg, "\\x%" PRIx8, (uint8_t)value);
 			} else if (value <= UINT16_C(0xffff)) {
-				result = format_printf(printer, arg, "\\u%.4I16x", (uint16_t)value);
+				result = format_printf(printer, arg, "\\u%.4" PRIx16, (uint16_t)value);
 			} else if (value <= UINT32_C(0xffffffff)) {
-				result = format_printf(printer, arg, "\\U%.8I32x", (uint32_t)value);
+				result = format_printf(printer, arg, "\\U%.8" PRIx32, (uint32_t)value);
 			} else {
-				result = format_printf(printer, arg, "\\x%I64x", (uint64_t)value);
+				result = format_printf(printer, arg, "\\x%" PRIx64, (uint64_t)value);
 			}
 			break;
 		}
@@ -2687,7 +2688,7 @@ generic_print_address:
 				DO((*printer)(arg, ")", 1));
 				FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
 				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-				DO(format_printf(printer, arg, "%I64u", value));
+				DO(format_printf(printer, arg, "%" PRIu64, value));
 				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 			}
 		}	break;
@@ -2740,7 +2741,7 @@ generic_print_address:
 			}
 			result = 0;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-			DO(format_printf(printer, arg, "%I64d", value));
+			DO(format_printf(printer, arg, "%" PRId64, value));
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		}	break;
 
@@ -2759,7 +2760,7 @@ generic_print_address:
 			}
 			result = 0;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-			DO(format_printf(printer, arg, "%I64u", value));
+			DO(format_printf(printer, arg, "%" PRIu64, value));
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		}	break;
 
@@ -3038,7 +3039,7 @@ print_generic_enum:
 			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
 		}
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-		DO(format_printf(printer, arg, "%I64u", value));
+		DO(format_printf(printer, arg, "%" PRIu64, value));
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 	}	break;
 
@@ -3104,7 +3105,7 @@ print_generic_enum:
 					} else {
 member_type_is_invalid:
 						temp = format_printf(printer, arg,
-						                     "<unknown+%Iu>",
+						                     "<unknown+%" PRIuPTR ">",
 						                     member.m_offset);
 					}
 					if unlikely(temp < 0)

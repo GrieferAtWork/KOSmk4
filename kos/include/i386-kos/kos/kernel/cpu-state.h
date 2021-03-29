@@ -33,20 +33,20 @@
  *               Kept as small  as possible,  this cpu  state
  *               can be used to describe the minimal register
  *               state required by  SysV to allow  C code  to
- *               function without errors.
+ *               perform longjmp()s without errors.
  *  - kcpustate: KernelCpuState
  *               A  small, but complete cpu state designed for
  *               unwinding the stack within the same privilege
  *               level, however cannot  be used for  unwinding
  *               from kernel- to user-space.
  *  - icpustate: InterruptCpuState
- *               Used for  describing  a  full  cpu  state  meant  to
- *               be   used   for   returning   from   an   interrupt.
- *               This state  is special  in that  it doesn't  contain
- *               an entry for the %gs register (unless when returning
- *               to vm86), and that it contains an inlined IRET tail,
- *               meaning that  the %esp  value loaded  by this  state
- *               depends on the state's address.
+ *               Used for describing  a full cpu  state meant to  be
+ *               used for returning from an interrupt. This state is
+ *               special in that it doesn't contain an entry for the
+ *               `%gs' register (unless when returning to vm86), and
+ *               that it contains an inlined IRET tail, meaning that
+ *               the `%esp' value  loaded by this  state depends  on
+ *               the state's address.
  *  - scpustate: SchedulerCpuState
  *               Very similar to `icpustate', but used by the
  *               scheduler. The only difference (on i386) to `icpustate'
@@ -58,7 +58,7 @@
  *               values are  stored inside,  thus making  them apart  of
  *               the  standard  set of  registers  saved/restored during
  *               scheduling  (on  i386,  (fs|gs)base are  saved  as part
- *               of THIS_TASK)
+ *               of THIS_TASK, instead)
  *  - fcpustate: FullCpuState
  *               A full cpu state, contains every register not related
  *               to floating  point handling,  including values  to-be

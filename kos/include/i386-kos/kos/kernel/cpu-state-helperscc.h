@@ -56,7 +56,7 @@ __DECL_BEGIN
 /************************************************************************/
 /* `struct gpregs32'                                                    */
 /************************************************************************/
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs32_to_gpregsnsp64_ex)(struct gpregs32 const *__restrict __self,
                                           struct gpregsnsp64 *__restrict __result,
                                           __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -79,7 +79,7 @@ __NOTHROW_NCX(gpregs32_to_gpregsnsp64_ex)(struct gpregs32 const *__restrict __se
 	__result->gp_rcx = __self->gp_ecx;
 	__result->gp_rax = __self->gp_eax;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs32_to_gpregs64_ex)(struct gpregs32 const *__restrict __self,
                                        struct gpregs64 *__restrict __result,
                                        __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -103,7 +103,7 @@ __NOTHROW_NCX(gpregs32_to_gpregs64_ex)(struct gpregs32 const *__restrict __self,
 	__result->gp_rcx = __self->gp_ecx;
 	__result->gp_rax = __self->gp_eax;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs32_to_gpregs64_spex)(struct gpregs32 const *__restrict __self,
                                          struct gpregs64 *__restrict __result,
                                          __u32 __v_esp,
@@ -128,17 +128,17 @@ __NOTHROW_NCX(gpregs32_to_gpregs64_spex)(struct gpregs32 const *__restrict __sel
 	__result->gp_rcx = __self->gp_ecx;
 	__result->gp_rax = __self->gp_eax;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs32_to_gpregsnsp64)(struct gpregs32 const *__restrict __self,
                                        struct gpregsnsp64 *__restrict __result) {
 	gpregs32_to_gpregsnsp64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs32_to_gpregs64)(struct gpregs32 const *__restrict __self,
                                     struct gpregs64 *__restrict __result) {
 	gpregs32_to_gpregs64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs32_to_gpregs64_sp)(struct gpregs32 const *__restrict __self,
                                        struct gpregs64 *__restrict __result,
                                        __u32 __v_esp) {
@@ -152,7 +152,7 @@ __NOTHROW_NCX(gpregs32_to_gpregs64_sp)(struct gpregs32 const *__restrict __self,
 /************************************************************************/
 /* `struct gpregs64'                                                    */
 /************************************************************************/
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregs64_to_gpregs32)(struct gpregs64 const *__restrict __self,
                                     struct gpregs32 *__restrict __result) {
 	__result->gp_edi = (__u32)__self->gp_rdi;
@@ -172,7 +172,7 @@ __NOTHROW_NCX(gpregs64_to_gpregs32)(struct gpregs64 const *__restrict __self,
 /************************************************************************/
 /* `struct gpregsnsp64'                                                    */
 /************************************************************************/
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(gpregsnsp64_to_gpregs32)(struct gpregsnsp64 const *__restrict __self,
                                        struct gpregs32 *__restrict __result,
                                        __u32 __v_esp) {
@@ -193,7 +193,7 @@ __NOTHROW_NCX(gpregsnsp64_to_gpregs32)(struct gpregsnsp64 const *__restrict __se
 /************************************************************************/
 /* `struct kcpustate32'                                                 */
 /************************************************************************/
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate32_to_kcpustate64_ex)(struct kcpustate32 const *__restrict __self,
                                              struct kcpustate64 *__restrict __result,
                                              __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -206,12 +206,12 @@ __NOTHROW_NCX(kcpustate32_to_kcpustate64_ex)(struct kcpustate32 const *__restric
 	__result->kcs_rflags = __self->kcs_eflags;
 	__result->kcs_rip    = __self->kcs_eip;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate32_to_kcpustate64)(struct kcpustate32 const *__restrict __self,
                                           struct kcpustate64 *__restrict __result) {
 	kcpustate32_to_kcpustate64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate32_to_ucpustate64_ex)(struct kcpustate32 const *__restrict __self,
                                              struct ucpustate64 *__restrict __result,
                                              __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -233,7 +233,7 @@ __NOTHROW_NCX(kcpustate32_to_ucpustate64_ex)(struct kcpustate32 const *__restric
 	__result->ucs_rflags       = __self->kcs_eflags;
 	__result->ucs_rip          = __self->kcs_eip;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate32_to_ucpustate64)(struct kcpustate32 const *__restrict __self,
                                           struct ucpustate64 *__restrict __result) {
 	kcpustate32_to_ucpustate64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -248,7 +248,7 @@ __NOTHROW_NCX(kcpustate32_to_ucpustate64)(struct kcpustate32 const *__restrict _
 	                              SEGMENT_CURRENT_CODE_RPL,
 	                              SEGMENT_CURRENT_DATA_RPL);
 }
-__LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
+__LOCAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct icpustate64 *
 __NOTHROW_NCX(kcpustate32_to_icpustate64_p_ex)(struct kcpustate32 const *__restrict __self,
                                                void *__restrict __kernel_rsp,
                                                __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -268,7 +268,7 @@ __NOTHROW_NCX(kcpustate32_to_icpustate64_p_ex)(struct kcpustate32 const *__restr
 	__result->ics_irregs.ir_ss     = __v_ss;
 	return __result;
 }
-__LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
+__LOCAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct icpustate64 *
 __NOTHROW_NCX(kcpustate32_to_icpustate64_p)(struct kcpustate32 const *__restrict __self,
                                             void *__restrict __kernel_rsp) {
 	return kcpustate32_to_icpustate64_p_ex(__self, __kernel_rsp,
@@ -276,7 +276,7 @@ __NOTHROW_NCX(kcpustate32_to_icpustate64_p)(struct kcpustate32 const *__restrict
 	                                       SEGMENT_CURRENT_CODE_RPL,
 	                                       SEGMENT_CURRENT_DATA_RPL);
 }
-__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
+__LOCAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct scpustate64 *
 __NOTHROW_NCX(kcpustate32_to_scpustate64_p_ex)(struct kcpustate32 const *__restrict __self,
                                                void *__restrict __kernel_rsp,
                                                __u64 __v_sg_gsbase, __u64 __v_sg_fsbase,
@@ -305,7 +305,7 @@ __NOTHROW_NCX(kcpustate32_to_scpustate64_p_ex)(struct kcpustate32 const *__restr
 	__result->scs_irregs.ir_ss     = __v_ss;
 	return __result;
 }
-__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
+__LOCAL __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) struct scpustate64 *
 __NOTHROW_NCX(kcpustate32_to_scpustate64_p)(struct kcpustate32 const *__restrict __self,
                                             void *__restrict __kernel_rsp) {
 	return kcpustate32_to_scpustate64_p_ex(__self, __kernel_rsp,
@@ -331,14 +331,14 @@ __NOTHROW_NCX(kcpustate32_to_scpustate64_p)(struct kcpustate32 const *__restrict
 /************************************************************************/
 /* `struct kcpustate64'                                                 */
 /************************************************************************/
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate64_to_kcpustate32)(struct kcpustate64 const *__restrict __self,
                                           struct kcpustate32 *__restrict __result) {
 	gpregs64_to_gpregs32(&__self->kcs_gpregs, &__result->kcs_gpregs);
 	__result->kcs_eflags = (__u32)__self->kcs_rflags;
 	__result->kcs_eip    = (__u32)__self->kcs_rip;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate64_to_ucpustate32_ex)(struct kcpustate64 const *__restrict __self,
                                              struct ucpustate32 *__restrict __result,
                                              __u16 __v_gs, __u16 __v_fs,
@@ -354,7 +354,7 @@ __NOTHROW_NCX(kcpustate64_to_ucpustate32_ex)(struct kcpustate64 const *__restric
 	__result->ucs_eflags       = (__u32)__self->kcs_rflags;
 	__result->ucs_eip          = (__u32)__self->kcs_rip;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate64_to_ucpustate32)(struct kcpustate64 const *__restrict __self,
                                           struct ucpustate32 *__restrict __result) {
 	kcpustate64_to_ucpustate32_ex(__self, __result,
@@ -369,7 +369,7 @@ __NOTHROW_NCX(kcpustate64_to_ucpustate32)(struct kcpustate64 const *__restrict _
 	                              SEGMENT_CURRENT_CODE_RPL,
 	                              SEGMENT_CURRENT_DATA_RPL);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kcpustate64_to_lcpustate32)(struct kcpustate64 const *__restrict __self,
                                           struct lcpustate32 *__restrict __result) {
 	__result->lcs_edi = (__u32)__self->kcs_gpregs.gp_rdi;
@@ -387,7 +387,7 @@ __NOTHROW_NCX(kcpustate64_to_lcpustate32)(struct kcpustate64 const *__restrict _
 /************************************************************************/
 /* `struct icpustate32'                                                 */
 /************************************************************************/
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate32_to_ucpustate64_ex)(struct icpustate32 const *__restrict __self,
                                              struct ucpustate64 *__restrict __result,
                                              __u64 __v_sg_gsbase, __u64 __v_sg_fsbase,
@@ -427,7 +427,7 @@ __NOTHROW_NCX(icpustate32_to_ucpustate64_ex)(struct icpustate32 const *__restric
 	                          __v_gp_r11, __v_gp_r10, __v_gp_r9, __v_gp_r8);
 	__result->ucs_rip = icpustate32_geteip(__self);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate32_to_ucpustate64)(struct icpustate32 const *__restrict __self,
                                           struct ucpustate64 *__restrict __result) {
 	icpustate32_to_ucpustate64_ex(__self, __result,
@@ -435,7 +435,7 @@ __NOTHROW_NCX(icpustate32_to_ucpustate64)(struct icpustate32 const *__restrict _
 	                              __CPUSTATE_GET_USER_FSBASE(),
 	                              __rdgs(), 0, 0, 0, 0, 0, 0, 0, 0);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate32_to_kcpustate64_ex)(struct icpustate32 const *__restrict __self,
                                              struct kcpustate64 *__restrict __result,
                                              __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -449,12 +449,12 @@ __NOTHROW_NCX(icpustate32_to_kcpustate64_ex)(struct icpustate32 const *__restric
 	__result->kcs_rflags = icpustate32_geteflags(__self);
 	__result->kcs_rip    = icpustate32_geteip(__self);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate32_to_kcpustate64)(struct icpustate32 const *__restrict __self,
                                           struct kcpustate64 *__restrict __result) {
 	icpustate32_to_kcpustate64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate32_user_to_kcpustate64_ex)(struct icpustate32 const *__restrict __self,
                                                   struct kcpustate64 *__restrict __result,
                                                   __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -468,7 +468,7 @@ __NOTHROW_NCX(icpustate32_user_to_kcpustate64_ex)(struct icpustate32 const *__re
 	__result->kcs_rflags = icpustate32_geteflags(__self);
 	__result->kcs_rip    = icpustate32_geteip(__self);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate32_user_to_kcpustate64)(struct icpustate32 const *__restrict __self,
                                                struct kcpustate64 *__restrict __result) {
 	icpustate32_user_to_kcpustate64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -481,7 +481,7 @@ __NOTHROW_NCX(icpustate32_user_to_kcpustate64)(struct icpustate32 const *__restr
 /************************************************************************/
 /* `struct icpustate64'                                                 */
 /************************************************************************/
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate64_to_ucpustate32_ex)(struct icpustate64 const *__restrict __self,
                                              struct ucpustate32 *__restrict __result,
                                              __u16 __v_gs, __u16 __v_fs,
@@ -499,13 +499,13 @@ __NOTHROW_NCX(icpustate64_to_ucpustate32_ex)(struct icpustate64 const *__restric
 	__result->ucs_eip          = (__u32)icpustate64_getrip(__self);
 }
 #define icpustate64_user_to_ucpustate32_ex icpustate64_to_ucpustate32_ex
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate64_to_ucpustate32)(struct icpustate64 const *__restrict __self,
                                           struct ucpustate32 *__restrict __result) {
 	icpustate64_to_ucpustate32_ex(__self, __result, __rdgs(), __rdfs(), __rdes(), __rdds());
 }
 #define icpustate64_user_to_ucpustate32 icpustate64_to_ucpustate32
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(icpustate64_to_kcpustate32)(struct icpustate64 const *__restrict __self,
                                           struct kcpustate32 *__restrict __result) {
 	__result->kcs_gpregs.gp_edi = (__u32)__self->ics_gpregs.gp_rdi;
@@ -554,7 +554,7 @@ __NOTHROW_NCX(icpustate64_to_kcpustate32)(struct icpustate64 const *__restrict _
 /************************************************************************/
 /* TODO: ucpustate32_to_icpustate64_p */
 /* TODO: ucpustate32_to_scpustate64_p */
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(ucpustate32_to_ucpustate64_ex)(struct ucpustate32 const *__restrict __self,
                                              struct ucpustate64 *__restrict __result,
                                              __u64 __v_sg_gsbase, __u64 __v_sg_fsbase,
@@ -576,7 +576,7 @@ __NOTHROW_NCX(ucpustate32_to_ucpustate64_ex)(struct ucpustate32 const *__restric
 	__result->ucs_rflags       = __self->ucs_eflags;
 	__result->ucs_rip          = __self->ucs_eip;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(ucpustate32_to_ucpustate64)(struct ucpustate32 const *__restrict __self,
                                           struct ucpustate64 *__restrict __result) {
 	ucpustate32_to_ucpustate64_ex(__self, __result,
@@ -584,7 +584,7 @@ __NOTHROW_NCX(ucpustate32_to_ucpustate64)(struct ucpustate32 const *__restrict _
 	                              __CPUSTATE_GET_USER_FSBASE(),
 	                              0, 0, 0, 0, 0, 0, 0, 0);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(ucpustate32_to_kcpustate64_ex)(struct ucpustate32 const *__restrict __self,
                                              struct kcpustate64 *__restrict __result,
                                              __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -597,12 +597,12 @@ __NOTHROW_NCX(ucpustate32_to_kcpustate64_ex)(struct ucpustate32 const *__restric
 	__result->kcs_rflags       = __self->ucs_eflags;
 	__result->kcs_rip          = __self->ucs_eip;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(ucpustate32_to_kcpustate64)(struct ucpustate32 const *__restrict __self,
                                           struct kcpustate64 *__restrict __result) {
 	ucpustate32_to_kcpustate64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0);
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(ucpustate32_to_lcpustate64_ex)(struct ucpustate32 const *__restrict __self,
                                              struct lcpustate64 *__restrict __result,
                                              __u64 __v_gp_r15, __u64 __v_gp_r14,
@@ -616,7 +616,7 @@ __NOTHROW_NCX(ucpustate32_to_lcpustate64_ex)(struct ucpustate32 const *__restric
 	__result->lcs_rbx = __self->ucs_gpregs.gp_ebx;
 	__result->lcs_rip = __self->ucs_eip;
 }
-__LOCAL __NOBLOCK void
+__LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(ucpustate32_to_lcpustate64)(struct ucpustate32 const *__restrict __self,
                                           struct lcpustate64 *__restrict __result) {
 	ucpustate32_to_lcpustate64_ex(__self, __result, 0, 0, 0, 0);
