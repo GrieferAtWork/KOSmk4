@@ -34,7 +34,7 @@
 
 DECL_BEGIN
 
-#if 0 /* TODO */
+#if !defined(__x86_64__) /* TODO */
 /* NOTE: This test program is derived from:
  * https://www.man7.org/linux/man-pages/man3/makecontext.3.html
  */
@@ -78,7 +78,7 @@ DEFINE_TEST(ucontext) {
 	uctx_func1.uc_stack.ss_sp   = func1_stack;
 	uctx_func1.uc_stack.ss_size = sizeof(func1_stack);
 	uctx_func1.uc_link          = &uctx_main;
-	makecontext(&uctx_func1, func1, 0);
+	makecontext(&uctx_func1, &func1, 0);
 
 	assert(getcontext(&uctx_func2) == 0);
 	++state;
@@ -87,7 +87,7 @@ DEFINE_TEST(ucontext) {
 	uctx_func2.uc_stack.ss_sp   = func2_stack;
 	uctx_func2.uc_stack.ss_size = sizeof(func2_stack);
 	uctx_func2.uc_link          = &uctx_func1;
-	makecontext(&uctx_func2, func2, 0);
+	makecontext(&uctx_func2, &func2, 0);
 	++state;
 	assert(state == 3);
 	ctest_substatf("state = 3\n");

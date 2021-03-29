@@ -229,6 +229,7 @@ INTERN_FUNCTION(libc_getcontext)
 	movl   $(__SIZEOF_SIGSET_T__),           %esi /* sigsetsize */
 	leal   UC(__OFFSET_UCONTEXTX32_SIGMASK), %edx /* oset = &ucp->uc_sigmask */
 /*	xorl   %ecx, %ecx */                          /* set  = NULL  (Already cleared; s.a. above) */
+	/* TODO: Integrate w/ the userprocmask mechanism */
 	movl   $(SYS_rt_sigprocmask), %eax
 	call   libc___i386_syscall
 
@@ -340,24 +341,23 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 	xorl   %edx, %edx                             /* oset = NULL */
 	leal   UC(__OFFSET_UCONTEXTX32_SIGMASK), %ecx /* set  = &ucp->uc_sigmask */
 	movl   $(SIG_SETMASK),                   %ebx /* how */
+	/* TODO: Integrate w/ the userprocmask mechanism */
 	movl   $(SYS_rt_sigprocmask), %eax
 	call   libc___i386_syscall
 
-	/* Load GP registers, except for `%edi' and `%eax' */
+	/* Load GP registers, except for `%edi' and `%eax' (and `%esp', which was already loaded) */
 	movl   R(REG_ECX), %ecx
 	.cfi_same_value %ecx
 	movl   R(REG_EDX), %edx
 	.cfi_same_value %edx
 	movl   R(REG_EBX), %ebx
 	.cfi_same_value %ebx
-	movl   R(REG_EDI), %edi
-	.cfi_same_value %edi
 	movl   R(REG_ESI), %esi
 	.cfi_same_value %esi
 	movl   R(REG_EBP), %ebp
 	.cfi_same_value %ebp
-	/* Load target segment registers. */
 
+	/* Load target segment registers. */
 	movw   R(REG_GS), %ax
 	movw   %ax, %gs
 	.cfi_same_value %gs
@@ -386,15 +386,20 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 	.cfi_same_value %ss
 
 	movl   %cs:R(REG_EAX), %eax /* Restore %eax */
-	movl   %cs:R(REG_EDI), %edi /* Restore %edi */
-	/* Inform CFI that all GP registers have now been restored */
 	.cfi_same_value %eax
+
+	movl   %cs:R(REG_EDI), %edi /* Restore %edi */
+	.cfi_same_value %edi
+
 	/* Tell CFI that %eip is stored at 0(%esp) */
 	.cfi_reg_offset %eip, 0, %esp
+
 	/* Tell CFI that %cs is stored at 4(%esp) */
 	.cfi_reg_offset %eip, 4, %esp
+
 	/* Tell CFI that %esp is offset by 8 */
 	.cfi_reg_value %esp, 8, %esp
+
 	/* Return to the caller */
 	lret
 
@@ -421,9 +426,7 @@ INTERN_FUNCTION(libc_swapcontext)
 	.cfi_startproc
 	pushl_cfi 4(%esp)      /* oucp */
 	call   libc_getcontext /* Generate the old-context */
-	addl   $(4), %esp
-	.cfi_adjust_cfa_offset -4
-	movl   4(%esp), %edi   /* oucp */
+	popl_cfi %edi          /* oucp (NOTE: We can do this because we know `libc_getcontext' doesn't modify that stack-value!) */
 	/* Override the registers that the previous call filled in incorrectly. */
 	movl   0(%esp), %eax   /* %eip */
 	movl   %eax, (__OFFSET_UCONTEXTX32_MCONTEXT + __OFFSET_MCONTEXTX32_CPU + 4 * REG_EIP)(%edi)
