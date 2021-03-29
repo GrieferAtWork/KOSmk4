@@ -42,11 +42,65 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
                                         __STDC_INT_AS_SIZE_T argc,
                                         ...) {
 #ifdef __x86_64__
-	(void)ucp;
-	(void)func;
-	(void)argc;
-	/* TODO */
-	abort();
+	byte_t *sp;
+	va_list args;
+	extern byte_t const libc_x86_setcontext_rbx[];      /* setcontext(%rbx); */
+	extern byte_t const libc_makecontext_exit_thread[]; /* pthread_exit(NULL); */
+	sp = (byte_t *)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size;
+	va_start(args, argc);
+	/* Load arguments into registers/push onto the stack.
+	 * NOTE: POSIX requires us to  load int-values, but binary  compatibility
+	 *       can also be ensured if we instead load 64-bit (and thus: pointer
+	 *       sized)  values, thus allowing  non-portable programs to directly
+	 *       pass pointers to makecontext callback functions. */
+	if (argc) {
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rdi = va_arg(args, u64);
+		--argc;
+	}
+	if (argc) {
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rsi = va_arg(args, u64);
+		--argc;
+	}
+	if (argc) {
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rdx = va_arg(args, u64);
+		--argc;
+	}
+	if (argc) {
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rcx = va_arg(args, u64);
+		--argc;
+	}
+	if (argc) {
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_r8 = va_arg(args, u64);
+		--argc;
+	}
+	if (argc) {
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_r9 = va_arg(args, u64);
+		--argc;
+	}
+	/* All  remaining  arguments   must  be  pushed   onto  the   stack.
+	 * Because `va_arg()' enumerates in forward order, we must also push
+	 * arguments in that same order, too! */
+	if (argc) {
+		unsigned int i;
+		sp -= argc * 8;
+		for (i = 0; i < argc; ++i) {
+			((u64 *)sp)[i] = va_arg(args, u64);
+		}
+	}
+	va_end(args);
+
+	/* Arguments have been loaded into the appropriate locations! */
+	sp -= 8; /* Return address */
+	*(u64 *)sp = (u64)libc_makecontext_exit_thread;
+	if (ucp->uc_link) {
+		*(u64 *)sp = (u64)libc_x86_setcontext_rbx;
+		/* Fill in `%rbx', which is required by `libc_x86_setcontext_rbx()' */
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rbx = (u64)ucp->uc_link;
+	}
+
+	/* Assign the %rip and %rsp registers. */
+	ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rsp = (u64)(void *)sp;
+	ucp->uc_mcontext.mc_context.ucs_rip           = (u64)(void *)func;
 #else /* __x86_64__ */
 	byte_t *sp;
 	extern byte_t const libc_x86_setcontext_edi[];      /* setcontext(%edi); */
@@ -65,7 +119,7 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 	*(u32 *)sp = (u32)libc_makecontext_exit_thread;
 	if (ucp->uc_link) {
 		*(u32 *)sp = (u32)libc_x86_setcontext_edi;
-		/* Fill in %edi, which is required by `libc_x86_setcontext_edi()' */
+		/* Fill in `%edi', which is required by `libc_x86_setcontext_edi()' */
 		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_edi = (u32)ucp->uc_link;
 	}
 	/* Assign the %eip and %esp registers. */

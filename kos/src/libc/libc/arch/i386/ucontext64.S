@@ -246,14 +246,17 @@ END(libc_getcontext)
 
 
 .section .text.crt.cpu.ucontext
+INTERN_FUNCTION(libc_x86_setcontext_rbx)
+	.cfi_startproc
+	movq   %rbx, %rdi
 INTERN_FUNCTION(libc_setcontext)
 	/* IN: ucontext_t const *%rdi = new_context; */
-	.cfi_startproc
 
 	/* TODO */
 	hlt
 	.cfi_endproc
 END(libc_setcontext)
+END(libc_x86_setcontext_rbx)
 
 
 
@@ -268,6 +271,15 @@ INTERN_FUNCTION(libc_swapcontext)
 	.cfi_endproc
 END(libc_swapcontext)
 
+
+.section .text.crt.cpu.ucontext
+INTERN_FUNCTION(libc_makecontext_exit_thread)
+	/* No CFI annotation, because we don't return! */
+	xorq   %rdi, %rdi
+	EXTERN(libc_pthread_exit)
+	call   libc_pthread_exit
+	hlt
+END(libc_makecontext_exit_thread)
 
 
 
