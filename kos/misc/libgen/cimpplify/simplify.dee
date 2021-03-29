@@ -24,7 +24,12 @@ import fs;
 
 /* CimPPlify -- Simply C source code by doing a partial preprocessor  pass.
  * For this purpose, you can specify a set of macros that can be assumed to
- * always/never be defined, as well as optionally remove comments. */
+ * always/never be defined, as well as optionally remove comments.
+ *
+ * Usage:
+ * $ deemon simplify.dee def/i386-kos-userspace.h < ../../../include/math.h > out.h
+ *
+ */
 
 class SimpFunctionMacro {
 	this = default;
@@ -443,19 +448,8 @@ function _simpPpParseAfter_cond(self: CParser, config: SimpConfig, base: PPBranc
 	return PPBranch(BRT_IFELSE, { base, tt, ff });
 }
 
-class _CannotFullyParse {}
-
 @@Parse and return a preprocessor expression
 function _simpPpParse(self: string | UserString | CParser | File, config: SimpConfig): PPBranch {
-	if (self !is CParser) {
-		switch(str(self)) {
-		case "0": return PPBranch(BRT_CONST, 0);
-		case "1": return PPBranch(BRT_CONST, 1);
-		default: break;
-		}
-		self = CParser(self);
-		self.next();
-	}
 	try {
 		local result = _simpPpParse_unary(self, config);
 		switch (self.tok) {
@@ -507,8 +501,6 @@ function _simpPpParse(self: string | UserString | CParser | File, config: SimpCo
 		default:
 			break;
 		}
-		if (self.tok)
-			throw _CannotFullyParse(); /* Cannot fully parse expression */
 		return result;
 	} catch (Error as e) {
 		print "... while parsing expression string", repr(str(self));
@@ -524,11 +516,21 @@ function _simpPpParse(self: string | UserString | CParser | File, config: SimpCo
 function simpPpParse(
 		self: string | UserString | CParser | File,
 		config: SimpConfig): PPBranch | none {
-	try {
-		return _simpPpParse(self, config);
-	} catch (_CannotFullyParse) {
-		return none;
+	if (self !is CParser) {
+		switch(str(self)) {
+		case "0": return PPBranch(BRT_CONST, 0);
+		case "1": return PPBranch(BRT_CONST, 1);
+		default: break;
+		}
+		self = CParser(self);
+		self.next();
 	}
+	local result = _simpPpParse(self, config);
+	if (self.tok) {
+//		print "Unexpected:", repr self.text[self.tokStart:];
+		return none; /* Cannot fully parse expression */
+	}
+	return result;
 }
 
 
@@ -919,6 +921,233 @@ continue_parsing:
 }
 
 
+
+/* Type annotation for object types used to represent C-file elements.
+ * For the purpose of simplification, a C file is split into a tree of
+ * #if-branches containing `{SimpPPElem...}' which in turn can contain
+ * more PP-branches.
+ *
+ * TODO: Add more handling here to detct macro-pairs that can be
+ *       optimized away when appearing next to each other (e.g.
+ *       `__NAMESPACE_STD_(ENTER|LEAVE)'), as well as `extern "..." {'
+ *       and `}' pairs. */
+#define SimpPPElem SimpPPIfCapsule | string
+
+class SimpPPIfCapsule {
+	this = default;
+
+	@@The preprocessor #if-condition string
+	public member cond: string;
+
+	@@tt-body
+	public member tt: {SimpPPElem...};
+
+	@@ff-body
+	public member ff: {SimpPPElem...};
+}
+
+
+function isBackslashEscaped(text: string, loc: int): bool {
+	local isEscaped = false;
+	while (loc && text[loc - 1] == "\\") {
+		isEscaped = !isEscaped;
+		--loc;
+	}
+	return isEscaped;
+}
+
+function findNonBackslashEscapedEOL(text: string, start: int, end: int): int {
+	local result = start;
+	for (;;) {
+		result = text.find("\n", result, end);
+		if (result < 0)
+			break;
+		if (!isBackslashEscaped(text, result))
+			break;
+		++result;
+	}
+	return result;
+}
+
+function findNonEscapedEOL(text: string, start: int, end: int): int {
+	local i = start;
+	while (i < end) {
+		local ch = text[i];
+		if (ch == "\\") {
+			i += 2;
+			continue;
+		}
+		if (ch == "/") {
+			++i;
+			if (i >= end)
+				return -1;
+			ch = text[i];
+			if (ch == "/")
+				return findNonBackslashEscapedEOL(text, i + 1, end);
+			if (ch == "*") {
+				i = text.find("*/", i + 1, end);
+				if (i < 0)
+					return -1;
+			}
+			continue;
+		}
+		if (ch == "\n")
+			return i;
+		++i;
+	}
+	return -1;
+}
+
+function simpParseCFile_impl(input: CParser): {SimpPPElem...} {
+	local flushStart = input.tokStart;
+	local inputText = input.text;
+	local tok = input.tok;
+	while (tok) {
+		if (tok.issymbol()) {
+			/* TODO: Lookup+expand known macros. */
+			tok = input.next();
+			continue;
+		}
+		if (tok != "#") {
+			tok = input.next();
+			continue;
+		}
+		/* Directive */
+		local directiveStart = input.tokEnd;
+		local directiveEnd = findNonEscapedEOL(inputText, directiveStart, input.end);
+		if (directiveEnd < 0)
+			directiveEnd = input.end;
+		while (directiveStart < directiveEnd && inputText.isspace(directiveStart))
+			++directiveStart;
+		while (directiveEnd > directiveStart && inputText.isspace(directiveEnd - 1))
+			--directiveEnd;
+		if (directiveStart >= directiveEnd)
+			goto next_directive; /* Empty directive */
+		if (!inputText.issymstrt(directiveStart)) {
+			tok = input.next();
+			continue;
+		}
+		local directiveKeywordEnd = directiveStart + 1;
+		while (directiveKeywordEnd < directiveEnd && inputText.issymcont(directiveKeywordEnd))
+			++directiveKeywordEnd;
+		local directiveName = inputText[directiveStart:directiveKeywordEnd];
+		local directiveArgsStart = directiveKeywordEnd;
+		while (directiveArgsStart < directiveEnd && inputText.isspace(directiveArgsStart))
+			++directiveArgsStart;
+		switch (directiveName) {
+
+		case "if":
+		case "ifdef":
+		case "ifndef": {
+			if (flushStart < input.tokStart)
+				yield inputText[flushStart:input.tokStart].replace("\\\n", "");
+			local capsule = inputText[directiveArgsStart:directiveEnd].replace("\\\n", "");
+			if (directiveName != "if") {
+				capsule = "defined({})".format({ capsule });
+				if (directiveName == "ifndef")
+					capsule = "!" + capsule;
+			}
+			capsule = SimpPPIfCapsule(cond: capsule);
+			local lastCapsule = capsule;
+
+			/* Load the first token after the directive. */
+parse_ppif_body:
+			input.tokEnd = directiveEnd;
+			input.next();
+			lastCapsule.tt = List(simpParseCFile_impl(input));
+			if (input.tok != "#")
+				input.errAt(directiveStart, "Unmatched #if");
+			directiveStart = input.tokEnd;
+			directiveEnd = findNonEscapedEOL(inputText, directiveStart, input.end);
+			if (directiveEnd < 0)
+				directiveEnd = input.end;
+			while (directiveStart < directiveEnd && inputText.isspace(directiveStart))
+				++directiveStart;
+			while (directiveEnd > directiveStart && inputText.isspace(directiveEnd - 1))
+				--directiveEnd;
+			directiveKeywordEnd = directiveStart + 1;
+			while (directiveKeywordEnd < directiveEnd && inputText.issymcont(directiveKeywordEnd))
+				++directiveKeywordEnd;
+			directiveName = inputText[directiveStart:directiveKeywordEnd];
+			directiveArgsStart = directiveKeywordEnd;
+			while (directiveArgsStart < directiveEnd && inputText.isspace(directiveArgsStart))
+				++directiveArgsStart;
+			switch (directiveName) {
+
+			case "elif": {
+				local newCapsule = SimpPPIfCapsule(
+					cond: inputText[directiveArgsStart:directiveEnd].replace("\\\n", ""));
+				lastCapsule.ff = { newCapsule };
+				lastCapsule = newCapsule;
+				goto parse_ppif_body;
+			}	break;
+
+			case "else":
+				input.tokEnd = directiveEnd;
+				input.next();
+				lastCapsule.ff = List(simpParseCFile_impl(input));
+				if (input.tok != "#")
+					input.errAt(directiveStart, "Unmatched #else");
+				directiveStart = input.tokEnd;
+				directiveEnd = findNonEscapedEOL(inputText, directiveStart, input.end);
+				if (directiveEnd < 0)
+					directiveEnd = input.end;
+				while (directiveStart < directiveEnd && inputText.isspace(directiveStart))
+					++directiveStart;
+				while (directiveEnd > directiveStart && inputText.isspace(directiveEnd - 1))
+					--directiveEnd;
+				directiveKeywordEnd = directiveStart + 1;
+				while (directiveKeywordEnd < directiveEnd && inputText.issymcont(directiveKeywordEnd))
+					++directiveKeywordEnd;
+				directiveName = inputText[directiveStart:directiveKeywordEnd];
+				if (directiveName != "endif")
+					input.errAt(directiveStart, "Unmatched #endif after #else, but got {!r}"
+						.format({ directiveName }));
+				break;
+
+			case "endif":
+				lastCapsule.ff = {}; /* empty... */
+				break;
+
+			default:
+				input.errAt(directiveStart, "Expected #endif, #else or #elif after #if, but got {!r}"
+					.format({ directiveName }));
+				break;
+			}
+			flushStart = directiveEnd;
+			if (flushStart < input.end && inputText.islf(flushStart))
+				++flushStart;
+
+			/* Yield the outer-most pp-condition-capsule. */
+			yield capsule;
+		}	break;
+
+		case "elif":
+		case "else":
+		case "endif":
+			/* Must let the caller deal with these! */
+			goto done;
+
+		default:
+			break;
+		}
+next_directive:
+		input.tokEnd = directiveEnd;
+		tok = input.next();
+	}
+done:
+	if (flushStart < input.tokStart)
+		yield inputText[flushStart:input.tokStart].replace("\\\n", "");
+}
+
+function simpParseCFile(input: CParser): {SimpPPElem...} {
+	local result = List(simpParseCFile_impl(input));
+	if (input.tok)
+		input.err("Unmatched #else, #endif or #elif");
+	return result;
+}
+
+
 class SimpOutputPrinter {
 	this = default;
 	public member output: File;
@@ -931,71 +1160,14 @@ class SimpOutputPrinter {
 			output.write("\n");
 	}
 
-	public function write(
-			text: string, start: int = 0, end: int = -1) {
-		/* TODO: By re-interpreting output text before actually writing it to the output,
-		 *       we can potentially perform some more higher-level optimizations, such as
-		 *       re-arranging or merging preprocessor blocks:
-		 * >> #if foo            >> #if foo && bar
-		 * >> #if bar            >> HERE
-		 * >> HERE               >> #endif
-		 * >> #endif
-		 * >> #endif
-		 *
-		 * >> #if bar            >> #if bar
-		 * >> A                  >> A
-		 * >> #endif             >> B
-		 * >> #if bar            >> #endif
-		 * >> B
-		 * >> #endif
-		 *
-		 * >> #if foo            >> #if foo
-		 * >> A                  >> A
-		 * >> #else              >> C
-		 * >> B                  >> #else
-		 * >> #endif             >> B
-		 * >> #if foo            >> D
-		 * >> C                  >> #endif
-		 * >> #else
-		 * >> D
-		 * >> #endif
-		 *
-		 * That last one could be _really_ useful, since a simplified header file often still
-		 * contains  declaration-patterns that cannot be optimized away, since they depend on
-		 * feature control macros that are under the control of the including __BASE_FILE__:
-		 *
-		 * >> #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
-		 * >> extern "C++" {
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memxchr,(void *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memxchr,(__haystack,__needle,__n_bytes))
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,memxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memxchr,(__haystack,__needle,__n_bytes))
-		 * >> }
-		 * >> #else
-		 * >> __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),(__haystack,__needle,__n_bytes))
-		 * >> #endif
-		 * >> #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
-		 * >> extern "C++" {
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrxchr,(void *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrxchr,(__haystack,__needle,__n_bytes))
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,memrxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrxchr,(__haystack,__needle,__n_bytes))
-		 * >> }
-		 * >> #else
-		 * >> __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),(__haystack,__needle,__n_bytes))
-		 * >> #endif
-		 *
-		 * Can be optimized to:
-		 * >> #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
-		 * >> extern "C++" {
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memxchr,(void *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memxchr,(__haystack,__needle,__n_bytes))
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,memxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memxchr,(__haystack,__needle,__n_bytes))
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrxchr,(void *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrxchr,(__haystack,__needle,__n_bytes))
-		 * >> __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,memrxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrxchr,(__haystack,__needle,__n_bytes))
-		 * >> }
-		 * >> #else
-		 * >> __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),(__haystack,__needle,__n_bytes))
-		 * >> __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrxchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),(__haystack,__needle,__n_bytes))
-		 * >> #endif
-		 */
+	public function write(text: string, start: int = 0, end: int = -1) {
 		if (end < 0)
 			end = #text;
+		/* TODO: Optimize:
+		 * >> __attribute__((foo)) __attribute__((bar))
+		 * Into:
+		 * >> __attribute__((foo, bar))
+		 */
 		if (config.truncateOutput) {
 			local flushStart = start;
 			while (start < end) {
@@ -1087,309 +1259,247 @@ class SimpOutputPrinter {
 		}
 	}
 
+	public function writeElements(elem: {SimpPPElem...}) {
+		for (local e: elem) {
+			if (e is SimpPPIfCapsule) {
+				local cond = e.cond;
+				if (cond.startswith("defined(") && cond.endswith(")") &&
+				    cond.findmatch("(", ")", 8) == #cond - 1) {
+					write("#ifdef {}\n".format({ cond[8:-1] }));
+				} else if (cond.startswith("!defined(") && cond.endswith(")") &&
+				           cond.findmatch("(", ")", 9) == #cond - 1) {
+					write("#ifndef {}\n".format({ cond[9:-1] }));
+				} else {
+					write("#if {}\n".format({ cond }));
+				}
+do_write_ppif_elem:
+				writeElements(e.tt);
+				if (e.ff) {
+					if (#e.ff == 1) {
+						local firstFF = e.ff.first;
+						if (firstFF is SimpPPIfCapsule) {
+							write("#elif {}\n".format({ firstFF.cond }));
+							e = firstFF;
+							goto do_write_ppif_elem;
+						}
+					}
+					write("#else\n");
+					writeElements(e.ff);
+				}
+				write("#endif\n");
+				continue;
+			}
+			write(e);
+		}
+	}
+}
+
+
+
+global simpOptimizeElems;
+function simpOptimizeElem(config: SimpConfig, assume: PPAssume, elem: SimpPPElem): {SimpPPElem...} {
+	if (elem is SimpPPIfCapsule) {
+again_optimize_ppif:
+		if (!elem.tt) {
+do_inverse_condition:
+			if (!elem.ff)
+				return {};
+			elem.cond = "!({})".format({ elem.cond });
+			elem.tt   = elem.ff;
+			elem.ff   = {};
+		}
+		local optCond = simpPpParse(elem.cond, config).optimize(assume: assume);
+		local optCondStr = optCond.tostr();
+		if (optCondStr !is none) {
+			/* Flatten constant conditions */
+			if (optCondStr == "1")
+				return simpOptimizeElems(config, assume, elem.tt);
+			if (optCondStr == "0")
+				return simpOptimizeElems(config, assume, elem.ff);
+			elem.cond = optCondStr;
+			elem.tt = simpOptimizeElems(config, assume.withAssumption(optCond, true), elem.tt);
+			if (elem.ff)
+				elem.ff = simpOptimizeElems(config, assume.withAssumption(optCond, false), elem.ff);
+			if (!elem.tt)
+				goto do_inverse_condition;
+		}
+		if (!elem.ff && #elem.tt == 1) {
+			local firstTT = elem.tt.first;
+			if (firstTT is SimpPPIfCapsule && !firstTT.ff) {
+				/* Optimize:              Info:
+				 * >> #if FOO             >> #if FOO && BAR
+				 * >> #if BAR             >> A
+				 * >> A                   >> #endif
+				 * >> #endif              >>
+				 * >> #endif              >> */
+				elem.cond = "({}) && ({})".format({ elem.cond, firstTT.cond });
+				elem.tt   = firstTT.tt;
+				goto again_optimize_ppif;
+			}
+		}
+
+		/* TODO: Optimize:         Into:
+		 * >> #if FOO              >> A
+		 * >> A                    >> #if FOO
+		 * >> B                    >> B
+		 * >> D                    >> #else
+		 * >> #else                >> C
+		 * >> A                    >> #endif
+		 * >> C                    >> D
+		 * >> D
+		 * >> #endif
+		 * NOTE: This optimization should work line-wise! */
+
+		return { elem };
+	}
+	/* TODO: Remove comments from strings (when config.truncateOutput)
+	 *       Needed so that more strings can become empty, and be removed
+	 *       from text blocks, allowing for more optimizations relating
+	 *       to adjacent #if-directives */
+	return { elem };
+}
+
+function simpOptimizeElems(config: SimpConfig, assume: PPAssume, elems: {SimpPPElem...}): {SimpPPElem...} {
+	local result = [];
+
+	/* Do a shallow optimization pass. */
+	for (local e: elems) {
+		/* TODO: #define / #undef directives should affect `assume' */
+		/* TODO: #include: Parse #include'd files for unconditionally defined macros,
+		 *                 and include those macro definitions within assumptions.
+		 *                 For this purpose, we should also try to recognize #include
+		 *                 guard macros and handle them as `#if 1', since otherwise,
+		 *                 we'd (correctly) deduce that unconditional macros from
+		 *                 include files only get defined if the include guard hasn't
+		 *                 been defined, yet.
+		 *                 With this, we can optimize:
+		 *                 >> #include <asm/crt/posix_spawn.h>
+		 *                 >> #ifdef __POSIX_SPAWN_RESETIDS
+		 *                 >> #define POSIX_SPAWN_RESETIDS __POSIX_SPAWN_RESETIDS
+		 *                 >> #endif
+		 *                 into:
+		 *                 >> #include <asm/crt/posix_spawn.h>
+		 *                 >> #define POSIX_SPAWN_RESETIDS __POSIX_SPAWN_RESETIDS
+		 */
+		result.extend(simpOptimizeElem(config, assume, e));
+	}
+
+	/* Merge adjacent string elements. */
+	local n = #result - 1;
+	for (local i = 0; i < n;) {
+		local a = result[i];
+		local b = result[i + 1];
+		if (a is string && b is string) {
+			result[i] = a + b;
+			result.erase(i + 1);
+			--n;
+			continue;
+		}
+		++i;
+	}
+
+	/* Remove empty string elements. */
+	result.removeif([](e) -> e is string && e.isspace());
+
+	/* Merge adjacent `SimpPPIfCapsule' with equal/inverse conditions */
+	local n = #result - 1;
+	for (local i = 0; i < n;) {
+		local a = result[i];
+		local b = result[i + 1];
+		if (a is SimpPPIfCapsule && b is SimpPPIfCapsule) {
+			if (a.cond == b.cond) {
+				a.tt.extend(b.tt);
+				if (a.ff !is List)
+					a.ff = List(a.ff);
+				a.ff.extend(b.ff);
+				result.erase(i + 1);
+				--n;
+				continue;
+			}
+			/* Optimize:             Into:
+			 * >> #if BAR            >> #if BAR
+			 * >> A                  >> A
+			 * >> #endif             >> #if FOO
+			 * >> #if FOO            >> B
+			 * >> #if BAR            >> #else
+			 * >> B                  >> C
+			 * >> #endif             >> #endif
+			 * >> #else              >>
+			 * >> #if BAR            >>
+			 * >> C                  >>
+			 * >> #endif             >>
+			 * >> #endif             >>
+			 */
+			/* TODO */
+
+			/* Optimize:             Into:
+			 * >> #if BAR            >> #if BAR
+			 * >> A                  >> A
+			 * >> #else              >> #if FOO
+			 * >> B                  >> C
+			 * >> #endif             >> #else
+			 * >> #if FOO            >> E
+			 * >> #if BAR            >> #endif
+			 * >> C                  >> #else
+			 * >> #else              >> B
+			 * >> D                  >> #if FOO
+			 * >> #endif             >> D
+			 * >> #else              >> #else
+			 * >> #if BAR            >> F
+			 * >> E                  >> #endif
+			 * >> #else              >> #endif
+			 * >> F                  >>
+			 * >> #endif             >>
+			 * >> #endif             >>
+			 */
+			/* TODO */
+
+		}
+		++i;
+	}
+
+	return result;
+}
+
+
+function simpPrintTree(tree: {SimpPPElem...}, indent: int = 0) {
+	for (local e: tree) {
+		print("\t" * indent),;
+		if (e is SimpPPIfCapsule) {
+			print("SimpPPIfCapsule[", repr e.cond, "][");
+			simpPrintTree(e.tt, indent + 1);
+			if (e.ff) {
+				print("\t" * indent),;
+				print("][");
+				simpPrintTree(e.ff, indent + 1);
+			}
+			print("\t" * indent),;
+			print("]");
+			continue;
+		}
+		print repr e;
+	}
 }
 
 function simplifyCFile(
 		input: string | UserString | CParser | File,
-		output: File,
-		config: SimpConfig) {
-	local flushStart;
+		output: File, config: SimpConfig) {
 	if (input !is CParser) {
 		input = CParser(input);
 		input.next();
-		flushStart = 0;
-	} else {
-		flushStart = input.tokStart;
 	}
+	local tree = simpParseCFile(input);
+	local tree = simpOptimizeElems(config, createPPAssume(), tree);
+//	simpPrintTree(tree);
 	local out = SimpOutputPrinter(output, config);
-	local inputText = input.text;
-	local tok = input.tok;
-#define IFDEF_BLOCK_DELETED         0 /* Preceding directive was deleted. */
-#define IFDEF_BLOCK_KEPT            1 /* Preceding directive was kept. */
-#define IFDEF_BLOCK_KEPT_AFTER_ELSE 2 /* Preceding directive (which was "#else") was kept. */
-	@@Active ifdef-blocks (list of `IFDEF_BLOCK_*')
-	@@NOTE: The @PPBranch element identifies the local expression
-	@@      assumptions that may be made. (if any)
-	local ifdefBlocks: {(int, {PPBranch...})...} = [];
-	@@Return the current PP-assumptions (if any)
-	function createAssumptions(): PPAssume {
-		local result = createPPAssume();
-		for (local none, branches: ifdefBlocks) {
-			for (local b: branches)
-				result.addAssumption(b, true);
-		}
-		return result;
-	}
-	while (tok) {
-		if (tok.issymbol()) {
-			/* TODO: Lookup+expand known macros. */
-			tok = input.next();
-			continue;
-		}
-		if (tok != "#") {
-			tok = input.next();
-			continue;
-		}
-		/* Directive */
-		local directiveStart = input.tokEnd;
-		local directiveEnd = inputText.find("\n", directiveStart, input.end);
-		if (directiveEnd < 0)
-			directiveEnd = input.end;
-		while (directiveStart < directiveEnd &&
-		       inputText.isspace(directiveStart))
-			++directiveStart;
-		while (directiveEnd > directiveStart &&
-		       inputText.isspace(directiveEnd - 1))
-			--directiveEnd;
-		if (directiveStart >= directiveEnd)
-			goto next_directive; /* Empty directive */
-		if (!inputText.issymstrt(directiveStart)) {
-			tok = input.next();
-			continue;
-		}
-		local directiveKeywordEnd = directiveStart + 1;
-		while (directiveKeywordEnd < directiveEnd &&
-		       inputText.issymcont(directiveKeywordEnd))
-			++directiveKeywordEnd;
-		local directiveName = inputText[directiveStart:directiveKeywordEnd];
-		local directiveArgsStart = directiveKeywordEnd;
-		while (directiveArgsStart < directiveEnd &&
-		       inputText.isspace(directiveArgsStart))
-			++directiveArgsStart;
-		switch (directiveName) {
-
-		case "if":
-		case "ifdef":
-		case "ifndef": {
-			out.write(inputText, flushStart, input.tokStart);
-again_parse_if_expression:
-			local baseExpr;
-			if (directiveName == "if") {
-				baseExpr = input.getUserString(directiveArgsStart, directiveEnd);
-			} else {
-				baseExpr = "defined({})".format({
-					inputText[directiveArgsStart:directiveEnd]
-				});
-				if (directiveName == "ifndef")
-					baseExpr = "!" + baseExpr;
-			}
-			local exprAst = simpPpParse(baseExpr, config)
-				.optimize(assume: createAssumptions());
-			local expr = exprAst.tostr();
-			if (expr is none) {
-				/* Error parsing directive */
-				expr = baseExpr;
-			} else if (expr == "1") {
-				/* Directive can be simplified to "#if 1" */
-				ifdefBlocks.append((IFDEF_BLOCK_DELETED, {}));
-				flushStart = directiveEnd;
-				break;
-			} else if (expr == "0") {
-				CParser_SkipPPBlock(input, directiveEnd);
-				directiveStart = input.tokEnd;
-				directiveEnd = inputText.find("\n", directiveStart, input.end);
-				if (directiveEnd < 0)
-					directiveEnd = input.end;
-				while (directiveStart < directiveEnd &&
-				       inputText.isspace(directiveStart))
-					++directiveStart;
-				while (directiveEnd > directiveStart &&
-				       inputText.isspace(directiveEnd - 1))
-					--directiveEnd;
-				if (directiveStart >= directiveEnd)
-					goto next_directive; /* Empty directive */
-				if (!inputText.issymstrt(directiveStart)) {
-					tok = input.next();
-					continue;
-				}
-				directiveKeywordEnd = directiveStart + 1;
-				while (directiveKeywordEnd < directiveEnd &&
-				       inputText.issymcont(directiveKeywordEnd))
-					++directiveKeywordEnd;
-				directiveName = inputText[directiveStart:directiveKeywordEnd];
-				directiveArgsStart = directiveKeywordEnd;
-				while (directiveArgsStart < directiveEnd &&
-				       inputText.isspace(directiveArgsStart))
-					++directiveArgsStart;
-				if (directiveName == "endif") {
-					/* The entire block was skipped. */
-					flushStart = directiveEnd;
-					break;
-				} else if (directiveName == "else") {
-					/* >> #if 0
-					 * >> #else
-					 * >> ...
-					 * >> #endif
-					 * Same  as:
-					 * >> #if 1
-					 * >> ...
-					 * >> #endif */
-					ifdefBlocks.append((IFDEF_BLOCK_DELETED, {}));
-					flushStart = directiveEnd;
-					break;
-				} else if (directiveName == "elif") {
-					/* >> #if 0
-					 * >> #elif foo
-					 * >> ...
-					 * >> #endif
-					 * Same  as:
-					 * >> #if foo
-					 * >> ...
-					 * >> #endif */
-					directiveName = "if";
-					goto again_parse_if_expression;
-				}
-				/* Shouldn't get here. */
-				assert false, "directiveName = " + repr(directiveName);
-			}
-			/* Expression cannot be optimized away.
-			 * As such, emit a proper directive, but remember that
-			 * we can assume the directive to be true for the time
-			 * being. */
-			expr = str(expr);
-			if (expr.startswith("defined(") && expr.endswith(")") &&
-			    expr.findmatch("(", ")", 8) == #expr - 1) {
-				out.write("#ifdef {}\n".format({ expr[8:-1].strip() }));
-			} else if (expr.startswith("!defined(") && expr.endswith(")") &&
-			           expr.findmatch("(", ")", 9) == #expr - 1) {
-				out.write("#ifndef {}\n".format({ expr[9:-1].strip() }));
-			} else {
-				out.write("#if {}\n".format({ expr }));
-			}
-			ifdefBlocks.append((IFDEF_BLOCK_KEPT, {exprAst}));
-			flushStart = directiveEnd;
-		}	break;
-
-		case "elif":
-		case "else": {
-			out.write(inputText, flushStart, input.tokStart);
-			if (!ifdefBlocks)
-				input.errAt(directiveStart, "#else or #elif without #if");
-			local blockKind = ifdefBlocks.last.first;
-			if (blockKind in [IFDEF_BLOCK_DELETED, IFDEF_BLOCK_KEPT_AFTER_ELSE]) {
-				/* We've already printed a #else. As such, we must
-				 * skip everything  until  the  associated  #endif */
-				for (;;) {
-					local kind = CParser_SkipPPBlock(input, directiveEnd);
-					if (kind in ["elif", "else"]) {
-						directiveEnd = inputText.find("\n", input.tokEnd, input.end);
-						if (directiveEnd < 0)
-							directiveEnd = input.end;
-						continue;
-					}
-					if (kind == "endif")
-						break;
-					/* Shouldn't get here. */
-					assert false, "kind = " + repr(kind);
-				}
-				directiveEnd = inputText.find("\n", input.tokEnd, input.end);
-				if (directiveEnd < 0)
-					directiveEnd = input.end;
-				flushStart = directiveEnd;
-				if (blockKind == IFDEF_BLOCK_KEPT_AFTER_ELSE)
-					out.write("#endif\n");
-				ifdefBlocks.popback();
-				break;
-			}
-			assert blockKind == IFDEF_BLOCK_KEPT;
-			local baseExpr;
-			if (directiveName == "else")
-				baseExpr = "1";
-			else {
-				baseExpr = input.getUserString(directiveArgsStart, directiveEnd);
-			}
-			local exprAst, expr;
-			if (baseExpr == "1") {
-				exprAst = PPBranch(BRT_CONST, 1);
-				expr    = baseExpr;
-			} else {
-				local usedAssumptions;
-				local origIfExpr = ifdefBlocks.popback();
-				usedAssumptions = createAssumptions();
-				ifdefBlocks.append(origIfExpr);
-				origIfExpr = List(origIfExpr.last);
-				if (origIfExpr !is none) {
-					/* The top-most assumption must be added as its  negative,
-					 * since it is known to _not_ hold true after an elif/else */
-					usedAssumptions.addAssumption(origIfExpr.popback(), false);
-					for (local a: origIfExpr)
-						usedAssumptions.addAssumption(a, true);
-				}
-				exprAst = simpPpParse(baseExpr, config)
-					.optimize(assume: usedAssumptions);
-				expr = exprAst.tostr();
-				if (expr is none)
-					expr = baseExpr; /* Error parsing directive */
-			}
-			if (expr == "1") {
-				/* >> #if foo
-				 * >> #elif 1
-				 * >> ...
-				 * >> #endif
-				 * Emit  as:
-				 * >> #if foo
-				 * >> #else
-				 * >> ...
-				 * >> #endif */
-				local origIfExpr = List(ifdefBlocks.popback().last);
-				origIfExpr.append(PPBranch(BRT_NOT, origIfExpr.popback())
-					.optimize(assume: createAssumptions()));
-				ifdefBlocks.append((IFDEF_BLOCK_KEPT_AFTER_ELSE, origIfExpr));
-				out.write("#else\n");
-				flushStart = directiveEnd;
-				goto next_directive;
-			} else if (expr == "0") {
-				/* >> #if foo
-				 * >> #elif 0
-				 * >> ...
-				 * >> #endif
-				 * Simply skip the current block and check what comes next. */
-				CParser_SkipPPBlock(input, directiveEnd);
-				directiveEnd = input.tokStart;
-				flushStart = directiveEnd;
-				goto next_directive;
-			}
-			/* Some other expression that cannot be fully optimized away.
-			 * -> Output it as-is, instead!
-			 * >> #if foo
-			 * >> #elif bar
-			 * >> #endif
-			 */
-			if (exprAst !is none) {
-				local origIfExpr = List(ifdefBlocks.popback().last);
-				/* For the #elif-block, we can assume that `!foo && bar' (in the above example) */
-				origIfExpr.append(PPBranch(BRT_NOT, origIfExpr.popback())
-					.optimize(assume: createAssumptions()));
-				origIfExpr.append(exprAst);
-				ifdefBlocks.append((IFDEF_BLOCK_KEPT, origIfExpr));
-			}
-			/* Emit the (optimized) expression as an #elif */
-			out.write("#elif {}\n".format({ expr }));
-			flushStart = directiveEnd;
-		}	break;
-
-		case "endif": {
-			out.write(inputText, flushStart, input.tokStart);
-			if (!ifdefBlocks)
-				input.errAt(directiveStart, "#endif without #if");
-			local kind = ifdefBlocks.popback().first;
-			if (kind in [IFDEF_BLOCK_KEPT, IFDEF_BLOCK_KEPT_AFTER_ELSE])
-				out.write("#endif\n"); /* Actually output the #endif */
-			flushStart = directiveEnd;
-		}	break;
-
-		default:
-			break;
-		}
-next_directive:
-		input.tokEnd = directiveEnd;
-		tok = input.next();
-	}
-	out.write(inputText, flushStart, input.end);
+	out.writeElements(tree);
 	out.finish();
-	if (ifdefBlocks)
-		input.err("Unclosed #if-blocks ({} in total)".format({ #ifdefBlocks }));
 }
+
+
+
+
+
 
 
 #ifdef __MAIN__
