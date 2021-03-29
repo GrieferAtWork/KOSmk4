@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccb53314 */
+/* HASH CRC-32:0x76deafe4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_strtoi_l_defined 1
 #include <__crt.h>
 #include <features.h>
-#include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strtoi from inttypes */

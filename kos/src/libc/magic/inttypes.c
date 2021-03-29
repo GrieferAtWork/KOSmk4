@@ -50,6 +50,8 @@
 #include <hybrid/__va_size.h>
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%[insert:prefix(
+#include <bits/types.h>
 )]%{
 
 }%[insert:prefix(
@@ -596,7 +598,7 @@ $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
 /************************************************************************/
 /* WARNING: The following functions aren't exported by-name from libc!  */
 /************************************************************************/
-[[nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64_r)]]
@@ -634,7 +636,7 @@ $intmax_t strtoimax_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[nocrt, ATTR_LEAF, decl_include("<features.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("strtou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64_r)]]
@@ -663,7 +665,7 @@ $uintmax_t strtoumax_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[wchar, nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[wchar, nocrt, ATTR_LEAF, decl_include("<features.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcsto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcsto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcsto64_r)]]
@@ -673,7 +675,7 @@ $intmax_t wcstoimax_r([[nonnull]] $wchar_t const *__restrict nptr,
                       [[nullable]] $errno_t *error)
 	%{generate(str2wcs("strtoimax_r"))}
 
-[[wchar, nocrt, ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[wchar, nocrt, ATTR_LEAF, decl_include("<features.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), alias("wcstou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), alias("wcstou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcstou64_r)]]
@@ -765,7 +767,7 @@ $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
 @@@param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
 @@@param: rstatus: When non-`NULL', set to a conversion error (if any)
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[guard, impl_include("<libc/errno.h>")]]
 $intmax_t strtoi([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **__restrict endptr,
@@ -814,7 +816,7 @@ $intmax_t strtoi([[nonnull]] char const *__restrict nptr,
 }
 
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("strtoi"), guard, impl_include("<libc/errno.h>")]]
 $uintmax_t strtou([[nonnull]] char const *__restrict nptr,
                   [[nullable]] char **__restrict endptr,
@@ -863,7 +865,7 @@ $uintmax_t strtou([[nonnull]] char const *__restrict nptr,
 }
 
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("strtoi"), impl_include("<libc/errno.h>")]]
 $intmax_t strtoi_l([[nonnull]] char const *__restrict nptr,
                    [[nullable]] char **__restrict endptr,
@@ -875,7 +877,7 @@ $intmax_t strtoi_l([[nonnull]] char const *__restrict nptr,
 }
 
 [[ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("strtoi"), impl_include("<libc/errno.h>")]]
 $uintmax_t strtou_l([[nonnull]] char const *__restrict nptr,
                     [[nullable]] char **__restrict endptr,

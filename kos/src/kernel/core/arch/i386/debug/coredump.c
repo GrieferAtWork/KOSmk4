@@ -37,6 +37,8 @@
 #include <asm/cpu-flags.h>
 #include <asm/registers.h>
 #include <bits/os/kos/siginfo-convert.h>
+#include <kos/bits/coredump.h>
+#include <kos/bits/coredump32.h>
 #include <kos/bits/exception_data-convert.h>
 #include <kos/bits/exception_data.h>
 #include <kos/bits/exception_data32.h>

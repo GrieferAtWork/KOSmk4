@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35b7c7e7 */
+/* HASH CRC-32:0xc943b2d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,6 +67,7 @@ __NAMESPACE_STD_USING(wcstoumax)
 
 #include <hybrid/__va_size.h>
 #include <hybrid/typecore.h>
+#include <bits/types.h>
 
 #include <bits/crt/inttypes.h>
 

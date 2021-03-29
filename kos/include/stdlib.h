@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a949d2b */
+/* HASH CRC-32:0x20bc8403 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3449,6 +3449,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __USE_OPENBSD && __LONGLONG */
 
 #ifdef __USE_NETBSD
+#ifndef __dev_t_defined
+#define __dev_t_defined 1
+typedef __dev_t dev_t;
+#endif /* !__dev_t_defined */
+#ifndef __mode_t_defined
+#define __mode_t_defined 1
+typedef __mode_t mode_t;
+#endif /* !__mode_t_defined */
 #ifndef __heapsort_defined
 #define __heapsort_defined 1
 #ifdef __CRT_HAVE_heapsort

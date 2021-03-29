@@ -3310,6 +3310,17 @@ __LONGLONG strtonum([[nonnull]] char const *nptr,
 
 %
 %#ifdef __USE_NETBSD
+%{
+#ifndef __dev_t_defined
+#define __dev_t_defined 1
+typedef __dev_t dev_t;
+#endif /* !__dev_t_defined */
+#ifndef __mode_t_defined
+#define __mode_t_defined 1
+typedef __mode_t mode_t;
+#endif /* !__mode_t_defined */
+}
+
 %[default:section(".text.crt{|.dos}.bsd")]
 
 [[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]

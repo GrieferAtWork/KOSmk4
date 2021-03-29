@@ -68,11 +68,12 @@ struct __siginfo_struct;
 struct __siginfox32_struct;
 #endif /* __x86_64__ || !__i386__ */
 #ifdef __USE_KOS_ALTERATIONS
-#ifdef __x86_64__
-struct ucontext32;
-#else /* __x86_64__ */
+#if ((defined(__linux__) || (defined(__KOS__) && __KOS_VERSION__ < 300)) && \
+     (!defined(__x86_64__) && defined(__i386__)))
 struct ucontext;
-#endif /* !__x86_64__ */
+#else /* ... */
+struct __ucontextx32;
+#endif /* !... */
 #endif /* __USE_KOS_ALTERATIONS */
 #endif /* __USE_POSIX199309 */
 #ifndef ____sigsetx32_t_defined
@@ -105,11 +106,20 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX32) __sigactionx32 /*[NAME(sigactionx3
 		__sighandlerx32_t sa_handler;
 		/* Used if SA_SIGINFO is set. */
 #ifdef __USE_KOS_ALTERATIONS
+#if ((defined(__linux__) || (defined(__KOS__) && __KOS_VERSION__ < 300)) && \
+     (!defined(__x86_64__) && defined(__i386__)))
+#if !defined(__x86_64__) && defined(__i386__)
+		__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sa_sigaction, (int __signo, struct __siginfox32_struct *__info, struct __ucontextx32 *__ctx));
+#else /* !__x86_64__ && __i386__ */
+		__HYBRID_FUNCPTR32(void, , sa_sigaction, (int __signo, struct __siginfox32_struct *__info, struct __ucontextx32 *__ctx));
+#endif /* __x86_64__ || !__i386__ */
+#else /* ... */
 #if !defined(__x86_64__) && defined(__i386__)
 		__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sa_sigaction, (int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx));
 #else /* !__x86_64__ && __i386__ */
-		__HYBRID_FUNCPTR32(void, , sa_sigaction, (int __signo, struct __siginfox32_struct *__info, struct ucontext32 *__ctx));
+		__HYBRID_FUNCPTR32(void, , sa_sigaction, (int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx));
 #endif /* __x86_64__ || !__i386__ */
+#endif /* !... */
 #else /* __USE_KOS_ALTERATIONS */
 #if !defined(__x86_64__) && defined(__i386__)
 		__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sa_sigaction, (int __signo, struct __siginfo_struct *__info, void *__ctx));

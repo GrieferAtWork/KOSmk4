@@ -73,7 +73,7 @@ struct __siginfo64_struct;
 #ifdef __x86_64__
 struct ucontext;
 #else /* __x86_64__ */
-struct ucontext64;
+struct __ucontextx64;
 #endif /* !__x86_64__ */
 #endif /* __USE_KOS_ALTERATIONS */
 #endif /* __USE_POSIX199309 */
@@ -100,7 +100,7 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx6
 #ifdef __x86_64__
 		__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_sigaction, (int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx));
 #else /* __x86_64__ */
-		__HYBRID_FUNCPTR64(void, , sa_sigaction, (int __signo, struct __siginfo64_struct *__info, struct ucontext64 *__ctx));
+		__HYBRID_FUNCPTR64(void, , sa_sigaction, (int __signo, struct __siginfo64_struct *__info, struct __ucontextx64 *__ctx));
 #endif /* !__x86_64__ */
 #else /* __USE_KOS_ALTERATIONS */
 #ifdef __x86_64__

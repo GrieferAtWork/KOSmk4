@@ -125,7 +125,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		signo = si.si_signo;
 		coredump_create(&curr_ustate, utb_vector, traceback_length,
 		                &orig_ustate, NULL, 0, NULL,
-		                container_of(&si, union NAME(coredump_info), ci_signal),
+		                container_of(&si, union coredump_info, ci_signal),
 		                unwind_error);
 	} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
 		char *dlbuf;
@@ -136,10 +136,10 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		*(char *)mempcpy(dlbuf, reason->ci_dlerror, errlen, sizeof(char)) = '\0';
 		coredump_create(&curr_ustate, utb_vector, traceback_length,
 		                &orig_ustate, NULL, 0, NULL,
-		                (union NAME(coredump_info) *)dlbuf,
+		                (union coredump_info *)dlbuf,
 		                unwind_error);
 	} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
-		struct NAME(coredump_assert) as;
+		struct coredump_assert as;
 		validate_readable(&reason->ci_assert, sizeof(reason->ci_assert));
 		as.ca_expr = reason->ci_assert.ca_expr;
 		as.ca_file = reason->ci_assert.ca_file;
@@ -164,7 +164,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 #undef COPY_USERSPACE_STRING
 		coredump_create(&curr_ustate, utb_vector, traceback_length,
 		                &orig_ustate, NULL, 0, NULL,
-		                container_of(&as, union NAME(coredump_info), ci_assert),
+		                container_of(&as, union coredump_info, ci_assert),
 		                unwind_error);
 	} else {
 		/* Coredump caused by an exception. */
@@ -174,7 +174,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		COMPILER_READ_BARRIER();
 		coredump_create(&curr_ustate, utb_vector, traceback_length,
 		                &orig_ustate, NULL, 0, NULL,
-		                container_of(&exc, union NAME(coredump_info), ci_except),
+		                container_of(&exc, union coredump_info, ci_except),
 		                unwind_error);
 		/* If we get here, try to exit the application with a signo that
 		 * is based on the exception that resulted in the coredump being

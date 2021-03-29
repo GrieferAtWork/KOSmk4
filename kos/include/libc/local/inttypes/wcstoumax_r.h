@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba9581fa */
+/* HASH CRC-32:0x811918b2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,12 @@
 #define __local_wcstoumax_r_defined 1
 #include <__crt.h>
 #include <features.h>
-#include <hybrid/typecore.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcstou32_r from wchar */
 #ifndef __local___localdep_wcstou32_r_defined
 #define __local___localdep_wcstou32_r_defined 1
 #ifdef __CRT_HAVE_wcstou32_r
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
  * errors in `*error' (if non-NULL). The following errors are defined:
@@ -75,9 +72,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstou64_r_defined
 #define __local___localdep_wcstou64_r_defined 1
 #ifdef __CRT_HAVE_wcstou64_r
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
  * errors in `*error' (if non-NULL). The following errors are defined:
@@ -119,6 +113,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_wcstou64_r */
 #endif /* !__local___localdep_wcstou64_r_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <hybrid/limitcore.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
