@@ -28,7 +28,10 @@
 #include <kos/exec/elf.h>  /* ELF_ARCH_DATA */
 #include <kos/exec/rtld.h> /* RTLD_PLATFORM */
 
+#include <fcntl.h>
+#include <pthread.h>
 #include <stddef.h> /* offsetafter */
+#include <stdlib.h>
 #include <time.h>   /* CLK_TCK */
 #include <unistd.h> /* preadall */
 
@@ -72,6 +75,25 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 #endif /* __i386__ && !__x86_64__ */
 
 
+PRIVATE ATTR_SECTION(".bss.crt.system.auxv") byte_t random_bytes[16];
+PRIVATE ATTR_SECTION(".bss.crt.system.auxv") pthread_once_t random_didinit = PTHREAD_ONCE_INIT;
+PRIVATE ATTR_SECTION(".text.crt.system.auxv") void LIBCCALL random_init(void) {
+	fd_t fd;
+	ssize_t read_status;
+	fd = open("/dev/random", O_RDONLY);
+	if (fd < 0) {
+fallback:
+		unsigned int i;
+		srand(time(NULL));
+		for (i = 0; i < 16; ++i)
+			random_bytes[i] = rand() & 0xff;
+		return;
+	}
+	read_status = readall(fd, random_bytes, 16);
+	close(fd);
+	if (read_status != 16)
+		goto fallback;
+}
 
 
 
@@ -207,6 +229,12 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 
 	case AT_EXECFN:
 		result = (ulongptr_t)dlmodulename(dlopen(NULL, 0));
+		break;
+
+	case AT_RANDOM:
+		/* Return a pointer to a buffer of 16 bytes of random data. */
+		pthread_once(&random_didinit, &random_init);
+		result = (ulongptr_t)(uintptr_t)&random_bytes[0];
 		break;
 
 	default:
