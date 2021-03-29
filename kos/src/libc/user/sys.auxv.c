@@ -205,6 +205,10 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 		result = (ulongptr_t)(void *)rtld_platform;
 		break;
 
+	case AT_EXECFN:
+		result = (ulongptr_t)dlmodulename(dlopen(NULL, 0));
+		break;
+
 	default:
 not_found:
 		libc_seterrno(ENOENT);

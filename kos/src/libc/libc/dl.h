@@ -83,6 +83,7 @@ DECL_BEGIN
 #define LIBC_DLGETHANDLE_SECTION   ".crt.sched.process" /* Used by `__cxa_atexit()' */
 #define LIBC_DLGETMODULE_SECTION   ".crt.system.auxv"   /* Used by `getauxval()' */
 #define LIBC_DLMODULEFD_SECTION    ".crt.system.auxv"   /* Used by `getauxval()' */
+#define LIBC_DLMODULENAME_SECTION  ".crt.system.auxv"   /* Used by `getauxval()' */
 #define LIBC_DLAUXCTRL_SECTION     ".crt.sched.process" /* Used by `__cxa_atexit()' */
 #define LIBC_DLERROR_SECTION       ".crt.heap.utility"  /* Used by `sbrk()' */
 #define LIBC_DLMODULEBASE_SECTION  ".crt.system.auxv"   /* Used by `getauxval()' */
@@ -99,6 +100,7 @@ typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSFREESEG)(void *ptr);
 typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETHANDLE)(void const *static_pointer, unsigned int flags);
 typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETMODULE)(char const *name, unsigned int flags);
 typedef WUNUSED NONNULL((1)) fd_t /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEFD)(void *handle);
+typedef WUNUSED NONNULL((1)) char const * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULENAME)(void *handle);
 typedef void * /*NOTHROW_NCX*/ (__DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned int cmd, ...);
 typedef WUNUSED char * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLERROR)(void);
 typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEBASE)(void *handle);
@@ -121,6 +123,7 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLTLSFREESEG NOTHROW_NCX(LIBCCALL libc_get_dltls
 INTDEF ATTR_RETNONNULL WUNUSED PDLGETHANDLE NOTHROW_NCX(LIBCCALL libc_get_dlgethandle)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLGETMODULE NOTHROW_NCX(LIBCCALL libc_get_dlgetmodule)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLMODULEFD NOTHROW_NCX(LIBCCALL libc_get_dlmodulefd)(void);
+INTDEF ATTR_RETNONNULL WUNUSED PDLMODULENAME NOTHROW_NCX(LIBCCALL libc_get_dlmodulename)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLAUXCTRL NOTHROW_NCX(LIBCCALL libc_get_dlauxctrl)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLERROR NOTHROW_NCX(LIBCCALL libc_get_dlerror)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLMODULEBASE NOTHROW_NCX(LIBCCALL libc_get_dlmodulebase)(void);
@@ -137,6 +140,7 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLTLSFREE NOTHROW_NCX(LIBCCALL libc_get_dltlsfre
 #define dlgethandle(static_pointer, flags)  (*libc_get_dlgethandle())(static_pointer, flags)
 #define dlgetmodule(name, flags)            (*libc_get_dlgetmodule())(name, flags)
 #define dlmodulefd(handle)                  (*libc_get_dlmodulefd())(handle)
+#define dlmodulename(handle)                (*libc_get_dlmodulename())(handle)
 #define dlauxctrl(handle, ...)              (*libc_get_dlauxctrl())(handle, __VA_ARGS__)
 #define dlerror()                           (*libc_get_dlerror())()
 #define dlmodulebase(handle)                (*libc_get_dlmodulebase())(handle)
