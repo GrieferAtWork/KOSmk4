@@ -55,7 +55,7 @@ popl  %eax    # %eax = 42
 | a3    | `%r9`               | `%rcx`              | `%r10`              |
 | a4    | `8(%rsp)`           | `%r8`               | `%r8`               |
 | a5    | `16(%rsp)`          | `%r9`               | `%r9`               |
-| aN    | `(8+(N-3)*8)(%rsp)` | `(8+(N-5)*8)(%rsp)` |                     |
+| aN    | `(8+(N-4)*8)(%rsp)` | `(8+(N-6)*8)(%rsp)` |                     |
 | Uses  |`LIBDCALL` | `LIBCCALL`, `LIBKCALL`, `KCALL`, `FCALL` | `syscall` |
 | Keep  | `%rbx`, `%rdi`, `%rsi`, `%rbp`, `%r12`, `%r13`, `%r14`, `%r15` | `%rbx`, `%rbp`, `%r12`, `%r13`, `%r14`, `%r15` | ... |
 | Clob  | `%rax`, `%rcx`, `%rdx`, `%r8`, `%r9`, `%r10`, `%r11`, `%rflags` | `%rax`, `%rdi`, `%rsi`, `%rdx`, `%rcx`, `%r8`, `%r9`, `%r10`, `%r11`, `%rflags` | `%rcx`, `%r11` |
