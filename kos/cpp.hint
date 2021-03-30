@@ -1615,6 +1615,15 @@
 #define _FCFUNCPROTOEND }
 #define FcPublic
 #define FC_ATTRIBUTE_SENTINEL(x)
+#define LZMA_API_IMPORT
+#define LZMA_API_CALL
+#define LZMA_API(type) type
+#define lzma_nothrow
+#define lzma_attribute(attr)
+#define lzma_attr_pure
+#define lzma_attr_const
+#define lzma_attr_warn_unused_result
+
 
 
 /* All of these are only here to make code navigation use non-escaped type names */
