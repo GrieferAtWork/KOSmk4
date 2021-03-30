@@ -440,8 +440,10 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 	if unlikely(PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
 		USER CHECKED struct userprocmask *old_ctl;
 		old_ctl = PERTASK_GET(this_userprocmask_address);
+
 		/* Load the final userprocmask into kernelspace */
 		load_userprocmask_into_kernelspace(old_ctl);
+
 		/* Clear  the userprocmask flag(s), the same way a
 		 * call `sys_set_userprocmask_address(NULL)' would
 		 * have. */

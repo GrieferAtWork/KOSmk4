@@ -232,10 +232,16 @@ libc_pthread_unmap_stack_and_exit(void *stackaddr,
                                   size_t stacksize,
                                   int exitcode);
 
+#ifndef __NR_sigprocmask
+#define sys_sigprocmask(how, set, oset) \
+	sys_rt_sigprocmask(how, set, oset, sizeof(sigset_t))
+#endif /* !__NR_sigprocmask */
+
+
 /* Perform cleanup & terminate the current thread `me'. */
 PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_exit_thread") void
 NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
-	/* TODO: Mask _all_ posix signals for our thread.
+	/* Mask _all_ posix signals for our thread.
 	 *
 	 * We  don't  want  to accidentally  invoke  signal handlers
 	 * once our  TLS-state is  broken,  or once  we've  unmapped
@@ -244,8 +250,30 @@ NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcod
 	 * meaning that since we use ATTR_THREAD-memory to implement
 	 * errno, we mustn't run any  more signal handlers once  TLS
 	 * has been torn down! */
-	/* TODO: Use `setsigmaskptr()' here, once that function's
-	 *       been added. */
+	static sigset_t const fullset = SIGSET_INIT_FULL;
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+	/* NOTE: If userprocmask was enabled for the calling thread, then we
+	 *       have to disable it before we can safely destroy our own TLS
+	 *       segment. - Otherwise, the kernel might try to write into it
+	 *       after it was already free'd, resulting in data corruption.
+	 * Note  that we first change our signal  mask to become the full set
+	 * of signals, since the  use of `sys_set_tid_address(2)' to  disable
+	 * the userprocmask mechanism will copy the then-set signal mask into
+	 * kernel-space, and assign  it as  the active mask  for the  calling
+	 * thread. By doing this, we don't have to do another system call  to
+	 * `sigprocmask(2)' in order  to mask  signals, but can  have all  of
+	 * this be done by `sys_set_tid_address(2)'. */
+	if (me->pt_pmask.lpm_pmask.pm_sigmask) {
+		COMPILER_BARRIER();
+		ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, (sigset_t *)&fullset);
+		COMPILER_BARRIER();
+		sys_set_tid_address(&me->pt_tid);
+	} else
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+	{
+		/* Simply change our procmask to mask all signals. */
+		sys_sigprocmask(SIG_SETMASK, &fullset, NULL);
+	}
 
 	if ((me->pt_flags & (PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK)) == 0) {
 		/* Must unmap our own stack. */
