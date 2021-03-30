@@ -2511,7 +2511,7 @@ again:
 #define sys_lfutex32_waitwhile64(uaddr, val, timeout, flags) \
 	sys_lfutex((uint64_t *)(uaddr),                          \
 	           LFUTEX_WAIT_WHILE_BITMASK | flags,            \
-	           (uint64_t)(UINT32_MAX << 32), timeout,        \
+	           (uint64_t)UINT32_MAX << 32, timeout,          \
 	           (uint64_t)(uint32_t)(val) << 32)
 #endif /* !... */
 
