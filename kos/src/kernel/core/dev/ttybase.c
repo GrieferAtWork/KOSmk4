@@ -33,6 +33,7 @@
 #include <sched/pid-ctty.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 

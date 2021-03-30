@@ -102,6 +102,19 @@ IU(	call   libc_error_info)
 	movq   %rsp, %rdi
 	INTERN(libc_error_unwind)
 	call   libc_error_unwind
+#ifndef NDEBUG
+	/* Inline the call to `libc_error_unwind'  so that tracebacks will  include
+	 * more information about how unwinding was actually initiated if something
+	 * goes wrong. */
+#define goto_Ldo_unwind_rsp    \
+	movq   %rsp, %rdi;         \
+	INTERN(libc_error_unwind); \
+	call   libc_error_unwind;  \
+	jmp    .Lload_kcpustate_rax
+#else /* !NDEBUG */
+#define goto_Ldo_unwind_rsp  jmp .Ldo_unwind_rsp
+#endif /* NDEBUG */
+
 .Lload_kcpustate_rax:
 	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R15)(%rax), %r15
 	.cfi_same_value %r15
@@ -187,7 +200,7 @@ PUBLIC_FUNCTION(_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP
-	jmp    .Ldo_unwind_rsp
+	goto_Ldo_unwind_rsp
 	.cfi_endproc
 END(_Unwind_Resume)
 #else
@@ -541,7 +554,7 @@ IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 	.Lindex = .Lindex + 8
 	.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	jmp    .Ldo_unwind_rsp
+	goto_Ldo_unwind_rsp
 #ifndef NDEBUG
 	.cfi_restore_state
 .Llibc_error_throw_current_inside_catch:
@@ -665,7 +678,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_rsp)
 	COPYSTATE(%rsp, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RSP, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP)
 #undef COPYSTATE
 
-	jmp    .Ldo_unwind_rsp
+	goto_Ldo_unwind_rsp
 #ifndef NDEBUG
 	.cfi_restore_state
 .Lx86_userexcept_unwind_interrupt_kernel_rsp_inside_catch:

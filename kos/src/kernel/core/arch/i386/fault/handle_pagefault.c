@@ -361,14 +361,44 @@ NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 
 
 
+PRIVATE ATTR_RETNONNULL WUNUSED byte_t *FCALL
+safe_instruction_trysucc(void const *pc, instrlen_isa_t isa) {
+	byte_t *result;
+	struct exception_info *xinfo = error_info();
+
+	/* While  filling in E_SEGFAULT  information, a nested exception
+	 * may be thrown when trying to advance the instruction pointer.
+	 *
+	 * Normally when this happens,  the original exception will  be
+	 * preserved automatically by  the `NESTED_TRY'  which you  can
+	 * find in  `[libil_]instruction_succ_nx()' (which  is used  to
+	 * implement  `[libil_]instruction_trysucc()'),  however   this
+	 * kind of exception-saving  is only done  if the INCATCH  flag
+	 * is  set (which would  normally always be  the case since the
+	 * act of throwing exception is normally something that happens
+	 * entirely atomically via `THROW()'). However since we as  the
+	 * #PF handler fill  in exception  information manually,  so-as
+	 * to be as  flexible as  possible, we  end up  in a  situation
+	 * where a nested exception must  be handled while we're  still
+	 * in the process of filling in information about the  original
+	 * exception.
+	 * As such, we have to cheat a  bit here and act like we're  in
+	 * a catch-block in order to get libinstrlen to preserve all of
+	 * the information which we've already fill in at this point. */
+	assert(!(xinfo->ei_flags & EXCEPT_FINCATCH));
+	xinfo->ei_flags |= EXCEPT_FINCATCH;
+	result = instruction_trysucc(pc, isa);
+	assert(xinfo->ei_flags & EXCEPT_FINCATCH);
+	xinfo->ei_flags &= ~EXCEPT_FINCATCH;
+	return result;
+}
+
 PRIVATE ATTR_NORETURN void FCALL
 rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void *pc) {
-	NESTED_TRY {
-		pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
-	} EXCEPT {
-		icpustate_setpc(state, (uintptr_t)pc + 1);
-		RETHROW();
-	}
+	/* Use the regular `instruction_trysucc()' since we're actually inside
+	 * of a CATCH-block right now, meaning that it will already do all  of
+	 * the necessary work of preserving the old exception for us! */
+	pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
 	icpustate_setpc(state, (uintptr_t)pc);
 	RETHROW();
 }
@@ -1170,7 +1200,7 @@ set_exception_pointers2:
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, pc);
-	pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
+	pc = safe_instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
 	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
 	       addr, (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE),
 	       icpustate_getpc(state), pc, ecode);
@@ -1179,6 +1209,7 @@ do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
+	assert(error_active());
 	x86_userexcept_unwind_interrupt(state);
 
 #else /* CONFIG_USE_NEW_VM */
