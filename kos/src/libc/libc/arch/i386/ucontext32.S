@@ -62,7 +62,7 @@ END(fpu_flags)
 .section .text.crt.cpu.ucontext
 /* Figure out how to preserve FPU registers.
  * Returns:    %eax = fpu_flags
- * Clobber:    %ecx, %edx, %ebx, %esi, %eflags */
+ * Clobber:    %ecx, %edx, %esi, %eflags */
 PRIVATE_FUNCTION(get_fpu_flags)
 	.cfi_startproc
 	call   1f
@@ -109,7 +109,9 @@ PRIVATE_FUNCTION(get_fpu_flags)
 .Lget_fpu_flags_noenv:
 #endif /* ENVIRON_HW_SSE */
 	movl   $(1), %eax
+	pushl_cfi_r %ebx
 	cpuid
+	popl_cfi_r %ebx
 	ttest  mask=CPUID_1D_SSE, loc=%edx
 	jz     .Lget_fpu_flags_SFPU
 .Lget_fpu_flags_XFPU:
@@ -142,8 +144,7 @@ INTERN_FUNCTION(libc_getcontext)
 
 	/* Preserve %eflags */
 	pushfl_cfi
-	popl_cfi %eax
-	movl   %eax, R(REG_EFL)
+	popl_cfi R(REG_EFL)
 /*	.cfi_rel_offset %eflags, R_(REG_EFL) */
 
 	/* Switch over to using `%edi' (i.e. the `ucontext_t') as CFA */
@@ -157,11 +158,6 @@ INTERN_FUNCTION(libc_getcontext)
 	.cfi_register %edi, %eax
 	movl   %eax, R(REG_EDI)
 	.cfi_rel_offset %edi, R_(REG_EDI)
-
-	/* Also return 0 the second time around! */
-	xorl   %eax, %eax
-	movl   %eax, R(REG_EAX)
-	movl   %eax, UC(__OFFSET_UCONTEXTX32_LINK)
 
 	/* At this point, we've filled in `REG_EIP', `REG_EDI' and `REG_EAX'
 	 * Now to fill in all of the remaining registers with proper values. */
@@ -193,7 +189,7 @@ INTERN_FUNCTION(libc_getcontext)
 	.cfi_rel_offset %esi, R_(REG_ESI) /* We're going to clobber this one, so restore during unwind! */
 
 	movl   %ebp, R(REG_EBP)
-	.cfi_rel_offset %ebp, R_(REG_EBP)
+	.cfi_rel_offset %ebp, R_(REG_EBP) /* We're going to clobber this one, so restore during unwind! */
 
 	movl   %esp, R(REG_ESP)
 #if REG_UESP != REG_ESP
@@ -202,13 +198,13 @@ INTERN_FUNCTION(libc_getcontext)
 	.cfi_rel_offset %esp, R_(REG_ESP)
 
 	movl   %ebx, R(REG_EBX)
-	.cfi_rel_offset %ebx, R_(REG_EBX) /* We're going to clobber this one, so restore during unwind! */
+/*	.cfi_rel_offset %ebx, R_(REG_EBX) */
 
 	movl   %edx, R(REG_EDX)
-	.cfi_rel_offset %edx, R_(REG_EDX)
+/*	.cfi_rel_offset %edx, R_(REG_EDX) */
 
 	movl   %ecx, R(REG_ECX)
-	.cfi_rel_offset %ecx, R_(REG_ECX)
+/*	.cfi_rel_offset %ecx, R_(REG_ECX) */
 
 	/* Fill in information about the caller's stack. */
 	EXTERN(libc_pthread_self)
@@ -222,16 +218,25 @@ INTERN_FUNCTION(libc_getcontext)
 	movl   __OFFSET_PTHREAD_STACKSIZE(%eax), %ecx
 	movl   %ecx, UC(__OFFSET_UCONTEXTX32_STACK + __OFFSET_SIGALTSTACKX32_SIZE)
 .Lgetcontext_got_stack:
-	xorl   %ecx, %ecx
-	movl   %ecx, UC(__OFFSET_UCONTEXTX32_STACK + __OFFSET_SIGALTSTACKX32_FLAGS)
 
 	/* Load the current signal mask */
-	movl   $(__SIZEOF_SIGSET_T__),           %esi /* sigsetsize */
-	leal   UC(__OFFSET_UCONTEXTX32_SIGMASK), %edx /* oset = &ucp->uc_sigmask */
-/*	xorl   %ecx, %ecx */                          /* set  = NULL  (Already cleared; s.a. above) */
-	/* TODO: Integrate w/ the userprocmask mechanism */
-	movl   $(SYS_rt_sigprocmask), %eax
-	call   libc___i386_syscall
+	EXTERN(libc_getsigmaskptr)
+	call   libc_getsigmaskptr
+
+	/* Copy the signal mask buffer into the given ucontext. */
+	movl   %edi, %ebp
+	.cfi_def_cfa_register %ebp
+	leal   UC(__OFFSET_UCONTEXTX32_SIGMASK), %edi /* dest */
+	movl   %eax, %esi                             /* source */
+#if (__SIZEOF_SIGSET_T__ % 4) == 0
+	movl   $(__SIZEOF_SIGSET_T__ / 4), %ecx       /* count */
+	rep;   movsl
+#else /* (__SIZEOF_SIGSET_T__ % 4) == 0 */
+	movl   $(__SIZEOF_SIGSET_T__), %ecx           /* count */
+	rep;   movsb
+#endif /* (__SIZEOF_SIGSET_T__ % 4) != 0 */
+	movl   %ebp, %edi
+	.cfi_def_cfa_register %edi
 
 	/* Now all that's left to save is the FPU context.
 	 * For this, we first have to figure out which format we should use for it.
@@ -247,8 +252,14 @@ INTERN_FUNCTION(libc_getcontext)
 .Lgetcontext_done_fpu:
 
 	/* Restore callee-preserve registers that we've clobberred. */
-	movl   R(REG_EBX), %ebx
-	.cfi_same_value %ebx
+	xorl   %eax, %eax       /* Return 0 */
+	movl   %eax, R(REG_EAX) /* Also return 0 the second time around! */
+	movl   %eax, UC(__OFFSET_UCONTEXTX32_LINK)                                  /* May as well do this here... */
+	movl   %eax, UC(__OFFSET_UCONTEXTX32_STACK + __OFFSET_SIGALTSTACKX32_FLAGS) /* *ditto* */
+
+	/* Restore  */
+	movl   R(REG_EBP), %ebp
+	.cfi_same_value %ebp
 	movl   R(REG_ESI), %esi
 	.cfi_same_value %esi
 	movl   R(REG_EIP), %ecx /* %ecx = RETURN_PC */
@@ -256,7 +267,6 @@ INTERN_FUNCTION(libc_getcontext)
 	movl   R(REG_EDI), %edi
 	.cfi_same_value %edi
 	.cfi_def_cfa %esp, 0
-	xorl   %eax, %eax /* Return 0 */
 	jmpl   *%ecx      /* Return the caller */
 
 	.cfi_restore_state
@@ -296,16 +306,16 @@ END(libc_getcontext)
 INTERN_FUNCTION(libc_setcontext)
 	.cfi_startproc
 	.cfi_signal_frame /* We need to modify %esp, so this is required! */
-	movl   4(%esp), %edi
-INTERN_FUNCTION(libc_x86_setcontext_edi)
+	movl   4(%esp), %ebp
+INTERN_FUNCTION(libc_x86_setcontext_ebp)
 #define UC_(offset) (offset)
-#define UC(offset)  (offset)(%edi)
+#define UC(offset)  (offset)(%ebp)
 #define MC_(offset) (__OFFSET_UCONTEXTX32_MCONTEXT + (offset))
-#define MC(offset)  (__OFFSET_UCONTEXTX32_MCONTEXT + (offset))(%edi)
+#define MC(offset)  (__OFFSET_UCONTEXTX32_MCONTEXT + (offset))(%ebp)
 #define R_(regno)   MC_(__OFFSET_MCONTEXTX32_CPU + (regno) * 4)
 #define R(regno)    MC(__OFFSET_MCONTEXTX32_CPU + (regno) * 4)
-	/* Define CFI annotations to load the CPU context from `%edi' */
-	.cfi_def_cfa %edi, 0
+	/* Define CFI annotations to load the CPU context from `%ebp' */
+	.cfi_def_cfa %ebp, 0
 	.cfi_rel_offset %gs, R_(REG_GS)
 	.cfi_rel_offset %fs, R_(REG_FS)
 	.cfi_rel_offset %es, R_(REG_ES)
@@ -329,6 +339,15 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 	 * stack   as   temporary  storage   during   the  transition. */
 	movl   R(REG_ESP), %esp
 
+	/* Load the new signal mask. (use `libc_sigprocmask()' so userprocmask is used if possible...) */
+	pushl  $(0)                                   /* sigset_t *oset */
+	leal   UC(__OFFSET_UCONTEXTX32_SIGMASK), %eax
+	pushl  %eax                                   /* sigset_t const *set */
+	pushl  $(SIG_SETMASK)                         /* __STDC_INT_AS_UINT_T how */
+	EXTERN(libc_sigprocmask)
+	call   libc_sigprocmask
+	movl   R(REG_ESP), %esp
+
 	/* Load the FPU context. (if there is one) */
 	ttest  mask=__MCONTEXTX32_FLAG_HAVEXFPU, loc=MC(__OFFSET_MCONTEXTX32_FLAGS)
 	jz     .Lsetcontext_noxfpu
@@ -336,43 +355,36 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 	fxrstor MC(__OFFSET_MCONTEXTX32_FPU)
 .Lsetcontext_donefpu:
 
-	/* Load the target's signal mask. */
-	movl   $(__SIZEOF_SIGSET_T__),           %esi /* sigsetsize */
-	xorl   %edx, %edx                             /* oset = NULL */
-	leal   UC(__OFFSET_UCONTEXTX32_SIGMASK), %ecx /* set  = &ucp->uc_sigmask */
-	movl   $(SIG_SETMASK),                   %ebx /* how */
-	/* TODO: Integrate w/ the userprocmask mechanism */
-	movl   $(SYS_rt_sigprocmask), %eax
-	call   libc___i386_syscall
-
-	/* Load GP registers, except for `%edi' and `%eax' (and `%esp', which was already loaded) */
+	/* Load GP registers, except for `%ebp' and `%eax' (and `%esp', which was already loaded) */
 	movl   R(REG_ECX), %ecx
 	.cfi_same_value %ecx
 	movl   R(REG_EDX), %edx
 	.cfi_same_value %edx
 	movl   R(REG_EBX), %ebx
 	.cfi_same_value %ebx
+	movl   R(REG_EDI), %edi
+	.cfi_same_value %edi
 	movl   R(REG_ESI), %esi
 	.cfi_same_value %esi
-	movl   R(REG_EBP), %ebp
-	.cfi_same_value %ebp
 
 	/* Load target segment registers. */
-	movw   R(REG_GS), %ax
-	movw   %ax, %gs
-	.cfi_same_value %gs
-
-	movw   R(REG_FS), %ax
-	movw   %ax, %fs
-	.cfi_same_value %fs
-
-	movw   R(REG_ES), %ax
-	movw   %ax, %es
-	.cfi_same_value %es
-
-	movw   R(REG_DS), %ax
-	movw   %ax, %ds
-	.cfi_same_value %ds
+	/* FIXME: Setting segment registers on x86_64 causes the segment base
+	 *        to be clobbered... */
+//	movw   R(REG_GS), %ax
+//	movw   %ax, %gs
+//	.cfi_same_value %gs
+//
+//	movw   R(REG_FS), %ax
+//	movw   %ax, %fs
+//	.cfi_same_value %fs
+//
+//	movw   R(REG_ES), %ax
+//	movw   %ax, %es
+//	.cfi_same_value %es
+//
+//	movw   R(REG_DS), %ax
+//	movw   %ax, %ds
+//	.cfi_same_value %ds
 
 	pushl  %cs:R(REG_CS)    /* Return %cs */
 	pushl  %cs:R(REG_EIP)   /* Return %eip */
@@ -388,14 +400,14 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 	movl   %cs:R(REG_EAX), %eax /* Restore %eax */
 	.cfi_same_value %eax
 
-	movl   %cs:R(REG_EDI), %edi /* Restore %edi */
-	.cfi_same_value %edi
+	movl   %cs:R(REG_EBP), %ebp /* Restore %ebp */
+	.cfi_same_value %ebp
 
 	/* Tell CFI that %eip is stored at 0(%esp) */
 	.cfi_reg_offset %eip, 0, %esp
 
 	/* Tell CFI that %cs is stored at 4(%esp) */
-	.cfi_reg_offset %eip, 4, %esp
+	.cfi_reg_offset %cs, 4, %esp
 
 	/* Tell CFI that %esp is offset by 8 */
 	.cfi_reg_value %esp, 8, %esp
@@ -416,7 +428,7 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 #undef R_
 #undef R
 	.cfi_endproc
-END(libc_x86_setcontext_edi)
+END(libc_x86_setcontext_ebp)
 END(libc_setcontext)
 
 
@@ -438,8 +450,8 @@ INTERN_FUNCTION(libc_swapcontext)
 
 	/* And with that, the old CPU context has been filled.
 	 * Now  we  just  have   to  load  the  new   context! */
-	movl   8(%esp), %edi   /* ucp */
-	jmp    libc_x86_setcontext_edi /* Load context from %edi */
+	movl   8(%esp), %ebp   /* ucp */
+	jmp    libc_x86_setcontext_ebp /* Load context from %ebp */
 	.cfi_endproc
 END(libc_swapcontext)
 
@@ -456,7 +468,7 @@ END(libc_makecontext_exit_thread)
 
 DEFINE_PUBLIC_ALIAS(getcontext, libc_getcontext)
 DEFINE_PUBLIC_ALIAS(setcontext, libc_setcontext)
-DEFINE_PUBLIC_ALIAS(__x86_setcontext_edi, libc_x86_setcontext_edi)
+DEFINE_PUBLIC_ALIAS(__x86_setcontext_ebp, libc_x86_setcontext_ebp)
 DEFINE_PUBLIC_ALIAS(swapcontext, libc_swapcontext)
 
 

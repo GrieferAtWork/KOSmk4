@@ -44,7 +44,7 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 #ifdef __x86_64__
 	byte_t *sp;
 	va_list args;
-	extern byte_t const libc_x86_setcontext_rbx[];      /* setcontext(%rbx); */
+	extern byte_t const libc_x86_setcontext_rbp[];      /* setcontext(%rbx); */
 	extern byte_t const libc_makecontext_exit_thread[]; /* pthread_exit(NULL); */
 	sp = (byte_t *)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size;
 	va_start(args, argc);
@@ -93,9 +93,9 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 	sp -= 8; /* Return address */
 	*(u64 *)sp = (u64)libc_makecontext_exit_thread;
 	if (ucp->uc_link) {
-		*(u64 *)sp = (u64)libc_x86_setcontext_rbx;
-		/* Fill in `%rbx', which is required by `libc_x86_setcontext_rbx()' */
-		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rbx = (u64)ucp->uc_link;
+		*(u64 *)sp = (u64)libc_x86_setcontext_rbp;
+		/* Fill in `%rbp', which is required by `libc_x86_setcontext_rbp()' */
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_rbp = (u64)ucp->uc_link;
 	}
 
 	/* Assign the %rip and %rsp registers. */
@@ -103,12 +103,12 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 	ucp->uc_mcontext.mc_context.ucs_rip           = (u64)(void *)func;
 #else /* __x86_64__ */
 	byte_t *sp;
-	extern byte_t const libc_x86_setcontext_edi[];      /* setcontext(%edi); */
+	extern byte_t const libc_x86_setcontext_ebp[];      /* setcontext(%ebp); */
 	extern byte_t const libc_makecontext_exit_thread[]; /* pthread_exit(NULL); */
 	/* We want to achieve the following layout:
 	 *
 	 * [...]       -- Available for use by `func'
-	 * -(argc * 4) &libc_x86_setcontext_edi     (Return-handler)
+	 * -(argc * 4) &libc_x86_setcontext_ebp     (Return-handler)
 	 * -(i * 4)    Function arguments.
 	 */
 	sp = (byte_t *)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size;
@@ -118,9 +118,9 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 	sp -= 4;
 	*(u32 *)sp = (u32)libc_makecontext_exit_thread;
 	if (ucp->uc_link) {
-		*(u32 *)sp = (u32)libc_x86_setcontext_edi;
-		/* Fill in `%edi', which is required by `libc_x86_setcontext_edi()' */
-		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_edi = (u32)ucp->uc_link;
+		*(u32 *)sp = (u32)libc_x86_setcontext_ebp;
+		/* Fill in `%ebp', which is required by `libc_x86_setcontext_ebp()' */
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_ebp = (u32)ucp->uc_link;
 	}
 	/* Assign the %eip and %esp registers. */
 	ucp->uc_mcontext.mc_context.ucs_gpregs.gp_esp = (u32)(void *)sp;

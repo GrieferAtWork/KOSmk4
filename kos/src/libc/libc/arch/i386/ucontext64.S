@@ -29,6 +29,7 @@
 #include <asm/cfi.h>
 #include <asm/cpu-cpuid.h>
 #include <asm/instr/fsgsbase.h>
+#include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
 #include <asm/pagesize.h>
 #include <bits/os/kos/mcontext64.h>
@@ -151,15 +152,19 @@ INTERN_FUNCTION(libc_getcontext)
 
 	/* Save %rflags */
 	pushfq_cfi
-	popq_cfi %rax
-	movq   %rax, R(__MCONTEXTX64_REGNO_RFLAGS)
+	popq_cfi R(__MCONTEXTX64_REGNO_RFLAGS)
 
 	/* Save %rip */
 	movq   0(%rsp), %rax
 	movq   %rax, R(__MCONTEXTX64_REGNO_RIP)
 
-	/* Save segment register indices. */
+	/* Fill in some 0-fields. */
 	xorq   %rax, %rax
+	movq   %rax, R(__MCONTEXTX64_REGNO_RAX) /* Return 0 the second time around! */
+	movq   %rax, UC(__OFFSET_UCONTEXTX64_LINK)                                  /* May as well do this here... */
+	movl   %eax, UC(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_FLAGS) /* *ditto* */
+
+	/* Save segment register indices. */
 	movl   %gs, %eax
 	movq   %rax, R(__MCONTEXTX64_REGNO_GS)
 	movl   %fs, %eax
@@ -179,34 +184,52 @@ INTERN_FUNCTION(libc_getcontext)
 	rdfsbaseq %rax
 	movq   %rax, R(__MCONTEXTX64_REGNO_FSBASE)
 
+	/* Preserve `%rdi' inside of `%rbp', since it may be
+	 * clobbered by the upcoming library functino calls.
+	 * Also: The upcoming `rep movsq' will also need to clobber
+	 *       that same register, so we'd have to do this sooner
+	 *       or later no matter what! */
+	movq   %rdi, %rbp
+	.cfi_reg_offset %rbp, UC_(__OFFSET_UCONTEXTX64_SIGMASK), %rbp
+
 	/* Fill in information about the caller's stack. */
 	EXTERN(libc_pthread_self)
 	call   libc_pthread_self
 
 	ttest  mask=PTHREAD_FNOSTACK, loc=__OFFSET_PTHREAD_FLAGS(%rax)
 	jnz    .Lgetcontext_generic_stack
-	movq   __OFFSET_PTHREAD_STACKADDR(%rax), %rsi
-	movq   %rsi, UC(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SP)
-	movq   __OFFSET_PTHREAD_STACKSIZE(%rax), %rsi
-	movq   %rsi, UC(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SIZE)
+	.cfi_remember_state
+	movq   __OFFSET_PTHREAD_STACKADDR(%rax), %rcx
+	movq   %rcx, UC_(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SP)(%rbp)
+	movq   __OFFSET_PTHREAD_STACKSIZE(%rax), %rcx
+	movq   %rcx, UC_(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SIZE)(%rbp)
 .Lgetcontext_got_stack:
-	xorq   %rsi, %rsi
-	movl   %esi, UC(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_FLAGS)
 
 	/* Load the current signal mask */
-	movq   $(__SIZEOF_SIGSET_T__),           %r10 /* sigsetsize */
-	leaq   UC(__OFFSET_UCONTEXTX64_SIGMASK), %rdx /* oset = &ucp->uc_sigmask */
-/*	xorq   %rsi, %rsi */                          /* set  = NULL  (Already cleared; s.a. above) */
-	/* TODO: Integrate w/ the userprocmask mechanism */
-	movq   $(SYS_rt_sigprocmask), %rax
-	syscall
+	EXTERN(libc_getsigmaskptr)
+	call   libc_getsigmaskptr
+
+	/* Copy the signal mask buffer into the given ucontext. */
+	leaq   UC_(__OFFSET_UCONTEXTX64_SIGMASK)(%rbp), %rdi /* dest */
+	movq   %rax, %rsi                                    /* source */
+#if (__SIZEOF_SIGSET_T__ % 8) == 0
+	movq   $(__SIZEOF_SIGSET_T__ / 8), %rcx       /* count */
+	rep;   movsq
+#else /* (__SIZEOF_SIGSET_T__ % 8) == 0 */
+	movq   $(__SIZEOF_SIGSET_T__), %rcx           /* count */
+	rep;   movsb
+#endif /* (__SIZEOF_SIGSET_T__ % 8) != 0 */
 
 	/* Now all that's left to save is the FPU context.
 	 * For this, we first have to figure out which format we should use for it.
 	 * This can be done with `get_fpu_flags',  which returns the value that  we
 	 * should use for the `mc_flags' field. */
 	call   get_fpu_flags
-	movq   %rax, MC(__OFFSET_MCONTEXTX64_FLAGS)
+
+	movq   %rbp, %rdi                           /* Use `%rdi' once again. */
+	movq   R(__MCONTEXTX64_REGNO_RBP), %rbp     /* Restore the original `%rbp' */
+	.cfi_same_value %rbp
+	movq   %rax, MC(__OFFSET_MCONTEXTX64_FLAGS) /* Save the fpu-flags value. */
 
 	/* Check if we're using fxsave64, or fnsave */
 	ttest  mask=__MCONTEXTX64_FLAG_HAVEXFPU, loc=%rax
@@ -216,17 +239,15 @@ INTERN_FUNCTION(libc_getcontext)
 
 	/* Return `0' to indicate success. */
 	xorq   %rax, %rax
-	movq   %rax, R(__MCONTEXTX64_REGNO_RAX) /* Also return 0 the second time around! */
-	movq   %rax, UC(__OFFSET_UCONTEXTX64_LINK)
 	ret
 
 .Lgetcontext_use_fnsave:
-	.cfi_remember_state
 	fnsave MC(__OFFSET_MCONTEXTX64_FPU)
 	frstor MC(__OFFSET_MCONTEXTX64_FPU)
 	jmp    .Lgetcontext_done_fpu
 
 .Lgetcontext_generic_stack:
+	.cfi_restore_state
 	/* Use the current %rsp as orientation for the stack's size */
 #ifndef ASSUMED_ADDITIONAL_STACK_PAGES
 #define ASSUMED_ADDITIONAL_STACK_PAGES 2
@@ -236,27 +257,190 @@ INTERN_FUNCTION(libc_getcontext)
 #if ASSUMED_ADDITIONAL_STACK_PAGES != 0
 	subq   $(ASSUMED_ADDITIONAL_STACK_PAGES * __ARCH_PAGESIZE), %rsi
 #endif /* ASSUMED_ADDITIONAL_STACK_PAGES != 0 */
-	movq   %rsi, UC(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SP)
+	movq   %rsi, UC_(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SP)(%rbp)
 	movq   $((1 + ASSUMED_ADDITIONAL_STACK_PAGES) * __ARCH_PAGESIZE), \
-	       UC(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SIZE)
+	       UC_(__OFFSET_UCONTEXTX64_STACK + __OFFSET_SIGALTSTACKX64_SIZE)(%rbp)
 	jmp    .Lgetcontext_got_stack
+#undef UC_
+#undef UC
+#undef MC_
+#undef MC
+#undef R_
+#undef R
 	.cfi_endproc
 END(libc_getcontext)
 
 
 
 .section .text.crt.cpu.ucontext
-INTERN_FUNCTION(libc_x86_setcontext_rbx)
-	.cfi_startproc
-	movq   %rbx, %rdi
 INTERN_FUNCTION(libc_setcontext)
-	/* IN: ucontext_t const *%rdi = new_context; */
+	.cfi_startproc
+	movq   %rdi, %rbp
+INTERN_FUNCTION(libc_x86_setcontext_rbp)
+#define UC_(offset) (offset)
+#define UC(offset)  (offset)(%rbp)
+#define MC_(offset) (__OFFSET_UCONTEXTX64_MCONTEXT + (offset))
+#define MC(offset)  (__OFFSET_UCONTEXTX64_MCONTEXT + (offset))(%rbp)
+#define R_(regno)   MC_(__OFFSET_MCONTEXTX64_CPU + (regno) * 8)
+#define R(regno)    MC(__OFFSET_MCONTEXTX64_CPU + (regno) * 8)
+	/* IN: ucontext_t const *%rbp = new_context; */
+	.cfi_def_cfa %rbp, 0
+	.cfi_rel_offset %gs.base, R_(__MCONTEXTX64_REGNO_GSBASE)
+	.cfi_rel_offset %fs.base, R_(__MCONTEXTX64_REGNO_FSBASE)
+	.cfi_rel_offset %r15, R_(__MCONTEXTX64_REGNO_R15)
+	.cfi_rel_offset %r14, R_(__MCONTEXTX64_REGNO_R14)
+	.cfi_rel_offset %r13, R_(__MCONTEXTX64_REGNO_R13)
+	.cfi_rel_offset %r12, R_(__MCONTEXTX64_REGNO_R12)
+	.cfi_rel_offset %r11, R_(__MCONTEXTX64_REGNO_R11)
+	.cfi_rel_offset %r10, R_(__MCONTEXTX64_REGNO_R10)
+	.cfi_rel_offset %r9, R_(__MCONTEXTX64_REGNO_R9)
+	.cfi_rel_offset %r8, R_(__MCONTEXTX64_REGNO_R8)
+	.cfi_rel_offset %rdi, R_(__MCONTEXTX64_REGNO_RDI)
+	.cfi_rel_offset %rsi, R_(__MCONTEXTX64_REGNO_RSI)
+	.cfi_rel_offset %rbp, R_(__MCONTEXTX64_REGNO_RBP)
+	.cfi_rel_offset %rsp, R_(__MCONTEXTX64_REGNO_RSP)
+	.cfi_rel_offset %rbx, R_(__MCONTEXTX64_REGNO_RBX)
+	.cfi_rel_offset %rdx, R_(__MCONTEXTX64_REGNO_RDX)
+	.cfi_rel_offset %rcx, R_(__MCONTEXTX64_REGNO_RCX)
+	.cfi_rel_offset %rax, R_(__MCONTEXTX64_REGNO_RAX)
+	.cfi_rel_offset %gs, R_(__MCONTEXTX64_REGNO_GS)
+	.cfi_rel_offset %fs, R_(__MCONTEXTX64_REGNO_FS)
+	.cfi_rel_offset %es, R_(__MCONTEXTX64_REGNO_ES)
+	.cfi_rel_offset %ds, R_(__MCONTEXTX64_REGNO_DS)
+	.cfi_rel_offset %cs, R_(__MCONTEXTX64_REGNO_CS)
+	.cfi_rel_offset %ss, R_(__MCONTEXTX64_REGNO_SS)
+	.cfi_rel_offset %rflags, R_(__MCONTEXTX64_REGNO_RFLAGS)
+	.cfi_rel_offset %rip, R_(__MCONTEXTX64_REGNO_RIP)
 
-	/* TODO */
-	hlt
+	/* Load the new stack pointer registers */
+	movq   R(__MCONTEXTX64_REGNO_RSP), %rsp
+
+	/* Load target segment registers & bases.
+	 * Note that during this, we  must disable signals because the  act
+	 * of writing to `%gs' or `%fs' may alter the base-values, causting
+	 * them to be inconsistent until we reload them manually. */
+	EXTERN(libc_setsigmaskfullptr)
+	call   libc_setsigmaskfullptr  /* %rax = OLD_PROC_MASK_PTR */
+
+	/* Copy the new ucontext's signal mask into the soon-to-be
+	 * restored old signal mask buffer (which is pointed-to by
+	 * `%rax' right now) */
+	movq   %rax, %rdi
+	leaq   UC(__OFFSET_UCONTEXTX64_SIGMASK), %rsi
+#if (__SIZEOF_SIGSET_T__ % 8) == 0
+	movzlq $(__SIZEOF_SIGSET_T__ / 8), %rcx
+	rep;   movsq
+#else /* (__SIZEOF_SIGSET_T__ % 8) == 0 */
+	movzlq $(__SIZEOF_SIGSET_T__), %rcx
+	rep;   movsb
+#endif /* (__SIZEOF_SIGSET_T__ % 8) != 0 */
+
+	movw   R(__MCONTEXTX64_REGNO_GS), %cx
+	movw   %cx, %gs
+	.cfi_same_value %gs
+
+	movw   R(__MCONTEXTX64_REGNO_FS), %cx
+	movw   %cx, %fs
+	.cfi_same_value %fs
+
+	movw   R(__MCONTEXTX64_REGNO_ES), %cx
+	movw   %cx, %es
+	.cfi_same_value %es
+
+	movw   R(__MCONTEXTX64_REGNO_DS), %cx
+	movw   %cx, %ds
+	.cfi_same_value %ds
+
+	/* Load the new segment base addresses. */
+	movq   R(__MCONTEXTX64_REGNO_GSBASE), %rcx
+	wrgsbaseq %rcx
+	movq   R(__MCONTEXTX64_REGNO_FSBASE), %rcx
+	wrfsbaseq %rcx
+
+	/* Restore the old procmask  buffer (which in the  mean
+	 * time got filled with the new ucontext's signal mask) */
+	movq   %rax, %rdi
+	EXTERN(libc_setsigmaskptr)
+	call   libc_setsigmaskptr
+
+	/* Load the FPU context. (if there is one) */
+	ttest  mask=__MCONTEXTX64_FLAG_HAVEXFPU, loc=MC(__OFFSET_MCONTEXTX64_FLAGS)
+	jz     .Lsetcontext_noxfpu
+	.cfi_remember_state
+	fxrstor64 MC(__OFFSET_MCONTEXTX64_FPU)
+.Lsetcontext_donefpu:
+
+	/* Load general purpose registers. */
+	movq   R(__MCONTEXTX64_REGNO_R15), %r15
+	.cfi_same_value %r15
+	movq   R(__MCONTEXTX64_REGNO_R14), %r14
+	.cfi_same_value %r14
+	movq   R(__MCONTEXTX64_REGNO_R13), %r13
+	.cfi_same_value %r13
+	movq   R(__MCONTEXTX64_REGNO_R12), %r12
+	.cfi_same_value %r12
+	movq   R(__MCONTEXTX64_REGNO_R11), %r11
+	.cfi_same_value %r11
+	movq   R(__MCONTEXTX64_REGNO_R10), %r10
+	.cfi_same_value %r10
+	movq   R(__MCONTEXTX64_REGNO_R9), %r9
+	.cfi_same_value %r9
+	movq   R(__MCONTEXTX64_REGNO_R8), %r8
+	.cfi_same_value %r8
+	movq   R(__MCONTEXTX64_REGNO_RDI), %rdi
+	.cfi_same_value %rdi
+	movq   R(__MCONTEXTX64_REGNO_RSI), %rsi
+	.cfi_same_value %rsi
+	movq   R(__MCONTEXTX64_REGNO_RBX), %rbx
+	.cfi_same_value %rbx
+	movq   R(__MCONTEXTX64_REGNO_RDX), %rdx
+	.cfi_same_value %rdx
+	movq   R(__MCONTEXTX64_REGNO_RCX), %rcx
+	.cfi_same_value %rcx
+
+	/* Push some new registers into the new stack. */
+	pushq  R(__MCONTEXTX64_REGNO_CS)     /* Return %cs */
+	pushq  R(__MCONTEXTX64_REGNO_RIP)    /* Return %rip */
+	pushq  R(__MCONTEXTX64_REGNO_RFLAGS) /* Return %rflags */
+	popfq                                /* Load %rflags */
+	.cfi_same_value %rflags
+
+	/* Only load %ss after all of the pushs and pops above! */
+	movw   R(__MCONTEXTX64_REGNO_SS), %ax
+	movw   %ax, %ss
+	.cfi_same_value %ss
+
+	movq   R(__MCONTEXTX64_REGNO_RAX), %rax /* Restore %rax */
+	.cfi_same_value %rax
+
+	movq   R(__MCONTEXTX64_REGNO_RBP), %rbp /* Restore %rbp */
+	.cfi_same_value %rbp
+
+	/* Tell CFI that %rip is stored at 0(%rsp) */
+	.cfi_reg_offset %rip, 0, %rsp
+
+	/* Tell CFI that %cs is stored at 8(%rsp) */
+	.cfi_reg_offset %cs, 8, %rsp
+
+	/* Tell CFI that %rsp is offset by 16 */
+	.cfi_reg_value %rsp, 16, %rsp
+
+	lretq
+	.cfi_restore_state
+.Lsetcontext_noxfpu:
+	ttest  mask=__MCONTEXTX64_FLAG_HAVESFPU, loc=MC(__OFFSET_MCONTEXTX64_FLAGS)
+	jz     .Lsetcontext_donefpu
+	frstor MC(__OFFSET_MCONTEXTX64_FPU)
+	jmp    .Lsetcontext_donefpu
 	.cfi_endproc
+#undef UC_
+#undef UC
+#undef MC_
+#undef MC
+#undef R_
+#undef R
+END(libc_x86_setcontext_rbp)
 END(libc_setcontext)
-END(libc_x86_setcontext_rbx)
 
 
 
@@ -265,9 +449,23 @@ INTERN_FUNCTION(libc_swapcontext)
 	/* IN: ucontext_t       *%rdi = old_context; */
 	/* IN: ucontext_t const *%rsi = new_context; */
 	.cfi_startproc
+	pushq_cfi %rsi         /* Preserve... */
+	pushq_cfi %rdi         /* Preserve... */
+	call   libc_getcontext /* Generate the old-context */
 
-	/* TODO */
-	hlt
+	/* NOTE: The swapping of %rsi/%rdi by the following 2 instruction is INTENTIONAL! */
+	popq_cfi %rsi          /* old_context */
+	popq_cfi %rdi          /* new_context */
+
+	/* Override the registers that the previous call filled in incorrectly. */
+	movq   0(%rsp), %rax   /* %rip */
+	movq   %rax, (__OFFSET_UCONTEXTX64_MCONTEXT + __OFFSET_MCONTEXTX64_CPU + 8 * __MCONTEXTX64_REGNO_RIP)(%rsi)
+	leaq   8(%rsp), %rax   /* return-%rsp */
+	movq   %rax, (__OFFSET_UCONTEXTX64_MCONTEXT + __OFFSET_MCONTEXTX64_CPU + 8 * __MCONTEXTX64_REGNO_RSP)(%rsi)
+
+	/* And with that, the old CPU context has been filled.
+	 * Now  we  just  have   to  load  the  new   context! */
+	jmp    libc_setcontext /* Load context from %rdi */
 	.cfi_endproc
 END(libc_swapcontext)
 

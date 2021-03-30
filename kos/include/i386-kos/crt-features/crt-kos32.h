@@ -763,7 +763,7 @@
 #define __CRT_HAVE___wctype_l
 #define __CRT_HAVE___write
 #define __CRT_HAVE___x86_rtm_xtest
-#define __CRT_HAVE___x86_setcontext_edi
+#define __CRT_HAVE___x86_setcontext_ebp
 #define __CRT_HAVE___xpg_basename
 #define __CRT_HAVE___xpg_sigpause
 #define __CRT_HAVE___xpg_strerror_r
