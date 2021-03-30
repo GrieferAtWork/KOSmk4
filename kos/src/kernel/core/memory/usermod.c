@@ -1090,7 +1090,7 @@ again:
 
 	/* Find the first mapped memory location above the given address. */
 #ifdef CONFIG_USE_NEW_VM
-	mnode_tree_minmaxlocate(self->v_tree, minaddr, maxaddr, &mima);
+	mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
 #else /* CONFIG_USE_NEW_VM */
 	mima.mm_min = mima.mm_max = NULL;
 	vm_nodetree_minmaxlocate(self->v_tree,
@@ -1121,12 +1121,17 @@ again:
 				map_inode_addr   = vm_node_getaddr(node);
 				sync_endread(self);
 				/* Try to construct a usermod from the mapping we've found. */
-				new_result = usermod_create_from_mapping(self,
-				                                         map_inode,
-				                                         map_inode_path,
-				                                         map_inode_name,
-				                                         map_inode_offset,
-				                                         map_inode_addr);
+				TRY {
+					new_result = usermod_create_from_mapping(self,
+					                                         map_inode,
+					                                         map_inode_path,
+					                                         map_inode_name,
+					                                         map_inode_offset,
+					                                         map_inode_addr);
+				} EXCEPT {
+					xdecref_unlikely(result);
+					RETHROW();
+				}
 				if (new_result) {
 					xdecref_unlikely(result);
 					/* Insert the new usermod object into the vm's cache. */

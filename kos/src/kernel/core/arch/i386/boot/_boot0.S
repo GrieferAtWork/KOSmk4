@@ -200,8 +200,8 @@ PRIVATE_FUNCTION(a20test)
 	decw   %di; decw  %di        /* %di -= 2;                                      */
 	/* Negate the word at %ds:%si */
 	notw   %ds:(%si)             /* *(u16 *)0x7dfe = ~*(u16 *)0x7dfe;              */
-	/* Repeat the compare (if A20 was enabled, the only 0x0000:0x7dfe was
-	 * changed. Otherwise, both memory locations will have been  changed) */
+	/* Repeat the compare (if A20 was enabled, then only 0x0000:0x7dfe was
+	 * changed. Otherwise, both memory  locations will have been  changed) */
 	cmpsw  %es:(%di), %ds:(%si)  /* FLAGS.ZF = *(u16 *)0x7dfe == *(u16 *)0x107dfe; */
 	jne8   2f                    /* if (!FLAGS.ZF) goto 2f; // non-equal -> A20 is enabled. */
 	popw   %ds

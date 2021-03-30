@@ -2459,4 +2459,64 @@ static_assert(__SIZEOF_ERROR_CODE_T__ == sizeof(__error_code_t));
 static_assert(__SIZEOF_ERROR_CLASS_T__ == sizeof(__error_class_t));
 static_assert(__SIZEOF_ERROR_SUBCLASS_T__ == sizeof(__error_subclass_t));
 
+#include <bits/os/kos/mcontext32.h>
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EDI]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_edi));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_ESI]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_esi));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EBP]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_ebp));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_ESP]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_esp));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EBX]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_ebx));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EDX]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_edx));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_ECX]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_ecx));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EAX]) == offsetof(struct __mcontextx32, mc_context.ucs_gpregs.gp_eax));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_GS])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_gs));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_GS])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_gs16));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_FS])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_fs));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_FS])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_fs16));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_ES])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_es));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_ES])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_es16));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_DS])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_ds));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_DS])  == offsetof(struct __mcontextx32, mc_context.ucs_sgregs.sg_ds16));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_CS])  == offsetof(struct __mcontextx32, mc_context.ucs_cs));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_CS])  == offsetof(struct __mcontextx32, mc_context.ucs_cs16));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_SS])  == offsetof(struct __mcontextx32, mc_context.ucs_ss));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_SS])  == offsetof(struct __mcontextx32, mc_context.ucs_ss16));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EFL]) == offsetof(struct __mcontextx32, mc_context.ucs_eflags));
+static_assert(offsetof(struct __mcontextx32, mc_gregs[__MCONTEXTX32_REGNO_EIP]) == offsetof(struct __mcontextx32, mc_context.ucs_eip));
+
+#include <bits/os/kos/mcontext64.h>
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_GS])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_gs));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_GS])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_gs16));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_FS])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_fs));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_FS])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_fs16));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_ES])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_es));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_ES])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_es16));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_DS])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_ds));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_DS])     == offsetof(struct __mcontextx64, mc_context.ucs_sgregs.sg_ds16));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_GSBASE]) == offsetof(struct __mcontextx64, mc_context.ucs_sgbase.sg_gsbase));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_FSBASE]) == offsetof(struct __mcontextx64, mc_context.ucs_sgbase.sg_fsbase));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_CS])     == offsetof(struct __mcontextx64, mc_context.ucs_cs));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_CS])     == offsetof(struct __mcontextx64, mc_context.ucs_cs16));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_SS])     == offsetof(struct __mcontextx64, mc_context.ucs_ss));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_SS])     == offsetof(struct __mcontextx64, mc_context.ucs_ss16));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R15])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r15));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R14])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r14));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R13])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r13));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R12])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r12));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R11])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r11));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R10])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r10));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R9])     == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r9));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_R8])     == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_r8));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RDI])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rdi));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RSI])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rsi));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RBP])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rbp));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RSP])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rsp));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RBX])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rbx));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RDX])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rdx));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RCX])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rcx));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RAX])    == offsetof(struct __mcontextx64, mc_context.ucs_gpregs.gp_rax));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RFLAGS]) == offsetof(struct __mcontextx64, mc_context.ucs_rflags));
+static_assert(offsetof(struct __mcontextx64, mc_gregs[__MCONTEXTX64_REGNO_RIP])    == offsetof(struct __mcontextx64, mc_context.ucs_rip));
+
+
+
 #endif /* !GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */

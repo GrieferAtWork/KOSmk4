@@ -1616,7 +1616,7 @@ sigset_t *setsigmaskptr([[nonnull]] sigset_t *sigmaskptr);
 [[libc, requires_function(setsigmaskptr)]]
 [[decl_include("<bits/os/sigset.h>")]]
 [[impl_include("<bits/os/sigset.h>")]]
-[[nonnull]] sigset_t *setsigmaskfullptr(void) {
+[[userimpl, nonnull]] sigset_t *setsigmaskfullptr(void) {
 	static sigset_t const ss_full = __SIGSET_INIT((__ULONGPTR_TYPE__)-1);
 	return setsigmaskptr((sigset_t *)&ss_full);
 }

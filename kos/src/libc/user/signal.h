@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60ebb30d */
+/* HASH CRC-32:0xe5fdb7c0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,6 +214,19 @@ INTDEF ATTR_RETNONNULL WUNUSED sigset_t *NOTHROW_NCX(LIBCCALL libc_getsigmaskptr
  * @param: sigmaskptr: Address of the signal mask to use from now on.
  * @return: * : Address of the previously used signal mask. */
 INTDEF ATTR_RETNONNULL NONNULL((1)) sigset_t *NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr);
+/* >> setsigmaskfullptr(3)
+ * Same as `setsigmaskptr()', but set a statically allocated, fully
+ * filled signal mask as the calling thread's current signal mask.
+ * This essentially means that this function can be used to temporarily
+ * disable the reception of all signals within the calling thread, thus
+ * allowing the thread to run without being interrupted (by another but
+ * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
+ * mask is restored.
+ * >> sigset_t *os;
+ * >> os = setsigmaskfullptr();
+ * >> ...
+ * >> setsigmaskptr(os); */
+INTDEF ATTR_RETNONNULL sigset_t *NOTHROW_NCX(LIBCCALL libc_setsigmaskfullptr)(void);
 /* >> sigsuspend(2)
  * Atomically save and set the caller's signal mask to `set', then wait for
  * one of the contained signals to arrive before restoring the old signal mask.

@@ -523,9 +523,9 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_RETNONNULL NONNULL((1)) sigse
 NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 /*[[[body:libc_setsigmaskptr]]]*/
 {
+	struct pthread *me = &current;
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	sigset_t *result;
-	struct pthread *me = &current;
 	result = me->pt_pmask.lpm_pmask.pm_sigmask;
 	if unlikely(!result) {
 		/* Lazily initialize the userprocmask sub-system. */
@@ -573,6 +573,53 @@ do_legacy_sigprocmask:
 	return result;
 }
 /*[[[end:libc_setsigmaskptr]]]*/
+
+/*[[[head:libc_setsigmaskfullptr,hash:CRC-32=0xc730b1a]]]*/
+/* >> setsigmaskfullptr(3)
+ * Same as `setsigmaskptr()', but set a statically allocated, fully
+ * filled signal mask as the calling thread's current signal mask.
+ * This essentially means that this function can be used to temporarily
+ * disable the reception of all signals within the calling thread, thus
+ * allowing the thread to run without being interrupted (by another but
+ * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
+ * mask is restored.
+ * >> sigset_t *os;
+ * >> os = setsigmaskfullptr();
+ * >> ...
+ * >> setsigmaskptr(os); */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_RETNONNULL sigset_t *
+NOTHROW_NCX(LIBCCALL libc_setsigmaskfullptr)(void)
+/*[[[body:libc_setsigmaskfullptr]]]*/
+{
+	static sigset_t const ss_full = __SIGSET_INIT((__ULONGPTR_TYPE__)-1);
+	struct pthread *me            = &current;
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+	sigset_t *result;
+	result = me->pt_pmask.lpm_pmask.pm_sigmask;
+	if unlikely(!result) {
+		/* Lazily initialize the userprocmask sub-system. */
+		result = &me->pt_pmask.lpm_masks[0];
+		me->pt_pmask.lpm_pmask.pm_sigmask = result;
+		if unlikely(sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask) != -EOK)
+			goto do_legacy_sigprocmask;
+	}
+	/* Atomically switch over to the new signal mask. */
+	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, (sigset_t *)&ss_full);
+	/* No need to check if anything because unmasked, since we know
+	 * that the new signal mask doesn't contain any unmasked signals! */
+	return result;
+do_legacy_sigprocmask:
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+	result = FALLBACK_SIGMASKPTR(me);
+	if (!result)
+		result = &INITIAL_SIGMASKBUF(me);
+	FALLBACK_SIGMASKPTR(me) = (sigset_t *)&ss_full;
+	/* Load the new signal mask into the kernel. */
+	if unlikely(sys_sigprocmask(SIG_SETMASK, &ss_full, result) != -EOK)
+		sigemptyset(result);
+	return result;
+}
+/*[[[end:libc_setsigmaskfullptr]]]*/
 
 
 /*[[[head:libc_sigsuspend,hash:CRC-32=0xc9c070c8]]]*/
@@ -981,7 +1028,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x49d14112]]]*/
+/*[[[start:exports,hash:CRC-32=0x875fcea2]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1004,6 +1051,7 @@ DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(sigprocmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(getsigmaskptr, libc_getsigmaskptr);
 DEFINE_PUBLIC_ALIAS(setsigmaskptr, libc_setsigmaskptr);
+DEFINE_PUBLIC_ALIAS(setsigmaskfullptr, libc_setsigmaskfullptr);
 DEFINE_PUBLIC_ALIAS(__sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(__sigaction, libc_sigaction);
