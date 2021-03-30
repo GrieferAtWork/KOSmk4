@@ -1256,29 +1256,25 @@ libregdump_ip(struct regdump_printer *__restrict self,
 			}
 		}
 		if (ENSURE_LIBDISASM()) {
+			if (did_lf_after_eip)
+				format(REGDUMP_FORMAT_INDENT);
+			PRINT("[");
 			NESTED_TRY {
-				if (did_lf_after_eip)
-					format(REGDUMP_FORMAT_INDENT);
-				else {
-					PRINT("[");
-				}
-				PRINT("[");
 				DO(disasm_single(self->rdp_printer, self->rdp_printer_arg, (void *)prev_ip,
 				                 DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL));
-				PRINT("]\n");
-#ifndef __KERNEL__
-				did_lf_after_eip = true;
-#endif /* !__KERNEL__ */
 			} EXCEPT {
 				error_class_t cls = error_class();
 				if (ERRORCLASS_ISRTLPRIORITY(cls))
 					RETHROW();
+				format(REGDUMP_FORMAT_ERROR_PREFIX);
+				printf("error:%s", error_name(error_code()));
+				format(REGDUMP_FORMAT_ERROR_SUFFIX);
 			}
+			PRINT("]\n");
+			did_lf_after_eip = true;
 		}
-#ifndef __KERNEL__
 		if unlikely(!did_lf_after_eip)
 			PRINT("\n");
-#endif /* !__KERNEL__ */
 	}
 	END;
 }
