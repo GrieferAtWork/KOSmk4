@@ -256,7 +256,7 @@ debug_regdump_print_format(struct regdump_printer *__restrict self,
 		return PRINT("    ");
 
 	case REGDUMP_FORMAT_REGISTER_PREFIX:
-		return PRINT(AC_FG_BLUE);
+		return PRINT(AC_FG_TEAL);
 
 	case REGDUMP_FORMAT_VALUE_PREFIX:
 	case REGDUMP_FORMAT_OFFSET_PREFIX:
