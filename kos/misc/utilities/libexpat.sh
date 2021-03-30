@@ -23,11 +23,6 @@ require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 PACKAGE_NAME="libexpat-2.2.9"
 PACKAGE_URL="https://github.com/libexpat/libexpat/releases/download/R_2_2_9/expat-2.2.9.tar.gz"
 
-# configure thinks that mmap isn't working without this :(
-PACKAGE_CONFIG_SITE='
-ac_cv_func_mmap_fixed_mapped=yes
-'
-
 INSTALL_SKIP=""
 INSTALL_SKIP="$INSTALL_SKIP /usr/include/expat_config.h" # Contains arch-specific code
 

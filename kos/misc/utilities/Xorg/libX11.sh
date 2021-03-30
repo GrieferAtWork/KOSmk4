@@ -41,10 +41,5 @@ CONFIGURE="$CONFIGURE --enable-xf86bigfont"
 CONFIGURE="$CONFIGURE --enable-xkb"
 CONFIGURE="$CONFIGURE --with-locale-lib-dir=/$TARGET_LIBPATH/X11/locale"
 
-# configure thinks that mmap isn't working without this :(
-PACKAGE_CONFIG_SITE='
-ac_cv_func_mmap_fixed_mapped=yes
-'
-
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

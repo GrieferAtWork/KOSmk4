@@ -638,6 +638,46 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 					esac
 				done < "$SRCPATH/._configure_help"
 			fi
+
+			# Auto-configure a custom config.site for ./configure
+			if ! test -z "$PACKAGE_CONFIG_SITE"; then
+				CONFIG_SITE="$PACKAGE_CONFIG_SITE\n$CONFIG_SITE"
+				if ! test -z "$CONFIG_SITE"; then
+					echo "Using given \$PACKAGE_CONFIG_SITE and \$CONFIG_SITE options:"
+					while IFS= read -r line; do
+						echo "	>> $line"
+					done <<< "$CONFIG_SITE"
+				fi
+			else
+				# Auto-detect necessary config.site options
+				if ! test -z "$CONFIG_SITE"; then
+					echo "Using given \$CONFIG_SITE options:"
+					while IFS= read -r line; do
+						echo "	>> $line"
+					done <<< "$CONFIG_SITE"
+				fi
+				if [ -e "$SRCPATH/configure.ac" ]; then
+					echo "Scanning '$SRCPATH/configure.ac' for needed config.site options..."
+					while IFS= read -r line; do
+						case "$line" in
+
+						*AC_FUNC_MMAP*)
+							# When cross-compiling, `AC_FUNC_MMAP' defaults to `no', even
+							# though KOS has a fully working mmap(2) system call that would
+							# pass all of autoconf's tests (at least I hope...)
+							# Anyways: Just hammer it home to autoconf and manually tell it
+							#          what we're capable of via a custom config.size entry.
+							if ! [[ "$CONFIG_SITE" == *ac_cv_func_mmap_fixed_mapped* ]]; then
+								echo "	config.site: ac_cv_func_mmap_fixed_mapped=yes"
+								CONFIG_SITE="ac_cv_func_mmap_fixed_mapped=yes\n$CONFIG_SITE"
+							fi
+							;;
+
+						*) ;;
+						esac
+					done < "$SRCPATH/configure.ac"
+				fi
+			fi
 			(
 				export CC="${CROSS_PREFIX}gcc"
 				export CFLAGS="-ggdb"
@@ -645,11 +685,9 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				export CXXFLAGS="-ggdb"
 				export CPP="${CROSS_PREFIX}cpp"
 				export CXXCPP="${CROSS_PREFIX}cpp"
-				if ! test -z "$PACKAGE_CONFIG_SITE"; then
+				if ! test -z "$CONFIG_SITE"; then
+					cat > "$OPTPATH/config.site" <<< "$CONFIG_SITE"
 					export CONFIG_SITE="$OPTPATH/config.site"
-					cat > "$CONFIG_SITE" <<EOF
-$PACKAGE_CONFIG_SITE
-EOF
 				fi
 				${GM_HOOK_BEFORE_CONFIGURE:-:}
 				cmd cd "$OPTPATH"
