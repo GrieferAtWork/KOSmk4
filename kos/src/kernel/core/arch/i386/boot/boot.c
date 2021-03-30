@@ -444,9 +444,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *        - character_device_tree
 	 *        - struct driver::d_eh_frame_cache
 	 *        - struct superblock::s_nodes
-	 *        - struct vm_futex_controller::fc_tree
-	 *        - struct vm::v_tree
-	 *        - struct vm_datablock::db_parts
 	 * TODO: Also make use of RB-trees to implement `struct epoll_controller::ec_list' */
 
 	/* TODO: Add `__USE_ISOC2X' to <features.h> */
@@ -466,18 +463,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       for as long as  a thread is in  kernel-space, but will be  changed
 	 *       to  the original error code prior to returning back to user-space. */
 
-	/* TODO: Update poll(2)  and select(2)  to only  use `handle_polltest()'  during  the
-	 *       initial  scan for ready  files. Afterwards, scan  all monitored files again,
-	 *       but  this  time do  `connect+test'  on each  one  of them.  The  second test
-	 *       must be done immediately following the  connect not due to race  conditions,
-	 *       but due to  malicious user-space  programs that might  otherwise change  the
-	 *       underlying  files in the mean time. This  can still happen between the first
-	 *       test and the intermediate connect, but  won't introduce any races. In  fact:
-	 *       the initial test  itself is  completely optional  and only  done to  quickly
-	 *       chatch files that  have become  ready without  having to  do any  connect()s
-	 *       before noticing them. (only the second test is integral for synchronization,
-	 *       as  it is  the one that  happens interlocked with  the associated connect()) */
-
 	/* TODO: Now that we've got signal  completion callbacks, it's also possible  to
 	 *       implement `SIGIO' and `O_ASYNC'.  Note that linux documentation  states
 	 *       that O_ASYNC should work for ttys, ptys, sockets, pipes and fifos,  all
@@ -489,22 +474,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       on a per-object basis. (and gets enabled/disabled as O_ASYNC is set/cleared)
 	 *       Essentially, SIGIO should be send  whenever there's a rising-edge event  for
 	 *       either readable or writable in the associated object. */
-
-	/* TODO: Using  signal completion  functions, we  can also  simplify the implementation
-	 *       of polling an async worker/job to where  we don't have to re-poll all  defined
-	 *       workers every time  that one of  them becomes triggered.  - Instead, we  could
-	 *       use one `struct sig_multicompletion'  for every worker/job,  which then  carry
-	 *       a per-worker is-ready  flag, alongside sig_send()ing  a single, common  signal
-	 *       whenever one of  them becomes ready.  Further still, we  can also implement  a
-	 *       singly linked list  of ready  workers/jobs, such  that the  async worker  main
-	 *       thread  essentially  only has  to `ATOMIC_XCH(ready_jobs, NULL)',  followed by
-	 *       iterating that chain  and servicing each  job individually before  re-creating
-	 *       the `struct sig_multicompletion' of  all jobs that  should remain  registered.
-	 *       This system could then be  extended to allow use of  more than a single  async
-	 *       worker thread by having the  async-thread-main function re-insert all but  the
-	 *       first (or better yet: last, thus following first-in-last-out) ready async job,
-	 *       and if there were any, doing a `sig_send()' on the internal ready-jobs signal,
-	 *       thus waking up a variable number of secondary async workers threads. */
 
 	/* TODO: Add drivers for loading binaries:
 	 *   - binfmt_misc   Allows user-space to register custom interpreters
@@ -540,7 +509,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *                 load the PE binary in-place, and have a user-space shared library
 	 *                 libpe.so  that does all  of the user-space initialization/dynamic
 	 *                 linking (libpe.so would then depend on libdl.so and libc.so)
-	 *
 	 */
 
 	/* TODO: Add a way for user-space to manually mmap() the kernel's libdl.so into  their
@@ -598,8 +566,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       file  offset to implement read(), write() and lseek() by dispatching these
 	 *       operators through pread(), pwrite() and fstat() (fstat for `stat::st_size'
 	 *       with lseek(SEEK_END))
-	 *       -> Useful for turning UVIO objects into file-like objects.
-	 */
+	 *       -> Useful for turning UVIO objects into file-like objects. */
 
 	/* TODO: Play around with `no_caller_saved_registers'
 	 *       It may be possible to cut down on boiler-plate assembly needed to wrap
@@ -683,7 +650,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * TODO:
 	 *     - Finish implementing ancillary data support for unix domain sockets
 	 *     - Properly implement libc's regex functions
-	 *     - Implement support for `sys_epoll_create1(2)'
 	 */
 
 	return state;
