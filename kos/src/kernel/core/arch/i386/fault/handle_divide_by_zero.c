@@ -39,21 +39,25 @@ DECL_BEGIN
 INTERN struct icpustate *FCALL
 x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x00)); /* #DE  Divide by zero */
-	byte_t *pc, *next_pc;
+	byte_t *curr_pc, *next_pc;
 	unsigned int i;
-	PERTASK_SET(this_exception_code,
-	            ERROR_CODEOF(E_DIVIDE_BY_ZERO));
+	/* NOTE: Must load `next_pc' before setting the exception code,
+	 *       since inspecting program  text may  clobber the  error
+	 *       code when a segfault happens. */
+	curr_pc = (byte_t *)icpustate_getpc(state);
+	next_pc = instruction_succ_nx(curr_pc, instrlen_isa_from_icpustate(state));
+
 	/* TODO: This function can also get called due to divide overflow! */
 	/* TODO: This function can also get called due to `aam $0' */
+
+	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_DIVIDE_BY_ZERO));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(this_exception_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	pc = (byte_t *)icpustate_getpc(state);
-	PERTASK_SET(this_exception_faultaddr, (void *)pc);
-	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
+	PERTASK_SET(this_exception_faultaddr, (void *)curr_pc);
 	if (next_pc)
 		icpustate_setpc(state, (uintptr_t)next_pc);
 	x86_userexcept_unwind_interrupt(state);

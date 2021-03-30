@@ -1756,12 +1756,12 @@ x86_lookup_segment_nopr(struct icpustate *__restrict state,
 			PREEMPTION_POP(was);
 			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
 			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
-			      0,                                    /* opcode */
-			      0,                                    /* op_flags */
-			      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
-			      X86_REGISTER_MISC_LDT,                /* regno */
-			      0,                                    /* offset */
-			      ldt);                                 /* regval */
+			      /* opcode:   */ 0,
+			      /* op_flags: */ 0,
+			      /* what:     */ E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+			      /* regno:    */ X86_REGISTER_MISC_LDT,
+			      /* offset:   */ 0,
+			      /* regval:   */ ldt);
 		}
 		seg = (struct segment *)((byte_t *)dt.dt_base + ldt);
 		dt.dt_base  = segment_rdbaseX(seg);
@@ -1771,35 +1771,35 @@ x86_lookup_segment_nopr(struct icpustate *__restrict state,
 	if (!segment_index || segment_index > dt.dt_limit) {
 		PREEMPTION_POP(was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
-		      0,                                    /* opcode */
-		      0,                                    /* op_flags */
-		      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
-		      segment_regno,                        /* regno */
-		      0,                                    /* offset */
-		      segment_value);                       /* regval */
+		      /* opcode:   */ 0,
+		      /* op_flags: */ 0,
+		      /* what:     */ E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+		      /* regno:    */ segment_regno,
+		      /* offset:   */ 0,
+		      /* regval:   */ segment_value);
 	}
 	seg = (struct segment *)((byte_t *)dt.dt_base + segment_index);
 	if (!((segment_value & 3) <= seg->s_descriptor.d_dpl)) {
 		/* Invariant violated: RPL <= DPL */
 		PREEMPTION_POP(was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
-		      0,                                    /* opcode */
-		      0,                                    /* op_flags */
-		      E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV, /* what */
-		      segment_regno,                        /* regno */
-		      0,                                    /* offset */
-		      segment_value);                       /* regval */
+		      /* opcode:   */ 0,
+		      /* op_flags: */ 0,
+		      /* what:     */ E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
+		      /* regno:    */ segment_regno,
+		      /* offset:   */ 0,
+		      /* regval:   */ segment_value);
 	}
 	if (!((icpustate_getcs(state) & 3) <= seg->s_descriptor.d_dpl)) {
 		/* Invariant violated: CPL <= DPL */
 		PREEMPTION_POP(was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
-		      0,                                    /* opcode */
-		      0,                                    /* op_flags */
-		      E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV, /* what */
-		      segment_regno,                        /* regno */
-		      0,                                    /* offset */
-		      segment_value);                       /* regval */
+		      /* opcode:   */ 0,
+		      /* op_flags: */ 0,
+		      /* what:     */ E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV,
+		      /* regno:    */ segment_regno,
+		      /* offset:   */ 0,
+		      /* regval:   */ segment_value);
 	}
 	return seg;
 }
@@ -1815,12 +1815,12 @@ x86_validate_ipcs(struct icpustate *__restrict state,
 		PREEMPTION_POP(was);
 		/* Not a code segment! */
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
-		      0,                                    /* opcode */
-		      0,                                    /* op_flags */
-		      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
-		      X86_REGISTER_SEGMENT_CS,              /* regno */
-		      0,                                    /* offset */
-		      cs);                                  /* regval */
+		      /* opcode:   */ 0,
+		      /* op_flags: */ 0,
+		      /* what:     */ E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD,
+		      /* regno:    */ X86_REGISTER_SEGMENT_CS,
+		      /* offset:   */ 0,
+		      /* regval:   */ cs);
 	}
 	/* Verify that `ip' belongs to `seg' */
 	if ((seg->s_descriptor.d_dpl == 0) != ADDR_ISKERN(ip)) {
@@ -1833,12 +1833,12 @@ x86_validate_ipcs(struct icpustate *__restrict state,
 		}
 		/* Tried to execute user with kernel CS */
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
-		      0,                                    /* opcode */
-		      0,                                    /* op_flags */
-		      E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV, /* what */
-		      X86_REGISTER_SEGMENT_CS,              /* regno */
-		      0,                                    /* offset */
-		      cs);                                  /* regval */
+		      /* opcode:   */ 0,
+		      /* op_flags: */ 0,
+		      /* what:     */ E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV,
+		      /* regno:    */ X86_REGISTER_SEGMENT_CS,
+		      /* offset:   */ 0,
+		      /* regval:   */ cs);
 	}
 	PREEMPTION_POP(was);
 }

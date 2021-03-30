@@ -47,20 +47,19 @@ DECL_BEGIN
 INTERN struct icpustate *FCALL
 x86_handle_bound_range(struct icpustate *__restrict state) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x05)); /* #BR  Bound Range */
-	byte_t const *pc;
+	byte_t const *curr_pc, *next_pc;
 	emu86_opcode_t opcode;
 	emu86_opflags_t flags;
 	uintptr_t bound_index, bound_min, bound_max;
-	pc = (byte_t *)icpustate_getpc(state);
-	PERTASK_SET(this_exception_faultaddr, (void *)pc);
+	curr_pc   = (byte_t *)icpustate_getpc(state);
 	flags     = emu86_opflags_from_icpustate(state);
-	pc        = emu86_opcode_decode(pc, &opcode, &flags);
+	next_pc   = emu86_opcode_decode(curr_pc, &opcode, &flags);
 	bound_min = bound_index = bound_max = 0;
 	if (opcode == EMU86_OPCODE_ENCODE(0x62)) {
 		struct emu86_modrm mod;
 		/* 62 /r      BOUND r16, m16&16      Check if r16 (array index) is within bounds specified by m16&16
 		 * 62 /r      BOUND r32, m32&32      Check if r32 (array index) is within bounds specified by m32&32 */
-		pc = emu86_modrm_decode(pc, &mod, flags);
+		next_pc = emu86_modrm_decode(next_pc, &mod, flags);
 		TRY {
 			byte_t *addr;
 			addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, flags);
@@ -78,7 +77,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 				bound_max   = *(u32 *)(addr + 4);
 			}
 		} EXCEPT {
-			icpustate_setpc(state, (uintptr_t)pc);
+			icpustate_setpc(state, (uintptr_t)next_pc);
 			RETHROW();
 		}
 		if ((s32)bound_index >= (s32)bound_min &&
@@ -87,18 +86,14 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			 *                 must have modified the bounds before we got  to
 			 *                 read them. - Just ignore this and act as though
 			 *                 this exception has never gotten raised! */
-			icpustate_setpc(state, (uintptr_t)pc);
+			icpustate_setpc(state, (uintptr_t)next_pc);
 			return state;
 		}
 	} else {
-		byte_t *next_pc;
-		next_pc = (byte_t *)icpustate_getpc(state);
-		next_pc = instruction_succ_nx(next_pc, instrlen_isa_from_icpustate(state));
-		if (next_pc)
-			pc = next_pc;
+		next_pc = instruction_trysucc(curr_pc, instrlen_isa_from_icpustate(state));
 	}
-	PERTASK_SET(this_exception_code,
-	            ERROR_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));
+	PERTASK_SET(this_exception_faultaddr, (void *)curr_pc);
+	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_index, bound_index);
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_min, bound_min);
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_max, bound_max);
@@ -111,7 +106,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			PERTASK_SET(this_exception_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
-	icpustate_setpc(state, (uintptr_t)pc);
+	icpustate_setpc(state, (uintptr_t)next_pc);
 	x86_userexcept_unwind_interrupt(state);
 }
 
