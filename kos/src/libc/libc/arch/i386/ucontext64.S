@@ -71,8 +71,8 @@ PRIVATE_FUNCTION(get_fpu_flags)
 .Lget_fpu_flags_firstcall:
 	/* Not yet calculated.
 	 * In order to determine support, we do the following:
-	 * >> char const *env = getenv("HW_SSE");
 	 * >> #ifdef ENVIRON_HW_SSE
+	 * >> char const *env = getenv(ENVIRON_HW_SSE);
 	 * >> if (env && env[0] && !env[1]) {
 	 * >>     if (env[0] == '1')
 	 * >>         return __MCONTEXTX64_FLAG_HAVEXFPU;
