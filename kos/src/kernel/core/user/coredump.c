@@ -404,7 +404,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 	}
 
 	/* Try to trigger a debugger trap (if enabled) */
-	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_COREDUMP)) {
+	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_COREDUMP)) {
 		siginfo_t siginfo;
 		if (!error_as_signal(error_data(), &siginfo))
 			siginfo.si_signo = SIGABRT;

@@ -247,7 +247,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 		x86_dump_ucpustate_register_state(&ustate, _boottask.t_mman->v_pdir_phys);
 	}
 	/* Try to trigger a debugger trap (if enabled) */
-	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
+	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
 		kernel_debugtrap(state, SIGBUS);
 #ifdef CONFIG_HAVE_DEBUGGER
 	{

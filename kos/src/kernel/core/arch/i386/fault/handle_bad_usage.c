@@ -449,7 +449,8 @@ NOTHROW(FCALL unwind)(struct icpustate *__restrict self) {
 /* Fill in missing exception pointer. */
 PRIVATE ATTR_NORETURN NOBLOCK void FCALL
 complete_except(struct icpustate *__restrict self) {
-	error_class_t cls = PERTASK_GET(this_exception_class);
+	error_class_t cls;
+	cls = PERTASK_GET(this_exception_class);
 	if (cls == E_SEGFAULT) {
 		uintptr_t context;
 		context = PERTASK_GET(this_exception_args.e_segfault.s_context);
@@ -517,7 +518,7 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
 	for (i = 7; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 	/* Try to trigger a debugger trap (if enabled) */
-	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
+	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
 	unwind(state);
 }

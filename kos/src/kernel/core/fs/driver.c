@@ -3584,8 +3584,7 @@ NONNULL((1)) void FCALL driver_do_invoke_initializer(void (*func)(void)) {
 	TRY {
 		(*func)();
 	} EXCEPT {
-		if (kernel_debugtrap_enabled() &&
-		    (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE))
+		if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE))
 			kernel_debugtrap(SIGTRAP);
 		RETHROW();
 	}

@@ -211,7 +211,7 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 #endif /* !__x86_64__ */
 	}
 	/* Try to trigger a debugger trap (if enabled) */
-	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
+	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
 		kernel_debugtrap(&state->dcs_regs, SIGBUS);
 #ifndef CONFIG_NO_DEBUGGER
 #ifdef __x86_64__

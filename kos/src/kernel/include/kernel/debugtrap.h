@@ -85,6 +85,10 @@ kernel_debugtraps_get(struct kernel_debugtraps *__restrict handlers)
 /* Check if debug traps are enabled. */
 FUNDEF NOBLOCK WUNUSED bool NOTHROW(FCALL kernel_debugtrap_enabled)(void);
 
+/* Check if the kernel should trep on `on' (one of `KERNEL_DEBUGTRAP_ON_*') */
+#define kernel_debugtrap_shouldtrap(on) \
+	(((kernel_debugtrap_on & (on)) != 0) && kernel_debugtrap_enabled())
+
 /* Trigger a debug trap at the calling source location. */
 FUNDEF void FCALL kernel_debugtrap(struct debugtrap_reason const *__restrict reason);
 

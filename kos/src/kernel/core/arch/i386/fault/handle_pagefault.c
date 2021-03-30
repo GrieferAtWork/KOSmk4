@@ -1207,7 +1207,7 @@ set_exception_pointers2:
 	icpustate_setpc(state, (uintptr_t)pc);
 do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */
-	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))
+	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	assert(error_active());
 	x86_userexcept_unwind_interrupt(state);
@@ -2084,7 +2084,7 @@ set_exception_pointers2:
 	icpustate_setpc(state, pc);
 do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */
-	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))
+	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
 	x86_userexcept_unwind_interrupt(state);
 #endif /* !CONFIG_USE_NEW_VM */
