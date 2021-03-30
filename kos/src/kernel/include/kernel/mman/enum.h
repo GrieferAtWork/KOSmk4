@@ -88,14 +88,8 @@ typedef ssize_t (FCALL *mman_enum_callback_t)(void *arg, struct mmapinfo *__rest
  *                       mapping. */
 FUNDEF ssize_t KCALL
 mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
-#ifdef USERSPACE_END
           UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)0),
-          UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)(USERSPACE_END - 1))
-#else /* USERSPACE_END */
-          UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)USERSPACE_START),
-          UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1)
-#endif /* !USERSPACE_END */
-          );
+          UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1));
 
 
 DECL_END

@@ -672,8 +672,7 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	void *pc;
 #ifndef NDEBUG
 	{
-		struct exception_info *info;
-		info = error_info();
+		struct exception_info *info = error_info();
 		assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 		        "In error_unwind(), but no exception set");
 	}

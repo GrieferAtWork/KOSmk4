@@ -178,9 +178,15 @@ ProcFS_PerProc_Maps_Printer(struct regular_node *__restrict self,
 		pd.pd_printer = printer;
 		pd.pd_arg     = arg;
 		/* Enumerate nodes and print the maps-file. */
-		result = vm_enum(threadvm,
-		                 &maps_printer_cb,
-		                 &pd);
+#ifdef USERSPACE_END
+		result = vm_enum(threadvm, &maps_printer_cb, &pd,
+		                 (UNCHECKED void *)0,
+		                 (UNCHECKED void *)(USERSPACE_END - 1));
+#else /* USERSPACE_END */
+		result = vm_enum(threadvm, &maps_printer_cb, &pd,
+		                 (UNCHECKED void *)USERSPACE_START,
+		                 (UNCHECKED void *)-1);
+#endif /* !USERSPACE_END */
 	}
 done:
 	return result;
