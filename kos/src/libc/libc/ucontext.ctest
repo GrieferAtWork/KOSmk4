@@ -34,7 +34,6 @@
 
 DECL_BEGIN
 
-#if !defined(__x86_64__) /* TODO */
 /* NOTE: This test program is derived from:
  * https://www.man7.org/linux/man-pages/man3/makecontext.3.html
  */
@@ -66,9 +65,10 @@ PRIVATE void func2(void) {
 	ctest_substatf("state = 6\n");
 }
 
+static void *func1_stack[1024];
+static void *func2_stack[1024];
+
 DEFINE_TEST(ucontext) {
-	byte_t func1_stack[1024];
-	byte_t func2_stack[1024];
 	state = 0;
 	ctest_substatf("state = 0\n");
 	assert(getcontext(&uctx_func1) == 0);
@@ -97,7 +97,6 @@ DEFINE_TEST(ucontext) {
 	assert(state == 8);
 	ctest_substatf("state = 8\n");
 }
-#endif
 
 DECL_END
 

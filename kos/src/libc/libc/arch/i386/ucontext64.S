@@ -449,23 +449,21 @@ INTERN_FUNCTION(libc_swapcontext)
 	/* IN: ucontext_t       *%rdi = old_context; */
 	/* IN: ucontext_t const *%rsi = new_context; */
 	.cfi_startproc
-	pushq_cfi %rsi         /* Preserve... */
-	pushq_cfi %rdi         /* Preserve... */
+	pushq_cfi %rdi         /* Preserve: old_context */
+	pushq_cfi %rsi         /* Preserve: new_context */
 	call   libc_getcontext /* Generate the old-context */
-
-	/* NOTE: The swapping of %rsi/%rdi by the following 2 instruction is INTENTIONAL! */
-	popq_cfi %rsi          /* old_context */
-	popq_cfi %rdi          /* new_context */
+	popq_cfi %rbp          /* new_context */
+	popq_cfi %rdi          /* old_context */
 
 	/* Override the registers that the previous call filled in incorrectly. */
 	movq   0(%rsp), %rax   /* %rip */
-	movq   %rax, (__OFFSET_UCONTEXTX64_MCONTEXT + __OFFSET_MCONTEXTX64_CPU + 8 * __MCONTEXTX64_REGNO_RIP)(%rsi)
+	movq   %rax, (__OFFSET_UCONTEXTX64_MCONTEXT + __OFFSET_MCONTEXTX64_CPU + __MCONTEXTX64_REGNO_RIP * 8)(%rdi)
 	leaq   8(%rsp), %rax   /* return-%rsp */
-	movq   %rax, (__OFFSET_UCONTEXTX64_MCONTEXT + __OFFSET_MCONTEXTX64_CPU + 8 * __MCONTEXTX64_REGNO_RSP)(%rsi)
+	movq   %rax, (__OFFSET_UCONTEXTX64_MCONTEXT + __OFFSET_MCONTEXTX64_CPU + __MCONTEXTX64_REGNO_RSP * 8)(%rdi)
 
 	/* And with that, the old CPU context has been filled.
 	 * Now  we  just  have   to  load  the  new   context! */
-	jmp    libc_setcontext /* Load context from %rdi */
+	jmp    libc_x86_setcontext_rbp /* Load context from %rbp */
 	.cfi_endproc
 END(libc_swapcontext)
 
