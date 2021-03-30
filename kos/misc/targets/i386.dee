@@ -51,7 +51,7 @@ global final DISK_USRLIBPATH = "/usr/lib/";
 global final KERNEL_CORE_BASE = 0xc0000000;
 
 @@The ELF SIZE32 relocation for this target (if available)
-global R_TARGET_SIZE32 = "R_386_SIZE32";
+global final R_TARGET_SIZE32 = "R_386_SIZE32";
 
 @@GNU AS pseudo-directive for emitting a pointer
 global final AS_PTR = ".long";

@@ -95,6 +95,7 @@ if (($# != 2)); then
 	echo "    --force-configure     Force configure to be re-executed"
 	echo "    --force-make          Force make to be re-executed"
 	echo "    --force-disk          Force on-disk files to be updated"
+	echo "    --dry-run             Don't install files, but tell what would be installed"
 	echo ""
 	echo "TARGET_NAME should be one of:"
 	echo "i386 x86_64"

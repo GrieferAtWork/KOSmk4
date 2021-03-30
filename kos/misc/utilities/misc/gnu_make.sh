@@ -384,6 +384,19 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--disable-doc* | *--enable-doc*)
+						if ! [[ "$CONFIGURE" == *--enable-doc* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-doc* ]]; then
+							if test -z "$PACKAGE_WITH_DOCS"; then
+								echo "	option: --disable-doc"
+								CONFIGURE="$CONFIGURE --disable-doc"
+							else
+								echo "	option: --enable-doc"
+								CONFIGURE="$CONFIGURE --enable-doc"
+							fi
+						fi
+						;;
+
 					*--without-docs* | *--with-docs*)
 						if ! [[ "$CONFIGURE" == *--with-docs* ]] && \
 						   ! [[ "$CONFIGURE" == *--without-docs* ]]; then

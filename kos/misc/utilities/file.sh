@@ -20,6 +20,7 @@
 
 require_utility libzlib  "$PKG_CONFIG_PATH/zlib.pc"
 require_utility libbzip2 "$PKG_CONFIG_PATH/bzip2.pc"
+require_utility liblzma  "$PKG_CONFIG_PATH/liblzma.pc"
 
 PACKAGE_NAME="file-5.39"
 PACKAGE_URL="https://github.com/file/file/archive/FILE5_39.tar.gz"
@@ -29,7 +30,7 @@ CONFIGURE="$CONFIGURE --enable-elf"
 CONFIGURE="$CONFIGURE --enable-elf-core"
 CONFIGURE="$CONFIGURE --enable-zlib"
 CONFIGURE="$CONFIGURE --enable-bzlib"
-#CONFIGURE="$CONFIGURE --enable-xzlib" # TODO
+CONFIGURE="$CONFIGURE --enable-xzlib"
 CONFIGURE="$CONFIGURE --disable-libseccomp"
 
 
