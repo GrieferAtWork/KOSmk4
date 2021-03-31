@@ -33,7 +33,6 @@
 #include <kernel/mman/phys.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
-#include <kernel/vm/exec.h>
 
 #include <hybrid/align.h>
 #include <hybrid/pointer.h>

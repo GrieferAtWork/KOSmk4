@@ -36,6 +36,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/mman/flags.h>
+#include <kernel/mman/execinfo.h>
 
 #ifdef LOCAL_EXEC_ARGV_SIZE
 #define LOCAL_STRINGARRAY_TYPE USER CHECKED void const *
@@ -272,10 +273,10 @@ err_overlap:
 			/* Apply  the newly  loaded binary  to the  given VM and
 			 * terminate all threads using it except for the caller. */
 			{
-				struct vm_execinfo_struct ei;
-				ei.ei_node = args->ea_xnode;
-				ei.ei_dent = args->ea_xdentry;
-				ei.ei_path = args->ea_xpath;
+				struct mexecinfo ei;
+				ei.mei_node = args->ea_xnode;
+				ei.mei_dent = args->ea_xdentry;
+				ei.mei_path = args->ea_xpath;
 				vmb_apply(&builder,
 				          args->ea_mman,
 				          VMB_APPLY_AA_TERMTHREADS |
