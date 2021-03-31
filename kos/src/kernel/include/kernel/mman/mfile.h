@@ -780,6 +780,22 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 		/* .mf_part_amask = */ __hybrid_max_c2(PAGESIZE, (size_t)1 << blockshift) - 1, \
 		/* .mf_blockshift = */ blockshift,                                             \
 	}
+
+/* TODO: Remove the following 2! */
+#define MFILE_INIT_VIO_EX(type, vio, parts, pageshift)    \
+	{                                                     \
+		/* .mf_refcnt     = */ 1,                         \
+		/* .mf_ops        = */ type,                      \
+		/* .mf_vio        = */ vio,                       \
+		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,        \
+		/* .mf_parts      = */ parts,                     \
+		/* .mf_initdone   = */ SIG_INIT,                  \
+		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~), \
+		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~), \
+		/* .mf_blockshift = */ PAGESHIFT - (pageshift),   \
+		/* .mf_part_amask = */ PAGESIZE - 1,              \
+	}
+#define MFILE_INIT_VIO(vio) MFILE_INIT_VIO_EX(&mfile_ndef_ops, vio, __NULLPTR, 0)
 #else /* CONFIG_MFILE_LEGACY_VIO_OPS */
 #define MFILE_INIT_EX(refcnt, ops, parts, changed, blockshift)                         \
 	{                                                                                  \

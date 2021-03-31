@@ -25,7 +25,7 @@
 #endif /* __INTELLISENSE__ */
 
 #ifdef __KERNEL__
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys-access.h>
 
 DECL_BEGIN
 
@@ -46,68 +46,52 @@ libvio_copytovio_from_phys(struct vioargs *__restrict args,
                            size_t num_bytes)
 #endif /* ... */
 		__THROWS(...) {
-	bool is_first;
-	pagedir_pushval_t backup;
-	byte_t *tramp;
+	PHYS_VARS;
+	byte_t *vbuf;
+#ifdef DEFINE_IO_READ
+	IF_PHYS_IDENTITY(buf, num_bytes, {
+		libvio_copyfromvio(args, offset,
+		                   PHYS_TO_IDENTITY(buf),
+		                   num_bytes);
+		return;
+	});
+#elif defined(DEFINE_IO_WRITE)
+	IF_PHYS_IDENTITY(buf, num_bytes, {
+		libvio_copytovio(args, offset,
+		                 PHYS_TO_IDENTITY(buf),
+		                 num_bytes);
+		return;
+	});
+#endif /* ... */
 	if unlikely(!num_bytes)
 		return;
-	/* TODO: Support for the phys2virt identity mapping! */
-	is_first = true;
-	tramp    = THIS_TRAMPOLINE;
-	for (;;) {
-		size_t page_bytes;
-		page_bytes = PAGESIZE - (buf & PAGEMASK);
-		if (page_bytes > num_bytes)
-			page_bytes = num_bytes;
-#ifdef DEFINE_IO_READ
-		if (is_first) {
-			backup = pagedir_push_mapone(tramp,
-			                             buf & ~PAGEMASK,
-			                             PAGEDIR_MAP_FWRITE);
-			is_first = false;
-		} else {
-			pagedir_mapone(tramp,
-			               buf & ~PAGEMASK,
-			               PAGEDIR_MAP_FWRITE);
-		}
-#elif defined(DEFINE_IO_WRITE)
-		if (is_first) {
-			backup = pagedir_push_mapone(tramp,
-			                             buf & ~PAGEMASK,
-			                             PAGEDIR_MAP_FREAD);
-			is_first = false;
-		} else {
-			pagedir_mapone(tramp,
-			               buf & ~PAGEMASK,
-			               PAGEDIR_MAP_FREAD);
-		}
-#endif /* ... */
-		pagedir_syncone(tramp);
-		TRY {
+	vbuf = phys_pushaddr(buf);
+
+	/* Try-catch is required, because VIO access may throw exceptions. */
+	TRY {
+		for (;;) {
+			size_t page_bytes;
+			page_bytes = PAGESIZE - ((uintptr_t)vbuf & PAGEMASK);
+			if (page_bytes > num_bytes)
+				page_bytes = num_bytes;
 			/* Copy memory. */
 #ifdef DEFINE_IO_READ
-			libvio_copyfromvio(args,
-			                   offset,
-			                   tramp + ((ptrdiff_t)buf & PAGEMASK),
-			                   page_bytes);
+			libvio_copyfromvio(args, offset, vbuf, page_bytes);
 #elif defined(DEFINE_IO_WRITE)
-			libvio_copytovio(args,
-			                 offset,
-			                 tramp + ((ptrdiff_t)buf & PAGEMASK),
-			                 page_bytes);
+			libvio_copytovio(args, offset, vbuf, page_bytes);
 #endif /* ... */
-		} EXCEPT {
-			/* Try-catch is required, because VIO access may throw exceptions. */
-			pagedir_pop_mapone(tramp, backup);
-			RETHROW();
+			if (page_bytes >= num_bytes)
+				break;
+			num_bytes -= page_bytes;
+			buf += page_bytes;
+			offset += page_bytes;
+			vbuf = phys_loadpage(buf);
 		}
-		if (page_bytes >= num_bytes)
-			break;
-		num_bytes -= page_bytes;
-		buf += page_bytes;
-		offset += page_bytes;
+	} EXCEPT {
+		phys_pop();
+		RETHROW();
 	}
-	pagedir_pop_mapone(tramp, backup);
+	phys_pop();
 }
 
 

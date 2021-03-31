@@ -244,7 +244,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 
 	/* Temporarily  switch  to  the  page-directory  to-be  freed,  so  we
 	 * can make use of its identity-mapping in order to free its contents.
-	 * The other possibility  would be to  use the slow  vm_copyfromphys()
+	 * The  other possibility  would be  to use  the slow `copyfromphys()'
 	 * function to dereference its memory contents. */
 	pagedir_set((pagedir_phys_t)phys_self);
 	/* NOTE: Only iterate 0, 1 and 2 here (entry #3 contains) */

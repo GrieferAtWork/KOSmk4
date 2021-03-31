@@ -29,7 +29,6 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/signal.h>
 
 #include <hybrid/atomic.h>

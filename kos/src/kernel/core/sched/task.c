@@ -31,11 +31,11 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
+#include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>

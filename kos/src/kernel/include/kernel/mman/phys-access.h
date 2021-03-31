@@ -59,15 +59,15 @@ DECL_BEGIN
 	pagedir_pushval_t _pp_oldval
 
 
-#define phys_pushpage(addr_or_page)                             \
+#define phys_pushpage(addr_of_page)                             \
 	(trampoline = THIS_TRAMPOLINE, COMPILER_BARRIER(),          \
-	 _pp_oldval = pagedir_push_mapone(trampoline, addr_or_page, \
+	 _pp_oldval = pagedir_push_mapone(trampoline, addr_of_page, \
 	                                  PAGEDIR_MAP_FREAD |       \
 	                                  PAGEDIR_MAP_FWRITE),      \
 	 pagedir_syncone(trampoline), COMPILER_BARRIER(), trampoline)
-#define phys_loadpage(addr_or_page)                          \
+#define phys_loadpage(addr_of_page)                          \
 	(COMPILER_BARRIER(),                                     \
-	 pagedir_mapone(trampoline, addr_or_page,                \
+	 pagedir_mapone(trampoline, addr_of_page,                \
 	                PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE), \
 	 pagedir_syncone(trampoline),                            \
 	 COMPILER_BARRIER(), trampoline)

@@ -30,10 +30,10 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/fault.h> /* mman_prefault(), mman_prefaultv() */
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
@@ -55,7 +55,7 @@ DECL_BEGIN
 #define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_read
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	vm_copyfromphys_nopf((byte_t *)buffer + (buffer_offset), mpart_physaddr, num_bytes)
+	copyfromphys_nopf((byte_t *)buffer + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_write)
 #define LOCAL_WRITING
 #define LOCAL_buffer_t           USER CHECKED void const *
@@ -65,7 +65,7 @@ DECL_BEGIN
 #define LOCAL_mpart_rw_or_unlock mpart_write_or_unlock
 #define LOCAL__mpart_buffered_rw _mpart_buffered_write
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	vm_copytophys_nopf(mpart_physaddr, (byte_t const *)buffer + (buffer_offset), num_bytes)
+	copytophys_nopf(mpart_physaddr, (byte_t const *)buffer + (buffer_offset), num_bytes)
 #elif defined(DEFINE_mpart_read_p)
 #define LOCAL_READING
 #define LOCAL_buffer_t           physaddr_t
@@ -75,7 +75,7 @@ DECL_BEGIN
 #define LOCAL_mpart_rw_or_unlock mpart_read_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	vm_copyinphys(buffer + (buffer_offset), mpart_physaddr, num_bytes)
+	copyinphys(buffer + (buffer_offset), mpart_physaddr, num_bytes)
 #elif defined(DEFINE_mpart_write_p)
 #define LOCAL_WRITING
 #define LOCAL_buffer_t           physaddr_t
@@ -85,7 +85,7 @@ DECL_BEGIN
 #define LOCAL_mpart_rw_or_unlock mpart_write_or_unlock_p
 #define LOCAL_BUFFER_TRANSFER_NOEXCEPT
 #define LOCAL_buffer_transfer_nopf(buffer_offset, mpart_physaddr, num_bytes) \
-	vm_copyinphys(mpart_physaddr, buffer + (buffer_offset), num_bytes)
+	copyinphys(mpart_physaddr, buffer + (buffer_offset), num_bytes)
 #elif defined(DEFINE_mpart_readv)
 #define LOCAL_READING
 #define LOCAL_BUFFER_IS_AIO

@@ -26,9 +26,9 @@
 #include <fs/node.h>
 #include <kernel/except.h>
 #include <kernel/iovec.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 
 #include <kos/except/reason/io.h>
 

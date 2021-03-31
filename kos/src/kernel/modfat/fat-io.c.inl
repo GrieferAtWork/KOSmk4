@@ -29,8 +29,7 @@
 
 #include <kernel/aio.h>
 #include <kernel/iovec.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 
 #include <string.h>
 
@@ -64,7 +63,7 @@ DECL_BEGIN
 #define DST_MEMSET(offset, byte, num_bytes) iov_buffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_PHYS)
 #define BUFFER_TYPE physaddr_t
-#define DST_MEMSET(offset, byte, num_bytes) vm_memsetphys((buf) + (offset), byte, num_bytes)
+#define DST_MEMSET(offset, byte, num_bytes) memsetphys((buf) + (offset), byte, num_bytes)
 #elif defined(DEFINE_IO_READ)
 #define BUFFER_TYPE CHECKED USER void *
 #define DST_MEMSET(offset, byte, num_bytes) memset((byte_t *)(buf) + (offset), byte, num_bytes)
@@ -76,30 +75,30 @@ DECL_BEGIN
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_areadv_phys(dev, buf, num_bytes, device_position, aio)
+	block_device_areadv_phys(dev, buf, num_bytes, device_position, aio)
 #elif defined(DEFINE_IO_VECTOR)
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_areadv(dev, buf, num_bytes, device_position, aio)
+	block_device_areadv(dev, buf, num_bytes, device_position, aio)
 #elif defined(DEFINE_IO_PHYS)
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_aread_phys(dev, buf, num_bytes, device_position, aio)
+	block_device_aread_phys(dev, buf, num_bytes, device_position, aio)
 #else
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_aread(dev, buf, num_bytes, device_position, aio)
+	block_device_aread(dev, buf, num_bytes, device_position, aio)
 #endif
 #else /* DEFINE_IO_READ */
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_awritev_phys(dev, buf, num_bytes, device_position, aio)
+	block_device_awritev_phys(dev, buf, num_bytes, device_position, aio)
 #elif defined(DEFINE_IO_VECTOR)
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_awritev(dev, buf, num_bytes, device_position, aio)
+	block_device_awritev(dev, buf, num_bytes, device_position, aio)
 #elif defined(DEFINE_IO_PHYS)
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_awrite_phys(dev, buf, num_bytes, device_position, aio)
+	block_device_awrite_phys(dev, buf, num_bytes, device_position, aio)
 #else
 #define BLOCK_DEVICE_IO(dev, buf, num_bytes, device_position, aio) \
-        block_device_awrite(dev, buf, num_bytes, device_position, aio)
+	block_device_awrite(dev, buf, num_bytes, device_position, aio)
 #endif
 #endif /* !DEFINE_IO_READ */
 

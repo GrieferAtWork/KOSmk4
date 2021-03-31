@@ -311,7 +311,7 @@ NOTHROW(KCALL page_isfree)(physpage_t page);
  *       >> page = page_malloc(1);
  *       >> pagedir_mapone(dest, page, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
  *       >> if (!page_iszero(page))
- *       >>      vm_memsetphys(physpage2addr(dest), 0, PAGESIZE);
+ *       >>      memsetphys(physpage2addr(dest), 0, PAGESIZE);
  *       In other words: The information is most useful in freshly
  *       allocated pages, in order to determine if the mapped memory
  *       already contains all zeros. */

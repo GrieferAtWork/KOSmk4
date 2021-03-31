@@ -417,22 +417,8 @@ DECL_END
 #define vm_datapart_do_freeram(self)                           mpart_ll_freemem(self)
 #define vm_datapart_freeram(self)                              mpart_ll_freemem(self)
 
-#define vm_datablock_deanonymize(self) \
-	(void)0 /* TODO: Function was always racy, and isn't supported anymore */
-#define VM_DATABLOCK_INIT_VIO_EX(type, vio, parts, pageshift) \
-	{                                                         \
-		/* .mf_refcnt     = */ 1,                             \
-		/* .mf_ops        = */ type,                          \
-		/* .mf_vio        = */ vio,                           \
-		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,            \
-		/* .mf_parts      = */ parts,                         \
-		/* .mf_initdone   = */ SIG_INIT,                      \
-		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),     \
-		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),     \
-		/* .mf_blockshift = */ PAGESHIFT - (pageshift),       \
-		/* .mf_part_amask = */ PAGESIZE - 1,                  \
-	}
-#define VM_DATABLOCK_INIT_VIO(vio) \
-	VM_DATABLOCK_INIT_VIO_EX(&mfile_ndef_ops, vio, __NULLPTR, 0)
+#define vm_datablock_deanonymize(self) (void)0 /* TODO: Function was always racy, and isn't supported anymore */
+#define VM_DATABLOCK_INIT_VIO_EX       MFILE_INIT_VIO_EX
+#define VM_DATABLOCK_INIT_VIO          MFILE_INIT_VIO
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_H */

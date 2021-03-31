@@ -30,10 +30,10 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/execabi.h>
+#include <kernel/mman/phys.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
 #include <kernel/vm/exec.h>
-#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/pointer.h>
@@ -174,8 +174,8 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 				/* Check if we must zero-initialize the BSS portion. */
 				if (!page_iszero(overlap_page)) {
 					/* Zero-initialize the BSS portion */
-					memsetphys(physpage2addr(overlap_page) + bss_start_page_offset,
-					           0, bss_num_bytes);
+					memsetphys_onepage(physpage2addr(overlap_page) + bss_start_page_offset,
+					                   0, bss_num_bytes);
 				}
 			} EXCEPT {
 				page_free(overlap_page, 1);

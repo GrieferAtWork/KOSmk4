@@ -37,10 +37,10 @@
 #include <kernel/iovec.h>
 #include <kernel/isr.h>
 #include <kernel/memory.h>
+#include <kernel/mman/phys.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <kernel/x86/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <sched/async.h>
 #include <sched/tsc.h>
@@ -1687,7 +1687,7 @@ NOTHROW(KCALL uhci_syncheap_fini)(struct uhci_syncheap *__restrict self) {
 	page = self->sh_current;
 	while (page != PHYSPAGE_INVALID) {
 		struct uhci_syncheap_page next;
-		vm_copyfromphys_onepage(&next, physpage2addr(self->sh_current),
+		copyfromphys_onepage(&next, physpage2addr(self->sh_current),
 		                        sizeof(struct uhci_syncheap_page));
 		page_free(page, next.shp_count);
 		page = next.shp_next;
@@ -1715,7 +1715,7 @@ NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
 		if (pg == PHYSPAGE_INVALID)
 			return UHCI_SYNCHEAP_ALLOC_FAILED;
 		header.shp_next = self->sh_current;
-		vm_copytophys_onepage(physpage2addr(pg), &header, sizeof(header));
+		copytophys_onepage(physpage2addr(pg), &header, sizeof(header));
 		self->sh_free = (header.shp_count * PAGESIZE) -
 		                sizeof(struct uhci_syncheap_page);
 		self->sh_current = pg;
@@ -1851,7 +1851,7 @@ do_alloc_new_buffer:
 						                        tx_iter->ut_buf,
 						                        tx_copy->ut_buflen);
 					} else {
-						vm_copytophys(tx_copy->ut_bufp,
+						copytophys(tx_copy->ut_bufp,
 						              tx_iter->ut_buf,
 						              tx_copy->ut_buflen);
 					}
@@ -1876,7 +1876,7 @@ do_alloc_new_buffer:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYS) {
 						if (tx_copy->ut_bufp == tx_iter->ut_bufp)
 							break; /* Same buffer was used. */
-						vm_copyinphys(tx_copy->ut_bufp,
+						copyinphys(tx_copy->ut_bufp,
 						              tx_iter->ut_bufp,
 						              tx_copy->ut_buflen);
 					} else {
@@ -1945,7 +1945,7 @@ copy_next_tx:
 						                      0,
 						                      tx_copy->ut_buflen);
 					} else {
-						vm_copyfromphys(tx_iter->ut_buf,
+						copyfromphys(tx_iter->ut_buf,
 						                tx_copy->ut_bufp,
 						                tx_copy->ut_buflen);
 					}
@@ -1970,7 +1970,7 @@ copy_next_tx:
 					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYS) {
 						if (tx_copy->ut_bufp == tx_iter->ut_bufp)
 							break; /* Same buffer was used. */
-						vm_copyinphys(tx_iter->ut_bufp,
+						copyinphys(tx_iter->ut_bufp,
 						              tx_copy->ut_bufp,
 						              tx_copy->ut_buflen);
 					} else {

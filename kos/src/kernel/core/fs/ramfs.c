@@ -26,9 +26,8 @@
 #include <fs/ramfs.h>
 #include <kernel/driver.h>
 #include <kernel/iovec.h>
+#include <kernel/mman/phys.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 
 #include <hybrid/atomic.h>
@@ -64,7 +63,7 @@ ramfs_pread(struct inode *__restrict UNUSED(self),
             size_t num_bytes, pos_t UNUSED(file_position),
             struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	vm_memsetphys(dst, 0, num_bytes);
+	memsetphys(dst, 0, num_bytes);
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
@@ -87,7 +86,7 @@ ramfs_preadv(struct inode *__restrict UNUSED(self),
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct iov_physentry ent;
 	IOV_PHYSBUFFER_FOREACH(ent, buf) {
-		vm_memsetphys(ent.ive_base, 0, ent.ive_size);
+		memsetphys(ent.ive_base, 0, ent.ive_size);
 	}
 }
 

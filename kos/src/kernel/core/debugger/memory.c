@@ -33,11 +33,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/rt.h>
+#include <kernel/mman/nopf.h>
+#include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/vm.h>
-#include <kernel/mman/nopf.h>
-#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 
@@ -234,7 +234,7 @@ again_memcpy_nopf_kernel:
 					copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
 					if (copybytes > num_bytes)
 						copybytes = num_bytes;
-					vm_copytophys(phys, buf, copybytes);
+					copytophys(phys, buf, copybytes);
 					if (copybytes >= num_bytes)
 						return 0; /* Managed to copy everything */
 					addr      = (byte_t *)addr + copybytes;
@@ -296,7 +296,7 @@ done_nopanic_copy:
 					copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
 					if (copybytes > num_bytes)
 						copybytes = num_bytes;
-					vm_copytophys(phys, buf, copybytes);
+					copytophys(phys, buf, copybytes);
 					if (copybytes >= num_bytes)
 						return 0; /* Managed to copy everything */
 					addr      = (byte_t *)addr + copybytes;

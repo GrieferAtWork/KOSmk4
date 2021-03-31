@@ -24,8 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/iovec.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -67,7 +66,7 @@ iov_buffer_copyfromphys(struct iov_buffer const *__restrict self,
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		vm_copyfromphys(ent.ive_base + dst_offset, src, ent.ive_size);
+		copyfromphys(ent.ive_base + dst_offset, src, ent.ive_size);
 		if (ent.ive_size >= num_bytes)
 			break;
 		src += ent.ive_size;
@@ -88,7 +87,7 @@ NOTHROW(KCALL iov_buffer_copyfromphys_nopf)(struct iov_buffer const *__restrict 
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		error = vm_copyfromphys_nopf(ent.ive_base + dst_offset, src, ent.ive_size);
+		error = copyfromphys_nopf(ent.ive_base + dst_offset, src, ent.ive_size);
 		if unlikely(error != 0)
 			return error + (num_bytes - ent.ive_size);
 		if (ent.ive_size >= num_bytes)
@@ -117,7 +116,7 @@ iov_buffer_copytophys(struct iov_buffer const *__restrict self,
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		vm_copytophys(dst, ent.ive_base, ent.ive_size);
+		copytophys(dst, ent.ive_base, ent.ive_size);
 		if (ent.ive_size >= num_bytes)
 			break;
 		dst += ent.ive_size;
@@ -142,7 +141,7 @@ NOTHROW(KCALL iov_buffer_copytophys_nopf)(struct iov_buffer const *__restrict se
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		error = vm_copytophys_nopf(dst, ent.ive_base, ent.ive_size);
+		error = copytophys_nopf(dst, ent.ive_base, ent.ive_size);
 		if unlikely(error != 0)
 			return error + (num_bytes - ent.ive_size);
 		if (ent.ive_size >= num_bytes)
@@ -177,7 +176,7 @@ iov_buffer_memset(struct iov_buffer const *__restrict self,
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL iov_physbuffer_memset)(struct iov_physbuffer const *__restrict self,
-                                  uintptr_t dst_offset, int byte, size_t num_bytes) {
+                                     uintptr_t dst_offset, int byte, size_t num_bytes) {
 	struct iov_physentry ent;
 	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
 		if (dst_offset >= ent.ive_size) {
@@ -186,7 +185,7 @@ NOTHROW(KCALL iov_physbuffer_memset)(struct iov_physbuffer const *__restrict sel
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		vm_memsetphys(ent.ive_base + dst_offset, byte, ent.ive_size);
+		memsetphys(ent.ive_base + dst_offset, byte, ent.ive_size);
 		if (ent.ive_size >= num_bytes)
 			break;
 		num_bytes -= ent.ive_size;
@@ -217,8 +216,8 @@ iov_buffer_copyfrommem(struct iov_buffer const *__restrict self, uintptr_t dst_o
 
 PUBLIC NONNULL((1)) void KCALL
 iov_physbuffer_copyfrommem(struct iov_physbuffer const *__restrict self,
-                        uintptr_t dst_offset,
-                        USER CHECKED void const *src, size_t num_bytes)
+                           uintptr_t dst_offset,
+                           USER CHECKED void const *src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	struct iov_physentry ent;
 	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
@@ -228,7 +227,7 @@ iov_physbuffer_copyfrommem(struct iov_physbuffer const *__restrict self,
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		vm_copytophys(ent.ive_base + dst_offset, src, ent.ive_size);
+		copytophys(ent.ive_base + dst_offset, src, ent.ive_size);
 		if (ent.ive_size >= num_bytes)
 			break;
 		src = (byte_t const *)src + ent.ive_size;
@@ -265,8 +264,8 @@ iov_buffer_copytomem(struct iov_buffer const *__restrict self,
 
 PUBLIC NONNULL((1)) void KCALL
 iov_physbuffer_copytomem(struct iov_physbuffer const *__restrict self,
-                      USER CHECKED void *dst,
-                      uintptr_t src_offset, size_t num_bytes)
+                         USER CHECKED void *dst,
+                         uintptr_t src_offset, size_t num_bytes)
        THROWS(E_SEGFAULT) {
 	struct iov_physentry ent;
 	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
@@ -281,7 +280,7 @@ iov_physbuffer_copytomem(struct iov_physbuffer const *__restrict self,
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		vm_copyfromphys(dst, ent.ive_base, ent.ive_size);
+		copyfromphys(dst, ent.ive_base, ent.ive_size);
 		if (ent.ive_size >= num_bytes)
 			break;
 		dst = (byte_t *)dst + ent.ive_size;
@@ -291,8 +290,8 @@ iov_physbuffer_copytomem(struct iov_physbuffer const *__restrict self,
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL iov_physbuffer_copyfromphys)(struct iov_physbuffer const *__restrict self,
-                                        uintptr_t dst_offset,
-                                        physaddr_t src, size_t num_bytes) {
+                                           uintptr_t dst_offset,
+                                           physaddr_t src, size_t num_bytes) {
 	struct iov_physentry ent;
 	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
 		if (dst_offset != 0) {
@@ -306,7 +305,7 @@ NOTHROW(KCALL iov_physbuffer_copyfromphys)(struct iov_physbuffer const *__restri
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		vm_copyinphys(ent.ive_base, src, ent.ive_size);
+		copyinphys(ent.ive_base, src, ent.ive_size);
 		if (ent.ive_size >= num_bytes)
 			break;
 		src += ent.ive_size;
@@ -316,8 +315,8 @@ NOTHROW(KCALL iov_physbuffer_copyfromphys)(struct iov_physbuffer const *__restri
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL iov_physbuffer_copytophys)(struct iov_physbuffer const *__restrict self,
-                                      physaddr_t dst,
-                                      uintptr_t src_offset, size_t num_bytes) {
+                                         physaddr_t dst,
+                                         uintptr_t src_offset, size_t num_bytes) {
 	struct iov_physentry ent;
 	IOV_PHYSBUFFER_FOREACH_N(ent, self) {
 		if (src_offset != 0) {
@@ -331,7 +330,7 @@ NOTHROW(KCALL iov_physbuffer_copytophys)(struct iov_physbuffer const *__restrict
 		}
 		if (ent.ive_size > num_bytes)
 			ent.ive_size = num_bytes;
-		vm_copyinphys(dst, ent.ive_base, ent.ive_size);
+		copyinphys(dst, ent.ive_base, ent.ive_size);
 		if (ent.ive_size >= num_bytes)
 			break;
 		dst += ent.ive_size;
@@ -409,10 +408,10 @@ iov_buffer_copytovphys(struct iov_buffer const *__restrict src,
 
 PUBLIC NONNULL((1)) void KCALL
 iov_physbuffer_copytovmem(struct iov_physbuffer const *__restrict src,
-                       struct iov_buffer const *__restrict dst,
-                       uintptr_t dst_offset,
-                       uintptr_t src_offset,
-                       size_t num_bytes)
+                          struct iov_buffer const *__restrict dst,
+                          uintptr_t dst_offset,
+                          uintptr_t src_offset,
+                          size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	struct iov_entry dstent;
 	assert(iov_physbuffer_size(src) >= src_offset + num_bytes);
@@ -444,10 +443,10 @@ iov_physbuffer_copytovmem(struct iov_physbuffer const *__restrict src,
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL iov_physbuffer_copytovphys)(struct iov_physbuffer const *__restrict src,
-                                       struct iov_physbuffer const *__restrict dst,
-                                       uintptr_t dst_offset,
-                                       uintptr_t src_offset,
-                                       size_t num_bytes) {
+                                          struct iov_physbuffer const *__restrict dst,
+                                          uintptr_t dst_offset,
+                                          uintptr_t src_offset,
+                                          size_t num_bytes) {
 	struct iov_physentry dstent;
 	assert(iov_physbuffer_size(src) >= src_offset + num_bytes);
 	assert(iov_physbuffer_size(dst) >= dst_offset + num_bytes);

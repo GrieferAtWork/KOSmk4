@@ -34,7 +34,6 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>

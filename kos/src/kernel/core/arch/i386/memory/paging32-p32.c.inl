@@ -1101,7 +1101,7 @@ NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self,
 	if (result & P32_PAGE_F4MIB)
 		return (physaddr_t)((result & P32_PAGE_FADDR_4MIB) | P32_PDIR_PAGEINDEX_4MIB(virt_addr));
 	assertf(result & P32_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
-	result = vm_readphysl((physaddr_t)((result & P32_PAGE_FADDR_4KIB) + P32_PDIR_VEC1INDEX(virt_addr) * 4));
+	result = peekphysl((physaddr_t)((result & P32_PAGE_FADDR_4KIB) + P32_PDIR_VEC1INDEX(virt_addr) * 4));
 	return (physaddr_t)((result & P32_PAGE_FADDR_4KIB) | P32_PDIR_PAGEINDEX_4KIB(virt_addr));
 }
 
@@ -1115,7 +1115,7 @@ NOTHROW(KCALL pagedir_ismapped_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t
 		return false;
 	if (temp & P32_PAGE_F4MIB)
 		return true;
-	temp = vm_readphysl((temp & P32_PAGE_FADDR_4KIB) + P32_PDIR_VEC1INDEX_VPAGE(vpage) * 4);
+	temp = peekphysl((temp & P32_PAGE_FADDR_4KIB) + P32_PDIR_VEC1INDEX_VPAGE(vpage) * 4);
 	return !!(temp & P32_PAGE_FPRESENT);
 }
 

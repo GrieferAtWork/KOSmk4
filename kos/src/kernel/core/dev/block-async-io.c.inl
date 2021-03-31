@@ -27,7 +27,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/aio.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 
 #include <inttypes.h>
 
@@ -42,17 +42,13 @@ DECL_BEGIN
 
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
-#define DST_MEMSET(offset, byte, num_bytes) \
-	iov_physbuffer_memset(buf, offset, byte, num_bytes)
+#define DST_MEMSET(offset, byte, num_bytes) iov_physbuffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_VECTOR)
-#define DST_MEMSET(offset, byte, num_bytes) \
-	iov_buffer_memset(buf, offset, byte, num_bytes)
+#define DST_MEMSET(offset, byte, num_bytes) iov_buffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_PHYS)
-#define DST_MEMSET(offset, byte, num_bytes) \
-	vm_memsetphys((buf) + (offset), byte, num_bytes)
+#define DST_MEMSET(offset, byte, num_bytes) memsetphys((buf) + (offset), byte, num_bytes)
 #else /* ... */
-#define DST_MEMSET(offset, byte, num_bytes) \
-	memset((byte_t *)(buf) + (offset), byte, num_bytes)
+#define DST_MEMSET(offset, byte, num_bytes) memset((byte_t *)(buf) + (offset), byte, num_bytes)
 #endif /* !... */
 #endif /* DEFINE_IO_READ */
 

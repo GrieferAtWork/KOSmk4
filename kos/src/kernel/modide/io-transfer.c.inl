@@ -29,7 +29,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 #include <sched/tsc.h>
 
 #include <sys/io.h>
@@ -101,11 +101,11 @@ DECL_BEGIN
 #endif /* DEFINE_DATA_... */
 
 #if defined(DEFINE_RW_Read) && defined(_ATA_DATA_IS_PHYSICAL)
-#define _ATA_LOWLEVEL_IO(port, buf, count) vm_insw_phys(port, buf, count)
+#define _ATA_LOWLEVEL_IO(port, buf, count) insphysw(port, buf, count)
 #elif defined(DEFINE_RW_Read) && defined(_ATA_DATA_IS_VIRTUAL)
 #define _ATA_LOWLEVEL_IO(port, buf, count) insw(port, buf, count)
 #elif defined(DEFINE_RW_Write) && defined(_ATA_DATA_IS_PHYSICAL)
-#define _ATA_LOWLEVEL_IO(port, buf, count) vm_outsw_phys(port, buf, count)
+#define _ATA_LOWLEVEL_IO(port, buf, count) outsphysw(port, buf, count)
 #elif defined(DEFINE_RW_Write) && defined(_ATA_DATA_IS_VIRTUAL)
 #define _ATA_LOWLEVEL_IO(port, buf, count) \
 	do {                                   \
@@ -117,10 +117,10 @@ DECL_BEGIN
 #endif
 
 #ifdef _ATA_DATA_IS_PHYSICAL
-#define _ATA_DATA_READB(addr)          vm_readphysb((physaddr_t)(addr))
-#define _ATA_DATA_WRITEB(addr, value) vm_writephysb((physaddr_t)(addr), value)
+#define _ATA_DATA_READB(addr)         peekphysb((physaddr_t)(addr))
+#define _ATA_DATA_WRITEB(addr, value) pokephysb((physaddr_t)(addr), value)
 #elif defined(_ATA_DATA_IS_VIRTUAL)
-#define _ATA_DATA_READB(addr)          (*(u8 const *)(addr))
+#define _ATA_DATA_READB(addr)         (*(u8 const *)(addr))
 #define _ATA_DATA_WRITEB(addr, value) (void)(*(u8 *)(addr) = (value))
 #endif /* ... */
 

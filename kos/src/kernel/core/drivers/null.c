@@ -26,11 +26,11 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/phys.h>
 #include <kernel/rand.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/cred.h>
 
 #include <hybrid/unaligned.h>
@@ -92,14 +92,14 @@ PRIVATE NONNULL((1, 2)) void KCALL
 phys_mmap(struct character_device *__restrict UNUSED(self),
           struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	info->hmi_file = incref(&vm_datablock_physical);
+	info->hmi_file = incref(&mfile_phys);
 }
 
 PRIVATE NONNULL((1, 2)) void KCALL
 zero_mmap(struct character_device *__restrict UNUSED(self),
           struct handle_mmap_info *__restrict info)
 		THROWS(...) {
-	info->hmi_file = incref(&vm_datablock_anonymous_zero);
+	info->hmi_file = incref(&mfile_zero);
 }
 
 
@@ -140,7 +140,7 @@ PRIVATE NONNULL((1)) size_t KCALL
 mem_pread(struct character_device *__restrict UNUSED(self),
           USER CHECKED void *dst, size_t num_bytes,
           pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	vm_copyfromphys(dst, (physaddr_t)addr, num_bytes);
+	copyfromphys(dst, (physaddr_t)addr, num_bytes);
 	return num_bytes;
 }
 
@@ -148,7 +148,7 @@ PRIVATE NONNULL((1)) size_t KCALL
 mem_pwrite(struct character_device *__restrict UNUSED(self),
            USER CHECKED void const *src, size_t num_bytes,
            pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	vm_copytophys((physaddr_t)addr, src, num_bytes);
+	copytophys((physaddr_t)addr, src, num_bytes);
 	return num_bytes;
 }
 
@@ -348,7 +348,7 @@ port_wrl(struct vioargs *__restrict UNUSED(args),
 PRIVATE struct vio_operators const port_vio =
 VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&port_rdb, &port_rdw, &port_rdl, NULL),
                    VIO_CALLBACK_INIT_WRITE(&port_wrb, &port_wrw, &port_wrl, NULL));
-PRIVATE struct vm_datablock port_datablock = VM_DATABLOCK_INIT_VIO(&port_vio);
+PRIVATE struct mfile port_datablock = MFILE_INIT_VIO(&port_vio);
 
 #define PORT_MMAP_POINTER (&port_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL
@@ -394,7 +394,7 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb,
                                           &random_rdl,
                                           &random_rdq),
                    VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
-PRIVATE struct vm_datablock random_datablock = VM_DATABLOCK_INIT_VIO(&random_vio);
+PRIVATE struct vm_datablock random_datablock = MFILE_INIT_VIO(&random_vio);
 
 #define RANDOM_MMAP_POINTER (&random_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL
@@ -429,7 +429,7 @@ urandom_rdq(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 PRIVATE struct vio_operators const urandom_vio =
 VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&urandom_rdb, &urandom_rdw, &urandom_rdl, &urandom_rdq),
                    VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
-PRIVATE struct vm_datablock urandom_datablock = VM_DATABLOCK_INIT_VIO(&urandom_vio);
+PRIVATE struct vm_datablock urandom_datablock = MFILE_INIT_VIO(&urandom_vio);
 
 #define URANDOM_MMAP_POINTER (&urandom_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL

@@ -38,11 +38,11 @@
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/phys.h>
 #include <kernel/printk.h>
 #include <kernel/swap.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/rpc.h>
@@ -4595,7 +4595,7 @@ db_inode_loadpart(struct inode *__restrict self, pos_t daddr,
 			if unlikely(daddr >= filesize) {
 				/* Entirely out-of-bounds */
 				/* TODO: This can be skipped if the page was allocated from ZERO-memory! */
-				vm_memsetphys(buffer, 0, num_bytes);
+				memsetphys(buffer, 0, num_bytes);
 				return;
 			}
 			/* Partially out-of-bounds */
@@ -4603,7 +4603,7 @@ db_inode_loadpart(struct inode *__restrict self, pos_t daddr,
 			assert(num_oob_bytes < num_bytes);
 			num_bytes -= num_oob_bytes;
 			/* TODO: This can be skipped if the page was allocated from ZERO-memory! */
-			vm_memsetphys(buffer + num_bytes, 0, num_oob_bytes);
+			memsetphys(buffer + num_bytes, 0, num_oob_bytes);
 		}
 		aio_multihandle_generic_init(&hand);
 		TRY {

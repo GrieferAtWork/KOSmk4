@@ -35,12 +35,12 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
+#include <kernel/mman/phys-access.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 
@@ -1249,43 +1249,36 @@ _block_device_read_phys(struct block_device *__restrict self,
                         physaddr_t dst, size_t num_bytes,
                         pos_t device_position)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
-	uintptr_t backup;
-	byte_t *tramp;
-	bool is_first;
+	byte_t *buf;
+	PHYS_VARS;
+	IF_PHYS_IDENTITY(dst, num_bytes, {
+		block_device_read(self, PHYS_TO_IDENTITY(dst),
+		                  num_bytes, device_position);
+		return;
+	});
 	if unlikely(!num_bytes)
 		return;
-	is_first = true;
-	tramp    = THIS_TRAMPOLINE;
+	buf = phys_pushaddr(dst);
 	TRY {
 		for (;;) {
 			size_t page_bytes;
-			page_bytes = PAGESIZE - (dst & PAGEMASK);
+			page_bytes = PAGESIZE - ((uintptr_t)buf & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
-			if (is_first) {
-				backup = pagedir_push_mapone(tramp, dst & ~PAGEMASK,
-				                             PAGEDIR_MAP_FWRITE);
-				is_first = false;
-			} else {
-				pagedir_mapone(tramp, dst & ~PAGEMASK,
-				               PAGEDIR_MAP_FWRITE);
-			}
-			pagedir_syncone(tramp);
 			/* Copy memory. */
-			block_device_read(self,
-			                  tramp + ((ptrdiff_t)dst & PAGEMASK),
-			                  page_bytes, device_position);
+			block_device_read(self, buf, page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;
 			num_bytes -= page_bytes;
 			dst += page_bytes;
 			device_position += (pos_t)page_bytes;
+			buf = phys_loadpage(dst);
 		}
 	} EXCEPT {
-		pagedir_pop_mapone(tramp, backup);
+		phys_pop();
 		RETHROW();
 	}
-	pagedir_pop_mapone(tramp, backup);
+	phys_pop();
 }
 
 PUBLIC NONNULL((1)) void KCALL
@@ -1293,43 +1286,36 @@ _block_device_write_phys(struct block_device *__restrict self,
                          physaddr_t src, size_t num_bytes,
                          pos_t device_position)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
-	pagedir_pushval_t backup;
-	byte_t *tramp;
-	bool is_first;
+	byte_t const *buf;
+	PHYS_VARS;
+	IF_PHYS_IDENTITY(src, num_bytes, {
+		block_device_write(self, PHYS_TO_IDENTITY(src),
+		                   num_bytes, device_position);
+		return;
+	});
 	if unlikely(!num_bytes)
 		return;
-	is_first = true;
-	tramp    = THIS_TRAMPOLINE;
+	buf = phys_pushaddr(src);
 	TRY {
 		for (;;) {
 			size_t page_bytes;
-			page_bytes = PAGESIZE - (src & PAGEMASK);
+			page_bytes = PAGESIZE - ((uintptr_t)buf & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
-			if (is_first) {
-				backup = pagedir_push_mapone(tramp, src & ~PAGEMASK,
-				                             PAGEDIR_MAP_FWRITE);
-				is_first = false;
-			} else {
-				pagedir_mapone(tramp, src & ~PAGEMASK,
-				               PAGEDIR_MAP_FWRITE);
-			}
-			pagedir_syncone(tramp);
 			/* Copy memory. */
-			block_device_write(self,
-			                   tramp + ((ptrdiff_t)src & PAGEMASK),
-			                   page_bytes, device_position);
+			block_device_write(self, buf, page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;
 			num_bytes -= page_bytes;
 			src += page_bytes;
 			device_position += (pos_t)page_bytes;
+			buf = phys_loadpage(src);
 		}
 	} EXCEPT {
-		pagedir_pop_mapone(tramp, backup);
+		phys_pop();
 		RETHROW();
 	}
-	pagedir_pop_mapone(tramp, backup);
+	phys_pop();
 }
 
 

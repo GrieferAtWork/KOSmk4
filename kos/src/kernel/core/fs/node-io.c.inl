@@ -25,7 +25,7 @@
 #include <kernel/aio.h>
 #include <kernel/iovec.h>
 #include <kernel/swap.h>
-#include <kernel/vm/phys.h>
+#include <kernel/mman/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
