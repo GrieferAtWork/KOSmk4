@@ -198,14 +198,8 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 
 	/* Reserve the associated address range to prevent the kernel
 	 * from re-assigning its  address range  for other  purposes. */
-#ifdef CONFIG_USE_NEW_VM
 	last_heap->sh_node.mn_minaddr = (byte_t *)new_heap;
 	last_heap->sh_node.mn_maxaddr = (byte_t *)new_heap + min_size - 1;
-#else /* CONFIG_USE_NEW_VM */
-	last_heap->sh_node.vn_node.a_vmin   = PAGEID_ENCODE((byte_t *)new_heap);
-	last_heap->sh_node.vn_node.a_vmax   = PAGEID_ENCODE((byte_t *)new_heap + min_size - 1);
-	last_heap->sh_node.vn_block         = NULL;
-#endif /* !CONFIG_USE_NEW_VM */
 	last_heap->sh_node.vn_prot          = VM_PROT_READ | VM_PROT_WRITE;
 	last_heap->sh_node.vn_flags         = VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE;
 	last_heap->sh_node.vn_vm            = &vm_kernel;
@@ -214,9 +208,6 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	last_heap->sh_node.vn_fsname        = NULL;
 	last_heap->sh_node.vn_link.ln_pself = NULL;
 	last_heap->sh_node.vn_link.ln_next  = NULL;
-#ifndef CONFIG_USE_NEW_VM
-	last_heap->sh_node.vn_guard = 0;
-#endif /* !CONFIG_USE_NEW_VM */
 	vm_node_insert(&last_heap->sh_node);
 	/* Remember the new heap. */
 	new_heap->sh_next  = NULL;

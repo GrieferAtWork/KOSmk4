@@ -632,12 +632,7 @@ NOTHROW(KCALL fs_filesystems_remove)(struct superblock *__restrict block) {
 
 
 
-#ifdef CONFIG_USE_NEW_VM
 #define INODE_SCOPED_LOCK_FOR(self) ((struct inode *)(self))
-#else /* CONFIG_USE_NEW_VM */
-#define INODE_SCOPED_LOCK_FOR(self) ((struct vm_datablock *)(self))
-#endif /* !CONFIG_USE_NEW_VM */
-
 
 /* INODE INTERFACE */
 PUBLIC NONNULL((1)) bool KCALL
@@ -4373,14 +4368,12 @@ superblock_open(struct superblock_type *__restrict type,
 			result = (struct superblock *)resptr.hp_ptr;
 			result->mf_refcnt = 1;
 			result->mf_ops      = &inode_datablock_type;
-#ifdef CONFIG_USE_NEW_VM
 			atomic_rwlock_cinit(&result->mf_lock);
 			assert(result->mf_vio == NULL);
 			assert(result->mf_parts == NULL);
 			sig_cinit(&result->mf_initdone);
 			assert(SLIST_EMPTY(&result->mf_lockops));
 			assert(SLIST_EMPTY(&result->mf_changed));
-#endif /* CONFIG_USE_NEW_VM */
 			rwlock_cinit(__inode_lock(result));
 			result->i_super     = result;
 			result->i_heapsize  = resptr.hp_siz;
@@ -4452,14 +4445,6 @@ superblock_open(struct superblock_type *__restrict type,
 		assert(result->db_refcnt != 0);
 		assert(result->i_type != NULL);
 		assert(result->s_type == type);
-#ifndef CONFIG_USE_NEW_VM
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-		result->db_addrshift = PAGESHIFT - result->db_pageshift;
-		result->db_pagealign = (size_t)1 << result->db_pageshift;
-		result->db_pagemask  = result->db_pagealign - 1;
-		result->db_pagesize  = (size_t)PAGESIZE >> result->db_pageshift;
-#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
-#endif /* !CONFIG_USE_NEW_VM */
 		/* Add the new superblock to the chain of known file-systems. */
 		OLD_SLIST_INSERT(fs_filesystems.f_superblocks, result, s_filesystems);
 	} EXCEPT {
@@ -4591,7 +4576,6 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 }
 
 
-#ifdef CONFIG_USE_NEW_VM
 PRIVATE NONNULL((1)) void KCALL
 db_inode_loadpart(struct inode *__restrict self, pos_t daddr,
                   physaddr_t buffer, size_t num_bytes) {
@@ -4678,100 +4662,6 @@ db_inode_savepart(struct inode *__restrict self, pos_t daddr,
 		aio_multihandle_generic_fini(&hand);
 	}
 }
-#else /* CONFIG_USE_NEW_VM */
-PRIVATE NONNULL((1)) void KCALL
-db_inode_loadpart(struct inode *__restrict self, datapage_t start,
-                  physaddr_t buffer, size_t num_data_pages) {
-	struct inode_type *type = self->i_type;
-	assert(type);
-	if (!type->it_file.f_pread)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_READ);
-	inode_loadattr(self);
-	{
-		size_t num_bytes;
-		pos_t daddr, filesize;
-		struct aio_multihandle_generic hand;
-		daddr = VM_DATABLOCK_DPAGE2DADDR(self, start);
-		num_bytes = num_data_pages << VM_DATABLOCK_ADDRSHIFT(self);
-		filesize  = self->i_filesize;
-		COMPILER_READ_BARRIER();
-		/* Deal with out-of-bound reads. */
-		if unlikely(daddr + num_bytes >= filesize) {
-			size_t num_oob_bytes;
-			if unlikely(daddr >= filesize) {
-				/* Entirely out-of-bounds */
-				/* TODO: This can be skipped if the page was allocated from ZERO-memory! */
-				vm_memsetphys(buffer, 0, num_bytes);
-				return;
-			}
-			/* Partially out-of-bounds */
-			num_oob_bytes = (size_t)((daddr + num_bytes) - filesize);
-			assert(num_oob_bytes < num_bytes);
-			num_bytes -= num_oob_bytes;
-			/* TODO: This can be skipped if the page was allocated from ZERO-memory! */
-			vm_memsetphys(buffer + num_bytes, 0, num_oob_bytes);
-		}
-		aio_multihandle_generic_init(&hand);
-		TRY {
-			SCOPED_READLOCK(INODE_SCOPED_LOCK_FOR(self));
-			(*type->it_file.f_pread)(self, buffer, num_bytes, daddr, &hand);
-			aio_multihandle_done(&hand);
-		} EXCEPT {
-			aio_multihandle_fail(&hand);
-		}
-		TRY {
-			aio_multihandle_generic_waitfor(&hand);
-			aio_multihandle_generic_checkerror(&hand);
-		} EXCEPT {
-			aio_multihandle_generic_fini(&hand);
-			RETHROW();
-		}
-		aio_multihandle_generic_fini(&hand);
-	}
-}
-
-PRIVATE NONNULL((1)) void KCALL
-db_inode_savepart(struct inode *__restrict self, datapage_t start,
-                  physaddr_t buffer, size_t num_data_pages) {
-	struct inode_type *type = self->i_type;
-	assert(type);
-	if (!type->it_file.f_pwrite)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_WRITE);
-	{
-		size_t num_bytes;
-		pos_t daddr, filesize;
-		struct aio_multihandle_generic hand;
-		daddr = VM_DATABLOCK_DPAGE2DADDR(self, start);
-		num_bytes = num_data_pages << VM_DATABLOCK_ADDRSHIFT(self);
-		filesize  = self->i_filesize;
-		COMPILER_READ_BARRIER();
-		/* Deal with out-of-bound writes. */
-		if unlikely(daddr + num_bytes > filesize) {
-			if unlikely(daddr >= filesize)
-				return; /* Entirely out-of-bounds */
-			/* Partially out-of-bounds */
-			assert((size_t)(filesize - daddr) < num_bytes);
-			num_bytes = (size_t)(filesize - daddr);
-		}
-		aio_multihandle_generic_init(&hand);
-		TRY {
-			SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
-			(*type->it_file.f_pwrite)(self, buffer, num_bytes, daddr, &hand);
-			aio_multihandle_done(&hand);
-		} EXCEPT {
-			aio_multihandle_fail(&hand);
-		}
-		TRY {
-			aio_multihandle_generic_waitfor(&hand);
-			aio_multihandle_generic_checkerror(&hand);
-		} EXCEPT {
-			aio_multihandle_generic_fini(&hand);
-			RETHROW();
-		}
-		aio_multihandle_generic_fini(&hand);
-	}
-}
-#endif /* !CONFIG_USE_NEW_VM */
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL db_inode_changed)(struct inode *__restrict self,

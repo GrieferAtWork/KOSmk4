@@ -174,57 +174,6 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-#ifdef CONFIG_DEBUG_HEAP
-#ifndef CONFIG_USE_NEW_VM
-PRIVATE void
-NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
-                                  datapage_t UNUSED(start),
-                                  physaddr_t buffer,
-                                  size_t num_data_pages) {
-	pagedir_pushval_t backup;
-	byte_t *tramp;
-	HEAP_ASSERT((buffer & PAGEMASK) == 0);
-	HEAP_ASSERT(num_data_pages != 0);
-	tramp  = THIS_TRAMPOLINE;
-	backup = pagedir_push_mapone(tramp, buffer,
-	                             PAGEDIR_MAP_FREAD |
-	                             PAGEDIR_MAP_FWRITE);
-	for (;;) {
-		pagedir_syncone(tramp);
-		memsetl(tramp, DEBUGHEAP_FRESH_MEMORY, PAGESIZE / 4);
-		if (!--num_data_pages)
-			break;
-		buffer += PAGESIZE;
-		pagedir_mapone(tramp, buffer,
-		               PAGEDIR_MAP_FREAD |
-		               PAGEDIR_MAP_FWRITE);
-	}
-	pagedir_pop_mapone(tramp, backup);
-}
-
-PUBLIC struct vm_datablock_type vm_datablock_debugheap_type = {
-	/* .dt_destroy  = */ NULL,
-	/* .dt_initpart = */ NULL,
-	/* .dt_loadpart = */ &debug_pat_loadpart,
-	/* .dt_savepart = */ NULL,
-};
-
-PUBLIC struct vm_datablock vm_datablock_debugheap = {
-	/* .db_refcnt = */ ((refcnt_t)-1)/2,
-	/* .db_lock   = */ RWLOCK_INIT,
-	/* .db_type   = */ &vm_datablock_debugheap_type,
-#ifdef LIBVIO_CONFIG_ENABLED
-	/* .db_vio    = */ NULL,
-#endif /* LIBVIO_CONFIG_ENABLED */
-	/* .db_parts  = */ MFILE_PARTS_ANONYMOUS,
-	VM_DATABLOCK_INIT_PAGEINFO(0)
-};
-
-DEFINE_DBG_BZERO_OBJECT(vm_datablock_debugheap.db_lock);
-#endif /* !CONFIG_USE_NEW_VM */
-#endif /* CONFIG_DEBUG_HEAP */
-
-
 /* Unlock the kernel heaps while inside of the debugger. */
 DEFINE_DBG_BZERO_VECTOR(&kernel_heaps[0].h_lock,
                         __GFP_HEAPCOUNT,

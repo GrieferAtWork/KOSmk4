@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/mman.h> /* Needed for `struct mman' for `mman_findunmapped_in_usertree()' */
 #include <kernel/paging.h>
 #include <kernel/types.h>
@@ -228,6 +225,5 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_UNMAPPED_H */

@@ -87,12 +87,7 @@ handle_datablock_pread(struct vm_datablock *__restrict self,
 		(void)mode;
 		return inode_read((struct inode *)self, dst, num_bytes, addr);
 	}
-#ifdef CONFIG_USE_NEW_VM
 	return 0;
-#else /* CONFIG_USE_NEW_VM */
-	vm_datablock_read(self, dst, num_bytes, addr);
-	return num_bytes;
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 INTERN NONNULL((1)) size_t KCALL
@@ -105,12 +100,7 @@ handle_datablock_pwrite(struct vm_datablock *__restrict self,
 		inode_write((struct inode *)self, src, num_bytes, addr);
 		return num_bytes;
 	}
-#ifdef CONFIG_USE_NEW_VM
 	return 0;
-#else /* CONFIG_USE_NEW_VM */
-	vm_datablock_write(self, src, num_bytes, addr);
-	return num_bytes;
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
@@ -122,12 +112,7 @@ handle_datablock_preadv(struct vm_datablock *__restrict self,
 		(void)mode;
 		return inode_readv((struct inode *)self, dst, num_bytes, addr);
 	}
-#ifdef CONFIG_USE_NEW_VM
 	return 0;
-#else /* CONFIG_USE_NEW_VM */
-	vm_datablock_readv(self, dst, num_bytes, addr);
-	return num_bytes;
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 INTERN NONNULL((1)) size_t KCALL
@@ -140,12 +125,7 @@ handle_datablock_pwritev(struct vm_datablock *__restrict self,
 		inode_writev((struct inode *)self, src, num_bytes, addr);
 		return num_bytes;
 	}
-#ifdef CONFIG_USE_NEW_VM
 	return 0;
-#else /* CONFIG_USE_NEW_VM */
-	vm_datablock_writev(self, src, num_bytes, addr);
-	return num_bytes;
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 
@@ -188,12 +168,8 @@ handle_datablock_pollconnect(struct vm_datablock *__restrict self,
 	if (self->db_type->dt_handle_pollconnect) {
 		(*self->db_type->dt_handle_pollconnect)(self, what);
 	} else if (what & (POLLOUTMASK | POLLINMASK)) {
-#ifdef CONFIG_USE_NEW_VM
 		if (vm_datablock_isinode(self))
 			rwlock_pollconnect(__inode_lock((struct inode *)self));
-#else /* CONFIG_USE_NEW_VM */
-		rwlock_pollconnect(&self->db_lock);
-#endif /* !CONFIG_USE_NEW_VM */
 	}
 }
 
@@ -205,120 +181,23 @@ handle_datablock_polltest(struct vm_datablock *__restrict self,
 	if (self->db_type->dt_handle_polltest)
 		return (*self->db_type->dt_handle_polltest)(self, what);
 	if (what & POLLOUTMASK) {
-#ifdef CONFIG_USE_NEW_VM
 		if (vm_datablock_isinode(self)) {
 			if (rwlock_canwrite(__inode_lock((struct inode *)self)))
 				return POLLOUTMASK | POLLINMASK;
 		} else {
 			return POLLOUTMASK | POLLINMASK;
 		}
-#else /* CONFIG_USE_NEW_VM */
-		if (rwlock_canwrite(&self->db_lock))
-			return POLLOUTMASK | POLLINMASK;
-#endif /* !CONFIG_USE_NEW_VM */
 	} else if (what & POLLINMASK) {
-#ifdef CONFIG_USE_NEW_VM
 		if (vm_datablock_isinode(self)) {
 			if (rwlock_canread(__inode_lock((struct inode *)self)))
 				return POLLINMASK;
 		} else {
 			return POLLINMASK;
 		}
-#else /* CONFIG_USE_NEW_VM */
-		if (rwlock_canread(&self->db_lock))
-			return POLLINMASK;
-#endif /* !CONFIG_USE_NEW_VM */
 	}
 	return 0;
 }
 
-
-#ifndef CONFIG_USE_NEW_VM
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL datablock_stat_parts)(struct vm_datapart *__restrict self,
-                                    struct hop_datablock_stat *__restrict st) {
-	u64 i, num_dpages;
-	uintptr_half_t flags;
-again:
-	++st->ds_part_mapped;
-	num_dpages = vm_datapart_numdpages(self);
-	st->ds_part_mapped_pages += num_dpages;
-	switch (ATOMIC_READ(self->dp_state)) {
-
-	case VM_DATAPART_STATE_INCORE:
-		++st->ds_part_st_incore;
-		st->ds_part_st_incore_pages += num_dpages;
-do_track_ramblocks:
-		if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0)
-			++st->ds_part_ram_blocks;
-		else {
-			st->ds_part_ram_blocks += ATOMIC_READ(self->dp_ramdata.rd_blockc);
-		}
-		break;
-
-	case VM_DATAPART_STATE_LOCKED:
-		++st->ds_part_st_locked;
-		st->ds_part_st_locked_pages += num_dpages;
-		goto do_track_ramblocks;
-
-#ifndef CONFIG_NO_SWAP
-	case VM_DATAPART_STATE_INSWAP:
-		++st->ds_part_st_inswap;
-		st->ds_part_st_inswap_pages += num_dpages;
-		if (self->dp_swpdata.sd_blockv == &self->dp_swpdata.sd_block0)
-			++st->ds_part_swap_blocks;
-		else {
-			st->ds_part_swap_blocks += ATOMIC_READ(self->dp_swpdata.sd_blockc);
-		}
-		break;
-#endif /* !CONFIG_NO_SWAP */
-
-	default: break;
-	}
-	flags = ATOMIC_READ(self->dp_flags);
-	if (flags & VM_DATAPART_FLAG_LOCKED) {
-		++st->ds_part_f_locked;
-		st->ds_part_f_locked_pages += num_dpages;
-	}
-	if (flags & VM_DATAPART_FLAG_CHANGED) {
-		++st->ds_part_f_changed;
-		st->ds_part_f_changed_pages += num_dpages;
-	}
-	for (i = 0; i < num_dpages; ++i) {
-		uintptr_t page_state;
-		page_state = vm_datapart_getstate(self, i);
-		switch (page_state) {
-
-		case VM_DATAPART_PPP_UNINITIALIZED:
-			++st->ds_part_uninit_pages;
-			break;
-
-		case VM_DATAPART_PPP_INITIALIZING:
-			break;
-
-		case VM_DATAPART_PPP_INITIALIZED:
-			++st->ds_part_init_pages;
-			break;
-
-		case VM_DATAPART_PPP_HASCHANGED:
-			++st->ds_part_changed_pages;
-			break;
-
-		default: __builtin_unreachable();
-		}
-	}
-	if (self->dp_tree.a_min) {
-		if (self->dp_tree.a_max)
-			datablock_stat_parts(self->dp_tree.a_max, st);
-		self = self->dp_tree.a_min;
-		goto again;
-	}
-	if (self->dp_tree.a_max) {
-		self = self->dp_tree.a_max;
-		goto again;
-	}
-}
-#endif /* !CONFIG_USE_NEW_VM */
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_datablock_ioctl(struct vm_datablock *__restrict self,
@@ -339,50 +218,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
                      iomode_t mode) {
 	switch (cmd) {
 
-#ifndef CONFIG_USE_NEW_VM
-	case HOP_DATABLOCK_STAT: {
-		struct hop_datablock_stat st;
-		struct vm_datapart *parts;
-		memset(&st, 0, sizeof(st));
-		st.ds_struct_size = sizeof(st);
-#ifdef LIBVIO_CONFIG_ENABLED
-		if (self->db_vio)
-			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_ISVIO;
-#endif /* LIBVIO_CONFIG_ENABLED */
-		if (self->db_type->dt_initpart)
-			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_INIT;
-		if (self->db_type->dt_loadpart)
-			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_LOAD;
-		if (self->db_type->dt_savepart)
-			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_SAVE;
-		if (self->db_type->dt_changed)
-			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_CHANGE;
-		st.ds_pageshift = VM_DATABLOCK_PAGESHIFT(self);
-		sync_read(self);
-		parts = ATOMIC_READ(self->db_parts);
-		if (!parts)
-			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_ISEMPTY;
-		else if (parts == MFILE_PARTS_ANONYMOUS)
-			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_ISANON;
-		else {
-			datablock_stat_parts(parts, &st);
-		}
-		sync_endread(self);
-
-		COMPILER_BARRIER();
-		{
-			struct hop_datablock_stat *info;
-			size_t info_size;
-			info = (struct hop_datablock_stat *)arg;
-			validate_readwrite(info, sizeof(struct hop_datablock_stat));
-			info_size = ATOMIC_READ(info->ds_struct_size);
-			if (info_size != sizeof(struct hop_datablock_stat))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), info_size);
-			memcpy(info, &st, sizeof(struct hop_datablock_stat));
-		}
-	}	break;
-#endif /* !CONFIG_USE_NEW_VM */
-
 	case HOP_DATABLOCK_SYNCALL: {
 		datapage_t count;
 		count = vm_datablock_sync(self);
@@ -392,37 +227,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		}
 	}	break;
 
-#ifndef CONFIG_USE_NEW_VM
-	case HOP_DATABLOCK_SYNCPAGES: {
-		struct hop_datablock_syncpages *range;
-		size_t struct_size;
-		range = (struct hop_datablock_syncpages *)arg;
-		validate_readwrite(range, sizeof(struct hop_datablock_syncpages));
-		struct_size = ATOMIC_READ(range->dsp_struct_size);
-		if (struct_size != sizeof(struct hop_datablock_syncpages))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), struct_size);
-		range->dsp_count = (u64)vm_datablock_sync(self,
-		                                          (datapage_t)range->dsp_minpage,
-		                                          (datapage_t)range->dsp_maxpage);
-	}	break;
-
-	case HOP_DATABLOCK_SYNCBYTES: {
-		struct hop_datablock_syncbytes *range;
-		size_t struct_size;
-		range = (struct hop_datablock_syncbytes *)arg;
-		validate_readwrite(range, sizeof(struct hop_datablock_syncbytes));
-		struct_size = ATOMIC_READ(range->dsb_struct_size);
-		if (struct_size != sizeof(struct hop_datablock_syncbytes))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), struct_size);
-		range->dsb_count = (u64)vm_datablock_sync(self,
-		                                          (datapage_t)range->dsb_minbyte >> VM_DATABLOCK_ADDRSHIFT(self),
-		                                          (datapage_t)((range->dsb_maxbyte +
-		                                                        VM_DATABLOCK_PAGESIZE(self)) >>
-		                                                       VM_DATABLOCK_ADDRSHIFT(self)))
-		                   << VM_DATABLOCK_ADDRSHIFT(self);
-	}	break;
-#endif /* !CONFIG_USE_NEW_VM */
-
 	case HOP_DATABLOCK_ANONYMIZE:
 		/* Need write permissions. */
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
@@ -430,66 +234,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		validate_writable(arg, sizeof(int));
 		*(int *)arg = vm_datablock_anonymize(self) ? 1 : 0;
 		break;
-
-#ifndef CONFIG_USE_NEW_VM
-	case HOP_DATABLOCK_DEANONYMIZE:
-		require(CAP_DATABLOCK_DEANONYMIZE);
-		validate_writable(arg, sizeof(int));
-		/* Ensure that the given datablock allows for being deanonymized. */
-		if (!vm_datablock_allow_deanonymize(self))
-			THROW(E_INVALID_CONTEXT);
-		*(int *)arg = vm_datablock_deanonymize(self) ? 1 : 0;
-		break;
-#endif /* !CONFIG_USE_NEW_VM */
-
-#ifndef CONFIG_USE_NEW_VM
-	case HOP_DATABLOCK_OPEN_PART:
-	case HOP_DATABLOCK_OPEN_PART_EXACT: {
-		size_t struct_size;
-		struct hop_datablock_openpart *data;
-		REF struct vm_datapart *part;
-		struct handle hnd;
-		validate_readwrite(arg, sizeof(struct hop_datablock_openpart));
-		data        = (struct hop_datablock_openpart *)arg;
-		struct_size = ATOMIC_READ(data->dop_struct_size);
-		if (struct_size != sizeof(struct hop_datablock_openpart))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_openpart), struct_size);
-		require(CAP_DATABLOCK_OPEN_PART);
-		part = cmd == HOP_DATABLOCK_OPEN_PART_EXACT
-		       ? vm_paged_datablock_locatepart_exact(self,
-		                                             (pageid64_t)data->dop_pageno,
-		                                             (size_t)data->dop_pages_hint)
-		       : vm_paged_datablock_locatepart(self,
-		                                       (pageid64_t)data->dop_pageno,
-		                                       (size_t)data->dop_pages_hint);
-		FINALLY_DECREF_UNLIKELY(part);
-		COMPILER_WRITE_BARRIER();
-		data->dop_pageno = (u64)vm_datapart_startvpage(part);
-		COMPILER_WRITE_BARRIER();
-		hnd.h_type = HANDLE_TYPE_DATAPART;
-		hnd.h_mode = mode;
-		hnd.h_data = part;
-		return handle_installhop(&data->dop_openfd, hnd);
-	}	break;
-
-	case HOP_DATABLOCK_HASCHANGED: {
-		size_t struct_size;
-		struct hop_datablock_haschanged *data;
-		bool haschanged;
-		validate_readwrite(arg, sizeof(struct hop_datablock_haschanged));
-		data        = (struct hop_datablock_haschanged *)arg;
-		struct_size = ATOMIC_READ(data->dhc_struct_size);
-		if (struct_size != sizeof(struct hop_datablock_haschanged))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_haschanged), struct_size);
-		haschanged = vm_datablock_haschanged(self,
-		                                     VM_DATABLOCK_DADDR2DPAGE(self, (pos_t)data->dhc_minbyte),
-		                                     VM_DATABLOCK_DADDR2DPAGE(self, (pos_t)data->dhc_maxbyte));
-		COMPILER_WRITE_BARRIER();
-		data->dhc_result = haschanged ? HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE
-		                              : HOP_DATABLOCK_HASCHANGED_FLAG_UNCHANGED;
-		COMPILER_WRITE_BARRIER();
-	}	break;
-#endif /* !CONFIG_USE_NEW_VM */
 
 	case HOP_DATABLOCK_OPEN_FUTEX:
 	case HOP_DATABLOCK_OPEN_FUTEX_EXISTING: {
@@ -1308,7 +1052,6 @@ NOTHROW(KCALL vm_datablock_count_part)(struct vm_datapart const *__restrict self
 	size_t result = 0;
 again:
 	++result;
-#ifdef CONFIG_USE_NEW_VM
 	assert(!mpart_isanon(self));
 	if (self->mp_filent.rb_lhs) {
 		if (self->mp_filent.rb_rhs)
@@ -1320,18 +1063,6 @@ again:
 		self = self->mp_filent.rb_rhs;
 		goto again;
 	}
-#else /* CONFIG_USE_NEW_VM */
-	if (self->dp_tree.a_min) {
-		if (self->dp_tree.a_max)
-			result += vm_datablock_count_part(self->dp_tree.a_max);
-		self = self->dp_tree.a_min;
-		goto again;
-	}
-	if (self->dp_tree.a_max) {
-		self = self->dp_tree.a_max;
-		goto again;
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 	return result;
 }
 

@@ -178,7 +178,6 @@ mpart_create_lockram(size_t num_pages) {
 	REF struct mpart *result;
 	result = (struct mpart *)kmalloc(sizeof(struct mpart),
 	                                 GFP_LOCKED | GFP_PREFLT);
-#ifdef CONFIG_USE_NEW_VM
 	result->mp_refcnt = 1;
 	result->mp_flags  = (MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                     MPART_F_MLOCK_FROZEN | MPART_F_MLOCK);
@@ -201,29 +200,6 @@ mpart_create_lockram(size_t num_pages) {
 		kfree(result);
 		RETHROW();
 	}
-#else /* CONFIG_USE_NEW_VM */
-	result->dp_refcnt = 1;
-	shared_rwlock_init(&result->dp_lock);
-	DBG_memset(&result->dp_tree.a_min, sizeof(result->dp_tree.a_min));
-	DBG_memset(&result->dp_tree.a_max, sizeof(result->dp_tree.a_max));
-	result->dp_tree.a_vmin = 0;
-	result->dp_tree.a_vmax = (datapage_t)(num_pages - 1);
-	result->dp_crefs = NULL;
-/*	DBG_memset(&result->dp_srefs, 0xcc, sizeof(result->dp_srefs)); */ /* Initialized by the caller */
-	result->dp_stale = NULL;
-	result->dp_block = incref(&vm_datablock_anonymous_zero);
-	result->dp_flags = VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_HEAPPPP | VM_DATAPART_FLAG_KERNPRT;
-	result->dp_state = VM_DATAPART_STATE_LOCKED;
-	result->dp_pprop_p = NULL;
-	result->dp_futex   = NULL;
-	/* Allocate RAM for the new datapart. */
-	TRY {
-		vm_datapart_do_allocram(result);
-	} EXCEPT {
-		kfree(result);
-		RETHROW();
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 	return result;
 }
 
@@ -239,7 +215,6 @@ mnode_create_lockram(size_t num_pages) {
 		destroy(part);
 		RETHROW();
 	}
-#ifdef CONFIG_USE_NEW_VM
 	result->mn_flags = MNODE_F_PWRITE | MNODE_F_PREAD |
 	                   MNODE_F_SHARED | MNODE_F_NOSPLIT |
 	                   MNODE_F_NOMERGE | MNODE_F_KERNPART |
@@ -254,19 +229,6 @@ mnode_create_lockram(size_t num_pages) {
 	result->_mn_module      = NULL;
 	part->mp_share.lh_first = result;
 	LIST_ENTRY_UNBOUND_INIT(&result->mn_writable);
-#else /* CONFIG_USE_NEW_VM */
-	result->vn_prot          = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
-	part->dp_srefs           = result;
-	result->vn_link.ln_pself = &part->dp_srefs;
-	result->vn_link.ln_next  = NULL;
-	result->vn_flags         = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE;
-	result->vn_vm            = &vm_kernel;
-	result->vn_part          = part;
-	result->vn_block         = incref(&vm_datablock_anonymous_zero);
-	result->vn_fspath        = NULL;
-	result->vn_fsname        = NULL;
-	result->vn_guard         = 0;
-#endif /* !CONFIG_USE_NEW_VM */
 	return result;
 }
 
@@ -391,7 +353,6 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	cpu_node2 = (struct mnode *)&FORCPU(result, thiscpu_x86_iobnode);
 	vm_node_setminaddr(cpu_node2, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes);
 	vm_node_setmaxaddr(cpu_node2, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + PAGESIZE - 1);
-#ifdef CONFIG_USE_NEW_VM
 	cpu_node2->mn_flags = MNODE_F_PWRITE | MNODE_F_PREAD |
 	                      MNODE_F_SHARED | MNODE_F_NOSPLIT |
 	                      MNODE_F_NOMERGE | MNODE_F_KERNPART |
@@ -403,16 +364,6 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	cpu_node2->mn_partoff = 0;
 	DBG_memset(&cpu_node2->mn_writable, 0xcc, sizeof(cpu_node2->mn_writable));
 	cpu_node2->_mn_module = 0;
-#else /* CONFIG_USE_NEW_VM */
-	cpu_node2->vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_PRIVATE;
-	cpu_node2->vn_flags  = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED;
-	cpu_node2->vn_vm     = &vm_kernel;
-	cpu_node2->vn_part   = NULL; /* Reservation */
-	cpu_node2->vn_block  = NULL; /* Reservation */
-	cpu_node2->vn_fspath = NULL;
-	cpu_node2->vn_fsname = NULL;
-	cpu_node2->vn_guard  = 0;
-#endif /* !CONFIG_USE_NEW_VM */
 	DBG_memset(&cpu_node2->mn_link, 0xcc, sizeof(cpu_node2->mn_link));
 
 	/* Insert the IOB VM node into the kernel VM. */
@@ -600,11 +551,7 @@ i386_allocate_secondary_cores(void) {
 #endif /* !__x86_64__ */
 		}
 
-#ifdef CONFIG_USE_NEW_VM
 		FORTASK(altidle, this_kernel_stackpart_).mp_maxaddr = (pos_t)(KERNEL_IDLE_STACKSIZE - 1);
-#else /* CONFIG_USE_NEW_VM */
-		FORTASK(altidle, this_kernel_stackpart_).dp_tree.a_vmax = (datapage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
-#endif /* !CONFIG_USE_NEW_VM */
 		/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
 		FORTASK(altidle, this_kernel_stacknode_).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
 

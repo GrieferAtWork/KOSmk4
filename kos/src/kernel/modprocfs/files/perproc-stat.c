@@ -110,7 +110,6 @@ NOTHROW(FCALL mnode_tree_get_total_mapped_bytes)(struct mnode const *root,
 again:
 	if (root != skipme)
 		result += mnode_getsize(root);
-#ifdef CONFIG_USE_NEW_VM
 	if (root->mn_mement.rb_lhs) {
 		if (root->mn_mement.rb_rhs)
 			result += mnode_tree_get_total_mapped_bytes(root->mn_mement.rb_rhs, skipme);
@@ -121,18 +120,6 @@ again:
 		root = root->mn_mement.rb_rhs;
 		goto again;
 	}
-#else /* CONFIG_USE_NEW_VM */
-	if (root->vn_node.a_min) {
-		if (root->vn_node.a_max)
-			result += mnode_tree_get_total_mapped_bytes(root->vn_node.a_max, skipme);
-		root = root->vn_node.a_min;
-		goto again;
-	}
-	if (root->vn_node.a_max) {
-		root = root->vn_node.a_max;
-		goto again;
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 	return result;
 }
 
@@ -140,13 +127,8 @@ PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) size_t
 NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman const *__restrict self) {
 	if unlikely(!self->mm_mappings)
 		return 0;
-#ifdef CONFIG_USE_NEW_VM
 	return mnode_tree_get_total_mapped_bytes(self->mm_mappings,
 	                                         &FORMMAN(self, thismman_kernel_reservation));
-#else /* CONFIG_USE_NEW_VM */
-	return mnode_tree_get_total_mapped_bytes(self->mm_mappings,
-	                                         vm_get_kernreserve_node(self));
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 
@@ -306,19 +288,11 @@ nofproc:
 	if (mm) {
 		size_t thread_count = 0;
 		struct task *iter;
-#ifdef CONFIG_USE_NEW_VM
 		mman_threadslock_acquire(mm);
 		LIST_FOREACH (iter, &mm->mm_threads, t_mman_tasks) {
 			++thread_count;
 		}
 		mman_threadslock_release(mm);
-#else /* CONFIG_USE_NEW_VM */
-		sync_read(&mm->v_tasklock);
-		LIST_FOREACH (iter, &mm->v_tasks, t_mman_tasks) {
-			++thread_count;
-		}
-		sync_endread(&mm->v_tasklock);
-#endif /* !CONFIG_USE_NEW_VM */
 		if (format_printf(printer, arg, "%" PRIuSIZ " ",
 		                  thread_count) < 0)
 			goto done;

@@ -34,12 +34,8 @@
 #define EXPORT_AS_OBJECT_EX(name, size_) \
 	EXPORT_AS_OBJECT(name)               \
 	.size name, size_;
-#ifdef CONFIG_USE_NEW_VM
 EXPORT_AS_OBJECT(mman_kernel)
 EXPORT_AS_OBJECT_EX(mman_kernel_lockops, __SIZEOF_POINTER__)
-#else /* CONFIG_USE_NEW_VM */
-EXPORT_AS_OBJECT(vm_kernel)
-#endif /* !CONFIG_USE_NEW_VM */
 EXPORT_AS_OBJECT(thiscpu_idle)
 EXPORT_AS_OBJECT(_bootcpu)
 EXPORT_AS_OBJECT(_bootidle)

@@ -53,24 +53,10 @@ PRIVATE struct superblock_type devfs_type = {
 PUBLIC struct superblock devfs = {
 	/* .s_rootdir = */ {
 		/* .d_node = */ {
-#ifdef CONFIG_USE_NEW_VM
 #define devfs_lock devfs.s_rootdir.d_node.i_lock
 			/* NOTE: 2 = +1: devfs, +1: devfs_type.st_singleton */
 			/* .i_datablock = */ MFILE_INIT_EX(2, &inode_datablock_type, NULL, NULL, PAGESHIFT),
 			/* .i_lock      = */ RWLOCK_INIT,
-#else /* CONFIG_USE_NEW_VM */
-#define devfs_lock devfs.s_rootdir.d_node.i_datablock.db_lock
-			/* .i_datablock = */ {
-				/* .db_refcnt = */ 2, /* +1: devfs, +1: devfs_type.st_singleton */
-				/* .db_lock   = */ RWLOCK_INIT,
-				/* .db_type   = */ &inode_datablock_type,
-#ifdef LIBVIO_CONFIG_ENABLED
-				/* .db_vio    = */ NULL,
-#endif /* LIBVIO_CONFIG_ENABLED */
-				/* .db_parts  = */ NULL,
-				VM_DATABLOCK_INIT_PAGEINFO(0)
-			},
-#endif /* !CONFIG_USE_NEW_VM */
 			/* .i_type         = */ &ramfs_directory_type,
 			/* .i_super        = */ &devfs,
 			/* .i_fsdata       = */ NULL,

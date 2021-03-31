@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
@@ -1179,6 +1176,5 @@ FUNDEF NOBLOCK void NOTHROW(FCALL _mpart_all_reap)(void);
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MPART_H */

@@ -45,13 +45,8 @@ struct ucpustate;
 typedef struct ucpustate vio_cpustate_t;
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
-#ifdef CONFIG_USE_NEW_VM
 struct mpart;
 struct mfile;
-#else /* CONFIG_USE_NEW_VM */
-struct vm_datablock;
-struct vm_datapart;
-#endif /* !CONFIG_USE_NEW_VM */
 #endif /* __KERNEL__ */
 struct vio_operators;
 
@@ -75,11 +70,7 @@ struct vioargs {
 	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU  state at the  time of the  access
 	                                              * being made (or `NULL' when accessed through other means). */
 #ifdef __KERNEL__
-#ifdef CONFIG_USE_NEW_VM
 	struct mfile               *va_file;         /* [1..1] The mem-file that is being accessed. */
-#else /* CONFIG_USE_NEW_VM */
-	struct vm_datablock        *va_file;         /* [1..1] The data block that is being accessed. */
-#endif /* !CONFIG_USE_NEW_VM */
 #else /* __KERNEL__ */
 	void                       *va_cookie;       /* [?..?] The cookie registered alongside the VIO mapping. */
 #endif /* !__KERNEL__ */

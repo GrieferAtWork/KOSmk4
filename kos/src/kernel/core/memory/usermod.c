@@ -57,10 +57,6 @@
 #include <debugger/debugger.h>
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#ifndef CONFIG_USE_NEW_VM
-#include "vm/vm-nodeapi.h"
-#endif /* !CONFIG_USE_NEW_VM */
-
 /* TODO: Add support for libdl.so to usermod objects.
  *    -> Because libdl  is loaded  as a  static binary  into  user-space,
  *       and is hard-coded into the kernel, it's not backed by a  regular
@@ -140,23 +136,6 @@ typedef union {
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-#ifndef CONFIG_USE_NEW_VM
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL usermod_section_unmap_and_free)(struct usermod_section *__restrict self) {
-	/* Must unmap sections data. */
-	uintptr_t sect_base;
-	size_t sect_size;
-	sect_base = (uintptr_t)self->us_cdata;
-	sect_size = self->us_size;
-	sect_size += sect_base & PAGEMASK;
-	sect_base &= ~PAGEMASK;
-	vm_unmap_kernel_mapping_locked((void *)sect_base,
-	                               (size_t)CEIL_ALIGN(sect_size,
-	                                                  PAGESIZE));
-	kfree(self);
-}
-#endif /* !CONFIG_USE_NEW_VM */
-
 /* Destroy the given usermod section. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) {
@@ -168,7 +147,6 @@ NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) 
 		return;
 	}
 	/* Must unmap sections data. */
-#ifdef CONFIG_USE_NEW_VM
 	{
 		byte_t *sect_base;
 		size_t sect_size;
@@ -179,14 +157,6 @@ NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) 
 		sect_size = CEIL_ALIGN(sect_size, PAGESIZE);
 		mman_unmap_kram_and_kfree(sect_base, sect_size, self);
 	}
-#else /* CONFIG_USE_NEW_VM */
-	{
-		STATIC_ASSERT(offsetof(struct usermod_section, us_cdata) >=
-		              sizeof(struct vm_kernel_pending_operation));
-		self->us_cdata = self->us_data;
-		vm_kernel_locked_operation(self, &usermod_section_unmap_and_free);
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 #ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
@@ -1030,11 +1000,7 @@ PUBLIC REF struct usermod *FCALL
 vm_getusermod_above(struct vm *__restrict self,
                     USER void *addr)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-#ifdef CONFIG_USE_NEW_VM
 	struct mnode_tree_minmax mima;
-#else /* CONFIG_USE_NEW_VM */
-	vm_nodetree_minmax_t mima;
-#endif /* !CONFIG_USE_NEW_VM */
 	byte_t *minaddr, *maxaddr;
 	REF struct usermod *result;
 	/* Special case: the kernel VM can never house user-space modules */
@@ -1089,15 +1055,7 @@ again:
 	}
 
 	/* Find the first mapped memory location above the given address. */
-#ifdef CONFIG_USE_NEW_VM
 	mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
-#else /* CONFIG_USE_NEW_VM */
-	mima.mm_min = mima.mm_max = NULL;
-	vm_nodetree_minmaxlocate(self->v_tree,
-	                         PAGEID_ENCODE(minaddr),
-	                         PAGEID_ENCODE(maxaddr),
-	                         &mima);
-#endif /* !CONFIG_USE_NEW_VM */
 	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
 	if (mima.mm_min) {
 		struct vm_node *node;

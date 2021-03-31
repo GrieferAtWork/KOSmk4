@@ -35,9 +35,7 @@
 #endif /* !__x86_64__ */
 #endif /* __INTELLISENSE__ */
 
-#ifdef CONFIG_USE_NEW_VM
 #include <kernel/mman/flags.h>
-#endif /* CONFIG_USE_NEW_VM */
 
 #ifdef LOCAL_EXEC_ARGV_SIZE
 #define LOCAL_STRINGARRAY_TYPE USER CHECKED void const *
@@ -109,21 +107,7 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 						if (((uintptr_t)bss_start & PAGEMASK) != 0)
 							fil_bytes -= PAGESIZE;
 					}
-#ifdef CONFIG_USE_NEW_VM
-					prot = prot_from_elfpf(phdr_vector[i].p_flags);
-#else /* CONFIG_USE_NEW_VM */
-#if PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ
-					prot = phdr_vector[i].p_flags & (PF_X | PF_W | PF_R);
-#else /* PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ */
-					prot = VM_PROT_NONE;
-					if (phdr_vector[i].p_flags & PF_X)
-						prot |= VM_PROT_EXEC;
-					if (phdr_vector[i].p_flags & PF_W)
-						prot |= VM_PROT_WRITE;
-					if (phdr_vector[i].p_flags & PF_R)
-						prot |= VM_PROT_READ;
-#endif /* PF_X != VM_PROT_EXEC || PF_W != VM_PROT_WRITE || PF_R != VM_PROT_READ */
-#endif /* !CONFIG_USE_NEW_VM */
+					prot   = prot_from_elfpf(phdr_vector[i].p_flags);
 					map_ok = vmb_mapat(&builder, loadaddr, fil_bytes,
 					                   args->ea_xnode, args->ea_xpath, args->ea_xdentry,
 					                   (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK),
@@ -178,20 +162,10 @@ err_overlap:
 							                                         bss_start_offset,
 							                                         bss_overlap);
 							/* Fill in remaining fields of `overlap_node' */
-#ifdef CONFIG_USE_NEW_VM
 							overlap_node->mbn_minaddr = bss_overlap_addr;
 							overlap_node->mbn_maxaddr = bss_overlap_addr + PAGESIZE - 1;
 							overlap_node->mbn_flags = prot | VM_PROT_PRIVATE;
 							mbuilder_insert_fmnode(&builder, overlap_node);
-#else /* CONFIG_USE_NEW_VM */
-							vm_node_setminaddr(overlap_node, bss_overlap_addr);
-							vm_node_setmaxaddr(overlap_node, bss_overlap_addr + PAGESIZE - 1);
-							assert(overlap_node->vn_part);
-							assert(overlap_node->vn_part->dp_block == &vm_datablock_anonymous_zero ||
-							       overlap_node->vn_part->dp_block == &vm_datablock_anonymous);
-							overlap_node->vn_prot = prot | VM_PROT_PRIVATE;
-							vmb_node_insert(&builder, overlap_node);
-#endif /* !CONFIG_USE_NEW_VM */
 							fil_bytes += PAGESIZE; /* Adjust to not map the first (special) page of .bss */
 						}
 						/* Map BSS as anonymous, zero-initialized memory. */
@@ -219,11 +193,7 @@ err_overlap:
 				                      LOCAL_FUNC(execabi_system_rtld_size),
 				                      PAGESIZE,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
-#ifdef CONFIG_USE_NEW_VM
 				                      MAP_GROWSUP | MAP_NOASLR,
-#else /* CONFIG_USE_NEW_VM */
-				                      VM_GETFREE_ABOVE,
-#endif /* !CONFIG_USE_NEW_VM */
 #else
 				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
@@ -325,16 +295,7 @@ err_overlap:
 			/* Change the calling thread's vm to `args->ea_mman' */
 			if (oldvm != args->ea_mman) {
 				incref(oldvm);
-#ifdef CONFIG_USE_NEW_VM
 				task_setvm(args->ea_mman);
-#else /* CONFIG_USE_NEW_VM */
-				TRY {
-					task_setvm(args->ea_mman);
-				} EXCEPT {
-					decref_nokill(oldvm);
-					RETHROW();
-				}
-#endif /* !CONFIG_USE_NEW_VM */
 			}
 			TRY {
 				size_t ustack_size;
@@ -370,18 +331,9 @@ err_overlap:
 				RETHROW();
 			}
 			if (oldvm != args->ea_mman) {
-#ifdef CONFIG_USE_NEW_VM
 				if unlikely(!args->ea_change_mman_to_effective_mman)
 					task_setmman(oldvm);
 				decref(oldvm);
-#else /* CONFIG_USE_NEW_VM */
-				if likely(args->ea_change_mman_to_effective_mman) {
-					decref(oldvm);
-				} else {
-					FINALLY_DECREF(oldvm);
-					task_setvm(oldvm);
-				}
-#endif /* !CONFIG_USE_NEW_VM */
 			}
 		}
 	} EXCEPT {

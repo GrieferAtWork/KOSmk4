@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/malloc-defs.h> /* GFP_* */
 #include <kernel/mman/kram.h>   /* GFP_MAP_* */
 #include <kernel/mman/map.h>    /* PROT_*, MAP_* */
@@ -300,6 +297,5 @@ DECL_BEGIN
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_FLAGS_H */

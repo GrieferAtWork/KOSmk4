@@ -174,11 +174,7 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 	if (clone_flags & CLONE_VM) {
 		result_vm = incref(caller->t_mman);
 	} else {
-#ifdef CONFIG_USE_NEW_VM
 		result_vm = mman_fork();
-#else /* CONFIG_USE_NEW_VM */
-		result_vm = vm_clone(caller->t_mman, false);
-#endif /* !CONFIG_USE_NEW_VM */
 	}
 	TRY {
 		/* Allocate a new task structure. */

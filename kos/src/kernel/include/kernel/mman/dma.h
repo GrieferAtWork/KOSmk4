@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
@@ -132,6 +129,5 @@ NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec, size_t lockcnt)
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_DMA_H */

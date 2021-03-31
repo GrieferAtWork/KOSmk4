@@ -175,56 +175,9 @@ again_calculate_vecN:
 
 
 
-#ifdef CONFIG_USE_NEW_VM
-
 /* Define the kernel mman */
 INTERN ATTR_SECTION(".data.permman.head")
 struct mman mman_kernel_head = { _MMAN_KERNEL_INIT };
-
-#else /* CONFIG_USE_NEW_VM */
-INTDEF byte_t __kernel_pervm_size[];
-
-/* Define the kernel VM */
-INTERN ATTR_SECTION(".data.pervm.head")
-struct vm vm_kernel_head = {
-	/* .v_pdir_phys     = */ pagedir_kernel_phys,
-	/* .v_refcnt        = */ 3,
-	/* .v_weakrefcnt    = */ 1,
-	/* .v_tree          = */ NULL,
-	/* .v_byaddr        = */ NULL,
-	/* .v_heap_size     = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,
-	/* .v_treelock      = */ ATOMIC_RWLOCK_INIT,
-	/* .v_tasks         = */ NULL,
-	/* .v_tasklock      = */ ATOMIC_RWLOCK_INIT,
-	/* .v_deltasks      = */ NULL,
-	/* .v_kernreserve   = */ {
-		/* .vn_node   = */ { NULL,
-		                     NULL,
-		                     KERNELSPACE_MINPAGEID,
-		                     KERNELSPACE_MAXPAGEID },
-		/* .vn_byaddr = */ { NULL, (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
-#ifndef CONFIG_NO_USERKERN_SEGMENT
-		/* .vn_prot   = */ VM_PROT_PRIVATE | VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
-#else /* !CONFIG_NO_USERKERN_SEGMENT */
-		/* .vn_prot   = */ VM_PROT_PRIVATE,
-#endif /* CONFIG_NO_USERKERN_SEGMENT */
-		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_KERNPRT,
-		/* .vn_vm     = */ (struct vm *)UINT64_C(0xcccccccccccccccc),
-#ifndef CONFIG_NO_USERKERN_SEGMENT
-		/* .vn_part   = */ &userkern_segment_part,
-		/* .vn_block  = */ &userkern_segment_file,
-#else /* !CONFIG_NO_USERKERN_SEGMENT */
-		/* .vn_part   = */ NULL,
-		/* .vn_block  = */ NULL,
-#endif /* CONFIG_NO_USERKERN_SEGMENT */
-		/* .vn_fspath = */ NULL,
-		/* .vn_fsname = */ NULL,
-		/* .vn_link   = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
-		                     (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
-		/* .vn_guard  = */ 0
-	}
-};
-#endif /* !CONFIG_USE_NEW_VM */
 
 
 typedef struct {

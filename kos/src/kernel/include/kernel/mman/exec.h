@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
@@ -59,6 +56,5 @@ mman_exec(/*in|out*/ struct execargs *__restrict args)
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EXEC_H */

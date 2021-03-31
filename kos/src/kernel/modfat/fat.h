@@ -374,11 +374,7 @@ struct fat_superblock
 	size_t                  f_sectorsize;  /* [const] Size of a sector (in bytes). */
 #else /* __INTELLISENSE__ */
 #define f_sectorshift       mf_blockshift  /* [const] ilog2(f_sectorsize) (in bytes). */
-#ifdef CONFIG_USE_NEW_VM
 	size_t                  f_sectorsize;  /* [const] Size of a sector (in bytes). */
-#else /* CONFIG_USE_NEW_VM */
-#define f_sectorsize        db_pagesize    /* [const] Size of a sector (in bytes). */
-#endif /* !CONFIG_USE_NEW_VM */
 #endif /* !__INTELLISENSE__ */
 	size_t                  f_clustersize; /* [const][== f_sec4clus << f_sectorshift] Size of a cluster (in bytes). */
 	size_t                  f_fat_size;    /* [const][== f_sec4fat << f_sectorshift] Size of a single FileAllocationTable (in bytes). */

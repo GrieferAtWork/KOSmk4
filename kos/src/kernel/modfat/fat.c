@@ -2609,37 +2609,10 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		    !disk_header.bpb.bpb_reserved_sectors) /* What's the first sector, then? */
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 		sector_size = LETOH16(disk_header.bpb.bpb_bytes_per_sector);
-#ifdef CONFIG_USE_NEW_VM
 		if unlikely(!IS_POWER_OF_TWO(sector_size))
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 		self->f_sectorsize = sector_size;
 		_mfile_init_blockshift(self, CTZ(sector_size));
-#else /* CONFIG_USE_NEW_VM */
-#if PAGESIZE < 512
-#error "System page size is too small to support any FAT variation"
-#endif /* PAGESIZE < 512 */
-		if (sector_size == 512) {
-			STATIC_ASSERT(1 << 9 == 512);
-			self->db_pageshift = PAGESHIFT - 9;
-		} else if (PAGESIZE >= 1024 && sector_size == 1024) {
-			STATIC_ASSERT(1 << 10 == 1024);
-			self->db_pageshift = PAGESHIFT - 10;
-		} else if (PAGESIZE >= 2048 && sector_size == 2048) {
-			STATIC_ASSERT(1 << 11 == 2048);
-			self->db_pageshift = PAGESHIFT - 11;
-		} else if (PAGESIZE >= 4096 && sector_size == 4096) {
-			STATIC_ASSERT(1 << 12 == 4096);
-			self->db_pageshift = PAGESHIFT - 12;
-		} else {
-			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
-		}
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-		self->db_addrshift = PAGESHIFT - self->db_pageshift;
-		self->db_pagealign = (size_t)1 << self->db_pageshift;
-		self->db_pagemask  = self->db_pagealign - 1;
-		self->db_pagesize  = sector_size;
-#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
-#endif /* !CONFIG_USE_NEW_VM */
 	}
 	/* Extract some common information. */
 	self->f_fat_start   = (FatSectorIndex)LETOH16(disk_header.bpb.bpb_reserved_sectors);

@@ -86,54 +86,6 @@ handle_datapart_tryas(struct vm_datapart *__restrict self,
 
 
 
-#ifndef CONFIG_USE_NEW_VM
-INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_datapart_pread(struct vm_datapart *__restrict self,
-                      USER CHECKED void *dst, size_t num_bytes,
-                      pos_t addr, iomode_t UNUSED(mode)) {
-#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
-	if (addr > (pos_t)SIZE_MAX)
-		return 0;
-#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
-	return vm_datapart_read(self, dst, num_bytes, (size_t)addr);
-}
-
-INTERN NONNULL((1)) size_t KCALL
-handle_datapart_pwrite(struct vm_datapart *__restrict self,
-                       USER CHECKED void const *src, size_t num_bytes,
-                       pos_t addr, iomode_t UNUSED(mode)) {
-#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
-	if (addr > (pos_t)SIZE_MAX)
-		return 0;
-#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
-	return vm_datapart_write(self, src, num_bytes, num_bytes, (size_t)addr);
-}
-
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
-handle_datapart_preadv(struct vm_datapart *__restrict self,
-                       struct iov_buffer *__restrict dst,
-                       size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
-	assert(iov_buffer_size(dst) == num_bytes);
-#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
-	if (addr > (pos_t)SIZE_MAX)
-		return 0;
-#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
-	return vm_datapart_readv(self, dst, (size_t)addr);
-}
-
-INTERN NONNULL((1, 2)) size_t KCALL
-handle_datapart_pwritev(struct vm_datapart *__restrict self,
-                        struct iov_buffer *__restrict src,
-                        size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
-	assert(iov_buffer_size(src) == num_bytes);
-#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
-	if (addr > (pos_t)SIZE_MAX)
-		return 0;
-#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
-	return vm_datapart_writev(self, src, num_bytes, (size_t)addr);
-}
-#endif /* !CONFIG_USE_NEW_VM */
-
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_datablock *KCALL
 vm_datapart_get_datablock(struct vm_datapart *__restrict self) {
 	REF struct vm_datablock *result;
@@ -158,28 +110,6 @@ handle_datapart_ioctl(struct vm_datapart *__restrict self,
 	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
 	      cmd);
 }
-
-#ifndef CONFIG_USE_NEW_VM
-INTERN NONNULL((1)) void KCALL
-handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
-#if __SIZEOF_POINTER__ < 8
-	if (new_size > (pos_t)((u32)-1))
-		return;
-#endif /* __SIZEOF_POINTER__ < 8 */
-	xdecref(vm_datapart_split(self, (size_t)(new_size / PAGESIZE)));
-}
-
-INTERN NONNULL((1, 2)) void KCALL
-handle_datapart_mmap(struct vm_datapart *__restrict self,
-                     struct handle_mmap_info *__restrict info)
-		THROWS(...) {
-	sync_read(self);
-	info->hmi_file    = incref(self->dp_block);
-	info->hmi_minaddr = vm_datapart_minbyte(self);
-	info->hmi_maxaddr = vm_datapart_maxbyte(self);
-	sync_endread(self);
-}
-#endif /* !CONFIG_USE_NEW_VM */
 
 //INTERN pos_t KCALL /* TODO: Pre-initialize specified reanges. */
 //handle_datapart_allocate(struct vm_datapart *__restrict self,
@@ -268,122 +198,6 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		FINALLY_DECREF_UNLIKELY((struct vm_datablock *)hnd.h_data);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
-
-#ifndef CONFIG_USE_NEW_VM
-	case HOP_DATAPART_OPEN_FUTEX:
-	case HOP_DATAPART_OPEN_FUTEX_EXISTING: {
-		size_t struct_size;
-		struct hop_datablock_open_futex *data;
-		REF struct vm_futex *ftx;
-		struct handle hnd;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		validate_readwrite(arg, sizeof(struct hop_datablock_open_futex));
-		data        = (struct hop_datablock_open_futex *)arg;
-		struct_size = ATOMIC_READ(data->dof_struct_size);
-		if (struct_size != sizeof(struct hop_datablock_open_futex))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_open_futex), struct_size);
-		if (cmd == HOP_DATAPART_OPEN_FUTEX_EXISTING) {
-			ftx = vm_datapart_getfutex_existing(self, (uintptr_t)data->dof_address);
-			if (!ftx)
-				return -ENOENT;
-		} else {
-			ftx = vm_datapart_getfutex(self, (uintptr_t)data->dof_address);
-		}
-		if (ftx == VM_DATAPART_GETFUTEX_OUTOFRANGE)
-			return -ERANGE;
-		FINALLY_DECREF_UNLIKELY(ftx);
-		hnd.h_type = HANDLE_TYPE_FUTEX;
-		hnd.h_mode = mode;
-		hnd.h_data = ftx;
-		return handle_installhop(&data->dof_openfd, hnd);
-	}	break;
-
-	case HOP_DATAPART_STAT: {
-		size_t struct_size;
-		struct hop_datapart_stat info;
-		struct hop_datapart_stat *data;
-		STATIC_ASSERT(HOP_DATAPART_STAT_FEATURE_ISLOCKED == VM_DATAPART_FLAG_LOCKED);
-		STATIC_ASSERT(HOP_DATAPART_STAT_FEATURE_HASCHANGED == VM_DATAPART_FLAG_CHANGED);
-		STATIC_ASSERT(HOP_DATAPART_STAT_FEATURE_KEEPRAM == VM_DATAPART_FLAG_KEEPRAM);
-		STATIC_ASSERT(HOP_DATAPART_STAT_FEATURE_TRKCHNG == VM_DATAPART_FLAG_TRKCHNG);
-		STATIC_ASSERT(HOP_DATAPART_STAT_FEATURE_COREPRT == VM_DATAPART_FLAG_COREPRT);
-		STATIC_ASSERT(HOP_DATAPART_STAT_FEATURE_KERNPRT == VM_DATAPART_FLAG_KERNPRT);
-		STATIC_ASSERT(HOP_DATAPART_STAT_STATE_ABSENT == VM_DATAPART_STATE_ABSENT);
-		STATIC_ASSERT(HOP_DATAPART_STAT_STATE_INCORE == VM_DATAPART_STATE_INCORE);
-		STATIC_ASSERT(HOP_DATAPART_STAT_STATE_LOCKED == VM_DATAPART_STATE_LOCKED);
-#ifdef VM_DATAPART_STATE_INSWAP
-		STATIC_ASSERT(HOP_DATAPART_STAT_STATE_INSWAP == VM_DATAPART_STATE_INSWAP);
-#endif /* VM_DATAPART_STATE_INSWAP */
-#ifdef VM_DATAPART_STATE_VIOPRT
-		STATIC_ASSERT(HOP_DATAPART_STAT_STATE_VIOPRT == VM_DATAPART_STATE_VIOPRT);
-#endif /* VM_DATAPART_STATE_VIOPRT */
-		validate_readwrite(arg, sizeof(struct hop_datapart_stat));
-		data        = (struct hop_datapart_stat *)arg;
-		struct_size = ATOMIC_READ(data->ds_struct_size);
-		if (struct_size != sizeof(struct hop_datapart_stat))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datapart_stat), struct_size);
-		/* Gather information about the datapart. */
-		sync_read(self);
-		info.ds_features = self->dp_flags;
-		if (self->dp_block->db_parts == MFILE_PARTS_ANONYMOUS)
-			info.ds_features |= HOP_DATAPART_STAT_FEATURE_ISANON;
-		if (self->dp_futex) {
-			info.ds_features |= HOP_DATAPART_STAT_FEATURE_HASFUTEXCTRL;
-			if (self->dp_futex->fc_tree != NULL)
-				info.ds_features |= HOP_DATAPART_STAT_FEATURE_HASFUTEXLIVE;
-		}
-		if (self->dp_crefs)
-			info.ds_features |= HOP_DATAPART_STAT_FEATURE_HASCMAP;
-		if (self->dp_srefs)
-			info.ds_features |= HOP_DATAPART_STAT_FEATURE_HASSMAP;
-		info.ds_state    = self->dp_state;
-		info.ds_minaddr  = (u64)vm_datapart_minbyte(self);
-		info.ds_maxaddr  = (u64)vm_datapart_maxbyte(self);
-		info.ds_minvpage = (u64)vm_datapart_minvpage(self);
-		info.ds_maxvpage = (u64)vm_datapart_maxvpage(self);
-		info.ds_mindpage = (u64)vm_datapart_mindpage(self);
-		info.ds_maxdpage = (u64)vm_datapart_maxdpage(self);
-		sync_endread(self);
-		/* Copy collected information to user-space. */
-		COMPILER_BARRIER();
-		data->ds_features = info.ds_features;
-		data->ds_state    = info.ds_state;
-		data->ds_minaddr  = info.ds_minaddr;
-		data->ds_maxaddr  = info.ds_maxaddr;
-		data->ds_minvpage = info.ds_minvpage;
-		data->ds_maxvpage = info.ds_maxvpage;
-		data->ds_mindpage = info.ds_mindpage;
-		data->ds_maxdpage = info.ds_maxdpage;
-	}	break;
-#endif /* !CONFIG_USE_NEW_VM */
-
-#ifndef CONFIG_USE_NEW_VM
-	case HOP_DATAPART_HASCHANGED: {
-		size_t struct_size;
-		struct hop_datablock_haschanged *data;
-		REF struct vm_datablock *block;
-		bool has_changed;
-		validate_readwrite(arg, sizeof(struct hop_datablock_haschanged));
-		data        = (struct hop_datablock_haschanged *)arg;
-		struct_size = ATOMIC_READ(data->dhc_struct_size);
-		if (struct_size != sizeof(struct hop_datablock_haschanged))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_haschanged), struct_size);
-		sync_read(self);
-		block = incref(self->dp_block);
-		sync_endread(self);
-		{
-			size_t mindatapage, maxdatapage;
-			FINALLY_DECREF_UNLIKELY(block);
-			mindatapage = (size_t)data->dhc_minbyte >> VM_DATABLOCK_ADDRSHIFT(block);
-			maxdatapage = (((size_t)data->dhc_maxbyte + VM_DATABLOCK_PAGESIZE(block)) >> VM_DATABLOCK_ADDRSHIFT(block)) - 1;
-			has_changed = vm_datapart_haschanged(self, mindatapage, maxdatapage);
-		}
-		COMPILER_WRITE_BARRIER();
-		data->dhc_result = has_changed ? HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE
-		                               : HOP_DATABLOCK_HASCHANGED_FLAG_UNCHANGED;
-	}	break;
-#endif /* !CONFIG_USE_NEW_VM */
-
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

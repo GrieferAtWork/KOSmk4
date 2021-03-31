@@ -158,9 +158,9 @@ shebang_exec(struct execargs *__restrict args) {
 				char *inject_arg0, *inject_arg1;
 				size_t more_argc;
 				/* Assert that the specified node is a regular file. */
-#ifndef CONFIG_USE_NEW_VM /* TODO */
+#if 0 /* TODO */
 				vm_exec_assert_regular(interp_node);
-#endif /* !CONFIG_USE_NEW_VM */
+#endif
 
 				/* Check for execute permissions? */
 				inode_access(interp_node, R_OK | X_OK);

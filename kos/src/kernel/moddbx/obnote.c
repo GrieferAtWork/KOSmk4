@@ -624,7 +624,6 @@ badobj:
 }
 
 
-#ifdef CONFIG_USE_NEW_VM
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) char const *
 NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
                                 struct mfile_ops const *__restrict ops,
@@ -968,7 +967,6 @@ badobj:
 	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
 	return 0;
 }
-#endif /* CONFIG_USE_NEW_VM */
 
 
 
@@ -996,14 +994,10 @@ PRIVATE struct obnote_entry const notes[] = {
 #ifdef CONFIG_HAVE_USERMOD
 	{ "usermod", &note_usermod },
 #endif /* CONFIG_HAVE_USERMOD */
-#ifdef CONFIG_USE_NEW_VM
 	{ "mnode", &note_mnode },
 	{ "mpart", &note_mpart },
 	{ "mfile", &note_mfile },
 	{ "mman", &note_mman },
-#else /* CONFIG_USE_NEW_VM */
-	{ "vm", &note_mman },
-#endif /* !CONFIG_USE_NEW_VM */
 };
 
 

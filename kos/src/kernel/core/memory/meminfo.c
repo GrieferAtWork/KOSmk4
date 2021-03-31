@@ -500,11 +500,7 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	       (physaddr_t)(physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start) + req_bytes - 1),
 	       req_bytes, req_pages);
 	kernel_meminfo_mpart.mp_mem.mc_size = req_pages;
-#ifdef CONFIG_USE_NEW_VM
-	kernel_meminfo_mpart.mp_maxaddr = (pos_t)((req_pages * PAGESIZE) - 1);
-#else /* CONFIG_USE_NEW_VM */
-	kernel_meminfo_mpart.dp_tree.a_vmax = (datapage_t)(req_pages - 1);
-#endif /* !CONFIG_USE_NEW_VM */
+	kernel_meminfo_mpart.mp_maxaddr     = (pos_t)((req_pages * PAGESIZE) - 1);
 	buffer = (byte_t *)(KERNEL_CORE_BASE + physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start));
 	vm_node_setminaddr(&kernel_meminfo_mnode, buffer);
 	vm_node_setmaxaddr(&kernel_meminfo_mnode, buffer + (req_pages * PAGESIZE) - 1);

@@ -500,16 +500,9 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 PRIVATE void KCALL unshare_vm(void) {
 	struct vm *myvm = THIS_MMAN;
 	if (isshared(myvm)) {
-#ifdef CONFIG_USE_NEW_VM
 		REF struct mman *newmm;
 		newmm = mman_fork();
 		task_setmman_inherit(newmm);
-#else /* CONFIG_USE_NEW_VM */
-		REF struct vm *newvm;
-		newvm = vm_clone(myvm);
-		FINALLY_DECREF_UNLIKELY(newvm);
-		task_setvm(newvm);
-#endif /* !CONFIG_USE_NEW_VM */
 	}
 }
 

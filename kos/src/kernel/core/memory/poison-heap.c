@@ -37,6 +37,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
@@ -51,11 +52,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stddef.h>
 #include <string.h>
 
-#ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman/mcoreheap.h>
-#endif /* CONFIG_USE_NEW_VM */
-
-#include "corebase.h"
 
 DECL_BEGIN
 
@@ -92,7 +88,6 @@ DECL_BEGIN
 PRIVATE ATTR_COLDTEXT PAGEDIR_PAGEALIGNED void *
 NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
                                     gfp_t flags) {
-#ifdef CONFIG_USE_NEW_VM
 #if 1
 	void *result;
 	struct mnode *node;
@@ -219,78 +214,6 @@ err:
 		result = NULL;
 	return result;
 #endif
-#else /* CONFIG_USE_NEW_VM */
-	PAGEDIR_PAGEALIGNED void *mapping_target;
-	struct vm_corepair_ptr corepair;
-	physpage_t block0_addr;
-	physpagecnt_t block0_size;
-	corepair = vm_corepair_alloc(flags, true);
-	if (!corepair.cp_node)
-		return NULL;
-	/* Setup the corepair. */
-	corepair.cp_part->dp_refcnt = 1; /* corepair.cp_node */
-	corepair.cp_node->vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
-	corepair.cp_node->vn_vm     = &vm_kernel;
-	corepair.cp_part->dp_block  = flags & GFP_CALLOC
-	                              ? &vm_datablock_anonymous_zero
-	                              : &vm_datablock_anonymous;
-	incref(corepair.cp_part->dp_block);
-	corepair.cp_node->vn_block  = incref(corepair.cp_part->dp_block);
-	corepair.cp_node->vn_fspath = NULL;
-	corepair.cp_node->vn_fsname = NULL;
-	corepair.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;
-	corepair.cp_node->vn_part          = corepair.cp_part;
-	corepair.cp_node->vn_link.ln_pself = &LLIST_HEAD(corepair.cp_part->dp_srefs);
-	corepair.cp_part->dp_srefs         = corepair.cp_node;
-	corepair.cp_part->dp_tree.a_vmax   = (datapage_t)((num_bytes / PAGESIZE) - 1);
-	corepair.cp_part->dp_state  = VM_DATAPART_STATE_LOCKED;
-	corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_LOCKED;
-	block0_size = num_bytes / PAGESIZE;
-	block0_addr = page_malloc(block0_size);
-	if unlikely(block0_addr == PHYSPAGE_INVALID)
-		goto err_corepair;
-	/* initialize the did-init bitset. */
-	if (num_bytes <= (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * PAGESIZE) {
-		corepair.cp_part->dp_pprop = (flags & GFP_PREFLT) ? (uintptr_t)-1 : 0;
-	} else {
-		corepair.cp_part->dp_pprop_p = NULL;
-		corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_HEAPPPP;
-	}
-	corepair.cp_part->dp_ramdata.rd_blockv = &corepair.cp_part->dp_ramdata.rd_block0;
-	corepair.cp_part->dp_ramdata.rd_block0.rb_start = block0_addr;
-	corepair.cp_part->dp_ramdata.rd_block0.rb_size  = block0_size;
-	if unlikely(!vm_kernel_treelock_writef_nx(flags))
-		goto err_corepair_content;
-	mapping_target = vm_getfree(&vm_kernel,
-	                            HINT_GETADDR(KERNEL_VMHINT_HEAP),
-	                            num_bytes,
-	                            PAGESIZE,
-	                            HINT_GETMODE(KERNEL_VMHINT_HEAP));
-	corepair.cp_node->vn_node.a_vmin = PAGEID_ENCODE((byte_t *)mapping_target);
-	corepair.cp_node->vn_node.a_vmax = PAGEID_ENCODE((byte_t *)mapping_target + num_bytes - 1);
-	/* Map the node to the kernel page directory & do initialization. */
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	/* Prepare to map all of the new blocks. */
-	if unlikely(!pagedir_prepare(mapping_target, num_bytes))
-		goto err_corepair_content;
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	pagedir_map(mapping_target, num_bytes,
-	            physpage2addr(block0_addr),
-	            PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-	if (flags & GFP_CALLOC)
-		memset(mapping_target, 0, num_bytes);
-	vm_node_insert(corepair.cp_node);
-	vm_kernel_treelock_endwrite();
-	return mapping_target;
-err_corepair_content:
-	page_free(block0_addr, block0_size);
-err_corepair:
-	decref_nokill(corepair.cp_node->vn_block);
-	decref_nokill(corepair.cp_part->dp_block);
-	vm_node_free(corepair.cp_node);
-	vm_datapart_free(corepair.cp_part);
-	return NULL;
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 struct ph_unused {

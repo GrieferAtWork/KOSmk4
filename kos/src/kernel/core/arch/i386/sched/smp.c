@@ -143,15 +143,10 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		/* Default configuration. */
 		x86_lapic_mpart.mp_mem.mc_start = physaddr2page(UINT32_C(0xfee00000));
 		x86_lapic_mpart.mp_mem.mc_size  = 1;
-#ifdef CONFIG_USE_NEW_VM
-		x86_lapic_mpart.mp_minaddr = (pos_t)(0);
-		x86_lapic_mpart.mp_maxaddr = (pos_t)(PAGESIZE - 1);
-#else /* CONFIG_USE_NEW_VM */
-		x86_lapic_mpart.dp_tree.a_vmin = (datapage_t)0;
-		x86_lapic_mpart.dp_tree.a_vmax = (datapage_t)0;
-#endif /* !CONFIG_USE_NEW_VM */
-		FORCPU(&_bootcpu, thiscpu_x86_lapicid_)         = 0xff; /* Read later using the LAPIC */
-		FORCPU(&_bootcpu, thiscpu_x86_lapicversion_)    = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
+		x86_lapic_mpart.mp_minaddr      = (pos_t)(0);
+		x86_lapic_mpart.mp_maxaddr      = (pos_t)(PAGESIZE - 1);
+		FORCPU(&_bootcpu, thiscpu_x86_lapicid_)      = 0xff; /* Read later using the LAPIC */
+		FORCPU(&_bootcpu, thiscpu_x86_lapicversion_) = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
 		return;
 	}
 	/* Check pointer location. */
@@ -169,23 +164,13 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		x86_lapicbase_ = (byte_t *)(uintptr_t)(table->tab_lapicaddr & PAGEMASK);
 		x86_lapic_mpart.mp_mem.mc_start = (physpage_t)physaddr2page(table->tab_lapicaddr);
 		x86_lapic_mpart.mp_mem.mc_size  = 2;
-#ifdef CONFIG_USE_NEW_VM
-		x86_lapic_mpart.mp_minaddr = (pos_t)(0);
-		x86_lapic_mpart.mp_maxaddr = (pos_t)((2 * PAGESIZE) - 1);
-#else /* CONFIG_USE_NEW_VM */
-		x86_lapic_mpart.dp_tree.a_vmin  = (datapage_t)0;
-		x86_lapic_mpart.dp_tree.a_vmax  = (datapage_t)1;
-#endif /* !CONFIG_USE_NEW_VM */
+		x86_lapic_mpart.mp_minaddr      = (pos_t)(0);
+		x86_lapic_mpart.mp_maxaddr      = (pos_t)((2 * PAGESIZE) - 1);
 	} else {
 		x86_lapic_mpart.mp_mem.mc_start = (physpage_t)physaddr2page(table->tab_lapicaddr);
 		x86_lapic_mpart.mp_mem.mc_size  = 1;
-#ifdef CONFIG_USE_NEW_VM
-		x86_lapic_mpart.mp_minaddr = (pos_t)(0);
-		x86_lapic_mpart.mp_maxaddr = (pos_t)(PAGESIZE - 1);
-#else /* CONFIG_USE_NEW_VM */
-		x86_lapic_mpart.dp_tree.a_vmin  = (datapage_t)0;
-		x86_lapic_mpart.dp_tree.a_vmax  = (datapage_t)0;
-#endif /* !CONFIG_USE_NEW_VM */
+		x86_lapic_mpart.mp_minaddr      = (pos_t)(0);
+		x86_lapic_mpart.mp_maxaddr      = (pos_t)(PAGESIZE - 1);
 	}
 	/* Process configuration entries. */
 	{

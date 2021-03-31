@@ -291,17 +291,11 @@ err_bad_length:
 				if (flags & MAP_GROWSUP) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
-#ifdef CONFIG_USE_NEW_VM
 					node_flags |= MAP_GROWSUP;
-#else /* CONFIG_USE_NEW_VM */
-					node_flags |= VM_NODE_FLAG_GROWSUP;
-#endif /* !CONFIG_USE_NEW_VM */
 				} else if (flags & MAP_GROWSDOWN) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
-#ifdef CONFIG_USE_NEW_VM
 					node_flags |= MAP_GROWSDOWN;
-#endif /* CONFIG_USE_NEW_VM */
 				}
 again_mapat:
 				/* XXX: vm_mapat_override(...)? */
@@ -375,17 +369,11 @@ again_mapat:
 				if (flags & MAP_GROWSUP) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
-#ifdef CONFIG_USE_NEW_VM
 					node_flags |= MAP_GROWSUP;
-#else /* CONFIG_USE_NEW_VM */
-					node_flags |= VM_NODE_FLAG_GROWSUP;
-#endif /* !CONFIG_USE_NEW_VM */
 				} else if (flags & MAP_GROWSDOWN) {
 					guard     = num_bytes - PAGESIZE;
 					num_bytes = PAGESIZE;
-#ifdef CONFIG_USE_NEW_VM
 					node_flags |= MAP_GROWSDOWN;
-#endif /* CONFIG_USE_NEW_VM */
 				}
 				result = (byte_t *)vm_map_subrange(THIS_MMAN,
 				                                   hint,

@@ -34,6 +34,7 @@
 #include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/task.h>
 #include <sched/x86/tss.h>
 
 #include <hybrid/atomic.h>
@@ -50,58 +51,45 @@
 DECL_BEGIN
 
 INTDEF byte_t __kernel_text_start[];
-INTDEF byte_t __kernel_text_startpage[];
 INTDEF byte_t __kernel_text_startpage_p[];
 INTDEF byte_t __kernel_text_end[];
-INTDEF byte_t __kernel_text_endpage[];
 INTDEF byte_t __kernel_text_size[];
 INTDEF byte_t __kernel_text_numpages[];
 
 INTDEF byte_t __kernel_rodata_start[];
-INTDEF byte_t __kernel_rodata_startpage[];
 INTDEF byte_t __kernel_rodata_startpage_p[];
 INTDEF byte_t __kernel_rodata_end[];
-INTDEF byte_t __kernel_rodata_endpage[];
 INTDEF byte_t __kernel_rodata_size[];
 INTDEF byte_t __kernel_rodata_numpages[];
 
 INTDEF byte_t __kernel_data_start[];
-INTDEF byte_t __kernel_data_startpage[];
 INTDEF byte_t __kernel_data_startpage_p[];
 INTDEF byte_t __kernel_data_end[];
-INTDEF byte_t __kernel_data_endpage[];
 INTDEF byte_t __kernel_data_size[];
 INTDEF byte_t __kernel_data_numpages[];
 
 INTDEF byte_t __kernel_pdata_start[];
 INTDEF byte_t __kernel_pdata_start_p[];
-INTDEF byte_t __kernel_pdata_startpage[];
 INTDEF byte_t __kernel_pdata_startpage_p[];
 INTDEF byte_t __kernel_pdata_end[];
 INTDEF byte_t __kernel_pdata_end_p[];
-INTDEF byte_t __kernel_pdata_endpage[];
 INTDEF byte_t __kernel_pdata_endpage_p[];
 INTDEF byte_t __kernel_pdata_size[];
 INTDEF byte_t __kernel_pdata_numpages[];
 
 INTDEF byte_t __kernel_xdata_start[];
-INTDEF byte_t __kernel_xdata_startpage[];
 INTDEF byte_t __kernel_xdata_startpage_p[];
 INTDEF byte_t __kernel_xdata_end[];
-INTDEF byte_t __kernel_xdata_endpage[];
 INTDEF byte_t __kernel_xdata_size[];
 INTDEF byte_t __kernel_xdata_numpages[];
 
 INTDEF byte_t __kernel_bss_start[];
-INTDEF byte_t __kernel_bss_startpage[];
 INTDEF byte_t __kernel_bss_startpage_p[];
 INTDEF byte_t __kernel_bss_end[];
-INTDEF byte_t __kernel_bss_endpage[];
 INTDEF byte_t __kernel_bss_size[];
 INTDEF byte_t __kernel_bss_numpages[];
 
 INTDEF byte_t __kernel_bootiob_start[] ASMNAME("__x86_iob_empty_base");
-INTDEF byte_t __kernel_bootiob_startpage[] ASMNAME("__x86_iob_empty_page");
 INTDEF byte_t __kernel_bootiob_startpage_p[] ASMNAME("__x86_iob_empty_page_p");
 
 #undef CONFIG_BOOTCPU_IOB_LIES_IN_BSS
@@ -127,20 +115,16 @@ INTDEF byte_t __kernel_bootiob_startpage_p[] ASMNAME("__x86_iob_empty_page_p");
 #define X86_KERNEL_VMMAPPING_CORE_BSS2        5 /* .bss */
 INTDEF byte_t __x86_kernel_bss_before_iob_size[];
 INTDEF byte_t __x86_kernel_bss_before_iob_pages[];
-INTDEF byte_t __x86_kernel_bss_after_iob_pages[];
 INTDEF byte_t __x86_kernel_bss_after_iob_size[];
+INTDEF byte_t __x86_kernel_bss_after_iob_pages[];
 #define __kernel_bss1_start       __kernel_bss_start
-#define __kernel_bss1_startpage   __kernel_bss_startpage
 #define __kernel_bss1_startpage_p __kernel_bss_startpage_p
 #define __kernel_bss1_end         __kernel_bootiob_start
-#define __kernel_bss1_endpage     __kernel_bootiob_startpage
 #define __kernel_bss1_size        __x86_kernel_bss_before_iob_size
 #define __kernel_bss1_numpages    __x86_kernel_bss_before_iob_pages
 #define __kernel_bss2_start       (__kernel_bootiob_start + 2 * PAGESIZE) /* 2: Number of pages in TSS.IOB */
-#define __kernel_bss2_startpage   (__kernel_bootiob_startpage + 2)        /* 2: Number of pages in TSS.IOB */
 #define __kernel_bss2_startpage_p (__kernel_bootiob_startpage_p + 2)      /* 2: Number of pages in TSS.IOB */
 #define __kernel_bss2_end         __kernel_bss_end
-#define __kernel_bss2_endpage     __kernel_bss_endpage
 #define __kernel_bss2_size        (__x86_kernel_bss_after_iob_size - 2 * PAGESIZE)
 #define __kernel_bss2_numpages    (__x86_kernel_bss_after_iob_pages - 2)
 #else /* CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
@@ -153,17 +137,13 @@ INTDEF byte_t __x86_kernel_data_before_iob_pages[];
 INTDEF byte_t __x86_kernel_data_after_iob_size[];
 INTDEF byte_t __x86_kernel_data_after_iob_pages[];
 #define __kernel_data1_start       __kernel_data_start
-#define __kernel_data1_startpage   __kernel_data_startpage
 #define __kernel_data1_startpage_p __kernel_data_startpage_p
 #define __kernel_data1_end         __kernel_bootiob_start
-#define __kernel_data1_endpage     __kernel_bootiob_startpage
 #define __kernel_data1_size        __x86_kernel_data_before_iob_size
 #define __kernel_data1_numpages    __x86_kernel_data_before_iob_pages
 #define __kernel_data2_start       (__kernel_bootiob_start + 2 * PAGESIZE) /* 2: Number of pages in TSS.IOB */
-#define __kernel_data2_startpage   (__kernel_bootiob_startpage + 2)        /* 2: Number of pages in TSS.IOB */
 #define __kernel_data2_startpage_p (__kernel_bootiob_startpage_p + 2)      /* 2: Number of pages in TSS.IOB */
 #define __kernel_data2_end         __kernel_data_end
-#define __kernel_data2_endpage     __kernel_data_endpage
 #define __kernel_data2_size        (__x86_kernel_data_after_iob_size - 2 * PAGESIZE)
 #define __kernel_data2_numpages    (__x86_kernel_data_after_iob_pages - 2)
 #endif /* !CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
@@ -175,7 +155,6 @@ INTDEF struct mpart x86_kernel_vm_parts[];
 INTDEF struct mnode x86_kernel_vm_nodes[];
 INTDEF struct mnode x86_vmnode_transition_reserve;
 
-#ifdef CONFIG_USE_NEW_VM
 #define INIT_MPART(self, node, pageptr, num_pages, num_bytes)                 \
 	{                                                                         \
 		MPART_INIT_mp_refcnt(2), /* 2 == 1(myself) + 1(node) */               \
@@ -196,124 +175,63 @@ INTDEF struct mnode x86_vmnode_transition_reserve;
 		MPART_INIT_mp_mem((physpage_t)(pageptr), (physpagecnt_t)(num_pages)), \
 		MPART_INIT_mp_meta(NULL)                                              \
 	}
-#else /* CONFIG_USE_NEW_VM */
-#define INIT_MPART(self, node, pageptr, num_pages, num_bytes)                       \
-	{                                                                               \
-		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */                        \
-		/* .dp_lock   = */ SHARED_RWLOCK_INIT,                                      \
-		{                                                                           \
-			/* .dp_tree_ptr = */ { NULL, NULL, { 0 }, { (size_t)(num_pages) - 1 } } \
-		},                                                                          \
-		/* .dp_crefs = */ LLIST_INIT,                                               \
-		/* .dp_srefs = */ node,                                                     \
-		/* .dp_stale = */ NULL,                                                     \
-		/* .dp_block = */ &vm_datablock_anonymous,                                  \
-		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,      \
-		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,                                 \
-		{                                                                           \
-			/* .dp_ramdata = */ {                                                   \
-				/* .rd_blockv = */ &(self).dp_ramdata.rd_block0,                    \
-				{                                                                   \
-					/* .rd_block0 = */ {                                            \
-						/* .rb_start = */ (physpage_t)(uintptr_t)(pageptr),         \
-						/* .rb_size  = */ (size_t)(num_pages)                       \
-					}                                                               \
-				}                                                                   \
-			}                                                                       \
-		}                                                                           \
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 
 INTERN struct mpart x86_kernel_vm_parts[6] = {
-#define DO_INIT_DATAPART_EX(id, startpage, num_pages, num_bytes) \
+#define DO_INIT_DATAPART(id, startpage, num_pages, num_bytes) \
 	INIT_MPART(x86_kernel_vm_parts[id], &x86_kernel_vm_nodes[id], startpage, num_pages, num_bytes)
-#define DO_INIT_DATAPART(id, name) \
-	DO_INIT_DATAPART_EX(id, name##_startpage_p, name##_numpages, name##_size)
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_TEXT,   __kernel_text),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_TEXT,   __kernel_text_startpage_p,   __kernel_text_numpages,   __kernel_text_size),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_startpage_p, __kernel_rodata_numpages, __kernel_rodata_size),
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA,   __kernel_data),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA,   __kernel_data_startpage_p,   __kernel_data_numpages,   __kernel_data_size),
 #else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA1,  __kernel_data1),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA2,  __kernel_data2),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA1,  __kernel_data1_startpage_p,  __kernel_data1_numpages,  __kernel_data1_size),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA2,  __kernel_data2_startpage_p,  __kernel_data2_numpages,  __kernel_data2_size),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_XDATA,  __kernel_xdata),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_XDATA,  __kernel_xdata_startpage_p,  __kernel_xdata_numpages,  __kernel_xdata_size),
 #ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS,    __kernel_bss),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS,    __kernel_bss_startpage_p,    __kernel_bss_numpages,    __kernel_bss_size),
 #else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS1,   __kernel_bss1),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS2,   __kernel_bss2),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS1,   __kernel_bss1_startpage_p,   __kernel_bss1_numpages,   __kernel_bss1_size),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS2,   __kernel_bss2_startpage_p,   __kernel_bss2_numpages,   __kernel_bss2_size),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
 #undef DO_INIT_DATAPART
-#undef DO_INIT_DATAPART_EX
 };
 
 
-#ifdef CONFIG_USE_NEW_VM
-#define INIT_MNODE_RESERVE(self, minaddr, maxaddr, minpage, maxpage, prot) \
-	{                                                                      \
-		MNODE_INIT_mn_mement({}),                                          \
-		MNODE_INIT_mn_minaddr(minaddr),                                    \
-		MNODE_INIT_mn_maxaddr(maxaddr),                                    \
-		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT |    \
-		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |           \
-		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),    \
-		MNODE_INIT_mn_part(NULL),                                          \
-		MNODE_INIT_mn_fspath(NULL),                                        \
-		MNODE_INIT_mn_fsname(NULL),                                        \
-		MNODE_INIT_mn_mman(&mman_kernel),                                  \
-		MNODE_INIT_mn_partoff(0),                                          \
-		MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),                \
-		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),            \
-		MNODE_INIT__mn_module(NULL)                                        \
+#define INIT_MNODE_RESERVE(self, minaddr, maxaddr, prot)                \
+	{                                                                   \
+		MNODE_INIT_mn_mement({}),                                       \
+		MNODE_INIT_mn_minaddr(minaddr),                                 \
+		MNODE_INIT_mn_maxaddr(maxaddr),                                 \
+		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
+		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |        \
+		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK), \
+		MNODE_INIT_mn_part(NULL),                                       \
+		MNODE_INIT_mn_fspath(NULL),                                     \
+		MNODE_INIT_mn_fsname(NULL),                                     \
+		MNODE_INIT_mn_mman(&mman_kernel),                               \
+		MNODE_INIT_mn_partoff(0),                                       \
+		MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),             \
+		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),         \
+		MNODE_INIT__mn_module(NULL)                                     \
 	}
-#define INIT_MNODE(self, minaddr, maxaddr, minpage, maxpage, prot, part) \
-	{                                                                    \
-		MNODE_INIT_mn_mement({}),                                        \
-		MNODE_INIT_mn_minaddr(minaddr),                                  \
-		MNODE_INIT_mn_maxaddr(maxaddr),                                  \
-		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT |  \
-		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |         \
-		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),  \
-		MNODE_INIT_mn_part(&(part)),                                     \
-		MNODE_INIT_mn_fspath(NULL),                                      \
-		MNODE_INIT_mn_fsname(NULL),                                      \
-		MNODE_INIT_mn_mman(&mman_kernel),                                \
-		MNODE_INIT_mn_partoff(0),                                        \
-		MNODE_INIT_mn_link({ NULL, &(part).mp_share.lh_first }),         \
-		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),          \
-		MNODE_INIT__mn_module(NULL)                                      \
+#define INIT_MNODE(self, minaddr, maxaddr, prot, part)                  \
+	{                                                                   \
+		MNODE_INIT_mn_mement({}),                                       \
+		MNODE_INIT_mn_minaddr(minaddr),                                 \
+		MNODE_INIT_mn_maxaddr(maxaddr),                                 \
+		MNODE_INIT_mn_flags((prot) | MNODE_F_SHARED | MNODE_F_NOSPLIT | \
+		                    MNODE_F_NOMERGE | MNODE_F_KERNPART |        \
+		                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK), \
+		MNODE_INIT_mn_part(&(part)),                                    \
+		MNODE_INIT_mn_fspath(NULL),                                     \
+		MNODE_INIT_mn_fsname(NULL),                                     \
+		MNODE_INIT_mn_mman(&mman_kernel),                               \
+		MNODE_INIT_mn_partoff(0),                                       \
+		MNODE_INIT_mn_link({ NULL, &(part).mp_share.lh_first }),        \
+		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),         \
+		MNODE_INIT__mn_module(NULL)                                     \
 	}
-#else /* CONFIG_USE_NEW_VM */
-#define INIT_MNODE_RESERVE(self, minaddr, maxaddr, minpage, maxpage, prot)                      \
-	{                                                                                           \
-		/* .vn_node   = */ { NULL, NULL, minpage, maxpage },                                    \
-		/* .vn_byaddr = */ LLIST_INITNODE,                                                      \
-		/* .vn_prot   = */ prot | VM_PROT_SHARED,                                               \
-		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
-		/* .vn_vm     = */ &vm_kernel,                                                          \
-		/* .vn_part   = */ NULL,                                                                \
-		/* .vn_block  = */ NULL,                                                                \
-		/* .vn_fspath = */ NULL,                                                                \
-		/* .vn_fsname = */ NULL,                                                                \
-		/* .vn_link   = */ LLIST_INITNODE,                                                      \
-		/* .vn_guard  = */ 0                                                                    \
-	}
-#define INIT_MNODE(self, minaddr, maxaddr, minpage, maxpage, prot, part)                        \
-	{                                                                                           \
-		/* .vn_node   = */ { NULL, NULL, minpage, maxpage },                                    \
-		/* .vn_byaddr = */ LLIST_INITNODE,                                                      \
-		/* .vn_prot   = */ prot | VM_PROT_SHARED,                                               \
-		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
-		/* .vn_vm     = */ &vm_kernel,                                                          \
-		/* .vn_part   = */ &(part),                                                             \
-		/* .vn_block  = */ &vm_datablock_anonymous,                                             \
-		/* .vn_fspath = */ NULL,                                                                \
-		/* .vn_fsname = */ NULL,                                                                \
-		/* .vn_link   = */ { NULL, &LLIST_HEAD((part).dp_srefs) },                              \
-		/* .vn_guard  = */ 0                                                                    \
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 
 
 /* Special VM node used to describe the memory reservation at the user-/kernel-space split. */
@@ -321,49 +239,37 @@ INTERN struct mnode x86_vmnode_transition_reserve =
 INIT_MNODE_RESERVE(x86_vmnode_transition_reserve,
                   KERNELSPACE_BASE,
                   KERNELSPACE_BASE + PAGESIZE - 1,
-                  PAGEID_ENCODE(KERNELSPACE_BASE),
-                  PAGEID_ENCODE(KERNELSPACE_BASE),
                   VM_PROT_NONE);
 
 INTERN struct mnode x86_kernel_vm_nodes[8] = {
-#define DO_INIT_NODE_EX(id, startaddr, endaddr, startpageid, endpageid, prot) \
-	INIT_MNODE(x86_kernel_vm_nodes[id], startaddr, (endaddr)-1,               \
-	           (pageid_t)(startpageid), (pageid_t)(endpageid)-1, prot,        \
-	           x86_kernel_vm_parts[id])
-#define DO_INIT_NODE(id, name, prot) \
-	DO_INIT_NODE_EX(id, name##_start, name##_end, name##_startpage, name##_endpage, prot)
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_TEXT,   __kernel_text,   MNODE_F_PEXEC | MNODE_F_PREAD),
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata, MNODE_F_PREAD),
+#define DO_INIT_NODE_EX(id, startaddr, endaddr, prot) INIT_MNODE(x86_kernel_vm_nodes[id], startaddr, (endaddr)-1, prot, x86_kernel_vm_parts[id])
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_TEXT,   __kernel_text_start,   __kernel_text_end,   MNODE_F_PEXEC | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_start, __kernel_rodata_end, MNODE_F_PREAD),
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA,   __kernel_data,   MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_DATA,   __kernel_data_start,   __kernel_data_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
 #else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA1,  __kernel_data1,  MNODE_F_PWRITE | MNODE_F_PREAD),
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA2,  __kernel_data2,  MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_DATA1,  __kernel_data1_start,  __kernel_data1_end,  MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_DATA2,  __kernel_data2_start,  __kernel_data2_end,  MNODE_F_PWRITE | MNODE_F_PREAD),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_XDATA,  __kernel_xdata,  MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_XDATA,  __kernel_xdata_start,  __kernel_xdata_end,  MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD),
 #ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS,    __kernel_bss,    MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_BSS,    __kernel_bss_start,    __kernel_bss_end,    MNODE_F_PWRITE | MNODE_F_PREAD),
 #else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS1,   __kernel_bss1,   MNODE_F_PWRITE | MNODE_F_PREAD),
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS2,   __kernel_bss2,   MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_BSS1,   __kernel_bss1_start,   __kernel_bss1_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_BSS2,   __kernel_bss2_start,   __kernel_bss2_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
-#undef DO_INIT_NODE
 
 	/* [X86_KERNEL_VMMAPPING_IDENTITY_RESERVE] = */
 #ifdef X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
 	INIT_MNODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-	                  0, /* Calculated below */
-	                  0, /* Calculated below */
-	                  0, /* Calculated below */
-	                  0, /* Calculated below */
-	                  VM_PROT_NONE),
+	                   0, /* Calculated below */
+	                   0, /* Calculated below */
+	                   VM_PROT_NONE),
 #else /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 	INIT_MNODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-	                  X86_MMAN_KERNEL_PDIR_RESERVED_BASE,
-	                  X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1,
-	                  PAGEID_ENCODE(X86_MMAN_KERNEL_PDIR_RESERVED_BASE),
-	                  PAGEID_ENCODE(X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE) - 1,
-	                  VM_PROT_NONE),
+	                   X86_MMAN_KERNEL_PDIR_RESERVED_BASE,
+	                   X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1,
+	                   VM_PROT_NONE),
 #endif /* !X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 };
 
@@ -380,8 +286,6 @@ INTERN struct mnode x86_pdata_mnode =
 INIT_MNODE(x86_pdata_mnode,
            __kernel_pdata_start_p,
            __kernel_pdata_end_p - 1,
-           (pageid_t)__kernel_pdata_startpage_p,
-           (pageid_t)__kernel_pdata_endpage_p - 1,
            MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD,
            x86_pdata_mpart);
 
@@ -394,10 +298,8 @@ INTDEF struct mpart x86_kernel_vm_part_free;
 INTDEF struct mnode x86_kernel_vm_node_free;
 
 INTDEF byte_t __kernel_free_start[];
-INTDEF byte_t __kernel_free_startpage[];
 INTDEF byte_t __kernel_free_startpage_p[];
 INTDEF byte_t __kernel_free_end[];
-INTDEF byte_t __kernel_free_endpage[];
 INTDEF byte_t __kernel_free_size[];
 INTDEF byte_t __kernel_free_numpages[];
 
@@ -410,8 +312,6 @@ INTERN ATTR_FREEDATA struct mnode x86_kernel_vm_node_free =
 INIT_MNODE(x86_kernel_vm_node_free,
            __kernel_free_start,
            __kernel_free_end - 1,
-           (pageid_t)__kernel_free_startpage,
-           (pageid_t)__kernel_free_endpage - 1,
            MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD,
            x86_kernel_vm_part_free);
 
@@ -424,7 +324,7 @@ INIT_MPART(kernel_meminfo_mpart, &kernel_meminfo_mnode,
            0 /* Filled later */,
            0 /* Filled later */);
 INTERN struct mnode kernel_meminfo_mnode =
-INIT_MNODE(kernel_meminfo_mnode, 0, 0, 0, 0,
+INIT_MNODE(kernel_meminfo_mnode, 0, 0,
            MNODE_F_PWRITE | MNODE_F_PREAD,
            kernel_meminfo_mpart);
 
@@ -436,7 +336,7 @@ INIT_MPART(x86_lapic_mpart, &x86_lapic_mnode,
            0 /* (possibly) Filled later */,
            0 /* (possibly) Filled later */);
 INTERN struct mnode x86_lapic_mnode =
-INIT_MNODE(x86_lapic_mnode, 0, 0, 0, 0,
+INIT_MNODE(x86_lapic_mnode, 0, 0,
            MNODE_F_PWRITE | MNODE_F_PREAD,
            x86_lapic_mpart);
 
@@ -458,13 +358,6 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 	struct mpart *part;
 	void *addr;
 	assert(node->vn_vm == &vm_kernel);
-#ifndef CONFIG_USE_NEW_VM
-	assertf(node->vn_part->dp_ramdata.rd_blockv == &node->vn_part->dp_ramdata.rd_block0,
-	        "node->vn_part->dp_ramdata.rd_blockv  = %p\n"
-	        "&node->vn_part->dp_ramdata.rd_block0 = %p\n",
-	        node->vn_part->dp_ramdata.rd_blockv,
-	        &node->vn_part->dp_ramdata.rd_block0);
-#endif /* !CONFIG_USE_NEW_VM */
 	vm_node_insert(node);
 	part = node->vn_part;
 	assertf(mnode_getsize(node) == mpart_getsize(part),
@@ -480,13 +373,6 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_map(addr, part->mp_mem.mc_size * PAGESIZE,
 	            physpage2addr(part->mp_mem.mc_start), prot);
-#ifndef CONFIG_USE_NEW_VM
-	assertf(part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0,
-	        "part->dp_ramdata.rd_blockv  = %p\n"
-	        "&part->dp_ramdata.rd_block0 = %p\n",
-	        part->dp_ramdata.rd_blockv,
-	        &part->dp_ramdata.rd_block0);
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 
@@ -566,11 +452,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 #endif /* !NDEBUG */
 
 	/* Map the LAPIC into the kernel VM. */
-#ifdef CONFIG_USE_NEW_VM
 	assert(mpart_getsize(&x86_lapic_mpart) == x86_lapic_mpart.mp_mem.mc_size * PAGESIZE);
-#else /* CONFIG_USE_NEW_VM */
-	assert(vm_datapart_numdpages(&x86_lapic_mpart) == x86_lapic_mpart.dp_ramdata.rd_block0.rb_size);
-#endif /* !CONFIG_USE_NEW_VM */
 	if (x86_lapic_mpart.mp_mem.mc_size != 0) {
 		byte_t *lapic_addr;
 		lapic_addr = (byte_t *)vm_getfree(&vm_kernel,
@@ -626,16 +508,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	 * physical memory identity mapping containing  the kernel core image,  or
 	 * may have also not been mapped at all (in which case this is a no-op)
 	 * s.a.: the comment inside of `vm_copyfromphys_noidentity_partial()' in `boot/acpi.c' */
-#ifdef CONFIG_USE_NEW_VM
 	pagedir_unmap_and_sync_one(FORTASK(&_boottask, this_trampoline));
 	pagedir_unmap_and_sync_one(FORTASK(&_bootidle, this_trampoline));
 	pagedir_unmap_and_sync_one(FORTASK(&_asyncwork, this_trampoline));
-#else /* CONFIG_USE_NEW_VM */
-	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_boottask, this_trampoline_page)));
-	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_bootidle, this_trampoline_page)));
-	pagedir_unmap_and_sync_one(PAGEID_DECODE_KERNEL(FORTASK(&_asyncwork, this_trampoline_page)));
-#endif /* !CONFIG_USE_NEW_VM */
-
 	/* All right! that's our entire kernel VM all cleaned up! */
 }
 

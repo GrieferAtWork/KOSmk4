@@ -564,18 +564,14 @@ x86_load_psp0_thread(struct x86_dbg_psp0threadstate const *__restrict state,
 }
 
 INTDEF byte_t __kernel_boottask_stack[];
-INTDEF byte_t __kernel_boottask_stack_page[];
 INTDEF byte_t __kernel_boottask_stack_page_p[];
 INTDEF byte_t __kernel_bootidle_stack[];
-INTDEF byte_t __kernel_bootidle_stack_page[];
 INTDEF byte_t __kernel_bootidle_stack_page_p[];
 INTDEF byte_t __kernel_asyncwork_stack[];
-INTDEF byte_t __kernel_asyncwork_stack_page[];
 INTDEF byte_t __kernel_asyncwork_stack_page_p[];
 
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
-#ifdef CONFIG_USE_NEW_VM
 	struct mnode *node = &FORTASK(thread, this_kernel_stacknode_);
 	struct mpart *part = &FORTASK(thread, this_kernel_stackpart_);
 	node->mn_part           = part;
@@ -603,27 +599,6 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 		part->mp_mem.mc_size = stack_size / PAGESIZE;
 	node->mn_maxaddr = node->mn_minaddr + stack_size - 1;
 	part->mp_maxaddr = part->mp_minaddr + stack_size - 1;
-#else /* CONFIG_USE_NEW_VM */
-	FORTASK(thread, this_kernel_stacknode_).vn_part              = &FORTASK(thread, this_kernel_stackpart_);
-	FORTASK(thread, this_kernel_stacknode_).vn_link.ln_pself     = &LLIST_HEAD(FORTASK(thread, this_kernel_stackpart_).dp_srefs);
-	FORTASK(thread, this_kernel_stackpart_).dp_srefs             = &FORTASK(thread, this_kernel_stacknode_);
-	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_blockv = &FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0;
-	if (thread == &_boottask) {
-		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_boottask_stack_page);
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_boottask_stack_page_p);
-	} else if (thread == &_bootidle) {
-		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_bootidle_stack_page);
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_bootidle_stack_page_p);
-	} else if (thread == &_asyncwork) {
-		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_asyncwork_stack_page);
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_asyncwork_stack_page_p);
-	}
-	FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmax = FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin +
-	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
-	FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmax = FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmin +
-	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
-	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size = CEILDIV(stack_size, PAGESIZE);
-#endif /* !CONFIG_USE_NEW_VM */
 	init_this_x86_kernel_psp0(thread);
 }
 

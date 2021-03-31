@@ -1219,7 +1219,6 @@ INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__r
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
-#ifdef CONFIG_USE_NEW_VM
 #define HANDLE_TYPE_MFILE        HANDLE_TYPE_DATABLOCK
 #define handle_mfile_refcnt      handle_datablock_refcnt
 #define handle_mfile_incref      handle_datablock_incref
@@ -1279,7 +1278,6 @@ INTDEF NONNULL((1)) void KCALL handle_mfile_pollconnect(struct mfile *__restrict
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mfile_polltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_mfile_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-#endif /* CONFIG_USE_NEW_VM */
 
 DECL_END
 

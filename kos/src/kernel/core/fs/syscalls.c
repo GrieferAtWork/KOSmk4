@@ -2996,7 +2996,6 @@ DEFINE_SYSCALL3(ssize_t, readlink,
 #endif /* __ARCH_WANT_SYSCALL_READLINK */
 
 
-#ifdef CONFIG_USE_NEW_VM
 typedef void(KCALL *kernel_permman_onexec_t)(void);
 INTDEF kernel_permman_onexec_t __kernel_permman_onexec_start[];
 INTDEF kernel_permman_onexec_t __kernel_permman_onexec_end[];
@@ -3009,20 +3008,6 @@ LOCAL void KCALL run_permman_onexec(void) {
 	/* Invoke dynamic callbacks. */
 	mman_onexec_callbacks();
 }
-#else /* CONFIG_USE_NEW_VM */
-typedef void(KCALL *kernel_pervm_onexec_t)(void);
-INTDEF kernel_pervm_onexec_t __kernel_pervm_onexec_start[];
-INTDEF kernel_pervm_onexec_t __kernel_pervm_onexec_end[];
-
-LOCAL void KCALL run_permman_onexec(void) {
-	kernel_pervm_onexec_t *iter;
-	for (iter = __kernel_pervm_onexec_start;
-	     iter < __kernel_pervm_onexec_end; ++iter)
-		(**iter)();
-	/* Invoke dynamic callbacks. */
-	vm_onexec_callbacks();
-}
-#endif /* !CONFIG_USE_NEW_VM */
 
 
 
@@ -3292,9 +3277,9 @@ kernel_execveat(fd_t dirfd,
 	                                                                &args.ea_xdentry);
 	TRY {
 		/* Assert that the specified node is a regular file. */
-#ifndef CONFIG_USE_NEW_VM /* TODO */
+#if 0 /* TODO */
 		vm_exec_assert_regular(args.ea_xnode);
-#endif /* !CONFIG_USE_NEW_VM */
+#endif
 
 		/* Check for execute permissions? */
 		inode_access(args.ea_xnode, R_OK | X_OK);

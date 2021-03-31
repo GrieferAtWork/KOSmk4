@@ -189,7 +189,7 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 		kfree(node);
 		RETHROW();
 	}
-#ifdef CONFIG_USE_NEW_VM
+
 	/* Initialize... */
 	part->mp_refcnt = 1;
 	part->mp_flags  = MPART_F_NORMAL;
@@ -222,35 +222,6 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 	node->mbn_file   = incref(&mfile_zero); /* Unused, but must be non-NULL */
 
 	return node;
-#else /* CONFIG_USE_NEW_VM */
-	part->dp_refcnt = 1;
-	shared_rwlock_init(&part->dp_lock);
-	part->dp_tree.a_vmin                = 0;
-	part->dp_tree.a_vmax                = 0;
-	part->dp_crefs                      = NULL;
-	part->dp_srefs                      = NULL;
-	part->dp_stale                      = NULL;
-	part->dp_block                      = incref(&vm_datablock_anonymous_zero);
-	part->dp_flags                      = VM_DATAPART_FLAG_NORMAL;
-	part->dp_state                      = VM_DATAPART_STATE_INCORE;
-	part->dp_ramdata.rd_blockv          = &part->dp_ramdata.rd_block0;
-	part->dp_ramdata.rd_block0.rb_start = overlap_page;
-	part->dp_ramdata.rd_block0.rb_size  = 1;
-	part->dp_pprop                      = VM_DATAPART_PPP_INITIALIZED << (0 * VM_DATAPART_PPP_BITS);
-	part->dp_futex                      = NULL;
-	/* node->vn_node.a_vmin = ...; // Initialized by the caller */
-	/* node->vn_node.a_vmax = ...; // Initialized by the caller */
-	/* node->vn_prot        = ...; // Initialized by the caller */
-	node->vn_flags = VM_NODE_FLAG_NORMAL;
-	/* node->vn_vm          = ...; // Unused by vmb */
-	node->vn_part   = part; /* Inherit reference */
-	node->vn_block  = incref(&vm_datablock_anonymous_zero);
-	node->vn_fspath = NULL;
-	node->vn_fsname = NULL;
-	/* node->vn_link        = ...; // Unused by vmb */
-	node->vn_guard = 0;
-	return node;
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 

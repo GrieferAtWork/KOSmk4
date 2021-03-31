@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <kernel/mman/mpart.h> /* `struct mpart_setcore_data', `struct mpart_unsharecow_data' */
@@ -238,6 +235,5 @@ NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict se
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MFILE_MAP_H */

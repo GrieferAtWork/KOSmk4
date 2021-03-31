@@ -849,7 +849,6 @@ struct inode
 #else /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 #define __inode_as_datablock(x)   (x)
 #endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
-#ifdef CONFIG_USE_NEW_VM
 	struct rwlock       i_lock;         /* Lock for this INode */
 #define __inode_lock(self) (&(self)->i_lock)
 #define __inode_cinit_base(self, block_shift)                                     \
@@ -858,11 +857,6 @@ struct inode
 #define __inode_init_base(self, block_shift)                                     \
 	(mfile_init(__inode_as_datablock(self), &inode_datablock_type, block_shift), \
 	 rwlock_init(&(self)->i_lock))
-#else /* CONFIG_USE_NEW_VM */
-#define __inode_lock(self)                    (&__inode_as_datablock(self)->db_lock)
-#define __inode_cinit_base(self, block_shift) mfile_cinit(__inode_as_datablock(self), &inode_datablock_type, block_shift)
-#define __inode_init_base(self, block_shift)  mfile_init(__inode_as_datablock(self), &inode_datablock_type, block_shift)
-#endif /* !CONFIG_USE_NEW_VM */
 
 	struct inode_type  *i_type;         /* [1..1][const] INode type. */
 	REF struct superblock *i_super;     /* [1..1][const][REF_IF(!= this)] The associated superblock. */
@@ -915,9 +909,6 @@ DATDEF struct vm_datablock_type inode_datablock_type;
 #define vm_datablock_isinode(x) ((x)->mf_ops == &inode_datablock_type)
 #endif /* !vm_datablock_isinode */
 
-
-#if (!defined(__INTELLISENSE__) || defined(CONFIG_USE_NEW_VM) || \
-     !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT))
 
 #ifndef ____devfs_datablock_defined
 #define ____devfs_datablock_defined 1
@@ -979,7 +970,6 @@ __DEFINE_SYNC_RWLOCK(struct inode,
                      inode_lock_upgrade,
                      inode_lock_upgrade_nx,
                      inode_lock_downgrade)
-#endif /* !__INTELLISENSE__ */
 
 
 

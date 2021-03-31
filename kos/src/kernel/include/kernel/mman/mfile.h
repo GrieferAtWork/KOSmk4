@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
@@ -82,12 +79,10 @@ typedef pos_t mfile_block_t;
 #define MFILE_PARTS_ANONYMOUS ((struct mpart *)-1)
 
 
-#ifdef CONFIG_USE_NEW_VM
 #ifndef __poll_mode_t_defined
 #define __poll_mode_t_defined 1
 typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !poll_mode_t_defined */
-#endif /* CONFIG_USE_NEW_VM */
 
 /*
  * HINTS: Disallowing certain operations for `struct mfile' users:
@@ -451,7 +446,8 @@ struct mfile_ops {
 	/*NOTHROW*/ (KCALL *mo_changed)(struct mfile *__restrict self,
 	                                struct mpart *__restrict part);
 
-#ifdef CONFIG_USE_NEW_VM /* Hacky forward-compatibility... */
+	/* Hacky forward-compatibility... */
+
 	/* [0..1] Optional operators for when read(2) or write(2) is used with
 	 *        a file descriptor pointing to a mfile of this type.
 	 * These callbacks are  used by UVIO  datablocks to implement  the
@@ -475,7 +471,6 @@ struct mfile_ops {
 	WUNUSED NONNULL((1)) poll_mode_t
 	(KCALL *dt_handle_polltest)(struct mfile *__restrict self,
 	                            poll_mode_t what) THROWS(...);
-#endif /* CONFIG_USE_NEW_VM */
 #endif /* !CONFIG_USE_NEW_FS */
 };
 
@@ -1146,11 +1141,7 @@ FUNDEF WUNUSED NONNULL((1)) poll_mode_t KCALL mfile_upolltest(struct mfile *__re
 FUNDEF NONNULL((1)) syscall_slong_t KCALL mfile_uhop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 #endif /* CONFIG_USE_NEW_FS */
 
-
-
-
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MFILE_H */

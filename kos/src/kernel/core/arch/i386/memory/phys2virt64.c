@@ -300,7 +300,6 @@ done:
  * Separately, this node's  presence within the  kernel VM  prevents
  * anything else from being mapped into the physical identity range. */
 PUBLIC struct mnode x86_phys2virt64_node = {
-#ifdef CONFIG_USE_NEW_VM
 	MNODE_INIT_mn_mement({}),
 	MNODE_INIT_mn_minaddr(KERNEL_PHYS2VIRT_MIN),
 	MNODE_INIT_mn_maxaddr(KERNEL_PHYS2VIRT_MAX),
@@ -316,24 +315,6 @@ PUBLIC struct mnode x86_phys2virt64_node = {
 	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT__mn_module(NULL)
-#else /* CONFIG_USE_NEW_VM */
-	/* .vn_node = */ {
-		NULL,
-		NULL,
-		PAGEID_ENCODE(KERNEL_PHYS2VIRT_MIN),
-		PAGEID_ENCODE(KERNEL_PHYS2VIRT_MAX)
-	},
-	/* .vn_byaddr = */ LLIST_INITNODE,
-	/* .vn_prot   = */ VM_PROT_READ | VM_PROT_WRITE,
-	/* .vn_flags  = */ VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE,
-	/* .vn_vm     = */ &vm_kernel,
-	/* .vn_part   = */ NULL,                   /* Reserved mapping */
-	/* .vn_block  = */ &vm_datablock_physical, /* Physical memory mapping */
-	/* .vn_fspath = */ NULL,
-	/* .vn_fsname = */ NULL,
-	/* .vn_link   = */ LLIST_INITNODE,
-	/* .vn_guard  = */ 0
-#endif /* !CONFIG_USE_NEW_VM */
 };
 
 

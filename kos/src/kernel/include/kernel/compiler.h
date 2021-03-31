@@ -45,11 +45,6 @@
 #   endif
 #endif /* !CONFIG_NO_SMP */
 
-#undef CONFIG_USE_NEW_VM
-#if 1
-#define CONFIG_USE_NEW_VM
-#endif
-
 #undef CONFIG_USE_NEW_FS
 #if 0
 #define CONFIG_USE_NEW_FS
@@ -61,7 +56,6 @@
 #endif
 
 
-#ifdef CONFIG_USE_NEW_VM
 /* Backward-compatibility */
 #define vm_datapart         mpart
 #define vm_datablock        mfile
@@ -76,20 +70,6 @@
 #define vmb                 mbuilder
 #define ln_pself            le_prev
 #define ln_next             le_next
-#else /* CONFIG_USE_NEW_VM */
-/* Forward-compatibility */
-#define mpart     vm_datapart
-#define mfile     vm_datablock
-#define mfile_ops vm_datablock_type
-#define mnode     vm_node
-#define mbnode    vm_node
-#define mman      vm
-#define mfutex    vm_futex
-#define mpartmeta vm_futex_controller
-#define mchunk    vm_ramblock
-#define mdmalock  vm_dmalock
-#define mbuilder  vmb
-#endif /* !CONFIG_USE_NEW_VM */
 
 #ifdef CONFIG_USE_NEW_FS
 /* Backward-compatibility */
@@ -229,11 +209,7 @@
 
 #define ATTR_PERCPU      ATTR_SECTION(".data.percpu")  /* Per-cpu template data. */
 #define ATTR_PERTASK     ATTR_SECTION(".data.pertask") /* Per-task template data. */
-#ifdef CONFIG_USE_NEW_VM
 #define ATTR_PERMMAN     ATTR_SECTION(".data.permman") /* Per-memory-manager template data. */
-#else /* CONFIG_USE_NEW_VM */
-#define ATTR_PERMMAN     ATTR_SECTION(".data.pervm")   /* Per-vm template data. */
-#endif /* !CONFIG_USE_NEW_VM */
 
 
 

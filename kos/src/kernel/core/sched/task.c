@@ -78,7 +78,6 @@ struct task task_header = {
 	}
 };
 
-#ifdef CONFIG_USE_NEW_VM
 DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 DATDEF ATTR_PERTASK struct mnode this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
@@ -141,76 +140,6 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stackguard_ = {
 };
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
-#else /* CONFIG_USE_NEW_VM */
-PUBLIC ATTR_PERTASK struct vm_datapart
-this_kernel_stackpart_ ASMNAME("this_kernel_stackpart") = {
-	/* .dp_refcnt = */ 1,
-	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
-	{
-		/* .dp_tree = */ { NULL, NULL, 0, CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1 }
-	},
-	/* .dp_crefs = */ LLIST_INIT,
-	/* .dp_srefs = */ (struct vm_node *)&this_kernel_stacknode,
-	/* .dp_stale = */ NULL,
-	/* .dp_block = */ &vm_datablock_anonymous,
-#if CEILDIV(KERNEL_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
-	/* .dp_flags = */ VM_DATAPART_FLAG_HEAPPPP,
-#else
-	/* .dp_flags = */ VM_DATAPART_FLAG_NORMAL,
-#endif
-	/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
-	{
-		/* .dp_ramdata = */ {
-			/* .rd_blockv = */ &this_kernel_stackpart_.dp_ramdata.rd_block0,
-			{
-				/* .rd_block0 = */ {
-					/* .rb_start = */ 0, /* Filled later. */
-					/* .rb_size  = */ CEILDIV(KERNEL_STACKSIZE, PAGESIZE)
-				}
-			}
-		}
-	},
-	{
-#if CEILDIV(KERNEL_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
-		/* .dp_pprop = */ 0,
-#else
-		/* .dp_pprop = */ (uintptr_t)-1,
-#endif
-	},
-};
-
-PUBLIC ATTR_PERTASK struct vm_node
-this_kernel_stacknode_ ASMNAME("this_kernel_stacknode") = {
-	/* .vn_node      = */ { NULL, NULL, 0, 0 },
-	/* .vn_byaddr    = */ LLIST_INITNODE,
-	/* .vn_prot      = */ VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
-	/* .vn_flags     = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
-	/* .vn_vm        = */ &vm_kernel,
-	/* .vn_part      = */ &this_kernel_stackpart_,
-	/* .vn_block     = */ &vm_datablock_anonymous,
-	/* .vn_fspath    = */ NULL,
-	/* .vn_fsname    = */ NULL,
-	/* .vn_link      = */ { NULL, &LLIST_HEAD(this_kernel_stackpart_.dp_srefs) },
-	/* .vn_guard     = */ 0
-};
-
-#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-PUBLIC ATTR_PERTASK struct vm_node
-this_kernel_stackguard_ ASMNAME("this_kernel_stackguard") = {
-	/* .vn_node      = */ { NULL, NULL, 0, 0 },
-	/* .vn_byaddr    = */ LLIST_INITNODE,
-	/* .vn_prot      = */ VM_PROT_SHARED,
-	/* .vn_flags     = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
-	/* .vn_vm        = */ &vm_kernel,
-	/* .vn_part      = */ NULL, /* Reservation */
-	/* .vn_block     = */ NULL, /* Reservation */
-	/* .vn_fspath    = */ NULL,
-	/* .vn_fsname    = */ NULL,
-	/* .vn_link      = */ { NULL, NULL },
-	/* .vn_guard     = */ 0
-};
-#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-#endif /* !CONFIG_USE_NEW_VM */
 
 
 
@@ -224,13 +153,8 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler_arch)(void);
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
                                                    PAGEDIR_PAGEALIGNED void *addr) {
-#ifdef CONFIG_USE_NEW_VM
 	FORTASK(self, this_trampoline_node).mn_minaddr = (byte_t *)addr;
 	FORTASK(self, this_trampoline_node).mn_maxaddr = (byte_t *)addr + PAGESIZE - 1;
-#else /* CONFIG_USE_NEW_VM */
-	FORTASK(self, this_trampoline_node).vn_node.a_vmin = PAGEID_ENCODE(addr);
-	FORTASK(self, this_trampoline_node).vn_node.a_vmax = PAGEID_ENCODE(addr);
-#endif /* !CONFIG_USE_NEW_VM */
 	/* Load the trampoline node into the kernel VM. */
 	assert(FORTASK(self, this_trampoline_node).vn_vm == &vm_kernel);
 	vm_node_insert(&FORTASK(self, this_trampoline_node));
@@ -247,33 +171,16 @@ NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
 PUBLIC ATTR_PERTASK struct exception_info this_exception_info = {};
 
 
-#ifdef CONFIG_USE_NEW_VM
 INTDEF byte_t __kernel_boottask_stack[];
 INTDEF byte_t __kernel_boottask_stack_page_p[];
 INTDEF byte_t __kernel_bootidle_stack[];
 INTDEF byte_t __kernel_bootidle_stack_page_p[];
 INTDEF byte_t __kernel_asyncwork_stack[];
 INTDEF byte_t __kernel_asyncwork_stack_page_p[];
-#else /* CONFIG_USE_NEW_VM */
-INTDEF byte_t __kernel_boottask_stack_page[];
-INTDEF byte_t __kernel_boottask_stack_page_p[];
-INTDEF byte_t __kernel_bootidle_stack_page[];
-INTDEF byte_t __kernel_bootidle_stack_page_p[];
-INTDEF byte_t __kernel_asyncwork_stack_page[];
-INTDEF byte_t __kernel_asyncwork_stack_page_p[];
-#endif /* !CONFIG_USE_NEW_VM */
-
-
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-#ifdef CONFIG_USE_NEW_VM
 INTDEF byte_t __kernel_boottask_stack_guard[];
 INTDEF byte_t __kernel_asyncwork_stack_guard[];
 INTDEF byte_t __kernel_bootidle_stack_guard[];
-#else /* CONFIG_USE_NEW_VM */
-INTDEF byte_t __kernel_boottask_stack_guard_page[];
-INTDEF byte_t __kernel_asyncwork_stack_guard_page[];
-INTDEF byte_t __kernel_bootidle_stack_guard_page[];
-#endif /* !CONFIG_USE_NEW_VM */
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 
@@ -329,7 +236,6 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 #define STN(thread) FORTASK(&thread, this_kernel_stacknode_)
 #define STP(thread) FORTASK(&thread, this_kernel_stackpart_)
 
-#ifdef CONFIG_USE_NEW_VM
 	/* _boottask */
 	STN(_boottask).mn_part           = &STP(_boottask);
 	STN(_boottask).mn_link.le_prev   = &STP(_boottask).mp_share.lh_first;
@@ -368,67 +274,6 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&_bootidle, this_kernel_stackguard_).mn_maxaddr = __kernel_bootidle_stack_guard + PAGESIZE - 1;
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
-#else /* CONFIG_USE_NEW_VM */
-	/* _boottask */
-	STN(_boottask).vn_part          = &STP(_boottask);
-	STN(_boottask).vn_link.ln_pself = &STP(_boottask).dp_srefs;
-	STP(_boottask).dp_srefs         = &STN(_boottask);
-	STP(_boottask).dp_ramdata.rd_blockv = &STP(_boottask).dp_ramdata.rd_block0;
-	{
-		pageid_t boottask_stack_pageid = (pageid_t)loadfarptr(__kernel_boottask_stack_page);
-		STN(_boottask).vn_node.a_vmin  = boottask_stack_pageid;
-		STN(_boottask).vn_node.a_vmax  = boottask_stack_pageid + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-	}
-	STP(_boottask).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_boottask_stack_page_p);
-#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	{
-		pageid_t boottask_stack_guard_pageid = (pageid_t)loadfarptr(__kernel_boottask_stack_guard_page);
-		FORTASK(&_boottask, this_kernel_stackguard_).vn_node.a_vmin = boottask_stack_guard_pageid;
-		FORTASK(&_boottask, this_kernel_stackguard_).vn_node.a_vmax = boottask_stack_guard_pageid;
-	}
-#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-
-
-	/* _asyncwork */
-	STN(_asyncwork).vn_part              = &STP(_asyncwork);
-	STN(_asyncwork).vn_link.ln_pself     = &STP(_asyncwork).dp_srefs;
-	STP(_asyncwork).dp_srefs             = &STN(_asyncwork);
-	STP(_asyncwork).dp_ramdata.rd_blockv = &STP(_asyncwork).dp_ramdata.rd_block0;
-	{
-		pageid_t asyncwork_stack_pageid = (pageid_t)loadfarptr(__kernel_asyncwork_stack_page);
-		FORTASK(&_asyncwork, this_kernel_stacknode_).vn_node.a_vmin = asyncwork_stack_pageid;
-		FORTASK(&_asyncwork, this_kernel_stacknode_).vn_node.a_vmax = asyncwork_stack_pageid + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-	}
-	FORTASK(&_asyncwork, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_asyncwork_stack_page_p);
-#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	{
-		pageid_t asyncwork_stack_guard_pageid = (pageid_t)loadfarptr(__kernel_asyncwork_stack_guard_page);
-		FORTASK(&_asyncwork, this_kernel_stackguard_).vn_node.a_vmin = asyncwork_stack_guard_pageid;
-		FORTASK(&_asyncwork, this_kernel_stackguard_).vn_node.a_vmax = asyncwork_stack_guard_pageid;
-	}
-#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-
-	/* _bootidle */
-	STN(_bootidle).vn_part              = &STP(_bootidle);
-	STN(_bootidle).vn_link.ln_pself     = &STP(_bootidle).dp_srefs;
-	STP(_bootidle).dp_srefs             = &STN(_bootidle);
-	STP(_bootidle).dp_ramdata.rd_blockv = &STP(_bootidle).dp_ramdata.rd_block0;
-	{
-		pageid_t bootidle_stack_pageid = (pageid_t)loadfarptr(__kernel_bootidle_stack_page);
-		FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmin = bootidle_stack_pageid;
-		FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmax = bootidle_stack_pageid + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
-	}
-	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_bootidle_stack_page_p);
-	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
-	FORTASK(&_bootidle, this_kernel_stackpart_).dp_tree.a_vmax                = (datapage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
-#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	{
-		pageid_t bootidle_stack_guard_pageid = (pageid_t)loadfarptr(__kernel_bootidle_stack_guard_page);
-		FORTASK(&_bootidle, this_kernel_stackguard_).vn_node.a_vmin = bootidle_stack_guard_pageid;
-		FORTASK(&_bootidle, this_kernel_stackguard_).vn_node.a_vmax = bootidle_stack_guard_pageid;
-	}
-#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-#endif /* !CONFIG_USE_NEW_VM */
 #undef STP
 #undef STN
 
@@ -503,9 +348,6 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 /* Called with a lock to the kernel VM's treelock held. */
 PRIVATE NOBLOCK VM_KERNEL_PENDING_CB_RETURN_T
 NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict self) {
-#ifndef CONFIG_USE_NEW_VM
-	struct vm_node *node;
-#endif /* !CONFIG_USE_NEW_VM */
 	void *addr;
 	size_t size;
 	assertf(self != &_boottask && self != &_bootidle && self != &_asyncwork,
@@ -518,7 +360,6 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	assert(vm_kernel_treelock_writing());
 	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 
-#ifdef CONFIG_USE_NEW_VM
 	/* Unlink + unmap the trampoline node. */
 	mnode_tree_removenode(&mman_kernel.mm_mappings, &FORTASK(self, this_trampoline_node));
 	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node));
@@ -538,49 +379,10 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare(addr, size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-#else /* CONFIG_USE_NEW_VM */
-	/* Unlink + unmap the trampoline node. */
-	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_trampoline_node).vn_node.a_vmin);
-	assertf(node == &FORTASK(self, this_trampoline_node),
-	        "node                                 = %p\n"
-	        "&FORTASK(self, this_trampoline_node) = %p\n"
-	        "self                                 = %p\n",
-	        node, &FORTASK(self, this_trampoline_node), self);
-	addr = vm_node_getaddr(node);
-	pagedir_unmapone(addr);
-	vm_supersyncone(addr);
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepareone(addr);
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-
-	/* Unlink + unmap the stack node. */
-#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_kernel_stackguard_).vn_node.a_vmin);
-	assertf(node == &FORTASK(self, this_kernel_stackguard_),
-	        "node                                   = %p\n"
-	        "&FORTASK(self, this_kernel_stackguard) = %p\n"
-	        "self                                   = %p\n",
-	        node, &FORTASK(self, this_kernel_stackguard_), self);
-#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_kernel_stacknode_).vn_node.a_vmin);
-	assertf(node == &FORTASK(self, this_kernel_stacknode_),
-	        "node                                  = %p\n"
-	        "&FORTASK(self, this_kernel_stacknode) = %p\n"
-	        "self                                  = %p\n",
-	        node, &FORTASK(self, this_kernel_stacknode_), self);
-	addr = vm_node_getaddr(node);
-	size = vm_node_getsize(node);
-	pagedir_unmap(addr, size);
-	vm_supersync(addr, size);
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare(addr, size);
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-#endif /* !CONFIG_USE_NEW_VM */
 
 	/* Deallocate the kernel stack. */
 	vm_datapart_do_freeram(&FORTASK(self, this_kernel_stackpart_));
 
-#ifdef CONFIG_USE_NEW_VM
 	/* TODO: Use 2-step cleanup and free the task structure _after_ releasing
 	 *       the  lock  to the  kernel mman  (through  use of  a postlockop) */
 	{
@@ -595,41 +397,6 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 		heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_NORMAL);
 		decref(mm);
 	}
-#else /* CONFIG_USE_NEW_VM */
-	{
-		REF struct vm *myvm = self->t_mman;
-		COMPILER_READ_BARRIER();
-		if (LIST_ISBOUND(self, t_mman_tasks)) {
-			struct task *next;
-			if (vm_tasklock_trywrite(myvm)) {
-				LIST_REMOVE(self, t_mman_tasks);
-				vm_tasklock_endwrite(myvm);
-				goto do_free_self;
-			}
-			/* Truncate the task structure so  that it will only  still
-			 * contain the per-vm task chain, as well as the next link. */
-			self->t_heapsz = heap_truncate(&kernel_locked_heap,
-			                               self,
-			                               self->t_heapsz,
-			                               MAX(MAX(COMPILER_OFFSETAFTER(struct task, t_mman_tasks),
-			                                       KEY_task__next_offsetafter),
-			                                   COMPILER_OFFSETAFTER(struct task, t_heapsz)),
-			                               GFP_NORMAL);
-			/* Schedule our task for pending removal within its associated VM.
-			 * The next time someone acquires  a lock to the VM's  task-chain,
-			 * we will be removed automatically, and finally freed. */
-			do {
-				next = ATOMIC_READ(myvm->v_deltasks);
-				ATOMIC_WRITE(KEY_task__next(self), next);
-			} while (!ATOMIC_CMPXCH_WEAK(myvm->v_deltasks, next, self));
-			vm_tasklock_tryservice(myvm);
-		} else {
-do_free_self:
-			heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_NORMAL);
-		}
-		decref(myvm);
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 	VM_KERNEL_PENDING_CB_RETURN;
 }
 
@@ -715,7 +482,6 @@ again_lock_vm:
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 				      CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
 			}
-#ifdef CONFIG_USE_NEW_VM
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 			FORTASK(result, this_kernel_stackguard_).mn_minaddr = (byte_t *)stack_addr;
 			FORTASK(result, this_kernel_stackguard_).mn_maxaddr = (byte_t *)stack_addr + PAGESIZE - 1;
@@ -723,22 +489,6 @@ again_lock_vm:
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 			FORTASK(result, this_kernel_stacknode_).mn_minaddr = (byte_t *)stack_addr;
 			FORTASK(result, this_kernel_stacknode_).mn_maxaddr = (byte_t *)stack_addr + KERNEL_STACKSIZE - 1;
-#else /* CONFIG_USE_NEW_VM */
-			{
-				pageid_t stackpage;
-				stackpage = PAGEID_ENCODE((byte_t *)stack_addr);
-#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-				FORTASK(result, this_kernel_stackguard_).vn_node.a_vmin = stackpage;
-				FORTASK(result, this_kernel_stackguard_).vn_node.a_vmax = stackpage;
-				FORTASK(result, this_kernel_stacknode_).vn_node.a_vmin  = stackpage + 1;
-				FORTASK(result, this_kernel_stacknode_).vn_node.a_vmax  = stackpage + 1 + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-				stack_addr = (byte_t *)stack_addr + PAGESIZE;
-#else  /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-				FORTASK(result, this_kernel_stacknode_).vn_node.a_vmin = stackpage;
-				FORTASK(result, this_kernel_stacknode_).vn_node.a_vmax = stackpage + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-#endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
-			}
-#endif /* !CONFIG_USE_NEW_VM */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepare(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
 				vm_kernel_treelock_endwrite();
@@ -757,13 +507,8 @@ again_lock_vm:
 					goto again_lock_vm;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 			}
-#ifdef CONFIG_USE_NEW_VM
 			FORTASK(result, this_trampoline_node).mn_minaddr = (byte_t *)trampoline_addr;
 			FORTASK(result, this_trampoline_node).mn_maxaddr = (byte_t *)trampoline_addr + PAGESIZE - 1;
-#else /* CONFIG_USE_NEW_VM */
-			FORTASK(result, this_trampoline_node).vn_node.a_vmin = PAGEID_ENCODE(trampoline_addr);
-			FORTASK(result, this_trampoline_node).vn_node.a_vmax = PAGEID_ENCODE(trampoline_addr);
-#endif /* !CONFIG_USE_NEW_VM */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepareone(trampoline_addr))
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);

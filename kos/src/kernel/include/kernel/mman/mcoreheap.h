@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-/* - */
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
@@ -176,6 +173,5 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part);
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MCOREHEAP_H */

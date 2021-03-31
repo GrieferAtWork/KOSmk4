@@ -26,13 +26,13 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
-#include <kernel/mman/unmapped.h>
+#include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 
@@ -46,10 +46,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-
-#ifdef CONFIG_USE_NEW_VM       /* TODO: REMOVE_ME */
-#include <kernel/vm.h>         /* TODO: REMOVE_ME */
-#endif /* CONFIG_USE_NEW_VM */ /* TODO: REMOVE_ME */
 
 DECL_BEGIN
 

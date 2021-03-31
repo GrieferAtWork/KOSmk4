@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm/phys.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
 #include <kernel/memory.h>      /* `physpage2addr()' */
 #include <kernel/paging.h>      /* `pagedir_push_mapone()' */
@@ -314,6 +311,5 @@ NOTHROW(KCALL mptram_map_noidentity)(struct mptram *__restrict self,
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_PHYS_H */

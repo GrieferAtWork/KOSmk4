@@ -282,9 +282,7 @@ again:
 
 			/* Initialize the new INode */
 			mfile_cinit(result, &inode_datablock_type, target_directory->mf_blockshift);
-#ifdef CONFIG_USE_NEW_VM
 			rwlock_cinit_write(__inode_lock(result));
-#endif /* CONFIG_USE_NEW_VM */
 			result->i_super    = target_directory->i_super; /* NOTE: Incref()'d below. */
 			result->i_heapsize = resptr.hp_siz;
 			result->i_flags    = INODE_FATTRLOADED;

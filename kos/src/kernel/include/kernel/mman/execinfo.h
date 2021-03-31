@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm/exec.h>
-#else /* !CONFIG_USE_NEW_VM */
 #ifdef __CC__
 DECL_BEGIN
 
@@ -43,6 +40,5 @@ DATDEF ATTR_PERMMAN struct mexecinfo thismman_execinfo;
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_EXECINFO_H */

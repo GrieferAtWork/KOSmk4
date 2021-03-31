@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include <kernel/vm.h>
-#else /* !CONFIG_USE_NEW_VM */
 #include <kernel/types.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
@@ -490,6 +487,5 @@ DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_VM */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_MNODE_H */

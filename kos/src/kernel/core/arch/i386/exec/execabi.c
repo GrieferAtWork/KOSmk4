@@ -32,33 +32,20 @@ DECL_BEGIN
 /* Define the RTLD file(s). */
 INTDEF byte_t execabi_system_rtld_startpage_p[];
 INTDEF byte_t execabi_system_rtld_numpages[];
-
-#ifdef CONFIG_USE_NEW_VM
 PUBLIC struct mramfile execabi_system_rtld_file =
 MRAMFILE_INIT(execabi_system_rtld_file,
               (physpage_t)execabi_system_rtld_startpage_p,
               (size_t)execabi_system_rtld_numpages,
               execabi_system_rtld_size);
-#else /* CONFIG_USE_NEW_VM */
-PUBLIC struct mramfile execabi_system_rtld_file =
-VM_RAMFILE_INIT((physpage_t)execabi_system_rtld_startpage_p,
-                (size_t)execabi_system_rtld_numpages);
-#endif /* !CONFIG_USE_NEW_VM */
 
 #ifdef __x86_64__
 INTDEF byte_t execabi_system_rtld32_startpage_p[];
 INTDEF byte_t execabi_system_rtld32_numpages[];
-#ifdef CONFIG_USE_NEW_VM
 PUBLIC struct mramfile execabi_system_rtld32_file =
 MRAMFILE_INIT(execabi_system_rtld32_file,
               (physpage_t)execabi_system_rtld32_startpage_p,
               (size_t)execabi_system_rtld32_numpages,
               execabi_system_rtld32_size);
-#else /* CONFIG_USE_NEW_VM */
-PUBLIC struct mramfile execabi_system_rtld32_file =
-VM_RAMFILE_INIT((physpage_t)execabi_system_rtld32_startpage_p,
-                (size_t)execabi_system_rtld32_numpages);
-#endif /* !CONFIG_USE_NEW_VM */
 #endif /* __x86_64__ */
 
 DECL_END

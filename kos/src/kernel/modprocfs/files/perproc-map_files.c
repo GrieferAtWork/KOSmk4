@@ -152,17 +152,14 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 		 * this  area could  be merged,  but that  isn't really necessary,
 		 * and not doing so doesn't introduce any glaring inconsistencies. */
 		vm_treelock_read(threadmm);
-#ifdef CONFIG_USE_NEW_VM
 		{
 			struct mnode_tree_minmax mima;
+			/* TODO: mnode_tree_first() */
 			mnode_tree_minmaxlocate(threadmm->mm_mappings,
 			                        (void *)0, (void *)-1,
 			                        &mima);
 			node = mima.mm_min;
 		}
-#else /* CONFIG_USE_NEW_VM */
-		node = threadmm->v_byaddr;
-#endif /* !CONFIG_USE_NEW_VM */
 		for (;;) {
 			if unlikely(!node) {
 unlock_threadvm_and_goto_err:
@@ -322,17 +319,14 @@ ProcFS_PerProc_MapFiles_Entry_Readlink(struct symlink_node *__restrict self,
 		FINALLY_DECREF_UNLIKELY(threadvm);
 		/* find the `nth'th `struct vm_node' within `threadvm' */
 		vm_treelock_read(threadvm);
-#ifdef CONFIG_USE_NEW_VM
 		{
 			struct mnode_tree_minmax mima;
+			/* TODO: mnode_tree_first() */
 			mnode_tree_minmaxlocate(threadvm->mm_mappings,
 			                        (void *)0, (void *)-1,
 			                        &mima);
 			node = mima.mm_min;
 		}
-#else /* CONFIG_USE_NEW_VM */
-		node = threadvm->v_byaddr;
-#endif /* !CONFIG_USE_NEW_VM */
 		for (;;) {
 			if unlikely(!node) {
 unlock_threadvm_and_goto_err:

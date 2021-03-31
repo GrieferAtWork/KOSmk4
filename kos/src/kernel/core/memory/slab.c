@@ -31,14 +31,12 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/kram.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#ifdef CONFIG_USE_NEW_VM
-#include <kernel/mman/kram.h>
-#endif /* CONFIG_USE_NEW_VM */
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -49,10 +47,6 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
-
-#ifndef CONFIG_USE_NEW_VM
-#include "corebase.h"
-#endif /* !CONFIG_USE_NEW_VM */
 
 DECL_BEGIN
 
@@ -234,7 +228,6 @@ again:
 	if unlikely(ATOMIC_READ(pool->sp_count) != 0)
 		goto again;
 	/* Must allocate a new slab page. */
-#ifdef CONFIG_USE_NEW_VM
 again_lock_vm:
 	if (flags & GFP_ATOMIC) {
 		if unlikely(!mman_lock_tryacquire(&mman_kernel))
@@ -323,158 +316,6 @@ gotaddr:
 
 		return result;
 	}
-#else /* CONFIG_USE_NEW_VM */
-	{
-		struct vm_corepair_ptr corepair;
-		if (flags & GFP_VCBASE) {
-			corepair = vm_corepair_alloc(flags, true);
-			if unlikely(!corepair.cp_node)
-				goto err;
-		} else {
-			corepair.cp_node = (VIRT struct vm_node *)kmalloc_nx(sizeof(struct vm_node),
-			                                                     CORE_ALLOC_FLAGS | GFP_CALLOC |
-			                                                     (flags & GFP_INHERIT));
-			if unlikely(!corepair.cp_node)
-				goto err;
-			corepair.cp_part = (VIRT struct vm_datapart *)kmalloc_nx(sizeof(struct vm_datapart),
-			                                                         CORE_ALLOC_FLAGS | GFP_CALLOC |
-			                                                         (flags & GFP_INHERIT));
-			if unlikely(!corepair.cp_part) {
-				kffree(corepair.cp_node, GFP_CALLOC);
-				goto err;
-			}
-		}
-		/* Setup the corepair. */
-		corepair.cp_node->vn_vm    = &vm_kernel;
-		corepair.cp_part->dp_block = flags & GFP_CALLOC
-		                             ? &vm_datablock_anonymous_zero
-#ifdef CONFIG_DEBUG_HEAP
-		                             : &vm_datablock_debugheap
-#else /* CONFIG_DEBUG_HEAP */
-		                             : &vm_datablock_anonymous
-#endif /* !CONFIG_DEBUG_HEAP */
-		                             ;
-		incref(corepair.cp_part->dp_block);
-		corepair.cp_node->vn_block  = incref(corepair.cp_part->dp_block);
-		corepair.cp_node->vn_fspath = NULL;
-		corepair.cp_node->vn_fsname = NULL;
-		corepair.cp_node->vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
-		corepair.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;
-		corepair.cp_node->vn_part   = corepair.cp_part;
-		corepair.cp_node->vn_link.ln_pself = &LLIST_HEAD(corepair.cp_part->dp_srefs);
-		corepair.cp_part->dp_refcnt = 1;
-		corepair.cp_part->dp_srefs  = corepair.cp_node;
-		corepair.cp_part->dp_state  = flags & GFP_LOCKED
-		                              ? VM_DATAPART_STATE_LOCKED
-		                              : VM_DATAPART_STATE_INCORE;
-		corepair.cp_part->dp_pprop                      = (uintptr_t)-1;
-		corepair.cp_part->dp_ramdata.rd_blockv          = &corepair.cp_part->dp_ramdata.rd_block0;
-		corepair.cp_part->dp_ramdata.rd_block0.rb_size  = 1;
-		corepair.cp_part->dp_ramdata.rd_block0.rb_start = page_malloc(1);
-		if unlikely(corepair.cp_part->dp_ramdata.rd_block0.rb_start == PHYSPAGE_INVALID)
-			goto err_corepair;
-		{
-			void *next_slab_addr;
-			void *slab_end_addr;
-again_lock_vm:
-			if unlikely(!vm_kernel_treelock_writef_nx(flags))
-				goto err_corepair_content;
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-			slab_end_addr  = kernel_slab_break;
-			next_slab_addr = vm_getfree(&vm_kernel,
-			                            HINT_GETADDR(KERNEL_VMHINT_SLAB),
-			                            PAGESIZE, PAGESIZE,
-			                            HINT_GETMODE(KERNEL_VMHINT_SLAB));
-#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-			if (next_slab_addr == VM_GETFREE_ERROR ||
-			    next_slab_addr < (byte_t *)slab_end_addr - PAGESIZE)
-#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
-			if (next_slab_addr == VM_GETFREE_ERROR ||
-			    next_slab_addr > (byte_t *)slab_end_addr)
-#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
-			{
-				uintptr_t version;
-				vm_kernel_treelock_endwrite();
-				version = 0;
-again_next_slab_page_tryhard:
-				if unlikely(!vm_kernel_treelock_writef_nx(flags))
-					goto err_corepair_content;
-				next_slab_addr = vm_getfree(&vm_kernel,
-				                            HINT_GETADDR(KERNEL_VMHINT_SLAB),
-				                            PAGESIZE, PAGESIZE,
-				                            HINT_GETMODE(KERNEL_VMHINT_SLAB));
-				vm_kernel_treelock_endwrite();
-#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-				if (next_slab_addr != VM_GETFREE_ERROR &&
-				    next_slab_addr >= (byte_t *)slab_end_addr - PAGESIZE)
-					goto again_lock_vm;
-#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
-				if (next_slab_addr != VM_PAGED_GETFREE_ERROR &&
-				    next_slab_addr <= (byte_t *)slab_end_addr)
-					goto again_lock_vm;
-#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
-				if (system_clearcaches_s(&version))
-					goto again_next_slab_page_tryhard;
-				goto err_corepair_content;
-			}
-			/* Now to map the new page. */
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!pagedir_prepareone(next_slab_addr)) {
-				vm_kernel_treelock_endwrite();
-				goto err_corepair_content;
-			}
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			/* Map all pre-allocated pages. */
-			pagedir_mapone(next_slab_addr,
-			               physpage2addr(corepair.cp_part->dp_ramdata.rd_block0.rb_start),
-			               PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-			if (flags & GFP_CALLOC) {
-				/* Write zeros to all random-content pages. */
-				if (!page_iszero(corepair.cp_part->dp_ramdata.rd_block0.rb_start)) {
-					memset(next_slab_addr, 0, PAGESIZE);
-#ifdef ARCH_PAGEDIR_HAVE_CHANGED
-					pagedir_unsetchanged(next_slab_addr);
-#endif /* ARCH_PAGEDIR_HAVE_CHANGED */
-				}
-			}
-#ifdef CONFIG_DEBUG_HEAP
-			else {
-				/* Fill memory using the no-mans-land pattern. */
-				mempatl(next_slab_addr,
-				        DEBUGHEAP_NO_MANS_LAND,
-				        PAGESIZE);
-#ifdef ARCH_PAGEDIR_HAVE_CHANGED
-				pagedir_unsetchanged(next_slab_addr);
-#endif /* ARCH_PAGEDIR_HAVE_CHANGED */
-			}
-#endif /* CONFIG_DEBUG_HEAP */
-			/* Set the returned slab */
-			result = (struct slab *)next_slab_addr;
-			/* Update the slab breaking point. */
-#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-			kernel_slab_break = (byte_t *)result;
-#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
-			kernel_slab_break = (byte_t *)result + PAGESIZE;
-#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
-			/* Insert the node into the kernel VM. */
-			corepair.cp_node->vn_node.a_vmin = PAGEID_ENCODE(next_slab_addr);
-			corepair.cp_node->vn_node.a_vmax = corepair.cp_node->vn_node.a_vmin;
-			vm_node_insert(corepair.cp_node);
-			vm_kernel_treelock_endwrite();
-			return result;
-		}
-err_corepair_content:
-		page_freeone(corepair.cp_part->dp_ramdata.rd_block0.rb_start);
-err_corepair:
-		decref(corepair.cp_node->vn_block);
-		decref(corepair.cp_part->dp_block);
-		vm_node_free(corepair.cp_node);
-		vm_datapart_free(corepair.cp_part);
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 err:
 	return NULL;
 }

@@ -431,21 +431,12 @@ INTERN_FUNCTION(_start)
 	movl   $(__kernel_pertask_size), %ecx
 	rep    movsb
 
-#ifdef CONFIG_USE_NEW_VM
 	/* memcpy((byte_t *)&mman_kernel + PAGEDIR_SIZE, __kernel_permman_start, (size_t)__kernel_permman_size); */
 	EXTERN(mman_kernel)
 	movl   $(V2P(mman_kernel) + PAGEDIR_SIZE), %edi
 	movl   $(V2P(__kernel_permman_start)), %esi
 	movl   $(__kernel_permman_size), %ecx
 	rep    movsb
-#else /* CONFIG_USE_NEW_VM */
-	/* memcpy((byte_t *)&vm_kernel + PAGEDIR_SIZE, __kernel_pervm_start, (size_t)__kernel_pervm_size); */
-	EXTERN(vm_kernel)
-	movl   $(V2P(vm_kernel) + PAGEDIR_SIZE), %edi
-	movl   $(V2P(__kernel_pervm_start)), %esi
-	movl   $(__kernel_pervm_size), %ecx
-	rep    movsb
-#endif /* !CONFIG_USE_NEW_VM */
 
 	/* Set the DIDINIT flag for the boot cpu's feature table. */
 	orl    $(CPU_FEATURE_FDIDINIT), V2P(bootcpu_x86_cpufeatures)

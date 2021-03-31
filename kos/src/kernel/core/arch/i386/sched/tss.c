@@ -51,7 +51,6 @@ INTDEF byte_t __bootcpu_x86_df_stack[KERNEL_DF_STACKSIZE];
 /* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
 INTERN ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity = NULL;
 
-#ifdef CONFIG_USE_NEW_VM
 INTDEF byte_t __bootcpu_x86_iob_start[] ASMNAME("__x86_iob_empty_base");
 
 DATDEF ATTR_PERCPU struct mnode thiscpu_x86_iobnode_ ASMNAME("thiscpu_x86_iobnode");
@@ -97,7 +96,8 @@ PUBLIC ATTR_PERCPU struct mpart thiscpu_x86_dfstackpart_ = {
 	MPART_INIT_mp_changed({}),
 	MPART_INIT_mp_filent({}),
 	MPART_INIT_mp_blkst_ptr(NULL),
-	MPART_INIT_mp_mem((physpage_t)__bootcpu_x86_df_stackpage_p, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)),
+	MPART_INIT_mp_mem((physpage_t)__bootcpu_x86_df_stackpage_p,
+	                  CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)),
 	MPART_INIT_mp_meta(NULL)
 };
 
@@ -118,88 +118,6 @@ PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ = {
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT__mn_module(NULL)
 };
-
-#else /* CONFIG_USE_NEW_VM */
-INTDEF byte_t __bootcpu_x86_iob_startpage[] ASMNAME("__x86_iob_empty_page");
-
-/* The VM node used to represent the IOB mapping of the current CPU */
-PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_iobnode = {
-	/* .vn_node   = */ { NULL, NULL,
-	                     (pageid_t)__bootcpu_x86_iob_startpage,
-	                     (pageid_t)__bootcpu_x86_iob_startpage + 1 },
-	/* .vn_byaddr = */ LLIST_INITNODE,
-	/* .vn_prot   = */ VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
-	/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT,
-	/* .vn_vm     = */ &vm_kernel,
-	/* .vn_part   = */ NULL,
-	/* .vn_block  = */ NULL,
-	/* .vn_fspath = */ NULL,
-	/* .vn_fsname = */ NULL,
-	/* .vn_link   = */ { NULL, NULL },
-	/* .vn_guard  = */ 0
-};
-
-INTDEF byte_t __bootcpu_x86_df_stackpage[];
-INTDEF byte_t __bootcpu_x86_df_stackpage_p[];
-INTDEF struct vm_node __bootcpu_x86_dfstack_node;
-INTDEF struct vm_datapart __bootcpu_x86_dfstack_part;
-
-PUBLIC ATTR_PERCPU struct vm_datapart
-thiscpu_x86_dfstackpart_ ASMNAME("thiscpu_x86_dfstackpart") = {
-	/* .dp_refcnt = */ 2, /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode' */
-	.dp_lock   = SHARED_RWLOCK_INIT,
-	{
-		/* .dp_tree = */ { NULL, NULL, 0, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1 }
-	},
-	.dp_crefs = LLIST_INIT,
-	.dp_srefs = &__bootcpu_x86_dfstack_node,
-	.dp_stale = NULL,
-	.dp_block = &vm_datablock_anonymous,
-#if CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
-	.dp_flags = VM_DATAPART_FLAG_NORMAL | VM_DATAPART_FLAG_HEAPPPP,
-#else
-	.dp_flags = VM_DATAPART_FLAG_NORMAL,
-#endif
-	.dp_state = VM_DATAPART_STATE_LOCKED,
-	{
-		.dp_ramdata = {
-			.rd_blockv = &__bootcpu_x86_dfstack_part.dp_ramdata.rd_block0,
-			{
-				.rd_block0 = {
-					.rb_start = (physpage_t)__bootcpu_x86_df_stackpage_p,
-					.rb_size  = CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)
-				}
-			}
-		}
-	},
-	{
-#if CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
-		.dp_pprop = 0,
-#else
-		.dp_pprop = (uintptr_t)-1,
-#endif
-	},
-};
-
-PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_dfstacknode_ ASMNAME("thiscpu_x86_dfstacknode") = {
-	.vn_node = {
-		NULL,
-		NULL,
-		(pageid_t)__bootcpu_x86_df_stackpage,
-		(pageid_t)__bootcpu_x86_df_stackpage + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1
-	},
-	.vn_byaddr = LLIST_INITNODE,
-	.vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
-	.vn_flags  = VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
-	.vn_vm     = &vm_kernel,
-	.vn_part   = &__bootcpu_x86_dfstack_part,
-	.vn_block  = &vm_datablock_anonymous,
-	.vn_fspath = NULL,
-	.vn_fsname = NULL,
-	.vn_link   = { NULL, &LLIST_HEAD(__bootcpu_x86_dfstack_part.dp_srefs) },
-	.vn_guard  = 0
-};
-#endif /* !CONFIG_USE_NEW_VM */
 
 
 

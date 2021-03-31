@@ -69,11 +69,6 @@
 #include <libinstrlen/instrlen.h>
 #include <libunwind/unwind.h>
 
-#ifndef CONFIG_USE_NEW_VM
-#include "corebase.h"
-#define mcorepage vm_corepage
-#endif /* CONFIG_USE_NEW_VM */
-
 #include <hybrid/sequence/rbtree.h>
 
 /* The minimum amount of traceback entries that MALL
@@ -1158,21 +1153,12 @@ INTDEF struct driver_state_arref current_driver_state;
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_corepage_chain)(struct mcorepage *chain) {
-#ifdef CONFIG_USE_NEW_VM
 	size_t result = 0;
 	for (; chain; chain = LIST_NEXT(chain, mcp_link)) {
 		result += gc_reachable_data((byte_t *)chain->mcp_part,
 		                            sizeof(chain->mcp_part));
 	}
 	return result;
-#else /* CONFIG_USE_NEW_VM */
-	size_t result = 0;
-	for (; chain; chain = chain->cp_ctrl.cpc_prev) {
-		result += gc_reachable_data((byte_t *)chain->cp_parts,
-		                            sizeof(chain->cp_parts));
-	}
-	return result;
-#endif /* !CONFIG_USE_NEW_VM */
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
@@ -1231,11 +1217,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	 *       tried to allocate a new recursion descriptor.
 	 */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan core base\n");
-#ifdef CONFIG_USE_NEW_VM
 	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_freelist));
-#else /* CONFIG_USE_NEW_VM */
-	gc_reachable_corepage_chain(vm_corepage_head);
-#endif /* !CONFIG_USE_NEW_VM */
 
 	/* `vm_corepage_head'  only  chains  core-base  pages
 	 * that contain at least one non-allocated page-slot!
@@ -1243,11 +1225,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	 * As such, we must also  search a secondary chain  of
 	 * pages that is used to represent ones that are fully
 	 * allocated. */
-#ifdef CONFIG_USE_NEW_VM
 	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_usedlist));
-#else /* CONFIG_USE_NEW_VM */
-	gc_reachable_corepage_chain(vm_corepage_full);
-#endif /* !CONFIG_USE_NEW_VM */
 
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
@@ -1584,18 +1562,6 @@ again:
 			task_yield();
 		goto again;
 	}
-
-#ifndef CONFIG_USE_NEW_VM
-	/* Acquire a lock  to the  corepage system,  thus
-	 * ensuring that it's in a consistent state, too. */
-	if (!sync_canwrite(&vm_corepage_lock)) {
-		vm_kernel_treelock_endwrite();
-		sched_super_override_end();
-		while (!sync_canwrite(&vm_corepage_lock))
-			task_yield();
-		goto again;
-	}
-#endif /* !CONFIG_USE_NEW_VM */
 
 	/* Also ensure that `kernel_locked_heap' and `trace_heap' can be locked. */
 	if (!sync_canwrite(&kernel_locked_heap.h_lock)) {
