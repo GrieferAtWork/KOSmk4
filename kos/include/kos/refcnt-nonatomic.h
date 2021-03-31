@@ -132,7 +132,7 @@
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                            \
 	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                              \
 	public:                                                                                                    \
-		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                         \
+		typedef __PRIVATE_REFCNT_TYPE_P(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                          \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL                                                             \
 		__NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t)                              \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {           \
@@ -214,7 +214,7 @@
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                            \
 	template<> class weakrefcnt_methods< T > {                                                                     \
 	public:                                                                                                        \
-		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                             \
+		typedef __PRIVATE_REFCNT_TYPE_P(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                              \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL                                                                 \
 		__NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t)                                  \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {               \

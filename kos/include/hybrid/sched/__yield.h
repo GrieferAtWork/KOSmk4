@@ -20,7 +20,9 @@
 #ifndef __GUARD_HYBRID_SCHED___YIELD_H
 #define __GUARD_HYBRID_SCHED___YIELD_H 1
 
-#include "../../__stdinc.h"
+#include <__stdinc.h>
+
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #ifdef __CC__
@@ -103,6 +105,18 @@ __PUBDEF errno_t (__KCALL task_yield)(void);
 __DECL_END
 #endif
 
+#elif defined(sched_yield) || defined(__sched_yield_defined)
+#define __hybrid_yield() sched_yield()
+#elif defined(__sched_yield) || defined(____sched_yield_defined)
+#define __hybrid_yield() __sched_yield()
+#elif defined(pthread_yield) || defined(__pthread_yield_defined)
+#define __hybrid_yield() pthread_yield()
+#elif defined(__pthread_yield) || defined(____pthread_yield_defined)
+#define __hybrid_yield() __pthread_yield()
+#elif defined(thrd_yield) || defined(__thrd_yield_defined)
+#define __hybrid_yield() thrd_yield()
+#elif defined(__thrd_yield) || defined(____thrd_yield_defined)
+#define __hybrid_yield() __thrd_yield()
 #elif defined(__BUILDING_LIBC) && defined(__KOS__)
 /************************************************************************/
 /* LIBC                                                                 */
@@ -128,9 +142,8 @@ __DECL_END
 /************************************************************************/
 
 #include <__crt.h>
-#if defined(__sched_yield_defined)
-#define __hybrid_yield() sched_yield()
-#elif defined(__CRT_HAVE_sched_yield)
+#ifdef __CRT_HAVE_sched_yield
+#undef sched_yield
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL sched_yield)(void);
 __NAMESPACE_INT_END __DECL_END
@@ -141,6 +154,7 @@ __LIBC int (__LIBCCALL __sched_yield)(void);
 __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield() (__NAMESPACE_INT_SYM __sched_yield)()
 #elif defined(__CRT_HAVE_pthread_yield)
+#undef pthread_yield
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL pthread_yield)(void);
 __NAMESPACE_INT_END __DECL_END
@@ -150,49 +164,62 @@ __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL __pthread_yield)(void);
 __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield() (__NAMESPACE_INT_SYM __pthread_yield)()
+#elif defined(__CRT_HAVE_yield)
+#undef yield
+__DECL_BEGIN __NAMESPACE_INT_BEGIN
+__LIBC int (__LIBCCALL yield)(void);
+__NAMESPACE_INT_END __DECL_END
+#define __hybrid_yield() (__NAMESPACE_INT_SYM yield)()
 #elif defined(__NO_has_include) || __has_include(<kos/syscalls.h>)
 #include <kos/syscalls.h>
 #if __CRT_HAVE_SC(sched_yield)
 #define __hybrid_yield()  sys_sched_yield()
 #endif /* __CRT_HAVE_SC(sched_yield) */
-#endif
-
-#elif (defined(__DOS_COMPAT__) && !defined(__CRT_KOS)) || \
-      (defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(__MINGW32__) || defined(__WINDOWS__) || \
-       defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) || \
-       defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
-       defined(_WIN32_WCE) || defined(WIN32_WCE))
+#endif /* ... */
+#elif defined(__WINNT__)
 /************************************************************************/
 /* Windows                                                              */
 /************************************************************************/
-
-__DECL_BEGIN
-__NAMESPACE_INT_BEGIN
+__DECL_BEGIN __NAMESPACE_INT_BEGIN
 __IMPDEF __ULONG32_TYPE__ __ATTR_STDCALL SleepEx(__ULONG32_TYPE__ __msec, __INT32_TYPE__ __alertable);
 #define __hybrid_yield() ((__NAMESPACE_INT_SYM SleepEx)(0, 0))
-__NAMESPACE_INT_END
-__DECL_END
-
-#elif defined(__linux__) || defined(__linux) || defined(linux) || \
-      defined(__LINUX__) || defined(__LINUX) || defined(LINUX) || \
-      __has_include(<sched.h>)
+__NAMESPACE_INT_END __DECL_END
+#elif (defined(__linux__) && (__has_include(<sched.h>) || defined(__NO_has_include)))
 /************************************************************************/
 /* Linux                                                                */
 /************************************************************************/
-
 #include <sched.h>
 #define __hybrid_yield() sched_yield()
-
-#elif __has_include(<pthread.h>) || \
-     (defined(__unix__) || defined(__unix) || defined(unix))
+#elif (__has_include(<pthread.h>) || (defined(__unix__) && defined(__NO_has_include)))
 /************************************************************************/
 /* PThread                                                              */
 /************************************************************************/
-
 #include <pthread.h>
 #define __hybrid_yield() pthread_yield()
-#endif /* Implementation... */
+#elif (__has_include(<threads.h>) ||                                  \
+       (defined(__NO_has_include) && !defined(__STDC_NO_THREADS__) && \
+        defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
+/************************************************************************/
+/* C11 Threads                                                          */
+/************************************************************************/
+#include <threads.h>
+#define __hybrid_yield() thrd_yield()
+#else /* Implementation... */
+#if (__has_include(<unistd.h>) || \
+     (defined(__unix__) && defined(__NO_has_include)))
+/************************************************************************/
+/* Generic, direct syscall                                              */
+/************************************************************************/
+#include <unistd.h>
+#ifdef SYS_sched_yield
+#define __hybrid_yield() syscall(SYS_sched_yield)
+#elif defined(__NR_sched_yield)
+#define __hybrid_yield() syscall(__NR_sched_yield)
+#endif /* ... */
+#endif /* Unistd... */
+#endif /* !Implementation... */
 
+/* If not possible to define in any other way, fall back to a no-op */
 #ifndef __hybrid_yield
 #define __NO_hybrid_yield 1
 #define __hybrid_yield() (void)0

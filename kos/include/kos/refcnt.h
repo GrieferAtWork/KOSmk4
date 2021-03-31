@@ -31,15 +31,15 @@
 #include <kos/anno.h>
 
 #if defined(__COMPILER_HAVE_TYPEOF) && 0
-#define __PRIVATE_REFCNT_TYPE(T, field)       __typeof__(((T *)0)->field)
-#define __PRIVATE_REFCNT_TYPE_EX(T, getfield) __typeof__(getfield((T *)0))
+#define __PRIVATE_REFCNT_TYPE(T, field)      __typeof__(((T *)0)->field)
+#define __PRIVATE_REFCNT_TYPE_P(T, getfield) __typeof__(getfield((T *)0))
 #elif defined(__COMPILER_HAVE_CXX_DECLTYPE)
-#define __PRIVATE_REFCNT_TYPE(T, field)       decltype(((T *)0)->field)
-#define __PRIVATE_REFCNT_TYPE_EX(T, getfield) decltype(getfield((T *)0))
+#define __PRIVATE_REFCNT_TYPE(T, field)      decltype(((T *)0)->field)
+#define __PRIVATE_REFCNT_TYPE_P(T, getfield) decltype(getfield((T *)0))
 #else /* __COMPILER_HAVE_CXX_DECLTYPE */
 #include <hybrid/typecore.h>
-#define __PRIVATE_REFCNT_TYPE(T, field)       __UINTPTR_TYPE__
-#define __PRIVATE_REFCNT_TYPE_EX(T, getfield) __UINTPTR_TYPE__
+#define __PRIVATE_REFCNT_TYPE(T, field)      __UINTPTR_TYPE__
+#define __PRIVATE_REFCNT_TYPE_P(T, getfield) __UINTPTR_TYPE__
 #endif /* !__COMPILER_HAVE_CXX_DECLTYPE */
 
 #ifndef __REFCNT_CC
@@ -120,7 +120,7 @@ public:
 #define __WEAKREFCNT_METHODS_BASE_P(i)                      decltype(((i), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))
 
 #ifdef __INTELLISENSE__
-#define __DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_)                                                                                               \
+#define __DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_)                                                                                             \
 	extern "C++" {                                                                                                                                  \
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                 \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE(T, field) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict self); \
@@ -139,26 +139,26 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                           \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                         \
 	}
-#define __DEFINE_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                                                                               \
-	extern "C++" {                                                                                                                                        \
-	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                       \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_EX(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict self); \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isshared)(T const *__restrict self);                                 \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(T const *__restrict self);                             \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryincref)(T *__restrict self);                                      \
-	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xincref)(T *__restrict self);                                                                               \
-	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC incref)(T *__restrict self);                                          \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC destroy)(T *__restrict self);                                                         \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref)(T *__restrict self);                                                          \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_nokill)(T *__restrict self);                                                   \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_likely)(T *__restrict self);                                                   \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_unlikely)(T *__restrict self);                                                 \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref)(T *self);                                                                                        \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_nokill)(T *self);                                                                                 \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                                 \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                               \
+#define __DEFINE_REFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                                                                             \
+	extern "C++" {                                                                                                                                       \
+	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                      \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_P(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict self); \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isshared)(T const *__restrict self);                                \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(T const *__restrict self);                            \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryincref)(T *__restrict self);                                     \
+	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xincref)(T *__restrict self);                                                                              \
+	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC incref)(T *__restrict self);                                         \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC destroy)(T *__restrict self);                                                        \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref)(T *__restrict self);                                                         \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_nokill)(T *__restrict self);                                                  \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_likely)(T *__restrict self);                                                  \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_unlikely)(T *__restrict self);                                                \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref)(T *self);                                                                                       \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_nokill)(T *self);                                                                                \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                                \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                              \
 	}
-#define __DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)                                                                                               \
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)                                                                                             \
 	extern "C++" {                                                                                                                                      \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                 \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE(T, field) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict self); \
@@ -177,24 +177,24 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                           \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                         \
 	}
-#define __DEFINE_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                                                                               \
-	extern "C++" {                                                                                                                                            \
-	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                       \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_EX(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict self); \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(T const *__restrict self);                                 \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(T const *__restrict self);                             \
-	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryweakincref)(T *__restrict self);                                      \
-	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xweakincref)(T *__restrict self);                                                                               \
-	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC weakincref)(T *__restrict self);                                          \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdestroy)(T *__restrict self);                                                         \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref)(T *__restrict self);                                                          \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_nokill)(T *__restrict self);                                                   \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_likely)(T *__restrict self);                                                   \
-	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_unlikely)(T *__restrict self);                                                 \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref)(T *self);                                                                                        \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_nokill)(T *self);                                                                                 \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                                 \
-	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                               \
+#define __DEFINE_WEAKREFCOUNT_FUNCTIONS_P(T, getfield, destroy_)                                                                                             \
+	extern "C++" {                                                                                                                                           \
+	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                      \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_P(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict self); \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(T const *__restrict self);                                \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(T const *__restrict self);                            \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryweakincref)(T *__restrict self);                                     \
+	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xweakincref)(T *__restrict self);                                                                              \
+	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC weakincref)(T *__restrict self);                                         \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdestroy)(T *__restrict self);                                                        \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref)(T *__restrict self);                                                         \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_nokill)(T *__restrict self);                                                  \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_likely)(T *__restrict self);                                                  \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_unlikely)(T *__restrict self);                                                \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref)(T *self);                                                                                       \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_nokill)(T *self);                                                                                \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                                \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                              \
 	}
 #endif /* __INTELLISENSE__ */
 #else /* __USE_KOS || __USE_KOS_KERNEL || (__KOS__ && __KERNEL__) */
@@ -355,7 +355,7 @@ extern "C++" {
 	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                  \
 	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                    \
 	public:                                                                                          \
-		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);               \
+		typedef __PRIVATE_REFCNT_TYPE_P(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL                                                   \
 		__NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t)                    \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) { \
@@ -437,7 +437,7 @@ extern "C++" {
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                  \
 	template<> class weakrefcnt_methods< T > {                                                           \
 	public:                                                                                              \
-		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                   \
+		typedef __PRIVATE_REFCNT_TYPE_P(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                    \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL                                                       \
 		__NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t)                        \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {     \

@@ -18,9 +18,10 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libffi "$TARGET_SYSROOT/$TARGET_LIBPATH/libffi.so"
-require_utility libexpat "$PKG_CONFIG_PATH/expat.pc"
-require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
+require_utility libexpat   "$PKG_CONFIG_PATH/expat.pc"
+require_utility libffi     "$TARGET_SYSROOT/$TARGET_LIBPATH/libffi.so"
+require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libzlib    "$PKG_CONFIG_PATH/zlib.pc"
 
 PYTHON_VERSION_MAJOR="2"
 PYTHON_VERSION_MINOR="7"

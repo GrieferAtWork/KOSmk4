@@ -26,10 +26,105 @@
 
 #include <hybrid/sequence/list.h>
 
+/* Helper  structures to implement  general-purpose lock operation handling.
+ * The basic idea here is to make it possible to enqueue a set of operations
+ * that will be performed asynchronously once some kind of lock becomes
+ * available:
+ *
+ * >> void _service(void);
+ * >> #define must_service() ...
+ * >> #define service() (void)(!must_service() || (_service(), 0))
+ * >> #define acquire() acquire_lock(&lock)
+ * >> #define release() (release_lock(&lock), service())
+ * >>
+ * >> ...
+ * >>
+ * >> void _service(void) {
+ * >>     do {
+ * >>         if (!try_acquire())
+ * >>             break;
+ * >>         SERVICE_LOCK_OPS();
+ * >>         release_lock(&lock);
+ * >>         SERVICE_POST_LOCK_OPS();
+ * >>     } while (must_service());
+ * >> }
+ *
+ * This kind of implementation is  sequentially consistent in that it  can
+ * guaranty the execution of all  enqueued lock operations "at some  point
+ * in  the future", so-long  as the user of  the locking functionality can
+ * guaranty that locks  are not  held forever, but  are _always_  released
+ * eventually. As such, the lockop mechanism works best with atomic locks,
+ * since  the eventual release of an atomic lock following its acquisition
+ * is  one of  the logical  consequences of  their semantical requirements
+ * regarding the  non-blocking-ness of  anything  performed while  such  a
+ * lock is held.
+ *
+ * Furthermore, lock operations can be used to perform otherwise  blocking
+ * operations in  the context  of contain  locks being  held, making  them
+ * perfect for augmenting and facilitating the non-blocking-ness of object
+ * finalizers that need to acquire locks to other data structures, such as
+ * lists,  in order  to remove (part  of) the object  being destroyed, and
+ * making  this possible by trying to acquire  such a lock, and making use
+ * of lock operations  if the  lock cannot be  acquired without  blocking.
+ * This then allows for the part  of the object's finalization that  needs
+ * a certain lock to be held, to be performed as an asynchronous operation
+ * executed once said lock becomes available.
+ *
+ * >> struct myobj;
+ * >> LIST_HEAD(myobj_list, myobj);
+ * >> struct myobj {
+ * >>     LIST_ENTRY(myobj) ent;
+ * >>     union {
+ * >>         struct lockop     lop;
+ * >>         struct postlockop postlop;
+ * >>     };
+ * >> };
+ * >>
+ * >> static struct myobj_list   list    = LIST_HEAD_INITIALIZER(list);
+ * >> static struct atomic_lock  lock    = ATOMIC_LOCK_INIT;
+ * >> static struct lockop_slist lockops = SLIST_HEAD_INITIALIZER(lockops);
+ * >> #define _service()   _lockop_reap(&lockops, &lock)
+ * >> #define service()    lockop_reap(&lockops, &lock)
+ * >> #define tryacquire() atomic_lock_tryacquire(&lock)
+ * >> #define acquire()    atomic_lock_acquire(&lock)
+ * >> #define _release()   atomic_lock_release(&lock)
+ * >> #define release()    (_release(), service())
+ * >>
+ * >> static NOBLOCK NONNULL((1)) void
+ * >> NOTHROW(FCALL myobj_destroy_postlop)(struct postlockop *__restrict self) {
+ * >>     struct myobj *me = container_of(self, struct myobj, postlop);
+ * >>     kfree(me);
+ * >> }
+ * >> static NOBLOCK NONNULL((1)) struct postlockop *
+ * >> NOTHROW(FCALL myobj_destroy_lop)(struct lockop *__restrict self) {
+ * >>     struct myobj *me = container_of(self, struct myobj, lop);
+ * >>     LIST_REMOVE(me, ent);
+ * >>     // kfree() the object _after_ releasing the lock so the lock
+ * >>     // itself can be released sonner than it could otherwise be.
+ * >>     me->postlop.plo_func = &myobj_destroy_postlop;
+ * >>     return &me->postlop;
+ * >> }
+ * >>
+ * >> // Non-blocking async-remove-object-from-locked-list-and-kfree-object function.
+ * >> static NOBLOCK NONNULL((1)) void
+ * >> NOTHROW(KCALL myobj_destroy)(struct myobj *self) {
+ * >>     if (tryacquire()) {
+ * >>         LIST_REMOVE(self, ent);
+ * >>         _release();
+ * >>         kfree(self);
+ * >>         service();
+ * >>     } else {
+ * >>         self->lop.lo_func = &myobj_destroy_lop;
+ * >>         SLIST_ATOMIC_INSERT(&lockops, &self->lop, lo_link);
+ * >>         _service();
+ * >>     }
+ * >> }
+ */
+
 #ifdef __CC__
 DECL_BEGIN
 
-/* TODO: Go through all of the different uses of lockop mechanics
+/* TODO: Go  through all  of the  different uses  of lockop mechanics
  *       and change APIs to make use of the general-purpose interface
  *       exposed by this header! */
 
@@ -219,6 +314,10 @@ NOTHROW(FCALL _oblockop_reap)(_Toblockop_slist<T> *__restrict self,
 }
 } /* extern "C++" */
 #endif /* __cplusplus */
+
+
+
+
 
 
 DECL_END

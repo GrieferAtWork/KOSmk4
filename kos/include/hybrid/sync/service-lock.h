@@ -18,6 +18,43 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+/* !!!THIS HEADER IS DEPRECATED!!!
+ * Replacement (kernel-only): <sched/lockop.h>
+ *
+ * The service-lock mechanism is a good idea, however it has been proven more efficient
+ * to only ever service lock operations just after having released a lock, which can be
+ * implemented must more efficiently on a per-case basis as:
+ * >> void _service(void);
+ * >> #define must_service() ...
+ * >> #define service() (void)(!must_service() || (_service(), 0))
+ * >> #define acquire() acquire_lock(&lock)
+ * >> #define release() (release_lock(&lock), service())
+ * >>
+ * >> ...
+ * >>
+ * >> void _service(void) {
+ * >>     do {
+ * >>         if (!try_acquire())
+ * >>             break;
+ * >>         SERVICE_LOCK_OPS();
+ * >>         release_lock(&lock);
+ * >>         SERVICE_POST_LOCK_OPS();
+ * >>     } while (must_service());
+ * >> }
+ *
+ * This kind of implementation is still sequentially consistent, and much better at
+ * dealing with lock operations in bulk, since operations can be queued for a while
+ * until the lock becomes available,  essentially allowing for async operations  to
+ * be used for performing async  operations once those operations become  possible,
+ * while only adding a single test of `must_service()' to every unlock operation in
+ * the most likely case where no operations are pending!
+ *
+ * As such, this header will be removed eventually, and new code should no longer
+ * make use of it!
+ */
+
+
+
 /* Helper functions for  automatically generating lock  wrapper functions for  invoking
  * some  service function whenever a lock is  acquired (either for reading or writing).
  * This  is useful in cases where cleanup  operations would normally require a blocking
