@@ -167,15 +167,16 @@ typedef unsigned int gfp_t;
 
 /* Reap lock operations of `mman_kernel' */
 FUNDEF NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void);
+#define _mman_lockops_reap(self) _mman_lockops_reap()
 #define mman_lockops_mustreap(self) \
 	(__hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
-#define mman_lockops_reap(self) _mman_lockops_reap()
+#define mman_lockops_reap(self) _mman_lockops_reap(self)
 #else /* __OPTIMIZE_SIZE__ */
 #define mman_lockops_reap(self)                      \
 	(void)(!mman_lockops_mustreap(self) ||           \
 	       (__hybrid_assert((self) == &mman_kernel), \
-	        _mman_lockops_reap(), 0))
+	        _mman_lockops_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 #ifndef CONFIG_NO_SMP
@@ -240,6 +241,10 @@ FUNDEF NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void);
 #define mman_lock_release_f(self)  mman_lock_endwrite_f(self)
 #define mman_lock_acquired(self)   mman_lock_writing(self)
 #define mman_lock_available(self)  mman_lock_canwrite(self)
+
+/* TODO: Remove general-purpose locking support for `struct mman'
+ *       Since there is more than 1 lock contained inside, it doesn't
+ *       make too much sense to provide generic locking overloads! */
 __DEFINE_SYNC_RWLOCK(struct mman,
                      mman_lock_tryread,
                      mman_lock_read,
@@ -266,6 +271,10 @@ __DEFINE_SYNC_RWLOCK(struct mman,
 #define mman_lock_release_f(self)  atomic_lock_release(&(self)->mm_lock)
 #define mman_lock_acquired(self)   atomic_lock_acquired(&(self)->mm_lock)
 #define mman_lock_available(self)  atomic_lock_available(&(self)->mm_lock)
+
+/* TODO: Remove general-purpose locking support for `struct mman'
+ *       Since there is more than 1 lock contained inside, it doesn't
+ *       make too much sense to provide generic locking overloads! */
 __DEFINE_SYNC_MUTEX(struct mman,
                     mman_lock_tryacquire,
                     mman_lock_acquire,

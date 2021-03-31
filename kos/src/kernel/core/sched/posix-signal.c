@@ -28,13 +28,14 @@
 #include <debugger/hook.h> /* DEFINE_DBG_BZERO_OBJECT */
 #include <kernel/coredump.h>
 #include <kernel/except.h>
+#include <kernel/mman.h>
+#include <kernel/mman/event.h> /* DEFINE_PERMMAN_ONEXEC() */
+#include <kernel/mman/nopf.h>
 #include <kernel/paging.h> /* KERNELSPACE_HIGHMEM */
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
-#include <kernel/mman/nopf.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/except-handler.h>
@@ -261,7 +262,7 @@ NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict sel
 	int result = SIGMASK_ISMASKED_MAYBE;
 	USER CHECKED struct userprocmask *um;
 	USER UNCHECKED sigset_t *current_sigmask;
-	struct vm *myvm, *threadvm;
+	struct mman *mymm, *threadmm;
 	/* NOTE: This read is safe, since `self' is running on  THIS_CPU,
 	 *       the `this_userprocmask_address'  field is  write-private
 	 *       to `self', and preemption  is disabled, meaning that  we
@@ -272,10 +273,10 @@ NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict sel
 	 * Note that we don't use task_setvm() to change our's, since
 	 * that function may throw an exception, and would already be
 	 * complete overkill for our purposes. */
-	myvm     = THIS_MMAN;
-	threadvm = self->t_mman;
-	if (myvm != threadvm)
-		pagedir_set(threadvm->v_pdir_phys);
+	mymm     = THIS_MMAN;
+	threadmm = self->t_mman;
+	if (mymm != threadmm)
+		pagedir_set(threadmm->mm_pagedir_p);
 
 	/* Use memcpy_nopf() to read the thread's current signal mask pointer. */
 	if (!read_nopf(&um->pm_sigmask, &current_sigmask))
@@ -332,8 +333,8 @@ set_maybe_and_return:
 
 done:
 	/* Switch back to our own VM */
-	if (myvm != threadvm)
-		pagedir_set(myvm->v_pdir_phys);
+	if (mymm != threadmm)
+		pagedir_set(mymm->mm_pagedir_p);
 	return result;
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
@@ -1911,7 +1912,7 @@ NOTHROW(FCALL sighand_has_nondefault_sig_ign)(struct sighand const *__restrict s
 
 
 /* During exec(), all signal handler dispositions of the calling thread are reset */
-DEFINE_PERVM_ONEXEC(onexec_posix_signals_reset_action);
+DEFINE_PERMMAN_ONEXEC(onexec_posix_signals_reset_action);
 INTERN void KCALL onexec_posix_signals_reset_action(void) {
 	REF struct sighand_ptr *handptr;
 	/* Posix says that signals set to SIG_IGN should remain SIG_IGN after exec(). */

@@ -160,14 +160,14 @@ DECL_BEGIN
  * >>         goto RETRY;
  * >>     if (changed) {
  * >>         sync_write(part);
- * >>         if (part->dp_futex->mpm_rtm_vers != version)
+ * >>         if (part->mp_meta->mpm_rtm_vers != version)
  * >>             goto RETRY;
  * >>     } else {
  * >>         // Have to acquire a read-lock to ensure that parts
  * >>         // that were only read aren't being modified right
  * >>         // now by another RTM context.
  * >>         sync_read(part);
- * >>         if (part->dp_futex->mpm_rtm_vers != version)
+ * >>         if (part->mp_meta->mpm_rtm_vers != version)
  * >>             goto RETRY;
  * >>         sync_endread(part);
  * >>     }
@@ -194,7 +194,7 @@ DECL_BEGIN
  * >>         size_t error;
  * >>         error = memcpy_nopf(addr, data.bytes(), #data);
  * >>         assert(error == 0); // We asserted this above!
- * >>         ++part->dp_futex->mpm_rtm_vers;
+ * >>         ++part->mp_meta->mpm_rtm_vers;
  * >>         sync_endwrite(part);
  * >>     }
  * >> }

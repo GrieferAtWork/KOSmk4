@@ -389,7 +389,7 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 		                                     NULL,
 		                                     VGA_VM86_BIOS_SIZE,
 		                                     PAGESIZE,
-		                                     VM_GETFREE_ABOVE,
+		                                     MAP_GROWSUP,
 		                                     &vm_datablock_physical,
 		                                     NULL,
 		                                     NULL,
@@ -420,9 +420,9 @@ NOTHROW(CC vga_vm86_state_fini)(vga_vm86_state_t *__restrict self) {
 			virt += PAGESIZE;
 		}
 	} else {
-		vm_unmap(&vm_kernel,
-		         self->vv_biosbase,
-		         VGA_VM86_BIOS_SIZE);
+		mman_unmap(&vm_kernel,
+		           self->vv_biosbase,
+		           VGA_VM86_BIOS_SIZE);
 	}
 #else /* __KERNEL__ */
 	munmapphys(self->vv_biosbase, VGA_VM86_BIOS_SIZE);

@@ -218,7 +218,7 @@ struct mapfiles_enum_data {
 };
 
 PRIVATE ssize_t FCALL
-vm_enum_callback_for_mapfiles_enum(void *arg, struct vm_mapinfo *__restrict info) {
+vm_enum_callback_for_mapfiles_enum(void *arg, struct mmapinfo *__restrict info) {
 	struct mapfiles_enum_data *ctx;
 	/* Buffer   for  the  filename   of  the  /map_files/  file.
 	 * This has  the  format:  '<pointer>-<pointer>\0',  meaning
@@ -227,15 +227,15 @@ vm_enum_callback_for_mapfiles_enum(void *arg, struct vm_mapinfo *__restrict info
 	 * the  representation  used   is  always  lower-case   hex. */
 	char filename[2 + (2 * (sizeof(void *) * 2))];
 	u16 filename_len;
-	if (!info->vmi_fspath || !info->vmi_fsname)
+	if (!info->mmi_fspath || !info->mmi_fsname)
 		return 0; /* Don't enumerate this one! */
 	ctx = (struct mapfiles_enum_data *)arg;
 	filename_len = (u16)sprintf(filename, "%" PRIxPTR "-%" PRIxPTR,
-	                            info->vmi_min, info->vmi_max);
+	                            info->mmi_min, info->mmi_max);
 	/* Enumerate this file mapping. */
 	(*ctx->ed_callback)(ctx->ed_arg, filename, filename_len, DT_LNK,
 	                    PROCFS_INOMAKE_MAPFILES(ctx->ed_pid,
-	                                            info->vmi_index));
+	                                            info->mmi_index));
 	return 1;
 }
 
@@ -262,9 +262,7 @@ ProcFS_PerProc_MapFiles_Enum(struct directory_node *__restrict self,
 		ed.ed_callback = callback;
 		ed.ed_arg      = arg;
 		/* Enumerate files from /proc/[pid]/map_files */
-		vm_enum(threadvm,
-		        &vm_enum_callback_for_mapfiles_enum,
-		        &ed);
+		mman_enum(threadvm, &vm_enum_callback_for_mapfiles_enum, &ed);
 	}
 done:
 	;

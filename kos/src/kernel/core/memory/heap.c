@@ -916,7 +916,7 @@ load_new_slot:
 			/* Reset the heap  hint in  a way  that will  keep our  heap
 			 * around the same area of memory, preventing it from slowly
 			 * crawling across the entire address space. */
-			if (self->h_hintmode & VM_GETFREE_BELOW) {
+			if (self->h_hintmode & MAP_GROWSDOWN) {
 				do {
 					if ((old_hint = ATOMIC_READ(self->h_hintaddr)) >= free_endaddr)
 						break;

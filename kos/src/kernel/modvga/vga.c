@@ -1894,7 +1894,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 		vga_device->v_vram_size = 8192 * 4 * 4; /* 128K */
 		vram_base = vm_map(&vm_kernel,
 		                   HINT_GETADDR(KERNEL_VMHINT_DEVICE),
-		                   CEIL_ALIGN(vga_device->v_vram_size, PAGESIZE),
+		                   vga_device->v_vram_size,
 		                   PAGESIZE, HINT_GETMODE(KERNEL_VMHINT_DEVICE),
 		                   &vm_datablock_physical, NULL, NULL,
 		                   (pos_t)(vga_device->v_vram_addr & ~PAGEMASK),
@@ -1942,7 +1942,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			/* Register the VGA adapter device. */
 			character_device_register_auto(vga_device);
 		} EXCEPT {
-			vm_unmap(&vm_kernel, vram_base, CEIL_ALIGN(vga_device->v_vram_size, PAGESIZE));
+			mman_unmap(&vm_kernel, vram_base, vga_device->v_vram_size);
 			RETHROW();
 		}
 	} EXCEPT {

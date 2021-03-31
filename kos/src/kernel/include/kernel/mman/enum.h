@@ -22,10 +22,11 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
-#include <kernel/mman/mpart.h>
+#include <kos/kernel/paging.h> /* USERSPACE_END, USERSPACE_START */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -87,6 +88,20 @@ FUNDEF ssize_t KCALL
 mman_enum(struct mman *__restrict self, mman_enum_callback_t cb, void *arg,
           UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)0),
           UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1));
+
+
+/* Enumerate all of userspace. */
+#ifdef USERSPACE_END
+#define mman_enum_userspace(self, cb, arg) \
+	mman_enum(self, cb, arg,               \
+	          (UNCHECKED void *)0,         \
+	          (UNCHECKED void *)(USERSPACE_END - 1))
+#else /* USERSPACE_END */
+#define mman_enum_userspace(self, cb, arg)       \
+	mman_enum(self, cb, arg,                     \
+	          (UNCHECKED void *)USERSPACE_START, \
+	          (UNCHECKED void *)-1);
+#endif /* !USERSPACE_END */
 
 
 DECL_END

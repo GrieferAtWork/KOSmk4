@@ -30,6 +30,8 @@
 
 #include "openfd.h"
 
+/* TODO: Refactor to <kos/hop/mfile.h> */
+
 __DECL_BEGIN
 
 #define HOP_DATABLOCK_STAT_FEATURE_NONE    0x00000000 /* No special features. */

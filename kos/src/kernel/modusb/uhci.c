@@ -771,11 +771,11 @@ NOTHROW(KCALL uhci_aio_retsize)(struct aio_handle *__restrict self) {
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_aio_handle_finidma)(struct uhci_aio_data *__restrict self) {
 	if (self->ud_flags & UHCI_AIO_FONEDMA)
-		vm_dmalock_release(&self->ud_dmalock);
+		mman_dmalock_release(&self->ud_dmalock);
 	else if (self->ud_dmalockvec) {
-		struct vm_dmalock *iter;
-		for (iter = self->ud_dmalockvec; iter->dl_part; ++iter)
-			vm_dmalock_release(iter);
+		struct mdmalock *iter;
+		for (iter = self->ud_dmalockvec; iter->mdl_part; ++iter)
+			mman_dmalock_release(iter);
 		kfree(self->ud_dmalockvec);
 	}
 }
@@ -2101,13 +2101,13 @@ uhci_transfer(struct usb_controller *__restrict self,
 				case USB_TRANSFER_BUFTYP_VIRT:
 					if (!tx_iter->ut_buflen)
 						goto do_configure_simple_empty;
-					/* TODO: vm_startdma() */
+					/* TODO: mman_startdma() */
 					goto cleanup_configured_and_do_syncio;
 
 				case USB_TRANSFER_BUFTYP_VIRTVEC:
 					if (!tx_iter->ut_buflen)
 						goto do_configure_simple_empty;
-					/* TODO: vm_startdmav() */
+					/* TODO: mman_startdmav() */
 					goto cleanup_configured_and_do_syncio;
 
 				case USB_TRANSFER_BUFTYP_PHYS:

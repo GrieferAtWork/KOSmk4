@@ -272,7 +272,7 @@ again_next_slab_page_tryhard:
 			                            HINT_GETMODE(KERNEL_VMHINT_SLAB));
 			vm_kernel_treelock_endwrite();
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-			if (next_slab_addr != VM_GETFREE_ERROR &&
+			if (next_slab_addr != MAP_FAILED &&
 			    next_slab_addr >= (byte_t *)slab_end_addr - PAGESIZE)
 				goto gotaddr;
 #else /* CONFIG_SLAB_GROWS_DOWNWARDS */

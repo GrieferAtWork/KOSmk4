@@ -355,12 +355,12 @@ NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Update the node/part */
-	mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+	mman_mappings_removenode(&mman_kernel, node);
 	node->mn_minaddr -= PAGESIZE;
 	part->mp_mem.mc_start -= 1;
 	part->mp_mem.mc_size += 1;
 	part->mp_maxaddr += PAGESIZE;
-	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+	mman_mappings_insert(&mman_kernel, node);
 	return true;
 fail:
 	return false;
@@ -390,11 +390,11 @@ NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Update the node/part */
-	mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+	mman_mappings_removenode(&mman_kernel, node);
 	part->mp_mem.mc_size += 1;
 	node->mn_maxaddr += PAGESIZE;
 	part->mp_maxaddr += PAGESIZE;
-	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+	mman_mappings_insert(&mman_kernel, node);
 	return true;
 fail:
 	return false;
@@ -422,11 +422,11 @@ NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
 	}
 
 	/* Fix-up mappings. */
-	mnode_tree_removenode(&mman_kernel.mm_mappings, lo);
-	mnode_tree_removenode(&mman_kernel.mm_mappings, hi);
+	mman_mappings_removenode(&mman_kernel, lo);
+	mman_mappings_removenode(&mman_kernel, hi);
 	lo->mn_maxaddr = hi->mn_maxaddr;
 	lopart->mp_maxaddr += mnode_getsize(hi);
-	mnode_tree_insert(&mman_kernel.mm_mappings, lo);
+	mman_mappings_insert(&mman_kernel, lo);
 	/* Destroy the existing mapping. */
 	mcoreheap_free_locked(container_of(hipart, union mcorepart, mcp_part));
 	mcoreheap_free_locked(container_of(hi, union mcorepart, mcp_node));
@@ -560,7 +560,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 
 	/* Load the mem-node into the kernel mman. */
 	LIST_INSERT_HEAD(&mman_kernel.mm_writable, node, mn_writable);
-	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+	mman_mappings_insert(&mman_kernel, node);
 
 	/* And finally: immediately map the new core-page into the kernel mman. */
 	pagedir_mapone(node->mn_minaddr,
@@ -652,7 +652,7 @@ NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
 		lop = (struct lockop *)part;
 		lop->lo_func = &lockop_coreheap_free_callback;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, lo_link);
-		_mman_lockops_reap();
+		_mman_lockops_reap(&mman_kernel);
 	}
 }
 

@@ -72,7 +72,7 @@ struct mfile_map {
 	 * >>         node->mn_fsname = NULL;
 	 * >>         node->mn_minaddr += (uintptr_t)addr;
 	 * >>         node->mn_maxaddr += (uintptr_t)addr;
-	 * >>         mnode_tree_insert(&mm->mm_mappings, node);
+	 * >>         mman_mappings_insert(mm, node);
 	 * >>         mpart_lock_release(node->mn_part);
 	 * >>     }
 	 * >>     mman_lock_release(mm);

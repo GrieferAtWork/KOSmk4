@@ -577,7 +577,7 @@ do_prefault:
 		part->mp_meta = NULL;
 
 		/* Insert the new node into the kernel mman. */
-		mnode_tree_insert(&mman_kernel.mm_mappings, node);
+		mman_mappings_insert(&mman_kernel, node);
 
 unlock_and_done:
 		mman_lock_release(&mman_kernel);

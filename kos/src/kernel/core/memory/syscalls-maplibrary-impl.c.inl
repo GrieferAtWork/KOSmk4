@@ -66,11 +66,10 @@ FUNC(unmap_range)(struct vm *__restrict v,
 		}
 		size += addr & PAGEMASK;
 		addr &= ~PAGEMASK;
-		vm_unmap(v,
-		         (byte_t *)loadaddr + addr,
-		         CEIL_ALIGN(size, PAGESIZE),
-		         VM_UNMAP_ANYTHING |
-		         VM_UNMAP_NOKERNPART);
+		mman_unmap(v,
+		           (byte_t *)loadaddr + addr,
+		           CEIL_ALIGN(size, PAGESIZE),
+		           MMAN_UNMAP_NOKERNPART);
 	}
 }
 
@@ -317,7 +316,7 @@ find_new_candidate:
 		                              min_alignment,
 		                              HINT_GETMODE(KERNEL_VMHINT_USER_LIBRARY));
 		sync_endread(v);
-		if unlikely(result == (byte_t *)VM_GETFREE_ERROR)
+		if unlikely(result == (byte_t *)MAP_FAILED)
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
 		result -= min_page * PAGESIZE;
 		if (flags & MAP_DONT_MAP)
@@ -414,11 +413,8 @@ unmap_check_overlap_and_find_new_candidate:
 						goto find_new_candidate;
 					}
 					if (!(flags & MAP_FIXED_NOREPLACE)) {
-						vm_unmap(v,
-						         result + addr,
-						         size,
-						         VM_UNMAP_ANYTHING |
-						         VM_UNMAP_NOKERNPART);
+						mman_unmap(v, result + addr, size,
+						           MMAN_UNMAP_NOKERNPART);
 						goto again_map_segments;
 					}
 					/* TODO: These aren't the correct arguments for this exception! */
@@ -507,7 +503,7 @@ unmap_check_overlap_and_find_new_candidate:
 							 * But still: It is something that is technically allowed by ELF, and
 							 *            maybe someone needed a really large section of  0-bytes
 							 *            for some kind of stub-implementation... */
-							vm_memset(v, bss_start, 0, bss_overlap, true);
+							mman_memset(v, bss_start, 0, bss_overlap, true);
 						}
 					}
 				}

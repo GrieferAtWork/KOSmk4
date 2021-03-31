@@ -45,11 +45,11 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_ReleaseDmaLocks)(struct aio_handle *__restri
 	assert(self->ah_type == &AtaDrive_DmaAioHandleType);
 	data = (AtaAIOHandleData *)self->ah_data;
 	if (data->hd_flags & ATA_AIO_HANDLE_FONEDMA) {
-		vm_dmalock_release(&data->hd_dmalock);
+		mman_dmalock_release(&data->hd_dmalock);
 	} else if (data->hd_dmalockvec) {
-		struct vm_dmalock *iter;
-		for (iter = data->hd_dmalockvec; iter->dl_part; ++iter)
-			vm_dmalock_release(iter);
+		struct mdmalock *iter;
+		for (iter = data->hd_dmalockvec; iter->mdl_part; ++iter)
+			mman_dmalock_release(iter);
 		kfree(data->hd_dmalockvec);
 	}
 #ifndef NDEBUG

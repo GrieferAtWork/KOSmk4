@@ -653,14 +653,14 @@ again_lock_mman:
 								/* All right! Let's extend the `v_kernreserve' node! */
 								printk(KERN_DEBUG "[x32] Extend v_kernreserve to include +3GiB...+4GiB\n");
 								mf.mfl_node = krs;
-								mnode_tree_removenode(&mm->mm_mappings, krs);
+								mman_mappings_removenode(mm, krs);
 								krs->mn_minaddr = (byte_t *)COMPAT_KERNELSPACE_BASE;
 								krs->mn_part    = &userkern_segment_part_compat;
 								assert(krs->mn_fspath == NULL);
 								assert(krs->mn_fsname == NULL);
 								/* Re-insert the node and continue operating as if we'd found
 								 * everything as it  has been changed  into from the  get-go. */
-								mnode_tree_insert(&mm->mm_mappings, krs);
+								mman_mappings_insert(mm, krs);
 #define NEED_got_node_and_lock
 								goto got_node_and_lock;
 							}

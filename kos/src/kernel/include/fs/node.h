@@ -1045,7 +1045,6 @@ directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 nam
 
 
 
-struct module;
 struct regular_node
 #if defined(__cplusplus) && !defined(CONFIG_WANT_FS_AS_STRUCT)
 	: inode

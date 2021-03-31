@@ -56,18 +56,6 @@
 #define VM_DATAPART_STATE_INCORE                      MPART_ST_MEM
 #define VM_DATAPART_STATE_INSWAP                      MPART_ST_SWP
 #define VM_DATAPART_STATE_VIOPRT                      MPART_ST_VIO
-#define dp_refcnt                                     mp_refcnt
-#define dp_crefs                                      mp_copy.lh_first
-#define dp_srefs                                      mp_share.lh_first
-#define dp_block                                      mp_file
-#define dp_flags                                      mp_flags
-#define dp_state                                      mp_state
-#define dp_pprop                                      mp_blkst_inl
-#define dp_pprop_p                                    mp_blkst_ptr
-#define dp_futex                                      mp_meta
-#define vm_datapart_free(...)                         mpart_free(__VA_ARGS__)
-#define vm_datapart_destroy(...)                      mpart_destroy(__VA_ARGS__)
-#define vm_datapart_numbytes(...)                     mpart_getsize(__VA_ARGS__)
 #define vm_datapart_minbyte(...)                      mpart_getminaddr(__VA_ARGS__)
 #define vm_datapart_maxbyte(...)                      mpart_getmaxaddr(__VA_ARGS__)
 #define vm_datapart_startbyte(...)                    mpart_getminaddr(__VA_ARGS__)
@@ -184,7 +172,6 @@
 #define vm_kernel_treelock_writing()                  mman_lock_writing(&mman_kernel)
 #define vm_kernel_treelock_reading()                  mman_lock_reading(&mman_kernel)
 #define vm_kernel_treelock_end()                      mman_lock_end(&mman_kernel)
-#define vm_kernel_treelock_tryservice()               mman_lockops_reap(&mman_kernel)
 #define vm_treelock_write(self)                       mman_lock_write(self)
 #define vm_treelock_write_nx(self)                    mman_lock_write_nx(self)
 #define vm_treelock_trywrite(self)                    mman_lock_trywrite(self)
@@ -316,15 +303,8 @@ DECL_END
 
 
 #define VM_GETFREE_ASLR  0 /* Enabled by default. */
-#define VM_GETFREE_ABOVE MAP_GROWSUP
-#define VM_GETFREE_BELOW MAP_GROWSDOWN
-#define VM_GETFREE_ERROR MAP_FAILED
 #define vm_getfree(self, hint, num_bytes, min_alignment, mode) \
 	mman_findunmapped(self, hint, num_bytes, mode, min_alignment)
-#define vm_get_aslr_disabled() (mman_getunmapped_extflags & MAP_NOASLR)
-#define vm_set_aslr_disabled(v)                                                        \
-	((v) ? __hybrid_atomic_or(mman_getunmapped_extflags, MAP_NOASLR, __ATOMIC_SEQ_CST) \
-	     : __hybrid_atomic_and(mman_getunmapped_extflags, ~MAP_NOASLR, __ATOMIC_SEQ_CST))
 #define vm_map(self, hint, num_bytes, min_alignment, getfree_mode, data, \
                fspath, fsname, data_start_offset, prot, flag, guard)     \
 	mman_map(self, hint, num_bytes, prot, (getfree_mode) | (flag),       \
@@ -341,64 +321,7 @@ DECL_END
 #define vm_mapres(self, hint, num_bytes, min_alignment, getfree_mode, flag) \
 	mman_map_res(self, hint, num_bytes, (getfree_mode) | (flag), min_alignment)
 
-#define VM_UNMAP_NORMAL           0
-#define VM_UNMAP_GUARD            0
-#define VM_UNMAP_RESERVE          0
-#define VM_UNMAP_ANYTHING         0
-#define VM_UNMAP_SEGFAULTIFUNUSED MMAN_UNMAP_FAULTIFUNUSED
-#define VM_UNMAP_NOSPLIT          MMAN_UNMAP_NOSPLIT
-#define VM_UNMAP_NOKERNPART       MMAN_UNMAP_NOKERNPART
-#define vm_unmap(...)             mman_unmap(__VA_ARGS__)
-#define vm_protect(...)           mman_protect(__VA_ARGS__)
-#define vm_syncmem(self, addr, num_bytes) \
-	(mman_syncmem(self, addr, num_bytes), (u64)0)
-#define vm_read_nopf(...)               mman_read_nopf(__VA_ARGS__)
-#define vm_write_nopf(...)              mman_write_nopf(__VA_ARGS__)
-#define vm_memset_nopf(...)             mman_memset_nopf(__VA_ARGS__)
-#define vm_read(...)                    mman_read(__VA_ARGS__)
-#define vm_write(...)                   mman_write(__VA_ARGS__)
-#define vm_memset(...)                  mman_memset(__VA_ARGS__)
-#define dl_part                         mdl_part
-#define vm_dmalock_release(...)         mman_dmalock_release(__VA_ARGS__)
-#define vm_startdma(effective_vm, prange, preset, arg, lockvec, lockcnt, vaddr, num_bytes, for_writing) \
-	mman_startdma(effective_vm, prange, arg, lockvec, lockcnt, vaddr, num_bytes, for_writing)
-#define vm_startdmav(effective_vm, prange, preset, arg, lockvec, lockcnt, vaddr_buf, for_writing) \
-	mman_startdmav(effective_vm, prange, arg, lockvec, lockcnt, vaddr_buf, for_writing)
-#define vm_enumdma(...)                 mman_enumdma(__VA_ARGS__)
-#define vm_enumdmav(...)                mman_enumdmav(__VA_ARGS__)
-#define vm_stopdma(...)                 mman_stopdma(__VA_ARGS__)
-#define vm_exec(...)                    mman_exec(__VA_ARGS__)
 #define vm_exec_assert_regular(self)    (void)0 /* TODO: This should be exposed in <fs/node.h>! */
-#define vm_mapinfo                      mmapinfo
-#define vmi_min                         mmi_min
-#define vmi_max                         mmi_max
-#define vmi_prot                        mmi_flags
-#define vmi_block                       mmi_file
-#define vmi_offset                      mmi_offset
-#define vmi_fspath                      mmi_fspath
-#define vmi_fsname                      mmi_fsname
-#define vmi_index                       mmi_index
-#define vm_mapinfo_size                 mmapinfo_size
-#define vm_enum_callback_t              mman_enum_callback_t
-#define vm_enum(...)                    mman_enum(__VA_ARGS__)
-#define vm_kernel_pending_operation     lockop
-#define vm_kernel_pending_cb_t          lockop_callback_t
-#define vkpo_next                       lo_link.sle_next
-#define vkpo_exec                       lo_func
-#define vm_kernel_pending_operations    mman_kernel_lockops.slh_first
-#define VM_KERNEL_PENDING_CB_RETURN_T   struct postlockop *
-#define VM_KERNEL_PENDING_CB_RETURN     return __NULLPTR
-#define VM_KERNEL_PENDING_CB_CC         FCALL
-#define vm_onexec_callbacks             mman_onexec_callbacks
-#define vm_oninit_callbacks             mman_oninit_callbacks
-#define vm_onfini_callbacks             mman_onfini_callbacks
-#define vm_onclone_callbacks            mman_onclone_callbacks
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-#define DEFINE_PERVM_ONEXEC DEFINE_PERMMAN_ONEXEC
-#define DEFINE_PERVM_INIT   DEFINE_PERMMAN_INIT
-#define DEFINE_PERVM_FINI   DEFINE_PERMMAN_FINI
-#define DEFINE_PERVM_CLONE  DEFINE_PERMMAN_CLONE
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 /* Misc. functions */
 #define vm_datapart_map_ram(self, addr, perm)                  mpart_mmap_force(self, addr, mpart_getsize(self), 0, perm)
@@ -418,7 +341,5 @@ DECL_END
 #define vm_datapart_freeram(self)                              mpart_ll_freemem(self)
 
 #define vm_datablock_deanonymize(self) (void)0 /* TODO: Function was always racy, and isn't supported anymore */
-#define VM_DATABLOCK_INIT_VIO_EX       MFILE_INIT_VIO_EX
-#define VM_DATABLOCK_INIT_VIO          MFILE_INIT_VIO
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_H */

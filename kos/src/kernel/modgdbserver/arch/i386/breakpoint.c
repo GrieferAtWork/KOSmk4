@@ -252,7 +252,7 @@ NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void) {
 		prev = GDBBreak_SwList[i].sb_prev;
 		GDBBreak_SwList[i].sb_vm = NULL;
 		TRY {
-			vm_write(thatvm, addr, &prev, 1, true);
+			mman_write(thatvm, addr, &prev, 1, true);
 		} EXCEPT {
 		}
 	}
@@ -262,7 +262,7 @@ NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void) {
 
 /* Delete all internal knowledge of breakpoints concerning `effective_vm'.
  * Note  that this function may be called  from threads other than the GDB
- * host thread, as it is invoked as part of `vm_onfini_callbacks()'! */
+ * host thread, as it is invoked as part of `mman_onfini_callbacks()'! */
 INTERN void
 NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm) {
 	size_t i, maxused;

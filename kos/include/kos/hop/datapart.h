@@ -31,6 +31,8 @@
 #include "datablock.h"
 #include "openfd.h"
 
+/* TODO: Refactor to <kos/hop/mpart.h> */
+
 __DECL_BEGIN
 
 #define HOP_DATAPART_STAT_FEATURE_NONE         0x00000000 /* No special features. */

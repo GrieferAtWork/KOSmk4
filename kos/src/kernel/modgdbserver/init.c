@@ -26,8 +26,9 @@
 #include <kernel/debugtrap.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/mman.h>
+#include <kernel/mman/event.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 
@@ -69,8 +70,8 @@ PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 	GDBInterrupt_Fini();
 
 	/* Uninstall traps and hooks. */
-	vm_onfini_callbacks.remove(&GDB_ClearAllBreakpointsOfVM);
-	vm_onclone_callbacks.remove(&GDB_CloneAllBreakpointsFromVM);
+	mman_onfini_callbacks.remove(&GDB_ClearAllBreakpointsOfVM);
+	mman_onclone_callbacks.remove(&GDB_CloneAllBreakpointsFromVM);
 	kernel_debugtraps_uninstall(&GDBServer_DebugTraps);
 
 	/* Terminate the fallback-host thread */
@@ -97,11 +98,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		GDBInterrupt_Init();
 
 		/* Hook the vm callbacks for breakpoints. */
-		vm_onfini_callbacks.insert(&GDB_ClearAllBreakpointsOfVM);
-		vm_onclone_callbacks.insert(&GDB_CloneAllBreakpointsFromVM);
+		mman_onfini_callbacks.insert(&GDB_ClearAllBreakpointsOfVM);
+		mman_onclone_callbacks.insert(&GDB_CloneAllBreakpointsFromVM);
 
 		/* Create the fallback-host thread. */
-		GDBServer_FallbackHost = task_alloc(&vm_kernel);
+		GDBServer_FallbackHost = task_alloc(&mman_kernel);
 		task_setup_kernel(GDBServer_FallbackHost, (thread_main_t)&GDBFallbackHost_Main, 0);
 		/* Set the Stopped flag to that the fallback-host can't be stopped by GDB. */
 		ATOMIC_OR(GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);

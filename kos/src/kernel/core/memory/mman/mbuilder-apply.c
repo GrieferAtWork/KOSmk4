@@ -116,8 +116,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	size_t i;
 
 	/* Step #1: Unlink the kernel-reserve node from `target' */
-	mnode_tree_removenode(&target->mm_mappings,
-	                      &FORMMAN(target, thismman_kernel_reservation));
+	mman_mappings_removenode(target, &FORMMAN(target, thismman_kernel_reservation));
 	assert(!LIST_ISBOUND(&FORMMAN(target, thismman_kernel_reservation), mn_writable));
 
 	/* Step #2: Clear the target mman's list of writable nodes. */
@@ -206,11 +205,11 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	 * >>             mman_lock_acquire(mm);
 	 * >>             if (!mnode_tree_rlocate(mm->mm_mappings, COMPAT_KERNELSPACE_BASE,
 	 * >>                                     KERNELSPACE_BASE - COMPAT_KERNELSPACE_BASE)) {
-	 * >>                 mnode_tree_removenode(&mm->mm_mappings, &FORMMAN(mm, thismman_kernel_reservation));
+	 * >>                 mman_mappings_removenode(mm, &FORMMAN(mm, thismman_kernel_reservation));
 	 * >>                 // Extend the kern-reserve node to fill the
 	 * >>                 // entire compat-mode kernel address space.
 	 * >>                 FORMMAN(mm, thismman_kernel_reservation).mn_minaddr = COMPAT_KERNELSPACE_BASE;
-	 * >>                 mnode_tree_insert(&mm->mm_mappings, &FORMMAN(mm, thismman_kernel_reservation));
+	 * >>                 mman_mappings_insert(mm, &FORMMAN(mm, thismman_kernel_reservation));
 	 * >>                 mman_lock_release(mm);
 	 * >>                 goto try_lookup_node_at_accessed_address;
 	 * >>             }
@@ -235,8 +234,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 #endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_USERKERN_SEGMENT */
 
 	/* Step #8: Re-insert the kernel-reserve node into the new tree */
-	mnode_tree_insert(&target->mm_mappings,
-	                  &FORMMAN(target, thismman_kernel_reservation));
+	mman_mappings_insert(target, &FORMMAN(target, thismman_kernel_reservation));
 
 	/* And with  that, the  newly constructed  mem-node-tree has  been
 	 * fully assigned  to the  given  target-mman. Assuming  that  our

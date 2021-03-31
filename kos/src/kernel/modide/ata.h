@@ -75,24 +75,24 @@ union ata_aio_prd {
 
 /* The layout of the `ah_data' field of AIO handles used with ATA */
 typedef struct {
-	REF AtaDrive         *hd_drive;       /* [1..1][const] The drive associated with this handle. */
-	union ata_aio_prd     hd_prd;         /* PRD data and atomic-command-descriptor. */
+	REF AtaDrive        *hd_drive;      /* [1..1][const] The drive associated with this handle. */
+	union ata_aio_prd    hd_prd;        /* PRD data and atomic-command-descriptor. */
 	union {
-		struct vm_dmalock  hd_dmalock;    /* [valid_if(ATA_AIO_HANDLE_FONEDMA)] Single DMA lock */
-		struct vm_dmalock *hd_dmalockvec; /* [valid_if(!ATA_AIO_HANDLE_FONEDMA)][0..1][owned] Vector of DMA locks
-		                                   * NOTE: This  vector is terminated  by a sentinel DMA
-		                                   *       lock with its `dl_part' pointer set to `NULL' */
+		struct mdmalock  hd_dmalock;    /* [valid_if(ATA_AIO_HANDLE_FONEDMA)] Single DMA lock */
+		struct mdmalock *hd_dmalockvec; /* [valid_if(!ATA_AIO_HANDLE_FONEDMA)][0..1][owned] Vector of DMA locks
+		                                 * NOTE: This vector is  terminated by  a sentinel  DMA
+		                                 *       lock with its `mdl_part' pointer set to `NULL' */
 	};
-	u8                hd_io_lbaaddr[6];/* [const] 48-bit starting LBA address. */
-	u8                hd_io_sectors[2];/* [const] 16-bit sector read count. */
-	u16               hd_flags;        /* [const] Set of `ATA_AIO_HANDLE_F*' */
-#define ATA_AIO_HANDLE_FNORMAL  0x0000 /* Normal AIO handle flags. */
-#define ATA_AIO_HANDLE_FWRITING 0x0001 /* This is a write-operation. */
-#define ATA_AIO_HANDLE_FONEPRD  0x0002 /* Only a single PRD is required for this AIO handle. */
-#define ATA_AIO_HANDLE_FONEDMA  0x0004 /* `hd_dmalock' is used, as opposed to `hd_dmalockvec'. */
+	u8                hd_io_lbaaddr[6]; /* [const] 48-bit starting LBA address. */
+	u8                hd_io_sectors[2]; /* [const] 16-bit sector read count. */
+	u16               hd_flags;         /* [const] Set of `ATA_AIO_HANDLE_F*' */
+#define ATA_AIO_HANDLE_FNORMAL  0x0000  /* Normal AIO handle flags. */
+#define ATA_AIO_HANDLE_FWRITING 0x0001  /* This is a write-operation. */
+#define ATA_AIO_HANDLE_FONEPRD  0x0002  /* Only a single PRD is required for this AIO handle. */
+#define ATA_AIO_HANDLE_FONEDMA  0x0004  /* `hd_dmalock' is used, as opposed to `hd_dmalockvec'. */
 	union {
-		u16           hd_prd0_bufsize; /* [valid_if(ATA_AIO_HANDLE_FONEPRD)] Physical buffer size (in bytes) */
-		u16           hd_prd_count;    /* [valid_if(!ATA_AIO_HANDLE_FONEPRD)][!0] Number of required PRD entires. */
+		u16           hd_prd0_bufsize;  /* [valid_if(ATA_AIO_HANDLE_FONEPRD)] Physical buffer size (in bytes) */
+		u16           hd_prd_count;     /* [valid_if(!ATA_AIO_HANDLE_FONEPRD)][!0] Number of required PRD entires. */
 	};
 } AtaAIOHandleData;
 

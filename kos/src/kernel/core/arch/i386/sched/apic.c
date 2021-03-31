@@ -30,11 +30,14 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/gdt.h>
@@ -234,19 +237,17 @@ mnode_create_lockram(size_t num_pages) {
 
 PRIVATE NOBLOCK ATTR_FREETEXT void
 NOTHROW(KCALL vm_node_destroy_locked_ram)(struct mnode *__restrict self) {
-	assert(self->vn_block);
-	assert(self->vn_part);
-	assert(self->vn_fspath == NULL);
-	assert(self->vn_fsname == NULL);
-	assert(self->vn_link.ln_pself == &self->vn_part->dp_srefs);
-	assert(self->vn_link.ln_next == NULL);
-	assert(self->vn_part->dp_srefs == self);
-	/* Clear out the SREFS field, as `vm_datapart_destroy()'
-	 * will   cause   panic  if   that  field   is  non-NULL */
-	self->vn_part->dp_srefs = NULL;
+	assert(self->mn_part);
+	assert(self->mn_fspath == NULL);
+	assert(self->mn_fsname == NULL);
+	assert(self->mn_link.le_prev == &self->mn_part->mp_share.lh_first);
+	assert(self->mn_link.le_next == NULL);
+	assert(self->mn_part->mp_share.lh_first == self);
+	/* Clear out the SREFS field, as `mpart_destroy()'
+	 * will  cause  panic  if that  field  is non-NULL */
+	self->mn_part->mp_share.lh_first = NULL;
 	/* Drop references and free the node descriptor. */
-	decref_unlikely(self->vn_block);
-	decref_likely(self->vn_part);
+	decref_likely(self->mn_part);
 	kfree(self);
 }
 
@@ -294,13 +295,13 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	TRY {
 		cpu_node3 = mnode_create_lockram(1);
 		TRY {
-			sync_write(&vm_kernel);
-			cpu_baseaddr = (byte_t *)vm_getfree(&vm_kernel,
-			                                    HINT_GETADDR(KERNEL_VMHINT_ALTCORE),
-			                                    (size_t)__kernel_percpu_full_bytes, PAGESIZE,
-			                                    HINT_GETMODE(KERNEL_VMHINT_ALTCORE));
-			if unlikely(cpu_baseaddr == VM_GETFREE_ERROR) {
-				sync_endwrite(&vm_kernel);
+			sync_write(&mman_kernel);
+			cpu_baseaddr = (byte_t *)mman_findunmapped(&mman_kernel,
+			                                           HINT_GETADDR(KERNEL_VMHINT_ALTCORE),
+			                                           (size_t)__kernel_percpu_full_bytes,
+			                                           HINT_GETMODE(KERNEL_VMHINT_ALTCORE));
+			if unlikely(cpu_baseaddr == MAP_FAILED) {
+				sync_endwrite(&mman_kernel);
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 				      (size_t)__kernel_percpu_full_bytes);
 			}
@@ -318,15 +319,15 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 		RETHROW();
 	}
 	/* Fill in address ranges for CPU nodes. */
-	vm_node_setminaddr(cpu_node1, cpu_baseaddr);
-	vm_node_setmaxaddr(cpu_node1, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes - 1);
-	vm_node_setminaddr(cpu_node3, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + 2 * PAGESIZE);
-	vm_node_setmaxaddr(cpu_node3, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + 2 * PAGESIZE + PAGESIZE - 1);
+	cpu_node1->mn_minaddr = cpu_baseaddr;
+	cpu_node1->mn_maxaddr = cpu_baseaddr + (size_t)__x86_cpu_part1_bytes - 1;
+	cpu_node3->mn_minaddr = cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + 2 * PAGESIZE;
+	cpu_node3->mn_maxaddr = cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + 2 * PAGESIZE + PAGESIZE - 1;
 
 	/* Insert the CPU nodes into the kernel VM. */
-	vm_node_insert(cpu_node1);
-	vm_node_insert(cpu_node3);
-	sync_endwrite(&vm_kernel);
+	mman_mappings_insert(&mman_kernel, cpu_node1);
+	mman_mappings_insert(&mman_kernel, cpu_node3);
+	sync_endwrite(&mman_kernel);
 
 	result = (struct cpu *)cpu_baseaddr;
 
@@ -351,12 +352,12 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	/* Fill in the IOB node mapping for this CPU. */
 	result = (struct cpu *)cpu_baseaddr;
 	cpu_node2 = (struct mnode *)&FORCPU(result, thiscpu_x86_iobnode);
-	vm_node_setminaddr(cpu_node2, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes);
-	vm_node_setmaxaddr(cpu_node2, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + PAGESIZE - 1);
-	cpu_node2->mn_flags = MNODE_F_PWRITE | MNODE_F_PREAD |
-	                      MNODE_F_SHARED | MNODE_F_NOSPLIT |
-	                      MNODE_F_NOMERGE | MNODE_F_KERNPART |
-	                      MNODE_F_MLOCK | MNODE_F_MPREPARED;
+	cpu_node2->mn_minaddr = cpu_baseaddr + (size_t)__x86_cpu_part1_bytes;
+	cpu_node2->mn_maxaddr = cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + PAGESIZE - 1;
+	cpu_node2->mn_flags   = MNODE_F_PWRITE | MNODE_F_PREAD |
+	                        MNODE_F_SHARED | MNODE_F_NOSPLIT |
+	                        MNODE_F_NOMERGE | MNODE_F_KERNPART |
+	                        MNODE_F_MLOCK | MNODE_F_MPREPARED;
 	cpu_node2->mn_mman    = &mman_kernel;
 	cpu_node2->mn_part    = NULL; /* Reservation */
 	cpu_node2->mn_fspath  = NULL;
@@ -367,9 +368,9 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	DBG_memset(&cpu_node2->mn_link, 0xcc, sizeof(cpu_node2->mn_link));
 
 	/* Insert the IOB VM node into the kernel VM. */
-	sync_write(&vm_kernel); /* Never throws due to early-boot guaranties. */
-	vm_node_insert(cpu_node2);
-	sync_endwrite(&vm_kernel);
+	mman_lock_acquire(&mman_kernel); /* Never throws due to early-boot guaranties. */
+	mman_mappings_insert(&mman_kernel, cpu_node2);
+	mman_lock_release(&mman_kernel);
 
 	/* Make sure that the IOB is terminated by a byte containing all ones
 	 * NOTE: The remainder of the last page (which is `cpu_node3') is left
@@ -394,31 +395,31 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	byte_t *cpu_baseaddr;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	cpu_baseaddr = (byte_t *)self;
-	sync_write(&vm_kernel); /* Never throws due to early-boot guaranties. */
+	sync_write(&mman_kernel); /* Never throws due to early-boot guaranties. */
 	/* NOTE: Must remove `cpu_node2'  first, since that  mnode object is  actually
 	 *       stored inside of `cpu_node1', meaning that once that node is removed,
 	 *       the `cpu_node2' descriptor will automatically become invalid! */
-	cpu_node2 = vm_node_remove(&vm_kernel, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes);
+	cpu_node2 = mnode_tree_remove(&mman_kernel.mm_mappings, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes);
 	COMPILER_BARRIER();
-	cpu_node3 = vm_node_remove(&vm_kernel, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + 2 * PAGESIZE);
-	cpu_node1 = vm_node_remove(&vm_kernel, cpu_baseaddr);
+	cpu_node3 = mnode_tree_remove(&mman_kernel.mm_mappings, cpu_baseaddr + (size_t)__x86_cpu_part1_bytes + 2 * PAGESIZE);
+	cpu_node1 = mnode_tree_remove(&mman_kernel.mm_mappings, cpu_baseaddr);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!pagedir_prepare(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE))
 		kernel_panic(FREESTR("Failed to prepare pagedir for unmapping CPU descriptor"));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_unmap(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
 	pagedir_kernelunprepare(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE);
-	sync_endwrite(&vm_kernel);
+	sync_endwrite(&mman_kernel);
 	assert(cpu_node1);
 	assert(cpu_node2);
 	assert(cpu_node3);
 	assert(mnode_getminaddr(cpu_node1) == cpu_baseaddr);
 	assert(mnode_getmaxaddr(cpu_node1) == cpu_baseaddr + (size_t)__x86_cpu_part1_bytes - 1);
-	/* NOTE: Because we've already removed the nodes from `vm_kernel', we must no longer
-	 *       access the `cpu_node2' structure, since the descriptor was contained inside
+	/* NOTE: Because we've already removed the nodes from `mman_kernel', we must no longer
+	 *       access the `cpu_node2' structure, since  the descriptor was contained  inside
 	 *       of `cpu_node1' */
-	/*assert(cpu_node2->vn_node.a_vmin == cpu_node1->vn_node.a_vmax + 1);*/
-	/*assert(cpu_node2->vn_node.a_vmax == cpu_node1->vn_node.a_vmax + 2);*/
+	/*assert(cpu_node2->mn_node.a_vmin == cpu_node1->mn_node.a_vmax + 1);*/
+	/*assert(cpu_node2->mn_node.a_vmax == cpu_node1->mn_node.a_vmax + 2);*/
 	assert((byte_t *)mnode_getminaddr(cpu_node3) == (byte_t *)mnode_getendaddr(cpu_node1) + 2 * PAGESIZE);
 	assert((byte_t *)mnode_getmaxaddr(cpu_node3) == (byte_t *)mnode_getminaddr(cpu_node3) + PAGESIZE - 1);
 	assert(cpu_node2 == &FORCPU(self, thiscpu_x86_iobnode));
@@ -444,21 +445,15 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
 	 * NOTE: Because these mappings are private the the CPU itself, we don't
 	 *       need to  be holding  a lock  to the  kernel VM  for this  part! */
-	pagedir_unmap(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
-	              vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
-	pagedir_sync(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
-	             vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
-	pagedir_kernelunprepare(vm_node_getaddr(&FORCPU(self, thiscpu_x86_dfstacknode_)),
-	                        vm_node_getsize(&FORCPU(self, thiscpu_x86_dfstacknode_)));
-	pagedir_unmap(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
-	              vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
-	pagedir_sync(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
-	             vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
-	pagedir_kernelunprepare(vm_node_getaddr(&FORTASK(myidle, this_kernel_stacknode_)),
-	                        vm_node_getsize(&FORTASK(myidle, this_kernel_stacknode_)));
-	pagedir_unmapone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
-	pagedir_syncone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
-	pagedir_kernelunprepareone(vm_node_getaddr(&FORTASK(myidle, this_trampoline_node)));
+	mnode_pagedir_unmap(&FORCPU(self, thiscpu_x86_dfstacknode_));
+	mnode_pagedir_sync(&FORCPU(self, thiscpu_x86_dfstacknode_));
+	mnode_pagedir_kernelunprepare(&FORCPU(self, thiscpu_x86_dfstacknode_));
+	mnode_pagedir_unmap(&FORTASK(myidle, this_kernel_stacknode_));
+	mnode_pagedir_sync(&FORTASK(myidle, this_kernel_stacknode_));
+	mnode_pagedir_kernelunprepare(&FORTASK(myidle, this_kernel_stacknode_));
+	pagedir_unmapone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node)));
+	pagedir_syncone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node)));
+	pagedir_kernelunprepareone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node)));
 
 	/* Remove the #DF and IDLE stack nodes from the kernel VM */
 	while (!mman_lock_tryacquire(&mman_kernel))
@@ -502,34 +497,34 @@ i386_allocate_secondary_cores(void) {
 		FORCPU(altcore, thiscpu_scheduler).s_running_last     = altidle;
 		/*FORCPU(altcore, thiscpu_scheduler).s_waiting_last = NULL;*/
 		FORTASK(altidle, this_sched_link).le_prev = &FORCPU(altcore, thiscpu_scheduler).s_running.lh_first;
-		/*FORTASK(altidle, this_sched_link).ln_next = NULL;*/
+		/*FORTASK(altidle, this_sched_link).le_next = NULL;*/
 
 		/* Insert the new task into the kernel VM's task user list. */
-		LIST_INSERT_HEAD(&vm_kernel.v_tasks, altidle, t_mman_tasks);
+		LIST_INSERT_HEAD(&mman_kernel.mm_threads, altidle, t_mman_tasks);
 
 		/* Allocate & map stacks for this cpu's IDLE task, as well as the #DF stack. */
-		FORCPU(altcore, thiscpu_x86_dfstacknode_).vn_part          = &FORCPU(altcore, thiscpu_x86_dfstackpart_);
-		FORCPU(altcore, thiscpu_x86_dfstacknode_).vn_link.ln_pself = &LLIST_HEAD(FORCPU(altcore, thiscpu_x86_dfstackpart_).dp_srefs);
-		FORCPU(altcore, thiscpu_x86_dfstackpart_).dp_srefs         = &FORCPU(altcore, thiscpu_x86_dfstacknode_);
-		vm_datapart_do_allocram(&FORCPU(altcore, thiscpu_x86_dfstackpart_));
+		FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_part           = &FORCPU(altcore, thiscpu_x86_dfstackpart_);
+		FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_link.le_prev   = &LLIST_HEAD(FORCPU(altcore, thiscpu_x86_dfstackpart_).mp_share.lh_first);
+		FORCPU(altcore, thiscpu_x86_dfstackpart_).mp_share.lh_first = &FORCPU(altcore, thiscpu_x86_dfstacknode_);
+		mpart_ll_allocmem(&FORCPU(altcore, thiscpu_x86_dfstackpart_), CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE));
 		{
 			byte_t *addr;
-			addr = (byte_t *)vm_getfree(&vm_kernel,
-			                            HINT_GETADDR(KERNEL_VMHINT_DFSTACK),
-			                            CEIL_ALIGN(KERNEL_DF_STACKSIZE, PAGESIZE), PAGESIZE,
-			                            HINT_GETMODE(KERNEL_VMHINT_DFSTACK));
-			if unlikely(addr == VM_GETFREE_ERROR)
+			addr = (byte_t *)mman_findunmapped(&mman_kernel,
+			                                   HINT_GETADDR(KERNEL_VMHINT_DFSTACK),
+			                                   CEIL_ALIGN(KERNEL_DF_STACKSIZE, PAGESIZE),
+			                                   HINT_GETMODE(KERNEL_VMHINT_DFSTACK));
+			if unlikely(addr == MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's #DF stack"), (unsigned int)i);
-			vm_node_setminaddr(&FORCPU(altcore, thiscpu_x86_dfstacknode_), addr);
-			vm_node_setmaxaddr(&FORCPU(altcore, thiscpu_x86_dfstacknode_), addr + KERNEL_DF_STACKSIZE - 1);
+			FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_minaddr = addr;
+			FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_maxaddr = addr + KERNEL_DF_STACKSIZE - 1;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (!pagedir_prepare(addr, CEIL_ALIGN(KERNEL_DF_STACKSIZE, PAGESIZE)))
 				kernel_panic(FREESTR("Failed to map CPU #%u's #DF stack"), (unsigned int)i);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			vm_datapart_map_ram(&FORCPU(altcore, thiscpu_x86_dfstackpart_),
-			                    addr,
-			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-			vm_node_insert(&FORCPU(altcore, thiscpu_x86_dfstacknode_));
+			mpart_mmap_force(&FORCPU(altcore, thiscpu_x86_dfstackpart_),
+			                 addr, KERNEL_DF_STACKSIZE, 0,
+			                 PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			mman_mappings_insert(&mman_kernel, &FORCPU(altcore, thiscpu_x86_dfstacknode_));
 			addr = (byte_t *)addr + KERNEL_DF_STACKSIZE;
 			/* Store the DF stack pointer in internal CPU structures. */
 #ifdef __x86_64__
@@ -553,64 +548,67 @@ i386_allocate_secondary_cores(void) {
 
 		FORTASK(altidle, this_kernel_stackpart_).mp_maxaddr = (pos_t)(KERNEL_IDLE_STACKSIZE - 1);
 		/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
-		FORTASK(altidle, this_kernel_stacknode_).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
+		FORTASK(altidle, this_kernel_stacknode_).mn_flags = (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |
+		                                                     MNODE_F_SHARED | MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
+		                                                     _MNODE_F_MPREPARED_KERNEL);
 
 #define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)altidle))
-		REL(FORTASK(altidle, this_kernel_stacknode_).vn_part);
-		REL(FORTASK(altidle, this_kernel_stacknode_).vn_link.ln_pself);
-		REL(FORTASK(altidle, this_kernel_stackpart_).dp_srefs);
+		REL(FORTASK(altidle, this_kernel_stacknode_).mn_part);
+		REL(FORTASK(altidle, this_kernel_stacknode_).mn_link.le_prev);
+		REL(FORTASK(altidle, this_kernel_stackpart_).mp_share.lh_first);
 #undef REL
-		vm_datapart_do_allocram(&FORTASK(altidle, this_kernel_stackpart_));
+		mpart_ll_allocmem(&FORTASK(altidle, this_kernel_stackpart_),
+		                  CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE));
 		{
 			byte_t *addr;
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			addr = (byte_t *)vm_getfree(&vm_kernel,
-			                            HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
-			                            CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE) + PAGESIZE,
-			                            PAGESIZE, HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
+			addr = (byte_t *)mman_findunmapped(&mman_kernel,
+			                                   HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
+			                                   CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE) + PAGESIZE,
+			                                   HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-			addr = (byte_t *)vm_getfree(&vm_kernel,
-			                            HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
-			                            CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE), PAGESIZE,
-			                            HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
+			addr = (byte_t *)mman_findunmapped(&mman_kernel,
+			                                   HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
+			                                   CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE),
+			                                   HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
-			if unlikely(addr == (byte_t *)VM_GETFREE_ERROR)
+			if unlikely(addr == (byte_t *)MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE stack"), (unsigned int)i);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			vm_node_setminaddr(&FORTASK(altidle, this_kernel_stackguard_), addr);
-			vm_node_setmaxaddr(&FORTASK(altidle, this_kernel_stackguard_), addr + PAGESIZE - 1);
+			FORTASK(altidle, this_kernel_stackguard_).mn_minaddr = addr;
+			FORTASK(altidle, this_kernel_stackguard_).mn_maxaddr = addr + PAGESIZE - 1;
 			addr += PAGESIZE;
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-			vm_node_setminaddr(&FORTASK(altidle, this_kernel_stacknode_), addr);
-			vm_node_setmaxaddr(&FORTASK(altidle, this_kernel_stacknode_), addr + KERNEL_IDLE_STACKSIZE - 1);
+			FORTASK(altidle, this_kernel_stacknode_).mn_minaddr = addr;
+			FORTASK(altidle, this_kernel_stacknode_).mn_maxaddr = addr + KERNEL_IDLE_STACKSIZE - 1;
 
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (!pagedir_prepare(addr, CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE)))
 				kernel_panic(FREESTR("Failed to map CPU #%u's IDLE stack"), (unsigned int)i);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			vm_datapart_map_ram(&FORTASK(altidle, this_kernel_stackpart_),
-			                    addr,
-			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-			vm_node_insert(&FORTASK(altidle, this_kernel_stacknode_));
+			mpart_mmap_force(&FORTASK(altidle, this_kernel_stackpart_), addr,
+			                 KERNEL_IDLE_STACKSIZE, 0,
+			                 PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_kernel_stacknode_));
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			vm_node_insert(&FORTASK(altidle, this_kernel_stackguard_));
+			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 		}
 
 		{
 			byte_t *addr;
-			addr = (byte_t *)vm_getfree(&vm_kernel,
-			                            HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE), PAGESIZE, PAGESIZE,
-			                            HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
-			if unlikely(addr == (byte_t *)VM_GETFREE_ERROR)
+			addr = (byte_t *)mman_findunmapped(&mman_kernel,
+			                                   HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE), PAGESIZE,
+			                                   HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+			if unlikely(addr == (byte_t *)MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE trampoline"), (unsigned int)i);
-			vm_node_setminaddr(&FORTASK(altidle, this_trampoline_node), addr);
-			vm_node_setmaxaddr(&FORTASK(altidle, this_trampoline_node), addr + PAGESIZE - 1);
+			FORTASK(altidle, this_trampoline_node).mn_minaddr = addr;
+			FORTASK(altidle, this_trampoline_node).mn_maxaddr = addr + PAGESIZE - 1;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepareone(addr))
 				kernel_panic(FREESTR("Failed to prepare CPU #%u's IDLE trampoline"), (unsigned int)i);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			vm_node_insert(&FORTASK(altidle, this_trampoline_node));
+			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_trampoline_node));
 		}
 
 		FORTASK(altidle, this_fs)             = incref(&fs_kernel);
@@ -627,7 +625,7 @@ i386_allocate_secondary_cores(void) {
 		 *    some future point in time when the CPU will be used again. */
 		{
 			struct scpustate *init_state;
-			init_state = (struct scpustate *)((byte_t *)vm_node_getendaddr(&FORTASK(altidle, this_kernel_stacknode_)) -
+			init_state = (struct scpustate *)((byte_t *)mnode_getendaddr(&FORTASK(altidle, this_kernel_stacknode_)) -
 			                                  (offsetafter(struct scpustate, scs_irregs) + sizeof(void *)));
 			memset(init_state, 0, offsetafter(struct scpustate, scs_irregs));
 			/* Set the return address to execute the IDLE main loop. */

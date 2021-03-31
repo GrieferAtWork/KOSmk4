@@ -50,7 +50,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 
 	case HOP_FUTEX_OPEN_DATAPART: {
 		struct handle hnd;
-		REF struct vm_datapart *part;
+		REF struct mpart *part;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		part = mfutex_getpart(self);
 		if (!part)
@@ -64,22 +64,22 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 
 	case HOP_FUTEX_OPEN_DATABLOCK: {
 		struct handle hnd;
-		REF struct vm_datablock *block;
-		REF struct vm_datapart *part;
+		REF struct mfile *file;
+		REF struct mpart *part;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		part = mfutex_getpart(self);
 		if (!part)
 			return -EOWNERDEAD;
 		{
 			FINALLY_DECREF_UNLIKELY(part);
-			sync_read(part);
-			block = incref(part->dp_block);
-			sync_endread(part);
+			mpart_lock_acquire(part);
+			file = incref(part->mp_file);
+			mpart_lock_release(part);
 		}
-		FINALLY_DECREF_UNLIKELY(block);
+		FINALLY_DECREF_UNLIKELY(file);
 		hnd.h_type = HANDLE_TYPE_DATABLOCK;
 		hnd.h_mode = mode;
-		hnd.h_data = block;
+		hnd.h_data = file;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
 

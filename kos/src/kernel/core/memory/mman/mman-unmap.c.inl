@@ -228,7 +228,7 @@ again_acquire_lock:
 
 #ifdef DEFINE_mman_unmap
 		/* Remove the node from the mappings tree. */
-		mnode_tree_removenode(&self->mm_mappings, node);
+		mman_mappings_removenode(self, node);
 
 		/* Make  sure to set  the UNMAPPED bit,  so that other kernel
 		 * components can identify this node as having been unmapped!

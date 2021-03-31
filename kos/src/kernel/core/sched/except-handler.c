@@ -23,12 +23,12 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/mman/event.h>     /* DEFINE_PERMMAN_ONEXEC() */
 #include <kernel/mman/mpartmeta.h> /* mman_broadcastfutex() */
 #include <kernel/paging.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
@@ -133,7 +133,7 @@ NOTHROW(KCALL clone_user_except_handler)(struct task *__restrict new_thread,
 	       sizeof(struct user_except_handler));
 }
 
-DEFINE_PERVM_ONEXEC(reset_user_except_handler);
+DEFINE_PERMMAN_ONEXEC(reset_user_except_handler);
 PRIVATE ATTR_USED NOBLOCK void
 NOTHROW(KCALL reset_user_except_handler)(void) {
 	struct user_except_handler *hand;

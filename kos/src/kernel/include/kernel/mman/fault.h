@@ -172,7 +172,7 @@ struct mfault {
 	 * >>         mfl_node->mn_maxaddr = mfl_node->mn_minaddr + mfl_size - 1;
 	 * >>         mfl_node->mn_part    = mfl_part;
 	 * >>         MMAN_DELETE_NODE_SUBRANGE(mfl_mman, mfl_node->mn_minaddr, mfl_node->mn_maxaddr);
-	 * >>         mnode_tree_insert(&mfl_mman->mm_mappings, mfl_node);
+	 * >>         mman_mappings_insert(mfl_mman, mfl_node);
 	 * >>     }
 	 * >>     mpart_changed(mfl_part);
 	 * >> } */

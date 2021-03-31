@@ -179,7 +179,7 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	                                      HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
 	                                      min_size, PAGESIZE,
 	                                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
-	if (new_heap == (struct sheap *)VM_GETFREE_ERROR)
+	if (new_heap == (struct sheap *)MAP_FAILED)
 		return false;
 
 	/* Prepare the address range for mappings. */

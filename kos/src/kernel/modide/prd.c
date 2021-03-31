@@ -28,7 +28,8 @@
 
 #include <kernel/aio.h>
 #include <kernel/iovec.h>
-#include <kernel/vm.h>
+#include <kernel/mman.h>
+#include <kernel/mman/dma.h>
 
 #include <hybrid/atomic.h>
 
@@ -68,7 +69,7 @@ struct ata_dma_acquire_data {
 
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL ata_dma_acquire_func)(void *arg, physaddr_t paddr, size_t num_bytes,
-                                    struct vm_dmalock *__restrict UNUSED(lock) DFL(NULL)) {
+                                    struct mdmalock *__restrict UNUSED(lock) DFL(NULL)) {
 	struct ata_dma_acquire_data *data;
 	data = (struct ata_dma_acquire_data *)arg;
 	assert(num_bytes != 0);
@@ -141,24 +142,23 @@ INTERN WUNUSED size_t KCALL
 AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *base,
                     size_t num_bytes, AtaAIOHandleData *__restrict handle, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
-	struct vm *effective_vm = &vm_kernel;
+	struct mman *effective_mm = &mman_kernel;
 	struct ata_dma_acquire_data data;
 	size_t req_locks, req_prd;
 	if (ADDR_ISUSER(base))
-		effective_vm = THIS_MMAN;
+		effective_mm = THIS_MMAN;
 	data.ad_base = data.ad_buf = prd_buf;
 	data.ad_siz = data.ad_max = prd_siz;
 	/* Try to start DMAing within the given address range. */
 	assert(handle != NULL);
-	req_locks = vm_startdma(effective_vm,
-	                        &ata_dma_acquire_func,
-	                        &ata_dma_reset_func,
-	                        &data,
-	                        &handle->hd_dmalock,
-	                        1,
-	                        base,
-	                        num_bytes,
-	                        for_writing);
+	req_locks = mman_startdma(effective_mm,
+	                          &ata_dma_acquire_func,
+	                          &data,
+	                          &handle->hd_dmalock,
+	                          1,
+	                          base,
+	                          num_bytes,
+	                          for_writing);
 	if (!req_locks)
 		return 0; /* Not encodable as PRD physical memory. */
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
@@ -172,39 +172,38 @@ AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *ba
 		/* Simple case: only a single lock is required! */
 		if unlikely(req_prd > prd_siz) {
 			/* Need more PRDs */
-			vm_dmalock_release(&handle->hd_dmalock);
+			mman_dmalock_release(&handle->hd_dmalock);
 			return req_prd;
 		}
 		handle->hd_flags |= ATA_AIO_HANDLE_FONEDMA;
 	} else {
 		/* Complicated case: Need multiple DMA locks. */
-		struct vm_dmalock *lockvec;
+		struct mdmalock *lockvec;
 		size_t new_req_locks;
 		assert(req_locks > 1);
 		if unlikely(req_prd > prd_siz)
 			return req_prd; /* Need more PRDs */
-		lockvec = (struct vm_dmalock *)kmalloc((req_locks + 1) *
-		                                       sizeof(struct vm_dmalock),
-		                                       GFP_LOCKED | GFP_PREFLT);
+		lockvec = (struct mdmalock *)kmalloc((req_locks + 1) *
+		                                     sizeof(struct mdmalock),
+		                                     GFP_LOCKED | GFP_PREFLT);
 again_start_dma_lockvec:
 		data.ad_base = data.ad_buf = prd_buf;
 		data.ad_siz = data.ad_max = prd_siz;
 		TRY {
-			new_req_locks = vm_startdma(effective_vm,
-			                            &ata_dma_acquire_func,
-			                            &ata_dma_reset_func,
-			                            &data,
-			                            lockvec,
-			                            req_locks,
-			                            base,
-			                            num_bytes,
-			                            for_writing);
+			new_req_locks = mman_startdma(effective_mm,
+			                              &ata_dma_acquire_func,
+			                              &data,
+			                              lockvec,
+			                              req_locks,
+			                              base,
+			                              num_bytes,
+			                              for_writing);
 			if unlikely(new_req_locks > req_locks) {
 				/* Need _even_ more DMA locks! */
-				lockvec = (struct vm_dmalock *)krealloc(lockvec,
-				                                        (new_req_locks + 1) *
-				                                        sizeof(struct vm_dmalock),
-				                                        GFP_LOCKED | GFP_PREFLT);
+				lockvec = (struct mdmalock *)krealloc(lockvec,
+				                                      (new_req_locks + 1) *
+				                                      sizeof(struct mdmalock),
+				                                      GFP_LOCKED | GFP_PREFLT);
 				req_locks = new_req_locks;
 				goto again_start_dma_lockvec;
 			}
@@ -215,7 +214,7 @@ again_start_dma_lockvec:
 		req_prd = (size_t)(data.ad_buf - data.ad_base);
 		if unlikely(req_prd > prd_siz) {
 			/* Need more PRDs */
-			vm_stopdma(lockvec, new_req_locks);
+			mman_stopdma(lockvec, new_req_locks);
 			kfree(lockvec);
 			return req_prd;
 		}
@@ -230,11 +229,11 @@ again_start_dma_lockvec:
 				kfree(lockvec);
 				handle->hd_flags |= ATA_AIO_HANDLE_FONEDMA;
 			} else {
-				struct vm_dmalock *newvec;
-				newvec = (struct vm_dmalock *)krealloc_nx(lockvec,
-				                                          (new_req_locks + 1) *
-				                                          sizeof(struct vm_dmalock),
-				                                          GFP_LOCKED | GFP_PREFLT);
+				struct mdmalock *newvec;
+				newvec = (struct mdmalock *)krealloc_nx(lockvec,
+				                                        (new_req_locks + 1) *
+				                                        sizeof(struct mdmalock),
+				                                        GFP_LOCKED | GFP_PREFLT);
 				if likely(newvec)
 					lockvec = newvec;
 				goto set_lock_vec;
@@ -242,8 +241,8 @@ again_start_dma_lockvec:
 		} else {
 set_lock_vec:
 			assert(!(handle->hd_flags & ATA_AIO_HANDLE_FONEDMA));
-			lockvec[new_req_locks].dl_part = NULL;    /* Sentinel */
-			handle->hd_dmalockvec          = lockvec; /* Inherit vector, locks & references */
+			lockvec[new_req_locks].mdl_part = NULL;    /* Sentinel */
+			handle->hd_dmalockvec           = lockvec; /* Inherit vector, locks & references */
 		}
 	}
 	assert(req_prd != 0);
@@ -254,23 +253,22 @@ INTERN WUNUSED size_t KCALL
 AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct iov_buffer *__restrict buf,
                           size_t num_bytes, AtaAIOHandleData *__restrict handle, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
-	struct vm *effective_vm = &vm_kernel;
+	struct mman *effective_mm = &mman_kernel;
 	struct ata_dma_acquire_data data;
 	size_t req_locks, req_prd;
 	if (ADDR_ISUSER(buf->iv_head.ive_base))
-		effective_vm = THIS_MMAN;
+		effective_mm = THIS_MMAN;
 	assert(num_bytes == iov_buffer_size(buf));
 	data.ad_base = data.ad_buf = prd_buf;
 	data.ad_siz = data.ad_max = prd_siz;
 	/* Try to start DMAing within the given address range. */
-	req_locks = vm_startdmav(effective_vm,
-	                         &ata_dma_acquire_func,
-	                         &ata_dma_reset_func,
-	                         &data,
-	                         &handle->hd_dmalock,
-	                         1,
-	                         buf,
-	                         for_writing);
+	req_locks = mman_startdmav(effective_mm,
+	                           &ata_dma_acquire_func,
+	                           &data,
+	                           &handle->hd_dmalock,
+	                           1,
+	                           buf,
+	                           for_writing);
 	if (!req_locks)
 		return 0; /* Not encodable as PRD physical memory. */
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
@@ -279,38 +277,37 @@ AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct iov
 		/* Simple case: only a single lock is required! */
 		if unlikely(req_prd > prd_siz) {
 			/* Need more PRDs */
-			vm_dmalock_release(&handle->hd_dmalock);
+			mman_dmalock_release(&handle->hd_dmalock);
 			return req_prd;
 		}
 		handle->hd_flags |= ATA_AIO_HANDLE_FONEDMA;
 	} else {
 		/* Complicated case: Need multiple DMA locks. */
-		struct vm_dmalock *lockvec;
+		struct mdmalock *lockvec;
 		size_t new_req_locks;
 		assert(req_locks > 1);
 		if unlikely(req_prd > prd_siz)
 			return req_prd; /* Need more PRDs */
-		lockvec = (struct vm_dmalock *)kmalloc((req_locks + 1) *
-		                                       sizeof(struct vm_dmalock),
-		                                       GFP_LOCKED | GFP_PREFLT);
+		lockvec = (struct mdmalock *)kmalloc((req_locks + 1) *
+		                                     sizeof(struct mdmalock),
+		                                     GFP_LOCKED | GFP_PREFLT);
 again_start_dma_lockvec:
 		data.ad_base = data.ad_buf = prd_buf;
 		data.ad_siz = data.ad_max = prd_siz;
 		TRY {
-			new_req_locks = vm_startdmav(effective_vm,
-			                             &ata_dma_acquire_func,
-			                             &ata_dma_reset_func,
-			                             &data,
-			                             lockvec,
-			                             req_locks,
-			                             buf,
-			                             for_writing);
+			new_req_locks = mman_startdmav(effective_mm,
+			                               &ata_dma_acquire_func,
+			                               &data,
+			                               lockvec,
+			                               req_locks,
+			                               buf,
+			                               for_writing);
 			if unlikely(new_req_locks > req_locks) {
 				/* Need _even_ more DMA locks! */
-				lockvec = (struct vm_dmalock *)krealloc(lockvec,
-				                                        (new_req_locks + 1) *
-				                                        sizeof(struct vm_dmalock),
-				                                        GFP_LOCKED | GFP_PREFLT);
+				lockvec = (struct mdmalock *)krealloc(lockvec,
+				                                      (new_req_locks + 1) *
+				                                      sizeof(struct mdmalock),
+				                                      GFP_LOCKED | GFP_PREFLT);
 				req_locks = new_req_locks;
 				goto again_start_dma_lockvec;
 			}
@@ -321,7 +318,7 @@ again_start_dma_lockvec:
 		req_prd = (size_t)(data.ad_buf - data.ad_base);
 		if unlikely(req_prd > prd_siz) {
 			/* Need more PRDs */
-			vm_stopdma(lockvec, new_req_locks);
+			mman_stopdma(lockvec, new_req_locks);
 			kfree(lockvec);
 			return req_prd;
 		}
@@ -336,11 +333,11 @@ again_start_dma_lockvec:
 				kfree(lockvec);
 				handle->hd_flags |= ATA_AIO_HANDLE_FONEDMA;
 			} else {
-				struct vm_dmalock *newvec;
-				newvec = (struct vm_dmalock *)krealloc_nx(lockvec,
-				                                          (new_req_locks + 1) *
-				                                          sizeof(struct vm_dmalock),
-				                                          GFP_LOCKED | GFP_PREFLT);
+				struct mdmalock *newvec;
+				newvec = (struct mdmalock *)krealloc_nx(lockvec,
+				                                        (new_req_locks + 1) *
+				                                        sizeof(struct mdmalock),
+				                                        GFP_LOCKED | GFP_PREFLT);
 				if likely(newvec)
 					lockvec = newvec;
 				goto set_lock_vec;
@@ -348,8 +345,8 @@ again_start_dma_lockvec:
 		} else {
 set_lock_vec:
 			assert(!(handle->hd_flags & ATA_AIO_HANDLE_FONEDMA));
-			lockvec[new_req_locks].dl_part = NULL;    /* Sentinel */
-			handle->hd_dmalockvec          = lockvec; /* Inherit vector, locks & references */
+			lockvec[new_req_locks].mdl_part = NULL;    /* Sentinel */
+			handle->hd_dmalockvec           = lockvec; /* Inherit vector, locks & references */
 		}
 	}
 	assert(req_prd != 0);

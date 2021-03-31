@@ -73,15 +73,15 @@ struct maps_printer_data {
 };
 
 PRIVATE ssize_t FCALL
-maps_printer_cb(void *arg, struct vm_mapinfo *__restrict info) {
+maps_printer_cb(void *arg, struct mmapinfo *__restrict info) {
 	struct maps_printer_data *ctx;
 	dev_t dev;
 	ino_t ino;
 	ssize_t temp, result;
 	dev = 0;
 	ino = 0;
-	if (info->vmi_block && vm_datablock_isinode(info->vmi_block)) {
-		struct inode *node = (struct inode *)info->vmi_block;
+	if (info->mmi_file && vm_datablock_isinode(info->mmi_file)) {
+		struct inode *node = (struct inode *)info->mmi_file;
 		struct basic_block_device *superdev;
 		ino      = node->i_fileino;
 		superdev = node->i_super->s_device;
@@ -97,43 +97,43 @@ maps_printer_cb(void *arg, struct vm_mapinfo *__restrict info) {
 	                       "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"  /* dev:major */
 	                       "%.2" PRIxN(__SIZEOF_MINOR_T__) " "  /* dev:minor */
 	                       "%-7" PRIuN(__SIZEOF_INO64_T__) " ", /* inode */
-	                       info->vmi_min, info->vmi_max,
-	                       info->vmi_prot & VM_PROT_READ /*  */ ? 'r' : '-',
-	                       info->vmi_prot & VM_PROT_WRITE /* */ ? 'w' : '-',
-	                       info->vmi_prot & VM_PROT_EXEC /*  */ ? 'x' : '-',
-	                       info->vmi_prot & VM_PROT_SHARED /**/ ? 's' : 'p',
-	                       info->vmi_offset,
+	                       info->mmi_min, info->mmi_max,
+	                       info->mmi_flags & MNODE_F_PREAD /* */ ? 'r' : '-',
+	                       info->mmi_flags & MNODE_F_PWRITE /**/ ? 'w' : '-',
+	                       info->mmi_flags & MNODE_F_PEXEC /* */ ? 'x' : '-',
+	                       info->mmi_flags & MNODE_F_SHARED /**/ ? 's' : 'p',
+	                       info->mmi_offset,
 	                       MAJOR(dev), MINOR(dev), ino);
 	if unlikely(result < 0)
 		goto done;
-	if (info->vmi_fspath) {
+	if (info->mmi_fspath) {
 		char const *filename;
 		u16 filename_len;
-		if likely(info->vmi_fsname) {
-			filename     = info->vmi_fsname->de_name;
-			filename_len = info->vmi_fsname->de_namelen;
+		if likely(info->mmi_fsname) {
+			filename     = info->mmi_fsname->de_name;
+			filename_len = info->mmi_fsname->de_namelen;
 		} else {
 			static char const str_unknown[] = "[unknown]";
 			filename     = str_unknown;
 			filename_len = COMPILER_STRLEN(str_unknown);
 		}
-		temp = path_printent(info->vmi_fspath,
+		temp = path_printent(info->mmi_fspath,
 		                     filename,
 		                     filename_len,
 		                     ctx->pd_printer,
 		                     ctx->pd_arg);
-	} else if (info->vmi_fsname) {
+	} else if (info->mmi_fsname) {
 		temp = format_printf(ctx->pd_printer,
 		                     ctx->pd_arg,
 		                     "[%$#q]",
-		                     (size_t)info->vmi_fsname->de_namelen,
-		                     info->vmi_fsname->de_name);
+		                     (size_t)info->mmi_fsname->de_namelen,
+		                     info->mmi_fsname->de_name);
 	} else {
 		temp = 0;
 		/* Check for special names for certain datablocks. */
-		if (info->vmi_block) {
+		if (info->mmi_file) {
 			char const *special_name;
-			special_name = nameof_special_datablock(info->vmi_block);
+			special_name = nameof_special_datablock(info->mmi_file);
 			if (special_name) {
 				temp = (*ctx->pd_printer)(ctx->pd_arg,
 				                          special_name,
@@ -178,15 +178,7 @@ ProcFS_PerProc_Maps_Printer(struct regular_node *__restrict self,
 		pd.pd_printer = printer;
 		pd.pd_arg     = arg;
 		/* Enumerate nodes and print the maps-file. */
-#ifdef USERSPACE_END
-		result = vm_enum(threadvm, &maps_printer_cb, &pd,
-		                 (UNCHECKED void *)0,
-		                 (UNCHECKED void *)(USERSPACE_END - 1));
-#else /* USERSPACE_END */
-		result = vm_enum(threadvm, &maps_printer_cb, &pd,
-		                 (UNCHECKED void *)USERSPACE_START,
-		                 (UNCHECKED void *)-1);
-#endif /* !USERSPACE_END */
+		result = mman_enum_userspace(threadvm, &maps_printer_cb, &pd);
 	}
 done:
 	return result;

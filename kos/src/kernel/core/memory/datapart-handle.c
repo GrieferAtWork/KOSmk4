@@ -29,8 +29,8 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cred.h>
 
 #include <hybrid/align.h>
@@ -42,38 +42,25 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <string.h>
 #include <stdint.h> /* SIZE_MAX */
+#include <string.h>
 
 DECL_BEGIN
 
 /* datapart handle operation. */
-INTERN NOBLOCK WUNUSED NONNULL((1)) refcnt_t
-NOTHROW(FCALL handle_datapart_refcnt)(struct vm_datapart const *__restrict self) {
-	return getrefcnt(self);
-}
-
-INTERN NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL handle_datapart_incref)(struct vm_datapart *__restrict self) {
-	incref(self);
-}
-
-INTERN NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL handle_datapart_decref)(REF struct vm_datapart *__restrict self) {
-	vm_datapart_decref_and_merge(self);
-}
+DEFINE_HANDLE_REFCNT_FUNCTIONS(datapart, struct mpart);
 
 INTERN NONNULL((1)) REF void *KCALL
-handle_datapart_tryas(struct vm_datapart *__restrict self,
+handle_datapart_tryas(struct mpart *__restrict self,
                       uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 
 	case HANDLE_TYPE_DATABLOCK: {
-		REF struct vm_datablock *result;
-		sync_read(self);
-		result = incref(self->dp_block);
-		sync_endread(self);
+		REF struct mfile *result;
+		mpart_lock_acquire(self);
+		result = incref(self->mp_file);
+		mpart_lock_release(self);
 		return result;
 	}	break;
 
@@ -85,52 +72,31 @@ handle_datapart_tryas(struct vm_datapart *__restrict self,
 
 
 
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_datablock *KCALL
-vm_datapart_get_datablock(struct vm_datapart *__restrict self) {
-	REF struct vm_datablock *result;
-	sync_read(self);
-	result = incref(self->dp_block);
-	sync_endread(self);
-	return result;
-}
-
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_datapart_ioctl(struct vm_datapart *__restrict self,
-                      syscall_ulong_t cmd,
-                      USER UNCHECKED void *arg, iomode_t mode) {
-	REF struct vm_datablock *block;
-	block = vm_datapart_get_datablock(self);
-	{
-		FINALLY_DECREF_UNLIKELY(block);
-		if (vm_datablock_isinode(block))
-			return inode_ioctl((struct inode *)block, cmd, arg, mode);
-	}
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-	      cmd);
-}
-
 //INTERN pos_t KCALL /* TODO: Pre-initialize specified reanges. */
-//handle_datapart_allocate(struct vm_datapart *__restrict self,
+//handle_datapart_allocate(struct mpart *__restrict self,
 //                         fallocate_mode_t mode, pos_t start, pos_t length) {
 //}
 
 INTERN void KCALL
-handle_datapart_sync(struct vm_datapart *__restrict self) {
-	vm_datapart_sync(self);
+handle_datapart_sync(struct mpart *__restrict self) {
+	mpart_sync(self);
 }
 
 DEFINE_INTERN_ALIAS(handle_datapart_datasync, handle_datapart_sync);
 
 INTERN void KCALL
-handle_datapart_stat(struct vm_datapart *__restrict self,
+handle_datapart_stat(struct mpart *__restrict self,
                      USER CHECKED struct stat *result) {
-	REF struct vm_datablock *block;
-	block = vm_datapart_get_datablock(self);
-	FINALLY_DECREF_UNLIKELY(block);
-	if (vm_datablock_isinode(block)) {
+	REF struct mfile *file;
+	size_t size;
+	mpart_lock_acquire(self);
+	file = incref(self->mp_file);
+	size = mpart_getsize(self);
+	mpart_lock_release(self);
+	FINALLY_DECREF_UNLIKELY(file);
+	if (vm_datablock_isinode(file)) {
 		struct basic_block_device *dev;
-		struct inode *ino = (struct inode *)block;
+		struct inode *ino = (struct inode *)file;
 		dev = ino->i_super->s_device;
 		result->st_dev   = (__dev_t)(dev ? block_device_devno(dev) : 0);
 		result->st_ino   = (__FS_TYPE(ino))ino->i_fileino;
@@ -178,13 +144,13 @@ handle_datapart_stat(struct vm_datapart *__restrict self,
 		memset(&result->st_mtimespec, 0, sizeof(result->st_mtimespec));
 		memset(&result->st_ctimespec, 0, sizeof(result->st_ctimespec));
 	}
-	result->st_size    = (__FS_TYPE(pos))vm_datapart_numbytes(self);
-	result->st_blksize = (__blksize_t)VM_DATABLOCK_PAGESIZE(block);
-	result->st_blocks  = (__FS_TYPE(blkcnt))CEILDIV(result->st_size, VM_DATABLOCK_PAGESIZE(block));
+	result->st_size    = (__FS_TYPE(pos))size;
+	result->st_blksize = (__blksize_t)1 << file->mf_blockshift;
+	result->st_blocks  = (__FS_TYPE(blkcnt))(size >> file->mf_blockshift);
 }
 
 INTERN syscall_slong_t KCALL
-handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
+handle_datapart_hop(struct mpart *__restrict self, syscall_ulong_t cmd,
                     USER UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
@@ -193,8 +159,10 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		hnd.h_type = HANDLE_TYPE_DATABLOCK;
 		hnd.h_mode = mode;
-		hnd.h_data = vm_datapart_get_datablock(self);
-		FINALLY_DECREF_UNLIKELY((struct vm_datablock *)hnd.h_data);
+		mpart_lock_acquire(self);
+		hnd.h_data = incref(self->mp_file);
+		mpart_lock_release(self);
+		FINALLY_DECREF_UNLIKELY((struct mfile *)hnd.h_data);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
 

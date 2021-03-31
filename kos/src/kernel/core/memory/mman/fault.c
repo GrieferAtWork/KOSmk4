@@ -771,7 +771,7 @@ done_mark_changed:
 
 			if ((uintptr_t)self->mfl_addr > (uintptr_t)mnode_getaddr(node)) {
 				struct mnode *lonode;
-				mnode_tree_removenode(&self->mfl_mman->mm_mappings, node);
+				mman_mappings_removenode(self->mfl_mman, node);
 				lonode = self->mfl_pcopy[0];
 				assert(lonode);
 
@@ -796,8 +796,8 @@ done_mark_changed:
 				self->mfl_pcopy[1] = NULL;
 
 				/* Re-insert both nodes into the mman's mapping tree. */
-				mnode_tree_insert(&self->mfl_mman->mm_mappings, lonode);
-				mnode_tree_insert(&self->mfl_mman->mm_mappings, node);
+				mman_mappings_insert(self->mfl_mman, lonode);
+				mman_mappings_insert(self->mfl_mman, node);
 
 				/* If the original node had been marked as containing writable
 				 * mappings, then  we must  also mark  the new  node as  such! */
@@ -808,7 +808,7 @@ done_mark_changed:
 
 			if ((uintptr_t)endaddr < (uintptr_t)mnode_getendaddr(node)) {
 				struct mnode *hinode;
-				mnode_tree_removenode(&self->mfl_mman->mm_mappings, node);
+				mman_mappings_removenode(self->mfl_mman, node);
 				hinode = self->mfl_pcopy[0];
 				assert(hinode);
 
@@ -831,8 +831,8 @@ done_mark_changed:
 				self->mfl_pcopy[1] = NULL;
 
 				/* Re-insert both nodes into the mman's mapping tree. */
-				mnode_tree_insert(&self->mfl_mman->mm_mappings, node);
-				mnode_tree_insert(&self->mfl_mman->mm_mappings, hinode);
+				mman_mappings_insert(self->mfl_mman, node);
+				mman_mappings_insert(self->mfl_mman, hinode);
 
 				/* If the original node had been marked as containing writable
 				 * mappings, then  we must  also mark  the new  node as  such! */

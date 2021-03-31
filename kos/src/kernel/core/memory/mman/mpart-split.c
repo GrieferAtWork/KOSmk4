@@ -920,10 +920,10 @@ relock_with_data:
 				hinode->mn_fsname = xincref(lonode->mn_fsname);
 
 				/* Update/re-insert both nodes. */
-				mnode_tree_removenode(&lonode->mn_mman->mm_mappings, lonode);
+				mman_mappings_removenode(lonode->mn_mman, lonode);
 				lonode->mn_maxaddr = hinode->mn_minaddr - 1;
-				mnode_tree_insert(&lonode->mn_mman->mm_mappings, lonode);
-				mnode_tree_insert(&lonode->mn_mman->mm_mappings, hinode);
+				mman_mappings_insert(lonode->mn_mman, lonode);
+				mman_mappings_insert(hinode->mn_mman, hinode);
 			}
 		}
 	} /* Scope */

@@ -35,10 +35,10 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/event.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
@@ -507,7 +507,7 @@ NOTHROW(FCALL task_sethandlemanager)(struct handle_manager *__restrict newman) {
 
 
 
-DEFINE_PERVM_ONEXEC(handler_manager_onexec);
+DEFINE_PERMMAN_ONEXEC(handler_manager_onexec);
 PRIVATE ATTR_USED void KCALL handler_manager_onexec(void) {
 	handle_manager_cloexec(THIS_HANDLE_MANAGER);
 }

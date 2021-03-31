@@ -127,12 +127,12 @@ INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm,
                                                VIRT void const *addr, void *buf, size_t num_bytes) {
 	size_t result;
-	result = vm_read_nopf(effective_vm, (void const *)addr, buf, num_bytes);
+	result = mman_read_nopf(effective_vm, (void const *)addr, buf, num_bytes);
 	if (result) {
 		TRY {
-			/* TODO: vm_read() may invoke RPC callbacks, which may in
-			 *       turn  throw  exceptions such  as `E_EXIT_THREAD' */
-			vm_read(effective_vm, (void const *)addr, buf, num_bytes, true);
+			/* TODO: mman_read()  may invoke RPC callbacks, which may
+			 *       in turn throw exceptions such as `E_EXIT_THREAD' */
+			mman_read(effective_vm, (void const *)addr, buf, num_bytes, true);
 			result = 0;
 		} EXCEPT {
 		}
@@ -144,12 +144,12 @@ INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_vm,
                                                 VIRT void *addr, void const *buf, size_t num_bytes) {
 	size_t result;
-	result = vm_write_nopf(effective_vm, (void *)addr, buf, num_bytes);
+	result = mman_write_nopf(effective_vm, (void *)addr, buf, num_bytes);
 	if (result) {
 		TRY {
-			/* TODO: vm_write() may invoke RPC callbacks, which may in
-			 *       turn throw  exceptions  such  as  `E_EXIT_THREAD' */
-			vm_write(effective_vm, (void *)addr, buf, num_bytes, true);
+			/* TODO: mman_write() may invoke RPC callbacks, which may
+			 *       in turn throw exceptions such as `E_EXIT_THREAD' */
+			mman_write(effective_vm, (void *)addr, buf, num_bytes, true);
 			result = 0;
 		} EXCEPT {
 		}

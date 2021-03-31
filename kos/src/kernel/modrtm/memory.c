@@ -67,7 +67,7 @@ INTERN size_t rtm_memory_limit = 4 * PAGESIZE;
 
 /* NOTE: The caller must be holding a read- or write-lock to `self' */
 #define vm_datapart_get_rtm_version(self) \
-	((self)->dp_futex ? (self)->dp_futex->mpm_rtm_vers : 0)
+	((self)->mp_meta ? (self)->mp_meta->mpm_rtm_vers : 0)
 
 #if !defined(NDEBUG) || 1
 #define assert_rtm_memory_region(self) (void)0
@@ -457,7 +457,7 @@ NOTHROW(FCALL rtm_memory_mark_region_as_changed)(struct rtm_memory *__restrict s
                                                  struct rtm_memory_region *__restrict region) {
 	size_t i;
 	struct rtm_memory_region *base_region;
-	struct vm_datapart *mypart;
+	struct mpart *mypart;
 	assert(region_index < self->rm_regionc);
 	assert(self->rm_regionv[region_index] == region);
 	if (rtm_memory_region_waschanged(region))
@@ -690,7 +690,7 @@ rtm_memory_create_far_region(struct rtm_memory *__restrict self,
                              USER void *region_min,
                              USER void *region_max,
                              struct vm *__restrict effective_vm,
-                             struct vm_datapart *__restrict part,
+                             struct mpart *__restrict part,
                              uintptr_t version) {
 	size_t region_size;
 	struct rtm_memory_region *result;
@@ -804,7 +804,7 @@ again_rw_region:
 	{
 		struct vm *effective_vm;
 		struct vm_node *node;
-		struct vm_datapart *node_part;
+		struct mpart *node_part;
 		struct rtm_memory_region *region;
 		size_t j, access_bytes;
 		/* Next, acquire a lock to the effective VM */
@@ -912,7 +912,7 @@ again_lock_effective_vm:
 		/* Verify address permissions. */
 #ifdef LIBVIO_CONFIG_ENABLED
 		if unlikely(!node || (node_part = node->vn_part) == NULL ||
-		            node_part->dp_state == VM_DATAPART_STATE_VIOPRT)
+		            node_part->mp_state == MPART_ST_VIO)
 #else /* LIBVIO_CONFIG_ENABLED */
 		if unlikely(!node || (node_part = node->vn_part) == NULL)
 #endif /* !LIBVIO_CONFIG_ENABLED */
@@ -921,8 +921,8 @@ again_lock_effective_vm:
 			context = E_SEGFAULT_CONTEXT_FAULT |
 			          E_SEGFAULT_CONTEXT_USERCODE;
 #ifdef LIBVIO_CONFIG_ENABLED
-			if (node && node->vn_part &&
-			    node->vn_part->dp_state == VM_DATAPART_STATE_VIOPRT)
+			if (node && node->mn_part &&
+			    node->mn_part->mp_state == MPART_ST_VIO)
 				context |= E_SEGFAULT_CONTEXT_VIO;
 #endif /* LIBVIO_CONFIG_ENABLED */
 			sync_endread(effective_vm);
@@ -938,8 +938,9 @@ again_lock_effective_vm:
 		/* NOTE: For write-access, we assert both read+write, since any write operation in RTM-mode is
 		 *       the equivalent of a read-compare-exchange operation, meaning that in order to perform
 		 *       a write, we literally and figuratively have to perform a read first! */
-		if unlikely(write ? (node->vn_prot & (VM_PROT_READ | VM_PROT_WRITE)) != (VM_PROT_READ | VM_PROT_WRITE)
-		                  : !(node->vn_prot & VM_PROT_READ)) {
+		if unlikely(write ? (node->mn_flags & (MNODE_F_PREAD | MNODE_F_PWRITE)) !=
+		                     /*            */ (MNODE_F_PREAD | MNODE_F_PWRITE)
+		                  : (node->mn_flags & MNODE_F_PREAD) == 0) {
 			uintptr_t context;
 			sync_endread(effective_vm);
 			/* Unmapped address! */
@@ -1070,7 +1071,7 @@ verify_access_range:
 			 * access  instead happens for  this region's mapping.  (At least we know
 			 * that  if  the data  parts  are identical,  then  both of  the  VM node
 			 * mappings  will have  identical sizes, since  the size of  a vm_node is
-			 * always identical to the size of an associated vm_datapart!) */
+			 * always identical to the size of an associated mpart!) */
 #if !CONFIG_RTM_USERSPACE_ONLY
 			aliasing_node_vm = &vm_kernel;
 			if (ADDR_ISUSER(region->mr_addrlo))
@@ -1265,7 +1266,7 @@ do_create_far_region:
 		region->mr_addrhi = (byte_t *)addr + access_bytes - 1;
 		region->mr_part   = node_part; /* Inherit reference */
 		region->mr_vers = 0;
-		if (ATOMIC_READ(node_part->dp_futex) != NULL) {
+		if (ATOMIC_READ(node_part->mp_meta) != NULL) {
 			/* Check for non-zero version counter. */
 			struct vm_futex_controller *ftx;
 			TRY {
@@ -1275,7 +1276,7 @@ do_create_far_region:
 				decref(node_part);
 				RETHROW();
 			}
-			ftx = ATOMIC_READ(node_part->dp_futex);
+			ftx = ATOMIC_READ(node_part->mp_meta);
 			if likely(ftx != NULL)
 				region->mr_vers = ftx->mpm_rtm_vers;
 			sync_endread(node_part);
@@ -1471,7 +1472,7 @@ again_acquire_region_locks:
 	must_allocate_missing_futex_controllers = false;
 	for (i = 0; i < self->rm_regionc; ++i) {
 		struct rtm_memory_region *region;
-		struct vm_datapart *part;
+		struct mpart *part;
 		region = self->rm_regionv[i];
 		part   = rtm_memory_region_getpart(region);
 		{
@@ -1519,7 +1520,7 @@ again_acquire_region_locks:
 				goto again_acquire_region_locks;
 			}
 			/* Verify that the version of this region did not change */
-			fxc = part->dp_futex;
+			fxc = part->mp_meta;
 			if (fxc) {
 				if (fxc->mpm_rtm_vers != region->mr_vers) {
 endwrite_par_and_release_locks_and_retry:
@@ -1552,13 +1553,13 @@ endwrite_par_and_release_locks_and_retry:
 		/* Allocate missing futex controllers. */
 		for (i = 0; i < self->rm_regionc; ++i) {
 			struct rtm_memory_region *region;
-			struct vm_datapart *part;
+			struct mpart *part;
 			struct vm_futex_controller *ftx;
 			region = self->rm_regionv[i];
 			if (!rtm_memory_region_waschanged_and_no_farregion(region))
 				continue;
 			part = rtm_memory_region_getpart(region);
-			ftx  = part->dp_futex;
+			ftx  = part->mp_meta;
 			if (ftx)
 				continue; /* Already allocated. */
 			/* Must allocate the missing controller.
@@ -1584,9 +1585,9 @@ again_allocate_ftx_controller_for_part:
 					kfree(ftx);
 					RETHROW();
 				}
-				if likely(!part->dp_futex) {
+				if likely(!part->mp_meta) {
 					/* Install the new controller. */
-					part->dp_futex = ftx;
+					part->mp_meta = ftx;
 					sync_endwrite(part);
 				} else {
 					/* Race condition: Someone else already installed a controller. */
@@ -1604,7 +1605,7 @@ again_allocate_ftx_controller_for_part:
 					if (!rtm_memory_region_waschanged_and_no_farregion(region))
 						continue; /* Not needed */
 					part = rtm_memory_region_getpart(region);
-					if (ATOMIC_READ(part->dp_futex))
+					if (ATOMIC_READ(part->mp_meta))
 						continue; /* Already allocated */
 					/* Allocate another controller for this one! */
 					goto again_allocate_ftx_controller_for_part;
@@ -1612,7 +1613,7 @@ again_allocate_ftx_controller_for_part:
 #endif /* !__OPTIMIZE_SIZE__ */
 				goto again_acquire_region_locks;
 			}
-			part->dp_futex = ftx;
+			part->mp_meta = ftx;
 		}
 	}
 
@@ -1624,7 +1625,7 @@ again_allocate_ftx_controller_for_part:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	for (i = 0; i < self->rm_regionc; ++i) {
 		struct rtm_memory_region *region;
-		struct vm_datapart *part;
+		struct mpart *part;
 #if !CONFIG_RTM_USERSPACE_ONLY
 		struct vm *effective_vm;
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
@@ -1684,7 +1685,7 @@ again_acquire_region_locks_for_vm_lock:
 	assert(i == self->rm_regionc);
 	while (i) {
 		struct rtm_memory_region *region;
-		struct vm_datapart *part;
+		struct mpart *part;
 		--i;
 		region = self->rm_regionv[i];
 		if (!rtm_memory_region_waschanged(region))
@@ -1723,13 +1724,13 @@ again_acquire_region_locks_for_vm_lock:
 		}
 #endif /* !NDEBUG */
 		/* Increment the RTM version counter of this part. */
-		assert(part->dp_futex);
+		assert(part->mp_meta);
 #if CONFIG_RTM_FAR_REGIONS
 		/* Only increase the version counter if this isn't an aliasing far region! */
 		if (!rtm_memory_region_isfarregion(region))
 #endif /* CONFIG_RTM_FAR_REGIONS */
 		{
-			++part->dp_futex->mpm_rtm_vers;
+			++part->mp_meta->mpm_rtm_vers;
 		}
 		COMPILER_BARRIER();
 		/* Release our lock to this part. */
@@ -1743,7 +1744,7 @@ again_acquire_region_locks_for_vm_lock:
 	i = self->rm_regionc;
 	while (i) {
 		struct rtm_memory_region *region;
-		struct vm_datapart *part;
+		struct mpart *part;
 		--i;
 		region = self->rm_regionv[i];
 		if (!rtm_memory_region_waschanged_and_no_farregion(region))

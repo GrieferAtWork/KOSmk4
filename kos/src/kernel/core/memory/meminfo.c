@@ -681,7 +681,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	                            HINT_GETADDR(KERNEL_VMHINT_PHYSINFO),
 	                            num_bytes, PAGESIZE,
 	                            HINT_GETMODE(KERNEL_VMHINT_PHYSINFO));
-	if unlikely(dest == VM_GETFREE_ERROR) {
+	if unlikely(dest == MAP_FAILED) {
 		kernel_panic(FREESTR("Failed to relocate memory information\n"));
 		return;
 	}
@@ -703,7 +703,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 		return;
 	}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	assert(vm_datapart_numbytes(&kernel_meminfo_mpart) == num_bytes);
+	assert(mpart_getsize(&kernel_meminfo_mpart) == num_bytes);
 	assert(kernel_meminfo_mpart.mp_mem.mc_size == num_bytes / PAGESIZE);
 	/* Create a new page directory mapping. */
 	pagedir_map(dest, num_bytes,

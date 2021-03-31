@@ -447,9 +447,9 @@ mbuilder_map_res(struct mbuilder *__restrict self,
  *       process startup information will  be passed via the  main()
  *       thread's stack! */
 
-/* Allocate  a  PEB  (Process  Environment   Block)  within  the  given   MBuilder,
- * initializing  its  contents  with the  strings  from the  given  argv+envp pair.
- * This function is called from `vm_exec()' after the remainder of the application,
+/* Allocate   a  PEB   (Process  Environment   Block)  within   the  given  MBuilder,
+ * initializing  its  contents  with  the  strings  from  the  given  argv+envp pair.
+ * This function is called from `mman_exec()' after the remainder of the application,
  * as well as the dynamic linker have already been loaded into memory.
  * @param: argc_inject: The number of arguments from `argv_inject' to inject
  *                      at the beginning of the user-space argc/argv vector.

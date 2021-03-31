@@ -70,10 +70,10 @@ struct uhci_aio_data {
 	REF struct uhci_osqh       *ud_osqh;       /* [1..1][const] The Queue head associated with this request. */
 	REF struct uhci_controller *ud_ctrl;       /* [1..1][const] The associated USB controller. */
 	union {
-		struct mdmalock       ud_dmalock;    /* [valid_if(!UHCI_AIO_FSERVED && UHCI_AIO_FONEDMA)] Single DMA lock */
-		struct mdmalock      *ud_dmalockvec; /* [valid_if(!UHCI_AIO_FSERVED && !UHCI_AIO_FONEDMA)][0..1][owned] Vector of DMA locks
-		                                        * NOTE: This vector is terminated by a sentinel DMA
-		                                        *       lock with its `dl_part' pointer set to `NULL' */
+		struct mdmalock         ud_dmalock;    /* [valid_if(!UHCI_AIO_FSERVED && UHCI_AIO_FONEDMA)] Single DMA lock */
+		struct mdmalock        *ud_dmalockvec; /* [valid_if(!UHCI_AIO_FSERVED && !UHCI_AIO_FONEDMA)][0..1][owned] Vector of DMA locks
+		                                        * NOTE: This vector is  terminated by  a sentinel  DMA
+		                                        *       lock with its `mdl_part' pointer set to `NULL' */
 	};
 #define UHCI_AIO_FNORMAL        0x0000         /* Normal AIO flags */
 #define UHCI_AIO_FSERVED        0x0004         /* FLAG: This handle has been serviced. */

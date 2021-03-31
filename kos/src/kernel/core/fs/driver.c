@@ -3870,7 +3870,7 @@ find_new_candidate:
 	                                 min_alignment,
 	                                 HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 	vm_kernel_treelock_endread();
-	if unlikely(loadaddr == (uintptr_t)VM_GETFREE_ERROR) {
+	if unlikely(loadaddr == (uintptr_t)MAP_FAILED) {
 		uintptr_t version;
 #ifndef __OPTIMIZE_SIZE__
 		if (system_clearcaches())
@@ -3885,7 +3885,7 @@ find_new_candidate_tryhard:
 		                                 min_alignment,
 		                                 HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 		vm_kernel_treelock_endread();
-		if (loadaddr == (uintptr_t)VM_GETFREE_ERROR) {
+		if (loadaddr == (uintptr_t)MAP_FAILED) {
 			if (system_clearcaches_s(&version))
 				goto find_new_candidate_tryhard;
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
@@ -4540,13 +4540,11 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 	} EXCEPT {
 		/* TODO: With the new mman, we can use `mman_unmap_kram_locked_ex()'
 		 *       to  get  the  guaranty  that  unmapping  won't  fail  here! */
-		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
-		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
+		mman_unmap(&mman_kernel, temp_mapping, num_bytes, MMAN_UNMAP_NOSPLIT);
 		RETHROW();
 	}
 	TRY {
-		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
-		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
+		mman_unmap(&vm_kernel, temp_mapping, num_bytes, MMAN_UNMAP_NOSPLIT);
 	} EXCEPT {
 		decref(result);
 		RETHROW();

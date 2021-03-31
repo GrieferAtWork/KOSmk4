@@ -31,10 +31,10 @@
 #include <kernel/driver-param.h> /* DEFINE_CMDLINE_FLAG_VAR() */
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/mman/unmapped.h> /* mman_getunmapped_extflags */
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/task.h>
@@ -894,11 +894,15 @@ LOCAL void NOTHROW(FCALL GDB_SetNoAckModeEnabled)(bool enabled) {
 }
 
 LOCAL bool NOTHROW(FCALL GDB_GetDisableRandomization)(void) {
-	return vm_get_aslr_disabled();
+	return mman_getunmapped_extflags & MAP_NOASLR;
 }
 
 LOCAL void NOTHROW(FCALL GDB_SetDisableRandomization)(bool enabled) {
-	vm_set_aslr_disabled(enabled);
+	if (enabled) {
+		ATOMIC_OR(mman_getunmapped_extflags, MAP_NOASLR);
+	} else {
+		ATOMIC_AND(mman_getunmapped_extflags, ~MAP_NOASLR);
+	}
 }
 
 LOCAL bool NOTHROW(FCALL GDB_GetNonStopModeEnabled)(void) {

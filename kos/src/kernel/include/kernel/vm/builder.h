@@ -73,10 +73,10 @@ DECL_END
 #define vmb_getnodeofaddress(self, addr) \
 	((struct vm_node *)mbnode_tree_locate((self)->mb_mappings, addr))
 #define vmb_apply(...) mbuilder_apply(__VA_ARGS__)
-#define VMB_APPLY_AA_NOTHING      MBUILDER_APPLY_AA_NOTHING
-#define VMB_APPLY_AA_TERMTHREADS  MBUILDER_APPLY_AA_TERMTHREADS
-#define VMB_APPLY_AA_SETEXECINFO  MBUILDER_APPLY_AA_SETEXECINFO
-#define vmb_alloc_peb(...)        mbuilder_alloc_peb(__VA_ARGS__)
+#define VMB_APPLY_AA_NOTHING     MBUILDER_APPLY_AA_NOTHING
+#define VMB_APPLY_AA_TERMTHREADS MBUILDER_APPLY_AA_TERMTHREADS
+#define VMB_APPLY_AA_SETEXECINFO MBUILDER_APPLY_AA_SETEXECINFO
+#define vmb_alloc_peb(...)       mbuilder_alloc_peb(__VA_ARGS__)
 #ifdef __ARCH_HAVE_COMPAT
 #define vmb_alloc_peb32(...)     mbuilder_alloc_peb32(__VA_ARGS__)
 #define vmb_alloc_peb64_p64(...) mbuilder_alloc_peb64_p64(__VA_ARGS__)

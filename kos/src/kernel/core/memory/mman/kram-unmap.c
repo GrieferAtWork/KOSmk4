@@ -486,7 +486,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		size_t part_size;
 
 		/* Truncate at the back. */
-		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+		mman_mappings_removenode(&mman_kernel, node);
 
 		/* Unmap the affected address range & sync in every mman. */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
@@ -498,7 +498,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		COMPILER_WRITE_BARRIER();
 
 		/* Re-insert the (now truncated) node into the kernel mman. */
-		mnode_tree_insert(&mman_kernel.mm_mappings, node);
+		mman_mappings_insert(&mman_kernel, node);
 		return true;
 	}
 
@@ -559,12 +559,12 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		/* We can truncate the node at the front. */
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 		remove_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
-		mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+		mman_mappings_removenode(&mman_kernel, node);
 		mpart_truncate_leading(part, remove_size, freefun, flags);
 
 		/* Trim the node. */
 		node->mn_minaddr += remove_size;
-		mnode_tree_insert(&mman_kernel.mm_mappings, node);
+		mman_mappings_insert(&mman_kernel, node);
 		return true;
 	}
 
@@ -843,7 +843,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	}
 
 	/* Remove the old node from the kernel mman. */
-	mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+	mman_mappings_removenode(&mman_kernel, node);
 
 	if (lopart->mp_flags & MPART_F_BLKST_INL) {
 		size_t hioffset_blocks;
@@ -985,8 +985,8 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 	/* Insert the lo- and hi-nodes now that they've been updated
 	 * to include the requested gap in-between. */
-	mnode_tree_insert(&mman_kernel.mm_mappings, lonode);
-	mnode_tree_insert(&mman_kernel.mm_mappings, hinode);
+	mman_mappings_insert(&mman_kernel, lonode);
+	mman_mappings_insert(&mman_kernel, hinode);
 
 	if (hipart->mp_flags & MPART_F_CHANGED) {
 		/* Must insert into the list of changed parts. */
@@ -1264,7 +1264,7 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
-			mnode_tree_removenode(&mman_kernel.mm_mappings, node);
+			mman_mappings_removenode(&mman_kernel, node);
 			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
 
 			/* Unmap the affected address range & sync in every mman. */
@@ -1572,7 +1572,7 @@ do_schedule_lockop:
 		job->mukj_lop_mm.lo_func = &lockop_kram_cb;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
 		                    &job->mukj_lop_mm, lo_link);
-		_mman_lockops_reap();
+		_mman_lockops_reap(&mman_kernel);
 	}
 }
 

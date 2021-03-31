@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/vm.h>
+#include <kernel/mman/unmapped.h> /* mman_getunmapped_extflags */
 
 #include <hybrid/atomic.h>
 
@@ -39,7 +39,7 @@ DECL_BEGIN
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_Kernel_RandomizeVaSpace_Print(struct regular_node *__restrict UNUSED(self),
                                          pformatprinter printer, void *arg) {
-	return ProcFS_PrintUInt(printer, arg, vm_get_aslr_disabled() ? 0 : 2);
+	return ProcFS_PrintUInt(printer, arg, (mman_getunmapped_extflags & MAP_NOASLR) ? 0 : 2);
 }
 
 INTERN NONNULL((1)) void KCALL
@@ -48,7 +48,13 @@ ProcFS_Sys_Kernel_RandomizeVaSpace_Write(struct regular_node *__restrict UNUSED(
                                          size_t bufsize) {
 	unsigned int mode;
 	mode = ProcFS_ParseUInt(buf, bufsize, 0, 2);
-	vm_set_aslr_disabled(mode == 0);
+	if (mode == 0) {
+		/* Disable */
+		ATOMIC_OR(mman_getunmapped_extflags, MAP_NOASLR);
+	} else {
+		/* Enable */
+		ATOMIC_AND(mman_getunmapped_extflags, ~MAP_NOASLR);
+	}
 }
 
 

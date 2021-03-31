@@ -72,12 +72,16 @@ opt.append("-Os");
 #include <kernel/debugtrap.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
+#include <kernel/mman/rtm.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/printk.h>
 #include <kernel/restart-interrupt.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
-#include <kernel/mman/rtm.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/emulock.h>
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
@@ -959,19 +963,24 @@ setgsbase(uintptr_t value) {
 PRIVATE struct icpustate *FCALL
 dispatch_userkern_vio_r(struct icpustate *__restrict state) {
 	struct vio_emulate_args args;
-	struct vm *myvm = THIS_MMAN;
+	struct mman *mymm = THIS_MMAN;
+	struct mpart *part;
 
 	/* The VIO emulation will span the entirety of the KERNRESERVE node. */
-	args.vea_ptrlo = vm_node_getminaddr(vm_get_kernreserve_node(myvm));
-	args.vea_ptrhi = vm_node_getmaxaddr(vm_get_kernreserve_node(myvm));
+	args.vea_ptrlo = mnode_getminaddr(&FORMMAN(mymm, thismman_kernel_reservation));
+	args.vea_ptrhi = mnode_getmaxaddr(&FORMMAN(mymm, thismman_kernel_reservation));
 
 	/* Load VM component pointers. */
-	args.vea_args.va_file = vm_get_kernreserve_node(myvm)->vn_block;
+	part = FORMMAN(mymm, thismman_kernel_reservation).mn_part;
+	assert(part);
+	mpart_lock_acquire(part);
+	args.vea_args.va_file = part->mp_file;
+	mpart_lock_release(part);
 	assert(args.vea_args.va_file);
-	assert(args.vea_args.va_file->db_vio);
 
 	/* Load the VIO dispatch table */
-	args.vea_args.va_ops = args.vea_args.va_file->db_vio;
+	args.vea_args.va_ops = mfile_getvio(args.vea_args.va_file);
+	assert(args.vea_args.va_ops);
 
 	/* Setup meta-data for where VIO is mapped
 	 * Since we know that the USERKERN VIO mapping consists of
@@ -1021,10 +1030,10 @@ assert_user_address_range(struct icpustate *__restrict state,
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UADD((uintptr_t)addr, num_bytes, &endaddr) ||
 	            endaddr > KERNELSPACE_BASE) {
-		struct vm *myvm = THIS_MMAN;
+		struct mman *mymm = THIS_MMAN;
 		/* Dispatch the current instruction through VIO */
-		if ((byte_t *)addr >= vm_node_getminaddr(vm_get_kernreserve_node(myvm)) &&
-		    (byte_t *)addr <= vm_node_getmaxaddr(vm_get_kernreserve_node(myvm))) {
+		if ((byte_t *)addr >= mnode_getminaddr(&FORMMAN(mymm, thismman_kernel_reservation)) &&
+		    (byte_t *)addr <= mnode_getmaxaddr(&FORMMAN(mymm, thismman_kernel_reservation))) {
 			/* Rewind the kernel stack such that `%(r|e)sp = state' before calling this function!
 			 * There is no need to keep the instruction emulation payload of `handle_bad_usage()'
 			 * on-stack when re-starting emulation for the purpose of dispatching userkern VIO. */
@@ -1645,12 +1654,11 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 				} else {
 					/* Cross-page instruction patching! */
 					void *tempaddr;
-					tempaddr = vm_getfree(&vm_kernel,
-					                      HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-					                      2 * PAGESIZE,
-					                      PAGESIZE,
-					                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
-					if (tempaddr != VM_GETFREE_ERROR) {
+					tempaddr = mman_findunmapped(&mman_kernel,
+					                             HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+					                             2 * PAGESIZE,
+					                             HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
+					if (tempaddr != MAP_FAILED) {
 						if (pagedir_prepare(tempaddr, 2 * PAGESIZE)) {
 							pagedir_map(tempaddr, 2 * PAGESIZE, pc_phys & ~PAGEMASK,
 							            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);

@@ -187,11 +187,11 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 	aligned_blob_size = CEIL_ALIGN(aligned_blob_size, PAGESIZE);
 	/* Create a  temporary  mapping  of  prepared  virtual  memory  which
 	 * we can then use to map the driver's data blob into virtual memory. */
-	blob = vm_mapres(&vm_kernel,
-	                 HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                 aligned_blob_size, PAGESIZE,
-	                 HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-	                 VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE);
+	blob = mman_map_res(&mman_kernel,
+	                    HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                    aligned_blob_size,
+	                    HINT_GETMODE(KERNEL_VMHINT_TEMPORARY) |
+	                    MAP_PREPARED | MAP_NOMERGE);
 	TRY {
 		/* Map the driver blob into virtual memory. */
 		pagedir_map(blob,
@@ -212,16 +212,10 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		/* Drop the reference returned by driver_insmod_blob() */
 		decref(drv);
 	} EXCEPT {
-		vm_unmap(&vm_kernel,
-		          blob,
-		          aligned_blob_size,
-		          VM_UNMAP_RESERVE);
+		mman_unmap(&mman_kernel, blob, aligned_blob_size);
 		RETHROW();
 	}
-	vm_unmap(&vm_kernel,
-	          blob,
-	          aligned_blob_size,
-	          VM_UNMAP_RESERVE);
+	mman_unmap(&mman_kernel, blob, aligned_blob_size);
 }
 
 PRIVATE ATTR_FREETEXT void KCALL

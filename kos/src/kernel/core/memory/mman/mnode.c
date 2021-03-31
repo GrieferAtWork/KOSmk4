@@ -418,10 +418,10 @@ done_nopart:
 		LIST_INSERT_HEAD(&self->mm_writable, hinode, mn_writable);
 
 	/* Update the existing node, and re-insert both nodes into the mman. */
-	mnode_tree_removenode(&self->mm_mappings, lonode);
+	mman_mappings_removenode(self, lonode);
 	lonode->mn_maxaddr = (byte_t *)addr_where_to_split - 1;
-	mnode_tree_insert(&self->mm_mappings, lonode);
-	mnode_tree_insert(&self->mm_mappings, hinode);
+	mman_mappings_insert(self, lonode);
+	mman_mappings_insert(self, hinode);
 
 	/* If we had  to unlock  stuff above,  release our  lock to  the mman  to
 	 * keep things consistent with the false-result-means-no-locks invariant. */

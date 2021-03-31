@@ -98,11 +98,11 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
 			/* TODO: This form of cleanup can result in exceptions! */
-			vm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
+			mman_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 			RETHROW();
 		}
 		/* TODO: This form of cleanup can result in exceptions! */
-		vm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
+		mman_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 	}
 }
 

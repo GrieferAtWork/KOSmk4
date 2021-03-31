@@ -96,16 +96,8 @@ getdatablock_from_handle(unsigned int fd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MUNMAP
 DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
-	size_t offset;
-	offset = (uintptr_t)addr & PAGEMASK;
-	addr   = (void *)((uintptr_t)addr & ~PAGEMASK);
-	if (OVERFLOW_UADD(length, offset, &length))
-		length = (size_t)-1;
-	if (vm_unmap(THIS_MMAN,
-	             addr,
-	             CEIL_ALIGN(length, PAGESIZE),
-	             VM_UNMAP_ANYTHING |
-	             VM_UNMAP_NOKERNPART)) {
+	if (mman_unmap(THIS_MMAN, addr, length,
+	               MMAN_UNMAP_NOKERNPART)) {
 #ifdef CONFIG_HAVE_USERMOD
 		vm_clear_usermod(THIS_MMAN);
 #endif /* CONFIG_HAVE_USERMOD */
@@ -126,20 +118,12 @@ DEFINE_SYSCALL3(errno_t, mprotect,
                 USER UNCHECKED void *, addr,
                 size_t, length,
                 syscall_ulong_t, prot) {
-	size_t offset;
-	offset = (uintptr_t)addr & PAGEMASK;
-	addr   = (void *)((uintptr_t)addr & ~PAGEMASK);
-	if (OVERFLOW_UADD(length, offset, &length))
-		length = (size_t)-1;
 	VALIDATE_FLAGSET(prot,
 	                 PROT_EXEC | PROT_WRITE | PROT_READ,
 	                 E_INVALID_ARGUMENT_CONTEXT_MPROTECT_PROT);
-	vm_protect(THIS_MMAN,
-	           addr,
-	           CEIL_ALIGN(length, PAGESIZE),
-	           VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
-	           prot,
-	           VM_UNMAP_ANYTHING | VM_UNMAP_NOKERNPART);
+	mman_protect(THIS_MMAN, addr, length,
+	             PROT_READ | PROT_WRITE | PROT_EXEC, prot,
+	             MMAN_UNMAP_NOKERNPART);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_MPROTECT */
@@ -312,11 +296,10 @@ again_mapat:
 				                            node_flags,
 				                            guard / PAGESIZE);
 				if (isused && !(flags & MAP_FIXED_NOREPLACE)) {
-					if (vm_unmap(THIS_MMAN,
-					             result,
-					             num_bytes + guard,
-					             VM_UNMAP_ANYTHING |
-					             VM_UNMAP_NOKERNPART)) {
+					if (mman_unmap(THIS_MMAN,
+					               result,
+					               num_bytes + guard,
+					               MMAN_UNMAP_NOKERNPART)) {
 #ifdef CONFIG_HAVE_USERMOD
 						vm_clear_usermod(THIS_MMAN);
 #endif /* CONFIG_HAVE_USERMOD */
@@ -349,7 +332,7 @@ again_mapat:
 				}
 			} else {
 				hint         = (void *)((uintptr_t)addr & ~PAGEMASK);
-				getfree_mode = VM_GETFREE_ABOVE | VM_GETFREE_ASLR;
+				getfree_mode = MAP_GROWSUP | VM_GETFREE_ASLR;
 			}
 			if (flags & MAP_DONT_MAP) {
 				/* Don't actually map memory. - Just find a free region */
@@ -360,7 +343,7 @@ again_mapat:
 				                              PAGESIZE,
 				                              getfree_mode);
 				sync_endread(THIS_MMAN);
-				if unlikely(result == (byte_t *)VM_GETFREE_ERROR)
+				if unlikely(result == (byte_t *)MAP_FAILED)
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);
 			} else {
 				/* Support for MAP_GROWSDOWN, MAP_GROWSUP  (create a growing guard mapping) */

@@ -179,7 +179,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	part->mp_meta      = NULL;
 
 	/* Insert the new node into the kernel and release our lock to it. */
-	mnode_tree_insert(&mman_kernel.mm_mappings, node);
+	mman_mappings_insert(&mman_kernel, node);
 	mman_lock_release(&mman_kernel);
 
 	/* Initialize resulting memory.

@@ -455,14 +455,14 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	assert(mpart_getsize(&x86_lapic_mpart) == x86_lapic_mpart.mp_mem.mc_size * PAGESIZE);
 	if (x86_lapic_mpart.mp_mem.mc_size != 0) {
 		byte_t *lapic_addr;
-		lapic_addr = (byte_t *)vm_getfree(&vm_kernel,
-		                                  HINT_GETADDR(KERNEL_VMHINT_LAPIC),
-		                                  mpart_getsize(&x86_lapic_mpart), PAGESIZE,
-		                                  HINT_GETMODE(KERNEL_VMHINT_LAPIC));
-		if unlikely(lapic_addr == VM_GETFREE_ERROR)
+		lapic_addr = (byte_t *)mman_findunmapped(&mman_kernel,
+		                                         HINT_GETADDR(KERNEL_VMHINT_LAPIC),
+		                                         mpart_getsize(&x86_lapic_mpart),
+		                                         HINT_GETMODE(KERNEL_VMHINT_LAPIC));
+		if unlikely(lapic_addr == MAP_FAILED)
 			kernel_panic(FREESTR("Failed to map the LAPIC somewhere\n"));
-		vm_node_setminaddr(&x86_lapic_mnode, lapic_addr);
-		vm_node_setmaxaddr(&x86_lapic_mnode, lapic_addr + x86_lapic_mpart.mp_mem.mc_size * PAGESIZE - 1);
+		x86_lapic_mnode.mn_minaddr = lapic_addr;
+		x86_lapic_mnode.mn_maxaddr = lapic_addr + x86_lapic_mpart.mp_mem.mc_size * PAGESIZE - 1;
 		simple_insert_and_activate(&x86_lapic_mnode, PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 		/* Remember where we mapped the LAPIC */
 		x86_lapicbase_ += (uintptr_t)lapic_addr;

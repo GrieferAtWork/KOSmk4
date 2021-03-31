@@ -334,7 +334,7 @@ usermod_section_map_into_kernel(struct usermod_section *__restrict self,
 	if unlikely(!ATOMIC_CMPXCH(self->us_data, (void *)-1, real_mapaddr)) {
 		/* Race condition: Another thread already did the load in the mean time. */
 		/* FIXME: Unhandled exception when this throws! */
-		vm_unmap(&vm_kernel, mapaddr, aligned_file_size);
+		mman_unmap(&vm_kernel, mapaddr, aligned_file_size);
 	}
 }
 
@@ -828,13 +828,13 @@ NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 
 
 /* Clear the usermod cache during exec() */
-DEFINE_PERVM_ONEXEC(usermod_onexec);
+DEFINE_PERMMAN_ONEXEC(usermod_onexec);
 PRIVATE ATTR_USED void KCALL usermod_onexec(void) {
 	vm_clear_usermod(THIS_MMAN);
 }
 
 /* Also clear the chain when finalizing the VM */
-DEFINE_PERVM_FINI(usermod_fini);
+DEFINE_PERMMAN_FINI(usermod_fini);
 PRIVATE NOBLOCK ATTR_USED void
 NOTHROW(KCALL usermod_fini)(struct vm *__restrict self) {
 	vm_clear_usermod(self);

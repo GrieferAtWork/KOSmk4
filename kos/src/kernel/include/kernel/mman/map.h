@@ -186,6 +186,18 @@ mman_map(struct mman *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
+#if 0
+mman_map(/* self:          */ self,
+         /* hint:          */ hint,
+         /* num_bytes:     */ num_bytes,
+         /* prot:          */ prot,
+         /* flags:         */ flags,
+         /* file:          */ file,
+         /* file_fspath:   */ file_fspath,
+         /* file_fsname:   */ file_fsname,
+         /* file_pos:      */ file_pos,
+         /* min_alignment: */ min_alignment);
+#endif
 
 
 /* Same as `mman_map()', but only allow pages entirely contained  within

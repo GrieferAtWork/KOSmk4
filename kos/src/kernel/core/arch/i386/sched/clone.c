@@ -186,12 +186,11 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 		memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 		result->t_heapsz = resptr.hp_siz;
 		result->t_self   = result;
-		incref(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stacknode_).vn_block */
-		incref(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stackpart_).dp_block */
+		incref(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 #define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)result))
-		REL(FORTASK(result, this_kernel_stacknode_).vn_part);
-		REL(FORTASK(result, this_kernel_stacknode_).vn_link.ln_pself);
-		REL(FORTASK(result, this_kernel_stackpart_).dp_srefs);
+		REL(FORTASK(result, this_kernel_stacknode_).mn_part);
+		REL(FORTASK(result, this_kernel_stacknode_).mn_link.le_prev);
+		REL(FORTASK(result, this_kernel_stackpart_).mp_share.lh_first);
 #undef REL
 		/* Set the VFORK flag to cause the thread to execute in VFORK-mode.
 		 * This must be done before we  start making the thread visible  to
@@ -221,7 +220,7 @@ again_lock_vm:
 				                                  PAGESIZE,
 				                                  HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
-				if unlikely(stack_addr == VM_GETFREE_ERROR) {
+				if unlikely(stack_addr == MAP_FAILED) {
 					mman_lock_release(&mman_kernel);
 					if (system_clearcaches_s(&cache_version))
 						goto again_lock_vm;
@@ -247,7 +246,7 @@ again_lock_vm:
 				                                       HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
 				                                       PAGESIZE, PAGESIZE,
 				                                       HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
-				if unlikely(trampoline_addr == VM_GETFREE_ERROR) {
+				if unlikely(trampoline_addr == MAP_FAILED) {
 					mman_lock_release(&mman_kernel);
 					if (system_clearcaches_s(&cache_version))
 						goto again_lock_vm;
@@ -280,8 +279,7 @@ again_lock_vm:
 				RETHROW();
 			}
 		} EXCEPT {
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stackpart_).dp_block */
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stacknode_).vn_block */
+			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stacknode_).mp_file */
 			heap_free(&kernel_locked_heap,
 			          resptr.hp_ptr,
 			          resptr.hp_siz,

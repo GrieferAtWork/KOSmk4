@@ -53,10 +53,10 @@ driver_clear_globals(struct driver *__restrict self)
 	 *   - driver_loaded_callbacks
 	 *   - driver_finalized_callbacks
 	 *   - driver_unloaded_callbacks
-	 *   - vm_onexec_callbacks
-	 *   - vm_oninit_callbacks
-	 *   - vm_onfini_callbacks
-	 *   - vm_onclone_callbacks
+	 *   - mman_onexec_callbacks
+	 *   - mman_oninit_callbacks
+	 *   - mman_onfini_callbacks
+	 *   - mman_onclone_callbacks
 	 *   - isr_register()
 	 *   - syslog_sink_register()
 	 *   - mrtm_hooks

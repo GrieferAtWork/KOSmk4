@@ -31,11 +31,15 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h> /* this_trampoline_node */
+#include <kernel/mman/sync.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
@@ -70,7 +74,7 @@ struct task task_header = {
 	/* .t_refcnt     = */ 1,
 	/* .t_flags      = */ TASK_FNORMAL,
 	/* .t_cpu        = */ &_bootcpu,
-	/* .t_mman       = */ &vm_kernel,
+	/* .t_mman       = */ &mman_kernel,
 	/* .t_mman_tasks = */ LIST_ENTRY_UNBOUND_INITIALIZER,
 	/* .t_heapsz     = */ (size_t)__kernel_pertask_size,
 	{
@@ -156,8 +160,8 @@ NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
 	FORTASK(self, this_trampoline_node).mn_minaddr = (byte_t *)addr;
 	FORTASK(self, this_trampoline_node).mn_maxaddr = (byte_t *)addr + PAGESIZE - 1;
 	/* Load the trampoline node into the kernel VM. */
-	assert(FORTASK(self, this_trampoline_node).vn_vm == &vm_kernel);
-	vm_node_insert(&FORTASK(self, this_trampoline_node));
+	assert(FORTASK(self, this_trampoline_node).mn_mman == &mman_kernel);
+	mman_mappings_insert(&mman_kernel, &FORTASK(self, this_trampoline_node));
 }
 
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
@@ -221,11 +225,10 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	boot_trampoline_pages = kernel_initialize_boot_trampolines();
 #else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	boot_trampoline_pages = vm_getfree(&vm_kernel,
-	                                   HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
-	                                   /* num_pages: */ 2 * PAGESIZE,
-	                                   /* alignment: */ 1 * PAGESIZE,
-	                                   HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+	boot_trampoline_pages = mman_findunmapped(&mman_kernel,
+	                                          HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
+	                                          2 * PAGESIZE,
+	                                          HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Construct the trampoline node for the predefined tasks. */
@@ -287,10 +290,12 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&_bootidle, this_handle_manager) = &handle_manager_kernel;
 
 	/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
-	FORTASK(&_bootidle, this_kernel_stacknode_).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
+	FORTASK(&_bootidle, this_kernel_stacknode_).mn_flags = (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |
+	                                                        MNODE_F_SHARED | MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
+	                                                        _MNODE_F_MPREPARED_KERNEL);
 
-	vm_kernel.v_tasks.lh_first      = &_boottask;
-	_boottask.t_mman_tasks.le_prev  = &vm_kernel.v_tasks.lh_first;
+	mman_kernel.mm_threads.lh_first = &_boottask;
+	_boottask.t_mman_tasks.le_prev  = &mman_kernel.mm_threads.lh_first;
 	_boottask.t_mman_tasks.le_next  = &_asyncwork;
 	_asyncwork.t_mman_tasks.le_prev = &_boottask.t_mman_tasks.le_next;
 	_asyncwork.t_mman_tasks.le_next = &_bootidle;
@@ -346,10 +351,12 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 
 
 /* Called with a lock to the kernel VM's treelock held. */
-PRIVATE NOBLOCK VM_KERNEL_PENDING_CB_RETURN_T
-NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict self) {
+PRIVATE NOBLOCK struct postlockop *
+NOTHROW(FCALL task_destroy_raw_impl)(struct lockop *__restrict _lop) {
 	void *addr;
 	size_t size;
+	struct task *self;
+	self = (struct task *)_lop;
 	assertf(self != &_boottask && self != &_bootidle && self != &_asyncwork,
 	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
 	        "self        = %p\n"
@@ -357,11 +364,11 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	        "&_bootidle  = %p\n"
 	        "&_asyncwork = %p\n",
 	        self, &_boottask, &_bootidle, &_asyncwork);
-	assert(vm_kernel_treelock_writing());
+	assert(mman_lock_writing(&mman_kernel));
 	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 
 	/* Unlink + unmap the trampoline node. */
-	mnode_tree_removenode(&mman_kernel.mm_mappings, &FORTASK(self, this_trampoline_node));
+	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node));
 	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node));
 	pagedir_unmapone(addr);
 	mman_supersyncone(addr);
@@ -369,22 +376,22 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 	pagedir_unprepareone(addr);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	mnode_tree_removenode(&mman_kernel.mm_mappings, &FORTASK(self, this_kernel_stackguard_));
+	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-	mnode_tree_removenode(&mman_kernel.mm_mappings, &FORTASK(self, this_kernel_stacknode_));
+	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stacknode_));
 	addr = mnode_getaddr(&FORTASK(self, this_kernel_stacknode_));
 	size = mnode_getsize(&FORTASK(self, this_kernel_stacknode_));
 	pagedir_unmap(addr, size);
-	vm_supersync(addr, size);
+	mman_supersync(addr, size);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare(addr, size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Deallocate the kernel stack. */
-	vm_datapart_do_freeram(&FORTASK(self, this_kernel_stackpart_));
+	mpart_ll_freemem(&FORTASK(self, this_kernel_stackpart_));
 
 	/* TODO: Use 2-step cleanup and free the task structure _after_ releasing
-	 *       the  lock  to the  kernel mman  (through  use of  a postlockop) */
+	 *       the  lock  to  the kernel  mman  (through use  of  a postlockop) */
 	{
 		REF struct mman *mm;
 		mm = self->t_mman;
@@ -397,7 +404,7 @@ NOTHROW(VM_KERNEL_PENDING_CB_CC task_destroy_raw_impl)(struct task *__restrict s
 		heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_NORMAL);
 		decref(mm);
 	}
-	VM_KERNEL_PENDING_CB_RETURN;
+	return NULL;
 }
 
 
@@ -416,21 +423,19 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	iter = __kernel_pertask_fini_start;
 	for (; iter < __kernel_pertask_fini_end; ++iter)
 		(**iter)(self);
-	if (vm_kernel_treelock_trywrite()) {
-		task_destroy_raw_impl(self);
-		vm_kernel_treelock_endwrite();
+
+	/* Destroy  the  task  structure,  and  unload  memory segments
+	 * occupied by the thread, including its stack, and trampoline. */
+	if (mman_lock_tryacquire(&mman_kernel)) {
+		task_destroy_raw_impl((struct lockop *)self);
+		mman_lock_release(&mman_kernel);
 	} else {
-		struct vm_kernel_pending_operation *mine, *next;
+		struct lockop *lop;
 		/* Schedule the task to-be destroyed later. */
-		mine = (struct vm_kernel_pending_operation *)self;
-		mine->vkpo_exec = (vm_kernel_pending_cb_t)&task_destroy_raw_impl;
-		do {
-			next = ATOMIC_READ(vm_kernel_pending_operations);
-			mine->vkpo_next = next;
-			COMPILER_WRITE_BARRIER();
-		} while (!ATOMIC_CMPXCH_WEAK(vm_kernel_pending_operations,
-		                             next, mine));
-		vm_kernel_treelock_tryservice();
+		lop          = (struct lockop *)self;
+		lop->lo_func = &task_destroy_raw_impl;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, lo_link);
+		_mman_lockops_reap(&mman_kernel);
 	}
 }
 
@@ -447,36 +452,34 @@ PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
 	memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 	result->t_heapsz = resptr.hp_siz;
 	result->t_self   = result;
-	incref(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stacknode_).vn_block */
-	incref(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stackpart_).dp_block */
+	incref(&mfile_ndef); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 #define STN(thread) FORTASK(&thread, this_kernel_stacknode_)
 #define STP(thread) FORTASK(&thread, this_kernel_stackpart_)
-	STN(*result).vn_part          = &STP(*result);
-	STN(*result).vn_link.ln_pself = &STP(*result).dp_srefs;
-	STP(*result).dp_srefs         = &STN(*result);
+	STN(*result).mn_part           = &STP(*result);
+	STN(*result).mn_link.le_prev   = &STP(*result).mp_share.lh_first;
+	STP(*result).mp_share.lh_first = &STN(*result);
 	TRY {
-		vm_datapart_do_allocram(&FORTASK(result, this_kernel_stackpart_));
+		mpart_ll_allocmem(&FORTASK(result, this_kernel_stackpart_),
+		                  CEILDIV(KERNEL_STACKSIZE, PAGESIZE));
 		TRY {
 			void *stack_addr;
 			void *trampoline_addr;
 			uintptr_t version = 0;
 again_lock_vm:
-			vm_kernel_treelock_write();
+			mman_lock_acquire(&mman_kernel);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			stack_addr = vm_getfree(&vm_kernel,
-			                        HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
-			                        CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
-			                        PAGESIZE,
-			                        HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
+			stack_addr = mman_findunmapped(&mman_kernel,
+			                               HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
+			                               CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
+			                               HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-			stack_addr = vm_getfree(&vm_kernel,
-			                        HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
-			                        CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
-			                        PAGESIZE,
-			                        HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
+			stack_addr = mman_findunmapped(&mman_kernel,
+			                               HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
+			                               CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
+			                               HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
-			if unlikely(stack_addr == VM_GETFREE_ERROR) {
-				vm_kernel_treelock_endwrite();
+			if unlikely(stack_addr == MAP_FAILED) {
+				mman_lock_release(&mman_kernel);
 				if (system_clearcaches_s(&version))
 					goto again_lock_vm;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
@@ -491,18 +494,17 @@ again_lock_vm:
 			FORTASK(result, this_kernel_stacknode_).mn_maxaddr = (byte_t *)stack_addr + KERNEL_STACKSIZE - 1;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepare(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
-				vm_kernel_treelock_endwrite();
+				mman_lock_release(&mman_kernel);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 			/* Map the trampoline node. */
-			trampoline_addr = vm_getfree(&vm_kernel,
-			                             HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
-			                             PAGESIZE, PAGESIZE,
-			                             HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
-			if unlikely(trampoline_addr == VM_GETFREE_ERROR) {
-				vm_kernel_treelock_endwrite();
+			trampoline_addr = mman_findunmapped(&mman_kernel,
+			                                    HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE), PAGESIZE,
+			                                    HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+			if unlikely(trampoline_addr == MAP_FAILED) {
+				mman_lock_release(&mman_kernel);
 				if (system_clearcaches_s(&version))
 					goto again_lock_vm;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
@@ -514,23 +516,22 @@ again_lock_vm:
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Load nodes into the kernel VM. */
-			vm_node_insert(&FORTASK(result, this_trampoline_node));
-			vm_node_insert(&FORTASK(result, this_kernel_stacknode_));
+			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_trampoline_node));
+			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			vm_node_insert(&FORTASK(result, this_kernel_stackguard_));
+			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 			/* Map the stack into memory */
-			vm_datapart_map_ram(&FORTASK(result, this_kernel_stackpart_), stack_addr,
-			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-			vm_kernel_treelock_endwrite();
+			mpart_mmap_force(&FORTASK(result, this_kernel_stackpart_), stack_addr,
+			                 KERNEL_STACKSIZE, 0, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			mman_lock_release(&mman_kernel);
 		} EXCEPT {
-			vm_datapart_do_ccfreeram(&FORTASK(result, this_kernel_stackpart_));
+			mpart_ll_ccfreemem(&FORTASK(result, this_kernel_stackpart_));
 			RETHROW();
 		}
 	} EXCEPT {
-		decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stackpart_).dp_block */
-		decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stacknode_).vn_block */
+		decref_nokill(&mfile_ndef); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 		heap_free(&kernel_locked_heap,
 		          resptr.hp_ptr,
 		          resptr.hp_siz,
@@ -547,9 +548,9 @@ again_lock_vm:
 		assert(!LIST_ISBOUND(result, t_mman_tasks));
 
 		/* Insert the new task into the VM */
-		vm_tasklock_write(task_vm);
-		LIST_INSERT_HEAD(&task_vm->v_tasks, result, t_mman_tasks);
-		vm_tasklock_endwrite(task_vm);
+		mman_threadslock_acquire(task_vm);
+		LIST_INSERT_HEAD(&task_vm->mm_threads, result, t_mman_tasks);
+		mman_threadslock_release(task_vm);
 
 		iter = __kernel_pertask_init_start;
 		for (; iter < __kernel_pertask_init_end; ++iter)
