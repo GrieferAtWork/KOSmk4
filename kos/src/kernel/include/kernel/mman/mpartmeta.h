@@ -109,6 +109,18 @@ struct mfutex {
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct mfutex, mfu_refcnt, mfutex_destroy)
 
+/* Helper macros. */
+#define mfutex_send(self)                    sig_send(&(self)->mfu_signal)
+#define mfutex_send_nopr(self)               sig_send_nopr(&(self)->mfu_signal)
+#define mfutex_sendmany(self, maxcount)      sig_sendmany(&(self)->mfu_signal, maxcount)
+#define mfutex_sendmany_nopr(self, maxcount) sig_sendmany_nopr(&(self)->mfu_signal, maxcount)
+#define mfutex_broadcast(self)               sig_broadcast(&(self)->mfu_signal)
+#define mfutex_broadcast_nopr(self)          sig_broadcast_nopr(&(self)->mfu_signal)
+#define mfutex_iswaiting(self)               sig_iswaiting(&(self)->mfu_signal)
+#define mfutex_connect(self)                 task_connect(&(self)->mfu_signal)
+#define mfutex_connect_for_poll(self)        task_connect_for_poll(&(self)->mfu_signal)
+#define mfutex_getpart(self)                 awref_get(&(self)->mfu_part) /* REF */
+
 
 /* Mem-futex tree API. All of  these functions require that the  caller
  * be holding a lock to the associated `struct mpartmeta::mpm_ftxlock'. */

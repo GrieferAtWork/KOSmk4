@@ -28,14 +28,14 @@
 
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mpartmeta.h>
+#include <kernel/mman/nopf.h>
 #include <kernel/paging.h> /* PAGESIZE */
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/futex.h>
-#include <kernel/mman/nopf.h>
 #include <sched/task.h>
 
 #include <hybrid/__assert.h>
@@ -67,7 +67,7 @@ INTERN size_t rtm_memory_limit = 4 * PAGESIZE;
 
 /* NOTE: The caller must be holding a read- or write-lock to `self' */
 #define vm_datapart_get_rtm_version(self) \
-	((self)->dp_futex ? (self)->dp_futex->fc_rtm_vers : 0)
+	((self)->dp_futex ? (self)->dp_futex->mpm_rtm_vers : 0)
 
 #if !defined(NDEBUG) || 1
 #define assert_rtm_memory_region(self) (void)0
@@ -1277,7 +1277,7 @@ do_create_far_region:
 			}
 			ftx = ATOMIC_READ(node_part->dp_futex);
 			if likely(ftx != NULL)
-				region->mr_vers = ftx->fc_rtm_vers;
+				region->mr_vers = ftx->mpm_rtm_vers;
 			sync_endread(node_part);
 		}
 		/* Insert `region' into the vector at index `i' */
@@ -1437,6 +1437,10 @@ NOTHROW(FCALL rtm_verify_writable_nopf)(USER CHECKED void *addr,
  * @return: false: Version of memory inconsistency detected (try again) */
 INTERN NONNULL((1)) bool FCALL
 rtm_memory_apply(struct rtm_memory const *__restrict self) {
+	/* TODO: This function needs a re-write in order to make use of `mpm_dmalocks'
+	 *       when writing to mem-parts, rather than keeping ahold of the much too
+	 *       powerful `MPART_F_LOCKBIT' in order to accomplish the same! */
+
 #if CONFIG_RTM_USERSPACE_ONLY
 #define effective_vm myvm
 #endif /* CONFIG_RTM_USERSPACE_ONLY */
@@ -1517,7 +1521,7 @@ again_acquire_region_locks:
 			/* Verify that the version of this region did not change */
 			fxc = part->dp_futex;
 			if (fxc) {
-				if (fxc->fc_rtm_vers != region->mr_vers) {
+				if (fxc->mpm_rtm_vers != region->mr_vers) {
 endwrite_par_and_release_locks_and_retry:
 					sync_endwrite(part);
 					goto partially_release_locks_and_retry;
@@ -1561,7 +1565,7 @@ endwrite_par_and_release_locks_and_retry:
 			 * Note that we're holding  a couple of non-recursive  locks
 			 * at the moment, so we must be careful not to do a blocking
 			 * memory allocation! */
-			ftx = vm_futex_controller_allocf_nx(GFP_ATOMIC);
+			ftx = (struct mpartmeta *)kmalloc_nx(sizeof(struct mpartmeta), GFP_ATOMIC | GFP_CALLOC);
 			if unlikely(!ftx) {
 				/* The difficult case:
 				 * In this case, we must release all of our beautiful locks, :(
@@ -1572,12 +1576,12 @@ endwrite_par_and_release_locks_and_retry:
 #ifndef __OPTIMIZE_SIZE__
 again_allocate_ftx_controller_for_part:
 #endif /* !__OPTIMIZE_SIZE__ */
-				ftx = vm_futex_controller_alloc();
+				ftx = (struct mpartmeta *)kmalloc(sizeof(struct mpartmeta), GFP_CALLOC);
 				/* Try to install `ftx' into `part' */
 				TRY {
 					sync_write(part);
 				} EXCEPT {
-					vm_futex_controller_free(ftx);
+					kfree(ftx);
 					RETHROW();
 				}
 				if likely(!part->dp_futex) {
@@ -1587,7 +1591,7 @@ again_allocate_ftx_controller_for_part:
 				} else {
 					/* Race condition: Someone else already installed a controller. */
 					sync_endwrite(part);
-					vm_futex_controller_free(ftx);
+					kfree(ftx);
 				}
 #ifndef __OPTIMIZE_SIZE__
 				/* While we're at it, also try  to look head if there  are
@@ -1725,7 +1729,7 @@ again_acquire_region_locks_for_vm_lock:
 		if (!rtm_memory_region_isfarregion(region))
 #endif /* CONFIG_RTM_FAR_REGIONS */
 		{
-			++part->dp_futex->fc_rtm_vers;
+			++part->dp_futex->mpm_rtm_vers;
 		}
 		COMPILER_BARRIER();
 		/* Release our lock to this part. */

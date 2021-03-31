@@ -31,9 +31,9 @@
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/mman/mpartmeta.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/futex.h>
 #include <sched/cred.h>
 
 #include <hybrid/atomic.h>
@@ -248,11 +248,11 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (struct_size != sizeof(struct hop_datablock_open_futex))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_open_futex), struct_size);
 		if (cmd == HOP_DATABLOCK_OPEN_FUTEX_EXISTING) {
-			ftx = vm_datablock_getfutex_existing(self, (pos_t)data->dof_address);
+			ftx = mfile_lookupfutex(self, (pos_t)data->dof_address);
 			if (!ftx)
 				return -ENOENT;
 		} else {
-			ftx = vm_datablock_getfutex(self, (pos_t)data->dof_address);
+			ftx = mfile_createfutex(self, (pos_t)data->dof_address);
 		}
 		FINALLY_DECREF_UNLIKELY(ftx);
 		hnd.h_type = HANDLE_TYPE_FUTEX;

@@ -25,12 +25,12 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/mman/mpartmeta.h>
 #include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/futex.h>
 #include <sched/pid.h>
 #include <sched/tsc.h>
 
@@ -96,9 +96,9 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 	case FUTEX_WAIT: {
 		/* while(*uaddr == val) wait(uaddr, rel_timeout); */
 		validate_user(uaddr, sizeof(*uaddr));
-		f = vm_getfutex(THIS_MMAN, uaddr);
+		f = mman_createfutex(THIS_MMAN, uaddr);
 		FINALLY_DECREF(f);
-		task_connect(&f->vmf_signal);
+		mfutex_connect(f);
 		TRY {
 			result = 0;
 			if (ATOMIC_READ(*uaddr) == val) {
@@ -116,14 +116,14 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 	case FUTEX_WAKE_BITSET: /* XXX: Channel support? */
 	case FUTEX_WAKE: /* wake(uaddr); */
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_MMAN, uaddr);
+		f = mman_lookupfutex(THIS_MMAN, uaddr);
 		result = 0;
 		if (f) {
 			if (val == (uint32_t)-1) {
-				result = sig_broadcast(&f->vmf_signal);
+				result = mfutex_broadcast(f);
 			} else {
 				/* Only signal at most `val' connected threads. */
-				result = sig_sendmany(&f->vmf_signal, (size_t)val);
+				result = mfutex_sendmany(f, (size_t)val);
 			}
 			decref_unlikely(f);
 		}

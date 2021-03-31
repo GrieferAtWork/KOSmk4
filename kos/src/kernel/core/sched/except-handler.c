@@ -23,12 +23,12 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/mman/mpartmeta.h> /* mman_broadcastfutex() */
 #include <kernel/paging.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>       /* DEFINE_PERVM_ONEXEC() */
-#include <kernel/vm/futex.h> /* vm_futex_broadcast() */
+#include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
@@ -68,7 +68,7 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  *     >> if (addr) {
  *     >>     TRY {
  *     >>         *addr = 0;
- *     >>         vm_futex_broadcast(addr);
+ *     >>         mman_broadcastfutex(addr);
  *     >>     } EXCEPT {
  *     >>         if (!was_thrown(E_SEGFAULT) ||
  *     >>             (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr))
@@ -107,7 +107,7 @@ INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
 			}
 #endif /* CONFIG_HAVE_USERPROCMASK */
 			ATOMIC_WRITE(*addr, 0);
-			vm_futex_broadcast(addr);
+			mman_broadcastfutex(addr);
 		} EXCEPT {
 			/* Explicitly handle E_SEGFAULT:addr as a no-op */
 			if (!was_thrown(E_SEGFAULT) ||

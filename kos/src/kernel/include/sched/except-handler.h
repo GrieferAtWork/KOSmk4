@@ -68,7 +68,7 @@ DATDEF ATTR_PERTASK struct user_except_handler this_user_except_handler;
  *     >> if (addr) {
  *     >>     TRY {
  *     >>         *addr = 0;
- *     >>         vm_futex_broadcast(addr);
+ *     >>         mman_broadcastfutex(addr);
  *     >>     } EXCEPT {
  *     >>         if (!was_thrown(E_SEGFAULT) ||
  *     >>             (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr))

@@ -26,13 +26,13 @@
 #include <kernel/cache.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mpartmeta.h> /* mman_broadcastfutex() */
 #include <kernel/printk.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/futex.h> /* vm_futex_broadcast() */
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/rpc-internal.h>
@@ -469,7 +469,7 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 		do {                                             \
 			if (futex_pointer != UNUSED_FUTEX_POINTER) { \
 				ATOMIC_STORE(*futex_pointer, code);      \
-				vm_futex_broadcast(futex_pointer);       \
+				mman_broadcastfutex(futex_pointer);      \
 			}                                            \
 		} __WHILE0
 		TRY {

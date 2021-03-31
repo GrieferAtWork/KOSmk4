@@ -122,13 +122,13 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_MMAN, uaddr);
+		f = mman_lookupfutex(THIS_MMAN, uaddr);
 		result = 0;
 		if (f) {
 			if (count == (size_t)-1) {
-				result = sig_broadcast(&f->vmf_signal);
+				result = mfutex_broadcast(f);
 			} else {
-				result = sig_sendmany(&f->vmf_signal, count);
+				result = mfutex_sendmany(f, count);
 			}
 			decref_unlikely(f);
 		}
@@ -177,15 +177,15 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_MMAN, uaddr);
+		f = mman_lookupfutex(THIS_MMAN, uaddr);
 		result = 0;
 		if (!f) {
 			APPLY_MASK();
 			/* Do a second check for the futex, thus ensuring
 			 * that  we're  interlocked  with  `APPLY_MASK()' */
-			f = vm_getfutex_existing(THIS_MMAN, uaddr);
+			f = mman_lookupfutex(THIS_MMAN, uaddr);
 			if unlikely(f) {
-				result = sig_broadcast(&f->vmf_signal);
+				result = mfutex_broadcast(f);
 				decref_unlikely(f);
 				if ((size_t)result > count)
 					result = (syscall_slong_t)count;
@@ -196,15 +196,15 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 				/* Since we're doing a broadcast, no need to wait
 				 * with  the  signal  application  until   later! */
 				APPLY_MASK();
-				result = sig_broadcast(&f->vmf_signal);
+				result = mfutex_broadcast(f);
 			} else {
 				/* Only signal at most `count' connected threads. */
 				while (count) {
-					if (!sig_send(&f->vmf_signal)) {
+					if (!mfutex_send(f)) {
 						size_t temp;
 						APPLY_MASK();
 						/* Broadcast again after modifying the memory location. */
-						temp = sig_broadcast(&f->vmf_signal);
+						temp = mfutex_broadcast(f);
 						if unlikely(temp > count)
 							temp = count;
 						result += temp;
@@ -228,9 +228,9 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 
 	case LFUTEX_WAIT: {
 		validate_user(uaddr, 1);
-		f = vm_getfutex(THIS_MMAN, uaddr);
+		f = mman_createfutex(THIS_MMAN, uaddr);
 		FINALLY_DECREF(f);
-		task_connect(&f->vmf_signal);
+		mfutex_connect(f);
 		TRY {
 			/* NOTE: The  futex `f'  must be  kept alive  during the wait,
 			 *       since even  though semantics  would  allow it  to  be
@@ -263,9 +263,9 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			/* Lock isn't available  (connect to it,  then set  the
 			 * is-waiting bit and sleep until it becomes available) */
 			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
-			f = vm_getfutex(THIS_MMAN, uaddr);
+			f = mman_createfutex(THIS_MMAN, uaddr);
 			FINALLY_DECREF(f);
-			task_connect(&f->vmf_signal);
+			mfutex_connect(f);
 			TRY {
 				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
 					/* Failed to set the locked bit (try again) */
@@ -287,9 +287,9 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		validate(uaddr, sizeof(*uaddr));                              \
 		/* Connect  to  the  futex first,  thus  performing the       \
 		 * should-wait checked in a manner that is interlocked. */    \
-		f = vm_getfutex(THIS_MMAN, uaddr);                              \
+		f = mman_createfutex(THIS_MMAN, uaddr);                       \
 		FINALLY_DECREF(f);                                            \
-		task_connect(&f->vmf_signal);                                   \
+		mfutex_connect(f);                                            \
 		/* Read the futex value. */                                   \
 		TRY {                                                         \
 			if (should_wait) {                                        \

@@ -31,7 +31,6 @@
 #include <kernel/iovec.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/futex.h>
 #include <sched/cred.h>
 
 #include <hybrid/align.h>
