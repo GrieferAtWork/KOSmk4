@@ -134,6 +134,7 @@ incdir("");
 #include <asm/crt/confname.h>
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/glob.h>
+#include <asm/crt/humanize_number.h>
 #include <asm/crt/limits.h>
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
@@ -208,6 +209,7 @@ incdir("");
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
 #include <asm/pkey.h>
+#include <asm/signed-shift.h>
 #include <asm/syscalls-proto.h>
 #include <asm/syscalls-trace.h>
 #include <asm/syscalls-types.h>
@@ -415,6 +417,7 @@ incdir("");
 #include <compat/bits/typesizes.h>
 #include <compat/bits/va_list-struct.h>
 #include <compat/config.h>
+#include <compat/kos/bits/coredump.h>
 #include <compat/kos/bits/except-handler.h>
 #include <compat/kos/bits/futex-expr.h>
 #include <compat/kos/bits/futex.h>
@@ -550,6 +553,7 @@ incdir("");
 #include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
 #include <kos/asm/uaio.h>
+#include <kos/bits/coredump.h>
 #include <kos/bits/debugtrap.h>
 #include <kos/bits/except-handler.h>
 #include <kos/bits/except.h>
@@ -571,6 +575,7 @@ incdir("");
 #include <kos/compat/linux-olddirent.h>
 #include <kos/compat/linux-oldselect.h>
 #include <kos/compat/linux-stat.h>
+#include <kos/coredump.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
 #include <kos/except/asm/codes.h>
@@ -1008,6 +1013,7 @@ incdir("");
 #include <sys/auxv.h>
 #include <sys/bitstring.h>
 #include <sys/bitypes.h>
+#include <sys/bsdtypes.h>
 #include <sys/bswap.h>
 #include <sys/byteorder.h>
 #include <sys/cdefs.h>

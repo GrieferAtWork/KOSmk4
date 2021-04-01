@@ -70,13 +70,13 @@ __SYSDECL_BEGIN
 
 
 #ifndef __TARGV
-#ifdef __USE_DOS
-#define __TARGV  char const *const *___argv
-#define __TENVP  char const *const *___envp
-#else /* __USE_DOS */
-#define __TARGV  char *const ___argv[__restrict_arr]
-#define __TENVP  char *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#ifdef __USE_DOS_ALTERATIONS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS_ALTERATIONS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 
 /* DOS */
@@ -191,10 +191,24 @@ void _endthreadex($u32 exitcode);
 %[insert:function(_getpid = getpid)]
 
 %[default:section(".text.crt.dos.fs.exec.exec")]
-%[insert:function(_execv = execv)]
-%[insert:function(_execvp = execvp)]
-%[insert:function(_execve = execve)]
-%[insert:function(_execvpe = execvpe)]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execv([[nonnull]] char const *__restrict path,
+           [[nonnull]] char const *const *___argv) = execv;
+
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execvp([[nonnull]] char const *__restrict file,
+            [[nonnull]] char const *const *___argv) = execvp;
+
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execve([[nonnull]] char const *__restrict path,
+            [[nonnull]] char const *const *___argv,
+            [[nonnull]] char const *const *___envp) = execve;
+
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+int _execvpe([[nonnull]] char const *__restrict file,
+             [[nonnull]] char const *const *___argv,
+             [[nonnull]] char const *const *___envp) = execvpe;
+
 %[insert:function(_execl = execl)]
 %[insert:function(_execlp = execlp)]
 %[insert:function(_execle = execle)]
@@ -203,46 +217,44 @@ void _endthreadex($u32 exitcode);
 %[default:section(".text.crt.dos.fs.exec.spawn")]
 %[insert:function(_cwait = cwait)]
 
-[[argument_names(mode, path, ___argv)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[decl_include("<features.h>")]]
 intptr_t _spawnv(__STDC_INT_AS_UINT_T mode,
                  [[nonnull]] char const *__restrict path,
-                 __TARGV) = spawnv;
+                 [[nonnull]] char const *const *___argv) = spawnv;
 
-[[argument_names(mode, file, ___argv)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[decl_include("<features.h>")]]
 intptr_t _spawnvp(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict file,
-                  __TARGV) = spawnvp;
+                  [[nonnull]] char const *const *___argv) = spawnvp;
 
-[[argument_names(mode, path, ___argv, ___envp)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[decl_include("<features.h>")]]
 intptr_t _spawnve(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict path,
-                  __TARGV, __TENVP) = spawnve;
+                  [[nonnull]] char const *const *___argv,
+                  [[nonnull]] char const *const *___envp) = spawnve;
 
-[[argument_names(mode, file, ___argv, ___envp)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[decl_include("<features.h>")]]
 intptr_t _spawnvpe(__STDC_INT_AS_UINT_T mode,
                    [[nonnull]] char const *__restrict file,
-                   __TARGV, __TENVP) = spawnvpe;
+                   [[nonnull]] char const *const *___argv,
+                   [[nonnull]] char const *const *___envp) = spawnvpe;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
 intptr_t _spawnl(__STDC_INT_AS_UINT_T mode,
                  [[nonnull]] char const *__restrict path,
                  char const *args, ... /*, (char *)NULL*/) = spawnl;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
 intptr_t _spawnlp(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict file,
                   char const *args, ... /*, (char *)NULL*/) = spawnlp;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
 intptr_t _spawnle(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict path,
                   char const *args, ... /*, (char *)NULL, (char **)environ*/) = spawnle;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
 intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
                    [[nonnull]] char const *__restrict file,
                    char const *args, ... /*, (char *)NULL, (char **)environ*/) = spawnlpe;
@@ -322,13 +334,13 @@ typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
 
 #ifndef __TWARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __TWARGV wchar_t const *const *__restrict ___argv
 #define __TWENVP wchar_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __TWARGV wchar_t *const ___argv[__restrict_arr]
 #define __TWENVP wchar_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TWARGV */
 
 }
@@ -340,54 +352,66 @@ typedef __intptr_t intptr_t;
 %#ifndef _WPROCESS_DEFINED
 %#define _WPROCESS_DEFINED 1
 %[default:section(".text.crt{|.dos}.wchar.fs.exec.exec")]
-%[insert:function(_wexecv = wexecv)]
-%[insert:function(_wexecvp = wexecvp)]
-%[insert:function(_wexecve = wexecve)]
-%[insert:function(_wexecvpe = wexecvpe)]
+[[argument_names(mode, path, ___argv), decl_include("<features.h>")]]
+int _wexecv([[nonnull]] wchar_t const *__restrict path,
+            [[nonnull]] wchar_t const *const *__restrict ___argv) = wexecv;
+
+[[argument_names(mode, file, ___argv), decl_include("<features.h>")]]
+int _wexecvp([[nonnull]] wchar_t const *__restrict file,
+             [[nonnull]] wchar_t const *const *__restrict ___argv) = wexecvp;
+
+[[argument_names(mode, path, ___argv, ___envp), decl_include("<features.h>")]]
+int _wexecve([[nonnull]] wchar_t const *__restrict path,
+             [[nonnull]] wchar_t const *const *__restrict ___argv,
+             [[nonnull]] wchar_t const *const *__restrict ___envp) = wexecve;
+
+[[argument_names(mode, file, ___argv, ___envp), decl_include("<features.h>")]]
+int _wexecvpe([[nonnull]] wchar_t const *__restrict file,
+              [[nonnull]] wchar_t const *const *__restrict ___argv,
+              [[nonnull]] wchar_t const *const *__restrict ___envp) = wexecvpe;
+
 %[insert:function(_wexecl = wexecl)]
 %[insert:function(_wexeclp = wexeclp)]
 %[insert:function(_wexecle = wexecle)]
 %[insert:function(_wexeclpe = wexeclpe)]
 
 %[default:section(".text.crt{|.dos}.wchar.fs.exec.spawn")]
-[[argument_names(mode, path, ___argv)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[argument_names(mode, path, ___argv), decl_include("<features.h>")]]
 intptr_t _wspawnv(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] wchar_t const *__restrict path,
-                  __TWARGV) = wspawnv;
+                  [[nonnull]] wchar_t const *const *__restrict ___argv) = wspawnv;
 
-[[argument_names(mode, path, ___argv)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[argument_names(mode, file, ___argv), decl_include("<features.h>")]]
 intptr_t _wspawnvp(__STDC_INT_AS_UINT_T mode,
-                   [[nonnull]] wchar_t const *__restrict path,
-                   __TWARGV) = wspawnvp;
+                   [[nonnull]] wchar_t const *__restrict file,
+                   [[nonnull]] wchar_t const *const *__restrict ___argv) = wspawnvp;
 
-[[argument_names(mode, path, ___argv, ___envp)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[argument_names(mode, path, ___argv, ___envp), decl_include("<features.h>")]]
 intptr_t _wspawnve(__STDC_INT_AS_UINT_T mode,
                    [[nonnull]] wchar_t const *__restrict path,
-                   __TWARGV, __TWENVP) = wspawnve;
+                   [[nonnull]] wchar_t const *const *__restrict ___argv,
+                   [[nonnull]] wchar_t const *const *__restrict ___envp) = wspawnve;
 
-[[argument_names(mode, path, ___argv, ___envp)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[argument_names(mode, file, ___argv, ___envp), decl_include("<features.h>")]]
 intptr_t _wspawnvpe(__STDC_INT_AS_UINT_T mode,
-                    [[nonnull]] wchar_t const *__restrict path,
-                    __TWARGV, __TWENVP) = wspawnvpe;
+                    [[nonnull]] wchar_t const *__restrict file,
+                    [[nonnull]] wchar_t const *const *__restrict ___argv,
+                    [[nonnull]] wchar_t const *const *__restrict ___envp) = wspawnvpe;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
 intptr_t _wspawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
                   wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnl;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
-intptr_t _wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
+[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
+intptr_t _wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file,
                    wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnlp;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
 intptr_t _wspawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
                    wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) = wspawnle;
 
-[[decl_include("<features.h>", "<bits/types.h>")]]
-intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
+intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file,
                     wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) = wspawnlpe;
 %#endif /* !_WPROCESS_DEFINED */
 

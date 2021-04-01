@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12c4aed3 */
+/* HASH CRC-32:0x779a2286 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2762,13 +2762,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pclose,(__FILE *__stream),_pcl
 
 #ifdef __USE_NETBSD
 #ifndef __TARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __TARGV char const *const *___argv
 #define __TENVP char const *const *___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __TARGV char *const ___argv[__restrict_arr]
 #define __TENVP char *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 /* >> popenve(3)
  * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',

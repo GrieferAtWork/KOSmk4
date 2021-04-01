@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf229575c */
+/* HASH CRC-32:0xb9b73b17 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,22 +31,22 @@
 DECL_BEGIN
 
 #ifndef __T16ARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __T16ARGV char16_t const *const *__restrict ___argv
 #define __T16ENVP char16_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __T16ARGV char16_t *const ___argv[__restrict_arr]
 #define __T16ENVP char16_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__T16ARGV */
 #ifndef __T32ARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __T32ARGV char32_t const *const *__restrict ___argv
 #define __T32ENVP char32_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __T32ARGV char32_t *const ___argv[__restrict_arr]
 #define __T32ENVP char32_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__T32ARGV */
 #ifndef __KERNEL__
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wexecv)(char16_t const *__restrict path, __T16ARGV);

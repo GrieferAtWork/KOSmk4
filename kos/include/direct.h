@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba864873 */
+/* HASH CRC-32:0xb12b6103 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@
 #include <features.h>
 
 #include <hybrid/typecore.h>
+#include <hybrid/pp/__va_nargs.h>
 
 #include <bits/crt/_diskfree_t.h>
 
@@ -133,17 +134,36 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_mkdir,(char const *__path),(__
 #include <libc/local/direct/_mkdir.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); })
 #endif /* ... */
+/* DOS  normally defines  mkdir() as  the 1-argument  form, but for
+ * compatibility with <sys/stat.h>, we define it as the  2-argument
+ * form, with the addition of a preprocessor overload to also allow
+ * use of the 1-argument variant. */
 #ifndef __mkdir_defined
 #define __mkdir_defined 1
-#ifdef __CRT_HAVE__mkdir
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__path),_mkdir,(__path))
-#elif defined(__CRT_HAVE_mkdir)
-#include <libc/local/direct/_mkdir.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); }
+#ifdef __CRT_HAVE_mkdir
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
+#elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
+#include <libc/local/sys.stat/mkdir.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir))(__pathname, __mode); })
 #else /* ... */
 #undef __mkdir_defined
 #endif /* !... */
 #endif /* !__mkdir_defined */
+
+/* DOS defines mkdir() as a  1-argument function, but we also  need
+ * it to accept 2 arguments. As such, we always define _mkdir()  as
+ * the  1-argument form,  and mkdir()  as the  2-argument one, with
+ * the addition of (if possible) a preprocessor overload of mkdir()
+ * to also accept 1 argument. */
+#if defined(__HYBRID_PP_VA_OVERLOAD) && (defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))) && (defined(__CRT_HAVE__mkdir) || defined(__CRT_HAVE_mkdir))
+#define __PRIVATE_mkdir_1 (_mkdir)
+#define __PRIVATE_mkdir_2 (mkdir)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define mkdir(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mkdir_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define mkdir(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mkdir_, (args))(args)
+#endif /* ... */
+#endif /* __HYBRID_PP_VA_OVERLOAD && (__CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir)) && (__CRT_HAVE__mkdir || __CRT_HAVE_mkdir) */
 
 __SYSDECL_END
 #endif /* __CC__ */

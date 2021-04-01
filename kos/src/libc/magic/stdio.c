@@ -1920,19 +1920,19 @@ int pclose([[nonnull]] $FILE *stream);
 %#ifdef __USE_NETBSD
 %{
 #ifndef __TARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __TARGV char const *const *___argv
 #define __TENVP char const *const *___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __TARGV char *const ___argv[__restrict_arr]
 #define __TENVP char *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 }
 
 %[define(DEFINE_TARGV =
 @@pp_ifndef __TARGV@@
-@@pp_ifdef __USE_DOS@@
+@@pp_ifdef __USE_DOS_ALTERATIONS@@
 #define __TARGV char const *const *___argv
 #define __TENVP char const *const *___envp
 @@pp_else@@

@@ -193,6 +193,16 @@
 #endif /* (__STDC_WANT_SECURE_LIB__ + 0) != 0 */
 #endif /* ... */
 
+/* DOS extensions that change the way that certain symbols are declared.
+ * This mainly affects the const-ness of argv-vectors taken by `execv(2)' */
+#ifdef _DOS_ALTERATIONS_SOURCE
+#if (_DOS_ALTERATIONS_SOURCE + 0) != 0
+#define __USE_DOS_ALTERATIONS 1
+#endif /* (_DOS_ALTERATIONS_SOURCE + 0) != 0 */
+#elif defined(_MSC_VER) && !defined(__USE_ISOC_PURE)
+#define __USE_DOS_ALTERATIONS 1
+#endif /* ... */
+
 /* 64-bit time_t extensions for KOS
  * (By the time of this writing, but I'm guessing by 2038-01-19T03:14:07 this'll
  * be similar to  what glibc will  have to do  if it doesn't  wan'na roll  over)

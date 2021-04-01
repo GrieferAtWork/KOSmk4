@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9b28429 */
+/* HASH CRC-32:0x8178ad44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,13 +98,13 @@ typedef __pid_t pid_t;
 #endif /* !pid_t_defined */
 
 #ifndef __TARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __TARGV char const *const *___argv
 #define __TENVP char const *const *___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __TARGV char *const ___argv[__restrict_arr]
 #define __TENVP char *const ___envp[__restrict_arr]
-#endif /* ! */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 
 typedef struct __posix_spawnattr posix_spawnattr_t;

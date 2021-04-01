@@ -51,22 +51,22 @@ __SYSDECL_BEGIN
 
 %{
 #ifndef __T16ARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __T16ARGV char16_t const *const *__restrict ___argv
 #define __T16ENVP char16_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __T16ARGV char16_t *const ___argv[__restrict_arr]
 #define __T16ENVP char16_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__T16ARGV */
 #ifndef __T32ARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __T32ARGV char32_t const *const *__restrict ___argv
 #define __T32ENVP char32_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __T32ARGV char32_t *const ___argv[__restrict_arr]
 #define __T32ENVP char32_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__T32ARGV */
 }
 

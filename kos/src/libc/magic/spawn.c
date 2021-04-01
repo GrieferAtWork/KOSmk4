@@ -101,13 +101,13 @@ typedef __pid_t pid_t;
 #endif /* !pid_t_defined */
 
 #ifndef __TARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __TARGV char const *const *___argv
 #define __TENVP char const *const *___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __TARGV char *const ___argv[__restrict_arr]
 #define __TENVP char *const ___envp[__restrict_arr]
-#endif /* ! */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 
 typedef struct __posix_spawnattr posix_spawnattr_t;
@@ -117,7 +117,7 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 
 %[define(DEFINE_TARGV =
 @@pp_ifndef __TARGV@@
-@@pp_ifdef __USE_DOS@@
+@@pp_ifdef __USE_DOS_ALTERATIONS@@
 #define __TARGV char const *const *___argv
 #define __TENVP char const *const *___envp
 @@pp_else@@

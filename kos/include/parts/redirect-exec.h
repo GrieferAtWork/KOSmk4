@@ -50,11 +50,11 @@
 
 #include <bits/types.h>
 
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __PRIVATE_ARGV_CONST const
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __PRIVATE_ARGV_CONST /* nothing */
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 
 #ifdef __hybrid_alloca
 #define __PRIVATE_EXEC_CAPTURE_VARARGS0_EX(T, first_arg, out_argv, return_2big)                  \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cb696cc */
+/* HASH CRC-32:0xf16c3ab9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -445,10 +445,10 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, cha
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_kfstatat) && defined(__CRT_KOS_PRIMARY)
 /* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),kfstatat,(__dirfd,__filename,__buf,__flags))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),kfstatat,(__dirfd,__filename,__buf,__flags))
 #elif defined(__CRT_HAVE_kfstatat64) && defined(__CRT_KOS_PRIMARY)
 /* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),kfstatat64,(__dirfd,__filename,__buf,__flags))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),kfstatat64,(__dirfd,__filename,__buf,__flags))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */

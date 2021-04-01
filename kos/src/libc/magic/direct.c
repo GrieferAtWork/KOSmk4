@@ -31,6 +31,8 @@
 
 }%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%[insert:prefix(
+#include <hybrid/pp/__va_nargs.h>
 )]%{
 
 }%[insert:prefix(
@@ -79,7 +81,32 @@ int _mkdir([[nonnull]] char const *path) {
 	return mkdir(path, 0755);
 }
 
-%[insert:guarded_function(mkdir = _mkdir)]
+%{
+/* DOS  normally defines  mkdir() as  the 1-argument  form, but for
+ * compatibility with <sys/stat.h>, we define it as the  2-argument
+ * form, with the addition of a preprocessor overload to also allow
+ * use of the 1-argument variant. */
+}
+%[insert:extern(mkdir)]
+
+
+%{
+
+/* DOS defines mkdir() as a  1-argument function, but we also  need
+ * it to accept 2 arguments. As such, we always define _mkdir()  as
+ * the  1-argument form,  and mkdir()  as the  2-argument one, with
+ * the addition of (if possible) a preprocessor overload of mkdir()
+ * to also accept 1 argument. */
+}%[insert:pp_if(defined(__HYBRID_PP_VA_OVERLOAD) && $has_function(mkdir) && $has_function(_mkdir))]%{
+#define __PRIVATE_mkdir_1 (_mkdir)
+#define __PRIVATE_mkdir_2 (mkdir)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define mkdir(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mkdir_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define mkdir(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mkdir_, (args))(args)
+#endif /* ... */
+}%[insert:pp_endif]%{
+}
 
 
 %{

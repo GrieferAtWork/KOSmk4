@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20d9ace3 */
+/* HASH CRC-32:0xb881765c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,22 +30,22 @@
 DECL_BEGIN
 
 #ifndef __T16ARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __T16ARGV char16_t const *const *__restrict ___argv
 #define __T16ENVP char16_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __T16ARGV char16_t *const ___argv[__restrict_arr]
 #define __T16ENVP char16_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__T16ARGV */
 #ifndef __T32ARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __T32ARGV char32_t const *const *__restrict ___argv
 #define __T32ENVP char32_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __T32ARGV char32_t *const ___argv[__restrict_arr]
 #define __T32ENVP char32_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__T32ARGV */
 
 DECL_END

@@ -616,7 +616,7 @@ int fstatat($fd_t dirfd, [[nonnull]] char const *__restrict filename,
 [[decl_include("<bits/os/stat.h>", "<bits/types.h>")]]
 [[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstatat", "kfstatat64")]]
 int fstatat64($fd_t dirfd, [[nonnull]] char const *__restrict filename,
-              [[nonnull]] struct stat *__restrict buf, $atflag_t flags);
+              [[nonnull]] struct stat64 *__restrict buf, $atflag_t flags);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96d5bdce */
+/* HASH CRC-32:0xc5a2bcb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,13 +42,13 @@
 __SYSDECL_BEGIN
 
 #ifndef __TWARGV
-#ifdef __USE_DOS
+#ifdef __USE_DOS_ALTERATIONS
 #define __TWARGV wchar_t const *const *__restrict ___argv
 #define __TWENVP wchar_t const *const *__restrict ___envp
-#else /* __USE_DOS */
+#else /* __USE_DOS_ALTERATIONS */
 #define __TWARGV wchar_t *const ___argv[__restrict_arr]
 #define __TWENVP wchar_t *const ___envp[__restrict_arr]
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TWARGV */
 #ifndef __wexecv_defined
 #define __wexecv_defined 1
