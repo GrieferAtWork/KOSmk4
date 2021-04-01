@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb12b6103 */
+/* HASH CRC-32:0x32914471 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@
 
 #include <hybrid/typecore.h>
 #include <hybrid/pp/__va_nargs.h>
+#include <bits/types.h>
 
 #include <bits/crt/_diskfree_t.h>
 

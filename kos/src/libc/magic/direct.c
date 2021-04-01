@@ -33,6 +33,8 @@
 #include <hybrid/typecore.h>
 )]%[insert:prefix(
 #include <hybrid/pp/__va_nargs.h>
+)]%[insert:prefix(
+#include <bits/types.h>
 )]%{
 
 }%[insert:prefix(
