@@ -41,9 +41,11 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module.h>
+#include <sched/lockop.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <kos/except.h>
 #include <kos/kernel/paging.h>
@@ -68,6 +70,75 @@
 
 DECL_BEGIN
 
+/************************************************************************/
+/* UserELF Section cache                                                */
+/************************************************************************/
+LIST_HEAD(userelf_module_section_list, REF userelf_module_section);
+
+/* [0..n][lock(uems_cache_lock)][link(ums_cache)]
+ * Global  cache of UserELF section objects. In order to keep UserELF
+ * module sections loaded for a while longer, even after the user has
+ * dropped a reference to them (so-as  to allow for faster lookup  if
+ * accessed again), a global cache of references to UserELF  sections
+ * if kept. This cache is  maintained thus, that when the  associated
+ * UserELF module is destroyed, it  will automatically remove all  of
+ * its sections from this cache (via asynchronous lockop operations),
+ * meaning that this  cache functions to  automatically clean up  the
+ * sections belonging to destroyed modules. */
+PRIVATE struct userelf_module_section_list uems_cache      = LIST_HEAD_INITIALIZER(uems_cache);
+PRIVATE struct atomic_lock /*           */ uems_cache_lock = ATOMIC_LOCK_INIT;
+PRIVATE struct lockop_slist /*          */ uems_cache_lops = SLIST_HEAD_INITIALIZER(uems_cache_lops);
+#define _uems_cache_reap()      _lockop_reap_atomic_lock(&uems_cache_lops, &uems_cache_lock)
+#define uems_cache_reap()       lockop_reap_atomic_lock(&uems_cache_lops, &uems_cache_lock)
+#define uems_cache_tryacquire() atomic_lock_tryacquire(&uems_cache_lock)
+#define uems_cache_acquire()    atomic_lock_acquire(&uems_cache_lock)
+#define uems_cache_acquire_nx() atomic_lock_acquire_nx(&uems_cache_lock)
+#define uems_cache_release()    (atomic_lock_release(&uems_cache_lock), uems_cache_reap())
+#define uems_cache_release_f()  atomic_lock_release(&uems_cache_lock)
+#define uems_cache_acquired()   atomic_lock_acquired(&uems_cache_lock)
+#define uems_cache_available()  atomic_lock_available(&uems_cache_lock)
+
+/* Clear the global cache of UserELF sections, and return a
+ * number  representative of an approximation of the amount
+ * of memory became available as a result of this. */
+DEFINE_SYSTEM_CACHE_CLEAR(uem_clearsections);
+INTERN NOBLOCK size_t NOTHROW(KCALL uem_clearsections)(void) {
+	size_t result = 0;
+	struct userelf_module_section_slist dead;
+	if (!uems_cache_tryacquire())
+		goto done;
+
+	/* Remove all objects from the cache. */
+	SLIST_INIT(&dead);
+	while (!LIST_EMPTY(&uems_cache)) {
+		REF struct userelf_module_section *sect;
+		sect = LIST_FIRST(&uems_cache);
+		LIST_UNBIND(sect, ums_cache);
+		if (ATOMIC_DECFETCH(sect->ms_refcnt) == 0)
+			SLIST_INSERT_HEAD(&dead, sect, _ums_dead);
+	}
+	uems_cache_release_f();
+
+	/* Destroy dead sections. */
+	while (!SLIST_EMPTY(&dead)) {
+		struct userelf_module_section *sect;
+		sect = SLIST_FIRST(&dead);
+		SLIST_REMOVE_HEAD(&dead, _ums_dead);
+		uems_destroy(sect);
+		result += sizeof(struct userelf_module_section);
+	}
+	uems_cache_reap();
+done:
+	return result;
+}
+/************************************************************************/
+
+
+
+
+
+
+/************************************************************************/
 PRIVATE /*ATTR_RETNONNULL*/ NONNULL((1)) UM_ElfW_ShdrP FCALL
 uem_shdrs(struct userelf_module *__restrict self) {
 	UM_ElfW_ShdrP result;
@@ -77,7 +148,6 @@ uem_shdrs(struct userelf_module *__restrict self) {
 	shsize         = self->um_shnum * UM_sizeof(self, UM_ElfW_Shdr);
 	UM_any(result) = (__typeof__(UM_any(result)))kmalloc(shsize, GFP_PREFLT);
 	TRY {
-		/* TODO: mfile_read()! */
 		if (!vm_datablock_isinode(self->md_file))
 			THROW(E_INVALID_ARGUMENT);
 		inode_readallk((struct inode *)self->md_file,
@@ -109,7 +179,6 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 	shstrtab_siz = UM_field(self, *shstrtab, .sh_size);
 	shstrtab_str = (char *)kmalloc((shstrtab_siz + 1) * sizeof(char), GFP_PREFLT);
 	TRY {
-		/* TODO: mfile_read()! */
 		if (!vm_datablock_isinode(self->md_file))
 			THROW(E_INVALID_ARGUMENT);
 		inode_readallk((struct inode *)self->md_file,
@@ -362,6 +431,59 @@ NOTHROW(FCALL uem_free)(struct userelf_module *__restrict self) {
 	kfree(self);
 }
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL uem_unbind_sections_and_destroy_postlop)(struct postlockop *__restrict self) {
+	struct userelf_module *me;
+	me = container_of(self, struct userelf_module, _um_sc_postlop);
+
+	/* Destroy dead sections! */
+	while (!SLIST_EMPTY(&me->_um_deadsect)) {
+		struct userelf_module_section *sect;
+		sect = SLIST_FIRST(&me->_um_deadsect);
+		SLIST_REMOVE_HEAD(&me->_um_deadsect, _ums_dead);
+		uems_destroy(sect);
+	}
+
+	/* Proceed normally with the full destruction
+	 * of the original UserELF module. */
+	module_clear_mnode_pointers_and_destroy(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL uem_unbind_sections_and_destroy_lop)(struct lockop *__restrict self) {
+	struct userelf_module *me;
+	me = container_of(self, struct userelf_module, _um_sc_lop);
+	SLIST_INIT(&me->_um_deadsect);
+
+	/* Remove all sections from the . */
+	while (me->um_shnum) {
+		REF struct userelf_module_section *sect;
+		--me->um_shnum;
+		sect = awref_get(&me->um_sections[me->um_shnum]);
+		if (!sect)
+			continue; /* Section was never allocated or is dead. */
+		if unlikely(!LIST_ISBOUND(sect, ums_cache)) {
+			decref_unlikely(sect);
+			continue; /* Section isn't apart of the cache... */
+		}
+		LIST_UNBIND(sect, ums_cache);
+		decref_nokill(sect); /* The reference from the section cache. */
+
+		/* Drop the reference we got from `awref_get()'
+		 * If this ends up destroying the section, then enqueue said
+		 * destruction to be performed  as part of the  post-lockop. */
+		if (ATOMIC_DECFETCH(sect->ms_refcnt) == 0)
+			SLIST_INSERT(&me->_um_deadsect, sect, _ums_dead);
+	}
+
+	/* Do the rest of the module destruction, as well as the
+	 * cleanup  of dead sections  from within a post-lockop,
+	 * thereby reducing the amount of time spent holding the
+	 * UEMS cache lock. */
+	me->_um_sc_postlop.plo_func = &uem_unbind_sections_and_destroy_postlop;
+	return &me->_um_sc_postlop;
+}
+
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 	decref_unlikely(self->md_file);
@@ -369,6 +491,46 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 	xdecref_unlikely(self->md_fsname);
 	kfree(UM_any(self->um_shdrs));
 	kfree(self->um_shstrtab);
+
+	/* Remove all of the UserELF module's sections from the global sections cache. */
+	while (self->um_shnum) {
+		REF struct userelf_module_section *sect;
+		--self->um_shnum;
+		sect = awref_get(&self->um_sections[self->um_shnum]);
+		if (!sect)
+			continue; /* Section was never allocated or is dead. */
+		if unlikely(!LIST_ISBOUND(sect, ums_cache)) {
+			decref_unlikely(sect);
+			continue; /* Section isn't apart of the cache... */
+		}
+
+		/* Must remove this section from the cache. */
+		if (uems_cache_tryacquire()) {
+			if likely(LIST_ISBOUND(sect, ums_cache)) {
+				LIST_UNBIND(sect, ums_cache);
+				decref_nokill(sect);
+			}
+			uems_cache_release_f();
+			decref_likely(sect);
+			uems_cache_reap();
+		} else {
+			/* Must  use  a lockop  to unbind  the section
+			 * once the UEMS cache lock becomes available.
+			 *
+			 * For this purpose,  we (re-)use the  original
+			 * UserELF module object as a storage container
+			 * for the a lockop descriptor that's then used
+			 * to  remove all of the module's sections from
+			 * the UserELF section cache. */
+			++self->um_shnum; /* Must do the last section once again! */
+			self->_um_sc_lop.lo_func = &uem_unbind_sections_and_destroy_lop;
+			SLIST_ATOMIC_INSERT(&uems_cache_lops, &self->_um_sc_lop, lo_link);
+			decref_unlikely(sect);
+			_uems_cache_reap();
+			return;
+		}
+	}
+
 	module_clear_mnode_pointers_and_destroy(self);
 }
 
@@ -415,6 +577,7 @@ NOTHROW(FCALL uem_nonodes)(struct userelf_module *__restrict self) {
 
 	if (LIST_ISBOUND(self, um_cache)) {
 		/* Remove from the UserELF module cache. */
+		assert(!wasdestroyed(self->md_mman));
 		assert(mman_lock_acquired(self->md_mman));
 		LIST_REMOVE(self, um_cache);
 		DBG_memset(&self->um_cache, 0xcc, sizeof(self->um_cache));
@@ -480,11 +643,33 @@ again:
 		                                             UM_field(self, *shdr, .sh_addr));
 	}
 
+	/* Acquire a lock to the UserELF section cache. */
+	TRY {
+		uems_cache_acquire();
+	} EXCEPT {
+		destroy(result);
+		RETHROW();
+	}
+
 	/* Replace a previously destroyed section object with the new section! */
 	if (!awref_replacedead(&self->um_sections[section_index], result)) {
+		uems_cache_release();
 		destroy(result);
 		goto again;
 	}
+
+	/* Add the new section to the sections cache.
+	 * This is done to prevent the section from being destroyed
+	 * the  second the caller of `module_locksection()' ends up
+	 * dropping the reference we return.
+	 *
+	 * However, sections are  automatically removed  from
+	 * the cache when the associated module is destroyed. */
+	LIST_INSERT_HEAD(&uems_cache, result, ums_cache);
+
+	/* Release the lock from the UserELF section cache. */
+	uems_cache_release();
+
 	return result;
 }
 
@@ -533,7 +718,65 @@ uem_locksection_index(struct userelf_module *__restrict self,
 /* UserELF Module creation                                              */
 /************************************************************************/
 
-/* TODO: Per-MMAN UserELF Module cache! */
+LIST_HEAD(userelf_module_list, userelf_module);
+SLIST_HEAD(userelf_module_slist, userelf_module);
+
+/* [0..n][lock(mman::mm_lock)] Per-mman UserELF Module Cache */
+PRIVATE ATTR_PERMMAN struct REF userelf_module_list
+thismman_uemc = LIST_HEAD_INITIALIZER(thismman_uemc);
+
+
+/* Clear the module cache of the given mman.
+ *
+ * Lazily loaded user-space modules end up being placed in this cache when
+ * first loaded, as  the mnode->module link  doesn't actually represent  a
+ * reference (which is intentional), meaning that a cache of recently used
+ * module objects is needed in order  to keep module objects alive  beyond
+ * the single initial reference returned  by the module lookup  functions.
+ *
+ * The mman module cache never has to be cleared, but may be cleared in
+ * order to free up system memory during a shortage. */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self) {
+	size_t result = 0;
+	struct userelf_module_slist dead;
+
+	/* Try to acquire the lock because we need to be NOBLOCK! */
+	if (!mman_lock_tryacquire(self))
+		goto done;
+
+	/* Clear the UEMC cache. */
+	SLIST_INIT(&dead);
+	while (!LIST_EMPTY(&FORMMAN(self, thismman_uemc))) {
+		REF struct userelf_module *mod;
+		mod = LIST_FIRST(&FORMMAN(self, thismman_uemc));
+		LIST_UNBIND(mod, um_cache);
+		/* Drop  references  originally   held  by  the   cache.
+		 * Modules that end up dying are added to the dead-list,
+		 * where they will be destroyed once we've released  our
+		 * lock to the mman. */
+		if (ATOMIC_DECFETCH(mod->md_refcnt) == 0) {
+			/* Add to the dead-list. */
+			SLIST_INSERT(&dead, mod, _um_dead);
+		}
+	}
+	mman_lock_release_f(self);
+
+	/* Destroy all dead UserELF modules. */
+	while (!SLIST_EMPTY(&dead)) {
+		struct userelf_module *mod;
+		mod = SLIST_FIRST(&dead);
+		SLIST_REMOVE_HEAD(&dead, _um_dead);
+		uem_destroy(mod);
+		result += sizeof(struct userelf_module);
+	}
+
+	/* Reap lock operations relatively late! */
+	mman_lockops_reap(self);
+done:
+	return result;
+}
+
 
 
 /* Special return values for `uem_trycreate()' */
@@ -580,6 +823,34 @@ uem_locksection_index(struct userelf_module *__restrict self,
 PRIVATE REF struct userelf_module *FCALL
 uem_trycreate(struct mman *__restrict self,
               struct mnode *__restrict node) {
+	REF struct userelf_module *result;
+
+	/* Quick check: Is there already a module registered under this node? */
+	result = (REF struct userelf_module *)node->mn_module;
+	if (result != NULL) {
+		if unlikely(result->md_ops != &uem_ops)
+			return NULL; /* Shouldn't happen... */
+
+		/* Try to get a reference to the pointed-to module.
+		 * Note  that  since `mn_module'  contains indirect
+		 * weak  references, we have to tryincref() in case
+		 * the pointed-to module isn't cached, and is being
+		 * destroyed at the moment. */
+		if likely(tryincref(result)) {
+			assertf(result->md_nodecount >= 1,
+			        "We know that there is at least 1 node!");
+			mman_lock_release(self);
+			return result;
+		}
+
+		/* Cleanup dead UserELF modules. */
+		node->mn_module = NULL;
+	}
+
+	/* Check if this node might qualify as a UserELF module. */
+	/* TODO */
+
+
 	COMPILER_IMPURE();
 	(void)self;
 	(void)node;
@@ -620,21 +891,107 @@ again:
 INTERN WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
 uem_aboveaddr(struct mman *__restrict self,
               USER CHECKED void const *addr) {
-	COMPILER_IMPURE();
-	(void)self;
-	(void)addr;
-	/* TODO */
-	return NULL;
+	REF struct userelf_module *result;
+	struct mnode *node;
+	struct mnode_tree_minmax mima;
+again:
+	mman_lock_acquire(self);
+	mman_mappings_minmaxlocate(self, addr, (void *)-1, &mima);
+	node = mima.mm_min;
+	if (!node) {
+		mman_lock_release(self);
+		return NULL;
+	}
+	for (;;) {
+		void *node_minaddr = mnode_getminaddr(node);
+		void *node_maxaddr = mnode_getmaxaddr(node);
+
+		/* Try to create a UserELF module ontop of this node. */
+		result = uem_trycreate(self, node);
+
+		/* Handle all of the different cases... */
+		if (result == NULL) {
+			if (node == mima.mm_max) {
+				mman_lock_release(self);
+				return NULL;
+			}
+			node = mnode_tree_nextnode(node);
+			assert(node);
+		} else if (result == UEM_TRYCREATE_UNLOCKED) {
+			addr = node_minaddr;
+			goto again;
+		} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
+			addr = (byte_t *)node_maxaddr + 1;
+			goto again;
+		} else {
+			/* Got it! */
+			break;
+		}
+	}
+	return result;
 }
 
 INTERN WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
 uem_next(struct mman *__restrict self,
          struct userelf_module *__restrict prev) {
-	COMPILER_IMPURE();
-	(void)self;
-	(void)prev;
-	/* TODO */
-	return NULL;
+	REF struct userelf_module *result;
+	struct mnode *node;
+	struct mnode_tree_minmax mima;
+	void *minaddr;
+	/* Because UserELF modules can be embedded inside of each other,
+	 * we have to start looking  for them starting immediatly  after
+	 * the original node. */
+	minaddr = (byte_t *)prev->md_loadstart + PAGESIZE;
+again:
+	mman_lock_acquire(self);
+	mman_mappings_minmaxlocate(self, minaddr, (void *)-1, &mima);
+	node = mima.mm_min;
+	if (!node) {
+		mman_lock_release(self);
+		return NULL;
+	}
+	for (;;) {
+		void *node_minaddr, *node_maxaddr;
+
+		/* Check if this node is known to be bound to the old module.
+		 * If it is, then simply skip this node! */
+		if (node->mn_module == prev) {
+nextnode:
+			if (node == mima.mm_max) {
+				mman_lock_release(self);
+				return NULL;
+			}
+			node = mnode_tree_nextnode(node);
+			assert(node);
+			continue;
+		}
+
+		node_minaddr = mnode_getminaddr(node);
+		node_maxaddr = mnode_getmaxaddr(node);
+
+		/* Try to create a UserELF module ontop of this node. */
+		result = uem_trycreate(self, node);
+
+		/* Handle all of the different cases... */
+		if (result == NULL) {
+			goto nextnode;
+		} else if (result == UEM_TRYCREATE_UNLOCKED) {
+			minaddr = node_minaddr;
+			goto again;
+		} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
+			minaddr = (byte_t *)node_maxaddr + 1;
+			goto again;
+		} else if (result == prev) {
+			/* Got the same module all over again... (skip this node) */
+			minaddr = (byte_t *)node_maxaddr + 1;
+			decref_nokill(result);
+			goto again;
+		} else {
+			/* Found the actual next UserELF module! */
+			break;
+		}
+	}
+	return result;
 }
 
 

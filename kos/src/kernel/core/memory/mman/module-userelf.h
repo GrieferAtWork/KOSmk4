@@ -70,15 +70,22 @@ typedef UM_ElfW(Chdr) UM_ElfW_Chdr;
 
 
 struct userelf_module_section: module_section {
-	UM_ElfW_Shdr      *ums_shdr;     /* [1..1][const] Section header. */
-	USER CHECKED void *ums_useraddr; /* [const] User-space address of `SHF_ALLOC' sections, or `(void *)-1' for others. */
-	KERNEL void       *ums_kernaddr; /* [0..1][lock(WRITE_ONCE)] Lazily allocated address of this section's
-	                                  * kernel mapping. If not already mapped, set to `(void *)-1' instead. */
-	KERNEL void       *ums_infladdr; /* [0..1][lock(WRITE_ONCE)] Inflated section address. */
-	size_t             ums_inflsize; /* [0..1][lock(WRITE_ONCE)] Inflated section size. */
+	UM_ElfW_Shdr                              *ums_shdr;     /* [1..1][const] Section header. */
+	USER CHECKED void                         *ums_useraddr; /* [const] User-space address of `SHF_ALLOC' sections, or `(void *)-1' for others. */
+	KERNEL void                               *ums_kernaddr; /* [0..1][lock(WRITE_ONCE)] Lazily allocated address of this section's
+	                                                          * kernel mapping. If not already mapped, set to `(void *)-1' instead. */
+	KERNEL void                               *ums_infladdr; /* [0..1][lock(WRITE_ONCE)] Inflated section address. */
+	size_t                                     ums_inflsize; /* [0..1][lock(WRITE_ONCE)] Inflated section size. */
+	union {
+		LIST_ENTRY(REF userelf_module_section) ums_cache;    /* [0..1][lock(INTERN(uems_cache_lock))]  Link entry for the UserELF section cache.
+		                                                      * When the associated UserELF module is destroyed, all of its sections are removed
+		                                                      * from the section cache. */
+		SLIST_ENTRY(userelf_module_section)   _ums_dead;     /* Used internally for async destruction of dead sections. */
+	};
 };
 
 AWREF(uems_awref, userelf_module_section);
+SLIST_HEAD(userelf_module_section_slist, userelf_module_section);
 
 struct userelf_module: module {
 	union {
@@ -90,6 +97,9 @@ struct userelf_module: module {
 		                                                      * as per use of the `mo_nonodes' operator. */
 		Toblockop(struct mman)                _um_cc_lop;    /* Used for async destruction as the result of removal from the UserELF cache. */
 		Tobpostlockop(struct mman)            _um_cc_postlop;/* *ditto* */
+		struct lockop                         _um_sc_lop;    /* Used for async removal of sections from the UserELF section cache. */
+		struct postlockop                     _um_sc_postlop;/* *ditto* */
+		SLIST_ENTRY(userelf_module)           _um_dead;      /* Used internally to chain dead UserELF modules. */
 	};
 	pos_t                                      um_phoff;     /* [const] == Elf_Ehdr::e_phoff. */
 	pos_t                                      um_shoff;     /* [const] == Elf_Ehdr::e_shoff. */
@@ -98,7 +108,10 @@ struct userelf_module: module {
 	uint16_t                                   um_shstrndx;  /* [const] == Elf_Ehdr::e_shstrndx. (< ue_shnum) */
 	uint16_t                                  _um_pad;       /* ... */
 	UM_ElfW_ShdrP                              um_shdrs;     /* [0..1][lock(WRICE_ONCE)] Section headers */
-	char                                      *um_shstrtab;  /* [0..1][lock(WRITE_ONCE)][owned] Section headers string table. */
+	union {
+		char                                  *um_shstrtab;  /* [0..1][lock(WRITE_ONCE)][owned] Section headers string table. */
+		struct userelf_module_section_slist   _um_deadsect;  /* [link(_ums_dead)] Used internally for async destruction of dead sections. */
+	};
 	COMPILER_FLEXIBLE_ARRAY(struct uems_awref, um_sections); /* [0..1][lock(WRITE_ONCE)][ue_shnum] Section cache. */
 };
 
@@ -120,10 +133,15 @@ INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uem_nonodes)(struct userelf_modul
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection(struct userelf_module *__restrict self, USER CHECKED char const *section_name);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection_index(struct userelf_module *__restrict self, unsigned int section_index);
 
-/* Genric UserELF module creation functions. */
+/* Generic UserELF module creation functions. */
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_next(struct mman *__restrict self, struct userelf_module *__restrict prev);
+
+/* Clear the global cache of UserELF sections, and return a
+ * number  representative of an approximation of the amount
+ * of memory became available as a result of this. */
+INTDEF NOBLOCK size_t NOTHROW(KCALL uem_clearsections)(void);
 
 DECL_END
 #endif /* CONFIG_HAVE_USERELF_MODULES */

@@ -171,7 +171,7 @@ struct module {
 	                                            * once for any  given module, the  `mo_nonodes'
 	                                            * operator must be invoked. */
 	struct module_ops const    *md_ops;        /* [1..1][const] Module operators. */
-	REF struct mman            *md_mman;       /* [1..1][const] Associated mman. */
+	WEAK REF struct mman       *md_mman;       /* [1..1][const] Associated mman. */
 	uintptr_t                   md_loadaddr;   /* [const] Load address of the module. */
 	void                       *md_loadstart;  /* [const] Lowest address mapped by this module. */
 	void                       *md_loadend;    /* [const] Greatest address mapped by this module. */
@@ -213,12 +213,12 @@ DEFINE_REFCOUNT_FUNCTIONS(struct module, md_refcnt, module_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct module, md_weakrefcnt, module_free)
 
 /* Clear all of the mman->mnode->module self-pointers associated with `self',
- * drop a reference from  `self->md_mman', and finally `weakdecref(self)'  in
- * order to finalize the destruction of `self'
+ * drop a weak reference from `self->md_mman', and finally `weakdecref(self)'
+ * in order to finalize the destruction of `self'
  * Note that the process of clearing self-pointers, as well as the subsequent
  * destruction of `self' may be  performed asynchronously through use of  the
  * associated mman's lockop system.
- * NOTE: This function inherits a reference to `self->md_mman',
+ * NOTE: This function inherits a weak reference to `self->md_mman',
  *       as well as a weak reference to `self'! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict self);
@@ -294,12 +294,10 @@ FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *p
  * module objects is needed in order  to keep module objects alive  beyond
  * the single initial reference returned  by the module lookup  functions.
  *
- * The mman module cache may be cleared
- */
-FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self);
-
-FUNDEF NOBLOCK size_t NOTHROW(FCALL clear_module_section_cache)(void);
-
+ * The mman module cache never has to be cleared, but may be cleared in
+ * order to free up system memory during a shortage. */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self);
 
 
 DECL_END

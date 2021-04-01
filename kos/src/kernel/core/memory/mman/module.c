@@ -105,12 +105,11 @@ NOTHROW(FCALL module_remove_from_mman)(struct module *__restrict self,
 	size_t nodecount = 0;
 #endif /* !NDEBUG */
 #if defined(NDEBUG) && !defined(__OPTIMIZE_SIZE__)
-	/* Fastpass optimization: If there aren't any nodes
+	/* Fastpass  optimization: If there aren't any nodes
 	 * left, then we don't actually have to do anything! */
 	if (self->md_nodecount == 0)
 		return;
 #endif /* NDEBUG && !__OPTIMIZE_SIZE__ */
-
 
 	mnode_tree_minmaxlocate(mm->mm_mappings,
 	                        (byte_t *)self->md_loadstart,
@@ -154,7 +153,11 @@ NOTHROW(FCALL module_mman_cleanup_postlop)(Tobpostlockop(struct mman) *__restric
 	me = container_of(self, struct module, _md_mmpostlop);
 	/* Drop inherited references */
 	assert(me->md_mman == mm);
-	decref_unlikely(mm);
+	DBG_memset(&me->md_mman, 0xcc, sizeof(me->md_mman));
+	decref_nokill(mm); /* nokill, because in order to get here, whoever ended
+	                    * up reaping lock operations must still be holding a
+	                    * reference to the mman, meaning that this reference
+	                    * can't possibly be the last one of them all! */
 	weakdecref_likely(me);
 }
 
@@ -175,34 +178,50 @@ NOTHROW(FCALL module_mman_cleanup_lop)(Toblockop(struct mman) *__restrict self,
 
 
 /* Clear all of the mman->mnode->module self-pointers associated with `self',
- * drop a reference from  `self->md_mman', and finally `weakdecref(self)'  in
- * order to finalize the destruction of `self'
+ * drop a weak reference from `self->md_mman', and finally `weakdecref(self)'
+ * in order to finalize the destruction of `self'
  * Note that the process of clearing self-pointers, as well as the subsequent
  * destruction of `self' may be  performed asynchronously through use of  the
  * associated mman's lockop system.
- * NOTE: This function inherits a reference to `self->md_mman',
+ * NOTE: This function inherits a weak reference to `self->md_mman',
  *       as well as a weak reference to `self'! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict self) {
 	REF struct mman *mm;
 	mm = self->md_mman;
 
+	/* Try to acquire a proper reference to the associated mman.
+	 * Note that if the mman had already been destroyed, then we
+	 * can  assume that the  mman has already  died, and that we
+	 * don't have to  manually clear self-pointers  from all  of
+	 * its mem-nodes! */
+	if (!tryincref(mm)) {
+		DBG_memset(&self->md_mman, 0xcc, sizeof(self->md_mman));
+		weakdecref_likely(self);
+		weakdecref_unlikely(mm);
+		return;
+	}
+
 	/* Remove module-self-pointers from `self' */
 	if (mman_lock_tryacquire(mm)) {
 		module_remove_from_mman(self, mm);
 		mman_lock_release_f(mm);
+		DBG_memset(&self->md_mman, 0xcc, sizeof(self->md_mman));
 		weakdecref_likely(self);
-		decref_unlikely(mm);
 		mman_lockops_reap(mm);
 	} else {
 		/* Enqueue a lockop to clear all of our mnode->module self-pointers.
 		 * NOTE: As  far as semantics  go, we let `module_mman_cleanup_lop()'
-		 *       inheirt the reference to `mm', as well as the weak reference
+		 *       inherit the reference to `mm', as well as the weak reference
 		 *       to `self'! */
+		incref(mm); /* Need a second reference to drop below so we can safely reap! */
 		self->_md_mmlop.olo_func = &module_mman_cleanup_lop;
-		SLIST_ATOMIC_INSERT(&FORMMAN(mm, thismman_lockops), &self->_md_mmlop, olo_link);
+		SLIST_ATOMIC_INSERT(&FORMMAN(mm, thismman_lockops),
+		                    &self->_md_mmlop, olo_link);
 		_mman_lockops_reap(mm);
 	}
+	decref_unlikely(mm);
+	weakdecref_unlikely(mm);
 }
 
 
@@ -320,6 +339,26 @@ NOTHROW(FCALL module_next_nx)(struct module *prev) {
 	}
 	return result;
 }
+
+
+#ifndef CONFIG_HAVE_USERELF_MODULES
+/* Clear the module cache of the given mman.
+ *
+ * Lazily loaded user-space modules end up being placed in this cache when
+ * first loaded, as  the mnode->module link  doesn't actually represent  a
+ * reference (which is intentional), meaning that a cache of recently used
+ * module objects is needed in order  to keep module objects alive  beyond
+ * the single initial reference returned  by the module lookup  functions.
+ *
+ * The mman module cache never has to be cleared, but may be cleared in
+ * order to free up system memory during a shortage. */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self) {
+	COMPILER_IMPURE();
+	(void)self;
+	return 0;
+}
+#endif /* !CONFIG_HAVE_USERELF_MODULES */
 
 
 
