@@ -229,7 +229,7 @@ mnode_create_lockram(size_t num_pages) {
 	result->mn_partoff      = 0;
 	result->mn_link.le_next = NULL;
 	result->mn_link.le_prev = &part->mp_share.lh_first;
-	result->_mn_module      = NULL;
+	result->mn_module       = NULL;
 	part->mp_share.lh_first = result;
 	LIST_ENTRY_UNBOUND_INIT(&result->mn_writable);
 	return result;
@@ -240,6 +240,7 @@ NOTHROW(KCALL vm_node_destroy_locked_ram)(struct mnode *__restrict self) {
 	assert(self->mn_part);
 	assert(self->mn_fspath == NULL);
 	assert(self->mn_fsname == NULL);
+	assert(self->mn_module == NULL);
 	assert(self->mn_link.le_prev == &self->mn_part->mp_share.lh_first);
 	assert(self->mn_link.le_next == NULL);
 	assert(self->mn_part->mp_share.lh_first == self);
@@ -363,8 +364,8 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	cpu_node2->mn_fspath  = NULL;
 	cpu_node2->mn_fsname  = NULL;
 	cpu_node2->mn_partoff = 0;
+	cpu_node2->mn_module  = NULL;
 	DBG_memset(&cpu_node2->mn_writable, 0xcc, sizeof(cpu_node2->mn_writable));
-	cpu_node2->_mn_module = 0;
 	DBG_memset(&cpu_node2->mn_link, 0xcc, sizeof(cpu_node2->mn_link));
 
 	/* Insert the IOB VM node into the kernel VM. */

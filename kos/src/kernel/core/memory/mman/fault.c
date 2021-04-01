@@ -32,6 +32,7 @@
 #include <kernel/mman/fault.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
@@ -786,7 +787,9 @@ done_mark_changed:
 				LIST_INSERT_HEAD(&part->mp_copy, lonode, mn_link);
 				lonode->mn_fspath  = xincref(node->mn_fspath);
 				lonode->mn_fsname  = xincref(node->mn_fsname);
-				lonode->_mn_module = NULL; /* XXX: Inherit from `node'? */
+				lonode->mn_module  = node->mn_module;
+				if (lonode->mn_module)
+					module_inc_nodecount(lonode->mn_module);
 
 				node->mn_minaddr = (byte_t *)self->mfl_addr;
 				node->mn_partoff += mnode_getsize(lonode); /* Potentially needed for `hinode->mn_partoff' */
@@ -823,8 +826,10 @@ done_mark_changed:
 				LIST_INSERT_HEAD(&part->mp_copy, hinode, mn_link);
 				hinode->mn_fspath  = xincref(node->mn_fspath);
 				hinode->mn_fsname  = xincref(node->mn_fsname);
-				hinode->_mn_module = NULL; /* XXX: Inherit from `node'? */
-				node->mn_maxaddr   = (byte_t *)endaddr - 1;
+				hinode->mn_module  = node->mn_module;
+				if (hinode->mn_module)
+					module_inc_nodecount(hinode->mn_module);
+				node->mn_maxaddr = (byte_t *)endaddr - 1;
 
 				/* Consume the first p-copy node. */
 				self->mfl_pcopy[0] = self->mfl_pcopy[1];

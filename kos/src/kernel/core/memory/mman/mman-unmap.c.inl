@@ -24,12 +24,13 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/map.h>
-#include <kernel/mman/sync.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/sync.h>
 #include <kernel/panic.h>
 
 #include <hybrid/align.h>
@@ -42,6 +43,14 @@
 #include <string.h>
 
 DECL_BEGIN
+
+#ifndef DBG_memset
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+#endif /* !DBG_memset */
 
 #ifdef DEFINE_mman_unmap
 /* Unmap all memory mappings within the given address range.
@@ -238,6 +247,11 @@ again_acquire_lock:
 		/* Remove the node from the writable-list in case it was apart of it. */
 		if (LIST_ISBOUND(node, mn_writable))
 			LIST_REMOVE(node, mn_writable);
+
+		/* Keep track of how many nodes are mapping a particular module. */
+		if (node->mn_module)
+			module_dec_nodecount(node->mn_module);
+		DBG_memset(&node->mn_module, 0xcc, sizeof(node->mn_module));
 
 		/* Enqueue the node to-be deleted once we've released our lock to `self' */
 		SLIST_INSERT(&deleted_nodes, node, _mn_dead);

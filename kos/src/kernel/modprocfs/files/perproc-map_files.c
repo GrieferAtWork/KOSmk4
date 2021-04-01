@@ -338,8 +338,8 @@ unlock_threadvm_and_goto_err:
 		}
 		/* Found the node!
 		 * Now to load its filesystem path and name. */
-		fspath = node->vn_fspath;
-		fsname = node->vn_fsname;
+		fspath = node->mn_fspath;
+		fsname = node->mn_fsname;
 		if unlikely(!fspath || !fsname)
 			goto unlock_threadvm_and_goto_err;
 		incref(fspath);

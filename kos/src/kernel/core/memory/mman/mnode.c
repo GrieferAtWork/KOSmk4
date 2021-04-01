@@ -30,6 +30,7 @@
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
@@ -372,6 +373,9 @@ reload_lonode_after_mman_lock:
 	hinode->mn_fsname  = xincref(lonode->mn_fsname);
 	hinode->mn_mman    = self;
 	hinode->mn_partoff = lonode->mn_partoff + (size_t)((byte_t *)addr_where_to_split - lonode->mn_minaddr);
+	hinode->mn_module  = lonode->mn_module;
+	if (hinode->mn_module)
+		module_inc_nodecount(hinode->mn_module);
 
 	/* At this point, we've managed to allocate the missing  hi-node.
 	 * Deal with the simple case where the original node doesn't have
@@ -386,6 +390,11 @@ reload_lonode_after_mman_lock:
 		incref(part);
 		lonode_minaddr = lonode->mn_minaddr;
 		lonode_maxaddr = lonode->mn_maxaddr;
+		if (hinode->mn_module) {
+			assert(hinode->mn_module->md_nodecount >= 2);
+			--hinode->mn_module->md_nodecount;
+		}
+		DBG_memset(&hinode->mn_module, 0xcc, sizeof(hinode->mn_module));
 		mman_lock_release(self);
 		if (result) {
 			unlockinfo_xunlock(unlock);

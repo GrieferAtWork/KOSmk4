@@ -200,15 +200,16 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	 * from re-assigning its  address range  for other  purposes. */
 	last_heap->sh_node.mn_minaddr = (byte_t *)new_heap;
 	last_heap->sh_node.mn_maxaddr = (byte_t *)new_heap + min_size - 1;
-	last_heap->sh_node.vn_prot          = VM_PROT_READ | VM_PROT_WRITE;
-	last_heap->sh_node.vn_flags         = VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE;
-	last_heap->sh_node.vn_vm            = &vm_kernel;
-	last_heap->sh_node.vn_part          = NULL;
-	last_heap->sh_node.vn_fspath        = NULL;
-	last_heap->sh_node.vn_fsname        = NULL;
-	last_heap->sh_node.vn_link.ln_pself = NULL;
-	last_heap->sh_node.vn_link.ln_next  = NULL;
-	vm_node_insert(&last_heap->sh_node);
+	last_heap->sh_node.mn_flags   = (MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_MPREPARED |
+	                                 MNODE_F_NOMERGE | MNODE_F_NOSPLIT);
+	last_heap->sh_node.mn_mman    = &mman_kernel;
+	last_heap->sh_node.mn_part    = NULL;
+	last_heap->sh_node.mn_fspath  = NULL;
+	last_heap->sh_node.mn_fsname  = NULL;
+	last_heap->sh_node.mn_module  = NULL;
+	last_heap->sh_node.mn_link.le_prev = NULL;
+	last_heap->sh_node.mn_link.le_next = NULL;
+	mman_mappings_insert(&mman_kernel, &last_heap->sh_node);
 	/* Remember the new heap. */
 	new_heap->sh_next  = NULL;
 	new_heap->sh_size  = min_size;

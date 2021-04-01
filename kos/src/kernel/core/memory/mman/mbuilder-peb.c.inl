@@ -300,6 +300,7 @@ string_size_changed:
 	assert(stolen_node);
 	assert(mbnode_getminaddr(stolen_node) == peb_temp_base);
 	assert(mbnode_getsize(stolen_node) == peb_total_size);
+	assert(stolen_node->_mbn_module == NULL);
 	assert(stolen_node->mbn_part);
 	assert(stolen_node->mbn_part->mp_share.lh_first == (struct mnode *)stolen_node);
 

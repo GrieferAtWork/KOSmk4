@@ -319,6 +319,8 @@ NOTHROW(FCALL is_coreheap_node)(struct mnode *__restrict node) {
 		goto nope;
 	if (node->mn_fsname != NULL)
 		goto nope;
+	if (node->mn_module != NULL)
+		goto nope;
 	if (node->mn_partoff != 0)
 		goto nope;
 	assert(node->mn_mman == &mman_kernel);
@@ -424,6 +426,7 @@ NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
 	/* Fix-up mappings. */
 	mman_mappings_removenode(&mman_kernel, lo);
 	mman_mappings_removenode(&mman_kernel, hi);
+	assert(!lo->mn_module && !hi->mn_module);
 	lo->mn_maxaddr = hi->mn_maxaddr;
 	lopart->mp_maxaddr += mnode_getsize(hi);
 	mman_mappings_insert(&mman_kernel, lo);
@@ -557,6 +560,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	node->mn_partoff      = 0;
 	node->mn_link.le_next = NULL;
 	node->mn_link.le_prev = &part->mp_share.lh_first;
+	node->mn_module       = NULL;
 
 	/* Load the mem-node into the kernel mman. */
 	LIST_INSERT_HEAD(&mman_kernel.mm_writable, node, mn_writable);
@@ -631,8 +635,9 @@ mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 }
 
 
-PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
-NOTHROW(FCALL lockop_coreheap_free_callback)(struct lockop *__restrict self) {
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL lockop_coreheap_free_callback)(Toblockop(struct mman) *__restrict self,
+                                             struct mman *__restrict UNUSED(mm)) {
 	union mcorepart *me;
 	me = (union mcorepart *)self;
 	mcoreheap_free_locked(me);
@@ -648,10 +653,10 @@ NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
 		mman_lock_release(&mman_kernel);
 	} else {
 		/* Must enqueue a lock operation for the kernel mman. */
-		struct lockop *lop;
-		lop = (struct lockop *)part;
-		lop->lo_func = &lockop_coreheap_free_callback;
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, lo_link);
+		Toblockop(struct mman) *lop;
+		lop = (Toblockop(struct mman) *)part;
+		lop->olo_func = &lockop_coreheap_free_callback;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, olo_link);
 		_mman_lockops_reap(&mman_kernel);
 	}
 }

@@ -154,7 +154,7 @@ typedef size_t mpart_reladdr_t;
 //	MNODE_INIT_mn_partoff(0),
 //	MNODE_INIT_mn_link({ NULL, FILL_ME }),
 //	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-//	MNODE_INIT__mn_module(NULL)
+//	MNODE_INIT_mn_module(NULL) 
 #endif
 
 struct mnode {
@@ -252,43 +252,33 @@ struct mnode {
 	                                                  * Nodes  are  removed  from this  list  by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
 #endif /* !__INTELLISENSE__ */
-	/* TODO: `struct usermod'   and   `struct driver'    integration   right    here!
-	 *       For this,  add  a  field  [0..1]  `union { REF struct usermod *, ... }',
-	 *       For `mman_kernel', it'll always be a `driver', and elsewhere a `usermod'
-	 * The  field  itself would  simply  behave the  same  as `mn_fspath'/`mn_fspath'
-	 * already do, with the addition of being [lock(mn_mman->mm_lock && WRITE_ONCE)],
-	 * thus allowing for lazy initialization.  (But also note that  in the case of  a
-	 * driver, it shouldn't be  a `REF', but rather  an implicit weak-ref, since  the
-	 * node shouldn't prevent the driver from being destroyed, and the driver  should
-	 * automatically get rid of all nodes it may be mapping during unloading)
-	 *
-	 * NOTE: Since the current usermod/driver system isn't integrated into the old vm
-	 *       system, this is something that should only be tackled once the new  mman
-	 *       has been enabled in all other aspects! */
-	void *_mn_module;
+	WEAK struct module                 *mn_module;   /* [0..1][lock(mn_mman->mm_lock)] Node executable module binding. (s.a. <kernel/mman/module.h>)
+	                                                  * The module pointed-to by this field is weak, in that the pointed-to object may have already
+	                                                  * been destroyed. For this purpose, the module actually getting destroyed will result in it
+	                                                  * going over all nodes in its address range, and clearing all of its self-pointers. */
 };
 
 #ifdef __WANT_MNODE_INIT
 #ifdef __WANT_MNODE__mn_dead
-#define MNODE_INIT_mn_mement(...)           { __VA_ARGS__ }
+#define MNODE_INIT_mn_mement(...)         { __VA_ARGS__ }
 #else /* __WANT_MNODE__mn_dead */
-#define MNODE_INIT_mn_mement(...)           __VA_ARGS__
+#define MNODE_INIT_mn_mement(...)         __VA_ARGS__
 #endif /* !__WANT_MNODE__mn_dead */
-#define MNODE_INIT_mn_minaddr(mn_minaddr)   (byte_t *)(mn_minaddr)
-#define MNODE_INIT_mn_maxaddr(mn_maxaddr)   (byte_t *)(mn_maxaddr)
-#define MNODE_INIT_mn_flags(mn_flags)       mn_flags
-#define MNODE_INIT_mn_part(mn_part)         mn_part
-#define MNODE_INIT_mn_fspath(mn_fspath)     mn_fspath
-#define MNODE_INIT_mn_fsname(mn_fsname)     mn_fsname
+#define MNODE_INIT_mn_minaddr(mn_minaddr) (byte_t *)(mn_minaddr)
+#define MNODE_INIT_mn_maxaddr(mn_maxaddr) (byte_t *)(mn_maxaddr)
+#define MNODE_INIT_mn_flags(mn_flags)     mn_flags
+#define MNODE_INIT_mn_part(mn_part)       mn_part
+#define MNODE_INIT_mn_fspath(mn_fspath)   mn_fspath
+#define MNODE_INIT_mn_fsname(mn_fsname)   mn_fsname
 #ifdef __WANT_MNODE__mn_alloc
-#define MNODE_INIT_mn_mman(mn_mman)         { mn_mman }
+#define MNODE_INIT_mn_mman(mn_mman)       { mn_mman }
 #else /* __WANT_MNODE__mn_alloc */
-#define MNODE_INIT_mn_mman(mn_mman)         mn_mman
+#define MNODE_INIT_mn_mman(mn_mman)       mn_mman
 #endif /* !__WANT_MNODE__mn_alloc */
-#define MNODE_INIT_mn_partoff(mn_partoff)   mn_partoff
-#define MNODE_INIT_mn_link(...)             __VA_ARGS__
-#define MNODE_INIT_mn_writable(...)         __VA_ARGS__
-#define MNODE_INIT__mn_module(_mn_module)   _mn_module
+#define MNODE_INIT_mn_partoff(mn_partoff) mn_partoff
+#define MNODE_INIT_mn_link(...)           __VA_ARGS__
+#define MNODE_INIT_mn_writable(...)       __VA_ARGS__
+#define MNODE_INIT_mn_module(mn_module)   mn_module
 #endif /* __WANT_MNODE_INIT */
 
 

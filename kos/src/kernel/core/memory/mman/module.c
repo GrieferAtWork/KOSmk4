@@ -1,0 +1,329 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_SRC_MEMORY_MODULE_C
+#define GUARD_KERNEL_SRC_MEMORY_MODULE_C 1
+#define __WANT_MODULE__md_mmlop
+#define _KOS_SOURCE 1
+
+#include <kernel/compiler.h>
+
+#include <fs/node.h>
+#include <fs/vfs.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
+#include <kernel/paging.h>
+
+#include <assert.h>
+#include <format-printer.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <string.h>
+
+/**/
+#include "module-userelf.h"
+
+DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
+/* Print  the absolute filesystem path or name (filesystem
+ * path excluding the leading  path) of the given  module.
+ * If the module doesn't have a path/name (s.a. the macros
+ * above), then nothing will be printed. */
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
+module_printpath(struct module *__restrict self,
+                 pformatprinter printer, void *arg) {
+	ssize_t result = 0;
+	if unlikely(self->md_fsname == NULL)
+		goto done;
+	if (self->md_fspath) {
+		result = path_printent(self->md_fspath,
+		                       self->md_fsname->de_name,
+		                       self->md_fsname->de_namelen,
+		                       printer, arg);
+	} else if (self->md_fsname->de_name[0] == '/') {
+		result = (*printer)(arg,
+		                    self->md_fsname->de_name,
+		                    self->md_fsname->de_namelen);
+	}
+done:
+	return result;
+}
+
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
+module_printname(struct module *__restrict self,
+                 pformatprinter printer, void *arg) {
+	ssize_t result = 0;
+	char const *name;
+	u16 namelen;
+	if unlikely(self->md_fsname == NULL)
+		goto done;
+	name    = self->md_fsname->de_name;
+	namelen = self->md_fsname->de_namelen;
+	if (name[0] == '/') {
+		char const *tail;
+		tail    = (char const *)rawmemrchr(name + namelen, '/') + 1;
+		namelen = (size_t)((name + namelen) - tail);
+		name    = tail;
+	}
+	result = (*printer)(arg, name, namelen);
+done:
+	return result;
+}
+
+
+/* Whilst holding a lock to `mm', clear all  mnode->module
+ * pointers that point to `self' by setting them to `NULL' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL module_remove_from_mman)(struct module *__restrict self,
+                                       struct mman *__restrict mm) {
+	struct mnode_tree_minmax mima;
+	struct mnode *node;
+#ifndef NDEBUG
+	size_t nodecount = 0;
+#endif /* !NDEBUG */
+#if defined(NDEBUG) && !defined(__OPTIMIZE_SIZE__)
+	/* Fastpass optimization: If there aren't any nodes
+	 * left, then we don't actually have to do anything! */
+	if (self->md_nodecount == 0)
+		return;
+#endif /* NDEBUG && !__OPTIMIZE_SIZE__ */
+
+
+	mnode_tree_minmaxlocate(mm->mm_mappings,
+	                        (byte_t *)self->md_loadstart,
+	                        (byte_t *)self->md_loadend - 1,
+	                        &mima);
+	if unlikely(!mima.mm_min) {
+#ifndef NDEBUG
+		assert(self->md_nodecount == 0);
+#endif /* !NDEBUG */
+		return;
+	}
+	for (node = mima.mm_min;;) {
+
+		/* Clear module self-pointers. */
+		if (node->mn_module == self) {
+#ifndef NDEBUG
+			++nodecount;
+#endif /* !NDEBUG */
+			node->mn_module = NULL;
+		}
+
+		if (node == mima.mm_max)
+			break;
+		node = mnode_tree_nextnode(node);
+		assert(node);
+	}
+#ifndef NDEBUG
+	assertf(nodecount == self->md_nodecount,
+	        "Wrong # of mnodes referencing this module:\n"
+	        "Expected: %" PRIuSIZ "\n"
+	        "Actually: %" PRIuSIZ "\n",
+	        self->md_nodecount, nodecount);
+	DBG_memset(&self->md_nodecount, 0xcc, sizeof(self->md_nodecount));
+#endif /* !NDEBUG */
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL module_mman_cleanup_postlop)(Tobpostlockop(struct mman) *__restrict self,
+                                           REF struct mman *__restrict mm) {
+	WEAK REF struct module *me;
+	me = container_of(self, struct module, _md_mmpostlop);
+	/* Drop inherited references */
+	assert(me->md_mman == mm);
+	decref_unlikely(mm);
+	weakdecref_likely(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL module_mman_cleanup_lop)(Toblockop(struct mman) *__restrict self,
+                                       REF struct mman *__restrict mm) {
+	WEAK REF struct module *me;
+
+	/* Clear all mnode->module self-pointers. */
+	me = container_of(self, struct module, _md_mmlop);
+	assert(me->md_mman == mm);
+	module_remove_from_mman(me, mm);
+
+	/* Setup a post-lock operation to drop all of our inherited references. */
+	me->_md_mmpostlop.oplo_func = &module_mman_cleanup_postlop;
+	return &me->_md_mmpostlop;
+}
+
+
+/* Clear all of the mman->mnode->module self-pointers associated with `self',
+ * drop a reference from  `self->md_mman', and finally `weakdecref(self)'  in
+ * order to finalize the destruction of `self'
+ * Note that the process of clearing self-pointers, as well as the subsequent
+ * destruction of `self' may be  performed asynchronously through use of  the
+ * associated mman's lockop system.
+ * NOTE: This function inherits a reference to `self->md_mman',
+ *       as well as a weak reference to `self'! */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict self) {
+	REF struct mman *mm;
+	mm = self->md_mman;
+
+	/* Remove module-self-pointers from `self' */
+	if (mman_lock_tryacquire(mm)) {
+		module_remove_from_mman(self, mm);
+		mman_lock_release_f(mm);
+		weakdecref_likely(self);
+		decref_unlikely(mm);
+		mman_lockops_reap(mm);
+	} else {
+		/* Enqueue a lockop to clear all of our mnode->module self-pointers.
+		 * NOTE: As  far as semantics  go, we let `module_mman_cleanup_lop()'
+		 *       inheirt the reference to `mm', as well as the weak reference
+		 *       to `self'! */
+		self->_md_mmlop.olo_func = &module_mman_cleanup_lop;
+		SLIST_ATOMIC_INSERT(&FORMMAN(mm, thismman_lockops), &self->_md_mmlop, olo_link);
+		_mman_lockops_reap(mm);
+	}
+}
+
+
+
+/* Return a reference to the module which can be found at the given address.
+ * For this purpose, that address may  either be a kernel-space address,  in
+ * which  case a pointer to the relevant driver  is returned, or it may be a
+ * user-space address, in  which case  memory mappings of  that address  are
+ * inspected in order to check if a module has been loaded to that location.
+ * If no module exists at `addr', return `NULL'. */
+PUBLIC WUNUSED REF struct module *FCALL
+module_fromaddr(USER CHECKED void const *addr) {
+#ifdef CONFIG_HAVE_USERELF_MODULES
+	if (ADDR_ISUSER(addr))
+		return uem_fromaddr(THIS_MMAN, addr);
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+	/* TODO: Driver lookup! */
+	COMPILER_IMPURE();
+	(void)addr;
+	return NULL;
+}
+
+/* Search for, and return a reference to the lowest available module, such
+ * that  `return->md_loadstart >= addr'. If no  such module exists, simply
+ * return `NULL' instead. */
+PUBLIC WUNUSED REF struct module *FCALL
+module_aboveaddr(USER CHECKED void const *addr) {
+#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef KERNELSPACE_HIGHMEM
+	if (ADDR_ISUSER(addr)) {
+		REF struct module *result;
+		result = uem_aboveaddr(THIS_MMAN, addr);
+		if (result)
+			return result;
+		/* Fallthru to find the first kernel-space module... */
+		addr = (USER CHECKED void *)KERNELSPACE_BASE;
+	}
+#endif /* KERNELSPACE_HIGHMEM */
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+	/* TODO: Driver lookup! */
+	COMPILER_IMPURE();
+	(void)addr;
+	return NULL;
+}
+
+/* Return  a  reference  to  the  first  module  different  from  `prev',  such  that
+ * `return->md_loadstart > prev->md_loadstart'.  When   `prev == NULL',  return   the
+ * first module, which is the same as returned by `module_aboveaddr((void const *)0)' */
+PUBLIC WUNUSED REF struct module *FCALL
+module_next(struct module *prev) {
+	/* Special case: lookup the lowest-address module currently visible. */
+	if (!prev)
+		return module_aboveaddr((void const *)0);
+#ifdef CONFIG_HAVE_USERELF_MODULES
+	if (prev->md_ops == &uem_ops) {
+		/* Find the next UserELF module. */
+		REF struct userelf_module *result;
+		struct userelf_module *ue_prev;
+		ue_prev = (struct userelf_module *)prev;
+		result  = uem_next(ue_prev->md_mman, ue_prev);
+#ifdef KERNELSPACE_HIGHMEM
+		if (result)
+			return result;
+		/* Find the first kernel-space module. */
+		return module_aboveaddr((USER CHECKED void *)KERNELSPACE_BASE);
+#else /* KERNELSPACE_HIGHMEM */
+		/* User-space exists in high memory, so the
+		 * last  module has to be a UserELF module. */
+		return NULL;
+#endif /* !KERNELSPACE_HIGHMEM */
+	}
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+
+	/* TODO: Driver lookup! */
+	COMPILER_IMPURE();
+	(void)prev;
+	return NULL;
+}
+
+
+
+
+/* Same as  the functions  above, but  preserve/restore the  old
+ * exception if one ends up being thrown by the above functions,
+ * and simply return `NULL', rather than RETHROW()-ing it. */
+PUBLIC WUNUSED REF struct module *
+NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr) {
+	REF struct module *result;
+	NESTED_TRY {
+		result = module_fromaddr(addr);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
+PUBLIC WUNUSED REF struct module *
+NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr) {
+	REF struct module *result;
+	NESTED_TRY {
+		result = module_aboveaddr(addr);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
+PUBLIC WUNUSED REF struct module *
+NOTHROW(FCALL module_next_nx)(struct module *prev) {
+	REF struct module *result;
+	NESTED_TRY {
+		result = module_next(prev);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
+
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MODULE_C */

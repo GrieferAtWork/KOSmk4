@@ -204,6 +204,14 @@
  * >> bool   awref_cmpxch_nopr             (AWREF(T) *self, T *oldobj, T *newobj);
  * >> void   awref_cmpxch                  (AWREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
  * >> void   awref_cmpxch_nopr             (AWREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
+ * >> bool   awref_replacedead             (AWREF(T) *self, T *newobj); // Replace an already-destroyed object
+ * >> bool   awref_replacedead_nopr        (AWREF(T) *self, T *newobj);
+ * >> void   awref_replacedead             (AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void   awref_replacedead_nopr        (AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void   awref_replacedead             (AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void   awref_replacedead_nopr        (AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void   awref_replacedead             (AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *));
+ * >> void   awref_replacedead_nopr        (AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *));
  *
  * If not given, refcnt operators default to those which may be defined by `<kos/refcnt.h>'
  */
@@ -1789,6 +1797,104 @@
 /* >> void awref_cmpxch_nopr(AWREF(T) *self, T *oldobj, T *newobj, bool *p_ok); */
 #define awref_cmpxch_nopr __PRIVATE_awref_cmpxch_nopr_4
 #endif /* !... */
+
+#define __PRIVATE_awref_replacedead_5(self, newobj, p_ok, T, wasdestroyed)        \
+	__PRIVATE_AR_INTR_PUSHOFF();                                                  \
+	T *__awrrd_oldobj;                                                            \
+	for (;;) {                                                                    \
+		__awrrd_oldobj = __hybrid_atomic_load((self)->awr_obj, __ATOMIC_ACQUIRE); \
+		if (!(*(p_ok) = (!__awrrd_oldobj || wasdestroyed(__awrrd_oldobj))))       \
+			break;                                                                \
+		if (__hybrid_atomic_cmpxch((self)->awr_obj, __awrrd_oldobj, newobj,       \
+		                           __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))           \
+			break;                                                                \
+	}                                                                             \
+	__PRIVATE_awref_waitfor(self)                                                 \
+	__PRIVATE_AR_INTR_POP()
+#define __PRIVATE_awref_replacedead_nopr_5(self, newobj, p_ok, T, wasdestroyed)   \
+	__PRIVATE_AR_INTR_PUSHOFF_NOPR();                                             \
+	T *__awrrd_oldobj;                                                            \
+	for (;;) {                                                                    \
+		__awrrd_oldobj = __hybrid_atomic_load((self)->awr_obj, __ATOMIC_ACQUIRE); \
+		if (!(*(p_ok) = (!__awrrd_oldobj || wasdestroyed(__awrrd_oldobj))))       \
+			break;                                                                \
+		if (__hybrid_atomic_cmpxch((self)->awr_obj, __awrrd_oldobj, newobj,       \
+		                           __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))           \
+			break;                                                                \
+	}                                                                             \
+	__PRIVATE_awref_waitfor(self)                                                 \
+	__PRIVATE_AR_INTR_POP_NOPR()
+#define __PRIVATE_awref_replacedead_4(self, newobj, p_ok, T) \
+	__PRIVATE_awref_replacedead_5(self, newobj, p_ok, T, wasdestroyed)
+#define __PRIVATE_awref_replacedead_nopr_4(self, newobj, p_ok, T) \
+	__PRIVATE_awref_replacedead_5(self, newobj, p_ok, T, wasdestroyed)
+#ifdef __COMPILER_HAVE_TYPEOF
+#define __PRIVATE_awref_replacedead_3(self, newobj, p_ok) \
+	__PRIVATE_awref_replacedead_5(self, newobj, p_ok, __typeof__(*(self)->awr_obj), wasdestroyed)
+#define __PRIVATE_awref_replacedead_nopr_3(self, newobj, p_ok) \
+	__PRIVATE_awref_replacedead_5(self, newobj, p_ok, __typeof__(*(self)->awr_obj), wasdestroyed)
+#ifndef __NO_XBLOCK
+#define __PRIVATE_awref_replacedead_2(self, newobj)               \
+	__XBLOCK({                                                    \
+		__BOOL __awrrd_ok;                                        \
+		__PRIVATE_awref_replacedead_3(self, newobj, &__awrrd_ok); \
+		__XRETURN __awrrd_ok;                                     \
+	})
+#define __PRIVATE_awref_replacedead_nopr_2(self, newobj)               \
+	__XBLOCK({                                                         \
+		__BOOL __awrrd_ok;                                             \
+		__PRIVATE_awref_replacedead_nopr_3(self, newobj, &__awrrd_ok); \
+		__XRETURN __awrrd_ok;                                          \
+	})
+#ifdef __HYBRID_PP_VA_OVERLOAD
+/* >> bool awref_replacedead(AWREF(T) *self, T *newobj);
+ * >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_awref_replacedead_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> bool awref_replacedead_nopr(AWREF(T) *self, T *newobj);
+ * >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_awref_replacedead_nopr_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __HYBRID_PP_VA_OVERLOAD */
+/* >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead __PRIVATE_awref_replacedead_5
+/* >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead_nopr __PRIVATE_awref_replacedead_nopr_5
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
+#else /* !__NO_XBLOCK */
+#ifdef __HYBRID_PP_VA_OVERLOAD
+/* >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_awref_replacedead_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_awref_replacedead_nopr_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __HYBRID_PP_VA_OVERLOAD */
+/* >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead __PRIVATE_awref_replacedead_5
+/* >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead_nopr __PRIVATE_awref_replacedead_nopr_5
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
+#endif /* __NO_XBLOCK */
+#else /* __COMPILER_HAVE_TYPEOF */
+#ifdef __HYBRID_PP_VA_OVERLOAD
+/* >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_awref_replacedead_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_awref_replacedead_nopr_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __HYBRID_PP_VA_OVERLOAD */
+/* >> void awref_replacedead(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead __PRIVATE_awref_replacedead_5
+/* >> void awref_replacedead_nopr(AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *)); */
+#define awref_replacedead_nopr __PRIVATE_awref_replacedead_nopr_5
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
+#endif /* !__COMPILER_HAVE_TYPEOF */
 /************************************************************************/
 
 

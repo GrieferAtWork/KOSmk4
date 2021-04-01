@@ -314,7 +314,7 @@ PUBLIC struct mnode x86_phys2virt64_node = {
 	MNODE_INIT_mn_partoff(0),
 	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-	MNODE_INIT__mn_module(NULL)
+	MNODE_INIT_mn_module(NULL) 
 };
 
 

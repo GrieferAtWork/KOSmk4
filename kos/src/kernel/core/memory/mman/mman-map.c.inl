@@ -33,6 +33,7 @@
 #include <kernel/mman/mfile-map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/sync.h>
@@ -125,6 +126,7 @@ mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
 			node->mn_part    = part; /* Inherit reference */
 			node->mn_fspath  = NULL;
 			node->mn_fsname  = NULL;
+			node->mn_module  = NULL;
 			node->mn_partoff = 0;
 			node->mn_link.le_next = NULL;
 			node->mn_link.le_prev = prot & PROT_SHARED ? &part->mp_share.lh_first
@@ -152,11 +154,11 @@ NOTHROW(FCALL mnode_destroy_anon_ram)(struct mnode *__restrict self) {
 
 #ifdef DEFINE_mman_map
 /* Map a given file into the specified mman.
- * @param: hint:          s.a. `mman_getunmapped_nx'
+ * @param: hint:          s.a. `mman_findunmapped'
  * @param: prot:          Set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SHARED' (Other bits are silently ignored)
- * @param: flags:         Set of `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED' (Other bits are silently ignored)
- *                        Additionally,  the   following   flags   may  be   set   to   customize  the   behavior   of   how
- *                        a   suitable    address   is    located   (s.a.    `mman_getunmapped_nx()'   for    more    info):
+ * @param: flags:         Set  of  `MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK | MAP_PREPARED'   (Other  bits   are
+ *                        silently ignored)  Additionally,  the following  flags  may  be set  to  customize  how
+ *                        a  suitable   address  is   located  (s.a.   `mman_findunmapped()'  for   more   info):
  *                        `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN | MAP_GROWSUP | MAP_STACK | MAP_FIXED_NOREPLACE'
  * @param: file:          The file that is being mapped.
  * @param: file_fspath:   Optional mapping path (only used for memory->disk mapping listings)
@@ -167,7 +169,7 @@ NOTHROW(FCALL mnode_destroy_anon_ram)(struct mnode *__restrict self) {
  *                        But  that that when  `MAP_FIXED' flag is also  set, then the sub-page
  *                        offset of `hint' will be silently ignored, meaning that in this  case
  *                        the return value may differ from `hint'!
- * @param: min_alignment: s.a. `mman_getunmapped_nx'
+ * @param: min_alignment: s.a. `mman_findunmapped'
  * @return: * : The effective mapping  base at which  `file->DATA.BYTES[file_pos]' can be  found,
  *              unless `num_bytes' was given as `0', in which case the return value is undefined,
  *              but  arguably valid (e.g. will be a  user-/kernel-space location as it would have
@@ -348,6 +350,7 @@ do_insert_without_file:
 		res_node->mn_part   = NULL; /* Reserved node */
 		res_node->mn_fspath = NULL;
 		res_node->mn_fsname = NULL;
+		res_node->mn_module = NULL;
 		res_node->mn_mman   = self;
 		DBG_memset(&res_node->mn_partoff, 0xcc, sizeof(res_node->mn_partoff));   /* Unused */
 		DBG_memset(&res_node->mn_link, 0xcc, sizeof(res_node->mn_link));         /* Unused */
@@ -413,15 +416,19 @@ again_lock_mfile_map:
 		SLIST_INIT(&old_mappings);
 		for (;;) {
 			struct mnode *removeme;
-			removeme = mnode_tree_rremove(&self->mm_mappings,
-			                              (byte_t *)result,
-			                              (byte_t *)result + num_bytes - 1);
+			removeme = mman_mappings_rremove(self,
+			                                 (byte_t *)result,
+			                                 (byte_t *)result + num_bytes - 1);
 			if likely(removeme == NULL)
 				break;
 			assert(removeme->mn_mman == self);
 			if (LIST_ISBOUND(removeme, mn_writable))
 				LIST_REMOVE(removeme, mn_writable);
+			/* Keep track of how many nodes are mapping some given module. */
+			if (removeme->mn_module)
+				module_dec_nodecount(removeme->mn_module);
 			DBG_memset(&removeme->mn_writable, 0xcc, sizeof(removeme->mn_writable));
+			DBG_memset(&removeme->mn_module, 0xcc, sizeof(removeme->mn_module));
 			SLIST_INSERT(&old_mappings, removeme, _mn_alloc);
 		}
 
@@ -444,6 +451,7 @@ again_lock_mfile_map:
 			}
 			node->mn_fspath = xincref(file_fspath);
 			node->mn_fsname = xincref(file_fsname);
+			node->mn_module = NULL;
 			node->mn_minaddr += file_base_offset + (uintptr_t)result;
 			node->mn_maxaddr += file_base_offset + (uintptr_t)result;
 

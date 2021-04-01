@@ -658,6 +658,7 @@ again_lock_mman:
 								krs->mn_part    = &userkern_segment_part_compat;
 								assert(krs->mn_fspath == NULL);
 								assert(krs->mn_fsname == NULL);
+								assert(krs->mn_module == NULL);
 								/* Re-insert the node and continue operating as if we'd found
 								 * everything as it  has been changed  into from the  get-go. */
 								mman_mappings_insert(mm, krs);

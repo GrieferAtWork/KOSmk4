@@ -122,7 +122,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
 	MNODE_INIT_mn_partoff(0),
 	MNODE_INIT_mn_link({ NULL, &this_kernel_stackpart_.mp_share.lh_first }),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-	MNODE_INIT__mn_module(NULL)
+	MNODE_INIT_mn_module(NULL) 
 };
 
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
@@ -140,7 +140,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stackguard_ = {
 	MNODE_INIT_mn_partoff(0),
 	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-	MNODE_INIT__mn_module(NULL)
+	MNODE_INIT_mn_module(NULL) 
 };
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
@@ -351,8 +351,9 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 
 
 /* Called with a lock to the kernel VM's treelock held. */
-PRIVATE NOBLOCK struct postlockop *
-NOTHROW(FCALL task_destroy_raw_impl)(struct lockop *__restrict _lop) {
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(struct mman) *__restrict _lop,
+                                     struct mman *__restrict UNUSED(mm)) {
 	void *addr;
 	size_t size;
 	struct task *self;
@@ -427,14 +428,14 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	/* Destroy  the  task  structure,  and  unload  memory segments
 	 * occupied by the thread, including its stack, and trampoline. */
 	if (mman_lock_tryacquire(&mman_kernel)) {
-		task_destroy_raw_impl((struct lockop *)self);
+		task_destroy_raw_impl((Toblockop(struct mman) *)self, &mman_kernel);
 		mman_lock_release(&mman_kernel);
 	} else {
-		struct lockop *lop;
+		Toblockop(struct mman) *lop;
 		/* Schedule the task to-be destroyed later. */
-		lop          = (struct lockop *)self;
-		lop->lo_func = &task_destroy_raw_impl;
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, lo_link);
+		lop           = (Toblockop(struct mman) *)self;
+		lop->olo_func = &task_destroy_raw_impl;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, olo_link);
 		_mman_lockops_reap(&mman_kernel);
 	}
 }

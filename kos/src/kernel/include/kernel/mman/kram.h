@@ -232,9 +232,9 @@ struct mman_unmap_kram_job {
 	byte_t                    *mukj_maxaddr; /* Greatest address being unmapped. */
 	gfp_t                      mukj_flags;   /* Set of `0 | GFP_CALLOC' */
 	union {
-		struct lockop                    mukj_lop_mm;      /* MMan lockop */
+		Toblockop(struct mman)           mukj_lop_mm;      /* MMan lockop */
 		Toblockop(struct mpart)          mukj_lop_mp;      /* MPart lockop */
-		struct postlockop                mukj_post_lop_mm; /* MMan post-lockop */
+		Tobpostlockop(struct mman)       mukj_post_lop_mm; /* MMan post-lockop */
 		Tobpostlockop(struct mpart)      mukj_post_lop_mp; /* MPart post-lockop */
 		SLIST_ENTRY(mman_unmap_kram_job) mukj_link;        /* List link (used internally) */
 	};
@@ -246,7 +246,7 @@ struct mman_unmap_kram_job {
  *       be written to without any chance of that write blocking, or
  *       resulting in an exception. (i.e. don't use this one to unmap
  *       file mappings or the like...)
- *       If your intend is to unmap mappings that don't fulfil this
+ *       If your intend is to unmap mappings that don't fulfill this
  *       requirement, the you should read the description of `struct
 *        mman_unmap_kram_job' and use `mman_unmap_kram_locked_ex()'
  * @param: flags:   Set of `0 | GFP_CALLOC'. When `GFP_CALLOC' is given, allows

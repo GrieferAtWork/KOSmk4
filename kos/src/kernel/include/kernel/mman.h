@@ -24,6 +24,7 @@
 
 #include <kernel/paging.h>
 #include <kernel/types.h>
+#include <sched/lockop.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/sequence/list.h>   /* LIST_HEAD, SLIST_HEAD, ... */
@@ -139,35 +140,16 @@ FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
 
 
-struct lockop;
-#ifndef __lockop_slist_defined
-#define __lockop_slist_defined 1
-SLIST_HEAD(lockop_slist, lockop);
-#endif /* !__lockop_slist_defined */
-
-
-/* Only used by the kernel mman: Linked chain of pending operations
- * that should be executed (via a reap-mechanism) whenever the lock
- * for this mman is released.
- * This list is situated such that for user-space mmans, it always
- * appears as an empty list, meaning that the must-reap-check  can
- * simply be performed for every mman, and will simply be a  no-op
- * when done for anything but the kernel mman.
- * However, you still mustn't add anything into it for a user-space
- * memory manager! */
-DATDEF ATTR_PERMMAN struct lockop_slist thismman_lockops;
+/* [0..n] Linked chain of pending  operations that should be  executed
+ * (via a reap-mechanism) whenever the lock for this mman is released. */
+DATDEF ATTR_PERMMAN Toblockop_slist(struct mman) thismman_lockops;
 
 /* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_lockops)' */
-DATDEF struct lockop_slist mman_kernel_lockops;
+DATDEF Toblockop_slist(struct mman) mman_kernel_lockops;
 
-#ifndef __gfp_t_defined
-#define __gfp_t_defined 1
-typedef unsigned int gfp_t;
-#endif /* !__gfp_t_defined */
-
-/* Reap lock operations of `mman_kernel' */
-FUNDEF NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void);
-#define _mman_lockops_reap(self) _mman_lockops_reap()
+/* Reap lock operations of the given mman. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lockops_mustreap(self) \
 	(__hybrid_atomic_load(FORMMAN(self, thismman_lockops.slh_first), __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
@@ -175,8 +157,7 @@ FUNDEF NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void);
 #else /* __OPTIMIZE_SIZE__ */
 #define mman_lockops_reap(self)                      \
 	(void)(!mman_lockops_mustreap(self) ||           \
-	       (__hybrid_assert((self) == &mman_kernel), \
-	        _mman_lockops_reap(self), 0))
+	       (_mman_lockops_reap(self), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 #ifndef CONFIG_NO_SMP
@@ -242,9 +223,9 @@ FUNDEF NOBLOCK void NOTHROW(FCALL _mman_lockops_reap)(void);
 #define mman_lock_acquired(self)   mman_lock_writing(self)
 #define mman_lock_available(self)  mman_lock_canwrite(self)
 
-/* TODO: Remove general-purpose locking support for `struct mman'
+/* TODO: Remove general-purpose  locking  support  for  `struct mman'
  *       Since there is more than 1 lock contained inside, it doesn't
- *       make too much sense to provide generic locking overloads! */
+ *       make too much  sense to provide  generic locking  overloads! */
 __DEFINE_SYNC_RWLOCK(struct mman,
                      mman_lock_tryread,
                      mman_lock_read,
@@ -272,9 +253,9 @@ __DEFINE_SYNC_RWLOCK(struct mman,
 #define mman_lock_acquired(self)   atomic_lock_acquired(&(self)->mm_lock)
 #define mman_lock_available(self)  atomic_lock_available(&(self)->mm_lock)
 
-/* TODO: Remove general-purpose locking support for `struct mman'
+/* TODO: Remove general-purpose  locking  support  for  `struct mman'
  *       Since there is more than 1 lock contained inside, it doesn't
- *       make too much sense to provide generic locking overloads! */
+ *       make too much  sense to provide  generic locking  overloads! */
 __DEFINE_SYNC_MUTEX(struct mman,
                     mman_lock_tryacquire,
                     mman_lock_acquire,

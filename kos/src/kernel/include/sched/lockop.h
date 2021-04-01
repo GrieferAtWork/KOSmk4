@@ -173,16 +173,27 @@ struct oblockop {
 SLIST_HEAD(lockop_slist, lockop);
 #endif /* !__lockop_slist_defined */
 
+#ifndef __postlockop_slist_defined
+#define __postlockop_slist_defined 1
+SLIST_HEAD(postlockop_slist, postlockop);
+#endif /* !__postlockop_slist_defined */
+
 #ifndef __oblockop_slist_defined
 #define __oblockop_slist_defined 1
 SLIST_HEAD(oblockop_slist, oblockop);
 #endif /* !__oblockop_slist_defined */
+
+#ifndef __obpostlockop_slist_defined
+#define __obpostlockop_slist_defined 1
+SLIST_HEAD(obpostlockop_slist, obpostlockop);
+#endif /* !__obpostlockop_slist_defined */
 
 #ifdef __cplusplus
 extern "C++" {
 #define Tobpostlockop(T)            _Tobpostlockop<T>
 #define Toblockop(T)                _Toblockop<T>
 #define Toblockop_slist(T)          _Toblockop_slist<T>
+#define Tobpostlockop_slist(T)      _Tobpostlockop_slist<T>
 #define Tobpostlockop_callback_t(T) _Tobpostlockop_callback_t<T>
 #define Toblockop_callback_t(T)     _Toblockop_callback_t<T>
 template<class T> struct _Tobpostlockop;
@@ -198,11 +209,13 @@ template<class T> struct _Toblockop {
 	_Toblockop_callback_t<T>   olo_func; /* [1..1][const] Operation to perform. */
 };
 template<class T> SLIST_HEAD(_Toblockop_slist, _Toblockop<T>);
+template<class T> SLIST_HEAD(_Tobpostlockop_slist, _Tobpostlockop<T>);
 } /* extern "C++" */
 #else /* __cplusplus */
 #define Tobpostlockop(T)            struct obpostlockop
 #define Toblockop(T)                struct oblockop
 #define Toblockop_slist(T)          struct oblockop_slist
+#define Tobpostlockop_slist(T)      struct obpostlockop_slist
 #define Tobpostlockop_callback_t(T) obpostlockop_callback_t
 #define Toblockop_callback_t(T)     oblockop_callback_t
 #endif /* !__cplusplus */

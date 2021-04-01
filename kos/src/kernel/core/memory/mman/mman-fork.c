@@ -50,13 +50,6 @@
 /* Mask of mnode flags copied during fork() */
 #define MNODE_FLAGS_FORKMASK (~(MNODE_F_COREPART))
 
-/* Because you're not allowed to fork the kernel mman, we never have to
- * check for pending lock-operations, since those are only supposed for
- * the kernel mman. As such, we should never have to reap anything! */
-#undef mman_lock_release
-#define mman_lock_release mman_lock_release_f
-
-
 /* In compatibility-mode, the kernel reserve node may change its location
  * over the course of a process's lifetime. - As such, we must do special
  * handling for it when it comes to forking an mman. */
@@ -137,6 +130,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
                                       struct mnode *__restrict node) {
 	REF struct mpart *part;
 	assert(!(node->mn_flags & MNODE_F_COREPART));
+	assert(node->mn_module == NULL);
 	xdecref_unlikely(node->mn_fspath);
 	xdecref_unlikely(node->mn_fsname);
 	if ((part = node->mn_part) != NULL) {
@@ -363,7 +357,7 @@ again:
 	newtree->mn_mman     = self->ft_newmm;
 	newtree->mn_partoff  = oldtree->mn_partoff;
 	LIST_ENTRY_UNBOUND_INIT(&newtree->mn_writable);
-	newtree->_mn_module = NULL;
+	newtree->mn_module = NULL;
 
 	if (part) {
 		struct mnode_list *list;

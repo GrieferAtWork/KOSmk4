@@ -131,7 +131,7 @@ struct mbnode {
 			PAGEDIR_PAGEALIGNED mpart_reladdr_t _mbn_partoff;  /* s.a. `struct mnode::mn_partoff' */
 			LIST_ENTRY(mnode)                   _mbn_link;     /* s.a. `struct mnode::mn_link' */
 			LIST_ENTRY(mnode)                   _mbn_writable; /* s.a. `struct mnode::mn_writable' */
-			void                               *_mbn_module;   /* s.a. `struct mnode::_mn_module' */
+			void                               *_mbn_module;   /* s.a. `struct mnode::mn_module' */
 		};
 	};
 };

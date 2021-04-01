@@ -1341,6 +1341,7 @@
 #define Tobpostlockop(T)            struct obpostlockop
 #define Toblockop(T)                struct oblockop
 #define Toblockop_slist(T)          struct oblockop_slist
+#define Tobpostlockop_slist(T)      struct obpostlockop_slist
 #define Tobpostlockop_callback_t(T) obpostlockop_callback_t
 #define Toblockop_callback_t(T)     oblockop_callback_t
 

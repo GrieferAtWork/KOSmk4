@@ -147,12 +147,12 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	node->mn_part         = part;
 	node->mn_fspath       = NULL;
 	node->mn_fsname       = NULL;
+	node->mn_module       = NULL;
 	node->mn_mman         = &mman_kernel;
 	node->mn_partoff      = 0;
 	node->mn_link.le_prev = &part->mp_share.lh_first;
 	node->mn_link.le_next = NULL;
 	LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
-	node->_mn_module = NULL;
 
 	part->mp_refcnt = 1;
 	part->mp_flags  = MPART_F_NOFREE | MPART_F_COREPART |

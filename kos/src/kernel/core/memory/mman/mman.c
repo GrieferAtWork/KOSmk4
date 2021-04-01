@@ -98,17 +98,15 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 	MNODE_INIT_mn_fsname(NULL),
 	MNODE_INIT_mn_mman(NULL), /* Filled in during init */
 	MNODE_INIT_mn_partoff(0),
-	/* NOTE: The next-link of this is (ab-)used for `thismman_lockops'.
-	 *       This is because that field has the attribute [valid_if(le_prev != NULL)],
-	 *       which  is never the case since this node is never linked to any mem-part,
-	 *       since it's always  a reserved node.  As such, we  can simply re-use  that
-	 *       field and not have to add yet another member to `struct mman' */
 	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
 };
 
-/* ALIAS@thismman_kernel_reservation.mn_link.le_next */
-DATDEF ATTR_PERMMAN struct lockop_slist thismman_lockops;
+/* [0..n] Linked chain of pending  operations that should be  executed
+ * (via a reap-mechanism) whenever the lock for this mman is released. */
+PUBLIC ATTR_PERMMAN Toblockop_slist(struct mman)
+thismman_lockops = SLIST_HEAD_INITIALIZER(thismman_lockops);
+
 
 /* Dynamic per-memory-manager init/fini callbacks.
  * XXX: Maybe get rid of these? (there aren't really ~that~ many of these) */
@@ -149,13 +147,8 @@ extern byte_t __kernel_permman_size[];
 /* Memory manager reference counting control. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_free)(struct mman *__restrict self) {
-	DEFINE_PUBLIC_SYMBOL(thismman_lockops,
-	                     &thismman_kernel_reservation.mn_link.le_next,
-	                     sizeof(struct lockop_slist));
 	_mman_free(self);
 }
-
-
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mnode_tree_destroy)(struct mnode *root,

@@ -298,6 +298,7 @@ again_getpart:
 	DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
 	DBG_memset(&node->mn_fspath, 0xcc, sizeof(node->mn_fspath));
 	DBG_memset(&node->mn_fsname, 0xcc, sizeof(node->mn_fsname));
+	DBG_memset(&node->mn_module, 0xcc, sizeof(node->mn_module));
 
 	/* Check if `part' already contains the whole mapping needed by `node' */
 	if (mpart_getmaxaddr(part) >= (self->mfm_addr + self->mfm_size - 1)) {

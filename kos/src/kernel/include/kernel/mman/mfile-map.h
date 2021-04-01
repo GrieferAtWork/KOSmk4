@@ -70,6 +70,7 @@ struct mfile_map {
 	 * >>         LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 	 * >>         node->mn_fspath = NULL;
 	 * >>         node->mn_fsname = NULL;
+	 * >>         node->mn_module = NULL;
 	 * >>         node->mn_minaddr += (uintptr_t)addr;
 	 * >>         node->mn_maxaddr += (uintptr_t)addr;
 	 * >>         mman_mappings_insert(mm, node);
@@ -103,7 +104,7 @@ struct mfile_map {
 	                                         *  - Each node is holding a lock to its `mn_part' field.
 	                                         * The following fields are uninitialized:
 	                                         *  - mn_flags, mn_mement, mn_mman, mn_link, mn_writable
-	                                         *  - mn_fspath, mn_fsname */
+	                                         *  - mn_fspath, mn_fsname, mn_module */
 	struct mnode_slist           mfm_flist; /* [0..n][owned] Internal list of free nodes.
 	                                         * Required/superfluous mem-nodes are added/removed from
 	                                         * this list for the purpose of allocation/deallocation.

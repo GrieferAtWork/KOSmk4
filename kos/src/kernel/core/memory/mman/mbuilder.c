@@ -61,6 +61,7 @@ STATIC_ASSERT(offsetof(struct mnode, mn_mman) == offsetof(struct mbnode, _mbn_mm
 STATIC_ASSERT(offsetof(struct mnode, mn_partoff) == offsetof(struct mbnode, _mbn_partoff));
 STATIC_ASSERT(offsetof(struct mnode, mn_link) == offsetof(struct mbnode, _mbn_link));
 STATIC_ASSERT(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, _mbn_writable));
+STATIC_ASSERT(offsetof(struct mnode, mn_module) == offsetof(struct mbnode, _mbn_module));
 STATIC_ASSERT_MSG(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, mbn_nxtuprt),
                   "This is needed so that all non-unique-part nodes already have their writable "
                   "link initialized as unbound, and all unique-part nodes can still be enumerated "
@@ -210,15 +211,15 @@ mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	struct mnode *result;
 	result = (struct mnode *)kmalloc(sizeof(struct mnode), GFP_LOCKED);
-	result->mn_minaddr  = (byte_t *)addr;
-	result->mn_maxaddr  = (byte_t *)addr + num_bytes - 1;
-	result->mn_part     = NULL; /* Reserved node */
-	result->mn_fspath   = NULL;
-	result->mn_fsname   = NULL;
-	result->mn_mman     = NULL;
-	result->mn_partoff  = 0;
+	result->mn_minaddr = (byte_t *)addr;
+	result->mn_maxaddr = (byte_t *)addr + num_bytes - 1;
+	result->mn_part    = NULL; /* Reserved node */
+	result->mn_fspath  = NULL;
+	result->mn_fsname  = NULL;
+	result->mn_mman    = NULL;
+	result->mn_partoff = 0;
 	DBG_memset(&result->mn_mman, 0xcc, sizeof(result->mn_mman));
-	DBG_memset(&result->_mn_module, 0xcc, sizeof(result->_mn_module));
+	DBG_memset(&result->mn_module, 0xcc, sizeof(result->mn_module));
 	DBG_memset(&result->mn_link, 0xcc, sizeof(result->mn_link));
 	LIST_ENTRY_UNBOUND_INIT(&result->mn_writable);
 	return result;

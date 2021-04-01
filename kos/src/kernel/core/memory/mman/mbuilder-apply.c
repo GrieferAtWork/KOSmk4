@@ -28,10 +28,11 @@
 #include <kernel/compat.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/mman/mbuilder.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/execinfo.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
@@ -48,11 +49,21 @@
 
 DECL_BEGIN
 
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
+
 /* Set the `MNODE_F_UNMAPPED' flag for all nodes starting at `root' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_tree_foreach_set_unmapped)(struct mnode *__restrict root) {
 again:
 	ATOMIC_OR(root->mn_flags, MNODE_F_UNMAPPED);
+	/* Keep track of how many nodes are mapping a particular module. */
+	if (root->mn_module)
+		module_dec_nodecount(root->mn_module);
+	DBG_memset(&root->mn_module, 0xcc, sizeof(root->mn_module));
 	if (root->mn_mement.rb_lhs) {
 		if (root->mn_mement.rb_rhs)
 			mnode_tree_foreach_set_unmapped(root->mn_mement.rb_rhs);
@@ -75,8 +86,8 @@ again:
 	assertf(!(root->mn_flags & MNODE_F_UNMAPPED), "Why is this node marked as UNMAPPED?");
 	assertf(!(root->mn_flags & MNODE_F_MPREPARED), "You can't set the PREPARED flag for user-space nodes!");
 	assertf(!(root->mn_flags & MNODE_F_MHINT), "You can't set the MHINT flag for user-space nodes!");
-	root->mn_mman    = mm;
-	root->_mn_module = NULL;
+	root->mn_mman   = mm;
+	root->mn_module = NULL;
 	if (root->mn_mement.rb_lhs) {
 		if (root->mn_mement.rb_rhs)
 			mnode_tree_init_mman_and_module(root->mn_mement.rb_rhs, mm);

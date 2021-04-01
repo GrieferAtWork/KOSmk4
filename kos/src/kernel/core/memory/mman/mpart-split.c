@@ -30,6 +30,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
@@ -918,6 +919,9 @@ relock_with_data:
 					LIST_INSERT_HEAD(&hinode->mn_mman->mm_writable, hinode, mn_writable);
 				hinode->mn_fspath = xincref(lonode->mn_fspath);
 				hinode->mn_fsname = xincref(lonode->mn_fsname);
+				hinode->mn_module = lonode->mn_module;
+				if (hinode->mn_module)
+					module_inc_nodecount(hinode->mn_module);
 
 				/* Update/re-insert both nodes. */
 				mman_mappings_removenode(lonode->mn_mman, lonode);
