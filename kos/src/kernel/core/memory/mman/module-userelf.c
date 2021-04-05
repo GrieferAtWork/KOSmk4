@@ -36,6 +36,7 @@
 #include <fs/vfs.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
@@ -43,6 +44,7 @@
 #include <kernel/mman/module.h>
 #include <sched/lockop.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sync/atomic-lock.h>
@@ -52,6 +54,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <malloca.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -67,6 +70,13 @@
 #else /* !NDEBUG */
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
+
+/* Max # of section headers accepted for UserELF modules.
+ * A limit must be imposed to prevent malicious  programs
+ * from flooding kernel-space memory. */
+#ifndef ELF_ARCH_MAXSHCOUNT
+#define ELF_ARCH_MAXSHCOUNT 128
+#endif /* !ELF_ARCH_MAXSHCOUNT */
 
 DECL_BEGIN
 
@@ -148,11 +158,16 @@ uem_shdrs(struct userelf_module *__restrict self) {
 	shsize         = self->um_shnum * UM_sizeof(self, UM_ElfW_Shdr);
 	UM_any(result) = (__typeof__(UM_any(result)))kmalloc(shsize, GFP_PREFLT);
 	TRY {
+#ifdef CONFIG_USE_NEW_FS
+		mfile_readall(self->md_file, UM_any(result),
+		              shsize, self->um_shoff);
+#else /* CONFIG_USE_NEW_FS */
 		if (!vm_datablock_isinode(self->md_file))
 			THROW(E_INVALID_ARGUMENT);
 		inode_readallk((struct inode *)self->md_file,
 		               UM_any(result), shsize,
 		               self->um_shoff);
+#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		kfree(UM_any(result));
 		RETHROW();
@@ -171,19 +186,23 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 	char *shstrtab_str;
 	if (self->um_shstrtab)
 		return self->um_shstrtab;
-	if unlikely(self->um_shstrndx >= self->um_shnum)
-		return NULL;
+	assert(self->um_shstrndx < self->um_shnum);
 	shdrs        = uem_shdrs(self);
 	shstrtab     = (UM_ElfW_Shdr *)UM_field_ptr(self, shdrs, [self->um_shstrndx]);
 	shstrtab_pos = (pos_t)UM_field(self, *shstrtab, .sh_offset);
 	shstrtab_siz = UM_field(self, *shstrtab, .sh_size);
 	shstrtab_str = (char *)kmalloc((shstrtab_siz + 1) * sizeof(char), GFP_PREFLT);
 	TRY {
+#ifdef CONFIG_USE_NEW_FS
+		mfile_readall(self->md_file, shstrtab_str,
+		              shstrtab_siz, shstrtab_pos);
+#else /* CONFIG_USE_NEW_FS */
 		if (!vm_datablock_isinode(self->md_file))
 			THROW(E_INVALID_ARGUMENT);
 		inode_readallk((struct inode *)self->md_file,
 		               shstrtab_str, shstrtab_siz,
 		               shstrtab_pos);
+#endif /* !CONFIG_USE_NEW_FS */
 	} EXCEPT {
 		kfree(shstrtab_str);
 		RETHROW();
@@ -777,11 +796,480 @@ done:
 	return result;
 }
 
-
-
 /* Special return values for `uem_trycreate()' */
 #define UEM_TRYCREATE_UNLOCKED       ((REF struct userelf_module *)-1)
 #define UEM_TRYCREATE_UNLOCKED_NOUEM ((REF struct userelf_module *)-2)
+
+
+
+/* Try to create  a UserELF  module based on  the knowledge  that
+ * the given mman `self' has a mapping for `file' at `node_addr',
+ * with an in-file offset of `node_fpos'.
+ *
+ * Check if `file' is an ELF module that can be mapped such that
+ * the given addr<==>file relation might be correct, and if  so,
+ * also  check that other mappings that should exist as a result
+ * of  such a memory mapping being created, are present as well.
+ * If all of this checks out, create the new UserELF module, and
+ * bind it to all of the mem-nodes that were created as a result
+ * of the UserELF module.
+ *
+ * If it turns out that `file' isn't an ELF module, or that the
+ * given  addr<==>file relation is impossible for that specific
+ * ELF module, return `UEM_TRYCREATE_UNLOCKED_NOUEM'
+ *
+ * If  the given  `file' is an  ELF module that  can sustain the
+ * given addr<==>file relation, but after the lock to `self' was
+ * re-acquired, it is found that  the mapping at `node_addr'  no
+ * longer matches a  file-mapping of `file'  with the  specified
+ * offset,  the lock to  `self' is released  once again, and the
+ * function  returns  `UEM_TRYCREATE_UNLOCKED' to  indicate that
+ * the call must be repeated after arguments were  re-generated.
+ *
+ * This function is called without any locks held, and also
+ * always returns without any locks held. */
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
+uem_create_from_mapping(struct mman *__restrict self,
+                        struct mfile *__restrict file,
+                        USER CHECKED byte_t *node_addr,
+                        pos_t node_fpos) {
+#ifndef CONFIG_USE_NEW_FS
+#define mfile_read(self, dst, num_bytes, pos) inode_readk((struct inode *)(self), dst, num_bytes, pos)
+#endif /* !CONFIG_USE_NEW_FS */
+
+	/* NOTE: Since the addr<==>file values were loaded from mem-nodes,
+	 *       we can assume  that they're always  properly aligned,  as
+	 *       it's impossible  for file  mappings to  be created,  such
+	 *       that the PAGEMASK'd  part of the  addr/fpos don't  match. */
+	REF struct userelf_module *result;
+	pos_t file_size, shoff;
+	UM_ElfW_Ehdr ehdr;
+	uint16_t phnum, shnum;
+	UM_ElfW_PhdrP phdrv;
+	size_t shsize;
+#ifdef _MODULE_HAVE_SIZEOF_POINTER
+	byte_t sizeof_pointer = sizeof(void *);
+#endif /* _MODULE_HAVE_SIZEOF_POINTER */
+
+	/* First step: Load what we hope will be the Elf_Ehdr */
+	if (mfile_read(file, &ehdr, sizeof(ehdr), 0) < sizeof(ehdr))
+		goto not_an_elf_file;
+
+	/* Verify that this is a valid EHDR. */
+	if (UM_any(ehdr).e_ident[EI_MAG0] != ELFMAG0)
+		goto not_an_elf_file;
+	if (UM_any(ehdr).e_ident[EI_MAG1] != ELFMAG1)
+		goto not_an_elf_file;
+	if (UM_any(ehdr).e_ident[EI_MAG2] != ELFMAG2)
+		goto not_an_elf_file;
+	if (UM_any(ehdr).e_ident[EI_MAG3] != ELFMAG3)
+		goto not_an_elf_file;
+	if (UM_any(ehdr).e_ident[EI_VERSION] != EV_CURRENT)
+		goto not_an_elf_file;
+#if !defined(__ARCH_HAVE_COMPAT) || COMPAT_ELF_ARCH_CLASS == ELF_ARCH_CLASS
+	if (UM_any(ehdr).e_ident[EI_CLASS] != ELF_ARCH_CLASS)
+		goto not_an_elf_file;
+#endif /* !__ARCH_HAVE_COMPAT || COMPAT_ELF_ARCH_CLASS == ELF_ARCH_CLASS */
+#if !defined(__ARCH_HAVE_COMPAT) || COMPAT_ELF_ARCH_DATA == ELF_ARCH_DATA
+	if (UM_any(ehdr).e_ident[EI_DATA] != ELF_ARCH_DATA)
+		goto not_an_elf_file;
+#endif /* !__ARCH_HAVE_COMPAT || COMPAT_ELF_ARCH_DATA == ELF_ARCH_DATA */
+	if (UM_any(ehdr).e_machine != ELF_ARCH_MACHINE) {
+#ifdef __ARCH_HAVE_COMPAT
+		/* Check for compatibility-mode support... */
+		if (UM_any(ehdr).e_machine != COMPAT_ELF_ARCH_MACHINE)
+			goto not_an_elf_file;
+#if COMPAT_ELF_ARCH_CLASS != ELF_ARCH_CLASS
+		if (UM_any(ehdr).e_ident[EI_CLASS] != COMPAT_ELF_ARCH_CLASS)
+			goto not_an_elf_file;
+#endif /* COMPAT_ELF_ARCH_CLASS != ELF_ARCH_CLASS */
+#if COMPAT_ELF_ARCH_DATA != ELF_ARCH_DATA
+		if (UM_any(ehdr).e_ident[EI_DATA] != COMPAT_ELF_ARCH_DATA)
+			goto not_an_elf_file;
+#endif /* COMPAT_ELF_ARCH_DATA != ELF_ARCH_DATA */
+#ifdef _MODULE_HAVE_SIZEOF_POINTER
+		sizeof_pointer = __ARCH_COMPAT_SIZEOF_POINTER;
+#endif /* _MODULE_HAVE_SIZEOF_POINTER */
+#else /* __ARCH_HAVE_COMPAT */
+		goto not_an_elf_file;
+#endif /* !__ARCH_HAVE_COMPAT */
+	} else {
+#if defined(__ARCH_HAVE_COMPAT) && COMPAT_ELF_ARCH_CLASS != ELF_ARCH_CLASS
+		if (UM_any(ehdr).e_ident[EI_CLASS] != ELF_ARCH_CLASS)
+			goto not_an_elf_file;
+#endif /* __ARCH_HAVE_COMPAT && COMPAT_ELF_ARCH_CLASS != ELF_ARCH_CLASS */
+#if defined(__ARCH_HAVE_COMPAT) && COMPAT_ELF_ARCH_DATA != ELF_ARCH_DATA
+		if (UM_any(ehdr).e_ident[EI_DATA] != ELF_ARCH_DATA)
+			goto not_an_elf_file;
+#endif /* __ARCH_HAVE_COMPAT && COMPAT_ELF_ARCH_DATA != ELF_ARCH_DATA */
+	}
+
+	/* We only accept executable, and .so files as UserELF modules. */
+	if (UM_field_r(sizeof_pointer, ehdr, .e_type) != ET_EXEC &&
+	    UM_field_r(sizeof_pointer, ehdr, .e_type) != ET_DYN)
+		goto not_an_elf_file;
+
+	/* Verify integrity of the ELF Ehdr */
+	if (UM_field_r(sizeof_pointer, ehdr, .e_phentsize) != UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr))
+		goto not_an_elf_file;
+	if (UM_field_r(sizeof_pointer, ehdr, .e_shentsize) != UM_sizeof_r(sizeof_pointer, UM_ElfW_Shdr))
+		goto not_an_elf_file;
+
+#ifdef CONFIG_USE_NEW_FS
+	file_size = (pos_t)atomic64_read(&file->mf_filesize);
+#else /* CONFIG_USE_NEW_FS */
+	inode_loadattr((struct inode *)file);
+	file_size = ((struct inode *)file)->i_filesize;
+#endif /* !CONFIG_USE_NEW_FS */
+
+	/* Validate section indices/offsets */
+	shnum = UM_field_r(sizeof_pointer, ehdr, .e_shnum);
+	if (shnum > ELF_ARCH_MAXSHCOUNT)
+		goto not_an_elf_file;
+	if (UM_field_r(sizeof_pointer, ehdr, .e_shstrndx) >= shnum)
+		goto not_an_elf_file;
+	shoff  = (pos_t)UM_field_r(sizeof_pointer, ehdr, .e_shoff);
+	shsize = UM_sizeof_r(sizeof_pointer, UM_ElfW_Shdr) * shnum;
+	if (OVERFLOW_UADD(shoff, shsize, &shoff) || shoff > file_size)
+		goto not_an_elf_file;
+
+	/* Validate/decode program header indices/offsets */
+	phnum = UM_field_r(sizeof_pointer, ehdr, .e_phnum);
+	if (phnum > ELF_ARCH_MAXPHCOUNT)
+		goto not_an_elf_file; /* Must still limit the max # of program headers! */
+	{
+		size_t phsize;
+		pos_t phoff, phend;
+		phoff  = (pos_t)UM_field_r(sizeof_pointer, ehdr, .e_phoff);
+		phsize = UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr) * phnum;
+		if (OVERFLOW_UADD(phoff, phsize, &phend) || phend > file_size)
+			goto not_an_elf_file;
+
+		/* Allocate+load the Elf program header vector! */
+		UM_any(phdrv) = (typeof(UM_any(phdrv)))malloca(phsize);
+		TRY {
+			if (mfile_read(file, UM_any(phdrv), phsize, phoff) < phsize)
+				goto not_an_elf_file_phdrv;
+		} EXCEPT {
+			freea(UM_any(phdrv));
+			RETHROW();
+		}
+	}
+	TRY {
+		uint16_t i;
+		uintptr_t loadaddr;
+
+		/* Validate that all program headers look like OK Elf_Phdr items! */
+		for (i = 0; i < phnum; ++i) {
+			if (UM_field_r(sizeof_pointer, phdrv, [i].p_type) != PT_LOAD)
+				continue; /* Allow anything for non-load headers! */
+			if (UM_field_r(sizeof_pointer, phdrv, [i].p_flags) & ~(PF_X | PF_W | PF_R))
+				goto not_an_elf_file_phdrv;
+			if ((UM_field_r(sizeof_pointer, phdrv, [i].p_offset) & PAGEMASK) !=
+			    (UM_field_r(sizeof_pointer, phdrv, [i].p_vaddr) & PAGEMASK))
+				goto not_an_elf_file_phdrv;
+		}
+
+		/* Find the program header that contains `node_fpos' */
+		for (i = 0;; ++i) {
+			size_t aligned_phdr_file_size, aligned_phdr_file_shift;
+			pos_t aligned_phdr_file_pos, aligned_phdr_file_end;
+			if (i >= phnum)
+				goto not_an_elf_file_phdrv;
+			if (UM_field_r(sizeof_pointer, phdrv, [i].p_type) != PT_LOAD)
+				continue; /* Must be a load-header! */
+			aligned_phdr_file_pos = (pos_t)UM_field_r(sizeof_pointer, phdrv, [i].p_offset);
+			aligned_phdr_file_size   = UM_field_r(sizeof_pointer, phdrv, [i].p_filesz);
+			aligned_phdr_file_shift  = (size_t)(aligned_phdr_file_pos & (PAGESIZE - 1));
+			aligned_phdr_file_size   += aligned_phdr_file_shift;
+			aligned_phdr_file_pos -= aligned_phdr_file_shift;
+			if (node_fpos < aligned_phdr_file_pos)
+				continue;
+			if (OVERFLOW_UADD(aligned_phdr_file_pos, aligned_phdr_file_size, &aligned_phdr_file_end))
+				goto not_an_elf_file_phdrv;
+			if (node_fpos < aligned_phdr_file_end) {
+				/* All right! We've found the program header that (supposedly)  was
+				 * used to map the node who's origin our caller wants us to verify.
+				 *
+				 * Assuming that the mapping is legit, we can use this information
+				 * to  determine the load-offset (i.e. the ASLR key) that was used
+				 * when the module was mapped, and that is needed to locate  other
+				 * nodes that would also belong to this module. */
+				USER byte_t *segment_address;
+				uintptr_t offset_in_segment;
+				offset_in_segment = (uintptr_t)(node_fpos - aligned_phdr_file_pos);
+				segment_address   = node_addr - offset_in_segment;
+				/* Calculate the effective module load address. */
+				loadaddr = (uintptr_t)segment_address - (UM_field_r(sizeof_pointer, phdrv, [i].p_vaddr) -
+				                                         aligned_phdr_file_shift);
+				break;
+			}
+		}
+
+		/* At this point, we can be fairly certain that we've found a
+		 * proper UserELF module, meaning that we should move forward
+		 * by actually creating its descriptor! */
+		result = (REF struct userelf_module *)kmalloc(offsetof(struct userelf_module, um_sections) +
+		                                              (shnum * sizeof(struct uems_awref)),
+		                                              GFP_CALLOC);
+		result->um_shoff      = shoff;
+		result->um_shnum      = shnum;
+		result->um_shstrndx   = UM_field_r(sizeof_pointer, ehdr, .e_shstrndx);
+/*		UM_any(result->um_shdrs) = NULL;*/ /* Already done by GFP_CALLOC */
+/*		result->um_shstrtab   = NULL;*/    /* Already done by GFP_CALLOC */
+		result->md_refcnt     = 2; /* +1: return, +1: thismman_uemc */
+		result->md_weakrefcnt = 1;
+/*		result->md_nodecount  = 0;*/ /* Already done by GFP_CALLOC; Incremented later! */
+		result->md_ops        = &uem_ops;
+		result->md_loadaddr   = loadaddr;
+		result->md_loadmin    = (void *)-1;
+/*		result->md_loadmax    = (void *)0;*/ /* Already done by GFP_CALLOC */
+/*		result->md_fspath     = NULL;*/      /* Already done by GFP_CALLOC */
+/*		result->md_fsname     = NULL;*/      /* Already done by GFP_CALLOC */
+#ifdef _MODULE_HAVE_SIZEOF_POINTER
+		result->md_sizeof_pointer = sizeof_pointer;
+#endif /* _MODULE_HAVE_SIZEOF_POINTER */
+
+		/* Re-acquire a lock to the mman. */
+		TRY {
+			mman_lock_acquire(self);
+		} EXCEPT {
+			kfree(result);
+			RETHROW();
+		}
+
+		/* Verify that the `node_addr<==>node_fpos' mapping is still a thing! */
+		{
+			struct mnode *node;
+			struct mpart *part;
+			pos_t real_node_fpos;
+			node = mman_mappings_locate(self, node_addr);
+			if unlikely(!node)
+				goto not_an_elf_file_phdrv_result_mmlock;
+			part = node->mn_part;
+			if unlikely(!part)
+				goto not_an_elf_file_phdrv_result_mmlock;
+			if unlikely(ATOMIC_READ(part->mp_file) != file) {
+something_changed:
+				mman_lock_release(self);
+				kfree(result);
+				freea(UM_any(phdrv));
+				return UEM_TRYCREATE_UNLOCKED;
+			}
+			/* Calculate the current file-position mapped at `node_addr',
+			 * and  make sure that it doesn't differ from what our caller
+			 * has told us to base our assumption upon.
+			 * NOTE: No need to lock `part',  because our lock to  `self'
+			 *       also guaranties that the part's address change isn't
+			 *       altered! */
+			real_node_fpos = mnode_getfileaddr(node);
+			real_node_fpos += (size_t)(node_addr -(byte_t *)mnode_getaddr(node));
+			if unlikely(real_node_fpos != node_fpos)
+				goto something_changed;
+		}
+
+		/* Verify that all PT_LOAD-segments of `result' are mapped correctly. */
+		for (i = 0; i < phnum; ++i) {
+			struct mnode *node;
+			struct mnode_tree_minmax mima;
+			byte_t *minaddr, *maxaddr;
+			pos_t ph_fpos;
+			uintptr_t ph_prot;
+			if (UM_field_r(sizeof_pointer, phdrv, [i].p_type) != PT_LOAD)
+				continue; /* Allow anything for non-load headers! */
+			ph_prot = mnodeflags_from_elfpf(UM_field_r(sizeof_pointer, phdrv, [i].p_flags));
+			ph_fpos = (pos_t)UM_field_r(sizeof_pointer, phdrv, [i].p_offset);
+			minaddr = (byte_t *)UM_field_r(sizeof_pointer, phdrv, [i].p_vaddr) + loadaddr;
+			maxaddr = (byte_t *)minaddr + UM_field_r(sizeof_pointer, phdrv, [i].p_memsz);
+			minaddr = (byte_t *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
+			maxaddr = (byte_t *)CEIL_ALIGN((uintptr_t)maxaddr, PAGESIZE) - 1;
+			if unlikely(minaddr >= maxaddr)
+				goto not_an_elf_file_phdrv_result_mmlock;
+			mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
+			if unlikely(!mima.mm_min)
+				goto not_an_elf_file_phdrv_result_mmlock;
+			if (result->md_loadmin > minaddr)
+				result->md_loadmin = minaddr;
+			if (result->md_loadmax < maxaddr)
+				result->md_loadmax = maxaddr;
+			for (node = mima.mm_min;;) {
+				struct mfile *node_file;
+
+				/* Load filesystem name info, and make sure it's consistent
+				 * across all segments that actually offer filesystem name
+				 * information. */
+				if (!result->md_fspath && !result->md_fsname) {
+					result->md_fspath = node->mn_fspath;
+					result->md_fsname = node->mn_fsname;
+				} else if (result->md_fspath != node->mn_fspath ||
+				           result->md_fsname != node->mn_fsname) {
+					if (node->mn_fspath || node->mn_fsname)
+						goto not_an_elf_file_phdrv_result_mmlock;
+				}
+
+				/* Verify that the node's protection flags include at least all
+				 * of the permissions required by the ELF Program header.  More
+				 * permissions are allowed, in case of stuff like TEXTREL being
+				 * handled at the moment, but less permissions aren't allowed. */
+				if unlikely((node->mn_flags & ph_prot) != ph_prot)
+					goto not_an_elf_file_phdrv_result_mmlock;
+
+				/* This node must either be a file-mapping of `self' with the
+				 * appropriate offset described by `phdrv[i]', or point at  a
+				 * zero-initialized .bss-style file. */
+				if unlikely(!node->mn_part)
+					goto not_an_elf_file_phdrv_result_mmlock;
+				node_file = ATOMIC_READ(node->mn_part->mp_file);
+				if (node_file == file) {
+					/* Verify file-offsets */
+					pos_t expected_fpos, actual_fpos;
+					expected_fpos = ph_fpos + (size_t)((byte_t *)mnode_getminaddr(node) - minaddr);
+					actual_fpos   = mnode_getfileaddr(node);
+					if (expected_fpos != actual_fpos)
+						goto not_an_elf_file_phdrv_result_mmlock;
+				} else if (node_file >= mfile_anon && node_file < COMPILER_ENDOF(mfile_anon)) {
+					/* Allow zero-memory for .bss-style mappings! */
+				} else {
+					/* Unexpected file mapping... (not a valid UserELF mapping!) */
+					goto not_an_elf_file_phdrv_result_mmlock;
+				}
+
+				/* Deal with the case where another module is already bound to this address... */
+				if unlikely(node->mn_module != NULL) {
+					/* There's already another module that's mapped here...
+					 *
+					 * Simple case: If the module's already been destroyed,
+					 *              just remove it manually! */
+					if (wasdestroyed(node->mn_module)) {
+						node->mn_module = NULL;
+					} else {
+						/* Check for race condition: another thread created
+						 * the module that was requested before we got here.
+						 *
+						 * In this case, use `node->mn_module' as result,
+						 * but also check that it can be found in all of
+						 * the places where we expect it to be located at. */
+						if (node == mima.mm_min &&
+						    node->mn_module->md_ops == &uem_ops &&
+						    node->mn_module->md_loadaddr == result->md_loadaddr &&
+						    node->mn_module->md_file == file &&
+						    node->mn_module->md_nodecount != 0) {
+							for (++i; i < phnum; ++i) {
+								if (UM_field_r(sizeof_pointer, phdrv, [i].p_type) != PT_LOAD)
+									continue; /* Allow anything for non-load headers! */
+								minaddr = (byte_t *)UM_field_r(sizeof_pointer, phdrv, [i].p_vaddr) + loadaddr;
+								maxaddr = (byte_t *)minaddr + UM_field_r(sizeof_pointer, phdrv, [i].p_memsz);
+								minaddr = (byte_t *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
+								maxaddr = (byte_t *)CEIL_ALIGN((uintptr_t)maxaddr, PAGESIZE) - 1;
+								if unlikely (minaddr >= maxaddr)
+									goto not_an_elf_file_phdrv_result_mmlock;
+								if (result->md_loadmin > minaddr)
+									result->md_loadmin = minaddr;
+								if (result->md_loadmax < maxaddr)
+									result->md_loadmax = maxaddr;
+							}
+							if (node->mn_module->md_loadmin == result->md_loadmin &&
+							    node->mn_module->md_loadmax == result->md_loadmax) {
+								/* Same module -> Re-use what was already registered! */
+								REF struct userelf_module *new_result;
+								new_result = (REF struct userelf_module *)incref(node->mn_module);
+								mman_lock_release(self);
+								kfree(result);
+								freea(UM_any(phdrv));
+								return new_result;
+							}
+						}
+
+						/* Complicated case: Something weird happened between
+						 * us and a different variant of the same module. And
+						 * considering that we're still dealing with the same
+						 * underlying `mfile', better be safe than sorry, and
+						 * simply go done the not-an-elf-file path... */
+						goto not_an_elf_file_phdrv_result_mmlock;
+					}
+				}
+				if (node == mima.mm_max)
+					break;
+				{
+					void *endaddr;
+					endaddr = mnode_getendaddr(node);
+					node    = mnode_tree_nextnode(node);
+					assert(node);
+					if (mnode_getaddr(node) != endaddr)
+						goto not_an_elf_file_phdrv_result_mmlock;
+				}
+			}
+		}
+
+		/* Add self-pointers for `result' to `self'. */
+		for (i = 0; i < phnum; ++i) {
+			struct mnode *node;
+			struct mnode_tree_minmax mima;
+			byte_t *minaddr, *maxaddr;
+			if (UM_field_r(sizeof_pointer, phdrv, [i].p_type) != PT_LOAD)
+				continue; /* Allow anything for non-load headers! */
+			minaddr = (byte_t *)UM_field_r(sizeof_pointer, phdrv, [i].p_vaddr) + loadaddr;
+			maxaddr = (byte_t *)minaddr + UM_field_r(sizeof_pointer, phdrv, [i].p_memsz);
+			minaddr = (byte_t *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
+			maxaddr = (byte_t *)CEIL_ALIGN((uintptr_t)maxaddr, PAGESIZE) - 1;
+			assert(minaddr < maxaddr);
+			mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
+			assert(mima.mm_min);
+			assert(result->md_loadmin <= minaddr);
+			assert(result->md_loadmax >= maxaddr);
+			for (node = mima.mm_min;;) {
+				assert(!node->mn_module);
+
+				/* Set the module self-pointer. */
+				node->mn_module = result;
+				++result->md_nodecount;
+
+				if (node == mima.mm_max)
+					break;
+#ifdef NDEBUG
+				node = mnode_tree_nextnode(node);
+#else /* NDEBUG */
+				{
+					void *endaddr;
+					endaddr = mnode_getendaddr(node);
+					node    = mnode_tree_nextnode(node);
+					assert(node);
+					assertf(mnode_getaddr(node) == endaddr,
+					        "mnode_getaddr(node) = %p\n"
+					        "endaddr             = %p\n",
+					        mnode_getaddr(node), endaddr);
+				}
+#endif /* !NDEBUG */
+			}
+		}
+		if unlikely(result->md_nodecount == 0)
+			goto not_an_elf_file_phdrv_result_mmlock; /* _really_ shouldn't happen... */
+
+		/* Add `result' to the cache of `self'.
+		 * NOTE: The reference inherited here was accounted for by the init of `md_refcnt'! */
+		LIST_INSERT_HEAD(&FORMMAN(self, thismman_uemc), result, um_cache);
+
+		/* Fill in remaining fields of `result' */
+		xincref(result->md_fspath);
+		xincref(result->md_fsname);
+		result->md_mman = weakincref(self);
+		result->md_file = incref(file);
+		mman_lock_release(self);
+	} EXCEPT {
+		freea(UM_any(phdrv));
+		RETHROW();
+	}
+	freea(UM_any(phdrv));
+	return result;
+not_an_elf_file_phdrv_result_mmlock:
+	mman_lock_release(self);
+/*not_an_elf_file_phdrv_result:*/
+	kfree(result);
+not_an_elf_file_phdrv:
+	freea(UM_any(phdrv));
+not_an_elf_file:
+	return UEM_TRYCREATE_UNLOCKED_NOUEM;
+}
 
 /* Try to create a UserELF module for the given `node' from `self'.
  * For this purpose, this function  is called while holding a  lock
@@ -820,10 +1308,13 @@ done:
  *        >> !mman_lock_acquired(self)
  *        An   exception   was  thrown
  */
-PRIVATE REF struct userelf_module *FCALL
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
 uem_trycreate(struct mman *__restrict self,
               struct mnode *__restrict node) {
+	bool did_unlock;
 	REF struct userelf_module *result;
+	struct mpart *part;
+	struct mfile *file;
 
 	/* Quick check: Is there already a module registered under this node? */
 	result = (REF struct userelf_module *)node->mn_module;
@@ -848,14 +1339,123 @@ uem_trycreate(struct mman *__restrict self,
 	}
 
 	/* Check if this node might qualify as a UserELF module. */
-	/* TODO */
+	if unlikely(node->mn_flags & (MNODE_F_MPREPARED | MNODE_F_KERNPART | MNODE_F_MHINT))
+		return NULL; /* Certain flags can't be set for UserELF modules. */
 
+	/* Acquire a lock to the node's part. */
+	part = node->mn_part;
+	if unlikely(!part)
+		return NULL; /* Mustn't be a reserved node. */
 
-	COMPILER_IMPURE();
-	(void)self;
-	(void)node;
-	/* TODO */
-	return NULL;
+	if (!mpart_lock_tryacquire(part)) {
+		/* Release mman lock & spin until we get the part-lock! */
+waitfor_part:
+		incref(part);
+		mman_lock_release(self);
+		FINALLY_DECREF_UNLIKELY(part);
+		while (!mpart_lock_available(part))
+			task_yield();
+		return UEM_TRYCREATE_UNLOCKED;
+	}
+
+	file = part->mp_file;
+
+	/* Check  for  specific files  that are  known to
+	 * never be able to be apart of a UserELF module.
+	 *
+	 * Note however that while some of these may  not
+	 * be able to form a UserELF module on their own,
+	 * they _are_ able to do so as extension to  some
+	 * other, adjacent, neighboring (and most  likely
+	 * preceding) mapping. */
+	if (file == &mfile_ndef || file == &mfile_phys) {
+		mpart_lock_release(part);
+		return NULL;
+	}
+
+	did_unlock = false;
+	if (file >= mfile_anon && file < COMPILER_ENDOF(mfile_anon)) {
+		/* Special case: zero-initialized memory.
+		 * In this case, we may be dealing with a .bss segment
+		 * of a UserELF module, in which case we should try to
+		 * see if we can find a neighboring node that has also
+		 * been yet to  be considered as  part of any  UserELF
+		 * module, may form one in conjunction with this node. */
+		unsigned int i;
+		for (i = 0; i < 2; ++i) {
+			struct mnode *neighbor;
+			neighbor = i == 0 ? mnode_tree_prevnode(node)
+			                  : mnode_tree_nextnode(node);
+			if (!neighbor)
+				continue; /* No neighbor */
+			if (neighbor->mn_module != NULL)
+				continue; /* Already apart of a known (different) module */
+			if (i == 0 ? mnode_getendaddr(neighbor) != mnode_getaddr(node)
+			           : mnode_getaddr(neighbor) != mnode_getendaddr(node))
+				continue; /* Not an immediate neighbor. */
+			void *minaddr, *maxaddr;
+			minaddr = mnode_getminaddr(node);
+			maxaddr = mnode_getmaxaddr(node);
+			mpart_lock_release(part);
+			result = uem_trycreate(self, neighbor);
+			if (result == UEM_TRYCREATE_UNLOCKED) {
+				/* Try again... */
+				return UEM_TRYCREATE_UNLOCKED;
+			} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
+				/* Not the preceding node.
+				 * Acquire the mman lock and see if anything's changed. */
+				did_unlock = true;
+				mman_lock_acquire(self);
+				if (mman_mappings_locate(self, minaddr) != node ||
+				    mnode_getminaddr(node) != minaddr ||
+				    mnode_getmaxaddr(node) != maxaddr ||
+				    node->mn_part != part)
+					return UEM_TRYCREATE_UNLOCKED;
+				if (!mpart_lock_tryacquire(part))
+					goto waitfor_part;
+			} else if (result != NULL) {
+				/* Potential  success (but let's  re-try in case the
+				 * module discovered is actually a different module) */
+				decref_unlikely(result);
+				return UEM_TRYCREATE_UNLOCKED;
+			}
+		}
+		if (did_unlock) {
+			mman_lock_release(self);
+			return UEM_TRYCREATE_UNLOCKED;
+		}
+		return NULL;
+	}
+
+#ifndef CONFIG_USE_NEW_FS
+	if (!vm_datablock_isinode(file)) {
+		mpart_lock_release(part);
+		if (did_unlock) {
+			mman_lock_release(self);
+			return UEM_TRYCREATE_UNLOCKED;
+		}
+		return NULL;
+	}
+#endif /* !CONFIG_USE_NEW_FS */
+
+	/* Assume that we're dealing with an actual file-mapping. */
+	{
+		USER CHECKED byte_t *node_addr;
+		pos_t node_fpos;
+		incref(file);
+		node_addr = (byte_t *)mnode_getaddr(node);
+		node_fpos = mnode_getfileaddr(node);
+		mpart_lock_release(part);
+		mman_lock_release(self);
+
+		/* TODO: Special handling for /lib/libdl.so (and its compat-counterpart!) */
+
+		/* Try to create a new UserELF module! */
+		FINALLY_DECREF_UNLIKELY(file);
+		result = uem_create_from_mapping(self, file, node_addr, node_fpos);
+		assertf(result != NULL, "Other values are used to indicate failure!");
+	}
+	return result;
 }
 
 
@@ -941,7 +1541,7 @@ uem_next(struct mman *__restrict self,
 	/* Because UserELF modules can be embedded inside of each other,
 	 * we have to start looking  for them starting immediatly  after
 	 * the original node. */
-	minaddr = (byte_t *)prev->md_loadstart + PAGESIZE;
+	minaddr = (byte_t *)prev->md_loadmin + PAGESIZE;
 again:
 	mman_lock_acquire(self);
 	mman_mappings_minmaxlocate(self, minaddr, (void *)-1, &mima);

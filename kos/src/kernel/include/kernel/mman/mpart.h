@@ -91,13 +91,13 @@
                                        *         this  flag   also  prevents   the   part  from   being   merged. */
 #define MPART_F_NOMERGE        0x0800 /* [const] Don't allow this mem-part to be merged. */
 #define MPART_F_MLOCK_FROZEN   0x1000 /* [lock(WRITE_ONCE)] The value of the `MPART_F_MLOCK' flag cannot be altered. */
-#define MPART_F_MLOCK          0x2000 /* [lock(MPART_F_LOCKBIT)] Locked mem-part (the part's state
-                                       * cannot move  away from  INCORE). Unless  `MPART_F_MLOCK_FROZEN' is  set, this  flag
-                                       * is set whenever  this part is  mapped by  any mem-node that  has the  MNODE_F_MLOCK
-                                       * flag set, and whenever a mem-node with the MNODE_F_MLOCK flag set has is destroyed,
-                                       * or has its  MNODE_F_MLOCK flag cleared,  all mappings of  the mem-part are  scanned
-                                       * in  search for other locked mappings. If any  are found, then this flag will remain
-                                       * set. If none are found, then this flag is cleared. */
+#define MPART_F_MLOCK          0x2000 /* [lock(MPART_F_LOCKBIT)] Locked mem-part (the  part's state  cannot move  away
+                                       * from INCORE). Unless `MPART_F_MLOCK_FROZEN' is set, this flag is set whenever
+                                       * this part is mapped  by any mem-node that  has the `MNODE_F_MLOCK' flag  set,
+                                       * and whenever a mem-node with the  `MNODE_F_MLOCK' flag set has is  destroyed,
+                                       * or  has its  `MNODE_F_MLOCK' flag cleared,  all mappings of  the mem-part are
+                                       * scanned in search  for other  locked mappings. If  any are  found, then  this
+                                       * flag will remain set. If none are found, then this flag is cleared. */
 #define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
 /*efine MPART_F_               0x8000  * ... */
 

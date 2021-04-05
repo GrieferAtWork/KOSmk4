@@ -68,7 +68,7 @@
                                       *  - mn_mman == &mman_kernel
                                       *  - mn_part != NULL
                                       *  - mn_link.le_prev == &(mn_flags & MNODE_F_SHARED ? mn_part->mp_share : mn_part->mp_copy).lh_first
-                                      *  - *mn_link.le_prev = this
+                                      *  - *mn_link.le_prev == this
                                       *  - mn_link.le_next == NULL
                                       *  - (mn_flags & MNODE_F_SHARED ? mn_part->mp_copy : mn_part->mp_share).lh_first == NULL
                                       *  - !isshared(mn_part) // Not strictly enforced, but assumed. - You are allowed to
@@ -85,7 +85,7 @@
                                       * must also be aware of the fact that requirements imposed by `MNODE_F_NOSPLIT'
                                       * and `MNODE_F_NOMERGE' also apply to nodes that are hinted! */
 #define MNODE_F_MLOCK     0x00002000 /* [lock(mn_part->MPART_F_LOCKBIT)] Lock backing memory (see `MPART_F_MLOCK' for how this flag works) */
-#define MNODE_F__RBRED    0x00004000 /* [lock(mn_mman->mm_lock)] Internal flag: This part is a red node. */
+#define MNODE_F__RBRED    0x00004000 /* [lock(mn_mman->mm_lock)] Internal flag: This node is red in the mman-mappings R/B tree. */
 #define MBNODE_F_POPULATE 0x00008000 /* Used internally by `struct mbnode' */
 #define MBNODE_F_NONBLOCK 0x00010000 /* Used internally by `struct mbnode' */
 /*efine MNODE_F_          0x00020000  * ... */

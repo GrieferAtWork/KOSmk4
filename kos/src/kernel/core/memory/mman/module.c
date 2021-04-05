@@ -112,8 +112,8 @@ NOTHROW(FCALL module_remove_from_mman)(struct module *__restrict self,
 #endif /* NDEBUG && !__OPTIMIZE_SIZE__ */
 
 	mnode_tree_minmaxlocate(mm->mm_mappings,
-	                        (byte_t *)self->md_loadstart,
-	                        (byte_t *)self->md_loadend - 1,
+	                        self->md_loadmin,
+	                        self->md_loadmax,
 	                        &mima);
 	if unlikely(!mima.mm_min) {
 #ifndef NDEBUG

@@ -32,6 +32,9 @@
 
 #include <hybrid/align.h>
 
+#include <kos/except.h>
+#include <kos/except/reason/io.h>
+
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -207,6 +210,81 @@ mfile_write_from_mempart_buffer(struct mfile *__restrict self,
 		}
 	}
 }
+
+PUBLIC WUNUSED NONNULL((1)) void KCALL
+mfile_readall(struct mfile *__restrict self,
+              USER CHECKED void *dst,
+              size_t num_bytes, pos_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	while (num_bytes) {
+		size_t temp;
+		temp = mfile_read(self, dst, num_bytes, src_offset);
+		if (temp >= num_bytes)
+			break;
+		if (!temp)
+			THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
+		dst = (USER CHECKED byte_t *)dst + temp;
+		num_bytes -= temp;
+		src_offset += temp;
+	}
+}
+
+PUBLIC WUNUSED NONNULL((1)) void KCALL
+mfile_readall_p(struct mfile *__restrict self,
+                physaddr_t dst,
+                size_t num_bytes, pos_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	while (num_bytes) {
+		size_t temp;
+		temp = mfile_read_p(self, dst, num_bytes, src_offset);
+		if (temp >= num_bytes)
+			break;
+		if (!temp)
+			THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
+		dst += temp;
+		num_bytes -= temp;
+		src_offset += temp;
+	}
+}
+
+PUBLIC WUNUSED NONNULL((1, 2)) void KCALL
+mfile_readvall(struct mfile *__restrict self,
+               struct iov_buffer const *__restrict buf,
+               size_t buf_offset, size_t num_bytes,
+               pos_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
+	while (num_bytes) {
+		size_t temp;
+		temp = mfile_readv(self, buf, buf_offset, num_bytes, src_offset);
+		if (temp >= num_bytes)
+			break;
+		if (!temp)
+			THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
+		buf_offset += temp;
+		num_bytes -= temp;
+		src_offset += temp;
+	}
+}
+
+PUBLIC WUNUSED NONNULL((1, 2)) void KCALL
+mfile_readallv_p(struct mfile *__restrict self,
+                 struct iov_physbuffer const *__restrict buf,
+                 size_t buf_offset, size_t num_bytes,
+                 pos_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	while (num_bytes) {
+		size_t temp;
+		temp = mfile_readv_p(self, buf, buf_offset, num_bytes, src_offset);
+		if (temp >= num_bytes)
+			break;
+		if (!temp)
+			THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
+		buf_offset += temp;
+		num_bytes -= temp;
+		src_offset += temp;
+	}
+}
+
 
 DECL_END
 #endif /* CONFIG_USE_NEW_FS */

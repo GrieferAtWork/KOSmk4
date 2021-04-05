@@ -47,15 +47,15 @@ DECL_BEGIN
 #define UM_HYBRID
 #define UM_ElfW(type) union { Elf32_##type _32; Elf64_##type _64; }
 #define UM_any(base) ((base)._32)
-#define UM_field(mod, base, field)                    \
-	((mod)->md_sizeof_pointer == 4 ? (base)._32 field \
-	                               : (base)._64 field)
-#define UM_field_ptr(mod, base, field)                         \
-	((mod)->md_sizeof_pointer == 4 ? (void *)&(base)._32 field \
-	                               : (void *)&(base)._64 field)
-#define UM_sizeof(mod, T)                                              \
-	((mod)->md_sizeof_pointer == 4 ? sizeof(((__typeof__(T) *)0)->_32) \
-	                               : sizeof(((__typeof__(T) *)0)->_64))
+#define UM_field_r(sizeof_pointer, base, field) \
+	((sizeof_pointer) == 4 ? (base)._32 field   \
+	                       : (base)._64 field)
+#define UM_field_ptr_r(sizeof_pointer, base, field)    \
+	((sizeof_pointer) == 4 ? (void *)&(base)._32 field \
+	                       : (void *)&(base)._64 field)
+#define UM_sizeof_r(sizeof_pointer, T)                         \
+	((sizeof_pointer) == 4 ? sizeof(((__typeof__(T) *)0)->_32) \
+	                       : sizeof(((__typeof__(T) *)0)->_64))
 #else /* ... */
 #define UM_ElfW                        ElfW
 #define UM_field(mod, base, field)     (base) field
@@ -63,10 +63,16 @@ DECL_BEGIN
 #define UM_sizeof(mod, T)              sizeof(T)
 #define UM_any(base)                   (base)
 #endif /* !... */
+#define UM_field(mod, base, field)     UM_field_r((mod)->md_sizeof_pointer, base, field)
+#define UM_field_ptr(mod, base, field) UM_field_ptr_r((mod)->md_sizeof_pointer, base, field)
+#define UM_sizeof(mod, T)              UM_sizeof_r((mod)->md_sizeof_pointer, T)
 
 typedef UM_ElfW(Shdr) UM_ElfW_Shdr;
 typedef UM_ElfW(Shdr *) UM_ElfW_ShdrP;
 typedef UM_ElfW(Chdr) UM_ElfW_Chdr;
+typedef UM_ElfW(Ehdr) UM_ElfW_Ehdr;
+typedef UM_ElfW(Phdr) UM_ElfW_Phdr;
+typedef UM_ElfW(Phdr *) UM_ElfW_PhdrP;
 
 
 struct userelf_module_section: module_section {
@@ -101,12 +107,9 @@ struct userelf_module: module {
 		struct postlockop                     _um_sc_postlop;/* *ditto* */
 		SLIST_ENTRY(userelf_module)           _um_dead;      /* Used internally to chain dead UserELF modules. */
 	};
-	pos_t                                      um_phoff;     /* [const] == Elf_Ehdr::e_phoff. */
 	pos_t                                      um_shoff;     /* [const] == Elf_Ehdr::e_shoff. */
-	uint16_t                                   um_phnum;     /* [const] == Elf_Ehdr::e_phnum. */
 	uint16_t                                   um_shnum;     /* [const] == Elf_Ehdr::e_shnum. */
 	uint16_t                                   um_shstrndx;  /* [const] == Elf_Ehdr::e_shstrndx. (< ue_shnum) */
-	uint16_t                                  _um_pad;       /* ... */
 	UM_ElfW_ShdrP                              um_shdrs;     /* [0..1][lock(WRICE_ONCE)] Section headers */
 	union {
 		char                                  *um_shstrtab;  /* [0..1][lock(WRITE_ONCE)][owned] Section headers string table. */

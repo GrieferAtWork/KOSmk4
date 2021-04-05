@@ -173,8 +173,8 @@ struct module {
 	struct module_ops const    *md_ops;        /* [1..1][const] Module operators. */
 	WEAK REF struct mman       *md_mman;       /* [1..1][const] Associated mman. */
 	uintptr_t                   md_loadaddr;   /* [const] Load address of the module. */
-	void                       *md_loadstart;  /* [const] Lowest address mapped by this module. */
-	void                       *md_loadend;    /* [const] Greatest address mapped by this module. */
+	void                       *md_loadmin;    /* [const] Lowest address mapped by this module. */
+	void                       *md_loadmax;    /* [const] Greatest address mapped by this module. */
 	REF struct mfile           *md_file;       /* [1..1][const] The backing file of the executable. */
 #ifdef __WANT_MODULE__md_mmlop
 	union {
