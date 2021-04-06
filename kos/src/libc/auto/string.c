@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ca2bbcc */
+/* HASH CRC-32:0x25914250 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,9 +133,12 @@ NOTHROW_NCX(LIBCCALL libc_strlen)(char const *__restrict str) {
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strchr)(char const *__restrict haystack,
                                   int needle) {
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char)needle)
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if unlikely((unsigned char)ch == (unsigned char)needle)
 			return (char *)haystack;
+		if (!ch)
+			break;
 	}
 	return NULL;
 }
@@ -147,9 +150,12 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) ch
 NOTHROW_NCX(LIBCCALL libc_strrchr)(char const *__restrict haystack,
                                    int needle) {
 	char const *result = NULL;
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char)needle)
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if unlikely((unsigned char)ch == (unsigned char)needle)
 			result = haystack;
+		if (!ch)
+			break;
 	}
 	return (char *)result;
 }
@@ -936,31 +942,6 @@ NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst,
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 }
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
-                                 int needle) {
-	for (;; ++haystack) {
-		char ch = *haystack;
-		if ((unsigned char)ch == (unsigned char)needle)
-			return (char *)haystack;
-		if (!ch)
-			break;
-	}
-	return NULL;
-}
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
-                                  int needle) {
-	char const *result = NULL;
-	for (;; ++haystack) {
-		char ch = *haystack;
-		if ((unsigned char)ch == (unsigned char)needle)
-			result = haystack;
-		if (!ch)
-			break;
-	}
-	return (char *)result;
-}
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1,
                                       char const *s2) {
@@ -4599,9 +4580,15 @@ DEFINE_PUBLIC_ALIAS(memchr, libc_memchr);
 DEFINE_PUBLIC_ALIAS(strlen, libc_strlen);
 #endif /* !LIBC_ARCH_HAVE_STRLEN */
 #ifndef LIBC_ARCH_HAVE_STRCHR
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(index, libc_strchr);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strchr, libc_strchr);
 #endif /* !LIBC_ARCH_HAVE_STRCHR */
 #ifndef LIBC_ARCH_HAVE_STRRCHR
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(rindex, libc_strrchr);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strrchr, libc_strrchr);
 #endif /* !LIBC_ARCH_HAVE_STRRCHR */
 #ifndef LIBC_ARCH_HAVE_STRCMP
@@ -4753,8 +4740,6 @@ DEFINE_PUBLIC_ALIAS(bzeroq, libc_bzeroq);
 #endif /* !LIBC_ARCH_HAVE_BZEROQ */
 DEFINE_PUBLIC_ALIAS(bzeroc, libc_bzeroc);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(index, libc_index);
-DEFINE_PUBLIC_ALIAS(rindex, libc_rindex);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_stricmp, libc_strcasecmp);
 DEFINE_PUBLIC_ALIAS(_strcmpi, libc_strcasecmp);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ec33c31 */
+/* HASH CRC-32:0xa47aa11a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -837,9 +837,12 @@ NOTHROW_NCX(LIBKCALL libc_wcscspn)(char32_t const *haystack,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcschr)(char16_t const *__restrict haystack,
                                   char16_t needle) {
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char16_t)needle)
+	for (;; ++haystack) {
+		char16_t ch = *haystack;
+		if unlikely((char16_t)ch == (char16_t)needle)
 			return (char16_t *)haystack;
+		if (!ch)
+			break;
 	}
 	return NULL;
 }
@@ -848,9 +851,12 @@ NOTHROW_NCX(LIBDCALL libd_wcschr)(char16_t const *__restrict haystack,
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcschr)(char32_t const *__restrict haystack,
                                   char32_t needle) {
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char32_t)needle)
+	for (;; ++haystack) {
+		char32_t ch = *haystack;
+		if unlikely((char32_t)ch == (char32_t)needle)
 			return (char32_t *)haystack;
+		if (!ch)
+			break;
 	}
 	return NULL;
 }
@@ -860,9 +866,12 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNU
 NOTHROW_NCX(LIBDCALL libd_wcsrchr)(char16_t const *__restrict haystack,
                                    char16_t needle) {
 	char16_t const *result = NULL;
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char16_t)needle)
+	for (;; ++haystack) {
+		char16_t ch = *haystack;
+		if unlikely((char16_t)ch == (char16_t)needle)
 			result = haystack;
+		if (!ch)
+			break;
 	}
 	return (char16_t *)result;
 }
@@ -872,9 +881,12 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((
 NOTHROW_NCX(LIBKCALL libc_wcsrchr)(char32_t const *__restrict haystack,
                                    char32_t needle) {
 	char32_t const *result = NULL;
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char32_t)needle)
+	for (;; ++haystack) {
+		char32_t ch = *haystack;
+		if unlikely((char32_t)ch == (char32_t)needle)
 			result = haystack;
+		if (!ch)
+			break;
 	}
 	return (char32_t *)result;
 }

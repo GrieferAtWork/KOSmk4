@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20bc8403 */
+/* HASH CRC-32:0x71d8859c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3188,14 +3188,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifndef __freezero_defined
 #define __freezero_defined 1
 #ifdef __CRT_HAVE_freezero
-/* Same as `free(mallptr)', but also ensure that the memory region
+/* >> freezero(3)
+ * Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 __CDECLARE_VOID(,__NOTHROW_NCX,freezero,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <libc/local/stdlib/freezero.h>
-/* Same as `free(mallptr)', but also ensure that the memory region
+/* >> freezero(3)
+ * Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */

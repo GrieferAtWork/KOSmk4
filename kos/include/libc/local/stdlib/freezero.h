@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c142adf */
+/* HASH CRC-32:0xf9773ddb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,8 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Same as `free(mallptr)', but also ensure that the memory region
+/* >> freezero(3)
+ * Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */

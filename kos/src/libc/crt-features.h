@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe53d750b */
+/* HASH CRC-32:0x80578e56 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1448,7 +1448,6 @@
 #define __CRT_HAVE_DOS$ilogbl
 #define __CRT_HAVE_DOS$imaxabs
 #define __CRT_HAVE_DOS$imaxdiv
-#define __CRT_HAVE_DOS$index
 #define __CRT_HAVE_DOS$inet6_opt_append
 #define __CRT_HAVE_DOS$inet6_opt_find
 #define __CRT_HAVE_DOS$inet6_opt_finish
@@ -2238,7 +2237,6 @@
 #define __CRT_HAVE_DOS$rewinddir
 #define __CRT_HAVE_DOS$rexec
 #define __CRT_HAVE_DOS$rexec_af
-#define __CRT_HAVE_DOS$rindex
 #define __CRT_HAVE_DOS$rint
 #define __CRT_HAVE_DOS$rintf
 #define __CRT_HAVE_DOS$rintl
@@ -4572,7 +4570,6 @@
 #define __CRT_HAVE_ilogbl
 #define __CRT_HAVE_imaxabs
 #define __CRT_HAVE_imaxdiv
-#define __CRT_HAVE_index
 #define __CRT_HAVE_inet6_opt_append
 #define __CRT_HAVE_inet6_opt_find
 #define __CRT_HAVE_inet6_opt_finish
@@ -5418,7 +5415,6 @@
 #define __CRT_HAVE_rewinddir
 #define __CRT_HAVE_rexec
 #define __CRT_HAVE_rexec_af
-#define __CRT_HAVE_rindex
 #define __CRT_HAVE_rint
 #define __CRT_HAVE_rintf
 #define __CRT_HAVE_rintl

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x196eaf3b */
+/* HASH CRC-32:0x45e7c743 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,10 +64,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> strchr(3)
  * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
+#elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
+/* >> strchr(3)
+ * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strchr)
 /* >> strchr(3)
  * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
+#elif defined(__CRT_HAVE_index)
+/* >> strchr(3)
+ * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchr.h>

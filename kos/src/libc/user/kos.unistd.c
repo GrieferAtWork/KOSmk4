@@ -134,16 +134,14 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 /*[[[body:libd_Execl]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	Execv(path,
-	      (char const *const *)&args);
+	Execv(path, (char *const *)&args);
 #else
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
 	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
-	Execv(path,
-	      (char const *const *)vector);
+	Execv(path, (char *const *)vector);
 #endif
 	__builtin_unreachable();
 }
@@ -162,16 +160,14 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 /*[[[body:libc_Execl]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	Execv(path,
-	      (char const *const *)&args);
+	Execv(path, (char *const *)&args);
 #else
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
 	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
-	Execv(path,
-	      (char const *const *)vector);
+	Execv(path, (char *const *)vector);
 #endif
 	__builtin_unreachable();
 }
@@ -194,8 +190,8 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	Execve(path,
-	       (char const *const *)&args,
-	       (char const *const *)*penvp);
+	       (char *const *)&args,
+	       (char *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;
@@ -204,8 +200,8 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execve(path,
-	       (char const *const *)vector,
-	       (char const *const *)envp);
+	       (char *const *)vector,
+	       (char *const *)envp);
 #endif
 	__builtin_unreachable();
 }
@@ -228,8 +224,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	Execve(path,
-	       (char const *const *)&args,
-	       (char const *const *)*penvp);
+	       (char *const *)&args,
+	       (char *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;
@@ -238,8 +234,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execve(path,
-	       (char const *const *)vector,
-	       (char const *const *)envp);
+	       (char *const *)vector,
+	       (char *const *)envp);
 #endif
 	__builtin_unreachable();
 }
@@ -257,16 +253,14 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 /*[[[body:libd_Execpl]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	Execvp(file,
-	       (char const *const *)&args);
+	Execvp(file, (char *const *)&args);
 #else
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
 	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
-	Execvp(file,
-	       (char const *const *)vector);
+	Execvp(file, (char *const *)vector);
 #endif
 	__builtin_unreachable();
 }
@@ -284,16 +278,14 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 /*[[[body:libc_Execpl]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	Execvp(file,
-	       (char const *const *)&args);
+	Execvp(file, (char *const *)&args);
 #else
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
 	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
-	Execvp(file,
-	       (char const *const *)vector);
+	Execvp(file, (char *const *)vector);
 #endif
 	__builtin_unreachable();
 }
@@ -316,8 +308,8 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	Execvpe(file,
-	        (char const *const *)&args,
-	        (char const *const *)*penvp);
+	        (char *const *)&args,
+	        (char *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;
@@ -326,8 +318,8 @@ INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENT
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execvpe(file,
-	        (char const *const *)vector,
-	        (char const *const *)envp);
+	        (char *const *)vector,
+	        (char *const *)envp);
 #endif
 	__builtin_unreachable();
 }
@@ -350,8 +342,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	Execvpe(file,
-	        (char const *const *)&args,
-	        (char const *const *)*penvp);
+	        (char *const *)&args,
+	        (char *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;
@@ -360,8 +352,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execvpe(file,
-	        (char const *const *)vector,
-	        (char const *const *)envp);
+	        (char *const *)vector,
+	        (char *const *)envp);
 #endif
 	__builtin_unreachable();
 }
@@ -570,8 +562,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((2, 3
 {
 	sys_Xexecveat(fd,
 	              "",
-	              (char const *const *)___argv,
-	              (char const *const *)___envp,
+	              (char *const *)___argv,
+	              (char *const *)___envp,
 	              AT_EMPTY_PATH);
 	__builtin_unreachable();
 }

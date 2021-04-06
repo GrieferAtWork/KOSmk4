@@ -2117,8 +2117,9 @@ NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
 }
 /*[[[end:libc_recallocarray]]]*/
 
-/*[[[head:libc_freezero,hash:CRC-32=0x86cde3d3]]]*/
-/* Same as `free(mallptr)', but also ensure that the memory region
+/*[[[head:libc_freezero,hash:CRC-32=0x9a62d36d]]]*/
+/* >> freezero(3)
+ * Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */

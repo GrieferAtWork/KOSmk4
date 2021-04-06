@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c731938 */
+/* HASH CRC-32:0x904a45b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
  * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __LOCAL_LIBC(wcschr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcschr))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle) {
-	for (; *__haystack; ++__haystack) {
-		if __unlikely(*__haystack == (__WCHAR_TYPE__)__needle)
+	for (;; ++__haystack) {
+		__WCHAR_TYPE__ __ch = *__haystack;
+		if __unlikely((__WCHAR_TYPE__)__ch == (__WCHAR_TYPE__)__needle)
 			return (__WCHAR_TYPE__ *)__haystack;
+		if (!__ch)
+			break;
 	}
 	return __NULLPTR;
 }

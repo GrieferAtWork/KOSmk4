@@ -69,8 +69,8 @@ typedef __SIZE_TYPE__ size_t;
 
 %[insert:extern(bcopy)]
 %[insert:guarded_function(bcmp = memcmp)]
-%[insert:extern(index)]
-%[insert:extern(rindex)]
+%[insert:guarded_function(index = strchr)]
+%[insert:guarded_function(rindex = strrchr)]
 
 %
 %#ifndef __bzero_defined

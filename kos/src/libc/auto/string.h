@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55102ca4 */
+/* HASH CRC-32:0xbeb4ed69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -848,18 +848,6 @@ INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__res
 INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_bzeroc)(void *__restrict dst, size_t elem_count, size_t elem_size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst, size_t elem_count, size_t elem_size);
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_index)(char const *__restrict haystack, int needle);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack, int needle);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_rindex)(char const *__restrict haystack, int needle);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack, int needle);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strcasecmp)(char const *s1, char const *s2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

@@ -3163,6 +3163,7 @@ void *recallocarray(void *mallptr, $size_t old_elem_count,
 	return recallocv(mallptr, new_elem_count, elem_size);
 }
 
+@@>> freezero(3)
 @@Same as `free(mallptr)', but also ensure that the memory region
 @@described by `mallptr...+=num_bytes' is explicitly freed to zero, or
 @@immediately returned to the OS, rather than being left in cache

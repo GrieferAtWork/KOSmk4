@@ -631,31 +631,43 @@ size_t strlen([[nonnull]] char const *__restrict str) {
 
 @@>> strchr(3)
 @@Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found.
-[[libc, std, kernel, wunused, crtbuiltin, pure]]
+[[libc, std, kernel, wunused, crtbuiltin, pure, alias("index")]]
+[[if(!defined(__KERNEL__)), export_as("index")]]
+[[if(__has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(index, { return __builtin_index(haystack, needle); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCHR))]]
 char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
 {
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char)needle)
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if unlikely((unsigned char)ch == (unsigned char)needle)
 			return (char *)haystack;
+		if (!ch)
+			break;
 	}
 	return NULL;
 }
 
 @@>> strrchr(3)
 @@Return the pointer of the last instance of `needle', or `NULL' if `needle' wasn't found.
-[[std, kernel, wunused, crtbuiltin, pure]]
+[[std, kernel, wunused, crtbuiltin, pure, alias("rindex")]]
+[[if(!defined(__KERNEL__)), export_as("rindex")]]
+[[if(__has_builtin(__builtin_rindex) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(rindex, { return __builtin_rindex(haystack, needle); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRRCHR))]]
 char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
 {
 	char const *result = NULL;
-	for (; *haystack; ++haystack) {
-		if unlikely(*haystack == (char)needle)
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if unlikely((unsigned char)ch == (unsigned char)needle)
 			result = haystack;
+		if (!ch)
+			break;
 	}
 	return (char *)result;
 }
@@ -1556,37 +1568,8 @@ void bzeroc([[nonnull]] void *__restrict dst,
 
 
 %[insert:guarded_function(bcmp = memcmp)]
-
-[[guard, wunused, crtbuiltin, pure]]
-char *index([[nonnull]] char const *__restrict haystack, int needle)
-	[([[nonnull]] char *__restrict haystack, int needle): char *]
-	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
-{
-	for (;; ++haystack) {
-		char ch = *haystack;
-		if ((unsigned char)ch == (unsigned char)needle)
-			return (char *)haystack;
-		if (!ch)
-			break;
-	}
-	return NULL;
-}
-
-[[guard, wunused, crtbuiltin, pure]]
-char *rindex([[nonnull]] char const *__restrict haystack, int needle)
-	[([[nonnull]] char *__restrict haystack, int needle): char *]
-	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
-{
-	char const *result = NULL;
-	for (;; ++haystack) {
-		char ch = *haystack;
-		if ((unsigned char)ch == (unsigned char)needle)
-			result = haystack;
-		if (!ch)
-			break;
-	}
-	return (char *)result;
-}
+%[insert:guarded_function(index = strchr)]
+%[insert:guarded_function(rindex = strrchr)]
 
 [[guard, dos_only_export_alias("_stricmp", "_strcmpi")]]
 [[export_alias("stricmp", "strcmpi", "__strcasecmp")]]
