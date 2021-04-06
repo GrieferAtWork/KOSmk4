@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MODULE_USERELF_C
 #define GUARD_KERNEL_SRC_MEMORY_MODULE_USERELF_C 1
+#define __WANT_MODULE_SECTION__ms_dead
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -41,6 +42,7 @@
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
 #include <sched/lockop.h>
 
@@ -79,74 +81,6 @@
 #endif /* !ELF_ARCH_MAXSHCOUNT */
 
 DECL_BEGIN
-
-/************************************************************************/
-/* UserELF Section cache                                                */
-/************************************************************************/
-LIST_HEAD(userelf_module_section_list, REF userelf_module_section);
-
-/* [0..n][lock(uems_cache_lock)][link(ums_cache)]
- * Global  cache of UserELF section objects. In order to keep UserELF
- * module sections loaded for a while longer, even after the user has
- * dropped a reference to them (so-as  to allow for faster lookup  if
- * accessed again), a global cache of references to UserELF  sections
- * if kept. This cache is  maintained thus, that when the  associated
- * UserELF module is destroyed, it  will automatically remove all  of
- * its sections from this cache (via asynchronous lockop operations),
- * meaning that this  cache functions to  automatically clean up  the
- * sections belonging to destroyed modules. */
-PRIVATE struct userelf_module_section_list uems_cache      = LIST_HEAD_INITIALIZER(uems_cache);
-PRIVATE struct atomic_lock /*           */ uems_cache_lock = ATOMIC_LOCK_INIT;
-PRIVATE struct lockop_slist /*          */ uems_cache_lops = SLIST_HEAD_INITIALIZER(uems_cache_lops);
-#define _uems_cache_reap()      _lockop_reap_atomic_lock(&uems_cache_lops, &uems_cache_lock)
-#define uems_cache_reap()       lockop_reap_atomic_lock(&uems_cache_lops, &uems_cache_lock)
-#define uems_cache_tryacquire() atomic_lock_tryacquire(&uems_cache_lock)
-#define uems_cache_acquire()    atomic_lock_acquire(&uems_cache_lock)
-#define uems_cache_acquire_nx() atomic_lock_acquire_nx(&uems_cache_lock)
-#define uems_cache_release()    (atomic_lock_release(&uems_cache_lock), uems_cache_reap())
-#define uems_cache_release_f()  atomic_lock_release(&uems_cache_lock)
-#define uems_cache_acquired()   atomic_lock_acquired(&uems_cache_lock)
-#define uems_cache_available()  atomic_lock_available(&uems_cache_lock)
-
-/* Clear the global cache of UserELF sections, and return a
- * number  representative of an approximation of the amount
- * of memory became available as a result of this. */
-DEFINE_SYSTEM_CACHE_CLEAR(uem_clearsections);
-INTERN NOBLOCK size_t NOTHROW(KCALL uem_clearsections)(void) {
-	size_t result = 0;
-	struct userelf_module_section_slist dead;
-	if (!uems_cache_tryacquire())
-		goto done;
-
-	/* Remove all objects from the cache. */
-	SLIST_INIT(&dead);
-	while (!LIST_EMPTY(&uems_cache)) {
-		REF struct userelf_module_section *sect;
-		sect = LIST_FIRST(&uems_cache);
-		LIST_UNBIND(sect, ums_cache);
-		if (ATOMIC_DECFETCH(sect->ms_refcnt) == 0)
-			SLIST_INSERT_HEAD(&dead, sect, _ums_dead);
-	}
-	uems_cache_release_f();
-
-	/* Destroy dead sections. */
-	while (!SLIST_EMPTY(&dead)) {
-		struct userelf_module_section *sect;
-		sect = SLIST_FIRST(&dead);
-		SLIST_REMOVE_HEAD(&dead, _ums_dead);
-		uems_destroy(sect);
-		result += sizeof(struct userelf_module_section);
-	}
-	uems_cache_reap();
-done:
-	return result;
-}
-/************************************************************************/
-
-
-
-
-
 
 /************************************************************************/
 PRIVATE /*ATTR_RETNONNULL*/ NONNULL((1)) UM_ElfW_ShdrP FCALL
@@ -457,10 +391,10 @@ NOTHROW(FCALL uem_unbind_sections_and_destroy_postlop)(struct postlockop *__rest
 
 	/* Destroy dead sections! */
 	while (!SLIST_EMPTY(&me->_um_deadsect)) {
-		struct userelf_module_section *sect;
+		struct module_section *sect;
 		sect = SLIST_FIRST(&me->_um_deadsect);
-		SLIST_REMOVE_HEAD(&me->_um_deadsect, _ums_dead);
-		uems_destroy(sect);
+		SLIST_REMOVE_HEAD(&me->_um_deadsect, _ms_dead);
+		uems_destroy((struct userelf_module_section *)sect);
 	}
 
 	/* Proceed normally with the full destruction
@@ -481,18 +415,18 @@ NOTHROW(FCALL uem_unbind_sections_and_destroy_lop)(struct lockop *__restrict sel
 		sect = awref_get(&me->um_sections[me->um_shnum]);
 		if (!sect)
 			continue; /* Section was never allocated or is dead. */
-		if unlikely(!LIST_ISBOUND(sect, ums_cache)) {
+		if unlikely(!LIST_ISBOUND(sect, ms_cache)) {
 			decref_unlikely(sect);
 			continue; /* Section isn't apart of the cache... */
 		}
-		LIST_UNBIND(sect, ums_cache);
+		LIST_UNBIND(sect, ms_cache);
 		decref_nokill(sect); /* The reference from the section cache. */
 
 		/* Drop the reference we got from `awref_get()'
 		 * If this ends up destroying the section, then enqueue said
 		 * destruction to be performed  as part of the  post-lockop. */
 		if (ATOMIC_DECFETCH(sect->ms_refcnt) == 0)
-			SLIST_INSERT(&me->_um_deadsect, sect, _ums_dead);
+			SLIST_INSERT(&me->_um_deadsect, sect, _ms_dead);
 	}
 
 	/* Do the rest of the module destruction, as well as the
@@ -518,20 +452,20 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 		sect = awref_get(&self->um_sections[self->um_shnum]);
 		if (!sect)
 			continue; /* Section was never allocated or is dead. */
-		if unlikely(!LIST_ISBOUND(sect, ums_cache)) {
+		if unlikely(!LIST_ISBOUND(sect, ms_cache)) {
 			decref_unlikely(sect);
 			continue; /* Section isn't apart of the cache... */
 		}
 
 		/* Must remove this section from the cache. */
-		if (uems_cache_tryacquire()) {
-			if likely(LIST_ISBOUND(sect, ums_cache)) {
-				LIST_UNBIND(sect, ums_cache);
+		if (module_section_cache_tryacquire()) {
+			if likely(LIST_ISBOUND(sect, ms_cache)) {
+				LIST_UNBIND(sect, ms_cache);
 				decref_nokill(sect);
 			}
-			uems_cache_release_f();
+			module_section_cache_release_f();
 			decref_likely(sect);
-			uems_cache_reap();
+			module_section_cache_reap();
 		} else {
 			/* Must  use  a lockop  to unbind  the section
 			 * once the UEMS cache lock becomes available.
@@ -543,9 +477,9 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 			 * the UserELF section cache. */
 			++self->um_shnum; /* Must do the last section once again! */
 			self->_um_sc_lop.lo_func = &uem_unbind_sections_and_destroy_lop;
-			SLIST_ATOMIC_INSERT(&uems_cache_lops, &self->_um_sc_lop, lo_link);
+			SLIST_ATOMIC_INSERT(&module_section_cache_lops, &self->_um_sc_lop, lo_link);
 			decref_unlikely(sect);
-			_uems_cache_reap();
+			_module_section_cache_reap();
 			return;
 		}
 	}
@@ -664,7 +598,7 @@ again:
 
 	/* Acquire a lock to the UserELF section cache. */
 	TRY {
-		uems_cache_acquire();
+		module_section_cache_acquire();
 	} EXCEPT {
 		destroy(result);
 		RETHROW();
@@ -672,7 +606,7 @@ again:
 
 	/* Replace a previously destroyed section object with the new section! */
 	if (!awref_replacedead(&self->um_sections[section_index], result)) {
-		uems_cache_release();
+		module_section_cache_release();
 		destroy(result);
 		goto again;
 	}
@@ -684,10 +618,10 @@ again:
 	 *
 	 * However, sections are  automatically removed  from
 	 * the cache when the associated module is destroyed. */
-	LIST_INSERT_HEAD(&uems_cache, result, ums_cache);
+	LIST_INSERT_HEAD(&module_section_cache, result, ms_cache);
 
 	/* Release the lock from the UserELF section cache. */
-	uems_cache_release();
+	module_section_cache_release();
 
 	return result;
 }
