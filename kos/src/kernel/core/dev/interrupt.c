@@ -23,11 +23,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/isr.h>
+#include <kernel/mman/cache.h>
+#include <kernel/mman/driver.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <sched/task.h>
@@ -387,7 +388,7 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 		                                 true));
 		new_state->ivs_greedy_fun = (isr_greedy_function_t)func;
 		new_state->ivs_greedy_arg = arg;
-		new_state->ivs_greedy_drv = incref(func_driver);
+		new_state->ivs_greedy_drv = (REF struct driver *)incref(func_driver);
 		new_state->ivs_greedy_cnt = 0;
 		memcpy(new_state->ivs_handv,
 		       old_state->ivs_handv,
@@ -399,13 +400,13 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 	} else {
 		new_state->ivs_greedy_fun = old_state->ivs_greedy_fun;
 		new_state->ivs_greedy_arg = old_state->ivs_greedy_arg;
-		new_state->ivs_greedy_drv = xincref(old_state->ivs_greedy_drv);
+		new_state->ivs_greedy_drv = (REF struct driver *)xincref(old_state->ivs_greedy_drv);
 		new_state->ivs_greedy_cnt = old_state->ivs_greedy_cnt;
 		/* Load the new function as the primary handler, so
 		 * we can more easily determine its hit/miss ratio. */
 		new_state->ivs_handv[0].ivh_fun = (isr_function_t)func;
 		new_state->ivs_handv[0].ivh_arg = arg;
-		new_state->ivs_handv[0].ivh_drv = incref(func_driver);
+		new_state->ivs_handv[0].ivh_drv = (REF struct driver *)incref(func_driver);
 		memcpy(new_state->ivs_handv + 1,
 		       old_state->ivs_handv,
 		       old_state->ivs_handc,
@@ -426,9 +427,9 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 			real_arg  = hi->hi_obj;
 			assert(func_driver == &drv_self);
 			decref_nokill(func_driver); /* Inherit on success. */
-			func_driver = driver_at_address(real_func);
+			func_driver = driver_fromaddr(real_func);
 			if unlikely(!func_driver)
-				func_driver = incref(&drv_self); /* Shouldn't happen... */
+				func_driver = (REF struct driver *)incref(&drv_self); /* Shouldn't happen... */
 		}
 		printk(KERN_INFO "[isr] Register handler for vector %#" PRIxSIZ " (%p with %p in driver %q)\n",
 		       (size_t)ISR_INDEX_TO_VECTOR(index),
@@ -452,7 +453,7 @@ isr_register_impl(void *func, void *arg, bool is_greedy)
 	size_t i, winner_index = 0;
 	uintptr_t cache_version;
 	cache_version = 0;
-	func_driver = driver_at_address(func);
+	func_driver = driver_fromaddr(func);
 	/* Make sure that a driver exists at the given address. */
 	if unlikely(!func_driver)
 		THROW(E_SEGFAULT_NOTEXECUTABLE, func, E_SEGFAULT_CONTEXT_FAULT);
@@ -529,7 +530,7 @@ isr_register_at_impl(isr_vector_t vector, void *func, void *arg, bool is_greedy)
 	 * act like it's impossible to allocate further data for it. */
 	if unlikely(!ISR_VECTOR_IS_VALID(vector))
 		THROW(E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS, vector);
-	func_driver = driver_at_address(func);
+	func_driver = driver_fromaddr(func);
 	/* Make sure that a driver exists at the given address. */
 	if unlikely(!func_driver)
 		THROW(E_SEGFAULT_NOTEXECUTABLE, func, E_SEGFAULT_CONTEXT_FAULT);
@@ -655,7 +656,7 @@ assign_new_state:
 			new_state = isr_vector_state_alloc(old_state->ivs_handc - 1);
 			new_state->ivs_greedy_fun = old_state->ivs_greedy_fun;
 			new_state->ivs_greedy_arg = old_state->ivs_greedy_arg;
-			new_state->ivs_greedy_drv = xincref(old_state->ivs_greedy_drv);
+			new_state->ivs_greedy_drv = (REF struct driver *)xincref(old_state->ivs_greedy_drv);
 			new_state->ivs_greedy_cnt = old_state->ivs_greedy_cnt;
 			/* Copy handlers, but leave out the one at index=`i' */
 			memcpy(&new_state->ivs_handv[0],
@@ -924,9 +925,9 @@ assign_new_state:
 shortcut_success:
 			{
 				REF struct driver *declaring_driver;
-				declaring_driver = driver_at_address(func);
+				declaring_driver = driver_fromaddr(func);
 				if unlikely(!declaring_driver)
-					declaring_driver = incref(&drv_self);
+					declaring_driver = (REF struct driver *)incref(&drv_self);
 				printk(KERN_INFO "[isr] Delete handler for vector %#" PRIxSIZ " (%p with %p in driver %q)\n",
 				       (size_t)ISR_INDEX_TO_VECTOR(index),
 				       func, ob_pointer, declaring_driver->d_name);
@@ -955,7 +956,7 @@ shortcut_success:
 				goto shortcut_success;
 			new_state->ivs_greedy_fun = old_state->ivs_greedy_fun;
 			new_state->ivs_greedy_arg = old_state->ivs_greedy_arg;
-			new_state->ivs_greedy_drv = xincref(old_state->ivs_greedy_drv);
+			new_state->ivs_greedy_drv = (REF struct driver *)xincref(old_state->ivs_greedy_drv);
 			new_state->ivs_greedy_cnt = old_state->ivs_greedy_cnt;
 			/* Copy handlers, but leave out the one at index=`i' */
 			memcpy(&new_state->ivs_handv[0],
@@ -1087,7 +1088,7 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	new_state->ivs_handc      = old_state->ivs_handc;
 	new_state->ivs_greedy_fun = old_state->ivs_greedy_fun;
 	new_state->ivs_greedy_arg = old_state->ivs_greedy_arg;
-	new_state->ivs_greedy_drv = xincref(old_state->ivs_greedy_drv);
+	new_state->ivs_greedy_drv = (REF struct driver *)xincref(old_state->ivs_greedy_drv);
 	new_state->ivs_greedy_cnt = old_state->ivs_greedy_cnt;
 	/************
 	 *   d  s   *

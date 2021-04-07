@@ -646,6 +646,22 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     - Properly implement libc's regex functions
 	 */
 
+	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
+Coredump /bin/playground tid:13
+assert.expr: "count == 0"
+assert.file: "kos/src/apps/playground/main.c"
+assert.line: 746
+assert.func: "main_leak"
+assert.mesg: "Leaks: 38"
+> l
+E:\c\kls\kos\kos\src\libdebuginfo\debug_info.c(995) : libdi_debuginfo_cu_parser_getstring : Error : err
+E:\c\kls\kos\kos\src\libdebuginfo\debug_info.c(1986) : libdi_debuginfo_cu_parser_loadattr_variable : Error : err
+argc: (int)<deleted>
+x   : (int volatile)<deleted>
+E:\c\kls\kos\kos\src\libdebuginfo\debug_info.c(995) : libdi_debuginfo_cu_parser_getstring : Error : err
+E:\c\kls\kos\kos\src\libdebuginfo\debug_info.c(1986) : libdi_debuginfo_cu_parser_loadattr_variable : Error : err
+*/
+
 	return state;
 }
 

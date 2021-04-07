@@ -185,6 +185,19 @@ init_alternatives(struct x86_alternative const *start,
  * defined via the  optional `.alternatives'  section. */
 INTERN ATTR_COLDTEXT NONNULL((1)) void KCALL
 arch_driver_initialize(struct driver *__restrict self) {
+#ifdef CONFIG_USE_NEW_DRIVER
+	REF struct module_section *sect;
+	sect = module_locksection((struct module *)self, ".alternatives");
+	if (sect) {
+		byte_t const *data;
+		size_t size;
+		FINALLY_DECREF_UNLIKELY(sect);
+		data = module_section_getaddr_inflate(sect, &size);
+		init_alternatives((struct x86_alternative const *)(data),
+		                  (struct x86_alternative const *)(data + size),
+		                  ((struct module *)self)->md_loadaddr);
+	}
+#else /* CONFIG_USE_NEW_DRIVER */
 	REF struct driver_section *sect;
 	sect = driver_section_lock(self, ".alternatives");
 	if (!sect)
@@ -193,6 +206,7 @@ arch_driver_initialize(struct driver *__restrict self) {
 	init_alternatives((struct x86_alternative const *)(sect->ds_data),
 	                  (struct x86_alternative const *)((byte_t *)sect->ds_data + sect->ds_size),
 	                  self->d_loadaddr);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 DATDEF struct cpuinfo bootcpu_x86_cpuid_ ASMNAME("bootcpu_x86_cpuid");

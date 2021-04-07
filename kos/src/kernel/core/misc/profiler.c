@@ -24,8 +24,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/mman/driver.h>
 #include <kernel/printk.h>
 #include <kernel/profiler.h>
 #include <kernel/types.h>
@@ -58,15 +58,15 @@ branchstat(branchstat_callback_t cb, void *arg) {
 	/* Enumerate the kernel core. */
 	result = branchstat_d(cb, arg, &kernel_driver);
 	if likely(result >= 0) {
-		REF struct driver_state *ds;
+		REF struct driver_loadlist *dll;
 		size_t i;
 		/* Enumerate all loaded drivers. */
-		ds = driver_get_state();
-		FINALLY_DECREF_UNLIKELY(ds);
-		for (i = 0; i < ds->ds_count; ++i) {
+		dll = get_driver_loadlist();
+		FINALLY_DECREF_UNLIKELY(dll);
+		for (i = 0; i < dll->dll_count; ++i) {
 			ssize_t temp;
 			struct driver *drv;
-			drv = ds->ds_drivers[i];
+			drv = dll->dll_drivers[i];
 			if unlikely(!tryincref(drv))
 				continue; /* Dead driver... */
 			{
@@ -94,8 +94,13 @@ branchstat_listone(branchstat_callback_t cb, void *arg,
 	/* In drivers, branch predictions contain driver-relative addresses.
 	 * Hide this detail from `cb()' and pass a relocated copy of  `pred' */
 	if (is_driver) {
+#ifdef CONFIG_USE_NEW_DRIVER
+		used_pred.bp_addr = (__BRANCH_PREDITION_ADDRESS_TYPE)((uintptr_t)used_pred.bp_addr +
+		                                                      mod->md_loadaddr);
+#else /* CONFIG_USE_NEW_DRIVER */
 		used_pred.bp_addr = (__BRANCH_PREDITION_ADDRESS_TYPE)((uintptr_t)used_pred.bp_addr +
 		                                                      mod->d_loadaddr);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	}
 	result = (*cb)(arg, mod, &used_pred, annotated);
 	return result;
@@ -135,10 +140,20 @@ branchstat_listsection(branchstat_callback_t cb, void *arg,
                        bool annotated, bool is_driver) {
 	ssize_t result;
 	/* Enumerate all entires contains within the given section. */
+#ifdef CONFIG_USE_NEW_DRIVER
+	byte_t *data;
+	size_t size;
+	data   = module_section_getaddr_inflate(sect, &size);
+	result = branchstat_list(cb, arg, mod,
+	                         (struct branch_prediction *)(data),
+	                         (struct branch_prediction *)(data + size),
+	                         annotated, is_driver);
+#else /* CONFIG_USE_NEW_DRIVER */
 	result = branchstat_list(cb, arg, mod,
 	                         (struct branch_prediction *)((byte_t *)sect->ds_data),
 	                         (struct branch_prediction *)((byte_t *)sect->ds_data + sect->ds_size),
 	                         annotated, is_driver);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	return result;
 }
 
@@ -166,8 +181,12 @@ branchstat_d(branchstat_callback_t cb, void *arg,
 		REF struct driver_section *sect;
 		result = 0;
 		/* Lock the individual sections. */
+#ifdef CONFIG_USE_NEW_DRIVER
+		sect = (REF struct driver_section *)module_locksection(mod, BRANCH_PREDICTION_SECTION);
+#else /* CONFIG_USE_NEW_DRIVER */
 		sect = driver_section_lock(mod, BRANCH_PREDICTION_SECTION,
 		                           DRIVER_SECTION_LOCK_FNORMAL);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (sect) {
 			FINALLY_DECREF(sect);
 			temp = branchstat_listsection(cb, arg, mod, sect, false, true);
@@ -175,8 +194,12 @@ branchstat_d(branchstat_callback_t cb, void *arg,
 				goto err;
 			result += temp;
 		}
-		sect = driver_section_lock(mod, BRANCH_PREDICTION_SECTION_ANNOTATED,
+#ifdef CONFIG_USE_NEW_DRIVER
+		sect = (REF struct driver_section *)module_locksection(mod, BRANCH_PREDICTION_SECTION_ANNOTATED);
+#else /* CONFIG_USE_NEW_DRIVER */
+		sect = driver_section_lock(mod, BRANCH_PREDICTION_SECTION,
 		                           DRIVER_SECTION_LOCK_FNORMAL);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (sect) {
 			FINALLY_DECREF(sect);
 			temp = branchstat_listsection(cb, arg, mod, sect, true, true);

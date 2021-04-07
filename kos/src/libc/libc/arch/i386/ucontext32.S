@@ -457,6 +457,7 @@ END(libc_swapcontext)
 
 
 .section .text.crt.cpu.ucontext
+	nop
 INTERN_FUNCTION(libc_makecontext_exit_thread)
 	/* No CFI annotation, because we don't return! */
 	pushl  $(0)

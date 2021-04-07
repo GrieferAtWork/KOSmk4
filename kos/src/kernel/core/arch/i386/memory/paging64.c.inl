@@ -46,6 +46,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>

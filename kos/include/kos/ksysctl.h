@@ -272,7 +272,6 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
                                                            * @return: 0 : Nothing was released/freed.
                                                            *              In this case, the caller should indicate failure due to
                                                            *              lack of some necessary resource. */
-#define KSYSCTL_SYSTEM_TRIMHEAPS               0xc05e0002 /* Trim known kernel-space heaps (also done as part of `KSYSCTL_SYSTEM_CLEARCACHES'; return the total number of trimmed bytes) */
 #define KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS       0xc05ed001 /* Dump kernel-space memory leaks to the system log (return the number of leaked allocations) */
 #define KSYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING 0xc05ed002 /* Validate heap padding and panic if memory has been corrupted */
 #define KSYSCTL_SYSTEM_BRANCH_DUMP_STATS       0xc05ef001 /* Dump kernel branch statistics to the system log */

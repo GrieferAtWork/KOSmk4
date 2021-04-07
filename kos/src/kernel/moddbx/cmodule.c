@@ -226,7 +226,7 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
                                            struct cmodule *skipme) {
 	size_t i;
 	ssize_t temp, result = 0;
-	REF struct driver_state *ds;
+	REF struct driver_loadlist *dll;
 	REF struct cmodule *cm;
 	/* Enumerate the kernel core driver. */
 	if (!skipme || skipme->cm_module != (module_t *)&kernel_driver) {
@@ -238,9 +238,9 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
 		if unlikely(result < 0)
 			goto done_nods;
 	}
-	ds = driver_get_state();
-	for (i = 0; i < ds->ds_count; ++i) {
-		cm = cmodule_locate((module_t *)ds->ds_drivers[i]
+	dll = get_driver_loadlist();
+	for (i = 0; i < dll->dll_count; ++i) {
+		cm = cmodule_locate((module_t *)dll->dll_drivers[i]
 		                    module_type__arg(MODULE_TYPE_DRIVER));
 		if likely(cm) {
 			temp = 0;
@@ -258,7 +258,7 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
 		}
 	}
 done:
-	decref(ds);
+	decref(dll);
 done_nods:
 	return result;
 err:

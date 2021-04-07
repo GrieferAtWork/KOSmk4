@@ -27,6 +27,7 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/cache.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <sched/signal.h>

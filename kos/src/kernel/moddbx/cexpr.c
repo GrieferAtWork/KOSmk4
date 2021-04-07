@@ -36,6 +36,7 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 
 #include <debugger/rt.h>
 #include <fs/node.h>
+#include <kernel/mman.h>
 #include <kernel/panic.h>
 #include <kernel/types.h>
 

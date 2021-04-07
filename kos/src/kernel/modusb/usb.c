@@ -29,6 +29,7 @@
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/driver.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <sched/task.h>
@@ -287,7 +288,7 @@ again:
 		decref_unlikely(ovec);
 		return false;
 	}
-	func_driver = driver_at_address(func);
+	func_driver = driver_fromaddr(func);
 	TRY {
 		if unlikely(!func_driver)
 			THROW(E_SEGFAULT_NOTEXECUTABLE, func, E_SEGFAULT_CONTEXT_FAULT);

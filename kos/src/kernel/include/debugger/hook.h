@@ -569,7 +569,7 @@ struct dbg_hookiterator {
 
 /* Initialize a given `struct dbg_hookiterator *self' */
 #define dbg_hookiterator_init(self)                                                                     \
-	(void)((self)->dhi_drivers    = driver_get_state(),                                                 \
+	(void)((self)->dhi_drivers    = get_driver_loadlist(),                                              \
 	       (self)->dhi_nextdriver = 0,                                                                  \
 	       (self)->dhi_section    = incref(&kernel_section_dbg_hooks),                                  \
 	       (self)->dhi_sectnext   = (struct dbg_hookhdr *)kernel_section_dbg_hooks.ds_data,             \

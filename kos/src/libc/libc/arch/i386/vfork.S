@@ -83,7 +83,7 @@ DEFINE_PUBLIC_ALIAS(__vfork, libc_vfork)
 INTERN_FUNCTION(libc_VFork)
 	.cfi_startproc
 	/* Encode CFI to clear EFLAGS.DF on exit
-	 * Since exceptinos are  enabled (thanks  to EFLAGS.DF=1),  the
+	 * Since exceptions are  enabled (thanks  to EFLAGS.DF=1),  the
 	 * int80/syscall can result in an exception being thrown, which
 	 * we must handle by  clearing `EFLAGS.DF' before returning  to
 	 * our caller. (otherwise, stuff like `memcpy(3)' will break if

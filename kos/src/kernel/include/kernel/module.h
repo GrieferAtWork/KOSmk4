@@ -22,6 +22,72 @@
 
 #include <kernel/compiler.h>
 
+/* !!!DEPRECATED HEADER!!! */
+
+#ifdef CONFIG_USE_NEW_DRIVER
+#include <kernel/mman/driver.h>
+#include <kernel/mman/module.h>
+
+#include <hybrid/pp/__va_nargs.h>
+
+#define module_section_t                        struct module_section
+#define module_t                                struct module
+#define MODULE_TYPE_COUNT                       1
+#define _module_section_refcnt(self, typ)       (self)->ms_refcnt
+#define module_section_getudata(self, typ)      module_section_getaddr(self)
+#define module_section_getdata(self, typ)       module_section_getaddr_alias(self)
+#define module_section_getsize(self, typ)       (self)->ms_size
+#define module_section_getentsize(self, typ)    (self)->ms_entsize
+#define module_section_getlink(self, typ)       (self)->ms_link
+#define module_section_getinfo(self, typ)       (self)->ms_info
+#define module_section_getflags(self, typ)      (self)->ms_flags
+#define module_section_inflate(self, typ, size) module_section_getaddr_inflate(self, &(size))
+#define module_ataddr(addr, result_typ)         module_fromaddr(addr)
+#define module_ataddr_nx(addr, result_typ)      module_fromaddr_nx(addr)
+#define module_ataddr_nouser(addr)              ((struct module *)driver_fromaddr(addr))
+#define _module_refcnt(self, typ)               (self)->md_refcnt
+#define module_getloadaddr(self, typ)           (self)->md_loadaddr
+#define module_getloadstart(self, typ)          (uintptr_t)(self)->md_loadmin
+#define module_getloadend(self, typ)            (uintptr_t)((self)->md_loadmax + 1)
+#define module_vm(self, typ)                    (self)->md_mman
+
+#define __PRIVATE_module_locksection_2                            (*(self)->md_ops->mo_locksection)(self, section_name)
+#define __PRIVATE_module_locksection_4(self, typ, name, flags)    (*(self)->md_ops->mo_locksection)(self, name)
+#define __PRIVATE_module_locksection_nx_2                         (module_locksection_nx)
+#define __PRIVATE_module_locksection_nx_4(self, typ, name, flags) (module_locksection_nx)(self, name)
+#define module_locksection(...)    __HYBRID_PP_VA_OVERLOAD(__PRIVATE_module_locksection_, (__VA_ARGS__))(__VA_ARGS__)
+#define module_locksection_nx(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_module_locksection_nx_, (__VA_ARGS__))(__VA_ARGS__)
+
+#define module_type_var(name)    /* nothing */
+#define module_type_param(name)  /* nothing */
+#define module_type__param(name) /* nothing */
+#define module_type_param_(name) /* nothing */
+#define module_type_arg(name)    /* nothing */
+#define module_type__arg(name)   /* nothing */
+#define module_type_arg_(name)   /* nothing */
+
+#define module_section_incref(self, typ)           incref(self)
+#define module_section_decref(self, typ)           decref(self)
+#define module_section_decref_likely(self, typ)    decref_likely(self)
+#define module_section_decref_unlikely(self, typ)  decref_unlikely(self)
+#define module_section_decref_nokill(self, typ)    decref_nokill(self)
+#define module_section_xincref(self, typ)          xincref(self)
+#define module_section_xdecref(self, typ)          xdecref(self)
+#define module_section_xdecref_likely(self, typ)   xdecref_likely(self)
+#define module_section_xdecref_unlikely(self, typ) xdecref_unlikely(self)
+#define module_incref(self, typ)                   incref(self)
+#define module_decref(self, typ)                   decref(self)
+#define module_decref_likely(self, typ)            decref_likely(self)
+#define module_decref_unlikely(self, typ)          decref_unlikely(self)
+#define module_decref_nokill(self, typ)            decref_nokill(self)
+#define module_xincref(self, typ)                  xincref(self)
+#define module_xdecref(self, typ)                  xdecref(self)
+#define module_xdecref_likely(self, typ)           xdecref_likely(self)
+#define module_xdecref_unlikely(self, typ)         xdecref_unlikely(self)
+
+
+#else /* CONFIG_USE_NEW_DRIVER */
+
 /* Convenience hybrid-api to implement a dynamic, compatibility-
  * api  between `struct driver' and `struct usermod', as well as
  * their related types. */
@@ -317,6 +383,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 
 DECL_END
 #endif /* __CC__ */
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MODULE_H */

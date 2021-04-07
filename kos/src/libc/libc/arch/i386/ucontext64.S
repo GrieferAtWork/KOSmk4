@@ -213,10 +213,10 @@ INTERN_FUNCTION(libc_getcontext)
 	leaq   UC_(__OFFSET_UCONTEXTX64_SIGMASK)(%rbp), %rdi /* dest */
 	movq   %rax, %rsi                                    /* source */
 #if (__SIZEOF_SIGSET_T__ % 8) == 0
-	movq   $(__SIZEOF_SIGSET_T__ / 8), %rcx       /* count */
+	movq   $(__SIZEOF_SIGSET_T__ / 8), %rcx              /* count */
 	rep;   movsq
 #else /* (__SIZEOF_SIGSET_T__ % 8) == 0 */
-	movq   $(__SIZEOF_SIGSET_T__), %rcx           /* count */
+	movq   $(__SIZEOF_SIGSET_T__), %rcx                  /* count */
 	rep;   movsb
 #endif /* (__SIZEOF_SIGSET_T__ % 8) != 0 */
 
@@ -469,6 +469,7 @@ END(libc_swapcontext)
 
 
 .section .text.crt.cpu.ucontext
+	nop
 INTERN_FUNCTION(libc_makecontext_exit_thread)
 	/* No CFI annotation, because we don't return! */
 	xorq   %rdi, %rdi

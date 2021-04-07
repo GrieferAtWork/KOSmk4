@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_DRIVER
 #include <kernel/driver.h>
 #include <kernel/types.h>
 
@@ -125,5 +126,6 @@ INTERN_CONST struct driver_section *const kernel_sections[KERNEL_SECTIONS_COUNT]
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_CORE_FS_DRIVER_C */

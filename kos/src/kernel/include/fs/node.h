@@ -31,8 +31,9 @@
 #else /* CONFIG_USE_NEW_FS */
 #include <dev/block.h>
 #include <kernel/driver.h>
-#include <kernel/types.h>
+#include <kernel/malloc-defs.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/types.h>
 
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sync/atomic-lock.h>
@@ -2034,8 +2035,11 @@ struct superblock_type {
 	OLD_SLIST_NODE(struct superblock_type) st_chain;
 };
 
-#define __private_superblock_type_destroy(self) driver_destroy((self)->st_driver)
-DEFINE_REFCOUNT_FUNCTIONS(struct superblock_type, st_driver->d_refcnt, __private_superblock_type_destroy);
+#define __private_superblock_type_destroy(self) __driver_destroy((self)->st_driver)
+#define __private_superblock_type_refcnt(self)  __driver_refcnt((self)->st_driver)
+DEFINE_REFCOUNT_FUNCTIONS_P(struct superblock_type,
+                            __private_superblock_type_refcnt,
+                            __private_superblock_type_destroy);
 
 struct superblock_features {
 	pos_t   sf_symlink_max;        /* Max length of text contained within symbolic links */

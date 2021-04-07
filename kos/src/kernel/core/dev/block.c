@@ -35,6 +35,7 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/phys-access.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -1543,9 +1544,9 @@ do_dump_block_device(struct basic_block_device *__restrict self,
 		total_bytes_adj /= (u64)1024;
 		total_bytes_name = DBGSTR("KiB");
 	}
-	drv = driver_at_address(block_device_ispartition(self)
-	                        ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
-	                        : (void *)self->bd_type.dt_read);
+	drv = driver_fromaddr(block_device_ispartition(self)
+	                      ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
+	                      : (void *)self->bd_type.dt_read);
 	dbg_printf(DBGSTR("/dev/" AC_WHITE("%-*s") "  "
 	                  "%3.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
@@ -1607,9 +1608,9 @@ again:
 	namelen = strlen(self->bd_name);
 	if (*pmax_device_namelen < namelen)
 		*pmax_device_namelen = namelen;
-	drv = driver_at_address(block_device_ispartition(self)
-	                        ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
-	                        : (void *)self->bd_type.dt_read);
+	drv = driver_fromaddr(block_device_ispartition(self)
+	                      ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
+	                      : (void *)self->bd_type.dt_read);
 	if (drv) {
 		namelen = strlen(drv->d_name);
 		if (*pmax_driver_namelen < namelen)

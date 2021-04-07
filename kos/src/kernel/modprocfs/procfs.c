@@ -27,6 +27,7 @@
 
 #include <fs/node.h>
 #include <kernel/driver.h>
+#include <kernel/malloc.h>
 #include <kernel/printk.h>
 
 #include <linux/magic.h>

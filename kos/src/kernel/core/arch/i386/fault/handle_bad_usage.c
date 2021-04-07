@@ -70,9 +70,9 @@ opt.append("-Os");
 
 #include <kernel/arch/mman/nopf.h>
 #include <kernel/debugtrap.h>
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -1602,7 +1602,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 	REF struct driver *d;
 	/* Make sure that there's a driver mapped here.
 	 * HINT: This also asserts that `pc' points into kernel-space! */
-	d = driver_at_address(pc);
+	d = driver_fromaddr(pc);
 	if unlikely(!d)
 		goto done;
 	if unlikely(d == &kernel_driver) {

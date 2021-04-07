@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_DRIVER
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
@@ -361,5 +362,6 @@ handle_driver_section_hop(struct driver_section *__restrict self,
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_CORE_FS_DRIVER_HANDLE_C */

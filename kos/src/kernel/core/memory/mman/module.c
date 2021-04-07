@@ -27,6 +27,7 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module.h>
 #include <kernel/paging.h>
@@ -47,6 +48,20 @@ DECL_BEGIN
 #else /* !NDEBUG */
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
+
+/* Same as `module_locksection()', but preserve/discard errors and return `NULL' instead. */
+PUBLIC WUNUSED NONNULL((1, 2)) REF struct module_section *
+NOTHROW(FCALL module_locksection_nx)(struct module *__restrict self,
+                                     char const *section_name) {
+	REF struct module_section *result;
+	NESTED_TRY {
+		result = module_locksection(self, section_name);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
 
 /* Print  the absolute filesystem path or name (filesystem
  * path excluding the leading  path) of the given  module.
@@ -78,6 +93,12 @@ module_printname(struct module *__restrict self,
 	ssize_t result = 0;
 	char const *name;
 	u16 namelen;
+#ifdef CONFIG_USE_NEW_DRIVER
+	if (module_isdriver(self)) {
+		name = ((struct driver *)self)->d_name;
+		return (*printer)(arg, name, strlen(name));
+	}
+#endif /* CONFIG_USE_NEW_DRIVER */
 	if unlikely(self->md_fsname == NULL)
 		goto done;
 	name    = self->md_fsname->de_name;
@@ -90,6 +111,33 @@ module_printname(struct module *__restrict self,
 	}
 	result = (*printer)(arg, name, namelen);
 done:
+	return result;
+}
+
+/* Try to print the module's path, and if that fails, print its name. */
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
+module_printpath_or_name(struct module *__restrict self,
+                         pformatprinter printer, void *arg) {
+	ssize_t result = 0;
+	if (self->md_fspath && self->md_fsname) {
+		result = path_printent(self->md_fspath,
+		                       self->md_fsname->de_name,
+		                       self->md_fsname->de_namelen,
+		                       printer, arg);
+	}
+#ifdef CONFIG_USE_NEW_DRIVER
+	else if (module_isdriver(self) &&
+	         (!self->md_fsname || self->md_fsname->de_name[0] != '/')) {
+		char const *name;
+		name = ((struct driver *)self)->d_name;
+		return (*printer)(arg, name, strlen(name));
+	}
+#endif /* CONFIG_USE_NEW_DRIVER */
+	else if (self->md_fsname) {
+		result = (*printer)(arg,
+		                    self->md_fsname->de_name,
+		                    self->md_fsname->de_namelen);
+	}
 	return result;
 }
 
@@ -238,10 +286,14 @@ module_fromaddr(USER CHECKED void const *addr) {
 	if (ADDR_ISUSER(addr))
 		return uem_fromaddr(THIS_MMAN, addr);
 #endif /* CONFIG_HAVE_USERELF_MODULES */
-	/* TODO: Driver lookup! */
+
+#ifdef CONFIG_USE_NEW_DRIVER
+	return driver_fromaddr(addr);
+#else /* CONFIG_USE_NEW_DRIVER */
 	COMPILER_IMPURE();
 	(void)addr;
 	return NULL;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 /* Search for, and return a reference to the lowest available module, such
@@ -261,10 +313,14 @@ module_aboveaddr(USER CHECKED void const *addr) {
 	}
 #endif /* KERNELSPACE_HIGHMEM */
 #endif /* CONFIG_HAVE_USERELF_MODULES */
-	/* TODO: Driver lookup! */
+
+#ifdef CONFIG_USE_NEW_DRIVER
+	return driver_aboveaddr(addr);
+#else /* CONFIG_USE_NEW_DRIVER */
 	COMPILER_IMPURE();
 	(void)addr;
 	return NULL;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 /* Return  a  reference  to  the  first  module  different  from  `prev',  such  that
@@ -295,10 +351,13 @@ module_next(struct module *prev) {
 	}
 #endif /* CONFIG_HAVE_USERELF_MODULES */
 
-	/* TODO: Driver lookup! */
+#ifdef CONFIG_USE_NEW_DRIVER
+	return driver_next((struct driver *)prev);
+#else /* CONFIG_USE_NEW_DRIVER */
 	COMPILER_IMPURE();
 	(void)prev;
 	return NULL;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 

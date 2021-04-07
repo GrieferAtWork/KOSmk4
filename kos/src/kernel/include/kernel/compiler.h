@@ -55,6 +55,11 @@
 #define CONFIG_USE_NEW_ASYNC
 #endif
 
+#undef CONFIG_USE_NEW_DRIVER
+#if 0
+#define CONFIG_USE_NEW_DRIVER
+#endif
+
 
 /* Backward-compatibility */
 #define vm_datapart         mpart

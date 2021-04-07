@@ -53,7 +53,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include "symtab.h"
 
 #ifdef __KERNEL__
-#include <kernel/driver.h>
+#include <kernel/mman/driver.h>
 #endif /* __KERNEL__ */
 
 
@@ -122,6 +122,14 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 	 * TODO: A similar special case should exist for `libdl.so'! */
 #ifdef __KERNEL__
 	else if (sections->ds_debug_line_start == __kernel_debug_line_start) {
+#ifdef CONFIG_USE_NEW_DRIVER
+		struct driver_symaddr info;
+		if (driver_dladdr_local(&kernel_driver, module_relative_pc, &info)) {
+			result->al_symstart = (byte_t *)info.dsa_addr;
+			result->al_symend   = (byte_t *)info.dsa_addr + info.dsa_size;
+			result->al_rawname  = (char *)info.dsa_name;
+		}
+#else /* CONFIG_USE_NEW_DRIVER */
 		char const *name;
 		size_t sym_size;
 		name = driver_symbol_at(&kernel_driver, module_relative_pc,
@@ -130,6 +138,7 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 			result->al_symend  = result->al_symstart + sym_size;
 			result->al_rawname = (char *)name;
 		}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	}
 #endif /* __KERNEL__ */
 }

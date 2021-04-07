@@ -70,7 +70,7 @@
 #define HANDLE_TYPE_PIPE_READER     0x000d /* `struct pipe_reader' */
 #define HANDLE_TYPE_PIPE_WRITER     0x000e /* `struct pipe_writer' */
 #define HANDLE_TYPE_PIDNS           0x000f /* `struct pidns' */
-#define HANDLE_TYPE_DRIVER_STATE    0x0010 /* `struct driver_state' */
+#define HANDLE_TYPE_DRIVER_STATE    0x0010 /* `struct driver_loadlist' */
 #define HANDLE_TYPE_CHARACTERDEVICE 0x0011 /* `struct character_device'
                                             * Castable into: HANDLE_TYPE_DATABLOCK (if supported) */
 #define HANDLE_TYPE_EVENTFD_FENCE   0x0012 /* `struct eventfd' (without `EFD_SEMAPHORE') */

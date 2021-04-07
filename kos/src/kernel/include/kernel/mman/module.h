@@ -39,7 +39,7 @@ DECL_BEGIN
 
 /* Common base-class for any kind of executable object descriptor:
  *   - Userspace library/application accessor interface (allowing
- *     for kernel-space access to debug information contained in
+ *     for  kernel-space access to debug information contained in
  *     user-space application)
  *   - Kernelspace, dynamically loaded drivers
  */
@@ -57,45 +57,45 @@ struct module_section_ops {
 	/*NOTHROW*/ (FCALL *ms_destroy)(struct module_section *__restrict self);
 
 	/* [1..1] Return the name of this section.
-	 * If the name can't be determined, then return `NULL'
+	 * If the name  can't be determined,  then return  `NULL'
 	 * instead. Before calling this function, the caller must
 	 * ensure that `!wasdestroyed(self->ms_module)') */
 	/*ATTR_PURE*/ WUNUSED NONNULL((1)) char const *
 	(FCALL *ms_getname)(struct module_section *__restrict self);
 
 	/* [1..1] Return the address of this module's section mapping.
-	 * If the section has the `SHF_ALLOC' flag set, then return
-	 * the address at which the section had already been loaded
-	 * into memory as the result of the associated module being
+	 * If the section  has the `SHF_ALLOC'  flag set, then  return
+	 * the address at  which the section  had already been  loaded
+	 * into memory as  the result of  the associated module  being
 	 * loaded.
-	 * Otherwise, lazily create a kernel-space memory mapping of
+	 * Otherwise,  lazily  create a  kernel-space memory  mapping of
 	 * the section's contents, and return a pointer to said mapping.
-	 * In either case, the returned data-blob (which has a size
-	 * that is specified by `self->ms_size') may be accessed until
+	 * In either  case, the  returned data-blob  (which has  a  size
+	 * that is specified by  `self->ms_size') may be accessed  until
 	 * the caller drops a reference from `self'
-	 * WARNING: In case of user-space module sections that have the
-	 *          `SHF_ALLOC' flag set, the returned buffer obviously
+	 * WARNING: In case of user-space module sections that have  the
+	 *          `SHF_ALLOC'  flag set, the returned buffer obviously
 	 *          resides in user-space, also meaning that it may only
 	 *          be accessed while the correct mman/pagedir is active */
-	WUNUSED NONNULL((1)) USER CHECKED void *
+	WUNUSED NONNULL((1)) USER CHECKED byte_t *
 	(FCALL *ms_getaddr)(struct module_section *__restrict self);
 
-	/* [1..1] Similar to `ms_getaddr' (and identical in case of
+	/* [1..1] Similar  to `ms_getaddr' (and  identical in case of
 	 * kernel-space driver modules). However, a difference exists
 	 * for user-space modules, in that user-space module sections
-	 * that have the `SHF_ALLOC' flag set will still be aliased
-	 * by a lazily allocated kernel-space memory mapping, the
-	 * address of which is then returned. As such, the returned
-	 * buffer can be dereferenced irregardless of the currently
+	 * that have the `SHF_ALLOC' flag  set will still be  aliased
+	 * by  a  lazily allocated  kernel-space memory  mapping, the
+	 * address of which is then  returned. As such, the  returned
+	 * buffer  can be dereferenced  irregardless of the currently
 	 * active mman, since it will be apart of kernel-space. */
-	WUNUSED NONNULL((1)) KERNEL CHECKED void *
+	WUNUSED NONNULL((1)) KERNEL byte_t *
 	(FCALL *ms_getaddr_alias)(struct module_section *__restrict self);
 
 	/* [1..1] Similar to `ms_getaddr_alias()', but if the section
-	 * contains compressed data, inflate that data, map it into
-	 * the kernel, and return a pointer to that mapping, as well
+	 * contains compressed data, inflate  that data, map it  into
+	 * the  kernel, and return a pointer to that mapping, as well
 	 * as the size (in bytes) of the decompressed data blob. */
-	WUNUSED NONNULL((1, 2)) KERNEL CHECKED void *
+	WUNUSED NONNULL((1, 2)) KERNEL byte_t *
 	(FCALL *ms_getaddr_inflate)(struct module_section *__restrict self,
 	                            size_t *__restrict psize);
 };
@@ -118,13 +118,13 @@ struct module_section {
 #ifdef __WANT_MODULE_SECTION__ms_dead
 	union {
 		LIST_ENTRY(REF module_section) ms_cache; /* [0..1][lock(module_section_cache_lock)] Link entry for the section cache.
-		                                          * When the associated module is destroyed, all of its sections are removed
+		                                          * When the associated module is destroyed, all of its sections are  removed
 		                                          * from the section cache. */
 		SLIST_ENTRY(module_section) _ms_dead;    /* Used internally for async destruction of dead sections. */
 	};
 #else /* __WANT_MODULE_SECTION__ms_dead */
 	LIST_ENTRY(REF module_section)   ms_cache;   /* [0..1][lock(module_section_cache_lock)] Link entry for the section cache.
-	                                              * When the associated module is destroyed, all of its sections are removed
+	                                              * When the associated module is destroyed, all of its sections are  removed
 	                                              * from the section cache. */
 #endif /* !__WANT_MODULE_SECTION__ms_dead */
 };
@@ -135,9 +135,9 @@ DEFINE_REFCOUNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destr
 /* Wrappers for module section operators. */
 #ifdef __INTELLISENSE__
 WUNUSED NONNULL((1)) char const *(module_section_getname)(struct module_section *__restrict self);
-WUNUSED NONNULL((1)) USER CHECKED void *(module_section_getaddr)(struct module_section *__restrict self);
-WUNUSED NONNULL((1)) KERNEL CHECKED void *(module_section_getaddr_alias)(struct module_section *__restrict self);
-WUNUSED NONNULL((1)) KERNEL CHECKED void *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
+WUNUSED NONNULL((1)) USER CHECKED byte_t *(module_section_getaddr)(struct module_section *__restrict self);
+WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
+WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
 #else /* __INTELLISENSE__ */
 #define module_section_getname(self)                (*(self)->ms_ops->ms_getname)(self)
 #define module_section_getaddr(self)                (*(self)->ms_ops->ms_getaddr)(self)
@@ -164,13 +164,13 @@ struct module_ops {
 	/*NOTHROW*/ (FCALL *mo_nonodes)(struct module *__restrict self);
 
 	/* [1..1] Return a reference for a module section, given its name.
-	 * If the given `section_name' isn't valid, return `NULL'. */
+	 * If   the  given  `section_name'  isn't  valid,  return  `NULL'. */
 	WUNUSED NONNULL((1)) REF struct module_section *
 	(FCALL *mo_locksection)(struct module *__restrict self,
 	                        USER CHECKED char const *section_name);
 
 	/* [1..1] Return a reference for a module section, given its index.
-	 * If the given `section_index' isn't valid, return `NULL'. */
+	 * If   the  given  `section_index'  isn't  valid,  return  `NULL'. */
 	WUNUSED NONNULL((1)) REF struct module_section *
 	(FCALL *mo_locksection_index)(struct module *__restrict self,
 	                              unsigned int section_index);
@@ -179,16 +179,16 @@ struct module_ops {
 struct module {
 	WEAK refcnt_t               md_refcnt;     /* Reference counter. */
 	WEAK refcnt_t               md_weakrefcnt; /* Weak reference counter. */
-	refcnt_t                    md_nodecount;  /* [lock(md_mman->mm_lock)] # of `struct mnode'
+	refcnt_t                    md_nodecount;  /* [lock(md_mman->mm_lock)] # of  `struct mnode'
 	                                            * structs that contain pointers to this module.
-	                                            * When this drops to 0, which may only happen
-	                                            * once for any given module, the `mo_nonodes'
+	                                            * When this drops to  0, which may only  happen
+	                                            * once for any  given module, the  `mo_nonodes'
 	                                            * operator must be invoked. */
 	struct module_ops const    *md_ops;        /* [1..1][const] Module operators. */
 	WEAK REF struct mman       *md_mman;       /* [1..1][const] Associated mman. */
 	uintptr_t                   md_loadaddr;   /* [const] Load address of the module. */
-	void                       *md_loadmin;    /* [const] Lowest address mapped by this module. */
-	void                       *md_loadmax;    /* [const] Greatest address mapped by this module. */
+	byte_t                     *md_loadmin;    /* [const] Lowest address mapped by this module. */
+	byte_t                     *md_loadmax;    /* [const] Greatest address mapped by this module. */
 	REF struct mfile           *md_file;       /* [0..1][lock(WRITE_ONCE)] The backing file of the executable. */
 #ifdef __WANT_MODULE__md_mmlop
 	union {
@@ -210,11 +210,13 @@ struct module {
 	byte_t                     _md_pad[sizeof(void *)];
 #endif /* !_MODULE_HAVE_SIZEOF_POINTER */
 	/* Module-specific data goes here.
-	 * NOTE: Module-descriptors for `/lib/libdl.so' have `md_fspath == NULL',
+	 * NOTE: Module-descriptors for  `/lib/libdl.so' have  `md_fspath == NULL',
 	 *       while `md_fsname' points to a string reference that specific path. */
 };
 
-/* Increment/decrement the `md_nodecount' counter of `self' */
+/* Increment/decrement  the  `md_nodecount' counter  of `self'
+ * Note that this doesn't happen atomically because the caller
+ * must be holding a lock to `self->md_mman->mm_lock'. */
 #define module_inc_nodecount(self) \
 	(void)(__hybrid_assert((self)->md_nodecount != 0), ++(self)->md_nodecount)
 #define module_dec_nodecount(self)                     \
@@ -230,7 +232,7 @@ DEFINE_WEAKREFCOUNT_FUNCTIONS(struct module, md_weakrefcnt, module_free)
  * drop a weak reference from `self->md_mman', and finally `weakdecref(self)'
  * in order to finalize the destruction of `self'
  * Note that the process of clearing self-pointers, as well as the subsequent
- * destruction of `self' may be performed asynchronously through use of the
+ * destruction of `self' may be  performed asynchronously through use of  the
  * associated mman's lockop system.
  * NOTE: This function inherits a weak reference to `self->md_mman',
  *       as well as a weak reference to `self'! */
@@ -247,6 +249,10 @@ WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struc
 #define module_locksection_index(self, section_index) (*(self)->md_ops->mo_locksection_index)(self, section_index)
 #endif /* !__INTELLISENSE__ */
 
+/* Same as `module_locksection()', but preserve/discard errors and return `NULL' instead. */
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct module_section *
+NOTHROW(FCALL module_locksection_nx)(struct module *__restrict self, char const *section_name);
+
 /* Return the size of a pointer for the given module. */
 #ifdef _MODULE_HAVE_SIZEOF_POINTER
 #define module_sizeof_pointer(self) ((self)->md_sizeof_pointer)
@@ -255,14 +261,26 @@ WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struc
 #endif /* !_MODULE_HAVE_SIZEOF_POINTER */
 
 
+#ifdef CONFIG_USE_NEW_DRIVER
+/* Check if a given module is actually a `struct driver' */
+#define module_isdriver(self) ((self)->md_ops->mo_free == &_driver_free)
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__restrict self) ASMNAME("driver_free");
+#endif /* CONFIG_USE_NEW_DRIVER */
+
+
 /* Check if the given module has a path and/or name. */
 #define module_haspath(self) \
 	((self)->md_fsname != __NULLPTR && ((self)->md_fspath != __NULLPTR || (self)->md_fsname->de_name[0] == '/'))
-#define module_hasname(self) \
-	((self)->md_fsname != __NULLPTR)
+#ifdef CONFIG_USE_NEW_DRIVER
+#define module_hasname(self)         ((self)->md_fsname != __NULLPTR || module_isdriver(self))
+#define module_haspath_or_name(self) ((self)->md_fsname != __NULLPTR || module_isdriver(self))
+#else /* CONFIG_USE_NEW_DRIVER */
+#define module_hasname(self)         ((self)->md_fsname != __NULLPTR)
+#define module_haspath_or_name(self) ((self)->md_fsname != __NULLPTR)
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
-/* Print the absolute filesystem path or name (filesystem
- * path excluding the leading path) of the given module.
+/* Print  the absolute filesystem path or name (filesystem
+ * path excluding the leading  path) of the given  module.
  * If the module doesn't have a path/name (s.a. the macros
  * above), then nothing will be printed. */
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
@@ -270,30 +288,34 @@ module_printpath(struct module *__restrict self, __pformatprinter printer, void 
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
 module_printname(struct module *__restrict self, __pformatprinter printer, void *arg);
 
+/* Try to print the module's path, and if that fails, print its name. */
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
+module_printpath_or_name(struct module *__restrict self, __pformatprinter printer, void *arg);
+
 
 /* Return a reference to the module which can be found at the given address.
- * For this purpose, that address may either be a kernel-space address, in
- * which case a pointer to the relevant driver is returned, or it may be a
- * user-space address, in which case memory mappings of that address are
+ * For this purpose, that address may  either be a kernel-space address,  in
+ * which  case a pointer to the relevant driver  is returned, or it may be a
+ * user-space address, in  which case  memory mappings of  that address  are
  * inspected in order to check if a module has been loaded to that location.
  * If no module exists at `addr', return `NULL'. */
 FUNDEF WUNUSED REF struct module *FCALL
 module_fromaddr(USER CHECKED void const *addr);
 
 /* Search for, and return a reference to the lowest available module, such
- * that `return->md_loadstart >= addr'. If no such module exists, simply
+ * that  `return->md_loadstart >= addr'. If no  such module exists, simply
  * return `NULL' instead. */
 FUNDEF WUNUSED REF struct module *FCALL
 module_aboveaddr(USER CHECKED void const *addr);
 
-/* Return a reference to the first module different from `prev', such that
- * `return->md_loadstart > prev->md_loadstart'. When `prev == NULL', return the
+/* Return  a  reference  to  the  first  module  different  from  `prev',  such  that
+ * `return->md_loadstart > prev->md_loadstart'.  When   `prev == NULL',  return   the
  * first module, which is the same as returned by `module_aboveaddr((void const *)0)' */
 FUNDEF WUNUSED REF struct module *FCALL
 module_next(struct module *prev);
 
 
-/* Same as the functions above, but preserve/restore the old
+/* Same as  the functions  above, but  preserve/restore the  old
  * exception if one ends up being thrown by the above functions,
  * and simply return `NULL', rather than RETHROW()-ing it. */
 FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr);
@@ -303,10 +325,10 @@ FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *p
 /* Clear the module cache of the given mman.
  *
  * Lazily loaded user-space modules end up being placed in this cache when
- * first loaded, as the mnode->module link doesn't actually represent a
+ * first loaded, as  the mnode->module link  doesn't actually represent  a
  * reference (which is intentional), meaning that a cache of recently used
- * module objects is needed in order to keep module objects alive beyond
- * the single initial reference returned by the module lookup functions.
+ * module objects is needed in order  to keep module objects alive  beyond
+ * the single initial reference returned  by the module lookup  functions.
  *
  * The mman module cache never has to be cleared, but may be cleared in
  * order to free up system memory during a shortage. */

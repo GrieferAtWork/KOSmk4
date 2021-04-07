@@ -1648,7 +1648,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pidns_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryas, handle_undefined_tryas);
 
-/* Weakly define operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_state') */
+/* Weakly define operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_loadlist') */
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_decref, handle_undefined_decref);

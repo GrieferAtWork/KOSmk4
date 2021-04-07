@@ -1229,9 +1229,15 @@ again:
 					if unlikely(!shstrtab)
 						break;
 					shstrtab += shdrs[i].sh_name;
+#ifdef CONFIG_USE_NEW_DRIVER
+					if unlikely(shstrtab < d->d_shstrtab ||
+					            shstrtab >= d->d_shstrtab + d->d_shstrsiz)
+						break;
+#else /* CONFIG_USE_NEW_DRIVER */
 					if unlikely(shstrtab < d->d_shstrtab ||
 					            shstrtab >= d->d_shstrtab_end)
 						break;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 					*psection_relative_addr = module_relative_addr - shdrs[i].sh_addr;
 					return shstrtab;
 				}

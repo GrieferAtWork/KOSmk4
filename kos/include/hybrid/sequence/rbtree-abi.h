@@ -30,6 +30,70 @@
 #include "../typecore.h"
 #include "rbtree.h"
 
+/*
+ * Configure options/macros:
+ *
+ * >> #define RBTREE_DECL                FUNDEF
+ * >> #define RBTREE_IMPL                PUBLIC
+ * >> #define RBTREE(name)               myrbtree_api_##name
+ * >> #define RBTREE_T                   struct myrbtree_node
+ * >> #define RBTREE_Tkey                uintptr_t
+ * >> #define RBTREE_CC                  LIBCCALL
+ * >> #define RBTREE_NOTHROW             NOTHROW_NCX
+ * >> #define RBTREE_MINKEY_EQ_MAXKEY                   // minkey == maxkey for all nodes
+ * >> #define RBTREE_KEY_LO(a, b)        ((a) < (b))    // Compare keys
+ * >> #define RBTREE_KEY_EQ(a, b)        ((a) == (b))   // Compare keys
+ * >> #define RBTREE_NULL                NULL           // Null-branch
+ * >> #define RBTREE_NODEPATH            rb_node
+ * >> #define RBTREE_ISRED(self)         ((self)->color == RED)
+ * >> #define RBTREE_XISRED(self)        ((self) != NULL && (self)->color == RED)
+ * >> #define RBTREE_SETRED(self)        (void)((self)->color = RED)
+ * >> #define RBTREE_SETBLACK(self)      (void)((self)->color = BLACK)
+ * >> #define RBTREE_FLIPCOLOR(self)     (void)((self)->color = (self)->color == RED ? BLACK : RED)
+ * >> #define RBTREE_COPYCOLOR(dst, src) (void)((dst)->color = (src)->color)
+ * >> #define RBTREE_GETNODE(self)       (self)->rb_node
+ * >> #define RBTREE_GETKEY(node)        (node)->rb_key    // Implies `RBTREE_MINKEY_EQ_MAXKEY'
+ * >> #define RBTREE_GETMINKEY(node)     (node)->rb_minkey
+ * >> #define RBTREE_GETMAXKEY(node)     (node)->rb_maxkey
+ * >> #define RBTREE_GETLHS(self)        (self)->rb_node.rb_lhs
+ * >> #define RBTREE_GETRHS(self)        (self)->rb_node.rb_rhs
+ * >> #define RBTREE_SETLHS(self, v)     (void)((self)->rb_node.rb_lhs = (v))
+ * >> #define RBTREE_SETRHS(self, v)     (void)((self)->rb_node.rb_rhs = (v))
+ * >> #ifndef RBTREE_LEFT_LEANING
+ * >> #define RBTREE_GETPAR(self)        (self)->rb_node.rb_par
+ * >> #define RBTREE_SETPAR(self, v)     (void)((self)->rb_node.rb_par = (v))
+ * >> #endif // !RBTREE_LEFT_LEANING
+ * >> #define RBTREE_ASSERT(expr)        assert(expr)
+ * >> #define RBTREE_ASSERTF(expr, ...)  assertf(expr, __VA_ARGS__)
+ *
+ * Features:
+ * >> #define RBTREE_MINKEY_EQ_MAXKEY         // Indicate that nodes don't take up key-ranges, but only a single key
+ * >> #define RBTREE_WANT_MINMAXLOCATE        // Declare `RBTREE(minmaxlocate)'
+ * >> #define RBTREE_WANT_PREV_NEXT_NODE      // Declare `RBTREE(prevnode)' and `RBTREE(nextnode)'
+ * >> #define RBTREE_WANT_RREMOVE             // Declare `RBTREE(rremove)'
+ * >> #define RBTREE_WANT_RLOCATE             // Declare `RBTREE(rlocate)'
+ * >> #define RBTREE_WANT_TRYINSERT           // Declare `RBTREE(tryinsert)'
+ * >> #define RBTREE_OMIT_REMOVE              // Omit    `RBTREE(remove)'
+ * >> #define RBTREE_OMIT_REMOVENODE          // Omit    `RBTREE(removenode)'
+ * >> #define RBTREE_OMIT_INSERT              // Omit    `RBTREE(insert)'
+ * >> #define RBTREE_DEBUG                    // Enable internal debug assertions and verification
+ * >> #define RBTREE_NDEBUG                   // Disable internal debug assertions and verification
+ * >> #define RBTREE_LEFT_LEANING             // Define ABI for a left-leaning tree, which doesn't require a parent
+ *                                            // pointer, but has a slightly slower, but still O(log(N)) worst-case
+ *                                            // insert/remove time
+ * >> #define RBTREE_NULL_IS_IMPLICIT_BLACK   // if defined, `RBTREE_NULL' can be dereferenced with:
+ *                                            //  - Its color set to BLACK
+ *                                            //  - Its parent field point back to itself
+ *                                            //  - Its lhs/rhs fields point back to itself
+ * >> #define RBTREE_ASSERT_IS_NOOP           // RBTREE_ASSERT is a no-op
+ *
+ * Exposure options:
+ * >> #define RBTREE_IMPLEMENTATION_ONLY      // Don't include header declarations
+ * >> #define RBTREE_HEADER_ONLY              // Don't include source implementations
+ *
+ */
+
+
 #ifdef __INTELLISENSE__
 #ifndef RBTREE
 #define RBTREE_WANT_MINMAXLOCATE

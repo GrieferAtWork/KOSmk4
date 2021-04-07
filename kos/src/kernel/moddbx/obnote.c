@@ -37,8 +37,9 @@
 #include <kernel/except.h>
 #include <kernel/execabi.h>
 #include <kernel/heap.h>
-#include <kernel/mman/mfile.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/ramfile.h>
@@ -205,9 +206,9 @@ badobj:
 PRIVATE bool
 NOTHROW(FCALL verify_driver)(struct driver *__restrict me) {
 	TRY {
-		if (me->d_refcnt == 0)
+		if (__driver_refcnt(me) == 0)
 			goto badobj;
-		if (me->d_weakrefcnt == 0)
+		if (__driver_weakrefcnt(me) == 0)
 			goto badobj;
 		if (!ADDR_ISKERN(me->d_name))
 			goto badobj;
@@ -227,9 +228,9 @@ NOTHROW(KCALL note_driver)(pformatprinter printer, void *arg,
 	char const *driver_name;
 	size_t driver_namelen;
 	TRY {
-		if (me->d_refcnt == 0)
+		if (__driver_refcnt(me) == 0)
 			goto badobj;
-		if (me->d_weakrefcnt == 0)
+		if (__driver_weakrefcnt(me) == 0)
 			goto badobj;
 		driver_name = me->d_name;
 		if (!ADDR_ISKERN(driver_name))
@@ -256,32 +257,50 @@ NOTHROW(KCALL note_driver_section)(pformatprinter printer, void *arg,
 	TRY {
 		struct driver *drv;
 		ElfW(Word) section_name_offset;
+#ifdef CONFIG_USE_NEW_DRIVER
+		if (me->ms_refcnt == 0)
+			goto badobj;
+		drv = (struct driver *)me->ms_module;
+#else /* CONFIG_USE_NEW_DRIVER */
 		if (me->ds_refcnt == 0)
 			goto badobj;
 		drv = me->ds_module;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (!ADDR_ISKERN(drv))
 			goto badobj;
-		if (drv->d_refcnt == 0)
+		if (__driver_refcnt(drv) == 0)
 			goto badobj;
-		if (drv->d_weakrefcnt == 0)
+		if (__driver_weakrefcnt(drv) == 0)
 			goto badobj;
 		driver_name = drv->d_name;
 		if (!ADDR_ISKERN(driver_name))
 			goto badobj;
 		driver_namelen = strlen(driver_name);
+#ifdef CONFIG_USE_NEW_DRIVER
+		if (me->ds_shdr < drv->d_shdr ||
+		    me->ds_shdr >= drv->d_shdr + drv->d_shnum)
+			goto badobj;
+		section_name_offset = me->ds_shdr->sh_name;
+#else /* CONFIG_USE_NEW_DRIVER */
 		if (me->ds_index >= drv->d_shnum)
 			goto badobj;
 		if (!ADDR_ISKERN(drv->d_shdr))
 			goto badobj;
 		section_name_offset = drv->d_shdr[me->ds_index].sh_name;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (!ADDR_ISKERN(drv->d_shstrtab))
 			goto badobj;
+#ifdef CONFIG_USE_NEW_DRIVER
+		if (section_name_offset >= drv->d_shstrsiz)
+			goto badobj;
+#else /* CONFIG_USE_NEW_DRIVER */
 		if (!ADDR_ISKERN(drv->d_shstrtab_end))
 			goto badobj;
 		if (drv->d_shstrtab_end <= drv->d_shstrtab)
 			goto badobj;
 		if (section_name_offset >= (size_t)(drv->d_shstrtab_end - drv->d_shstrtab))
 			goto badobj;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		section_name    = drv->d_shstrtab + section_name_offset;
 		section_namelen = strlen(section_name);
 	} EXCEPT {

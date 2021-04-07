@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_DRIVER
 #include <kernel/driver-offsets.h>
 #include <kernel/driver.h>
 
@@ -84,5 +85,6 @@ STATIC_ASSERT(offsetof(struct driver_state, ds_drivers) == WS(DRIVER_STATE, DRIV
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_CORE_FS_DRIVER_OFFSETS_C */

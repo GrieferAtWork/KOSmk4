@@ -154,9 +154,9 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 INTERN_CONST struct module_section_ops const uems_ops = {
 	.ms_destroy         = (void (FCALL *)(struct module_section *__restrict))&uems_destroy,
 	.ms_getname         = (char const *(FCALL *)(struct module_section *__restrict))&uems_getname,
-	.ms_getaddr         = (void *(FCALL *)(struct module_section *__restrict))&uems_getaddr,
-	.ms_getaddr_alias   = (void *(FCALL *)(struct module_section *__restrict))&uems_getaddr_alias,
-	.ms_getaddr_inflate = (void *(FCALL *)(struct module_section *__restrict, size_t *__restrict))&uems_getaddr_inflate,
+	.ms_getaddr         = (byte_t *(FCALL *)(struct module_section *__restrict))&uems_getaddr,
+	.ms_getaddr_alias   = (byte_t *(FCALL *)(struct module_section *__restrict))&uems_getaddr_alias,
+	.ms_getaddr_inflate = (byte_t *(FCALL *)(struct module_section *__restrict, size_t *__restrict))&uems_getaddr_inflate,
 };
 
 INTERN_CONST struct module_ops const uem_ops = {
@@ -188,12 +188,12 @@ NOTHROW(FCALL uems_destroy)(struct userelf_module_section *__restrict self) {
 		decref_unlikely(mod);
 	}
 	weakdecref(mod);
-	if (self->ums_infladdr != (KERNEL void *)-1 &&
+	if (self->ums_infladdr != (KERNEL byte_t *)-1 &&
 	    self->ums_infladdr != self->ums_kernaddr) {
 		mman_unmap_kram(self->ums_infladdr,
 		                self->ums_inflsize);
 	}
-	if (self->ums_kernaddr != (KERNEL void *)-1) {
+	if (self->ums_kernaddr != (KERNEL byte_t *)-1) {
 		mman_unmap_kram_and_kfree(self->ums_kernaddr,
 		                          self->ms_size,
 		                          self);
@@ -219,28 +219,28 @@ uems_getname(struct userelf_module_section *__restrict self) {
 	return result;
 }
 
-INTERN WUNUSED NONNULL((1)) USER CHECKED void *FCALL
+INTERN WUNUSED NONNULL((1)) USER CHECKED byte_t *FCALL
 uems_getaddr(struct userelf_module_section *__restrict self) {
 	if (self->ms_flags & SHF_ALLOC)
 		return self->ums_useraddr;
 	return uems_getaddr_alias(self);
 }
 
-PRIVATE WUNUSED NONNULL((1)) KERNEL void *FCALL
+PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_create_kernaddr_ex(struct userelf_module_section *__restrict self,
                         struct userelf_module *__restrict mod) {
-	return mman_map(/* self:          */ &mman_kernel,
-	                /* hint:          */ HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                /* num_bytes:     */ self->ms_size,
-	                /* prot:          */ (PROT_READ | PROT_WRITE) & ~PROT_SHARED,
-	                /* flags:         */ HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-	                /* file:          */ mod->md_file,
-	                /* file_fspath:   */ mod->md_fspath,
-	                /* file_fsname:   */ mod->md_fsname,
-	                /* file_pos:      */ (pos_t)UM_field(mod, *self->ums_shdr, .sh_offset));
+	return (byte_t *)mman_map(/* self:          */ &mman_kernel,
+	                          /* hint:          */ HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                          /* num_bytes:     */ self->ms_size,
+	                          /* prot:          */ (PROT_READ | PROT_WRITE) & ~PROT_SHARED,
+	                          /* flags:         */ HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+	                          /* file:          */ mod->md_file,
+	                          /* file_fspath:   */ mod->md_fspath,
+	                          /* file_fsname:   */ mod->md_fsname,
+	                          /* file_pos:      */ (pos_t)UM_field(mod, *self->ums_shdr, .sh_offset));
 }
 
-PRIVATE WUNUSED NONNULL((1)) KERNEL void *FCALL
+PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_create_kernaddr(struct userelf_module_section *__restrict self) {
 	REF struct userelf_module *mod;
 	mod = (REF struct userelf_module *)self->ms_module;
@@ -252,27 +252,27 @@ uems_create_kernaddr(struct userelf_module_section *__restrict self) {
 
 
 
-INTERN WUNUSED NONNULL((1)) KERNEL void *FCALL
+INTERN WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_getaddr_alias(struct userelf_module_section *__restrict self) {
-	void *result;
-	if (self->ums_kernaddr != (KERNEL void *)-1)
+	byte_t *result;
+	if (self->ums_kernaddr != (KERNEL byte_t *)-1)
 		return self->ums_kernaddr;
 	result = uems_create_kernaddr(self);
-	if unlikely(!ATOMIC_CMPXCH(self->ums_kernaddr, (KERNEL void *)-1, result)) {
+	if unlikely(!ATOMIC_CMPXCH(self->ums_kernaddr, (KERNEL byte_t *)-1, result)) {
 		/* Race condition: some other thread already did this in the mean time... */
 		mman_unmap_kram(result, self->ms_size);
 	}
 	return self->ums_kernaddr;
 }
 
-INTERN WUNUSED NONNULL((1, 2)) KERNEL void *FCALL
+INTERN WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL
 uems_getaddr_inflate(struct userelf_module_section *__restrict self,
                      size_t *__restrict psize) {
 	size_t dst_size, src_size;
-	KERNEL void *src_data, *dst_data;
+	KERNEL byte_t *src_data, *dst_data;
 	void *src_data_freeme_cookie;
 	REF struct userelf_module *mod;
-	if (self->ums_infladdr != (KERNEL void *)-1) {
+	if (self->ums_infladdr != (KERNEL byte_t *)-1) {
 		*psize = self->ums_inflsize;
 		return self->ums_infladdr;
 	}
@@ -280,7 +280,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 		/* Section isn't actually compressed! */
 		dst_data = uems_getaddr_alias(self);
 		ATOMIC_WRITE(self->ums_inflsize, self->ms_size);
-		ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL void *)-1, dst_data);
+		ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
 		*psize = self->ms_size;
 		return dst_data;
 	}
@@ -290,9 +290,9 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 	FINALLY_DECREF_UNLIKELY(mod);
 	if unlikely(OVERFLOW_USUB(self->ms_size, UM_sizeof(mod, UM_ElfW_Chdr), &src_size))
 		THROW(E_INVALID_ARGUMENT);
-	src_data  = self->ums_kernaddr;
+	src_data = self->ums_kernaddr;
 	src_data_freeme_cookie = NULL;
-	if (src_data == (KERNEL void *)-1) {
+	if (src_data == (KERNEL byte_t *)-1) {
 		/* Allocate a  cookie that  we can  later use  to
 		 * asynchronously unmap the compressed data blob. */
 		src_data_freeme_cookie = kmalloc(sizeof(struct mman_unmap_kram_job),
@@ -310,7 +310,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 		if unlikely(UM_field(mod, *chdr, .ch_type) != ELFCOMPRESS_ZLIB)
 			THROW(E_INVALID_ARGUMENT);
 		dst_size = UM_field(mod, *chdr, .ch_size);
-		dst_data = mman_map_kram(NULL, dst_size, GFP_PREFLT);
+		dst_data = (KERNEL byte_t *)mman_map_kram(NULL, dst_size, GFP_PREFLT);
 		TRY {
 			ssize_t error;
 			struct zlib_reader reader;
@@ -333,10 +333,8 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 				dbg_hline(0, dbg_screen_height - 1, dbg_screen_width, ' ');
 				dbg_pprinter_arg_init(&pp, 0, dbg_screen_height - 1);
 				dbg_pprinter(&pp, DBGSTR("Decompressing "), 14);
-				if (module_haspath(mod)) {
-					module_printpath(mod, &dbg_pprinter, &pp);
-				} else if (module_hasname(mod)) {
-					module_printname(mod, &dbg_pprinter, &pp);
+				if (module_haspath_or_name(mod)) {
+					module_printpath_or_name(mod, &dbg_pprinter, &pp);
 				} else {
 					dbg_pprinter(&pp, DBGSTR("?"), 1);
 				}
@@ -373,7 +371,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 	if (src_data_freeme_cookie)
 		mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
 	ATOMIC_WRITE(self->ums_inflsize, dst_size);
-	ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL void *)-1, dst_data);
+	ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;
 	return dst_data;
 }
@@ -586,14 +584,14 @@ again:
 	result->ms_link      = UM_field(self, *shdr, .sh_link);
 	result->ms_info      = UM_field(self, *shdr, .sh_info);
 	result->ums_shdr     = shdr;
-	result->ums_useraddr = (USER CHECKED void *)-1;
-	result->ums_kernaddr = (KERNEL void *)-1;
-	result->ums_infladdr = (KERNEL void *)-1;
+	result->ums_useraddr = (USER CHECKED byte_t *)-1;
+	result->ums_kernaddr = (KERNEL byte_t *)-1;
+	result->ums_infladdr = (KERNEL byte_t *)-1;
 	result->ums_inflsize = 0;
 	if (result->ms_flags & SHF_ALLOC) {
 		/* Set the user-space load-address for allocated sections. */
-		result->ums_useraddr = (USER CHECKED void *)(self->md_loadaddr +
-		                                             UM_field(self, *shdr, .sh_addr));
+		result->ums_useraddr = (USER CHECKED byte_t *)(self->md_loadaddr +
+		                                               UM_field(self, *shdr, .sh_addr));
 	}
 
 	/* Acquire a lock to the UserELF section cache. */
@@ -956,7 +954,7 @@ uem_create_from_mapping(struct mman *__restrict self,
 /*		result->md_nodecount  = 0;*/ /* Already done by GFP_CALLOC; Incremented later! */
 		result->md_ops        = &uem_ops;
 		result->md_loadaddr   = loadaddr;
-		result->md_loadmin    = (void *)-1;
+		result->md_loadmin    = (byte_t *)-1;
 /*		result->md_loadmax    = (void *)0;*/ /* Already done by GFP_CALLOC */
 /*		result->md_fspath     = NULL;*/      /* Already done by GFP_CALLOC */
 /*		result->md_fsname     = NULL;*/      /* Already done by GFP_CALLOC */
@@ -1475,7 +1473,7 @@ uem_next(struct mman *__restrict self,
 	/* Because UserELF modules can be embedded inside of each other,
 	 * we have to start looking  for them starting immediatly  after
 	 * the original node. */
-	minaddr = (byte_t *)prev->md_loadmin + PAGESIZE;
+	minaddr = prev->md_loadmin + PAGESIZE;
 again:
 	mman_lock_acquire(self);
 	mman_mappings_minmaxlocate(self, minaddr, (void *)-1, &mima);

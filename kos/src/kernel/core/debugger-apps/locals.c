@@ -33,6 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
+#include <kernel/mman.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <sched/task.h>

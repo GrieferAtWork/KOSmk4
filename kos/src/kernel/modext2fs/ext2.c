@@ -850,7 +850,6 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void init2(void) {
 	printk(KERN_DEBUG "drv_start         = %p\n", drv_start);
 	printk(KERN_DEBUG "drv_end           = %p\n", drv_end);
 	printk(KERN_DEBUG "drv_name          = %q\n", drv_name);
-	printk(KERN_DEBUG "drv_filename      = %q\n", drv_filename);
 	printk(KERN_DEBUG "drv_file          = %p\n", drv_file);
 	printk(KERN_DEBUG "drv_commandline   = %q\n", drv_commandline);
 	printk(KERN_DEBUG "drv_argc          = %Iu\n", drv_argc);

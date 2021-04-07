@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
+#include <kernel/mman/cache.h>
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
 #include <sched/lockop.h>

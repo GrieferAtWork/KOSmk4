@@ -22,11 +22,100 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_USE_NEW_DRIVER
+#include <kernel/mman/module.h>
+
+/* This header only defines the bare minimum to get  interactions
+ * with driver objects going. (such as refcnt support for the all
+ * important `struct driver', as well as the magical `drv_self')
+ *
+ * All of the other stuff, including loading/unloading of drivers
+ * is contained in <kernel/mman/driver.h>! */
+
+#ifdef __CC__
+DECL_BEGIN
+
+/* Enable reference count interface support without
+ * having to define  the layout of  `struct driver' */
+#ifndef __driver_defined
+struct driver;
+#define __driver_destroy(self)    module_destroy((struct module *)(self))
+#define __driver_free(self)       module_free((struct module *)(self))
+#define __driver_refcnt(self)     ((struct module *)(self))->md_refcnt
+#define __driver_weakrefcnt(self) ((struct module *)(self))->md_weakrefcnt
+DEFINE_REFCOUNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
+DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
+#else /* !__driver_defined */
+#ifndef __driver_refcnt
+#define __driver_refcnt(self)     (self)->md_refcnt
+#endif /* !__driver_refcnt */
+#ifndef __driver_weakrefcnt
+#define __driver_weakrefcnt(self) (self)->md_weakrefcnt
+#endif /* !__driver_weakrefcnt */
+#endif /* __driver_defined */
+
+/* The driver descriptor for the kernel core */
+#ifndef __kernel_driver_defined
+#define __kernel_driver_defined
+DATDEF struct driver kernel_driver;
+#endif /* !__kernel_driver_defined */
+
+
+/* Special driver symbols */
+#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef __drv_self_defined
+#define __drv_self_defined
+/* Self-pointer to the current driver's descriptor */
+DATDEF struct driver drv_self;
+#endif /* !__drv_self_defined */
+
+DATDEF byte_t /*         */ drv_loadaddr[];    /* Absolute load-address of the driver (== drv_self.md_loadaddr) */
+DATDEF byte_t /*         */ drv_loadmin[];     /* Absolute min-address of the driver program (== drv_self.md_loadmin) */
+DATDEF byte_t /*         */ drv_loadmax[];     /* Absolute max-address of the driver program (== drv_self.md_loadmax) */
+DATDEF char /*           */ drv_name[];        /* Name of the driver (== drv_self.d_name) */
+DATDEF struct regular_node *drv_file;          /* [0..1] Inode of the of the driver (== drv_self.d_file) */
+DATDEF char /*           */ drv_cmdline[];     /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
+DATDEF size_t /*         */ drv_argc;          /* Driver argument count (== &drv_self.d_argc) */
+DATDEF char /*          */ *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
+
+/* NOTE: This  function  may  be implemented  by  individual drivers!
+ *       This isn't a function that is exported by the kernel itself!
+ * Try (as in: never throw, or block) to clear global caches,  releasing
+ * heap  memory as those  caches are cleared  before returning the total
+ * sum of bytes  that were  cleared by doing  this. (Alternatively,  any
+ * non-zero value should be returned if ~some~ kind of optional resource
+ * was released, with 0 being _required_ to be returned when nothing was
+ * freed at all)
+ * This function is  called when the  kernel has run  out of physical  or
+ * virtual memory, at which point this  function's purpose is to try  and
+ * reclaim resources to  allow the kernel  to continue operation  without
+ * (normally) causing an E_BADALLOC exception to be thrown by the caller.
+ * @return: * : Some  kind of optional resource(s) was/were freed,
+ *              and the caller should re-attempt their allocation.
+ * @return: 0 : Nothing could be freed/released (at the moment) */
+FUNDEF NOBLOCK size_t NOTHROW(KCALL drv_clearcache)(void);
+
+#ifndef DRIVER_INIT
+#define DRIVER_INIT __attribute__((__constructor__))
+#define DRIVER_FINI __attribute__((__destructor__))
+#endif /* !DRIVER_INIT */
+#else /* !CONFIG_BUILDING_KERNEL_CORE */
+#ifndef __drv_self_defined
+#define __drv_self_defined
+DATDEF struct driver drv_self ASMNAME("kernel_driver");
+#endif /* !__drv_self_defined */
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+DECL_END
+#endif /* __CC__ */
+
+#else /* CONFIG_USE_NEW_DRIVER */
 #include <debugger/config.h>
 #include <kernel/arch/driver.h>
 #include <kernel/driver-callbacks.h>
 #include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/cache.h>
 #include <kernel/types.h>
 #include <sched/signal.h>
 
@@ -48,6 +137,23 @@ DECL_BEGIN
 
 
 #ifdef __CC__
+/* FORWARD COMPATIBILITY */
+#define __driver_destroy          driver_destroy
+#define __driver_free             driver_free
+#define __driver_refcnt(self)     (self)->d_refcnt
+#define __driver_weakrefcnt(self) (self)->d_weakrefcnt
+#define driver_fromaddr           driver_at_address
+#define driver_fromfile           driver_with_file
+#define driver_fromname           driver_with_name
+#define driver_fromname_with_len  driver_with_namel
+#define get_driver_loadlist       driver_get_state
+#define driver_loadlist           driver_state
+#define dll_refcnt                ds_refcnt
+#define dll_count                 ds_count
+#define dll_drivers               ds_drivers
+#define driver_libpath_struct     driver_library_path_string
+#define driver_libpath            driver_library_path
+/* FORWARD COMPATIBILITY */
 
 
 /* KOS Kernel  modules  are  implemented as  shared  ELF  binaries  (libraries)
@@ -842,74 +948,6 @@ NOTHROW(KCALL driver_clear_fde_cache)(struct driver *__restrict self);
 FUNDEF NOBLOCK size_t
 NOTHROW(KCALL driver_clear_fde_caches)(void);
 
-/* Invoke cache clear callbacks for each and every globally reachable
- * component within the entire kernel.
- * This function is  called when  the kernel  has run  out of  physical/virtual
- * memory, or some other kind of limited, and dynamically allocatable resource.
- * @return: * : At  least some amount of some kind of resource was released.
- *              In this case the caller should re-attempt whatever lead them
- *              to try and clear caches to reclaim resource (usually memory)
- * @return: 0 : Nothing was released/freed.
- *              In this case, the caller should indicate failure due to
- *              lack of some necessary resource. */
-FUNDEF NOBLOCK size_t NOTHROW(KCALL system_clearcaches)(void);
-
-/* multi-thread-corrected version of `system_clearcaches()'.
- * This function should always be used in favor of `system_clearcaches()', as it
- * solves the scenario of multiple threads calling `system_clearcaches()' at the
- * same time, in which case resources may only get freed by one thread, with the
- * other thread never getting informed about that fact.
- * In this case,  `system_clearcaches()' would  normally (and correctly  I might  add)
- * return `0' for some threads, since that thread really didn't release any resources.
- * However, the intended use of  this function is inform a  caller who just failed  to
- * allocate some optional  resource, that  their resource may  have become  available,
- * and that they  should try again  (which is  something that isn't  fulfilled by  the
- * regular     `system_clearcaches()'     in     a     multi-threaded     environment)
- * That is where this function comes in:
- * >> void *my_alloc_tryhard() {
- * >>     void *result;
- * >>     result = my_alloc();
- * >>     if unlikely(!result) {
- * >>         uintptr_t cache_version;
- * >>         cache_version = 0;
- * >>         for (;;) {
- * >>             result = my_alloc();
- * >>             if (result)
- * >>                 break;
- * >>             if (!system_clearcaches_s(&cache_version))
- * >>                 break;
- * >>         }
- * >>     }
- * >>     return result;
- * >> }
- * WARNING: Do  _NOT_ write to  `*pversion' after a  non-zero value was returned!
- *          In  this  case, re-attempt  your  allocation and  upon  failure, call
- *          `system_clearcaches_s()'  again with an unmodified `*pversion' value.
- *          This function makes use of the  version number for tracking how  many
- *          more times the caller is allowed to make an attempt before giving up.
- * @return: * : At  least  some amount  of  some kind  of  resource (may  have) been
- *              released by some thread since the last time the function was called.
- *              In  this  case  the  caller  should  re-attempt  whatever  lead them
- *              to try and clear caches to reclaim resource (usually memory)
- * @return: 0 : Nothing was released/freed.
- *              In this case, the caller should indicate failure due to
- *              lack of some necessary resource. */
-FUNDEF NOBLOCK NONNULL((1)) size_t
-NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion);
-
-/* Called as part of `system_clearcaches()': Trim standard kernel heaps.
- * @return: * : The total number of trimmed bytes. */
-FUNDEF NOBLOCK size_t NOTHROW(KCALL system_trimheaps)(void);
-
-
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-#ifndef DEFINE_SYSTEM_CACHE_CLEAR
-/* >> NOBLOCK size_t NOTHROW(KCALL func)(void);
- * Define a function that should be called when `system_clearcaches()' is invoked. */
-#define DEFINE_SYSTEM_CACHE_CLEAR(func) DEFINE_CALLBACK(".rodata.cold.callback.system_clearcaches", func)
-#endif /* !DEFINE_SYSTEM_CACHE_CLEAR */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
-
 
 /* Try to lookup a driver stored at a given address.
  * If   no   such   driver   exists,   return   NULL */
@@ -946,5 +984,6 @@ DATDEF CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/ KCALL(struct driver *)) driver_un
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_H */
