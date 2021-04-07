@@ -449,6 +449,42 @@ kernel_locksection(struct driver *__restrict self,
 	return kernel_locksection_index(self, i);
 }
 
+PRIVATE WUNUSED NONNULL((1, 3)) bool FCALL
+kernel_sectinfo(struct driver *__restrict UNUSED(self),
+                uintptr_t module_relative_addr,
+                struct module_sectinfo *__restrict info) {
+	unsigned int i;
+	bool allow_section_end_pointers;
+	allow_section_end_pointers = false;
+again:
+	for (i = 0; i < KERNEL_SECTIONS_COUNT; ++i) {
+		if (module_relative_addr < kernel_shdr[i].sh_addr)
+			continue;
+		if (module_relative_addr >= kernel_shdr[i].sh_addr + kernel_shdr[i].sh_size) {
+			if (!allow_section_end_pointers)
+				continue;
+			if (module_relative_addr > kernel_shdr[i].sh_addr + kernel_shdr[i].sh_size)
+				continue;
+		}
+		/* Found it! (fill in section information for our caller) */
+		info->msi_name    = (char *)&kernel_shstrtab_data + kernel_shdr[i].sh_name;
+		info->msi_addr    = kernel_shdr[i].sh_addr;
+		info->msi_size    = kernel_shdr[i].sh_size;
+		info->msi_entsize = kernel_shdr[i].sh_entsize;
+		info->msi_type    = kernel_shdr[i].sh_type;
+		info->msi_flags   = kernel_shdr[i].sh_flags;
+		info->msi_link    = kernel_shdr[i].sh_link;
+		info->msi_info    = kernel_shdr[i].sh_info;
+		info->msi_index   = i;
+		return true;
+	}
+	if (!allow_section_end_pointers) {
+		allow_section_end_pointers = true;
+		goto again;
+	}
+	return false;
+}
+
 
 
 #ifndef KERNEL_DRIVER_NAME
@@ -465,6 +501,7 @@ PRIVATE struct module_ops const kernel_module_ops = {
 	.mo_nonodes           = (typeof(((struct module_ops *)0)->mo_nonodes))BADPOINTER, /* Must never be called! */
 	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&kernel_locksection,
 	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&kernel_locksection_index,
+	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&kernel_sectinfo,
 };
 
 PRIVATE ATTR_COLDRODATA char const kernel_driver_name[] = KERNEL_DRIVER_NAME;
@@ -644,7 +681,7 @@ NOTHROW(FCALL driver_aboveaddr)(void const *addr) {
 }
 
 PUBLIC NOBLOCK WUNUSED REF struct driver *
-NOTHROW(FCALL driver_next)(struct driver *prev) {
+NOTHROW(FCALL driver_next)(struct module *prev) {
 	size_t i;
 	REF struct driver *result;
 	REF struct driver_loadlist *ll;
@@ -656,7 +693,7 @@ NOTHROW(FCALL driver_next)(struct driver *prev) {
 		for (;; ++i) {
 			if (i >= ll->dll_count - 1)
 				return NULL; /* No successor... */
-			if (ll->dll_drivers[i] == prev) {
+			if (&ll->dll_drivers[i]->d_module == prev) {
 				++i;
 				break;
 			}

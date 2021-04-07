@@ -111,10 +111,10 @@ struct module_section {
 	WEAK REF struct module          *ms_module;  /* [1..1][const] Associated module. */
 	size_t                           ms_size;    /* [const] Size of the section (in bytes) */
 	size_t                           ms_entsize; /* [const] Section entity size (or 0 if unknown) */
-	unsigned int                     ms_type;    /* [const] Section type (s.a. `ElfNN_Shdr::sh_type'; one of `SHT_*') */
-	unsigned int                     ms_flags;   /* [const] Section flags (s.a. `ElfNN_Shdr::sh_flags'; set of `SHF_*') */
-	unsigned int                     ms_link;    /* [const] Section link (s.a. `ElfNN_Shdr::sh_link') */
-	unsigned int                     ms_info;    /* [const] Section info (s.a. `ElfNN_Shdr::sh_info') */
+	unsigned int                     ms_type;    /* [const] Section type (s.a. `Elf_Shdr::sh_type'; one of `SHT_*') */
+	unsigned int                     ms_flags;   /* [const] Section flags (s.a. `Elf_Shdr::sh_flags'; set of `SHF_*') */
+	unsigned int                     ms_link;    /* [const] Section link (s.a. `Elf_Shdr::sh_link') */
+	unsigned int                     ms_info;    /* [const] Section info (s.a. `Elf_Shdr::sh_info') */
 #ifdef __WANT_MODULE_SECTION__ms_dead
 	union {
 		LIST_ENTRY(REF module_section) ms_cache; /* [0..1][lock(module_section_cache_lock)] Link entry for the section cache.
@@ -145,8 +145,24 @@ WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_inflate)(struct modu
 #define module_section_getaddr_inflate(self, psize) (*(self)->ms_ops->ms_getaddr_inflate)(self, psize)
 #endif /* !__INTELLISENSE__ */
 
+/* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
+FUNDEF WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) USER CHECKED byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
 
 
+struct module_sectinfo {
+	char const  *msi_name;    /* [0..1] Section name. */
+	uintptr_t    msi_addr;    /* Section address. (module-relative) */
+	size_t       msi_size;    /* Size of the section (in bytes) */
+	size_t       msi_entsize; /* Section entity size (or 0 if unknown) */
+	unsigned int msi_type;    /* Section type (s.a. `Elf_Shdr::sh_type'; one of `SHT_*') */
+	unsigned int msi_flags;   /* Section flags (s.a. `Elf_Shdr::sh_flags'; set of `SHF_*') */
+	unsigned int msi_link;    /* Section link (s.a. `Elf_Shdr::sh_link') */
+	unsigned int msi_info;    /* Section info (s.a. `Elf_Shdr::sh_info') */
+	unsigned int msi_index;   /* Section index (for use with `mo_locksection_index') */
+};
 
 struct module_ops {
 	/* [1..1] Module free callback */
@@ -174,6 +190,16 @@ struct module_ops {
 	WUNUSED NONNULL((1)) REF struct module_section *
 	(FCALL *mo_locksection_index)(struct module *__restrict self,
 	                              unsigned int section_index);
+
+	/* [1..1] Try to lookup information about the section that a given
+	 * `module_relative_addr' belongs to, returning information  about
+	 * that section in `*info'. Note that only SHF_ALLOC-sections  can
+	 * be found using this function!
+	 * @return: true: Success (section info was filled in) */
+	WUNUSED NONNULL((1, 3)) __BOOL
+	(FCALL *mo_sectinfo)(struct module *__restrict self,
+	                     uintptr_t module_relative_addr,
+	                     struct module_sectinfo *__restrict info);
 };
 
 struct module {
@@ -244,9 +270,11 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 #ifdef __INTELLISENSE__
 WUNUSED NONNULL((1)) REF struct module_section *(module_locksection)(struct module *__restrict self, USER CHECKED char const *section_name);
 WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struct module *__restrict self, unsigned int section_index);
+WUNUSED NONNULL((1, 3)) __BOOL (FCALL module_sectinfo)(struct module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
 #else /* __INTELLISENSE__ */
-#define module_locksection(self, section_name)        (*(self)->md_ops->mo_locksection)(self, section_name)
-#define module_locksection_index(self, section_index) (*(self)->md_ops->mo_locksection_index)(self, section_index)
+#define module_locksection(self, section_name)            (*(self)->md_ops->mo_locksection)(self, section_name)
+#define module_locksection_index(self, section_index)     (*(self)->md_ops->mo_locksection_index)(self, section_index)
+#define module_sectinfo(self, module_relative_addr, info) (*(self)->md_ops->mo_sectinfo)(self, module_relative_addr, info)
 #endif /* !__INTELLISENSE__ */
 
 /* Same as `module_locksection()', but preserve/discard errors and return `NULL' instead. */
@@ -278,6 +306,11 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__re
 #define module_hasname(self)         ((self)->md_fsname != __NULLPTR)
 #define module_haspath_or_name(self) ((self)->md_fsname != __NULLPTR)
 #endif /* !CONFIG_USE_NEW_DRIVER */
+
+/* Return the name of the given module (or `NULL' if `!module_hasname(self)')
+ * The returned pointer  is the  same as is  printed by  `module_printname()' */
+FUNDEF WUNUSED NONNULL((1)) char const *FCALL
+module_getname(struct module *__restrict self);
 
 /* Print  the absolute filesystem path or name (filesystem
  * path excluding the leading  path) of the given  module.
@@ -313,6 +346,7 @@ module_aboveaddr(USER CHECKED void const *addr);
  * first module, which is the same as returned by `module_aboveaddr((void const *)0)' */
 FUNDEF WUNUSED REF struct module *FCALL
 module_next(struct module *prev);
+#define module_first() module_aboveaddr((void const *)0)
 
 
 /* Same as  the functions  above, but  preserve/restore the  old
@@ -321,6 +355,20 @@ module_next(struct module *prev);
 FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_fromaddr_nx)(USER CHECKED void const *addr);
 FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_aboveaddr_nx)(USER CHECKED void const *addr);
 FUNDEF WUNUSED REF struct module *NOTHROW(FCALL module_next_nx)(struct module *prev);
+#define module_first_nx() module_aboveaddr_nx((void const *)0)
+
+/* Same as the functions above,  but rather than operating  the
+ * usual THIS_MMAN/mman_kernel hybrid-combo, based on the given
+ * `addr', operate exclusively on the given mman `self'
+ * @param: self: The mman who's modules should be enumerated. */
+FUNDEF WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *FCALL mman_module_next(struct mman *__restrict self, struct module *prev);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_fromaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_aboveaddr_nx)(struct mman *__restrict self, USER CHECKED void const *addr);
+FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self, struct module *prev);
+#define mman_module_first(self)    mman_module_aboveaddr(self, (void const *)0)
+#define mman_module_first_nx(self) mman_module_aboveaddr_nx(self, (void const *)0)
 
 /* Clear the module cache of the given mman.
  *

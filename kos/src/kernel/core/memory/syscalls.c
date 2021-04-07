@@ -96,12 +96,16 @@ getdatablock_from_handle(unsigned int fd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MUNMAP
 DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
+#ifdef CONFIG_USE_NEW_DRIVER
+	mman_unmap(THIS_MMAN, addr, length, MMAN_UNMAP_NOKERNPART);
+#else /* CONFIG_USE_NEW_DRIVER */
 	if (mman_unmap(THIS_MMAN, addr, length,
 	               MMAN_UNMAP_NOKERNPART)) {
 #ifdef CONFIG_HAVE_USERMOD
 		vm_clear_usermod(THIS_MMAN);
 #endif /* CONFIG_HAVE_USERMOD */
 	}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_MUNMAP */

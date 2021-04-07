@@ -292,7 +292,7 @@ DATDEF struct driver drv_self;
 /************************************************************************/
 FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_fromaddr)(void const *addr);
 FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_aboveaddr)(void const *addr);
-FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_next)(struct driver *prev);
+FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_next)(struct module *prev);
 
 /* Lookup an already-loaded driver, given its name or file. */
 FUNDEF WUNUSED REF struct driver *FCALL driver_fromname(USER CHECKED char const *driver_name) THROWS(E_SEGFAULT);

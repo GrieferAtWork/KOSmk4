@@ -48,7 +48,9 @@
 #include <stddef.h>
 #include <string.h>
 #else /* !__KERNEL__ */
+#ifndef CONFIG_USE_NEW_DRIVER
 #include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
+#endif /* !CONFIG_USE_NEW_DRIVER */
 #endif /* __KERNEL__ */
 
 DECL_BEGIN
@@ -294,9 +296,11 @@ DEFINE_PUBLIC_ALIAS(unwind, linuw_unwind);
 /* In certain configurations, the kernel's `unwind_for_debug(3)'
  * is  identical  to  its  regular,  old  `unwind(3)'  function. */
 #ifdef __KERNEL__
+#ifndef CONFIG_USE_NEW_DRIVER
 #if !defined(CONFIG_HAVE_USERMOD) && defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
 DEFINE_PUBLIC_ALIAS(unwind_for_debug, linuw_unwind);
 #endif /* !CONFIG_HAVE_USERMOD && LIBDEBUGINFO_CC_IS_LIBUNWIND_CC */
+#endif /* !CONFIG_USE_NEW_DRIVER */
 #endif /* __KERNEL__ */
 
 

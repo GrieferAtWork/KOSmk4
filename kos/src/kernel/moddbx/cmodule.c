@@ -31,6 +31,8 @@
 #include <debugger/input.h>
 #include <debugger/rt.h>
 #include <kernel/driver.h>
+#include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vm/usermod.h>
@@ -163,7 +165,39 @@ NOTHROW(FCALL cmodule_enum_uservm_except)(struct vm *__restrict self,
                                           cmodule_enum_callback_t cb,
                                           void *cookie,
                                           struct cmodule *skipme) {
-#ifdef CONFIG_HAVE_USERMOD
+#ifdef CONFIG_USE_NEW_DRIVER
+	ssize_t temp, result = 0;
+	REF struct module *um, *nx;
+	/* Enumerate modules. */
+	for (um = mman_module_first_nx(self); um != NULL;
+	     nx = mman_module_next_nx(self, um), decref(um), um = nx) {
+		REF struct cmodule *cm;
+		cm = cmodule_locate((module_t *)um
+		                    module_type__arg(MODULE_TYPE_USRMOD));
+		if likely(cm) {
+			temp = 0;
+			if (cm != skipme)
+				temp = (*cb)(cookie, cm);
+			decref(cm);
+			if unlikely(temp < 0) {
+				decref(um);
+				goto err;
+			}
+			result += temp;
+		}
+		/* Check if the user has requested an interrupt. */
+		if (dbg_awaituser()) {
+			decref(um);
+			result = DBX_EINTR;
+			break;
+		}
+	} while (um != NULL);
+done:
+	return result;
+err:
+	result = temp;
+	goto done;
+#elif defined(CONFIG_HAVE_USERMOD)
 	ssize_t temp, result = 0;
 	REF struct usermod *um;
 	TRY {

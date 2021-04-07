@@ -41,6 +41,7 @@ struct addr2line_buf {
 	module_type_var           (ds_modtype); /* The type of the linked module. */
 };
 
+#ifndef CONFIG_USE_NEW_DRIVER
 struct inode;
 struct path;
 struct directory_entry;
@@ -58,6 +59,7 @@ struct addr2line_modinfo {
 	(xdecref_unlikely((self)->ami_fsfile), \
 	 xdecref_unlikely((self)->ami_fspath), \
 	 xdecref_unlikely((self)->ami_fsname))
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 
 
@@ -82,10 +84,16 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level DFL(0));
+#ifdef CONFIG_USE_NEW_DRIVER
+FUNDEF WUNUSED NONNULL((1)) uintptr_t
+NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
+                               void const *abs_pc);
+#else /* CONFIG_USE_NEW_DRIVER */
 FUNDEF WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
                                void const *abs_pc,
                                struct addr2line_modinfo *modinfo DFL(__NULLPTR));
+#endif /* !CONFIG_USE_NEW_DRIVER */
 FUNDEF NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
 

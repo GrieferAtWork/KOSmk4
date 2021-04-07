@@ -33,7 +33,7 @@
 #undef HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE
 #undef HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO
 #ifdef __KERNEL__
-#ifdef CONFIG_HAVE_USERMOD
+#if defined(CONFIG_USE_NEW_DRIVER) || defined(CONFIG_HAVE_USERMOD)
 #define HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE 1 /* Define in `memory/vm/usermod.c' */
 #elif defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
 #define HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO 1 /* Define in `libunwind/unwind.c' */

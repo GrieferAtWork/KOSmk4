@@ -1095,6 +1095,10 @@ print_a2l_symbol(struct cprinter const *__restrict printer,
 	PRINT(" ");
 	FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
 	PRINT("(");
+#ifdef CONFIG_USE_NEW_DRIVER
+	DO(module_hasname(mod) ? module_printname(mod, P_PRINTER, P_ARG)
+	                       : (*P_PRINTER)(P_ARG, "?", 1));
+#else /* CONFIG_USE_NEW_DRIVER */
 #ifdef CONFIG_HAVE_USERMOD
 	if (modtyp == MODULE_TYPE_USRMOD) {
 		if (mod->m_usrmod.um_fsname) {
@@ -1117,6 +1121,7 @@ print_a2l_symbol(struct cprinter const *__restrict printer,
 			namelen = 16;
 		DO((*P_PRINTER)(P_ARG, name, namelen));
 	}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	PRINT("!");
 	DO((*P_PRINTER)(P_ARG, name, strlen(name)));
 	if (offset != 0)
@@ -1146,6 +1151,13 @@ NOTHROW(KCALL get_name_and_offset_of_containing_sections)(uintptr_t module_relat
                                                           module_t *__restrict mod
                                                           module_type__param(modtyp)) {
 	TRY {
+#ifdef CONFIG_USE_NEW_DRIVER
+		struct module_sectinfo info;
+		if (!module_sectinfo(mod, module_relative_addr, &info))
+			return NULL;
+		*psection_relative_addr = module_relative_addr - info.msi_addr;
+		return info.msi_name;
+#else /* CONFIG_USE_NEW_DRIVER */
 		bool allow_section_end_pointers;
 		allow_section_end_pointers = false;
 again:
@@ -1247,6 +1259,7 @@ again:
 			allow_section_end_pointers = true;
 			goto again;
 		}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	} EXCEPT {
 	}
 	return NULL;
@@ -1496,6 +1509,10 @@ print_function(struct ctyperef const *__restrict self,
 							PRINT(" ");
 							FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
 							PRINT("(");
+#ifdef CONFIG_USE_NEW_DRIVER
+							DO(module_hasname(mod) ? module_printname(mod, P_PRINTER, P_ARG)
+							                       : (*P_PRINTER)(P_ARG, "?", 1));
+#else /* CONFIG_USE_NEW_DRIVER */
 #ifdef CONFIG_HAVE_USERMOD
 							if (modtyp == MODULE_TYPE_USRMOD) {
 								if (mod->m_usrmod.um_fsname) {
@@ -1518,6 +1535,7 @@ print_function(struct ctyperef const *__restrict self,
 									namelen = 16;
 								DO((*P_PRINTER)(P_ARG, name, namelen));
 							}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 							PRINTF("!%#" PRIxPTR ")", ptr);
 							FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
 						}

@@ -37,6 +37,7 @@
 #include <kernel/except.h>
 #include <kernel/execabi.h>
 #include <kernel/heap.h>
+#include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/mfile.h>
@@ -220,6 +221,159 @@ badobj:
 	return false;
 }
 
+#ifdef CONFIG_USE_NEW_DRIVER
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus) {
+	struct module *me = (struct module *)pointer;
+	char const *module_name;
+	size_t module_namelen;
+	TRY {
+		if (me->md_refcnt == 0)
+			goto badobj;
+		if (me->md_weakrefcnt == 0)
+			goto badobj;
+		if (!ADDR_ISKERN(me->md_ops))
+			goto badobj;
+		if (me->md_ops->mo_free == &_driver_free) {
+			module_name = ((struct driver *)me)->d_name;
+			if (!ADDR_ISKERN(module_name))
+				goto badobj;
+			module_namelen = strlen(module_name);
+		} else if (me->md_fsname == NULL) {
+			module_name    = "?";
+			module_namelen = 1;
+		} else {
+			if (!ADDR_ISKERN(me->md_fsname))
+				goto badobj;
+			module_name    = me->md_fsname->de_name;
+			module_namelen = me->md_fsname->de_namelen;
+			if (!ADDRRANGE_ISKERN(module_name,
+			                      module_name + module_namelen))
+				goto badobj;
+			if (module_name[0] == '/') {
+				char const *tail;
+				tail           = (char const *)rawmemrchr(module_name + module_namelen, '/') + 1;
+				module_namelen = (size_t)((module_name + module_namelen) - tail);
+				module_name    = tail;
+			}
+		}
+	} EXCEPT {
+		goto badobj;
+	}
+	return (*printer)(arg, module_name, module_namelen);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
+                                   KERNEL CHECKED void const *pointer,
+                                   unsigned int *__restrict pstatus) {
+	struct module_section *me = (struct module_section *)pointer;
+	char const *module_name;
+	size_t module_namelen;
+	char const *section_name;
+	size_t section_namelen;
+	TRY {
+		struct module *mod;
+		ElfW(Word) section_name_offset;
+		if (me->ms_refcnt == 0)
+			goto badobj;
+		if (!ADDR_ISKERN(me->ms_ops))
+			goto badobj;
+		if (!ADDR_ISKERN(me->ms_ops->ms_destroy))
+			goto badobj;
+		if (!ADDR_ISKERN(me->ms_ops->ms_getname))
+			goto badobj;
+		mod = (struct module *)me->ms_module;
+		if (!ADDR_ISKERN(mod))
+			goto badobj;
+		if (mod->md_weakrefcnt == 0)
+			goto badobj;
+		if (mod->md_refcnt == 0) {
+			module_name     = "?";
+			module_namelen  = 1;
+			section_name    = "?";
+			section_namelen = 1;
+		} else {
+			if (!ADDR_ISKERN(mod->md_ops))
+				goto badobj;
+			if (mod->md_ops->mo_free == &_driver_free) {
+				struct driver *drv;
+				struct driver_section *sect;
+				drv         = (struct driver *)mod;
+				sect        = (struct driver_section *)me;
+				module_name = drv->d_name;
+				if (!ADDR_ISKERN(module_name))
+					goto badobj;
+				module_namelen = strlen(module_name);
+				if (!ADDR_ISKERN(drv->d_shdr))
+					goto badobj;
+				if (!ADDR_ISKERN(drv->d_shdr + drv->d_shnum))
+					goto badobj;
+				if (drv->d_shdr < (drv->d_shdr + drv->d_shnum))
+					goto badobj;
+				if (sect->ds_shdr < drv->d_shdr ||
+				    sect->ds_shdr >= drv->d_shdr + drv->d_shnum)
+					goto badobj;
+				section_name_offset = sect->ds_shdr->sh_name;
+				if (!ADDR_ISKERN(drv->d_shstrtab))
+					goto badobj;
+				if (section_name_offset >= drv->d_shstrsiz)
+					goto badobj;
+				section_name    = drv->d_shstrtab + section_name_offset;
+				section_namelen = strlen(section_name);
+			} else {
+				if (mod->md_fsname == NULL) {
+					module_name    = "?";
+					module_namelen = 1;
+				} else {
+					if (!ADDR_ISKERN(mod->md_fsname))
+						goto badobj;
+					module_name    = mod->md_fsname->de_name;
+					module_namelen = mod->md_fsname->de_namelen;
+					if (!ADDRRANGE_ISKERN(module_name,
+					                      module_name + module_namelen))
+						goto badobj;
+					if (module_name[0] == '/') {
+						char const *tail;
+						tail           = (char const *)rawmemrchr(module_name + module_namelen, '/') + 1;
+						module_namelen = (size_t)((module_name + module_namelen) - tail);
+						module_name    = tail;
+					}
+				}
+				/* We  can't safely invoke the `ms_getname' operator,
+				 * since the section/module  may be  corrupt in  some
+				 * way which we cannot forsee, in which case we  must
+				 * not cause undefined behavior by calling a function
+				 * that wasn't designed with guards against this kind
+				 * of situation. */
+#if 0
+				section_name = (*me->ms_ops->ms_getname)(me);
+				if (!section_name)
+					section_name = "?";
+				section_namelen = strlen(section_name);
+#else
+				/* TODO: Support for `userelf_module_section' names! */
+				section_name    = "?";
+				section_namelen = 1;
+#endif
+			}
+		}
+	} EXCEPT {
+		goto badobj;
+	}
+	return format_printf(printer, arg, "%$s!%$s",
+	                     module_namelen, module_name,
+	                     section_namelen, section_name);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+#else /* CONFIG_USE_NEW_DRIVER */
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_driver)(pformatprinter printer, void *arg,
                            KERNEL CHECKED void const *pointer,
@@ -257,15 +411,9 @@ NOTHROW(KCALL note_driver_section)(pformatprinter printer, void *arg,
 	TRY {
 		struct driver *drv;
 		ElfW(Word) section_name_offset;
-#ifdef CONFIG_USE_NEW_DRIVER
-		if (me->ms_refcnt == 0)
-			goto badobj;
-		drv = (struct driver *)me->ms_module;
-#else /* CONFIG_USE_NEW_DRIVER */
 		if (me->ds_refcnt == 0)
 			goto badobj;
 		drv = me->ds_module;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (!ADDR_ISKERN(drv))
 			goto badobj;
 		if (__driver_refcnt(drv) == 0)
@@ -276,31 +424,19 @@ NOTHROW(KCALL note_driver_section)(pformatprinter printer, void *arg,
 		if (!ADDR_ISKERN(driver_name))
 			goto badobj;
 		driver_namelen = strlen(driver_name);
-#ifdef CONFIG_USE_NEW_DRIVER
-		if (me->ds_shdr < drv->d_shdr ||
-		    me->ds_shdr >= drv->d_shdr + drv->d_shnum)
-			goto badobj;
-		section_name_offset = me->ds_shdr->sh_name;
-#else /* CONFIG_USE_NEW_DRIVER */
 		if (me->ds_index >= drv->d_shnum)
 			goto badobj;
 		if (!ADDR_ISKERN(drv->d_shdr))
 			goto badobj;
 		section_name_offset = drv->d_shdr[me->ds_index].sh_name;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (!ADDR_ISKERN(drv->d_shstrtab))
 			goto badobj;
-#ifdef CONFIG_USE_NEW_DRIVER
-		if (section_name_offset >= drv->d_shstrsiz)
-			goto badobj;
-#else /* CONFIG_USE_NEW_DRIVER */
 		if (!ADDR_ISKERN(drv->d_shstrtab_end))
 			goto badobj;
 		if (drv->d_shstrtab_end <= drv->d_shstrtab)
 			goto badobj;
 		if (section_name_offset >= (size_t)(drv->d_shstrtab_end - drv->d_shstrtab))
 			goto badobj;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		section_name    = drv->d_shstrtab + section_name_offset;
 		section_namelen = strlen(section_name);
 	} EXCEPT {
@@ -357,6 +493,7 @@ badobj:
 	return 0;
 }
 #endif /* CONFIG_HAVE_USERMOD */
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_directory_entry)(pformatprinter printer, void *arg,
@@ -996,11 +1133,20 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "character_device", &note_character_device },
 	{ "cpu", &note_cpu },
 	{ "directory_entry", &note_directory_entry },
+#ifdef CONFIG_USE_NEW_DRIVER
+	{ "driver", &note_module },
+	{ "driver_section", &note_module_section },
+#else /* CONFIG_USE_NEW_DRIVER */
 	{ "driver", &note_driver },
 	{ "driver_section", &note_driver_section },
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	{ "file", &note_file },
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
 	{ "keyboard_device", &note_character_device },
+#ifdef CONFIG_USE_NEW_DRIVER
+	{ "module", &note_module },
+	{ "module_section", &note_module_section },
+#endif /* CONFIG_USE_NEW_DRIVER */
 	{ "mouse_device", &note_character_device },
 	{ "nic_device", &note_character_device },
 	{ "oneshot_directory_file", &note_file },
@@ -1010,9 +1156,15 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "ttybase_device", &note_character_device },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
+#ifdef CONFIG_USE_NEW_DRIVER
+	{ "userelf_module", &note_module },
+	{ "userelf_module_section", &note_module_section },
+#endif /* CONFIG_USE_NEW_DRIVER */
+#ifndef CONFIG_USE_NEW_DRIVER
 #ifdef CONFIG_HAVE_USERMOD
 	{ "usermod", &note_usermod },
 #endif /* CONFIG_HAVE_USERMOD */
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	{ "mnode", &note_mnode },
 	{ "mpart", &note_mpart },
 	{ "mfile", &note_mfile },

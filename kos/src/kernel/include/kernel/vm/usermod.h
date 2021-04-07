@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_DRIVER
 #ifndef CONFIG_NO_USERMOD
 #define CONFIG_HAVE_USERMOD 1
 #endif /* !CONFIG_NO_USERMOD */
@@ -290,5 +291,6 @@ vm_enumusermod(struct mman *__restrict self,
 
 DECL_END
 #endif /* CONFIG_HAVE_USERMOD */
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_USERMOD_H */

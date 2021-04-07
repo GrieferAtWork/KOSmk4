@@ -133,11 +133,13 @@ INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uem_destroy)(struct userelf_modul
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL uem_nonodes)(struct userelf_module *__restrict self);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection(struct userelf_module *__restrict self, USER CHECKED char const *section_name);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL uem_locksection_index(struct userelf_module *__restrict self, unsigned int section_index);
+INTDEF WUNUSED NONNULL((1, 3)) bool FCALL uem_sectinfo(struct userelf_module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
+
 
 /* Generic UserELF module creation functions. */
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
-INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_next(struct mman *__restrict self, struct userelf_module *__restrict prev);
+INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_next(struct mman *__restrict self, struct module *__restrict prev);
 
 DECL_END
 #endif /* CONFIG_HAVE_USERELF_MODULES */

@@ -165,6 +165,7 @@ INTERN_CONST struct module_ops const uem_ops = {
 	.mo_nonodes           = (void (FCALL *)(struct module *__restrict))&uem_nonodes,
 	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&uem_locksection,
 	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&uem_locksection_index,
+	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&uem_sectinfo,
 };
 
 
@@ -663,6 +664,59 @@ uem_locksection_index(struct userelf_module *__restrict self,
 	                                  (uint16_t)section_index);
 }
 
+INTERN WUNUSED NONNULL((1, 3)) bool FCALL
+uem_sectinfo(struct userelf_module *__restrict self,
+             uintptr_t module_relative_addr,
+             struct module_sectinfo *__restrict info) {
+	uint16_t i;
+	UM_ElfW_ShdrP shdrs;
+	bool allow_section_end_pointers;
+	allow_section_end_pointers = false;
+	shdrs = uem_shdrs(self);
+again:
+	for (i = 0; i < self->um_shnum; ++i) {
+		char *shstrtab;
+		uintptr_t sh_addr, sh_size;
+		uintptr_t sh_name;
+		size_t shstrtab_siz;
+		sh_addr = UM_field(self, shdrs, [i].sh_addr);
+		sh_size = UM_field(self, shdrs, [i].sh_size);
+		if (!(UM_field(self, shdrs, [i].sh_flags) & SHF_ALLOC))
+			continue; /* Section isn't allocated, so this one can't be it. */
+		if (module_relative_addr < sh_addr)
+			continue;
+		if (module_relative_addr >= sh_addr + sh_size) {
+			if (!allow_section_end_pointers)
+				continue;
+			if (module_relative_addr > sh_addr + sh_size)
+				continue;
+		}
+		/* Found it! (fill in section information for our caller) */
+		info->msi_name    = NULL;
+		info->msi_addr    = sh_addr;
+		info->msi_size    = sh_size;
+		info->msi_entsize = UM_field(self, shdrs, [i].sh_entsize);
+		info->msi_type    = UM_field(self, shdrs, [i].sh_type);
+		info->msi_flags   = UM_field(self, shdrs, [i].sh_flags);
+		info->msi_link    = UM_field(self, shdrs, [i].sh_link);
+		info->msi_info    = UM_field(self, shdrs, [i].sh_info);
+		info->msi_index   = (unsigned int)i;
+		if likely((shstrtab = uem_shstrtab(self)) != NULL) {
+			shstrtab_siz = UM_field(self, shdrs, [self->um_shstrndx].sh_size);
+			sh_name      = UM_field(self, shdrs, [i].sh_name);
+			if likely(sh_name < shstrtab_siz) {
+				info->msi_name = shstrtab + sh_name;
+			}
+		}
+		return true;
+	}
+	if (!allow_section_end_pointers) {
+		allow_section_end_pointers = true;
+		goto again;
+	}
+	return false;
+}
+
 
 
 /************************************************************************/
@@ -1028,7 +1082,7 @@ something_changed:
 				struct mfile *node_file;
 
 				/* Load filesystem name info, and make sure it's consistent
-				 * across all segments that actually offer filesystem name
+				 * across  all segments that actually offer filesystem name
 				 * information. */
 				if (!result->md_fspath && !result->md_fsname) {
 					result->md_fspath = node->mn_fspath;
@@ -1075,11 +1129,11 @@ something_changed:
 					if (wasdestroyed(node->mn_module)) {
 						node->mn_module = NULL;
 					} else {
-						/* Check for race condition: another thread created
+						/* Check  for race condition: another thread created
 						 * the module that was requested before we got here.
 						 *
-						 * In this case, use `node->mn_module' as result,
-						 * but also check that it can be found in all of
+						 * In  this case, use `node->mn_module' as result,
+						 * but also check that it  can be found in all  of
 						 * the places where we expect it to be located at. */
 						if (node == mima.mm_min &&
 						    node->mn_module->md_ops == &uem_ops &&
@@ -1465,7 +1519,7 @@ again:
 
 INTERN WUNUSED NONNULL((1)) REF struct userelf_module *FCALL
 uem_next(struct mman *__restrict self,
-         struct userelf_module *__restrict prev) {
+         struct module *__restrict prev) {
 	REF struct userelf_module *result;
 	struct mnode *node;
 	struct mnode_tree_minmax mima;
@@ -1517,6 +1571,11 @@ nextnode:
 			/* Got the same module all over again... (skip this node) */
 			minaddr = (byte_t *)node_maxaddr + 1;
 			decref_nokill(result);
+			goto again;
+		} else if (result->md_loadmin <= prev->md_loadmin) {
+			/* Got a module that is based below the current module... (skip this node) */
+			minaddr = (byte_t *)node_maxaddr + 1;
+			decref(result);
 			goto again;
 		} else {
 			/* Found the actual next UserELF module! */

@@ -50,15 +50,27 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level) {
+#ifdef CONFIG_USE_NEW_DRIVER
+	NESTED_TRY {
+		return debug_addr2line(&info->ds_info,
+		                       result,
+		                       module_relative_pc,
+		                       level,
+		                       DEBUG_ADDR2LINE_FNORMAL);
+	} EXCEPT {
+		/* XXX: What do we do about RT-level exceptions? */
+	}
+	return DEBUG_INFO_ERROR_CORRUPT;
+#else /* CONFIG_USE_NEW_DRIVER */
 #ifdef CONFIG_HAVE_USERMOD
 	NESTED_TRY
 #endif /* CONFIG_HAVE_USERMOD */
 	{
 		return debug_addr2line(&info->ds_info,
-		                                result,
-		                                module_relative_pc,
-		                                level,
-		                                DEBUG_ADDR2LINE_FNORMAL);
+		                       result,
+		                       module_relative_pc,
+		                       level,
+		                       DEBUG_ADDR2LINE_FNORMAL);
 	}
 #ifdef CONFIG_HAVE_USERMOD
 	EXCEPT {
@@ -66,20 +78,30 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
 	}
 	return DEBUG_INFO_ERROR_CORRUPT;
 #endif /* CONFIG_HAVE_USERMOD */
+#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 
+#ifdef CONFIG_USE_NEW_DRIVER
+PUBLIC ATTR_COLDTEXT WUNUSED NONNULL((1)) uintptr_t
+NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
+                               void const *abs_pc)
+#else /* CONFIG_USE_NEW_DRIVER */
 PUBLIC ATTR_COLDTEXT WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
                                void const *abs_pc,
-                               struct addr2line_modinfo *modinfo) {
+                               struct addr2line_modinfo *modinfo)
+#endif /* !CONFIG_USE_NEW_DRIVER */
+{
 	REF module_t *mod;
 	module_type_var(modtype);
 	mod = module_ataddr_nx(abs_pc, modtype);
 	if unlikely(!mod) {
 		memset(buf, 0, sizeof(*buf));
+#ifndef CONFIG_USE_NEW_DRIVER
 		if (modinfo)
 			memset(modinfo, 0, sizeof(*modinfo));
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		return (uintptr_t)abs_pc;
 	}
 	abs_pc = (byte_t *)abs_pc - module_getloadaddr(mod, modtype);
@@ -87,6 +109,7 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 	                                  module_type__arg(modtype)) !=
 	    DEBUG_INFO_ERROR_SUCCESS)
 		memset(buf, 0, sizeof(*buf));
+#ifndef CONFIG_USE_NEW_DRIVER
 	if (modinfo) {
 #ifdef CONFIG_HAVE_USERMOD
 		if (modtype == MODULE_TYPE_USRMOD) {
@@ -109,6 +132,7 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 			modinfo->ami_filename = d->d_filename;
 		}
 	}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	buf->ds_mod = mod; /* Inherit reference */
 	module_type_arg(buf->ds_modtype = modtype);
 	return (uintptr_t)abs_pc;
@@ -179,6 +203,46 @@ do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
 	error = addr2line(ainfo, module_relative_start_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
 		if (mod) {
+#ifdef CONFIG_USE_NEW_DRIVER
+			if (module_haspath(mod)) {
+				static char const prefix[] = "%%{vinfo:";
+				result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
+				if unlikely(result < 0)
+					goto done;
+				temp = module_printpath(mod, printer, arg);
+			} else if (module_hasname(mod)) {
+				static char const prefix[] = "%%{vinfo:/os/drivers/";
+				result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
+				if unlikely(result < 0)
+					goto done;
+				temp = module_printname(mod, printer, arg);
+			} else {
+				goto unknown_module;
+			}
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+			temp = format_printf(printer, arg,
+			                     ":%p:%p:%%f(%%l,%%c) : %%n : %%p",
+			                     module_relative_start_pc, start_pc);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+			if (message_format) {
+				temp = (*printer)(arg, " : ", 3);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+				temp = format_vprintf(printer, arg, message_format, args);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+			}
+			temp = (*printer)(arg, "}\n", 2);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+#else /* CONFIG_USE_NEW_DRIVER */
 #ifdef CONFIG_HAVE_USERMOD
 			if (modtype == MODULE_TYPE_USRMOD) {
 				static char const prefix[] = "%{vinfo:";
@@ -233,8 +297,11 @@ do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		} else {
-#ifdef CONFIG_HAVE_USERMOD
+#ifdef CONFIG_USE_NEW_DRIVER
+unknown_module:
+#elif defined(CONFIG_HAVE_USERMOD)
 unknown_module:
 #endif /* CONFIG_HAVE_USERMOD */
 			result = format_printf(printer, arg, "%p+%" PRIuSIZ,
@@ -335,7 +402,7 @@ addr2line_vprintf(pformatprinter printer, void *arg, void const *start_pc,
 	ssize_t result;
 	uintptr_t module_relative_pc;
 	struct addr2line_buf ainfo;
-	module_relative_pc = addr2line_begin(&ainfo, start_pc, NULL);
+	module_relative_pc = addr2line_begin(&ainfo, start_pc);
 	result = do_addr2line_vprintf(&ainfo,
 	                              printer,
 	                              arg,
