@@ -211,7 +211,7 @@ struct driver
 	 *    - d_module.md_sizeof_pointer
 	 *    - d_state                     (will eventually be set to `DRIVER_STATE_DEAD')
 	 * All other fields must be considered as `[valid_if(!wasdestroyed(self))]',
-	 * and no longer be accessed after that point in time! */
+	 * and  may   no   longer   be   accessed  after   that   point   in   time! */
 
 	/* Basic driver information */
 	uintptr_t                      d_state;      /* [lock(ATOMIC)] Driver state (one of `DRIVER_STATE_*')
@@ -260,7 +260,7 @@ struct driver
 	};
 	union {
 		struct task               *_d_initthread; /* Used internally by `DRIVER_STATE_INIT_DEPS...DRIVER_STATE_INIT_CTRS',
-		                                           * as well as `DRIVER_STATE_FINI_DTRS...DRIVER_STATE_FINI_RDPS' */
+		                                           * as    well    as    `DRIVER_STATE_FINI_DTRS...DRIVER_STATE_FINI_RDPS' */
 		struct mnode_slist         _d_deadnodes;  /* Used internally by `DRIVER_STATE_FINI_TEXT' */
 	};
 
@@ -275,14 +275,21 @@ struct driver
 	(__hybrid_atomic_load((self)->d_state, __ATOMIC_ACQUIRE) >= DRIVER_STATE_FINI_DTRS)
 
 
+#undef __driver_as_module
 #if !defined(__cplusplus) || defined(__WANT_DRIVER_d_module)
+#undef __driver_destroy
+#undef __driver_free
+#undef __driver_refcnt
+#undef __driver_weakrefcnt
 #define __driver_as_module(self)  (&(self)->d_module)
 #define __driver_destroy(self)    module_destroy(&(self)->d_module)
 #define __driver_free(self)       module_free(&(self)->d_module)
 #define __driver_refcnt(self)     (self)->d_module.md_refcnt
 #define __driver_weakrefcnt(self) (self)->d_module.md_weakrefcnt
+#ifndef __DRIVER_REFCNT_FUNCTIONS_DEFINED
 DEFINE_REFCOUNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
+#endif /* !__DRIVER_REFCNT_FUNCTIONS_DEFINED */
 #else /* !__cplusplus || __WANT_DRIVER_d_module */
 #define __driver_as_module /* nothing */
 #endif /* __cplusplus && !__WANT_DRIVER_d_module */
@@ -661,6 +668,21 @@ DEFINE_REFCOUNT_FUNCTIONS(struct driver_loadlist, dll_refcnt, driver_loadlist_de
  * Note that this function is  NOBLOCK+NOTHROW! */
 FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED REF struct driver_loadlist *
 NOTHROW(FCALL get_driver_loadlist)(void);
+
+#ifndef __driver_loadlist_arref_defined
+#define __driver_loadlist_arref_defined
+ARREF(driver_loadlist_arref, driver_loadlist);
+#endif /* !__driver_loadlist_arref_defined */
+
+/* [1..1] A descriptor for the set of currently loaded drivers.
+ * NOTE: To retrieve this list, don't use `arref_get(&drivers)',
+ *       but make use  of `get_driver_loadlist()' instead.  This
+ *       must be done since the later will automatically try  to
+ *       get rid of drivers that  have been destroyed, but  were
+ *       unable to remove themselves from the load-list. */
+DATDEF struct driver_loadlist_arref drivers;
+
+
 
 
 

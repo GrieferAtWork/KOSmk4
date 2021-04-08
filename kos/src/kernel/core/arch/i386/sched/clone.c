@@ -24,11 +24,11 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cache.h>
 #include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/printk.h>
 #include <kernel/syscall.h>

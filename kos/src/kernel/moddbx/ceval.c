@@ -1785,9 +1785,9 @@ done:
  *       be used  as a  sort-of with-statement,  where the  left-hand-side can  be
  *       used to specify a struct- or pointer-to-struct expression, where  members
  *       of that struct can be used directly, as though they were local variables:
- * >> eval current_driver_state.m_pointer:ds_drivers,ds_count
+ * >> eval drivers.m_pointer:dll_drivers,dll_count
  * Same as:
- * >> eval current_driver_state.m_pointer.ds_drivers,current_driver_state.m_pointer.ds_count
+ * >> eval drivers.m_pointer.dll_drivers,drivers.m_pointer.dll_count
  *
  * As far as semantics go, this would simply be parsed as
  *     <parse_assign> ':' <parse_collon>

@@ -31,13 +31,13 @@
 #include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/cache.h>
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/phys.h>
 #include <kernel/printk.h>
 #include <kernel/swap.h>

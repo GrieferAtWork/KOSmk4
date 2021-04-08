@@ -191,7 +191,9 @@ NOTHROW(VCALL dbg_addr2line_printf)(void const *start_pc, void const *end_pc,
 
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict ainfo,
+#ifndef CONFIG_USE_NEW_DRIVER
                                         struct addr2line_modinfo const *__restrict modinfo,
+#endif /* !CONFIG_USE_NEW_DRIVER */
                                         uintptr_t module_relative_start_pc,
                                         void const *start_pc, void const *end_pc,
                                         char const *message_format, va_list args) {
@@ -223,6 +225,16 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 		           (size_t)((byte_t *)end_pc -
 		                    (byte_t *)start_pc));
 		dbg_loadcolor();
+#ifdef CONFIG_USE_NEW_DRIVER
+		if (ainfo->ds_mod && module_hasname(ainfo->ds_mod)) {
+			dbg_putc('[');
+			dbg_savecolor();
+			dbg_setfgcolor(normal_fgcolor);
+			module_printname(ainfo->ds_mod, &dbg_printer, NULL);
+			dbg_loadcolor();
+			dbg_putc(']');
+		}
+#else /* CONFIG_USE_NEW_DRIVER */
 		if (modinfo->ami_name) {
 			dbg_putc('[');
 			dbg_savecolor();
@@ -231,6 +243,7 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 			dbg_loadcolor();
 			dbg_putc(']');
 		}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (message_format) {
 			dbg_putc('[');
 			dbg_savecolor();
@@ -274,6 +287,13 @@ again_printlevel:
 			                         info.al_symstart),
 			             level == 0 ? (size_t)((byte_t *)end_pc - (byte_t *)start_pc)
 			                      : (size_t)(info.al_lineend - info.al_linestart));
+#ifdef CONFIG_USE_NEW_DRIVER
+			if (ainfo->ds_mod && module_haspath_or_name(ainfo->ds_mod)) {
+				dbg_logecho(DBGSTR("["));
+				module_printpath_or_name(ainfo->ds_mod, &dbg_logecho_printer, NULL);
+				dbg_logecho(DBGSTR("]"));
+			}
+#else /* CONFIG_USE_NEW_DRIVER */
 			if (modinfo->ami_filename) {
 				dbg_logechof(DBGSTR("[%s]"), modinfo->ami_filename);
 			} else if (modinfo->ami_name && modinfo->ami_fspath) {
@@ -288,6 +308,7 @@ again_printlevel:
 			} else if (modinfo->ami_name) {
 				dbg_logechof(DBGSTR("[%s]"), modinfo->ami_name);
 			}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 			dbg_logechof(DBGSTR("[%s+%" PRIuSIZ "]"),
 			             info.al_rawname,
 			             level == 0 ? (size_t)(module_relative_start_pc - info.al_symstart)
@@ -321,6 +342,16 @@ again_printlevel:
 		           level == 0 ? (size_t)((byte_t *)end_pc - (byte_t *)start_pc)
 		                      : (size_t)(info.al_lineend - info.al_linestart));
 		dbg_loadcolor();
+#ifdef CONFIG_USE_NEW_DRIVER
+		if (ainfo->ds_mod && module_hasname(ainfo->ds_mod)) {
+			dbg_putc('[');
+			dbg_savecolor();
+			dbg_setfgcolor(fgcolor);
+			module_printname(ainfo->ds_mod, &dbg_printer, NULL);
+			dbg_loadcolor();
+			dbg_putc(']');
+		}
+#else /* CONFIG_USE_NEW_DRIVER */
 		if (modinfo->ami_name) {
 			dbg_putc('[');
 			dbg_savecolor();
@@ -329,6 +360,7 @@ again_printlevel:
 			dbg_loadcolor();
 			dbg_putc(']');
 		}
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		dbg_putc('[');
 		dbg_savecolor();
 		dbg_setfgcolor(fgcolor);
@@ -407,6 +439,14 @@ again_printlevel:
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
                                      char const *message_format, va_list args) {
+#ifdef CONFIG_USE_NEW_DRIVER
+	struct addr2line_buf ainfo;
+	uintptr_t module_relative_start_pc;
+	module_relative_start_pc = addr2line_begin(&ainfo, start_pc);
+	do_dbg_addr2line_vprintf(&ainfo, module_relative_start_pc,
+	                         start_pc, end_pc, message_format, args);
+	addr2line_end(&ainfo);
+#else /* CONFIG_USE_NEW_DRIVER */
 	struct addr2line_buf ainfo;
 	struct addr2line_modinfo modinfo;
 	uintptr_t module_relative_start_pc;
@@ -420,6 +460,7 @@ NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
 	                         args);
 	addr2line_modinfo_fini(&modinfo);
 	addr2line_end(&ainfo);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 

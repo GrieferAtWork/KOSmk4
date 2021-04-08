@@ -1144,12 +1144,14 @@ INTDEF byte_t __debug_malloc_tracked_start[];
 INTDEF byte_t __debug_malloc_tracked_end[];
 INTDEF byte_t __debug_malloc_tracked_size[];
 
-#ifndef __driver_state_arref_defined
-#define __driver_state_arref_defined
-ARREF(driver_state_arref, driver_state);
-#endif /* !__driver_state_arref_defined */
+#ifndef __driver_loadlist_arref_defined
+#define __driver_loadlist_arref_defined
+ARREF(driver_loadlist_arref, driver_loadlist);
+#endif /* !__driver_loadlist_arref_defined */
 
-INTDEF struct driver_state_arref current_driver_state;
+#ifndef CONFIG_USE_NEW_DRIVER
+INTDEF struct driver_loadlist_arref drivers ASMNAME("current_driver_state");
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_corepage_chain)(struct mcorepage *chain) {
@@ -1230,12 +1232,12 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
 	{
-		struct driver_state *drivers;
+		struct driver_loadlist *dll;
 		size_t i;
-		drivers = arref_ptr(&current_driver_state);
-		for (i = 0; i < drivers->ds_count; ++i) {
+		dll = arref_ptr(&drivers);
+		for (i = 0; i < dll->dll_count; ++i) {
 			uint16_t j;
-			struct driver *drv = drivers->ds_drivers[i];
+			struct driver *drv = dll->dll_drivers[i];
 			if unlikely(wasdestroyed(drv))
 				continue;
 			/* Since  we're in single-core  mode, we know  that when `drv' isn't
@@ -1247,7 +1249,11 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 					continue;
 				if (!(drv->d_phdr[j].p_flags & PF_W))
 					continue;
+#ifdef CONFIG_USE_NEW_DRIVER
+				progaddr = (uintptr_t)(drv->md_loadaddr + drv->d_phdr[j].p_vaddr);
+#else /* CONFIG_USE_NEW_DRIVER */
 				progaddr = (uintptr_t)(drv->d_loadaddr + drv->d_phdr[j].p_vaddr);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 				progsize = drv->d_phdr[j].p_memsz;
 				progsize += progaddr & PAGEMASK;
 				progaddr &= ~PAGEMASK;

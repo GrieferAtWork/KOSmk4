@@ -551,20 +551,20 @@ struct dbg_clearhook {
 /* Helpers for enumerating system-wide debugger hooks. */
 #ifdef __CC__
 
-struct driver_state;
+struct driver_loadlist;
 struct driver_section;
 struct dbg_hookiterator {
-	REF struct driver_state   *dhi_drivers;    /* [1..1] Loaded drivers. */
-	size_t                     dhi_nextdriver; /* Index for the next driver to scan. */
-	REF struct driver_section *dhi_section;    /* [1..1] Section currently being scanned.
-	                                            * HINT: This is 1..1, since the kernel _always_ defines
-	                                            *       a .dbg.hook section, so  we know that at  least
-	                                            *       one such section will exist at run-time! */
-	struct dbg_hookhdr        *dhi_sectnext;   /* [1..1] Pointer to the next hook to enumerate. */
-	struct dbg_hookhdr        *dhi_sectend;    /* [== dhi_section->ds_data + dhi_section->ds_size]
-	                                            * Pointer  to  the  end  of  the  current  driver's  .dbg.hook  section.
-	                                            * Set to point to the end of the MORE-vector when `dhi_sectprev != NULL' */
-	struct dbg_hookhdr        *dhi_sectprev;   /* [0..1] Return-pointer for DBG_HOOK_MORE-hooks. */
+	REF struct driver_loadlist *dhi_drivers;    /* [1..1] Loaded drivers. */
+	size_t                      dhi_nextdriver; /* Index for the next driver to scan. */
+	REF struct driver_section  *dhi_section;    /* [1..1] Section currently being scanned.
+	                                             * HINT: This is 1..1, since the kernel _always_ defines
+	                                             *       a `.dbg.hook' section, so we know that at least
+	                                             *       one such section will exist at run-time! */
+	struct dbg_hookhdr         *dhi_sectnext;   /* [1..1] Pointer to the next hook to enumerate. */
+	struct dbg_hookhdr         *dhi_sectend;    /* [== dhi_section->ds_data + dhi_section->ds_size]
+	                                             * Pointer  to  the  end  of  the  current  driver's  .dbg.hook  section.
+	                                             * Set to point to the end of the MORE-vector when `dhi_sectprev != NULL' */
+	struct dbg_hookhdr         *dhi_sectprev;   /* [0..1] Return-pointer for DBG_HOOK_MORE-hooks. */
 };
 
 /* Initialize a given `struct dbg_hookiterator *self' */

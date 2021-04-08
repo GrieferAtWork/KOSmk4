@@ -537,7 +537,7 @@ NOTHROW(FCALL module_get_libdl_DlModule_address)(struct module *__restrict self,
 		inode_readallk((struct inode *)self->md_file,
 		               &ehdr, sizeof(ehdr), 0);
 	} EXCEPT {
-		goto nope_phdr;
+		goto nope;
 	}
 
 	/* Sanity check. */

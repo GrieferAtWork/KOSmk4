@@ -39,18 +39,20 @@ DECL_BEGIN
  * having to define  the layout of  `struct driver' */
 #ifndef __driver_defined
 struct driver;
+#define __driver_as_module(self)  ((struct module *)(self))
 #define __driver_destroy(self)    module_destroy((struct module *)(self))
 #define __driver_free(self)       module_free((struct module *)(self))
 #define __driver_refcnt(self)     ((struct module *)(self))->md_refcnt
 #define __driver_weakrefcnt(self) ((struct module *)(self))->md_weakrefcnt
+#define __DRIVER_REFCNT_FUNCTIONS_DEFINED
 DEFINE_REFCOUNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
 #else /* !__driver_defined */
 #ifndef __driver_refcnt
-#define __driver_refcnt(self)     (self)->md_refcnt
+#define __driver_refcnt(self)     __driver_as_module(self)->md_refcnt
 #endif /* !__driver_refcnt */
 #ifndef __driver_weakrefcnt
-#define __driver_weakrefcnt(self) (self)->md_weakrefcnt
+#define __driver_weakrefcnt(self) __driver_as_module(self)->md_weakrefcnt
 #endif /* !__driver_weakrefcnt */
 #endif /* __driver_defined */
 

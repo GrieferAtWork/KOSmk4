@@ -124,31 +124,175 @@ DECL_BEGIN
 /* Loaded driver enumeration (lockless!)                                */
 /************************************************************************/
 
-#ifndef __driver_loadlist_arref_defined
-#define __driver_loadlist_arref_defined
-ARREF(driver_loadlist_arref, driver_loadlist);
-#endif /* !__driver_loadlist_arref_defined */
-
 PRIVATE struct driver_loadlist default_loaded_drivers = {
-	.dll_refcnt  = 2, /* +1:default_loaded_drivers, +1:loaded_drivers */
+	.dll_refcnt  = 2, /* +1:default_loaded_drivers, +1:drivers */
 	.dll_count   = 1, /* Upon boot, only the kernel core driver exists. */
 	.dll_drivers = { &kernel_driver }
 };
 
-/* [1..1] A descriptor for the set of currently loaded drivers. */
-INTERN struct driver_loadlist_arref loaded_drivers = ARREF_INIT(&default_loaded_drivers);
+/* [1..1] A descriptor for the set of currently loaded drivers.
+ * NOTE: To retrieve this list, don't use `arref_get(&drivers)',
+ *       but make use  of `get_driver_loadlist()' instead.  This
+ *       must be done since the later will automatically try  to
+ *       get rid of drivers that  have been destroyed, but  were
+ *       unable to remove themselves from the load-list. */
+PUBLIC struct driver_loadlist_arref drivers = ARREF_INIT(&default_loaded_drivers);
 #ifdef CONFIG_VBOXGDB
-DEFINE_PUBLIC_ALIAS(_vboxgdb_kos_driver_state, loaded_drivers);
+DEFINE_PUBLIC_ALIAS(_vboxgdb_kos_driver_state, drivers);
 #endif /* CONFIG_VBOXGDB */
+
+/* Set to true if `drivers' may contain drivers
+ * that  have been destroyed,  but could not be
+ * removed due to lack of memory. */
+PRIVATE bool loaded_drivers_contains_dead = false;
+
 
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_loadlist_destroy)(struct driver_loadlist *__restrict self);
+NOTHROW(FCALL driver_loadlist_destroy)(struct driver_loadlist *__restrict self) {
+	size_t i;
+	for (i = 0; i < self->dll_count; ++i)
+		weakdecref(self->dll_drivers[i]);
+	kfree(self);
+}
 
 /* Return the list of currently loaded drivers.
  * Note that this function is  NOBLOCK+NOTHROW! */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED REF struct driver_loadlist *
-NOTHROW(FCALL get_driver_loadlist)(void);
+NOTHROW(FCALL get_driver_loadlist)(void) {
+	REF struct driver_loadlist *result;
+again:
+	result = arref_get(&drivers);
+
+	/* Only reap dead drivers from the load-list if the kernel
+	 * hasn't been poisoned,  and debugger-mode isn't  active.
+	 *
+	 * iow: Only do this when the system is running "normal" */
+	if (unlikely(loaded_drivers_contains_dead) &&
+	    likely(!kernel_poisoned() && !dbg_active)) {
+		bool cmpxch_ok;
+		size_t i, newcount;
+		REF struct driver_loadlist *new_dll;
+		COMPILER_BARRIER();
+		loaded_drivers_contains_dead = false;
+
+		/* Try to construct a new driver load-list that doesn't
+		 * contain any of the drivers that have been destroyed.
+		 *
+		 * For this purpose, figure out the set of drivers  that
+		 * aren't already dead. This can easily be done by doing
+		 * a tryincref() on every driver from the resulting set,
+		 * and counting how many we got.
+		 *
+		 * After that point, we'll continue to hold a reference
+		 * to every non-destroyed driver, meaning that the # of
+		 * non-destroyed drivers in the resulting set will stay
+		 * the same until we release those reference again. */
+		for (i = 0, newcount = 0; i < result->dll_count; ++i) {
+			if (tryincref(result->dll_drivers[i]))
+				++newcount;
+		}
+		assert(newcount <= result->dll_count);
+
+		/* Check for special case: all drivers are still alive.
+		 * This  might  happen due  to race  conditions, etc... */
+		if unlikely(newcount == result->dll_count) {
+			/* Simply drop all of the references we acquired. */
+			for (i = 0; i < result->dll_count; ++i)
+				decref_unlikely(result->dll_drivers[i]);
+			goto done;
+		}
+
+		if unlikely(newcount == 1) {
+			/* Special  case:  only 1  driver remains,
+			 * which has to be the kernel core driver! */
+			new_dll = incref(&default_loaded_drivers);
+		} else {
+			size_t dst;
+			/* Try to allocate a new driver load-list.
+			 * If this fails, drop all of our references, change the
+			 * `loaded_drivers_contains_dead' flag back to true, and
+			 * silently return  the original  list (containing  some
+			 * dead drivers), thus letting the next caller deal with
+			 * the removal of dead drivers. */
+			new_dll = (REF struct driver_loadlist *)kmalloc_nx(offsetof(struct driver_loadlist, dll_drivers) +
+			                                                   newcount * sizeof(WEAK REF struct driver *),
+			                                                   GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+			if unlikely(!new_dll) {
+				/* Failed to allocate a  new loadlist, and there  are
+				 * still some more dead drivers within the old one...
+				 *
+				 * In this case, leave the work to-be done up for the
+				 * next caller of this function. */
+				loaded_drivers_contains_dead = true;
+				COMPILER_WRITE_BARRIER();
+
+				for (i = 0; i < result->dll_count; ++i) {
+					if (!wasdestroyed(result->dll_drivers[i]))
+						decref_unlikely(result->dll_drivers[i]);
+				}
+				goto done;
+			}
+
+			/* Fill in the new driver load-list with all of the non-
+			 * destroyed   drivers   from    the   original    list. */
+			new_dll->dll_refcnt = 2; /* +1:return, +1:arref_cmpxch_inherit_new() */
+			new_dll->dll_count  = newcount;
+			for (i = 0, dst = 0; i < result->dll_count; ++i) {
+				if (wasdestroyed(result->dll_drivers[i]))
+					continue;
+				new_dll->dll_drivers[dst] = weakincref(result->dll_drivers[i]);
+				++dst;
+			}
+			assert(dst == newcount);
+		}
+
+		/* Try to exchange the  old driver load-list (which  contains
+		 * some dead drivers) with the new one (which doesn't contain
+		 * any dead drivers at the moment, since we're still  holding
+		 * full references to all drivers that would have been  dead) */
+		COMPILER_BARRIER();
+		cmpxch_ok = arref_cmpxch_inherit_new(&drivers, result, new_dll);
+		COMPILER_BARRIER();
+
+		/* Drop all of  our references  to drivers  apart of  the set  of
+		 * ones that haven't been destroyed yet. Note that by doing this,
+		 * more  drivers may end up being destroyed, but that's ok, since
+		 * those  drivers will  once again  be able  to remove themselves
+		 * normally from the driver-load-list.
+		 *
+		 * Also note that we can  simply `decref()' every driver  from
+		 * `new_dll' here, since that list contains only those drivers
+		 * which weren't destroyed earlier, which  is the same set  as
+		 * those which we were able to `tryincref()' above!
+		 *
+		 * As far as logic ordering goes, the only thing import here is
+		 * that these decref() operations happen _after_ the CMPXCH  of
+		 * the current driver load-list above! */
+		for (i = 0; i < new_dll->dll_count; ++i)
+			decref_unlikely(new_dll->dll_drivers[i]);
+
+		/* Drop our reference to the old set of loaded drivers. */
+		decref_likely(result);
+
+		if (!cmpxch_ok) {
+			/* The driver load-list changed in the mean time...
+			 * Handle this case by trying again... */
+			loaded_drivers_contains_dead = true;
+			decref_nokill(new_dll); /* The would-be inherited-by-drivers reference */
+			decref_likely(new_dll); /* The would-be returned reference */
+			COMPILER_WRITE_BARRIER();
+			goto again;
+		}
+
+		/* Success. - Simply return the (now smaller)
+		 * set  of  (probably)  still-alive  drivers. */
+		result = new_dll;
+		COMPILER_BARRIER();
+	}
+done:
+	return result;
+}
 
 
 
@@ -2439,14 +2583,17 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	DBG_memset(&self->d_phdr, 0xcc, self->d_phnum * sizeof(ElfW(Phdr)));
 	DBG_memset(&self->d_phnum, 0xcc, sizeof(self->d_phnum));
 
+	/* TODO: Try to remove `self' from the current `drivers'. And if
+	 *       that's not possible, set `loaded_drivers_contains_dead' */
+
 	/* TODO: Using lock operations, remove all still-loaded
 	 *       driver sections from the module section cache.
-	 * NOTE:  */
+	 * NOTE: */
 	//TODO: kfree(self->d_sections);
 	//TODO: DBG_memset(&self->d_shnum, 0xcc, sizeof(self->d_shnum));
 	//TODO: DBG_memset(&self->d_sections, 0xcc, sizeof(self->d_sections));
 
-	/* TODO: Using lock operations, remove all of the mnode
+	/* TODO: Using  lock operations, remove all of the mnode
 	 *       self-pointers back towards this driver from the
 	 *       kernel mman. */
 
@@ -3216,7 +3363,7 @@ done_dynhdr_for_soname:
 				/* Allocate a new `struct driver_loadlist' descriptor
 				 * which can then be used to replace the current one. */
 again_get_driver_loadlist:
-				old_ll = arref_get(&loaded_drivers);
+				old_ll = arref_get(&drivers);
 				FINALLY_DECREF_UNLIKELY(old_ll);
 				new_ll = (REF struct driver_loadlist *)kmalloc(offsetof(struct driver_loadlist, dll_drivers) +
 				                                               (old_ll->dll_count + 1) *
@@ -3403,7 +3550,7 @@ again_acquire_mman_lock:
 					 * load-list hasn't changed  since then. (If  it did change,  then
 					 * there's a chance that the `result'-driver has since been loaded
 					 * by some other thread...) */
-					if unlikely(!arref_cmpxch_inherit_new(&loaded_drivers, old_ll, new_ll)) {
+					if unlikely(!arref_cmpxch_inherit_new(&drivers, old_ll, new_ll)) {
 						/* The set of loaded drivers has changed.
 						 * Undo everything we did since we've read out `old_ll' */
 						struct mnode *node;

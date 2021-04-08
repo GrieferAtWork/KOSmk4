@@ -34,9 +34,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/rt.h>
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/phys.h>
 
 #include <hybrid/overflow.h>
@@ -53,14 +53,18 @@ dbg_hookiterator_current_driver_loadaddr(struct dbg_hookiterator const *__restri
 	TRY {
 		if unlikely(!self->dhi_nextdriver)
 			return 0; /* Kernel core. */
-		if unlikely(self->dhi_nextdriver > self->dhi_drivers->ds_count)
+		if unlikely(self->dhi_nextdriver > self->dhi_drivers->dll_count)
 			return 0; /* Shouldn't happen! */
-		drv = self->dhi_drivers->ds_drivers[self->dhi_nextdriver - 1];
+		drv = self->dhi_drivers->dll_drivers[self->dhi_nextdriver - 1];
 		if unlikely(!ADDR_ISKERN(drv))
 			return 0; /* Shouldn't happen! */
 		if unlikely(wasdestroyed(drv))
 			return 0; /* Driver has been unloaded */
+#ifdef CONFIG_USE_NEW_DRIVER
+		result = drv->md_loadaddr;
+#else /* CONFIG_USE_NEW_DRIVER */
 		result = drv->d_loadaddr;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	} EXCEPT { /* Shouldn't happen */
 		if (dbg_active)
 			return 0;
@@ -221,7 +225,8 @@ end_of_section:
 				if unlikely((byte_t *)self->dhi_sectnext < (byte_t *)self->dhi_section->ds_data)
 					goto end_of_driver; /* Shouldn't happen */
 load_section_end_and_read_first_item:
-				self->dhi_sectend = (struct dbg_hookhdr *)((byte_t *)self->dhi_section->ds_data + self->dhi_section->ds_size);
+				self->dhi_sectend = (struct dbg_hookhdr *)((byte_t *)self->dhi_section->ds_data +
+				                                           self->dhi_section->ds_size);
 				if unlikely(!ADDR_ISKERN(self->dhi_sectend))
 					goto end_of_driver; /* Shouldn't happen */
 				goto again;
@@ -229,14 +234,14 @@ load_section_end_and_read_first_item:
 end_of_driver:
 			if unlikely(!ADDR_ISKERN(self->dhi_drivers))
 				goto end_of_everything; /* Shouldn't happen */
-			if (self->dhi_nextdriver >= self->dhi_drivers->ds_count) {
+			if (self->dhi_nextdriver >= self->dhi_drivers->dll_count) {
 end_of_everything:
 				return NULL;
 			}
 			{
 				struct driver *next_driver;
 				REF struct driver_section *sect;
-				next_driver = self->dhi_drivers->ds_drivers[self->dhi_nextdriver];
+				next_driver = self->dhi_drivers->dll_drivers[self->dhi_nextdriver];
 				++self->dhi_nextdriver;
 				if unlikely(!ADDR_ISKERN(next_driver))
 					goto end_of_driver; /* Shouldn't happen */
@@ -322,9 +327,9 @@ dbg_hookiterator_driver(struct dbg_hookiterator const *__restrict self) {
 	TRY {
 		if unlikely(!self->dhi_nextdriver)
 			goto done; /* Kernel core. */
-		if unlikely(self->dhi_nextdriver > self->dhi_drivers->ds_count)
+		if unlikely(self->dhi_nextdriver > self->dhi_drivers->dll_count)
 			goto done; /* Shouldn't happen! */
-		drv = self->dhi_drivers->ds_drivers[self->dhi_nextdriver - 1];
+		drv = self->dhi_drivers->dll_drivers[self->dhi_nextdriver - 1];
 		if unlikely(!ADDR_ISKERN(drv))
 			drv = &kernel_driver; /* Shouldn't happen! */
 		if unlikely(wasdestroyed(drv))
