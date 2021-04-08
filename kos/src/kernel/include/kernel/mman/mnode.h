@@ -494,6 +494,9 @@ DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 #define mnode_pagedir_unmap_p(pagedir, self)           pagedir_unmap_p(pagedir, mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_denywrite_p(pagedir, self)       pagedir_denywrite_p(pagedir, mnode_getaddr(self), mnode_getsize(self))
 #define mnode_pagedir_sync_smp_p(pagedir, self)        pagedir_sync_smp_p(pagedir, mnode_getaddr(self), mnode_getsize(self))
+#define mnode_mman_sync(self)                          mman_sync(mnode_getaddr(self), mnode_getsize(self))
+#define mnode_mman_sync_p(self)                        mman_sync_p((self)->mn_mman, mnode_getaddr(self), mnode_getsize(self))
+#define mnode_mman_supersync(self)                     mman_supersync(mnode_getaddr(self), mnode_getsize(self))
 
 
 DECL_END

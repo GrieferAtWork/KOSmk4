@@ -123,7 +123,7 @@ done:
 
 /* Return the name of the given module (or `NULL' if `!module_hasname(self)')
  * The returned pointer  is the  same as is  printed by  `module_printname()' */
-PUBLIC WUNUSED NONNULL((1)) char const *FCALL
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) char const *FCALL
 module_getname(struct module *__restrict self) {
 	char const *result;
 #ifdef CONFIG_USE_NEW_DRIVER
@@ -298,6 +298,7 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 
 
 #ifndef CONFIG_USE_NEW_DRIVER
+#undef driver_fromaddr
 #define driver_fromaddr(addr)  ({ COMPILER_IMPURE(); (void)addr; (struct module *)NULL; })
 #define driver_aboveaddr(addr) ({ COMPILER_IMPURE(); (void)addr; (struct module *)NULL; })
 #define driver_next(prev)      ({ COMPILER_IMPURE(); (void)prev; (struct module *)NULL; })

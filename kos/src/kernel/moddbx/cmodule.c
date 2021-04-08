@@ -413,7 +413,7 @@ PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 		if (keep_loaded) {
 			/* Check if we should keep this module. */
 			struct vm *modvm;
-			modvm = module_vm(iter->cm_module,
+			modvm = module_mman(iter->cm_module,
 			                  iter->cm_modtyp);
 			if (modvm == &mman_kernel ||
 			    modvm == dbg_current->t_mman) {

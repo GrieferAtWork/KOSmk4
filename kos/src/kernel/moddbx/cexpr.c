@@ -595,7 +595,7 @@ nope:
  * `dbg_current', and store the result in `*ptls_base' */
 PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
-                                         byte_t **__restrict ptls_base) {
+                                        byte_t **__restrict ptls_base) {
 	struct libdl_tls_segment *utls;
 	struct libdl_dlmodule *dlmod;
 
@@ -647,10 +647,10 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 	{
 		ptrdiff_t tls_offset;
 		if (!module_getpointer(self,
-		                        (byte_t *)dlmod +
-		                        STRUCT_dlmodule_INDEXOF_dm_tlsstoff *
-		                        module_sizeof_pointer(self),
-		                        (void **)&tls_offset))
+		                       (byte_t *)dlmod +
+		                       STRUCT_dlmodule_INDEXOF_dm_tlsstoff *
+		                       module_sizeof_pointer(self),
+		                       (void **)&tls_offset))
 			goto nope;
 		/* Check if this module has a static TLS offset. */
 		if (tls_offset != 0) {
@@ -672,10 +672,10 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 		struct libdl_dtls_extension *ext;
 		unsigned int max_indirection;
 		if (!module_getpointer(self,
-		                        (byte_t *)utls +
-		                        STRUCT_tls_segment_INDEXOF_ts_extree *
-		                        module_sizeof_pointer(self),
-		                        (void **)&ext))
+		                       (byte_t *)utls +
+		                       STRUCT_tls_segment_INDEXOF_ts_extree *
+		                       module_sizeof_pointer(self),
+		                       (void **)&ext))
 			goto nope;
 		max_indirection = BITSOF(void *);
 		while (ext) {
@@ -686,10 +686,10 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 			if (!ADDR_ISUSER(ext))
 				goto nope;
 			if (!module_getpointer(self,
-			                        (byte_t *)ext +
-			                        STRUCT_dtls_extension_INDEXOF_te_module *
-			                        module_sizeof_pointer(self),
-			                        (void **)&extab_dlmod))
+			                       (byte_t *)ext +
+			                       STRUCT_dtls_extension_INDEXOF_te_module *
+			                       module_sizeof_pointer(self),
+			                       (void **)&extab_dlmod))
 				goto nope;
 			/* The least significant bit is used as red/black indicator.
 			 * As such, we must clear that bit here. */
@@ -1423,8 +1423,8 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	req_pdir = old_pdir;
 	mod      = self->cv_expr.v_expr.v_module;
 	if (mod)
-		req_pdir = cmodule_vm(mod)->mm_pagedir_p;
-	/* This must run in the context of `cmodule_vm(mod)' */
+		req_pdir = cmodule_mman(mod)->mm_pagedir_p;
+	/* This must run in the context of `cmodule_mman(mod)' */
 	if (old_pdir != req_pdir) {
 		if unlikely(!dbg_verifypagedir(req_pdir))
 			return DBX_EFAULT;
@@ -1474,7 +1474,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			{
 				pagedir_phys_t old_pdir, req_pdir;
 				old_pdir = pagedir_get();
-				req_pdir = cmodule_vm(mod)->mm_pagedir_p;
+				req_pdir = cmodule_mman(mod)->mm_pagedir_p;
 				if (old_pdir != req_pdir) {
 					if unlikely(!dbg_verifypagedir(req_pdir))
 						return DBX_EFAULT;

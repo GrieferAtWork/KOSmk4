@@ -28,6 +28,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/module.h>
 #include <kernel/types.h>
+#include <sched/lockop.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -122,20 +123,29 @@ AWREF(driver_section_awref, driver_section);
  *  [initial]              --> DRIVER_STATE_INIT        // Initial state
  *
  *  DRIVER_STATE_INIT      --> DRIVER_STATE_INIT_DEPS   // Being initialization
- *  DRIVER_STATE_INIT      --> DRIVER_STATE_KILL        // Finalize immediatly
+ *  DRIVER_STATE_INIT      --> DRIVER_STATE_FINI_TEXT   // When `driver_finalize()' is called
  *
  *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_INIT_RELO   // Upon success
  *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_KILL        // If loading dependencies fails
+ *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_FINI_RDPS   // When `driver_finalize()' is called by the same thread
  *
  *  DRIVER_STATE_INIT_RELO --> DRIVER_STATE_INIT_CTRS   // Upon success
  *  DRIVER_STATE_INIT_RELO --> DRIVER_STATE_FINI_DEPS   // If applying relocations fails
+ *  DRIVER_STATE_INIT_RELO --> DRIVER_STATE_FINI_RDPS   // When `driver_finalize()' is called by the same thread
  *
  *  DRIVER_STATE_INIT_CTRS --> DRIVER_STATE_LOADED      // Upon success
  *  DRIVER_STATE_INIT_CTRS --> DRIVER_STATE_FINI_DTRS   // If a ctor throws an exception
+ *  DRIVER_STATE_INIT_CTRS --> DRIVER_STATE_FINI_DTRS   // When `driver_finalize()' is called by the same thread
+ *
+ *  DRIVER_STATE_LOADED    --> DRIVER_STATE_FINI_DTRS   // When `driver_finalize()' is called
+ *
+ *  DRIVER_STATE_FINI_RDPS --> DRIVER_STATE_FINI_DEPS   // Always
  *
  *  DRIVER_STATE_FINI_DTRS --> DRIVER_STATE_FINI_DEPS   // Always
  *
- *  DRIVER_STATE_FINI_DEPS --> DRIVER_STATE_KILL        // Always
+ *  DRIVER_STATE_FINI_DEPS --> DRIVER_STATE_FINI_TEXT   // Always
+ *
+ *  DRIVER_STATE_FINI_TEXT --> DRIVER_STATE_KILL        // Always
  *
  *  DRIVER_STATE_KILL      --> DRIVER_STATE_DEAD        // When `md_refcnt' drops to `0'
  *
@@ -150,20 +160,31 @@ AWREF(driver_section_awref, driver_section);
 #define DRIVER_STATE_INIT_CTRS 3 /* [SELFREF] Currently executing driver constructors. */
 #define DRIVER_STATE_LOADED    4 /* [SELFREF] Driver has been loaded, and is sitting in memory. */
 #define DRIVER_STATE_FINI_DTRS 5 /* [SELFREF] Currently executing driver destructors. */
-#define DRIVER_STATE_FINI_DEPS 6 /* [SELFREF] Currently clearing */
-#define DRIVER_STATE_KILL      7 /* Driver was killed. */
-#define DRIVER_STATE_DEAD      8 /* Driver `wasdestroyed() == true'. */
+#define DRIVER_STATE_FINI_RDPS 6 /* [SELFREF] RecrusiveDePendencieS (used internally) */
+#define DRIVER_STATE_FINI_DEPS 7 /* [SELFREF] Currently clearing driver dependencies. */
+#define DRIVER_STATE_FINI_TEXT 8 /* [SELFREF] Currently in the process of unmapping driver
+                                  * mappings. This is done asynchronously because it needs
+                                  * a lock to the kernel mman (i.e. requires a lockop) */
+#define DRIVER_STATE_KILL      9 /* Driver was killed. */
+#define DRIVER_STATE_DEAD     10 /* Driver `wasdestroyed() == true'. */
 
 /* Signal broadcast whenever the `d_state' of any loaded driver changes. */
 DATDEF struct sig driver_state_changed;
 
 struct driver;
 struct driver_fde_cache;
+struct mnode;
 
 #ifndef __driver_axref_defined
 #define __driver_axref_defined
 AXREF(driver_axref, driver);
 #endif /* !__driver_axref_defined */
+
+#ifndef __mnode_slist_defined
+#define __mnode_slist_defined
+SLIST_HEAD(mnode_slist, mnode);
+#endif /* !__mnode_slist_defined */
+
 
 #define __driver_defined
 struct driver
@@ -171,11 +192,17 @@ struct driver
     : module
 #endif /* __cplusplus && !__WANT_DRIVER_d_module */
 {
+	/* [OVERRIDE(.md_mman, [1..1][== &mman_kernel][NOT(WEAK REF)])]
+	 * iow: For `struct driver', the `md_mman' field is always set to
+	 *      `mman_kernel', and doesn't contain any sort of reference! */
 #if !defined(__cplusplus) || defined(__WANT_DRIVER_d_module)
 	struct module                  d_module;     /* The underlying module. */
 #endif /* !__cplusplus || __WANT_DRIVER_d_module */
 
 	/* NOTE: The following members remain valid, even after `wasdestroyed(self)':
+	 *    - d_module.md_refcnt          (always `0')
+	 *    - d_module.md_weakrefcnt
+	 *    - d_module.md_nodecount
 	 *    - d_module.md_ops
 	 *    - d_module.md_mman            (will still be `mman_kernel')
 	 *    - d_module.md_loadaddr
@@ -183,19 +210,6 @@ struct driver
 	 *    - d_module.md_loadmax
 	 *    - d_module.md_sizeof_pointer
 	 *    - d_state                     (will eventually be set to `DRIVER_STATE_DEAD')
-	 *    - d_name
-	 *    - d_eh_frame_start
-	 *    - d_eh_frame_end
-	 *    - d_dyncnt
-	 *    - d_dynhdr
-	 *    - d_dynsym_tab
-	 *    - d_dynsym_cnt
-	 *    - d_gnuhashtab
-	 *    - d_hashtab
-	 *    - d_dynstr
-	 *    - d_dynstr_end
-	 *    - d_phnum
-	 *    - d_phdr
 	 * All other fields must be considered as `[valid_if(!wasdestroyed(self))]',
 	 * and no longer be accessed after that point in time! */
 
@@ -232,16 +246,23 @@ struct driver
 	char const                    *d_dynstr_end; /* [0..1][const] End of the dynamic string table. */
 
 	/* Named sections information for the driver. */
-	ElfW(Off)                      d_shoff;      /* [const] File offset to section headers. */
 	ElfW(Half)                     d_shstrndx;   /* [const] Index of the section header names section. */
 	ElfW(Half)                     d_shnum;      /* [const] (Max) number of section headers. */
-#if __SIZEOF_POINTER__ > 4
-	__byte_t                      _d_pad2[__SIZEOF_POINTER__ - 4];
-#endif /* __SIZEOF_POINTER__ > 4 */
-	ElfW(Shdr) const              *d_shdr;       /* [lock(WRITE_ONCE)][0..d_shnum][owned] Vector of section headers (or `NULL' if not loaded). */
+	ElfW(Shdr)                    *d_shdr;       /* [0..d_shnum][const][owned] Vector of section headers (or `NULL' if not loaded). */
 	struct driver_section_awref   *d_sections;   /* [0..1][0..d_shnum][const][owned] Vector of locked sections. */
-	char const                    *d_shstrtab;   /* [lock(WRITE_ONCE)][0..1][owned] Section headers name table (or `NULL' if not loaded). */
-	size_t                         d_shstrsiz;   /* [lock(WRITE_ONCE)][valid_if(d_shstrtab)] Section header name table size. */
+	char                          *d_shstrtab;   /* [0..1][const][owned] Section headers name table (or `NULL' if not loaded). */
+	size_t                         d_shstrsiz;   /* [const] Section header name table size. */
+
+	/* Driver runtime internal temporaries. */
+	union {
+		Toblockop(struct mman)     _d_mm_lop;     /* Used internally */
+		Tobpostlockop(struct mman) _d_mm_postlop; /* Used internally */
+	};
+	union {
+		struct task               *_d_initthread; /* Used internally by `DRIVER_STATE_INIT_DEPS...DRIVER_STATE_INIT_CTRS',
+		                                           * as well as `DRIVER_STATE_FINI_DTRS...DRIVER_STATE_FINI_RDPS' */
+		struct mnode_slist         _d_deadnodes;  /* Used internally by `DRIVER_STATE_FINI_TEXT' */
+	};
 
 	/* Driver program headers */
 	ElfW(Half)                     d_phnum;      /* [!0][const] (Max) number of program headers. */
@@ -321,18 +342,6 @@ driver_fromname(USER CHECKED char const *driver_name, size_t driver_name_len)
  * If the file still can't be found, return `NULL'. */
 FUNDEF WUNUSED NONNULL((1)) struct mfile *FCALL
 driver_getfile(struct driver *__restrict self)
-		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
-
-/* Try to return a mapping for the given driver's section headers.
- * If this fails, return `NULL' instead. */
-FUNDEF WUNUSED NONNULL((1)) ElfW(Shdr) const *FCALL
-driver_getshdrs(struct driver *__restrict self)
-		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
-
-/* Try to return a mapping for the given driver's .shstrtab section.
- * If this fails, return `NULL' instead. */
-FUNDEF WUNUSED NONNULL((1)) char const *FCALL
-driver_getshstrtab(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
 
 
@@ -459,18 +468,16 @@ FUNDEF NONNULL((1)) void FCALL
 driver_initialize(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK, E_FSERROR, E_NOT_EXECUTABLE);
 
-/* Finalize the given driver. Note that this function is NOTHROW,
- * but isn't necessarily NOBLOCK! - Driver finalizers are allowed
- * to block and throw exceptions (meaning that this function  may
- * also block), and any exception  thrown will be written to  the
- * system log. However, any such exceptions are silently ignored,
- * and driver finalization will always continue regardless.
- *
- * Note however that driver program text/data will only be
- * unmapped once the driver's weak reference counter drops
- * to `0'! */
-FUNDEF NONNULL((1)) void
-NOTHROW(FCALL driver_finalize)(struct driver *__restrict self);
+/* Finalize the given driver. Note that driver finalizers are
+ * allowed to block and  throw exceptions (meaning that  this
+ * function  may  also block  and throw).  Additionally, this
+ * function  may wait  for a  driver that  is currently being
+ * initialized or finalized  by another to  finish doing  so,
+ * however if it's the caller thread that does the init/fini,
+ * then this function will  return immediately, so-as to  not
+ * cause a deadlock! */
+FUNDEF NONNULL((1)) void FCALL
+driver_finalize(struct driver *__restrict self);
 
 
 /* Load & return  a driver from  a given `driver_file'.  The

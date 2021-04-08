@@ -309,7 +309,7 @@ struct cmodule {
 #define cmodule_getloadaddr(self)  module_getloadaddr((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_getloadstart(self) module_getloadstart((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_getloadend(self)   module_getloadend((self)->cm_module, (self)->cm_modtyp)
-#define cmodule_vm(self)           module_vm((self)->cm_module, (self)->cm_modtyp)
+#define cmodule_mman(self)         module_mman((self)->cm_module, (self)->cm_modtyp)
 #if MODULE_TYPE_COUNT >= 2
 #define cmodule_isuser(self) ((self)->cm_modtyp == MODULE_TYPE_USRMOD)
 #define cmodule_iskern(self) ((self)->cm_modtyp == MODULE_TYPE_DRIVER)

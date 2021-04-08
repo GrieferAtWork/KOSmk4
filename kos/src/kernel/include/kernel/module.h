@@ -49,7 +49,7 @@
 #define module_getloadaddr(self, typ)           (self)->md_loadaddr
 #define module_getloadstart(self, typ)          (uintptr_t)(self)->md_loadmin
 #define module_getloadend(self, typ)            (uintptr_t)((self)->md_loadmax + 1)
-#define module_vm(self, typ)                    (self)->md_mman
+#define module_mman(self, typ)                  (self)->md_mman
 
 #define __PRIVATE_module_locksection_2                            (*(self)->md_ops->mo_locksection)(self, section_name)
 #define __PRIVATE_module_locksection_4(self, typ, name, flags)    (*(self)->md_ops->mo_locksection)(self, name)
@@ -249,7 +249,7 @@ NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_getloadend)(module_t const
 
 /* Return a pointer to the VM inside of which the module has been loaded. */
 NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) struct vm *
-NOTHROW(module_vm)(module_t const *__restrict self, module_type_t typ);
+NOTHROW(module_mman)(module_t const *__restrict self, module_type_t typ);
 
 /* Lock a section into memory,  returning a reference to it  upon
  * success, or `NULL' if no section exists with the given `name'.
@@ -293,7 +293,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_getloadaddr(self, typ)                 (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadaddr[typ]))
 #define module_getloadstart(self, typ)                (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadstart[typ]))
 #define module_getloadend(self, typ)                  (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadend[typ]))
-#define module_vm(self, typ)                          ((typ) == MODULE_TYPE_DRIVER ? &mman_kernel : (self)->m_usrmod.um_vm)
+#define module_mman(self, typ)                        ((typ) == MODULE_TYPE_DRIVER ? &mman_kernel : (self)->m_usrmod.um_vm)
 #define module_locksection(self, typ, name, flags)    (*module_abi.ma_section_lock[typ])(self, name, flags)
 #define module_locksection_nx(self, typ, name, flags) (*module_abi.ma_section_lock_nx[typ])(self, name, flags)
 #else /* CONFIG_HAVE_USERMOD */
@@ -318,7 +318,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_getloadaddr(self, typ)                 (self)->d_loadaddr
 #define module_getloadstart(self, typ)                (self)->d_loadstart
 #define module_getloadend(self, typ)                  (self)->d_loadend
-#define module_vm(self, typ)                          (&mman_kernel)
+#define module_mman(self, typ)                        (&mman_kernel)
 #define module_locksection(self, typ, name, flags)    driver_section_lock(self, name, flags)
 #define module_locksection_nx(self, typ, name, flags) driver_section_lock_nx(self, name, flags)
 #endif /* !CONFIG_HAVE_USERMOD */

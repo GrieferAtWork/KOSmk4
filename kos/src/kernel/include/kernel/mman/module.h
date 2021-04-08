@@ -309,7 +309,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__re
 
 /* Return the name of the given module (or `NULL' if `!module_hasname(self)')
  * The returned pointer  is the  same as is  printed by  `module_printname()' */
-FUNDEF WUNUSED NONNULL((1)) char const *FCALL
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) char const *FCALL
 module_getname(struct module *__restrict self);
 
 /* Print  the absolute filesystem path or name (filesystem
