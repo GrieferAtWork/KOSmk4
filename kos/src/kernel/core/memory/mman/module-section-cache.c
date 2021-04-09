@@ -51,9 +51,9 @@ SLIST_HEAD(module_section_slist, module_section);
  * lockop  operations), meaning that  this cache functions to
  * automatically clean up the sections belonging to destroyed
  * modules. */
-PUBLIC struct module_section_list module_section_cache      = LIST_HEAD_INITIALIZER(module_section_cache);
-PUBLIC struct atomic_lock /*   */ module_section_cache_lock = ATOMIC_LOCK_INIT;
-PUBLIC struct lockop_slist /*  */ module_section_cache_lops = SLIST_HEAD_INITIALIZER(module_section_cache_lops);
+PUBLIC struct REF module_section_list module_section_cache      = LIST_HEAD_INITIALIZER(module_section_cache);
+PUBLIC struct atomic_lock /*       */ module_section_cache_lock = ATOMIC_LOCK_INIT;
+PUBLIC struct lockop_slist /*      */ module_section_cache_lops = SLIST_HEAD_INITIALIZER(module_section_cache_lops);
 
 
 /* Clear the global cache of module sections, and return a

@@ -153,7 +153,7 @@ struct mfault {
 	 * >>                LIST_FIRST(&mfl_part->mp_copy) == mfl_node &&
 	 * >>                LIST_NEXT(mfl_node, mn_link) == NULL &&
 	 * >>                mpart_isanon(mfl_part)) {
-	 * >>         // Accessed mfl_node is the only copy-on-write mfl_node in existance
+	 * >>         // Accessed mfl_node is the only copy-on-write mfl_node in existence
 	 * >>         mpart_split(mfl_part, FLOOR_ALIGN(partrel_addr));
 	 * >>         mpart_split(mfl_part, CEIL_ALIGN(partrel_addr + mfl_size));
 	 * >>         mpart_lock_acquire_and_setcore_load(mfl_part, partrel_addr, mfl_size);

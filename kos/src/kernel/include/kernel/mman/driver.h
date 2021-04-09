@@ -28,13 +28,16 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/module.h>
 #include <kernel/types.h>
-#include <sched/lockop.h>
 
 #include <hybrid/__assert.h>
-#include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/aref.h>
 #include <kos/exec/elf.h>
+
+#ifdef __WANT_DRIVER__d_internals
+#include <hybrid/sync/atomic-rwlock.h>
+#include <sched/lockop.h>
+#endif /* __WANT_DRIVER__d_internals */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -123,7 +126,7 @@ AWREF(driver_section_awref, driver_section);
  *  [initial]              --> DRIVER_STATE_INIT        // Initial state
  *
  *  DRIVER_STATE_INIT      --> DRIVER_STATE_INIT_DEPS   // Being initialization
- *  DRIVER_STATE_INIT      --> DRIVER_STATE_FINI_TEXT   // When `driver_finalize()' is called
+ *  DRIVER_STATE_INIT      --> DRIVER_STATE_KILL       // When `driver_finalize()' is called
  *
  *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_INIT_RELO   // Upon success
  *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_KILL        // If loading dependencies fails
@@ -143,9 +146,7 @@ AWREF(driver_section_awref, driver_section);
  *
  *  DRIVER_STATE_FINI_DTRS --> DRIVER_STATE_FINI_DEPS   // Always
  *
- *  DRIVER_STATE_FINI_DEPS --> DRIVER_STATE_FINI_TEXT   // Always
- *
- *  DRIVER_STATE_FINI_TEXT --> DRIVER_STATE_KILL        // Always
+ *  DRIVER_STATE_FINI_DEPS --> DRIVER_STATE_KILL        // Always
  *
  *  DRIVER_STATE_KILL      --> DRIVER_STATE_DEAD        // When `md_refcnt' drops to `0'
  *
@@ -162,28 +163,31 @@ AWREF(driver_section_awref, driver_section);
 #define DRIVER_STATE_FINI_DTRS 5 /* [SELFREF] Currently executing driver destructors. */
 #define DRIVER_STATE_FINI_RDPS 6 /* [SELFREF] RecrusiveDePendencieS (used internally) */
 #define DRIVER_STATE_FINI_DEPS 7 /* [SELFREF] Currently clearing driver dependencies. */
-#define DRIVER_STATE_FINI_TEXT 8 /* [SELFREF] Currently in the process of unmapping driver
-                                  * mappings. This is done asynchronously because it needs
-                                  * a lock to the kernel mman (i.e. requires a lockop) */
-#define DRIVER_STATE_KILL      9 /* Driver was killed. */
-#define DRIVER_STATE_DEAD     10 /* Driver `wasdestroyed() == true'. */
+#define DRIVER_STATE_KILL      8 /* Driver was killed. */
+#define DRIVER_STATE_DEAD      9 /* Driver `wasdestroyed() == true'. */
 
 /* Signal broadcast whenever the `d_state' of any loaded driver changes. */
 DATDEF struct sig driver_state_changed;
 
 struct driver;
 struct driver_fde_cache;
-struct mnode;
 
 #ifndef __driver_axref_defined
 #define __driver_axref_defined
 AXREF(driver_axref, driver);
 #endif /* !__driver_axref_defined */
 
+#ifdef __WANT_DRIVER__d_internals
 #ifndef __mnode_slist_defined
 #define __mnode_slist_defined
+struct mnode;
 SLIST_HEAD(mnode_slist, mnode);
 #endif /* !__mnode_slist_defined */
+#ifndef __module_section_slist_defined
+#define __module_section_slist_defined
+SLIST_HEAD(module_section_slist, module_section);
+#endif /* !__module_section_slist_defined */
+#endif /* __WANT_DRIVER__d_internals */
 
 
 #define __driver_defined
@@ -199,11 +203,49 @@ struct driver
 	struct module                  d_module;     /* The underlying module. */
 #endif /* !__cplusplus || __WANT_DRIVER_d_module */
 
+	/* (weak) reference management for drivers:
+	 *
+	 *    (d_module.md_refcnt != 0)     ==>  DRIVER_IS_MAPPED               // Driver mnode mappings still exist
+	 *    (d_module.md_refcnt != 0)     ==>  REF(d_module.md_weakrefcnt)    // Non-zero refcnt holds a weakref
+	 *    (d_module.md_nodecount != 0)  ==>  REF(d_module.md_weakrefcnt)    // Non-zero node count holds a weakref
+	 *
+	 * When `md_nodecount' drops to 0:
+	 *   - Simply `weakdecref()' the driver.
+	 *     iow: The existence of memory mappings implies that the associated
+	 *     driver  object must  still exist,  but not  necessarily that said
+	 *     driver hasn't can't be destroyed  (note that destroying a  driver
+	 *     includes the removal of all of its memory nodes!)
+	 *
+	 * When `md_refcnt' drops to 0:
+	 *   - Remove all of the driver's still-loaded module sections from the
+	 *     module section cache. Each section destroyed by this was holding
+	 *     a weak reference to the associated driver which is dropped as  a
+	 *     result of this.
+	 *
+	 *   - Search the kernel mman for mnodes that point back to the driver,
+	 *     and unmap+remove them. As a result of this, `md_nodecount'  must
+	 *     drop to `0' (unless it was already `0' to being which, which may
+	 *     have been the case when all  mappings of the driver had  already
+	 *     been munmap'd explicitly)
+	 *     Once `md_nodecount' drops to `0', weakdecref_nokill() the driver,
+	 *     as is the usual behavior for this happening.
+	 *
+	 *   - Once all mem-nodes have been removed, weakdecref() the driver a
+	 *     (possibly) second time, which will most likely be the last weak
+	 *     reference to be dropped, allowing the driver to be free'd
+	 *
+	 * When `md_weakrefcnt' drops to 0:
+	 *   - Destroy all remaining members  that remained valid following  the
+	 *     driver's destruction. Then simply `kfree()' the driver descriptor
+	 *     itself and call it a day :)
+	 */
+
+
 	/* NOTE: The following members remain valid, even after `wasdestroyed(self)':
 	 *    - d_module.md_refcnt          (always `0')
 	 *    - d_module.md_weakrefcnt
-	 *    - d_module.md_nodecount
-	 *    - d_module.md_ops
+	 *    - d_module.md_nodecount       (always `0')
+	 *    - d_module.md_ops             (Though all operators other than `mo_free' are off-limits!)
 	 *    - d_module.md_mman            (will still be `mman_kernel')
 	 *    - d_module.md_loadaddr
 	 *    - d_module.md_loadmin
@@ -211,7 +253,8 @@ struct driver
 	 *    - d_module.md_sizeof_pointer
 	 *    - d_state                     (will eventually be set to `DRIVER_STATE_DEAD')
 	 * All other fields must be considered as `[valid_if(!wasdestroyed(self))]',
-	 * and  may   no   longer   be   accessed  after   that   point   in   time! */
+	 * and may no longer be accessed after that point in time! Additionally, the
+	 * driver should be skipped if encountered in driver load-lists! */
 
 	/* Basic driver information */
 	uintptr_t                      d_state;      /* [lock(ATOMIC)] Driver state (one of `DRIVER_STATE_*')
@@ -228,12 +271,6 @@ struct driver
 	                                              * the  vector of dependencies  is cleared during driver
 	                                              * finalization by `DRIVER_STATE_FINI_DEPS', thus fixing
 	                                              * the reference  loops caused  by cyclic  dependencies. */
-
-	/* Special handling for the `.eh_frame' section. */
-	byte_t const                  *d_eh_frame_start;      /* [0..1][<= d_eh_frame_end][const] Starting pointer for the `.eh_frame' section */
-	byte_t const                  *d_eh_frame_end;        /* [0..1][>= d_eh_frame_start][const] Ending pointer for the `.eh_frame' section */
-	struct driver_fde_cache       *d_eh_frame_cache;      /* [0..1][lock(d_eh_frame_cache)] Tree for an `.eh_frame' lookup cache. */
-	struct atomic_rwlock           d_eh_frame_cache_lock; /* Lock for `d_eh_frame_cache' */
 
 	/* Special handling for the `.dynamic' section. */
 	size_t                         d_dyncnt;     /* [const] Number of dynamic definition headers. */
@@ -253,20 +290,37 @@ struct driver
 	char                          *d_shstrtab;   /* [0..1][const][owned] Section headers name table (or `NULL' if not loaded). */
 	size_t                         d_shstrsiz;   /* [const] Section header name table size. */
 
+	/* Special handling for the `.eh_frame' section. */
+	byte_t const                  *d_eh_frame_start;      /* [0..1][<= d_eh_frame_end][const] Starting pointer for the `.eh_frame' section */
+	byte_t const                  *d_eh_frame_end;        /* [0..1][>= d_eh_frame_start][const] Ending pointer for the `.eh_frame' section */
+#ifdef __WANT_DRIVER__d_internals
+	struct driver_fde_cache       *d_eh_frame_cache;      /* [0..1][lock(d_eh_frame_cache)] Tree for an `.eh_frame' lookup cache. */
+	struct atomic_rwlock           d_eh_frame_cache_lock; /* Lock for `d_eh_frame_cache' */
+#else /* __WANT_DRIVER__d_internals */
+	void                         *_d_intern1[2]; /* Used internally */
+#endif /* !__WANT_DRIVER__d_internals */
+
 	/* Driver runtime internal temporaries. */
+#ifdef __WANT_DRIVER__d_internals
 	union {
 		Toblockop(struct mman)     _d_mm_lop;     /* Used internally */
 		Tobpostlockop(struct mman) _d_mm_postlop; /* Used internally */
+		struct lockop              _d_lop;        /* Used internally */
+		struct postlockop          _d_postlop;    /* Used internally */
 	};
 	union {
-		struct task               *_d_initthread; /* Used internally by `DRIVER_STATE_INIT_DEPS...DRIVER_STATE_INIT_CTRS',
-		                                           * as    well    as    `DRIVER_STATE_FINI_DTRS...DRIVER_STATE_FINI_RDPS' */
+		struct task               *_d_initthread; /* Used internally by `DRIVER_STATE_INIT_DEPS...DRIVER_STATE_INIT_CTRS'
+		                                           * as    well    as   `DRIVER_STATE_FINI_DTRS...DRIVER_STATE_FINI_RDPS' */
 		struct mnode_slist         _d_deadnodes;  /* Used internally by `DRIVER_STATE_FINI_TEXT' */
+		struct module_section_slist _d_deadsect;  /* Used internally */
 	};
+#else /* __WANT_DRIVER__d_internals */
+	void                          *_d_intern2[3]; /* Used internally */
+#endif /* !__WANT_DRIVER__d_internals */
 
 	/* Driver program headers */
 	ElfW(Half)                     d_phnum;      /* [!0][const] (Max) number of program headers. */
-	byte_t                        _d_pad3[sizeof(void *) - sizeof(ElfW(Half))];
+	byte_t                        _d_pad1[sizeof(void *) - sizeof(ElfW(Half))];
 	COMPILER_FLEXIBLE_ARRAY(ElfW(Phdr), d_phdr); /* [d_phnum][const] Vector of program headers. */
 };
 

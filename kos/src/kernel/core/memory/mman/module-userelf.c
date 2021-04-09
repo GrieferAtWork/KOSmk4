@@ -390,8 +390,8 @@ NOTHROW(FCALL uem_unbind_sections_and_destroy_postlop)(struct postlockop *__rest
 
 	/* Destroy dead sections! */
 	while (!SLIST_EMPTY(&me->_um_deadsect)) {
-		struct module_section *sect;
-		sect = SLIST_FIRST(&me->_um_deadsect);
+		struct userelf_module_section *sect;
+		sect = (struct userelf_module_section *)SLIST_FIRST(&me->_um_deadsect);
 		SLIST_REMOVE_HEAD(&me->_um_deadsect, _ms_dead);
 		uems_destroy((struct userelf_module_section *)sect);
 	}
@@ -466,14 +466,14 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 			decref_likely(sect);
 			module_section_cache_reap();
 		} else {
-			/* Must  use  a lockop  to unbind  the section
-			 * once the UEMS cache lock becomes available.
+			/* Must use a lockop to unbind the section
+			 * once the cache lock becomes  available.
 			 *
 			 * For this purpose,  we (re-)use the  original
 			 * UserELF module object as a storage container
 			 * for the a lockop descriptor that's then used
 			 * to  remove all of the module's sections from
-			 * the UserELF section cache. */
+			 * the module section cache. */
 			++self->um_shnum; /* Must do the last section once again! */
 			self->_um_sc_lop.lo_func = &uem_unbind_sections_and_destroy_lop;
 			SLIST_ATOMIC_INSERT(&module_section_cache_lops, &self->_um_sc_lop, lo_link);
@@ -575,7 +575,7 @@ again:
 	                                                      GFP_PREFLT);
 
 	/* Fill in information about the section. */
-	result->ms_refcnt    = 1;
+	result->ms_refcnt    = 2; /* +1:return, +1:module_section_cache */
 	result->ms_ops       = &uems_ops;
 	result->ms_module    = weakincref(self);
 	result->ms_size      = UM_field(self, *shdr, .sh_size);
@@ -595,7 +595,7 @@ again:
 		                                               UM_field(self, *shdr, .sh_addr));
 	}
 
-	/* Acquire a lock to the UserELF section cache. */
+	/* Acquire a lock to the module section cache. */
 	TRY {
 		module_section_cache_acquire();
 	} EXCEPT {
@@ -619,7 +619,7 @@ again:
 	 * the cache when the associated module is destroyed. */
 	LIST_INSERT_HEAD(&module_section_cache, result, ms_cache);
 
-	/* Release the lock from the UserELF section cache. */
+	/* Release the lock from the module section cache. */
 	module_section_cache_release();
 
 	return result;

@@ -1458,7 +1458,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 #endif /* __KOS__ || __x86_64__ */
 #ifdef __KOS__
 #ifndef EMU86_EMULATE_RDPID
-#ifdef __KERNEL__ /* Don't rely on the existance of `__rdpid()' when running from kernel-space! */
+#ifdef __KERNEL__ /* Don't rely on the existence of `__rdpid()' when running from kernel-space! */
 #define EMU86_EMULATE_RDPID() __rdmsr(IA32_TSC_AUX)
 #else /* __KERNEL__ */
 #define EMU86_EMULATE_RDPID() __rdpid()

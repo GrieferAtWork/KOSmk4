@@ -23,6 +23,7 @@
 #define __WANT_MODULE__md_mmlop
 #define __WANT_DRIVER_SECTION_ds_sect
 #define __WANT_DRIVER_d_module
+#define __WANT_DRIVER__d_internals
 #define __WANT_MNODE__mn_dead
 #define _KOS_SOURCE 1
 
@@ -45,9 +46,11 @@
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/nopf.h>
+#include <kernel/mman/phys.h>
 #include <kernel/mman/rw.h>
 #include <kernel/mman/sync.h>
 #include <kernel/mman/unmapped.h>
@@ -62,6 +65,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/rbtree.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/typecore.h>
 
 #include <kos/except.h>
@@ -657,7 +661,7 @@ driver_sectinfo(struct driver *__restrict self,
 #endif /* !KERNEL_DRIVER_FILENAME */
 
 PRIVATE struct module_ops const kernel_module_ops = {
-	.mo_free              = (void(FCALL *)(struct module *__restrict))&driver_free_,
+	.mo_free              = (void(FCALL *)(struct module *__restrict))&driver_free_,  /* Needed for `module_isdriver()' */
 	.mo_destroy           = (typeof(((struct module_ops *)0)->mo_destroy))BADPOINTER, /* Must never be called! */
 	.mo_nonodes           = (typeof(((struct module_ops *)0)->mo_nonodes))BADPOINTER, /* Must never be called! */
 	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&kernel_locksection,
@@ -682,8 +686,8 @@ PRIVATE ATTR_COLDDATA struct directory_entry kernel_driver_fsname = {
 
 PUBLIC struct driver kernel_driver = {
 	.d_module = {
-		.md_refcnt     = 2, /* +1: kernel_driver, +1: d_state == DRIVER_STATE_LOADED */
-		.md_weakrefcnt = 1 + KERNEL_SECTIONS_COUNT,
+		.md_refcnt     = 2,                         /* +1: kernel_driver, +1: d_state == DRIVER_STATE_LOADED */
+		.md_weakrefcnt = 2 + KERNEL_SECTIONS_COUNT, /* +1:md_refcnt != 0, +1:md_nodecount != 0, +N: KERNEL_SECTIONS_COUNT */
 		.md_nodecount  = 1, /* TODO */
 		.md_ops        = &kernel_module_ops,
 		.md_mman       = &mman_kernel,
@@ -1221,6 +1225,57 @@ nosym_no_elf_ht:
 
 
 
+
+#ifndef CONFIG_NO_SMP
+/* Lock that must be held while reading/writing the `st_value'
+ * field  of any driver symbol using one of the indirect types
+ * `STT_GNU_IFUNC' and `STT_KOS_IDATA'
+ *
+ * Note that this is an SMP-lock! */
+PRIVATE struct atomic_lock driver_isym_lock = ATOMIC_LOCK_INIT;
+#define driver_isym_acquire_nopr() atomic_lock_acquire_nopr(&driver_isym_lock)
+#define driver_isym_release_nopr() atomic_lock_release(&driver_isym_lock)
+#else /* !CONFIG_NO_SMP */
+#define driver_isym_acquire_nopr() (void)0
+#define driver_isym_release_nopr() (void)0
+#endif /* CONFIG_NO_SMP */
+#define driver_isym_acquire()                    \
+	do {                                         \
+		pflag_t _dis_was = PREEMPTION_PUSHOFF(); \
+		driver_isym_acquire_nopr()
+#define driver_isym_break()          \
+		(driver_isym_release_nopr(), \
+		 PREEMPTION_POP(_dis_was))
+#define driver_isym_release() \
+		driver_isym_break();  \
+	}	__WHILE0
+
+
+/* Copy data to physical memory located at the virtual
+ * address that `dst' points to. This in turns  allows
+ * writes  to virtual memory that'd otherwise be read-
+ * only. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL copy_to_phys_of_virt)(void const *dst,
+                                    void const *src,
+                                    size_t num_bytes) {
+	while (num_bytes) {
+		physaddr_t phys_dst;
+		size_t maxbytes;
+		phys_dst = pagedir_translate(dst);
+		maxbytes = PAGESIZE - (uintptr_t)dst & PAGEMASK;
+		if (maxbytes > num_bytes)
+			maxbytes = num_bytes;
+		copytophys_onepage(phys_dst, src, maxbytes);
+		if (maxbytes >= num_bytes)
+			break;
+		dst = (byte_t const *)dst + maxbytes;
+		src = (byte_t const *)src + maxbytes;
+		num_bytes -= maxbytes;
+	}
+}
+
+
 /* Lookup a symbol  within a driver,  given its  name.
  * Note that this function will _not_ look into driver
  * dependencies in order to resolve that symbol.
@@ -1249,16 +1304,64 @@ driver_dlsym_local(struct driver *__restrict self,
 		uintptr_t st_addr;
 		unsigned char st_info;
 		st_info = ATOMIC_READ(symbol->st_info);
-		st_addr = symbol->st_value;
-		if (symbol->st_shndx != SHN_ABS)
-			st_addr += self->d_module.md_loadaddr;
 		if (ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC ||
 		    ELFW(ST_TYPE)(st_info) == STT_KOS_IDATA) {
+			ElfW(Addr) newaddr;
+			unsigned char newinfo;
+			/* Special case: Indirect symbol! */
+			driver_isym_acquire();
+			st_info = symbol->st_info;
+			st_addr = symbol->st_value;
+			driver_isym_release();
+			if unlikely(ELFW(ST_TYPE)(st_info) != STT_GNU_IFUNC &&
+			            ELFW(ST_TYPE)(st_info) != STT_KOS_IDATA)
+				goto normal_symbol;
+			if (symbol->st_shndx != SHN_ABS)
+				st_addr += self->d_module.md_loadaddr;
+
 			/* Resolve dynamic address. */
 			st_addr = (*(uintptr_t(*)(void))st_addr)();
-			/* TODO: Write-back the resolved address, and change
-			 *       the typing of  the symbol to  no longer  be
-			 *       indirect! */
+
+			/* Write-back the resolved address, and change
+			 * the typing of  the symbol to  no longer  be
+			 * indirect! */
+			newaddr = st_addr;
+			if (symbol->st_shndx != SHN_ABS)
+				newaddr -= self->d_module.md_loadaddr;
+			newinfo = ELFW(ST_INFO)(ELFW(ST_BIND)(st_info),
+			                        ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC
+			                        ? STT_FUNC
+			                        : STT_OBJECT);
+			driver_isym_acquire();
+			/* Check if we're still dealing with an indirect symbol.
+			 * if that's no longer the case, then we must abort, and
+			 * discard the results we got from calling the  indirect
+			 * function! */
+			st_info = symbol->st_info;
+			if unlikely(ELFW(ST_TYPE)(st_info) != STT_GNU_IFUNC &&
+			            ELFW(ST_TYPE)(st_info) != STT_KOS_IDATA) {
+				driver_isym_break();
+				goto normal_symbol;
+			}
+			/* _VERY_ important! must write `st_info' second, since knowing
+			 * that it indicates an  indirect symbol, `st_value' is  _only_
+			 * guarded against reads/writes  from other cpus/threads  while
+			 * that's still the case.
+			 * As such, the write to `st_value' _must_ happen _before_ the
+			 * write to `st_info'. - Otherwise this'd be a race condition! */
+			COMPILER_BARRIER();
+			copy_to_phys_of_virt(&symbol->st_value, &newaddr, sizeof(symbol->st_value));
+			COMPILER_BARRIER();
+			copy_to_phys_of_virt(&symbol->st_info, &newinfo, sizeof(symbol->st_info));
+			COMPILER_BARRIER();
+			driver_isym_release();
+			/* XXX: If doing a pagedir-sync really enough here? */
+			mman_supersync((void *)symbol, sizeof(*symbol));
+		} else {
+normal_symbol:
+			st_addr = symbol->st_value;
+			if (symbol->st_shndx != SHN_ABS)
+				st_addr += self->d_module.md_loadaddr;
 		}
 		info->dsi_addr = (void *)st_addr;
 		info->dsi_size = symbol->st_size;
@@ -1784,178 +1887,6 @@ PUBLIC struct sig driver_state_changed = SIG_INIT;
 	      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF, \
 	      __VA_ARGS__)
 
-INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) * /* from "mnode.c" */
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
-                                             struct mpart *__restrict part);
-INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
-NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
-
-/* Free a given mem-node that was destroyed when unmapping a driver. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_deadnodes_free)(struct mnode *__restrict self) {
-	REF struct mpart *part;
-	xdecref(self->mn_fspath);
-	xdecref(self->mn_fsname);
-	if ((part = self->mn_part) != NULL) {
-		/* Try to unlink the node from the copy- or share-chain of the associated part. */
-		if (mpart_lock_tryacquire(part)) {
-			LIST_REMOVE(self, mn_link);
-			if ((self->mn_flags & (MNODE_F_MLOCK)) &&
-			    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
-				mpart_maybe_clear_mlock(part);
-			mpart_lock_release(part);
-			decref_unlikely(part);
-		} else {
-			Toblockop(struct mpart) *lop;
-			/* Must insert the node into the part's list of deleted nodes. */
-			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
-			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
-
-			/* Insert into the  lock-operations list of  `part'
-			 * The act of doing this is what essentially causes
-			 * ownership of our node to be transfered to `part' */
-			lop = (Toblockop(struct mpart) *)self;
-			lop->olo_func = &mnode_unlink_from_part_lockop;
-			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
-
-			/* Try to reap dead nodes. */
-			_mpart_lockops_reap(part);
-
-			/* Drop our old reference to the associated part. */
-			decref(part);
-			return;
-		}
-	}
-	mnode_free(self);
-}
-
-/* Free all nodes from the given list of dead nodes. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_deadnodes_freelist)(struct mnode_slist *__restrict deadnodes) {
-	while (!SLIST_EMPTY(deadnodes)) {
-		struct mnode *node;
-		node = SLIST_FIRST(deadnodes);
-		SLIST_REMOVE_HEAD(deadnodes, _mn_dead);
-		driver_deadnodes_free(node);
-	}
-}
-
-/* While holding a lock to the kernel mman, unmap all of  the
- * mappings that are associated with the given driver `self'.
- * Destroyed nodes are added to `deadlist' */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mman_remove_driver_nodes)(struct driver *__restrict self,
-                                        struct mnode_slist *__restrict deadlist) {
-	/* Go over all mem-nodes that cover the address range of `self',
-	 * and  remove+unmap+unprepare all that have module-pointers set
-	 * to point back at `self'.
-	 * Doing this should result in exactly `self->d_module.md_nodecount'
-	 * nodes being removed! */
-	struct mnode_tree_minmax mima;
-again_find_nodes:
-	mman_mappings_minmaxlocate(&mman_kernel,
-	                           self->d_module.md_loadmin,
-	                           self->d_module.md_loadmax,
-	                           &mima);
-	if (mima.mm_min != NULL) {
-		struct mnode *node;
-		for (node = mima.mm_min;;) {
-			if likely(node->mn_module == &self->d_module) {
-#ifndef NDEBUG
-				assert(self->d_module.md_nodecount != 0);
-				--self->d_module.md_nodecount;
-#endif /* !NDEBUG */
-				/* Driver nodes _must_ have the NOMERGE+PREPARED flags set.
-				 * Otherwise, we'd  be unable  to  unmap them  as  NOTHROW! */
-				assert(node->mn_flags & MNODE_F_NOMERGE);
-				assert(node->mn_flags & MNODE_F_MPREPARED);
-
-				/* Must get rid of this node! */
-				mman_mappings_removenode(&mman_kernel, node);
-
-				/* Unmap+sync+unprepare the node. */
-				mnode_pagedir_unmap(node);
-				mnode_mman_supersync(node);
-				mnode_pagedir_kernelunprepare(node);
-
-				/* Set the UNMAPPED flag for the node */
-				ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
-
-				/* Add the node to the list of dead nodes. */
-				SLIST_INSERT(&self->_d_deadnodes, node, _mn_dead);
-				goto again_find_nodes;
-			}
-			if (node == mima.mm_max)
-				break;
-			node = mnode_tree_nextnode(node);
-			assert(node);
-		}
-	}
-#ifdef NDEBUG
-	assert(self->d_module.md_nodecount == 0);
-#else /* NDEBUG */
-	self->d_module.md_nodecount = 0;
-#endif /* !NDEBUG */
-}
-
-/* While holding a lock to the kernel mman, unmap all of  the
- * mappings that are associated with the given driver `self'.
- * Destroyed nodes are added to `self->_d_deadnodes' */
-#define driver_unmap_text(self)                               \
-	(mman_remove_driver_nodes((self), &(self)->_d_deadnodes), \
-	 (*(self)->d_module.md_ops->mo_nonodes)(&(self)->d_module))
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_finitext_postlop)(Tobpostlockop(struct mman) *__restrict lop,
-                                       struct mman *__restrict UNUSED(mm)) {
-	REF struct driver *me;
-	me = container_of(lop, struct driver, _d_mm_postlop);
-	sig_broadcast(&driver_state_changed);
-	/* Destroy all of the dead mem-nodes. */
-	driver_deadnodes_freelist(&me->_d_deadnodes);
-	/* The reference inherited by the state-transition to `DRIVER_STATE_KILL' */
-	decref(me);
-}
-
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL driver_finitext_lop)(Toblockop(struct mman) *__restrict lop,
-                                   struct mman *__restrict UNUSED(mm)) {
-	struct driver *me;
-	me = container_of(lop, struct driver, _d_mm_lop);
-	/* Unmap driver text sections. */
-	driver_unmap_text(me);
-	/* Setup a post lock operation to broadcast the state-change,
-	 * as well as drop the self-reference we've inherited as  the
-	 * result of inheriting */
-	ATOMIC_WRITE(me->d_state, DRIVER_STATE_KILL);
-	me->_d_mm_postlop.oplo_func = &driver_finitext_postlop;
-	return &me->_d_mm_postlop;
-}
-
-/* Perform the necessary actions after the state of
- * `self' has been set to `DRIVER_STATE_FINI_TEXT'. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_runstate_fini_text)(struct driver *__restrict self) {
-	/* Initialize the list of dead mem-nodes. */
-	SLIST_INIT(&self->_d_deadnodes);
-
-	/* Initiate the unmapping of  */
-	if (mman_lock_tryacquire(&mman_kernel)) {
-		driver_unmap_text(self);
-		mman_lock_release_f(&mman_kernel);
-		ATOMIC_WRITE(self->d_state, DRIVER_STATE_KILL);
-		decref_nokill(self); /* The self-reference dropped by the transition to `DRIVER_STATE_KILL'! */
-		sig_broadcast(&driver_state_changed);
-		/* Destroy all of the dead mem-noeds. */
-		driver_deadnodes_freelist(&self->_d_deadnodes);
-		mman_lockops_reap(&mman_kernel);
-	} else {
-		self->_d_mm_lop.olo_func = &driver_finitext_lop;
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, &self->_d_mm_lop, olo_link);
-		_mman_lockops_reap(&mman_kernel);
-	}
-}
-
 /* Perform the necessary actions after the state of
  * `self' has been set to `DRIVER_STATE_FINI_DEPS'. */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -1965,10 +1896,12 @@ NOTHROW(FCALL driver_runstate_fini_deps)(struct driver *__restrict self) {
 	for (i = 0; i < self->d_depcnt; ++i)
 		axref_clear(&self->d_depvec[i]);
 
-	/* Next up: finalize driver text. */
-	ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_TEXT);
+	/* Drop the self-reference that was held by the
+	 * driver's state being `!= DRIVER_STATE_KILL'. */
+	ATOMIC_WRITE(self->d_state, DRIVER_STATE_KILL);
+	decref_nokill(self);
+
 	sig_broadcast(&driver_state_changed);
-	driver_runstate_fini_text(self);
 }
 
 
@@ -2445,10 +2378,12 @@ again:
 		/* Directly switch over to the FINI_TEXT state. */
 		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
 		                        DRIVER_STATE_INIT,
-		                        DRIVER_STATE_FINI_TEXT))
+		                        DRIVER_STATE_KILL))
 			goto again;
 		sig_broadcast(&driver_state_changed);
-		driver_runstate_fini_text(self);
+		/* Drop the self-reference that was held by the
+		 * driver's state being `!= DRIVER_STATE_KILL'. */
+		decref_nokill(self);
 		break;
 
 	case DRIVER_STATE_INIT_DEPS:
@@ -2504,15 +2439,30 @@ again:
 		sig_broadcast(&driver_state_changed);
 
 		/* Invoke driver finalizers. */
+		/* TODO: If you think about it, exceptions from driver
+		 *       finalizers  should be handled by aborting the
+		 *       finalization!  I mean: imagine the user doing
+		 *       CTRL+C  during this, and a blocking operation
+		 *       throws E_INTERRUPT. - You'd want the rmmod to
+		 *       be able to be restartable... */
 		run_driver_finiall(self);
 
-		/* Finalizer driver dependencies, and proceed to
-		 * finalizing driver text, etc... */
+		/* TODO: Try to unbind known, global hooks that may
+		 *       contain references to  the driver  `self'. */
+
+		/* Finalize driver dependencies... */
 		ATOMIC_WRITE(self->_d_initthread, NULL);
 		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
 		sig_broadcast(&driver_state_changed);
 		driver_runstate_fini_deps(self);
 	}	break;
+
+	/* TODO: Other states should wait for  `DRIVER_STATE_KILL'!
+	 *       Think about it: If you  wanted to implement a  way
+	 *       to unload+reload drivers,  you'd do  rmmod,insmod.
+	 *       But if the rmmod is left to happen asynchronously,
+	 *       the insmod would re-return the currently-deloading
+	 *       driver... */
 
 	default:
 		/* All other states indicate already-finalized, or currently finalizing.
@@ -2529,6 +2479,333 @@ again:
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_free_)(struct driver *__restrict self) {
 	kfree(self);
+}
+
+/* Try to  remove all  dead drivers  from the  load-list.
+ * If this fails to lack of memory, or failure to acquire
+ * some  internal locks without blocking, return `false'.
+ * Upon success, return `true' */
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL remove_dead_drivers_from_loadlist)(void) {
+	REF struct driver_loadlist *old_ll;
+	REF struct driver_loadlist *new_ll;
+	size_t i, count;
+	bool cmpxch_ok;
+
+again:
+	old_ll = arref_get(&drivers);
+	/* Could the # of non-destroyed drivers.
+	 * Note that this # may decrease over time, but is
+	 * guarantied  not to increase (meaning we can use
+	 * it as an upper limit  to the # of drivers  that
+	 * the new load-list must be able to hold) */
+	assert_assume(old_ll->dll_count >= 1);
+	for (i = 0, count = 0; i < old_ll->dll_count; ++i) {
+		if (!wasdestroyed(old_ll->dll_drivers[i]))
+			++count;
+	}
+	assert(count <= old_ll->dll_count);
+	if unlikely(count == old_ll->dll_count) {
+		/* This _really_ shouldn't happen, given how this
+		 * function is meant to be called after a  driver
+		 * has just been destroyed.
+		 * However,  this _could_ happen if someone else
+		 * already did the work of removing our caller's
+		 * dead  driver, as is automatically done by the
+		 * `get_driver_loadlist()' function! */
+		decref_unlikely(old_ll);
+		return true;
+	}
+
+	/* Allocate the new load-list descriptor. */
+	if unlikely(count == 1) {
+		/* Special case: only the kernel remains! */
+		new_ll = incref(&default_loaded_drivers);
+	} else {
+		size_t dst;
+		new_ll = (REF struct driver_loadlist *)kmalloc_nx(offsetof(struct driver_loadlist, dll_drivers) +
+		                                                  (count * sizeof(WEAK REF struct driver *)),
+		                                                  GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if unlikely(!new_ll) {
+			decref_unlikely(old_ll);
+			return false;
+		}
+		/* Construct new weak referneces for all (still) non-destroyed drivers. */
+		for (i = 0, dst = 0; i < old_ll->dll_count; ++i) {
+			if (wasdestroyed(old_ll->dll_drivers[i]))
+				continue;
+			assert(dst <= count);
+			new_ll->dll_drivers[dst] = weakincref(old_ll->dll_drivers[i]);
+			++dst;
+		}
+		if unlikely(dst < count) {
+			/* More drivers died, so we can try to strip
+			 * some  more memory from our new load-list. */
+			REF struct driver_loadlist *temp;
+			temp = (REF struct driver_loadlist *)krealloc_nx(new_ll,
+			                                                 offsetof(struct driver_loadlist, dll_drivers) +
+			                                                 (dst * sizeof(WEAK REF struct driver *)),
+			                                                 GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+			if likely(temp != NULL)
+				new_ll = temp;
+		}
+		new_ll->dll_refcnt = 1;
+		new_ll->dll_count  = dst;
+	}
+
+	/* Try to write-back the new (truncated) set of drivers. */
+	cmpxch_ok = arref_cmpxch_inherit_new(&drivers, old_ll, new_ll);
+	decref_likely(old_ll);
+	if (!cmpxch_ok) {
+		/* The load-list changed in the mean time.
+		 * -> Must try again! */
+		decref_likely(new_ll);
+		goto again;
+	}
+
+	/* Success! (dead drivers were removed; though more may have
+	 * already popped up once again, thanks to race  conditions) */
+	return true;
+}
+
+
+INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) * /* from "mnode.c" */
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
+                                             struct mpart *__restrict part);
+INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
+NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
+
+/* Free a given mem-node that was destroyed when unmapping a driver. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_deadnodes_free)(struct mnode *__restrict self) {
+	REF struct mpart *part;
+	xdecref(self->mn_fspath);
+	xdecref(self->mn_fsname);
+	if ((part = self->mn_part) != NULL) {
+		/* Try to unlink the node from the copy- or share-chain of the associated part. */
+		if (mpart_lock_tryacquire(part)) {
+			LIST_REMOVE(self, mn_link);
+			if ((self->mn_flags & (MNODE_F_MLOCK)) &&
+			    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
+				mpart_maybe_clear_mlock(part);
+			mpart_lock_release(part);
+			decref_unlikely(part);
+		} else {
+			Toblockop(struct mpart) *lop;
+			/* Must insert the node into the part's list of deleted nodes. */
+			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
+			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
+
+			/* Insert into the  lock-operations list of  `part'
+			 * The act of doing this is what essentially causes
+			 * ownership of our node to be transfered to `part' */
+			lop = (Toblockop(struct mpart) *)self;
+			lop->olo_func = &mnode_unlink_from_part_lockop;
+			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
+
+			/* Try to reap dead nodes. */
+			_mpart_lockops_reap(part);
+
+			/* Drop our old reference to the associated part. */
+			decref(part);
+			return;
+		}
+	}
+	mnode_free(self);
+}
+
+/* Free all nodes from the given list of dead nodes. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_deadnodes_freelist)(struct mnode_slist *__restrict deadnodes) {
+	while (!SLIST_EMPTY(deadnodes)) {
+		struct mnode *node;
+		node = SLIST_FIRST(deadnodes);
+		SLIST_REMOVE_HEAD(deadnodes, _mn_dead);
+		driver_deadnodes_free(node);
+	}
+}
+
+/* While holding a lock to the kernel mman, unmap all of  the
+ * mappings that are associated with the given driver `self'.
+ * Destroyed nodes are added to `deadlist' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_remove_driver_nodes)(struct driver *__restrict self,
+                                        struct mnode_slist *__restrict deadlist) {
+	/* Go over all mem-nodes that cover the address range of `self',
+	 * and  remove+unmap+unprepare all that have module-pointers set
+	 * to point back at `self'.
+	 * Doing this should result in exactly `self->d_module.md_nodecount'
+	 * nodes being removed! */
+	struct mnode_tree_minmax mima;
+again_find_nodes:
+	mman_mappings_minmaxlocate(&mman_kernel,
+	                           self->d_module.md_loadmin,
+	                           self->d_module.md_loadmax,
+	                           &mima);
+	if (mima.mm_min != NULL) {
+		struct mnode *node;
+		for (node = mima.mm_min;;) {
+			if likely(node->mn_module == &self->d_module) {
+#ifndef NDEBUG
+				assert(self->d_module.md_nodecount != 0);
+				--self->d_module.md_nodecount;
+#endif /* !NDEBUG */
+				/* Driver  nodes  _must_ have  the PREPARED  flag set.
+				 * Otherwise, we'd be unable to unmap them as NOTHROW! */
+				assert(node->mn_flags & MNODE_F_MPREPARED);
+
+				/* Must get rid of this node! */
+				mman_mappings_removenode(&mman_kernel, node);
+
+				/* Unmap+sync+unprepare the node. */
+				mnode_pagedir_unmap(node);
+				mnode_mman_supersync(node);
+				mnode_pagedir_kernelunprepare(node);
+
+				/* Set the UNMAPPED flag for the node */
+				ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
+
+				/* Add the node to the list of dead nodes. */
+				SLIST_INSERT(&self->_d_deadnodes, node, _mn_dead);
+				goto again_find_nodes;
+			}
+			if (node == mima.mm_max)
+				break;
+			node = mnode_tree_nextnode(node);
+			assert(node);
+		}
+	}
+#ifdef NDEBUG
+	assert(self->d_module.md_nodecount == 0);
+#else /* NDEBUG */
+	self->d_module.md_nodecount = 0;
+#endif /* !NDEBUG */
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_finitext_postlop)(Tobpostlockop(struct mman) *__restrict lop,
+                                       struct mman *__restrict UNUSED(mm)) {
+	REF struct driver *me;
+	me = container_of(lop, struct driver, _d_mm_postlop);
+
+	/* Destroy all of the dead mem-nodes. */
+	driver_deadnodes_freelist(&me->_d_deadnodes);
+	DBG_memset(&me->_d_deadnodes, 0xcc, sizeof(me->_d_deadnodes));
+
+	/* The weak reference originally inherited from
+	 * `driver_clear_mnode_pointers_and_destroy()' */
+	weakdecref(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL driver_finitext_lop)(Toblockop(struct mman) *__restrict lop,
+                                   struct mman *__restrict UNUSED(mm)) {
+	struct driver *me;
+	me = container_of(lop, struct driver, _d_mm_lop);
+
+	if likely(me->d_module.md_nodecount != 0) {
+		/* Unmap driver text sections. */
+		mman_remove_driver_nodes(me, &me->_d_deadnodes);
+		assert(!SLIST_EMPTY(&me->_d_deadnodes));
+		weakdecref_nokill(me); /* Reference inherited from `md_nodecount' dropping to 0 */
+	}
+
+	/* Setup a post lock operation to broadcast the state-change,
+	 * as well  as  drop  the  weak  reference  we've  inherited. */
+	me->_d_mm_postlop.oplo_func = &driver_finitext_postlop;
+	return &me->_d_mm_postlop;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_clear_mnode_pointers_and_destroy)(struct driver *__restrict self) {
+	kfree(self->d_sections);
+	DBG_memset(&self->d_shnum, 0xcc, sizeof(self->d_shnum));
+	DBG_memset(&self->d_sections, 0xcc, sizeof(self->d_sections));
+
+	/* Using  lock operations, remove all of the mnode
+	 * self-pointers back towards this driver from the
+	 * kernel mman. */
+	if (self->d_module.md_nodecount != 0) {
+		/* Initialize the list of dead mem-nodes. */
+		SLIST_INIT(&self->_d_deadnodes);
+		if (mman_lock_tryacquire(&mman_kernel)) {
+			COMPILER_READ_BARRIER();
+			if unlikely(self->d_module.md_nodecount == 0) {
+				mman_lock_release_f(&mman_kernel);
+			} else {
+				mman_remove_driver_nodes(self, &self->_d_deadnodes);
+				mman_lock_release_f(&mman_kernel);
+				/* Destroy all of the dead mem-noeds. */
+				assert(!SLIST_EMPTY(&self->_d_deadnodes));
+				driver_deadnodes_freelist(&self->_d_deadnodes);
+				DBG_memset(&self->_d_deadnodes, 0xcc, sizeof(self->_d_deadnodes));
+				weakdecref_nokill(self); /* Reference inherited from `md_nodecount' dropping to 0 */
+			}
+			mman_lockops_reap(&mman_kernel);
+			weakdecref(self); /* Reference inherited from `md_refcnt' dropping to 0 */
+		} else {
+			self->_d_mm_lop.olo_func = &driver_finitext_lop;
+			SLIST_ATOMIC_INSERT(&mman_kernel_lockops, &self->_d_mm_lop, olo_link);
+			_mman_lockops_reap(&mman_kernel);
+		}
+	} else {
+		weakdecref(self); /* Reference inherited from `md_refcnt' dropping to 0 */
+	}
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_unbind_sections_and_destroy_postlop)(struct postlockop *__restrict self) {
+	struct driver *me;
+	me = container_of(self, struct driver, _d_postlop);
+
+	/* Destroy dead sections! */
+	while (!SLIST_EMPTY(&me->_d_deadsect)) {
+		struct driver_section *sect;
+		sect = (struct driver_section *)SLIST_FIRST(&me->_d_deadsect);
+		SLIST_REMOVE_HEAD(&me->_d_deadsect, _ms_dead);
+		driver_section_destroy(sect);
+	}
+	DBG_memset(&me->_d_deadsect, 0xcc, sizeof(me->_d_deadsect));
+
+	/* Proceed normally with the full destruction
+	 * of the original driver module. */
+	driver_clear_mnode_pointers_and_destroy(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL driver_unbind_sections_and_destroy_lop)(struct lockop *__restrict self) {
+	struct driver *me;
+	me = container_of(self, struct driver, _d_lop);
+	SLIST_INIT(&me->_d_deadsect);
+
+	/* Remove all sections from the . */
+	while (me->d_shnum) {
+		REF struct driver_section *sect;
+		--me->d_shnum;
+		sect = awref_get(&me->d_sections[me->d_shnum]);
+		if (!sect)
+			continue; /* Section was never allocated or is dead. */
+		if unlikely(!LIST_ISBOUND(&sect->ds_sect, ms_cache)) {
+			decref_unlikely(sect);
+			continue; /* Section isn't apart of the cache... */
+		}
+		LIST_UNBIND(&sect->ds_sect, ms_cache);
+		decref_nokill(sect); /* The reference from the section cache. */
+
+		/* Drop the reference we got from `awref_get()'
+		 * If this ends up destroying the section, then enqueue said
+		 * destruction to be performed  as part of the  post-lockop. */
+		if (ATOMIC_DECFETCH(sect->ds_sect.ms_refcnt) == 0)
+			SLIST_INSERT(&me->_d_deadsect, &sect->ds_sect, _ms_dead);
+	}
+
+	/* Do the rest of the module destruction, as well as the
+	 * cleanup  of dead sections  from within a post-lockop,
+	 * thereby reducing the amount of time spent holding the
+	 * module section cache lock. */
+	me->_d_postlop.plo_func = &driver_unbind_sections_and_destroy_postlop;
+	return &me->_d_postlop;
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -2583,40 +2860,192 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	DBG_memset(&self->d_phdr, 0xcc, self->d_phnum * sizeof(ElfW(Phdr)));
 	DBG_memset(&self->d_phnum, 0xcc, sizeof(self->d_phnum));
 
-	/* TODO: Try to remove `self' from the current `drivers'. And if
-	 *       that's not possible, set `loaded_drivers_contains_dead' */
+	/* Try to remove `self' from the current `drivers'. And if
+	 * that's not possible, set `loaded_drivers_contains_dead'
+	 * For  simplicity, just remove  _all_ dead drivers (which
+	 * ought  to include `self', since `wasdestroyed(self)' is
+	 * the case at this point!) */
+	if (!remove_dead_drivers_from_loadlist())
+		loaded_drivers_contains_dead = true;
 
-	/* TODO: Using lock operations, remove all still-loaded
-	 *       driver sections from the module section cache.
-	 * NOTE: */
-	//TODO: kfree(self->d_sections);
-	//TODO: DBG_memset(&self->d_shnum, 0xcc, sizeof(self->d_shnum));
-	//TODO: DBG_memset(&self->d_sections, 0xcc, sizeof(self->d_sections));
+	/* Using lock operations, remove all still-loaded
+	 * driver sections from the module section cache. */
+	while (self->d_shnum) {
+		REF struct driver_section *sect;
+		--self->d_shnum;
+		sect = awref_get(&self->d_sections[self->d_shnum]);
+		if (!sect)
+			continue; /* Section was never allocated or is dead. */
+		if unlikely(!LIST_ISBOUND(&sect->ds_sect, ms_cache)) {
+			decref_unlikely(sect);
+			continue; /* Section isn't apart of the cache... */
+		}
 
-	/* TODO: Using  lock operations, remove all of the mnode
-	 *       self-pointers back towards this driver from the
-	 *       kernel mman. */
+		/* Must remove this section from the cache. */
+		if (module_section_cache_tryacquire()) {
+			if likely(LIST_ISBOUND(&sect->ds_sect, ms_cache)) {
+				LIST_UNBIND(&sect->ds_sect, ms_cache);
+				decref_nokill(sect);
+			}
+			module_section_cache_release_f();
+			decref_likely(sect);
+			module_section_cache_reap();
+		} else {
+			/* Must use a lockop to unbind the section
+			 * once the cache lock becomes  available.
+			 *
+			 * For  this  purpose, we  (re-)use  the original
+			 * driver  object as a  storage container for the
+			 * a lockop descriptor that's then used to remove
+			 * all  of the module's  sections from the module
+			 * section cache. */
+			++self->d_shnum; /* Must do the last section once again! */
+			self->_d_lop.lo_func = &driver_unbind_sections_and_destroy_lop;
+			SLIST_ATOMIC_INSERT(&module_section_cache_lops, &self->_d_lop, lo_link);
+			decref_unlikely(sect);
+			_module_section_cache_reap();
+			return;
+		}
+	}
+	driver_clear_mnode_pointers_and_destroy(self);
+}
 
-	weakdecref(self);
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_nonodes_cleanup_postlop)(Tobpostlockop(struct mman) *__restrict self,
+                                              struct mman *__restrict UNUSED(mm)) {
+	struct driver *me;
+	me = container_of(self, struct driver, _d_mm_postlop);
+	driver_free_(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL driver_nonodes_cleanup_lop)(Toblockop(struct mman) *__restrict self,
+                                          struct mman *__restrict UNUSED(mm)) {
+	struct driver *me;
+	me = container_of(self, struct driver, _d_mm_lop);
+	me->_d_mm_postlop.oplo_func = &driver_nonodes_cleanup_postlop;
+	return &me->_d_mm_postlop;
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_nonodes)(struct driver *__restrict self) {
-	weakdecref(self);
+	/* The node-counter of drivers is always holding an implicit weak reference.
+	 * Once  all mem-nodes have  gone away, we must  simply drop that reference. */
+	assert(self->d_module.md_weakrefcnt >= 1);
+	if (ATOMIC_DECFETCH(self->d_module.md_weakrefcnt) == 0) {
+		/* Enqueue a lock operation for the kernel mman to-be performed
+		 * once the kernel mman lock has been released in order to free
+		 * the driver control structure.
+		 * We don't do this inline to reduce the time spent holding onto
+		 * the kernel mman mappings lock (which our caller is  currently
+		 * holding) */
+		driver_free_(self);
+		self->_d_mm_lop.olo_func = &driver_nonodes_cleanup_lop;
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
+		                    &self->_d_mm_lop, olo_link);
+		/* DONT REAP LOCKOPS HERE!
+		 *
+		 * It won't work since our caller still holds a lock to
+		 * the  associated mman's mappings lock. Also: the only
+		 * reason  we're  enqueuing the  destruction  of `self'
+		 * via  a lockop is  so it can  happen _after_ the mman
+		 * lock has been released!
+		 *
+		 * Note however that doing a normal decref() here  would
+		 * also be semantically acceptable, however by doing the
+		 * actual destruction later, we can reduce the amount of
+		 * time spent holding onto the mman's mappings lock! */
+	}
 }
 
-PRIVATE WUNUSED NONNULL((1)) REF struct module_section *FCALL
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL image_validate)(struct driver *__restrict self,
+                              void const *src, size_t num_bytes);
+
+PRIVATE WUNUSED NONNULL((1)) REF struct driver_section *FCALL
 driver_locksection_index(struct driver *__restrict self,
                          unsigned int section_index) {
-	/* TODO */
-	return NULL;
+	ElfW(Shdr) *shdr;
+	REF struct driver_section *result;
+
+	/* Check if the given section index is valid. */
+	if unlikely(section_index >= self->d_shnum)
+		return NULL;
+
+	/* Try to return an already-loaded section */
+again:
+	result = awref_get(&self->d_sections[section_index]);
+	if (result)
+		return result;
+
+	/* Must create a new section object. */
+	result = (REF struct driver_section *)kmalloc(sizeof(struct driver_section),
+	                                              GFP_PREFLT);
+
+	/* Fill in information about the section. */
+	shdr = &self->d_shdr[section_index];
+	result->ds_sect.ms_refcnt  = 2; /* +1:return, +1:module_section_cache */
+	result->ds_sect.ms_ops     = &driver_section_ops;
+	result->ds_sect.ms_module  = weakincref(&self->d_module);
+	result->ds_sect.ms_size    = shdr->sh_size;
+	result->ds_sect.ms_entsize = shdr->sh_entsize;
+	result->ds_sect.ms_type    = shdr->sh_type;
+	result->ds_sect.ms_flags   = shdr->sh_flags;
+	result->ds_sect.ms_link    = shdr->sh_link;
+	result->ds_sect.ms_info    = shdr->sh_info;
+	result->ds_shdr            = shdr;
+	result->ds_addr            = (byte_t *)-1;
+	result->ds_infladdr        = (byte_t *)-1;
+	result->ds_inflsize        = 0;
+	if (shdr->sh_flags & SHF_ALLOC) {
+		byte_t *addr;
+		addr = (byte_t *)(self->d_module.md_loadaddr + shdr->sh_addr);
+		if (image_validate(self, addr, shdr->sh_size))
+			result->ds_addr = addr;
+	}
+	/* Acquire a lock to the module section cache. */
+	TRY {
+		module_section_cache_acquire();
+	} EXCEPT {
+		destroy(result);
+		RETHROW();
+	}
+
+	/* Replace a previously destroyed section object with the new section! */
+	if (!awref_replacedead(&self->d_sections[section_index], result)) {
+		module_section_cache_release();
+		destroy(result);
+		goto again;
+	}
+
+	/* Add the new section to the sections cache.
+	 * This is done to prevent the section from being destroyed
+	 * the  second the caller of `module_locksection()' ends up
+	 * dropping the reference we return.
+	 *
+	 * However, sections are  automatically removed  from
+	 * the cache when the associated module is destroyed. */
+	LIST_INSERT_HEAD(&module_section_cache, &result->ds_sect, ms_cache);
+
+	/* Release the lock from the module section cache. */
+	module_section_cache_release();
+
+	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) REF struct module_section *FCALL
+PRIVATE WUNUSED NONNULL((1)) REF struct driver_section *FCALL
 driver_locksection(struct driver *__restrict self,
                    USER CHECKED char const *section_name) {
-	/* TODO */
-	return NULL;
+	unsigned int i;
+	for (i = 0; i < self->d_shnum; ++i) {
+		char const *name;
+		if unlikely(self->d_shdr[i].sh_name >= self->d_shstrsiz)
+			continue; /* Shouldn't happen... */
+		name = self->d_shstrtab + self->d_shdr[i].sh_name;
+		if (strcmp(name, section_name) == 0)
+			break; /* Found it! */
+	}
+	return driver_locksection_index(self, i);
 }
 
 
@@ -3050,17 +3479,19 @@ err_bad_dynsym:
 	}
 got_dynsym_size:
 
-	/* Locate this driver's .eh_frame section. */
+	/* Locate this driver's `.eh_frame' section. */
 	self->d_eh_frame_start = NULL;
 	self->d_eh_frame_end   = NULL;
 	for (i = 0; i < self->d_shnum; ++i) {
-		char namebuf[sizeof(".eh_frame")];
+#define EH_FRAME_SECTION_NAME ".eh_frame"
+		char namebuf[sizeof(EH_FRAME_SECTION_NAME)];
 		if unlikely(self->d_shdr[i].sh_name >= self->d_shstrsiz)
 			continue;
 		if (memcpy_nopf(namebuf, self->d_shstrtab + self->d_shdr[i].sh_name, sizeof(namebuf)) != 0)
 			continue;
-		if (memcmp(namebuf, ".eh_frame", sizeof(".eh_frame")) != 0)
+		if (memcmp(namebuf, EH_FRAME_SECTION_NAME, sizeof(EH_FRAME_SECTION_NAME)) != 0)
 			continue;
+#undef EH_FRAME_SECTION_NAME
 		/* Found the `.eh_frame' section! */
 
 		/* Make sure that `.eh_frame' has the SHF_ALLOC flag set! */
@@ -3339,7 +3770,7 @@ done_dynhdr_for_soname:
 			assert(result->d_module.md_loadmin <= result->d_module.md_loadmax);
 
 			/* Fill in simple fields. */
-			result->d_module.md_refcnt     = 2; /* +1:<return-value>, +1:Not setting the `DRIVER_STATE_INIT' flag */
+			result->d_module.md_refcnt     = 2; /* +1:<return-value>, +1:The self-reference of `DRIVER_STATE_INIT' */
 			result->d_module.md_weakrefcnt = 3; /* +1:md_refcnt != 0, +1:md_nodecount != 0, +1:new_ll->dll_drivers[new_ll_insert_index] */
 /*			result->d_module.md_nodecount  = 0; */ /* Already initialized by `GFP_CALLOC' */
 			result->d_module.md_ops        = &driver_module_ops;
@@ -3493,6 +3924,7 @@ again_acquire_mman_lock:
 					/* Check if the current driver load list already contains
 					 * a driver with  a name  identical to  `result->d_name'. */
 					new_ll_insert_index = old_ll->dll_count;
+					assert_assume(old_ll->dll_count >= 1);
 					for (i = 0; i < old_ll->dll_count; ++i) {
 						REF struct driver *other_driver;
 						other_driver = old_ll->dll_drivers[i];
@@ -3529,6 +3961,7 @@ again_acquire_mman_lock:
 					       &old_ll->dll_drivers[new_ll_insert_index],
 					       old_ll->dll_count - new_ll_insert_index,
 					       sizeof(WEAK REF struct driver *));
+					assert_assume(old_ll->dll_count >= 1);
 					for (i = 0; i < old_ll->dll_count; ++i)
 						weakincref(old_ll->dll_drivers[i]);
 

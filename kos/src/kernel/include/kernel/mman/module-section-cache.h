@@ -51,9 +51,9 @@ LIST_HEAD(module_section_list, module_section);
  * lockop  operations), meaning that  this cache functions to
  * automatically clean up the sections belonging to destroyed
  * modules. */
-DATDEF struct module_section_list module_section_cache;
-DATDEF struct atomic_lock /*   */ module_section_cache_lock;
-DATDEF struct lockop_slist /*  */ module_section_cache_lops;
+DATDEF struct REF module_section_list module_section_cache;
+DATDEF struct atomic_lock /*       */ module_section_cache_lock;
+DATDEF struct lockop_slist /*      */ module_section_cache_lops;
 #define _module_section_cache_reap()      _lockop_reap_atomic_lock(&module_section_cache_lops, &module_section_cache_lock)
 #define module_section_cache_reap()       lockop_reap_atomic_lock(&module_section_cache_lops, &module_section_cache_lock)
 #define module_section_cache_tryacquire() atomic_lock_tryacquire(&module_section_cache_lock)
