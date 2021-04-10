@@ -887,11 +887,11 @@ err_no_data:
 	}
 #undef LOCK_SECTION
 	/* Support for compressed sections. */
-#define LOAD_SECTION(sect, lv_start, lv_end)                                          \
-	do {                                                                              \
-		size_t size;                                                                  \
-		(lv_start) = (byte_t const *)module_section_inflate(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                               \
+#define LOAD_SECTION(sect, lv_start, lv_end)                                             \
+	do {                                                                                 \
+		size_t size;                                                                     \
+		(lv_start) = (byte_t const *)module_section_inflate_nx(sect, module_type, size); \
+		(lv_end)   = (lv_start) + size;                                                  \
 	}	__WHILE0
 
 

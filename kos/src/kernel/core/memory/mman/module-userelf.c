@@ -828,7 +828,7 @@ uem_create_from_mapping(struct mman *__restrict self,
 	 *       it's impossible  for file  mappings to  be created,  such
 	 *       that the PAGEMASK'd  part of the  addr/fpos don't  match. */
 	REF struct userelf_module *result;
-	pos_t file_size, shoff;
+	pos_t file_size, shoff, shend;
 	UM_ElfW_Ehdr ehdr;
 	uint16_t phnum, shnum;
 	UM_ElfW_PhdrP phdrv;
@@ -916,7 +916,7 @@ uem_create_from_mapping(struct mman *__restrict self,
 		goto not_an_elf_file;
 	shoff  = (pos_t)UM_field_r(sizeof_pointer, ehdr, .e_shoff);
 	shsize = UM_sizeof_r(sizeof_pointer, UM_ElfW_Shdr) * shnum;
-	if (OVERFLOW_UADD(shoff, shsize, &shoff) || shoff > file_size)
+	if (OVERFLOW_UADD(shoff, shsize, &shend) || shend > file_size)
 		goto not_an_elf_file;
 
 	/* Validate/decode program header indices/offsets */
@@ -1067,7 +1067,12 @@ something_changed:
 			ph_fpos = (pos_t)UM_field_r(sizeof_pointer, phdrv, [i].p_offset);
 			minaddr = (byte_t *)UM_field_r(sizeof_pointer, phdrv, [i].p_vaddr) + loadaddr;
 			maxaddr = (byte_t *)minaddr + UM_field_r(sizeof_pointer, phdrv, [i].p_memsz);
-			minaddr = (byte_t *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
+			if ((uintptr_t)minaddr & PAGEMASK) {
+				/* Must also account for base-address shift within the header's file-offset. */
+				if (OVERFLOW_USUB(ph_fpos, (uintptr_t)minaddr & PAGEMASK, &ph_fpos))
+					goto not_an_elf_file_phdrv_result_mmlock;
+				minaddr = (byte_t *)((uintptr_t)minaddr & ~PAGEMASK);
+			}
 			maxaddr = (byte_t *)CEIL_ALIGN((uintptr_t)maxaddr, PAGESIZE) - 1;
 			if unlikely(minaddr >= maxaddr)
 				goto not_an_elf_file_phdrv_result_mmlock;
@@ -1335,7 +1340,6 @@ uem_trycreate(struct mman *__restrict self,
 
 	if (!mpart_lock_tryacquire(part)) {
 		/* Release mman lock & spin until we get the part-lock! */
-waitfor_part:
 		incref(part);
 		mman_lock_release(self);
 		FINALLY_DECREF_UNLIKELY(part);
@@ -1368,6 +1372,7 @@ waitfor_part:
 		 * been yet to  be considered as  part of any  UserELF
 		 * module, may form one in conjunction with this node. */
 		unsigned int i;
+		mpart_lock_release(part);
 		for (i = 0; i < 2; ++i) {
 			struct mnode *neighbor;
 			neighbor = i == 0 ? mnode_tree_prevnode(node)
@@ -1382,7 +1387,6 @@ waitfor_part:
 			void *minaddr, *maxaddr;
 			minaddr = mnode_getminaddr(node);
 			maxaddr = mnode_getmaxaddr(node);
-			mpart_lock_release(part);
 			result = uem_trycreate(self, neighbor);
 			if (result == UEM_TRYCREATE_UNLOCKED) {
 				/* Try again... */
@@ -1397,8 +1401,6 @@ waitfor_part:
 				    mnode_getmaxaddr(node) != maxaddr ||
 				    node->mn_part != part)
 					return UEM_TRYCREATE_UNLOCKED;
-				if (!mpart_lock_tryacquire(part))
-					goto waitfor_part;
 			} else if (result != NULL) {
 				/* Potential  success (but let's  re-try in case the
 				 * module discovered is actually a different module) */

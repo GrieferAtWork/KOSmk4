@@ -5403,7 +5403,8 @@ DBG_COMMAND(lsmod,
 		}
 		dbg_printf(DBGSTR("%-*s "), longest_name, d->d_name);
 		temp = (size_t)cmdline_encode(&dbg_printer, NULL, d->d_argc, d->d_argv);
-		format_repeat(&dbg_printer, NULL, ' ', longest_cmdl - temp);
+		if (longest_cmdl > temp)
+			format_repeat(&dbg_printer, NULL, ' ', longest_cmdl - temp);
 		dbg_printf(DBGSTR(" %p %p %p" AC_DEFATTR "\n"),
 		           d->d_module.md_loadaddr,
 		           d->d_module.md_loadmin,

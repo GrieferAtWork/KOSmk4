@@ -3579,11 +3579,11 @@ try_load_dynsym:
 		sections->ds_eh_frame_start = (byte_t const *)module_section_getudata(dl_sections->ds_eh_frame, module_type);
 		sections->ds_eh_frame_end   = sections->ds_eh_frame_start + module_section_getsize(dl_sections->ds_eh_frame, module_type);
 	}
-#define BIND_SECTION(sect, lv_start, lv_end)                                          \
-	if (sect) {                                                                       \
-		size_t size;                                                                  \
-		(lv_start) = (byte_t const *)module_section_inflate(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                               \
+#define BIND_SECTION(sect, lv_start, lv_end)                                             \
+	if (sect) {                                                                          \
+		size_t size;                                                                     \
+		(lv_start) = (byte_t const *)module_section_inflate_nx(sect, module_type, size); \
+		(lv_end)   = (lv_start) + size;                                                  \
 	}
 	BIND_SECTION(dl_sections->ds_debug_frame, sections->ds_debug_frame_start, sections->ds_debug_frame_end);
 	BIND_SECTION(dl_sections->ds_debug_addr, sections->ds_debug_addr_start, sections->ds_debug_addr_end);
@@ -3598,11 +3598,11 @@ try_load_dynsym:
 	/* Bind symbol/string sections. */
 	if (dl_sections->ds_symtab) {
 		size_t size;
-		sections->ds_strtab_start = (byte_t const *)module_section_inflate(dl_sections->ds_strtab,
-		                                                                   module_type, size);
+		sections->ds_strtab_start = (byte_t const *)module_section_inflate_nx(dl_sections->ds_strtab,
+		                                                                      module_type, size);
 		sections->ds_strtab_end   = sections->ds_strtab_start + size;
-		sections->ds_symtab_start = (byte_t const *)module_section_inflate(dl_sections->ds_symtab,
-		                                                                   module_type, size);
+		sections->ds_symtab_start = (byte_t const *)module_section_inflate_nx(dl_sections->ds_symtab,
+		                                                                      module_type, size);
 		sections->ds_symtab_end   = sections->ds_symtab_start + size;
 		sections->ds_symtab_ent   = module_section_getentsize(dl_sections->ds_symtab, module_type);
 	}

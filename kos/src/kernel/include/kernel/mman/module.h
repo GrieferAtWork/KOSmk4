@@ -137,7 +137,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destr
 WUNUSED NONNULL((1)) char const *(module_section_getname)(struct module_section *__restrict self);
 WUNUSED NONNULL((1)) USER CHECKED byte_t *(module_section_getaddr)(struct module_section *__restrict self);
 WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_alias)(struct module_section *__restrict self);
-WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
+WUNUSED NONNULL((1, 2)) KERNEL byte_t *(module_section_getaddr_inflate)(struct module_section *__restrict self, size_t *__restrict psize);
 #else /* __INTELLISENSE__ */
 #define module_section_getname(self)                (*(self)->ms_ops->ms_getname)(self)
 #define module_section_getaddr(self)                (*(self)->ms_ops->ms_getaddr)(self)
@@ -149,7 +149,7 @@ WUNUSED NONNULL((1)) KERNEL byte_t *(module_section_getaddr_inflate)(struct modu
 FUNDEF WUNUSED NONNULL((1)) char const *NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) USER CHECKED byte_t *NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
+FUNDEF WUNUSED NONNULL((1, 2)) KERNEL byte_t *NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self, size_t *__restrict psize);
 
 
 struct module_sectinfo {

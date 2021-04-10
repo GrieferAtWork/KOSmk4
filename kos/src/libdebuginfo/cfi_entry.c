@@ -277,11 +277,11 @@ INTDEF char const secname_eh_frame[];
 INTDEF char const secname_debug_frame[];
 INTDEF char const secname_debug_addr[];
 
-#define LOAD_SECTION(sect, module_type, lv_start, lv_end)                             \
-	do {                                                                              \
-		size_t size;                                                                  \
-		(lv_start) = (byte_t const *)module_section_inflate(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                               \
+#define LOAD_SECTION(sect, module_type, lv_start, lv_end)                                \
+	do {                                                                                 \
+		size_t size;                                                                     \
+		(lv_start) = (byte_t const *)module_section_inflate_nx(sect, module_type, size); \
+		(lv_end)   = (lv_start) + size;                                                  \
 	}	__WHILE0
 
 

@@ -166,6 +166,61 @@ module_printpath_or_name(struct module *__restrict self,
 }
 
 
+
+/* Same as the functions above, but preserve the current exception, and return `NULL' on error. */
+PUBLIC WUNUSED NONNULL((1)) char const *
+NOTHROW(FCALL module_section_getname_nx)(struct module_section *__restrict self) {
+	char const *result;
+	NESTED_TRY {
+		result = module_section_getname(self);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
+PUBLIC WUNUSED NONNULL((1)) USER CHECKED byte_t *
+NOTHROW(FCALL module_section_getaddr_nx)(struct module_section *__restrict self) {
+	USER CHECKED byte_t *result;
+	NESTED_TRY {
+		result = module_section_getaddr(self);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
+PUBLIC WUNUSED NONNULL((1)) KERNEL byte_t *
+NOTHROW(FCALL module_section_getaddr_alias_nx)(struct module_section *__restrict self) {
+	KERNEL byte_t *result;
+	NESTED_TRY {
+		result = module_section_getaddr_alias(self);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
+PUBLIC WUNUSED NONNULL((1, 2)) KERNEL byte_t *
+NOTHROW(FCALL module_section_getaddr_inflate_nx)(struct module_section *__restrict self,
+                                                 size_t *__restrict psize) {
+	KERNEL byte_t *result;
+	NESTED_TRY {
+		result = module_section_getaddr_inflate(self, psize);
+	} EXCEPT {
+		*psize = 0;
+		result = NULL;
+	}
+	return result;
+}
+
+
+
+
+
+
+
+
 /* Whilst holding a lock to `mm', clear all  mnode->module
  * pointers that point to `self' by setting them to `NULL' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void

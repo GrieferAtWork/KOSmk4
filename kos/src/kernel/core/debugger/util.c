@@ -202,7 +202,7 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 	u8 normal_fgcolor = ANSITTY_CL_WHITE;
 	u8 inline_fgcolor = ANSITTY_CL_AQUA;
 #ifdef CONFIG_USE_NEW_DRIVER
-	if (!module_isdriver(ainfo->ds_mod)) {
+	if (ainfo->ds_mod && !module_isdriver(ainfo->ds_mod)) {
 		normal_fgcolor = ANSITTY_CL_OLIVE;
 		inline_fgcolor = ANSITTY_CL_TEAL;
 	}

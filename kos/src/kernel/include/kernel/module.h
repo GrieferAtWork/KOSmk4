@@ -30,26 +30,27 @@
 
 #include <hybrid/pp/__va_nargs.h>
 
-#define module_section_t                        struct module_section
-#define module_t                                struct module
-#define MODULE_TYPE_COUNT                       1
-#define _module_section_refcnt(self, typ)       (self)->ms_refcnt
-#define module_section_getudata(self, typ)      module_section_getaddr(self)
-#define module_section_getdata(self, typ)       module_section_getaddr_alias(self)
-#define module_section_getsize(self, typ)       (self)->ms_size
-#define module_section_getentsize(self, typ)    (self)->ms_entsize
-#define module_section_getlink(self, typ)       (self)->ms_link
-#define module_section_getinfo(self, typ)       (self)->ms_info
-#define module_section_getflags(self, typ)      (self)->ms_flags
-#define module_section_inflate(self, typ, size) module_section_getaddr_inflate(self, &(size))
-#define module_ataddr(addr, result_typ)         module_fromaddr(addr)
-#define module_ataddr_nx(addr, result_typ)      module_fromaddr_nx(addr)
-#define module_ataddr_nouser(addr)              ((struct module *)driver_fromaddr(addr))
-#define _module_refcnt(self, typ)               (self)->md_refcnt
-#define module_getloadaddr(self, typ)           (self)->md_loadaddr
-#define module_getloadstart(self, typ)          (uintptr_t)(self)->md_loadmin
-#define module_getloadend(self, typ)            (uintptr_t)((self)->md_loadmax + 1)
-#define module_mman(self, typ)                  (self)->md_mman
+#define module_section_t                           struct module_section
+#define module_t                                   struct module
+#define MODULE_TYPE_COUNT                          1
+#define _module_section_refcnt(self, typ)          (self)->ms_refcnt
+#define module_section_getudata(self, typ)         module_section_getaddr(self)
+#define module_section_getdata(self, typ)          module_section_getaddr_alias(self)
+#define module_section_getsize(self, typ)          (self)->ms_size
+#define module_section_getentsize(self, typ)       (self)->ms_entsize
+#define module_section_getlink(self, typ)          (self)->ms_link
+#define module_section_getinfo(self, typ)          (self)->ms_info
+#define module_section_getflags(self, typ)         (self)->ms_flags
+#define module_section_inflate(self, typ, size)    module_section_getaddr_inflate(self, &(size))
+#define module_section_inflate_nx(self, typ, size) module_section_getaddr_inflate_nx(self, &(size))
+#define module_ataddr(addr, result_typ)            module_fromaddr(addr)
+#define module_ataddr_nx(addr, result_typ)         module_fromaddr_nx(addr)
+#define module_ataddr_nouser(addr)                 ((struct module *)driver_fromaddr(addr))
+#define _module_refcnt(self, typ)                  (self)->md_refcnt
+#define module_getloadaddr(self, typ)              (self)->md_loadaddr
+#define module_getloadstart(self, typ)             (uintptr_t)(self)->md_loadmin
+#define module_getloadend(self, typ)               (uintptr_t)((self)->md_loadmax + 1)
+#define module_mman(self, typ)                     (self)->md_mman
 
 #define __PRIVATE_module_locksection_2                            (*(self)->md_ops->mo_locksection)(self, section_name)
 #define __PRIVATE_module_locksection_4(self, typ, name, flags)    (*(self)->md_ops->mo_locksection)(self, name)

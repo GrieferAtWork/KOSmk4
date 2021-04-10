@@ -158,9 +158,14 @@ __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
                                            __size_t *__psize);
 #endif /* !__dlinflatesection_defined && __CRT_HAVE_dlinflatesection */
 
-/* void *NOTHROW(module_section_inflate)(module_t *self, module_type_t typ, size_t &size); */
+/* void *module_section_inflate(module_t *self, module_type_t typ, size_t &size); */
 #ifdef __dlinflatesection_defined
 #define module_section_inflate(self, typ, size) dlinflatesection(self, &(size))
+#endif /* __dlinflatesection_defined */
+
+/* void *NOTHROW(module_section_inflate_nx)(module_t *self, module_type_t typ, size_t &size); */
+#ifdef __dlinflatesection_defined
+#define module_section_inflate_nx(self, typ, size) dlinflatesection(self, &(size))
 #endif /* __dlinflatesection_defined */
 
 
@@ -243,21 +248,37 @@ __DECL_END
 #ifdef __CC__
 /* Implement some (otherwise) user-space only operations for kernel-space. */
 #if (!defined(module_section_inflate) && \
-     (defined(module_section_getcdata_nx) && defined(module_section_getcsize)))
+     (defined(module_section_getcdata) && defined(module_section_getcsize)))
 __DECL_BEGIN
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
 __NOTHROW(__module_section_inflate_impl)(module_section_t *__restrict __self,
                                          __size_t *__restrict __size
                                          module_type__param(__typ)) {
 	void *__result;
-	__result = module_section_getcdata_nx(__self, __typ, 0);
+	__result = module_section_getcdata(__self, __typ, 0);
 	*__size  = module_section_getcsize(__self, __typ);
 	return __result;
 }
 __DECL_END
 #define module_section_inflate(self, typ, size) \
 	__module_section_inflate_impl(self, &(size)module_type__arg(typ))
-#endif /* !module_section_inflate && (module_section_getcdata_nx && module_section_getcsize) */
+#endif /* !module_section_inflate && (module_section_getcdata && module_section_getcsize) */
+#if (!defined(module_section_inflate_nx) && \
+     (defined(module_section_getcdata_nx) && defined(module_section_getcsize)))
+__DECL_BEGIN
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
+__NOTHROW(__module_section_inflate_nx_impl)(module_section_t *__restrict __self,
+                                            __size_t *__restrict __size
+                                            module_type__param(__typ)) {
+	void *__result;
+	__result = module_section_getcdata_nx(__self, __typ, 0);
+	*__size  = module_section_getcsize(__self, __typ);
+	return __result;
+}
+__DECL_END
+#define module_section_inflate_nx(self, typ, size) \
+	__module_section_inflate_nx_impl(self, &(size)module_type__arg(typ))
+#endif /* !module_section_inflate_nx && (module_section_getcdata_nx && module_section_getcsize) */
 
 #if (!defined(module_section_getudata) && defined(module_section_getdata))
 #define module_section_getudata(self, typ) module_section_getdata(self, typ)
