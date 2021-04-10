@@ -5366,7 +5366,7 @@ DBG_COMMAND(lsmod,
 		struct driver *d;
 		size_t temp;
 		d = ds->dll_drivers[i];
-		if (wasdestroyed(d))
+		if (wasdestroyed(d) || d == &kernel_driver)
 			continue; /* Dead driver... */
 		temp = strlen(d->d_name);
 		if (longest_name < temp)
@@ -5377,8 +5377,14 @@ DBG_COMMAND(lsmod,
 	}
 	if (longest_name > 24)
 		longest_name = 24;
-	if (longest_cmdl > 24)
-		longest_cmdl = 24;
+	{
+		unsigned int maxwidth;
+		maxwidth = dbg_screen_width - (longest_name + 4 + (3 * sizeof(void *) * 2));
+		if (longest_cmdl > maxwidth)
+			longest_cmdl = maxwidth;
+		if (longest_cmdl < 7)
+			longest_cmdl = 7;
+	}
 #if __SIZEOF_POINTER__ == 8
 	dbg_printf(DBGSTR("%-*s %-*s loadaddr         minaddr          maxaddr\n"),
 	           longest_name, DBGSTR("name"),
@@ -5392,7 +5398,7 @@ DBG_COMMAND(lsmod,
 		struct driver *d;
 		size_t temp;
 		d = ds->dll_drivers[i];
-		if (wasdestroyed(d))
+		if (wasdestroyed(d) || d == &kernel_driver)
 			continue; /* Dead driver... */
 		if (d->d_state >= DRIVER_STATE_KILL) {
 			/* Already finalized */
@@ -5414,6 +5420,16 @@ DBG_COMMAND(lsmod,
 		           d->d_module.md_loadmax);
 	}
 	decref_nokill(ds);
+	return 0;
+}
+
+DBG_COMMAND(cmdline,
+            "cmdline\n"
+            "\tPrint the kernel commandline (ala " AC_WHITE("/proc/cmdline") ")\n") {
+	cmdline_encode(&dbg_printer, NULL,
+	               kernel_driver.d_argc,
+	               kernel_driver.d_argv);
+	dbg_putc('\n');
 	return 0;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
