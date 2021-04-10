@@ -310,7 +310,10 @@ struct cmodule {
 #define cmodule_getloadstart(self) module_getloadstart((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_getloadend(self)   module_getloadend((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_mman(self)         module_mman((self)->cm_module, (self)->cm_modtyp)
-#if MODULE_TYPE_COUNT >= 2
+#ifdef CONFIG_USE_NEW_DRIVER
+#define cmodule_isuser(self) (!module_isdriver((self)->cm_module))
+#define cmodule_iskern(self) module_isdriver((self)->cm_module)
+#elif MODULE_TYPE_COUNT >= 2
 #define cmodule_isuser(self) ((self)->cm_modtyp == MODULE_TYPE_USRMOD)
 #define cmodule_iskern(self) ((self)->cm_modtyp == MODULE_TYPE_DRIVER)
 #elif defined(MODULE_TYPE_DRIVER)

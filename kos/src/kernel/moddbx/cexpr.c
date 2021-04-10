@@ -1362,12 +1362,7 @@ do_second_pass:
 		 * TLS address, since the one calculated by libunwind only works
 		 * for the kernel core and drivers (but not for userspace) */
 		if (emulator.ue_tlsbase != (byte_t *)-1 && mod &&
-#ifdef CONFIG_USE_NEW_DRIVER
-		    !module_isdriver(mod->cm_module) &&
-#else /* CONFIG_USE_NEW_DRIVER */
-		    mod->cm_modtyp == MODULE_TYPE_USRMOD &&
-#endif /* !CONFIG_USE_NEW_DRIVER */
-		    !second_pass) {
+		    cmodule_isuser(mod) && !second_pass) {
 			bool ok;
 			/* Calculate the TLS-base address for `mod' in the context of `dbg_current' */
 #ifdef CONFIG_USE_NEW_DRIVER
