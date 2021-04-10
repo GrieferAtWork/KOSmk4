@@ -996,18 +996,18 @@
 #define __IF1 if(1)
 #define __WHILE0 while(0)
 #define __WHILE1 while(1)
-#define likely(x) x
-#define unlikely(x) x
-#define __likely(x) x
-#define __unlikely(x) x
-#define __predict_true(x) x
-#define __predict_false(x) x
-#define likely_untraced(x) x
-#define unlikely_untraced(x) x
-#define __likely_untraced(x) x
-#define __unlikely_untraced(x) x
-#define untraced(x) x
-#define __untraced(x) x
+#define likely
+#define unlikely
+#define __likely
+#define __unlikely
+#define __predict_true
+#define __predict_false
+#define likely_untraced
+#define unlikely_untraced
+#define __likely_untraced
+#define __unlikely_untraced
+#define untraced
+#define __untraced
 
 #define TRY
 #define NESTED_TRY
@@ -1096,7 +1096,7 @@
 
 #define ELFW(x) ELF64_##x
 #define ElfW(x) Elf64_##x
-#define elfw(x) elf64_##x
+#define elfW(x) elf64_##x
 #define COMPAT_ElfW(x) Elf32_##x
 #define COMPAT_ELFW(x) ELF32_##x
 #define COMPAT_elfW(x) elf32_##x

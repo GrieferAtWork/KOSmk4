@@ -826,7 +826,7 @@ INTERN_FUNCTION(_start64)
 
 
 	/* Set the `%gs.base' (`THIS_TASK') register to point to `&_boottask'
-	 * Normally  we'd just use `wrgsbase' for this, however we havn't yet
+	 * Normally we'd just use `wrgsbase' for this, however we haven't yet
 	 * determined if that instruction even exists, so for now we have  to
 	 * use the associated MSR... */
 	movq   $(_boottask), %rdx

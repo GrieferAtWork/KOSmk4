@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/execabi.h>
-#include <kernel/vm.h>
+#include <kernel/mman/ramfile.h>
 
 DECL_BEGIN
 

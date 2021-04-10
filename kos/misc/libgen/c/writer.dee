@@ -627,7 +627,7 @@ dont_emit_branch:
 			goto done;
 		}
 		assert !ent.didWriteElse;
-		/* If we havn't yet written a #if branch, do so now */
+		/* If we haven't yet written a #if branch, do so now */
 		if (!ent.didWriteIf) {
 			ent.didWriteIf = true;
 			if (!m_IfdefDead) {

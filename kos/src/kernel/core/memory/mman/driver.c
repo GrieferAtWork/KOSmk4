@@ -483,7 +483,7 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			zlib_reader_fini(&reader);
 			if unlikely(error < 0)
 				THROW(E_INVALID_ARGUMENT);
-			/* clear all trailing data that could not be read. */
+			/* clear trailing data that could not be read. */
 			if (dst_size > (size_t)error) {
 				memset((byte_t *)dst_data + (size_t)error,
 				       0, dst_size - error);
@@ -683,21 +683,27 @@ PRIVATE ATTR_COLDDATA struct directory_entry kernel_driver_fsname = {
 	.de_fsdata   = {},
 	.de_pos      = 0,
 	.de_ino      = 0,
+#if __SIZEOF_POINTER__ == 8
+	.de_hash     = UINT64_C(0xe205ff2e0d3d550c),
+#elif __SIZEOF_POINTER__ == 4
+	.de_hash     = 0, /* TODO */
+#else /* __SIZEOF_POINTER__ == ... */
 	.de_hash     = 0,
+#endif /* __SIZEOF_POINTER__ != ... */
 	.de_namelen  = COMPILER_STRLEN(KERNEL_DRIVER_FILENAME),
 	.de_type     = DT_REG,
-	/* .de_name  = */ KERNEL_DRIVER_FILENAME
+	KERNEL_DRIVER_FILENAME
 };
 
 PUBLIC struct driver kernel_driver = {
 	.d_module = {
 		.md_refcnt     = 2,                         /* +1: kernel_driver, +1: d_state == DRIVER_STATE_LOADED */
 		.md_weakrefcnt = 2 + KERNEL_SECTIONS_COUNT, /* +1:md_refcnt != 0, +1:md_nodecount != 0, +N: KERNEL_SECTIONS_COUNT */
-		.md_nodecount  = 1, /* Any  non-zero value is  ok. `1' is perfect  here, since any mem-node
-		                     * that is apart  of the  kernel core must  never be  unmapped, and  by
-		                     * setting `1' here, anyone attempting to do so will cause this counter
-		                     * to  drop  to `0',  which in  turn will  invoke the  bad `mo_nonodes'
-		                     * callback and cause kernel panic! */
+		.md_nodecount  = 1, /* Any non-zero value is ok, but `1' is perfect here, since any mem-
+		                     * node that is apart of the kernel core must never be unmapped, and
+		                     * by setting `1' here, anyone attempting  to do so will cause  this
+		                     * counter to drop to `0', which in turn will invoke the  BADPONITER
+		                     * `mo_nonodes' callback and cause kernel panic! */
 		.md_ops        = &kernel_module_ops,
 		.md_mman       = &mman_kernel,
 		.md_loadaddr   = 0,
@@ -1029,6 +1035,12 @@ driver_dlsym_drv(struct driver *__restrict self,
 		}
 		if (arg_name[0] == '$') {
 			/* TODO */
+			/* TODO: extern bool     drv_arg$foo;         == ARG_EXISTS("foo") ? true : false */
+			/* TODO: extern char[]   drv_arg$foo$s;       == ARG_EXISTS("foo=$VALUE") ? "$VALUE" : strdup("") */
+			/* TODO: extern char[]   drv_arg$foo$s$bar;   == ARG_EXISTS("foo=$VALUE") ? "$VALUE" : strdup("bar") */
+			/* TODO: extern int      drv_arg$foo$d;       == ARG_EXISTS("foo=$VALUE") ? atoi("$VALUE") : 0 */
+			/* TODO: extern int      drv_arg$foo$d$42;    == ARG_EXISTS("foo=$VALUE") ? atoi("$VALUE") : atoi("42") */
+			/* TODO: extern uint32_t drv_arg$foo$I32u$42; == ARG_EXISTS("foo=$VALUE") ? atou32("$VALUE") : atou32("42") */
 		}
 	}
 	return false;
@@ -1128,109 +1140,111 @@ driver_dlsym_elf(struct driver *__restrict self,
                  struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...) {
 	ElfW(Sym) const *result;
+
 	/************************************************************************/
 	/* GNU hash table support                                               */
 	/************************************************************************/
-	{
+	if (self->d_gnuhashtab) {
+		/* This implementation is derived from:
+		 * https://flapenguin.me/2017/05/10/elf-lookup-dt-gnu-hash/
+		 * https://sourceware.org/ml/binutils/2006-10/msg00377.html
+		 */
 		ElfW(GnuHashTable) const *gnu_ht;
-		if ((gnu_ht = self->d_gnuhashtab) != NULL) {
-			/* This implementation is derived from:
-			 * https://flapenguin.me/2017/05/10/elf-lookup-dt-gnu-hash/
-			 * https://sourceware.org/ml/binutils/2006-10/msg00377.html
-			 */
-			ElfW(Word) symid, gh_symoffset;
-			ElfW(Word) const *gh_buckets;
-			ElfW(Word) const *gh_chains;
-			ElfW(Addr) bloom_word, bloom_mask;
-			uint32_t hash = info->dsi_gnuhash;
-			if (hash == (uint32_t)-1)
-				hash = info->dsi_gnuhash = gnu_symhash(info->dsi_name);
-			if unlikely(!gnu_ht->gh_bloom_size || !gnu_ht->gh_bloom_size)
-				goto nosym_no_gnu_ht;
-			gh_symoffset = gnu_ht->gh_symoffset;
-			gh_buckets   = (ElfW(Word) const *)(gnu_ht->gh_bloom + gnu_ht->gh_bloom_size);
-			gh_chains    = (ElfW(Word) const *)(gh_buckets + gnu_ht->gh_nbuckets);
-			bloom_word   = gnu_ht->gh_bloom[(hash / ELF_CLASSBITS) % gnu_ht->gh_bloom_size];
-			bloom_mask   = ((ElfW(Addr))1 << (hash % ELF_CLASSBITS)) |
-			               ((ElfW(Addr))1 << ((hash >> gnu_ht->gh_bloom_shift) % ELF_CLASSBITS));
-			if ((bloom_word & bloom_mask) != bloom_mask)
-				goto nosym;
-			symid = gh_buckets[hash % gnu_ht->gh_nbuckets];
-			if unlikely(symid < gh_symoffset)
-				goto nosym;
-			/* Search for the symbol. */
-			for (;; ++symid) {
-				ElfW(Word) enthash;
-				result  = self->d_dynsym_tab + symid;
-				enthash = gh_chains[symid - gh_symoffset];
-				if likely((hash | 1) == (enthash | 1)) {
-					if likely(strcmp(info->dsi_name, self->d_dynstr + result->st_name) == 0)
-						return result; /* Found it! */
-				}
-				if unlikely(enthash & 1)
-					break; /* End of chain */
-			}
+		ElfW(Word) symid, gh_symoffset;
+		ElfW(Word) const *gh_buckets;
+		ElfW(Word) const *gh_chains;
+		ElfW(Addr) bloom_word, bloom_mask;
+		uint32_t hash;
+		gnu_ht = self->d_gnuhashtab;
+		hash   = info->dsi_gnuhash;
+		if (hash == (uint32_t)-1)
+			hash = info->dsi_gnuhash = gnu_symhash(info->dsi_name);
+		if unlikely(!gnu_ht->gh_bloom_size || !gnu_ht->gh_bloom_size)
+			goto nosym_no_gnu_ht;
+		gh_symoffset = gnu_ht->gh_symoffset;
+		gh_buckets   = (ElfW(Word) const *)(gnu_ht->gh_bloom + gnu_ht->gh_bloom_size);
+		gh_chains    = (ElfW(Word) const *)(gh_buckets + gnu_ht->gh_nbuckets);
+		bloom_word   = gnu_ht->gh_bloom[(hash / ELF_CLASSBITS) % gnu_ht->gh_bloom_size];
+		bloom_mask   = ((ElfW(Addr))1 << (hash % ELF_CLASSBITS)) |
+		               ((ElfW(Addr))1 << ((hash >> gnu_ht->gh_bloom_shift) % ELF_CLASSBITS));
+		if ((bloom_word & bloom_mask) != bloom_mask)
 			goto nosym;
+		symid = gh_buckets[hash % gnu_ht->gh_nbuckets];
+		if unlikely(symid < gh_symoffset)
+			goto nosym;
+		/* Search for the symbol. */
+		for (;; ++symid) {
+			ElfW(Word) enthash;
+			result  = self->d_dynsym_tab + symid;
+			enthash = gh_chains[symid - gh_symoffset];
+			if likely((hash | 1) == (enthash | 1)) {
+				if likely(strcmp(info->dsi_name, self->d_dynstr + result->st_name) != 0)
+					return result; /* Found it! */
+			}
+			if unlikely(enthash & 1)
+				break; /* End of chain */
 		}
+		goto nosym;
 	}
 
-search_elf_table:
 	/************************************************************************/
 	/* ELF hash table support                                               */
 	/************************************************************************/
-	{
+search_elf_table:
+	if (self->d_hashtab) {
 		ElfW(HashTable) const *elf_ht;
-		if ((elf_ht = self->d_hashtab) != NULL) {
-			ElfW(Word) const *ht_chains;
-			ElfW(Word) max_attempts, chain;
-			uint32_t hash = info->dsi_elfhash;
-			if (hash == (uint32_t)-1)
-				hash = info->dsi_elfhash = elf_symhash(info->dsi_name);
-			if unlikely(!elf_ht->ht_nbuckts || !elf_ht->ht_nchains)
-				goto nosym_no_elf_ht;
-			max_attempts = elf_ht->ht_nchains;
-			ht_chains    = elf_ht->ht_table + elf_ht->ht_nbuckts;
-			chain        = elf_ht->ht_table[hash % elf_ht->ht_nbuckts];
-			do {
-				if unlikely(chain == STN_UNDEF)
-					break; /* End of chain. */
-				if unlikely(chain >= elf_ht->ht_nchains)
-					goto nosym_no_elf_ht; /* Corrupted hash-table */
-				result = self->d_dynsym_tab + chain;
-				if likely(strcmp(info->dsi_name, self->d_dynstr + result->st_name) == 0)
-					return result; /* Found it! */
-				/* Load the next chain entry. */
-				chain = ht_chains[chain];
-			} while likely(--max_attempts);
-			goto nosym;
-		}
+		ElfW(Word) const *ht_chains;
+		ElfW(Word) max_attempts, chain;
+		uint32_t hash;
+		elf_ht = self->d_hashtab;
+		hash   = info->dsi_elfhash;
+		if (hash == (uint32_t)-1)
+			hash = info->dsi_elfhash = elf_symhash(info->dsi_name);
+		if unlikely(!elf_ht->ht_nbuckts || !elf_ht->ht_nchains)
+			goto nosym_no_elf_ht;
+		max_attempts = elf_ht->ht_nchains;
+		ht_chains    = elf_ht->ht_table + elf_ht->ht_nbuckts;
+		chain        = elf_ht->ht_table[hash % elf_ht->ht_nbuckts];
+		do {
+			if unlikely(chain == STN_UNDEF)
+				break; /* End of chain. */
+			if unlikely(chain >= elf_ht->ht_nchains)
+				goto nosym_no_elf_ht; /* Corrupted hash-table */
+			result = self->d_dynsym_tab + chain;
+			if likely(strcmp(info->dsi_name, self->d_dynstr + result->st_name) == 0)
+				return result; /* Found it! */
+			/* Load the next chain entry. */
+			chain = ht_chains[chain];
+		} while likely(--max_attempts);
+		goto nosym;
 	}
 
-search_dynsym:
 	/************************************************************************/
 	/* Do a linear search over the symbol table.                            */
 	/************************************************************************/
-	{
+search_dynsym:
+	if (self->d_dynsym_tab) {
 		ElfW(Sym) const *dynsym;
-		if ((dynsym = self->d_dynsym_tab) != NULL) {
-			size_t i, dyncnt;
-			dyncnt = self->d_dynsym_cnt;
-			for (i = 0; i < dyncnt; ++i) {
-				char const *symname;
-				symname = self->d_dynstr + dynsym[i].st_name;
-				if (strcmp(info->dsi_name, symname) != 0)
-					continue;
-				/* Found it! */
-				return &dynsym[i];
-			}
+		size_t i, dyncnt;
+		dynsym = self->d_dynsym_tab;
+		dyncnt = self->d_dynsym_cnt;
+		for (i = 0; i < dyncnt; ++i) {
+			char const *symname;
+			symname = self->d_dynstr + dynsym[i].st_name;
+			if (strcmp(info->dsi_name, symname) != 0)
+				continue;
+			/* Found it! */
+			return &dynsym[i];
 		}
 	}
 nosym:
 	return NULL;
+
 nosym_no_gnu_ht:
 	print_corrupted_symbol_table_error_message(self, "GNU");
 	self->d_gnuhashtab = NULL;
 	goto search_elf_table;
+
 nosym_no_elf_ht:
 	print_corrupted_symbol_table_error_message(self, "ELF");
 	self->d_hashtab = NULL;

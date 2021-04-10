@@ -192,7 +192,7 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
 
 /* High-level wrapper for `mf_ops->mo_newpart' that automatically does
  * the  right  things when  `mf_ops->mo_newpart' hasn't  been defined.
- * This function doesn't  do any further  initialization that what  is
+ * This function doesn't  do any further  initialization than what  is
  * already described by `mf_ops->mo_newpart' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *FCALL
 _mfile_newpart(struct mfile *__restrict self,

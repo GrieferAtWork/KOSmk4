@@ -2186,7 +2186,7 @@ driver_local_symbol(struct driver *__restrict self,
 				ElfW(Word) enthash;
 				result  = self->d_dynsym_tab + symid;
 				enthash = gh_chains[symid - gh_symoffset];
-				if likely((hash | 1) == (enthash | 1)) {
+				if (likely((hash | 1) == (enthash | 1))) {
 					if likely(strcmp(name, self->d_dynstr + result->st_name) == 0)
 						return result; /* Found it! */
 				}

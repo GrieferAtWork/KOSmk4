@@ -123,7 +123,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 	 *       not dealing with VIO memory.
 	 *       Otherwise, debugging user-space programs becomes a
 	 *       chore since  we'd be  unable to  load lazy  memory
-	 *       mappings that havn't been accessed, yet. */
+	 *       mappings that haven't been accessed, yet. */
 	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {
 		error = memcpy_nopf(buf, addr, num_bytes);
 		if (unlikely(error != 0) && ALLOW_MANAGED_MEMORY_ACCESS()) {
@@ -206,7 +206,7 @@ NOTHROW(KCALL dbg_writememory)(void *addr,
 	 *       not dealing with VIO memory.
 	 *       Otherwise, debugging user-space programs becomes a
 	 *       chore since  we'd be  unable to  load lazy  memory
-	 *       mappings that havn't been accessed, yet. */
+	 *       mappings that haven't been accessed, yet. */
 	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {
 again_memcpy_nopf_kernel:
 		error = memcpy_nopf(addr, buf, num_bytes);

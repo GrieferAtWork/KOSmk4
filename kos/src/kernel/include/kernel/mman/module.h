@@ -290,7 +290,10 @@ NOTHROW(FCALL module_locksection_nx)(struct module *__restrict self, char const 
 
 
 #ifdef CONFIG_USE_NEW_DRIVER
-/* Check if a given module is actually a `struct driver' */
+/* Check if a given module is actually a `struct driver'
+ * Note  that when this is not the case, you are allowed
+ * to assume  that the  module represents  some sort  of
+ * user-space executable object. */
 #define module_isdriver(self) ((self)->md_ops->mo_free == &_driver_free)
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__restrict self) ASMNAME("driver_free");
 #endif /* CONFIG_USE_NEW_DRIVER */

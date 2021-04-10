@@ -3666,7 +3666,7 @@ again_skip_annotation_rbracket:
 
 		/* If the function isn't being exported from libc, then make sure
 		 * that certain attributes that would affect its export  behavior
-		 * havn't been set. */
+		 * haven't been set. */
 		if (currentFeatures.crt_noImpl) {
 			if (currentFeatures.crt_kosSection !== context.defaultFeatures.crt_kosSection ||
 			    currentFeatures.crt_dosSection !== context.defaultFeatures.crt_dosSection) {

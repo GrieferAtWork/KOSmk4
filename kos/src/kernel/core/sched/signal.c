@@ -177,7 +177,7 @@ NOTHROW(FCALL task_popconnections)(void) {
 	/* Make sure that no connections are left active. */
 	assertf(cons->tcs_con == NULL,
 	        "Cannot call `task_popconnections()' when you've still "
-	        "got connections that havn't been disconnected, yet\n"
+	        "got connections that haven't been disconnected, yet\n"
 	        "call `task_disconnectall()' first!");
 
 	/* Set the TLS pointer for the current set of connection to the old set. */

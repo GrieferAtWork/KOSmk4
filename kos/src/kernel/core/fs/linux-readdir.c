@@ -247,9 +247,9 @@ struct _readdir_buffer_finally_fini {
 private:
 	struct readdir_buffer *m_self;
 public:
-	inline _readdir_buffer_finally_fini(struct readdir_buffer *__restrict self) noexcept
+	ATTR_FORCEINLINE _readdir_buffer_finally_fini(struct readdir_buffer *__restrict self) noexcept
 	    : m_self(self) { }
-	inline ~_readdir_buffer_finally_fini() noexcept {
+	ATTR_FORCEINLINE ~_readdir_buffer_finally_fini() noexcept {
 		readdir_buffer_fini(m_self);
 	}
 };

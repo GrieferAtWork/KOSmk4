@@ -132,6 +132,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		panic_critical_thread_exited();
 		ATOMIC_AND(caller->t_flags, ~TASK_FCRITICAL);
 	}
+
 	/* Fill in the exit status */
 	if (pid)
 		ATOMIC_WRITE(pid->tp_status.w_status, w_status);

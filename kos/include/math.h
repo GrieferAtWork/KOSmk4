@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac31e930 */
+/* HASH CRC-32:0xe961f67c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10714,7 +10714,7 @@ enum {
 #endif /* ... */
 
 /* Figure out defaults for `float_t' and `double_t' if those
- * havn't already  been  defined  by  `<bits/crt/mathdef.h>' */
+ * haven't  already  been defined  by `<bits/crt/mathdef.h>' */
 #if !defined(__float_t) || !defined(__double_t)
 #if (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 2)
 #ifdef __COMPILER_HAVE_LONGDOUBLE

@@ -52,8 +52,6 @@
 
 #include <hybrid/align.h>
 
-#include <sys/mmio.h>
-
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -61,6 +59,14 @@
 #include <string.h>
 
 #include "include/obnote.h"
+
+/**/
+#include "../core/memory/mman/module-userelf.h"
+
+#ifndef ELF_ARCH_MAXSHSTRTAB_SIZ
+#define ELF_ARCH_MAXSHSTRTAB_SIZ 65536
+#endif /* !ELF_ARCH_MAXSHSTRTAB_SIZ */
+
 
 DECL_BEGIN
 
@@ -74,6 +80,21 @@ DECL_BEGIN
 #define PRINT(str)        DO(RAWPRINT(str))
 #define REPEAT(ch, count) DO(format_repeat(printer, arg, ch, count))
 #define PRINTF(...)       DO(format_printf(printer, arg, __VA_ARGS__))
+
+/* Touch at least 1 byte from every page within the given address range. */
+PRIVATE void KCALL
+readmem(void const *__restrict ptr, size_t num_bytes) {
+	if unlikely(!num_bytes)
+		return;
+	for (;;) {
+		__asm__ __volatile__("" : : "r" (*(byte_t const *)ptr));
+		if (num_bytes <= PAGESIZE)
+			break;
+		ptr = (byte_t const *)ptr + PAGESIZE;
+		num_bytes -= PAGESIZE;
+	}
+}
+
 
 PRIVATE ATTR_PURE WUNUSED bool KCALL verify_cpu(struct cpu *me) {
 	unsigned int i;
@@ -122,8 +143,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 			exec_namelen = dent->de_namelen;
 			if (exec_namelen > 16)
 				exec_namelen = 16;
-			peekb(exec_name);
-			peekb(exec_name + exec_namelen - 1);
+			readmem(exec_name, exec_namelen * sizeof(char));
 		}
 		pid = task_getrootpid_of_s(thread);
 		tid = task_getroottid_of_s(thread);
@@ -259,6 +279,7 @@ NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
 				module_name    = tail;
 			}
 		}
+		readmem(module_name, module_namelen * sizeof(char));
 	} EXCEPT {
 		goto badobj;
 	}
@@ -267,6 +288,19 @@ badobj:
 	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
 	return 0;
 }
+
+
+typedef void (FCALL *LPMODULE_OPERATOR_FREE)(struct module *__restrict self);
+PRIVATE LPMODULE_OPERATOR_FREE pdyn__userelf_module_free = (LPMODULE_OPERATOR_FREE)(void *)-1;
+
+PRIVATE NOBLOCK ATTR_PURE WUNUSED LPMODULE_OPERATOR_FREE
+NOTHROW(FCALL get__userelf_module_free)(void) {
+	if (pdyn__userelf_module_free == (LPMODULE_OPERATOR_FREE)(void *)-1)
+		*(void **)&pdyn__userelf_module_free = driver_dlsym_global("_userelf_module_free");
+	return pdyn__userelf_module_free;
+}
+
+
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
@@ -279,7 +313,6 @@ NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
 	size_t section_namelen;
 	TRY {
 		struct module *mod;
-		ElfW(Word) section_name_offset;
 		if (me->ms_refcnt == 0)
 			goto badobj;
 		if (!ADDR_ISKERN(me->ms_ops))
@@ -299,11 +332,15 @@ NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
 			section_name    = "?";
 			section_namelen = 1;
 		} else {
-			if (!ADDR_ISKERN(mod->md_ops))
+			struct module_ops const *ops;
+			ops = mod->md_ops;
+			if (!ADDR_ISKERN(ops))
 				goto badobj;
-			if (mod->md_ops->mo_free == &_driver_free) {
+			if (ops->mo_free == &_driver_free) {
 				struct driver *drv;
 				struct driver_section *sect;
+				ElfW(Word) section_name_offset;
+				ElfW(Shdr) *drv_shend;
 				drv         = (struct driver *)mod;
 				sect        = (struct driver_section *)me;
 				module_name = drv->d_name;
@@ -312,12 +349,12 @@ NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
 				module_namelen = strlen(module_name);
 				if (!ADDR_ISKERN(drv->d_shdr))
 					goto badobj;
-				if (!ADDR_ISKERN(drv->d_shdr + drv->d_shnum))
+				drv_shend = drv->d_shdr + drv->d_shnum;
+				if (!ADDR_ISKERN(drv_shend))
 					goto badobj;
-				if (drv->d_shdr < (drv->d_shdr + drv->d_shnum))
+				if (!(drv->d_shdr < drv_shend))
 					goto badobj;
-				if (sect->ds_shdr < drv->d_shdr ||
-				    sect->ds_shdr >= drv->d_shdr + drv->d_shnum)
+				if (!(sect->ds_shdr >= drv->d_shdr && sect->ds_shdr < drv_shend))
 					goto badobj;
 				section_name_offset = sect->ds_shdr->sh_name;
 				if (!ADDR_ISKERN(drv->d_shstrtab))
@@ -345,6 +382,9 @@ NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
 						module_name    = tail;
 					}
 				}
+				section_name    = "?";
+				section_namelen = 1;
+
 				/* We  can't safely invoke the `ms_getname' operator,
 				 * since the section/module  may be  corrupt in  some
 				 * way which we cannot forsee, in which case we  must
@@ -357,12 +397,44 @@ NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
 					section_name = "?";
 				section_namelen = strlen(section_name);
 #else
-				/* TODO: Support for `userelf_module_section' names! */
-				section_name    = "?";
-				section_namelen = 1;
+				/* Support for `userelf_module_section' names! */
+				if (ops->mo_free == get__userelf_module_free()) {
+					struct userelf_module *ue_mod;
+					struct userelf_module_section *ue_sct;
+					ue_mod = (struct userelf_module *)mod;
+					ue_sct = (struct userelf_module_section *)me;
+					if (UM_any(ue_mod->um_shdrs) && ue_mod->um_shstrtab) {
+						size_t sizeof_ElfW_Shdr, shstrtab_siz;
+						uintptr_t sh_name;
+						sizeof_ElfW_Shdr = UM_sizeof(ue_mod, UM_ElfW_Shdr);
+						if ((byte_t const *)ue_sct->ums_shdr < (byte_t const *)UM_any(ue_mod->um_shdrs) ||
+						    (byte_t const *)ue_sct->ums_shdr >= ((byte_t const *)UM_any(ue_mod->um_shdrs) +
+						                                         (size_t)ue_mod->um_shnum * sizeof_ElfW_Shdr))
+							goto badobj;
+						if ((((byte_t const *)ue_sct->ums_shdr -
+						      (byte_t const *)UM_any(ue_mod->um_shdrs)) %
+						     sizeof_ElfW_Shdr) != 0)
+							goto badobj;
+						if (!ADDR_ISKERN(ue_mod->um_shstrtab))
+							goto badobj;
+						if (ue_mod->um_shstrndx >= ue_mod->um_shnum)
+							goto badobj;
+						sh_name      = UM_field(ue_mod, *ue_sct->ums_shdr, .sh_name);
+						shstrtab_siz = UM_field(ue_mod, ue_mod->um_shdrs, [ue_mod->um_shstrndx].sh_size);
+						if (shstrtab_siz > ELF_ARCH_MAXSHSTRTAB_SIZ)
+							goto badobj;
+						if (sh_name >= shstrtab_siz)
+							goto badobj;
+						/* Extract the name from the section string table. */
+						section_name    = ue_mod->um_shstrtab + sh_name;
+						section_namelen = strnlen(section_name, shstrtab_siz - sh_name);
+					}
+				}
 #endif
 			}
 		}
+		readmem(module_name, module_namelen * sizeof(char));
+		readmem(section_name, section_namelen * sizeof(char));
 	} EXCEPT {
 		goto badobj;
 	}
@@ -479,10 +551,7 @@ NOTHROW(KCALL note_usermod)(pformatprinter printer, void *arg,
 			usermod_namelen = me->um_fsname->de_namelen;
 			if (usermod_namelen > 16)
 				usermod_namelen = 16;
-			if (usermod_namelen) {
-				peekb(usermod_name);
-				peekb(usermod_name + usermod_namelen - 1);
-			}
+			readmem(usermod_name, usermod_namelen * sizeof(char));
 		}
 	} EXCEPT {
 		goto badobj;
@@ -506,14 +575,15 @@ NOTHROW(KCALL note_directory_entry)(pformatprinter printer, void *arg,
 	TRY {
 		if (me->de_refcnt == 0)
 			goto badobj;
-		if (me->de_heapsize < offsetof(struct directory_entry, de_name) +
-		                      (me->de_namelen + 1) * sizeof(char))
-			goto badobj;
 		dent_name    = me->de_name;
 		dent_namelen = me->de_namelen;
+		if (me->de_heapsize < offsetof(struct directory_entry, de_name) +
+		                      (dent_namelen + 1) * sizeof(char))
+			goto badobj;
 		dent_type    = me->de_type;
 		if (me->de_hash != directory_entry_hash(dent_name, dent_namelen))
 			goto badobj;
+		readmem(dent_name, dent_namelen * sizeof(char));
 		/* TODO: Verify  `dent_type',  and  print  its  name.
 		 *       as  `reg'  for `DT_REG',  etc...,  such that
 		 *       the actual string printed is something like:
@@ -544,8 +614,7 @@ NOTHROW(KCALL note_character_device)(pformatprinter printer, void *arg,
 			goto badobj;
 		dev_name    = me->cd_name;
 		dev_namelen = strnlen(me->cd_name, COMPILER_LENOF(me->cd_name));
-		peekb(dev_name);
-		peekb(dev_name + dev_namelen - 1);
+		readmem(dev_name, dev_namelen * sizeof(char));
 	} EXCEPT {
 		goto badobj;
 	}
@@ -569,8 +638,7 @@ NOTHROW(KCALL note_block_device)(pformatprinter printer, void *arg,
 			goto badobj;
 		dev_name    = me->bd_name;
 		dev_namelen = strnlen(me->bd_name, COMPILER_LENOF(me->bd_name));
-		peekb(dev_name);
-		peekb(dev_name + dev_namelen - 1);
+		readmem(dev_name, dev_namelen * sizeof(char));
 	} EXCEPT {
 		goto badobj;
 	}

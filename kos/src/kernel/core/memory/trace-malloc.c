@@ -770,8 +770,8 @@ again:
 }
 #endif /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */
 
-/* Validate that headers/footers of data blocks returned by kmalloc() havn't
- * been modified (which can accidentally happen as the result of programming
+/* Validate that headers/footers of data blocks returned by kmalloc() haven't
+ * been  modified (which can accidentally happen as the result of programming
  * errors, such as array over-/under-runs)
  * If inconsistencies are found, the kernel will panic.
  * s.a.  `heap_validate()'  and   `heap_validate_all()' */

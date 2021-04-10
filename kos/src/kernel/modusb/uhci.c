@@ -1148,8 +1148,8 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 		 * more completed queues to be found, since that would imply that
 		 * our current queue would have also been completed! */
 		if (td->td_lp & UHCI_TDLP_DBS) {
-			/* Depth-first -> Later QHs havn't been touched, yet
-			 * As such,  skip  all  the way  to  the  very  end. */
+			/* Depth-first  -> Later QHs haven't been touched,
+			 * yet. As such, skip all the way to the very end. */
 			while (ui->ui_reg.ife_next)
 				ui = ui->ui_reg.ife_next;
 		}
@@ -1389,7 +1389,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 		 * more completed queues to be found, since that would imply that
 		 * our current queue would have also been completed! */
 		if (td->td_lp & UHCI_TDLP_DBS)
-			break; /* Depth-first -> Later QHs havn't been touched, yet */
+			break; /* Depth-first -> Later QHs haven't been touched, yet */
 		piter = &iter->qh_next;
 	}
 }

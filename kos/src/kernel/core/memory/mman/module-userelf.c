@@ -35,6 +35,7 @@
 #include <debugger/rt.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/execabi.h> /* execabi_system_rtld_file, compat_execabi_system_rtld_file */
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>
@@ -44,6 +45,7 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
+#include <kernel/mman/ramfile.h> /* `struct mramfile' */
 #include <sched/lockop.h>
 
 #include <hybrid/align.h>
@@ -86,10 +88,14 @@
 #define ELF_ARCH_MAXSHCOUNT 128
 #endif /* !ELF_ARCH_MAXSHCOUNT */
 
+#ifndef ELF_ARCH_MAXSHSTRTAB_SIZ
+#define ELF_ARCH_MAXSHSTRTAB_SIZ 65536
+#endif /* !ELF_ARCH_MAXSHSTRTAB_SIZ */
+
 DECL_BEGIN
 
 /************************************************************************/
-PRIVATE /*ATTR_RETNONNULL*/ NONNULL((1)) UM_ElfW_ShdrP FCALL
+PRIVATE NONNULL((1)) UM_ElfW_ShdrP FCALL
 uem_shdrs(struct userelf_module *__restrict self) {
 	UM_ElfW_ShdrP result;
 	size_t shsize;
@@ -102,8 +108,10 @@ uem_shdrs(struct userelf_module *__restrict self) {
 		mfile_readall(self->md_file, UM_any(result),
 		              shsize, self->um_shoff);
 #else /* CONFIG_USE_NEW_FS */
-		if (!vm_datablock_isinode(self->md_file))
-			THROW(E_INVALID_ARGUMENT);
+		if (!vm_datablock_isinode(self->md_file)) {
+			UM_any(result) = NULL;
+			return result;
+		}
 		inode_readallk((struct inode *)self->md_file,
 		               UM_any(result), shsize,
 		               self->um_shoff);
@@ -131,6 +139,8 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 	shstrtab     = (UM_ElfW_Shdr *)UM_field_ptr(self, shdrs, [self->um_shstrndx]);
 	shstrtab_pos = (pos_t)UM_field(self, *shstrtab, .sh_offset);
 	shstrtab_siz = UM_field(self, *shstrtab, .sh_size);
+	if unlikely(shstrtab_siz > ELF_ARCH_MAXSHSTRTAB_SIZ)
+		return NULL;
 	shstrtab_str = (char *)kmalloc((shstrtab_siz + 1) * sizeof(char), GFP_PREFLT);
 	TRY {
 #ifdef CONFIG_USE_NEW_FS
@@ -138,7 +148,7 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 		              shstrtab_siz, shstrtab_pos);
 #else /* CONFIG_USE_NEW_FS */
 		if (!vm_datablock_isinode(self->md_file))
-			THROW(E_INVALID_ARGUMENT);
+			return NULL;
 		inode_readallk((struct inode *)self->md_file,
 		               shstrtab_str, shstrtab_siz,
 		               shstrtab_pos);
@@ -386,6 +396,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 }
 
 /* UserELF module operators */
+DEFINE_PUBLIC_ALIAS(_userelf_module_free, uem_free); /* Needed by `moddbx' to identify UserELF modules! */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL uem_free)(struct userelf_module *__restrict self) {
 	kfree(self);
@@ -668,6 +679,8 @@ uem_locksection_index(struct userelf_module *__restrict self,
 	if unlikely(section_index >= self->um_shnum)
 		return NULL;
 	shdrs = uem_shdrs(self);
+	if unlikely(!UM_any(shdrs))
+		return NULL;
 	return uem_locksection_index_impl(self, (UM_ElfW_Shdr *)UM_field_ptr(self, shdrs, [section_index]),
 	                                  (uint16_t)section_index);
 }
@@ -681,6 +694,8 @@ uem_sectinfo(struct userelf_module *__restrict self,
 	bool allow_section_end_pointers;
 	allow_section_end_pointers = false;
 	shdrs = uem_shdrs(self);
+	if unlikely(!UM_any(shdrs))
+		return false;
 again:
 	for (i = 0; i < self->um_shnum; ++i) {
 		char *shstrtab;
@@ -1429,6 +1444,22 @@ uem_trycreate(struct mman *__restrict self,
 		return NULL;
 	}
 
+	/* Deal with the special RTLD files. (that are mapped by the
+	 * kernel, but are also expected to exist on-disk  alongside
+	 * all of the other, regular libraries) */
+	if (file == &execabi_system_rtld_file.mrf_file) {
+		/* TODO: Special handling for /lib[64]/libdl.so */
+		mpart_lock_release(part);
+		return NULL;
+	}
+#ifdef __ARCH_HAVE_COMPAT
+	if (file == &compat_execabi_system_rtld_file.mrf_file) {
+		/* TODO: Special handling for /lib/libdl.so */
+		mpart_lock_release(part);
+		return NULL;
+	}
+#endif /* __ARCH_HAVE_COMPAT */
+
 #ifndef CONFIG_USE_NEW_FS
 	if (!vm_datablock_isinode(file)) {
 		mpart_lock_release(part);
@@ -1449,8 +1480,6 @@ uem_trycreate(struct mman *__restrict self,
 		node_fpos = mnode_getfileaddr(node);
 		mpart_lock_release(part);
 		mman_lock_release(self);
-
-		/* TODO: Special handling for /lib/libdl.so (and its compat-counterpart!) */
 
 		/* Try to create a new UserELF module! */
 		FINALLY_DECREF_UNLIKELY(file);

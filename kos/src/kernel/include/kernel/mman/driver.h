@@ -44,27 +44,24 @@
 DECL_BEGIN
 
 
-/*
- * Special, per-driver symbols:
+/* Special, per-driver symbols:
  *
  *   - extern struct driver drv_self;         // Current driver
- *   - extern byte_t[]      drv_loadaddr;     // == drv_self.md_loadaddr
- *   - extern byte_t[]      drv_loadmin;      // == drv_self.md_loadmin
- *   - extern byte_t[]      drv_loadmax;      // == drv_self.md_loadmax
- *   - extern char const[]  drv_name;         // == drv_self.d_name
- *   - extern struct mfile* drv_file;         // == driver_getfile(self)
- *   - extern char[]        drv_cmdline;      // == drv_self.d_cmdline
+ *   - extern byte_t        drv_loadaddr[];   // == drv_self.md_loadaddr
+ *   - extern byte_t        drv_loadmin[];    // == drv_self.md_loadmin
+ *   - extern byte_t        drv_loadmax[];    // == drv_self.md_loadmax
+ *   - extern char const    drv_name[];       // == drv_self.d_name
+ *   - extern struct mfile *drv_file;         // == driver_getfile(self)
+ *   - extern char          drv_cmdline[];    // == drv_self.d_cmdline
  *   - extern size_t        drv_argc;         // == &drv_self.d_argc
- *   - extern char*[]       drv_argv;         // == drv_self.d_argv
+ *   - extern char         *drv_argv[];       // == drv_self.d_argv
  *
- * TODO: extern bool     drv_arg$foo;         == ARG_EXISTS("foo") ? true : false
- * TODO: extern char*    drv_arg$foo$s;       == ARG_EXISTS("foo=$VALUE") ? "$VALUE" : NULL
- * TODO: extern char[]   drv_arg$foo$S;       == ARG_EXISTS("foo=$VALUE") ? "$VALUE" : ""
- * TODO: extern int      drv_arg$foo$d;       == ARG_EXISTS("foo=$VALUE") ? atoi("$VALUE") : 0
- * TODO: extern int      drv_arg$foo$d$42;    == ARG_EXISTS("foo=$VALUE") ? atoi("$VALUE") : atoi("42")
- * TODO: extern uint32_t drv_arg$foo$I32u$42; == ARG_EXISTS("foo=$VALUE") ? atou32("$VALUE") : atou32("42")
- *
- */
+ * These symbols can be referenced from inside of drivers  just
+ * like any other symbol can be, and will be resolved to  point
+ * at the relevant address as relocations are performed for the
+ * associated driver.
+ * As such, these symbols are useful for static initialization
+ * of control structures. */
 
 
 struct mfile;
@@ -284,7 +281,7 @@ struct driver
 	 *    - d_module.md_loadmin
 	 *    - d_module.md_loadmax
 	 *    - d_module.md_sizeof_pointer
-	 *    - d_state                     (will eventually be set to `DRIVER_STATE_DEAD')
+	 *    - d_state                     (Either `DRIVER_STATE_DEAD' or `DRIVER_STATE_KILL')
 	 * All other fields must be considered as `[valid_if(!wasdestroyed(self))]',
 	 * and may no longer be accessed after that point in time! Additionally, the
 	 * driver should be skipped if encountered in driver load-lists! */
@@ -543,8 +540,8 @@ FUNDEF WUNUSED NONNULL((1)) void *FCALL driver_dlsym_global_f(USER CHECKED char 
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF WUNUSED NONNULL((1)) void *FCALL driver_dlsym_local(struct driver *__restrict self, USER CHECKED char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_local_f");
-FUNDEF WUNUSED NONNULL((1)) void *FCALL driver_dlsym(struct driver *__restrict self, USER CHECKED char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_f");
 FUNDEF WUNUSED NONNULL((1)) void *FCALL driver_dlsym_global(USER CHECKED char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_global_f");
+FUNDEF WUNUSED NONNULL((1)) void *FCALL driver_dlsym(struct driver *__restrict self, USER CHECKED char const *name) THROWS(E_SEGFAULT, ...) ASMNAME("driver_dlsym_f");
 } /* extern "C++" */
 #endif /* __cplusplus */
 

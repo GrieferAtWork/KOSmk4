@@ -646,6 +646,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     - Properly implement libc's regex functions
 	 */
 
+	/* TODO: Refactor:
+	 *   - _bootcpu  --> bootcpu
+	 *   - _bootidle --> bootidle
+	 *   - _boottask --> boottask
+	 */
+
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
 assert.expr: "count == 0"

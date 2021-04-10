@@ -435,8 +435,8 @@ FUNDEF NOBLOCK size_t
 NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
                                  pid_t *p_alloc_roottid);
 
-/* Validate that headers/footers of data blocks returned by kmalloc() havn't
- * been modified (which can accidentally happen as the result of programming
+/* Validate that headers/footers of data blocks returned by kmalloc() haven't
+ * been  modified (which can accidentally happen as the result of programming
  * errors, such as array over-/under-runs)
  * If inconsistencies are found, the kernel will panic.
  * s.a.  `heap_validate()'  and   `heap_validate_all()' */

@@ -22,12 +22,15 @@
 
 #include <kernel/compiler.h>
 
+#ifdef CONFIG_BUILDING_KERNEL_CORE
 #undef CONFIG_HAVE_USERELF_MODULES
 #if 1
 #define CONFIG_HAVE_USERELF_MODULES 1
 #endif
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
-#ifdef CONFIG_HAVE_USERELF_MODULES
+
+#if (defined(CONFIG_HAVE_USERELF_MODULES) || !defined(CONFIG_BUILDING_KERNEL_CORE))
 #include <kernel/mman/module.h>
 #include <sched/lockop.h>
 
@@ -116,6 +119,8 @@ struct userelf_module: module {
 	COMPILER_FLEXIBLE_ARRAY(struct uems_awref, um_sections); /* [0..1][lock(WRITE_ONCE)][ue_shnum] Section cache. */
 };
 
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
 /* Operator tables for userelf module objects. */
 INTDEF struct module_section_ops const uems_ops;
 INTDEF struct module_ops const uem_ops;
@@ -140,8 +145,9 @@ INTDEF WUNUSED NONNULL((1, 3)) bool FCALL uem_sectinfo(struct userelf_module *__
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
 INTDEF WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_next(struct mman *__restrict self, struct module *__restrict prev);
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 DECL_END
-#endif /* CONFIG_HAVE_USERELF_MODULES */
+#endif /* CONFIG_HAVE_USERELF_MODULES || !CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MODULE_USERELF_H */
