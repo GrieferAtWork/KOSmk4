@@ -49,7 +49,7 @@ DECL_BEGIN
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
  *       and will pass that value onto `mfile_alloc_physmem()'! */
-PUBLIC NONNULL((1)) void KCALL
+PUBLIC NONNULL((1)) void FCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages)
 		THROWS(E_BADALLOC) {
@@ -154,7 +154,7 @@ err_nophys:
 /* Free backing memory using `page_free()'.  When an mchunkvec was  used,
  * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL mpart_ll_freemem)(struct mpart *__restrict self) {
+NOTHROW(FCALL mpart_ll_freemem)(struct mpart *__restrict self) {
 	if (self->mp_state == MPART_ST_MEM) {
 		page_free(self->mp_mem.mc_start,
 		          self->mp_mem.mc_size);
@@ -172,7 +172,7 @@ NOTHROW(KCALL mpart_ll_freemem)(struct mpart *__restrict self) {
 /* Free backing memory using `page_ccfree()'. When an mchunkvec was used,
  * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self) {
+NOTHROW(FCALL mpart_ll_ccfreemem)(struct mpart *__restrict self) {
 	if (self->mp_state == MPART_ST_MEM) {
 		page_ccfree(self->mp_mem.mc_start,
 		            self->mp_mem.mc_size);
@@ -187,8 +187,13 @@ NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self) {
 	}
 }
 
-
-
 DECL_END
+
+#ifndef __INTELLISENSE__
+#define DEFINE_mpart_ll_writemem
+#include "mpart-ll-rw.c.inl"
+#define DEFINE_mpart_ll_bzeromemcc
+#include "mpart-ll-rw.c.inl"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_LL_C */

@@ -545,6 +545,65 @@ NOTHROW(KCALL memsetphys)(PHYS physaddr_t dst, int byte, size_t num_bytes) {
 	});
 }
 
+/* Same as `memsetphys(dst, 0, num_bytes)', but includes a special optimization
+ * where it will skip whole  physical pages when `page_iszero()' returns  true. */
+PUBLIC NOBLOCK void
+NOTHROW(KCALL bzerophyscc)(PHYS physaddr_t dst, size_t num_bytes) {
+	PHYS_VARS;
+	byte_t *map;
+	physpage_t page;
+	size_t missing_bytes;
+#ifndef NO_PHYS_IDENTITY
+again:
+#endif /* !NO_PHYS_IDENTITY */
+	for (;;) {
+		page = physaddr2page(dst);
+		if (!page_iszero(page))
+			break; /* Must zero-initialize bytes from this page! */
+		missing_bytes = PAGESIZE - ((uintptr_t)dst & PAGEMASK);
+		if (missing_bytes >= num_bytes)
+			return; /* Everything's already zero-initialized! */
+		dst += missing_bytes;
+		num_bytes -= missing_bytes;
+	}
+	missing_bytes = PAGESIZE - ((uintptr_t)dst & PAGEMASK);
+	if (missing_bytes > num_bytes)
+		missing_bytes = num_bytes;
+#ifndef NO_PHYS_IDENTITY
+	IF_PHYS_IDENTITY(dst, missing_bytes, {
+		bzero(PHYS_TO_IDENTITY(dst), missing_bytes);
+		dst += missing_bytes;
+		num_bytes -= missing_bytes;
+		goto again;
+	});
+#endif /* !NO_PHYS_IDENTITY */
+	map = phys_pushaddr(dst);
+	bzero(map, missing_bytes);
+	dst += missing_bytes;
+	num_bytes -= missing_bytes;
+	while (num_bytes) {
+		/* Must bzero() more pages (note that `dst' is now page-aligned!) */
+		page = physaddr2page(dst);
+		if (page_iszero(page)) {
+			if (num_bytes <= PAGESIZE)
+				break; /* done! */
+		} else {
+			map = phys_loadpage(dst);
+			if (num_bytes <= PAGESIZE) {
+				/* Clear the remainder of the request */
+				bzero(map, num_bytes);
+				break;
+			}
+			/* Clear a whole n'other page! */
+			bzero(map, PAGESIZE);
+		}
+		dst += PAGESIZE;
+		num_bytes -= PAGESIZE;
+	}
+	phys_pop();
+}
+
+
 /* no-#PF variants of `copy(from|to)phys()'.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.

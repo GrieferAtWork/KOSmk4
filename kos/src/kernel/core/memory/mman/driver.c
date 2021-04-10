@@ -42,6 +42,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/cache.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
@@ -61,6 +62,7 @@
 #include <kernel/vboxgdb.h>
 #include <sched/signal.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
@@ -74,6 +76,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <elf.h>
+#include <inttypes.h>
 #include <malloca.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -1301,7 +1304,7 @@ driver_dlsym_local(struct driver *__restrict self,
 	/* Do a generic ELF .dynsym lookup. */
 	symbol = driver_dlsym_elf(self, info);
 	if (symbol && symbol->st_shndx != SHN_UNDEF) {
-		uintptr_t st_addr;
+		ElfW(Addr) st_addr;
 		unsigned char st_info;
 		st_info = ATOMIC_READ(symbol->st_info);
 		if (ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC ||
@@ -1320,7 +1323,7 @@ driver_dlsym_local(struct driver *__restrict self,
 				st_addr += self->d_module.md_loadaddr;
 
 			/* Resolve dynamic address. */
-			st_addr = (*(uintptr_t(*)(void))st_addr)();
+			st_addr = (*(ElfW(Addr)(*)(void))(void *)st_addr)();
 
 			/* Write-back the resolved address, and change
 			 * the typing of  the symbol to  no longer  be
@@ -1332,11 +1335,12 @@ driver_dlsym_local(struct driver *__restrict self,
 			                        ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC
 			                        ? STT_FUNC
 			                        : STT_OBJECT);
-			driver_isym_acquire();
+
 			/* Check if we're still dealing with an indirect symbol.
 			 * if that's no longer the case, then we must abort, and
 			 * discard the results we got from calling the  indirect
 			 * function! */
+			driver_isym_acquire();
 			st_info = symbol->st_info;
 			if unlikely(ELFW(ST_TYPE)(st_info) != STT_GNU_IFUNC &&
 			            ELFW(ST_TYPE)(st_info) != STT_KOS_IDATA) {
@@ -1355,8 +1359,9 @@ driver_dlsym_local(struct driver *__restrict self,
 			copy_to_phys_of_virt(&symbol->st_info, &newinfo, sizeof(symbol->st_info));
 			COMPILER_BARRIER();
 			driver_isym_release();
-			/* XXX: If doing a pagedir-sync really enough here? */
-			mman_supersync((void *)symbol, sizeof(*symbol));
+			/* XXX: Do we need to do some explicit cache flushing here? */
+			/* XXX: Why not just temporarily try to remap the pagedir for write?
+			 *      Then we  can just  write to  the normal  virtual  address... */
 		} else {
 normal_symbol:
 			st_addr = symbol->st_value;
@@ -1900,8 +1905,7 @@ NOTHROW(FCALL driver_runstate_fini_deps)(struct driver *__restrict self) {
 	 * driver's state being `!= DRIVER_STATE_KILL'. */
 	ATOMIC_WRITE(self->d_state, DRIVER_STATE_KILL);
 	decref_nokill(self);
-
-	sig_broadcast(&driver_state_changed);
+	sig_broadcast(driver_changesignal(self));
 }
 
 
@@ -1959,26 +1963,13 @@ driver_runstate_init_deps(struct driver *__restrict self) {
 
 
 /* Initialize driver relocations, but stop if the driver's state is altered. */
-PRIVATE NONNULL((1)) bool FCALL
+PRIVATE NONNULL((1)) void FCALL
 driver_runstate_init_relo(struct driver *__restrict self) {
 	/* TODO */
 }
 
 
 typedef void (*driver_initfini_t)(int argc, char *argv[]);
-struct driver_constructor_info {
-	driver_initfini_t  dci_init;             /* [0..1] Initializer callback */
-	driver_initfini_t *dci_init_array;       /* [1..1][dci_fini_array_sz] Constructors. */
-	size_t             dci_init_array_sz;    /* # of constructors. */
-	driver_initfini_t *dci_preinit_array;    /* [1..1][dci_fini_array_sz] Pre-constructors. */
-	size_t             dci_preinit_array_sz; /* # of pre-constructors. */
-};
-struct driver_destructor_info {
-	driver_initfini_t  ddi_fini;          /* [0..1] Finalizer callback */
-	driver_initfini_t *ddi_fini_array;    /* [1..1][ddi_fini_array_sz] Destructors. */
-	size_t             ddi_fini_array_sz; /* # of destructors. */
-};
-
 struct driver_initfini_savestate {
 	pflag_t difss_preemption; /* Saved preemption state. */
 	inline driver_initfini_savestate() noexcept
@@ -1988,216 +1979,222 @@ struct driver_initfini_savestate {
 	}
 };
 
-PRIVATE NONNULL((1, 3)) void FCALL
-run_driver_initfini_cb(struct driver *__restrict self,
-                       driver_initfini_t cb, char const *__restrict kind) {
-	if unlikely(*(void **)&cb < self->d_module.md_loadmin ||
-	            *(void **)&cb > self->d_module.md_loadmax) {
-		printk(KERN_ERR "[mod] Bad %s-function in driver %q (%p is out-of-bounds of %p...%p, loadaddr:%p)\n",
-		       kind, self->d_name, cb, self->d_module.md_loadmin, self->d_module.md_loadmax, self->d_module.md_loadaddr);
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC,
-		                       (uintptr_t)(void *)cb - self->d_module.md_loadaddr);
-	} else {
-		/* Preserve a couple of thread context variables when invoking an init/fini function. */
-		struct driver_initfini_savestate savestate;
-		/* Invoke the actual function. */
-		(*cb)(self->d_argc, self->d_argv);
-	}
-}
 
-PRIVATE NOBLOCK NONNULL((1, 4)) void
-NOTHROW(FCALL log_bad_initfini_vector)(struct driver *__restrict self,
-                                       driver_initfini_t *vector,
-                                       size_t count, char const *__restrict kind) {
-	printk(KERN_ERR "[mod] Bad %s-function-vector in driver %q "
-	                "(%p...%p is out-of-bounds of %p...%p, loadaddr:%p)\n",
-	       kind, self->d_name, (void *)(vector), (byte_t *)((void *)(vector + count)) - 1,
-	       self->d_module.md_loadmin, self->d_module.md_loadmax, self->d_module.md_loadaddr);
-}
+struct driver_initfini_vector {
+	driver_initfini_t *difv_vec; /* [1..1][difv_siz] Callbacks. */
+	size_t             difv_siz; /* # of callbacks. */
+};
 
-/* Run driver constructors, but stop if the driver's state is altered. */
-PRIVATE NONNULL((1, 4)) bool FCALL
-run_driver_init_vector_cb(struct driver *__restrict self,
-                          driver_initfini_t *vector,
-                          size_t count, char const *__restrict kind) {
-	if (!count)
-		return; /* Nothing to do here! */
-	if unlikely((void *)(vector) < self->d_module.md_loadmin ||
-	            (void *)(vector + count) > self->d_module.md_loadmax + 1 ||
-	            (void *)(vector + count) < (void *)(vector)) {
-		log_bad_initfini_vector(self, vector, count, kind);
-		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC,
-		                       (uintptr_t)(void *)(vector),
-		                       (uintptr_t)(void *)(vector + count));
+/* Check if the given address range is mapped by the given driver. */
+PRIVATE NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL driver_ismapped)(struct driver *__restrict self,
+                               void const *addr, size_t num_bytes) {
+	ElfW(Half) i;
+	byte_t const *minaddr;
+	byte_t const *maxaddr;
+	minaddr = (byte_t const *)addr;
+	maxaddr = (byte_t const *)addr + num_bytes - 1;
+	if unlikely(minaddr > maxaddr)
+		goto fail;
+	if unlikely(minaddr < self->d_module.md_loadmin)
+		goto fail;
+	if unlikely(maxaddr > self->d_module.md_loadmax)
+		goto fail;
+	if (mman_lock_tryacquire(&mman_kernel)) {
+		/* Search for the mem-nodes that should point back to `self' */
+		for (;;) {
+			struct mnode *node;
+			node = mman_mappings_locate(&mman_kernel, minaddr);
+			if unlikely(!node)
+				break;
+			if (maxaddr <= (byte_t const *)mnode_getmaxaddr(node)) {
+				mman_lock_release(&mman_kernel);
+				return true;
+			}
+			minaddr = (byte_t const *)mnode_getendaddr(node);
+		}
+		mman_lock_release(&mman_kernel);
 	} else {
-		size_t i;
-		for (i = 0; i < count; ++i) {
-			run_driver_initfini_cb(self, vector[i], kind);
-			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CTRS)
-				return false;
+		/* Find the program header that contains the given address range. */
+again_scan_phdrs:
+		for (i = 0; i < self->d_phnum; ++i) {
+			byte_t const *phdr_minaddr;
+			byte_t const *phdr_maxaddr;
+			if (self->d_phdr[i].p_type != PT_LOAD)
+				continue;
+			phdr_minaddr = (byte_t const *)(self->d_module.md_loadaddr + self->d_phdr[i].p_vaddr);
+			phdr_maxaddr = phdr_minaddr + self->d_phdr[i].p_memsz;
+			if (!(minaddr >= phdr_minaddr && minaddr <= phdr_maxaddr))
+				continue;
+			/* This header contains at least 1 byte of the requested range! */
+			if (maxaddr <= phdr_maxaddr)
+				return true;
+			minaddr = phdr_maxaddr + 1;
+			goto again_scan_phdrs;
 		}
 	}
-	return true;
+fail:
+	return false;
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL dump_driver_initfini_exception)(struct driver *__restrict self,
-                                              char const *__restrict kind) {
-	error_printf("running %s functions for driver %s", kind, self->d_name);
-}
-
-PRIVATE NONNULL((1, 3)) void
-NOTHROW(FCALL run_driver_initfini_cb_nx)(struct driver *__restrict self,
-                                         driver_initfini_t cb,
-                                         char const *__restrict kind) {
-	TRY {
-		run_driver_initfini_cb(self, cb, kind);
-	} EXCEPT {
-		dump_driver_initfini_exception(self, kind);
+/* @param: name: The tag-name (e.g. "DT_INIT_ARRAY") */
+PRIVATE NOBLOCK NONNULL((1, 4, 5)) void
+NOTHROW(FCALL driver_get_initfini_array)(struct driver *__restrict self,
+                                         uint32_t elf_dt_array, uint32_t elf_dt_array_sz,
+                                         struct driver_initfini_vector *__restrict result,
+                                         char const *__restrict name) {
+	size_t i;
+	result->difv_vec = NULL;
+	result->difv_siz = 0;
+	for (i = 0; i < self->d_dyncnt; ++i) {
+		if (self->d_dynhdr[i].d_tag == elf_dt_array) {
+			result->difv_vec = (driver_initfini_t *)(self->d_module.md_loadaddr +
+			                                         self->d_dynhdr[i].d_un.d_ptr);
+		} else if (self->d_dynhdr[i].d_tag == elf_dt_array_sz) {
+			result->difv_siz = self->d_dynhdr[i].d_un.d_val / sizeof(driver_initfini_t);
+		}
 	}
-}
-
-PRIVATE NONNULL((1, 4)) void
-NOTHROW(FCALL run_driver_initfini_vector_cb_nx)(struct driver *__restrict self,
-                                                driver_initfini_t *vector,
-                                                size_t count, char const *__restrict kind) {
-	if (!count)
-		return; /* Nothing to do here! */
-	if unlikely((void *)(vector) < self->d_module.md_loadmin ||
-	            (void *)(vector + count) > self->d_module.md_loadmax + 1 ||
-	            (void *)(vector + count) < (void *)(vector)) {
-		log_bad_initfini_vector(self, vector, count, kind);
-	} else {
-		size_t i;
-		for (i = 0; i < count; ++i) {
-			TRY {
-				run_driver_initfini_cb(self, vector[i], kind);
-			} EXCEPT {
-				dump_driver_initfini_exception(self, kind);
+	if (result->difv_siz) {
+		/* Make sure that the array is in-bounds of the driver! */
+		if unlikely(!result->difv_vec)
+			result->difv_siz = 0;
+		else {
+			if unlikely(!driver_ismapped(self, (void *)result->difv_vec,
+			                             result->difv_siz * sizeof(driver_initfini_t))) {
+				printk(KERN_WARNING "[mod][%s] Driver %s-array at %p-%p is not mapped in of %p-%p (loadaddr: %p)\n",
+				       self->d_name, name, result->difv_vec,
+				       (byte_t *)(void *)result->difv_vec + result->difv_siz * sizeof(driver_initfini_t),
+				       self->d_module.md_loadmin, self->d_module.md_loadmax, self->d_module.md_loadaddr);
+				result->difv_vec = NULL;
+				result->difv_siz = 0;
 			}
 		}
 	}
 }
 
+PRIVATE NONNULL((1, 4)) void FCALL
+driver_run_initfini_array(struct driver *__restrict self,
+                          uint32_t elf_dt_array, uint32_t elf_dt_array_sz,
+                          char const *__restrict name,
+                          unsigned int flags) {
+	size_t i;
+	struct driver_initfini_vector vec;
+	driver_get_initfini_array(self, elf_dt_array, elf_dt_array_sz, &vec, name);
+	for (i = 0; i < vec.difv_siz; ++i) {
+		driver_initfini_t func;
+		if unlikely(memcpy_nopf(&func, &vec.difv_vec[i], sizeof(func)) != 0) {
+			printk(KERN_WARNING "[mod][%s] Failed to load %s[%" PRIuSIZ "] (of %" PRIuSIZ ") at %p. "
+			                    "Address not mapped in %p-%p (loadaddr: %p)\n",
+			       self->d_name, name, i, vec.difv_siz, &vec.difv_vec[i],
+			       self->d_module.md_loadmin, self->d_module.md_loadmax,
+			       self->d_module.md_loadaddr);
+			continue;
+		}
 
-/* Fill in information about constructors of `self' */
-PRIVATE NONNULL((1, 2)) void FCALL
-driver_getctors(struct driver *__restrict self,
-                struct driver_constructor_info *__restrict result) {
-	ElfW(Dyn) const *elf_dynamic;
-	size_t i, elf_dynsize;
-	elf_dynamic = self->d_dynhdr;
-	elf_dynsize = self->d_dyncnt;
-	memset(result, 0, sizeof(*result));
-	for (i = 0; i < elf_dynsize; ++i) {
-		switch (elf_dynamic[i].d_tag) {
+		/* Verify that at least the first byte of the function is mapped by the driver. */
+		if unlikely(!driver_ismapped(self, (void *)func, 1)) {
+			printk(KERN_WARNING "[mod][%s] Function %p from %s[%" PRIuSIZ "] (of %" PRIuSIZ ") at %p "
+			                    "is not mapped in %p-%p (loadaddr: %p)\n",
+			       self->d_name, (void *)func, name, i, vec.difv_siz, &vec.difv_vec[i],
+			       self->d_module.md_loadmin, self->d_module.md_loadmax,
+			       self->d_module.md_loadaddr);
+			continue;
+		}
 
-		case DT_INIT:
-			*(void **)&result->dci_init = (void *)(self->d_module.md_loadaddr +
-			                                       self->d_dynhdr[i].d_un.d_ptr);
-			break;
-
-		case DT_PREINIT_ARRAY:
-			result->dci_preinit_array = (driver_initfini_t *)(self->d_module.md_loadaddr +
-			                                                  self->d_dynhdr[i].d_un.d_ptr);
-			break;
-
-		case DT_PREINIT_ARRAYSZ:
-			result->dci_preinit_array_sz = self->d_dynhdr[i].d_un.d_val /
-			                               sizeof(driver_initfini_t);
-			break;
-
-		case DT_INIT_ARRAY:
-			result->dci_init_array = (driver_initfini_t *)(self->d_module.md_loadaddr +
-			                                               self->d_dynhdr[i].d_un.d_ptr);
-			break;
-
-		case DT_INIT_ARRAYSZ:
-			result->dci_init_array_sz = self->d_dynhdr[i].d_un.d_val /
-			                            sizeof(driver_initfini_t);
-			break;
-
-		default:
-			break;
+		/* Actually invoke the function! */
+		TRY {
+			(*func)((int)(unsigned int)self->d_argc, self->d_argv);
+		} EXCEPT {
+			error_printf("running driver %q function %p from %s[%" PRIuSIZ "] (of %" PRIuSIZ ") at %p",
+			             self->d_name, (void *)func, name, i, vec.difv_siz, &vec.difv_vec[i]);
+			if (!(flags & DRIVER_INITFINI_F_FORCEFINI))
+				RETHROW();
 		}
 	}
 }
 
-/* Fill in information about destructors of `self' */
-PRIVATE NONNULL((1, 2)) void FCALL
-driver_getdtors(struct driver *__restrict self,
-                struct driver_destructor_info *__restrict result) {
-	ElfW(Dyn) const *elf_dynamic;
-	size_t i, elf_dynsize;
-	elf_dynamic = self->d_dynhdr;
-	elf_dynsize = self->d_dyncnt;
-	memset(result, 0, sizeof(*result));
-	for (i = 0; i < elf_dynsize; ++i) {
-		switch (elf_dynamic[i].d_tag) {
-
-		case DT_FINI:
-			*(void **)&result->ddi_fini = (void *)(self->d_module.md_loadaddr +
-			                                       self->d_dynhdr[i].d_un.d_ptr);
-			break;
-
-		case DT_FINI_ARRAY:
-			result->ddi_fini_array = (driver_initfini_t *)(self->d_module.md_loadaddr +
-			                                               self->d_dynhdr[i].d_un.d_ptr);
-			break;
-
-		case DT_FINI_ARRAYSZ:
-			result->ddi_fini_array_sz = self->d_dynhdr[i].d_un.d_val /
-			                            sizeof(driver_initfini_t);
-			break;
-
-		default:
+PRIVATE NONNULL((1, 3)) void FCALL
+driver_run_initfini_func(struct driver *__restrict self, uint32_t elf_dt_func,
+                         char const *__restrict name, unsigned int flags) {
+	size_t i;
+	driver_initfini_t func = NULL;
+	/* Search for a function matching the specified tag. */
+	for (i = 0; i < self->d_dyncnt; ++i) {
+		if (self->d_dynhdr[i].d_tag == elf_dt_func) {
+			func = (driver_initfini_t)(void *)(self->d_module.md_loadaddr +
+			                                   self->d_dynhdr[i].d_un.d_ptr);
 			break;
 		}
 	}
-}
+	if (!func)
+		return;
 
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL run_driver_fini_vector)(struct driver *__restrict self) {
-	struct driver_destructor_info dtrs;
-	NESTED_EXCEPTION;
-	TRY {
-		driver_getdtors(self, &dtrs);
-	} EXCEPT {
-		dump_driver_initfini_exception(self, "DT_FINI_ARRAY");
+	/* Verify that at least the first byte of the function is mapped by the driver. */
+	if unlikely(!driver_ismapped(self, (void *)func, 1)) {
+		printk(KERN_WARNING "[mod][%s] %s-function at %p is not mapped in %p-%p (loadaddr: %p)\n",
+		       self->d_name, name, (void *)func,
+		       self->d_module.md_loadmin, self->d_module.md_loadmax,
+		       self->d_module.md_loadaddr);
 		return;
 	}
-	run_driver_initfini_vector_cb_nx(self,
-	                                 dtrs.ddi_fini_array,
-	                                 dtrs.ddi_fini_array_sz,
-	                                 "DT_FINI_ARRAY");
-}
 
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL run_driver_finiall)(struct driver *__restrict self) {
-	struct driver_destructor_info dtrs;
-	NESTED_EXCEPTION;
+	/* Actually invoke the function! */
 	TRY {
-		driver_getdtors(self, &dtrs);
+		(*func)((int)(unsigned int)self->d_argc, self->d_argv);
 	} EXCEPT {
-		dump_driver_initfini_exception(self, "DT_FINI[_ARRAY]");
-		return;
+		error_printf("running driver %q %s-function at %p",
+		             self->d_name, name, (void *)func);
+		if (!(flags & DRIVER_INITFINI_F_FORCEFINI))
+			RETHROW();
 	}
-	if (dtrs.ddi_fini != NULL)
-		run_driver_initfini_cb_nx(self, dtrs.ddi_fini, "DT_FINI");
-	run_driver_initfini_vector_cb_nx(self,
-	                                 dtrs.ddi_fini_array,
-	                                 dtrs.ddi_fini_array_sz,
-	                                 "DT_FINI_ARRAY");
 }
 
+/************************************************************************/
+/* Driver-specific constructor/finalization callbacks                   */
+/************************************************************************/
+PRIVATE NONNULL((1)) void FCALL
+driver_runinit_DT_PREINITARR(struct driver *__restrict self) {
+	driver_run_initfini_array(self, DT_PREINIT_ARRAY, DT_PREINIT_ARRAYSZ,
+	                          "DT_PREINIT_ARRAY", DRIVER_INITFINI_F_NORMAL);
+}
+
+PRIVATE NONNULL((1)) void FCALL
+driver_runinit_DT_INITARR(struct driver *__restrict self) {
+	driver_run_initfini_array(self, DT_INIT_ARRAY, DT_INIT_ARRAYSZ,
+	                          "DT_INIT_ARRAY", DRIVER_INITFINI_F_NORMAL);
+}
+
+PRIVATE NONNULL((1)) void FCALL
+driver_runinit_DT_INIT(struct driver *__restrict self) {
+	driver_run_initfini_func(self, DT_INIT, "DT_INIT", DRIVER_INITFINI_F_NORMAL);
+}
+
+PRIVATE NONNULL((1)) void FCALL
+driver_runfini_DT_FINI(struct driver *__restrict self, unsigned int flags) {
+	driver_run_initfini_func(self, DT_FINI, "DT_FINI", flags);
+}
+
+PRIVATE NONNULL((1)) void FCALL
+driver_runfini_DT_FINIARR(struct driver *__restrict self, unsigned int flags) {
+	driver_run_initfini_array(self, DT_FINI_ARRAY, DT_FINI_ARRAYSZ,
+	                          "DT_FINI_ARRAY", flags);
+}
+
+PRIVATE NONNULL((1)) void FCALL
+driver_runfini_unbindglob(struct driver *__restrict self) {
+	/* TODO */
+	(void)self;
+	COMPILER_IMPURE();
+}
 
 
 /* Initialize the given driver by transitioning its state  to
  * `DRIVER_STATE_LOADED'. If this fails, or if the driver was
  * already finalized, its state is set to `DRIVER_STATE_KILL'
- * instead. */
+ * instead.
+ * @param: flags: Set of `DRIVER_INITFINI_F_*' */
 PUBLIC NONNULL((1)) void FCALL
-driver_initialize(struct driver *__restrict self)
+driver_initialize(struct driver *__restrict self, unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_FSERROR, E_NOT_EXECUTABLE) {
 	uintptr_t state;
 again:
@@ -2205,14 +2202,13 @@ again:
 	switch (state) {
 
 	case DRIVER_STATE_INIT: {
-		struct driver_constructor_info ctrs;
 		/* Start initialization. */
 		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
 		                        DRIVER_STATE_INIT,
 		                        DRIVER_STATE_INIT_DEPS))
 			goto again;
 		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
-		sig_broadcast(&driver_state_changed);
+		sig_broadcast(driver_changesignal(self));
 		/* At this point, we have exclusive authority to initialize
 		 * the given driver however we  want, as well as the  right
 		 * to finalize it if something happens that we don't  like! */
@@ -2224,17 +2220,17 @@ again:
 			 *          init-loop is broken by the init_thread == THIS_TASK
 			 *          check when  `driver_initialize()'  is  called  with
 			 *          `d_state == DRIVER_STATE_INIT_DEPS'! */
-			if (self->d_depcnt != 0) {
+			if (self->d_depcnt != 0)
 				driver_runstate_init_deps(self);
-			}
 
 			/* Step #2: service relocations. */
 			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_RELO);
-			sig_broadcast(&driver_state_changed);
-			if (!driver_runstate_init_relo(self)) {
+			sig_broadcast(driver_changesignal(self));
+			driver_runstate_init_relo(self);
+			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_RELO) {
 				/* This can happen if a IFUNC/IDATA element called `driver_finalize()' */
 				assert(self->d_state == DRIVER_STATE_FINI_RDPS);
-				goto abort_initialization_fini_deps;
+				goto abort_init_deps;
 			}
 
 			/* Inform any attached debugger of the new driver.
@@ -2251,86 +2247,137 @@ again:
 				kernel_debugtrap(&r);
 			}
 
-			/* Step #3: Load driver constructors. */
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CTRS);
-			sig_broadcast(&driver_state_changed);
-			driver_getctors(self, &ctrs);
 		} EXCEPT {
 			ATOMIC_WRITE(self->_d_initthread, NULL);
 			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
-			sig_broadcast(&driver_state_changed);
+			sig_broadcast(driver_changesignal(self));
 			driver_runstate_fini_deps(self);
 			RETHROW();
-		}
-		/* Run driver constructors. */
-		TRY {
-			if (!run_driver_init_vector_cb(self,
-			                               ctrs.dci_preinit_array,
-			                               ctrs.dci_preinit_array_sz,
-			                               "DT_PREINIT_ARRAY"))
-				goto abort_initialization;
-			if (!run_driver_init_vector_cb(self,
-			                               ctrs.dci_init_array,
-			                               ctrs.dci_init_array_sz,
-			                               "DT_INIT_ARRAY"))
-				goto abort_initialization;
-		} EXCEPT {
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DTRS);
-			sig_broadcast(&driver_state_changed);
-			/* Run vector finalizers (but don't run the primary DT_FINI-function). */
-			run_driver_fini_vector(self);
-			ATOMIC_WRITE(self->_d_initthread, NULL);
-			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
-			sig_broadcast(&driver_state_changed);
-			driver_runstate_fini_deps(self);
-			RETHROW();
-		}
-		/* The primary DT_INIT-callback is handled specifically, because
-		 * if  it throws an exception, then we must also invoke DT_INIT,
-		 * which we mustn't do if  (e.g.) a DT_INIT_ARRAY callback  does
-		 * the same! */
-		if (ctrs.dci_init != NULL) {
-			TRY {
-				run_driver_initfini_cb(self, ctrs.dci_init, "DT_INIT");
-			} EXCEPT {
-				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DTRS);
-				sig_broadcast(&driver_state_changed);
-				/* Run vector finalizers (including the DT_FINI-function). */
-				run_driver_finiall(self);
-				ATOMIC_WRITE(self->_d_initthread, NULL);
-				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
-				sig_broadcast(&driver_state_changed);
-				driver_runstate_fini_deps(self);
-				RETHROW();
-			}
-			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CTRS)
-				goto abort_initialization_full;
 		}
 
-		/* Step #4: Indicate that the driver has been initialized! */
+		TRY {
+			/* Step #3: Run driver DT_PREINIT_ARRAY constructions. */
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_PREINITARR);
+			sig_broadcast(driver_changesignal(self));
+			driver_runinit_DT_PREINITARR(self);
+			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CT_PREINITARR)
+				goto abort_init_DT_FINIARR;
+
+			/* Step #4: Run driver DT_INIT_ARRAY constructions. */
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_INITARR);
+			sig_broadcast(driver_changesignal(self));
+			driver_runinit_DT_INITARR(self);
+			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CT_INITARR)
+				goto abort_init_DT_FINIARR;
+		} EXCEPT {
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+			sig_broadcast(driver_changesignal(self));
+			NESTED_TRY {
+				driver_runfini_DT_FINIARR(self, flags);
+			} EXCEPT {
+				ATOMIC_WRITE(self->_d_initthread, NULL);
+				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+				sig_broadcast(driver_changesignal(self));
+				RETHROW();
+			}
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
+			sig_broadcast(driver_changesignal(self));
+			driver_runstate_fini_deps(self);
+			RETHROW();
+		}
+
+		TRY {
+			/* Step #5: Run the driver DT_INIT callback. */
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_INIT);
+			sig_broadcast(driver_changesignal(self));
+			driver_runinit_DT_INIT(self);
+			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CT_INIT)
+				goto abort_init_DT_FINI;
+		} EXCEPT {
+			{
+				NESTED_EXCEPTION;
+				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINI);
+				sig_broadcast(driver_changesignal(self));
+				TRY {
+					driver_runfini_DT_FINI(self, flags);
+				} EXCEPT {
+					ATOMIC_WRITE(self->_d_initthread, NULL);
+					ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINI);
+					sig_broadcast(driver_changesignal(self));
+					RETHROW();
+				}
+				ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+				sig_broadcast(driver_changesignal(self));
+				TRY {
+					driver_runfini_DT_FINIARR(self, flags);
+				} EXCEPT {
+					ATOMIC_WRITE(self->_d_initthread, NULL);
+					ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+					sig_broadcast(driver_changesignal(self));
+					RETHROW();
+				}
+			}
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
+			sig_broadcast(driver_changesignal(self));
+			driver_runstate_fini_deps(self);
+			RETHROW();
+		}
+
+		/* Step #6: Indicate that the driver has been initialized! */
 		ATOMIC_WRITE(self->_d_initthread, NULL);
 		ATOMIC_WRITE(self->d_state, DRIVER_STATE_LOADED);
-		sig_broadcast(&driver_state_changed);
+		sig_broadcast(driver_changesignal(self));
 		break;
 
 		/* These can happen if a driver initializer called `driver_finalize()' */
-abort_initialization_full:
-		assert(self->d_state == DRIVER_STATE_FINI_DTRS);
-		run_driver_finiall(self);
-		goto abort_initialization_fini_deps;
-abort_initialization:
-		assert(self->d_state == DRIVER_STATE_FINI_DTRS);
-		run_driver_fini_vector(self);
-abort_initialization_fini_deps:
+abort_init_DT_FINI:
+		assert(self->d_state == DRIVER_STATE_FINI_DT_FINI);
+		TRY {
+			driver_runfini_DT_FINI(self, flags);
+		} EXCEPT {
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINI);
+			sig_broadcast(driver_changesignal(self));
+			RETHROW();
+		}
+		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+		sig_broadcast(driver_changesignal(self));
+abort_init_DT_FINIARR:
+		assert(self->d_state == DRIVER_STATE_FINI_DT_FINIARR);
+		TRY {
+			driver_runfini_DT_FINIARR(self, flags);
+		} EXCEPT {
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+			sig_broadcast(driver_changesignal(self));
+			RETHROW();
+		}
+		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_UNBINDGLOB);
+		sig_broadcast(driver_changesignal(self));
+/*abort_init_globalhooks:*/
+		assert(self->d_state == DRIVER_STATE_FINI_UNBINDGLOB);
+		TRY {
+			driver_runfini_unbindglob(self);
+		} EXCEPT {
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_UNBINDGLOB);
+			sig_broadcast(driver_changesignal(self));
+			RETHROW();
+		}
+abort_init_deps:
 		ATOMIC_WRITE(self->_d_initthread, NULL);
 		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
-		sig_broadcast(&driver_state_changed);
+		sig_broadcast(driver_changesignal(self));
 		driver_runstate_fini_deps(self);
 	}	break;
 
 	case DRIVER_STATE_INIT_DEPS:
 	case DRIVER_STATE_INIT_RELO:
-	case DRIVER_STATE_INIT_CTRS: {
+	case DRIVER_STATE_INIT_CT_PREINITARR:
+	case DRIVER_STATE_INIT_CT_INITARR:
+	case DRIVER_STATE_INIT_CT_INIT: {
 		/* Wait for another thread to finish the initialization.
 		 * However, make sure to deal  with the case where  it's
 		 * the calling thread that's doing the init! */
@@ -2340,9 +2387,9 @@ abort_initialization_fini_deps:
 			goto again;
 		if unlikely(init_thread == THIS_TASK)
 			return; /* Don't cause a deadlock by waiting for ourselves to finish init! */
-		/* Wait for the driver's state to become `>= DRIVER_STATE_LOADED' */
-		task_connect(&driver_state_changed);
-		if unlikely(ATOMIC_READ(self->d_state) >= DRIVER_STATE_LOADED) {
+		/* Wait for the driver's state to change. */
+		task_connect(driver_changesignal(self));
+		if unlikely(ATOMIC_READ(self->d_state) != state) {
 			task_disconnectall();
 			break;
 		}
@@ -2366,9 +2413,10 @@ abort_initialization_fini_deps:
  * initialized or finalized  by another to  finish doing  so,
  * however if it's the caller thread that does the init/fini,
  * then this function will  return immediately, so-as to  not
- * cause a deadlock! */
+ * cause a deadlock!
+ * @param: flags: Set of `DRIVER_INITFINI_F_*' */
 PUBLIC NONNULL((1)) void FCALL
-driver_finalize(struct driver *__restrict self) {
+driver_finalize(struct driver *__restrict self, unsigned int flags) {
 	uintptr_t state;
 again:
 	state = ATOMIC_READ(self->d_state);
@@ -2380,7 +2428,7 @@ again:
 		                        DRIVER_STATE_INIT,
 		                        DRIVER_STATE_KILL))
 			goto again;
-		sig_broadcast(&driver_state_changed);
+		sig_broadcast(driver_changesignal(self));
 		/* Drop the self-reference that was held by the
 		 * driver's state being `!= DRIVER_STATE_KILL'. */
 		decref_nokill(self);
@@ -2388,7 +2436,9 @@ again:
 
 	case DRIVER_STATE_INIT_DEPS:
 	case DRIVER_STATE_INIT_RELO:
-	case DRIVER_STATE_INIT_CTRS: {
+	case DRIVER_STATE_INIT_CT_PREINITARR:
+	case DRIVER_STATE_INIT_CT_INITARR:
+	case DRIVER_STATE_INIT_CT_INIT: {
 		/* The driver  is being  initialized _right_  _now_
 		 * In  this case, we must differentiate between the
 		 * case where it's the calling thread that does the
@@ -2409,17 +2459,21 @@ again:
 		if unlikely(init_thread == THIS_TASK) {
 			unsigned int new_state;
 			new_state = DRIVER_STATE_FINI_RDPS;
-			if (state == DRIVER_STATE_INIT_CTRS)
-				state = DRIVER_STATE_FINI_DTRS;
+			if (state == DRIVER_STATE_INIT_CT_PREINITARR ||
+			    state == DRIVER_STATE_INIT_CT_INITARR) {
+				state = DRIVER_STATE_FINI_DT_FINIARR;
+			} else if (state == DRIVER_STATE_INIT_CT_INIT) {
+				state = DRIVER_STATE_FINI_DT_FINI;
+			}
 			/* Mark the driver for lazy finalization once
 			 * we return back up the stack to our caller! */
 			if (!ATOMIC_CMPXCH_WEAK(self->d_state, state, new_state))
 				goto again;
-			sig_broadcast(&driver_state_changed);
+			sig_broadcast(driver_changesignal(self));
 			return;
 		}
 		/* Wait for another thread to finish initialization. */
-		task_connect(&driver_state_changed);
+		task_connect(driver_changesignal(self));
 		if unlikely(state != ATOMIC_READ(self->d_state)) {
 			task_disconnectall();
 			goto again;
@@ -2428,41 +2482,98 @@ again:
 		goto again;
 	}	break;
 
-	case DRIVER_STATE_LOADED: {
+	case DRIVER_STATE_LOADED:
+	case DRIVER_STATE_FAIL_DT_FINI: {
 		/* The actual heart-piece of `driver_finalize()':
 		 * Finalize a driver  that is fully  initialized. */
-		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
-		                        DRIVER_STATE_LOADED,
-		                        DRIVER_STATE_FINI_DTRS))
+		if (!ATOMIC_CMPXCH_WEAK(self->d_state, state,
+		                        DRIVER_STATE_FINI_DT_FINI))
 			goto again;
+
+		/* Run second-stage driver finalizers. */
 		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
-		sig_broadcast(&driver_state_changed);
+		sig_broadcast(driver_changesignal(self));
+		TRY {
+			driver_runfini_DT_FINI(self, flags);
+		} EXCEPT {
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINI);
+			sig_broadcast(driver_changesignal(self));
+			RETHROW();
+		}
 
-		/* Invoke driver finalizers. */
-		/* TODO: If you think about it, exceptions from driver
-		 *       finalizers  should be handled by aborting the
-		 *       finalization!  I mean: imagine the user doing
-		 *       CTRL+C  during this, and a blocking operation
-		 *       throws E_INTERRUPT. - You'd want the rmmod to
-		 *       be able to be restartable... */
-		run_driver_finiall(self);
+		/* Run normal driver finalizers. */
+		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DT_FINIARR);
+do_handle_fini_dtors:
+		sig_broadcast(driver_changesignal(self));
+		TRY {
+			driver_runfini_DT_FINIARR(self, flags);
+		} EXCEPT {
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_DT_FINIARR);
+			sig_broadcast(driver_changesignal(self));
+			RETHROW();
+		}
 
-		/* TODO: Try to unbind known, global hooks that may
-		 *       contain references to  the driver  `self'. */
+		/* Unbind global driver hooks. */
+		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_UNBINDGLOB);
+do_handle_fini_unbindglob:
+		sig_broadcast(driver_changesignal(self));
+		TRY {
+			driver_runfini_unbindglob(self);
+		} EXCEPT {
+			ATOMIC_WRITE(self->_d_initthread, NULL);
+			ATOMIC_WRITE(self->d_state, DRIVER_STATE_FAIL_UNBINDGLOB);
+			sig_broadcast(driver_changesignal(self));
+			RETHROW();
+		}
 
 		/* Finalize driver dependencies... */
 		ATOMIC_WRITE(self->_d_initthread, NULL);
 		ATOMIC_WRITE(self->d_state, DRIVER_STATE_FINI_DEPS);
-		sig_broadcast(&driver_state_changed);
+		sig_broadcast(driver_changesignal(self));
 		driver_runstate_fini_deps(self);
 	}	break;
 
-	/* TODO: Other states should wait for  `DRIVER_STATE_KILL'!
-	 *       Think about it: If you  wanted to implement a  way
-	 *       to unload+reload drivers,  you'd do  rmmod,insmod.
-	 *       But if the rmmod is left to happen asynchronously,
-	 *       the insmod would re-return the currently-deloading
-	 *       driver... */
+	case DRIVER_STATE_FAIL_DT_FINIARR:
+		/* Try to restart a previously failed step. */
+		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
+		                        DRIVER_STATE_FAIL_DT_FINIARR,
+		                        DRIVER_STATE_FINI_DT_FINIARR))
+			goto again;
+		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
+		goto do_handle_fini_dtors;
+
+	case DRIVER_STATE_FAIL_UNBINDGLOB:
+		/* Try to restart a previously failed step. */
+		if (!ATOMIC_CMPXCH_WEAK(self->d_state,
+		                        DRIVER_STATE_FAIL_UNBINDGLOB,
+		                        DRIVER_STATE_FINI_UNBINDGLOB))
+			goto again;
+		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
+		goto do_handle_fini_unbindglob;
+
+	case DRIVER_STATE_FINI_DT_FINI:
+	case DRIVER_STATE_FINI_DT_FINIARR:
+	case DRIVER_STATE_FINI_UNBINDGLOB:
+	case DRIVER_STATE_FINI_RDPS: {
+		/* Check if this is a recursive call (if it is, don't do anything!) */
+		struct task *fini_thread;
+		fini_thread = ATOMIC_READ(self->_d_initthread);
+		if (state != ATOMIC_READ(self->d_state))
+			goto again;
+		if (fini_thread == THIS_TASK)
+			return; /* Ignore recursive calls. */
+	case DRIVER_STATE_FINI_DEPS:
+		/* Wait for the state to change. */
+		task_connect(driver_changesignal(self));
+		if (state != ATOMIC_READ(self->d_state)) {
+			task_disconnectall();
+			goto again;
+		}
+		task_waitfor();
+		goto again;
+	}	break;
 
 	default:
 		/* All other states indicate already-finalized, or currently finalizing.
@@ -2815,7 +2926,7 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	/* Change the driver's state from KILL to DEAD */
 	assert(self->d_state == DRIVER_STATE_KILL);
 	ATOMIC_WRITE(self->d_state, DRIVER_STATE_DEAD);
-	sig_broadcast(&driver_state_changed);
+	sig_broadcast(driver_changesignal(self));
 
 	/* Clear out members that are no longer valid for a destroyed driver. */
 	xdecref(self->d_module.md_file);
@@ -3519,7 +3630,103 @@ PRIVATE WUNUSED NONNULL((1)) struct mnode *FCALL
 create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
                       USER CHECKED byte_t const *base, size_t num_bytes,
                       struct path *drv_fspath, struct directory_entry *drv_fsname) {
-	/* TODO */
+	struct mnode *node;
+	struct mpart *part;
+	/* Allocate a new node/part pair. */
+	node = (struct mnode *)kmalloc(sizeof(struct mnode), GFP_LOCKED | GFP_PREFLT);
+	TRY {
+		part = (struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);
+		TRY {
+			PAGEDIR_PAGEALIGNED uintptr_t vaddr, vend;
+			PAGEDIR_PAGEALIGNED size_t vsize;
+			size_t faddr, fsize, voffs;
+			vaddr = phdr->p_vaddr;
+			voffs = vaddr & PAGEMASK;
+			vsize = phdr->p_memsz + voffs;
+			vaddr -= voffs;
+			vsize = CEIL_ALIGN(vsize, PAGESIZE);
+			faddr = phdr->p_offset;
+			fsize = phdr->p_filesz;
+			/* Verify that the in-file bounds for the initialization template are OK */
+			if unlikely(faddr + fsize < faddr || faddr + fsize > num_bytes) {
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_OFFSET,
+				                       phdr->p_offset, phdr->p_filesz);
+			}
+			/* Verify that the file-size doesn't exceed the mem-size. */
+			if unlikely(voffs + fsize > vsize) {
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_FSIZE,
+				                       phdr->p_filesz, phdr->p_memsz);
+			}
+
+			/* Initialize all of the basic fields. */
+			node->mn_minaddr = (byte_t *)vaddr;
+			node->mn_maxaddr = (byte_t *)vaddr + vsize - 1;
+			if unlikely(vsize < phdr->p_memsz || node->mn_minaddr > node->mn_maxaddr) {
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR,
+				                       phdr->p_vaddr, phdr->p_memsz);
+			}
+			node->mn_flags   = mnodeflags_from_elfpf(phdr->p_flags) |
+			                   MNODE_F_SHARED | MNODE_F_MPREPARED |
+			                   MNODE_F_MLOCK;
+			node->mn_part    = part;
+			node->mn_fspath  = drv_fspath;
+			node->mn_fsname  = drv_fsname;
+			node->mn_mman    = &mman_kernel;
+			node->mn_partoff = 0;
+			node->mn_link.le_prev = &part->mp_share.lh_first;
+			node->mn_link.le_next = NULL;
+			DBG_memset(&node->mn_module, 0xcc, sizeof(node->mn_module)); /* Done later... */
+			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
+			part->mp_refcnt = 1; /* +1:node->mn_part */
+			part->mp_flags  = MPART_F_MLOCK;
+			mpart_ll_allocmem(part, vsize / PAGESIZE);
+			part->mp_file   = &mfile_zero;
+			LIST_INIT(&part->mp_copy);
+			part->mp_share.lh_first = node;
+			SLIST_INIT(&part->mp_lockops);
+			LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
+			part->mp_minaddr = (pos_t)(0);
+			part->mp_maxaddr = (pos_t)(vsize - 1);
+			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
+			DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
+			part->mp_blkst_ptr = NULL; /* All parts marked as `MPART_BLOCK_ST_CHNG' */
+			part->mp_meta      = NULL;
+
+			/* And with that, all of the data from the part's been
+			 * initialized. Now all that's left  to be done is  to
+			 * copy over data from the caller-given initialization
+			 * blob, and paste it into the part's physical  memory
+			 * buffer! */
+			TRY {
+				mpart_reladdr_t dst = 0;
+				/* Zero-initialize a couple of leading bytes. */
+				if (voffs != 0) {
+					mpart_ll_bzeromemcc(part, dst, voffs);
+					dst += voffs;
+				}
+				/* Copy file initialization data from the template. */
+				if (fsize != 0) {
+					mpart_ll_writemem(part, dst, base + faddr, fsize);
+					dst += fsize;
+				}
+				/* Finally, zero-initialize all of the trailing (.bss-style) memory. */
+				assert(dst <= vsize);
+				if (dst < vsize)
+					mpart_ll_bzeromemcc(part, dst, vsize - dst);
+			} EXCEPT {
+				mpart_ll_freemem(part);
+				RETHROW();
+			}
+			incref(&mfile_zero); /* Reference for `part->mp_file' */
+		} EXCEPT {
+			kfree(part);
+			RETHROW();
+		}
+	} EXCEPT {
+		kfree(node);
+		RETHROW();
+	}
+	return node;
 }
 
 
@@ -3883,7 +4090,10 @@ again_acquire_mman_lock:
 						/* Force-map the node's part into kernelspace. */
 						mpart_mmap_force(node->mn_part, mnode_getaddr(node),
 						                 mnode_getsize(node), node->mn_partoff,
-						                 mnode_getperm_force_nouser(node));
+						                 mnode_getperm_force_nouser(node) |
+						                 /* Always force write-access  for all mappings,  until
+						                  * `driver_initialize()' has finished applying relocs. */
+						                 PAGEDIR_MAP_FWRITE);
 					}
 					assert(result->d_module.md_nodecount != 0);
 

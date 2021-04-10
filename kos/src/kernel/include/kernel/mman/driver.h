@@ -123,51 +123,83 @@ AWREF(driver_section_awref, driver_section);
 
 /* NOTE: Driver states are only allowed to transition as follows:
  *
- *  [initial]              --> DRIVER_STATE_INIT        // Initial state
+ *  [initial]                       --> DRIVER_STATE_INIT               // Initial state
  *
- *  DRIVER_STATE_INIT      --> DRIVER_STATE_INIT_DEPS   // Being initialization
- *  DRIVER_STATE_INIT      --> DRIVER_STATE_KILL       // When `driver_finalize()' is called
+ *  DRIVER_STATE_INIT               --> DRIVER_STATE_INIT_DEPS          // Being initialization
+ *  DRIVER_STATE_INIT               --> DRIVER_STATE_KILL               // When `driver_finalize()' is called
  *
- *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_INIT_RELO   // Upon success
- *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_KILL        // If loading dependencies fails
- *  DRIVER_STATE_INIT_DEPS --> DRIVER_STATE_FINI_RDPS   // When `driver_finalize()' is called by the same thread
+ *  DRIVER_STATE_INIT_DEPS          --> DRIVER_STATE_INIT_RELO          // Upon success
+ *  DRIVER_STATE_INIT_DEPS          --> DRIVER_STATE_KILL               // If loading dependencies fails
+ *  DRIVER_STATE_INIT_DEPS          --> DRIVER_STATE_FINI_RDPS          // When `driver_finalize()' is called by the same thread
  *
- *  DRIVER_STATE_INIT_RELO --> DRIVER_STATE_INIT_CTRS   // Upon success
- *  DRIVER_STATE_INIT_RELO --> DRIVER_STATE_FINI_DEPS   // If applying relocations fails
- *  DRIVER_STATE_INIT_RELO --> DRIVER_STATE_FINI_RDPS   // When `driver_finalize()' is called by the same thread
+ *  DRIVER_STATE_INIT_RELO          --> DRIVER_STATE_INIT_CT_PREINITARR // Upon success
+ *  DRIVER_STATE_INIT_RELO          --> DRIVER_STATE_FINI_DEPS          // If applying relocations fails
+ *  DRIVER_STATE_INIT_RELO          --> DRIVER_STATE_FINI_RDPS          // When `driver_finalize()' is called by the same thread
  *
- *  DRIVER_STATE_INIT_CTRS --> DRIVER_STATE_LOADED      // Upon success
- *  DRIVER_STATE_INIT_CTRS --> DRIVER_STATE_FINI_DTRS   // If a ctor throws an exception
- *  DRIVER_STATE_INIT_CTRS --> DRIVER_STATE_FINI_DTRS   // When `driver_finalize()' is called by the same thread
+ *  DRIVER_STATE_INIT_CT_PREINITARR --> DRIVER_STATE_INIT_CT_INITARR    // Upon success
+ *  DRIVER_STATE_INIT_CT_PREINITARR --> DRIVER_STATE_FINI_DT_FINIARR    // If a ctor throws an exception
+ *  DRIVER_STATE_INIT_CT_PREINITARR --> DRIVER_STATE_FINI_DT_FINIARR    // When `driver_finalize()' is called by the same thread
  *
- *  DRIVER_STATE_LOADED    --> DRIVER_STATE_FINI_DTRS   // When `driver_finalize()' is called
+ *  DRIVER_STATE_INIT_CT_INITARR    --> DRIVER_STATE_INIT_CT_INIT       // Upon success
+ *  DRIVER_STATE_INIT_CT_INITARR    --> DRIVER_STATE_FINI_DT_FINIARR    // If a ctor throws an exception
+ *  DRIVER_STATE_INIT_CT_INITARR    --> DRIVER_STATE_FINI_DT_FINIARR    // When `driver_finalize()' is called by the same thread
  *
- *  DRIVER_STATE_FINI_RDPS --> DRIVER_STATE_FINI_DEPS   // Always
+ *  DRIVER_STATE_INIT_CT_INIT       --> DRIVER_STATE_LOADED             // Upon success
+ *  DRIVER_STATE_INIT_CT_INIT       --> DRIVER_STATE_FINI_DT_FINI       // If a ctor throws an exception
+ *  DRIVER_STATE_INIT_CT_INIT       --> DRIVER_STATE_FINI_DT_FINI       // When `driver_finalize()' is called by the same thread
  *
- *  DRIVER_STATE_FINI_DTRS --> DRIVER_STATE_FINI_DEPS   // Always
+ *  DRIVER_STATE_LOADED             --> DRIVER_STATE_FINI_DT_FINI       // When `driver_finalize()' is called
  *
- *  DRIVER_STATE_FINI_DEPS --> DRIVER_STATE_KILL        // Always
+ *  DRIVER_STATE_FINI_DT_FINI       --> DRIVER_STATE_FINI_DT_FINIARR    // Upon success
+ *  DRIVER_STATE_FINI_DT_FINI       --> DRIVER_STATE_FAIL_DT_FINI       // If the destructor throws an exception
  *
- *  DRIVER_STATE_KILL      --> DRIVER_STATE_DEAD        // When `md_refcnt' drops to `0'
+ *  DRIVER_STATE_FAIL_DT_FINI       --> DRIVER_STATE_FINI_DT_FINI       // When `driver_finalize()' is called again
+ *
+ *  DRIVER_STATE_FINI_DT_FINIARR    --> DRIVER_STATE_FINI_UNBINDGLOB    // Upon success
+ *  DRIVER_STATE_FINI_DT_FINIARR    --> DRIVER_STATE_FAIL_DT_FINIARR    // If the destructor throws an exception
+ *
+ *  DRIVER_STATE_FAIL_DT_FINIARR    --> DRIVER_STATE_FINI_DT_FINIARR    // When `driver_finalize()' is called again
+ *
+ *  DRIVER_STATE_FINI_UNBINDGLOB    --> DRIVER_STATE_FINI_DEPS          // Upon success
+ *  DRIVER_STATE_FINI_UNBINDGLOB    --> DRIVER_STATE_FAIL_UNBINDGLOB    // If the destructor throws an exception
+ *
+ *  DRIVER_STATE_FAIL_UNBINDGLOB    --> DRIVER_STATE_FINI_UNBINDGLOB    // When `driver_finalize()' is called again
+ *
+ *  DRIVER_STATE_FINI_RDPS          --> DRIVER_STATE_FINI_DEPS          // Always
+ *
+ *  DRIVER_STATE_FINI_DEPS          --> DRIVER_STATE_KILL               // Always
+ *
+ *  DRIVER_STATE_KILL               --> DRIVER_STATE_DEAD               // When `md_refcnt' drops to `0'
  *
  * NOTE: Depending on state, drivers also hold a reference to  themselves.
  *       The reference loop formed by this is intentional, and is used  to
  *       prevent a driver from being destroyed before finalizers have been
  *       executed, thus preventing driver text being unloaded before  that
  *       point in time. */
-#define DRIVER_STATE_INIT      0 /* [SELFREF] Currently loading driver dependencies. */
-#define DRIVER_STATE_INIT_DEPS 1 /* [SELFREF] Currently loading driver dependencies. */
-#define DRIVER_STATE_INIT_RELO 2 /* [SELFREF] Currently applying relocations. */
-#define DRIVER_STATE_INIT_CTRS 3 /* [SELFREF] Currently executing driver constructors. */
-#define DRIVER_STATE_LOADED    4 /* [SELFREF] Driver has been loaded, and is sitting in memory. */
-#define DRIVER_STATE_FINI_DTRS 5 /* [SELFREF] Currently executing driver destructors. */
-#define DRIVER_STATE_FINI_RDPS 6 /* [SELFREF] RecrusiveDePendencieS (used internally) */
-#define DRIVER_STATE_FINI_DEPS 7 /* [SELFREF] Currently clearing driver dependencies. */
-#define DRIVER_STATE_KILL      8 /* Driver was killed. */
-#define DRIVER_STATE_DEAD      9 /* Driver `wasdestroyed() == true'. */
+#define DRIVER_STATE_INIT               0  /* [SELFREF] Currently loading driver dependencies. */
+#define DRIVER_STATE_INIT_DEPS          1  /* [SELFREF] Currently loading driver dependencies. */
+#define DRIVER_STATE_INIT_RELO          2  /* [SELFREF] Currently applying relocations. */
+#define DRIVER_STATE_INIT_CT_PREINITARR 3  /* [SELFREF] Currently executing DT_PREINIT_ARRAY */
+#define DRIVER_STATE_INIT_CT_INITARR    4  /* [SELFREF] Currently executing DT_INIT_ARRAY */
+#define DRIVER_STATE_INIT_CT_INIT       5  /* [SELFREF] Currently executing DT_INIT */
+#define DRIVER_STATE_LOADED             6  /* [SELFREF] Driver has been loaded, and is sitting in memory. */
+#define DRIVER_STATE_FINI_DT_FINI       7  /* [SELFREF] Currently executing DT_FINI */
+#define DRIVER_STATE_FAIL_DT_FINI       8  /* [SELFREF] Failed to execute DT_FINI */
+#define DRIVER_STATE_FINI_DT_FINIARR    9  /* [SELFREF] Currently executing DT_FINI_ARRAY */
+#define DRIVER_STATE_FAIL_DT_FINIARR    10 /* [SELFREF] Failed to execute DT_FINI_ARRAY */
+#define DRIVER_STATE_FINI_UNBINDGLOB    11 /* [SELFREF] Currently unbinding global hooks */
+#define DRIVER_STATE_FAIL_UNBINDGLOB    12 /* [SELFREF] Failed to unbind global hooks */
+#define DRIVER_STATE_FINI_RDPS          13 /* [SELFREF] RecrusiveDePendencieS (used internally) */
+#define DRIVER_STATE_FINI_DEPS          14 /* [SELFREF] Currently clearing driver dependencies. */
+#define DRIVER_STATE_KILL               15 /* Driver was killed. */
+#define DRIVER_STATE_DEAD               16 /* Driver `wasdestroyed() == true'. */
 
 /* Signal broadcast whenever the `d_state' of any loaded driver changes. */
 DATDEF struct sig driver_state_changed;
+
+/* Return a pointer to a `struct sig' that is  broadcast
+ * when the state of the given driver `self' is altered. */
+#define driver_changesignal(self) &driver_state_changed
 
 struct driver;
 struct driver_fde_cache;
@@ -309,8 +341,16 @@ struct driver
 		struct postlockop          _d_postlop;    /* Used internally */
 	};
 	union {
-		struct task               *_d_initthread; /* Used internally by `DRIVER_STATE_INIT_DEPS...DRIVER_STATE_INIT_CTRS'
-		                                           * as    well    as   `DRIVER_STATE_FINI_DTRS...DRIVER_STATE_FINI_RDPS' */
+		struct task               *_d_initthread; /* The thread currently performing init/fini for states:
+		                                           *  - DRIVER_STATE_INIT_DEPS
+		                                           *  - DRIVER_STATE_INIT_RELO
+		                                           *  - DRIVER_STATE_INIT_CT_PREINITARR
+		                                           *  - DRIVER_STATE_INIT_CT_INITARR
+		                                           *  - DRIVER_STATE_INIT_CT_INIT
+		                                           *  - DRIVER_STATE_FINI_DT_FINI
+		                                           *  - DRIVER_STATE_FINI_DT_FINIARR
+		                                           *  - DRIVER_STATE_FINI_UNBINDGLOB
+		                                           *  - DRIVER_STATE_FINI_RDPS */
 		struct mnode_slist         _d_deadnodes;  /* Used internally by `DRIVER_STATE_FINI_TEXT' */
 		struct module_section_slist _d_deadsect;  /* Used internally */
 	};
@@ -326,7 +366,7 @@ struct driver
 
 /* Check if the given driver is/was finalized. */
 #define driver_isfinalizing(self) \
-	(__hybrid_atomic_load((self)->d_state, __ATOMIC_ACQUIRE) >= DRIVER_STATE_FINI_DTRS)
+	(__hybrid_atomic_load((self)->d_state, __ATOMIC_ACQUIRE) >= DRIVER_STATE_FINI_DT_FINIARR)
 
 
 #undef __driver_as_module
@@ -521,12 +561,29 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 /* Driver load/unload functions                                         */
 /************************************************************************/
 
+/* Flags for `driver_initialize()' and `driver_finalize()' */
+#define DRIVER_INITFINI_F_NORMAL    0x0000 /* Normal flags */
+#define DRIVER_INITFINI_F_FORCEFINI 0x0001 /* Discard exceptions thrown by driver  destructors.
+                                            * But note that `driver_finalize()' may still throw
+                                            * exceptions when this flag is set, since that func
+                                            * may try to task_waitfor() the driver to finalize,
+                                            * of need to allocate  memory to remove the  driver
+                                            * from some kind of global hook.
+                                            * WARNING: Don't  set this flag! Using this flag is
+                                            *          considered unsafe, the same way that use
+                                            *          of `DRIVER_DELMOD_F_FORCE' is, too!
+                                            * Only use this flag to work around buggy drivers
+                                            * that  refuse to unload because their finalizers
+                                            * might unconditionally throw exceptions. */
+
 /* Initialize the given driver by transitioning its state  to
  * `DRIVER_STATE_LOADED'. If this fails, or if the driver was
  * already finalized, its state is set to `DRIVER_STATE_KILL'
- * instead. */
+ * instead.
+ * @param: flags: Set of `DRIVER_INITFINI_F_*' */
 FUNDEF NONNULL((1)) void FCALL
-driver_initialize(struct driver *__restrict self)
+driver_initialize(struct driver *__restrict self,
+                  unsigned int flags DFL(DRIVER_INITFINI_F_NORMAL))
 		THROWS(E_WOULDBLOCK, E_FSERROR, E_NOT_EXECUTABLE);
 
 /* Finalize the given driver. Note that driver finalizers are
@@ -536,9 +593,12 @@ driver_initialize(struct driver *__restrict self)
  * initialized or finalized  by another to  finish doing  so,
  * however if it's the caller thread that does the init/fini,
  * then this function will  return immediately, so-as to  not
- * cause a deadlock! */
+ * cause a deadlock!
+ * @param: flags: Set of `DRIVER_INITFINI_F_*' */
 FUNDEF NONNULL((1)) void FCALL
-driver_finalize(struct driver *__restrict self);
+driver_finalize(struct driver *__restrict self,
+                unsigned int flags DFL(DRIVER_INITFINI_F_NORMAL));
+
 
 
 /* Load & return  a driver from  a given `driver_file'.  The

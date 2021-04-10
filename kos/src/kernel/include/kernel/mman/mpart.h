@@ -540,7 +540,7 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL mpart_tree_minmaxlocate)(struct m
  * was already fully initialized.
  * NOTE: This function assumes that `self->mp_file' has already been initialized,
  *       and will pass that value onto `mfile_alloc_physmem()'! */
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF NONNULL((1)) void FCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages)
 		THROWS(E_BADALLOC);
@@ -548,12 +548,30 @@ mpart_ll_allocmem(struct mpart *__restrict self,
 /* Free backing memory using `page_free()'.  When an mchunkvec was  used,
  * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL mpart_ll_freemem)(struct mpart *__restrict self);
+NOTHROW(FCALL mpart_ll_freemem)(struct mpart *__restrict self);
 
 /* Free backing memory using `page_ccfree()'. When an mchunkvec was used,
  * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
+NOTHROW(FCALL mpart_ll_ccfreemem)(struct mpart *__restrict self);
+
+/* Low-level write to  the backing memory  of the  given
+ * part. Requires that  `MPART_ST_INMEM(self->mp_state)'
+ * The caller must ensure that `offset...+=num_bytes' is
+ * in-bounds of the given mem-part! */
+FUNDEF NONNULL((1)) void KCALL
+mpart_ll_writemem(struct mpart *__restrict self,
+                  mpart_reladdr_t offset,
+                  void const *__restrict src,
+                  size_t num_bytes)
+		THROWS(E_SEGFAULT);
+/* Low-level bzero-if-!page_iszero() the given address range.
+ * The  caller must ensure that `offset...+=num_bytes' is in-
+ * bounds of the given mem-part! */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mpart_ll_bzeromemcc)(struct mpart *__restrict self,
+                                   mpart_reladdr_t offset,
+                                   size_t num_bytes);
 
 
 
