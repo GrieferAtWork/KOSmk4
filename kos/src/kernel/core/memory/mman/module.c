@@ -714,11 +714,27 @@ unwind_userspace(void const *absolute_pc,
 				continue;
 			FINALLY_DECREF_UNLIKELY(sect);
 			/* Load a mapping for the section. */
-			data   = module_section_getaddr_inflate(sect, &size);
+			if (i == 0) {
+				/* Special case: the `.eh_frame' must be allocated in user-space,
+				 *               and we also need to  parse it in its  user-space
+				 *               location,  since  it may  contain  some pointer-
+				 *               relative offsets which we'd otherwise  interpret
+				 *               incorrectly. */
+				if unlikely(!(sect->ms_flags & SHF_ALLOC))
+					continue;
+				data = module_section_getaddr_nx(sect);
+				if unlikely(!data)
+					continue;
+				size = sect->ms_size;
+			} else {
+				data = module_section_getaddr_inflate_nx(sect, &size);
+				if unlikely(size == 0)
+					continue;
+			}
 			result = unwind_userspace_with_section(mod, absolute_pc, data, size,
 			                                       reg_getter, reg_getter_arg,
 			                                       reg_setter, reg_setter_arg,
-			                                       i == 0);
+			                                       i != 0);
 			if (result != UNWIND_NO_FRAME)
 				break;
 		}
