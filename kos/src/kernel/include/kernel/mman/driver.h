@@ -75,7 +75,7 @@ struct driver_section
 #if !defined(__cplusplus) || defined(__WANT_DRIVER_SECTION_ds_sect)
 	struct module_section ds_sect;     /* The underlying section. */
 #endif /* !__cplusplus || __WANT_DRIVER_SECTION_ds_sect */
-	ElfW(Shdr)           *ds_shdr;     /* [1..1][const] Section header. */
+	ElfW(Shdr) const     *ds_shdr;     /* [1..1][const] Section header. */
 	byte_t               *ds_addr;     /* [0..1][lock(WRITE_ONCE)] Section buffer address.
 	                                    * Owned for non-`SHF_ALLOC' section. */
 	byte_t               *ds_infladdr; /* [0..1][lock(WRITE_ONCE)] Inflated section address. */
@@ -483,16 +483,18 @@ driver_dlsym_local(struct driver *__restrict self,
  * symbol is found return it. Otherwise, return the first  weak
  * symbol encountered during the search, and if all that fails,
  * return `false' to indicate failure.
- * @return: true:  Found a symbol matching the given name.
- * @return: false: No symbol matching the given name found. */
-FUNDEF WUNUSED NONNULL((1, 2)) __BOOL FCALL
+ * @return: *   : Found a symbol matching the given name in this driver.
+ * @return: NULL: No symbol matching the given name found. */
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct driver *FCALL
 driver_dlsym(struct driver *__restrict self,
              struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...);
 
 /* Search for a symbol in all loaded drivers, following the order
- * of drivers, as they appear returned by `get_driver_loadlist()' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+ * of drivers, as they appear returned by `get_driver_loadlist()'
+ * @return: *   : Found a symbol matching the given name in this driver.
+ * @return: NULL: No symbol matching the given name found. */
+FUNDEF WUNUSED NONNULL((1)) REF struct driver *FCALL
 driver_dlsym_global(struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...);
 

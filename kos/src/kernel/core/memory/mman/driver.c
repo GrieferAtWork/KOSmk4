@@ -580,24 +580,24 @@ INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT]
 
 
 /* Define the driver section descriptors. */
-#define _SECTION(decl_name, name, type, flags, start, size, entsize, link, info) \
-	struct driver_section decl_name = {                                          \
-		.ds_sect = {                                                             \
-			.ms_refcnt  = 1,                                                     \
-			.ms_ops     = &driver_section_ops,                                   \
-			.ms_module  = &kernel_driver,                                        \
-			.ms_size    = (size_t)(size),                                        \
-			.ms_entsize = (size_t)(entsize),                                     \
-			.ms_type    = (type),                                                \
-			.ms_flags   = (flags),                                               \
-			.ms_link    = (link),                                                \
-			.ms_info    = (info),                                                \
-			.ms_cache   = LIST_ENTRY_UNBOUND_INITIALIZER,                        \
-		},                                                                       \
-		.ds_shdr     = &kernel_shdr[SECTION_DESCRIPTOR_INDEX],                   \
-		.ds_addr     = (void *)(start),                                          \
-		.ds_infladdr = (flags) & SHF_COMPRESSED ? (void *)-1 : (void *)(start),  \
-		.ds_inflsize = (flags) & SHF_COMPRESSED ? 0 : (size_t)(size),            \
+#define _SECTION(decl_name, name, type, flags, start, size, entsize, link, info)    \
+	struct driver_section decl_name = {                                             \
+		.ds_sect = {                                                                \
+			.ms_refcnt  = 1,                                                        \
+			.ms_ops     = &driver_section_ops,                                      \
+			.ms_module  = &kernel_driver.d_module,                                  \
+			.ms_size    = (size_t)(size),                                           \
+			.ms_entsize = (size_t)(entsize),                                        \
+			.ms_type    = (type),                                                   \
+			.ms_flags   = (flags),                                                  \
+			.ms_link    = (link),                                                   \
+			.ms_info    = (info),                                                   \
+			.ms_cache   = LIST_ENTRY_UNBOUND_INITIALIZER,                           \
+		},                                                                          \
+		.ds_shdr     = &kernel_shdr[SECTION_DESCRIPTOR_INDEX],                      \
+		.ds_addr     = (byte_t *)(start),                                           \
+		.ds_infladdr = (flags) & SHF_COMPRESSED ? (byte_t *)-1 : (byte_t *)(start), \
+		.ds_inflsize = (flags) & SHF_COMPRESSED ? 0 : (size_t)(size),               \
 	};
 #define INTERN_SECTION(intern_name, name, type, flags, start, size, entsize, link, info) \
 	INTERN _SECTION(intern_name, name, type, flags, start, size, entsize, link, info)
@@ -710,10 +710,6 @@ PUBLIC struct driver kernel_driver = {
 	.d_argv                = NULL,
 	.d_depcnt              = 0,
 	.d_depvec              = NULL,
-	.d_eh_frame_start      = __kernel_eh_frame_start,
-	.d_eh_frame_end        = __kernel_eh_frame_end,
-	.d_eh_frame_cache      = NULL,
-	.d_eh_frame_cache_lock = ATOMIC_RWLOCK_INIT,
 	.d_dyncnt              = 0,
 	.d_dynhdr              = NULL,
 	.d_dynsym_tab          = NULL,
@@ -728,6 +724,10 @@ PUBLIC struct driver kernel_driver = {
 	.d_sections            = kernel_sections,
 	.d_shstrtab            = (char *)&kernel_shstrtab_data,
 	.d_shstrsiz            = sizeof(kernel_shstrtab_data),
+	.d_eh_frame_start      = __kernel_eh_frame_start,
+	.d_eh_frame_end        = __kernel_eh_frame_end,
+	.d_eh_frame_cache      = NULL,
+	.d_eh_frame_cache_lock = ATOMIC_RWLOCK_INIT,
 	.d_phnum               = 2,
 	.d_phdr                = {
 		/* [0] = */ ELFW(PHDR_INIT)(
@@ -1001,7 +1001,7 @@ driver_dlsym_drv(struct driver *__restrict self,
 	}
 	if (strcmp(name, "cmdline") == 0) {
 		info->dsi_addr = (void *)self->d_cmdline;
-		info->dsi_size = (strlen(self->d_cmdline) + 1) * sizeof(char);sizeof(void *);
+		info->dsi_size = (strlen(self->d_cmdline) + 1) * sizeof(char);
 		goto ok;
 	}
 	if (name[0] == 'a' && name[1] == 'r' && name[2] == 'g') {
@@ -1266,7 +1266,7 @@ NOTHROW(KCALL copy_to_phys_of_virt)(void const *dst,
 		physaddr_t phys_dst;
 		size_t maxbytes;
 		phys_dst = pagedir_translate(dst);
-		maxbytes = PAGESIZE - (uintptr_t)dst & PAGEMASK;
+		maxbytes = PAGESIZE - ((uintptr_t)dst & PAGEMASK);
 		if (maxbytes > num_bytes)
 			maxbytes = num_bytes;
 		copytophys_onepage(phys_dst, src, maxbytes);
@@ -1276,6 +1276,80 @@ NOTHROW(KCALL copy_to_phys_of_virt)(void const *dst,
 		src = (byte_t const *)src + maxbytes;
 		num_bytes -= maxbytes;
 	}
+}
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) void FCALL
+resolve_elf_symbol(struct driver *__restrict self,
+                   struct driver_syminfo *__restrict info,
+                   ElfW(Sym) const *__restrict symbol)
+		THROWS(E_SEGFAULT, ...) {
+	ElfW(Addr) st_addr;
+	unsigned char st_info;
+	st_info = ATOMIC_READ(symbol->st_info);
+	if (ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC ||
+	    ELFW(ST_TYPE)(st_info) == STT_KOS_IDATA) {
+		ElfW(Addr) newaddr;
+		unsigned char newinfo;
+		/* Special case: Indirect symbol! */
+		driver_isym_acquire();
+		st_info = symbol->st_info;
+		st_addr = symbol->st_value;
+		driver_isym_release();
+		if unlikely(ELFW(ST_TYPE)(st_info) != STT_GNU_IFUNC &&
+		            ELFW(ST_TYPE)(st_info) != STT_KOS_IDATA)
+			goto normal_symbol;
+		if (symbol->st_shndx != SHN_ABS)
+			st_addr += self->d_module.md_loadaddr;
+
+		/* Resolve dynamic address. */
+		st_addr = (*(ElfW(Addr)(*)(void))(void *)st_addr)();
+
+		/* Write-back the resolved address, and change
+		 * the typing of  the symbol to  no longer  be
+		 * indirect! */
+		newaddr = st_addr;
+		if (symbol->st_shndx != SHN_ABS)
+			newaddr -= self->d_module.md_loadaddr;
+		newinfo = ELFW(ST_INFO)(ELFW(ST_BIND)(st_info),
+		                        ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC
+		                        ? STT_FUNC
+		                        : STT_OBJECT);
+
+		/* Check if we're still dealing with an indirect symbol.
+		 * if that's no longer the case, then we must abort, and
+		 * discard the results we got from calling the  indirect
+		 * function! */
+		driver_isym_acquire();
+		st_info = symbol->st_info;
+		if unlikely(ELFW(ST_TYPE)(st_info) != STT_GNU_IFUNC &&
+		            ELFW(ST_TYPE)(st_info) != STT_KOS_IDATA) {
+			driver_isym_break();
+			goto normal_symbol;
+		}
+		/* _VERY_ important! must write `st_info' second, since knowing
+		 * that it indicates an  indirect symbol, `st_value' is  _only_
+		 * guarded against reads/writes  from other cpus/threads  while
+		 * that's still the case.
+		 * As such, the write to `st_value' _must_ happen _before_ the
+		 * write to `st_info'. - Otherwise this'd be a race condition! */
+		COMPILER_BARRIER();
+		copy_to_phys_of_virt(&symbol->st_value, &newaddr, sizeof(symbol->st_value));
+		COMPILER_BARRIER();
+		copy_to_phys_of_virt(&symbol->st_info, &newinfo, sizeof(symbol->st_info));
+		COMPILER_BARRIER();
+		driver_isym_release();
+		/* XXX: Do we need to do some explicit cache flushing here? */
+		/* XXX: Why not just temporarily try to remap the pagedir for write?
+		 *      Then we  can just  write to  the normal  virtual  address... */
+	} else {
+normal_symbol:
+		st_addr = symbol->st_value;
+		if (symbol->st_shndx != SHN_ABS)
+			st_addr += self->d_module.md_loadaddr;
+	}
+	info->dsi_addr = (void *)st_addr;
+	info->dsi_size = symbol->st_size;
+	info->dsi_bind = ELFW(ST_BIND)(st_info);
 }
 
 
@@ -1304,73 +1378,7 @@ driver_dlsym_local(struct driver *__restrict self,
 	/* Do a generic ELF .dynsym lookup. */
 	symbol = driver_dlsym_elf(self, info);
 	if (symbol && symbol->st_shndx != SHN_UNDEF) {
-		ElfW(Addr) st_addr;
-		unsigned char st_info;
-		st_info = ATOMIC_READ(symbol->st_info);
-		if (ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC ||
-		    ELFW(ST_TYPE)(st_info) == STT_KOS_IDATA) {
-			ElfW(Addr) newaddr;
-			unsigned char newinfo;
-			/* Special case: Indirect symbol! */
-			driver_isym_acquire();
-			st_info = symbol->st_info;
-			st_addr = symbol->st_value;
-			driver_isym_release();
-			if unlikely(ELFW(ST_TYPE)(st_info) != STT_GNU_IFUNC &&
-			            ELFW(ST_TYPE)(st_info) != STT_KOS_IDATA)
-				goto normal_symbol;
-			if (symbol->st_shndx != SHN_ABS)
-				st_addr += self->d_module.md_loadaddr;
-
-			/* Resolve dynamic address. */
-			st_addr = (*(ElfW(Addr)(*)(void))(void *)st_addr)();
-
-			/* Write-back the resolved address, and change
-			 * the typing of  the symbol to  no longer  be
-			 * indirect! */
-			newaddr = st_addr;
-			if (symbol->st_shndx != SHN_ABS)
-				newaddr -= self->d_module.md_loadaddr;
-			newinfo = ELFW(ST_INFO)(ELFW(ST_BIND)(st_info),
-			                        ELFW(ST_TYPE)(st_info) == STT_GNU_IFUNC
-			                        ? STT_FUNC
-			                        : STT_OBJECT);
-
-			/* Check if we're still dealing with an indirect symbol.
-			 * if that's no longer the case, then we must abort, and
-			 * discard the results we got from calling the  indirect
-			 * function! */
-			driver_isym_acquire();
-			st_info = symbol->st_info;
-			if unlikely(ELFW(ST_TYPE)(st_info) != STT_GNU_IFUNC &&
-			            ELFW(ST_TYPE)(st_info) != STT_KOS_IDATA) {
-				driver_isym_break();
-				goto normal_symbol;
-			}
-			/* _VERY_ important! must write `st_info' second, since knowing
-			 * that it indicates an  indirect symbol, `st_value' is  _only_
-			 * guarded against reads/writes  from other cpus/threads  while
-			 * that's still the case.
-			 * As such, the write to `st_value' _must_ happen _before_ the
-			 * write to `st_info'. - Otherwise this'd be a race condition! */
-			COMPILER_BARRIER();
-			copy_to_phys_of_virt(&symbol->st_value, &newaddr, sizeof(symbol->st_value));
-			COMPILER_BARRIER();
-			copy_to_phys_of_virt(&symbol->st_info, &newinfo, sizeof(symbol->st_info));
-			COMPILER_BARRIER();
-			driver_isym_release();
-			/* XXX: Do we need to do some explicit cache flushing here? */
-			/* XXX: Why not just temporarily try to remap the pagedir for write?
-			 *      Then we  can just  write to  the normal  virtual  address... */
-		} else {
-normal_symbol:
-			st_addr = symbol->st_value;
-			if (symbol->st_shndx != SHN_ABS)
-				st_addr += self->d_module.md_loadaddr;
-		}
-		info->dsi_addr = (void *)st_addr;
-		info->dsi_size = symbol->st_size;
-		info->dsi_bind = ELFW(ST_BIND)(st_info);
+		resolve_elf_symbol(self, info, symbol);
 		return true;
 	}
 	return false;
@@ -1382,16 +1390,19 @@ normal_symbol:
 #define DRIVER_DLSYM_EX_OK    1 /* Success */
 #define DRIVER_DLSYM_EX_EOF   2 /* No drivers found at `depth' */
 
-PRIVATE WUNUSED NONNULL((1, 2)) unsigned int FCALL
+PRIVATE WUNUSED NONNULL((1, 2, 3)) unsigned int FCALL
 driver_dlsym_ex(struct driver *__restrict self,
                 struct driver_syminfo *__restrict info,
+                REF struct driver **__restrict p_driver,
                 unsigned int depth)
 		THROWS(E_SEGFAULT, ...) {
 	unsigned int result, status;
 	size_t i;
 	if (depth == 0) {
-		if (driver_dlsym_local(self, info))
+		if (driver_dlsym_local(self, info)) {
+			*p_driver = incref(self);
 			return DRIVER_DLSYM_EX_OK;
+		}
 		return DRIVER_DLSYM_EX_NOENT;
 	}
 	--depth;
@@ -1403,7 +1414,7 @@ driver_dlsym_ex(struct driver *__restrict self,
 			continue;
 		{
 			FINALLY_DECREF_UNLIKELY(dep);
-			status = driver_dlsym_ex(dep, info, depth);
+			status = driver_dlsym_ex(dep, info, p_driver, depth);
 		}
 		if (status != DRIVER_DLSYM_EX_EOF) {
 			result = status;
@@ -1414,70 +1425,90 @@ driver_dlsym_ex(struct driver *__restrict self,
 	return result;
 }
 
+PRIVATE WUNUSED NOBLOCK unsigned int
+NOTHROW(FCALL get_max_dependency_depth)(void) {
+	unsigned int result;
+	REF struct driver_loadlist *ll;
+	ll     = get_driver_loadlist();
+	result = (unsigned int)ll->dll_count;
+	decref_unlikely(ll);
+	return result;
+}
+
 /* Same  as `driver_dlsym_local()', but if that function fails,
  * or  returns a weak  symbol, scan all  of the dependencies of
  * `self'  for another symbol with the same name. If a non-weak
  * symbol is found return it. Otherwise, return the first  weak
  * symbol encountered during the search, and if all that fails,
  * return `false' to indicate failure.
- * @return: true:  Found a symbol matching the given name.
- * @return: false: No symbol matching the given name found. */
-PUBLIC WUNUSED NONNULL((1, 2)) bool FCALL
+ * @return: *   : Found a symbol matching the given name in this driver.
+ * @return: NULL: No symbol matching the given name found. */
+PUBLIC WUNUSED NONNULL((1, 2)) REF struct driver *FCALL
 driver_dlsym(struct driver *__restrict self,
              struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...) {
 	unsigned int status, depth, max_depth;
+	struct driver *resdrv = self;
 	bool result = driver_dlsym_local(self, info);
 	/* All drivers have an implicit dependency on the kernel core! */
-	if (!result)
-		result = kernel_dlsym(info);
 	if (!result) {
-		REF struct driver_loadlist *ll;
-		ll        = get_driver_loadlist();
-		max_depth = (unsigned int)ll->dll_count;
-		decref_unlikely(ll);
+		resdrv = &kernel_driver;
+		result = kernel_dlsym(info);
+	}
+	if (!result) {
+		max_depth = get_max_dependency_depth();
 		for (depth = 0; depth < max_depth; ++depth) {
-			status = driver_dlsym_ex(self, info, depth);
+			status = driver_dlsym_ex(self, info, &resdrv, depth);
 			if (status != DRIVER_DLSYM_EX_NOENT) {
 				if (status == DRIVER_DLSYM_EX_OK) {
-					result = true;
 					if (info->dsi_bind == STB_WEAK) {
 						++depth;
 						goto find_nonweak_after;
 					}
+					return resdrv;
 				}
 				break;
 			}
 		}
-	} else if (info->dsi_bind == STB_WEAK) {
-		REF struct driver_loadlist *ll;
+		return NULL;
+	}
+	incref(resdrv);
+	if (info->dsi_bind == STB_WEAK) {
+		REF struct driver *drv2;
 		struct driver_syminfo info2;
-		ll        = get_driver_loadlist();
-		max_depth = (unsigned int)ll->dll_count;
-		decref_unlikely(ll);
-		depth = 0;
+		depth     = 0;
+		max_depth = get_max_dependency_depth();
 find_nonweak_after:
 		info2.dsi_name    = info->dsi_name;
 		info2.dsi_elfhash = info->dsi_elfhash;
 		info2.dsi_gnuhash = info->dsi_gnuhash;
 		for (; depth < max_depth; ++depth) {
-			status = driver_dlsym_ex(self, &info2, depth);
+			status = driver_dlsym_ex(self, &info2, &drv2, depth);
 			if (status != DRIVER_DLSYM_EX_NOENT) {
-				if (status == DRIVER_DLSYM_EX_OK && info2.dsi_bind == STB_WEAK)
-					continue; /* Another weak symbol (skip; we only ever use the first one found!) */
+				if (status == DRIVER_DLSYM_EX_EOF)
+					break;
+				assert(status == DRIVER_DLSYM_EX_OK);
+				if (info2.dsi_bind == STB_WEAK) {
+					/* Another weak symbol (skip; we only ever use the first one found!) */
+					decref_unlikely(drv2);
+					continue;
+				}
 				info->dsi_addr = info2.dsi_addr;
 				info->dsi_size = info2.dsi_size;
 				info->dsi_bind = info2.dsi_bind;
-				break;
+				decref_unlikely(resdrv);
+				return drv2;
 			}
 		}
 	}
-	return result;
+	return resdrv;
 }
 
 /* Search for a symbol in all loaded drivers, following the order
- * of drivers, as they appear returned by `get_driver_loadlist()' */
-PUBLIC WUNUSED NONNULL((1)) bool FCALL
+ * of drivers, as they appear returned by `get_driver_loadlist()'
+ * @return: *   : Found a symbol matching the given name in this driver.
+ * @return: NULL: No symbol matching the given name found. */
+PUBLIC WUNUSED NONNULL((1)) REF struct driver *FCALL
 driver_dlsym_global(struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...) {
 	size_t i;
@@ -1491,12 +1522,16 @@ driver_dlsym_global(struct driver_syminfo *__restrict info)
 		d = ll->dll_drivers[i];
 		if (!tryincref(d))
 			continue;
-		{
-			FINALLY_DECREF_UNLIKELY(d);
+		TRY {
 			ok = driver_dlsym_local(d, info);
+		} EXCEPT {
+			decref_unlikely(d);
+			RETHROW();
 		}
-		if (!ok)
+		if (!ok) {
+			decref_unlikely(d);
 			continue;
+		}
 		if (info->dsi_bind == STB_WEAK) {
 			/* Try to find another driver that may define this symbol as non-weak! */
 			struct driver_syminfo info2;
@@ -1504,26 +1539,33 @@ driver_dlsym_global(struct driver_syminfo *__restrict info)
 			info2.dsi_elfhash = info->dsi_elfhash;
 			info2.dsi_gnuhash = info->dsi_gnuhash;
 			for (++i; i < ll->dll_count; ++i) {
-				d = ll->dll_drivers[i];
-				if (!tryincref(d))
+				REF struct driver *d2;
+				d2 = ll->dll_drivers[i];
+				if (!tryincref(d2))
 					continue;
-				{
-					FINALLY_DECREF_UNLIKELY(d);
+				TRY {
 					ok = driver_dlsym_local(d, info);
+				} EXCEPT {
+					decref_unlikely(d2);
+					decref_unlikely(d);
+					RETHROW();
 				}
 				/* Only accept non-weak symbols at this point! */
-				if (!ok || info2.dsi_bind == STB_WEAK)
+				if (!ok || info2.dsi_bind == STB_WEAK) {
+					decref_unlikely(d2);
 					continue;
+				}
 				/* Found a non-weak symbol! */
 				info->dsi_addr = info2.dsi_addr;
 				info->dsi_size = info2.dsi_size;
 				info->dsi_bind = info2.dsi_bind;
-				break;
+				decref_unlikely(d);
+				return d2;
 			}
 		}
-		return true;
+		return d;
 	}
-	return false;
+	return NULL;
 }
 
 /* Helper wrappers for the above functions that simply take the
@@ -1540,14 +1582,26 @@ driver_dlsym_local_f(struct driver *__restrict self,
 	return info.dsi_addr;
 }
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_destroy)(struct driver *__restrict self);
+
 PUBLIC WUNUSED NONNULL((1)) void *FCALL
 driver_dlsym_f(struct driver *__restrict self,
                USER CHECKED char const *name)
 		THROWS(E_SEGFAULT, ...) {
 	struct driver_syminfo info;
+	REF struct driver *drv;
 	driver_syminfo_init(&info, name);
-	if (!driver_dlsym(self, &info))
+again:
+	drv = driver_dlsym(self, &info);
+	if (drv) {
+		if unlikely(ATOMIC_DECFETCH(drv->d_module.md_refcnt) == 0) {
+			driver_destroy(drv);
+			goto again;
+		}
+	} else {
 		info.dsi_addr = NULL;
+	}
 	return info.dsi_addr;
 }
 
@@ -1555,9 +1609,18 @@ PUBLIC WUNUSED NONNULL((1)) void *FCALL
 driver_dlsym_global_f(USER CHECKED char const *name)
 		THROWS(E_SEGFAULT, ...) {
 	struct driver_syminfo info;
+	REF struct driver *drv;
 	driver_syminfo_init(&info, name);
-	if (!driver_dlsym_global(&info))
+again:
+	drv = driver_dlsym_global(&info);
+	if (drv) {
+		if unlikely(ATOMIC_DECFETCH(drv->d_module.md_refcnt) == 0) {
+			driver_destroy(drv);
+			goto again;
+		}
+	} else {
 		info.dsi_addr = NULL;
+	}
 	return info.dsi_addr;
 }
 
@@ -1962,10 +2025,307 @@ driver_runstate_init_deps(struct driver *__restrict self) {
 }
 
 
+/* Remove  */
+PRIVATE NONNULL((1)) void FCALL
+driver_disable_textrel(struct driver *__restrict self)
+		THROWS(E_WOULDBLOCK) {
+	ElfW(Half) i;
+	bool haslock  = false;
+	bool mustsync = false;
+	for (i = 0; i < self->d_phnum; ++i) {
+		struct mnode_tree_minmax mima;
+		struct mnode *node;
+		byte_t const *phdr_minaddr;
+		byte_t const *phdr_maxaddr;
+		if (self->d_phdr[i].p_type != PT_LOAD)
+			continue; /* Not a load header */
+		if (self->d_phdr[i].p_flags & PF_W)
+			continue; /* This one's supposed to be writable! */
+		phdr_minaddr = (byte_t const *)(self->d_module.md_loadaddr + self->d_phdr[i].p_vaddr);
+		phdr_maxaddr = phdr_minaddr + self->d_phdr[i].p_memsz;
+		/* Must make this header writable! */
+		if (!haslock) {
+			mman_lock_acquire(&mman_kernel);
+			haslock = true;
+		}
+		mman_mappings_minmaxlocate(&mman_kernel, phdr_minaddr,
+		                           phdr_maxaddr, &mima);
+		if unlikely(!mima.mm_min)
+			continue;
+		for (node = mima.mm_min;;) {
+			if ((node->mn_flags & MNODE_F_PWRITE) &&
+			    (node->mn_module == &self->d_module)) {
+				assert(node->mn_part != NULL);
+				assert(node->mn_flags & MNODE_F_MPREPARED);
+				/* Remap this node w/o write-permissions. */
+				mpart_mmap_force(node->mn_part, mnode_getaddr(node),
+				                 mnode_getsize(node), node->mn_partoff,
+				                 mnode_getperm_force_nouser(node));
+				/* 'have to sync the driver on all CPUs down below! */
+				mustsync = true;
+			}
+			if (node == mima.mm_max)
+				break;
+			node = mnode_tree_nextnode(node);
+			assert(node);
+		}
+	}
+	if (haslock)
+		mman_lock_release(&mman_kernel);
+	if (mustsync) {
+		mman_supersync(self->d_module.md_loadmin,
+		               (size_t)((self->d_module.md_loadmax + 1) -
+		                        (self->d_module.md_loadmin)));
+	}
+}
+
+
+#define DRIVER_RELOC_F_NORMAL   0x0000 /* Normal relocation flags. */
+#define DRIVER_RELOC_F_SYMBOLIC 0x0001 /* DT_SYMBOLIC was set. */
+
+struct driver_reloc_syminfo: driver_syminfo {
+	/* NOTE: The `dsi_name' field ~may~ be left undefined! */
+	struct driver *drs_orig;   /* [1..1][out] The driver that defines the requested symbol. */
+	struct driver *drs_self;   /* [1..1][const] The driver who's relocations are being applied. */
+	unsigned int   drs_rflags; /* [const] Relocation flags (set of `DRIVER_RELOC_F_*') */
+};
+
+PRIVATE NONNULL((1)) void FCALL
+driver_dlsym_for_reloc(struct driver_reloc_syminfo *__restrict self,
+                       uintptr_t symbol_id) {
+	size_t i;
+	ElfW(Sym) const *sym;
+	struct driver *me = self->drs_self;
+	if unlikely(symbol_id >= me->d_dynsym_cnt)
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL, symbol_id);
+	sym = &me->d_dynsym_tab[symbol_id];
+	if ((sym->st_shndx != SHN_UNDEF) &&
+	    (self->drs_rflags & DRIVER_RELOC_F_SYMBOLIC) &&
+	    (ELFW(ST_BIND)(sym->st_info) != STB_WEAK)) {
+		/* Bind the driver's own, local symbol. */
+bind_own_sym:
+		resolve_elf_symbol(me, self, sym);
+		self->drs_orig = me;
+		return;
+	}
+
+	self->dsi_name = me->d_dynstr + sym->st_name;
+	if unlikely(self->dsi_name < me->d_dynstr || self->dsi_name >= me->d_dynstr_end)
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME, sym->st_name);
+	self->dsi_elfhash = (uint32_t)-1;
+	self->dsi_gnuhash = (uint32_t)-1;
+
+	/* Check for special symbols from the `drv_*' namespace. */
+	if (self->dsi_name[0] == 'd' && self->dsi_name[1] == 'r' &&
+	    self->dsi_name[2] == 'v' && self->dsi_name[3] == '_') {
+		if (driver_dlsym_drv(me, self)) {
+			self->drs_orig = me;
+			return;
+		}
+	}
+
+	/* Search for kernel core for the requested symbol. */
+	if (kernel_dlsym(self)) {
+		self->drs_orig = &kernel_driver;
+		return;
+	}
+
+	/* Search through dependencies of the driver itself. */
+	for (i = 0; i < me->d_depcnt; ++i) {
+		REF struct driver *depdrv;
+		depdrv = axref_get(&me->d_depvec[i]);
+		if (!depdrv)
+			continue;
+		{
+			FINALLY_DECREF_UNLIKELY(depdrv);
+			self->drs_orig = driver_dlsym(depdrv, self);
+		}
+		if (self->drs_orig) {
+			struct driver_syminfo info2;
+			decref_unlikely(self->drs_orig);
+			if (self->dsi_bind != STB_WEAK)
+				return;
+			/* Found a weak symbol!
+			 * Note  that we must  also handle the case  where our own driver
+			 * already defined a weak symbol due to `DRIVER_RELOC_F_SYMBOLIC' */
+			if ((sym->st_shndx != SHN_UNDEF) &&
+			    (self->drs_rflags & DRIVER_RELOC_F_SYMBOLIC) &&
+			    (ELFW(ST_BIND)(sym->st_info) == STB_WEAK)) {
+				resolve_elf_symbol(me, self, sym);
+				self->drs_orig = me;
+			}
+			/* Go through all other dependencies and look for a driver
+			 * that defines this symbol as something other than weak! */
+			info2.dsi_name    = self->dsi_name;
+			info2.dsi_elfhash = self->dsi_elfhash;
+			info2.dsi_gnuhash = self->dsi_gnuhash;
+			for (++i; i < me->d_depcnt; ++i) {
+				REF struct driver *depdrv2;
+				depdrv = axref_get(&me->d_depvec[i]);
+				if (!depdrv)
+					continue;
+				{
+					FINALLY_DECREF_UNLIKELY(depdrv);
+					depdrv2 = driver_dlsym(depdrv, &info2);
+				}
+				if (!depdrv2)
+					continue;
+				decref_unlikely(depdrv2);
+				if (info2.dsi_bind != STB_WEAK) {
+					/* Found a non-weak symbol! */
+					self->dsi_addr = info2.dsi_addr;
+					self->dsi_size = info2.dsi_size;
+					self->dsi_bind = info2.dsi_bind;
+					self->drs_orig = depdrv2;
+					break;
+				}
+			}
+			return;
+		}
+	}
+
+	/* Fallback: If the driver itself also defines the symbol, bind against that one! */
+	if (sym->st_shndx != SHN_UNDEF)
+		goto bind_own_sym;
+
+	/* Special case: weak symbols that are never defined may be bound to ADDR=0 */
+	if (ELFW(ST_BIND)(sym->st_info) == STB_WEAK) {
+		self->dsi_addr = NULL;
+		self->dsi_size = 0;
+		self->dsi_bind = STB_WEAK;
+		self->drs_orig = NULL;
+		return;
+	}
+
+	/* Lastly: print an error message, and throw an exception. */
+	printk(KERN_ERR "[mod][%s] Relocation against unknown symbol %q\n",
+	       me->d_name, self->dsi_name);
+	THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL,
+	                       sym->st_name);
+}
+
+
+#ifndef __INTELLISENSE__
+#define DEFINE_driver_do_apply_relocations_vector
+#include "driver-relocate.c.inl"
+#if ELF_ARCH_USESRELA
+#define DEFINE_driver_do_apply_relocations_vector_addend
+#include "driver-relocate.c.inl"
+#endif /* ELF_ARCH_USESRELA */
+#else /* !__INTELLISENSE__ */
+
+/* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
+PRIVATE NONNULL((1, 2)) void KCALL
+driver_do_apply_relocations_vector(struct driver *__restrict self,
+                                   ElfW(Rel) *__restrict vector,
+                                   size_t count, unsigned int reloc_flags);
+
+/* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
+PRIVATE NONNULL((1, 2)) void KCALL
+driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
+                                          ElfW(Rela) *__restrict vector,
+                                          size_t count, unsigned int reloc_flags);
+
+#endif /* __INTELLISENSE__ */
+
+
 /* Initialize driver relocations, but stop if the driver's state is altered. */
 PRIVATE NONNULL((1)) void FCALL
 driver_runstate_init_relo(struct driver *__restrict self) {
-	/* TODO */
+	unsigned int reloc_flags = DRIVER_RELOC_F_NORMAL;
+	ElfW(Rel) *rel_base      = NULL;
+	size_t rel_count         = 0;
+	ElfW(Rel) *jmp_base      = NULL;
+	size_t jmp_size          = 0;
+#if ELF_ARCH_USESRELA
+	ElfW(Rela) *rela_base     = NULL;
+	size_t rela_count         = 0;
+	bool jmp_rels_have_addend = false;
+#endif /* ELF_ARCH_USESRELA */
+	size_t i;
+
+	/* Service relocations of the module. */
+	for (i = 0; i < self->d_dyncnt; ++i) {
+		ElfW(Dyn) tag = self->d_dynhdr[i];
+		switch (tag.d_tag) {
+
+		case DT_NULL:
+			goto done_dynamic;
+
+		case DT_REL:
+			rel_base = (ElfW(Rel) *)(self->d_module.md_loadaddr + tag.d_un.d_ptr);
+			break;
+
+		case DT_RELSZ:
+			rel_count = tag.d_un.d_val / sizeof(ElfW(Rel));
+			break;
+
+		case DT_JMPREL:
+			jmp_base = (ElfW(Rel) *)(self->d_module.md_loadaddr + tag.d_un.d_ptr);
+			break;
+
+		case DT_PLTRELSZ:
+#if !ELF_ARCH_USESRELA
+			jmp_size = tag.d_un.d_val / sizeof(ElfW(Rel));
+#else /* !ELF_ARCH_USESRELA */
+			jmp_size = tag.d_un.d_val;
+#endif /* ELF_ARCH_USESRELA */
+			break;
+
+#if ELF_ARCH_USESRELA
+		case DT_RELA:
+			rela_base = (ElfW(Rela) *)(self->d_module.md_loadaddr + tag.d_un.d_ptr);
+			break;
+
+		case DT_RELASZ:
+			rela_count = tag.d_un.d_val / sizeof(ElfW(Rela));
+			break;
+
+		case DT_PLTREL:
+			if (tag.d_un.d_val == DT_RELA)
+				jmp_rels_have_addend = true;
+			break;
+#endif /* ELF_ARCH_USESRELA */
+
+		case DT_FLAGS:
+			if (tag.d_un.d_val & DF_SYMBOLIC)
+				reloc_flags |= DRIVER_RELOC_F_SYMBOLIC;
+			break;
+
+		case DT_SYMBOLIC:
+			reloc_flags |= DRIVER_RELOC_F_SYMBOLIC;
+			break;
+
+		default: break;
+		}
+	}
+done_dynamic:
+
+	/* Actually apply relocations. */
+	driver_do_apply_relocations_vector(self, rel_base, rel_count, reloc_flags);
+#if !ELF_ARCH_USESRELA
+	driver_do_apply_relocations_vector(self, jmp_base, jmp_size, reloc_flags);
+#else /* !ELF_ARCH_USESRELA */
+	driver_do_apply_relocations_vector_addend(self, rela_base, rela_count, reloc_flags);
+	if (jmp_rels_have_addend) {
+		driver_do_apply_relocations_vector_addend(self,
+		                                          (ElfW(Rela) *)jmp_base,
+		                                          jmp_size / sizeof(ElfW(Rela)),
+		                                          reloc_flags);
+	} else {
+		driver_do_apply_relocations_vector(self, jmp_base,
+		                                   jmp_size / sizeof(ElfW(Rel)),
+		                                   reloc_flags);
+	}
+#endif /* ELF_ARCH_USESRELA */
+
+	/* Perform arch-specific driver initialization. */
+#ifdef ARCH_HAVE_ARCH_DRIVER_INITIALIZE
+	arch_driver_initialize(self);
+#endif /* ARCH_HAVE_ARCH_DRIVER_INITIALIZE */
+
+	/* Disable text relocations for read-only program sections of the driver. */
+	driver_disable_textrel(self);
 }
 
 
@@ -3111,8 +3471,13 @@ again:
 	if (shdr->sh_flags & SHF_ALLOC) {
 		byte_t *addr;
 		addr = (byte_t *)(self->d_module.md_loadaddr + shdr->sh_addr);
-		if (image_validate(self, addr, shdr->sh_size))
+		if (image_validate(self, addr, shdr->sh_size)) {
 			result->ds_addr = addr;
+			if (!(shdr->sh_flags & SHF_COMPRESSED)) {
+				result->ds_infladdr = addr;
+				result->ds_inflsize = shdr->sh_size;
+			}
+		}
 	}
 	/* Acquire a lock to the module section cache. */
 	TRY {
@@ -3637,7 +4002,7 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 	TRY {
 		part = (struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);
 		TRY {
-			PAGEDIR_PAGEALIGNED uintptr_t vaddr, vend;
+			PAGEDIR_PAGEALIGNED uintptr_t vaddr;
 			PAGEDIR_PAGEALIGNED size_t vsize;
 			size_t faddr, fsize, voffs;
 			vaddr = phdr->p_vaddr;
@@ -3667,7 +4032,7 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 			}
 			node->mn_flags   = mnodeflags_from_elfpf(phdr->p_flags) |
 			                   MNODE_F_SHARED | MNODE_F_MPREPARED |
-			                   MNODE_F_MLOCK;
+			                   MNODE_F_MLOCK | MNODE_F_PWRITE; /* Force write-access for relocations */
 			node->mn_part    = part;
 			node->mn_fspath  = drv_fspath;
 			node->mn_fsname  = drv_fsname;
@@ -4098,7 +4463,9 @@ again_acquire_mman_lock:
 					assert(result->d_module.md_nodecount != 0);
 
 					/* Sync the fact that we've just created bunch of new memory mappings. */
-					mman_supersyncall();
+					pagedir_sync(result->d_module.md_loadmin,
+					             (size_t)((result->d_module.md_loadmax + 1) -
+					                      (result->d_module.md_loadmin)));
 
 					/* At this point, we still have to initialize all of the following,
 					 * all of which depend on where we end up loading the driver to, or
