@@ -1301,7 +1301,8 @@ not_an_elf_file:
  */
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct userelf_module *FCALL
 uem_trycreate(struct mman *__restrict self,
-              struct mnode *__restrict node) {
+              struct mnode *__restrict node,
+              unsigned int skipped_neighbor = (unsigned int)-1) {
 	bool did_unlock;
 	REF struct userelf_module *result;
 	struct mpart *part;
@@ -1375,6 +1376,8 @@ uem_trycreate(struct mman *__restrict self,
 		mpart_lock_release(part);
 		for (i = 0; i < 2; ++i) {
 			struct mnode *neighbor;
+			if (i == skipped_neighbor)
+				continue; /* Skip this neighbor. */
 			neighbor = i == 0 ? mnode_tree_prevnode(node)
 			                  : mnode_tree_nextnode(node);
 			if (!neighbor)
@@ -1387,7 +1390,10 @@ uem_trycreate(struct mman *__restrict self,
 			void *minaddr, *maxaddr;
 			minaddr = mnode_getminaddr(node);
 			maxaddr = mnode_getmaxaddr(node);
-			result = uem_trycreate(self, neighbor);
+			/* Don't let the recursive call bounce back the call to our
+			 * original node. - Do this by disallowing the inner callee
+			 * from checking our original node for adjacency. */
+			result = uem_trycreate(self, neighbor, i == 0 ? 1 : 0);
 			if (result == UEM_TRYCREATE_UNLOCKED) {
 				/* Try again... */
 				return UEM_TRYCREATE_UNLOCKED;
