@@ -255,6 +255,9 @@ end_of_everything:
 				REF struct driver_section *sect;
 				next_driver = self->dhi_drivers->dll_drivers[self->dhi_nextdriver];
 				++self->dhi_nextdriver;
+				if unlikely(next_driver == &kernel_driver)
+					goto end_of_driver; /* The kernel core is always enumerated
+					                     * first, and was thus already handled. */
 				if unlikely(!ADDR_ISKERN(next_driver))
 					goto end_of_driver; /* Shouldn't happen */
 				if unlikely(wasdestroyed(next_driver))
