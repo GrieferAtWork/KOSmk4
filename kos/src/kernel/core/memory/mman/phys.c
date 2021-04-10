@@ -556,6 +556,8 @@ NOTHROW(KCALL bzerophyscc)(PHYS physaddr_t dst, size_t num_bytes) {
 #ifndef NO_PHYS_IDENTITY
 again:
 #endif /* !NO_PHYS_IDENTITY */
+	if (!num_bytes)
+		return;
 	for (;;) {
 		page = physaddr2page(dst);
 		if (!page_iszero(page))

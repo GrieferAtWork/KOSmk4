@@ -336,9 +336,9 @@ NOTHROW(FCALL driver_section_destroy)(struct driver_section *__restrict self) {
 	}
 	if (!(self->ds_sect.ms_flags & SHF_ALLOC) &&
 	    self->ds_addr != (KERNEL byte_t *)-1) {
-		mman_unmap_kram_and_kfree(self->ds_addr,
-		                          self->ds_sect.ms_size,
-		                          self);
+		mman_unmap_kram_and_kfree_u(self->ds_addr,
+		                            self->ds_sect.ms_size,
+		                            self);
 	} else {
 		kfree(self);
 	}
@@ -494,11 +494,11 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 		}
 	} EXCEPT {
 		if (src_data_freeme_cookie)
-			mman_unmap_kram_and_kfree(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
+			mman_unmap_kram_and_kfree_u(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
 		RETHROW();
 	}
 	if (src_data_freeme_cookie)
-		mman_unmap_kram_and_kfree(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
+		mman_unmap_kram_and_kfree_u(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
 	ATOMIC_WRITE(self->ds_inflsize, dst_size);
 	ATOMIC_CMPXCH(self->ds_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;
@@ -3837,7 +3837,7 @@ got_dynstr_size:
 	self->d_name       = self->d_dynstr + soname_offset;
 
 	/* Make sure that `d_name' isn't an empty string! */
-	if (memcpy_nopf(&lastch, self->d_name, sizeof(lastch)) == 0 || lastch == '\0')
+	if (memcpy_nopf(&lastch, self->d_name, sizeof(lastch)) != 0 || lastch == '\0')
 		return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME;
 
 	/* Make sure that the DT_SONAME string is NUL-terminated _before_ the end of the .dynstr table. */
@@ -4057,7 +4057,6 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 			part->mp_refcnt = 1; /* +1:node->mn_part */
 			part->mp_flags  = MPART_F_MLOCK;
-			mpart_ll_allocmem(part, vsize / PAGESIZE);
 			part->mp_file   = &mfile_zero;
 			LIST_INIT(&part->mp_copy);
 			part->mp_share.lh_first = node;
@@ -4066,9 +4065,12 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 			part->mp_minaddr = (pos_t)(0);
 			part->mp_maxaddr = (pos_t)(vsize - 1);
 			DBG_memset(&part->mp_changed, 0xcc, sizeof(part->mp_changed));
-			DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
+			_mpart_init_asanon(part);
 			part->mp_blkst_ptr = NULL; /* All parts marked as `MPART_BLOCK_ST_CHNG' */
 			part->mp_meta      = NULL;
+
+			/* Allocate physical memory for the part. */
+			mpart_ll_allocmem(part, vsize / PAGESIZE);
 
 			/* And with that, all of the data from the part's been
 			 * initialized. Now all that's left  to be done is  to
@@ -4096,6 +4098,8 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 				RETHROW();
 			}
 			incref(&mfile_zero); /* Reference for `part->mp_file' */
+			xincref(drv_fspath); /* Reference for `node->mn_fspath' */
+			xincref(drv_fsname); /* Reference for `node->mn_fsname' */
 		} EXCEPT {
 			kfree(part);
 			RETHROW();
@@ -4239,6 +4243,7 @@ done_dynhdr_for_soname:
 					*pnew_driver_loaded = false;
 				return result; /* This driver has already been loaded. */
 			}
+			break;
 		}
 	}
 
@@ -4527,7 +4532,6 @@ again_acquire_mman_lock:
 							mman_remove_driver_nodes(result, &nodes);
 							mman_lock_release_f(&mman_kernel);
 							kfree(new_ll);
-							weakdecref_nokill(&mman_kernel);
 							xdecref_nokill(drv_file);
 							xdecref_nokill(drv_fspath);
 							xdecref_nokill(drv_fsname);
@@ -4602,7 +4606,6 @@ again_acquire_mman_lock:
 					RETHROW();
 				}
 			} EXCEPT {
-				weakdecref_nokill(&mman_kernel);
 				xdecref_nokill(drv_file);
 				xdecref_nokill(drv_fspath);
 				xdecref_nokill(drv_fsname);
@@ -4686,13 +4689,13 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 			                       driver_dentry, driver_cmdline,
 			                       pnew_driver_loaded);
 		} EXCEPT {
-			mman_unmap_kram_and_kfree(tempmap, (size_t)tempmap_size,
-			                          unmap_cookie);
+			mman_unmap_kram_and_kfree_u(tempmap, (size_t)tempmap_size,
+			                            unmap_cookie);
 			RETHROW();
 		}
 		/* Delete the temporary mapping created above. */
-		mman_unmap_kram_and_kfree(tempmap, (size_t)tempmap_size,
-		                          unmap_cookie);
+		mman_unmap_kram_and_kfree_u(tempmap, (size_t)tempmap_size,
+		                            unmap_cookie);
 	}
 	return result;
 }
@@ -4940,7 +4943,7 @@ driver_loadmod_file_in_path(char const *__restrict path, size_t pathlen,
 		/* Construct the filename  */
 		p = (char *)mempcpy(buf, path, pathlen, sizeof(char));
 		*p++ = '/';
-		p = (char *)mempcpy(buf, driver_name, driver_namelen, sizeof(char));
+		p = (char *)mempcpy(p, driver_name, driver_namelen, sizeof(char));
 		*p++ = '\0';
 		if (create_new_drivers) {
 			/* Second-phase (actually load new drivers) */

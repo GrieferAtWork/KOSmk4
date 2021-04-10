@@ -1567,12 +1567,16 @@ NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) void
 NOTHROW(FCALL mman_unmap_kram_ex)(/*inherit(always)*/ struct mman_unmap_kram_job *__restrict job) {
 	if (mman_lock_tryacquire(&mman_kernel)) {
+		struct mman_unmap_kram_job *st;
 		/* Try to unmap kernel ram directly. */
-		job = mman_unmap_kram_locked_ex(job);
+		st = mman_unmap_kram_locked_ex(job);
 		mman_lock_release(&mman_kernel);
-		assert(job != MMAN_UNMAP_KRAM_LOCKED_EX_DONE);
-		if unlikely(job != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC)
+		if (st == MMAN_UNMAP_KRAM_LOCKED_EX_DONE) {
+			if likely(job->mukj_done != NULL)
+				(*job->mukj_done)(job);
+		} else if unlikely(st != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
 			goto do_schedule_lockop;
+		}
 	} else {
 do_schedule_lockop:
 		job->mukj_lop_mm.olo_func = &lockop_kram_cb;
@@ -1611,6 +1615,19 @@ NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
 	job->mukj_flags   = flags;
 	mman_unmap_kram_ex(job);
 }
+
+/* Same as `mman_unmap_kram_and_kfree()', but automatically expand the given
+ * address range to  include all partially  covered pages (i.e.  floor-align
+ * the base-address, and ceil-align the end-address) */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL mman_unmap_kram_and_kfree_u)(void const *addr, size_t num_bytes,
+                                           void *freeme, gfp_t flags) {
+	num_bytes += (uintptr_t)addr & PAGESIZE;
+	addr      = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
+	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
+	mman_unmap_kram_and_kfree(addr, num_bytes, freeme, flags);
+}
+
 
 
 

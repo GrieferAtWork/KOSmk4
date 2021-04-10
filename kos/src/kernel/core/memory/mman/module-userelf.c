@@ -195,9 +195,9 @@ NOTHROW(FCALL uems_destroy)(struct userelf_module_section *__restrict self) {
 		                self->ums_inflsize);
 	}
 	if (self->ums_kernaddr != (KERNEL byte_t *)-1) {
-		mman_unmap_kram_and_kfree(self->ums_kernaddr,
-		                          self->ms_size,
-		                          self);
+		mman_unmap_kram_and_kfree_u(self->ums_kernaddr,
+		                            self->ms_size,
+		                            self);
 	} else {
 		kfree(self);
 	}
@@ -366,11 +366,11 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 		}
 	} EXCEPT {
 		if (src_data_freeme_cookie)
-			mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
+			mman_unmap_kram_and_kfree_u(src_data, self->ms_size, src_data_freeme_cookie);
 		RETHROW();
 	}
 	if (src_data_freeme_cookie)
-		mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
+		mman_unmap_kram_and_kfree_u(src_data, self->ms_size, src_data_freeme_cookie);
 	ATOMIC_WRITE(self->ums_inflsize, dst_size);
 	ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;

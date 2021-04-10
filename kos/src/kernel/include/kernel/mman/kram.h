@@ -148,21 +148,21 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  *
  * In the case of writable mappings, the solution is fairly simple, since
  * all that really needs to  be done is (ab-)use  a small portion of  the
- * region being free'd as a `struct lockop' that is enqueued for running
+ * region  being free'd as a `struct lockop' that is enqueued for running
  * when a lock to the kernel mman becomes available.
  *
- * Once that lock is available, iteratively  go through all nodes of  the
- * region  (splitting the region at the front if necessary, and asserting
- * that any partial nodes don't  have the MNODE_F_NOSPLIT flag set).  For
- * every node encountered in  this manner, try to  acquire a lock to  the
- * associated mem-part. If this lock  cannot be acquired, re-purpose  the
- * region being freed  as a `Toblockop(struct mpart)'  that is executed  once
- * that lock becomes available. If  this was done, the Toblockop(struct mpart)  will
- * try to acquire a lock to the  kernel mman. On success, continue as  if
- * the original mman->part  locking order attempt  was successful.  Else,
- * re-purpose  the `Toblockop(struct mpart)' as yet another `struct lockop',
- * and  enqueue that one  back onto the kernel  mman lock-job queue, thus
- * letting the request bounce back and forth without ever blocking, until
+ * Once  that  lock  is  available,  iteratively  go  through  all  nodes  of  the
+ * region  (splitting  the  region  at  the  front  if  necessary,  and  asserting
+ * that   any  partial  nodes  don't  have  the  MNODE_F_NOSPLIT  flag  set).  For
+ * every  node  encountered  in  this  manner,  try  to  acquire  a  lock  to  the
+ * associated  mem-part.  If  this  lock   cannot  be  acquired,  re-purpose   the
+ * region  being  freed  as  a  `Toblockop(struct mpart)'  that  is  executed once
+ * that lock becomes available. If this was done, the Toblockop(struct mpart) will
+ * try to  acquire  a  lock  to  the kernel  mman.  On  success,  continue  as  if
+ * the  original   mman->part  locking   order  attempt   was  successful.   Else,
+ * re-purpose   the  `Toblockop(struct mpart)'  as  yet  another  `struct lockop',
+ * and  enqueue  that  one  back  onto  the  kernel  mman  lock-job  queue,   thus
+ * letting  the  request  bounce  back  and  forth  without  ever  blocking, until
  * both locks can be acquired at the same time.
  *
  * Once  both locks are held, do the  actual unmap. For this purpose, when
@@ -174,22 +174,22 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  *
  * If the unmap itself (or the  attempt to partially split a  leading/trailing
  * node/part) fails (due to lack of memory during a split or pagedir_prepare),
- * then the unmap operation  is enqueued as a  `struct lockop' in such a  way
+ * then the unmap  operation is enqueued  as a `struct lockop'  in such a  way
  * that it will _not_ be (re-)attempted immediately once the caller (which  is
  * usually `_mman_lockops_reap()')  releases their  lock to  the kernel  mman.
  * The idea here is to hope that more memory will be available once the kernel
  * mman is unlocked the next time around.
  *
- * If the remainder of the requested unmap-area is now gone, then  we're
- * done. Otherwise, if the current locking order is mman->part (that is:
+ * If the remainder  of the  requested unmap-area  is now  gone, then  we're
+ * done. Otherwise, if  the current  locking order is  mman->part (that  is:
  * the current request originates from a `Toblockop(struct mpart)'), release
  * the part lock. Then, continue searching for the next node to unmap.
  *
- * When unmapping a read-only mapping, things are a bit more complicated,
- * since it's not possible to (ab-)use the region being free'd as a lock-
- * job descriptor (either  a `struct lockop' or  `Toblockop(struct mpart)').
- * In this case, unmapping is only possible if the caller sacrifices  yet
- * another  dynamically allocated (and most importantly: writable) region
+ * When  unmapping a read-only mapping, things are a bit more complicated,
+ * since it's not possible to (ab-)use the region being free'd as a  lock-
+ * job descriptor (either a `struct lockop' or `Toblockop(struct mpart)').
+ * In this case, unmapping is only  possible if the caller sacrifices  yet
+ * another  dynamically allocated (and  most importantly: writable) region
  * of memory: a `struct mman_unmap_kram_job'.
  *
  * In this case, instead of always re-using the actual region that is being
@@ -292,6 +292,13 @@ FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
                                          PAGEDIR_PAGEALIGNED size_t num_bytes,
                                          void *freeme, gfp_t flags DFL(0));
+
+/* Same as `mman_unmap_kram_and_kfree()', but automatically expand the given
+ * address range to  include all partially  covered pages (i.e.  floor-align
+ * the base-address, and ceil-align the end-address) */
+FUNDEF NOBLOCK void
+NOTHROW(FCALL mman_unmap_kram_and_kfree_u)(void const *addr, size_t num_bytes,
+                                           void *freeme, gfp_t flags DFL(0));
 
 DECL_END
 #endif /* __CC__ */
