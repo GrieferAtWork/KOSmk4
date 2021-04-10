@@ -443,7 +443,7 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 		TRY {
 			ssize_t error;
 			struct zlib_reader reader;
-			zlib_reader_init(&reader, src_data, src_size);
+			zlib_reader_init(&reader, chdr + 1, src_size);
 			/* Decompress data. */
 #ifdef CONFIG_HAVE_DEBUGGER
 			if (dbg_active) {

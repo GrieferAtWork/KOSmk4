@@ -269,6 +269,7 @@ uems_getaddr_alias(struct userelf_module_section *__restrict self) {
 INTERN WUNUSED NONNULL((1, 2)) KERNEL byte_t *FCALL
 uems_getaddr_inflate(struct userelf_module_section *__restrict self,
                      size_t *__restrict psize) {
+	size_t sizeof_cdhr;
 	size_t dst_size, src_size;
 	KERNEL byte_t *src_data, *dst_data;
 	void *src_data_freeme_cookie;
@@ -289,7 +290,8 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 	if (!tryincref(mod))
 		THROW(E_NO_SUCH_OBJECT);
 	FINALLY_DECREF_UNLIKELY(mod);
-	if unlikely(OVERFLOW_USUB(self->ms_size, UM_sizeof(mod, UM_ElfW_Chdr), &src_size))
+	sizeof_cdhr = UM_sizeof(mod, UM_ElfW_Chdr);
+	if unlikely(OVERFLOW_USUB(self->ms_size, sizeof_cdhr, &src_size))
 		THROW(E_INVALID_ARGUMENT);
 	src_data = self->ums_kernaddr;
 	src_data_freeme_cookie = NULL;
@@ -315,7 +317,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 		TRY {
 			ssize_t error;
 			struct zlib_reader reader;
-			zlib_reader_init(&reader, src_data, src_size);
+			zlib_reader_init(&reader, src_data + sizeof_cdhr, src_size);
 			/* Decompress data. */
 #ifdef CONFIG_HAVE_DEBUGGER
 			if (dbg_active) {
