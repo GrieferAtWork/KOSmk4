@@ -62,6 +62,12 @@
 
 #include <libzlib/inflate.h>
 
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <kernel/mman/execinfo.h>
+
+#include <inttypes.h>
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
@@ -1595,6 +1601,46 @@ nextnode:
 	return result;
 }
 
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DBG_COMMAND(lslib,
+            "lslib\n"
+            "\tEnumerate user-space libraries\n") {
+	REF struct module *mod;
+	struct mfile *exec_file;
+	struct mman *mm;
+	mm        = dbg_current->t_mman;
+	exec_file = FORMMAN(mm, thismman_execinfo).mei_node;
+	dbg_print(DBGSTR("name                            loadaddr minaddr  maxaddr\n"));
+	for (mod = mman_module_first_nx(mm); mod;) {
+		ssize_t len;
+		FINALLY_DECREF_UNLIKELY(mod);
+		dbg_savecolor();
+		if (mod->md_file == exec_file) {
+			/* Highlight the main executable. */
+			dbg_setcolor(ANSITTY_CL_WHITE,
+			             ANSITTY_CL_DARK_GRAY);
+		}
+		if (module_haspath_or_name(mod)) {
+			len = module_printpath_or_name(mod, &dbg_printer, NULL);
+		} else {
+			dbg_putc('?');
+			len = 1;
+		}
+		while (len < 31) {
+			dbg_putc(' ');
+			++len;
+		}
+		dbg_printf(DBGSTR(" %.8" PRIxPTR " %.8" PRIxPTR " %.8" PRIxPTR "\n"),
+		           mod->md_loadaddr,
+		           mod->md_loadmin,
+		           mod->md_loadmax);
+		dbg_loadcolor();
+		mod = mman_module_next_nx(mm, mod);
+	}
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_END
 #endif /* CONFIG_HAVE_USERELF_MODULES */
