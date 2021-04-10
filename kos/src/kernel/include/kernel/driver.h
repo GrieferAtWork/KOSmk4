@@ -48,6 +48,12 @@ struct driver;
 DEFINE_REFCOUNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
 #else /* !__driver_defined */
+#ifndef __driver_destroy
+#define __driver_destroy(self)    module_destroy(__driver_as_module(self))
+#endif /* !__driver_destroy */
+#ifndef __driver_free
+#define __driver_free(self)       module_free(__driver_as_module(self))
+#endif /* !__driver_free */
 #ifndef __driver_refcnt
 #define __driver_refcnt(self)     __driver_as_module(self)->md_refcnt
 #endif /* !__driver_refcnt */
@@ -60,6 +66,8 @@ DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_fre
 #ifndef __kernel_driver_defined
 #define __kernel_driver_defined
 DATDEF struct driver kernel_driver;
+DATDEF struct module __kernel_driver ASMNAME("kernel_driver");
+#define kernel_driver (*(struct driver *)&__kernel_driver)
 #endif /* !__kernel_driver_defined */
 
 
@@ -69,6 +77,8 @@ DATDEF struct driver kernel_driver;
 #define __drv_self_defined
 /* Self-pointer to the current driver's descriptor */
 DATDEF struct driver drv_self;
+DATDEF struct module __drv_self ASMNAME("drv_self");
+#define drv_self (*(struct driver *)&__drv_self)
 #endif /* !__drv_self_defined */
 
 DATDEF byte_t /*         */ drv_loadaddr[];    /* Absolute load-address of the driver (== drv_self.md_loadaddr) */
@@ -105,6 +115,8 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL drv_clearcache)(void);
 #ifndef __drv_self_defined
 #define __drv_self_defined
 DATDEF struct driver drv_self ASMNAME("kernel_driver");
+DATDEF struct module __drv_self ASMNAME("kernel_driver");
+#define drv_self (*(struct driver *)&__drv_self)
 #endif /* !__drv_self_defined */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 

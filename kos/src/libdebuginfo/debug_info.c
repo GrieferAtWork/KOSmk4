@@ -59,6 +59,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/panic.h> /* kernel_poisoned() */
 
 #include <hybrid/atomic.h>
+#include <hybrid/sync/atomic-rwlock.h>
 #else /* __KERNEL__ */
 #include <malloc.h>
 #endif /* !__KERNEL__ */

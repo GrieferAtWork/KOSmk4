@@ -125,8 +125,8 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 #ifdef CONFIG_USE_NEW_DRIVER
 		struct driver_symaddr info;
 		if (driver_dladdr_local(&kernel_driver, module_relative_pc, &info)) {
-			result->al_symstart = (byte_t *)info.dsa_addr;
-			result->al_symend   = (byte_t *)info.dsa_addr + info.dsa_size;
+			result->al_symstart = (uintptr_t)info.dsa_addr;
+			result->al_symend   = (uintptr_t)info.dsa_addr + info.dsa_size;
 			result->al_rawname  = (char *)info.dsa_name;
 		}
 #else /* CONFIG_USE_NEW_DRIVER */

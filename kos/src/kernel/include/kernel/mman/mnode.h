@@ -278,7 +278,11 @@ struct mnode {
 #define MNODE_INIT_mn_partoff(mn_partoff) mn_partoff
 #define MNODE_INIT_mn_link(...)           __VA_ARGS__
 #define MNODE_INIT_mn_writable(...)       __VA_ARGS__
+#ifdef CONFIG_USE_NEW_DRIVER
 #define MNODE_INIT_mn_module(mn_module)   mn_module
+#else /* CONFIG_USE_NEW_DRIVER */
+#define MNODE_INIT_mn_module(mn_module)   __NULLPTR
+#endif /* !CONFIG_USE_NEW_DRIVER */
 #endif /* __WANT_MNODE_INIT */
 
 

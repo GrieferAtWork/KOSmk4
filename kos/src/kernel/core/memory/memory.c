@@ -27,8 +27,8 @@
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <debugger/io.h>
-#include <kernel/driver.h>
 #include <kernel/memory.h>
+#include <kernel/mman/cache.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>

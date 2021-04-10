@@ -76,6 +76,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <elf.h>
+#include <format-printer.h>
 #include <inttypes.h>
 #include <malloca.h>
 #include <signal.h>
@@ -85,6 +86,7 @@
 #include <string.h>
 
 #include <libcmdline/decode.h>
+#include <libcmdline/encode.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/unwind.h>
 #include <libzlib/inflate.h>
@@ -521,10 +523,10 @@ PRIVATE struct module_section_ops const driver_section_ops = {
 /************************************************************************/
 #ifdef __INTELLISENSE__
 struct kernel_shstrtab { char zero; };
-INTERN_CONST ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data = { 0 };
+PRIVATE ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data = { 0 };
 enum { KERNEL_SECTIONS_COUNT };
-INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {};
-INTERN_CONST struct driver_section_awref kernel_sections[KERNEL_SECTIONS_COUNT] = {};
+PRIVATE ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {};
+PRIVATE struct driver_section_awref kernel_sections[KERNEL_SECTIONS_COUNT] = {};
 #else /* __INTELLISENSE__ */
 #define SECTION_DESCRIPTOR_INDEX     PP_CAT2(KERNEL_SECTION_INDEX_, __LINE__)
 #define SECTION_DESCRIPTOR_SHSTRNAME PP_CAT2(ks_name_, __LINE__)
@@ -541,7 +543,7 @@ struct kernel_shstrtab {
 	char zero;
 };
 
-INTERN_CONST ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data = {
+PRIVATE ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data = {
 #define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	/* .SECTION_DESCRIPTOR_SHSTRNAME = */ name,
 #include "../../fs/kernel_sections.def"
@@ -560,7 +562,7 @@ enum {
 
 
 /* Define the ELF section header vector. */
-INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {
+PRIVATE ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {
 #define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	/* [SECTION_DESCRIPTOR_INDEX] = */ {                                                 \
 		.sh_name      = offsetof(struct kernel_shstrtab, SECTION_DESCRIPTOR_SHSTRNAME),  \
@@ -607,7 +609,7 @@ INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT]
 
 
 /* Define the driver sections vector. */
-INTERN_CONST struct driver_section_awref kernel_sections[KERNEL_SECTIONS_COUNT] = {
+PRIVATE struct driver_section_awref kernel_sections[KERNEL_SECTIONS_COUNT] = {
 #define INTERN_SECTION(symbol_name, ...) /* [SECTION_DESCRIPTOR_INDEX] = */ AWREF_INIT(&symbol_name),
 #include "../../fs/kernel_sections.def"
 };
@@ -684,14 +686,18 @@ PRIVATE ATTR_COLDDATA struct directory_entry kernel_driver_fsname = {
 	.de_hash     = 0,
 	.de_namelen  = COMPILER_STRLEN(KERNEL_DRIVER_FILENAME),
 	.de_type     = DT_REG,
-	.de_name     = KERNEL_DRIVER_FILENAME
+	/* .de_name  = */ KERNEL_DRIVER_FILENAME
 };
 
 PUBLIC struct driver kernel_driver = {
 	.d_module = {
 		.md_refcnt     = 2,                         /* +1: kernel_driver, +1: d_state == DRIVER_STATE_LOADED */
 		.md_weakrefcnt = 2 + KERNEL_SECTIONS_COUNT, /* +1:md_refcnt != 0, +1:md_nodecount != 0, +N: KERNEL_SECTIONS_COUNT */
-		.md_nodecount  = 1, /* TODO */
+		.md_nodecount  = 1, /* Any  non-zero value is  ok. `1' is perfect  here, since any mem-node
+		                     * that is apart  of the  kernel core must  never be  unmapped, and  by
+		                     * setting `1' here, anyone attempting to do so will cause this counter
+		                     * to  drop  to `0',  which in  turn will  invoke the  bad `mo_nonodes'
+		                     * callback and cause kernel panic! */
 		.md_ops        = &kernel_module_ops,
 		.md_mman       = &mman_kernel,
 		.md_loadaddr   = 0,
@@ -834,6 +840,7 @@ NOTHROW(FCALL driver_aboveaddr)(void const *addr) {
 	ll = get_driver_loadlist();
 	assert_assume(ll->dll_count >= 1);
 	for (i = 0; i < ll->dll_count; ++i) {
+		result = ll->dll_drivers[i];
 		if (addr >= result->d_module.md_loadmin) {
 			if likely(tryincref(result)) {
 				decref_unlikely(ll);
@@ -874,7 +881,11 @@ NOTHROW(FCALL driver_next)(struct module *prev) {
 	return result;
 }
 
-/* Lookup an already-loaded driver, given its name or file. */
+/* Lookup an already-loaded driver, given its name, filename, or  file.
+ * Note that driver filenames (if  not absolute paths) are  interpreted
+ * relative to the calling thread's current CWD, however absolute paths
+ * are interpreted relative to `vfs_kernel' (i.e. are _NOT_ affected by
+ * chroot(2)) */
 PUBLIC WUNUSED REF struct driver *FCALL
 driver_fromname(USER CHECKED char const *driver_name)
 		THROWS(E_SEGFAULT) {
@@ -1278,7 +1289,7 @@ NOTHROW(KCALL copy_to_phys_of_virt)(void const *dst,
 	}
 }
 
-PRIVATE WUNUSED NONNULL((1, 2, 3)) void FCALL
+PRIVATE NONNULL((1, 2, 3)) void FCALL
 resolve_elf_symbol(struct driver *__restrict self,
                    struct driver_syminfo *__restrict info,
                    ElfW(Sym) const *__restrict symbol)
@@ -1544,7 +1555,7 @@ driver_dlsym_global(struct driver_syminfo *__restrict info)
 				if (!tryincref(d2))
 					continue;
 				TRY {
-					ok = driver_dlsym_local(d, info);
+					ok = driver_dlsym_local(d, &info2);
 				} EXCEPT {
 					decref_unlikely(d2);
 					decref_unlikely(d);
@@ -1714,10 +1725,10 @@ NOTHROW(FCALL driver_dladdr_elf)(struct driver *__restrict self,
  * about the symbol that contains that address.
  * @return: true:  Success.
  * @return: false: Failure. */
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 3)) bool
 NOTHROW(FCALL driver_dladdr_local)(struct driver *__restrict self,
-                                   struct driver_symaddr *__restrict info,
-                                   uintptr_t driver_reladdr) {
+                                   uintptr_t driver_reladdr,
+                                   struct driver_symaddr *__restrict info) {
 	ElfW(Sym) const *symbol;
 	/* Special case for the kernel core. */
 	if (self == &kernel_driver)
@@ -1738,16 +1749,16 @@ NOTHROW(FCALL driver_dladdr_local)(struct driver *__restrict self,
 /* Similar to `driver_dladdr_local()', but uses `driver_fromaddr()'
  * to lookup the module containing  `addr', and follows this up  by
  * using `driver_dladdr_local()' */
-PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct driver *
-NOTHROW(FCALL driver_dladdr)(struct driver_symaddr *__restrict info,
-                             void const *addr) {
+PUBLIC NOBLOCK WUNUSED NONNULL((2)) REF struct driver *
+NOTHROW(FCALL driver_dladdr)(void const *addr,
+                             struct driver_symaddr *__restrict info) {
 	REF struct driver *drv;
 	drv = driver_fromaddr(addr);
 	if (!drv)
 		return NULL;
-	if (!driver_dladdr_local(drv, info,
-	                         (uintptr_t)addr -
-	                         drv->d_module.md_loadaddr)) {
+	if (!driver_dladdr_local(drv,
+	                         (uintptr_t)addr - drv->d_module.md_loadaddr,
+	                         info)) {
 		decref_unlikely(drv);
 		drv = NULL;
 	}
@@ -2010,6 +2021,8 @@ driver_runstate_init_deps(struct driver *__restrict self) {
 					kernel_panic("Cannot load dependency %q of driver %q\n"
 					             "Consider starting KOS with the dependency as a boot-module",
 					             name, self->d_name);
+				} else {
+					driver_initialize(dependency);
 				}
 			}
 		} else {
@@ -2155,7 +2168,7 @@ bind_own_sym:
 				self->drs_orig = me;
 			}
 			/* Go through all other dependencies and look for a driver
-			 * that defines this symbol as something other than weak! */
+			 * that defines this symbol as something other than  weak! */
 			info2.dsi_name    = self->dsi_name;
 			info2.dsi_elfhash = self->dsi_elfhash;
 			info2.dsi_gnuhash = self->dsi_gnuhash;
@@ -3137,7 +3150,7 @@ again_find_nodes:
 				ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
 
 				/* Add the node to the list of dead nodes. */
-				SLIST_INSERT(&self->_d_deadnodes, node, _mn_dead);
+				SLIST_INSERT(deadlist, node, _mn_dead);
 				goto again_find_nodes;
 			}
 			if (node == mima.mm_max)
@@ -4825,7 +4838,7 @@ nope:
 }
 
 
-PRIVATE WUNUSED REF struct driver *KCALL
+PUBLIC WUNUSED REF struct driver *KCALL
 driver_fromfilename(USER CHECKED char const *driver_filename)
 		THROWS(E_SEGFAULT) {
 	REF struct driver *result;
@@ -4849,6 +4862,48 @@ driver_fromfilename(USER CHECKED char const *driver_filename)
 		if (result->d_module.md_fspath && result->d_module.md_fsname) {
 			TRY {
 				if (strcmp(result->d_module.md_fsname->de_name, name) == 0 &&
+				    path_equals_string(result->d_module.md_fspath,
+				                       driver_filename, pathlen))
+					return result; /* This is the one! */
+			} EXCEPT {
+				decref_unlikely(result);
+				RETHROW();
+			}
+		}
+		decref_unlikely(result);
+	}
+	return NULL;
+}
+
+PUBLIC WUNUSED REF struct driver *KCALL
+driver_fromfilename_with_len(USER CHECKED char const *driver_filename,
+                             size_t driver_filename_len)
+		THROWS(E_SEGFAULT) {
+	REF struct driver *result;
+	REF struct driver_loadlist *ll;
+	char const *name;
+	size_t namelen, pathlen, i;
+	name = (char const *)memrchr(driver_filename, '/', driver_filename_len);
+	if (name) {
+		pathlen = (size_t)(name - driver_filename);
+		++name;
+		namelen = (size_t)((driver_filename + driver_filename_len) - name);
+	} else {
+		pathlen = 0;
+		name    = driver_filename;
+		namelen = driver_filename_len;
+	}
+	ll = get_driver_loadlist();
+	FINALLY_DECREF_UNLIKELY(ll);
+	for (i = 0; i < ll->dll_count; ++i) {
+		result = ll->dll_drivers[i];
+		if (!tryincref(result))
+			continue;
+		if (result->d_module.md_fspath && result->d_module.md_fsname) {
+			TRY {
+				if (result->d_module.md_fsname->de_namelen == namelen &&
+				    memcmp(result->d_module.md_fsname->de_name,
+				           name, namelen * sizeof(char)) == 0 &&
 				    path_equals_string(result->d_module.md_fspath,
 				                       driver_filename, pathlen))
 					return result; /* This is the one! */
@@ -5073,7 +5128,125 @@ driver_insmod(USER CHECKED char const *driver_name,
 PUBLIC NONNULL((1)) unsigned int FCALL
 driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict self,
                              unsigned int flags)
-		THROWS(E_WOULDBLOCK);
+		THROWS(E_WOULDBLOCK) {
+	TRY {
+		if unlikely(self == &kernel_driver) {
+			decref_nokill(self);
+			return DRIVER_DELMOD_ST_INUSE; /* Not allowed! */
+		}
+
+		/* Always finalize the driver */
+		driver_finalize(self);
+
+		if (ATOMIC_CMPXCH(self->d_module.md_refcnt, 1, 0))
+			goto success;
+		if (!(flags & DRIVER_DELMOD_F_NODEPEND)) {
+			/* Search for, and delete modules that are using `self' */
+			size_t j;
+			REF struct driver_loadlist *dll;
+			bool changed;
+again_search_for_depending_drivers:
+			dll = arref_get(&drivers);
+			for (j = 0; j < dll->dll_count; ++j) {
+				struct driver *d;
+				size_t i;
+				d = dll->dll_drivers[j];
+				if (d == self)
+					continue;
+				if (!tryincref(d))
+					continue;
+				/* Check if this driver has a dependency on us. */
+				for (i = 0; i < d->d_depcnt; ++i) {
+					if (axref_ptr(&d->d_depvec[i]) != self)
+						continue;
+					TRY {
+						/* Recursively delete this driver. */
+						driver_try_decref_and_delmod(d, flags);
+						/* Even if 1 depending driver could not be unloaded, keep on finalizing
+						 * all other drivers to give the first  one more time to come to  terms
+						 * with the fact that it is being unloaded.
+						 * If everything works out, we'll still be able to destroy our driver
+						 * in the final ATOMIC_CMPXCH() below. */
+						goto find_next_dependent_driver;
+					} EXCEPT {
+						decref_unlikely(dll);
+						RETHROW();
+					}
+				}
+				decref_unlikely(d);
+find_next_dependent_driver:
+				;
+			}
+			/* If the set of loaded drivers has changed, then
+			 * we  have to check  for more depending drivers. */
+			changed = arref_ptr(&drivers) != dll;
+			decref_unlikely(dll);
+			if unlikely(changed)
+				goto again_search_for_depending_drivers;
+		}
+	} EXCEPT {
+		decref(self);
+		RETHROW();
+	}
+
+	/* Check if we can get rid of the last reference */
+	if (ATOMIC_CMPXCH(self->d_module.md_refcnt, 1, 0))
+		goto success;
+
+	if (flags & DRIVER_DELMOD_F_FORCE) {
+		refcnt_t remaining_references;
+		remaining_references = ATOMIC_CMPXCH_VAL(self->d_module.md_refcnt, 1, 0);
+		if unlikely(remaining_references == 1)
+			goto success;
+		/* Forcing the kernel to do this is really bad, and the only situation
+		 * where  us getting won't end up in  the kernel crashing, is when the
+		 * driver really did leak one of its references.
+		 * Now granted, the driver may have intentionally leaked one of its
+		 * references, but even still: this is bad... */
+		printk(KERN_CRIT "[mod][%s] Force unload driver with %" PRIuSIZ " unaccounted references\n",
+		       self->d_name, remaining_references);
+		ATOMIC_WRITE(self->d_module.md_refcnt, 0);
+		goto success;
+	}
+	if (!(flags & DRIVER_DELMOD_F_NONBLOCK)) {
+		/* Wait for the driver to be destroyed. */
+		task_connect(driver_changesignal(self)); /* This is broadcast when the driver gets destroyed. */
+		weakincref(self);                        /* Keep the driver control structure alive */
+again_decref_and_waitfor_destroy:
+		decref(self); /* We'll re-acquire this reference of something goes wrong. */
+		if unlikely(wasdestroyed(self)) {
+			task_disconnectall();
+			goto drop_weakref_after_destroyed;
+		}
+		TRY {
+			task_waitfor();
+		} EXCEPT {
+			/* Drop the weak reference we took above. */
+			weakdecref(self);
+			RETHROW();
+		}
+		/* Check if we can still acquire references. */
+		if unlikely(tryincref(self)) {
+			TRY {
+				task_connect(driver_changesignal(self));
+			} EXCEPT {
+				decref_unlikely(self);
+				RETHROW();
+			}
+			goto again_decref_and_waitfor_destroy;
+		}
+drop_weakref_after_destroyed:
+		/* Yes: the driver is dead!
+		 * Now all that's left is the weak reference we still have from above. */
+		weakdecref(self);
+		return DRIVER_DELMOD_ST_SUCCESS;
+	}
+	return DRIVER_DELMOD_ST_INUSE;
+success:
+	/* Successfully caused the reference counter to drop to zero! */
+	driver_destroy(self);
+	return DRIVER_DELMOD_ST_SUCCESS;
+}
 
 
 
@@ -5085,21 +5258,161 @@ driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict s
 PUBLIC NONNULL((1)) unsigned int FCALL
 driver_delmod(USER CHECKED char const *driver_name,
               unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	unsigned int result;
+	REF struct driver *drv;
+	/* Lookup the requested driver. */
+	drv = driver_name[0] == '/'
+	      ? driver_fromfilename(driver_name)
+	      : driver_fromname(driver_name);
+	if (!drv)
+		return DRIVER_DELMOD_ST_UNKNOWN;
+	/* Try to unload the driver. */
+	result = driver_try_decref_and_delmod(drv, flags);
+	return result;
+}
+
 PUBLIC NONNULL((1)) unsigned int FCALL
 driver_delmod_file(struct mfile *__restrict driver_file,
                    unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	unsigned int result;
+	REF struct driver *drv;
+	/* Lookup the requested driver. */
+	drv = driver_fromfile(driver_file);
+	if (!drv)
+		return DRIVER_DELMOD_ST_UNKNOWN;
+	/* Try to unload the driver. */
+	result = driver_try_decref_and_delmod(drv, flags);
+	return result;
+}
 
 
 
+#ifndef KERNEL_DRIVER_DEFAULT_LIBRARY_PATH
+#define KERNEL_DRIVER_DEFAULT_LIBRARY_PATH "/os/drivers"
+#endif /* !KERNEL_DRIVER_DEFAULT_LIBRARY_PATH */
+
+/* The default library path.
+ * By default, this string is simply set to "/os/drivers"
+ * NOTE: This path can be restored with
+ *      `ksysctl_set_driver_library_path(KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT)' */
+INTERN struct driver_libpath_struct default_library_path = {
+	.dlp_refcnt = 2, /* +1:default_library_path, +1:driver_libpath */
+	KERNEL_DRIVER_DEFAULT_LIBRARY_PATH
+};
 
 /* [1..1] The current driver library path.
  * This path  is  a  ':'-separated list  of  UNIX-style  pathnames
  * that are used to resolve dependencies of kernel driver modules.
  * By default, this  string is  KERNEL_DRIVER_DEFAULT_LIBRARY_PATH */
-PUBLIC struct driver_libpath_arref driver_libpath;
+PUBLIC struct driver_libpath_arref driver_libpath = ARREF_INIT(&default_library_path);
 
+
+/************************************************************************/
+/* Bootloader driver support                                            */
+/************************************************************************/
+
+#ifndef CONFIG_NO_BOOTLOADER_DRIVERS
+/* Initialize (link, relocation  & initialize) all  drivers
+ * loaded via the kernel commandline as bootloader modules.
+ * This  is done as a separate step from the actual loading
+ * of  drivers so-as to allow for inter-driver dependencies
+ * to be resolved correctly. */
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL kernel_initialize_loaded_drivers)(void) {
+	bool found_some;
+	REF struct driver_loadlist *dll;
+	size_t i;
+again:
+	dll = arref_get(&drivers);
+	found_some = false;
+	for (i = 0; i < dll->dll_count; ++i) {
+		uintptr_t old_state, new_state;
+		REF struct driver *drv;
+		drv = dll->dll_drivers[i];
+		if unlikely(!tryincref(drv))
+			continue;
+		old_state = ATOMIC_READ(drv->d_state);
+		driver_initialize(drv);
+		new_state = ATOMIC_READ(drv->d_state);
+		decref_unlikely(drv);
+		/* Keep on restarting bootloader driver init
+		 * for  as long as driver states change, and
+		 * havn't yet transitioned to LOADED. */
+		if (old_state != new_state && new_state != DRIVER_STATE_LOADED)
+			found_some = true;
+	}
+	decref_unlikely(dll);
+	if (found_some)
+		goto again;
+}
+#endif /* !CONFIG_NO_BOOTLOADER_DRIVERS */
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DBG_COMMAND(lsmod,
+            "lsmod\n"
+            "\tList all currently loaded drivers\n") {
+	size_t i, longest_name, longest_cmdl;
+	REF struct driver_loadlist *ds;
+	ds           = arref_get(&drivers);
+	longest_name = 4;
+	longest_cmdl = 7;
+	for (i = 0; i < ds->dll_count; ++i) {
+		struct driver *d;
+		size_t temp;
+		d = ds->dll_drivers[i];
+		if (wasdestroyed(d))
+			continue; /* Dead driver... */
+		temp = strlen(d->d_name);
+		if (longest_name < temp)
+			longest_name = temp;
+		temp = (size_t)cmdline_encode(&format_length, NULL, d->d_argc, d->d_argv);
+		if (longest_cmdl < temp)
+			longest_cmdl = temp;
+	}
+	if (longest_name > 24)
+		longest_name = 24;
+	if (longest_cmdl > 24)
+		longest_cmdl = 24;
+#if __SIZEOF_POINTER__ == 8
+	dbg_printf(DBGSTR("%-*s %-*s loadaddr         minaddr          maxaddr\n"),
+	           longest_name, DBGSTR("name"),
+	           longest_cmdl, DBGSTR("cmdline"));
+#else /* __SIZEOF_POINTER__ == 8 */
+	dbg_printf(DBGSTR("%-*s %-*s loadaddr minaddr  maxaddr\n"),
+	           longest_name, DBGSTR("name"),
+	           longest_cmdl, DBGSTR("cmdline"));
+#endif /* __SIZEOF_POINTER__ == 8 */
+	for (i = 0; i < ds->dll_count; ++i) {
+		struct driver *d;
+		size_t temp;
+		d = ds->dll_drivers[i];
+		if (wasdestroyed(d))
+			continue; /* Dead driver... */
+		if (d->d_state >= DRIVER_STATE_KILL) {
+			/* Already finalized */
+			dbg_setfgcolor(ANSITTY_CL_MAROON);
+		} else if (d->d_state > DRIVER_STATE_LOADED) {
+			/* In the process of being finalized */
+			dbg_setfgcolor(ANSITTY_CL_RED);
+		} else if (d->d_state < DRIVER_STATE_LOADED) {
+			/* In the process of being initialized */
+			dbg_setfgcolor(ANSITTY_CL_YELLOW);
+		}
+		dbg_printf(DBGSTR("%-*s "), longest_name, d->d_name);
+		temp = (size_t)cmdline_encode(&dbg_printer, NULL, d->d_argc, d->d_argv);
+		format_repeat(&dbg_printer, NULL, ' ', longest_cmdl - temp);
+		dbg_printf(DBGSTR(" %p %p %p" AC_DEFATTR "\n"),
+		           d->d_module.md_loadaddr,
+		           d->d_module.md_loadmin,
+		           d->d_module.md_loadmax);
+	}
+	decref_nokill(ds);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

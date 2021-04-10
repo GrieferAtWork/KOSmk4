@@ -25,9 +25,9 @@
 #include <kernel/compiler.h>
 
 #include <kernel/boot.h>
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
@@ -204,11 +204,16 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		 *       once all drivers specified by  the boot loader have been  loaded.
 		 *    -> That way,  driver dependencies  can be  loaded in  the same  manner,
 		 *       thus not relying on file-system drivers not having any dependencies. */
+#ifdef CONFIG_USE_NEW_DRIVER
+		drv = driver_loadmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
+		                          blob_size, cmdline);
+#else /* CONFIG_USE_NEW_DRIVER */
 		drv = driver_insmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
 		                         blob_size,
 		                         cmdline,
 		                         NULL,
 		                         DRIVER_INSMOD_FLAG_NOINIT);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		/* Drop the reference returned by driver_insmod_blob() */
 		decref(drv);
 	} EXCEPT {

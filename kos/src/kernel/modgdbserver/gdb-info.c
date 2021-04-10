@@ -27,12 +27,11 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
-#include <kernel/driver.h>
 #include <kernel/handle.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/uname.h>
-#include <kernel/vm.h>
-#include <kernel/vm/usermod.h>
+#include <kernel/mman.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
@@ -53,6 +52,10 @@
 #include "thread-enum.h"
 
 #define XML_VERSION_HEADER "<?xml version=\"1.0\"?>"
+
+#ifndef CONFIG_USE_NEW_DRIVER
+#include <kernel/vm/usermod.h>
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 DECL_BEGIN
 
@@ -91,10 +94,15 @@ err:
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintKernelFilename)(pformatprinter printer, void *arg,
                                            bool filename_only) {
+#ifdef CONFIG_USE_NEW_DRIVER
+	return filename_only ? module_printname(&kernel_driver, printer, arg)
+	                     : module_printpath(&kernel_driver, printer, arg);
+#else /* CONFIG_USE_NEW_DRIVER */
 	char const *str = filename_only
 	                  ? kernel_driver.d_name
 	                  : kernel_driver.d_filename;
 	return (*printer)(arg, str, strlen(str));
+#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 /* Print the commandline of a given `thread' */
@@ -122,14 +130,14 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
                                            struct task *__restrict thread,
                                            bool filename_only) {
 	ssize_t result;
-	REF struct vm *v;
+	REF struct mman *v;
 	REF struct directory_entry *dent;
 	REF struct path            *path;
 	if (task_getrootpid_of_s(thread) == 0 ||
 	    task_getroottid_of_s(thread) == 0)
 		return GDBInfo_PrintKernelFilename(printer, arg, filename_only);
-	v = task_getvm(thread);
-	if (v == &vm_kernel)
+	v = task_getmman(thread);
+	if (v == &mman_kernel)
 		result = GDBInfo_PrintKernelFilename(printer, arg, filename_only);
 	else {
 		if (GDBThread_IsAllStopModeActive) {
@@ -218,6 +226,31 @@ format_escape_printer(void *arg,
 	                     FORMAT_ESCAPE_FPRINTRAW);
 }
 
+#ifdef CONFIG_USE_NEW_DRIVER
+PRIVATE NONNULL((1, 2)) ssize_t KCALL
+GDB_LibraryListPrinter(void *cookie, struct module *__restrict mod) {
+	ssize_t temp, result = 0;
+	GDB_LibraryListPrinterData *data;
+	data = (GDB_LibraryListPrinterData *)cookie;
+	if likely(module_haspath(mod)) {
+		result = (*data->ll_printer)(data->ll_arg,
+		                             "<library name=\"",
+		                             COMPILER_STRLEN("<library name=\""));
+		if likely(result >= 0) {
+			DO(module_printpath(mod, &format_escape_printer, data));
+			DO(format_printf(data->ll_printer,
+			                 data->ll_arg,
+			                 "\">"
+			                 "<segment address=\"%#" PRIxPTR "\"/>"
+			                 "</library>",
+			                 mod->md_loadmin));
+		}
+	}
+	return result;
+err:
+	return temp;
+}
+#else /* CONFIG_USE_NEW_DRIVER */
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
 GDB_LibraryListPrinter(void *cookie,
                        struct usermod *__restrict um) {
@@ -246,15 +279,16 @@ GDB_LibraryListPrinter(void *cookie,
 err:
 	return temp;
 }
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) {
 	size_t i;
 	ssize_t temp, result = 0;
-	REF struct driver_state *state;
-	state = driver_get_state();
-	for (i = 0; i < state->ds_count; ++i) {
-		struct driver *drv = state->ds_drivers[i];
+	REF struct driver_loadlist *state;
+	state = get_driver_loadlist();
+	for (i = 0; i < state->dll_count; ++i) {
+		struct driver *drv = state->dll_drivers[i];
 		ElfW(Half) j;
 		ElfW(Addr) lowest_segment_offset;
 		size_t alignment_offset;
@@ -277,11 +311,23 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 			lowest_segment_offset = drv->d_phdr[j].p_vaddr;
 			alignment_offset      = drv->d_phdr[j].p_offset & PAGEMASK;
 		}
+#ifdef CONFIG_USE_NEW_DRIVER
+		if (module_haspath(drv)) {
+			GDB_LibraryListPrinterData data;
+			data.ll_printer = printer;
+			data.ll_arg     = arg;
+			PRINT("<library name=\"");
+			DO(module_printpath(drv, &format_escape_printer, &data));
+			PRINT("\">");
+		} else
+#else /* CONFIG_USE_NEW_DRIVER */
 		if (drv->d_filename) {
 			PRINTF("<library name=\"%#q\">", drv->d_filename);
-		} else {
-			REF struct driver_library_path_string *libpath;
-			libpath = arref_get(&driver_library_path);
+		} else
+#endif /* !CONFIG_USE_NEW_DRIVER */
+		{
+			REF struct driver_libpath_struct *libpath;
+			libpath = arref_get(&driver_libpath);
 			if (!strrchr(libpath->dlp_path, ':')) {
 				/* Only a single library path was defined.
 				 * In this case, we can pretty much assume where the driver originates from. */
@@ -299,9 +345,15 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 				PRINTF("<library name=\"%#q\">", drv->d_name);
 			}
 		}
+#ifdef CONFIG_USE_NEW_DRIVER
+		PRINTF("<segment address=\"%#" PRIxPTR "\"/>"
+		       "</library>",
+		       drv->md_loadmin + alignment_offset);
+#else /* CONFIG_USE_NEW_DRIVER */
 		PRINTF("<segment address=\"%#" PRIxPTR "\"/>"
 		       "</library>",
 		       drv->d_loadstart + alignment_offset);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	}
 	decref_unlikely(state);
 	return result;
@@ -316,7 +368,7 @@ INTERN NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintLibraryList)(pformatprinter printer, void *arg,
                                         struct task *__restrict thread) {
 	ssize_t result;
-	REF struct vm *v = task_getvm(thread);
+	REF struct mman *v = task_getmman(thread);
 	result = GDBInfo_PrintVMLibraryList(printer, arg, v);
 	decref_unlikely(v);
 	return result;
@@ -324,11 +376,16 @@ NOTHROW(FCALL GDBInfo_PrintLibraryList)(pformatprinter printer, void *arg,
 
 INTERN NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
-                                          struct vm *__restrict effective_vm) {
+                                          struct mman *__restrict effective_mm) {
 	ssize_t temp, result = 0;
 	GDB_LibraryListPrinterData data;
 	data.ll_printer = printer;
 	data.ll_arg     = arg;
+#ifdef CONFIG_USE_NEW_DRIVER
+	PRINT(XML_VERSION_HEADER
+	      "<!DOCTYPE target SYSTEM \"library-list.dtd\">"
+	      "<library-list>");
+#else /* CONFIG_USE_NEW_DRIVER */
 	PRINTF(XML_VERSION_HEADER
 	       "<!DOCTYPE target SYSTEM \"library-list.dtd\">"
 	       "<library-list>"
@@ -337,13 +394,23 @@ NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
 	           "</library>",
 	       kernel_driver.d_filename,
 	       kernel_driver.d_loadstart);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	DO(GDBInfo_PrintKernelDriverList(printer, arg));
 	/* Print user-space library listings. */
-	if (effective_vm != &vm_kernel) {
+	if (effective_mm != &mman_kernel) {
 		TRY {
-			DO(vm_enumusermod(effective_vm,
+#ifdef CONFIG_USE_NEW_DRIVER
+			REF struct module *mod;
+			for (mod = mman_module_first(effective_mm); mod;) {
+				FINALLY_DECREF_UNLIKELY(mod);
+				DO(GDB_LibraryListPrinter(&data, mod));
+				mod = mman_module_next(effective_mm, mod);
+			}
+#else /* CONFIG_USE_NEW_DRIVER */
+			DO(vm_enumusermod(effective_mm,
 			                  &GDB_LibraryListPrinter,
 			                  &data));
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		} EXCEPT {
 		}
 	}
@@ -464,6 +531,20 @@ PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintProcessList)(pformatprinter printer, void *arg) {
 	struct GDBInfo_PrintThreadList_Data data;
 	ssize_t temp, result = 0;
+#ifdef CONFIG_USE_NEW_DRIVER
+	PRINT(XML_VERSION_HEADER
+	      "<!DOCTYPE target SYSTEM \"osdata.dtd\">"
+	      "<osdata type=\"processes\">"
+	      "<item>"
+	      "<column name=\"pid\">");
+	PRINTF("%" PRIx32 "</column>"
+	       "<column name=\"user\">root</column>"
+	       "<column name=\"program\">",
+	       GDB_KERNEL_PID);
+	DO(module_printpath_or_name(&kernel_driver, printer, arg));
+	PRINT("</column>"
+	      "<column name=\"command\">");
+#else /* CONFIG_USE_NEW_DRIVER */
 	PRINT(XML_VERSION_HEADER
 	      "<!DOCTYPE target SYSTEM \"osdata.dtd\">"
 	      "<osdata type=\"processes\">");
@@ -474,6 +555,7 @@ NOTHROW(FCALL GDBInfo_PrintProcessList)(pformatprinter printer, void *arg) {
 	       "<column name=\"command\">",
 	       GDB_KERNEL_PID,
 	       kernel_driver.d_filename);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	DO(cmdline_encode(printer, arg,
 	                  kernel_driver.d_argc,
 	                  kernel_driver.d_argv));
@@ -490,12 +572,12 @@ err:
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL is_a_valid_driver)(struct driver *__restrict d,
-                                 struct driver_state const *__restrict ds) {
+                                 struct driver_loadlist const *__restrict ds) {
 	size_t i;
 	if (d == &kernel_driver)
 		return true;
-	for (i = 0; i < ds->ds_count; ++i) {
-		if (ds->ds_drivers[i] == d)
+	for (i = 0; i < ds->dll_count; ++i) {
+		if (ds->dll_drivers[i] == d)
 			return true;
 	}
 	return false;
@@ -504,16 +586,36 @@ NOTHROW(FCALL is_a_valid_driver)(struct driver *__restrict d,
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintDriverListEntry)(pformatprinter printer, void *arg,
                                             struct driver *__restrict d,
-                                            struct driver_state const *__restrict ds) {
+                                            struct driver_loadlist const *__restrict ds) {
 	size_t i;
 	ssize_t temp, result = 0;
+#ifdef CONFIG_USE_NEW_DRIVER
+	PRINTF("<item>"
+	       "<column name=\"name\">%s</column>"
+	       "<column name=\"file\">",
+	       d->d_name);
+	DO(module_printpath_or_name(d, printer, arg));
+	PRINT("</column>"
+	      "<column name=\"args\">");
+#else /* CONFIG_USE_NEW_DRIVER */
 	PRINTF("<item>"
 	       "<column name=\"name\">%s</column>"
 	       "<column name=\"file\">%s</column>"
 	       "<column name=\"args\">",
 	       d->d_name,
 	       d->d_filename);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	DO(cmdline_encode(printer, arg, d->d_argc, d->d_argv));
+#ifdef CONFIG_USE_NEW_DRIVER
+	PRINTF("</column>"
+	       "<column name=\"loadaddr\">%p</column>"
+	       "<column name=\"loadmin\">%p</column>"
+	       "<column name=\"loadmax\">%p</column>"
+	       "<column name=\"dependencies\">",
+	       d->md_loadaddr,
+	       d->md_loadmin,
+	       d->md_loadmax);
+#else /* CONFIG_USE_NEW_DRIVER */
 	PRINTF("</column>"
 	       "<column name=\"loadaddr\">%p</column>"
 	       "<column name=\"loadstart\">%p</column>"
@@ -522,8 +624,17 @@ NOTHROW(FCALL GDBInfo_PrintDriverListEntry)(pformatprinter printer, void *arg,
 	       d->d_loadaddr,
 	       d->d_loadstart,
 	       d->d_loadend);
+#endif /* !CONFIG_USE_NEW_DRIVER */
 	for (i = 0; i < d->d_depcnt; ++i) {
-		struct driver *dep = d->d_depvec[i];
+		struct driver *dep;
+#ifdef CONFIG_USE_NEW_DRIVER
+		dep = axref_get(&d->d_depvec[i]);
+		if (!dep)
+			continue;
+		FINALLY_DECREF_UNLIKELY(dep);
+#else /* CONFIG_USE_NEW_DRIVER */
+		dep = d->d_depvec[i];
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (i != 0)
 			PRINT(",");
 		if (is_a_valid_driver(dep, ds)) {
@@ -543,13 +654,13 @@ PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintDriverList)(pformatprinter printer, void *arg) {
 	size_t i;
 	ssize_t temp, result = 0;
-	REF struct driver_state *ds;
-	ds = driver_get_state();
+	REF struct driver_loadlist *ds;
+	ds = get_driver_loadlist();
 	PRINT("<osdata type=\"drivers\">");
 	DO(GDBInfo_PrintDriverListEntry(printer, arg,
 	                                &kernel_driver, ds));
-	for (i = 0; i < ds->ds_count; ++i) {
-		struct driver *drv = ds->ds_drivers[i];
+	for (i = 0; i < ds->dll_count; ++i) {
+		struct driver *drv = ds->dll_drivers[i];
 		if unlikely(!tryincref(drv))
 			continue; /* Dead driver... */
 		DO(GDBInfo_PrintDriverListEntry(printer, arg,
@@ -743,6 +854,34 @@ err:
 	return temp;
 }
 
+#ifdef CONFIG_USE_NEW_DRIVER
+PRIVATE NONNULL((1, 2)) ssize_t KCALL
+GDB_UserLibraryListPrinter(void *cookie,
+                           struct module *__restrict mod) {
+	ssize_t temp, result = 0;
+	GDB_LibraryListPrinterData *data;
+	data = (GDB_LibraryListPrinterData *)cookie;
+	if likely(module_haspath_or_name(mod)) {
+		result = format_printf(data->ll_printer,
+		                       data->ll_arg,
+		                       "<item>"
+		                       "<column name=\"loadaddr\">%p</column>"
+		                       "<column name=\"loadmin\">%p</column>"
+		                       "<column name=\"loadmax\">%p</column>"
+		                       "<column name=\"name\">",
+		                       mod->md_loadaddr,
+		                       mod->md_loadmin,
+		                       mod->md_loadmax);
+		if likely(result >= 0) {
+			DO(module_printpath_or_name(mod, &format_escape_printer, data));
+			DO(PRINTO(data->ll_printer, data->ll_arg, "</column></item>"));
+		}
+	}
+	return result;
+err:
+	return temp;
+}
+#else /* CONFIG_USE_NEW_DRIVER */
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
 GDB_UserLibraryListPrinter(void *cookie,
                            struct usermod *__restrict um) {
@@ -774,19 +913,29 @@ GDB_UserLibraryListPrinter(void *cookie,
 err:
 	return temp;
 }
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintUserLibraryListWithVM)(pformatprinter printer, void *arg,
-                                                  struct vm *__restrict effective_vm) {
+                                                  struct mman *__restrict effective_mm) {
 	ssize_t temp, result = 0;
 	GDB_LibraryListPrinterData data;
 	data.ll_printer = printer;
 	data.ll_arg     = arg;
 	PRINT("<osdata type=\"libraries\">");
 	/* Print user-space library listings. */
-	if (effective_vm != &vm_kernel) {
+	if (effective_mm != &mman_kernel) {
 		TRY {
-			DO(vm_enumusermod(effective_vm, &GDB_UserLibraryListPrinter, &data));
+#ifdef CONFIG_USE_NEW_DRIVER
+			REF struct module *mod;
+			for (mod = mman_module_first(effective_mm); mod;) {
+				FINALLY_DECREF_UNLIKELY(mod);
+				DO(GDB_UserLibraryListPrinter(&data, mod));
+				mod = mman_module_next(effective_mm, mod);
+			}
+#else /* CONFIG_USE_NEW_DRIVER */
+			DO(vm_enumusermod(effective_mm, &GDB_UserLibraryListPrinter, &data));
+#endif /* !CONFIG_USE_NEW_DRIVER */
 		} EXCEPT {
 		}
 	}
@@ -800,7 +949,7 @@ PRIVATE NONNULL((1, 3)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintUserLibraryList)(pformatprinter printer, void *arg,
                                             struct task *__restrict thread) {
 	ssize_t result;
-	REF struct vm *v = task_getvm(thread);
+	REF struct mman *v = task_getmman(thread);
 	result = GDBInfo_PrintUserLibraryListWithVM(printer, arg, v);
 	decref_unlikely(v);
 	return result;

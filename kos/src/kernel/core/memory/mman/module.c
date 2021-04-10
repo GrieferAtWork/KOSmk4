@@ -100,14 +100,15 @@ module_printname(struct module *__restrict self,
 	ssize_t result = 0;
 	char const *name;
 	u16 namelen;
+	if unlikely(self->md_fsname == NULL) {
 #ifdef CONFIG_USE_NEW_DRIVER
-	if (module_isdriver(self)) {
-		name = ((struct driver *)self)->d_name;
-		return (*printer)(arg, name, strlen(name));
-	}
+		if (module_isdriver(self)) {
+			name = ((struct driver *)self)->d_name;
+			return (*printer)(arg, name, strlen(name));
+		}
 #endif /* CONFIG_USE_NEW_DRIVER */
-	if unlikely(self->md_fsname == NULL)
 		goto done;
+	}
 	name    = self->md_fsname->de_name;
 	namelen = self->md_fsname->de_namelen;
 	if (name[0] == '/') {
@@ -126,12 +127,13 @@ done:
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) char const *FCALL
 module_getname(struct module *__restrict self) {
 	char const *result;
+	if unlikely(self->md_fsname == NULL) {
 #ifdef CONFIG_USE_NEW_DRIVER
-	if (module_isdriver(self))
-		return ((struct driver *)self)->d_name;
+		if (module_isdriver(self))
+			return ((struct driver *)self)->d_name;
 #endif /* CONFIG_USE_NEW_DRIVER */
-	if unlikely(self->md_fsname == NULL)
 		return NULL;
+	}
 	result = self->md_fsname->de_name;
 	if (result[0] == '/')
 		result = (char const *)rawmemrchr(result + self->md_fsname->de_namelen, '/') + 1;
@@ -148,20 +150,18 @@ module_printpath_or_name(struct module *__restrict self,
 		                       self->md_fsname->de_name,
 		                       self->md_fsname->de_namelen,
 		                       printer, arg);
+	} else if (self->md_fsname) {
+		result = (*printer)(arg,
+		                    self->md_fsname->de_name,
+		                    self->md_fsname->de_namelen);
 	}
 #ifdef CONFIG_USE_NEW_DRIVER
-	else if (module_isdriver(self) &&
-	         (!self->md_fsname || self->md_fsname->de_name[0] != '/')) {
+	else if (module_isdriver(self)) {
 		char const *name;
 		name = ((struct driver *)self)->d_name;
 		return (*printer)(arg, name, strlen(name));
 	}
 #endif /* CONFIG_USE_NEW_DRIVER */
-	else if (self->md_fsname) {
-		result = (*printer)(arg,
-		                    self->md_fsname->de_name,
-		                    self->md_fsname->de_namelen);
-	}
 	return result;
 }
 
@@ -668,7 +668,6 @@ unwind_userspace(void const *absolute_pc,
 				break;
 		}
 	}
-done:
 	return result;
 }
 

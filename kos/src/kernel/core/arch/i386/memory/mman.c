@@ -26,6 +26,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver.h>
 #include <kernel/memory.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
@@ -215,7 +216,7 @@ INTERN struct mpart x86_kernel_vm_parts[6] = {
 		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),         \
 		MNODE_INIT_mn_module(NULL)                                      \
 	}
-#define INIT_MNODE(self, minaddr, maxaddr, prot, part)                  \
+#define INIT_MNODE(self, minaddr, maxaddr, prot, part, mod)             \
 	{                                                                   \
 		MNODE_INIT_mn_mement({}),                                       \
 		MNODE_INIT_mn_minaddr(minaddr),                                 \
@@ -230,7 +231,7 @@ INTERN struct mpart x86_kernel_vm_parts[6] = {
 		MNODE_INIT_mn_partoff(0),                                       \
 		MNODE_INIT_mn_link({ NULL, &(part).mp_share.lh_first }),        \
 		MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),         \
-		MNODE_INIT_mn_module(NULL)                                      \
+		MNODE_INIT_mn_module((struct module *)mod)                      \
 	}
 
 
@@ -242,7 +243,7 @@ INIT_MNODE_RESERVE(x86_vmnode_transition_reserve,
                   VM_PROT_NONE);
 
 INTERN struct mnode x86_kernel_vm_nodes[8] = {
-#define DO_INIT_NODE_EX(id, startaddr, endaddr, prot) INIT_MNODE(x86_kernel_vm_nodes[id], startaddr, (endaddr)-1, prot, x86_kernel_vm_parts[id])
+#define DO_INIT_NODE_EX(id, startaddr, endaddr, prot) INIT_MNODE(x86_kernel_vm_nodes[id], startaddr, (endaddr)-1, prot, x86_kernel_vm_parts[id], &kernel_driver)
 	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_TEXT,   __kernel_text_start,   __kernel_text_end,   MNODE_F_PEXEC | MNODE_F_PREAD),
 	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_start, __kernel_rodata_end, MNODE_F_PREAD),
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
@@ -287,7 +288,8 @@ INIT_MNODE(x86_pdata_mnode,
            __kernel_pdata_start_p,
            __kernel_pdata_end_p - 1,
            MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD,
-           x86_pdata_mpart);
+           x86_pdata_mpart,
+           NULL);
 
 
 
@@ -313,7 +315,8 @@ INIT_MNODE(x86_kernel_vm_node_free,
            __kernel_free_start,
            __kernel_free_end - 1,
            MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD,
-           x86_kernel_vm_part_free);
+           x86_kernel_vm_part_free,
+           &kernel_driver);
 
 
 INTDEF struct mpart kernel_meminfo_mpart;
@@ -326,7 +329,7 @@ INIT_MPART(kernel_meminfo_mpart, &kernel_meminfo_mnode,
 INTERN struct mnode kernel_meminfo_mnode =
 INIT_MNODE(kernel_meminfo_mnode, 0, 0,
            MNODE_F_PWRITE | MNODE_F_PREAD,
-           kernel_meminfo_mpart);
+           kernel_meminfo_mpart, NULL);
 
 INTDEF struct mpart x86_lapic_mpart;
 INTDEF struct mnode x86_lapic_mnode;
@@ -338,7 +341,7 @@ INIT_MPART(x86_lapic_mpart, &x86_lapic_mnode,
 INTERN struct mnode x86_lapic_mnode =
 INIT_MNODE(x86_lapic_mnode, 0, 0,
            MNODE_F_PWRITE | MNODE_F_PREAD,
-           x86_lapic_mpart);
+           x86_lapic_mpart, NULL);
 
 
 
@@ -430,10 +433,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
-	vm_node_insert(&FORCPU(&_bootcpu, thiscpu_x86_iobnode));
-	vm_node_insert(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]);
-	vm_node_insert(&x86_kernel_vm_node_free);
-	vm_node_insert(&kernel_meminfo_mnode);
+	mman_mappings_insert(&mman_kernel, &FORCPU(&_bootcpu, thiscpu_x86_iobnode));
+	mman_mappings_insert(&mman_kernel, &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]);
+	mman_mappings_insert(&mman_kernel, &x86_kernel_vm_node_free);
+	mman_mappings_insert(&mman_kernel, &kernel_meminfo_mnode);
 
 	/* Insert  the  mapping  for   the  physical  identity  (.pdata)   section.
 	 * The contents of this section are mainly required for SMP initialization,

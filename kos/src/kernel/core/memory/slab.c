@@ -27,10 +27,10 @@
 #include <kernel/malloc-defs.h>
 #if defined(CONFIG_USE_SLAB_ALLOCATORS) || defined(__DEEMON__)
 
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/cache.h>
 #include <kernel/mman/kram.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>

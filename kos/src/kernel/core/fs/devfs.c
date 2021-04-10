@@ -26,6 +26,7 @@
 #include <fs/node.h>
 #include <fs/ramfs.h>
 #include <kernel/driver.h>
+#include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 

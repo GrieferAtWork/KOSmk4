@@ -25,6 +25,7 @@
 #ifndef CONFIG_USE_NEW_DRIVER
 #include <kernel/driver.h>
 #else /* !CONFIG_USE_NEW_DRIVER */
+#include <debugger/config.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/module.h>
 #include <kernel/types.h>
@@ -199,7 +200,7 @@ DATDEF struct sig driver_state_changed;
 
 /* Return a pointer to a `struct sig' that is  broadcast
  * when the state of the given driver `self' is altered. */
-#define driver_changesignal(self) &driver_state_changed
+#define driver_changesignal(self) (&driver_state_changed)
 
 struct driver;
 struct driver_fde_cache;
@@ -393,6 +394,7 @@ DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_fre
 #define __kernel_driver_defined
 DATDEF struct driver kernel_driver;
 #endif /* !__kernel_driver_defined */
+#undef kernel_driver
 
 #ifndef __drv_self_defined
 #define __drv_self_defined
@@ -402,6 +404,31 @@ DATDEF struct driver drv_self ASMNAME("kernel_driver");
 DATDEF struct driver drv_self;
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 #endif /* !__drv_self_defined */
+#undef drv_self
+
+/* Kernel core sections. */
+DATDEF struct driver_section kernel_section_text;
+DATDEF struct driver_section kernel_section_rodata;
+DATDEF struct driver_section kernel_section_gcc_except_table;
+DATDEF struct driver_section kernel_section_eh_frame;
+DATDEF struct driver_section kernel_section_data;
+DATDEF struct driver_section kernel_section_bss;
+#ifdef CONFIG_HAVE_DEBUGGER
+DATDEF struct driver_section kernel_section_dbg_hooks;
+#endif /* CONFIG_HAVE_DEBUGGER */
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+INTDEF struct driver_section kernel_section_debug_line;
+INTDEF struct driver_section kernel_section_debug_info;
+INTDEF struct driver_section kernel_section_debug_aranges;
+INTDEF struct driver_section kernel_section_debug_abbrev;
+INTDEF struct driver_section kernel_section_debug_str;
+INTDEF struct driver_section kernel_section_debug_ranges;
+INTDEF struct driver_section kernel_section_debug_loc;
+INTDEF struct driver_section kernel_section_pertask;
+INTDEF struct driver_section kernel_section_permman;
+INTDEF struct driver_section kernel_section_percpu;
+INTDEF struct driver_section kernel_section_shstrtab;
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
 
@@ -416,15 +443,24 @@ FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_fromaddr)(void co
 FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_aboveaddr)(void const *addr);
 FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_next)(struct module *prev);
 
-/* Lookup an already-loaded driver, given its name or file. */
+/* Lookup an already-loaded driver, given its name, filename, or  file.
+ * Note that driver filenames (if  not absolute paths) are  interpreted
+ * relative to the calling thread's current CWD, however absolute paths
+ * are interpreted relative to `vfs_kernel' (i.e. are _NOT_ affected by
+ * chroot(2)) */
 FUNDEF WUNUSED REF struct driver *FCALL driver_fromname(USER CHECKED char const *driver_name) THROWS(E_SEGFAULT);
 FUNDEF WUNUSED REF struct driver *FCALL driver_fromname_with_len(USER CHECKED char const *driver_name, size_t driver_name_len) THROWS(E_SEGFAULT);
+FUNDEF WUNUSED REF struct driver *FCALL driver_fromfilename(USER CHECKED char const *driver_filename) THROWS(E_SEGFAULT);
+FUNDEF WUNUSED REF struct driver *FCALL driver_fromfilename_with_len(USER CHECKED char const *driver_filename, size_t driver_name_len) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver *NOTHROW(FCALL driver_fromfile)(struct mfile *__restrict driver_file);
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF WUNUSED REF struct driver *FCALL
 driver_fromname(USER CHECKED char const *driver_name, size_t driver_name_len)
 	THROWS(E_SEGFAULT) ASMNAME("driver_fromname_with_len");
+FUNDEF WUNUSED REF struct driver *FCALL
+driver_fromfilename(USER CHECKED char const *driver_filename, size_t driver_name_len)
+	THROWS(E_SEGFAULT) ASMNAME("driver_fromfilename_with_len");
 } /* extern "C++" */
 #endif /* __cplusplus */
 
@@ -527,17 +563,17 @@ struct driver_symaddr {
  * about the symbol that contains that address.
  * @return: true:  Success.
  * @return: false: Failure. */
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 3)) __BOOL
 NOTHROW(FCALL driver_dladdr_local)(struct driver *__restrict self,
-                                   struct driver_symaddr *__restrict info,
-                                   uintptr_t driver_reladdr);
+                                   uintptr_t driver_reladdr,
+                                   struct driver_symaddr *__restrict info);
 
 /* Similar to `driver_dladdr_local()', but uses `driver_fromaddr()'
  * to lookup the module containing  `addr', and follows this up  by
  * using `driver_dladdr_local()' */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver *
-NOTHROW(FCALL driver_dladdr)(struct driver_symaddr *__restrict info,
-                             void const *addr);
+FUNDEF NOBLOCK WUNUSED NONNULL((2)) REF struct driver *
+NOTHROW(FCALL driver_dladdr)(void const *addr,
+                             struct driver_symaddr *__restrict info);
 
 
 struct unwind_fde_struct;
@@ -806,7 +842,11 @@ struct driver_libpath_struct {
 	WEAK refcnt_t                 dlp_refcnt; /* Reference counter. */
 	COMPILER_FLEXIBLE_ARRAY(char, dlp_path);  /* Path string. */
 };
-DEFINE_REFCOUNT_FUNCTIONS(struct driver_libpath_struct, dlp_refcnt, kfree);
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
+DEFINE_REFCOUNT_FUNCTIONS(struct driver_libpath_struct, dlp_refcnt, __os_free);
 
 #ifndef __driver_libpath_arref_defined
 #define __driver_libpath_arref_defined
