@@ -129,8 +129,9 @@ dbg_coredump(void const *const *traceback_vector,
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 				if (!reason->ci_except.e_args.e_pointers[i])
 					continue;
-				dbg_printf(DBGSTR("\tpointer[%u] = %p\n"),
-				           i, reason->ci_except.e_args.e_pointers[i]);
+				dbg_printf(DBGSTR("\tpointer[%u] = %p (%" PRIuPTR ")\n"),
+				           i, reason->ci_except.e_args.e_pointers[i],
+				           reason->ci_except.e_args.e_pointers[i]);
 			}
 			if (error_as_signal(&reason->ci_except, &siginfo)) {
 				dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
@@ -344,8 +345,9 @@ coredump_create(struct ucpustate const *curr_ustate,
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 				if (!reason->ci_except.e_args.e_pointers[i])
 					continue;
-				printk(KERN_ERR "\tpointer[%u] = %p\n",
-				       i, reason->ci_except.e_args.e_pointers[i]);
+				printk(KERN_ERR "\tpointer[%u] = %p (%" PRIuPTR ")\n",
+				       i, reason->ci_except.e_args.e_pointers[i],
+				       reason->ci_except.e_args.e_pointers[i]);
 			}
 			if (error_as_signal(&reason->ci_except, &siginfo)) {
 				printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
