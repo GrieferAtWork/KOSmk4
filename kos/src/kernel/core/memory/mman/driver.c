@@ -64,6 +64,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/rbtree.h>
@@ -76,10 +77,12 @@
 #include <alloca.h>
 #include <assert.h>
 #include <elf.h>
+#include <errno.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <malloca.h>
 #include <signal.h>
+#include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -123,6 +126,11 @@
 #endif /* !ELF_ARCH_MAXSHCOUNT */
 
 DECL_BEGIN
+
+#define THROW_FAULTY_ELF_ERROR(...)           \
+	THROW(E_NOT_EXECUTABLE_FAULTY,            \
+	      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF, \
+	      __VA_ARGS__)
 
 #ifndef CONFIG_USE_NEW_FS
 #define mfile_read(self, dst, num_bytes, pos)    inode_readk((struct inode *)(self), dst, num_bytes, pos)
@@ -978,6 +986,632 @@ driver_getfile(struct driver *__restrict self)
 
 
 /************************************************************************/
+/* Special handling for "drv_arg$..." symbols.                          */
+/************************************************************************/
+
+
+/* Known arg$ entry types:
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_STRING:   char   dbg_arg$foo$s$bar[];        // == EXISTS("foo=$value") ? "$value" : "bar"
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_HEX:      byte_t dbg_arg$foo$x$00000000[4];  // == EXISTS("foo=$value") ? tohex("$value") : tohex("00000000")
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_PRESENT:  bool   dbg_arg$foo;                // == EXISTS("foo=$value") ? true : false
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_INT:      int    dbg_arg$foo$d$42;           // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_UINT:     u32    dbg_arg$foo$I32u$42;        // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *
+ * *NOTE: The  tohex() function is fairly simple, in that
+ *        it will silently skip all non-xdigit characters
+ *        during parsing!
+ */
+#define DRIVER_ARGCASH_ENTRY_TYPE_STRING  0x0000 /* String argument. */
+#define DRIVER_ARGCASH_ENTRY_TYPE_HEX     0x0001 /* Hex blob. */
+#define DRIVER_ARGCASH_ENTRY_TYPE_HASSIZE(x) ((x) >= DRIVER_ARGCASH_ENTRY_TYPE_PRESENT)
+#define DRIVER_ARGCASH_ENTRY_TYPE_PRESENT 0x0002 /* Is-argument-present? */
+#define DRIVER_ARGCASH_ENTRY_TYPE_INT     0x0003 /* Signed integer argument. */
+#define DRIVER_ARGCASH_ENTRY_TYPE_UINT    0x0004 /* Unsigned integer argument. */
+
+static intmax_t const argcash_sint_minmax[][2] = {
+	/* [0] = */ { 0, 0 },
+	/* [1] = */ { INT8_MIN,  INT8_MAX },
+	/* [2] = */ { INT16_MIN, INT16_MAX },
+	/* [3] = */ { 0, 0 },
+	/* [4] = */ { INT32_MIN, INT32_MAX },
+#if __SIZEOF_INTMAX_T__ > 8
+	/* [5] = */ { 0, 0 },
+	/* [6] = */ { 0, 0 },
+	/* [7] = */ { 0, 0 },
+	/* [8] = */ { INT64_MIN, INT64_MAX },
+#endif /* __SIZEOF_INTMAX_T__ > 8 */
+};
+
+static uintmax_t const argcash_uint_minmax[] = {
+	/* [0] = */ 0,
+	/* [1] = */ UINT8_MAX,
+	/* [2] = */ UINT16_MAX,
+	/* [3] = */ 0,
+	/* [4] = */ UINT32_MAX,
+#if __SIZEOF_INTMAX_T__ > 8
+	/* [5] = */ 0,
+	/* [6] = */ 0,
+	/* [7] = */ 0,
+	/* [8] = */ UINT64_MAX,
+#endif /* __SIZEOF_INTMAX_T__ > 8 */
+};
+
+/* Interpret `value' as `type' and (try) to write the  generated
+ * data to `buf', returning the # of required bytes, and leaving
+ * the contents of `buf' undefined when `return > bufsize'
+ * NOTE: Don't use to resolve `DRIVER_ARGCASH_ENTRY_TYPE_PRESENT'! */
+PRIVATE NONNULL((1, 2)) uintptr_half_t FCALL
+argcash_eval(struct driver *__restrict self,
+             char const *__restrict arg_name,
+             byte_t *buf, uintptr_half_t bufsize,
+             uintptr_half_t type, char const *value,
+             char const *defl_value) {
+	/* Simple case: When no value is provided, then we can
+	 *              simply zero-initialize the data  blob. */
+	if (!value) {
+		if (type == DRIVER_ARGCASH_ENTRY_TYPE_STRING) {
+			/* Special case: No value provided for a string argument
+			 * requires  that  we write-back  a  zero-length string! */
+			if (bufsize >= sizeof(char))
+				*(char *)buf = '\0';
+			return sizeof(char);
+		}
+		bzero(buf, bufsize);
+		return bufsize;
+	}
+	switch (type) {
+
+	case DRIVER_ARGCASH_ENTRY_TYPE_HEX: {
+		/* For hex-argument, the required # of bytes for the hex-blob
+		 * is always given by the # of hex-digits from  `defl_value'. */
+		uintptr_half_t result = 0;
+		if (defl_value) {
+			size_t i;
+			for (i = 0;; ++i) {
+				char ch = defl_value[i];
+				if (!ch)
+					break;
+				if ((ch >= '0' && ch <= '9') ||
+				    (ch >= 'a' && ch <= 'f') ||
+				    (ch >= 'A' && ch <= 'F'))
+					++result;
+			}
+			result /= 2;
+		}
+		if (bufsize >= result) {
+			/* Decode hex data from `value' */
+			size_t i, dst;
+			bzero(buf, result);
+			for (i = 0, dst = 0; value[i]; ++i) {
+				uint8_t high_nibble, low_nibble;
+				char ch = value[i];
+				if (ch >= '0' && ch <= '9') {
+					high_nibble = ch - '0';
+				} else if (ch >= 'a' && ch <= 'f') {
+					high_nibble = 10 + (ch - 'a');
+				} else if (ch >= 'A' && ch <= 'F') {
+					high_nibble = 10 + (ch - 'A');
+				} else {
+					continue;
+				}
+				for (++i;; ++i) {
+					ch = value[i];
+					if (!ch) {
+						printk(KERN_ERR "[mod][%s] Argument %q contains an incomplete hex-nibble in %q\n",
+						       self->d_name, arg_name, value);
+						THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_X_BAD_NIBBLE);
+					}
+					if (ch >= '0' && ch <= '9') {
+						low_nibble = ch - '0';
+					} else if (ch >= 'a' && ch <= 'f') {
+						low_nibble = 10 + (ch - 'a');
+					} else if (ch >= 'A' && ch <= 'F') {
+						low_nibble = 10 + (ch - 'A');
+					} else {
+						continue;
+					}
+					break;
+				}
+				/* Write-back the next hex-byte. */
+				if (dst < result)
+					buf[dst] = (high_nibble << 4) | low_nibble;
+				++dst;
+			}
+			if (dst > result) {
+				printk(KERN_ERR "[mod][%s] Argument %q requires %" PRIuSIZ " bytes, but %" PRIuSIZ " were given in %q\n",
+				       self->d_name, arg_name, result, dst, value);
+				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_X_TOO_LONG,
+				                       result, dst);
+			}
+		}
+		return result;
+	}	break;
+
+	case DRIVER_ARGCASH_ENTRY_TYPE_INT:
+	case DRIVER_ARGCASH_ENTRY_TYPE_UINT: {
+		errno_t error;
+		union {
+			intmax_t  im;
+			uintmax_t um;
+		} intval;
+		if (type == DRIVER_ARGCASH_ENTRY_TYPE_INT) {
+			intval.im = strtoimax_r(value, NULL, 0, &error);
+			if (error == 0 && bufsize < COMPILER_LENOF(argcash_sint_minmax)) {
+				if (intval.im < argcash_sint_minmax[bufsize][0] ||
+				    intval.im > argcash_sint_minmax[bufsize][1])
+					error = ERANGE;
+			}
+		} else {
+			intval.um = strtoumax_r(value, NULL, 0, &error);
+			if (error == 0 && bufsize < COMPILER_LENOF(argcash_uint_minmax)) {
+				if (intval.um > argcash_uint_minmax[bufsize])
+					error = ERANGE;
+			}
+		}
+		/* Check for errors. */
+		if (error != 0) {
+			assert(error == ECANCELED || error == ERANGE || error == EINVAL);
+			unsigned int reason;
+			reason = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_ECANCELED;
+			if (error == ERANGE)
+				reason = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_ERANGE;
+			if (error == EINVAL)
+				reason = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_EINVAL;
+			THROW_FAULTY_ELF_ERROR(reason);
+		}
+		/* Write-back the fully parsed integer argument. */
+		bzero(buf, bufsize);
+		memcpy(buf, &intval, MIN(sizeof(intval), bufsize));
+		return bufsize;
+	}	break;
+
+	case DRIVER_ARGCASH_ENTRY_TYPE_STRING:
+	default: {
+		/* String argument. */
+		size_t len = strlen(value);
+		size_t res = (len + 1) * sizeof(char);
+		/* Write-back the NUL-terminated string. */
+		if (bufsize >= res)
+			*(char *)mempcpy(buf, value, len, sizeof(char)) = '\0';
+		return (uintptr_half_t)res;
+
+	}	break;
+
+	}
+	return bufsize;
+}
+
+/* Check if one of the argument of `self' equals `name' */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL driver_hasarg)(struct driver const *__restrict self,
+                             char const *__restrict name) {
+	size_t i;
+	for (i = 0; i < self->d_argc; ++i) {
+		if (strcmp(self->d_argv[i], name) == 0)
+			return true;
+	}
+	return false;
+}
+
+/* Return  a  pointer   to  the  value-portion   of  an  argument   `name'
+ * For this purpose, any of the following forms of arguments are accepted:
+ *   - "$name=$value"
+ *   - "$name:$value" */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) char *
+NOTHROW(FCALL driver_getargval)(struct driver const *__restrict self,
+                                char const *__restrict name) {
+	size_t i;
+	size_t namelen = strlen(name);
+	for (i = 0; i < self->d_argc; ++i) {
+		char *arg = self->d_argv[i];
+		if (memcmp(arg, name, namelen * sizeof(char)) != 0)
+			continue;
+		if (name[namelen] != '=' && name[namelen] != ':')
+			continue;
+		/* Found it! */
+		return arg + namelen + 1;
+	}
+	return NULL;
+}
+
+
+struct alignas(__ALIGNOF_MAX_ALIGN_T__) driver_argcash_entry {
+	size_t                        dace_next;  /* [const] Total size of this entry (in bytes) */
+	uintptr_half_t                dace_type;  /* [const] Entry type (one of `DRIVER_ARGCASH_ENTRY_TYPE_*') */
+	uintptr_half_t                dace_size;  /* [!0][const] Entry data size (in bytes) */
+	byte_t                       *dace_data;  /* [1..dace_size][const] Entry data blob.
+	                                           * Note that an effort is made to keep this pointer as close
+	                                           * to  the associated driver's  load-range as possible, thus
+	                                           * ensuring that use in PC-relative relocations is possible. */
+	COMPILER_FLEXIBLE_ARRAY(char, dace_name); /* Name of the argument bound to this entry. */
+};
+
+struct driver_argcash {
+	SLIST_ENTRY(driver_argcash) dac_link;   /* [0..1][const] Next arg$ descriptor. */
+	PAGEDIR_PAGEALIGNED size_t  dac_size;   /* [const] Size of this descriptor (in bytes) */
+	size_t                      dac_used;   /* [lock(:d_eh_frame_cache_lock)] # of bytes used.
+	                                         * NOTE: Always aligned by `__ALIGNOF_MAX_ALIGN_T__' */
+#if ((__SIZEOF_POINTER__ + __SIZEOF_SIZE_T__ * 2) % __ALIGNOF_MAX_ALIGN_T__) != 0
+	byte_t                     _dac_pad[__ALIGNOF_MAX_ALIGN_T__ - ((__SIZEOF_POINTER__ + __SIZEOF_SIZE_T__ * 2) % __ALIGNOF_MAX_ALIGN_T__)];
+#endif /* ((__SIZEOF_POINTER__ + __SIZEOF_SIZE_T__ * 2) % __ALIGNOF_MAX_ALIGN_T__) != 0 */
+	struct driver_argcash_entry dac_ent[1]; /* First entry. */
+};
+
+#define driver_argcash_lock(self) (&(self)->d_eh_frame_cache_lock)
+
+PRIVATE NONNULL((1)) struct driver_argcash *FCALL
+driver_argcash_alloc(struct driver *__restrict self, size_t req_ent_size) {
+	struct driver_argcash *result;
+	void *kram;
+	size_t minsize;
+	byte_t *hint;
+	minsize = offsetof(struct driver_argcash, dac_ent) + req_ent_size;
+	minsize = CEIL_ALIGN(minsize, PAGESIZE);
+	/* Allocate kernel ram and use the middle of the driver's
+	 * load-range as the  mapping base-address hint,  meaning
+	 * that the resulting mapped address will be close-by  to
+	 * the driver's text  location, meaning that  it will  be
+	 * most  likely that PC-relative relocations can be done. */
+	hint = self->d_module.md_loadmin +
+	       ((size_t)((self->d_module.md_loadmax + 1) -
+	                 self->d_module.md_loadmin) /
+	        2);
+
+	/* NOTE: Also set `GFP_LOCKED' because arg$-symbols must
+	 *       be  accessible  from  any  arbitrary   context! */
+	kram = mman_map_kram(hint, minsize,
+	                     GFP_LOCKED | GFP_PREFLT |
+	                     GFP_MAP_BELOW | GFP_MAP_ABOVE);
+
+	/* Store the arg$-table's size as the # of bytes of kram
+	 * that we've just allocated. */
+	result = (struct driver_argcash *)kram;
+	result->dac_size = minsize;
+	return result;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_argcash_free)(struct driver_argcash *__restrict self) {
+	mman_unmap_kram(self, self->dac_size);
+}
+
+
+/* Find an arg$-argument matching the given requirements.
+ * If  no  such argument  exists, return  `NULL' instead. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 4)) struct driver_argcash_entry *
+NOTHROW(FCALL driver_argcash_find_locked)(struct driver *__restrict self,
+                                          uintptr_half_t type, uintptr_half_t size,
+                                          char const *__restrict name) {
+	struct driver_argcash *tab;
+	SLIST_FOREACH (tab, &self->d_argcash, dac_link) {
+		struct driver_argcash_entry *ent;
+		byte_t *endptr = (byte_t *)tab + tab->dac_used;
+		for (ent = tab->dac_ent; (byte_t *)ent < endptr;
+		     ent = (struct driver_argcash_entry *)((byte_t *)ent + ent->dace_next)) {
+			if (ent->dace_type != type)
+				continue;
+			if (strcmp(ent->dace_name, name) != 0)
+				continue; /* Some other argument... */
+			if (DRIVER_ARGCASH_ENTRY_TYPE_HASSIZE(type) &&
+			    ent->dace_size != size)
+				continue;
+			/* Found it! */
+			return ent;
+		}
+	}
+	return NULL;
+}
+
+/* Try to allocate an `entsize'-large arg$-entry within `self' by
+ * re-using available space  within already-existing arg$  blobs.
+ * If doing so is impossible due to lack of available space, then
+ * return `NULL' instead.
+ * NOTE: Upon success, this function will _only_ initialize
+ *       `return->dace_next'. All  other  fields  are  left
+ *       uninitialized! */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct driver_argcash_entry *
+NOTHROW(FCALL driver_argcash_alloc_locked)(struct driver *__restrict self,
+                                           size_t entsize) {
+	struct driver_argcash *tab;
+	SLIST_FOREACH (tab, &self->d_argcash, dac_link) {
+		size_t avail;
+		assert(tab->dac_size >= tab->dac_used);
+		avail = tab->dac_size - tab->dac_used;
+		if (entsize >= avail) {
+			struct driver_argcash_entry *result;
+			/* Can allocate the new entry within this table! */
+			result = (struct driver_argcash_entry *)((byte_t *)tab + tab->dac_used);
+			tab->dac_used += entsize;
+			/* Set the `dace_next'-pointer to point at the new table end. */
+			result->dace_next = tab->dac_used;
+			return result;
+		}
+	}
+	return NULL;
+}
+
+
+/* Lookup or create a new descriptor for the named/typed `drv_arg$'-variable.
+ * @param: type: One of `DRIVER_ARGCASH_ENTRY_TYPE_*'
+ * @param: size: Size of the data-blob that should be referenced by the entry.
+ *               Ignored for `STRING' and `HEX' entries.
+ * @param: name: Name of the arg$ variable.
+ * @param: defl: Default   value  string  to  interpret  for  the  variable.
+ *               Ignored if the variable was already defined, as well as for
+ *               `DRIVER_ARGCASH_ENTRY_TYPE_PRESENT'-style variables. May be
+ *               set to `NULL' if not given.
+ * @return: * : Descriptor for the variable. */
+PRIVATE ATTR_NOINLINE ATTR_RETNONNULL WUNUSED NONNULL((1, 4)) struct driver_argcash_entry *FCALL
+driver_argcash_lookup(struct driver *__restrict self,
+                      uintptr_half_t type, uintptr_half_t size,
+                      char const *__restrict name, char const *defl)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	struct driver_argcash_entry *ent;
+	size_t namelen, entsize;
+	byte_t *arg_data, *ent_data;
+	uintptr_half_t arg_size;
+
+	/* Step #1: Search for an existing instance of the named variable. */
+	atomic_rwlock_read(driver_argcash_lock(self));
+	ent = driver_argcash_find_locked(self, type, size, name);
+	atomic_rwlock_endread(driver_argcash_lock(self));
+	if (ent)
+		return ent; /* Argument had already been accessed in the past! */
+
+	/* Entry doesn't exist, so we need to create it.
+	 * For this purpose, calculate how much memory we'll need in order to represent it! */
+	namelen = strlen(name);
+
+	/* Calculate an intermediate buffer for the arguments final encoded data value. */
+	if (type == DRIVER_ARGCASH_ENTRY_TYPE_PRESENT) {
+		arg_size = size;
+		arg_data = (byte_t *)alloca(arg_size);
+		bzero(arg_data, arg_size);
+		if (driver_hasarg(self, name))
+			memset(arg_data, 0xff, arg_size);
+	} else {
+		char const *value;
+		value = driver_getargval(self, name);
+		if (!value)
+			value = defl;
+		arg_data = NULL;
+		arg_data = (byte_t *)alloca(size);
+		arg_size = argcash_eval(self, name, arg_data, size, type, value, defl);
+		if (arg_size > size) {
+			arg_data = (byte_t *)alloca(size);
+			argcash_eval(self, name, arg_data, size, type, value, defl);
+		}
+	}
+
+	/* Figure out how large the actual entry needs to be. */
+	entsize = offsetof(struct driver_argcash_entry, dace_name);
+	entsize += (namelen + 1) * sizeof(char);
+	entsize += CEIL_ALIGN(namelen, __ALIGNOF_MAX_ALIGN_T__) - 1;
+	entsize &= ~(CEIL_ALIGN(namelen, __ALIGNOF_MAX_ALIGN_T__) - 1);
+	entsize += arg_size;
+
+	/* Try to create the missing arg$-argument. */
+	atomic_rwlock_write(driver_argcash_lock(self));
+
+	/* Since we've lost the lock in the mean time, we must re-check
+	 * if the argument  has since been  created by another  thread. */
+	ent = driver_argcash_find_locked(self, type, size, name);
+	if unlikely(ent) {
+		atomic_rwlock_endwrite(driver_argcash_lock(self));
+		return ent; /* Argument had already been accessed in the past! */
+	}
+
+	/* Try to allocate a new entry by re-using available space. */
+	ent = driver_argcash_alloc_locked(self, entsize);
+	if (!ent) {
+		struct driver_argcash *newtab;
+		atomic_rwlock_endwrite(driver_argcash_lock(self));
+		/* Allocate a new arg$ page able to hold at
+		 * least  1 entry with a size of `entsize'. */
+		newtab = driver_argcash_alloc(self, entsize);
+		atomic_rwlock_write(driver_argcash_lock(self));
+		ent = driver_argcash_find_locked(self, type, size, name);
+		if unlikely(ent) {
+			/* The entry has been created by another thread in the mean time... */
+			atomic_rwlock_endwrite(driver_argcash_lock(self));
+			driver_argcash_free(newtab);
+			return ent;
+		}
+		/* Insert the new arg$ table into the list of tables of this driver. */
+		SLIST_INSERT_HEAD(&self->d_argcash, newtab, dac_link);
+		ent              = &newtab->dac_ent[0];
+		newtab->dac_used = offsetof(struct driver_argcash, dac_ent) + entsize;
+		ent->dace_next   = newtab->dac_used;
+		assert(newtab->dac_used <= newtab->dac_size);
+	}
+
+	/* Initialize the contents of this new entry. */
+	ent->dace_type = type;
+	ent->dace_size = arg_size;
+	ent_data = (byte_t *)ent->dace_name;
+	ent_data = (byte_t *)mempcpy(ent_data, name, namelen, sizeof(char));
+	*ent_data++ = '\0';
+	ent_data = (byte_t *)CEIL_ALIGN((uintptr_t)ent_data, __ALIGNOF_MAX_ALIGN_T__);
+	ent->dace_data = ent_data;
+	memcpy(ent_data, arg_data, arg_size);
+	atomic_rwlock_endwrite(driver_argcash_lock(self));
+	return ent;
+}
+
+
+/* Resolve a `drv_arg$...'-style symbol. */
+PRIVATE NONNULL((1, 2)) void FCALL
+driver_argcash_resolve(struct driver *__restrict self,
+                       struct driver_syminfo *__restrict info) {
+	struct driver_argcash_entry *entry;
+	USER CHECKED char const *uname, *unameend;
+	USER CHECKED char const *utype, *utypeend;
+	USER CHECKED char const *udefl, *udeflend;
+	char *kname, *kdefl;
+	uintptr_half_t arg_type;
+	uintptr_half_t arg_size;
+
+	/* Split the string at its $-bounds to get:
+	 *   - The argument name
+	 *   - The method by which to interpret the argument's typing (a printf-style format code)
+	 *   - The default value to use if the argument wasn't given.
+	 */
+	uname    = info->dsi_name + 8;
+	unameend = strchrnul(uname, '$');
+	utype = utypeend = NULL;
+	udefl = udeflend = NULL;
+	if (*unameend) {
+		utype    = unameend + 1;
+		utypeend = strchrnul(utype, '$');
+		if (*utypeend) {
+			udefl    = utypeend + 1;
+			udeflend = strend(udefl);
+		}
+	}
+
+	arg_type = DRIVER_ARGCASH_ENTRY_TYPE_PRESENT;
+	arg_size = sizeof(bool);
+	if (utype) {
+		USER CHECKED char const *iter;
+		/* Parse the user-type string. */
+		iter     = utype;
+		arg_size = sizeof(int);
+next_type_ch:
+		if unlikely(iter >= utypeend) {
+badtype:
+			printk(KERN_ERR "[mod][%s] Invalid type string %$q in arg$-symbol %q",
+			       self->d_name, (size_t)(utypeend - utype), utype, info->dsi_name);
+			THROW(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND);
+		}
+		switch (*iter++) {
+
+		case 'h':
+			if unlikely(iter >= utypeend)
+				goto badtype;
+			if (*iter == 'h') {
+				++iter;
+				arg_size = sizeof(char);
+			} else {
+				arg_size = sizeof(short);
+			}
+			goto next_type_ch;
+
+		case 'l':
+			if unlikely(iter >= utypeend)
+				goto badtype;
+			if (*iter == 'l') {
+				++iter;
+				arg_size = sizeof(__LONGLONG);
+			} else {
+				arg_size = sizeof(long);
+			}
+			goto next_type_ch;
+
+		case 'I':
+			arg_size = sizeof(void *);
+			if unlikely(iter >= utypeend)
+				goto badtype;
+			if (*iter == '8') {
+				++iter;
+				arg_size = sizeof(int8_t);
+			} else if (*iter == '1') {
+				++iter;
+				if unlikely(iter >= utypeend)
+					goto badtype;
+				if (*iter != '6')
+					goto badtype;
+				++iter;
+				arg_size = sizeof(int16_t);
+			} else if (*iter == '3') {
+				++iter;
+				if unlikely(iter >= utypeend)
+					goto badtype;
+				if (*iter != '2')
+					goto badtype;
+				++iter;
+				arg_size = sizeof(int32_t);
+			} else if (*iter == '6') {
+				++iter;
+				if unlikely(iter >= utypeend)
+					goto badtype;
+				if (*iter != '4')
+					goto badtype;
+				++iter;
+				arg_size = sizeof(int64_t);
+			} else {
+				arg_size = sizeof(long);
+			}
+			goto next_type_ch;
+
+		case 'z':
+			arg_size = sizeof(size_t);
+			goto next_type_ch;
+
+		case 't':
+			arg_size = sizeof(ptrdiff_t);
+			goto next_type_ch;
+
+		case 'L':
+			arg_size = sizeof(wchar_t);
+			goto next_type_ch;
+
+		case 'j':
+			arg_size = sizeof(intmax_t);
+			goto next_type_ch;
+
+		case 'd':
+			arg_type = DRIVER_ARGCASH_ENTRY_TYPE_INT;
+			break;
+
+		case 'u':
+			arg_type = DRIVER_ARGCASH_ENTRY_TYPE_UINT;
+			break;
+
+		case 'x':
+			arg_type = DRIVER_ARGCASH_ENTRY_TYPE_HEX;
+			arg_size = 0;
+			break;
+
+		case 's':
+			arg_type = DRIVER_ARGCASH_ENTRY_TYPE_STRING;
+			arg_size = 0;
+			break;
+
+		default:
+			goto badtype;
+		}
+		if (iter != utypeend)
+			goto badtype;
+	}
+	kname = (char *)malloca(((size_t)(unameend - uname) + 1) * sizeof(char));
+	*(char *)mempcpy(kname, uname, (size_t)(unameend - uname), sizeof(char)) = '\0';
+	kdefl = NULL;
+	TRY {
+		if (udefl < udeflend) {
+			kdefl = (char *)malloca(((size_t)(udeflend - udefl) + 1) * sizeof(char));
+			*(char *)mempcpy(kdefl, udefl, (size_t)(udeflend - udefl), sizeof(char)) = '\0';
+		}
+		entry = driver_argcash_lookup(self, arg_type, arg_size, kname, kdefl);
+	} EXCEPT {
+		if (kdefl)
+			freea(kdefl);
+		freea(kname);
+		RETHROW();
+	}
+	if (kdefl)
+		freea(kdefl);
+	freea(kname);
+	/* Write-back information from the argcash entry. */
+	info->dsi_addr = entry->dace_data;
+	info->dsi_size = entry->dace_size;
+	info->dsi_bind = STB_GLOBAL;
+}
+
+
+
+
+
+/************************************************************************/
 /* Driver symbol lookup functions                                       */
 /************************************************************************/
 PRIVATE WUNUSED NONNULL((1, 2)) bool FCALL
@@ -1033,14 +1667,10 @@ driver_dlsym_drv(struct driver *__restrict self,
 			info->dsi_size = self->d_argc * sizeof(char *);
 			goto ok;
 		}
+		/* Special case: `drv_arg$...' symbols! */
 		if (arg_name[0] == '$') {
-			/* TODO */
-			/* TODO: extern bool     drv_arg$foo;         == ARG_EXISTS("foo") ? true : false */
-			/* TODO: extern char[]   drv_arg$foo$s;       == ARG_EXISTS("foo=$VALUE") ? "$VALUE" : strdup("") */
-			/* TODO: extern char[]   drv_arg$foo$s$bar;   == ARG_EXISTS("foo=$VALUE") ? "$VALUE" : strdup("bar") */
-			/* TODO: extern int      drv_arg$foo$d;       == ARG_EXISTS("foo=$VALUE") ? atoi("$VALUE") : 0 */
-			/* TODO: extern int      drv_arg$foo$d$42;    == ARG_EXISTS("foo=$VALUE") ? atoi("$VALUE") : atoi("42") */
-			/* TODO: extern uint32_t drv_arg$foo$I32u$42; == ARG_EXISTS("foo=$VALUE") ? atou32("$VALUE") : atou32("42") */
+			driver_argcash_resolve(self, info);
+			return true;
 		}
 	}
 	return false;
@@ -1974,11 +2604,6 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
 
 /* Signal broadcast whenever the `d_state' of any loaded driver changes. */
 PUBLIC struct sig driver_state_changed = SIG_INIT;
-
-#define THROW_FAULTY_ELF_ERROR(...)           \
-	THROW(E_NOT_EXECUTABLE_FAULTY,            \
-	      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF, \
-	      __VA_ARGS__)
 
 /* Perform the necessary actions after the state of
  * `self' has been set to `DRIVER_STATE_FINI_DEPS'. */
@@ -3067,6 +3692,24 @@ again:
 }
 
 
+/* Perform all remaining destroy operations after the given driver
+ * `self'  has had  all of  its mem-nodes  unmapped and destroyed. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL driver_destroy_after_mnodes)(struct driver *__restrict self) {
+	/* Cleanup drv_arg$-symbols  _after_  we've  destroyed  mem-nodes,
+	 * thus allowing users to assume that any kind of address returned
+	 * by  one of the driver dlsym() functions will remain valid until
+	 * that driver has been unmapped from kernel memory! */
+	while (!SLIST_EMPTY(&self->d_argcash)) {
+		struct driver_argcash *cash;
+		cash = SLIST_FIRST(&self->d_argcash);
+		SLIST_REMOVE_HEAD(&self->d_argcash, dac_link);
+		driver_argcash_free(cash);
+	}
+	DBG_memset(&self->d_argcash, 0xcc, sizeof(self->d_argcash));
+	weakdecref(self);
+}
+
 INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) * /* from "mnode.c" */
 NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
                                              struct mpart *__restrict part);
@@ -3192,7 +3835,7 @@ NOTHROW(FCALL driver_finitext_postlop)(Tobpostlockop(struct mman) *__restrict lo
 
 	/* The weak reference originally inherited from
 	 * `driver_clear_mnode_pointers_and_destroy()' */
-	weakdecref(me);
+	driver_destroy_after_mnodes(me);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
@@ -3240,14 +3883,14 @@ NOTHROW(FCALL driver_clear_mnode_pointers_and_destroy)(struct driver *__restrict
 				weakdecref_nokill(self); /* Reference inherited from `md_nodecount' dropping to 0 */
 			}
 			mman_lockops_reap(&mman_kernel);
-			weakdecref(self); /* Reference inherited from `md_refcnt' dropping to 0 */
+			driver_destroy_after_mnodes(self); /* Reference inherited from `md_refcnt' dropping to 0 */
 		} else {
 			self->_d_mm_lop.olo_func = &driver_finitext_lop;
 			SLIST_ATOMIC_INSERT(&mman_kernel_lockops, &self->_d_mm_lop, olo_link);
 			_mman_lockops_reap(&mman_kernel);
 		}
 	} else {
-		weakdecref(self); /* Reference inherited from `md_refcnt' dropping to 0 */
+		driver_destroy_after_mnodes(self); /* Reference inherited from `md_refcnt' dropping to 0 */
 	}
 }
 

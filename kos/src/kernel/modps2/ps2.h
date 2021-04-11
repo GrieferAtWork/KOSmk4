@@ -22,15 +22,16 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver-param.h>
 #include <kernel/except.h>  /* THROW() */
 #include <kernel/x86/pic.h> /* TODO: Non-portable! */
 #include <sched/cpu.h>      /* jiffies */
 #include <sched/signal.h>   /* struct sig */
 #include <sched/task.h>     /* task_tryyield_or_pause */
 
-#include <hw/hid/ps2.h>    /* PS2_* */
+#include <hw/hid/ps2.h>           /* PS2_* */
 #include <kos/except/reason/io.h> /* E_IOERROR_SUBSYSTEM_* */
-#include <sys/io.h>        /* (in|out)(b|w|l)[_p]() */
+#include <sys/io.h>               /* (in|out)(b|w|l)[_p]() */
 
 DECL_BEGIN
 
@@ -41,10 +42,17 @@ DECL_BEGIN
 typedef u8 ps2_portid_t; /* `PS2_PORT1' or `PS2_PORT2' */
 
 
-INTDEF unsigned int ps2_infull_timeout;  /* In milliseconds */
-INTDEF unsigned int ps2_outfull_timeout; /* In milliseconds */
-INTDEF unsigned int ps2_command_timeout; /* In milliseconds */
-INTDEF unsigned int ps2_command_attempts;
+#ifdef CONFIG_USE_NEW_DRIVER
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_infull_timeout, "timeout_infull", 100); /* In milliseconds */
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_outfull_timeout, "timeout_outfull", 100); /* In milliseconds */
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_timeout, "timeout_command", 100); /* In milliseconds */
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_attempts, "attempts_command", 3);
+#else /* CONFIG_USE_NEW_DRIVER */
+extern unsigned int ps2_infull_timeout;  /* In milliseconds */
+extern unsigned int ps2_outfull_timeout; /* In milliseconds */
+extern unsigned int ps2_command_timeout; /* In milliseconds */
+extern unsigned int ps2_command_attempts;
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 /* TODO: Non-portable! */
 #define PS2_GET_ISR_FOR_PORT(portno)            \

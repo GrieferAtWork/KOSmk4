@@ -22,6 +22,43 @@
 
 #include <kernel/compiler.h>
 
+#if defined(CONFIG_USE_NEW_DRIVER) && !defined(CONFIG_BUILDING_KERNEL_CORE)
+#ifndef DRIVER_INIT
+#define DRIVER_INIT     __attribute__((__constructor__))
+#define DRIVER_FINI     __attribute__((__destructor__))
+#endif /* !DRIVER_INIT */
+
+#define DEFINE_CMDLINE_FLAG_VAR(flagname, parname)              extern bool flagname ASMNAME("\"drv_arg$" parname "\"");
+#define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name, parname)   extern char string_name[] ASMNAME("\"drv_arg$" parname "$s\"");
+#define DEFINE_CMDLINE_PARAM_INT8_VAR(varname, parname, defl)   extern int8_t varname ASMNAME("\"drv_arg$" parname "$I8d$" PP_STR(defl) "\"");
+#define DEFINE_CMDLINE_PARAM_INT16_VAR(varname, parname, defl)  extern int16_t varname ASMNAME("\"drv_arg$" parname "$I16d$" PP_STR(defl) "\"");
+#define DEFINE_CMDLINE_PARAM_INT32_VAR(varname, parname, defl)  extern int32_t varname ASMNAME("\"drv_arg$" parname "$I32d$" PP_STR(defl) "\"");
+#define DEFINE_CMDLINE_PARAM_INT64_VAR(varname, parname, defl)  extern int64_t varname ASMNAME("\"drv_arg$" parname "$I64d$" PP_STR(defl) "\"");
+#define DEFINE_CMDLINE_PARAM_UINT8_VAR(varname, parname, defl)  extern uint8_t varname ASMNAME("\"drv_arg$" parname "$I8u$" PP_STR(defl) "\"");
+#define DEFINE_CMDLINE_PARAM_UINT16_VAR(varname, parname, defl) extern uint16_t varname ASMNAME("\"drv_arg$" parname "$I16u$" PP_STR(defl) "\"");
+#define DEFINE_CMDLINE_PARAM_UINT32_VAR(varname, parname, defl) extern uint32_t varname ASMNAME("\"drv_arg$" parname "$I32u$" PP_STR(defl) "\"");
+#define DEFINE_CMDLINE_PARAM_UINT64_VAR(varname, parname, defl) extern uint64_t varname ASMNAME("\"drv_arg$" parname "$I64u$" PP_STR(defl) "\"");
+
+#define __DEFINE_CMDLINE_PARAM_INTN_VAR_1  DEFINE_CMDLINE_PARAM_INT8_VAR
+#define __DEFINE_CMDLINE_PARAM_INTN_VAR_2  DEFINE_CMDLINE_PARAM_INT16_VAR
+#define __DEFINE_CMDLINE_PARAM_INTN_VAR_4  DEFINE_CMDLINE_PARAM_INT32_VAR
+#define __DEFINE_CMDLINE_PARAM_INTN_VAR_8  DEFINE_CMDLINE_PARAM_INT64_VAR
+#define __DEFINE_CMDLINE_PARAM_INTN_VAR(n) __DEFINE_CMDLINE_PARAM_INTN_VAR_##n
+#define DEFINE_CMDLINE_PARAM_INTN_VAR(n) __DEFINE_CMDLINE_PARAM_INTN_VAR(n)
+#define __DEFINE_CMDLINE_PARAM_UINTN_VAR_1 DEFINE_CMDLINE_PARAM_UINT8_VAR
+#define __DEFINE_CMDLINE_PARAM_UINTN_VAR_2 DEFINE_CMDLINE_PARAM_UINT16_VAR
+#define __DEFINE_CMDLINE_PARAM_UINTN_VAR_4 DEFINE_CMDLINE_PARAM_UINT32_VAR
+#define __DEFINE_CMDLINE_PARAM_UINTN_VAR_8 DEFINE_CMDLINE_PARAM_UINT64_VAR
+#define __DEFINE_CMDLINE_PARAM_UINTN_VAR(n) __DEFINE_CMDLINE_PARAM_UINTN_VAR_##n
+#define DEFINE_CMDLINE_PARAM_UINTN_VAR(n) __DEFINE_CMDLINE_PARAM_UINTN_VAR(n)
+
+#define DEFINE_CMDLINE_PARAM_INT_VAR(varname, parname, defl)      DEFINE_CMDLINE_PARAM_INTN_VAR(__SIZEOF_INT__)(varname, parname, defl)
+#define DEFINE_CMDLINE_PARAM_UINT_VAR(varname, parname, defl)     DEFINE_CMDLINE_PARAM_UINTN_VAR(__SIZEOF_INT__)(varname, parname, defl)
+#define DEFINE_CMDLINE_PARAM_INTPTR_VAR(varname, parname, defl)   DEFINE_CMDLINE_PARAM_INTN_VAR(__SIZEOF_POINTER__)(varname, parname, defl)
+#define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname, parname, defl)  DEFINE_CMDLINE_PARAM_UINTN_VAR(__SIZEOF_POINTER__)(varname, parname, defl)
+
+#else /* CONFIG_USE_NEW_DRIVER && !CONFIG_BUILDING_KERNEL_CORE */
+
 #include <kernel/arch/driver-param.h>
 
 #include <hybrid/typecore.h>
@@ -339,5 +376,6 @@ struct kernel_commandline_option {
 #define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname, parname, defl)  DEFINE_CMDLINE_PARAM_UINTN_VAR(__SIZEOF_POINTER__)(varname, parname, defl)
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_DRIVER || CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_PARAM_H */

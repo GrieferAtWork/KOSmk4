@@ -196,7 +196,7 @@ again_lock_mman:
 		 * For this purpose, we also accept a special flag `GFP_MAP_FIXED'! */
 		if (flags & GFP_MAP_FIXED) {
 			struct mnode *existing_node;
-			if unlikely(IS_ALIGNED((uintptr_t)hint, PAGESIZE)) {
+			if unlikely(!IS_ALIGNED((uintptr_t)hint, PAGESIZE)) {
 				addend    = (uintptr_t)hint & PAGEMASK;
 				hint      = (void *)FLOOR_ALIGN((uintptr_t)hint, PAGESIZE);
 				num_bytes = CEIL_ALIGN(num_bytes + addend, PAGESIZE);

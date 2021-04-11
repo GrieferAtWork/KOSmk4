@@ -61,7 +61,65 @@ DECL_BEGIN
  * at the relevant address as relocations are performed for the
  * associated driver.
  * As such, these symbols are useful for static initialization
- * of control structures. */
+ * of control structures.
+ *
+ * Additionally, driver commandline arguments can be accessed
+ * via custom-named symbols:
+ *
+ *   - char   dbg_arg$foo$s$bar[];        // == EXISTS("foo=$value") ? "$value" : "bar"
+ *   - byte_t dbg_arg$foo$x$00000000[4];  // == EXISTS("foo=$value") ? tohex("$value") : tohex("00000000")
+ *   - bool   dbg_arg$foo;                // == EXISTS("foo=$value") ? true : false
+ *   - int    dbg_arg$foo$d$42;           // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *   - u32    dbg_arg$foo$I32u$42;        // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
+ *
+ * *NOTE: The  tohex() function is fairly simple, in that
+ *        it will silently skip all non-xdigit characters
+ *        during parsing!
+ *
+ * The format for these symbols is:
+ *    "dbg_arg$" <argument_name> "$" <fmt_spec> ["$" <default_value>]
+ *
+ *    <argument_name>: The  name  of   the  argument  in   question.
+ *                     For this purpose, the driver's argv vector is
+ *                     scanned  for  arguments "<argument_name>=..."
+ *                     and "<argument_name>:...", where "..." is the
+ *                     value that will be interpreted as the initial
+ *                     assignment  for   the  pointed-to   location.
+ *
+ *    <fmt_spec>:      A printf-style  format  specifier  that  describes
+ *                     what the symbol should point to. For this purpose,
+ *                     you can specify 1  of 4 different encoding  types:
+ *                       - signed integer:   [LENGTH_PREFIX] "d"
+ *                       - unsigned integer: [LENGTH_PREFIX] "u"
+ *                       - hex-blob:         "x"
+ *                       - string:           "s"
+ *                     Where  `LENGTH_PREFIX' is one of ""; "h", "hh",
+ *                     "l", "ll", "I", "I8", "I16", "I32", "I64", "z",
+ *                     "t", "L", "j"
+ *                     In the case  of hex-blob,  a <default_value>  is
+ *                     required, and (via the # of hex-digit characters
+ *                     contained), specifies the size of the pointed-to
+ *                     blob.
+ *
+ *    <default_value>: Default initializer  for  the  argument  value.
+ *                     When the driver's  commandline doesn't  contain
+ *                     <argument_name>, then act as though an argument
+ *                     "<default_value>=<default_value>" had  actually
+ *                     been given.
+ *                     When no <default_value> is given, and the argument
+ *                     isn't given on  the driver  commandline, then  the
+ *                     pointed-to blob is simply zero-initialized.
+ *
+ * Or alternatively:
+ *    "dbg_arg$" <argument_name>
+ * which is a special case that forms a variable which points
+ * at a non-zero boolean if <argument_name> exists, and at  a
+ * zero-boolean if it does exist.
+ *
+ * Note that all pointed-to symbol locations are always read/
+ * write to the driver that uses them.
+ *
+ */
 
 
 struct mfile;
@@ -200,7 +258,6 @@ DATDEF struct sig driver_state_changed;
 #define driver_changesignal(self) (&driver_state_changed)
 
 struct driver;
-struct driver_fde_cache;
 
 #ifndef __driver_axref_defined
 #define __driver_axref_defined
@@ -208,6 +265,12 @@ AXREF(driver_axref, driver);
 #endif /* !__driver_axref_defined */
 
 #ifdef __WANT_DRIVER__d_internals
+struct driver_fde_cache;
+struct driver_argcash; /* Descriptor for a `drv_arg$...' symbol. */
+#ifndef __driver_argcash_slist_defined
+#define __driver_argcash_slist_defined
+SLIST_HEAD(driver_argcash_slist, driver_argcash);
+#endif /* !__driver_argcash_slist_defined */
 #ifndef __mnode_slist_defined
 #define __mnode_slist_defined
 struct mnode;
@@ -326,8 +389,9 @@ struct driver
 #ifdef __WANT_DRIVER__d_internals
 	struct driver_fde_cache       *d_eh_frame_cache;      /* [0..1][lock(d_eh_frame_cache)] Tree for an `.eh_frame' lookup cache. */
 	struct atomic_rwlock           d_eh_frame_cache_lock; /* Lock for `d_eh_frame_cache' */
+	struct driver_argcash_slist    d_argcash;             /* [0..n][lock(d_eh_frame_cache_lock)][owned] Descriptors for `drv_arg$...' symbols. */
 #else /* __WANT_DRIVER__d_internals */
-	void                         *_d_intern1[2]; /* Used internally */
+	void                         *_d_intern1[3]; /* Used internally */
 #endif /* !__WANT_DRIVER__d_internals */
 
 	/* Driver runtime internal temporaries. */
