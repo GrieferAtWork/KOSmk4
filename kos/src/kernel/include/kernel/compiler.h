@@ -56,7 +56,7 @@
 #endif
 
 #undef CONFIG_USE_NEW_DRIVER
-#if 0
+#if 1
 #define CONFIG_USE_NEW_DRIVER
 #endif
 

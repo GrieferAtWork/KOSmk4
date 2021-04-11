@@ -1278,8 +1278,8 @@ NOTHROW(FCALL driver_argcash_free)(struct driver_argcash *__restrict self) {
 
 /* Find an arg$-argument matching the given requirements.
  * If  no  such argument  exists, return  `NULL' instead. */
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 4)) struct driver_argcash_entry *
-NOTHROW(FCALL driver_argcash_find_locked)(struct driver *__restrict self,
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 4)) struct driver_argcash_entry *
+NOTHROW(FCALL driver_argcash_find_locked)(struct driver const *__restrict self,
                                           uintptr_half_t type, uintptr_half_t size,
                                           char const *__restrict name) {
 	struct driver_argcash *tab;
@@ -3052,7 +3052,7 @@ fail:
 /* @param: name: The tag-name (e.g. "DT_INIT_ARRAY") */
 PRIVATE NOBLOCK NONNULL((1, 4, 5)) void
 NOTHROW(FCALL driver_get_initfini_array)(struct driver *__restrict self,
-                                         uint32_t elf_dt_array, uint32_t elf_dt_array_sz,
+                                         intptr_t elf_dt_array, intptr_t elf_dt_array_sz,
                                          struct driver_initfini_vector *__restrict result,
                                          char const *__restrict name) {
 	size_t i;
@@ -3086,7 +3086,7 @@ NOTHROW(FCALL driver_get_initfini_array)(struct driver *__restrict self,
 
 PRIVATE NONNULL((1, 4)) void FCALL
 driver_run_initfini_array(struct driver *__restrict self,
-                          uint32_t elf_dt_array, uint32_t elf_dt_array_sz,
+                          intptr_t elf_dt_array, intptr_t elf_dt_array_sz,
                           char const *__restrict name,
                           unsigned int flags) {
 	size_t i;
@@ -3126,7 +3126,7 @@ driver_run_initfini_array(struct driver *__restrict self,
 }
 
 PRIVATE NONNULL((1, 3)) void FCALL
-driver_run_initfini_func(struct driver *__restrict self, uint32_t elf_dt_func,
+driver_run_initfini_func(struct driver *__restrict self, intptr_t elf_dt_func,
                          char const *__restrict name, unsigned int flags) {
 	size_t i;
 	driver_initfini_t func = NULL;
@@ -4243,7 +4243,7 @@ PRIVATE struct module_ops const driver_module_ops = {
 
 
 
-PRIVATE NONNULL((1)) void KCALL
+PRIVATE NONNULL((1)) void FCALL
 driver_verify_ElfEhdr(ElfW(Ehdr) const *__restrict ehdr)
 		THROWS(E_NOT_EXECUTABLE) {
 	unsigned int reason;
@@ -4284,7 +4284,7 @@ err_elf_reason:
 }
 
 
-PRIVATE NONNULL((1)) void KCALL
+PRIVATE NONNULL((1)) void FCALL
 driver_init_cmdline(struct driver *__restrict self,
                     USER CHECKED char const *cmdline)
 		THROWS(E_BADALLOC, E_SEGFAULT, E_WOULDBLOCK) {
@@ -4322,7 +4322,7 @@ NOTHROW(FCALL destroy_partially_initialized_driver)(struct driver *__restrict se
 	kfree(self);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) bool
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1, 2)) bool
 NOTHROW(FCALL image_validate)(struct driver *__restrict self,
                               void const *src, size_t num_bytes) {
 	return (byte_t const *)src >= self->d_module.md_loadmin &&
@@ -5498,7 +5498,7 @@ nope:
 }
 
 
-PUBLIC WUNUSED REF struct driver *KCALL
+PUBLIC WUNUSED REF struct driver *FCALL
 driver_fromfilename(USER CHECKED char const *driver_filename)
 		THROWS(E_SEGFAULT) {
 	REF struct driver *result;
@@ -5535,7 +5535,7 @@ driver_fromfilename(USER CHECKED char const *driver_filename)
 	return NULL;
 }
 
-PUBLIC WUNUSED REF struct driver *KCALL
+PUBLIC WUNUSED REF struct driver *FCALL
 driver_fromfilename_with_len(USER CHECKED char const *driver_filename,
                              size_t driver_filename_len)
 		THROWS(E_SEGFAULT) {
