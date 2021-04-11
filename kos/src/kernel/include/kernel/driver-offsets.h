@@ -24,6 +24,9 @@
  *          /kos/misc/magicemulator/_vboxgdbkos.dee, as that file includes
  *          this  one but may  not get re-compiled  once this one changes. */
 
+/* TODO: Deprecated header: this header should _really_ go away in  its
+ *       entirety. Especially considering that all of these offsets are
+ *       no longer correct when `CONFIG_USE_NEW_DRIVER' is enabled! */
 
 /* Offsets into `struct driver' (on 32-bit machines) */
 #define OFFSET_DRIVER32_REFCNT               0
