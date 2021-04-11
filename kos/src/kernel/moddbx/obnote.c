@@ -52,6 +52,9 @@
 
 #include <hybrid/align.h>
 
+#include <compat/config.h>
+#include <kos/exec/rtld.h>
+
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -67,6 +70,9 @@
 #define ELF_ARCH_MAXSHSTRTAB_SIZ 65536
 #endif /* !ELF_ARCH_MAXSHSTRTAB_SIZ */
 
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/exec/rtld.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -854,15 +860,10 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
                                 char buf[64]) {
 	char const *result = NULL;
 	if (self == &execabi_system_rtld_file.mrf_file) {
-		result = "/lib/libdl.so";
+		result = RTLD_LIBDL;
 #ifdef __ARCH_HAVE_COMPAT
-#if __ARCH_COMPAT_SIZEOF_POINTER == 4
 	} else if (self == &compat_execabi_system_rtld_file.mrf_file) {
-		result = "/lib64/libdl.so";
-#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
-	} else if (self == &compat_execabi_system_rtld_file.mrf_file) {
-		result = "/lib32/libdl.so";
-#endif /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
+		result = COMPAT_RTLD_LIBDL;
 #endif /* __ARCH_HAVE_COMPAT */
 #ifdef CONFIG_DEBUG_HEAP
 	} else if (self == &mfile_dbgheap) {

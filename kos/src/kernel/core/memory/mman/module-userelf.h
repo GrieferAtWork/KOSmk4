@@ -96,27 +96,27 @@ SLIST_HEAD(module_section_slist, module_section);
 
 struct userelf_module: module {
 	union {
-		LIST_ENTRY(REF userelf_module)         um_cache;     /* [0..1][lock(md_mman->mm_lock)][valid_if(md_nodecount != 0)]
-		                                                      * Link entry within the UserELF  module cache of the  associated
-		                                                      * mman.  When bound, then  this link entry  holds a reference to
-		                                                      * the associated module. Additionally, when `md_nodecount' drops
-		                                                      * to `0', the module is  removed from the UserELF module  cache,
-		                                                      * as per use of the `mo_nonodes' operator. */
-		Toblockop(struct mman)                _um_cc_lop;    /* Used for async destruction as the result of removal from the UserELF cache. */
-		Tobpostlockop(struct mman)            _um_cc_postlop;/* *ditto* */
-		struct lockop                         _um_sc_lop;    /* Used for async removal of sections from the UserELF section cache. */
-		struct postlockop                     _um_sc_postlop;/* *ditto* */
-		SLIST_ENTRY(userelf_module)           _um_dead;      /* Used internally to chain dead UserELF modules. */
+		LIST_ENTRY(REF userelf_module)         um_cache;      /* [0..1][lock(md_mman->mm_lock)][valid_if(md_nodecount != 0)]
+		                                                       * Link entry within the UserELF  module cache of the  associated
+		                                                       * mman.  When bound, then  this link entry  holds a reference to
+		                                                       * the associated module. Additionally, when `md_nodecount' drops
+		                                                       * to `0', the module is  removed from the UserELF module  cache,
+		                                                       * as per use of the `mo_nonodes' operator. */
+		Toblockop(struct mman)                _um_cc_lop;     /* Used for async destruction as the result of removal from the UserELF cache. */
+		Tobpostlockop(struct mman)            _um_cc_postlop; /* *ditto* */
+		struct lockop                         _um_sc_lop;     /* Used for async removal of sections from the UserELF section cache. */
+		struct postlockop                     _um_sc_postlop; /* *ditto* */
+		SLIST_ENTRY(userelf_module)           _um_dead;       /* Used internally to chain dead UserELF modules. */
 	};
-	pos_t                                      um_shoff;     /* [const] == Elf_Ehdr::e_shoff. */
-	uint16_t                                   um_shnum;     /* [const] == Elf_Ehdr::e_shnum. */
-	uint16_t                                   um_shstrndx;  /* [const] == Elf_Ehdr::e_shstrndx. (< ue_shnum) */
-	UM_ElfW_ShdrP                              um_shdrs;     /* [0..1][lock(WRICE_ONCE)] Section headers */
+	pos_t                                      um_shoff;      /* [const] == Elf_Ehdr::e_shoff. */
+	uint16_t                                   um_shnum;      /* [const] == Elf_Ehdr::e_shnum. */
+	uint16_t                                   um_shstrndx;   /* [const] == Elf_Ehdr::e_shstrndx. (< ue_shnum) */
+	UM_ElfW_ShdrP                              um_shdrs;      /* [0..1][lock(WRICE_ONCE)][owned] Section headers */
 	union {
-		char                                  *um_shstrtab;  /* [0..1][lock(WRITE_ONCE)][owned] Section headers string table. */
-		struct module_section_slist           _um_deadsect;  /* [link(_ums_dead)] Used internally for async destruction of dead sections. */
+		char                                  *um_shstrtab;   /* [0..1][lock(WRITE_ONCE)][owned] Section headers string table. */
+		struct module_section_slist           _um_deadsect;   /* [link(_ums_dead)] Used internally for async destruction of dead sections. */
 	};
-	COMPILER_FLEXIBLE_ARRAY(struct uems_awref, um_sections); /* [0..1][lock(WRITE_ONCE)][ue_shnum] Section cache. */
+	COMPILER_FLEXIBLE_ARRAY(struct uems_awref, um_sections);  /* [0..1][lock(WRITE_ONCE)][ue_shnum] Section cache. */
 };
 
 

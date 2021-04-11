@@ -814,7 +814,7 @@ handle_as_vfs(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
 
-#define handle_as_datablock(self)        ((REF struct vm_datablock *)handle_as(self, HANDLE_TYPE_DATABLOCK))
+#define handle_as_mfile(self)            ((REF struct mfile *)handle_as(self, HANDLE_TYPE_DATABLOCK))
 #define handle_as_directory_entry(self)  ((REF struct directory_entry *)handle_as(self, HANDLE_TYPE_DIRECTORYENTRY))
 #define handle_as_path(self)             ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
 #define handle_as_taskpid(self)          ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_TASK))
