@@ -1643,7 +1643,7 @@ set_node_nullptr:
 			/* Fill in remaining fields of `result' */
 			result->md_fsname = incref(rtld_name);
 			result->md_mman   = weakincref(self);
-			result->md_file   = incref(file);
+			result->md_file   = file; /* Inherit reference. */
 			mman_lock_release(self);
 		} EXCEPT {
 			kfree(UM_any(shdrs));
