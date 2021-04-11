@@ -26,6 +26,7 @@
 
 #include <kos/io.h>
 
+#ifdef __CC__
 DECL_BEGIN
 
 #ifdef __DEEMON__
@@ -1279,6 +1280,67 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mfile_polltest(struct mfile
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_mfile_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
+#define HANDLE_TYPE_DRIVER_LOADLIST HANDLE_TYPE_DRIVER_STATE
+#define handle_driver_loadlist_refcnt      handle_driver_state_refcnt
+#define handle_driver_loadlist_incref      handle_driver_state_incref
+#define handle_driver_loadlist_decref      handle_driver_state_decref
+#define handle_driver_loadlist_tryincref   handle_driver_state_tryincref
+#define handle_driver_loadlist_weakgetref  handle_driver_state_weakgetref
+#define handle_driver_loadlist_weaklckref  handle_driver_state_weaklckref
+#define handle_driver_loadlist_weakdecref  handle_driver_state_weakdecref
+#define handle_driver_loadlist_read        handle_driver_state_read
+#define handle_driver_loadlist_write       handle_driver_state_write
+#define handle_driver_loadlist_pread       handle_driver_state_pread
+#define handle_driver_loadlist_pwrite      handle_driver_state_pwrite
+#define handle_driver_loadlist_readv       handle_driver_state_readv
+#define handle_driver_loadlist_writev      handle_driver_state_writev
+#define handle_driver_loadlist_preadv      handle_driver_state_preadv
+#define handle_driver_loadlist_pwritev     handle_driver_state_pwritev
+#define handle_driver_loadlist_readdir     handle_driver_state_readdir
+#define handle_driver_loadlist_seek        handle_driver_state_seek
+#define handle_driver_loadlist_ioctl       handle_driver_state_ioctl
+#define handle_driver_loadlist_truncate    handle_driver_state_truncate
+#define handle_driver_loadlist_mmap        handle_driver_state_mmap
+#define handle_driver_loadlist_allocate    handle_driver_state_allocate
+#define handle_driver_loadlist_sync        handle_driver_state_sync
+#define handle_driver_loadlist_datasync    handle_driver_state_datasync
+#define handle_driver_loadlist_stat        handle_driver_state_stat
+#define handle_driver_loadlist_pollconnect handle_driver_state_pollconnect
+#define handle_driver_loadlist_polltest    handle_driver_state_polltest
+#define handle_driver_loadlist_hop         handle_driver_state_hop
+#define handle_driver_loadlist_tryas       handle_driver_state_tryas
+
+/* Handle operators for `HANDLE_TYPE_DRIVER_LOADLIST' (`struct driver_loadlist') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_loadlist_refcnt)(struct driver_loadlist const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_incref)(struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_decref)(REF struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_loadlist_tryincref)(struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_loadlist_weakgetref)(struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver_loadlist *NOTHROW(FCALL handle_driver_loadlist_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_read(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_write(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_pread(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_pwrite(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_readv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_writev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_preadv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_pwritev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_readdir(struct driver_loadlist *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_driver_loadlist_seek(struct driver_loadlist *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_ioctl(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_truncate(struct driver_loadlist *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_driver_loadlist_mmap(struct driver_loadlist *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_driver_loadlist_allocate(struct driver_loadlist *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_sync(struct driver_loadlist *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_datasync(struct driver_loadlist *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_stat(struct driver_loadlist *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_pollconnect(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_loadlist_polltest(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_hop(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_driver_loadlist_tryas(struct driver_loadlist *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_PROTO_H */

@@ -498,7 +498,7 @@ INTDEF struct driver_section kernel_section_shstrtab;
 /************************************************************************/
 /* Note that the `module_*' functions can also be used, however these   */
 /* functions will always return `NULL' for non-kernel-space addresses!  */
-/* Additionally, these functions are alowed NOBLOCK+NOTHROW!            */
+/* Additionally, these functions are always NOBLOCK+NOTHROW!            */
 /************************************************************************/
 FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_fromaddr)(void const *addr);
 FUNDEF NOBLOCK WUNUSED REF struct driver *NOTHROW(FCALL driver_aboveaddr)(void const *addr);
@@ -548,9 +548,9 @@ driver_getfile(struct driver *__restrict self)
 /************************************************************************/
 
 struct driver_syminfo {
-	USER CHECKED char const *dsi_name;    /* [1..1][in] Symbol name */
 	uint32_t                 dsi_elfhash; /* [in|out] ELF symbol name hash. */
 	uint32_t                 dsi_gnuhash; /* [in|out] GNU symbol name hash. */
+	USER CHECKED char const *dsi_name;    /* [1..1][in] Symbol name */
 	void                    *dsi_addr;    /* [out] Symbol address. (absolute) */
 	size_t                   dsi_size;    /* [out] Symbol size. */
 	unsigned char            dsi_bind;    /* [out] Symbol binding (one of `STB_GLOBAL' or `STB_WEAK') */
@@ -558,9 +558,9 @@ struct driver_syminfo {
 
 /* Initialize a given driver symbol info descriptor. */
 #define driver_syminfo_init(self, name)        \
-	(void)((self)->dsi_name    = (name),       \
-	       (self)->dsi_elfhash = (uint32_t)-1, \
-	       (self)->dsi_gnuhash = (uint32_t)-1)
+	(void)((self)->dsi_elfhash = (uint32_t)-1, \
+	       (self)->dsi_gnuhash = (uint32_t)-1, \
+	       (self)->dsi_name    = (name))
 
 /* Lookup a symbol  within a driver,  given its  name.
  * Note that this function will _not_ look into driver
@@ -612,10 +612,10 @@ FUNDEF WUNUSED NONNULL((1)) void *FCALL driver_dlsym(struct driver *__restrict s
 
 
 struct driver_symaddr {
-	void         *dsa_addr;    /* [out] Symbol address. (absolute) */
-	size_t        dsa_size;    /* [out] Symbol size. */
-	char const   *dsa_name;    /* [1..1][out] Symbol name */
-	unsigned char dsa_bind;    /* [out] Symbol binding (one of `STB_GLOBAL' or `STB_WEAK') */
+	char const   *dsa_name; /* [1..1][out] Symbol name */
+	void         *dsa_addr; /* [out] Symbol address. (absolute) */
+	size_t        dsa_size; /* [out] Symbol size. */
+	unsigned char dsa_bind; /* [out] Symbol binding (one of `STB_GLOBAL' or `STB_WEAK') */
 };
 
 
@@ -639,8 +639,8 @@ NOTHROW(FCALL driver_dladdr)(void const *addr,
 
 struct unwind_fde_struct;
 
-/* Lookup the FDE descriptor for a given `absolute_pc', whilst trying to
- * make use of the FDE cache of `self'.
+/* Lookup  the FDE descriptor for a given `absolute_pc',
+ * whilst trying to make use of the FDE cache of `self'.
  * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolute_pc,

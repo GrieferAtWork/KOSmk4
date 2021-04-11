@@ -38,6 +38,7 @@
 #include <fs/vfs.h>
 #include <kernel/arch/driver.h>
 #include <kernel/debugtrap.h>
+#include <kernel/handle-proto.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cache.h>
@@ -127,6 +128,7 @@
 #endif /* !ELF_ARCH_MAXSHCOUNT */
 
 DECL_BEGIN
+
 
 #define THROW_FAULTY_ELF_ERROR(...)           \
 	THROW(E_NOT_EXECUTABLE_FAULTY,            \
@@ -2511,8 +2513,8 @@ NOTHROW(KCALL clear_fde_caches)(void) {
 }
 
 
-/* Lookup the FDE descriptor for a given `absolute_pc', whilst trying to
- * make use of the FDE cache of `self'.
+/* Lookup  the FDE descriptor for a given `absolute_pc',
+ * whilst trying to make use of the FDE cache of `self'.
  * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
 PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolute_pc,
@@ -2583,6 +2585,7 @@ cannot_cache:
  * address, as well as  keep track of a  lazily allocated address-tree of  FDE
  * caches for quick (O(1))  repeated access to an  FDE located within a  known
  * function. */
+DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
 INTERN NOBLOCK NONNULL((2)) unsigned int
 NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
@@ -2597,7 +2600,6 @@ NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void const *absolute_pc,
 	decref_unlikely(d);
 	return error;
 }
-DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
 
 
 
@@ -2645,22 +2647,26 @@ driver_runstate_init_deps(struct driver *__restrict self) {
 		if unlikely(dst >= self->d_depcnt)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED, dst);
 		filename = self->d_dynstr + elf_dynamic[i].d_un.d_ptr;
-		if unlikely(filename < self->d_dynstr ||
-		            filename >= self->d_dynstr_end)
+		if unlikely(filename < self->d_dynstr || filename >= self->d_dynstr_end)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED, dst);
+
 		/* Check  for  special case:  loading driver  dependencies before
 		 * the root filesystem has been mounted (i.e. bootloader drivers) */
 		if unlikely(!ATOMIC_READ(vfs_kernel.p_inode)) {
 			dependency = driver_fromname(filename);
 			if unlikely(!dependency) {
 				char const *name;
-				/* We  get here if  a driver loaded as  a bootloader module required
-				 * another driver as a dependency, with that other driver not having
-				 * been provided in the same manner.
-				 * In this case, tell the user that they've booted KOS in an impossible
-				 * configuration,   also   informing  them   of  the   missing  driver.
-				 * Note that when  built with  the builtin debugger  enabled, the  user
-				 * will  even  be  prompted  with  a  really  nice  error  message!  ;) */
+				/* We  get here if  a driver loaded  as a bootloader module
+				 * required another driver as a dependency, with that other
+				 * driver not having been provided in the same manner.
+				 *
+				 * In  this case, tell the user that they've booted KOS in
+				 * an impossible configuration, also informing them of the
+				 * missing driver.
+				 *
+				 * Note that when built with the builtin debugger enabled,
+				 * the user will even be prompted with a really nice error
+				 * message! ;) */
 				name = strchr(filename, '/');
 				name = name ? name + 1 : filename;
 				dependency = driver_fromname(name);
@@ -2685,7 +2691,11 @@ driver_runstate_init_deps(struct driver *__restrict self) {
 }
 
 
-/* Remove  */
+/* Remove write-permissions from normally read-only program headers
+ * that had none-the-less been mapped  as writable for the sake  of
+ * allowing TEXT-relocations to be applied.
+ * This function is called during driver initialization once driver
+ * relocations have being applied. */
 PRIVATE NONNULL((1)) void FCALL
 driver_disable_textrel(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK) {
@@ -2701,7 +2711,8 @@ driver_disable_textrel(struct driver *__restrict self)
 			continue; /* Not a load header */
 		if (self->d_phdr[i].p_flags & PF_W)
 			continue; /* This one's supposed to be writable! */
-		phdr_minaddr = (byte_t const *)(self->d_module.md_loadaddr + self->d_phdr[i].p_vaddr);
+		phdr_minaddr = (byte_t const *)(self->d_module.md_loadaddr +
+		                                self->d_phdr[i].p_vaddr);
 		phdr_maxaddr = phdr_minaddr + self->d_phdr[i].p_memsz;
 		/* Must make this header writable! */
 		if (!haslock) {
@@ -3959,9 +3970,15 @@ NOTHROW(FCALL driver_unbind_sections_and_destroy_lop)(struct lockop *__restrict 
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
-	assert(self->d_module.md_mman == &mman_kernel);
+
+	/* Log a system message informing the user that  this
+	 * driver is now officially dead, and will no  longer
+	 * appear in load-lists (or at the very least: should
+	 * always be skipped when encountered) */
+	printk(KERN_NOTICE "[mod][-] Delmod: %q\n", self->d_name);
 
 	/* Change the driver's state from KILL to DEAD */
+	assert(self->d_module.md_mman == &mman_kernel);
 	assert(self->d_state == DRIVER_STATE_KILL);
 	ATOMIC_WRITE(self->d_state, DRIVER_STATE_DEAD);
 	sig_broadcast(driver_changesignal(self));

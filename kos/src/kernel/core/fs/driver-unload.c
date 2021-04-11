@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_DRIVER
 #include <dev/block.h>
 #include <dev/char.h>
 #include <kernel/driver.h>
@@ -79,5 +80,6 @@ driver_clear_globals(struct driver *__restrict self)
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_CORE_FS_DRIVER_UNLOAD_C */
