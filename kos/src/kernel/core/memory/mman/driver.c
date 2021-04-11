@@ -64,6 +64,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
@@ -1161,7 +1162,14 @@ argcash_eval(struct driver *__restrict self,
 		}
 		/* Write-back the fully parsed integer argument. */
 		bzero(buf, bufsize);
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		memcpy(buf, &intval, MIN(sizeof(intval), bufsize));
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+		{
+			size_t copy = MIN(sizeof(intval), bufsize);
+			memcpy(buf, (byte_t *)&intval + sizeof(intval) - copy, copy);
+		}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		return bufsize;
 	}	break;
 
