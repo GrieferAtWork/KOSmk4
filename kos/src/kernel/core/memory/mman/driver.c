@@ -694,7 +694,7 @@ PRIVATE ATTR_COLDDATA struct directory_entry kernel_driver_fsname = {
 #if __SIZEOF_POINTER__ == 8
 	.de_hash     = UINT64_C(0xe205ff2e0d3d550c),
 #elif __SIZEOF_POINTER__ == 4
-	.de_hash     = 0, /* TODO */
+	.de_hash     = UINT32_C(0x858bf1a8),
 #else /* __SIZEOF_POINTER__ == ... */
 	.de_hash     = 0,
 #endif /* __SIZEOF_POINTER__ != ... */

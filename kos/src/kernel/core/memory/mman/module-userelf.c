@@ -1674,11 +1674,11 @@ PRIVATE struct directory_entry system_rtld_dirent = {
 	.de_pos      = 0,
 	.de_ino      = 0,
 #ifdef __x86_64__
-	.de_hash     = UINT64_C(42), /* TODO */
+	.de_hash     = UINT64_C(0xce184917e2193010),
 #elif __SIZEOF_POINTER__ == 8
-	.de_hash     = UINT64_C(42), /* TODO */
+	.de_hash     = UINT64_C(0x75b4ce19e8e33a0b),
 #elif __SIZEOF_POINTER__ == 4
-	.de_hash     = UINT32_C(42), /* TODO */
+	.de_hash     = UINT32_C(0x6e321ca9),
 #else /* __SIZEOF_POINTER__ == ... */
 	.de_hash     = 0,
 #endif /* __SIZEOF_POINTER__ != ... */
@@ -1698,9 +1698,9 @@ PRIVATE struct directory_entry compat_system_rtld_dirent = {
 	.de_pos      = 0,
 	.de_ino      = 0,
 #if __SIZEOF_POINTER__ == 8
-	.de_hash     = UINT64_C(42), /* TODO */
+	.de_hash     = UINT64_C(0x75b4ce19e8e33a0b),
 #elif __SIZEOF_POINTER__ == 4
-	.de_hash     = UINT32_C(42), /* TODO */
+	.de_hash     = UINT32_C(0x6e321ca9),
 #else /* __SIZEOF_POINTER__ == ... */
 	.de_hash     = 0,
 #endif /* __SIZEOF_POINTER__ != ... */
