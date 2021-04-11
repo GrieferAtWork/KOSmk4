@@ -21,16 +21,28 @@
 #define _KOS_EXEC_MODULE_H 1
 
 /* Portable (as in: both user- and kernel-space capable) API
- * for working with  dynamically loaded objects,  including:
- *   - (kernelspace-only) Userspace modules (`struct usermod')
- *   - (kernelspace-only) Kernel drivers (`struct driver')
- *   - (userspace-only)   libdl.so shared library handles
+ * for working with  dynamically loaded objects:
+ *   kernelspace: `struct module *'  from <kernel/mman/module.h>
+ *   userspace:   `void *'           from <dlfcn.h>  (aka: struct dlmodule *)
  */
 
 #include <__stdinc.h>
 
 #ifdef __KERNEL__
+#include <kernel/compiler.h>
+#ifdef CONFIG_USE_NEW_DRIVER
+/* TODO: Define all of  the macros  right here,  since
+ *       CONFIG_USE_NEW_DRIVER makes <kernel/module.h>
+ *       deprecated. */
+/* TODO: Once support for `#ifndef CONFIG_USE_NEW_DRIVER'
+ *       gets dropped, get rid of `module_type_var' and
+ *       all of the related macros, as nothing will need
+ *       module type variables anymore!
+ *       ALso get rid of `MODULE_TYPE_*'! */
 #include <kernel/module.h>
+#else /* CONFIG_USE_NEW_DRIVER */
+#include <kernel/module.h>
+#endif /* !CONFIG_USE_NEW_DRIVER */
 #else /* __KERNEL__ */
 
 #include <bits/types.h>

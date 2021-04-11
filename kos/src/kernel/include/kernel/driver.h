@@ -81,14 +81,15 @@ DATDEF struct module __drv_self ASMNAME("drv_self");
 #define drv_self (*(struct driver *)&__drv_self)
 #endif /* !__drv_self_defined */
 
-DATDEF byte_t /*         */ drv_loadaddr[];    /* Absolute load-address of the driver (== drv_self.md_loadaddr) */
-DATDEF byte_t /*         */ drv_loadmin[];     /* Absolute min-address of the driver program (== drv_self.md_loadmin) */
-DATDEF byte_t /*         */ drv_loadmax[];     /* Absolute max-address of the driver program (== drv_self.md_loadmax) */
-DATDEF char /*           */ drv_name[];        /* Name of the driver (== drv_self.d_name) */
-DATDEF struct regular_node *drv_file;          /* [0..1] Inode of the of the driver (== drv_self.d_file) */
-DATDEF char /*           */ drv_cmdline[];     /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
-DATDEF size_t /*         */ drv_argc;          /* Driver argument count (== &drv_self.d_argc) */
-DATDEF char /*          */ *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
+struct mfile;
+DATDEF byte_t /*  */ drv_loadaddr[]; /* Absolute load-address of the driver (== drv_self.md_loadaddr) */
+DATDEF byte_t /*  */ drv_loadmin[];  /* Absolute min-address of the driver program (== drv_self.md_loadmin) */
+DATDEF byte_t /*  */ drv_loadmax[];  /* Absolute max-address of the driver program (== drv_self.md_loadmax) */
+DATDEF char /*    */ drv_name[];     /* Name of the driver (== drv_self.d_name) */
+DATDEF struct mfile *drv_file;       /* [0..1] Inode of the of the driver (== drv_self.d_file) */
+DATDEF char /*    */ drv_cmdline[];  /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
+DATDEF size_t /*  */ drv_argc;       /* Driver argument count (== &drv_self.d_argc) */
+DATDEF char /*   */ *drv_argv[];     /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
 
 /* NOTE: This  function  may  be implemented  by  individual drivers!
  *       This isn't a function that is exported by the kernel itself!

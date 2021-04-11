@@ -652,6 +652,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *   - _boottask --> boottask
 	 */
 
+	/* TODO: Probably due to changes made by CONFIG_USE_NEW_DRIVER,
+	 *       >> deemon magic.dee --driver=usb-hid:usb
+	 *       crashes, but
+	 *       >> deemon magic.dee --driver=usb:usb-hid
+	 *       works correctly.
+	 * iow:  Bootloader driver order suddenly makes a difference,
+	 *       when it really shouldn't... */
+
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
 assert.expr: "count == 0"

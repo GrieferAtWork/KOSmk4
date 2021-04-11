@@ -3729,51 +3729,6 @@ NOTHROW(FCALL driver_destroy_after_mnodes)(struct driver *__restrict self) {
 	weakdecref(self);
 }
 
-INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) * /* from "mnode.c" */
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
-                                             struct mpart *__restrict part);
-INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
-NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
-
-/* Free a given mem-node that was destroyed when unmapping a driver. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_deadnodes_free)(struct mnode *__restrict self) {
-	REF struct mpart *part;
-	xdecref(self->mn_fspath);
-	xdecref(self->mn_fsname);
-	if ((part = self->mn_part) != NULL) {
-		/* Try to unlink the node from the copy- or share-chain of the associated part. */
-		if (mpart_lock_tryacquire(part)) {
-			LIST_REMOVE(self, mn_link);
-			if ((self->mn_flags & (MNODE_F_MLOCK)) &&
-			    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
-				mpart_maybe_clear_mlock(part);
-			mpart_lock_release(part);
-			decref_unlikely(part);
-		} else {
-			Toblockop(struct mpart) *lop;
-			/* Must insert the node into the part's list of deleted nodes. */
-			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
-			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
-
-			/* Insert into the  lock-operations list of  `part'
-			 * The act of doing this is what essentially causes
-			 * ownership of our node to be transfered to `part' */
-			lop = (Toblockop(struct mpart) *)self;
-			lop->olo_func = &mnode_unlink_from_part_lockop;
-			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
-
-			/* Try to reap dead nodes. */
-			_mpart_lockops_reap(part);
-
-			/* Drop our old reference to the associated part. */
-			decref(part);
-			return;
-		}
-	}
-	mnode_free(self);
-}
-
 /* Free all nodes from the given list of dead nodes. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_deadnodes_freelist)(struct mnode_slist *__restrict deadnodes) {
@@ -3781,7 +3736,7 @@ NOTHROW(FCALL driver_deadnodes_freelist)(struct mnode_slist *__restrict deadnode
 		struct mnode *node;
 		node = SLIST_FIRST(deadnodes);
 		SLIST_REMOVE_HEAD(deadnodes, _mn_dead);
-		driver_deadnodes_free(node);
+		mnode_destroy(node);
 	}
 }
 

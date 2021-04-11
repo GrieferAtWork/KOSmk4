@@ -126,16 +126,6 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 	        "A mem-node may only be destroyed if it's marked as UNMAPPED, "
 	        "or belongs to a dead memory manager");
 
-	/* FIXME: The unprepare part really shouldn't be happening here! */
-	if (self->mn_flags & MNODE_F_MPREPARED) {
-		REF struct mman *mm = self->mn_mman;
-		if (tryincref(mm)) {
-			pagedir_phys_t pd = self->mn_mman->mm_pagedir_p;
-			pagedir_unprepare_p(pd, mnode_getaddr(self), mnode_getsize(self));
-			decref_unlikely(mm);
-		}
-	}
-
 	xdecref(self->mn_fspath);
 	xdecref(self->mn_fsname);
 	if ((part = self->mn_part) != NULL) {

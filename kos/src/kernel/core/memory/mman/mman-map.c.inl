@@ -393,13 +393,18 @@ again_lock_mfile_map:
 				goto again_lock_mfile_map; /* Locks were released -> Try again */
 
 			/* Make sure that the target address range is prepared within the page directory. */
-			if (!pagedir_prepare_p(self->mm_pagedir_p, result, num_bytes)) {
-				/* Failed to prepare the backing page directory... :( */
+#ifdef DEFINE_mman_map_res
+			if (flags & MAP_PREPARED)
+#endif /* DEFINE_mman_map_res */
+			{
+				if (!pagedir_prepare_p(self->mm_pagedir_p, result, num_bytes)) {
+					/* Failed to prepare the backing page directory... :( */
 #ifdef HAVE_FILE
-				mfile_map_release(&map.mmwu_map);
+					mfile_map_release(&map.mmwu_map);
 #endif /* HAVE_FILE */
-				mman_lock_release(self);
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+					mman_lock_release(self);
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+				}
 			}
 		} EXCEPT {
 #ifdef HAVE_FILE
@@ -535,10 +540,12 @@ again_lock_mfile_map:
 		pagedir_unmap_p(self->mm_pagedir_p, result, num_bytes);
 #endif /* DEFINE_mman_map_res */
 
+#ifndef DEFINE_mman_map_res
 	/* If we're not supposed to keep the mappings prepared, then
 	 * unprepare them now. */
 	if (!(flags & MAP_PREPARED))
 		pagedir_unprepare_p(self->mm_pagedir_p, result, num_bytes);
+#endif /* !DEFINE_mman_map_res */
 
 	/* If some other mapping was there before, then we must invalidate
 	 * the page directory  cache so-as to  prevent any stale  entires.
