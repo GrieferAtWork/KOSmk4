@@ -2457,7 +2457,7 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
 		 * caller) */
 		memcpy(info, &data.info, sizeof(struct cmodsyminfo));
 	} else if (error < 0 && error != -0xffff) {
-		/* Custom  error  code  override  (e.g.  DBX_EINTR  or DBX_ENOMEM).
+		/* Custom  error code override  (e.g. `DBX_EINTR' or `DBX_ENOMEM').
 		 * In general, these errors all originate from `cmodule_loadsyms()' */
 		data.error = error;
 	}

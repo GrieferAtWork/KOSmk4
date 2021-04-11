@@ -43,6 +43,9 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
+#include <compat/config.h>
+#include <kos/exec/rtld.h>
+
 #include <alloca.h>
 #include <assert.h>
 #include <inttypes.h>
@@ -50,6 +53,11 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include <string.h>
 
 #include <libunwind/cfi.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/exec/rtld.h>
+#include <compat/kos/types.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 /**/
 #include "include/cexpr.h"
@@ -3400,6 +3408,199 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
 }
 
 
+#ifdef CONFIG_USE_NEW_DRIVER
+
+/* Perform custom handling of special symbols exported by the system `libdl.so' */
+PRIVATE dbx_errno_t
+NOTHROW(FCALL cexpr_load_special_libdl_symbol)(char const *__restrict name) {
+#define LIBDL_VAR___peb                         0 /* "__peb" */
+#define LIBDL_VAR_environ                       1 /* "environ", "_environ", "__environ" */
+#define LIBDL_VAR___argc                        2 /* "__argc" */
+#define LIBDL_VAR___argv                        3 /* "__argv" */
+#define LIBDL_VAR_program_invocation_name       4 /* "_pgmptr", "__progname_full", "program_invocation_name" */
+#define LIBDL_VAR_program_invocation_short_name 5 /* "__progname", "program_invocation_short_name" */
+	unsigned int varid = (unsigned int)-1;
+	dbx_errno_t result = DBX_EOK;
+	/* Figure what (if any) special variable is being accessed. */
+	if (*name == '_') {
+		++name;
+		if (*name == '_') {
+			++name;
+			if (strcmp(name, "peb") == 0) {
+				varid = LIBDL_VAR___peb;
+			} else if (strcmp(name, "environ") == 0) {
+				varid = LIBDL_VAR_environ;
+			} else if (strcmp(name, "argc") == 0) {
+				varid = LIBDL_VAR___argc;
+			} else if (strcmp(name, "argv") == 0) {
+				varid = LIBDL_VAR___argv;
+			} else if (strcmp(name, "progname_full") == 0) {
+				varid = LIBDL_VAR_program_invocation_name;
+			} else if (strcmp(name, "progname") == 0) {
+				varid = LIBDL_VAR_program_invocation_short_name;
+			}
+		} else if (strcmp(name, "environ") == 0) {
+			varid = LIBDL_VAR_environ;
+		} else if (strcmp(name, "pgmptr") == 0) {
+			varid = LIBDL_VAR_program_invocation_name;
+		}
+	} else if (strcmp(name, "environ") == 0) {
+		varid = LIBDL_VAR_environ;
+	} else if (memcmp(name, "program_invocation_", 19 * sizeof(char)) == 0) {
+		name += 19;
+		if (strcmp(name, "name") == 0)
+			varid = LIBDL_VAR_program_invocation_name;
+		else if (strcmp(name, "short_name") == 0) {
+			varid = LIBDL_VAR_program_invocation_short_name;
+		}
+	}
+	if (varid != (unsigned int)-1) {
+		result = cexpr_pop();
+		if unlikely(result != DBX_EOK)
+			goto done;
+		/* All of the special symbols somehow interact with "root_peb",
+		 * which should be an INTERN-visibility symbol from `libdl.so'! */
+		result = cexpr_pushsymbol_byname("root_peb", 8);
+		if unlikely(result != DBX_EOK)
+			goto done;
+		result = cexpr_deref();
+		if unlikely(result != DBX_EOK)
+			goto done;
+		switch (varid) {
+
+		case LIBDL_VAR___peb:
+			/* &__peb == root_peb */
+			break;
+
+		case LIBDL_VAR_environ:
+			/* &environ == &root_peb->pp_envp */
+			result = cexpr_field("pp_envp", 7);
+			break;
+
+		case LIBDL_VAR___argc:
+			/* &__argc == &root_peb->pp_argc */
+			result = cexpr_field("pp_argc", 7);
+			break;
+
+		case LIBDL_VAR___argv:
+			/* &__argv == &root_peb->pp_argv */
+			result = cexpr_field("pp_argv", 7);
+			break;
+
+		case LIBDL_VAR_program_invocation_name:
+			/* &program_invocation_name == &root_peb->pp_argv[0] */
+			result = cexpr_field("pp_argv", 7);
+			if likely(result == 0)
+				result = cexpr_deref();
+			break;
+
+		case LIBDL_VAR_program_invocation_short_name: {
+			/* This is where it gets a bit complicated, since `program_invocation_short_name'
+			 * is  lazily initialized upon first access (meaning that we have to do that init
+			 * for ourselves if it wasn't already done)
+			 * s.a. `libdl:dlget_p_program_invocation_short_name()' */
+			static char const str_dl_program_invocation_short_name[] = "dl_program_invocation_short_name";
+			char const *argv0;
+			byte_t *addrof_dl_program_invocation_short_name;
+			size_t sizeof_dl_program_invocation_short_name;
+			result = cexpr_pushsymbol_byname(str_dl_program_invocation_short_name,
+			                                 COMPILER_STRLEN(str_dl_program_invocation_short_name));
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cexpr_getdata(&addrof_dl_program_invocation_short_name);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			sizeof_dl_program_invocation_short_name = cexpr_getsize();
+			if (sizeof_dl_program_invocation_short_name == sizeof(void *)) {
+				uintptr_t pointed_addr;
+				if (dbg_readmemory(addrof_dl_program_invocation_short_name,
+				                   &pointed_addr, sizeof(pointed_addr)) != 0)
+					goto err_fault;
+				if (pointed_addr != 0)
+					goto push_normal_dl_program_invocation_short_name;
+#ifdef __ARCH_HAVE_COMPAT
+			} else if (sizeof_dl_program_invocation_short_name == __ARCH_COMPAT_SIZEOF_POINTER) {
+				compat_uintptr_t pointed_addr;
+				if (dbg_readmemory(addrof_dl_program_invocation_short_name,
+				                   &pointed_addr, sizeof(pointed_addr)) != 0)
+					goto err_fault;
+				if (pointed_addr != 0)
+					goto push_normal_dl_program_invocation_short_name;
+#endif /* __ARCH_HAVE_COMPAT */
+			} else {
+push_normal_dl_program_invocation_short_name:
+				result = cexpr_swap();
+				if unlikely(result != DBX_EOK)
+					goto done;
+				result = cexpr_pop();
+				goto done;
+			}
+			/* Must lazily initialize `dl_program_invocation_short_name' */
+			result = cexpr_swap();
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cexpr_field("pp_argv", 7);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cexpr_deref();
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cexpr_deref();
+			if unlikely(result != DBX_EOK)
+				goto done;
+			/* Right now, the top of  the stack points at  `*root_peb->pp_argv[0]',
+			 * which contains the address that we want to write back to the program
+			 * invocation short name symbol. */
+			result = cexpr_getdata((byte_t **)&argv0);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			if (!argv0 || !ADDR_ISUSER(argv0))
+				goto push_normal_dl_program_invocation_short_name;
+			/* Pop the root_peb-based expression off of the stack! */
+			result = cexpr_pop();
+			if unlikely(result != DBX_EOK)
+				goto done;
+			/* Find the position of the last '/' in the `argv0' string.
+			 * Then, write-back the position 1 past that character back
+			 * to `*addrof_dl_program_invocation_short_name' */
+			{
+				char const *iter;
+				for (iter = argv0;; ++iter) {
+					char ch;
+					if (dbg_readmemory(iter, &ch, sizeof(ch)) != 0)
+						goto err_fault;
+					if (ch == '\0')
+						break;
+					if (ch == '/')
+						argv0 = iter + 1;
+				}
+			}
+
+#if defined(__ARCH_COMPAT) && __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+			if (sizeof_dl_program_invocation_short_name != sizeof(void *)) {
+				compat_uintptr_t compat_argv0;
+				compat_argv0 = (compat_uintptr_t)(uintptr_t)argv0;
+				argv0        = NULL;
+				memcpy(&argv0, &compat_argv0, sizeof(compat_uintptr_t));
+			}
+#endif /* __ARCH_COMPAT && __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+			if (dbg_writememory(addrof_dl_program_invocation_short_name, &argv0,
+			                    sizeof_dl_program_invocation_short_name, false) != 0)
+				goto err_fault;
+		}	break;
+
+		default:
+			break;
+		}
+	}
+done:
+	return result;
+err_fault:
+	return DBX_EFAULT;
+}
+#endif /* CONFIG_USE_NEW_DRIVER */
+
+
 /* Push  a currently visible  symbol, as selected by  the code location from
  * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
  * given that symbol's `name'. For this  purpose, `name' can be (in  order):
@@ -3536,6 +3737,7 @@ got_symbol_type:
 			result = cexpr_pushdata(&symtype, sym->clv_data.s_var.v_objaddr);
 		} else {
 			struct cvalue_cfiexpr expr;
+
 			/* Fill in the expression for loading the symbol. */
 			expr.v_module            = sym->clv_mod;
 			expr.v_expr              = sym->clv_data.s_var.v_location;
@@ -3545,78 +3747,125 @@ got_symbol_type:
 			expr.v_addrsize          = sym->clv_parser.dup_addrsize;
 			expr.v_ptrsize           = sym->clv_parser.dup_ptrsize;
 			expr.v_objaddr           = sym->clv_data.s_var.v_objaddr;
+
 			/* Push the symbol expression. */
 			result = cexpr_pushexpr(&symtype,
 			                        &expr,
 			                        ctype_sizeof(symtype.ct_typ),
 			                        0);
-			/* Do special handling for this[|vm|cpu]_* globals from the kernel core!
-			 * When accessed, automatically include an addend to the relevant object
-			 * in relation to dbg_current, such that the user can directly reference
-			 * these objects without having to manually sym@object them.
-			 *
-			 * Note  however that this is in normal code, this is only done when the
-			 * symbol doesn't already appear in an @-expression (i.e. isn't followed
-			 * by an @-token) or within __identifier, meaning that:
-			 *   - `&__identifier(this_cred)' == `&__identifier(this_cred)'
-			 *   - `this_cred'                == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current)'
-			 *   - `this_cred@foo'            == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)foo)'
-			 *   - `(this_cred)@foo'          == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current + (uintptr_t)foo)'
-			 */
-			if (likely(result == DBX_EOK) && automatic_symbol_addend && !cexpr_typeonly &&
-			    sym->clv_mod && sym->clv_mod->cm_module == (module_t *)&kernel_driver &&
-			    !CTYPE_KIND_ISFUNCTION(symtype.ct_typ->ct_kind)) {
-				uintptr_t addend;
-				char const *name = cmodsyminfo_name(sym);
-				if (name && memcmp(name, "this", 4 * sizeof(char)) == 0) {
-					if (name[4] == '_') {
-						REF struct ctype *symtype_ptr;
-						addend = (uintptr_t)dbg_current;
+
+			if likely(result == DBX_EOK) {
+#ifdef CONFIG_USE_NEW_DRIVER
+				/* Special  handling for ".fakedata" symbols exported by `libdl.so'.
+				 * Libdl claims to export these symbols like any others are, however
+				 * in actuality, their address/size aren't resolved to the suggested
+				 * locations, but rather to custom locations relative to `root_peb'.
+				 *
+				 * As such, and because there really are some rather important symbols
+				 * in  here, we have  to do some special  filtering to duplicate those
+				 * custom routers, as already seen in `dlsym_builtin()':
+				 *
+				 *    &__peb                         == root_peb;
+				 *    &environ                       == &root_peb->pp_envp;
+				 *    &_environ                      == &root_peb->pp_envp;
+				 *    &__environ                     == &root_peb->pp_envp;
+				 *    &__argc                        == &root_peb->pp_argc;
+				 *    &__argv                        == &root_peb->pp_argv;
+				 *    &_pgmptr                       == &root_peb->pp_argv[0];
+				 *    &__progname_full               == &root_peb->pp_argv[0];
+				 *    &program_invocation_name       == &root_peb->pp_argv[0];
+				 *    &__progname                    == dlget_p_program_invocation_short_name();
+				 *    &program_invocation_short_name == dlget_p_program_invocation_short_name();
+				 *
+				 */
+				if (cmodule_isuser(expr.v_module) &&
+				    expr.v_module->cm_module->md_fspath == NULL &&
+				    expr.v_module->cm_module->md_fsname != NULL) {
+					struct directory_entry *dent = expr.v_module->cm_module->md_fsname;
+					if ((dent->de_namelen == COMPILER_STRLEN(RTLD_LIBDL) &&
+					     memcmp(dent->de_name, RTLD_LIBDL, sizeof(RTLD_LIBDL)) == 0)
+#ifdef __ARCH_HAVE_COMPAT
+					    ||
+					    (dent->de_namelen == COMPILER_STRLEN(COMPAT_RTLD_LIBDL) &&
+					     memcmp(dent->de_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
+#endif /* __ARCH_HAVE_COMPAT */
+					    ) {
+						char const *name;
+						name   = cmodsyminfo_name(sym);
+						result = cexpr_load_special_libdl_symbol(name);
+						goto done_symtype;
+					}
+				}
+#endif /* CONFIG_USE_NEW_DRIVER */
+
+				/* Do special handling for this[|vm|cpu]_* globals from the kernel core!
+				 * When accessed, automatically include an addend to the relevant object
+				 * in relation to dbg_current, such that the user can directly reference
+				 * these objects without having to manually sym@object them.
+				 *
+				 * Note  however that this is in normal code, this is only done when the
+				 * symbol doesn't already appear in an @-expression (i.e. isn't followed
+				 * by an @-token) or within __identifier, meaning that:
+				 *   - `&__identifier(this_cred)' == `&__identifier(this_cred)'
+				 *   - `this_cred'                == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current)'
+				 *   - `this_cred@foo'            == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)foo)'
+				 *   - `(this_cred)@foo'          == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current + (uintptr_t)foo)'
+				 */
+				if (automatic_symbol_addend && !cexpr_typeonly &&
+				    sym->clv_mod && sym->clv_mod->cm_module == (module_t *)&kernel_driver &&
+				    !CTYPE_KIND_ISFUNCTION(symtype.ct_typ->ct_kind)) {
+					uintptr_t addend;
+					char const *name = cmodsyminfo_name(sym);
+					if (name && memcmp(name, "this", 4 * sizeof(char)) == 0) {
+						if (name[4] == '_') {
+							REF struct ctype *symtype_ptr;
+							addend = (uintptr_t)dbg_current;
 do_increase_addend:
-						/* Offset by the given addend, essentially doing `this_foo@dbg_current' */
-						result = cexpr_ref();
-						if unlikely(result != DBX_EOK)
-							goto done_symtype;
-						result = cexpr_cast_simple(&ctype_uintptr_t);
-						if unlikely(result != DBX_EOK)
-							goto done_symtype;
-						result = cexpr_pushint_simple(&ctype_uintptr_t, addend);
-						if unlikely(result != DBX_EOK)
-							goto done_symtype;
-						result = cexpr_op2('+');
-						if unlikely(result != DBX_EOK)
-							goto done_symtype;
-						symtype_ptr = ctype_ptr(&symtype, dbg_current_sizeof_pointer());
-						if unlikely(!symtype_ptr) {
-							result = DBX_ENOMEM;
-							goto done_symtype;
-						}
-						result = cexpr_cast_simple(symtype_ptr);
-						decref(symtype_ptr);
-						if unlikely(result != DBX_EOK)
-							goto done_symtype;
-						result = cexpr_deref();
-					} else {
-						/* Guard against bad memory accesses when `dbg_current'
-						 * has become corrupt for whatever reason. */
-						TRY {
-							if (name[4] == 'm' && name[5] == 'm' &&
-							    name[6] == 'a' && name[7] == 'n' &&
-							    name[8] == '_') {
-								if unlikely(!ADDR_ISKERN(dbg_current))
-									goto err_fefault_symtype;
-								addend = (uintptr_t)dbg_current->t_mman;
-								goto do_increase_addend;
+							/* Offset by the given addend, essentially doing `this_foo@dbg_current' */
+							result = cexpr_ref();
+							if unlikely(result != DBX_EOK)
+								goto done_symtype;
+							result = cexpr_cast_simple(&ctype_uintptr_t);
+							if unlikely(result != DBX_EOK)
+								goto done_symtype;
+							result = cexpr_pushint_simple(&ctype_uintptr_t, addend);
+							if unlikely(result != DBX_EOK)
+								goto done_symtype;
+							result = cexpr_op2('+');
+							if unlikely(result != DBX_EOK)
+								goto done_symtype;
+							symtype_ptr = ctype_ptr(&symtype, dbg_current_sizeof_pointer());
+							if unlikely(!symtype_ptr) {
+								result = DBX_ENOMEM;
+								goto done_symtype;
 							}
-							if (name[4] == 'c' && name[5] == 'p' &&
-							    name[6] == 'u' && name[7] == '_') {
-								if unlikely(!ADDR_ISKERN(dbg_current))
-									goto err_fefault_symtype;
-								addend = (uintptr_t)dbg_current->t_cpu;
-								goto do_increase_addend;
+							result = cexpr_cast_simple(symtype_ptr);
+							decref(symtype_ptr);
+							if unlikely(result != DBX_EOK)
+								goto done_symtype;
+							result = cexpr_deref();
+						} else {
+							/* Guard against bad memory accesses when `dbg_current'
+							 * has become corrupt for whatever reason. */
+							TRY {
+								if (name[4] == 'm' && name[5] == 'm' &&
+								    name[6] == 'a' && name[7] == 'n' &&
+								    name[8] == '_') {
+									if unlikely(!ADDR_ISKERN(dbg_current))
+										goto err_fefault_symtype;
+									addend = (uintptr_t)dbg_current->t_mman;
+									goto do_increase_addend;
+								}
+								if (name[4] == 'c' && name[5] == 'p' &&
+								    name[6] == 'u' && name[7] == '_') {
+									if unlikely(!ADDR_ISKERN(dbg_current))
+										goto err_fefault_symtype;
+									addend = (uintptr_t)dbg_current->t_cpu;
+									goto do_increase_addend;
+								}
+							} EXCEPT {
+								goto err_fefault_symtype;
 							}
-						} EXCEPT {
-							goto err_fefault_symtype;
 						}
 					}
 				}
