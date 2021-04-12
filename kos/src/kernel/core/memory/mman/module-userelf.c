@@ -325,12 +325,11 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 	if (src_data == (KERNEL byte_t *)-1) {
 		/* Allocate a  cookie that  we can  later use  to
 		 * asynchronously unmap the compressed data blob. */
-		src_data_freeme_cookie = kmalloc(sizeof(struct mman_unmap_kram_job),
-		                                 GFP_LOCKED | GFP_PREFLT);
+		src_data_freeme_cookie = mman_unmap_kram_cookie_alloc();
 		TRY {
 			src_data = uems_create_kernaddr_ex(self, mod);
 		} EXCEPT {
-			kfree(src_data_freeme_cookie);
+			mman_unmap_kram_cookie_free(src_data_freeme_cookie);
 			RETHROW();
 		}
 	}
@@ -1717,13 +1716,13 @@ NOTHROW(KCALL clear_system_rtld_fsfile_cache)(void) {
 	size_t result = 0;
 	REF struct mfile *mf;
 	mf = axref_xch_inherit(&system_rtld_fsfile, NULL);
-	if (ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
+	if (mf && ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
 		result += sizeof(struct mfile);
 		mfile_destroy(mf);
 	}
 #ifdef __ARCH_HAVE_COMPAT
 	mf = axref_xch_inherit(&compat_system_rtld_fsfile, NULL);
-	if (ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
+	if (mf && ATOMIC_DECFETCH(mf->mf_refcnt) == 0) {
 		result += sizeof(struct mfile);
 		mfile_destroy(mf);
 	}
