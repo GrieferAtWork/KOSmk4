@@ -32,6 +32,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/poison-heap.h>
 
 #ifdef CONFIG_HAVE_POISON_HEAP
+#include <debugger/rt.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
@@ -89,18 +90,53 @@ PRIVATE ATTR_COLDTEXT PAGEDIR_PAGEALIGNED void *
 NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
                                     gfp_t flags) {
 #if 1
+#ifdef CONFIG_HAVE_DEBUGGER
+	static int dbg_called_phcore = 0;
+	bool haslock;
+#endif /* CONFIG_HAVE_DEBUGGER */
 	void *result;
 	struct mnode *node;
 	struct mpart *part;
 	union mcorepart *cp;
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-	if (flags & GFP_ATOMIC) {
-		if (!mman_lock_tryacquire(&mman_kernel))
+#ifdef CONFIG_HAVE_DEBUGGER
+	haslock = true;
+#endif /* CONFIG_HAVE_DEBUGGER */
+	if (!mman_lock_tryacquire(&mman_kernel)) {
+		if (flags & GFP_ATOMIC)
 			goto err;
-	} else {
-		if (!mman_lock_acquire_nx(&mman_kernel))
-			goto err;
+#ifdef CONFIG_HAVE_DEBUGGER
+		if (dbg_active) {
+			/* If  the kernel mman can't be locked from within the debugger,
+			 * then yielding until it can be won't do anything since there's
+			 * no-one else we could possibly yield to.
+			 * This is a really _bad_ situation, and one which we can only
+			 * hope doesn't cause any recursive problems.
+			 * However, just in case it does, we use `dbg_called_phcore' to
+			 * track  recursive calls to `phcore_page_alloc_nx()' whilst in
+			 * debugger-mode.
+			 * Such calls should never happen in practice, but if something
+			 * goes wrong and the debugger  resets itself whilst inside  of
+			 * this function, then don't make  any further attempts to  get
+			 * more  poison-heap  memory, since  doing  so in-and-of-itself
+			 * seems to cause the kernel to panic! */
+			if (dbg_called_phcore)
+				return NULL;
+			haslock = false;
+		} else
+#endif /* CONFIG_HAVE_DEBUGGER */
+		{
+			if (!mman_lock_acquire_nx(&mman_kernel))
+				goto err;
+		}
 	}
+
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Keep track of recursive calls. */
+	if (dbg_active)
+		++dbg_called_phcore;
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 	/* Find a suitable free location.
 	 * NOTE: To aid in debugging, unconditionally disable ASLR
 	 *       for  memory  allocated   from  the   poison-heap! */
@@ -180,7 +216,18 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 
 	/* Insert the new node into the kernel and release our lock to it. */
 	mman_mappings_insert(&mman_kernel, node);
-	mman_lock_release(&mman_kernel);
+#ifdef CONFIG_HAVE_DEBUGGER
+	if (haslock)
+#endif /* CONFIG_HAVE_DEBUGGER */
+	{
+		mman_lock_release(&mman_kernel);
+	}
+
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Keep track of recursive calls. */
+	if (dbg_active)
+		--dbg_called_phcore;
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 	/* Initialize resulting memory.
 	 * Note that technically, we could use `page_iszero()' to skip pages
@@ -198,11 +245,21 @@ err_unlock_node_part:
 err_unlock_node:
 	mcoreheap_free_locked(container_of(node, union mcorepart, mcp_node));
 err_unlock:
-	mman_lock_release(&mman_kernel);
+#ifdef CONFIG_HAVE_DEBUGGER
+	if (haslock)
+#endif /* CONFIG_HAVE_DEBUGGER */
+	{
+		mman_lock_release(&mman_kernel);
+	}
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Keep track of recursive calls. */
+	if (dbg_active)
+		--dbg_called_phcore;
+#endif /* CONFIG_HAVE_DEBUGGER */
 err:
 	return NULL;
 #else
-	/* TODO: Can't use `mman_map_kram_nx()' because that one may allocate
+	/* NOTE: Can't use `mman_map_kram_nx()' because that one may allocate
 	 *       physical  memory via a chunk-vector (which recursively calls
 	 *       kmalloc_nx(), which we're not able to deal with) */
 	void *result;
