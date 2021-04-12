@@ -479,7 +479,7 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 				}
 				dbg_pprinter(&pp, DBGSTR(":"), 1);
 				dbg_pprinter(&pp, section_name, strlen(section_name));
-				dbg_pprinter(&pp, DBGSTR("..."), 1);
+				dbg_pprinter(&pp, DBGSTR("..."), 3);
 				dbg_loadcolor();
 				dbg_endupdate();
 				error = zlib_reader_read(&reader, dst_data, dst_size);
