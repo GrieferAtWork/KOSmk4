@@ -397,8 +397,8 @@ NOTHROW(FCALL mchunkvec_free_subrange)(struct mchunk *__restrict vec, freefun_t 
                                        size_t lo_split_chunk_index, physpagecnt_t lo_split_chunk_offset,
                                        size_t hi_split_chunk_index, physpagecnt_t hi_split_chunk_offset) {
 	size_t i;
-	assert(lo_split_chunk_index <= hi_split_chunk_offset);
-	if (lo_split_chunk_index == hi_split_chunk_offset) {
+	assert(lo_split_chunk_index <= hi_split_chunk_index);
+	if (lo_split_chunk_index == hi_split_chunk_index) {
 		assert(lo_split_chunk_offset < hi_split_chunk_offset);
 		/* Special case: the entire unmap-area is located within the last chunk. */
 		(*freefun)(vec[lo_split_chunk_index].mc_start + lo_split_chunk_offset,
@@ -408,14 +408,14 @@ NOTHROW(FCALL mchunkvec_free_subrange)(struct mchunk *__restrict vec, freefun_t 
 		(*freefun)(vec[lo_split_chunk_index].mc_start + lo_split_chunk_offset,
 		           vec[lo_split_chunk_index].mc_size - lo_split_chunk_offset,
 		           flags);
+
 		/* Free all whole chunks being unmapped. */
 		for (i = lo_split_chunk_index + 1; i < hi_split_chunk_index; ++i)
 			(*freefun)(vec[i].mc_start, vec[i].mc_size, flags);
+
 		/* Free leading data before `hi_split_chunk_offset'. */
-		if (hi_split_chunk_offset != 0) {
-			(*freefun)(vec[hi_split_chunk_index].mc_start,
-			           hi_split_chunk_offset, flags);
-		}
+		(*freefun)(vec[hi_split_chunk_index].mc_start,
+		           hi_split_chunk_offset, flags);
 	}
 }
 
@@ -681,24 +681,26 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		 * For  this, start out by figuring out exactly how many chunks we'll be needing
 		 * for the lo- and hi-part's chunk-vectors. */
 		lo_chunks = lo_split_chunk_index;
-		if (lo_split_chunk_offset != 0) {
-			assert(lo_split_chunk_index != 0);
+		if (lo_split_chunk_offset != 0)
 			++lo_chunks;
-		}
 		hi_chunks = vec.ms_c - hi_split_chunk_index;
 		assert(lo_chunks >= 1);
 		assert(hi_chunks >= 1);
 		/* Handle the simple cases where one of the 2 parts can
 		 * be  implemented without the  need of a chunk-vector. */
 		if (lo_chunks == 1 && hi_chunks == 1) {
+			size_t lo_size;
 			/* Both parts only need a single chunk. */
-			assert(lo_split_chunk_index == 0);
-			assert(lo_split_chunk_offset != 0);
+			assert((lo_split_chunk_index == 0 && lo_split_chunk_offset != 0) ||
+			       (lo_split_chunk_index == 1 && lo_split_chunk_offset == 0));
 			assert(hi_split_chunk_index == vec.ms_c - 1);
+			lo_size = lo_split_chunk_offset;
+			if (lo_split_chunk_index != 0)
+				lo_size = vec.ms_v[0].mc_size;
 			lopart->mp_state = lopart->mp_state == MPART_ST_MEM_SC ? MPART_ST_MEM : MPART_ST_SWP;
 			hipart->mp_state = lopart->mp_state;
 			lopart->mp_mem.mc_start = vec.ms_v[0].mc_start;
-			lopart->mp_mem.mc_size  = lo_split_chunk_offset;
+			lopart->mp_mem.mc_size  = lo_size;
 			hipart->mp_mem.mc_start = vec.ms_v[hi_split_chunk_index].mc_start + hi_split_chunk_offset;
 			hipart->mp_mem.mc_size  = vec.ms_v[hi_split_chunk_index].mc_size - hi_split_chunk_offset;
 			/* === Point of no return */
@@ -712,17 +714,27 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			                        hi_split_chunk_index, hi_split_chunk_offset);
 			kfree(vec.ms_v);
 		} else if (lo_chunks == 1) {
+			size_t lo_size;
 			/* `hipart' must use a vector, while `lopart' uses a single chunk. */
 			assert(hipart->mp_state == lopart->mp_state);
-			assert(lo_split_chunk_index == 0);
-			/* === Point of no return */
-			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+			assert((lo_split_chunk_index == 0 && lo_split_chunk_offset != 0) ||
+			       (lo_split_chunk_index == 1 && lo_split_chunk_offset == 0));
+			lo_size = lo_split_chunk_offset;
+			if (lo_split_chunk_index != 0)
+				lo_size = vec.ms_v[0].mc_size;
 			lopart->mp_state = lopart->mp_state == MPART_ST_MEM_SC ? MPART_ST_MEM : MPART_ST_SWP;
 			lopart->mp_mem.mc_start = vec.ms_v[0].mc_start;
-			lopart->mp_mem.mc_size  = lo_split_chunk_offset;
+			lopart->mp_mem.mc_size  = lo_size;
+			/* === Point of no return */
+
+			/* Unmap the requested address range. */
+			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+
+			/* Free physical memory. */
 			mchunkvec_free_subrange(vec.ms_v, freefun, flags,
 			                        lo_split_chunk_index, lo_split_chunk_offset,
 			                        hi_split_chunk_index, hi_split_chunk_offset);
+
 			/* Shift down the still-remaining hi-part. */
 			vec.ms_c -= hi_split_chunk_index;
 			memmovedown(&vec.ms_v[0],
@@ -741,15 +753,19 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			assert(lo_chunks > 1);
 			assert(hi_split_chunk_index == vec.ms_c - 1);
 			hipart->mp_state = lopart->mp_state == MPART_ST_MEM_SC ? MPART_ST_MEM : MPART_ST_SWP;
-			/* === Point of no return */
-			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 			hipart->mp_mem = vec.ms_v[hi_split_chunk_index];
 			hipart->mp_mem.mc_start += hi_split_chunk_offset;
 			hipart->mp_mem.mc_size -= hi_split_chunk_offset;
+			/* === Point of no return */
+
+			/* Unmap the requested address range. */
+			unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
+
 			/* Now to free all of the backing physical memory to-be removed. */
 			mchunkvec_free_subrange(vec.ms_v, freefun, flags,
 			                        lo_split_chunk_index, lo_split_chunk_offset,
 			                        hi_split_chunk_index, hi_split_chunk_offset);
+
 			/* Update the vector information for `lopart' */
 			vec.ms_v[lo_split_chunk_index].mc_size = lo_split_chunk_offset;
 			vec.ms_c = lo_chunks;

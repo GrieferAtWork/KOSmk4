@@ -135,6 +135,7 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	 * As such, in the interest of preventing a deadlock situation,
 	 * rather than allowing the caller to yield indefinitely, we will
 	 * throw an `E_WOULDBLOCK' exception. */
+	EXTERN(dbg_active)
 	cmpb   $0, dbg_active
 	jne    .Ldbg_active_task_yield
 #endif /* CONFIG_HAVE_DEBUGGER */
