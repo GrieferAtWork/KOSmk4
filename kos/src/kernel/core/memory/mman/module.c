@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/rt.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/mman.h>
@@ -39,6 +40,10 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <sched/task.h>
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 /**/
 #include "module-userelf.h"
 
@@ -49,6 +54,12 @@
 #endif /* CONFIG_HAVE_USERELF_MODULES */
 
 DECL_BEGIN
+
+#ifdef CONFIG_HAVE_DEBUGGER
+#define CURRENT_MMAN (unlikely(dbg_active) ? dbg_current->t_mman : THIS_MMAN)
+#else /* CONFIG_HAVE_DEBUGGER */
+#define CURRENT_MMAN THIS_MMAN
+#endif /* !CONFIG_HAVE_DEBUGGER */
 
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
@@ -370,7 +381,7 @@ PUBLIC WUNUSED REF struct module *FCALL
 module_fromaddr(USER CHECKED void const *addr) {
 #ifdef CONFIG_HAVE_USERELF_MODULES
 	if (ADDR_ISUSER(addr))
-		return uem_fromaddr(THIS_MMAN, addr);
+		return uem_fromaddr(CURRENT_MMAN, addr);
 #else /* CONFIG_HAVE_USERELF_MODULES */
 #define _MODULE_FROMADDR_IS_NOTHROW
 #endif /* !CONFIG_HAVE_USERELF_MODULES */
@@ -386,7 +397,7 @@ module_aboveaddr(USER CHECKED void const *addr) {
 #ifdef KERNELSPACE_HIGHMEM
 	if (ADDR_ISUSER(addr)) {
 		REF struct module *result;
-		result = uem_aboveaddr(THIS_MMAN, addr);
+		result = uem_aboveaddr(CURRENT_MMAN, addr);
 		if (result)
 			return result;
 		/* Fallthru to find the first kernel-space module... */
@@ -400,7 +411,7 @@ module_aboveaddr(USER CHECKED void const *addr) {
 		if (result)
 			return result;
 	}
-	return uem_aboveaddr(THIS_MMAN, addr);
+	return uem_aboveaddr(CURRENT_MMAN, addr);
 #endif /* !KERNELSPACE_HIGHMEM */
 #else /* CONFIG_HAVE_USERELF_MODULES */
 #define _MODULE_ABOVEADDR_IS_NOTHROW
@@ -440,7 +451,7 @@ module_next(struct module *prev) {
 		if (next)
 			return next;
 	}
-	return uem_aboveaddr(THIS_MMAN, (void const *)USERSPACE_START);
+	return uem_aboveaddr(CURRENT_MMAN, (void const *)USERSPACE_START);
 #endif /* !KERNELSPACE_HIGHMEM */
 #else /* CONFIG_HAVE_USERELF_MODULES */
 #define _MODULE_NEXT_IS_NOTHROW
