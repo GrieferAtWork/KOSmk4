@@ -25,14 +25,24 @@
 
 #include <fs/vfs.h>
 #include <kernel/execabi.h> /* execabi_system_rtld_file */
-#include <kernel/vm.h>
+#include <kernel/mman.h>
+#include <kernel/mman/enum.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/ramfile.h>
 #include <sched/pid.h>
 
+#include <compat/config.h>
 #include <kos/dev.h>
+#include <kos/exec/rtld.h> /* RTLD_LIBDL */
 
 #include <format-printer.h>
 #include <inttypes.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/exec/rtld.h> /* COMPAT_RTLD_LIBDL */
+#endif /* __ARCH_HAVE_COMPAT */
 
 #include "../procfs.h"
 
@@ -40,29 +50,22 @@ DECL_BEGIN
 
 /* Check if `self' has a special names, and if so: return that name. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) char const *
-NOTHROW(FCALL nameof_special_datablock)(struct vm_datablock *__restrict self) {
+NOTHROW(FCALL nameof_special_datablock)(struct mfile *__restrict self) {
 	/* The libdl program hard-coded into the kernel. */
-	if (self == &execabi_system_rtld_file.rf_block) {
+	if (self == &execabi_system_rtld_file.mrf_file)
+		return "[" RTLD_LIBDL "]";
 #ifdef __ARCH_HAVE_COMPAT
-#if __SIZEOF_POINTER__ == 8
-		return "[kernel.libdl64]";
-#else /* __SIZEOF_POINTER__ == 8 */
-		return "[kernel.libdl32]";
-#endif /* __SIZEOF_POINTER__ != 8 */
-#else /* __ARCH_HAVE_COMPAT */
-		return "[kernel.libdl]";
-#endif /* !__ARCH_HAVE_COMPAT */
-	}
-#ifdef __ARCH_HAVE_COMPAT
-	if (self == &compat_execabi_system_rtld_file.rf_block)
-		return "[kernel.libdl]";
+	if (self == &compat_execabi_system_rtld_file.mrf_file)
+		return "[" COMPAT_RTLD_LIBDL "]";
 #endif /* __ARCH_HAVE_COMPAT */
-	if (self == &vm_datablock_physical)
-		return "[mem]"; /* same as: /dev7mem */
-	if (self == &vm_datablock_anonymous)
+	if (self == &mfile_phys)
+		return "[/dev/mem]";
+	if (self == &mfile_zero)
+		return "[/dev/zero]";
+	if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon))
 		return "[anon]";
-	if (self == &vm_datablock_anonymous_zero)
-		return "[zero]"; /* same as: /dev/zero */
+	if (self == &mfile_ndef)
+		return "[undef]";
 	return NULL;
 }
 
@@ -123,11 +126,17 @@ maps_printer_cb(void *arg, struct mmapinfo *__restrict info) {
 		                     ctx->pd_printer,
 		                     ctx->pd_arg);
 	} else if (info->mmi_fsname) {
-		temp = format_printf(ctx->pd_printer,
-		                     ctx->pd_arg,
-		                     "[%$#q]",
-		                     (size_t)info->mmi_fsname->de_namelen,
-		                     info->mmi_fsname->de_name);
+		if (info->mmi_fsname->de_name[0] == '/') {
+			temp = (*ctx->pd_printer)(ctx->pd_arg,
+			                          info->mmi_fsname->de_name,
+			                          info->mmi_fsname->de_namelen);
+		} else {
+			temp = format_printf(ctx->pd_printer,
+			                     ctx->pd_arg,
+			                     "[%$#q]",
+			                     (size_t)info->mmi_fsname->de_namelen,
+			                     info->mmi_fsname->de_name);
+		}
 	} else {
 		temp = 0;
 		/* Check for special names for certain datablocks. */
@@ -159,7 +168,7 @@ INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_PerProc_Maps_Printer(struct regular_node *__restrict self,
                             pformatprinter printer, void *arg) {
 	REF struct task *thread;
-	REF struct vm *threadvm;
+	REF struct mman *threadmm;
 	ssize_t result = 0;
 	upid_t pid;
 	/* Lookup the associated thread. */
@@ -167,18 +176,18 @@ ProcFS_PerProc_Maps_Printer(struct regular_node *__restrict self,
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
 	if unlikely(!thread)
 		goto done;
-	/* Lookup the associated VM. */
+	/* Lookup the associated mman. */
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadvm = task_getvm(thread);
+		threadmm = task_getmman(thread);
 	}
 	{
 		struct maps_printer_data pd;
-		FINALLY_DECREF_UNLIKELY(threadvm);
+		FINALLY_DECREF_UNLIKELY(threadmm);
 		pd.pd_printer = printer;
 		pd.pd_arg     = arg;
 		/* Enumerate nodes and print the maps-file. */
-		result = mman_enum_userspace(threadvm, &maps_printer_cb, &pd);
+		result = mman_enum_userspace(threadmm, &maps_printer_cb, &pd);
 	}
 done:
 	return result;

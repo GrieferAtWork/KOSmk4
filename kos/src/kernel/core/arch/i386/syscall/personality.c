@@ -63,12 +63,12 @@ NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restric
                                              byte_t *__restrict UNUSED(lsda)) {
 	struct icpustate *return_cpustate;
 	struct rpc_syscall_info *sc_info;
-	byte_t *pc;
+	byte_t const *pc;
 	/* Check if the exception happened while actually in the process of
 	 * servicing the system call.
 	 * Technically, there shouldn't  be a chance  of an exception  happening
 	 * for another reason, but better be careful and do this check properly. */
-	pc = (byte_t *)kcpustate_getpc(state);
+	pc = (byte_t const *)kcpustate_getpc(state);
 	if (pc <= __x86_syscall_emulate_r_protect_start ||
 	    pc > __x86_syscall_emulate_r_protect_end)
 		return DWARF_PERSO_CONTINUE_UNWIND;
@@ -106,7 +106,7 @@ NOTHROW(KCALL x86_syscall_personality_asm32_lcall7)(struct unwind_fde_struct *__
 	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void *pc = (void *)(ucpustate_getpc(&ustate) - 1);
+		void const *pc = (void const *)(ucpustate_getpc(&ustate) - 1);
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;

@@ -29,10 +29,12 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/mman.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
@@ -1892,16 +1894,18 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 		atomic_rwlock_cinit(&vga_device->v_textlock);
 		vga_device->v_vram_addr = (physaddr_t)0xa0000;
 		vga_device->v_vram_size = 8192 * 4 * 4; /* 128K */
-		vram_base = vm_map(&vm_kernel,
-		                   HINT_GETADDR(KERNEL_VMHINT_DEVICE),
-		                   vga_device->v_vram_size,
-		                   PAGESIZE, HINT_GETMODE(KERNEL_VMHINT_DEVICE),
-		                   &vm_datablock_physical, NULL, NULL,
-		                   (pos_t)(vga_device->v_vram_addr & ~PAGEMASK),
-		                   VM_PROT_READ | VM_PROT_WRITE,
-		                   VM_NODE_FLAG_NORMAL, 0);
+
+		vram_base = mman_map(/* self:        */ &mman_kernel,
+		                     /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_DEVICE),
+		                     /* num_bytes:   */ vga_device->v_vram_size,
+		                     /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+		                     /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_DEVICE),
+		                     /* file:        */ &mfile_phys,
+		                     /* file_fspath: */ NULL,
+		                     /* file_fsname: */ NULL,
+		                     /* file_pos:    */ (pos_t)vga_device->v_vram_addr);
 		TRY {
-			vga_device->v_vram = (byte_t *)vram_base + (uintptr_t)(vga_device->v_vram_addr & PAGEMASK);
+			vga_device->v_vram  = (byte_t *)vram_base;
 			vga_device->v_crt_i = VGA_CRT_IC;
 			vga_device->v_crt_d = VGA_CRT_DC;
 			vga_device->v_is1_r = VGA_IS1_RC;
@@ -1942,7 +1946,8 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			/* Register the VGA adapter device. */
 			character_device_register_auto(vga_device);
 		} EXCEPT {
-			mman_unmap(&vm_kernel, vram_base, vga_device->v_vram_size);
+			NESTED_EXCEPTION;
+			mman_unmap(&mman_kernel, vram_base, vga_device->v_vram_size);
 			RETHROW();
 		}
 	} EXCEPT {

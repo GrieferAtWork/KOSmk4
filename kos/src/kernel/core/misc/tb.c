@@ -30,10 +30,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kernel/addr2line.h>
 #include <kernel/except.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
 #include <kernel/syslog.h>
 #include <kernel/tb.h>
-#include <kernel/vm.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -65,19 +66,18 @@ NOTHROW(FCALL try_read_pointer)(void **src, void **dst) {
 PRIVATE ATTR_COLDTEXT NOBLOCK bool
 NOTHROW(FCALL is_pc)(void *pc) {
 	bool result;
-	struct vm_node *node;
+	struct mnode *node;
 	if (!ADDR_ISKERN(pc))
-		return false;
-	if (!sync_tryread(&vm_kernel))
-		return true;
-	node = vm_getnodeofaddress(&vm_kernel, pc);
-	if (!node) {
-		sync_endread(&vm_kernel);
-		return false;
-	}
-	result = (node->vn_prot & VM_PROT_EXEC) != 0;
-	sync_endread(&vm_kernel);
+		goto nope;
+	if (!mman_lock_tryread(&mman_kernel))
+		return true; /* Assume so we don't skip anything... */
+	node   = mman_mappings_locate(&mman_kernel, pc);
+	result = (node != NULL) &&
+	         (node->mn_flags & MNODE_F_PEXEC) != 0;
+	mman_lock_endread(&mman_kernel);
 	return result;
+nope:
+	return false;
 }
 
 

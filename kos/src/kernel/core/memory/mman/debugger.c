@@ -49,11 +49,16 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <compat/config.h>
 #include <kos/dev.h>
+#include <kos/exec/rtld.h> /* RTLD_LIBDL */
 
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/exec/rtld.h> /* COMPAT_RTLD_LIBDL */
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -74,27 +79,20 @@ DBG_AUTOCOMPLETE(lsmm,
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL nameof_special_datablock)(struct vm_datablock *__restrict self) {
 	/* The libdl program hard-coded into the kernel. */
-	if (self == &execabi_system_rtld_file.mrf_file) {
-#ifdef __ARCH_HAVE_COMPAT
-#if __SIZEOF_POINTER__ == 8
-		return "[kernel.libdl64]";
-#else /* __SIZEOF_POINTER__ == 8 */
-		return "[kernel.libdl32]";
-#endif /* __SIZEOF_POINTER__ != 8 */
-#else /* __ARCH_HAVE_COMPAT */
-		return "[kernel.libdl]";
-#endif /* !__ARCH_HAVE_COMPAT */
-	}
+	if (self == &execabi_system_rtld_file.mrf_file)
+		return "[" RTLD_LIBDL "]";
 #ifdef __ARCH_HAVE_COMPAT
 	if (self == &compat_execabi_system_rtld_file.mrf_file)
-		return "[kernel.libdl]";
+		return "[" COMPAT_RTLD_LIBDL "]";
 #endif /* __ARCH_HAVE_COMPAT */
 	if (self == &mfile_phys)
-		return "[mem]"; /* same as: /dev7mem */
-	if (self == &mfile_ndef)
-		return "[anon]";
+		return "[/dev/mem]";
 	if (self == &mfile_zero)
-		return "[zero]"; /* same as: /dev/zero */
+		return "[/dev/zero]";
+	if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon))
+		return "[anon]";
+	if (self == &mfile_ndef)
+		return "[undef]";
 	return NULL;
 }
 
@@ -142,9 +140,15 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 		              filename_len, &dbg_printer, NULL);
 	} else if (info->mmi_fsname) {
 		dbg_setcolor(ANSITTY_CL_LIME, ANSITTY_CL_DARK_GRAY);
-		dbg_printf(DBGSTR("[%$#q]"),
-		           (size_t)info->mmi_fsname->de_namelen,
-		           info->mmi_fsname->de_name);
+		if (info->mmi_fsname->de_name[0] == '/') {
+			dbg_printer(NULL,
+			            info->mmi_fsname->de_name,
+			            info->mmi_fsname->de_namelen);
+		} else {
+			dbg_printf(DBGSTR("[%$#q]"),
+			           (size_t)info->mmi_fsname->de_namelen,
+			           info->mmi_fsname->de_name);
+		}
 	} else {
 		/* Check for special names for certain datablocks. */
 		if (info->mmi_file) {

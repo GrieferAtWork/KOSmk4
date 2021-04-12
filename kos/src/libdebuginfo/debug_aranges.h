@@ -34,11 +34,10 @@ DECL_BEGIN
 /* Scan through  the given  debug_aranges blob  for a  descriptor referring  to
  * the given `module_relative_pc'. - If  found, store that descriptor's  offset
  * into the .debug_info section in `*pdebug_info_cu_offset' and return success.
- * @param: pdebug_info_cu_offset: Pointer  that  will  receive an  offset  into .debug_info,
+ * @param: pdebug_info_cu_offset: Pointer that will  receive an  offset into  `.debug_info',
  *                                which may then be used with `debuginfo_cu_parser_loadunit'
- *                                in order  to load  the  compilation unit  associated  with
- *                                the   `module_relative_pc'   originally  passed   to  this
- *                                function.
+ *                                in order to load the compilation unit associated with  the
+ *                                `module_relative_pc' originally passed  to this  function.
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
@@ -47,7 +46,6 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t const *__restrict debug_aranges
                                           byte_t const *__restrict debug_aranges_end,
                                           uintptr_t *__restrict pdebug_info_cu_offset,
                                           uintptr_t module_relative_pc);
-
 
 DECL_END
 

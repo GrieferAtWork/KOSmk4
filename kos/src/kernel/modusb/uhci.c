@@ -37,10 +37,11 @@
 #include <kernel/iovec.h>
 #include <kernel/isr.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/phys.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <kernel/x86/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <sched/async.h>
 #include <sched/tsc.h>
@@ -3136,13 +3137,15 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		result->uc_base.uc_iobase = (port_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start;
 	} else {
 		void *addr;
-		addr = vm_map(&vm_kernel,
-		               HINT_GETADDR(KERNEL_VMHINT_DEVICE), 1, 1,
-		               HINT_GETMODE(KERNEL_VMHINT_DEVICE),
-		               &vm_datablock_physical, NULL, NULL,
-		               (pos_t)(dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start & ~PAGEMASK),
-		               VM_PROT_READ | VM_PROT_WRITE,
-		               VM_NODE_FLAG_NORMAL, 0);
+		addr = mman_map(/* self:        */ &mman_kernel,
+		                /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_DEVICE),
+		                /* num_bytes:   */ 0x100,
+		                /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+		                /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_DEVICE),
+		                /* file:        */ &mfile_phys,
+		                /* file_fspath: */ NULL,
+		                /* file_fsname: */ NULL,
+		                /* file_pos:    */ (pos_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start);
 		result->uc_base.uc_mmbase = (byte_t *)addr;
 		result->uc_flags |= UHCI_CONTROLLER_FLAG_USESMMIO;
 	}

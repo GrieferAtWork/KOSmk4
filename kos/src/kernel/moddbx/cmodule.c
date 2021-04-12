@@ -318,7 +318,7 @@ NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
 	ssize_t result;
 	REF struct cmodule *pc_module;
 	void const *pc;
-	pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc        = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	pc_module = cmodule_ataddr(pc);
 	result    = cmodule_enum_with_hint(pc_module, cb, cookie);
 	xdecref(pc_module);
@@ -700,7 +700,7 @@ PUBLIC WUNUSED REF struct cmodule *
 NOTHROW(FCALL cmodule_current)(void) {
 	void const *pc;
 	REF struct cmodule *result;
-	pc     = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc     = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	result = cmodule_ataddr(pc);
 	return result;
 }
@@ -2176,7 +2176,7 @@ NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 	 * pointer, as returned by `dbg_getpcreg(DBG_REGLEVEL_VIEW)' */
 	if (result && (cmodsym_getns(result) & CMODSYM_DIP_NS_FCONFLICT)) {
 		void const *pc;
-		pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+		pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 		if (pc >= (void const *)cmodule_getloadstart(self) &&
 		    pc <  (void const *)cmodule_getloadend(self)) {
 			uintptr_t module_relative_pc;
@@ -2479,7 +2479,7 @@ NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
                                   uintptr_t ns) {
 	void const *pc;
 	dbx_errno_t result;
-	pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	/* Lookup the module that contains `pc' */
 	info->clv_mod = cmodule_ataddr(pc);
 	if (info->clv_mod) {
@@ -3397,7 +3397,7 @@ NOTHROW(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo
                                   size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
 	void const *pc;
 	ssize_t result;
-	pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	/* Lookup the module that contains `pc' */
 	info->clv_mod = cmodule_ataddr(pc);
 	if (info->clv_mod) {

@@ -38,11 +38,12 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/addr2line.h>
 #include <kernel/debugtrap.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/panic.h>
 #include <kernel/poison-heap.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
-#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/rwlock-intern.h>
 #include <sched/task.h>
@@ -170,15 +171,17 @@ NOTHROW(KCALL handle_error_during_panic_info)(void) {
 }
 
 
-PRIVATE NOBLOCK ATTR_COLDTEXT ATTR_PURE bool
-NOTHROW(KCALL is_pc)(void *pc) {
-	struct vm_node *node;
-	if (pc < (void *)KERNELSPACE_BASE)
-		return false;
-	node = vm_getnodeofaddress(&vm_kernel, pc);
+PRIVATE NOBLOCK ATTR_COLDTEXT ATTR_PURE WUNUSED bool
+NOTHROW(KCALL is_pc)(void const *pc) {
+	struct mnode *node;
+	if (!ADDR_ISKERN(pc))
+		goto nope;
+	node = mman_mappings_locate(&mman_kernel, pc);
 	if (!node)
-		return false;
-	return (node->vn_prot & VM_PROT_EXEC) != 0;
+		goto nope;
+	return (node->mn_flags & MNODE_F_PEXEC) != 0;
+nope:
+	return false;
 }
 
 INTERN ATTR_COLD ATTR_COLDTEXT NONNULL((1, 3)) void KCALL
@@ -409,9 +412,9 @@ PRIVATE ATTR_DBGRODATA char const *const assert_chk_options[] = {
 	NULL
 };
 
-PRIVATE ATTR_DBGBSS uintptr_t always_ignored_assertions[64] = { 0 };
+PRIVATE ATTR_DBGBSS void const *always_ignored_assertions[64] = { 0 };
 PRIVATE ATTR_COLDTEXT ATTR_PURE NOBLOCK bool
-NOTHROW(KCALL is_pc_always_ignored)(uintptr_t pc) {
+NOTHROW(KCALL is_pc_always_ignored)(void const *pc) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
 		if (pc == always_ignored_assertions[i])
@@ -479,7 +482,7 @@ INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE struct kcpustate *FCALL
 libc_assertion_check_core(struct assert_args *__restrict args) {
 	/* Check if assertion failures at the caller's PC should always be ignored. */
 #ifdef CONFIG_HAVE_DEBUGGER
-	if (is_pc_always_ignored(kcpustate_getpc(&args->aa_state))) {
+	if (is_pc_always_ignored((void const *)kcpustate_getpc(&args->aa_state))) {
 		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__
 		args->aa_state.kcs_gpregs.gp_rax = 0;
@@ -540,17 +543,17 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_genfail_dbg_main(/*char const **/ void *message) {
-	uintptr_t pc, prev_pc;
+	void const *pc, *prev_pc;
 	instrlen_isa_t isa;
 	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
 	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
-	prev_pc = (uintptr_t)instruction_trypred((void const *)pc, isa);
+	prev_pc = instruction_trypred(pc, isa);
 	dbg_printf(DBGSTR(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON) "%s" AC_DEFCOLOR "%[vinfo:"
 	                  "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
 	                  "func: " AC_WHITE("%n") "\n]"
 	                  "addr: " AC_WHITE("%p") "+" AC_WHITE("%" PRIuSIZ) "\n"),
 	           message, prev_pc, prev_pc,
-	           (size_t)(pc - prev_pc));
+	           (size_t)((byte_t const *)pc - (byte_t const *)prev_pc));
 	dbg_main(0);
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
@@ -617,12 +620,12 @@ struct panic_args {
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_kernel_dbg_main(void *arg) {
 	struct panic_args *args;
-	uintptr_t pc, prev_pc;
+	void const *pc, *prev_pc;
 	instrlen_isa_t isa;
 	args = (struct panic_args *)arg;
 	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
 	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
-	prev_pc = (uintptr_t)instruction_trypred((void const *)pc, isa);
+	prev_pc = instruction_trypred(pc, isa);
 	dbg_printf(DBGSTR("Kernel Panic\n"
 	                  "%[vinfo:" "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
 	                             "func: " AC_WHITE("%n") "\n"
@@ -640,7 +643,7 @@ panic_kernel_dbg_main(void *arg) {
 		dbg_print(AC_DEFCOLOR "\n");
 	}
 	dbg_printf(DBGSTR("addr: " AC_WHITE("%p") "+" AC_WHITE("%" PRIuSIZ) "\n"),
-	           prev_pc, (size_t)(pc - prev_pc));
+	           prev_pc, (size_t)((byte_t const *)pc - (byte_t const *)prev_pc));
 	dbg_main(0);
 }
 #endif /* CONFIG_HAVE_DEBUGGER */

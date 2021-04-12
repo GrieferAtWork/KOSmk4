@@ -141,14 +141,19 @@ struct mfile;
 struct path;
 struct directory_entry;
 
+#ifndef __mfile_phys_defined
+#define __mfile_phys_defined
+DATDEF struct mfile mfile_phys; /* Physical memory access (file position is physical memory address) */
+#endif /* !__mfile_phys_defined */
+
 #ifndef __mfile_ndef_defined
-#define __mfile_ndef_defined 1
-DATDEF struct mfile mfile_ndef;     /* Random, uninitialized, anonymous memory. */
+#define __mfile_ndef_defined
+DATDEF struct mfile mfile_ndef; /* Random, uninitialized, anonymous memory. */
 #endif /* !__mfile_ndef_defined */
 
 #ifndef __mfile_zero_defined
-#define __mfile_zero_defined 1
-DATDEF struct mfile mfile_zero;     /* Zero-initialized, anonymous memory. */
+#define __mfile_zero_defined
+DATDEF struct mfile mfile_zero; /* Zero-initialized, anonymous memory. */
 #endif /* !__mfile_zero_defined */
 
 

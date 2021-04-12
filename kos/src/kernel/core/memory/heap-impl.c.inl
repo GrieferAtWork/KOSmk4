@@ -241,7 +241,7 @@ search_heap:
 		 * data   do  so,  then  search  the  heap  again. */
 		if (flags & GFP_ATOMIC)
 			IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
-		__hybrid_yield();
+		task_yield();
 		goto search_heap;
 	}
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
@@ -1023,16 +1023,15 @@ NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_b
 		TRY {
 			memcpy(result, old_base, old_pages, PAGESIZE);
 		} EXCEPT {
-			vm_unmap_kernel_ram(result, new_pages * PAGESIZE, false);
+			mman_unmap_kram(result, new_pages * PAGESIZE, GFP_NORMAL);
 #ifdef HEAP_NX
 			return NULL;
 #else /* HEAP_NX */
 			RETHROW();
 #endif /* !HEAP_NX */
 		}
-		vm_unmap_kernel_ram(old_base,
-		                    old_pages * PAGESIZE,
-		                    !!(free_flags & GFP_CALLOC));
+		mman_unmap_kram(old_base, old_pages * PAGESIZE,
+		                free_flags & GFP_CALLOC);
 	}
 	return result;
 }

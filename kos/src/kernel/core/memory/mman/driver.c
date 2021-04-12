@@ -435,12 +435,11 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 	if (src_data == (KERNEL byte_t *)-1) {
 		/* Allocate a  cookie that  we can  later use  to
 		 * asynchronously unmap the compressed data blob. */
-		src_data_freeme_cookie = kmalloc(sizeof(struct mman_unmap_kram_job),
-		                                 GFP_LOCKED | GFP_PREFLT);
+		src_data_freeme_cookie = mman_unmap_kram_cookie_alloc();
 		TRY {
 			src_data = driver_section_create_kernaddr_ex(self, drv);
 		} EXCEPT {
-			kfree(src_data_freeme_cookie);
+			mman_unmap_kram_cookie_free(src_data_freeme_cookie);
 			RETHROW();
 		}
 	}
@@ -5307,7 +5306,7 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 			THROW(E_NOT_EXECUTABLE_TOOLARGE);
 		/* Allocate  a cookie which we can use to NOBLOCK-unmap the temporary
 		 * mapping of the given `driver_file' once we're done, or upon error. */
-		unmap_cookie = kmalloc(sizeof(struct mman_unmap_kram_job), GFP_LOCKED | GFP_PREFLT);
+		unmap_cookie = mman_unmap_kram_cookie_alloc();
 		/* Create a temporary memory mapping of the given file. */
 		TRY {
 			tempmap = mman_map(/* self:          */ &mman_kernel,
@@ -5320,7 +5319,7 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 			                   /* file_fsname:   */ driver_dentry,
 			                   /* file_pos:      */ (pos_t)0);
 		} EXCEPT {
-			kfree(unmap_cookie);
+			mman_unmap_kram_cookie_free(unmap_cookie);
 			RETHROW();
 		}
 		TRY {

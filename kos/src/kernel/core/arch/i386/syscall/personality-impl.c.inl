@@ -60,7 +60,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_int80))(struct unwind_fde_struc
 	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void *pc = (void *)(ucpustate_getpc(&ustate) - 1);
+		void const *pc = (void const *)(ucpustate_getpc(&ustate) - 1);
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
@@ -103,7 +103,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_st
 	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void *pc = (void *)(ucpustate_getpc(&ustate) - 1);
+		void const *pc = (void const *)(ucpustate_getpc(&ustate) - 1);
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
@@ -150,7 +150,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm64_syscall))(struct unwind_fde_str
 	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void *pc = (void *)(ucpustate_getpc(&ustate) - 1);
+		void const *pc = (void const *)(ucpustate_getpc(&ustate) - 1);
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;

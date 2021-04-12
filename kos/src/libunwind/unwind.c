@@ -48,6 +48,7 @@
 #include <stddef.h>
 #include <string.h>
 #else /* !__KERNEL__ */
+#include <kernel/compiler.h>
 #ifndef CONFIG_USE_NEW_DRIVER
 #include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 #endif /* !CONFIG_USE_NEW_DRIVER */

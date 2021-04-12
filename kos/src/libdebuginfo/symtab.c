@@ -65,7 +65,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 	if (symtab_entsize == sizeof(Elf32_Sym)) {
 		Elf32_Sym const *iter;
 		Elf32_Addr result_value;
-		symtab_end -= sizeof(Elf32_Sym) - 1;
+		symtab_end -= (sizeof(Elf32_Sym) - 1);
 		for (iter = (Elf32_Sym const *)symtab_start;
 		     iter < (Elf32_Sym const *)symtab_end; ++iter) {
 			Elf32_Section st_shndx; /* Section index */
@@ -102,7 +102,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 	} else if (symtab_entsize == sizeof(Elf64_Sym)) {
 		Elf64_Sym const *iter;
 		Elf64_Addr result_value;
-		symtab_end -= sizeof(Elf64_Sym) - 1;
+		symtab_end -= (sizeof(Elf64_Sym) - 1);
 		for (iter = (Elf64_Sym const *)symtab_start;
 		     iter < (Elf64_Sym const *)symtab_end; ++iter) {
 			Elf64_Section st_shndx; /* Section index */

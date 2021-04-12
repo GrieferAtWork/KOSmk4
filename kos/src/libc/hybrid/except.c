@@ -233,6 +233,38 @@ NOTHROW(FCALL libc_except_badusage_throw_current)(error_register_state_t const *
 }
 #endif /* !NDEBUG */
 
+/* [ 1] TRY {
+ * [ 2]     foo();
+ * [ 3] } EXCEPT {
+ * [ 4]     NESTED_TRY {
+ * [ 5]         bar();
+ * [ 6]     } EXCEPT {
+ * [ 7]         foobar();
+ * [ 8]         RETHROW();
+ * [ 9]     }
+ * [10]     RETHROW();
+ * [11] }
+ *
+ * Equivalent:
+ * >> foo();                                // [ 2]
+ * >> if (EXCEPTION_THROWN) {
+ * >>     __cxa_begin_catch();              // [ 3]
+ * >>     struct _exception_nesting_data nest;
+ * >>     error_nesting_begin(&nest);
+ * >>     bar();                            // [ 5]
+ * >>     if (EXCEPTION_THROWN) {
+ * >>         __cxa_begin_catch();          // [ 6]
+ * >>         foobar();                     // [ 7]
+ * >>         error_rethrow();              // [ 8]
+ * >>         __cxa_end_catch();            // [ 9]
+ * >>         error_nesting_end(&nest);
+ * >>     } else {
+ * >>         error_nesting_end(&nest);
+ * >>         error_rethrow();              // [10]
+ * >>     }
+ * >>     __cxa_end_catch();                // [11]
+ * >> }
+ */
 
 /* Only export  __cxa_* functions  as weak  in user-space,  such  that
  * libstdc++ can override them, should that library end up being used. */

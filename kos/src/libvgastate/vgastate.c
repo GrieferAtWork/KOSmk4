@@ -52,8 +52,10 @@ opt.removeif([](e) -> e.startswith("-O"));
 #ifdef __KERNEL__
 #include <debugger/rt.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>      /* mman_kernel */
+#include <kernel/mman/kram.h> /* mman_unmap_kram_and_kfree */
+#include <kernel/mman/map.h>  /* mman_map */
 #include <kernel/paging.h>
-#include <kernel/vm.h>
 #else /* __KERNEL__ */
 #include <sys/mman.h>
 
@@ -351,7 +353,10 @@ typedef struct {
 	vm86_state_t      vv_vm86;       /* The underlying vm86 state. */
 	byte_t           *vv_biosbase;   /* Base address for where we've mapped the BIOS */
 #ifdef __KERNEL__
-	pagedir_pushval_t vv_backup[VGA_VM86_BIOS_SIZE / PAGESIZE]; /* Backup of page directory mappings. */
+	union {
+		void             *vv_unmapcookie; /* [1..1][owned] Unmap cookie */
+		pagedir_pushval_t vv_backup[VGA_VM86_BIOS_SIZE / PAGESIZE]; /* Backup of page directory mappings. */
+	};
 #endif /* __KERNEL__ */
 } vga_vm86_state_t;
 
@@ -363,6 +368,10 @@ typedef struct {
 PRIVATE unsigned int
 NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 #ifdef __KERNEL__
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
+#define HINT_GETADDR(x) HINT_ADDR x
+#define HINT_GETMODE(x) HINT_MODE x
 	if (dbg_onstack()) {
 		unsigned int i;
 		byte_t *virt;
@@ -384,19 +393,22 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 	} else {
 		if (!PREEMPTION_ENABLED())
 			THROW(E_WOULDBLOCK_PREEMPTED);
-		/* Use a regular memory mapping. */
-		self->vv_biosbase = (byte_t *)vm_map(&vm_kernel,
-		                                     NULL,
-		                                     VGA_VM86_BIOS_SIZE,
-		                                     PAGESIZE,
-		                                     MAP_GROWSUP,
-		                                     &vm_datablock_physical,
-		                                     NULL,
-		                                     NULL,
-		                                     0,
-		                                     VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
-		                                     VM_NODE_FLAG_NOMERGE,
-		                                     0);
+		self->vv_unmapcookie = mman_unmap_kram_cookie_alloc();
+		TRY {
+			/* Use a regular memory mapping. */
+			self->vv_biosbase = (byte_t *)mman_map(/* self:        */ &mman_kernel,
+			                                       /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+			                                       /* num_bytes:   */ VGA_VM86_BIOS_SIZE,
+			                                       /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+			                                       /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+			                                       /* file:        */ &mfile_phys,
+			                                       /* file_fspath: */ NULL,
+			                                       /* file_fsname: */ NULL,
+			                                       /* file_pos:    */ (pos_t)0);
+		} EXCEPT {
+			mman_unmap_kram_cookie_free(self->vv_unmapcookie);
+			RETHROW();
+		}
 	}
 #else /* __KERNEL__ */
 	void *bios;
@@ -420,9 +432,8 @@ NOTHROW(CC vga_vm86_state_fini)(vga_vm86_state_t *__restrict self) {
 			virt += PAGESIZE;
 		}
 	} else {
-		mman_unmap(&vm_kernel,
-		           self->vv_biosbase,
-		           VGA_VM86_BIOS_SIZE);
+		mman_unmap_kram_and_kfree(self->vv_biosbase, VGA_VM86_BIOS_SIZE,
+		                          self->vv_unmapcookie);
 	}
 #else /* __KERNEL__ */
 	munmapphys(self->vv_biosbase, VGA_VM86_BIOS_SIZE);

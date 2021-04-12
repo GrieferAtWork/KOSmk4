@@ -34,8 +34,8 @@
 #define libuw_unwind_fde_scan libdi_unwind_fde_scan_df
 
 
-/* Re-use the implementation from libunwind.so, but re-compile
- * with   `DEBUG_FRAME'   to    get   .debug_frame    support. */
+/* Re-use the  implementation from  `libunwind.so', but  re-
+ * compile with `DEBUG_FRAME' to get `.debug_frame' support. */
 #define DEBUG_FRAME 1
 #ifndef __INTELLISENSE__
 #define FIND_SPECIFIC_ADDRESS

@@ -30,10 +30,13 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/flags.h>
+#include <kernel/mman/kram.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -908,10 +911,10 @@ load_new_slot:
 				heap_free_raw(self, tkeep, tkeep_size, flags);
 
 			/* Release full pages back to the system. */
-			vm_unmap_kernel_ram(free_minaddr,
-			                    (size_t)((byte_t *)free_endaddr -
-			                             (byte_t *)free_minaddr),
-			                    !!(flags & GFP_CALLOC));
+			mman_unmap_kram(free_minaddr,
+			                (size_t)((byte_t *)free_endaddr -
+			                         (byte_t *)free_minaddr),
+			                flags & GFP_CALLOC);
 
 			/* Reset the heap  hint in  a way  that will  keep our  heap
 			 * around the same area of memory, preventing it from slowly
@@ -1083,10 +1086,10 @@ again:
 			heap_free_raw(self, tail_pointer, tail_keep, free_flags);
 
 		/* Release full pages in-between back to the core. */
-		vm_unmap_kernel_ram(free_minaddr,
-		                    (size_t)((byte_t *)free_endaddr -
-		                             (byte_t *)free_minaddr),
-		                    !!(free_flags & GFP_CALLOC));
+		mman_unmap_kram(free_minaddr,
+		                (size_t)((byte_t *)free_endaddr -
+		                         (byte_t *)free_minaddr),
+		                free_flags & GFP_CALLOC);
 
 		/* Keep track of how much has already been released to the core. */
 		result += (size_t)((byte_t *)free_endaddr - (byte_t *)free_minaddr);
@@ -1286,14 +1289,14 @@ PUBLIC NOBLOCK void
 NOTHROW(KCALL vpage_free_untraced)(VIRT /*page-aligned*/ void *base,
                                    size_t num_pages) {
 	assertf(IS_ALIGNED((uintptr_t)base, PAGESIZE), "base = %p", base);
-	vm_unmap_kernel_ram(base, num_pages * PAGESIZE, false);
+	mman_unmap_kram(base, num_pages * PAGESIZE, GFP_NORMAL);
 }
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/ void *base,
                                     size_t num_pages, gfp_t flags) {
 	assertf(IS_ALIGNED((uintptr_t)base, PAGESIZE), "base = %p", base);
-	vm_unmap_kernel_ram(base, num_pages * PAGESIZE, !!(flags & GFP_CALLOC));
+	mman_unmap_kram(base, num_pages * PAGESIZE, flags & GFP_CALLOC);
 }
 
 

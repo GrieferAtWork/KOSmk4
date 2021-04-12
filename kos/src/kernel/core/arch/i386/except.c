@@ -660,12 +660,12 @@ halt_unhandled_exception(unsigned int unwind_error,
 PRIVATE NONNULL((1)) unsigned int
 NOTHROW(FCALL unwind_landingpad)(unwind_fde_t const *__restrict fde,
                                  struct kcpustate *__restrict state,
-                                 void *except_pc) {
-	void *landing_pad_pc;
+                                 void const *except_pc) {
+	void const *landing_pad_pc;
 	unwind_cfa_landing_state_t cfa;
 	struct kcpustate new_state;
 	unsigned int unwind_error;
-	landing_pad_pc = (void *)kcpustate_getpc(state);
+	landing_pad_pc = (void const *)kcpustate_getpc(state);
 	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto done;
@@ -694,7 +694,7 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	unsigned int error;
 	unwind_fde_t fde;
 	struct kcpustate old_state;
-	void *pc;
+	void const *pc;
 #ifndef NDEBUG
 	{
 		struct exception_info *info = error_info();
@@ -709,7 +709,7 @@ search_fde:
 	 * NOTE: -1 because the state we're being given has its PC pointer
 	 *       set  to  be  directed  after  the  faulting  instruction. */
 	memcpy(&old_state, state, sizeof(old_state));
-	pc = (void *)(kcpustate_getpc(&old_state) - 1);
+	pc = (void const *)(kcpustate_getpc(&old_state) - 1);
 	error = unwind_fde_find(pc, &fde);
 	if unlikely(error != UNWIND_SUCCESS)
 		goto err;
@@ -988,43 +988,6 @@ NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict U
 }
 
 
-
-/*
- *
- * [ 1] TRY {
- * [ 2]     foo();
- * [ 3] } EXCEPT {
- * [ 4]     NESTED_TRY {
- * [ 5]         bar();
- * [ 6]     } EXCEPT {
- * [ 7]         foobar();
- * [ 8]         RETHROW();
- * [ 9]     }
- * [10]     RETHROW();
- * [11] }
- *
- * Equivalent:
- * >> foo();                                // [ 2]
- * >> if (EXCEPTION_THROWN) {
- * >>     __cxa_begin_catch();              // [ 3]
- * >>     struct _exception_nesting_data nest;
- * >>     error_nesting_begin(&nest);
- * >>     bar();                            // [ 5]
- * >>     if (EXCEPTION_THROWN) {
- * >>         __cxa_begin_catch();          // [ 6]
- * >>         foobar();                     // [ 7]
- * >>         error_rethrow();              // [ 8]
- * >>         __cxa_end_catch();            // [ 9]
- * >>         error_nesting_end(&nest);
- * >>     } else {
- * >>         error_nesting_end(&nest);
- * >>         error_rethrow();              // [10]
- * >>     }
- * >>     __cxa_end_catch();                // [11]
- * >> }
- *
- *
- */
 
 
 DECL_END

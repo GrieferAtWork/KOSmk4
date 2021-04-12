@@ -192,14 +192,14 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 	/* Check if our CPU supports fsgsbase. If it does, the we don't  have
 	 * to do anything, and we can NOP out calls to `x86_fsgsbase_patch()' */
 	if (X86_HAVE_FSGSBASE) {
-		*((byte_t *)x86_fsgsbase_patch + 0) = 0xc3;
+		*((byte_t *)&x86_fsgsbase_patch + 0) = 0xc3;
 		return;
 	}
 	/* Patch all fsgsbase instructions within the kernel core. */
 	for (iter = __x86_fixup_fsgsbase_start;
 	     iter < __x86_fixup_fsgsbase_end; ++iter) {
-		uintptr_t pc = KERNEL_CORE_BASE + *iter;
-		bool was_ok = x86_fsgsbase_patch((void *)pc, (void *)pc);
+		void *pc = (byte_t *)KERNEL_CORE_BASE + *iter;
+		bool was_ok = x86_fsgsbase_patch(pc, pc);
 		if unlikely(!was_ok)
 			kernel_panic(FREESTR("Failed to patch fsgsbase instruction at %p\n"), pc);
 	}

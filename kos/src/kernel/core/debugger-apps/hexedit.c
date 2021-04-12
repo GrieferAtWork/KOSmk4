@@ -171,10 +171,12 @@ NOTHROW(FCALL hd_changes_append)(byte_t *addr, byte_t value) {
 }
 
 PRIVATE ATTR_DBGTEXT void
-NOTHROW(FCALL hd_changes_applyto)(byte_t *addr, byte_t *buf, size_t buflen, u64 *pchanged) {
+NOTHROW(FCALL hd_changes_applyto)(void const *addr, byte_t *buf,
+                                  size_t buflen, u64 *pchanged) {
 	struct hd_change *iter;
-	byte_t *endaddr = addr + buflen;
-	iter = (struct hd_change *)hd_change_buffer;
+	byte_t const *endaddr;
+	endaddr = (byte_t const *)addr + buflen;
+	iter    = (struct hd_change *)hd_change_buffer;
 	while (iter->hc_length) {
 		byte_t *block_start, *block_end;
 		block_start = iter->hc_start;
@@ -182,15 +184,16 @@ NOTHROW(FCALL hd_changes_applyto)(byte_t *addr, byte_t *buf, size_t buflen, u64 
 		if (addr < block_end && endaddr > block_start) {
 			size_t i;
 			for (i = 0; i < buflen; ++i) {
-				byte_t *effective_address;
-				effective_address = addr + i;
+				byte_t const *effective_address;
+				effective_address = (byte_t const *)addr + i;
 				if (effective_address < block_start)
 					continue;
 				if (effective_address >= block_end)
 					continue;
 				if (pchanged)
 					*pchanged |= ((u64)1 << i);
-				buf[i] = iter->hc_data[effective_address - block_start];
+				buf[i] = iter->hc_data[(size_t)(effective_address -
+				                                block_start)];
 			}
 		}
 		iter = HD_CHANGE_NEXT(iter);
@@ -243,7 +246,7 @@ NOTHROW(FCALL dbg_calculate_linesize)(void);
 /* Get the bytes for a given line of hex data.
  * @return: * : Bitset of valid bytes (usually 0xffff). */
 PRIVATE ATTR_DBGTEXT u64 FCALL
-hd_getline(void *start_addr, byte_t data[HD_MAXLINESIZE], u64 *pchanged) {
+hd_getline(void const *start_addr, byte_t data[HD_MAXLINESIZE], u64 *pchanged) {
 	size_t error;
 	u64 result = (u64)-1;
 	error = dbg_readmemory(start_addr, data, hd_linesize);
@@ -251,13 +254,14 @@ hd_getline(void *start_addr, byte_t data[HD_MAXLINESIZE], u64 *pchanged) {
 		/* Something's wrong with the address. - Try to copy each byte individually. */
 		unsigned int i;
 		for (i = 0; i < hd_linesize; ++i) {
-			error = dbg_readmemory(&((byte_t *)start_addr)[i],
-			                       &data[i], 1);
+			void const *baddr;
+			baddr = (byte_t const *)start_addr + i;
+			error = dbg_readmemory(baddr, &data[i], 1);
 			if (error != 0)
 				result &= ~((u64)1 << i);
 		}
 	}
-	hd_changes_applyto((byte_t *)start_addr, data, hd_linesize, pchanged);
+	hd_changes_applyto(start_addr, data, hd_linesize, pchanged);
 	return result;
 }
 

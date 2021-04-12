@@ -199,7 +199,7 @@ dbg_coredump(void const *const *traceback_vector,
 		                     DBGSTR("traceback_vector[%" PRIuSIZ "]\n"),
 		                     tbi);
 	}
-	current_pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_TRAP);
+	current_pc = dbg_getpcreg(DBG_REGLEVEL_TRAP);
 	if (current_pc != (void const *)ucpustate_getpc(orig_ustate) &&
 	    (traceback_length == 0 ||
 	     current_pc != traceback_vector[traceback_length - 1])) {

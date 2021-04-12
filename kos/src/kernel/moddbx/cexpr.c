@@ -1306,7 +1306,7 @@ cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
 do_second_pass:
 #endif /* CONFIG_USE_NEW_DRIVER || CONFIG_HAVE_USERMOD */
 	memset(&cu, 0, sizeof(cu));
-	pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	/* Select the proper function. */
 	module_relative_pc = (uintptr_t)pc;
 	if (mod) {
@@ -1471,7 +1471,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			memset(&cu, 0, sizeof(cu));
 			cu.cu_ranges.r_startpc = self->v_cu_ranges_startpc;
 			cu.cu_addr_base        = self->v_cu_addr_base;
-			pc  = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+			pc  = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 			mod = self->v_module;
 			/* Must execute these functions in the context of the VM associated with their module. */
 			{

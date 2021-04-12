@@ -35,9 +35,9 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* Load  the   next  debug_frame   function   descriptor  from   `*PDEBUG_FRAME_READER',   which
- * must   either  be  a  pointer  to  the  start  of  the  `.debug_frame'  section,  or  be  the
- * value written back to `*PDEBUG_FRAME_READER' after a previous call to `unwind_fde_load_df()'.
+/* Load the  next  debug_frame  function  descriptor  from  `*pdebug_frame_reader',  which
+ * must either be a pointer  to the start of the  `.debug_frame' section, or be the  value
+ * written back to `*pdebug_frame_reader' after a previous call to `unwind_fde_load_df()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL((1, 2, 3, 4)) unsigned int

@@ -25,7 +25,9 @@
 
 #include <fs/vfs.h>
 #include <kernel/mman.h>
-#include <kernel/vm.h>
+#include <kernel/mman/enum.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
 #include <sched/pid.h>
 
 #include <hybrid/align.h>
@@ -119,7 +121,7 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 	REF struct directory_entry *result;
 	upid_t pid;
 	REF struct task *thread;
-	REF struct vm *threadmm;
+	REF struct mman *threadmm;
 	UNCHECKED void *minaddr;
 	UNCHECKED void *maxaddr;
 	/* Try to parse the min/max address range from `name' */
@@ -136,22 +138,20 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
 	if unlikely(!thread)
 		goto err;
-	/* Lookup the associated VM. */
-	{
-		FINALLY_DECREF_UNLIKELY(thread);
-		threadmm = task_getmman(thread);
-	}
+	/* Lookup the associated mman. */
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
 	{
 		FINALLY_DECREF_UNLIKELY(threadmm);
 		size_t nodeid = 0;
-		struct vm_node *node;
-		/* Check if `threadvm' contains a  node that starts at  `minaddr',
+		struct mnode *node;
+		/* Check if `threadmm' contains a  node that starts at  `minaddr',
 		 * and either itself  also ends  at `maxaddr', or  is followed  by
 		 * some other node that ends at `maxaddr', with no gap in-between.
 		 * Note  that we  could in theory  also check if  all nodes within
 		 * this  area could  be merged,  but that  isn't really necessary,
 		 * and not doing so doesn't introduce any glaring inconsistencies. */
-		vm_treelock_read(threadmm);
+		mman_lock_read(threadmm);
 		{
 			struct mnode_tree_minmax mima;
 			/* TODO: mnode_tree_first() */
@@ -162,8 +162,8 @@ ProcFS_PerProc_MapFiles_Lookup(struct directory_node *__restrict self,
 		}
 		for (;;) {
 			if unlikely(!node) {
-unlock_threadvm_and_goto_err:
-				vm_treelock_endread(threadmm);
+unlock_threadmm_and_goto_err:
+				mman_lock_endread(threadmm);
 				goto err;
 			}
 			if (mnode_getminaddr(node) >= minaddr)
@@ -172,22 +172,24 @@ unlock_threadvm_and_goto_err:
 			node = mnode_tree_nextnode(node);
 		}
 		if (mnode_getminaddr(node) != minaddr)
-			goto unlock_threadvm_and_goto_err;
+			goto unlock_threadmm_and_goto_err;
 		/* Make sure that there is another node that ends at `maxaddr' */
 		while (mnode_getmaxaddr(node) != maxaddr) {
-			struct vm_node *succ;
+			struct mnode *succ;
 			if (mnode_getmaxaddr(node) > maxaddr)
-				goto unlock_threadvm_and_goto_err; /* `maxaddr' is too large */
+				goto unlock_threadmm_and_goto_err; /* `maxaddr' is too large */
 			succ = mnode_tree_nextnode(node);
 			if (!succ)
-				goto unlock_threadvm_and_goto_err; /* Non-consecutive */
+				goto unlock_threadmm_and_goto_err; /* Non-consecutive */
 			if ((byte_t *)mnode_getminaddr(succ) != (byte_t *)mnode_getmaxaddr(node) + 1)
-				goto unlock_threadvm_and_goto_err; /* Non-consecutive */
+				goto unlock_threadmm_and_goto_err; /* Non-consecutive */
 			node = succ;
 		}
-		vm_treelock_endread(threadmm);
+		mman_lock_endread(threadmm);
+
 		/* Found it! - It's the `nodeid'th node! */
 		result = directory_entry_alloc(namelen);
+
 		/* Re-print  the  proper  filename to  prevent  duplicate access
 		 * to a (potentially)  user-space string, as  well as deal  with
 		 * the  user-space   filename   having   been   case-insensitive
@@ -245,24 +247,22 @@ ProcFS_PerProc_MapFiles_Enum(struct directory_node *__restrict self,
                              void *arg)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	REF struct task *thread;
-	REF struct vm *threadvm;
+	REF struct mman *threadmm;
 	struct mapfiles_enum_data ed;
 	/* Lookup the associated thread. */
 	ed.ed_pid = (upid_t)(self->i_fileino & PROCFS_INOTYPE_MAPFILES_PIDMASK);
 	thread    = pidns_trylookup_task(THIS_PIDNS, ed.ed_pid);
 	if unlikely(!thread)
 		goto done;
-	/* Lookup the associated VM. */
+	/* Lookup the associated MMan. */
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
 	{
-		FINALLY_DECREF_UNLIKELY(thread);
-		threadvm = task_getmman(thread);
-	}
-	{
-		FINALLY_DECREF_UNLIKELY(threadvm);
+		FINALLY_DECREF_UNLIKELY(threadmm);
 		ed.ed_callback = callback;
 		ed.ed_arg      = arg;
 		/* Enumerate files from /proc/[pid]/map_files */
-		mman_enum(threadvm, &vm_enum_callback_for_mapfiles_enum, &ed);
+		mman_enum(threadmm, &vm_enum_callback_for_mapfiles_enum, &ed);
 	}
 done:
 	;
@@ -296,7 +296,7 @@ ProcFS_PerProc_MapFiles_Entry_Readlink(struct symlink_node *__restrict self,
                                        size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	REF struct task *thread;
-	REF struct vm *threadvm;
+	REF struct mman *threadmm;
 	REF struct path *fspath;
 	REF struct directory_entry *fsname;
 	size_t nth, result;
@@ -307,28 +307,26 @@ ProcFS_PerProc_MapFiles_Entry_Readlink(struct symlink_node *__restrict self,
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
 	if unlikely(!thread)
 		goto err;
-	/* Lookup the associated VM. */
+	/* Lookup the associated MMan. */
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
 	{
-		FINALLY_DECREF_UNLIKELY(thread);
-		threadvm = task_getmman(thread);
-	}
-	{
-		struct vm_node *node;
-		FINALLY_DECREF_UNLIKELY(threadvm);
-		/* find the `nth'th `struct vm_node' within `threadvm' */
-		vm_treelock_read(threadvm);
+		struct mnode *node;
+		FINALLY_DECREF_UNLIKELY(threadmm);
+		/* find the `nth'th `struct mnode' within `threadmm' */
+		mman_lock_read(threadmm);
 		{
 			struct mnode_tree_minmax mima;
 			/* TODO: mnode_tree_first() */
-			mnode_tree_minmaxlocate(threadvm->mm_mappings,
+			mnode_tree_minmaxlocate(threadmm->mm_mappings,
 			                        (void *)0, (void *)-1,
 			                        &mima);
 			node = mima.mm_min;
 		}
 		for (;;) {
 			if unlikely(!node) {
-unlock_threadvm_and_goto_err:
-				vm_treelock_endread(threadvm);
+unlock_threadmm_and_goto_err:
+				mman_lock_endread(threadmm);
 				goto err;
 			}
 			if (!nth)
@@ -341,25 +339,21 @@ unlock_threadvm_and_goto_err:
 		fspath = node->mn_fspath;
 		fsname = node->mn_fsname;
 		if unlikely(!fspath || !fsname)
-			goto unlock_threadvm_and_goto_err;
+			goto unlock_threadmm_and_goto_err;
 		incref(fspath);
 		incref(fsname);
-		vm_treelock_endread(threadvm);
+		mman_lock_endread(threadmm);
 	}
-	TRY {
+	{
+		FINALLY_DECREF_UNLIKELY(fspath);
+		FINALLY_DECREF_UNLIKELY(fsname);
 		/* Print the filesystem name. */
 		result = path_sprintent(buf,
 		                        bufsize,
 		                        fspath,
 		                        fsname->de_name,
 		                        fsname->de_namelen);
-	} EXCEPT {
-		decref_unlikely(fspath);
-		decref_unlikely(fsname);
-		RETHROW();
 	}
-	decref_unlikely(fspath);
-	decref_unlikely(fsname);
 	return result;
 err:
 	return 0;

@@ -89,10 +89,10 @@ FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void co
 FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uintptr_half_t cfi_regno, void const *__restrict buf);
 
 /* Get/Set the PC/SP registers of a given register level. */
-#define dbg_getpcreg(level)        dbg_getregp(level, CFI_UNWIND_REGISTER_PC)
-#define dbg_setpcreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_PC, value)
-#define dbg_getspreg(level)        dbg_getregp(level, CFI_UNWIND_REGISTER_SP)
-#define dbg_setspreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_SP, value)
+#define dbg_getpcreg(level)        (byte_t const *)dbg_getregp(level, CFI_UNWIND_REGISTER_PC)
+#define dbg_setpcreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_PC, (uintptr_t)(value))
+#define dbg_getspreg(level)        (byte_t *)dbg_getregp(level, CFI_UNWIND_REGISTER_SP)
+#define dbg_setspreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_SP, (uintptr_t)(value))
 
 /* Return the size of a pointer within the context of `dbg_current' */
 #ifndef dbg_current_sizeof_pointer
@@ -101,9 +101,8 @@ FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *a
 
 /* Return the fault program counter position
  * That is: the address of the last-executed instruction */
-#define dbg_getfaultpcreg(level)                         \
-	dbg_instruction_trypred((void *)dbg_getpcreg(level), \
-	                        dbg_instrlen_isa(level))
+#define dbg_getfaultpcreg(level) \
+	dbg_instruction_trypred(dbg_getpcreg(level), dbg_instrlen_isa(level))
 
 
 LOCAL uintptr_t

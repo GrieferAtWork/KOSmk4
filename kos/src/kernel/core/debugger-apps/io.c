@@ -37,7 +37,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/util.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -261,15 +262,17 @@ DBG_COMMAND(mp,
 }
 
 
-PRIVATE NOBLOCK ATTR_DBGTEXT ATTR_PURE bool
-NOTHROW(KCALL is_pc)(void *pc) {
-	struct vm_node *node;
+PRIVATE NOBLOCK ATTR_DBGTEXT ATTR_PURE WUNUSED bool
+NOTHROW(KCALL is_pc)(void const *pc) {
+	struct mnode *node;
 	if (!ADDR_ISKERN(pc))
-		return false;
-	node = vm_getnodeofaddress(&vm_kernel, pc);
+		goto nope;
+	node = mman_mappings_locate(&mman_kernel, pc);
 	if (!node)
-		return false;
-	return (node->vn_prot & VM_PROT_EXEC) != 0;
+		goto nope;
+	return (node->mn_flags & MNODE_F_PEXEC) != 0;
+nope:
+	return false;
 }
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t LIBDISASM_CC
@@ -300,22 +303,23 @@ DBG_COMMAND(disasm,
             "disasm [PC=registers.PC] [COUNT=<1 instruction>]\n"
             "\tPrint the disassembly of the given address range\n",
             argc, argv) {
-	uintptr_t addr, current_pc, count;
+	void const *addr, *current_pc;
+	uintptr_t count;
 	struct disassembler da;
-	current_pc = (uintptr_t)dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	current_pc = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
 	addr       = current_pc;
 	if (argc >= 2) {
-		if (!dbg_evaladdr(argv[1], &addr))
+		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
-	disasm_init(&da, &dbg_printer, NULL, (void *)addr,
+	disasm_init(&da, &dbg_printer, NULL, addr,
 	            DISASSEMBLER_TARGET_CURRENT,
 	            DISASSEMBLER_FNORMAL, 0);
 	da.d_format = &debug_da_formater;
 	if (argc >= 3) {
 		if (sscanf(argv[2], DBGSTR("%lU"), &count) != 1)
 			return DBG_STATUS_INVALID_ARGUMENTS;
-		disasm_print_until(&da, (byte_t *)addr + (size_t)count);
+		disasm_print_until(&da, (byte_t const *)addr + (size_t)count);
 	} else {
 		disasm_print_instruction(&da);
 		dbg_putc('\n');
@@ -327,15 +331,15 @@ DBG_COMMAND(instrlen,
             "instrlen [PC=registers.PC]\n"
             "\tPrint the length of the specified instruction\n",
             argc, argv) {
-	uintptr_t addr, current_pc;
+	void const *addr, *current_pc;
 	size_t length;
-	current_pc = (uintptr_t)dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	current_pc = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
 	addr       = current_pc;
 	if (argc >= 2) {
-		if (!dbg_evaladdr(argv[1], &addr))
+		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
-	length = instruction_length((void *)addr, INSTRLEN_ISA_DEFAULT);
+	length = instruction_length(addr, INSTRLEN_ISA_DEFAULT);
 	dbg_printf(DBGSTR("%" PRIuSIZ "\n"), length);
 	return 0;
 }
@@ -347,7 +351,7 @@ DBG_COMMAND(trace,
             "\tPC       IS   Name           Off   File    Line  Info\n"
             "\tC01936B0+5   [dwarf_fde_find+245] [dwarf.c:262] [...]\n"
             "\tPC:   Program counter position\n"
-            "\tIS:   Instriction/inline size\n"
+            "\tIS:   Instruction/inline size\n"
             "\tName: Name of the surrounding function\n"
             "\tOff:  Offset of PC from the surrounding function's start\n"
             "\tFile: Last component of the associated source's filename\n"
@@ -404,12 +408,12 @@ DBG_COMMAND(trace,
 			while (iter > (uintptr_t)minaddr)
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 			{
-				void *pc;
+				void const *pc;
 #ifndef __ARCH_STACK_GROWS_DOWNWARDS
 				iter -= sizeof(void *);
 #endif /* __ARCH_STACK_GROWS_DOWNWARDS */
 				TRY {
-					pc = *(void **)iter;
+					pc = *(void const **)iter;
 				} EXCEPT {
 					break;
 				}
@@ -434,7 +438,7 @@ DBG_COMMAND(u,
             "\tUnwind the current source location to its call-site\n") {
 	struct fcpustate oldstate, newstate;
 	unsigned int error;
-	void *final_pc;
+	void const *final_pc;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &oldstate);
 	memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
 	error = unwind_for_debug((void *)(fcpustate_getpc(&oldstate) - 1),
@@ -446,7 +450,7 @@ DBG_COMMAND(u,
 	} else {
 		dbg_setallregs(DBG_REGLEVEL_VIEW, &newstate);
 	}
-	final_pc = (void *)fcpustate_getpc(&newstate);
+	final_pc = (void const *)fcpustate_getpc(&newstate);
 	dbg_addr2line_printf(dbg_instruction_trypred(final_pc, instrlen_isa_from_fcpustate(&newstate)),
 	                     final_pc, DBGSTR("sp=%p"), final_pc);
 	return 0;
@@ -458,23 +462,21 @@ DBG_COMMAND(a2l,
             "a2l [ADDR=PC] [ADDR...]\n"
             "\tPrint the source location name for the given ADDR\n",
             argc, argv) {
-	uintptr_t addr, current_pc;
+	void const *addr, *current_pc;
 	instrlen_isa_t isa;
 	isa = dbg_instrlen_isa(DBG_REGLEVEL_VIEW);
 again:
 	--argc;
 	++argv;
 	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	current_pc = (uintptr_t)dbg_instruction_trypred((void const *)current_pc, isa);
+	current_pc = dbg_instruction_trypred(current_pc, isa);
 	addr = current_pc;
 	if (argc >= 1) {
-		if (!dbg_evaladdr(argv[0], &addr))
+		if (!dbg_evaladdr(argv[0], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;
-		current_pc = (uintptr_t)dbg_instruction_trysucc((void const *)addr, isa);
+		current_pc = dbg_instruction_trysucc(addr, isa);
 	}
-	dbg_addr2line_printf((void const *)addr,
-	                     (void const *)current_pc,
-	                     NULL);
+	dbg_addr2line_printf(addr, current_pc, NULL);
 	if (argc > 1)
 		goto again;
 	return 0;

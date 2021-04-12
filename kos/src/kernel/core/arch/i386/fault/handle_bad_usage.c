@@ -1667,6 +1667,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 							                        ((uintptr_t)pc & PAGEMASK),
 							                        pc);
 							pagedir_unmap(tempaddr, 2 * PAGESIZE);
+							pagedir_sync(tempaddr, 2 * PAGESIZE);
 							pagedir_unprepare(tempaddr, 2 * PAGESIZE);
 						}
 					}

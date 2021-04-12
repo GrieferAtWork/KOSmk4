@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
 
@@ -73,13 +72,13 @@ DECL_BEGIN
 struct rtm_memory_region {
 	void                           *mr_addrlo; /* Lowest region address. (1-byte granularity) */
 	void                           *mr_addrhi; /* Greatest region address. */
-	REF /*struct vm_datapart*/void *mr_part;   /* [1..1] The datapart used  for backing this  region.
+	REF /*struct mpart*/void       *mr_part;   /* [1..1] The datapart used  for backing this  region.
 	                                            * NOTE: The least significant 2 bits has special use. */
 	uintptr_t                       mr_vers;   /* Region RTM version before the initial read. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, mr_data);  /* [rtm_memory_region_getsize(self)] Cached RTM region data. */
 };
 #define rtm_memory_region_getsize(self)     ((size_t)((byte_t *)(self)->mr_addrhi - (byte_t *)(self)->mr_addrlo) + 1)
-#define rtm_memory_region_getpart(self)     ((struct vm_datapart *)((uintptr_t)(self)->mr_part & ~3))
+#define rtm_memory_region_getpart(self)     ((struct mpart *)((uintptr_t)(self)->mr_part & ~3))
 #define RTM_MEMORY_REGION_CHANGED_FLAG      1 /* Flag for `mr_part': was changed */
 #define rtm_memory_region_waschanged(self)  (((uintptr_t)(self)->mr_part & 1) != 0)
 #define rtm_memory_region_setchanged(self)  (void)((self)->mr_part = (void *)((uintptr_t)(self)->mr_part | 1))

@@ -282,12 +282,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t const *__restr
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
-/* Behaves  similar  to `unwind_fde_exec()',  but must  be used  to calculate  the CFA
- * for the purpose  of jumping  to a  custom `LANDINGPAD_PC'  as part  of handling  an
- * exceptions  which  originates  from  `absolute_pc'  within  the  current  cfi-proc.
- * This function is calculates the relative CFI-capsule offset between  `absolute_pc',
- * and `LANDINGPAD_PC', as  well as  the GNU-argsize  adjustment. Once  this is  done,
- * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
+/* Behaves similar to `unwind_fde_exec()', but must  be used to calculate the  CFA
+ * for the purpose of jumping to a  custom `landingpad_pc' as part of handling  an
+ * exceptions which  originates from  `absolute_pc' within  the current  cfi-proc.
+ * This function calculates the relative CFI-capsule offset between `absolute_pc',
+ * and `landingpad_pc', as well as the GNU-argsize adjustment. Once this is  done,
+ * the caller must use `unwind_cfa_landing_apply()' to apply these transformations
  * onto some given register state, which may then be used to resume execution.
  * @param: self:   The FDE to execute in search of `absolute_pc'
  * @param: result: CFA state descriptor, to-be filled with restore information upon success.

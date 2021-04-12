@@ -182,7 +182,7 @@ do_parse_as_hex:
 
 	case '.':
 		/* Current address. */
-		value = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+		value = (uintptr_t)dbg_getpcreg(DBG_REGLEVEL_VIEW);
 		break;
 
 	case '+':

@@ -121,7 +121,7 @@ INTDEF byte_t x86_syscall_emulate_r_redirection_jmp[];
 #define V2P(addr) (physaddr_t)((uintptr_t)(addr) - KERNEL_CORE_BASE)
 
 PRIVATE NOBLOCK void
-NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
+NOTHROW(FCALL setpcrel32)(s32 *pcrel, void const *dest) {
 	s32 offset;
 	offset = (s32)(intptr_t)((uintptr_t)dest - ((uintptr_t)pcrel + 4));
 	pokephysl_unaligned(V2P(pcrel), (u32)offset);
@@ -147,7 +147,7 @@ NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
 PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 	bool result;
 	struct idt_segment newsyscall;
-	void *addr;
+	void const *addr;
 	if (!sync_trywrite(&syscall_tracing_lock)) {
 		if (nx)
 			return false;
@@ -155,8 +155,8 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 	}
 	FINALLY_ENDWRITE(&syscall_tracing_lock);
 
-	addr = enable ? (void *)&x86_syscall32_int80_traced
-	              : (void *)&x86_syscall32_int80;
+	addr = enable ? (void const *)&x86_syscall32_int80_traced
+	              : (void const *)&x86_syscall32_int80;
 #ifdef __x86_64__
 	/* NOTE: On x86_64, we  must use `SEGMENT_DESCRIPTOR_TYPE_INTRGATE'  as gate  type
 	 *       for int80h because we always _need_ to enter the kernel with #IF disabled
@@ -176,12 +176,12 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 
 	/* Re-write assembly to jump to tracing handlers. */
 #ifdef __x86_64__
-	addr = enable ? (void *)&x86_syscall64x64_int80_traced
-	              : (void *)&x86_syscall64x64_int80;
+	addr = enable ? (void const *)&x86_syscall64x64_int80_traced
+	              : (void const *)&x86_syscall64x64_int80;
 	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80, addr);
 	setpcrel32(&x86_syscall_emulate64_int80h_r_rel_x86_syscall64x64_int80, addr);
-	addr = enable ? (void *)&x86_syscall64x32_int80_traced
-	              : (void *)&x86_syscall64x32_int80;
+	addr = enable ? (void const *)&x86_syscall64x32_int80_traced
+	              : (void const *)&x86_syscall64x32_int80;
 	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80, addr);
 	setpcrel32(&x86_syscall_emulate32_int80h_r_rel_x86_syscall64x32_int80, addr);
 #else /* __x86_64__ */

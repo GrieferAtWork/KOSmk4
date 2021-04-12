@@ -293,6 +293,15 @@ NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
                                          PAGEDIR_PAGEALIGNED size_t num_bytes,
                                          void *freeme, gfp_t flags DFL(0));
 
+/* Helper macros to  alloc/free a cookie  that can later  be
+ * used in order  to service  `mman_unmap_kram_and_kfree()'.
+ * Note however  that you  are in  no way  obligated to  use
+ * these functions  specifically. -  You  can use  any  kind
+ * of other dynamically  allocated data  structure, so  long
+ * as that structure can hold a `struct mman_unmap_kram_job' */
+#define mman_unmap_kram_cookie_alloc()    kmalloc(sizeof(struct mman_unmap_kram_job), GFP_LOCKED | GFP_PREFLT)
+#define mman_unmap_kram_cookie_free(self) kfree(self)
+
 /* Same as `mman_unmap_kram_and_kfree()', but automatically expand the given
  * address range to  include all partially  covered pages (i.e.  floor-align
  * the base-address, and ceil-align the end-address) */

@@ -299,8 +299,8 @@ DBG_COMMAND(locals,
             "locals\n"
             "List the names, types and values of locally defined C variables at the current source location\n") {
 	/* Enumerate location variables. */
-	enum_locals_at_with_debug_sections((void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW),
-	                                   &print_local, NULL);
+	void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	enum_locals_at_with_debug_sections(pc, &print_local, NULL);
 	return 0;
 }
 
@@ -328,12 +328,11 @@ DBG_COMMAND(l,
             "\tSimilar to " AC_WHITE("locals") ", however the presentation layout is somewhat "
             "different, in that instead of following C syntax, variable names are written "
             "first, and are also aligned alongside each other\n") {
-	size_t maxlen = 0;
+	size_t maxlen  = 0;
+	void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	/* Enumerate location variables. */
-	enum_locals_at_with_debug_sections((void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW),
-	                                   &locals_maxlen, &maxlen);
-	enum_locals_at_with_debug_sections((void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW),
-	                                   &print_local, &maxlen);
+	enum_locals_at_with_debug_sections(pc, &locals_maxlen, &maxlen);
+	enum_locals_at_with_debug_sections(pc, &print_local, &maxlen);
 	return 0;
 }
 

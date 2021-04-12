@@ -27,12 +27,13 @@
 #include <kernel/boot.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <kernel/x86/multiboot.h>
 
 #include <hybrid/align.h>
