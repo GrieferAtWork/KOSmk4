@@ -34,9 +34,9 @@ DECL_BEGIN
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #ifndef DEFINE_SYSTEM_CACHE_CLEAR
 /* >> NOBLOCK size_t NOTHROW(KCALL func)(void);
- * Define a function that should be called when `system_clearcaches()' is invoked. */
+ * Define a function that should be called when `syscache_clear()' is invoked. */
 #define DEFINE_SYSTEM_CACHE_CLEAR(func) \
-	DEFINE_CALLBACK(".rodata.cold.callback.system_clearcaches",func)
+	DEFINE_CALLBACK(".rodata.cold.callback.syscache_clear",func)
 #endif /* !DEFINE_SYSTEM_CACHE_CLEAR */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 

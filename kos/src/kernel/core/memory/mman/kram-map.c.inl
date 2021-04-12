@@ -80,7 +80,7 @@ DECL_BEGIN
  *   - GFP_MAP_NOSPLIT:  Set the `MNODE_F_NOSPLIT' flag for new nodes
  *   - GFP_MAP_NOMERGE:  Set the `MNODE_F_NOMERGE' flag for new nodes, and don't try
  *                       to extend an existing node.
- *   - GFP_NOCLRC:       Don't call `system_clearcaches()' to try to free up memory
+ *   - GFP_NOCLRC:       Don't call `syscache_clear()' to try to free up memory
  *   - GFP_NOSWAP:       Don't move memory to swap to free up memory
  *   - Other flags are silently ignored, but will be forwarded  onto
  *     other calls to kmalloc() that may need to be made internally.
@@ -132,7 +132,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 #define LOCAL_IFELSE_NX(without_nx, with_nx) without_nx
 #define LOCAL_THROW                          THROW
 #endif /* !LOCAL_NX */
-	uintptr_t cache_version = 0;
+	syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
 	uintptr_t addend = 0;
 	void *result;
 	struct mnode *node = NULL;

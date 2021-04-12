@@ -155,7 +155,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 	case KSYSCTL_SYSTEM_CLEARCACHES:
 		cred_require_sysadmin();
-		return (syscall_slong_t)system_clearcaches();
+		return (syscall_slong_t)syscache_clear();
 
 	case KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS:
 		cred_require_sysadmin();

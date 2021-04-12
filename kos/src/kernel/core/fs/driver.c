@@ -3383,12 +3383,11 @@ find_new_candidate:
 	                                 HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 	vm_kernel_treelock_endread();
 	if unlikely(loadaddr == (uintptr_t)MAP_FAILED) {
-		uintptr_t version;
+		syscache_version_t version = SYSCACHE_VERSION_INIT;
 #ifndef __OPTIMIZE_SIZE__
-		if (system_clearcaches())
+		if (syscache_clear())
 			goto find_new_candidate;
 #endif /* !__OPTIMIZE_SIZE__ */
-		version = 0;
 find_new_candidate_tryhard:
 		vm_kernel_treelock_read();
 		loadaddr = (uintptr_t)vm_getfree(&vm_kernel,
@@ -3398,7 +3397,7 @@ find_new_candidate_tryhard:
 		                                 HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 		vm_kernel_treelock_endread();
 		if (loadaddr == (uintptr_t)MAP_FAILED) {
-			if (system_clearcaches_s(&version))
+			if (syscache_clear_s(&version))
 				goto find_new_candidate_tryhard;
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
 		}

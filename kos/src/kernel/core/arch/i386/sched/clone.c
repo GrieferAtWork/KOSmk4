@@ -201,10 +201,9 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 		TRY {
 			vm_datapart_do_allocram(&FORTASK(result, this_kernel_stackpart_));
 			TRY {
-				uintptr_t cache_version;
+				syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
 				byte_t *stack_addr;
 				byte_t *trampoline_addr;
-				cache_version = 0;
 again_lock_vm:
 				mman_lock_acquire(&mman_kernel);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
@@ -222,7 +221,7 @@ again_lock_vm:
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
 				if unlikely(stack_addr == MAP_FAILED) {
 					mman_lock_release(&mman_kernel);
-					if (system_clearcaches_s(&cache_version))
+					if (syscache_clear_s(&cache_version))
 						goto again_lock_vm;
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 					      CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
@@ -248,7 +247,7 @@ again_lock_vm:
 				                                       HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
 				if unlikely(trampoline_addr == MAP_FAILED) {
 					mman_lock_release(&mman_kernel);
-					if (system_clearcaches_s(&cache_version))
+					if (syscache_clear_s(&cache_version))
 						goto again_lock_vm;
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 				}

@@ -4972,8 +4972,6 @@ done_dynhdr_for_soname:
 		 * for all  of  the  driver's  program  headers. */
 		SLIST_INIT(&nodes);
 		TRY {
-			uintptr_t cache_version;
-			cache_version = 0;
 
 			result->d_module.md_loadmin = (byte_t *)-1;
 			for (phidx = 0; phidx < phnum; ++phidx) {
@@ -5032,6 +5030,7 @@ again_get_driver_loadlist:
 				                                               sizeof(WEAK REF struct driver *),
 				                                               GFP_LOCKED | GFP_PREFLT);
 				TRY {
+					syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
 					size_t i, new_ll_insert_index;
 					uintptr_t loadaddr;
 					/* Acquire a lock to the kernel mman, so we can insert the new nodes. */
@@ -5052,7 +5051,7 @@ again_acquire_mman_lock:
 						                             loadsize, HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 						if unlikely(loadbase == MAP_FAILED) {
 							mman_lock_release(&mman_kernel);
-							if (system_clearcaches_s(&cache_version))
+							if (syscache_clear_s(&cache_version))
 								goto again_acquire_mman_lock;
 							/*driver_deadnodes_freelist(&nodes);*/
 							/*destroy_partially_initialized_driver(result);*/

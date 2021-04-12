@@ -466,7 +466,7 @@ PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
 		TRY {
 			void *stack_addr;
 			void *trampoline_addr;
-			uintptr_t version = 0;
+			syscache_version_t version = SYSCACHE_VERSION_INIT;
 again_lock_vm:
 			mman_lock_acquire(&mman_kernel);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
@@ -482,7 +482,7 @@ again_lock_vm:
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
 			if unlikely(stack_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
-				if (system_clearcaches_s(&version))
+				if (syscache_clear_s(&version))
 					goto again_lock_vm;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 				      CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
@@ -507,7 +507,7 @@ again_lock_vm:
 			                                    HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
 			if unlikely(trampoline_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
-				if (system_clearcaches_s(&version))
+				if (syscache_clear_s(&version))
 					goto again_lock_vm;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 			}

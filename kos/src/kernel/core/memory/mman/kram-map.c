@@ -100,10 +100,10 @@ NOTHROW(FCALL bzero_pages)(PAGEDIR_PAGEALIGNED void *vbase,
 
 /* Try some things to reclaim system memory. */
 PRIVATE NOBLOCK bool
-NOTHROW(FCALL kram_reclaim_memory)(uintptr_t *__restrict p_cache_version,
+NOTHROW(FCALL kram_reclaim_memory)(syscache_version_t *__restrict p_cache_version,
                                    gfp_t flags) {
 	if (!(flags & GFP_NOCLRC)) {
-		if (system_clearcaches_s(p_cache_version))
+		if (syscache_clear_s(p_cache_version))
 			return true;
 	}
 	if (!(flags & GFP_NOSWAP)) {

@@ -817,7 +817,7 @@ PUBLIC NOBLOCK size_t
 NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 	REF struct usermod *chain;
 	/* TODO: Run this function for every VM in existence
-	 *       when   `system_clearcaches()'   is  called. */
+	 *       when   `syscache_clear()'   is  called. */
 	chain = axref_steal(&FORMMAN(self, usermod_cache).uc_first);
 	if (!chain)
 		return 0;

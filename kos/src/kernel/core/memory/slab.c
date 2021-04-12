@@ -255,9 +255,8 @@ again_lock_vm:
 		if (next_slab_addr == MAP_FAILED || next_slab_addr > (byte_t *)slab_end_addr)
 #endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
 		{
-			uintptr_t version;
+			syscache_version_t version = SYSCACHE_VERSION_INIT;
 			mman_lock_release(&mman_kernel);
-			version = 0;
 again_next_slab_page_tryhard:
 			if (flags & GFP_ATOMIC) {
 				if unlikely(!mman_lock_tryacquire(&mman_kernel))
@@ -280,7 +279,7 @@ again_next_slab_page_tryhard:
 			    next_slab_addr <= (byte_t *)slab_end_addr)
 				goto gotaddr;
 #endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
-			if (system_clearcaches_s(&version))
+			if (syscache_clear_s(&version))
 				goto again_next_slab_page_tryhard;
 			goto err;
 		}

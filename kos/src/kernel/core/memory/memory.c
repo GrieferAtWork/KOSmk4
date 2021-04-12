@@ -675,7 +675,7 @@ PUBLIC NOBLOCK WUNUSED physpage_t
 NOTHROW(KCALL page_malloc)(physpagecnt_t num_pages) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	uintptr_t version = 0;
+	syscache_version_t version = SYSCACHE_VERSION_INIT;
 again:
 	zone = mzones.pm_last;
 	do {
@@ -715,7 +715,7 @@ again:
 	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
-	if (system_clearcaches_s(&version))
+	if (syscache_clear_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;
 }
@@ -728,7 +728,7 @@ PUBLIC NOBLOCK WUNUSED physpage_t
 NOTHROW(KCALL page_mallocone)(void) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	uintptr_t version = 0;
+	syscache_version_t version = SYSCACHE_VERSION_INIT;
 again:
 	zone = mzones.pm_last;
 	do {
@@ -768,7 +768,7 @@ again:
 	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
-	if (system_clearcaches_s(&version))
+	if (syscache_clear_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;
 }
@@ -786,7 +786,7 @@ NOTHROW(KCALL page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages
                                 physpagecnt_t *__restrict res_pages) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	uintptr_t version;
+	syscache_version_t version = SYSCACHE_VERSION_INIT;
 #ifdef ALLOCATE_MIN_PARTS
 	max_pages = min_pages;
 #elif defined(ALLOCATE_MIN_PARTS_RANDOMIZE)
@@ -799,7 +799,6 @@ NOTHROW(KCALL page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages
 		max_pages = new_count;
 	}
 #endif
-	version = 0;
 again:
 	zone = mzones.pm_last;
 	do {
@@ -870,7 +869,7 @@ again:
 	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
-	if (system_clearcaches_s(&version))
+	if (syscache_clear_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;
 }
@@ -902,7 +901,7 @@ again:
 			return PAGE_MALLOC_AT_SUCCESS;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
-	if (system_clearcaches())
+	if (syscache_clear())
 		goto again;
 	return PAGE_MALLOC_AT_NOTMAPPED;
 }
@@ -937,7 +936,7 @@ NOTHROW(KCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page
                                         physpagecnt_t *__restrict res_pages) {
 	physpage_t result, free_max;
 	struct pmemzone *zone;
-	uintptr_t version;
+	syscache_version_t version = SYSCACHE_VERSION_INIT;
 #ifdef ALLOCATE_MIN_PARTS
 	max_pages = min_pages;
 #elif defined(ALLOCATE_MIN_PARTS_RANDOMIZE)
@@ -950,7 +949,6 @@ NOTHROW(KCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page
 		max_pages = new_count;
 	}
 #endif
-	version = 0;
 again:
 	zone = mzones.pm_last;
 	do {
@@ -1085,7 +1083,7 @@ again:
 	 * I totally forgot  that this happens  in here, and  there are many  places
 	 * that aren't designed to efficiently deal with system caches being cleared
 	 * in this manner! */
-	if (system_clearcaches_s(&version))
+	if (syscache_clear_s(&version))
 		goto again;
 	return PHYSPAGE_INVALID;
 }

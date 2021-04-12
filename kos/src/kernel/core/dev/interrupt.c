@@ -451,8 +451,7 @@ isr_register_impl(void *func, void *arg, bool is_greedy)
 	REF struct driver *func_driver;
 	REF struct isr_vector_state *winner;
 	size_t i, winner_index = 0;
-	uintptr_t cache_version;
-	cache_version = 0;
+	syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
 	func_driver = driver_fromaddr(func);
 	/* Make sure that a driver exists at the given address. */
 	if unlikely(!func_driver)
@@ -491,7 +490,7 @@ again_determine_winner:
 	                                      winner->ivs_greedy_arg,
 	                                      true)) {
 		/* Try to reclaim cache resources, which may free up a suitable interrupt vector slot. */
-		if (system_clearcaches_s(&cache_version))
+		if (syscache_clear_s(&cache_version))
 			goto again_check_finalizing;
 		decref_unlikely(func_driver);
 		THROW(E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS, (uintptr_t)-1);
@@ -524,8 +523,7 @@ isr_register_at_impl(isr_vector_t vector, void *func, void *arg, bool is_greedy)
 	REF struct driver *func_driver;
 	REF struct isr_vector_state *old_state;
 	size_t index;
-	uintptr_t cache_version;
-	cache_version = 0;
+	syscache_version_t cache_version = SYSCACHE_VERSION_INIT;
 	/* Make sure that the given vector is valid. - If it  isn't,
 	 * act like it's impossible to allocate further data for it. */
 	if unlikely(!ISR_VECTOR_IS_VALID(vector))
@@ -551,7 +549,7 @@ again_get_old_state:
 		/* The old vector is already in use. */
 		decref(old_state);
 		/* Try to reclaim resources. */
-		if (system_clearcaches_s(&cache_version))
+		if (syscache_clear_s(&cache_version))
 			goto again_check_finalizing;
 		decref_unlikely(func_driver);
 		THROW(E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS, vector);
