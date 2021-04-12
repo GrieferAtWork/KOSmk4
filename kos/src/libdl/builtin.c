@@ -2164,7 +2164,7 @@ DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
 
 
 /* WARNING: If you intend to rename this `dl_program_invocation_short_name'
- *          variable, make sure to also update the special handling found
+ *          variable, make sure to also  update the special handling  found
  *          in moddbx's `cexpr_load_special_libdl_symbol()' function, which
  *          contains special handling for binding against this symbol! */
 PRIVATE char *dl_program_invocation_short_name = NULL;

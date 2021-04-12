@@ -70,10 +70,10 @@ DECL_BEGIN
 
 #ifndef EH_FRAME_CFA_LANDING_APPLY
 #ifdef EH_FRAME_CFA_APPLY
-/* Execute CFA state instruction  until `absolute_pc' has been  reached,
+/* Execute CFA state  instruction until `absolute_pc'  has been  reached,
  * or  the entirety of  the FDE instruction code  has been executed. This
- * function is used to fill in CFA state information at a given address,
- * which  can then be used to unwind a register state for the purpose of
+ * function is used to fill in CFA state information at a given  address,
+ * which can then be used to unwind  a register state for the purpose  of
  * implementing language-level, zero-effort exception support, as well as
  * for generating tracebacks when combined with `libdebuginfo.so'
  * NOTE: Usually, the caller will have already ensured that:

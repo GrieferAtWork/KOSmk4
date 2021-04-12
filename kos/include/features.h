@@ -193,7 +193,7 @@
 #endif /* (__STDC_WANT_SECURE_LIB__ + 0) != 0 */
 #endif /* ... */
 
-/* DOS extensions that change the way that certain symbols are declared.
+/* DOS  extensions that change the way that certain symbols are declared.
  * This mainly affects the const-ness of argv-vectors taken by `execv(2)' */
 #ifdef _DOS_ALTERATIONS_SOURCE
 #if (_DOS_ALTERATIONS_SOURCE + 0) != 0

@@ -304,7 +304,7 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 }
 
 
-/* Split `lonode' (which contains `addr_where_to_split') at that address. If
+/* Split `lonode' (which contains `addr_where_to_split') at that address.  If
  * this cannot be done without blocking, unlock and eventually return `false' */
 PUBLIC WUNUSED NONNULL((1, 2)) bool FCALL
 mnode_split_or_unlock(struct mman *__restrict self,

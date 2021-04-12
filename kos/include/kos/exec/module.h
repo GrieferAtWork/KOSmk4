@@ -21,7 +21,7 @@
 #define _KOS_EXEC_MODULE_H 1
 
 /* Portable (as in: both user- and kernel-space capable) API
- * for working with  dynamically loaded objects:
+ * for    working    with   dynamically    loaded   objects:
  *   kernelspace: `struct module *'  from <kernel/mman/module.h>
  *   userspace:   `void *'           from <dlfcn.h>  (aka: struct dlmodule *)
  */
@@ -35,8 +35,8 @@
  *       CONFIG_USE_NEW_DRIVER makes <kernel/module.h>
  *       deprecated. */
 /* TODO: Once support for `#ifndef CONFIG_USE_NEW_DRIVER'
- *       gets dropped, get rid of `module_type_var' and
- *       all of the related macros, as nothing will need
+ *       gets dropped, get  rid of `module_type_var'  and
+ *       all of the related macros, as nothing will  need
  *       module type variables anymore!
  *       ALso get rid of `MODULE_TYPE_*'! */
 #include <kernel/module.h>

@@ -2815,12 +2815,12 @@ again_parse_annotations:
 					 * >> [[if(defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("foo")]]
 					 *
 					 * May be used to export a symbol alias that (may) only visible within
-					 * the DOS namespace, unless DOS uses the same calling convention as
-					 * the regular libc, in which case the behavior is the same as normal
+					 * the DOS namespace, unless DOS  uses the same calling convention  as
+					 * the regular libc, in which case the behavior is the same as  normal
 					 * use of `[[export_as("foo")]]'
 					 *
 					 * WARNING: Don't use this tag for [[wchar]] functions! Because those
-					 *          function _always_ have a dedicated dos-variant, you have
+					 *          function  _always_ have a dedicated dos-variant, you have
 					 *          to use the normal `[[dos_export_as("foo")]]' instead! */
 					local mode = tok;
 					if (currentDosLibraryFunction is none)

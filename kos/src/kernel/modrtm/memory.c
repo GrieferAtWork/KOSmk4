@@ -1439,7 +1439,7 @@ NOTHROW(FCALL rtm_verify_writable_nopf)(USER CHECKED void *addr,
 INTERN NONNULL((1)) bool FCALL
 rtm_memory_apply(struct rtm_memory const *__restrict self) {
 	/* TODO: This function needs a re-write in order to make use of `mpm_dmalocks'
-	 *       when writing to mem-parts, rather than keeping ahold of the much too
+	 *       when writing to mem-parts, rather than keeping ahold of the much  too
 	 *       powerful `MPART_F_LOCKBIT' in order to accomplish the same! */
 
 #if CONFIG_RTM_USERSPACE_ONLY

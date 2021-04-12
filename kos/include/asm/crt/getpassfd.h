@@ -27,8 +27,8 @@
 #define __GETPASS_FAIL_EOF    0x002 /* Input EOF is an error */
 #define __GETPASS_BUF_LIMIT   0x004 /* BEEP when typing after buffer limit is reached */
 #define __GETPASS_NO_SIGNAL   0x008 /* When a control character (such as ^C) causes password
-                                     * reading to be aborted (with `errno=EINTR'), don't
-                                     * raise(3) the signal associated with that character
+                                     * reading  to  be aborted  (with  `errno=EINTR'), don't
+                                     * raise(3) the  signal associated  with that  character
                                      * before returning from `getpassfd()' */
 #define __GETPASS_NO_BEEP     0x010 /* Don't BEEP */
 #define __GETPASS_ECHO        0x020 /* RPP_ECHO_ON: Don't disable echo (but leave it on). */

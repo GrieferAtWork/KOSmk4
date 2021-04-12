@@ -303,7 +303,7 @@ async_worker_new(struct async_worker_ops const *__restrict ops,
 }
 
 
-/* Using an internal database of known async workers, add or remove
+/* Using  an internal database of known async workers, add or remove
  * workers for the given operator table, that are bound to the given
  * ob_pointer/ob_type pair. */
 PUBLIC NONNULL((1, 2)) bool KCALL

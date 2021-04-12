@@ -662,9 +662,9 @@ NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
 }
 
 
-/* Same as `mcoreheap_free()', but no need to just through all of the  hoops
+/* Same as `mcoreheap_free()', but no need to just through all of the hoops
  * of enqueuing the free of `part' as a lockop when no lock can be acquired
- * to the kernel  mman, since the  caller allows us  to assume that  they've
+ * to the kernel mman,  since the caller allows  us to assume that  they've
  * already acquired a lock to the kernel mman. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {

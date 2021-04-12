@@ -472,7 +472,7 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 @@read data into `count' separate buffers, though still return the actual
 @@number of read bytes.
 @@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
-@@available at the time the call was made, and throw `E_WOULDBLOCK' 
+@@available at the time the call was made, and throw `E_WOULDBLOCK'
 @@no data was available at the time.
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
 @@@return: 0                     : EOF

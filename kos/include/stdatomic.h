@@ -54,7 +54,7 @@
 
 #ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 /* Everything's already implicitly imported by the `using namespace std;'
- * that's used when the `__COMPILER_HAVE_BUG_BLOATY_CXX_USING' bug-check
+ * that's used when the `__COMPILER_HAVE_BUG_BLOATY_CXX_USING'  bug-check
  * is enabled. */
 #else /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 __DECL_BEGIN

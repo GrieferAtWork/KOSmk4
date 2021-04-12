@@ -23,7 +23,7 @@
 /* Behavior of signed shift opeartions (`(-1 >> 1) == ???')
  *
  * The exact result of such an operation is arch-specific, but
- * for our purpose, we narrow down the range of possibilities
+ * for our purpose, we narrow down the range of  possibilities
  * to one of 3 options:
  *   #1: (-1 >> 1) == -1                --> Signed divide (most significant bit is copied)
  *   #2: (-1 >> 1) == 0x7fffffff[...]   --> Unsigned divide (most significant bit is set to `0')
@@ -36,7 +36,7 @@
  */
 
 
-/* Without any arch-specific override, assume that the preprocessor's
+/* Without  any arch-specific override, assume that the preprocessor's
  * C-like expression evaluator gets it right, and use it to figure out
  * what the result should be. */
 #undef __ARCH_SIGNED_SHIFT_IS_SDIV

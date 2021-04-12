@@ -123,7 +123,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
 	MNODE_INIT_mn_partoff(0),
 	MNODE_INIT_mn_link({ NULL, &this_kernel_stackpart_.mp_share.lh_first }),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-	MNODE_INIT_mn_module(NULL) 
+	MNODE_INIT_mn_module(NULL)
 };
 
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
@@ -141,7 +141,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stackguard_ = {
 	MNODE_INIT_mn_partoff(0),
 	MNODE_INIT_mn_link(LIST_ENTRY_UNBOUND_INITIALIZER),
 	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-	MNODE_INIT_mn_module(NULL) 
+	MNODE_INIT_mn_module(NULL)
 };
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 

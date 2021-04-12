@@ -605,7 +605,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskfullptr)(void)
 	}
 	/* Atomically switch over to the new signal mask. */
 	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, (sigset_t *)&ss_full);
-	/* No need to check if anything because unmasked, since we know
+	/* No need to check if  anything because unmasked, since we  know
 	 * that the new signal mask doesn't contain any unmasked signals! */
 	return result;
 do_legacy_sigprocmask:

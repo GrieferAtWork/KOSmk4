@@ -1595,7 +1595,7 @@ set_node_nullptr:
 							           node->mn_module->md_fsname == rtld_name) {
 								/* Another instance of the RTLD mapping.
 								 * -> If it covers the entirety of our own one's
-								 *    address range, then someone else was just
+								 *    address  range, then someone else was just
 								 *    faster than us.
 								 *    Otherwise, something went wrong... */
 								REF struct userelf_module *new_result;

@@ -927,8 +927,8 @@ continue_parsing:
  * #if-branches containing `{SimpPPElem...}' which in turn can contain
  * more PP-branches.
  *
- * TODO: Add more handling here to detct macro-pairs that can be
- *       optimized away when appearing next to each other (e.g.
+ * TODO: Add  more  handling here  to  detct macro-pairs  that  can be
+ *       optimized away  when  appearing  next  to  each  other  (e.g.
  *       `__NAMESPACE_STD_(ENTER|LEAVE)'), as well as `extern "..." {'
  *       and `}' pairs. */
 #define SimpPPElem SimpPPIfCapsule | string
@@ -1352,9 +1352,9 @@ do_inverse_condition:
 
 		return { elem };
 	}
-	/* TODO: Remove comments from strings (when config.truncateOutput)
+	/* TODO: Remove  comments  from strings  (when config.truncateOutput)
 	 *       Needed so that more strings can become empty, and be removed
-	 *       from text blocks, allowing for more optimizations relating
+	 *       from  text blocks, allowing  for more optimizations relating
 	 *       to adjacent #if-directives */
 	return { elem };
 }
@@ -1366,10 +1366,10 @@ function simpOptimizeElems(config: SimpConfig, assume: PPAssume, elems: {SimpPPE
 	for (local e: elems) {
 		/* TODO: #define / #undef directives should affect `assume' */
 		/* TODO: #include: Parse #include'd files for unconditionally defined macros,
-		 *                 and include those macro definitions within assumptions.
+		 *                 and include  those macro  definitions within  assumptions.
 		 *                 For this purpose, we should also try to recognize #include
-		 *                 guard macros and handle them as `#if 1', since otherwise,
-		 *                 we'd (correctly) deduce that unconditional macros from
+		 *                 guard macros and handle them as `#if 1', since  otherwise,
+		 *                 we'd  (correctly)  deduce that  unconditional  macros from
 		 *                 include files only get defined if the include guard hasn't
 		 *                 been defined, yet.
 		 *                 With this, we can optimize:

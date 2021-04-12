@@ -38,7 +38,7 @@
 #include <math.h>
 
 /* In c++, both <complex.h> and <math.h> already define all of the necessary
- * overloads to facilitate type-generic use of all of the functions below! */
+ * overloads to facilitate type-generic use  of all of the functions  below! */
 #ifndef __cplusplus
 #if !defined(__NO_builtin_types_compatible_p) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_TG_ISTYPE(x, T) __builtin_types_compatible_p(__typeof__(x), T)

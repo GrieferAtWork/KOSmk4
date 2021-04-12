@@ -39,12 +39,12 @@ DECL_BEGIN
 
 /* Pre-defined directory access helper node for linear directories.
  * A linear directory is one that simply divides the directory data
- * into chunks of either fixed- or variable-length segments, where
- * one (or multiple) such segments make up a file entry.
- * As such, linear directories have the following characteristics:
+ * into chunks of either fixed- or variable-length segments,  where
+ * one  (or  multiple)  such  segments   make  up  a  file   entry.
+ * As  such, linear directories have the following characteristics:
  *   - Linear time search
  *   - Linearly ordered directory entry enumeration
- *   - In-stream positions of files do not change, unless a file is
+ *   - In-stream  positions of files do not change, unless a file is
  *     deleted, or a new file is created. In both cases, the in-file
  *     positions of any unrelated directory entry is not altered. */
 
@@ -102,7 +102,7 @@ struct flindirnode_ops {
 	                                                                                  \
 	/* [1..1][lock(READ(ldd_flock))]                                                  \
 	 * Read a directory entry from a given position within the directory file.        \
-	 * When returning non-NULL, this function should initialize:                      \
+	 * When   returning   non-NULL,    this   function   should    initialize:        \
 	 *   - return->fld_byname         = UNDEF;                                        \
 	 *   - return->fld_bypos          = UNDEF;                                        \
 	 *   - return->fld_minpos         = ... >= pos;                                   \
@@ -138,7 +138,7 @@ struct flindirnode_ops {
 	                           struct flindirent const *__restrict entry);            \
 	                                                                                  \
 	/* [0..1][lock(WRITE(ldd_flock))]                                                 \
-	 * Try to create a new file within a directory at the given `pos'.                \
+	 * Try  to  create  a  new  file  within  a  directory  at  the  given  `pos'.    \
 	 * Upon success (see @return below), the caller will fill in `info->mkf_dent':    \
 	 *   - info->mkf_name     = [in:const];                                           \
 	 *   - info->mkf_hash     = [in:const];                                           \
@@ -146,8 +146,8 @@ struct flindirnode_ops {
 	 *   - info->mkf_flags    = [in:const,undef]; // NOCASE and EXISTS are handled    \
 	 *                                            // by the caller!                   \
 	 *   - info->mkf_dent     = [out];            // Set to NULL to indicate reserved \
-	 *                                            // directory space. In this case,   \
-	 *                                            // `return' if # of reserved bytes  \
+	 *                                            // directory space.  In this  case, \
+	 *                                            // `return' if # of reserved  bytes \
 	 *                                            // starting at `pos'                \
 	 *   - info->mkf_fmode    = [in:const];                                           \
 	 *   - info->mkf_rnode    = [out];            // Already added to tree of nodes   \
@@ -156,9 +156,9 @@ struct flindirnode_ops {
 	 * @param: pos:      The position where the new entry should go.                  \
 	 * @param: size:     The max # of bytes which may be                              \
 	 * @return: 0:       Unsupported file type/operation (`info->mkf_fmode')          \
-	 *                   Same as not implementing this operator.                      \
+	 *                   Same   as   not    implementing   this    operator.          \
 	 *                   Caller will throw `E_FSERROR_UNSUPPORTED_OPERATION'          \
-	 * @return: > size:  The required amount of free directory-file space.            \
+	 * @return: > size:  The  required  amount of  free  directory-file space.        \
 	 *                   In this case, all out-fields of `info' are undefined.        \
 	 * @return: <= size: The total amount of required file space.                     \
 	 *                   When `info->mkf_dent == NULL',  */                           \
@@ -168,13 +168,13 @@ struct flindirnode_ops {
 	                           pos_t pos, size_t size);                               \
 	                                                                                  \
 	/* [0..1][lock(WRITE(self->ldd_flock) && WRITE(info->flrn_olddir->ldd_flock))]    \
-	 * Try to create a new file within a directory at the given `pos'.                \
+	 * Try  to  create  a  new  file  within  a  directory  at  the  given  `pos'.    \
 	 *   - info->flrn_name     = [in:const];                                          \
 	 *   - info->flrn_hash     = [in:const];                                          \
 	 *   - info->flrn_namelen  = [in:const];                                          \
 	 *   - info->flrn_dent     = [out];           // Set to NULL to indicate reserved \
-	 *                                            // directory space. In this case,   \
-	 *                                            // `return' if # of reserved bytes  \
+	 *                                            // directory space.  In this  case, \
+	 *                                            // `return' if # of reserved  bytes \
 	 *                                            // starting at `pos'                \
 	 *   - info->flrn_file     = [in:const];                                          \
 	 *   - info->flrn_oldent   = [in:const];                                          \
@@ -184,7 +184,7 @@ struct flindirnode_ops {
 	 * @return: 0:       Unsupported operation.                                       \
 	 *                   Same as not implementing this operator.                      \
 	 *                   Caller will throw `E_FSERROR_UNSUPPORTED_OPERATION'          \
-	 * @return: > size:  The required amount of free directory-file space.            \
+	 * @return: > size:  The  required  amount of  free  directory-file space.        \
 	 *                   In this case, all out-fields of `info' are undefined.        \
 	 * @return: <= size: The total amount of required file space.                     \
 	 *                   When `info->flrn_dent == NULL',  */                          \
@@ -201,14 +201,14 @@ struct flindirenum;
 struct flindirenum {
 	struct fdirenum_ops const *lde_ops; /* [1..1][const] Operators. */
 	REF struct flindirnode    *lde_dir; /* [1..1][const] Source directory.
-	                                     * Note that this field also holds a reference
-	                                     * to the `ldd_norehash' counter, such that said
+	                                     * Note that this  field also  holds a  reference
+	                                     * to  the `ldd_norehash' counter, such that said
 	                                     * counter is decremented when this enumerator is
 	                                     * destroyed. */
 	atomic64_t                 lde_pos; /* Lower bound for the next-to-be-read entry's `fld_minpos' */
-	WEAK struct flindirent    *lde_ent; /* [0..1] Cache for the next entry to-be read. NULL if
-	                                     * the next entry was deleted before it was read, or if
-	                                     * the next entry has yet to be loaded from-disk.
+	WEAK struct flindirent    *lde_ent; /* [0..1] Cache for  the next  entry  to-be read.  NULL  if
+	                                     * the next entry  was deleted  before it was  read, or  if
+	                                     * the  next  entry  has   yet  to  be  loaded   from-disk.
 	                                     * In either case, `lde_pos' must be used to in conjunction
 	                                     * with `ldno_linreaddir', unless `ldd_loaded' */
 	LIST_ENTRY(flindirenum)    lde_all; /* [0..1][lock(lde_dir->_MFILE_F_SMP_TSLOCK)]

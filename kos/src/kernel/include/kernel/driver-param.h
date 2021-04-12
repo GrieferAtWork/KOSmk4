@@ -29,7 +29,7 @@
 #endif /* !DRIVER_INIT */
 
 /* TODO: Once support for `#ifndef CONFIG_USE_NEW_DRIVER' is dropped,
- *       re-work these macros into something that is more pretty. */
+ *       re-work these  macros into  something that  is more  pretty. */
 #define DEFINE_CMDLINE_FLAG_VAR(flagname, parname)              extern bool flagname ASMNAME("\"drv_arg$" parname "\"");
 #define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name, parname)   extern char string_name[] ASMNAME("\"drv_arg$" parname "$s\"");
 #define DEFINE_CMDLINE_PARAM_INT8_VAR(varname, parname, defl)   extern int8_t varname ASMNAME("\"drv_arg$" parname "$I8d$" PP_STR(defl) "\"");

@@ -113,7 +113,7 @@ NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread) {
 
 		/* Deliver the pending kill-rpc.
 		 * All of the remaining work needed to get rid of `thread'
-		 * will then be performed from within `thread' itself! */
+		 * will  then  be performed  from within  `thread' itself! */
 		rpc_status = task_deliver_rpc(thread, rpc);
 		assert(rpc_status != TASK_DELIVER_RPC_KERNTHREAD);
 		assert(rpc_status != TASK_DELIVER_RPC_INTERRUPTED);

@@ -360,7 +360,7 @@ typedef __uint32_t emu86_opflags_t;
  * @return: * :   A pointer to the first byte past the opcode's ID
  * @param: popcode: Filled with the opcode's number
  * @param: pflags:  [in(EMU86_F_BITMASK)|out] Opcode flags.
- *                  NOTE: The caller should  have previously initialized  flags
+ *                  NOTE: The caller  should  have  previously  initialized  flags
  *                        through use of `emu86_opflags_from_*()', or by explicity
  *                        setting `EMU86_F_BITMASK' */
 typedef __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t *

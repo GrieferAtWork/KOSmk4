@@ -65,7 +65,7 @@ NOTHROW(FCALL flindirdat_fini)(struct flindirdat *__restrict self) {
 
 
 /* Default callback for `flindirnode_ops::ldno_destory'
- * If overwritten, sub-classes _must_ invoke this one! */
+ * If  overwritten, sub-classes _must_ invoke this one! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL flindirnode_v_destroy)(struct flindirnode *__restrict self) {
 	flindirdat_fini(&self->ldn_dat);
@@ -110,7 +110,7 @@ NOTHROW(FCALL lindir_rehash)(struct flindirbucket *__restrict newtab, size_t new
 }
 
 /* Read the next directory entry after `pos', insert it into the map
- * of `self', and (always) release a read-lock from `self' before
+ * of `self', and  (always) release a  read-lock from `self'  before
  * returning. */
 PRIVATE NONNULL((1)) void FCALL
 lindir_readmore_and_endread(struct flindirnode *__restrict self) {
@@ -139,7 +139,7 @@ lindir_readmore_and_endread(struct flindirnode *__restrict self) {
 			if unlikely(!TAILQ_EMPTY(&self->ldn_dat.ldd_bypos) &&
 			            pos <= TAILQ_LAST(&self->ldn_dat.ldd_bypos)->fld_maxpos) {
 				/* We didn't actually read the last entry!
-				 * Discard `ent' and try again... */
+				 * Discard   `ent'   and   try    again... */
 				sync_endread(&self->ldn_dat.ldd_flock);
 				ent->fld_ent.fd_refcnt = 0;
 				destroy(ent);
@@ -330,7 +330,7 @@ loadmore:
 				return 0; /* EOF */
 			}
 			/* Load entries until the one that includes `pos',
-			 * or until the end of the directory is reached. */
+			 * or until the end  of the directory is  reached. */
 			lindir_readmore_and_endread(dir);
 			goto again;
 		}

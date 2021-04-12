@@ -52,10 +52,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t const *__restrict eh_frame_start,
                                       uint8_t sizeof_address);
 
 
-/* Execute CFA state instruction  until `absolute_pc' has been  reached,
+/* Execute CFA state  instruction until `absolute_pc'  has been  reached,
  * or  the entirety of  the FDE instruction code  has been executed. This
- * function is used to fill in CFA state information at a given address,
- * which  can then be used to unwind a register state for the purpose of
+ * function is used to fill in CFA state information at a given  address,
+ * which can then be used to unwind  a register state for the purpose  of
  * implementing language-level, zero-effort exception support, as well as
  * for generating tracebacks when combined with `libdebuginfo.so'
  * NOTE: Usually, the caller will have already ensured that:
