@@ -76,7 +76,7 @@ PRIVATE void console_sane_ios(void) {
 
 
 /* User-space entry point for /bin/init
- * NOTE: This program is running as  PID=1 (i.e. _boottask), which  carries
+ * NOTE: This program is  running as PID=1  (i.e. boottask), which  carries
  *       the `TASK_FCRITICAL' flag, meaning that if this program ever dies,
  *       then the kernel will (intentionally) PANIC! */
 int main(int argc, char *argv[], char *envp[]) {

@@ -149,14 +149,14 @@ INTERN_FUNCTION(_start)
 
 
 #ifndef CONFIG_NO_SMP
-	/* memcpy(&_bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
-	movl   $(V2P(_bootcpu)), %edi
+	/* memcpy(&bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
+	movl   $(V2P(bootcpu)), %edi
 	movl   $(V2P(__kernel_percpu_start)), %esi
 	movl   $(__kernel_percpu_size), %ecx
 	rep    movsb
 
-	/* memcpy(&_bootcpu_x86_tss, __kernel_percpu_tss, SIZEOF_TSS); */
-	movl   $(V2P(_bootcpu_x86_tss)), %edi
+	/* memcpy(&bootcpu_x86_tss, __kernel_percpu_tss, SIZEOF_TSS); */
+	movl   $(V2P(bootcpu_x86_tss)), %edi
 	movl   $(V2P(__kernel_percpu_tss)), %esi
 #if IS_ALIGNED(SIZEOF_TSS, 4)
 	movl   $(SIZEOF_TSS / 4), %ecx
@@ -170,22 +170,22 @@ INTERN_FUNCTION(_start)
 #endif
 #endif /* !CONFIG_NO_SMP */
 
-	/* memcpy(&_bootidle, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
-	movl   $(V2P(_bootidle)), %edi
+	/* memcpy(&bootidle, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
+	movl   $(V2P(bootidle)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
 	rep    movsb
 
-	/* memcpy(&_boottask, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
-	EXTERN(_boottask)
-	movl   $(V2P(_boottask)), %edi
+	/* memcpy(&boottask, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
+	EXTERN(boottask)
+	movl   $(V2P(boottask)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
 	rep    movsb
 
-	/* memcpy(&_asyncwork, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
-	EXTERN(_asyncwork)
-	movl   $(V2P(_asyncwork)), %edi
+	/* memcpy(&asyncwork, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
+	EXTERN(asyncwork)
+	movl   $(V2P(asyncwork)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
 	rep    movsb

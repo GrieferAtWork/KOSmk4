@@ -348,7 +348,7 @@ nope:
 }
 
 #else /* !CONFIG_NO_SMP */
-#define is_iob_node(node) ((node) == &FORCPU(&_bootcpu, thiscpu_x86_iobnode))
+#define is_iob_node(node) ((node) == &FORCPU(&bootcpu, thiscpu_x86_iobnode))
 #endif /* CONFIG_NO_SMP */
 
 

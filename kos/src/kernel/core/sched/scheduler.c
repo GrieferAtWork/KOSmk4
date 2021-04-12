@@ -1342,7 +1342,7 @@ NOTHROW(FCALL task_transfer_thread_to_other_cpu)(struct cpu *__restrict me,
 	assert(thread != &sched_idle);
 	if (thread->t_flags & (TASK_FKEEPCORE | TASK_FTERMINATING))
 		return false; /* Thread cannot be transfered. */
-	target = &_bootcpu; /* TODO: Dynamically determine based on recent load. */
+	target = &bootcpu; /* TODO: Dynamically determine based on recent load. */
 	assert(thread->t_cpu == me);
 	if unlikely(target == me)
 		return false; /* Must be a different thread. */
@@ -1429,7 +1429,7 @@ again:
 #endif /* !PREEMPTION_ENABLE_P */
 		goto again;
 	}
-	if (me != &_bootcpu) {
+	if (me != &bootcpu) {
 		/* We're not the boot CPU,  so we can be shut  off.
 		 * For this purpose, `sched_shutdown_delay' exists. */
 		struct task *thread;
@@ -1732,7 +1732,7 @@ NOTHROW(FCALL sched_super_override_trystart)(void) {
 
 PUBLIC NOBLOCK ATTR_PURE bool
 NOTHROW(FCALL sched_super_override_active)(void) {
-	return FORCPU(&_bootcpu, thiscpu_sched_override) != NULL;
+	return FORCPU(&bootcpu, thiscpu_sched_override) != NULL;
 }
 #endif /* !CONFIG_NO_SMP */
 

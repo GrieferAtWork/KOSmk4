@@ -66,8 +66,8 @@ PUBLIC unsigned int cpu_online_count = 1;
 
 /* [1..1][cpu_count] Vector of CPU descriptors.
  * NOTE: The index in this vector is the `cpu_id' of the associated CPU.
- * NOTE: `_bootcpu' always has the CPUID ZERO(0) */
-PUBLIC struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector") = { &_bootcpu };
+ * NOTE: `bootcpu' always has the CPUID ZERO(0) */
+PUBLIC struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector") = { &bootcpu };
 
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")

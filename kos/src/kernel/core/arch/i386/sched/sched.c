@@ -107,8 +107,8 @@ INTDEF byte_t __kernel_asyncwork_stack[KERNEL_STACKSIZE];
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler_arch)(void) {
 	/* Initialize the CPU state of the boot CPU's idle thread, as well as the ASYNC worker thread. */
-	kernel_initialize_threadstack(&_bootidle, __kernel_bootidle_stack, KERNEL_IDLE_STACKSIZE, (void *)&cpu_idlemain);
-	kernel_initialize_threadstack(&_asyncwork, __kernel_asyncwork_stack, KERNEL_STACKSIZE, (void *)&_asyncmain);
+	kernel_initialize_threadstack(&bootidle, __kernel_bootidle_stack, KERNEL_IDLE_STACKSIZE, (void *)&cpu_idlemain);
+	kernel_initialize_threadstack(&asyncwork, __kernel_asyncwork_stack, KERNEL_STACKSIZE, (void *)&_asyncmain);
 }
 
 

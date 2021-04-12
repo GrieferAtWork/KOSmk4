@@ -62,11 +62,11 @@ NOTHROW(KCALL copyfromphys_noidentity_partial)(void *__restrict dst,
 	byte_t *vsrc = THIS_TRAMPOLINE;
 	pagedir_pushval_t pv;
 	/* NOTE: We must still preserve the trampoline here, since the trampoline
-	 *       for  _boottask is allocated  past the end  of the kernel's .free
+	 *       for boottask is  allocated past  the end of  the kernel's  .free
 	 *       section. This is  important since the  bootloader/bios may  have
 	 *       placed  various  data structures  at  that location  (on  QEMU I
 	 *       noticed that the kernel's  commandline is placed directly  over-
-	 *       top   of  the  _boottask's   page  directory  identity  mapping)
+	 *       top  of  the   boottask's  page   directory  identity   mapping)
 	 *       As such, we must preserve this mapping, as things such that  the
 	 *       kernel commandline are  still used  by later steps  of the  boot
 	 *       process. */

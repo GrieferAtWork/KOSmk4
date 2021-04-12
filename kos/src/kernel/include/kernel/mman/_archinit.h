@@ -44,7 +44,7 @@ DECL_BEGIN
 /* Field initializers for the  kernel mman (but excluding  `mm_pagedir')
  * This macro is used by the arch-specific initializer for `mman_kernel' */
 #define _MMAN_KERNEL_INIT                                                                          \
-	/* .mm_refcnt      = */ 4, /* mman_kernel, this_mman@{_boottask,_bootidle,_asyncwork} */       \
+	/* .mm_refcnt      = */ 4, /* mman_kernel, this_mman@{boottask,bootidle,asyncwork} */          \
 	/* .mm_weakrefcnt  = */ 1,                                                                     \
 	/* .mm_lock        = */ __MMAN_KERNEL_INIT_MM_LOCK,                                            \
 	/* .mm_mappings    = */ __NULLPTR, /* XXX: Statically initialize the initial mappings tree? */ \

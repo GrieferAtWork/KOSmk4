@@ -189,11 +189,11 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PERTASK') */
 #endif /* !__this_task_defined */
 
-DATDEF struct task _boottask; /* The boot task (aka. `/proc/1'; aka. `/bin/init') */
-DATDEF struct task _bootidle; /* The idle thread for the boot CPU */
+DATDEF struct task boottask; /* The boot task (aka. `/proc/1'; aka. `/bin/init') */
+DATDEF struct task bootidle; /* The idle thread for the boot CPU */
 
 /* [const] VM node referring to the kernel stack of the current thread.
- * WARNING: These structures for `_boottask' and `_bootidle' are not actually part of the kernel VM!
+ * WARNING: These structures for `boottask' and `bootidle' are not actually part of the kernel VM!
  * WARNING: You cannot assume that your stack-pointer is always located within `THIS_KERNEL_STACK',
  *          as KOS may use special, arch-specific stacks  to deal with certain CPU exceptions  that
  *          require  execution   on   a  separate   stack   (such   as  the   #DF-stack   on   x86)

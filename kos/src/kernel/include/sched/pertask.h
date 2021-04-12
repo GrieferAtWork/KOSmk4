@@ -95,7 +95,7 @@ extern struct task *THIS_TASK;
 #ifndef PERCPU
 DECL_BEGIN
 #ifdef CONFIG_NO_SMP
-INTDEF __UINT8_TYPE__ ___bootcpu[] ASMNAME("_bootcpu");
+INTDEF __UINT8_TYPE__ ___bootcpu[] ASMNAME("bootcpu");
 #define PERCPU(x) (*(__typeof__(&(x)))(___bootcpu + (__UINTPTR_TYPE__)&(x)))
 #else /* CONFIG_NO_SMP */
 DATDEF __UINTPTR_TYPE__ ___this_cpu ASMNAME("this_cpu");

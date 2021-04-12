@@ -74,7 +74,7 @@ struct task task_header = {
 	/* .t_self       = */ NULL, /* Filled in by the initializer. */
 	/* .t_refcnt     = */ 1,
 	/* .t_flags      = */ TASK_FNORMAL,
-	/* .t_cpu        = */ &_bootcpu,
+	/* .t_cpu        = */ &bootcpu,
 	/* .t_mman       = */ &mman_kernel,
 	/* .t_mman_tasks = */ LIST_ENTRY_UNBOUND_INITIALIZER,
 	/* .t_heapsz     = */ (size_t)__kernel_pertask_size,
@@ -166,9 +166,9 @@ NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
 }
 
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-/* Prepare 2 consecutive  (and 2-page aligned)  pages of  virtual
- * memory for the purpose of  doing the initial prepare  required
- * for `THIS_TRAMPOLINE_PAGE' of `_boottask' and also `_bootidle' */
+/* Prepare 2 consecutive (and 2-page aligned) pages of  virtual
+ * memory for the purpose of doing the initial prepare required
+ * for `THIS_TRAMPOLINE_PAGE' of `boottask' and also `bootidle' */
 INTDEF NOBLOCK FREE void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -218,11 +218,11 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
 	DEFINE_PUBLIC_SYMBOL(thismman_pagedir_p, offsetof(struct mman, mm_pagedir_p), sizeof(physaddr_t));
 
-	assert(_boottask.t_refcnt == 1);
-	assert(_bootidle.t_refcnt == 1);
-	assert(_asyncwork.t_refcnt == 1);
+	assert(boottask.t_refcnt == 1);
+	assert(bootidle.t_refcnt == 1);
+	assert(asyncwork.t_refcnt == 1);
 
-	/* Figure out where to put the initial trampolines for _boottask and _bootidle */
+	/* Figure out where to put the initial trampolines for boottask and bootidle */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	boot_trampoline_pages = kernel_initialize_boot_trampolines();
 #else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -233,98 +233,98 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Construct the trampoline node for the predefined tasks. */
-	initialize_predefined_vm_trampoline(&_boottask, (byte_t *)boot_trampoline_pages + 0 * PAGESIZE);
-	initialize_predefined_vm_trampoline(&_bootidle, (byte_t *)boot_trampoline_pages + 1 * PAGESIZE);
-	initialize_predefined_vm_trampoline(&_asyncwork, (byte_t *)boot_trampoline_pages + 2 * PAGESIZE);
+	initialize_predefined_vm_trampoline(&boottask, (byte_t *)boot_trampoline_pages + 0 * PAGESIZE);
+	initialize_predefined_vm_trampoline(&bootidle, (byte_t *)boot_trampoline_pages + 1 * PAGESIZE);
+	initialize_predefined_vm_trampoline(&asyncwork, (byte_t *)boot_trampoline_pages + 2 * PAGESIZE);
 
 #define STN(thread) FORTASK(&thread, this_kernel_stacknode_)
 #define STP(thread) FORTASK(&thread, this_kernel_stackpart_)
 
-	/* _boottask */
-	STN(_boottask).mn_part           = &STP(_boottask);
-	STN(_boottask).mn_link.le_prev   = &STP(_boottask).mp_share.lh_first;
-	STP(_boottask).mp_share.lh_first = &STN(_boottask);
-	STN(_boottask).mn_minaddr        = __kernel_boottask_stack;
-	STN(_boottask).mn_maxaddr        = __kernel_boottask_stack + KERNEL_STACKSIZE - 1;
-	STP(_boottask).mp_mem.mc_start   = (physpage_t)loadfarptr(__kernel_boottask_stack_page_p);
+	/* boottask */
+	STN(boottask).mn_part           = &STP(boottask);
+	STN(boottask).mn_link.le_prev   = &STP(boottask).mp_share.lh_first;
+	STP(boottask).mp_share.lh_first = &STN(boottask);
+	STN(boottask).mn_minaddr        = __kernel_boottask_stack;
+	STN(boottask).mn_maxaddr        = __kernel_boottask_stack + KERNEL_STACKSIZE - 1;
+	STP(boottask).mp_mem.mc_start   = (physpage_t)loadfarptr(__kernel_boottask_stack_page_p);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	FORTASK(&_boottask, this_kernel_stackguard_).mn_minaddr = __kernel_boottask_stack_guard;
-	FORTASK(&_boottask, this_kernel_stackguard_).mn_maxaddr = __kernel_boottask_stack_guard + PAGESIZE - 1;
+	FORTASK(&boottask, this_kernel_stackguard_).mn_minaddr = __kernel_boottask_stack_guard;
+	FORTASK(&boottask, this_kernel_stackguard_).mn_maxaddr = __kernel_boottask_stack_guard + PAGESIZE - 1;
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
-	/* _asyncwork */
-	STN(_asyncwork).mn_part           = &STP(_asyncwork);
-	STN(_asyncwork).mn_link.le_prev   = &STP(_asyncwork).mp_share.lh_first;
-	STP(_asyncwork).mp_share.lh_first = &STN(_asyncwork);
-	STN(_asyncwork).mn_minaddr        = __kernel_asyncwork_stack;
-	STN(_asyncwork).mn_maxaddr        = __kernel_asyncwork_stack + KERNEL_STACKSIZE - 1;
-	STP(_asyncwork).mp_mem.mc_start   = (physpage_t)loadfarptr(__kernel_asyncwork_stack_page_p);
+	/* asyncwork */
+	STN(asyncwork).mn_part           = &STP(asyncwork);
+	STN(asyncwork).mn_link.le_prev   = &STP(asyncwork).mp_share.lh_first;
+	STP(asyncwork).mp_share.lh_first = &STN(asyncwork);
+	STN(asyncwork).mn_minaddr        = __kernel_asyncwork_stack;
+	STN(asyncwork).mn_maxaddr        = __kernel_asyncwork_stack + KERNEL_STACKSIZE - 1;
+	STP(asyncwork).mp_mem.mc_start   = (physpage_t)loadfarptr(__kernel_asyncwork_stack_page_p);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	FORTASK(&_asyncwork, this_kernel_stackguard_).mn_minaddr = __kernel_asyncwork_stack_guard;
-	FORTASK(&_asyncwork, this_kernel_stackguard_).mn_maxaddr = __kernel_asyncwork_stack_guard + PAGESIZE - 1;
+	FORTASK(&asyncwork, this_kernel_stackguard_).mn_minaddr = __kernel_asyncwork_stack_guard;
+	FORTASK(&asyncwork, this_kernel_stackguard_).mn_maxaddr = __kernel_asyncwork_stack_guard + PAGESIZE - 1;
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
-	/* _bootidle */
-	STN(_bootidle).mn_part           = &STP(_bootidle);
-	STN(_bootidle).mn_link.le_prev   = &STP(_bootidle).mp_share.lh_first;
-	STP(_bootidle).mp_share.lh_first = &STN(_bootidle);
-	STN(_bootidle).mn_minaddr        = __kernel_bootidle_stack;
-	STN(_bootidle).mn_maxaddr        = __kernel_bootidle_stack + KERNEL_IDLE_STACKSIZE - 1;
-	STP(_bootidle).mp_maxaddr        = (pos_t)(KERNEL_IDLE_STACKSIZE - 1);
-	STP(_bootidle).mp_mem.mc_start   = (physpage_t)loadfarptr(__kernel_bootidle_stack_page_p);
-	STP(_bootidle).mp_mem.mc_size    = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
+	/* bootidle */
+	STN(bootidle).mn_part           = &STP(bootidle);
+	STN(bootidle).mn_link.le_prev   = &STP(bootidle).mp_share.lh_first;
+	STP(bootidle).mp_share.lh_first = &STN(bootidle);
+	STN(bootidle).mn_minaddr        = __kernel_bootidle_stack;
+	STN(bootidle).mn_maxaddr        = __kernel_bootidle_stack + KERNEL_IDLE_STACKSIZE - 1;
+	STP(bootidle).mp_maxaddr        = (pos_t)(KERNEL_IDLE_STACKSIZE - 1);
+	STP(bootidle).mp_mem.mc_start   = (physpage_t)loadfarptr(__kernel_bootidle_stack_page_p);
+	STP(bootidle).mp_mem.mc_size    = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	FORTASK(&_bootidle, this_kernel_stackguard_).mn_minaddr = __kernel_bootidle_stack_guard;
-	FORTASK(&_bootidle, this_kernel_stackguard_).mn_maxaddr = __kernel_bootidle_stack_guard + PAGESIZE - 1;
+	FORTASK(&bootidle, this_kernel_stackguard_).mn_minaddr = __kernel_bootidle_stack_guard;
+	FORTASK(&bootidle, this_kernel_stackguard_).mn_maxaddr = __kernel_bootidle_stack_guard + PAGESIZE - 1;
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 #undef STP
 #undef STN
 
-	FORTASK(&_boottask, this_fs) = &fs_kernel;
-	FORTASK(&_bootidle, this_fs) = &fs_kernel;
+	FORTASK(&boottask, this_fs) = &fs_kernel;
+	FORTASK(&bootidle, this_fs) = &fs_kernel;
 #ifndef CONFIG_EVERYONE_IS_ROOT
-	FORTASK(&_boottask, this_cred) = &cred_kernel;
-	FORTASK(&_bootidle, this_cred) = &cred_kernel;
+	FORTASK(&boottask, this_cred) = &cred_kernel;
+	FORTASK(&bootidle, this_cred) = &cred_kernel;
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
-	FORTASK(&_boottask, this_handle_manager) = &handle_manager_kernel;
-	FORTASK(&_bootidle, this_handle_manager) = &handle_manager_kernel;
+	FORTASK(&boottask, this_handle_manager) = &handle_manager_kernel;
+	FORTASK(&bootidle, this_handle_manager) = &handle_manager_kernel;
 
 	/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
-	FORTASK(&_bootidle, this_kernel_stacknode_).mn_flags = (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |
+	FORTASK(&bootidle, this_kernel_stacknode_).mn_flags = (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |
 	                                                        MNODE_F_SHARED | MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                                                        _MNODE_F_MPREPARED_KERNEL);
 
-	mman_kernel.mm_threads.lh_first = &_boottask;
-	_boottask.t_mman_tasks.le_prev  = &mman_kernel.mm_threads.lh_first;
-	_boottask.t_mman_tasks.le_next  = &_asyncwork;
-	_asyncwork.t_mman_tasks.le_prev = &_boottask.t_mman_tasks.le_next;
-	_asyncwork.t_mman_tasks.le_next = &_bootidle;
-	_bootidle.t_mman_tasks.le_prev  = &_asyncwork.t_mman_tasks.le_next;
-	assert(_bootidle.t_mman_tasks.le_next == NULL);
+	mman_kernel.mm_threads.lh_first = &boottask;
+	boottask.t_mman_tasks.le_prev  = &mman_kernel.mm_threads.lh_first;
+	boottask.t_mman_tasks.le_next  = &asyncwork;
+	asyncwork.t_mman_tasks.le_prev = &boottask.t_mman_tasks.le_next;
+	asyncwork.t_mman_tasks.le_next = &bootidle;
+	bootidle.t_mman_tasks.le_prev  = &asyncwork.t_mman_tasks.le_next;
+	assert(bootidle.t_mman_tasks.le_next == NULL);
 
-	_boottask.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `_boottask' */
-	_asyncwork.t_refcnt = 2; /* +1: scheduler chain, +1: intern symbol `_asyncwork' */
-	_bootidle.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `_bootidle' */
+	boottask.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `boottask' */
+	asyncwork.t_refcnt = 2; /* +1: scheduler chain, +1: intern symbol `asyncwork' */
+	bootidle.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `bootidle' */
 
-	_boottask.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING;
-	_asyncwork.t_flags = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING | TASK_FKERNTHREAD;
-	_bootidle.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FKEEPCORE | TASK_FKERNTHREAD;
+	boottask.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING;
+	asyncwork.t_flags = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING | TASK_FKERNTHREAD;
+	bootidle.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FKEEPCORE | TASK_FKERNTHREAD;
 
 	/* Initialize the boot CPU's scheduler. */
-	FORTASK(&_boottask, this_sched_link).le_prev  = &FORCPU(&_bootcpu, thiscpu_scheduler).s_running.lh_first;
-	FORTASK(&_boottask, this_sched_link).le_next  = &_asyncwork;
-	FORTASK(&_asyncwork, this_sched_link).le_prev = &FORTASK(&_boottask, this_sched_link).le_next;
-	/*FORTASK(&_asyncwork, this_sched_link).ln_next = NULL;*/
-	FORCPU(&_bootcpu, thiscpu_scheduler).s_running.lh_first = &_boottask;
-	FORCPU(&_bootcpu, thiscpu_scheduler).s_running_last     = &_asyncwork;
-	FORCPU(&_bootcpu, thiscpu_scheduler).s_runcount         = 2;
+	FORTASK(&boottask, this_sched_link).le_prev  = &FORCPU(&bootcpu, thiscpu_scheduler).s_running.lh_first;
+	FORTASK(&boottask, this_sched_link).le_next  = &asyncwork;
+	FORTASK(&asyncwork, this_sched_link).le_prev = &FORTASK(&boottask, this_sched_link).le_next;
+	/*FORTASK(&asyncwork, this_sched_link).ln_next = NULL;*/
+	FORCPU(&bootcpu, thiscpu_scheduler).s_running.lh_first = &boottask;
+	FORCPU(&bootcpu, thiscpu_scheduler).s_running_last     = &asyncwork;
+	FORCPU(&bootcpu, thiscpu_scheduler).s_runcount         = 2;
 
-	_boottask.t_self  = &_boottask;
-	_bootidle.t_self  = &_bootidle;
-	_asyncwork.t_self = &_asyncwork;
+	boottask.t_self  = &boottask;
+	bootidle.t_self  = &bootidle;
+	asyncwork.t_self = &asyncwork;
 
-	FORCPU(&_bootcpu, thiscpu_sched_current) = &_boottask;
+	FORCPU(&bootcpu, thiscpu_sched_current) = &boottask;
 
 	kernel_initialize_scheduler_arch();
 }
@@ -335,9 +335,9 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 	pertask_init_t *iter;
 	iter = __kernel_pertask_init_start;
 	for (; iter < __kernel_pertask_init_end; ++iter) {
-		(**iter)(&_boottask);
-		(**iter)(&_bootidle);
-		(**iter)(&_asyncwork);
+		(**iter)(&boottask);
+		(**iter)(&bootidle);
+		(**iter)(&asyncwork);
 	}
 }
 
@@ -359,13 +359,13 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(struct mman) *__restrict _lop,
 	size_t size;
 	struct task *self;
 	self = (struct task *)_lop;
-	assertf(self != &_boottask && self != &_bootidle && self != &_asyncwork,
+	assertf(self != &boottask && self != &bootidle && self != &asyncwork,
 	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
-	        "self        = %p\n"
-	        "&_boottask  = %p\n"
-	        "&_bootidle  = %p\n"
-	        "&_asyncwork = %p\n",
-	        self, &_boottask, &_bootidle, &_asyncwork);
+	        "self       = %p\n"
+	        "&boottask  = %p\n"
+	        "&bootidle  = %p\n"
+	        "&asyncwork = %p\n",
+	        self, &boottask, &bootidle, &asyncwork);
 	assert(mman_lock_writing(&mman_kernel));
 	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 

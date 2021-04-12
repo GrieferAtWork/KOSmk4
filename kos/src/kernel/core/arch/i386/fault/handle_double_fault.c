@@ -75,7 +75,7 @@ struct df_cpustate {
 
 
 #ifdef CONFIG_NO_SMP
-#define x86_failsafe_getcpu() &_bootcpu
+#define x86_failsafe_getcpu() &bootcpu
 #else /* CONFIG_NO_SMP */
 INTERN ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED struct cpu *
 NOTHROW(KCALL x86_failsafe_getcpu)(void) {
@@ -84,12 +84,12 @@ NOTHROW(KCALL x86_failsafe_getcpu)(void) {
 	 * don't do anything that could break stuff...) */
 	if (cpu_count <= 1) {
 		/* Simple case: There's only 1 CPU, so that has to be us! */
-		result = &_bootcpu;
+		result = &bootcpu;
 	} else if (X86_HAVE_LAPIC) {
 		/* Use the LAPIC id to determine the current CPU. */
 		unsigned int i;
 		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
-		result = &_bootcpu;
+		result = &bootcpu;
 		for (i = 0; i < cpu_count; ++i) {
 			if unlikely(!ADDR_ISKERN(cpu_vector[i]))
 				continue; /* At one point during booting, `cpu_vector' contains LAPIC IDs. */
@@ -100,7 +100,7 @@ NOTHROW(KCALL x86_failsafe_getcpu)(void) {
 		}
 	} else {
 		/* XXX: Use pointers from `x86_dbg_exitstate' to determine the calling CPU */
-		result = &_bootcpu;
+		result = &bootcpu;
 	}
 	return result;
 }

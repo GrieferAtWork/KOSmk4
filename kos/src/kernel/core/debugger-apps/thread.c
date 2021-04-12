@@ -250,12 +250,12 @@ evalthreadexpr(char *expr, struct task **presult) {
 	 *    `c0c':  cpu[0].current
 	 *    `c0s':  cpu[0].sleeping
 	 *    `c0s2': cpu[0].sleeping->next
-	 *    `bc':   _bootcpu.current
-	 *    `bs':   _bootcpu.sleeping
-	 *    `bs2':  _bootcpu.sleeping->next */
+	 *    `bc':   bootcpu.current
+	 *    `bs':   bootcpu.sleeping
+	 *    `bs2':  bootcpu.sleeping->next */
 	/* TODO: Allow selecting by name:
-	 *    `b':    _boottask
-	 *    `bi':   _bootidle */
+	 *    `b':    boottask
+	 *    `bi':   bootidle */
 
 	default:
 		break;

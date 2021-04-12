@@ -113,9 +113,9 @@ union p64_pdir_e1 boot_trampoline_e1v[512];
 
 INTDEF byte_t __kernel_free_end[] ASMNAME("__kernel_end");
 
-/* Prepare 2 consecutive  (and 2-page aligned)  pages of  virtual
- * memory for the purpose of  doing the initial prepare  required
- * for `THIS_TRAMPOLINE_PAGE' of `_boottask' and also `_bootidle' */
+/* Prepare 2 consecutive (and 2-page aligned) pages of  virtual
+ * memory for the purpose of doing the initial prepare required
+ * for `THIS_TRAMPOLINE_PAGE' of `boottask' and also `bootidle' */
 INTERN NOBLOCK ATTR_FREETEXT void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void) {
 	u64 e1_word, e2_word;
@@ -167,7 +167,7 @@ again_calculate_vecN:
 	/* Set the E1-vector as being used. */
 	ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, e2_word);
 	/* Return the virtual memory locations used for the
-	 * trampolines needed by `_boottask', `_bootidle' and `_asyncwork' */
+	 * trampolines needed by `boottask', `bootidle' and `asyncwork' */
 	return trampoline_addr;
 }
 
@@ -2398,8 +2398,8 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 	}
 
-	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
-	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&_bootcpu);
+	/* Initialize the `bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
+	FORCPU(&bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&bootcpu);
 }
 
 

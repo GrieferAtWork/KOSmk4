@@ -598,7 +598,7 @@ again_get_oldpath:
 		require(CAP_KERNEL_QUERY);
 		temp.h_type = HANDLE_TYPE_TASK;
 		temp.h_mode = IO_RDWR;
-		temp.h_data = FORTASK(&_boottask, this_taskpid);
+		temp.h_data = FORTASK(&boottask, this_taskpid);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 

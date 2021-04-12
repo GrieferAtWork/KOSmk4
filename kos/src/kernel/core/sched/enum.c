@@ -397,7 +397,7 @@ task_enum_all_nb(task_enum_cb_t cb, void *arg)
 		THROWS(E_WOULDBLOCK) {
 	ssize_t result;
 #ifdef CONFIG_NO_SMP
-	result = task_enum_cpu_nb(cb, arg, &_bootcpu);
+	result = task_enum_cpu_nb(cb, arg, &bootcpu);
 #else /* CONFIG_NO_SMP */
 	ssize_t temp;
 	unsigned int i;

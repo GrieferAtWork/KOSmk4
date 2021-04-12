@@ -50,7 +50,7 @@ DECL_BEGIN
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 struct task;
-INTDEF struct task _asyncwork;
+INTDEF struct task asyncwork;
 INTDEF ATTR_NORETURN void KCALL _asyncmain(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
@@ -435,11 +435,11 @@ DECL_END
 /* The async callback API can be used to facilitate the servicing of
  * operations that require synchronous access as the result of async
  * input (such as hardware interrupts)
- * For this purpose, a pre-defined thread `_asyncwork' is defined that
- * exists on a similar level to `_boottask', which always idles in the
- * background,   waiting   for   async  work   to   become  available.
- * Note  however that KOS is allowed to distribute the async work-load
- * over  multiple threads  spanning across  multiple CPUs  in order to
+ * For this purpose, a pre-defined thread `asyncwork' is defined that
+ * exists on a similar level to `boottask', which always idles in the
+ * background,   waiting   for  async   work  to   become  available.
+ * Note however that KOS is allowed to distribute the async work-load
+ * over multiple threads  spanning across multiple  CPUs in order  to
  * improve performance.
  * The public API consists of 2 functions:
  *  - register_async_worker()
@@ -456,7 +456,7 @@ DECL_BEGIN
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 struct task;
-INTDEF struct task _asyncwork;
+INTDEF struct task asyncwork;
 INTDEF ATTR_NORETURN void KCALL _asyncmain(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 

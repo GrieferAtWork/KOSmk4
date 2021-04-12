@@ -145,8 +145,8 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		x86_lapic_mpart.mp_mem.mc_size  = 1;
 		x86_lapic_mpart.mp_minaddr      = (pos_t)(0);
 		x86_lapic_mpart.mp_maxaddr      = (pos_t)(PAGESIZE - 1);
-		FORCPU(&_bootcpu, thiscpu_x86_lapicid_)      = 0xff; /* Read later using the LAPIC */
-		FORCPU(&_bootcpu, thiscpu_x86_lapicversion_) = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
+		FORCPU(&bootcpu, thiscpu_x86_lapicid_)      = 0xff; /* Read later using the LAPIC */
+		FORCPU(&bootcpu, thiscpu_x86_lapicversion_) = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
 		return;
 	}
 	/* Check pointer location. */
@@ -189,7 +189,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 					if (entry->mp_processor.p_cpuflag & MP_PROCESSOR_FBOOTPROCESSOR) {
 						printk(FREESTR(KERN_INFO "[smp] Found boot processor with lapic id %#.2" PRIx8 "\n"),
 						       entry->mp_processor.p_lapicid);
-						FORCPU(&_bootcpu, thiscpu_x86_lapicid_) = entry->mp_processor.p_lapicid;
+						FORCPU(&bootcpu, thiscpu_x86_lapicid_) = entry->mp_processor.p_lapicid;
 					}
 #ifndef CONFIG_NO_SMP
 					else if unlikely(cpu_count_ >= x86_config_max_cpu_count) {

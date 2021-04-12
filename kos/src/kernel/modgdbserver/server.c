@@ -453,7 +453,7 @@ NOTHROW(FCALL GDBThread_DoLookupPID)(intptr_t pid) {
 	if (pid == 0) /* Any thread */
 		return incref(GDB_CurrentThread_general.ts_thread);
 	if (pid == GDB_KERNEL_PID)
-		return incref(&_bootidle);
+		return incref(&bootidle);
 	if (GDBThread_IsAllStopModeActive)
 		return pidns_trylookup_task_locked(&pidns_root, (upid_t)pid);
 	/* FIXME: What if one of the suspended threads is holding the PIDNS  lock?
@@ -496,7 +496,7 @@ NOTHROW(FCALL GDBThread_DecodeThreadID)(char **__restrict preader,
 			if (tid == -1) {
 				/* Select the entire kernel */
 				result->ts_mode   = GDBTHREADSEL_MODE_PROCESS;
-				result->ts_thread = incref(&_bootidle);
+				result->ts_thread = incref(&bootidle);
 			} else if (tid == 0) {
 				/* Select any thread. */
 				result->ts_mode   = GDBTHREADSEL_MODE_SINGLE;
@@ -2548,7 +2548,7 @@ again:
 			GDB_CurrentThread_general.ts_thread = incref(notif->tse_thread);
 		} else {
 			/* If nothing is stopped, default to /bin/init */
-			GDB_CurrentThread_general.ts_thread = incref(&_boottask);
+			GDB_CurrentThread_general.ts_thread = incref(&boottask);
 		}
 	}
 	if (!(GDBServer_Features & GDB_SERVER_FEATURE_SHOWKERNEL) &&
@@ -2569,7 +2569,7 @@ again:
 		}
 		/* Fallback: Just use /bin/init */
 		if (!GDB_CurrentThread_general.ts_thread)
-			GDB_CurrentThread_general.ts_thread = &_boottask;
+			GDB_CurrentThread_general.ts_thread = &boottask;
 		incref(GDB_CurrentThread_general.ts_thread);
 	}
 	GDB_CurrentThread_continue = GDB_CurrentThread_general;

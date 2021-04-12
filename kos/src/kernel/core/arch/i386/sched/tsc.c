@@ -851,17 +851,17 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 	tsc_hz_t hz;
 	/* Calibrate the APIC */
 	hz = x86_tsc_calibrate_hz();
-	FORCPU(&_bootcpu, thiscpu_tsc_hz)                          = hz;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_tscbase)         = 0;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_prev_current)    = UINT32_MAX;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_divide)          = 7;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_deadline)        = (u64)-1;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_initial)         = UINT32_MAX;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)UINT32_MAX << 7;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_early_interrupt) = false;
-	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_mindistance)     = hz / TSC_MIN_DISTANCE_HZ;
+	FORCPU(&bootcpu, thiscpu_tsc_hz)                          = hz;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_tscbase)         = 0;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_prev_current)    = UINT32_MAX;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_divide)          = 7;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_deadline)        = (u64)-1;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_initial)         = UINT32_MAX;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)UINT32_MAX << 7;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_early_interrupt) = false;
+	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_mindistance)     = hz / TSC_MIN_DISTANCE_HZ;
 #ifdef CONFIG_TSC_ASSERT_FORWARD
-	FORCPU(&_bootcpu, thiscpu_x86_last_tsc) = 0;
+	FORCPU(&bootcpu, thiscpu_x86_last_tsc) = 0;
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 	if (!X86_HAVE_TSC_DEADLINE) {
 		/* Calibrate the TSC-cmpxch delay.
@@ -873,20 +873,20 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 		 * again  use the PIT to determine the timings of for this, however I feel
 		 * like doing it that way would only introduce further inaccuracies due to
 		 * having to convert timings back-and-forth... */
-		FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_cmpxch_delay) = x86_calibrate_tsc_cmpxch_delay_stable();
+		FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_cmpxch_delay) = x86_calibrate_tsc_cmpxch_delay_stable();
 	}
 	/* Re-initialize our APIC's timer. (since we trashed its registers during calibration) */
 	lapic_write(APIC_TIMER, X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC);
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F128);
 	lapic_write(APIC_TIMER_INITIAL, UINT32_MAX);
-	tsc_ignore_pending_interrupt(&_bootcpu);
+	tsc_ignore_pending_interrupt(&bootcpu);
 
 	/* Initialize the RTC proper. */
-	tsc_resync_init(&_bootcpu);
+	tsc_resync_init(&bootcpu);
 	printk(FREESTR(KERN_INFO "[tsc] Boot CPU uses tsc_hz=%" PRIuN(__SIZEOF_TSC_HZ_T__) "\n"), hz);
 	if (!X86_HAVE_TSC_DEADLINE) {
 		printk(FREESTR(KERN_INFO "[tsc] Boot CPU uses tsc_cmpxch_delay=%" PRIu32 "\n"),
-		       FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_cmpxch_delay));
+		       FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_cmpxch_delay));
 	}
 }
 

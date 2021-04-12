@@ -133,12 +133,12 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	mythread = THIS_TASK;
 #endif /* !__x86_64__ && !__i386__ */
 
-	fixup_uninitialized_thread(&_boottask);
-	fixup_uninitialized_thread(&_asyncwork);
-	fixup_uninitialized_thread(&_bootidle);
-	if (mythread != &_boottask &&
-	    mythread != &_asyncwork &&
-	    mythread != &_bootidle)
+	fixup_uninitialized_thread(&boottask);
+	fixup_uninitialized_thread(&asyncwork);
+	fixup_uninitialized_thread(&bootidle);
+	if (mythread != &boottask &&
+	    mythread != &asyncwork &&
+	    mythread != &bootidle)
 		fixup_uninitialized_thread(mythread);
 	/* Poison the kernel (indicating  that the kernel has  become
 	 * inconsistent, and can no longer be trusted to sporadically

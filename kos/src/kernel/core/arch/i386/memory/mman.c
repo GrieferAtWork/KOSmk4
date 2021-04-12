@@ -433,7 +433,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
-	mman_mappings_insert(&mman_kernel, &FORCPU(&_bootcpu, thiscpu_x86_iobnode));
+	mman_mappings_insert(&mman_kernel, &FORCPU(&bootcpu, thiscpu_x86_iobnode));
 	mman_mappings_insert(&mman_kernel, &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]);
 	mman_mappings_insert(&mman_kernel, &x86_kernel_vm_node_free);
 	mman_mappings_insert(&mman_kernel, &kernel_meminfo_mnode);
@@ -511,9 +511,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	 * physical memory identity mapping containing  the kernel core image,  or
 	 * may have also not been mapped at all (in which case this is a no-op)
 	 * s.a.: the comment inside of `vm_copyfromphys_noidentity_partial()' in `boot/acpi.c' */
-	pagedir_unmap_and_sync_one(FORTASK(&_boottask, this_trampoline));
-	pagedir_unmap_and_sync_one(FORTASK(&_bootidle, this_trampoline));
-	pagedir_unmap_and_sync_one(FORTASK(&_asyncwork, this_trampoline));
+	pagedir_unmap_and_sync_one(FORTASK(&boottask, this_trampoline));
+	pagedir_unmap_and_sync_one(FORTASK(&bootidle, this_trampoline));
+	pagedir_unmap_and_sync_one(FORTASK(&asyncwork, this_trampoline));
 	/* All right! that's our entire kernel VM all cleaned up! */
 }
 

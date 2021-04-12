@@ -355,7 +355,7 @@ nofproc:
 		goto done; /* exit_signal */
 	if (format_printf(printer, arg, "%u ",
 	                  thread ? (unsigned int)thread->t_cpu->c_id
-	                         : (unsigned int)_bootcpu.c_id) < 0)
+	                         : (unsigned int)bootcpu.c_id) < 0)
 		goto done; /* processor */
 	if (format_printf(printer, arg, "%u ", 0) < 0)
 		goto done; /* TODO: rt_priority */

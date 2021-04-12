@@ -121,7 +121,7 @@ DATDEF unsigned int cpu_online_count;
 
 /* [1..1][cpu_count] Vector of CPU descriptors.
  * NOTE: The index in this vector is the `cpu_id' of the associated CPU.
- * NOTE: `_bootcpu' always has the CPUID ZERO(0) */
+ * NOTE: `bootcpu' always has the CPUID ZERO(0) */
 DATDEF struct cpu *const cpu_vector[CONFIG_MAX_CPU_COUNT];
 
 #if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
@@ -204,7 +204,7 @@ DATDEF cpuset_t const __cpuset_full_mask; /* [== (1 << cpu_count) - 1] */
 
 
 /* The boot CPU. */
-DATDEF struct cpu _bootcpu;
+DATDEF struct cpu bootcpu;
 
 /* The CPU of the calling thread */
 DATDEF ATTR_PERTASK struct cpu *this_cpu;
@@ -221,8 +221,8 @@ DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
 #ifdef CONFIG_NO_SMP
 #undef THIS_CPU
 #undef THIS_IDLE
-#define THIS_CPU  (&_bootcpu)
-#define THIS_IDLE (&_bootidle)
+#define THIS_CPU  (&bootcpu)
+#define THIS_IDLE (&bootidle)
 #else /* CONFIG_NO_SMP */
 #ifndef THIS_CPU
 #define THIS_CPU PERTASK_GET(this_cpu)

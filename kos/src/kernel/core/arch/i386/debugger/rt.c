@@ -118,7 +118,7 @@ DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_sta
 INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 
 #ifdef CONFIG_NO_SMP
-#define x86_failsafe_getcpu() &_bootcpu
+#define x86_failsafe_getcpu() &bootcpu
 #else /* CONFIG_NO_SMP */
 INTDEF ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED struct cpu *
 NOTHROW(KCALL x86_failsafe_getcpu)(void);
@@ -579,15 +579,15 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 	node->mn_link.le_next   = NULL;
 	part->mp_share.lh_first = node;
 	part->mp_flags &= ~(MPART_F_LOCKBIT);
-	if (thread == &_boottask) {
+	if (thread == &boottask) {
 		part->mp_state        = MPART_ST_MEM;
 		node->mn_minaddr      = __kernel_boottask_stack;
 		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_boottask_stack_page_p);
-	} else if (thread == &_bootidle) {
+	} else if (thread == &bootidle) {
 		part->mp_state        = MPART_ST_MEM;
 		node->mn_minaddr      = __kernel_bootidle_stack;
 		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_bootidle_stack_page_p);
-	} else if (thread == &_asyncwork) {
+	} else if (thread == &asyncwork) {
 		part->mp_state        = MPART_ST_MEM;
 		node->mn_minaddr      = __kernel_asyncwork_stack;
 		part->mp_mem.mc_start = (physpage_t)loadfarptr(__kernel_asyncwork_stack_page_p);

@@ -318,11 +318,11 @@ NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self) 
 #ifndef CONFIG_NO_SMP
 		if (cpu_count > 1) {
 			pflag_t was = PREEMPTION_PUSHOFF();
-			if (THIS_CPU != &_bootcpu) {
+			if (THIS_CPU != &bootcpu) {
 				/* Let the boot CPU do all of the cleanup asynchronously. */
 				void *args[CPU_IPI_ARGCOUNT];
 				args[0] = self;
-				while (!cpu_sendipi(&_bootcpu, &ipi_destroy_block_device, args, CPU_IPI_FWAKEUP))
+				while (!cpu_sendipi(&bootcpu, &ipi_destroy_block_device, args, CPU_IPI_FWAKEUP))
 					task_pause();
 				return;
 			}

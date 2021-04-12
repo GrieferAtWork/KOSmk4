@@ -311,7 +311,7 @@ NOTHROW(FCALL async_thread_controller_findsleepon)(struct async_thread_controlle
  * In order to service async jobs faster, you may spawn threads to run
  * this  function in parallel,  and you may also  kill such threads by
  * sending them an RPC that will throw an E_EXIT_THREAD exception, but
- * be careful not to kill the hard-coded `_asyncwork' thread, which is
+ * be  careful not to kill the hard-coded `asyncwork' thread, which is
  * statically allocated and must not be killed.
  ************************************************************************/
 INTERN ATTR_NORETURN void KCALL _asyncmain(void) {
@@ -1336,7 +1336,7 @@ NOTHROW(KCALL try_delete_async_worker)(struct awork_vector *__restrict old_worke
 AXREF(aworker_axref, aworker);
 #endif /* !__aworker_axref_defined */
 
-/* [lock(PRIVATE(_asyncwork))] The  timeout   argument
+/* [lock(PRIVATE(asyncwork))] The   timeout   argument
  * for the async worker main `task_waitfor()' function */
 PRIVATE ktime_t asyncmain_timeout_p = KTIME_INFINITE;
 
@@ -1344,7 +1344,7 @@ PRIVATE ktime_t asyncmain_timeout_p = KTIME_INFINITE;
  * be invoked when `asyncmain_timeout_p'  expires. */
 PRIVATE struct aworker_axref asyncmain_timeout_worker = AXREF_INIT(NULL);
 
-/* [lock(PRIVATE(_asyncwork))][1..1]
+/* [lock(PRIVATE(asyncwork))][1..1]
  * [valid_if(asyncmain_timeout_worker != NULL)]
  * The timeout callback to-be invoked when the timeout expires. */
 PRIVATE async_worker_timeout_t asyncmain_timeout_cb = NULL;
@@ -1360,7 +1360,7 @@ NOTHROW(FCALL async_worker_timeout)(ktime_t abs_timeout,
                                     async_worker_timeout_t on_timeout) {
 	struct aworker *w;
 	w = (struct aworker *)cookie;
-	assertf(THIS_TASK == &_asyncwork, "This function may only be called by async-worker-poll-callbacks");
+	assertf(THIS_TASK == &asyncwork, "This function may only be called by async-worker-poll-callbacks");
 	assertf(on_timeout && ADDR_ISKERN((void *)on_timeout), "Bad on_timeout callback");
 	assertf(w && ADDR_ISKERN(w) && !wasdestroyed(w), "Bad cookie");
 	if (abs_timeout >= asyncmain_timeout_p)

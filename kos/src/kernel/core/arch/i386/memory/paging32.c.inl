@@ -241,8 +241,8 @@ NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu *__restrict self) {
 }
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
-	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
-	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p32(&_bootcpu);
+	/* Initialize the `bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
+	FORCPU(&bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p32(&bootcpu);
 #ifndef CONFIG_NO_PAGING_PAE
 	/* Re-write the assembly of `__x86_lazy_disable_ioperm_bitmap_pae',  as
 	 * found in `arch/i386/sched/sched32.S' to only clear 8 bytes of memory
@@ -274,8 +274,8 @@ NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self) {
 }
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL ioperm_preemption_set_pae_unmap)(void) {
-	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
-	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_pae(&_bootcpu);
+	/* Initialize the `bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
+	FORCPU(&bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_pae(&bootcpu);
 }
 #endif /* !CONFIG_NO_PAGING_PAE */
 

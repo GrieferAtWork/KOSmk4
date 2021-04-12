@@ -140,7 +140,7 @@ again:
 
 /* Generic kernel credentials / credentials for /bin/init */
 PUBLIC struct cred cred_kernel = {
-	/* .c_refcnt          = */ 2, /* +1: `cred_kernel', +1: FORTASK(&_boottask, this_cred) */
+	/* .c_refcnt          = */ 2, /* +1: `cred_kernel', +1: FORTASK(&boottask, this_cred) */
 	/* .c_lock            = */ ATOMIC_RWLOCK_INIT,
 	/* .c_ruid            = */ (uid_t)0,
 	/* .c_rgid            = */ (gid_t)0,

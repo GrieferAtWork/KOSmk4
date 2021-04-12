@@ -195,7 +195,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 				}
 			}
 			decref_unlikely(dent);
-		} else if (thread == &_boottask) {
+		} else if (thread == &boottask) {
 			/* Workaround for early-boot (before the initial user-space exec()) */
 			result = GDBInfo_PrintKernelFilename(printer, arg,
 			                                     filename_only);

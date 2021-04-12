@@ -191,8 +191,8 @@ DATDEF ATTR_PERCPU struct scheduler thiscpu_scheduler;
  * running. */
 DATDEF ATTR_PERCPU struct task thiscpu_idle;
 
-/* Alias for `FORCPU(&_bootcpu, thiscpu_idle)' */
-DATDEF struct task _bootidle;
+/* Alias for `FORCPU(&bootcpu, thiscpu_idle)' */
+DATDEF struct task bootidle;
 
 
 /* Enumerate all (running+sleeping) threads of the given CPU

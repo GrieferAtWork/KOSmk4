@@ -42,13 +42,13 @@ DECL_BEGIN
 
 PRIVATE struct async_thread_data _asyncwork_data = {
 	.atd_refcnt  = 2, /* +1: _asyncwork_data, +1: _async_workers_deafult.atc_threads[0] */
-	.atd_thread  = &_asyncwork,
+	.atd_thread  = &asyncwork,
 	.atd_sleepon = NULL,
-	.atd_killrpc = NULL, /* `_asyncwork' can't be killed, so this can be `NULL'! */
+	.atd_killrpc = NULL, /* `asyncwork' can't be killed, so this can be `NULL'! */
 };
 
 
-/* The default set of async workers (which is exactly 1, that is `_asyncwork'). */
+/* The default set of async workers (which is exactly 1, that is `asyncwork'). */
 PRIVATE struct async_thread_controller _async_workers_deafult = {
 	.atc_refcnt  = 2, /* +1: _async_workers_deafult, +1: async_threads */
 	.atc_count   = 1,
@@ -88,9 +88,9 @@ async_threads_spawn(void) THROWS(E_BADALLOC) {
 
 /* Kill the given async-worker-thread.
  * @return: true:  Success: The given `thread' will soon be dead!
- * @return: false: Either `thread' isn't  an async-worker  thread, is  the
- *                 root async worker thread (`_asyncwork'), or has already
- *                 been killed  (the thread  actually terminating  happens
+ * @return: false: Either  `thread' isn't an  async-worker thread, is the
+ *                 root async worker thread (`asyncwork'), or has already
+ *                 been killed (the  thread actually terminating  happens
  *                 asynchronously, and independent of this function) */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread) {
@@ -136,7 +136,7 @@ NOTHROW(FCALL async_thread_controller_livecount)(struct async_thread_controller 
 	for (i = 0; i < self->atc_count; ++i) {
 		struct async_thread_data *thread;
 		thread = self->atc_threads[i];
-		if (thread->atd_thread == &_asyncwork ||
+		if (thread->atd_thread == &asyncwork ||
 		    thread->atd_killrpc != NULL)
 			++result; /* This one's live! */
 	}

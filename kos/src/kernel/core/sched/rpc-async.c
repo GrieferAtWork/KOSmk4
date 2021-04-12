@@ -104,7 +104,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state,
 	}
 	if (!(mode & TASK_RPC_FDONTWAKE)) {
 		struct task *next_thread;
-		next_thread = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		next_thread = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 		                                     caller, target,
 		                                     (mode & TASK_RPC_FHIGHPRIO) != 0);
 		if (next_thread != caller) {
@@ -154,7 +154,7 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
 	task_enable_redirect_usercode_rpc(target);
 	if (!(mode & TASK_RPC_FDONTWAKE)) {
 		struct task *next_thread;
-		next_thread = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		next_thread = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 		                                     caller, target,
 		                                     (mode & TASK_RPC_FHIGHPRIO) != 0);
 		if (next_thread != caller) {
@@ -218,13 +218,13 @@ NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintpt
 		}
 		task_enable_redirect_usercode_rpc(target);
 		if (!(mode & TASK_RPC_FDONTWAKE)) {
-			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			target = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 			                                caller, target,
 			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
 			                                PREEMPTION_WASENABLED(was));
 			if (target != caller) {
 				/* Immediately switch to the next target thread. */
-				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				FORCPU(IFELSE_SMP(me, &bootcpu), thiscpu_sched_current) = target;
 				cpu_run_current_and_remember_nopr(caller);
 			}
 		}
@@ -289,13 +289,13 @@ NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target,
 			FORTASK(target, this_sstate) = target_state;
 		}
 		if (!(mode & TASK_RPC_FDONTWAKE)) {
-			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			target = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 			                                caller, target,
 			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
 			                                PREEMPTION_WASENABLED(was));
 			if (target != caller) {
 				/* Immediately switch to the next target thread. */
-				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				FORCPU(IFELSE_SMP(me, &bootcpu), thiscpu_sched_current) = target;
 				cpu_run_current_and_remember_nopr(caller);
 			}
 		}
@@ -368,7 +368,7 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc)(struct icpustate *__restrict state,
 		FORTASK(target, this_sstate) = target_state;
 	}
 	if (!(data->ar_mode & TASK_RPC_FDONTWAKE)) {
-		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		target = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 		                                caller, target,
 		                                data->ar_mode & TASK_RPC_FHIGHPRIO);
 		if (target != caller) {
@@ -446,13 +446,13 @@ again:
 			FORTASK(target, this_sstate) = target_state;
 		}
 		if (!(mode & TASK_RPC_FDONTWAKE)) {
-			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			target = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 			                                caller, target,
 			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
 			                                PREEMPTION_WASENABLED(was));
 			if (target != caller) {
 				/* Immediately switch to the next target thread. */
-				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				FORCPU(IFELSE_SMP(me, &bootcpu), thiscpu_sched_current) = target;
 				cpu_run_current_and_remember_nopr(caller);
 			}
 		}
@@ -529,7 +529,7 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc_v)(struct icpustate *__restrict state,
 		FORTASK(target, this_sstate) = target_state;
 	}
 	if (!(data->ar_mode & TASK_RPC_FDONTWAKE)) {
-		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		target = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 		                                caller, target,
 		                                data->ar_mode & TASK_RPC_FHIGHPRIO);
 		if (target != caller) {
@@ -618,13 +618,13 @@ again:
 			FORTASK(target, this_sstate) = target_state;
 		}
 		if (!(mode & TASK_RPC_FDONTWAKE)) {
-			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			target = sched_intern_localwake(IFELSE_SMP(me, &bootcpu),
 			                                caller, target,
 			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
 			                                PREEMPTION_WASENABLED(was));
 			if (target != caller) {
 				/* Immediately switch to the next target thread. */
-				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				FORCPU(IFELSE_SMP(me, &bootcpu), thiscpu_sched_current) = target;
 				cpu_run_current_and_remember_nopr(caller);
 			}
 		}

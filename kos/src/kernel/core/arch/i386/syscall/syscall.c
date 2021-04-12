@@ -260,7 +260,7 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 	if (X86_HAVE_SYSENTER) {
 		/* Configure support for the `sysenter' instruction. */
 		__wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE);
-		__wrmsr(IA32_SYSENTER_ESP, (u64)(uintptr_t)(void *)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_psp0);
+		__wrmsr(IA32_SYSENTER_ESP, (u64)(uintptr_t)(void *)&FORCPU(&bootcpu, thiscpu_x86_tss).t_psp0);
 		__wrmsr(IA32_SYSENTER_EIP, (u64)(uintptr_t)(void *)&x86_syscall32_sysenter);
 	} else {
 #ifndef __x86_64__

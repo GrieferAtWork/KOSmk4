@@ -80,9 +80,9 @@ FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *FCALL async_threads_spawn(void) 
 
 /* Kill the given async-worker-thread.
  * @return: true:  Success: The given `thread' will soon be dead!
- * @return: false: Either `thread' isn't  an async-worker  thread, is  the
- *                 root async worker thread (`_asyncwork'), or has already
- *                 been killed  (the thread  actually terminating  happens
+ * @return: false: Either  `thread' isn't an  async-worker thread, is the
+ *                 root async worker thread (`asyncwork'), or has already
+ *                 been killed (the  thread actually terminating  happens
  *                 asynchronously, and independent of this function) */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread);

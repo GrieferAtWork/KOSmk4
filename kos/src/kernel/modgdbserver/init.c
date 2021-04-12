@@ -140,7 +140,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 			struct debugtrap_reason r;
 			r.dtr_signo  = SIGTRAP;
 			r.dtr_reason = DEBUGTRAP_REASON_FORK;
-			r.dtr_ptrarg = &_bootidle;
+			r.dtr_ptrarg = &bootidle;
 			kernel_debugtrap(&r);
 		}
 

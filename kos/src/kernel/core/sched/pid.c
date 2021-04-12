@@ -1601,11 +1601,11 @@ INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_bootpid)(void) {
 	struct taskgroup *grp;
 	/* Assign PID #1 of the root PID namespace to the boot task. */
-	task_setpid(&_boottask, &pidns_root, 1);
-	grp = &FORTASK(&_boottask, this_taskgroup);
-	grp->tg_process      = &_boottask; /* the boot task is a process */
-	grp->tg_proc_group   = incref(FORTASK(&_boottask, this_taskpid)); /* the boot task is a process group */
-	grp->tg_pgrp_session = incref(FORTASK(&_boottask, this_taskpid)); /* the boot task is a session */
+	task_setpid(&boottask, &pidns_root, 1);
+	grp = &FORTASK(&boottask, this_taskgroup);
+	grp->tg_process      = &boottask; /* the boot task is a process */
+	grp->tg_proc_group   = incref(FORTASK(&boottask, this_taskpid)); /* the boot task is a process group */
+	grp->tg_pgrp_session = incref(FORTASK(&boottask, this_taskpid)); /* the boot task is a session */
 }
 
 

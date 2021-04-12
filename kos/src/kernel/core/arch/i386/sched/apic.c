@@ -794,9 +794,9 @@ done_early_altcore_init:
 #endif /* !CONFIG_NO_SMP */
 
 		/* Read out the boot cpu's LAPIC id if it couldn't be determined before now. */
-		if (FORCPU(&_bootcpu, thiscpu_x86_lapicid_) == 0xff) {
+		if (FORCPU(&bootcpu, thiscpu_x86_lapicid_) == 0xff) {
 			u32 id = lapic_read(APIC_ID);
-			FORCPU(&_bootcpu, thiscpu_x86_lapicid_) = (u8)(id >> APIC_ID_FSHIFT);
+			FORCPU(&bootcpu, thiscpu_x86_lapicid_) = (u8)(id >> APIC_ID_FSHIFT);
 		}
 
 		/* Disable the PIT interrupt if we're going to use the LAPIC timer. */

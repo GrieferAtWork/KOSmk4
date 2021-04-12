@@ -272,13 +272,13 @@ SECTIONS {
 #ifdef CONFIG_NO_SMP
 		IP_ALIGN(__ARCH_CACHELINESIZE);
 		PROVIDE_HIDDEN(__kernel_percpu_start = ABSOLUTE(.));
-		PROVIDE(_bootcpu = ABSOLUTE(.));
+		PROVIDE(bootcpu = ABSOLUTE(.));
 		KEEP(*(.data.percpu.head))
 		KEEP(*(.data.percpu))
 		PROVIDE_HIDDEN(__kernel_percpu_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_percpu_size = ABSOLUTE(ABSOLUTE(__kernel_percpu_end) - ABSOLUTE(__kernel_percpu_start)));
 		IP_ALIGN(__ARCH_CACHELINESIZE);
-		PROVIDE(_bootidle = ABSOLUTE(.));
+		PROVIDE(bootidle = ABSOLUTE(.));
 		PROVIDE(thiscpu_idle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 		IP_ALIGN(PAGESIZE);
@@ -321,6 +321,7 @@ SECTIONS {
 
 		PROVIDE_HIDDEN(__kernel_xdata_start = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_xdata_startpage_p = addr2pageptr_p(ABSOLUTE(.)));
+
 		/* PDATA: Memory that remains mapping at VADDR=PADDR within the kernel VM.
 		 *        Note  however that this memory is linked by its virtual address! */
 		PROVIDE_HIDDEN(__kernel_pdata_start = ABSOLUTE(.));
@@ -339,11 +340,11 @@ SECTIONS {
 		*(.text.xdata .xdata)
 		*(.text.xdata.cold .xdata.cold .text.xdata.unlikely .xdata.unlikely)
 
-		PROVIDE_HIDDEN(__bootcpu_x86_df_stack = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__bootcpu_x86_df_stackpage_p = addr2pageptr_p(ABSOLUTE(__bootcpu_x86_df_stack)));
+		PROVIDE_HIDDEN(bootcpu_x86_df_stack = ABSOLUTE(.));
+		PROVIDE_HIDDEN(bootcpu_x86_df_stackpage_p = addr2pageptr_p(ABSOLUTE(bootcpu_x86_df_stack)));
 		KEEP(*(.text.xdata.x86.free_unloader))
 		/* Allocate the remainder for the boot cpu's #DF stack. */
-		. += (KERNEL_DF_STACKSIZE - (ABSOLUTE(.) - ABSOLUTE(__bootcpu_x86_df_stack)));
+		. += (KERNEL_DF_STACKSIZE - (ABSOLUTE(.) - ABSOLUTE(bootcpu_x86_df_stack)));
 	}
 	PROVIDE_HIDDEN(__kernel_sect_data_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_data_start)));
 
@@ -366,18 +367,18 @@ SECTIONS {
 		/* Boot CPU/TASK/VM data. */
 #ifndef CONFIG_NO_SMP
 		IP_ALIGN(PAGESIZE);
-		PROVIDE(_bootcpu = ABSOLUTE(.));
+		PROVIDE(bootcpu = ABSOLUTE(.));
 		. += thiscpu_idle;
-		PROVIDE(_bootidle = ABSOLUTE(.));
+		PROVIDE(bootidle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
-		STATIC_ASSERT((_bootcpu & PAGEMASK) == 0);
+		STATIC_ASSERT((bootcpu & PAGEMASK) == 0);
 		STATIC_ASSERT((thiscpu_x86_tss & PAGEMASK) == 0);
 		STATIC_ASSERT((thiscpu_x86_iob & PAGEMASK) == 0);
-		. = ABSOLUTE(_bootcpu + thiscpu_x86_tss);
-		PROVIDE_HIDDEN(_bootcpu_x86_tss = ABSOLUTE(.));
+		. = ABSOLUTE(bootcpu + thiscpu_x86_tss);
+		PROVIDE_HIDDEN(bootcpu_x86_tss = ABSOLUTE(.));
 		STATIC_ASSERT((ABSOLUTE(.) & PAGEMASK) == 0);
-		. = ABSOLUTE(_bootcpu + thiscpu_x86_iob);
-		/* Re-use the physical  memory allocated  for _bootcpu's  IOB
+		. = ABSOLUTE(bootcpu + thiscpu_x86_iob);
+		/* Re-use  the  physical memory  allocated for  bootcpu's IOB
 		 * vector as the pages used to describe the empty IOB vector. */
 		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__x86_iob_empty_page_p = addr2pageptr_p(ABSOLUTE(.)));
@@ -392,11 +393,11 @@ SECTIONS {
 		PROVIDE_HIDDEN(__x86_cputss_iob_offset = ABSOLUTE(thiscpu_x86_iob - thiscpu_x86_tss));
 
 		IP_ALIGN(__ARCH_CACHELINESIZE);
-		PROVIDE(_boottask = ABSOLUTE(.));
+		PROVIDE(boottask = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 
 		IP_ALIGN(__ARCH_CACHELINESIZE);
-		PROVIDE_HIDDEN(_asyncwork = ABSOLUTE(.));
+		PROVIDE_HIDDEN(asyncwork = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 
 		IP_ALIGN(PAGEDIR_ALIGN);
@@ -538,11 +539,11 @@ SECTIONS {
 	}
 
 	PROVIDE_HIDDEN(__templatecpu_x86_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
-	PROVIDE_HIDDEN(__bootcpu_x86_dfstack_node = ABSOLUTE(_bootcpu + thiscpu_x86_dfstacknode));
-	PROVIDE_HIDDEN(__bootcpu_x86_dfstack_part = ABSOLUTE(_bootcpu + thiscpu_x86_dfstackpart));
-	PROVIDE(bootcpu_x86_cpufeatures = ABSOLUTE(_bootcpu + thiscpu_x86_cpufeatures));
-	PROVIDE(bootcpu_x86_cpuid = ABSOLUTE(_bootcpu + thiscpu_x86_cpuid));
-	PROVIDE(bootcpu_x86_gdt = ABSOLUTE(_bootcpu + thiscpu_x86_gdt));
+	PROVIDE_HIDDEN(bootcpu_x86_dfstack_node = ABSOLUTE(bootcpu + thiscpu_x86_dfstacknode));
+	PROVIDE_HIDDEN(bootcpu_x86_dfstack_part = ABSOLUTE(bootcpu + thiscpu_x86_dfstackpart));
+	PROVIDE(bootcpu_x86_cpufeatures = ABSOLUTE(bootcpu + thiscpu_x86_cpufeatures));
+	PROVIDE(bootcpu_x86_cpuid = ABSOLUTE(bootcpu + thiscpu_x86_cpuid));
+	PROVIDE(bootcpu_x86_gdt = ABSOLUTE(bootcpu + thiscpu_x86_gdt));
 
 #ifndef CONFIG_NO_BOOT0
 	PROVIDE_HIDDEN(__kernel_sector_count = ABSOLUTE((__kernel_size + 511) / 512));
@@ -553,9 +554,9 @@ SECTIONS {
 #define TSS_DF_BASE thiscpu_x86_tssdf
 #define LDT_BASE    thiscpu_x86_ldt
 #else /* CONFIG_NO_SMP */
-#define TSS_BASE    _bootcpu + thiscpu_x86_tss
-#define TSS_DF_BASE _bootcpu + thiscpu_x86_tssdf
-#define LDT_BASE    _bootcpu + thiscpu_x86_ldt
+#define TSS_BASE    bootcpu + thiscpu_x86_tss
+#define TSS_DF_BASE bootcpu + thiscpu_x86_tssdf
+#define LDT_BASE    bootcpu + thiscpu_x86_ldt
 #endif /* !CONFIG_NO_SMP */
 
 	/* The size of the `struct tss' plus the associated IOB vector addend. */
@@ -583,7 +584,7 @@ SECTIONS {
 	DEFINE_SEGMENT_SYMBOLS(__x86_ldt_lcall7_main, CALLGATE, (x86_syscall32_lcall7, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, 1))
 #endif /* !CONFIG_X86_EMULATE_LCALL7 */
 	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_tss_df, TSS, (TSS_DF_BASE, SIZEOF_TSS - 1, SEGMENT_DESCRIPTOR_TYPE_TSS_AVL, 0, 1, 0, 0))
-	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_kernel_tls, DESCRIPTOR, (_boottask, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, GDT_DB, 1))
+	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_kernel_tls, DESCRIPTOR, (boottask, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, GDT_DB, 1))
 #endif /* !__x86_64__ */
 #undef DEFINE_SEGMENT_SYMBOLS
 #undef GDT_DB
@@ -615,7 +616,7 @@ SECTIONS {
 #endif /* __x86_64__ */
 
 #ifndef __x86_64__
-	PROVIDE_HIDDEN(_bootcpu_thiscpu_x86_tss = ABSOLUTE(_bootcpu + thiscpu_x86_tss));
+	PROVIDE_HIDDEN(bootcpu_thiscpu_x86_tss = ABSOLUTE(bootcpu + thiscpu_x86_tss));
 #endif /* !__x86_64__ */
 
 #ifndef __x86_64__

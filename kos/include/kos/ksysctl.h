@@ -312,7 +312,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
                                                            * @return: == result->of_hint */
 #define KSYSCTL_OPEN_ROOT_PIDNS                0xfffe0005 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PIDNS' to `pidns_root'
                                                            * @return: == result->of_hint */
-#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0006 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_TASK' to `_boottask'
+#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0006 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_TASK' to `boottask'
                                                            * @return: == result->of_hint */
 
 
