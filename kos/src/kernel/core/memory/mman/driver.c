@@ -2674,10 +2674,15 @@ driver_runstate_init_deps(struct driver *__restrict self) {
 					kernel_panic("Cannot load dependency %q of driver %q\n"
 					             "Consider starting KOS with the dependency as a boot-module",
 					             name, self->d_name);
-				} else {
-					driver_initialize(dependency);
 				}
 			}
+			/* Make sure that the dependency has been initialized.
+			 * This way, bootloader drivers are always initialized
+			 * boot-up, no matter the order.
+			 * Only in the case of circular dependencies can  the
+			 * initialization order be affected by load ordering! */
+			if likely(dependency)
+				driver_initialize(dependency);
 		} else {
 			/* Recursively load the dependent driver. */
 			dependency = driver_insmod(filename);
@@ -5979,7 +5984,7 @@ again:
 		decref_unlikely(drv);
 		/* Keep on restarting bootloader driver init
 		 * for  as long as driver states change, and
-		 * havn't yet transitioned to LOADED. */
+		 * haven't yet transitioned to LOADED. */
 		if (old_state != new_state && new_state != DRIVER_STATE_LOADED)
 			found_some = true;
 	}
