@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
@@ -123,6 +124,21 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	pause
 	cli
 #endif /* !CONFIG_NO_SMP */
+
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Special case: calling `task_yield()' whilst in debugger-mode.
+	 * Assuming that the caller wants to wait for something specific
+	 * to happen, and knowing that the system is running in debugger
+	 * mode, we know that there aren't any other threads running that
+	 * may cause whatever our caller is waiting for end up happening.
+	 *
+	 * As such, in the interest of preventing a deadlock situation,
+	 * rather than allowing the caller to yield indefinitely, we will
+	 * throw an `E_WOULDBLOCK' exception. */
+	cmpb   $0, dbg_active
+	jne    .Ldbg_active_task_yield
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 #ifdef __x86_64__
 	EXTERN(x86_load_scpustate_rsp_gsbase_rax_nopr)
 	jmp    x86_load_scpustate_rsp_gsbase_rax_nopr
@@ -130,6 +146,16 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	EXTERN(x86_load_scpustate_esp_nopr)
 	jmp    x86_load_scpustate_esp_nopr
 #endif /* !__x86_64__ */
+
+#ifdef CONFIG_HAVE_DEBUGGER
+.Ldbg_active_task_yield:
+	/* Throw an exception if the builtin debugger is active. */
+	movP   $(ERROR_CODEOF(E_WOULDBLOCK)), %R_fcall0P
+	EXTERN(error_throw)
+	call   error_throw
+	nop
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 	.cfi_restore_state
 .Lillegal_task_yield:
 	movP   $(ERROR_CODEOF(E_WOULDBLOCK_PREEMPTED)), %R_fcall0P
