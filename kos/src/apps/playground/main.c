@@ -891,6 +891,17 @@ int main_assert(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_cc(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	/* Clear system caches. */
+	KSysctl(KSYSCTL_SYSTEM_CLEARCACHES);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -928,6 +939,7 @@ PRIVATE DEF defs[] = {
 	{ "bigfile", &main_bigfile },
 	{ "pass", &main_pass },
 	{ "assert", &main_assert },
+	{ "cc", &main_cc },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall
