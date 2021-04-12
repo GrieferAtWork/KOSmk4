@@ -115,11 +115,25 @@ int main(int argc, char *argv[], char *envp[]) {
 	(void)argv;
 	(void)envp;
 
+	/* Like below, but also clear caches before we start.
+	 *
+	 * This way, we make the system state a bit more consistent,
+	 * meaning  that while we  may not catch  some bugs that are
+	 * the result of problems with caches, bugs that are related
+	 * to caches can be reproduced consistently! */
+	KSysctl(KSYSCTL_SYSTEM_CLEARCACHES);
+
+	/* Actually run all of the tests. */
 	run_all_tests();
 
 	/* Make sure that we didn't end up with any memory leaks. */
 	assertf(KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS) == 0,
 	        "Memory leaks detected (see system log)");
+
+	/* Clear system caches in order to touch all of the various
+	 * systems that doing so affects,  making sure that all  of
+	 * them function correctly. */
+	KSysctl(KSYSCTL_SYSTEM_CLEARCACHES);
 
 	printf("All tests OK" EL "\n");
 	return 0;
