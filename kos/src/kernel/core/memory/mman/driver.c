@@ -347,9 +347,9 @@ NOTHROW(FCALL driver_section_destroy)(struct driver_section *__restrict self) {
 	}
 	if (!(self->ds_sect.ms_flags & SHF_ALLOC) &&
 	    self->ds_addr != (KERNEL byte_t *)-1) {
-		mman_unmap_kram_and_kfree_u(self->ds_addr,
-		                            self->ds_sect.ms_size,
-		                            self);
+		mman_unmap_kram_and_kfree(self->ds_addr,
+		                          self->ds_sect.ms_size,
+		                          self);
 	} else {
 		kfree(self);
 	}
@@ -366,8 +366,9 @@ driver_section_getname(struct driver_section *__restrict self) {
 PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 driver_section_create_kernaddr_ex(struct driver_section *__restrict self,
                                   struct driver *__restrict drv) {
-	struct mfile *file = driver_getfile(drv);
-	if (!file)
+	struct mfile *file;
+	assert(self->ds_sect.ms_size != 0);
+	if ((file = driver_getfile(drv)) == NULL)
 		THROW(E_NO_SUCH_OBJECT);
 	return (byte_t *)mman_map(/* self:        */ &mman_kernel,
 	                          /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
@@ -383,6 +384,8 @@ driver_section_create_kernaddr_ex(struct driver_section *__restrict self,
 PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 driver_section_create_kernaddr(struct driver_section *__restrict self) {
 	REF struct driver *drv;
+	if unlikely(self->ds_sect.ms_size == 0)
+		return (KERNEL byte_t *)KERNELSPACE_BASE + PAGESIZE;
 	drv = (REF struct driver *)self->ds_sect.ms_module;
 	if (!tryincref(drv))
 		THROW(E_NO_SUCH_OBJECT);
@@ -504,11 +507,11 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 		}
 	} EXCEPT {
 		if (src_data_freeme_cookie)
-			mman_unmap_kram_and_kfree_u(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
+			mman_unmap_kram_and_kfree(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
 		RETHROW();
 	}
 	if (src_data_freeme_cookie)
-		mman_unmap_kram_and_kfree_u(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
+		mman_unmap_kram_and_kfree(src_data, self->ds_sect.ms_size, src_data_freeme_cookie);
 	ATOMIC_WRITE(self->ds_inflsize, dst_size);
 	ATOMIC_CMPXCH(self->ds_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;
@@ -5329,13 +5332,13 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 			                       driver_dentry, driver_cmdline,
 			                       pnew_driver_loaded);
 		} EXCEPT {
-			mman_unmap_kram_and_kfree_u(tempmap, (size_t)tempmap_size,
-			                            unmap_cookie);
+			mman_unmap_kram_and_kfree(tempmap, (size_t)tempmap_size,
+			                          unmap_cookie);
 			RETHROW();
 		}
 		/* Delete the temporary mapping created above. */
-		mman_unmap_kram_and_kfree_u(tempmap, (size_t)tempmap_size,
-		                            unmap_cookie);
+		mman_unmap_kram_and_kfree(tempmap, (size_t)tempmap_size,
+		                          unmap_cookie);
 	}
 	return result;
 }

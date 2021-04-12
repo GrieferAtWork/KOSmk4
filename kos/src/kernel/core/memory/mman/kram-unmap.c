@@ -1613,17 +1613,19 @@ NOTHROW(FCALL kfree_for_done)(struct mman_unmap_kram_job *__restrict self) {
 /* Helper  function that can  be used to unmap  anything by re-using  `freeme', which must be
  * a kmalloc-pointer with `kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job)'
  * in order to represent intermediate storage for */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
-                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                         void *freeme, gfp_t flags) {
+PUBLIC NOBLOCK NONNULL((3)) void
+NOTHROW(FCALL mman_unmap_kram_and_kfree)(void const *addr, size_t num_bytes,
+                                         void *__restrict freeme, gfp_t flags) {
 	struct mman_unmap_kram_job *job;
+	num_bytes += (uintptr_t)addr & PAGEMASK;
+	addr      = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
+	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 	assert(kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job));
 	if unlikely(!num_bytes) {
+		/* Special case: nothing to do... */
 		kfree(freeme);
 		return;
 	}
-
 	job = (struct mman_unmap_kram_job *)freeme;
 	job->mukj_done    = &kfree_for_done;
 	job->mukj_minaddr = (byte_t *)addr;
@@ -1631,20 +1633,6 @@ NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
 	job->mukj_flags   = flags;
 	mman_unmap_kram_ex(job);
 }
-
-/* Same as `mman_unmap_kram_and_kfree()', but automatically expand the given
- * address range to  include all partially  covered pages (i.e.  floor-align
- * the base-address, and ceil-align the end-address) */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL mman_unmap_kram_and_kfree_u)(void const *addr, size_t num_bytes,
-                                           void *freeme, gfp_t flags) {
-	num_bytes += (uintptr_t)addr & PAGESIZE;
-	addr      = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
-	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-	mman_unmap_kram_and_kfree(addr, num_bytes, freeme, flags);
-}
-
-
 
 
 DECL_END

@@ -222,9 +222,9 @@ NOTHROW(FCALL uems_destroy)(struct userelf_module_section *__restrict self) {
 		                self->ums_inflsize);
 	}
 	if (self->ums_kernaddr != (KERNEL byte_t *)-1) {
-		mman_unmap_kram_and_kfree_u(self->ums_kernaddr,
-		                            self->ms_size,
-		                            self);
+		mman_unmap_kram_and_kfree(self->ums_kernaddr,
+		                          self->ms_size,
+		                          self);
 	} else {
 		kfree(self);
 	}
@@ -257,20 +257,23 @@ uems_getaddr(struct userelf_module_section *__restrict self) {
 PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_create_kernaddr_ex(struct userelf_module_section *__restrict self,
                         struct userelf_module *__restrict mod) {
-	return (byte_t *)mman_map(/* self:          */ &mman_kernel,
-	                          /* hint:          */ HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                          /* num_bytes:     */ self->ms_size,
-	                          /* prot:          */ (PROT_READ | PROT_WRITE) & ~PROT_SHARED,
-	                          /* flags:         */ HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-	                          /* file:          */ mod->md_file,
-	                          /* file_fspath:   */ mod->md_fspath,
-	                          /* file_fsname:   */ mod->md_fsname,
-	                          /* file_pos:      */ (pos_t)UM_field(mod, *self->ums_shdr, .sh_offset));
+	assert(self->ms_size != 0);
+	return (byte_t *)mman_map(/* self:        */ &mman_kernel,
+	                          /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                          /* num_bytes:   */ self->ms_size,
+	                          /* prot:        */ (PROT_READ | PROT_WRITE) & ~PROT_SHARED,
+	                          /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+	                          /* file:        */ mod->md_file,
+	                          /* file_fspath: */ mod->md_fspath,
+	                          /* file_fsname: */ mod->md_fsname,
+	                          /* file_pos:    */ (pos_t)UM_field(mod, *self->ums_shdr, .sh_offset));
 }
 
 PRIVATE WUNUSED NONNULL((1)) KERNEL byte_t *FCALL
 uems_create_kernaddr(struct userelf_module_section *__restrict self) {
 	REF struct userelf_module *mod;
+	if unlikely(self->ms_size == 0)
+		return (KERNEL byte_t *)KERNELSPACE_BASE + PAGESIZE;
 	mod = (REF struct userelf_module *)self->ms_module;
 	if (!tryincref(mod))
 		THROW(E_NO_SUCH_OBJECT);
@@ -394,11 +397,11 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 		}
 	} EXCEPT {
 		if (src_data_freeme_cookie)
-			mman_unmap_kram_and_kfree_u(src_data, self->ms_size, src_data_freeme_cookie);
+			mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
 		RETHROW();
 	}
 	if (src_data_freeme_cookie)
-		mman_unmap_kram_and_kfree_u(src_data, self->ms_size, src_data_freeme_cookie);
+		mman_unmap_kram_and_kfree(src_data, self->ms_size, src_data_freeme_cookie);
 	ATOMIC_WRITE(self->ums_inflsize, dst_size);
 	ATOMIC_CMPXCH(self->ums_infladdr, (KERNEL byte_t *)-1, dst_data);
 	*psize = dst_size;

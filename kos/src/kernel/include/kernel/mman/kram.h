@@ -287,11 +287,12 @@ NOTHROW(FCALL mman_unmap_kram_ex)(/*inherit(always)*/ struct mman_unmap_kram_job
 
 /* Helper  function that can  be used to unmap  anything by re-using  `freeme', which must be
  * a kmalloc-pointer with `kmalloc_usable_size(freeme) >= sizeof(struct mman_unmap_kram_job)'
- * in order to represent intermediate storage for */
-FUNDEF NOBLOCK void
-NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
-                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                         void *freeme, gfp_t flags DFL(0));
+ * in order to represent intermediate storage for.
+ * NOTE: The  given  `addr...+=num_bytes' address  range  is automatically
+ *       expanded to encompass all whole pages touched by the given range. */
+FUNDEF NOBLOCK NONNULL((3)) void
+NOTHROW(FCALL mman_unmap_kram_and_kfree)(void const *addr, size_t num_bytes,
+                                         void *__restrict freeme, gfp_t flags DFL(0));
 
 /* Helper macros to  alloc/free a cookie  that can later  be
  * used in order  to service  `mman_unmap_kram_and_kfree()'.
@@ -301,13 +302,6 @@ NOTHROW(FCALL mman_unmap_kram_and_kfree)(PAGEDIR_PAGEALIGNED void const *addr,
  * as that structure can hold a `struct mman_unmap_kram_job' */
 #define mman_unmap_kram_cookie_alloc()    kmalloc(sizeof(struct mman_unmap_kram_job), GFP_LOCKED | GFP_PREFLT)
 #define mman_unmap_kram_cookie_free(self) kfree(self)
-
-/* Same as `mman_unmap_kram_and_kfree()', but automatically expand the given
- * address range to  include all partially  covered pages (i.e.  floor-align
- * the base-address, and ceil-align the end-address) */
-FUNDEF NOBLOCK void
-NOTHROW(FCALL mman_unmap_kram_and_kfree_u)(void const *addr, size_t num_bytes,
-                                           void *freeme, gfp_t flags DFL(0));
 
 DECL_END
 #endif /* __CC__ */
