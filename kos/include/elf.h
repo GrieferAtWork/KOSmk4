@@ -1172,17 +1172,17 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 #define STT_LOPROC      13              /* Start of processor-specific */
 #define STT_HIPROC      15              /* End of processor-specific */
 
-/* How does `STT_GNU_IFUNC' / `STT_KOS_IDATA' work:
+/* How `STT_GNU_IFUNC' and `STT_KOS_IDATA' work:
  * STT_GNU_IFUNC:
  *     Purpose:
- *       ...
+ *       ...   (see: online documentation)
  *     Behavior:
- *       ...
+ *       ...   (see: online documentation)
  *     st_value: Pointer to a function `T (*resolve(void))(T1 a, T2 b, ...)'
  *               When called, this function should  return a pointer to  the
  *               function that should be linked at runtime.
- *     st_size:  Only  used   for   R_386_SIZE32   and   similar   relocations
- *     compiler-time linker may use  relocations such as `R_386_JUMP_SLOT'  to
+ *     st_size:  Only  used  for   `R_386_SIZE32'  and  similar   relocations.
+ *     Compile-time linkers may use  relocations such as `R_386_JUMP_SLOT'  to
  *     add another layer of indirection, where `resolve()' will only be called
  *     once the function is used for the first time.
  *
@@ -1199,11 +1199,11 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
  *         st_value: Pointer to a function `T *resolve(void)'
  *                   When  called, this  function should  return a  pointer to the
  *                   data-blob that  should be  linked  at runtime.  Note  however
- *                   that due to relocations such as `R_386_GLOB_DAT', the pointed
- *                   that  will be returned  by dlsym() for  the object may differ
- *                   from the  pointer returned  by resolve().  When this  is  the
+ *                   that due to relocations such as `R_386_GLOB_DAT', the pointer
+ *                   that will be returned by `dlsym(3)' for the object may differ
+ *                   from the pointer  returned by `resolve()'.  When this is  the
  *                   case,  then the actual  symbol pointer will  be filled with a
- *                   copy of  the  data-blob  returned by  resolve(),  where  this
+ *                   copy of  the data-blob  returned by  `resolve()', where  this
  *                   copy will  have previously  been allocated  by `ld'  when  it
  *                   was linking against the declaring library.
  *         st_size:  The size of the lazily  initialized data blob. This size  must
@@ -1216,9 +1216,10 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 
 #define ELF_SYM_UNDEFINED 0             /* Symbol Table index of the undefined symbol */
 
-/* Symbol  table  indices are  found in  the hash  buckets and  chain table
- * of  a  symbol hash  table section.  This  special index  value indicates
- * the end of a chain, meaning no further symbols are found in that bucket. */
+/* Symbol table indices are found in the hash buckets and chain table
+ * of a symbol hash table section. This special index value indicates
+ * the  end of a chain, meaning no  further symbols are found in that
+ * bucket. */
 #define STN_UNDEF       0               /* End of a chain. */
 
 

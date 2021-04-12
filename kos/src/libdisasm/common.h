@@ -41,7 +41,7 @@ DECL_BEGIN
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 INTDEF NONNULL((1)) ssize_t CC
-libda_disasm(pformatprinter printer, void *arg, void *pc, size_t num_bytes,
+libda_disasm(pformatprinter printer, void *arg, void const *pc, size_t num_bytes,
              uintptr_half_t target DFL(DISASSEMBLER_TARGET_CURRENT),
              uintptr_half_t flags DFL(DISASSEMBLER_FNORMAL));
 
@@ -54,7 +54,7 @@ libda_disasm(pformatprinter printer, void *arg, void *pc, size_t num_bytes,
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 INTDEF NONNULL((1)) ssize_t CC
-libda_disasm_single(pformatprinter printer, void *arg, void *pc,
+libda_disasm_single(pformatprinter printer, void *arg, void const *pc,
                     uintptr_half_t target DFL(DISASSEMBLER_TARGET_CURRENT),
                     uintptr_half_t flags DFL(DISASSEMBLER_FNORMAL));
 
@@ -89,7 +89,8 @@ libda_disasm_print_instruction(struct disassembler *__restrict self);
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
 INTDEF NONNULL((1)) ssize_t CC
-libda_disasm_print_symbol(struct disassembler *__restrict self, void *symbol_addr);
+libda_disasm_print_symbol(struct disassembler *__restrict self,
+                          void const *symbol_addr);
 
 /* Returns the length (in bytes) of the next instruction to-be disassembled. */
 INTDEF NONNULL((1)) size_t CC

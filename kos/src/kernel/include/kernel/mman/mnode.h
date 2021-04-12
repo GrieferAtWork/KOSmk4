@@ -154,7 +154,7 @@ typedef size_t mpart_reladdr_t;
 //	MNODE_INIT_mn_partoff(0),
 //	MNODE_INIT_mn_link({ NULL, FILL_ME }),
 //	MNODE_INIT_mn_writable(LIST_ENTRY_UNBOUND_INITIALIZER),
-//	MNODE_INIT_mn_module(NULL) 
+//	MNODE_INIT_mn_module(NULL)
 #endif
 
 struct mnode {
@@ -253,8 +253,8 @@ struct mnode {
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
 #endif /* !__INTELLISENSE__ */
 	WEAK struct module                 *mn_module;   /* [0..1][lock(mn_mman->mm_lock)] Node executable module binding. (s.a. <kernel/mman/module.h>)
-	                                                  * The module pointed-to by this field is weak, in that the pointed-to object may have already
-	                                                  * been destroyed. For this purpose, the module actually getting destroyed will result in it
+	                                                  * The  module pointed-to by this field is weak, in that the pointed-to object may have already
+	                                                  * been destroyed. For this purpose,  the module actually getting  destroyed will result in  it
 	                                                  * going over all nodes in its address range, and clearing all of its self-pointers. */
 };
 
@@ -364,9 +364,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__re
 
 
 
-/* Clear page-directory-level  write-access to  `self'. This  function must  be
- * called for all writable memory mappings of a MMAN when the MMAN is cloned or
- * a  copy-on-write  mapping  is  created  for  an  already-shared   `mn_part':
+/* Clear page-directory-level write-access to `self'. This function must  be
+ * called for all writable memory mappings of a MMAN when the MMAN is cloned
+ * or a copy-on-write  mapping is created  for an already-shared  `mn_part':
  * >> mmap() {
  * >>     ...
  * >>     if (flags & MNODE_F_SHARED) {
@@ -383,8 +383,8 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_destroy)(struct mnode *__re
  * >>         }
  * >>     }
  * >> }
- * NOTE: This function is designed to be called while the caller is already
- *       holding a lock to the node's associated mem-part.
+ * NOTE: This function is designed to be called while the caller is
+ *       already holding a lock to the node's associated  mem-part.
  * @return: * : One of `MNODE_CLEAR_WRITE_*' */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self);
@@ -405,13 +405,13 @@ FUNDEF NOBLOCK NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
                                           struct mman *__restrict mm);
 
-/* Same as `mnode_clear_write_locked_p()', but directory operate
- * on   the   current   page   directory   /   memory   manager. */
+/* Same as  `mnode_clear_write_locked_p()', but  directory
+ * operate on the current page directory / memory manager. */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self);
 
-/* Split  `lonode'  (which  contains  `addr_where_to_split')  at  that  address.
- * If this cannot be done without blocking, unlock and eventually return `false' */
+/* Split `lonode' (which contains `addr_where_to_split') at that address.  If
+ * this cannot be done without blocking, unlock and eventually return `false' */
 FUNDEF WUNUSED NONNULL((1, 2)) __BOOL FCALL
 mnode_split_or_unlock(struct mman *__restrict self,
                       struct mnode *__restrict lonode,
@@ -471,8 +471,8 @@ DATDEF ATTR_PERMMAN struct mnode thismman_kernel_reservation;
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
  * This counter behaves similar to the in-use counter found in <kos/aref.h>, and is needed in order
- * to  allow  for  syncing  of  internal  re-trace  operations  in  `mman_unmap_kram_locked()' with
- * other CPUs having previously started initializing hinted pages.
+ * to  allow for syncing  of internal re-trace operations  in `mman_unmap_kram_locked()' with other
+ * CPUs having previously started initializing hinted pages.
  *
  * For more information on the data race solved by this counter, see the detailed explanation
  * of `mman_kernel_hintinit_inuse' within `mman_unmap_kram_locked()' */

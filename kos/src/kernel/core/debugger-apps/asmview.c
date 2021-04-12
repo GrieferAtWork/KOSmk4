@@ -89,7 +89,8 @@ NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self)
 	 * This is used to ensure that libdisasm sees that our instruction
 	 * sequence terminates after a certain offset. */
 	enum { TEXTTAILSIZE = 12 };
-	byte_t textbuf[MAXTEXTSIZ + TEXTTAILSIZE], *old_pc;
+	byte_t textbuf[MAXTEXTSIZ + TEXTTAILSIZE];
+	byte_t const *old_pc;
 	size_t textsiz;
 	textsiz = MAXTEXTSIZ - dbg_readmemory(self->d_pc, textbuf, MAXTEXTSIZ);
 	if (!textsiz)
@@ -126,7 +127,7 @@ NOTHROW(KCALL stub_printer)(void *UNUSED(arg),
 
 PRIVATE NOBLOCK ssize_t
 NOTHROW(LIBDISASM_CC stub_symbol_printer)(struct disassembler *__restrict UNUSED(self),
-                                          void *UNUSED(symbol_addr)) {
+                                          void const *UNUSED(symbol_addr)) {
 	return 0;
 }
 
@@ -144,15 +145,15 @@ PRIVATE ATTR_DBGDATA struct disassembler av_instrlen_da = {
 };
 
 PRIVATE ATTR_DBGTEXT void *
-NOTHROW(FCALL av_core_instr_trysucc)(void *addr) {
-	av_instrlen_da.d_pc = (byte_t *)addr;
+NOTHROW(FCALL av_core_instr_trysucc)(void const *addr) {
+	av_instrlen_da.d_pc = (byte_t const *)addr;
 	if (!av_disasm_print_instruction(&av_instrlen_da))
 		return (byte_t *)addr + 1;
-	return av_instrlen_da.d_pc;
+	return (void *)av_instrlen_da.d_pc;
 }
 
 PRIVATE ATTR_DBGTEXT void *
-NOTHROW(FCALL av_core_instr_trypred)(void *addr) {
+NOTHROW(FCALL av_core_instr_trypred)(void const *addr) {
 	byte_t *result;
 	unsigned int i = 15; /* 15 is the max instruction length on X86 */
 	do {
@@ -248,7 +249,7 @@ av_format(struct disassembler *__restrict UNUSED(self), unsigned int format_opti
 }
 
 LOCAL ATTR_DBGTEXT bool
-NOTHROW(FCALL av_getbyte)(void *addr, byte_t *pvalue) {
+NOTHROW(FCALL av_getbyte)(void const *addr, byte_t *pvalue) {
 	return dbg_readmemory(addr, pvalue, 1) == 0;
 }
 
@@ -428,7 +429,7 @@ done:
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t
 NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
-                                        void *symbol_addr) {
+                                        void const *symbol_addr) {
 	struct av_symbol *sym;
 	/* Semantically speaking, this function behaves identical to the default
 	 * symbol printer, in that it will  try to lookup debug information  and
@@ -458,13 +459,14 @@ NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
 
 
 PRIVATE ATTR_DBGTEXT void *
-NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
+NOTHROW(FCALL av_printscreen)(void const *start_addr,
+                              void const **psel_addr,
                               bool display_addr2line) {
 	struct disassembler da;
 	unsigned int line;
-	byte_t *current_line_base = NULL;
+	byte_t const *current_line_base = NULL;
 	size_t current_line_size = 0;
-	void *sel_addr = *psel_addr;
+	void const *sel_addr = *psel_addr;
 	size_t maxbytes;
 	maxbytes = disasm_default_maxbytes(DISASSEMBLER_TARGET_CURRENT);
 	disasm_init(&da, &dbg_printer, NULL, start_addr,
@@ -481,7 +483,7 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 		size_t i, ilen;
 		bool is_current_line;
 		dbg_color_t old_default_color;
-		byte_t *line_start = da.d_pc;
+		byte_t const *line_start = da.d_pc;
 		line_endaddr = av_instr_succ(line_start);
 		ilen = (size_t)((byte_t *)line_endaddr - line_start);
 		is_current_line = sel_addr >= line_start && sel_addr < line_endaddr;
@@ -570,7 +572,7 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 			}
 		}
 	}
-	return da.d_pc;
+	return (void *)da.d_pc;
 }
 
 
@@ -598,7 +600,7 @@ NOTHROW(FCALL av_main)(void *addr) {
 		if (start_addr > addr)
 			start_addr = addr;
 		dbg_beginupdate();
-		end_addr = av_printscreen(start_addr, &addr, display_addr2line);
+		end_addr = av_printscreen(start_addr, (void const **)&addr, display_addr2line);
 		if (addr >= end_addr) {
 			unsigned int n = dbg_screen_height;
 			if (display_addr2line)
@@ -606,7 +608,7 @@ NOTHROW(FCALL av_main)(void *addr) {
 			while (n) {
 				/* Slowly move the screen upwards until the start-address is displayed on-screen. */
 				start_addr = av_instr_pred_n(addr, n);
-				end_addr   = av_printscreen(start_addr, &addr, display_addr2line);
+				end_addr   = av_printscreen(start_addr, (void const **)&addr, display_addr2line);
 				if (addr < end_addr)
 					break;
 				--n;

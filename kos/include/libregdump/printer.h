@@ -31,17 +31,17 @@
 #include <libdisasm/format.h>
 
 /* Format codes for `regdump_print_format_t' */
-#define REGDUMP_FORMAT_REGISTER_PREFIX   DISASSEMBLER_FORMAT_REGISTER_PREFIX  /* Prefix for register names. */
-#define REGDUMP_FORMAT_REGISTER_SUFFIX   DISASSEMBLER_FORMAT_REGISTER_SUFFIX  /* Suffix for register names. */
-#define REGDUMP_FORMAT_VALUE_PREFIX      DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX /* Prefix for register values. */
-#define REGDUMP_FORMAT_VALUE_SUFFIX      DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX /* Suffix for register values. */
-#define REGDUMP_FORMAT_OFFSET_PREFIX     DISASSEMBLER_FORMAT_OFFSET_PREFIX    /* Prefix for memory offsets. */
-#define REGDUMP_FORMAT_OFFSET_SUFFIX     DISASSEMBLER_FORMAT_OFFSET_SUFFIX    /* Suffix for memory offsets. */
-#define REGDUMP_FORMAT_FLAG_PREFIX       DISASSEMBLER_FORMAT_SYMBOL_PREFIX    /* Prefix for register flags. */
-#define REGDUMP_FORMAT_FLAG_SUFFIX       DISASSEMBLER_FORMAT_SYMBOL_SUFFIX    /* Suffix for register flags. */
-#define REGDUMP_FORMAT_ERROR_PREFIX      0x1002 /* Prefix for error messages. */
-#define REGDUMP_FORMAT_ERROR_SUFFIX      0x1003 /* Suffix for error messages. */
-#define REGDUMP_FORMAT_INDENT            0x1010 /* Indent printed before any line. */
+#define REGDUMP_FORMAT_REGISTER_PREFIX DISASSEMBLER_FORMAT_REGISTER_PREFIX  /* Prefix for register names. */
+#define REGDUMP_FORMAT_REGISTER_SUFFIX DISASSEMBLER_FORMAT_REGISTER_SUFFIX  /* Suffix for register names. */
+#define REGDUMP_FORMAT_VALUE_PREFIX    DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX /* Prefix for register values. */
+#define REGDUMP_FORMAT_VALUE_SUFFIX    DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX /* Suffix for register values. */
+#define REGDUMP_FORMAT_OFFSET_PREFIX   DISASSEMBLER_FORMAT_OFFSET_PREFIX    /* Prefix for memory offsets. */
+#define REGDUMP_FORMAT_OFFSET_SUFFIX   DISASSEMBLER_FORMAT_OFFSET_SUFFIX    /* Suffix for memory offsets. */
+#define REGDUMP_FORMAT_FLAG_PREFIX     DISASSEMBLER_FORMAT_SYMBOL_PREFIX    /* Prefix for register flags. */
+#define REGDUMP_FORMAT_FLAG_SUFFIX     DISASSEMBLER_FORMAT_SYMBOL_SUFFIX    /* Suffix for register flags. */
+#define REGDUMP_FORMAT_ERROR_PREFIX    0x1002 /* Prefix for error messages. */
+#define REGDUMP_FORMAT_ERROR_SUFFIX    0x1003 /* Suffix for error messages. */
+#define REGDUMP_FORMAT_INDENT          0x1010 /* Indent printed before any line. */
 
 #ifdef __CC__
 __DECL_BEGIN

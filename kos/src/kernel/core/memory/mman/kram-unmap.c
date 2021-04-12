@@ -76,8 +76,8 @@ STATIC_ASSERT_MSG(sizeof(struct mman_unmap_kram_job) <= PAGESIZE,
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').
  * This counter behaves similar to the in-use counter found in <kos/aref.h>, and is needed in order
- * to  allow  for  syncing  of  internal  re-trace  operations  in  `mman_unmap_kram_locked()' with
- * other CPUs having previously started initializing hinted pages.
+ * to  allow for syncing  of internal re-trace operations  in `mman_unmap_kram_locked()' with other
+ * CPUs having previously started initializing hinted pages.
  *
  * For more information on the data race solved by this counter, see the detailed explanation
  * of `mman_kernel_hintinit_inuse' within `mman_unmap_kram_locked()' */

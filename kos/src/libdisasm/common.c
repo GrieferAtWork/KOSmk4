@@ -68,8 +68,8 @@ DECL_BEGIN
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 INTERN NONNULL((1)) ssize_t CC
-libda_disasm(pformatprinter printer, void *arg, void *pc, size_t num_bytes,
-             uintptr_half_t target, uintptr_half_t flags) {
+libda_disasm(pformatprinter printer, void *arg, void const *pc,
+             size_t num_bytes, uintptr_half_t target, uintptr_half_t flags) {
 	struct disassembler da;
 	disasm_init(&da, printer, arg, pc, target, flags, 0);
 	return libda_disasm_print_until(&da,
@@ -85,7 +85,7 @@ libda_disasm(pformatprinter printer, void *arg, void *pc, size_t num_bytes,
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 INTERN NONNULL((1)) ssize_t CC
-libda_disasm_single(pformatprinter printer, void *arg, void *pc,
+libda_disasm_single(pformatprinter printer, void *arg, void const *pc,
                     uintptr_half_t target, uintptr_half_t flags) {
 	struct disassembler da;
 	disasm_init(&da, printer, arg, pc, target, flags, 0);
@@ -101,7 +101,7 @@ INTERN NONNULL((1)) ssize_t CC
 libda_disasm_print_until(struct disassembler *__restrict self,
                          void const *endpc) {
 	while (self->d_result >= 0 &&
-	       (byte_t *)self->d_pc < (byte_t *)endpc)
+	       (byte_t const *)self->d_pc < (byte_t const *)endpc)
 		libda_disasm_print_line(self);
 	return self->d_result;
 }
@@ -125,7 +125,7 @@ libda_disasm_print_line_nolf(struct disassembler *__restrict self) {
 		disasm_printf(self, "%p: ", self->d_pc + self->d_baseoff);
 	if (!(self->d_flags & DISASSEMBLER_FNOBYTES)) {
 		size_t instrlen, i;
-		byte_t *bytes_base;
+		byte_t const *bytes_base;
 		if (!self->d_maxbytes)
 			self->d_maxbytes = libda_disasm_default_maxbytes(self->d_target);
 		instrlen = libda_disasm_instrlen(self);
@@ -302,7 +302,7 @@ address_width(uintptr_half_t target) {
  * @return: <0: The printer error that has occurred. */
 INTERN NONNULL((1)) ssize_t CC
 libda_disasm_print_symbol(struct disassembler *__restrict self,
-                          void *symbol_addr) {
+                          void const *symbol_addr) {
 	if likely(self->d_result >= 0) {
 		disasm_print_format(self, DISASSEMBLER_FORMAT_SYMBOL_PREFIX);
 		if (self->d_symbol) {
@@ -418,7 +418,7 @@ NOTHROW(FORMATPRINTER_CC stub_printer)(void *UNUSED(arg),
 
 PRIVATE ssize_t
 NOTHROW(LIBDISASM_CC stub_symbol_printer)(struct disassembler *__restrict UNUSED(self),
-                                          void *UNUSED(symbol_addr)) {
+                                          void const *UNUSED(symbol_addr)) {
 	return 0;
 }
 
@@ -426,7 +426,7 @@ NOTHROW(LIBDISASM_CC stub_symbol_printer)(struct disassembler *__restrict UNUSED
 /* Returns the length (in bytes) of the next instruction to-be disassembled. */
 INTERN NONNULL((1)) size_t CC
 libda_disasm_instrlen(struct disassembler *__restrict self) {
-	byte_t *oldpc;
+	byte_t const *oldpc;
 	size_t result;
 	ssize_t oldresult;
 	pformatprinter old_printer;

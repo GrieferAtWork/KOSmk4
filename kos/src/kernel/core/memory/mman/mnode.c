@@ -163,9 +163,9 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 
 
 
-/* Clear page-directory-level  write-access to  `self'. This  function must  be
- * called for all writable memory mappings of a MMAN when the MMAN is cloned or
- * a  copy-on-write  mapping  is  created  for  an  already-shared   `mn_part':
+/* Clear page-directory-level write-access to `self'. This function must  be
+ * called for all writable memory mappings of a MMAN when the MMAN is cloned
+ * or a copy-on-write  mapping is created  for an already-shared  `mn_part':
  * >> mmap() {
  * >>     ...
  * >>     if (flags & MNODE_F_SHARED) {
@@ -182,8 +182,8 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
  * >>         }
  * >>     }
  * >> }
- * NOTE: This function is designed to be called while the caller is already
- *       holding a lock to the node's associated mem-part.
+ * NOTE: This function is designed to be called while the caller is
+ *       already holding a lock to the node's associated  mem-part.
  * @return: * : One of `MNODE_CLEAR_WRITE_*' */
 PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
@@ -270,8 +270,8 @@ NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
 
 
 
-/* Same as `mnode_clear_write_locked_p()', but directory operate
- * on   the   current   page   directory   /   memory   manager. */
+/* Same as  `mnode_clear_write_locked_p()', but  directory
+ * operate on the current page directory / memory manager. */
 PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 	void *addr;
@@ -304,8 +304,8 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 }
 
 
-/* Split  `lonode'  (which  contains  `addr_where_to_split')  at  that  address.
- * If this cannot be done without blocking, unlock and eventually return `false' */
+/* Split `lonode' (which contains `addr_where_to_split') at that address. If
+ * this cannot be done without blocking, unlock and eventually return `false' */
 PUBLIC WUNUSED NONNULL((1, 2)) bool FCALL
 mnode_split_or_unlock(struct mman *__restrict self,
                       struct mnode *__restrict lonode,

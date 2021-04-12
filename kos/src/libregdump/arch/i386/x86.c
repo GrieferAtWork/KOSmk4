@@ -1163,8 +1163,13 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
                                 uintptr_t relpc,
                                 bool *__restrict pdid_lf_after_eip) {
 	BEGIN;
+	if (info->al_name || info->al_srcfile || info->al_srcline) {
+		PRINT("\n");
+		format(REGDUMP_FORMAT_INDENT);
+		format(REGDUMP_FORMAT_INDENT);
+	}
 	if (info->al_name) {
-		PRINT(" [");
+		PRINT("[");
 		format(REGDUMP_FORMAT_VALUE_PREFIX);
 		print(info->al_name, strlen(info->al_name));
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
@@ -1175,14 +1180,18 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 		PRINT("]");
 	}
 	if (info->al_srcfile) {
-		PRINT(" [");
+		if (info->al_name)
+			PRINT(" ");
+		PRINT("[");
 		format(REGDUMP_FORMAT_VALUE_PREFIX);
 		print(info->al_srcfile, strlen(info->al_srcfile));
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
 		PRINT("]");
 	}
 	if (info->al_srcline) {
-		PRINT(" [line=");
+		if (info->al_name || info->al_srcfile)
+			PRINT(" ");
+		PRINT("[line=");
 		format(REGDUMP_FORMAT_VALUE_PREFIX);
 		printf("%Iu", info->al_srcline);
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
@@ -1256,8 +1265,10 @@ libregdump_ip(struct regdump_printer *__restrict self,
 			}
 		}
 		if (ENSURE_LIBDISASM()) {
-			if (did_lf_after_eip)
-				format(REGDUMP_FORMAT_INDENT);
+			if (!did_lf_after_eip)
+				PRINT("\n");
+			format(REGDUMP_FORMAT_INDENT);
+			format(REGDUMP_FORMAT_INDENT);
 			PRINT("[");
 			NESTED_TRY {
 				DO(disasm_single(self->rdp_printer, self->rdp_printer_arg, (void *)prev_ip,

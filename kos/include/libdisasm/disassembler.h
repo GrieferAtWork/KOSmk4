@@ -88,10 +88,10 @@ struct disassembler;
  *                      itself directly. */
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBDISASM_CC *diasm_symbol_printer_t)(struct disassembler *__restrict self,
-                                       void *symbol_addr);
+                                       void const *symbol_addr);
 
 struct disassembler {
-	__byte_t              *d_pc;       /* [1..1] Next address to-be disassembled. */
+	__byte_t const        *d_pc;       /* [1..1] Next address to-be disassembled. */
 	__ptrdiff_t            d_baseoff;  /* Offset added to `d_pc' for the purpose of relative relocations. */
 	__pformatprinter       d_printer;  /* [1..1][const] The printer used to output disassembly text. */
 	void                  *d_arg;      /* [const] Argument passed to `d_printer'. */
@@ -107,8 +107,8 @@ struct disassembler {
 	                                    * When ZERO(0), use a target-specific default value, but ignore this
 	                                    * option  completely when the  `DISASSEMBLER_FNOBYTES' flag was set,
 	                                    * in which case instruction bytes aren't printed at all. */
-	__UINTPTR_HALF_TYPE__  d_pad0;      /* ... */
-	void                  *d_pad1[4];   /* ... */
+	__UINTPTR_HALF_TYPE__  d_pad0;     /* ... */
+	void                  *d_pad1[4];  /* ... */
 };
 
 
@@ -119,17 +119,17 @@ __NOTHROW_NCX(LIBDISASM_CC disasm_init)(struct disassembler *__restrict self,
                                         __UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_CURRENT),
                                         __UINTPTR_HALF_TYPE__ flags __DFL(DISASSEMBLER_FNORMAL),
                                         __ptrdiff_t baseoff __DFL(0)) {
-	self->d_pc         = (__byte_t *)pc;
-	self->d_baseoff    = baseoff;
-	self->d_printer    = printer;
-	self->d_arg        = arg;
-	self->d_result     = 0;
-	self->d_format     = __NULLPTR;
-	self->d_symbol     = __NULLPTR;
-	self->d_target     = target;
-	self->d_flags      = flags;
-	self->d_maxbytes   = 0;
-	self->d_pad0       = 0;
+	self->d_pc       = (__byte_t const *)pc;
+	self->d_baseoff  = baseoff;
+	self->d_printer  = printer;
+	self->d_arg      = arg;
+	self->d_result   = 0;
+	self->d_format   = __NULLPTR;
+	self->d_symbol   = __NULLPTR;
+	self->d_target   = target;
+	self->d_flags    = flags;
+	self->d_maxbytes = 0;
+	self->d_pad0     = 0;
 	__libc_memset(self->d_pad1, 0, sizeof(self->d_pad1));
 }
 
@@ -198,12 +198,12 @@ disasm_print_format(struct disassembler *__restrict self,
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(LIBDISASM_CC *PDISASM)(__pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
+(LIBDISASM_CC *PDISASM)(__pformatprinter printer, void *arg, void const *pc, __size_t num_bytes,
                         __UINTPTR_HALF_TYPE__ target /*__DFL(DISASSEMBLER_TARGET_CURRENT)*/,
                         __UINTPTR_HALF_TYPE__ flags /*__DFL(DISASSEMBLER_FNORMAL)*/);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
-disasm(__pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
+disasm(__pformatprinter printer, void *arg, void const *pc, __size_t num_bytes,
        __UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_CURRENT),
        __UINTPTR_HALF_TYPE__ flags __DFL(DISASSEMBLER_FNORMAL));
 #endif /* LIBDISASM_WANT_PROTOTYPES */
@@ -217,12 +217,12 @@ disasm(__pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(LIBDISASM_CC *PDISASM_SINGLE)(__pformatprinter printer, void *arg, void *pc,
+(LIBDISASM_CC *PDISASM_SINGLE)(__pformatprinter printer, void *arg, void const *pc,
                                __UINTPTR_HALF_TYPE__ target /*__DFL(DISASSEMBLER_TARGET_CURRENT)*/,
                                __UINTPTR_HALF_TYPE__ flags /*__DFL(DISASSEMBLER_FNORMAL)*/);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
-disasm_single(__pformatprinter printer, void *arg, void *pc,
+disasm_single(__pformatprinter printer, void *arg, void const *pc,
               __UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_CURRENT),
               __UINTPTR_HALF_TYPE__ flags __DFL(DISASSEMBLER_FNORMAL));
 #endif /* LIBDISASM_WANT_PROTOTYPES */
@@ -276,10 +276,10 @@ disasm_print_instruction(struct disassembler *__restrict self);
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(LIBDISASM_CC *PDISASM_PRINT_SYMBOL)(struct disassembler *__restrict self, void *symbol_addr);
+(LIBDISASM_CC *PDISASM_PRINT_SYMBOL)(struct disassembler *__restrict self, void const *symbol_addr);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
-disasm_print_symbol(struct disassembler *__restrict self, void *symbol_addr);
+disasm_print_symbol(struct disassembler *__restrict self, void const *symbol_addr);
 #endif /* LIBDISASM_WANT_PROTOTYPES */
 
 /* Returns the length (in bytes) of the next instruction to-be disassembled. */
