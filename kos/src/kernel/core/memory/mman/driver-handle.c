@@ -45,8 +45,8 @@
 DECL_BEGIN
 
 /* Driver-handle API */
-DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(driver, struct driver);
-DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_section, struct driver_section);
+DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(module, struct module);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(module_section, struct module_section);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_loadlist, struct driver_loadlist);
 
 
@@ -63,9 +63,9 @@ hop_driver_getflags(struct driver *__restrict self)
 	return result;
 }
 
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_driver_getstring(USER CHECKED struct hop_driver_string *data,
-                        char const *__restrict str, size_t str_len_with_nul)
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+get_driver_string(USER CHECKED struct hop_driver_string *data,
+                  char const *__restrict str, size_t str_len_with_nul)
 		THROWS(...) {
 	USER UNCHECKED char *buf;
 	size_t buflen;
@@ -78,10 +78,10 @@ handle_driver_getstring(USER CHECKED struct hop_driver_string *data,
 	return 0;
 }
 
-INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_driver_getstring0(USER UNCHECKED void *arg,
-                         char const *__restrict str,
-                         size_t str_len_with_nul)
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+get_driver_string0(USER UNCHECKED void *arg,
+                   char const *__restrict str,
+                   size_t str_len_with_nul)
 		THROWS(...) {
 	u64 index;
 	size_t struct_size;
@@ -101,15 +101,28 @@ handle_driver_getstring0(USER UNCHECKED void *arg,
 		      E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0,
 		      index);
 	}
-	return handle_driver_getstring(data, str, str_len_with_nul);
+	return get_driver_string(data, str, str_len_with_nul);
 }
 
 
 /************************************************************************/
 /* struct driver;                                                       */
 /************************************************************************/
+PRIVATE struct driver *FCALL
+require_driver(struct module *__restrict self) {
+	if (!module_isdriver(self)) {
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ 0,
+		      /* needed_handle_type: */ HANDLE_TYPE_MODULE,
+		      /* actual_handle_type: */ HANDLE_TYPE_MODULE,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_MODULE_DRIVER,
+		      /* actual_handle_kind: */ HANDLE_TYPEKIND_MODULE_GENERIC);
+	}
+	return (struct driver *)self;
+}
+
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_driver_hop(struct driver *__restrict self,
+handle_module_hop(struct module *__restrict self,
                   syscall_ulong_t cmd,
                   USER UNCHECKED void *arg,
                   iomode_t mode)
@@ -118,6 +131,7 @@ handle_driver_hop(struct driver *__restrict self,
 
 	case HOP_DRIVER_STAT: {
 		size_t struct_size;
+		struct driver *me = require_driver(self);
 		USER CHECKED struct hop_driver_stat *data;
 		data = (USER CHECKED struct hop_driver_stat *)arg;
 		validate_readwrite(data, sizeof(*data));
@@ -128,41 +142,44 @@ handle_driver_hop(struct driver *__restrict self,
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 		COMPILER_WRITE_BARRIER();
 		data->ds_state      = 0;
-		data->ds_flags      = hop_driver_getflags(self);
-		data->ds_loadaddr   = self->md_loadaddr;
-		data->ds_loadstart  = (uintptr_t)self->md_loadmin;
-		data->ds_loadend    = (uintptr_t)self->md_loadmax + 1;
-		data->ds_argc       = self->d_argc;
-		data->ds_depc       = self->d_depcnt;
-		data->ds_symcnt     = self->d_dynsym_cnt;
-		data->ds_shnum      = self->d_shnum;
-		data->ds_strtabsz   = (size_t)(self->d_dynstr_end - self->d_dynstr);
-		data->ds_shstrtabsz = self->d_shstrsiz;
+		data->ds_flags      = hop_driver_getflags(me);
+		data->ds_loadaddr   = me->md_loadaddr;
+		data->ds_loadstart  = (uintptr_t)me->md_loadmin;
+		data->ds_loadend    = (uintptr_t)me->md_loadmax + 1;
+		data->ds_argc       = me->d_argc;
+		data->ds_depc       = me->d_depcnt;
+		data->ds_symcnt     = me->d_dynsym_cnt;
+		data->ds_shnum      = me->d_shnum;
+		data->ds_strtabsz   = (size_t)(me->d_dynstr_end - me->d_dynstr);
+		data->ds_shstrtabsz = me->d_shstrsiz;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
 	case HOP_DRIVER_GET_NAME: {
 		char const *name;
-		name = driver_getname(self);
-		return handle_driver_getstring0(arg, name, strlen(name) + 1);
+		struct driver *me;
+		me   = require_driver(self);
+		name = driver_getname(me);
+		return get_driver_string0(arg, name, strlen(name) + 1);
 	}	break;
 
 	case HOP_DRIVER_GET_CMDLINE: {
+		struct driver *me = require_driver(self);
 		char *cmdline, *endptr;
-		cmdline = self->d_cmdline;
+		cmdline = me->d_cmdline;
 		endptr  = cmdline;
 		do {
 			endptr = strend(endptr) + 1;
 		} while (*endptr);
-		return handle_driver_getstring0(arg, cmdline,
-		                                (size_t)(endptr - cmdline));
+		return get_driver_string0(arg, cmdline, (size_t)(endptr - cmdline));
 	}	break;
 
 	case HOP_DRIVER_GET_ARGV: {
-		u64 index;
-		size_t struct_size;
-		char const *argument_string;
+		struct driver *me = require_driver(self);
 		USER CHECKED struct hop_driver_string *data;
+		char const *argument_string;
+		size_t struct_size;
+		u64 index;
 		data = (USER CHECKED struct hop_driver_string *)arg;
 		validate_readwrite(data, sizeof(*data));
 		COMPILER_READ_BARRIER();
@@ -173,22 +190,23 @@ handle_driver_hop(struct driver *__restrict self,
 		COMPILER_WRITE_BARRIER();
 		index = data->ds_index;
 		COMPILER_READ_BARRIER();
-		if unlikely(index >= (u64)self->d_argc) {
+		if unlikely(index >= (u64)me->d_argc) {
 			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
 			      (intptr_t)(uintptr_t)index,
 			      (intptr_t)(uintptr_t)0,
-			      (intptr_t)(uintptr_t)self->d_argc - 1);
+			      (intptr_t)(uintptr_t)me->d_argc - 1);
 		}
-		argument_string = self->d_argv[(size_t)index];
-		return handle_driver_getstring(data, argument_string,
+		argument_string = me->d_argv[(size_t)index];
+		return get_driver_string(data, argument_string,
 		                               strlen(argument_string) + 1);
 	}	break;
 
 	case HOP_DRIVER_OPEN_FILE: {
+		struct driver *me = require_driver(self);
 		struct handle d;
 		struct mfile *file;
 		require(CAP_DRIVER_QUERY);
-		file = driver_getfile(self);
+		file = driver_getfile(me);
 		if unlikely(!file)
 			THROW(E_NO_SUCH_OBJECT);
 		d.h_type = HANDLE_TYPE_MFILE;
@@ -198,9 +216,10 @@ handle_driver_hop(struct driver *__restrict self,
 	}	break;
 
 	case HOP_DRIVER_OPEN_DEPENDENCY: {
+		struct driver *me = require_driver(self);
+		struct handle d;
 		size_t struct_size;
 		u64 depno;
-		struct handle d;
 		USER CHECKED struct hop_driver_open_dependency *data;
 		data = (USER CHECKED struct hop_driver_open_dependency *)arg;
 		validate_readable(data, sizeof(*data));
@@ -213,29 +232,31 @@ handle_driver_hop(struct driver *__restrict self,
 		COMPILER_READ_BARRIER();
 		depno = data->dod_depno;
 		COMPILER_READ_BARRIER();
-		if unlikely(depno >= (u64)self->d_depcnt) {
+		if unlikely(depno >= (u64)me->d_depcnt) {
 			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
 			      (intptr_t)(uintptr_t)depno,
 			      (intptr_t)(uintptr_t)0,
-			      (intptr_t)(uintptr_t)self->d_depcnt - 1);
+			      (intptr_t)(uintptr_t)me->d_depcnt - 1);
 		}
 		d.h_type = HANDLE_TYPE_MODULE;
 		d.h_mode = mode;
-		d.h_data = axref_get(&self->d_depvec[(uintptr_t)depno]);
+		d.h_data = axref_get(&me->d_depvec[(uintptr_t)depno]);
 		if unlikely(!d.h_data)
 			THROW(E_NO_SUCH_OBJECT);
 		return handle_installhop(&data->dod_result, d);
 	}	break;
 
-	case HOP_DRIVER_INITIALIZE:
+	case HOP_DRIVER_INITIALIZE: {
+		struct driver *me = require_driver(self);
 		require(CAP_DRIVER_CONTROL);
-		driver_initialize(self);
-		break;
+		driver_initialize(me);
+	}	break;
 
-	case HOP_DRIVER_FINALIZE:
+	case HOP_DRIVER_FINALIZE: {
+		struct driver *me = require_driver(self);
 		require(CAP_DRIVER_CONTROL);
-		driver_finalize(self);
-		break;
+		driver_finalize(me);
+	}	break;
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

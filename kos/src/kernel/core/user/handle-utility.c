@@ -40,6 +40,7 @@
 #include <fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/module.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/atomic64.h>
@@ -102,10 +103,24 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 			return HANDLE_TYPEKIND_CHARACTERDEVICE_MOUSE;
 	}	break;
 
-	case HANDLE_TYPE_PATH:
-		if (((struct path *)self->h_data)->p_vfs == (struct path *)self->h_data)
+	case HANDLE_TYPE_PATH: {
+		struct path *me = (struct path *)self->h_data;
+		if (me->p_vfs == me)
 			return HANDLE_TYPEKIND_PATH_VFSROOT;
-		break;
+	}	break;
+
+	case HANDLE_TYPE_MODULE: {
+		struct module *me = (struct module *)self->h_data;
+		if (module_isdriver(me))
+			return HANDLE_TYPEKIND_MODULE_DRIVER;
+	}	break;
+
+	case HANDLE_TYPE_MODULE_SECTION: {
+		struct module_section *me = (struct module_section *)self->h_data;
+		struct module *mod        = me->ms_module;
+		if (module_isdriver(mod))
+			return HANDLE_TYPEKIND_MODULE_SECTION_DRIVER;
+	}	break;
 
 	default: break;
 	}

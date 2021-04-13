@@ -139,10 +139,12 @@
 #define HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE 0x0005 /* The handle refers to a `struct symlink_node' */
 #define HANDLE_TYPEKIND_DATABLOCK_FIFONODE    0x0006 /* The handle refers to a `struct fifo_node' */
 #define HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE  0x0007 /* The handle refers to a `struct socket_node' */
+
 /* Handle kinds for `HANDLE_TYPE_BLOCKDEVICE' */
 #define HANDLE_TYPEKIND_BLOCKDEVICE_GENERIC   0x0000 /* The handle refers to a `struct basic_block_device' */
 #define HANDLE_TYPEKIND_BLOCKDEVICE_PARTITION 0x0001 /* The handle refers to a `struct block_device_partition' */
 #define HANDLE_TYPEKIND_BLOCKDEVICE_DRIVEROOT 0x0002 /* The handle refers to a `struct block_device' */
+
 /* Handle kinds for `HANDLE_TYPE_CHARACTERDEVICE' */
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_GENERIC  0x0000 /* The handle refers to a `struct character_device' */
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_TTYBASE  0x0001 /* The handle refers to a `struct ttybase_device' */
@@ -150,9 +152,18 @@
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_PTY      0x0003 /* The handle refers to a `struct pty_master' and `struct ttybase_device' */
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_KEYBOARD 0x0004 /* The handle refers to a `struct keyboard_device' */
 #define HANDLE_TYPEKIND_CHARACTERDEVICE_MOUSE    0x0005 /* The handle refers to a `struct mouse_device' */
+
 /* Handle kinds for `HANDLE_TYPE_PATH' */
 #define HANDLE_TYPEKIND_PATH_GENERIC          0x0000 /* The handle refers to a `struct path' */
 #define HANDLE_TYPEKIND_PATH_VFSROOT          0x0001 /* The handle refers to a `struct vfs' */
+
+/* Handle kinds for `HANDLE_TYPE_MODULE' */
+#define HANDLE_TYPEKIND_MODULE_GENERIC        0x0000 /* The handle refers to a `struct module' */
+#define HANDLE_TYPEKIND_MODULE_DRIVER         0x0001 /* The handle refers to a `struct driver' */
+
+/* Handle kinds for `HANDLE_TYPE_MODULE_SECTION' */
+#define HANDLE_TYPEKIND_MODULE_SECTION_GENERIC 0x0000 /* The handle refers to a `struct module_section' */
+#define HANDLE_TYPEKIND_MODULE_SECTION_DRIVER  0x0001 /* The handle refers to a `struct driver_section' */
 
 
 #endif /* !_KOS_KERNEL_HANDLE_H */
