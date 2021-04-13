@@ -417,7 +417,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       e.g.: assert(self->foo == 42);
 	 *       Will automatically display the value of `self->foo' as part of
 	 *       the initial assertion check screen.
-	 *       Recognized expression sequences should token sequences matching:
+	 *       Recognized expression token sequences should match:
 	 *          EXPR      ::= UNARY [SUFFIX...]
 	 *          UNARY     ::= KEYWORD | '(' TYPE_EXPR ')' EXPR | '(' EXPR ')' | '*' UNARY
 	 *          SUFFIX    ::= '->' KEYWORD | '.' KEYWORD | '[' FULL_EXPR ']'
@@ -462,7 +462,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       that O_ASYNC should work for ttys, ptys, sockets, pipes and fifos,  all
 	 *       of which KOS is already implementing, but currently does so w/o support
 	 *       for SIGIO.
-	 *       Note that  in all  of these  cases, we  an make  the jump  from the  NOBLOCK
+	 *       Note that in  all of  these cases,  we can make  the jump  from the  NOBLOCK
 	 *       world that  `sig_postcompletion_t' would  still be  stuck in  by posting  an
 	 *       event to an async worker that is registered using  `register_async_worker()'
 	 *       on a per-object basis. (and gets enabled/disabled as O_ASYNC is set/cleared)
@@ -568,9 +568,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       to save registers that wouldn't be used in any case! */
 
 	/* TODO: renameat2() is missing from <stdio.h> */
-
-	/* TODO: Decompressed driver section data should be reference counted, such that (then)
-	 *       unused sections can be lazily  unloaded during calls to  `system_clearcache()' */
 
 	/* TODO: Add auto-completion to the `cpuid' debugger command.
 	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */

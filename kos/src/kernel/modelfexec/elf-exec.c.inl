@@ -35,8 +35,10 @@
 #endif /* !__x86_64__ */
 #endif /* __INTELLISENSE__ */
 
-#include <kernel/mman/flags.h>
+#include <kernel/execabi.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/flags.h>
+#include <kernel/mman/ramfile.h>
 
 #ifdef LOCAL_EXEC_ARGV_SIZE
 #define LOCAL_STRINGARRAY_TYPE USER CHECKED void const *
@@ -54,7 +56,7 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 	ehdr        = (LOCAL_ElfW(Ehdr) *)args->ea_header;
 	phdr_vector = (LOCAL_ElfW(Phdr) *)malloca(ehdr->e_phnum * sizeof(LOCAL_ElfW(Phdr)));
 	TRY {
-		struct vmb builder = VMB_INIT;
+		struct mbuilder builder = MBUILDER_INIT;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *peb_base;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *stack_base;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *linker_base;
@@ -87,7 +89,6 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 					size_t adjusted_filsize;
 					size_t adjusted_memsize;
 					void *bss_start;
-					bool map_ok;
 					/* Load entry into memory. */
 					if ((phdr_vector[i].p_offset & PAGEMASK) !=
 					    (phdr_vector[i].p_vaddr & PAGEMASK)) {
@@ -108,16 +109,18 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 						if (((uintptr_t)bss_start & PAGEMASK) != 0)
 							fil_bytes -= PAGESIZE;
 					}
-					prot   = prot_from_elfpf(phdr_vector[i].p_flags);
-					map_ok = vmb_mapat(&builder, loadaddr, fil_bytes,
-					                   args->ea_xnode, args->ea_xpath, args->ea_xdentry,
-					                   (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK),
-					                   prot | VM_PROT_PRIVATE);
-					if unlikely(!map_ok) {
-err_overlap:
-						THROW(E_NOT_EXECUTABLE_FAULTY,
-						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
-						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
+					prot = prot_from_elfpf(phdr_vector[i].p_flags);
+					TRY {
+						mbuilder_map(&builder, loadaddr, fil_bytes, prot,
+						             MAP_FIXED | MAP_FIXED_NOREPLACE,
+						             args->ea_xnode,
+						             args->ea_xpath,
+						             args->ea_xdentry,
+						             (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK));
+					} EXCEPT {
+						if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
+							goto err_overlap;
+						RETHROW();
 					}
 					if (mem_bytes > fil_bytes) {
 						/* LD  sometimes produces really  weird .bss sections  that are neither whole
@@ -154,8 +157,13 @@ err_overlap:
 							if (bss_overlap > bss_total_size)
 								bss_overlap = bss_total_size;
 							bss_overlap_addr = loadaddr + fil_bytes;
-							if unlikely(vmb_getnodeofaddress(&builder, bss_overlap_addr) != NULL)
-								goto err_overlap; /* Already in use... */
+							if unlikely(mbuilder_mappings_locate(&builder, bss_overlap_addr) != NULL) {
+err_overlap:
+								/* Already in use... */
+								THROW(E_NOT_EXECUTABLE_FAULTY,
+								      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
+								      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
+							}
 							overlap_node = create_bss_overlap_mbnode(args->ea_xnode,
 							                                         (pos_t)(phdr_vector[i].p_offset +
 							                                                 phdr_vector[i].p_filesz -
@@ -165,20 +173,21 @@ err_overlap:
 							/* Fill in remaining fields of `overlap_node' */
 							overlap_node->mbn_minaddr = bss_overlap_addr;
 							overlap_node->mbn_maxaddr = bss_overlap_addr + PAGESIZE - 1;
-							overlap_node->mbn_flags = prot | VM_PROT_PRIVATE;
+							overlap_node->mbn_flags   = prot;
 							mbuilder_insert_fmnode(&builder, overlap_node);
 							fil_bytes += PAGESIZE; /* Adjust to not map the first (special) page of .bss */
 						}
 						/* Map BSS as anonymous, zero-initialized memory. */
-						map_ok = vmb_mapat(&builder,
-						                   loadaddr + fil_bytes,
-						                   mem_bytes - fil_bytes,
-						                   &vm_datablock_anonymous_zero,
-						                   NULL, NULL, 0,
-						                   prot | VM_PROT_PRIVATE,
-						                   0, 0);
-						if unlikely(!map_ok)
-							goto err_overlap;
+						TRY {
+							mbuilder_map(&builder, loadaddr + fil_bytes,
+							             mem_bytes - fil_bytes, prot,
+							             MAP_FIXED | MAP_FIXED_NOREPLACE,
+							             &mfile_zero);
+						} EXCEPT {
+							if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
+								goto err_overlap;
+							RETHROW();
+						}
 					}
 				}	break;
 
@@ -189,38 +198,29 @@ err_overlap:
 			}
 			/* If necessary, load the dynamic linker. */
 			if (need_dyn_linker) {
-				linker_base = vmb_map(&builder,
-				                      HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
-				                      LOCAL_FUNC(execabi_system_rtld_size),
-				                      PAGESIZE,
+				linker_base = mbuilder_map(/* self:        */ &builder,
+				                           /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
+				                           /* num_bytes:   */ LOCAL_FUNC(execabi_system_rtld_size),
+				                           /* prot:        */ PROT_READ | PROT_WRITE | PROT_EXEC,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
-				                      MAP_GROWSUP | MAP_NOASLR,
+				                           /* flags:       */ MAP_GROWSUP | MAP_NOASLR,
 #else
-				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
+				                           /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
-				                      &LOCAL_FUNC(execabi_system_rtld_file).rf_block,
-				                      NULL,
-				                      NULL,
-				                      0,
-				                      VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
-				                      VM_NODE_FLAG_NORMAL,
-				                      0);
+				                           /* file:        */ &LOCAL_FUNC(execabi_system_rtld_file).mrf_file,
+				                           /* file_fspath: */ NULL,
+				                           /* file_fsname: */ NULL,
+				                           /* file_pos:    */ 0);
 			}
 
-#define USER_STACK_NUM_PAGES 64 /* TODO: Don't put this here! */
+#define USER_STACK_SIZE (64 * PAGESIZE) /* TODO: Don't put this here! */
 			/* Allocate a new user-space stack for the calling thread. */
-			stack_base = vmb_map(&builder,
-			                     HINT_GETADDR(KERNEL_VMHINT_USER_STACK),
-			                     USER_STACK_NUM_PAGES * PAGESIZE,
-			                     PAGESIZE,
-			                     HINT_GETMODE(KERNEL_VMHINT_USER_STACK),
-			                     &vm_datablock_anonymous_zero, /* XXX: Use memory with a debug initializer? */
-			                     NULL,
-			                     NULL,
-			                     0,
-			                     VM_PROT_READ | VM_PROT_WRITE,
-			                     VM_NODE_FLAG_NORMAL,
-			                     0);
+			stack_base = mbuilder_map(/* self:      */ &builder,
+			                          /* hint:      */ HINT_GETADDR(KERNEL_VMHINT_USER_STACK),
+			                          /* num_bytes: */ USER_STACK_SIZE,
+			                          /* prot:      */ PROT_READ | PROT_WRITE,
+			                          /* flags:     */ HINT_GETMODE(KERNEL_VMHINT_USER_STACK),
+			                          /* file:      */ &mfile_zero);
 
 			/* Create a memory mapping for the PEB containing `args->ea_argv' and `args->ea_envp' */
 #ifdef LOCAL_EXEC_ARGV_SIZE
@@ -234,40 +234,40 @@ err_overlap:
 			{
 				typedef USER UNCHECKED PTR32(char const) USER CHECKED const *vec_t;
 #if LOCAL_POINTERSIZE == 4
-				peb_base = vmb_alloc_peb32_p32(&builder,
-				                               args->ea_argc_inject,
-				                               args->ea_argv_inject,
-				                               (vec_t)args->ea_argv,
-				                               (vec_t)args->ea_envp);
+				peb_base = mbuilder_alloc_peb32_p32(&builder,
+				                                    args->ea_argc_inject,
+				                                    args->ea_argv_inject,
+				                                    (vec_t)args->ea_argv,
+				                                    (vec_t)args->ea_envp);
 #else /* LOCAL_POINTERSIZE == 4 */
-				peb_base = vmb_alloc_peb64_p32(&builder,
-				                               args->ea_argc_inject,
-				                               args->ea_argv_inject,
-				                               (vec_t)args->ea_argv,
-				                               (vec_t)args->ea_envp);
+				peb_base = mbuilder_alloc_peb64_p32(&builder,
+				                                    args->ea_argc_inject,
+				                                    args->ea_argv_inject,
+				                                    (vec_t)args->ea_argv,
+				                                    (vec_t)args->ea_envp);
 #endif /* LOCAL_POINTERSIZE != 4 */
 			} else {
 				typedef USER UNCHECKED PTR64(char const) USER CHECKED const *vec_t;
 #if LOCAL_POINTERSIZE == 4
-				peb_base = vmb_alloc_peb32_p64(&builder,
-				                               args->ea_argc_inject,
-				                               args->ea_argv_inject,
-				                               (vec_t)args->ea_argv,
-				                               (vec_t)args->ea_envp);
+				peb_base = mbuilder_alloc_peb32_p64(&builder,
+				                                    args->ea_argc_inject,
+				                                    args->ea_argv_inject,
+				                                    (vec_t)args->ea_argv,
+				                                    (vec_t)args->ea_envp);
 #else /* LOCAL_POINTERSIZE == 4 */
-				peb_base = vmb_alloc_peb64_p64(&builder,
-				                               args->ea_argc_inject,
-				                               args->ea_argv_inject,
-				                               (vec_t)args->ea_argv,
-				                               (vec_t)args->ea_envp);
+				peb_base = mbuilder_alloc_peb64_p64(&builder,
+				                                    args->ea_argc_inject,
+				                                    args->ea_argv_inject,
+				                                    (vec_t)args->ea_argv,
+				                                    (vec_t)args->ea_envp);
 #endif /* LOCAL_POINTERSIZE != 4 */
 			}
 #else /* LOCAL_EXEC_ARGV_SIZE */
-			peb_base = LOCAL_FUNC(vmb_alloc_peb)(&builder,
-			                                     args->ea_argc_inject,
-			                                     args->ea_argv_inject,
-			                                     (LOCAL_STRINGARRAY_TYPE)args->ea_argv,
-			                                     (LOCAL_STRINGARRAY_TYPE)args->ea_envp);
+			peb_base = LOCAL_FUNC(mbuilder_alloc_peb)(&builder,
+			                                          args->ea_argc_inject,
+			                                          args->ea_argv_inject,
+			                                          (LOCAL_STRINGARRAY_TYPE)args->ea_argv,
+			                                          (LOCAL_STRINGARRAY_TYPE)args->ea_envp);
 #endif /* !LOCAL_EXEC_ARGV_SIZE */
 
 			/* Apply  the newly  loaded binary  to the  given VM and
@@ -277,31 +277,29 @@ err_overlap:
 				ei.mei_node = args->ea_xnode;
 				ei.mei_dent = args->ea_xdentry;
 				ei.mei_path = args->ea_xpath;
-				vmb_apply(&builder,
-				          args->ea_mman,
-				          VMB_APPLY_AA_TERMTHREADS |
-				          VMB_APPLY_AA_SETEXECINFO,
-				          &ei);
+				mbuilder_apply(&builder,
+				               args->ea_mman,
+				               MBUILDER_APPLY_AA_TERMTHREADS |
+				               MBUILDER_APPLY_AA_SETEXECINFO,
+				               &ei);
 			}
 		} EXCEPT {
-			vmb_fini(&builder);
+			mbuilder_fini(&builder);
 			RETHROW();
 		}
-#ifdef WANT_VMB_FINI_AFTER_SUCCESSFUL_APPLY
-		vmb_fini(&builder);
-#endif /* WANT_VMB_FINI_AFTER_SUCCESSFUL_APPLY */
+		mbuilder_fini(&builder);
 
 		{
-			REF struct vm *oldvm = THIS_MMAN;
-			/* Change the calling thread's vm to `args->ea_mman' */
-			if (oldvm != args->ea_mman) {
-				incref(oldvm);
-				task_setvm(args->ea_mman);
+			REF struct mman *oldmman = THIS_MMAN;
+			/* Change the calling thread's mman to `args->ea_mman' */
+			if (oldmman != args->ea_mman) {
+				incref(oldmman);
+				task_setmman(args->ea_mman);
 			}
 			TRY {
 				size_t ustack_size;
 				USER void *entry_pc;
-				ustack_size = USER_STACK_NUM_PAGES * PAGESIZE;
+				ustack_size = USER_STACK_SIZE;
 				entry_pc    = (USER void *)(uintptr_t)ehdr->e_entry;
 				if (linker_base != (void *)-1) {
 					/* Initialize such that we make use of the dynamic linker. */
@@ -328,13 +326,14 @@ err_overlap:
 					                                                entry_pc);
 				}
 			} EXCEPT {
-				task_setmman_inherit(oldvm);
+				if (oldmman != args->ea_mman)
+					task_setmman_inherit(oldmman);
 				RETHROW();
 			}
-			if (oldvm != args->ea_mman) {
+			if (oldmman != args->ea_mman) {
 				if unlikely(!args->ea_change_mman_to_effective_mman)
-					task_setmman(oldvm);
-				decref(oldvm);
+					task_setmman(oldmman);
+				decref(oldmman);
 			}
 		}
 	} EXCEPT {

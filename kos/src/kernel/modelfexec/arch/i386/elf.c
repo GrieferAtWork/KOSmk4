@@ -27,7 +27,6 @@
 #include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <kernel/x86/gdt.h>
 #include <sched/arch/posix-signal.h>
 

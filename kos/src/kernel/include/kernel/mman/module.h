@@ -280,6 +280,8 @@ WUNUSED NONNULL((1, 3)) __BOOL (FCALL module_sectinfo)(struct module *__restrict
 /* Same as `module_locksection()', but preserve/discard errors and return `NULL' instead. */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct module_section *
 NOTHROW(FCALL module_locksection_nx)(struct module *__restrict self, char const *section_name);
+FUNDEF WUNUSED NONNULL((1)) REF struct module_section *
+NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self, unsigned int section_index);
 
 /* Return the size of a pointer for the given module. */
 #ifdef _MODULE_HAVE_SIZEOF_POINTER

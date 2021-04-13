@@ -24,7 +24,8 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/vm.h>
+#include <kernel/mman.h>
+#include <kernel/mman/rw.h>
 #include <sched/task.h>
 
 #include <assert.h>
@@ -36,7 +37,7 @@
 DECL_BEGIN
 
 /* Read/Write memory
- * WARNING: `GDB_WriteMemory()' and `GDB_VM_WriteMemory()' may modify the contents of the given `buf'!
+ * WARNING: `GDB_WriteMemory()' and `GDB_MMan_WriteMemory()' may modify the contents of the given `buf'!
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
  *              The affected memory ranges are:
@@ -47,12 +48,12 @@ NOTHROW(FCALL GDB_ReadMemory)(struct task *__restrict thread,
                               VIRT void const *addr, void *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
-		result = GDB_VM_ReadMemory(&vm_kernel, addr, buf, num_bytes);
+		result = GDB_MMan_ReadMemory(&mman_kernel, addr, buf, num_bytes);
 	else {
-		REF struct vm *effective_vm;
-		effective_vm = task_getvm(thread);
-		result = GDB_VM_ReadMemory(effective_vm, addr, buf, num_bytes);
-		decref_unlikely(effective_vm);
+		REF struct mman *effective_mm;
+		effective_mm = task_getmman(thread);
+		result = GDB_MMan_ReadMemory(effective_mm, addr, buf, num_bytes);
+		decref_unlikely(effective_mm);
 	}
 	return result;
 }
@@ -62,12 +63,12 @@ NOTHROW(FCALL GDB_WriteMemory)(struct task *__restrict thread,
                                VIRT void *addr, void *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
-		result = GDB_VM_WriteMemory(&vm_kernel, addr, buf, num_bytes);
+		result = GDB_MMan_WriteMemory(&mman_kernel, addr, buf, num_bytes);
 	else {
-		REF struct vm *effective_vm;
-		effective_vm = task_getvm(thread);
-		result = GDB_VM_WriteMemory(effective_vm, addr, buf, num_bytes);
-		decref_unlikely(effective_vm);
+		REF struct mman *effective_mm;
+		effective_mm = task_getmman(thread);
+		result = GDB_MMan_WriteMemory(effective_mm, addr, buf, num_bytes);
+		decref_unlikely(effective_mm);
 	}
 	return result;
 }
@@ -78,12 +79,12 @@ NOTHROW(FCALL GDB_ReadMemoryWithoutSwBreak)(struct task *__restrict thread,
                                             void *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
-		result = GDB_VM_ReadMemoryWithoutSwBreak(&vm_kernel, addr, buf, num_bytes);
+		result = GDB_MMan_ReadMemoryWithoutSwBreak(&mman_kernel, addr, buf, num_bytes);
 	else {
-		REF struct vm *effective_vm;
-		effective_vm = task_getvm(thread);
-		result = GDB_VM_ReadMemoryWithoutSwBreak(effective_vm, addr, buf, num_bytes);
-		decref_unlikely(effective_vm);
+		REF struct mman *effective_mm;
+		effective_mm = task_getmman(thread);
+		result = GDB_MMan_ReadMemoryWithoutSwBreak(effective_mm, addr, buf, num_bytes);
+		decref_unlikely(effective_mm);
 	}
 	return result;
 }
@@ -94,45 +95,45 @@ NOTHROW(FCALL GDB_WriteMemoryWithoutSwBreak)(struct task *__restrict thread,
                                              void const *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
-		result = GDB_VM_WriteMemoryWithoutSwBreak(&vm_kernel, addr, buf, num_bytes);
+		result = GDB_MMan_WriteMemoryWithoutSwBreak(&mman_kernel, addr, buf, num_bytes);
 	else {
-		REF struct vm *effective_vm;
-		effective_vm = task_getvm(thread);
-		result = GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, addr, buf, num_bytes);
-		decref_unlikely(effective_vm);
+		REF struct mman *effective_mm;
+		effective_mm = task_getmman(thread);
+		result = GDB_MMan_WriteMemoryWithoutSwBreak(effective_mm, addr, buf, num_bytes);
+		decref_unlikely(effective_mm);
 	}
 	return result;
 }
 
 INTERN NONNULL((1, 3)) size_t
-NOTHROW(FCALL GDB_VM_ReadMemory)(struct vm *__restrict effective_vm,
-                                 VIRT void const *addr,
-                                 void *buf, size_t num_bytes) {
+NOTHROW(FCALL GDB_MMan_ReadMemory)(struct mman *__restrict effective_mm,
+                                   VIRT void const *addr,
+                                   void *buf, size_t num_bytes) {
 	size_t result;
-	result = GDB_VM_ReadMemoryWithoutSwBreak(effective_vm, addr, buf, num_bytes);
-	GDB_ExcludeSwBreak(effective_vm, addr, buf, num_bytes - __builtin_expect(result, 0));
+	result = GDB_MMan_ReadMemoryWithoutSwBreak(effective_mm, addr, buf, num_bytes);
+	GDB_ExcludeSwBreak(effective_mm, addr, buf, num_bytes - __builtin_expect(result, 0));
 	return result;
 }
 
 INTERN NONNULL((1, 3)) size_t
-NOTHROW(FCALL GDB_VM_WriteMemory)(struct vm *__restrict effective_vm,
+NOTHROW(FCALL GDB_MMan_WriteMemory)(struct mman *__restrict effective_mm,
                                   VIRT void *addr, void *buf, size_t num_bytes) {
 	size_t result;
-	GDB_IncludeSwBreak(effective_vm, addr, buf, num_bytes);
-	result = GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, addr, buf, num_bytes);
+	GDB_IncludeSwBreak(effective_mm, addr, buf, num_bytes);
+	result = GDB_MMan_WriteMemoryWithoutSwBreak(effective_mm, addr, buf, num_bytes);
 	return result;
 }
 
 INTERN NONNULL((1, 3)) size_t
-NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm,
-                                               VIRT void const *addr, void *buf, size_t num_bytes) {
+NOTHROW(FCALL GDB_MMan_ReadMemoryWithoutSwBreak)(struct mman *__restrict effective_mm,
+                                                 VIRT void const *addr, void *buf, size_t num_bytes) {
 	size_t result;
-	result = mman_read_nopf(effective_vm, (void const *)addr, buf, num_bytes);
+	result = mman_read_nopf(effective_mm, (void const *)addr, buf, num_bytes);
 	if (result) {
 		TRY {
 			/* TODO: mman_read()  may invoke RPC callbacks, which may
 			 *       in turn throw exceptions such as `E_EXIT_THREAD' */
-			mman_read(effective_vm, (void const *)addr, buf, num_bytes, true);
+			mman_read(effective_mm, (void const *)addr, buf, num_bytes, true);
 			result = 0;
 		} EXCEPT {
 		}
@@ -141,15 +142,15 @@ NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_v
 }
 
 INTERN NONNULL((1, 3)) size_t
-NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_vm,
+NOTHROW(FCALL GDB_MMan_WriteMemoryWithoutSwBreak)(struct mman *__restrict effective_mm,
                                                 VIRT void *addr, void const *buf, size_t num_bytes) {
 	size_t result;
-	result = mman_write_nopf(effective_vm, (void *)addr, buf, num_bytes);
+	result = mman_write_nopf(effective_mm, (void *)addr, buf, num_bytes);
 	if (result) {
 		TRY {
 			/* TODO: mman_write() may invoke RPC callbacks, which may
 			 *       in turn throw exceptions such as `E_EXIT_THREAD' */
-			mman_write(effective_vm, (void *)addr, buf, num_bytes, true);
+			mman_write(effective_mm, (void *)addr, buf, num_bytes, true);
 			result = 0;
 		} EXCEPT {
 		}

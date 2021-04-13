@@ -70,8 +70,8 @@ PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 	GDBInterrupt_Fini();
 
 	/* Uninstall traps and hooks. */
-	mman_onfini_callbacks.remove(&GDB_ClearAllBreakpointsOfVM);
-	mman_onclone_callbacks.remove(&GDB_CloneAllBreakpointsFromVM);
+	mman_onfini_callbacks.remove(&GDB_ClearAllBreakpointsOfMMan);
+	mman_onclone_callbacks.remove(&GDB_CloneAllBreakpointsFromMMan);
 	kernel_debugtraps_uninstall(&GDBServer_DebugTraps);
 
 	/* Terminate the fallback-host thread */
@@ -98,8 +98,8 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		GDBInterrupt_Init();
 
 		/* Hook the vm callbacks for breakpoints. */
-		mman_onfini_callbacks.insert(&GDB_ClearAllBreakpointsOfVM);
-		mman_onclone_callbacks.insert(&GDB_CloneAllBreakpointsFromVM);
+		mman_onfini_callbacks.insert(&GDB_ClearAllBreakpointsOfMMan);
+		mman_onclone_callbacks.insert(&GDB_CloneAllBreakpointsFromMMan);
 
 		/* Create the fallback-host thread. */
 		GDBServer_FallbackHost = task_alloc(&mman_kernel);

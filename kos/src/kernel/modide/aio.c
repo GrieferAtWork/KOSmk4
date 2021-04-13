@@ -25,7 +25,6 @@
 /**/
 
 #include <kernel/compiler.h>
-#include <kernel/vm.h>
 
 #include <hybrid/atomic.h>
 

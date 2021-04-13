@@ -27,7 +27,6 @@
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/paging.h>
-#include <kernel/vm.h>
 
 #include <kos/except/reason/io.h>
 #include <sys/stat.h>

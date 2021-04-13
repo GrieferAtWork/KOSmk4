@@ -80,6 +80,18 @@ NOTHROW(FCALL module_locksection_nx)(struct module *__restrict self,
 	return result;
 }
 
+PUBLIC WUNUSED NONNULL((1)) REF struct module_section *
+NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self,
+                                           unsigned int section_index) {
+	REF struct module_section *result;
+	NESTED_TRY {
+		result = module_locksection_index(self, section_index);
+	} EXCEPT {
+		result = NULL;
+	}
+	return result;
+}
+
 
 /* Print  the absolute filesystem path or name (filesystem
  * path excluding the leading  path) of the given  module.

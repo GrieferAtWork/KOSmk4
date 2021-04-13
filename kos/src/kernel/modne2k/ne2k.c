@@ -30,8 +30,8 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/isr.h>
+#include <kernel/mman.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <kernel/x86/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <sched/async.h>
 #include <sched/cpu.h>

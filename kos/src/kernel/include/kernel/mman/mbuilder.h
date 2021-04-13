@@ -234,6 +234,17 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
 
 
+/* Helper macros for operating on the mappings tree of a given mbuilder. */
+#define mbuilder_mappings_locate(self, key)                          mbnode_tree_locate((self)->mb_mappings, key)
+#define mbuilder_mappings_rlocate(self, minkey, maxkey)              mbnode_tree_rlocate((self)->mb_mappings, minkey, maxkey)
+#define mbuilder_mappings_insert(self, node)                         mbnode_tree_insert(&(self)->mb_mappings, node)
+#define mbuilder_mappings_tryinsert(self, node)                      mbnode_tree_tryinsert(&(self)->mb_mappings, node)
+#define mbuilder_mappings_remove(self, key)                          mbnode_tree_remove(&(self)->mb_mappings, key)
+#define mbuilder_mappings_rremove(self, minkey, maxkey)              mbnode_tree_rremove(&(self)->mb_mappings, minkey, maxkey)
+#define mbuilder_mappings_removenode(self, node)                     mbnode_tree_removenode(&(self)->mb_mappings, node)
+#define mbuilder_mappings_minmaxlocate(self, minkey, maxkey, result) mbnode_tree_minmaxlocate((self)->mb_mappings, minkey, maxkey, result)
+
+
 /* Insert or remove a raw mem-node `fmnode' from self.
  * This function does:
  *  - assert(fmnode->mbn_part != NULL);
@@ -414,6 +425,19 @@ mbuilder_map(struct mbuilder *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
+#if 0
+mbuilder_map(/* self:          */ self,
+             /* hint:          */ hint,
+             /* num_bytes:     */ num_bytes,
+             /* prot:          */ prot,
+             /* flags:         */ flags,
+             /* file:          */ file,
+             /* file_fspath:   */ file_fspath,
+             /* file_fsname:   */ file_fsname,
+             /* file_pos:      */ file_pos,
+             /* min_alignment: */ min_alignment);
+#endif
+
 
 /* MBuilder-version of `mman_map_subrange()' */
 FUNDEF NONNULL((1, 6)) void *KCALL

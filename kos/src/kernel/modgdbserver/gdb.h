@@ -32,7 +32,7 @@
 
 DECL_BEGIN
 
-struct vm;
+struct mman;
 struct gdb_cpustate;
 
 typedef struct gdb_thread_stop_event GDBThreadStopEvent;
@@ -288,22 +288,22 @@ INTDEF bool NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread, boo
  * @return: ENOENT:   [GDB_DelBreak] The specified breakpoint doesn't exist. */
 INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_AddBreak)(struct task *__restrict thread, unsigned int type, VIRT void *addr, unsigned int kind);
 INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_DelBreak)(struct task *__restrict thread, unsigned int type, VIRT void *addr, unsigned int kind);
-INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm, unsigned int type, VIRT void *addr, unsigned int kind);
-INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm, unsigned int type, VIRT void *addr, unsigned int kind);
+INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_MMan_AddBreak)(struct mman *__restrict effective_mm, unsigned int type, VIRT void *addr, unsigned int kind);
+INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_MMan_DelBreak)(struct mman *__restrict effective_mm, unsigned int type, VIRT void *addr, unsigned int kind);
 
-/* Remove all breakpoints from any sort of VM */
+/* Remove all breakpoints from any sort of MMan */
 INTDEF void NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void);
 
-/* Delete all internal knowledge of breakpoints concerning `effective_vm'.
+/* Delete all internal knowledge of breakpoints concerning `effective_mm'.
  * Note  that this function may be called  from threads other than the GDB
  * host thread, as it is invoked as part of `mman_onfini_callbacks()'! */
-INTDEF void NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm);
+INTDEF void NOTHROW(FCALL GDB_ClearAllBreakpointsOfMMan)(struct mman *__restrict effective_mm);
 
-/* Copy all breakpoint definitions of `oldvm' to also exist in `newvm' (called during `vm_clone()') */
-INTDEF void NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm, struct vm *__restrict oldvm);
+/* Copy all breakpoint definitions of `oldmm' to also exist in `newmm' (called during `mman_fork()') */
+INTDEF void NOTHROW(FCALL GDB_CloneAllBreakpointsFromMMan)(struct mman *__restrict newmm, struct mman *__restrict oldmm);
 
 /* Read/Write memory
- * WARNING: `GDB_WriteMemory()' and `GDB_VM_WriteMemory()' may modify the contents of the given `buf'!
+ * WARNING: `GDB_WriteMemory()' and `GDB_MMan_WriteMemory()' may modify the contents of the given `buf'!
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
  *              The affected memory ranges are:
@@ -313,10 +313,10 @@ INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_ReadMemory)(struct task *__restr
 INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_WriteMemory)(struct task *__restrict thread, VIRT void *addr, void *buf, size_t num_bytes);
 INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_ReadMemoryWithoutSwBreak)(struct task *__restrict thread, VIRT void const *addr, void *buf, size_t num_bytes);
 INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_WriteMemoryWithoutSwBreak)(struct task *__restrict thread, VIRT void *addr, void const *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_ReadMemory)(struct vm *__restrict effective_vm, VIRT void const *addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemory)(struct vm *__restrict effective_vm, VIRT void *addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, VIRT void const *addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, VIRT void *addr, void const *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_MMan_ReadMemory)(struct mman *__restrict effective_mm, VIRT void const *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_MMan_WriteMemory)(struct mman *__restrict effective_mm, VIRT void *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_MMan_ReadMemoryWithoutSwBreak)(struct mman *__restrict effective_mm, VIRT void const *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_MMan_WriteMemoryWithoutSwBreak)(struct mman *__restrict effective_mm, VIRT void *addr, void const *buf, size_t num_bytes);
 
 /* Search memory for a specific need
  * This function behaves identical to `memmem()'
@@ -352,10 +352,10 @@ NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
  *       the  restore buffer and only into main memory once the breakpoint
  *       is removed. */
 INTDEF NONNULL((1, 3)) void
-NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
+NOTHROW(FCALL GDB_IncludeSwBreak)(struct mman *__restrict effective_mm,
                                   VIRT void const *addr, void *buf, size_t bufsize);
 INTDEF NONNULL((1, 3)) void
-NOTHROW(FCALL GDB_ExcludeSwBreak)(struct vm *__restrict effective_vm,
+NOTHROW(FCALL GDB_ExcludeSwBreak)(struct mman *__restrict effective_mm,
                                   VIRT void const *addr, void *buf, size_t bufsize);
 
 

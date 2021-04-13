@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/vm.h>
+#include <kernel/mman.h>
 #include <sched/task.h>
 
 #include "gdb.h"
@@ -45,12 +45,12 @@ NOTHROW(FCALL GDB_AddBreak)(struct task *__restrict thread,
                             VIRT void *addr, unsigned int kind) {
 	errno_t result;
 	if (ADDR_ISKERN(addr)) {
-		result = GDB_VM_AddBreak(&vm_kernel, type, addr, kind);
+		result = GDB_MMan_AddBreak(&mman_kernel, type, addr, kind);
 	} else {
-		REF struct vm *effective_vm;
-		effective_vm = task_getvm(thread);
-		result = GDB_VM_AddBreak(effective_vm, type, addr, kind);
-		decref_unlikely(effective_vm);
+		REF struct mman *effective_mm;
+		effective_mm = task_getmman(thread);
+		result = GDB_MMan_AddBreak(effective_mm, type, addr, kind);
+		decref_unlikely(effective_mm);
 	}
 	return result;
 }
@@ -61,12 +61,12 @@ NOTHROW(FCALL GDB_DelBreak)(struct task *__restrict thread,
                             VIRT void *addr, unsigned int kind) {
 	errno_t result;
 	if (ADDR_ISKERN(addr)) {
-		result = GDB_VM_DelBreak(&vm_kernel, type, addr, kind);
+		result = GDB_MMan_DelBreak(&mman_kernel, type, addr, kind);
 	} else {
-		REF struct vm *effective_vm;
-		effective_vm = task_getvm(thread);
-		result = GDB_VM_DelBreak(effective_vm, type, addr, kind);
-		decref_unlikely(effective_vm);
+		REF struct mman *effective_mm;
+		effective_mm = task_getmman(thread);
+		result = GDB_MMan_DelBreak(effective_mm, type, addr, kind);
+		decref_unlikely(effective_mm);
 	}
 	return result;
 }

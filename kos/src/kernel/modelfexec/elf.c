@@ -30,9 +30,10 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/execabi.h>
+#include <kernel/mman/mbuilder.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
-#include <kernel/vm.h>
-#include <kernel/vm/builder.h>
 
 #include <hybrid/align.h>
 #include <hybrid/pointer.h>
@@ -160,7 +161,7 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 	                                GFP_LOCKED | GFP_PREFLT);
 	TRY {
 		part = (struct mpart *)kmalloc(sizeof(struct mpart),
-		                                      GFP_LOCKED | GFP_PREFLT);
+		                               GFP_LOCKED | GFP_PREFLT);
 		TRY {
 			overlap_page = page_mallocone();
 			if unlikely(overlap_page == PHYSPAGE_INVALID)

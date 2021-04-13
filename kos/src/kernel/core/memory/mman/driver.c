@@ -3220,6 +3220,45 @@ driver_runfini_DT_FINIARR(struct driver *__restrict self, unsigned int flags) {
 
 PRIVATE NONNULL((1)) void FCALL
 driver_runfini_unbindglob(struct driver *__restrict self) {
+#if 0
+	bool result;
+	(void)self;
+	result = driver_clear_execabis(self);
+
+	/* TODO: Delete global hooks of `self':
+	 *   - block_device_register()
+	 *   - character_device_register()
+	 *   - nic_device_setdefault()
+	 *   - register_filesystem_type()
+	 *   - fs_filesystems                       (All filesystem implemented by `self')
+	 *   - fs_filesystems                       (All filesystem using a block-device implemented by `self')
+	 *   - kernel_debugtraps_install()
+	 *   - driver_loaded_callbacks
+	 *   - driver_finalized_callbacks
+	 *   - driver_unloaded_callbacks
+	 *   - mman_onexec_callbacks
+	 *   - mman_oninit_callbacks
+	 *   - mman_onfini_callbacks
+	 *   - mman_onclone_callbacks
+	 *   - isr_register()
+	 *   - syslog_sink_register()
+	 *   - mrtm_hooks
+	 *   - register_async_worker()              (Delete all workers with callbacks apart of `self')
+	 *   - async_job_start()                    (Cancel all running jobs with callbacks apart of `self')
+	 *   - realtime_clock
+	 * XXX:
+	 *   - What  about  file  handles  that  somehow  reference  the   driver,
+	 *     including  stuff  like  HANDLE_TYPE_FILE->f_node->i_super->s_device
+	 *     We should probably try to find these files, and close them in their
+	 *     accompanying handle manager.
+	 *     We can enumerate open handle managers by enumerating threads!
+	 *   - This function should also have a  return value to indicate if  it
+	 *     even  did something, and if it did,  the caller should be able to
+	 *     call us multiple times to do a kind-of keep-killing-until-it-dies
+	 *     functionality, alongside doing other things in-between.
+	 */
+	return result;
+#endif
 	/* TODO */
 	(void)self;
 	COMPILER_IMPURE();

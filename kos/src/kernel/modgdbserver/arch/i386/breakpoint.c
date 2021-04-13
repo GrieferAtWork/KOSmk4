@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/vm.h>
+#include <kernel/mman/rw.h>
 #include <kernel/x86/breakpoint.h>
 
 #include <hybrid/atomic.h>
@@ -44,7 +44,7 @@ DECL_BEGIN
 #endif /* !CONFIG_GDBSERVER_SWBREAK_MAX_COUNT */
 
 struct sw_brk {
-	struct vm *sb_vm;   /* [0..1] The VM inside of which this breakpoint exists.
+	struct mman *sb_vm;   /* [0..1] The VM inside of which this breakpoint exists.
 	                     * When  NULL,  then  this  entry  is  not  being  used. */
 	byte_t    *sb_addr; /* [1..1][valid_if(sb_vm != NULL)] The breakpointa address. */
 	byte_t     sb_prev; /* The breakpoint's previous value. */
@@ -84,11 +84,11 @@ NOTHROW(FCALL GDBBreak_SwMinFree_SetLower)(size_t newval) {
  * @return: true:  An entry already exists.
  * @return: false: No matching entry exists. */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL GDBBreak_SwExists)(struct vm const *effective_vm,
+NOTHROW(FCALL GDBBreak_SwExists)(struct mman const *effective_mm,
                                  byte_t *addr) {
 	size_t i;
 	for (i = 0; i <= GDBBreak_SwMaxUsed; ++i) {
-		if (GDBBreak_SwList[i].sb_vm != effective_vm)
+		if (GDBBreak_SwList[i].sb_vm != effective_mm)
 			continue; /* Already in use. */
 		if (GDBBreak_SwList[i].sb_addr != addr)
 			continue; /* Already in use. */
@@ -102,7 +102,7 @@ NOTHROW(FCALL GDBBreak_SwExists)(struct vm const *effective_vm,
  * @return: true:  Successfully create the new SW break entry.
  * @return: false: All slots are already in use. */
 PRIVATE NOBLOCK bool
-NOTHROW(FCALL GDBBreak_SwPush)(struct vm *effective_vm,
+NOTHROW(FCALL GDBBreak_SwPush)(struct mman *effective_mm,
                                byte_t *addr, byte_t prev) {
 	size_t i, start;
 	start = ATOMIC_READ(GDBBreak_SwMinFree);
@@ -112,7 +112,7 @@ again:
 		if (GDBBreak_SwList[i].sb_vm)
 			continue; /* Already in use. */
 		/* Use this slot! */
-		GDBBreak_SwList[i].sb_vm   = effective_vm;
+		GDBBreak_SwList[i].sb_vm   = effective_mm;
 		GDBBreak_SwList[i].sb_addr = addr;
 		GDBBreak_SwList[i].sb_prev = prev;
 		if (GDBBreak_SwMaxUsed < i)
@@ -133,12 +133,12 @@ again:
  * @return: true:  Successfully removed the new SW break entry.
  * @return: false: No slot matching the given VM and ADDR exists. */
 PRIVATE NOBLOCK bool
-NOTHROW(FCALL GDBBreak_SwPop)(struct vm *effective_vm,
+NOTHROW(FCALL GDBBreak_SwPop)(struct mman *effective_mm,
                               byte_t *addr,
                               byte_t *__restrict pprev) {
 	size_t i;
 	for (i = 0; i <= GDBBreak_SwMaxUsed; ++i) {
-		if (GDBBreak_SwList[i].sb_vm != effective_vm)
+		if (GDBBreak_SwList[i].sb_vm != effective_mm)
 			continue; /* Already in use. */
 		if (GDBBreak_SwList[i].sb_addr != addr)
 			continue; /* Already in use. */
@@ -161,30 +161,30 @@ NOTHROW(FCALL GDBBreak_SwPop)(struct vm *effective_vm,
 }
 
 PRIVATE NOBLOCK errno_t
-NOTHROW(FCALL GDB_AddSwBreak)(struct vm *__restrict effective_vm, byte_t *addr) {
+NOTHROW(FCALL GDB_AddSwBreak)(struct mman *__restrict effective_mm, byte_t *addr) {
 	byte_t prev;
 	byte_t op_int3[] = { OP_INT3 };
-	if unlikely(GDBBreak_SwExists(effective_vm, addr))
+	if unlikely(GDBBreak_SwExists(effective_mm, addr))
 		return EALREADY;
-	if unlikely(GDB_VM_ReadMemory(effective_vm, addr, &prev, 1) != 0)
+	if unlikely(GDB_MMan_ReadMemory(effective_mm, addr, &prev, 1) != 0)
 		return EFAULT; /* Faulty memory */
-	if unlikely(!GDBBreak_SwPush(effective_vm, addr, prev))
+	if unlikely(!GDBBreak_SwPush(effective_mm, addr, prev))
 		return ENOMEM; /* Too many breakpoints already */
 	/* Override the target location. */
-	if unlikely(GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, addr, op_int3, 1) != 0) {
-		GDBBreak_SwPop(effective_vm, addr, &prev);
+	if unlikely(GDB_MMan_WriteMemoryWithoutSwBreak(effective_mm, addr, op_int3, 1) != 0) {
+		GDBBreak_SwPop(effective_mm, addr, &prev);
 		return EFAULT; /* Faulty memory */
 	}
 	return EOK;
 }
 
 PRIVATE NOBLOCK errno_t
-NOTHROW(FCALL GDB_DelSwBreak)(struct vm *__restrict effective_vm, byte_t *addr) {
+NOTHROW(FCALL GDB_DelSwBreak)(struct mman *__restrict effective_mm, byte_t *addr) {
 	byte_t prev;
-	if (!GDBBreak_SwPop(effective_vm, (byte_t *)addr, &prev))
+	if (!GDBBreak_SwPop(effective_mm, (byte_t *)addr, &prev))
 		return ENOENT; /* No breakpoint at this location */
 	/* Restore what was originally written at the given address. */
-	if unlikely(GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, addr, &prev, 1) != 0)
+	if unlikely(GDB_MMan_WriteMemoryWithoutSwBreak(effective_mm, addr, &prev, 1) != 0)
 		return EFAULT; /* Faulty memory */
 	return EOK;
 }
@@ -199,13 +199,13 @@ NOTHROW(FCALL GDB_DelSwBreak)(struct vm *__restrict effective_vm, byte_t *addr) 
  * @return: EFAULT:   [GDB_AddBreak] Attempted to define a software-breakpoint at a faulty memory location.
  * @return: ENOENT:   [GDB_DelBreak] The specified breakpoint doesn't exist. */
 INTERN WUNUSED errno_t
-NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm,
-                               unsigned int type, VIRT void *addr,
-                               unsigned int kind) {
+NOTHROW(FCALL GDB_MMan_AddBreak)(struct mman *__restrict effective_mm,
+                                 unsigned int type, VIRT void *addr,
+                                 unsigned int kind) {
 	unsigned int cond;
 	(void)kind;
 	if (type == GDB_BREAKPOINT_TYPE_SWBREAK)
-		return GDB_AddSwBreak(effective_vm, (byte_t *)addr);
+		return GDB_AddSwBreak(effective_mm, (byte_t *)addr);
 	if (type == GDB_BREAKPOINT_TYPE_HWBREAK)
 		cond = DR_CEXEC;
 	else if (type == GDB_BREAKPOINT_TYPE_WRITE)
@@ -213,19 +213,19 @@ NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm,
 	else {
 		cond = DR_CREADWRITE;
 	}
-	if (!mman_addhwbreak(effective_vm, addr, cond, DR_S1))
+	if (!mman_addhwbreak(effective_mm, addr, cond, DR_S1))
 		return ENOMEM;
 	return EOK;
 }
 
 INTERN WUNUSED errno_t
-NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm,
-                               unsigned int type, VIRT void *addr,
-                               unsigned int kind) {
+NOTHROW(FCALL GDB_MMan_DelBreak)(struct mman *__restrict effective_mm,
+                                 unsigned int type, VIRT void *addr,
+                                 unsigned int kind) {
 	unsigned int cond;
 	(void)kind;
 	if (type == GDB_BREAKPOINT_TYPE_SWBREAK)
-		return GDB_DelSwBreak(effective_vm, (byte_t *)addr);
+		return GDB_DelSwBreak(effective_mm, (byte_t *)addr);
 	if (type == GDB_BREAKPOINT_TYPE_HWBREAK)
 		cond = DR_CEXEC;
 	else if (type == GDB_BREAKPOINT_TYPE_WRITE)
@@ -233,7 +233,7 @@ NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm,
 	else {
 		cond = DR_CREADWRITE;
 	}
-	if (!mman_addhwbreak(effective_vm, addr, cond, DR_S1))
+	if (!mman_addhwbreak(effective_mm, addr, cond, DR_S1))
 		return ENOENT;
 	return EOK;
 }
@@ -244,7 +244,7 @@ NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void) {
 	size_t i;
 	for (i = 0; i <= GDBBreak_SwMaxUsed; ++i) {
 		byte_t *addr, prev;
-		struct vm *thatvm;
+		struct mman *thatvm;
 		thatvm = GDBBreak_SwList[i].sb_vm;
 		if (!thatvm)
 			continue;
@@ -260,19 +260,19 @@ NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void) {
 	GDBBreak_SwMinFree = 0;
 }
 
-/* Delete all internal knowledge of breakpoints concerning `effective_vm'.
+/* Delete all internal knowledge of breakpoints concerning `effective_mm'.
  * Note  that this function may be called  from threads other than the GDB
  * host thread, as it is invoked as part of `mman_onfini_callbacks()'! */
 INTERN void
-NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm) {
+NOTHROW(FCALL GDB_ClearAllBreakpointsOfMMan)(struct mman *__restrict effective_mm) {
 	size_t i, maxused;
 	bool isfirst = true;
 	maxused = ATOMIC_READ(GDBBreak_SwMaxUsed);
 	for (i = 0; i <= maxused; ++i) {
-		if (GDBBreak_SwList[i].sb_vm != effective_vm)
+		if (GDBBreak_SwList[i].sb_vm != effective_mm)
 			continue; /* Already in use. */
 		/* Try to delete this slot. */
-		if (!ATOMIC_CMPXCH(GDBBreak_SwList[i].sb_vm, effective_vm, NULL))
+		if (!ATOMIC_CMPXCH(GDBBreak_SwList[i].sb_vm, effective_mm, NULL))
 			continue;;
 		if (isfirst) {
 			GDBBreak_SwMinFree_SetLower(i);
@@ -281,20 +281,20 @@ NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm) {
 	}
 }
 
-/* Copy all breakpoint definitions of `oldvm' to also exist in `newvm' (called during `vm_clone()') */
+/* Copy all breakpoint definitions of `oldmm' to also exist in `newmm' (called during `mman_fork()') */
 INTERN void
-NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm,
-                                             struct vm *__restrict oldvm) {
+NOTHROW(FCALL GDB_CloneAllBreakpointsFromMMan)(struct mman *__restrict newmm,
+                                               struct mman *__restrict oldmm) {
 	size_t i, maxused;
 	maxused = ATOMIC_READ(GDBBreak_SwMaxUsed);
 	for (i = 0; i <= maxused; ++i) {
 		byte_t *addr, prev;
-		if (GDBBreak_SwList[i].sb_vm != oldvm)
+		if (GDBBreak_SwList[i].sb_vm != oldmm)
 			continue; /* Already in use. */
-		/* Add a new breakpoint for `newvm' */
+		/* Add a new breakpoint for `newmm' */
 		addr = GDBBreak_SwList[i].sb_addr;
 		prev = GDBBreak_SwList[i].sb_prev;
-		GDBBreak_SwPush(newvm, addr, prev);
+		GDBBreak_SwPush(newmm, addr, prev);
 	}
 }
 
@@ -315,7 +315,7 @@ NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm,
  *       the  restore buffer and only into main memory once the breakpoint
  *       is removed. */
 INTERN NONNULL((1, 3)) void
-NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
+NOTHROW(FCALL GDB_IncludeSwBreak)(struct mman *__restrict effective_mm,
                                   VIRT void const *addr,
                                   void *buf, size_t bufsize) {
 	size_t i;
@@ -323,7 +323,7 @@ NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
 	start = (byte_t *)addr;
 	end   = (byte_t *)addr + bufsize;
 	for (i = 0; i <= GDBBreak_SwMaxUsed; ++i) {
-		if (GDBBreak_SwList[i].sb_vm != effective_vm)
+		if (GDBBreak_SwList[i].sb_vm != effective_mm)
 			continue;
 		if (GDBBreak_SwList[i].sb_addr >= start &&
 		    GDBBreak_SwList[i].sb_addr < end) {
@@ -337,7 +337,7 @@ NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
 }
 
 INTERN NONNULL((1, 3)) void
-NOTHROW(FCALL GDB_ExcludeSwBreak)(struct vm *__restrict effective_vm,
+NOTHROW(FCALL GDB_ExcludeSwBreak)(struct mman *__restrict effective_mm,
                                   VIRT void const *addr,
                                   void *buf, size_t bufsize) {
 	size_t i;
@@ -345,7 +345,7 @@ NOTHROW(FCALL GDB_ExcludeSwBreak)(struct vm *__restrict effective_vm,
 	start = (byte_t *)addr;
 	end   = (byte_t *)addr + bufsize;
 	for (i = 0; i <= GDBBreak_SwMaxUsed; ++i) {
-		if (GDBBreak_SwList[i].sb_vm != effective_vm)
+		if (GDBBreak_SwList[i].sb_vm != effective_mm)
 			continue;
 		if (GDBBreak_SwList[i].sb_addr >= start &&
 		    GDBBreak_SwList[i].sb_addr < end) {
