@@ -1242,23 +1242,20 @@ libregdump_ip(struct regdump_printer *__restrict self,
 		}
 		if (ENSURE_LIBDEBUGINFO()) {
 			REF module_t *ip_module;
-			module_type_var(ip_module_type);
-			ip_module = module_ataddr_nx((void const *)ip,
-			                             ip_module_type);
+			ip_module = module_fromaddr_nx((void const *)ip);
 			if (ip_module) {
 				di_addr2line_sections_t sections;
 				di_addr2line_dl_sections_t dl_sections;
 				temp = 0;
-				if (debug_addr2line_sections_lock(ip_module, &sections, &dl_sections
-				                                  module_type__arg(ip_module_type)) ==
+				if (debug_addr2line_sections_lock(ip_module, &sections, &dl_sections) ==
 				    DEBUG_INFO_ERROR_SUCCESS) {
 					di_debug_addr2line_t info;
-					uintptr_t relpc = prev_ip - (uintptr_t)module_getloadaddr(ip_module, ip_module_type);
+					uintptr_t relpc = prev_ip - module_getloadaddr(ip_module);
 					if (debug_addr2line(&sections, &info, relpc, 0, 0) == DEBUG_INFO_ERROR_SUCCESS)
 						temp = libregdump_do_ip_addr2line_info(self, &info, relpc, &did_lf_after_eip);
-					debug_addr2line_sections_unlock(&dl_sections module_type__arg(ip_module_type));
+					debug_addr2line_sections_unlock(&dl_sections);
 				}
-				module_decref(ip_module, ip_module_type);
+				module_decref_unlikely(ip_module);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;

@@ -161,7 +161,6 @@ struct cfientry {
 	};
 	unwind_emulator_t                 *ce_emulator;              /* [1..1][const] The instruction emulator that is being used. */
 	REF module_t                      *ce_module;                /* [0..1][lock(WRITE_ONCE)] The module associated with the PC-register from `ce_unwind_regv' */
-	module_type_var                   (ce_modtyp);               /* [valid_if(ce_module)][const] Module type for `ce_module' */
 	uintptr_t                          ce_modrelpc;              /* [valid_if(ce_module)][const] Module-relative PC-offset (of the PC-register from `ce_unwind_regv') */
 	REF module_section_t              *ce_s_eh_frame;            /* [0..1][valid_if(ce_module)] The .eh_frame section of `ce_module' */
 	REF module_section_t              *ce_s_debug_frame;         /* [0..1][valid_if(ce_module)] The .debug_frame section of `ce_module' */
@@ -214,19 +213,19 @@ PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC cfientry_fini)(struct cfientry *__restrict self) {
 	if (self->ce_module && self->ce_module != (REF module_t *)-1) {
 		if (self->ce_s_eh_frame != (REF module_section_t *)-1)
-			module_section_xdecref(self->ce_s_eh_frame, self->ce_modtyp);
+			module_section_xdecref(self->ce_s_eh_frame);
 		if (self->ce_s_debug_frame != (REF module_section_t *)-1)
-			module_section_xdecref(self->ce_s_debug_frame, self->ce_modtyp);
+			module_section_xdecref(self->ce_s_debug_frame);
 		if (self->ce_s_debug_addr != (REF module_section_t *)-1)
-			module_section_xdecref(self->ce_s_debug_addr, self->ce_modtyp);
+			module_section_xdecref(self->ce_s_debug_addr);
 		if (self->ce_s_debug_loc != (REF module_section_t *)-1)
-			module_section_xdecref(self->ce_s_debug_loc, self->ce_modtyp);
-		module_section_decref(self->ce_s_debug_abbrev, self->ce_modtyp);
-		module_section_decref(self->ce_s_debug_info, self->ce_modtyp);
-		module_section_xdecref(self->ce_s_debug_aranges, self->ce_modtyp);
+			module_section_xdecref(self->ce_s_debug_loc);
+		module_section_decref(self->ce_s_debug_abbrev);
+		module_section_decref(self->ce_s_debug_info);
+		module_section_xdecref(self->ce_s_debug_aranges);
 		if (self->ce_s_debug_ranges != (REF module_section_t *)-1)
-			module_section_xdecref(self->ce_s_debug_ranges, self->ce_modtyp);
-		module_decref(self->ce_module, self->ce_modtyp);
+			module_section_xdecref(self->ce_s_debug_ranges);
+		module_decref(self->ce_module);
 		libdi_debuginfo_cu_abbrev_fini(&self->ce_abbrev);
 	}
 }
@@ -277,11 +276,11 @@ INTDEF char const secname_eh_frame[];
 INTDEF char const secname_debug_frame[];
 INTDEF char const secname_debug_addr[];
 
-#define LOAD_SECTION(sect, module_type, lv_start, lv_end)                                \
-	do {                                                                                 \
-		size_t size;                                                                     \
-		(lv_start) = (byte_t const *)module_section_inflate_nx(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                                  \
+#define LOAD_SECTION(sect, lv_start, lv_end)                                         \
+	do {                                                                             \
+		size_t size;                                                                 \
+		(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
+		(lv_end)   = (lv_start) + size;                                              \
 	}	__WHILE0
 
 
@@ -290,14 +289,14 @@ PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
 	if (self->ce_s_debug_ranges)
 		return;
-	self->ce_s_debug_ranges = module_locksection(self->ce_module, self->ce_modtyp,
-	                                             secname_debug_ranges, MODULE_LOCKSECTION_FNORMAL);
+	self->ce_s_debug_ranges = module_locksection(self->ce_module,
+	                                             secname_debug_ranges,
+	                                             MODULE_LOCKSECTION_FNORMAL);
 	if (!self->ce_s_debug_ranges) {
 		self->ce_s_debug_ranges = (REF module_section_t *)-1;
 		return;
 	}
 	LOAD_SECTION(self->ce_s_debug_ranges,
-	             self->ce_modtyp,
 	             self->ce_sections.ds_debug_ranges_start,
 	             self->ce_sections.ds_debug_ranges_end);
 }
@@ -500,23 +499,21 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	pc_register = find_register(self, CFI_UNWIND_REGISTER_PC);
 	if unlikely(!pc_register)
 		goto noinfo_fail;
-	self->ce_module = module_ataddr_nx((void const *)pc_register->ur_word, self->ce_modtyp);
+	self->ce_module = module_fromaddr_nx((void const *)pc_register->ur_word);
 	if unlikely(!self->ce_module)
 		goto noinfo_fail;
 
 	/* Fill in data that becomes valid once a module's been loaded. */
-	self->ce_modrelpc = pc_register->ur_word - module_getloadaddr(self->ce_module, self->ce_modtyp);
-#define lock_section(name)                               \
-	module_locksection(self->ce_module, self->ce_modtyp, \
-	                   name, MODULE_LOCKSECTION_FNORMAL)
-	self->ce_s_debug_info = lock_section(secname_debug_info);
+	self->ce_modrelpc = pc_register->ur_word - module_getloadaddr(self->ce_module);
+#define locksection(name) module_locksection(self->ce_module, name, MODULE_LOCKSECTION_FNORMAL)
+	self->ce_s_debug_info = locksection(secname_debug_info);
 	if unlikely(!self->ce_s_debug_info) /* We absolutely _need_ the .debug_info section! */
 		goto noinfo_fail_module;
-	self->ce_s_debug_abbrev = lock_section(secname_debug_abbrev);
+	self->ce_s_debug_abbrev = locksection(secname_debug_abbrev);
 	if unlikely(!self->ce_s_debug_abbrev) /* We absolutely _need_ the .debug_abbrev section! */
 		goto noinfo_fail_module_debug_info;
-	self->ce_s_debug_aranges = lock_section(secname_debug_aranges);
-#undef lock_section
+	self->ce_s_debug_aranges = locksection(secname_debug_aranges);
+#undef locksection
 	self->ce_s_eh_frame     = NULL; /* Loaded lazily. */
 	self->ce_s_debug_frame  = NULL; /* Loaded lazily. */
 	self->ce_s_debug_addr   = NULL; /* Loaded lazily. */
@@ -527,16 +524,13 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	/* Bind sections. */
 	if (self->ce_s_debug_aranges) {
 		LOAD_SECTION(self->ce_s_debug_aranges,
-		             self->ce_modtyp,
 		             self->ce_sections.ds_debug_aranges_start,
 		             self->ce_sections.ds_debug_aranges_end);
 	}
 	LOAD_SECTION(self->ce_s_debug_abbrev,
-	             self->ce_modtyp,
 	             self->ce_sections.ds_debug_abbrev_start,
 	             self->ce_sections.ds_debug_abbrev_end);
 	LOAD_SECTION(self->ce_s_debug_info,
-	             self->ce_modtyp,
 	             self->ce_sections.ds_debug_info_start,
 	             self->ce_sections.ds_debug_info_end);
 
@@ -588,12 +582,12 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	}
 	return UNWIND_SUCCESS;
 noinfo_fail_module_sections:
-	module_section_xdecref(self->ce_s_debug_aranges, self->ce_modtyp);
-	module_section_decref(self->ce_s_debug_abbrev, self->ce_modtyp);
+	module_section_xdecref(self->ce_s_debug_aranges);
+	module_section_decref(self->ce_s_debug_abbrev);
 noinfo_fail_module_debug_info:
-	module_section_decref(self->ce_s_debug_info, self->ce_modtyp);
+	module_section_decref(self->ce_s_debug_info);
 noinfo_fail_module:
-	module_decref(self->ce_module, self->ce_modtyp);
+	module_decref(self->ce_module);
 noinfo_fail:
 	self->ce_module = (REF module_t *)-1;
 	return UNWIND_OPTIMIZED_AWAY;
@@ -742,7 +736,7 @@ again_runexpr:
 	emulator.ue_regget_arg         = self;
 	/*ulator.ue_regset_arg         = NULL;*/ /* Unused */
 	emulator.ue_framebase          = &self->ce_subprogram_frame_base;
-	emulator.ue_addroffset         = module_getloadaddr(self->ce_module, self->ce_modtyp);
+	emulator.ue_addroffset         = module_getloadaddr(self->ce_module);
 	emulator.ue_objaddr            = NULL;
 	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
 	emulator.ue_addrsize           = self->ce_parser.dup_addrsize;
@@ -792,19 +786,16 @@ again_runexpr:
 	    error == UNWIND_EMULATOR_NO_CFA) {
 		if (!self->ce_s_eh_frame && !self->ce_s_debug_frame &&
 		    !self->ce_s_debug_addr && !self->ce_s_debug_loc) {
-#define lock_section(name)                                       \
-			module_locksection(self->ce_module, self->ce_modtyp, \
-			                   name, MODULE_LOCKSECTION_FNORMAL)
-			self->ce_s_eh_frame    = lock_section(secname_eh_frame);
-			self->ce_s_debug_frame = lock_section(secname_debug_frame);
-			self->ce_s_debug_addr  = lock_section(secname_debug_addr);
-			self->ce_s_debug_loc   = lock_section(secname_debug_loc);
-#undef lock_section
+#define locksection(name) module_locksection(self->ce_module, name, MODULE_LOCKSECTION_FNORMAL)
+			self->ce_s_eh_frame    = locksection(secname_eh_frame);
+			self->ce_s_debug_frame = locksection(secname_debug_frame);
+			self->ce_s_debug_addr  = locksection(secname_debug_addr);
+			self->ce_s_debug_loc   = locksection(secname_debug_loc);
+#undef locksection
 			if (!self->ce_s_eh_frame)
 				self->ce_s_eh_frame = (REF module_section_t *)-1;
 			else {
 				LOAD_SECTION(self->ce_s_eh_frame,
-				             self->ce_modtyp,
 				             self->ce_sections.ds_eh_frame_start,
 				             self->ce_sections.ds_eh_frame_end);
 			}
@@ -812,7 +803,6 @@ again_runexpr:
 				self->ce_s_debug_frame = (REF module_section_t *)-1;
 			else {
 				LOAD_SECTION(self->ce_s_debug_frame,
-				             self->ce_modtyp,
 				             self->ce_sections.ds_debug_frame_start,
 				             self->ce_sections.ds_debug_frame_end);
 			}
@@ -820,7 +810,6 @@ again_runexpr:
 				self->ce_s_debug_addr = (REF module_section_t *)-1;
 			else {
 				LOAD_SECTION(self->ce_s_debug_addr,
-				             self->ce_modtyp,
 				             self->ce_sections.ds_debug_addr_start,
 				             self->ce_sections.ds_debug_addr_end);
 			}
@@ -828,7 +817,6 @@ again_runexpr:
 				self->ce_s_debug_loc = (REF module_section_t *)-1;
 			else {
 				LOAD_SECTION(self->ce_s_debug_loc,
-				             self->ce_modtyp,
 				             self->ce_sections.ds_debug_loc_start,
 				             self->ce_sections.ds_debug_loc_end);
 			}

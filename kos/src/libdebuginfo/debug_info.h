@@ -236,11 +236,9 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
 INTDEF NONNULL((2, 3)) void
 NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
                                           di_debug_sections_t *__restrict sections,
-                                          di_debug_dl_sections_t *__restrict dl_sections
-                                          module_type__param(module_type));
+                                          di_debug_dl_sections_t *__restrict dl_sections);
 INTDEF NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections
-                                            module_type__param(module_type));
+NOTHROW_NCX(CC libdi_debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections);
 
 
 DECL_END

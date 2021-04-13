@@ -39,7 +39,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/addr2line.h>
-#include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 
 #include <kos/keyboard.h>
 
@@ -191,9 +190,6 @@ NOTHROW(VCALL dbg_addr2line_printf)(void const *start_pc, void const *end_pc,
 
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict ainfo,
-#ifndef CONFIG_USE_NEW_DRIVER
-                                        struct addr2line_modinfo const *__restrict modinfo,
-#endif /* !CONFIG_USE_NEW_DRIVER */
                                         uintptr_t module_relative_start_pc,
                                         void const *start_pc, void const *end_pc,
                                         char const *message_format, va_list args) {
@@ -201,17 +197,10 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 	unsigned int error;
 	u8 normal_fgcolor = ANSITTY_CL_WHITE;
 	u8 inline_fgcolor = ANSITTY_CL_AQUA;
-#ifdef CONFIG_USE_NEW_DRIVER
 	if (ainfo->ds_mod && !module_isdriver(ainfo->ds_mod)) {
 		normal_fgcolor = ANSITTY_CL_OLIVE;
 		inline_fgcolor = ANSITTY_CL_TEAL;
 	}
-#elif defined(CONFIG_HAVE_USERMOD)
-	if (ainfo->ds_modtype == MODULE_TYPE_USRMOD) {
-		normal_fgcolor = ANSITTY_CL_OLIVE;
-		inline_fgcolor = ANSITTY_CL_TEAL;
-	}
-#endif /* CONFIG_HAVE_USERMOD */
 	error = addr2line(ainfo, module_relative_start_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
 		dbg_savecolor();
@@ -225,7 +214,6 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 		           (size_t)((byte_t *)end_pc -
 		                    (byte_t *)start_pc));
 		dbg_loadcolor();
-#ifdef CONFIG_USE_NEW_DRIVER
 		if (ainfo->ds_mod && module_hasname(ainfo->ds_mod)) {
 			dbg_putc('[');
 			dbg_savecolor();
@@ -234,16 +222,6 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 			dbg_loadcolor();
 			dbg_putc(']');
 		}
-#else /* CONFIG_USE_NEW_DRIVER */
-		if (modinfo->ami_name) {
-			dbg_putc('[');
-			dbg_savecolor();
-			dbg_setfgcolor(normal_fgcolor);
-			dbg_print(modinfo->ami_name);
-			dbg_loadcolor();
-			dbg_putc(']');
-		}
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		if (message_format) {
 			dbg_putc('[');
 			dbg_savecolor();
@@ -287,28 +265,11 @@ again_printlevel:
 			                         info.al_symstart),
 			             level == 0 ? (size_t)((byte_t *)end_pc - (byte_t *)start_pc)
 			                      : (size_t)(info.al_lineend - info.al_linestart));
-#ifdef CONFIG_USE_NEW_DRIVER
 			if (ainfo->ds_mod && module_haspath_or_name(ainfo->ds_mod)) {
 				dbg_logecho(DBGSTR("["));
 				module_printpath_or_name(ainfo->ds_mod, &dbg_logecho_printer, NULL);
 				dbg_logecho(DBGSTR("]"));
 			}
-#else /* CONFIG_USE_NEW_DRIVER */
-			if (modinfo->ami_filename) {
-				dbg_logechof(DBGSTR("[%s]"), modinfo->ami_filename);
-			} else if (modinfo->ami_name && modinfo->ami_fspath) {
-				dbg_logecho(DBGSTR("["));
-				path_printentex(modinfo->ami_fspath,
-				                modinfo->ami_name,
-				                strlen(modinfo->ami_name),
-				                &dbg_logecho_printer, NULL,
-				                PATH_PRINT_MODE_NORMAL,
-				                &vfs_kernel);
-				dbg_logecho(DBGSTR("]"));
-			} else if (modinfo->ami_name) {
-				dbg_logechof(DBGSTR("[%s]"), modinfo->ami_name);
-			}
-#endif /* !CONFIG_USE_NEW_DRIVER */
 			dbg_logechof(DBGSTR("[%s+%" PRIuSIZ "]"),
 			             info.al_rawname,
 			             level == 0 ? (size_t)(module_relative_start_pc - info.al_symstart)
@@ -342,7 +303,6 @@ again_printlevel:
 		           level == 0 ? (size_t)((byte_t *)end_pc - (byte_t *)start_pc)
 		                      : (size_t)(info.al_lineend - info.al_linestart));
 		dbg_loadcolor();
-#ifdef CONFIG_USE_NEW_DRIVER
 		if (ainfo->ds_mod && module_hasname(ainfo->ds_mod)) {
 			dbg_putc('[');
 			dbg_savecolor();
@@ -351,16 +311,6 @@ again_printlevel:
 			dbg_loadcolor();
 			dbg_putc(']');
 		}
-#else /* CONFIG_USE_NEW_DRIVER */
-		if (modinfo->ami_name) {
-			dbg_putc('[');
-			dbg_savecolor();
-			dbg_setfgcolor(fgcolor);
-			dbg_print(modinfo->ami_name);
-			dbg_loadcolor();
-			dbg_putc(']');
-		}
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		dbg_putc('[');
 		dbg_savecolor();
 		dbg_setfgcolor(fgcolor);
@@ -439,28 +389,12 @@ again_printlevel:
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
                                      char const *message_format, va_list args) {
-#ifdef CONFIG_USE_NEW_DRIVER
 	struct addr2line_buf ainfo;
 	uintptr_t module_relative_start_pc;
 	module_relative_start_pc = addr2line_begin(&ainfo, start_pc);
 	do_dbg_addr2line_vprintf(&ainfo, module_relative_start_pc,
 	                         start_pc, end_pc, message_format, args);
 	addr2line_end(&ainfo);
-#else /* CONFIG_USE_NEW_DRIVER */
-	struct addr2line_buf ainfo;
-	struct addr2line_modinfo modinfo;
-	uintptr_t module_relative_start_pc;
-	module_relative_start_pc = addr2line_begin(&ainfo, start_pc, &modinfo);
-	do_dbg_addr2line_vprintf(&ainfo,
-	                         &modinfo,
-	                         module_relative_start_pc,
-	                         start_pc,
-	                         end_pc,
-	                         message_format,
-	                         args);
-	addr2line_modinfo_fini(&modinfo);
-	addr2line_end(&ainfo);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 }
 
 

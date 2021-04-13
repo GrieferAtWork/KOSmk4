@@ -40,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/exec/module.h>
 
 #include <ctype.h>
+#include <elf.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -3520,28 +3521,25 @@ INTDEF char const secname_dynstr[];
 INTERN NONNULL((2, 3)) void
 NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
                                           di_debug_sections_t *__restrict sections,
-                                          di_debug_dl_sections_t *__restrict dl_sections
-                                          module_type__param(module_type)) {
+                                          di_debug_dl_sections_t *__restrict dl_sections) {
 	memset(sections, 0, sizeof(*sections));
 	memset(dl_sections, 0, sizeof(*dl_sections));
 	if unlikely(!dl_handle)
 		return;
 	/* Special handling for .eh_frame */
-	dl_sections->ds_eh_frame = module_locksection_nx(dl_handle, module_type,
+	dl_sections->ds_eh_frame = module_locksection_nx(dl_handle,
 	                                                 secname_eh_frame,
 	                                                 MODULE_LOCKSECTION_FNODATA);
 	if (dl_sections->ds_eh_frame) {
 		/* Make  sure  that  user-level  data  for  the  section  is available.
 		 * This is essentially a portable way to assert that SHF_ALLOC was set. */
-		if unlikely(module_section_getudata(dl_sections->ds_eh_frame,
-		                                    module_type) == (void *)-1) {
-			module_section_decref(dl_sections->ds_eh_frame, module_type);
+		if unlikely(!(module_section_getflags(dl_sections->ds_eh_frame) & SHF_ALLOC)) {
+			module_section_decref(dl_sections->ds_eh_frame);
 			dl_sections->ds_eh_frame = NULL;
 		}
 	}
 	/* Lock sections into memory */
-#define LOCK_SECTION(name) \
-	module_locksection_nx(dl_handle, module_type, name, MODULE_LOCKSECTION_FNORMAL)
+#define LOCK_SECTION(name) module_locksection_nx(dl_handle, name, MODULE_LOCKSECTION_FNORMAL)
 	dl_sections->ds_debug_frame   = LOCK_SECTION(secname_debug_frame);
 	dl_sections->ds_debug_addr    = LOCK_SECTION(secname_debug_addr);
 	dl_sections->ds_debug_loc     = LOCK_SECTION(secname_debug_loc);
@@ -3557,8 +3555,7 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 	if (dl_sections->ds_symtab) {
 		dl_sections->ds_strtab = LOCK_SECTION(secname_strtab);
 		if unlikely(!dl_sections->ds_strtab) {
-			module_section_decref(dl_sections->ds_symtab,
-			                      module_type);
+			module_section_decref(dl_sections->ds_symtab);
 			goto try_load_dynsym;
 		}
 	} else {
@@ -3568,22 +3565,22 @@ try_load_dynsym:
 		if (dl_sections->ds_symtab) {
 			dl_sections->ds_strtab = LOCK_SECTION(secname_dynstr);
 			if unlikely(!dl_sections->ds_strtab) {
-				module_section_decref(dl_sections->ds_symtab,
-				                      module_type);
+				module_section_decref(dl_sections->ds_symtab);
+				dl_sections->ds_symtab = NULL;
 			}
 		}
 	}
 #undef LOCK_SECTION
 	/* Bind section data */
 	if (dl_sections->ds_eh_frame) {
-		sections->ds_eh_frame_start = (byte_t const *)module_section_getudata(dl_sections->ds_eh_frame, module_type);
-		sections->ds_eh_frame_end   = sections->ds_eh_frame_start + module_section_getsize(dl_sections->ds_eh_frame, module_type);
+		sections->ds_eh_frame_start = (byte_t const *)module_section_getaddr(dl_sections->ds_eh_frame);
+		sections->ds_eh_frame_end   = sections->ds_eh_frame_start + module_section_getsize(dl_sections->ds_eh_frame);
 	}
-#define BIND_SECTION(sect, lv_start, lv_end)                                             \
-	if (sect) {                                                                          \
-		size_t size;                                                                     \
-		(lv_start) = (byte_t const *)module_section_inflate_nx(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                                  \
+#define BIND_SECTION(sect, lv_start, lv_end)                                         \
+	if (sect) {                                                                      \
+		size_t size;                                                                 \
+		(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
+		(lv_end)   = (lv_start) + size;                                              \
 	}
 	BIND_SECTION(dl_sections->ds_debug_frame, sections->ds_debug_frame_start, sections->ds_debug_frame_end);
 	BIND_SECTION(dl_sections->ds_debug_addr, sections->ds_debug_addr_start, sections->ds_debug_addr_end);
@@ -3598,25 +3595,22 @@ try_load_dynsym:
 	/* Bind symbol/string sections. */
 	if (dl_sections->ds_symtab) {
 		size_t size;
-		sections->ds_strtab_start = (byte_t const *)module_section_inflate_nx(dl_sections->ds_strtab,
-		                                                                      module_type, size);
+		sections->ds_strtab_start = (byte_t const *)module_section_getaddr_inflate_nx(dl_sections->ds_strtab, &size);
 		sections->ds_strtab_end   = sections->ds_strtab_start + size;
-		sections->ds_symtab_start = (byte_t const *)module_section_inflate_nx(dl_sections->ds_symtab,
-		                                                                      module_type, size);
+		sections->ds_symtab_start = (byte_t const *)module_section_getaddr_inflate_nx(dl_sections->ds_symtab, &size);
 		sections->ds_symtab_end   = sections->ds_symtab_start + size;
-		sections->ds_symtab_ent   = module_section_getentsize(dl_sections->ds_symtab, module_type);
+		sections->ds_symtab_ent   = module_section_getentsize(dl_sections->ds_symtab);
 	}
 }
 
 INTERN NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections
-                                            module_type__param(module_type)) {
+NOTHROW_NCX(CC libdi_debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections) {
 	unsigned int i;
 	for (i = 0; i < sizeof(di_debug_dl_sections_t) / sizeof(REF module_section_t *); ++i) {
 		REF module_section_t *section;
 		section = ((REF module_section_t **)dl_sections)[i];
 		if (section)
-			module_section_decref(section, module_type);
+			module_section_decref(section);
 	}
 }
 

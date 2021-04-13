@@ -86,7 +86,6 @@ PRIVATE NOBLOCK size_t NOTHROW(KCALL cc_trimheaps)(void) {
 /* Clear driver caches. */
 PRIVATE NOBLOCK size_t NOTHROW(KCALL cc_drivers)(void) {
 	size_t i, result = 0;
-#ifdef CONFIG_USE_NEW_DRIVER
 	REF struct driver_loadlist *ll;
 	/* Invoke the `drv_clearcache()' function of every loaded driver. */
 	ll = get_driver_loadlist();
@@ -108,28 +107,6 @@ PRIVATE NOBLOCK size_t NOTHROW(KCALL cc_drivers)(void) {
 		           (ll->dll_count * sizeof(REF struct driver *)));
 		destroy(ll);
 	}
-#else /* CONFIG_USE_NEW_DRIVER */
-	REF struct driver_state *state;
-	/* Invoke the `drv_clearcache()' function of every loaded driver. */
-	state = driver_get_state();
-	for (i = 0; i < state->ds_count; ++i) {
-		kernel_system_clearcache_t func;
-		REF struct driver *drv;
-		drv = state->ds_drivers[i];
-		if (!tryincref(drv))
-			continue; /* Dead driver... */
-		if (driver_symbol_ex(drv, "drv_clearcache", (void **)&func))
-			cc_account(&result, (*func)());
-		decref_unlikely(drv);
-	}
-	assert(!wasdestroyed(state));
-	if (ATOMIC_DECFETCH(state->ds_refcnt) == 0) {
-		cc_account(&result,
-		           offsetof(struct driver_state, ds_drivers) +
-		           (state->ds_count * sizeof(REF struct driver *)));
-		destroy(state);
-	}
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	return result;
 }
 

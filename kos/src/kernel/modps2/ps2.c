@@ -49,13 +49,6 @@ DECL_BEGIN
  *   - https://www.win.tue.nl/~aeb/linux/kbd/scancodes-13.html
  */
 
-#ifndef CONFIG_USE_NEW_DRIVER
-DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_infull_timeout, "timeout_infull", 100); /* In milliseconds */
-DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_outfull_timeout, "timeout_outfull", 100); /* In milliseconds */
-DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_timeout, "timeout_command", 100); /* In milliseconds */
-DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_attempts, "attempts_command", 3);
-#endif /* !CONFIG_USE_NEW_DRIVER */
-
 
 /* Probing code from here on... */
 PRIVATE NOBLOCK NOPREEMPT ATTR_FREETEXT void

@@ -30,7 +30,6 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/vm/usermod.h>
 #include <sched/cred.h>
 
 #include <hybrid/align.h>
@@ -96,16 +95,7 @@ getdatablock_from_handle(unsigned int fd,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MUNMAP
 DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
-#ifdef CONFIG_USE_NEW_DRIVER
 	mman_unmap(THIS_MMAN, addr, length, MMAN_UNMAP_NOKERNPART);
-#else /* CONFIG_USE_NEW_DRIVER */
-	if (mman_unmap(THIS_MMAN, addr, length,
-	               MMAN_UNMAP_NOKERNPART)) {
-#ifdef CONFIG_HAVE_USERMOD
-		vm_clear_usermod(THIS_MMAN);
-#endif /* CONFIG_HAVE_USERMOD */
-	}
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_MUNMAP */
@@ -300,16 +290,8 @@ again_mapat:
 				                            node_flags,
 				                            guard / PAGESIZE);
 				if (isused && !(flags & MAP_FIXED_NOREPLACE)) {
-					if (mman_unmap(THIS_MMAN,
-					               result,
-					               num_bytes + guard,
-					               MMAN_UNMAP_NOKERNPART)) {
-#ifdef CONFIG_HAVE_USERMOD
-						vm_clear_usermod(THIS_MMAN);
-#endif /* CONFIG_HAVE_USERMOD */
-						/* Try again, now that the existing mapping was deleted. */
-						goto again_mapat;
-					}
+					if (mman_unmap(THIS_MMAN, result, num_bytes + guard, MMAN_UNMAP_NOKERNPART))
+						goto again_mapat; /* Try again, now that the existing mapping was deleted. */
 					/* Check if the given range overlaps with KERNEL-SPACE */
 					if (!ADDRRANGE_ISKERN_PARTIAL(result, num_bytes + guard))
 						goto again_mapat;

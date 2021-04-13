@@ -183,7 +183,6 @@ PRIVATE ATTR_FREETEXT void KCALL
 load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 	void *blob;
 	size_t aligned_blob_size;
-	REF struct driver *drv;
 	aligned_blob_size = blob_size + (blob_addr & PAGEMASK);
 	aligned_blob_size = CEIL_ALIGN(aligned_blob_size, PAGESIZE);
 	/* Create a  temporary  mapping  of  prepared  virtual  memory  which
@@ -194,27 +193,23 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 	                    HINT_GETMODE(KERNEL_VMHINT_TEMPORARY) |
 	                    MAP_PREPARED | MAP_NOMERGE);
 	TRY {
+		REF struct driver *drv;
+
 		/* Map the driver blob into virtual memory. */
 		pagedir_map(blob,
 		            aligned_blob_size,
 		            (physaddr_t)(blob_addr & ~PAGEMASK),
 		            PAGEDIR_MAP_FREAD);
+
 		/* Load the mapped driver blob as a driver module.
 		 * NOTE: We  pass  the  `DRIVER_INSMOD_FLAG_NOINIT'  flag  so-as  to allow
 		 *       the driver to be initialized (and have its dependencies be bound)
 		 *       once all drivers specified by  the boot loader have been  loaded.
 		 *    -> That way,  driver dependencies  can be  loaded in  the same  manner,
 		 *       thus not relying on file-system drivers not having any dependencies. */
-#ifdef CONFIG_USE_NEW_DRIVER
 		drv = driver_loadmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
 		                          blob_size, cmdline);
-#else /* CONFIG_USE_NEW_DRIVER */
-		drv = driver_insmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
-		                         blob_size,
-		                         cmdline,
-		                         NULL,
-		                         DRIVER_INSMOD_FLAG_NOINIT);
-#endif /* !CONFIG_USE_NEW_DRIVER */
+
 		/* Drop the reference returned by driver_insmod_blob() */
 		decref(drv);
 	} EXCEPT {

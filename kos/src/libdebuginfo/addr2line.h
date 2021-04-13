@@ -103,11 +103,9 @@ libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
 INTDEF NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
                                                     di_addr2line_sections_t *__restrict sections,
-                                                    di_addr2line_dl_sections_t *__restrict dl_sections
-                                                    module_type__param(module_type));
+                                                    di_addr2line_dl_sections_t *__restrict dl_sections);
 INTDEF NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections
-                                                      module_type__param(module_type));
+NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections);
 
 
 

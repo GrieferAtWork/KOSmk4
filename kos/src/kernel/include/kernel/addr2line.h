@@ -20,13 +20,12 @@
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_ADDR2LINE_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_ADDR2LINE_H 1
 
-#include <features.h>
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 
-#include <bits/crt/format-printer.h>
+#include <bits/crt/format-printer.h> /* __pformatprinter */
+#include <kos/exec/module.h>         /* module_t */
 
 #include <libdebuginfo/addr2line.h>
 
@@ -38,30 +37,7 @@ struct addr2line_buf {
 	di_addr2line_sections_t    ds_info;     /* Section pointers */
 	di_addr2line_dl_sections_t ds_sect;     /* Section references */
 	REF module_t              *ds_mod;      /* [0..1] The linked module. */
-	module_type_var           (ds_modtype); /* The type of the linked module. */
 };
-
-#ifndef CONFIG_USE_NEW_DRIVER
-struct inode;
-struct path;
-struct directory_entry;
-struct addr2line_modinfo {
-	REF struct inode           *ami_fsfile;   /* [0..1] Backing filesystem node. */
-	REF struct path            *ami_fspath;   /* [0..1] Backing filesystem path. */
-	REF struct directory_entry *ami_fsname;   /* [0..1] Backing filesystem name. */
-	char const                 *ami_name;     /* [0..1] Backing name. */
-	char const                 *ami_filename; /* [0..1] Backing file name. */
-};
-
-/* TODO: Generate  `struct addr2line_modinfo'   from  `ds_mod'   dynamically!
- *       Don't generate it as apart of the invocation of `addr2line_begin()'! */
-#define addr2line_modinfo_fini(self)       \
-	(xdecref_unlikely((self)->ami_fsfile), \
-	 xdecref_unlikely((self)->ami_fspath), \
-	 xdecref_unlikely((self)->ami_fsname))
-#endif /* !CONFIG_USE_NEW_DRIVER */
-
-
 
 
 /* Lookup addr2line information for the given source address.
@@ -84,16 +60,9 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level DFL(0));
-#ifdef CONFIG_USE_NEW_DRIVER
 FUNDEF WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
                                void const *abs_pc);
-#else /* CONFIG_USE_NEW_DRIVER */
-FUNDEF WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
-                               void const *abs_pc,
-                               struct addr2line_modinfo *modinfo DFL(__NULLPTR));
-#endif /* !CONFIG_USE_NEW_DRIVER */
 FUNDEF NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
 

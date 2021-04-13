@@ -22,9 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_USE_NEW_DRIVER
-#include <kernel/driver.h>
-#else /* !CONFIG_USE_NEW_DRIVER */
 #include <debugger/config.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/module.h>
@@ -923,6 +920,5 @@ DATDEF struct driver_libpath_arref driver_libpath;
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN_DRIVER_H */

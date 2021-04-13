@@ -44,7 +44,6 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/ramfile.h>
-#include <kernel/vm/usermod.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
@@ -247,7 +246,6 @@ badobj:
 	return false;
 }
 
-#ifdef CONFIG_USE_NEW_DRIVER
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
                            KERNEL CHECKED void const *pointer,
@@ -451,124 +449,6 @@ badobj:
 	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
 	return 0;
 }
-#else /* CONFIG_USE_NEW_DRIVER */
-PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_driver)(pformatprinter printer, void *arg,
-                           KERNEL CHECKED void const *pointer,
-                           unsigned int *__restrict pstatus) {
-	struct driver *me = (struct driver *)pointer;
-	char const *driver_name;
-	size_t driver_namelen;
-	TRY {
-		if (__driver_refcnt(me) == 0)
-			goto badobj;
-		if (__driver_weakrefcnt(me) == 0)
-			goto badobj;
-		driver_name = me->d_name;
-		if (!ADDR_ISKERN(driver_name))
-			goto badobj;
-		driver_namelen = strlen(driver_name);
-	} EXCEPT {
-		goto badobj;
-	}
-	return (*printer)(arg, driver_name, driver_namelen);
-badobj:
-	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
-	return 0;
-}
-
-PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_driver_section)(pformatprinter printer, void *arg,
-                                   KERNEL CHECKED void const *pointer,
-                                   unsigned int *__restrict pstatus) {
-	struct driver_section *me = (struct driver_section *)pointer;
-	char const *driver_name;
-	size_t driver_namelen;
-	char const *section_name;
-	size_t section_namelen;
-	TRY {
-		struct driver *drv;
-		ElfW(Word) section_name_offset;
-		if (me->ds_refcnt == 0)
-			goto badobj;
-		drv = me->ds_module;
-		if (!ADDR_ISKERN(drv))
-			goto badobj;
-		if (__driver_refcnt(drv) == 0)
-			goto badobj;
-		if (__driver_weakrefcnt(drv) == 0)
-			goto badobj;
-		driver_name = drv->d_name;
-		if (!ADDR_ISKERN(driver_name))
-			goto badobj;
-		driver_namelen = strlen(driver_name);
-		if (me->ds_index >= drv->d_shnum)
-			goto badobj;
-		if (!ADDR_ISKERN(drv->d_shdr))
-			goto badobj;
-		section_name_offset = drv->d_shdr[me->ds_index].sh_name;
-		if (!ADDR_ISKERN(drv->d_shstrtab))
-			goto badobj;
-		if (!ADDR_ISKERN(drv->d_shstrtab_end))
-			goto badobj;
-		if (drv->d_shstrtab_end <= drv->d_shstrtab)
-			goto badobj;
-		if (section_name_offset >= (size_t)(drv->d_shstrtab_end - drv->d_shstrtab))
-			goto badobj;
-		section_name    = drv->d_shstrtab + section_name_offset;
-		section_namelen = strlen(section_name);
-	} EXCEPT {
-		goto badobj;
-	}
-	return format_printf(printer, arg, "%$s!%$s",
-	                     driver_namelen, driver_name,
-	                     section_namelen, section_name);
-badobj:
-	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
-	return 0;
-}
-
-#ifdef CONFIG_HAVE_USERMOD
-PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_usermod)(pformatprinter printer, void *arg,
-                            KERNEL CHECKED void const *pointer,
-                            unsigned int *__restrict pstatus) {
-	struct usermod *me = (struct usermod *)pointer;
-	char const *usermod_name;
-	size_t usermod_namelen;
-	TRY {
-		if (me->um_refcnt == 0)
-			goto badobj;
-		if (!ADDR_ISUSER(me->um_loadstart))
-			goto badobj;
-		if (me->um_loadstart >= me->um_loadend)
-			goto badobj;
-		if (!ADDR_ISUSER(me->um_loadend - 1))
-			goto badobj;
-		if (!ADDR_ISKERN(me->um_file))
-			goto badobj;
-		if (!me->um_fsname) {
-			usermod_name    = NULL;
-			usermod_namelen = 0;
-		} else {
-			if (!ADDR_ISKERN(me->um_fsname))
-				goto badobj;
-			usermod_name    = me->um_fsname->de_name;
-			usermod_namelen = me->um_fsname->de_namelen;
-			if (usermod_namelen > 16)
-				usermod_namelen = 16;
-			readmem(usermod_name, usermod_namelen * sizeof(char));
-		}
-	} EXCEPT {
-		goto badobj;
-	}
-	return (*printer)(arg, usermod_name, usermod_namelen);
-badobj:
-	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
-	return 0;
-}
-#endif /* CONFIG_HAVE_USERMOD */
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_directory_entry)(pformatprinter printer, void *arg,
@@ -1202,20 +1082,13 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "character_device", &note_character_device },
 	{ "cpu", &note_cpu },
 	{ "directory_entry", &note_directory_entry },
-#ifdef CONFIG_USE_NEW_DRIVER
 	{ "driver", &note_module },
 	{ "driver_section", &note_module_section },
-#else /* CONFIG_USE_NEW_DRIVER */
-	{ "driver", &note_driver },
-	{ "driver_section", &note_driver_section },
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	{ "file", &note_file },
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
 	{ "keyboard_device", &note_character_device },
-#ifdef CONFIG_USE_NEW_DRIVER
 	{ "module", &note_module },
 	{ "module_section", &note_module_section },
-#endif /* CONFIG_USE_NEW_DRIVER */
 	{ "mouse_device", &note_character_device },
 	{ "nic_device", &note_character_device },
 	{ "oneshot_directory_file", &note_file },
@@ -1225,15 +1098,8 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "ttybase_device", &note_character_device },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
-#ifdef CONFIG_USE_NEW_DRIVER
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
-#endif /* CONFIG_USE_NEW_DRIVER */
-#ifndef CONFIG_USE_NEW_DRIVER
-#ifdef CONFIG_HAVE_USERMOD
-	{ "usermod", &note_usermod },
-#endif /* CONFIG_HAVE_USERMOD */
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	{ "mnode", &note_mnode },
 	{ "mpart", &note_mpart },
 	{ "mfile", &note_mfile },

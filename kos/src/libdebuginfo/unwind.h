@@ -30,21 +30,10 @@
 #include <libdebuginfo/unwind.h>
 
 /* Figure out if unwind_for_debug() has already been defined externally somehow. */
-#undef HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE
-#undef HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO
-#ifdef __KERNEL__
-#if defined(CONFIG_USE_NEW_DRIVER) || defined(CONFIG_HAVE_USERMOD)
-#define HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE 1 /* Define in `memory/vm/usermod.c' */
-#elif defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
-#define HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO 1 /* Define in `libunwind/unwind.c' */
-#endif /* ... */
-#endif /* __KERNEL__ */
-
 #undef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
-#if (defined(HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE) || \
-     defined(HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO))
-#define HAVE_UNWIND_FOR_DEBUG_EXTERNALLY 1
-#endif /* ... */
+#ifdef __KERNEL__
+#define HAVE_UNWIND_FOR_DEBUG_EXTERNALLY 1 /* Defined in `/kos/src/kernel/core/memory/mman/module.c' */
+#endif /* __KERNEL__ */
 
 DECL_BEGIN
 

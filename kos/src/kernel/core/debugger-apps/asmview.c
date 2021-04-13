@@ -255,14 +255,13 @@ NOTHROW(FCALL av_getbyte)(void const *addr, byte_t *pvalue) {
 
 
 struct av_symbol {
-	char const *s_name;  /* [1..1] Symbol name (set to (char const *)-1 if unknown). (Set to NULL if entry is used) */
-	uintptr_t   s_start; /* Symbol start address. */
-	size_t      s_end;   /* Symbol end address. */
+	char const   *s_name;  /* [1..1] Symbol name (set to (char const *)-1 if unknown). (Set to NULL if entry is used) */
+	byte_t const *s_start; /* Symbol start address. (absolute) */
+	byte_t const *s_end;   /* Symbol end address. (absolute) */
 };
 
 struct av_sections_lock {
 	REF module_t              *sl_module;  /* [1..1] The associated module. (Set to NULL if entry is used) */
-	module_type_var           (sl_modtyp); /* Module type. */
 	di_addr2line_dl_sections_t sl_dlsect;  /* DL sections data */
 	di_addr2line_sections_t    sl_dbsect;  /* Debug sections data */
 };
@@ -275,10 +274,8 @@ DBG_FINI(finalize_av_symbol_cache) {
 	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
 		if (!av_sections_cache[i].sl_module)
 			continue;
-		debug_addr2line_sections_unlock(&av_sections_cache[i].sl_dlsect
-		                                module_type__arg(av_sections_cache[i].sl_modtyp));
-		module_decref(av_sections_cache[i].sl_module,
-		              av_sections_cache[i].sl_modtyp);
+		debug_addr2line_sections_unlock(&av_sections_cache[i].sl_dlsect);
+		module_decref_unlikely(av_sections_cache[i].sl_module);
 	}
 	memset(av_symbol_cache, 0, sizeof(av_symbol_cache));
 	memset(av_sections_cache, 0, sizeof(av_sections_cache));
@@ -286,28 +283,25 @@ DBG_FINI(finalize_av_symbol_cache) {
 
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_do_lock_sections)(struct av_sections_lock *__restrict info,
-                                   uintptr_t symbol_addr) {
+                                   void const *symbol_addr) {
 	unsigned int lock_error;
 	REF module_t *symbol_module;
-	module_type_var(symbol_module_type);
-	symbol_module = module_ataddr_nx((void *)symbol_addr,
-	                                 symbol_module_type);
+	symbol_module = module_fromaddr_nx(symbol_addr);
 	if (!symbol_module)
 		return false;
 	lock_error = debug_addr2line_sections_lock(symbol_module,
-	                                           &info->sl_dbsect, &info->sl_dlsect
-	                                           module_type__arg(symbol_module_type));
+	                                           &info->sl_dbsect,
+	                                           &info->sl_dlsect);
 	if (lock_error != DEBUG_INFO_ERROR_SUCCESS) {
-		module_decref_unlikely(symbol_module, symbol_module_type);
+		module_decref_unlikely(symbol_module);
 		return false;
 	}
 	info->sl_module = symbol_module;
-	module_type_arg(info->sl_modtyp = symbol_module_type);
 	return true;
 }
 
 PRIVATE ATTR_DBGTEXT struct av_sections_lock *
-NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
+NOTHROW(FCALL av_lock_sections)(void const *symbol_addr) {
 	unsigned int i;
 	struct av_sections_lock *resent = NULL;
 #ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
@@ -320,19 +314,13 @@ NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 				resent = &av_sections_cache[i];
 			continue;
 		}
-		if (symbol_addr < module_getloadstart(av_sections_cache[i].sl_module,
-		                                      av_sections_cache[i].sl_modtyp))
-			continue;
-		if (symbol_addr >= module_getloadend(av_sections_cache[i].sl_module,
-		                                     av_sections_cache[i].sl_modtyp))
-			continue;
-		return &av_sections_cache[i];
+		if ((byte_t const *)symbol_addr >= module_getloadmin(av_sections_cache[i].sl_module) &&
+		    (byte_t const *)symbol_addr <= module_getloadmax(av_sections_cache[i].sl_module))
+			return &av_sections_cache[i];
 	}
 	if (!resent) {
-		debug_addr2line_sections_unlock(&av_sections_cache[0].sl_dlsect
-		                                module_type__arg(av_sections_cache[0].sl_modtyp));
-		module_decref_unlikely(av_sections_cache[0].sl_module,
-		                       av_sections_cache[0].sl_modtyp);
+		debug_addr2line_sections_unlock(&av_sections_cache[0].sl_dlsect);
+		module_decref_unlikely(av_sections_cache[0].sl_module);
 		memmovedown(&av_sections_cache[0], &av_sections_cache[1],
 		            sizeof(av_sections_cache) - sizeof(av_sections_cache[0]));
 		resent = COMPILER_ENDOF(av_sections_cache) - 1;
@@ -349,29 +337,27 @@ done:
 
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_addr2line)(di_debug_addr2line_t *__restrict info,
-                            uintptr_t symbol_addr) {
+                            void const *symbol_addr) {
 	unsigned int addr2line_error;
 	struct av_sections_lock *sections;
-	uintptr_t module_relative_pc;
+	uintptr_t module_relative_pc, loadaddr;
 	sections = av_lock_sections(symbol_addr);
 	if (!sections)
 		return false;
-	module_relative_pc = symbol_addr -
-	                     module_getloadaddr(sections->sl_module,
-	                                        sections->sl_modtyp);
-	addr2line_error = debug_addr2line(&sections->sl_dbsect,
-	                                  info,
-	                                  module_relative_pc,
-	                                  DEBUG_ADDR2LINE_LEVEL_SOURCE,
-	                                  DEBUG_ADDR2LINE_FNORMAL);
+	loadaddr           = module_getloadaddr(sections->sl_module);
+	module_relative_pc = (uintptr_t)symbol_addr - loadaddr;
+	addr2line_error    = debug_addr2line(&sections->sl_dbsect, info, module_relative_pc,
+	                                     DEBUG_ADDR2LINE_LEVEL_SOURCE, DEBUG_ADDR2LINE_FNORMAL);
 	if (addr2line_error != DEBUG_INFO_ERROR_SUCCESS)
 		return false;
+	info->al_symstart += loadaddr;
+	info->al_symend += loadaddr;
 	return true;
 }
 
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_do_lookup_symbol)(struct av_symbol *__restrict info,
-                                   uintptr_t symbol_addr) {
+                                   void const *symbol_addr) {
 	di_debug_addr2line_t a2l_info;
 	if (!av_addr2line(&a2l_info, symbol_addr))
 		return false;
@@ -380,13 +366,13 @@ NOTHROW(FCALL av_do_lookup_symbol)(struct av_symbol *__restrict info,
 	if (!a2l_info.al_rawname)
 		a2l_info.al_rawname = (char *)-1;
 	info->s_name  = a2l_info.al_rawname;
-	info->s_start = a2l_info.al_symstart;
-	info->s_end   = a2l_info.al_symend;
+	info->s_start = (byte_t const *)a2l_info.al_symstart;
+	info->s_end   = (byte_t const *)a2l_info.al_symend;
 	return true;
 }
 
 PRIVATE ATTR_DBGTEXT struct av_symbol *
-NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
+NOTHROW(FCALL av_lookup_symbol)(void const *symbol_addr) {
 	unsigned int i;
 	struct av_symbol *resent = NULL;
 #ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
@@ -399,9 +385,9 @@ NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 				resent = &av_symbol_cache[i];
 			continue;
 		}
-		if (symbol_addr < av_symbol_cache[i].s_start)
+		if ((byte_t const *)symbol_addr < av_symbol_cache[i].s_start)
 			continue;
-		if (symbol_addr >= av_symbol_cache[i].s_end)
+		if ((byte_t const *)symbol_addr >= av_symbol_cache[i].s_end)
 			continue;
 		if (av_symbol_cache[i].s_name == (char *)-2)
 			return NULL;
@@ -416,8 +402,8 @@ NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 	if (!av_do_lookup_symbol(resent, symbol_addr)) {
 		/* Cache the fact that the given address is unknown. */
 		resent->s_name  = (char *)-2;
-		resent->s_start = symbol_addr;
-		resent->s_end   = symbol_addr + 1;
+		resent->s_start = (byte_t const *)symbol_addr;
+		resent->s_end   = (byte_t const *)symbol_addr + 1;
 		resent = NULL;
 	}
 #ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
@@ -436,7 +422,7 @@ NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
 	 * use those to display the names of symbols.
 	 * However, since KOS's addr2line function really is quite slow, we extend
 	 * on that default functionality by  making use of an intermediate  cache. */
-	sym = av_lookup_symbol((uintptr_t)symbol_addr);
+	sym = av_lookup_symbol(symbol_addr);
 	if (sym) {
 		uintptr_t symbol_offset;
 		dbg_putc('<');
@@ -447,7 +433,7 @@ NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
 			dbg_printf(DBGSTR("sym_%p"), sym->s_start);
 		}
 		/* Include the symbol offset (if non-zero) */
-		symbol_offset = (uintptr_t)symbol_addr - sym->s_start;
+		symbol_offset = (size_t)((byte_t const *)symbol_addr - sym->s_start);
 		if (symbol_offset != 0)
 			disasm_printf(self, "+%#" PRIxPTR, symbol_offset);
 		disasm_print(self, ">", 1);
@@ -555,7 +541,7 @@ NOTHROW(FCALL av_printscreen)(void const *start_addr,
 	}
 	if (display_addr2line) {
 		di_debug_addr2line_t a2l;
-		if (av_addr2line(&a2l, (uintptr_t)sel_addr)) {
+		if (av_addr2line(&a2l, sel_addr)) {
 			dbg_hline(0, 0, dbg_screen_width, ' ');
 			dbg_setcur(0, 0);
 			dbg_print(a2l.al_srcfile ? a2l.al_srcfile : DBGSTR("?"));

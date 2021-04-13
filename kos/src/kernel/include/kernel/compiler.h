@@ -55,12 +55,6 @@
 #define CONFIG_USE_NEW_ASYNC
 #endif
 
-#undef CONFIG_USE_NEW_DRIVER
-#if 1
-#define CONFIG_USE_NEW_DRIVER
-#endif
-
-
 /* Backward-compatibility */
 #define vm_datapart         mpart
 #define vm_datablock        mfile

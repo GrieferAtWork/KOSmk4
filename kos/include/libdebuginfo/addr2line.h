@@ -249,20 +249,16 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 typedef __ATTR_NONNULL((2, 3)) unsigned int
 (LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_LOCK)(module_t *dl_handle,
                                                   di_addr2line_sections_t *__restrict sections,
-                                                  di_addr2line_dl_sections_t *__restrict dl_sections
-                                                  module_type__param(module_type));
+                                                  di_addr2line_dl_sections_t *__restrict dl_sections);
 typedef __ATTR_NONNULL((1)) void
-(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_UNLOCK)(di_addr2line_dl_sections_t *__restrict dl_sections
-                                                    module_type__param(module_type));
+(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_UNLOCK)(di_addr2line_dl_sections_t *__restrict dl_sections);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((2, 3)) unsigned int
 __NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line_sections_lock)(module_t *dl_handle,
                                                              di_addr2line_sections_t *__restrict sections,
-                                                             di_addr2line_dl_sections_t *__restrict dl_sections
-                                                             module_type__param(module_type));
+                                                             di_addr2line_dl_sections_t *__restrict dl_sections);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections
-                                                               module_type__param(module_type));
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 __DECL_END

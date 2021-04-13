@@ -222,7 +222,6 @@ NOTHROW(FCALL cvalue_fini)(struct cvalue *__restrict self) {
 }
 
 
-#ifdef CONFIG_USE_NEW_DRIVER
 DECL_END
 
 #if defined(__x86_64__) || defined(__i386__)
@@ -739,513 +738,6 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 nope:
 	return false;
 }
-#elif defined(CONFIG_HAVE_USERMOD)
-DECL_END
-
-#if defined(__x86_64__) || defined(__i386__)
-#include <kernel/x86/gdt.h>
-#endif /* __x86_64__ || __i386__ */
-
-DECL_BEGIN
-
-
-/* Return the user-space TLS base register for `dbg_current' */
-PRIVATE ATTR_PURE WUNUSED uintptr_t
-NOTHROW(FCALL get_user_tls_base_register)(void) {
-	uintptr_t result;
-#ifdef __x86_64__
-	x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_FSBASEQ,
-	                   &result, sizeof(result));
-#elif defined(__i386__)
-	if (!x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_GSBASEL,
-	                        &result, sizeof(result)))
-		result = FORTASK(dbg_current, this_x86_user_gsbase);
-#else /* ... */
-#error "Unsupported architecture"
-#endif /* !... */
-	return result;
-}
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Shdr e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Shdr e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Shdr;
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Phdr e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Phdr e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Phdr;
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Dyn e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Dyn e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Dyn;
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Rel e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Rel e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Rel;
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Rela e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Rela e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Rela;
-
-
-#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
-#define ElfV_sizeof(T, um_modtype)         (USERMOD_TYPE_ISELF32(um_modtype) ? sizeof(Elf32_##T) : sizeof(Elf64_##T))
-#define ElfV_field(self, um_modtype, name) (USERMOD_TYPE_ISELF32(um_modtype) ? (self).e32.name : (self).e64.name)
-#elif defined(USERMOD_TYPE_ELF32)
-#define ElfV_sizeof(T, um_modtype)         sizeof(Elf32_##T)
-#define ElfV_field(self, um_modtype, name) ((self).e32.name)
-#elif defined(USERMOD_TYPE_ELF64)
-#define ElfV_sizeof(T, um_modtype)         sizeof(Elf64_##T)
-#define ElfV_field(self, um_modtype, name) ((self).e64.name)
-#endif /* ... */
-
-/* Member indices (to-be multipled by the pointer-size) libdl internals */
-#define STRUCT_dlmodule_INDEXOF_dm_loadaddr             0
-#define STRUCT_dlmodule_INDEXOF_dm_filename             1
-#define STRUCT_dlmodule_INDEXOF_dm_dynhdr               2
-#define STRUCT_dlmodule_INDEXOF_dm_modules_next         3
-#define STRUCT_dlmodule_INDEXOF_dm_modules_prev         4
-#define STRUCT_dlmodule_INDEXOF_dm_tlsoff               5
-#define STRUCT_dlmodule_INDEXOF_dm_tlsinit              6
-#define STRUCT_dlmodule_INDEXOF_dm_tlsfsize             7
-#define STRUCT_dlmodule_INDEXOF_dm_tlsmsize             8
-#define STRUCT_dlmodule_INDEXOF_dm_tlsalign             9
-#define STRUCT_dlmodule_INDEXOF_dm_tlsstoff             10
-#define STRUCT_tls_segment_INDEXOF_ts_self              0
-#define STRUCT_tls_segment_INDEXOF_ts_threads__ln_next  1
-#define STRUCT_tls_segment_INDEXOF_ts_threads__ln_pself 2
-#define STRUCT_tls_segment_INDEXOF_ts_exlock            3
-#define STRUCT_tls_segment_INDEXOF_ts_extree            4
-#define STRUCT_dtls_extension_INDEXOF_te_tree__rb_lhs   0
-#define STRUCT_dtls_extension_INDEXOF_te_tree__rb_rhs   1
-#define STRUCT_dtls_extension_INDEXOF_te_module         2
-#define STRUCT_dtls_extension_INDEXOF_te_data           3
-
-struct libdl_dlmodule;
-struct libdl_tls_segment;
-struct libdl_dtls_extension;
-
-/* Read out a user-space pointer who's size is defined by `self',
- * and store the  resulting pointer in  `*presult'. The  original
- * pointer may be zero-extended if necessary. */
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL usermod_getpointer)(struct usermod *__restrict self,
-                                  USER void *address,
-                                  void **__restrict presult) {
-#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
-	if (USERMOD_TYPE_ISELF32(self->um_modtype)) {
-		uint32_t p32;
-		if (dbg_readmemory(address, &p32, 4) != 0)
-			goto err;
-		*presult = (void *)(uintptr_t)p32;
-	} else {
-		uint64_t p64;
-		if (dbg_readmemory(address, &p64, 8) != 0)
-			goto err;
-		*presult = (void *)(uintptr_t)p64;
-	}
-#elif defined(USERMOD_TYPE_ELF32)
-	uint32_t p32;
-	(void)self;
-	if (dbg_readmemory(address, &p32, 4) != 0)
-		goto err;
-	*presult = (void *)(uintptr_t)p32;
-#elif defined(USERMOD_TYPE_ELF64)
-	uint64_t p64;
-	(void)self;
-	if (dbg_readmemory(address, &p64, 8) != 0)
-		goto err;
-	*presult = (void *)(uintptr_t)p64;
-#endif /* ... */
-	return true;
-err:
-	return false;
-}
-
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL usermod_scan_reloc_for_DlModule)(struct usermod *__restrict self,
-                                               struct libdl_dlmodule **__restrict presult,
-                                               uintptr_t r_offset, uintptr_t r_info,
-                                               uintptr_t r_addend) {
-	(void)r_addend;
-	switch (ELF32_R_TYPE(r_info)) {
-
-#ifdef __x86_64__
-	case R_X86_64_DTPMOD64: {
-		USER uint64_t *uaddr;
-		if (USERMOD_TYPE_ISELF32(self->um_modtype))
-			break;
-		uaddr = (USER uint64_t *)(self->um_loadaddr + r_offset);
-		if (!ADDR_ISUSER(uaddr))
-			break;
-		/* Try to read the pointer from this location. */
-		return usermod_getpointer(self, uaddr, (void **)presult);
-	}	break;
-#endif /* __x86_64__ */
-
-#if defined(__x86_64__) || defined(__i386__)
-	case R_386_TLS_DTPMOD32: {
-		USER uint32_t *uaddr;
-#ifdef __x86_64__
-		if (!USERMOD_TYPE_ISELF32(self->um_modtype))
-			break;
-#endif /* __x86_64__ */
-		uaddr = (USER uint32_t *)(self->um_loadaddr + r_offset);
-		if (!ADDR_ISUSER(uaddr))
-			break;
-		/* Try to read the pointer from this location. */
-		return usermod_getpointer(self, uaddr, (void **)presult);
-	}	break;
-#endif /* __x86_64__ || __i386__ */
-
-	default:
-		break;
-	}
-	return false;
-}
-
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL usermod_scan_rel_for_DlModule)(struct usermod *__restrict self,
-                                             struct libdl_dlmodule **__restrict presult,
-                                             USER ElfV_Rel const *base, size_t count) {
-	size_t sizeof_rel;
-	sizeof_rel = ElfV_sizeof(Rel, self->um_modtype);
-	for (; count; --count) {
-		ElfV_Rel field;
-		if (dbg_readmemory(base, &field, sizeof_rel) != 0)
-			break;
-		if (usermod_scan_reloc_for_DlModule(self, presult,
-		                                    ElfV_field(field, self->um_modtype, r_offset),
-		                                    ElfV_field(field, self->um_modtype, r_info),
-		                                    0))
-			return true;
-		base = (USER ElfV_Rel const *)((byte_t const *)base + sizeof_rel);
-	}
-	return false;
-}
-
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL usermod_scan_rela_for_DlModule)(struct usermod *__restrict self,
-                                              struct libdl_dlmodule **__restrict presult,
-                                              USER ElfV_Rela const *base, size_t count) {
-	size_t sizeof_rel;
-	sizeof_rel = ElfV_sizeof(Rela, self->um_modtype);
-	for (; count; --count) {
-		ElfV_Rela field;
-		if (dbg_readmemory(base, &field, sizeof_rel) != 0)
-			break;
-		if (usermod_scan_reloc_for_DlModule(self, presult,
-		                                    ElfV_field(field, self->um_modtype, r_offset),
-		                                    ElfV_field(field, self->um_modtype, r_info),
-		                                    ElfV_field(field, self->um_modtype, r_addend)))
-			return true;
-		base = (USER ElfV_Rela const *)((byte_t const *)base + sizeof_rel);
-	}
-	return false;
-}
-
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL usermod_scan_dynamic_for_DlModule)(struct usermod *__restrict self,
-                                                 struct libdl_dlmodule **__restrict presult,
-                                                 USER ElfV_Dyn const *dyn_start,
-                                                 USER ElfV_Dyn const *dyn_end) {
-	ElfV_Rela const *rela_base;
-	ElfV_Rel const *rel_base, *jmp_base;
-	size_t rela_count, rel_count;
-	size_t jmp_count, entsize;
-	bool jmp_rels_have_addend;
-	rela_base            = NULL;
-	rela_count           = 0;
-	jmp_rels_have_addend = false;
-	rel_base             = NULL;
-	rel_count            = 0;
-	jmp_base             = NULL;
-	jmp_count            = 0;
-	entsize              = ElfV_sizeof(Dyn, self->um_modtype);
-	while (dyn_start < dyn_end) {
-		ElfV_Dyn ent;
-		uintptr_t d_tag, d_val;
-		if (dbg_readmemory(dyn_start, &ent, entsize) != 0)
-			goto nope;
-		d_tag = ElfV_field(ent, self->um_modtype, d_tag);
-		d_val = ElfV_field(ent, self->um_modtype, d_un.d_val);
-		switch (d_tag) {
-
-		case DT_NULL:
-			goto done_dynamic;
-
-		case DT_REL:
-			rel_base = (ElfV_Rel *)(self->um_loadaddr + d_val);
-			break;
-
-		case DT_RELSZ:
-			rel_count = d_val / ElfV_sizeof(Rel, self->um_modtype);
-			break;
-
-		case DT_JMPREL:
-			jmp_base = (ElfV_Rel *)(self->um_loadaddr + d_val);
-			break;
-
-		case DT_PLTRELSZ:
-			jmp_count = d_val / ElfV_sizeof(Rel, self->um_modtype);
-			break;
-
-		case DT_RELA:
-			rela_base = (ElfV_Rela *)(self->um_loadaddr + d_val);
-			break;
-
-		case DT_RELASZ:
-			rela_count = d_val / ElfV_sizeof(Rela, self->um_modtype);
-			break;
-
-		case DT_PLTREL:
-			if (d_val == DT_RELA)
-				jmp_rels_have_addend = true;
-			break;
-
-		default:
-			break;
-		}
-		dyn_start = (USER ElfV_Dyn const *)((byte_t const *)dyn_start + entsize);
-	}
-done_dynamic:
-	/* Scan the different relocation tables for what we're looking for. */
-	if (usermod_scan_rel_for_DlModule(self, presult, rel_base, rel_count))
-		return true;
-	if (usermod_scan_rela_for_DlModule(self, presult, rela_base, rela_count))
-		return true;
-	if (jmp_rels_have_addend) {
-		if (usermod_scan_rela_for_DlModule(self, presult, (ElfV_Rela const *)jmp_base, jmp_count))
-			return true;
-	} else {
-		if (usermod_scan_rel_for_DlModule(self, presult, jmp_base, jmp_count))
-			return true;
-	}
-nope:
-	return false;
-}
-
-/* Calculate the value of the user-space `DlModule' for `self' */
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL usermod_get_libdl_DlModule_address)(struct usermod *__restrict self,
-                                                  struct libdl_dlmodule **__restrict presult) {
-	ElfV_Dyn const *dyn_start, *dyn_end;
-	ElfV_Phdr *phdr;
-	uint16_t pt_dyn_header;
-	/* Sanity check. */
-	if (self->um_elf.ue_phentsize != ElfV_sizeof(Phdr, self->um_modtype))
-		goto nope;
-
-	phdr = (ElfV_Phdr *)dbx_malloc(self->um_elf.ue_phnum *
-	                               self->um_elf.ue_phentsize);
-	if unlikely(!phdr)
-		goto nope;
-
-	/* Load program headers. (so we can find the PT_DYNAMIC header) */
-	TRY {
-		inode_readallk(self->um_file,
-		               phdr,
-		               self->um_elf.ue_phnum *
-		               self->um_elf.ue_phentsize,
-		               self->um_elf.ue_phoff);
-	} EXCEPT {
-		goto nope_phdr;
-	}
-
-	/* Find the PT_DYNAMIC header. */
-	for (pt_dyn_header = 0; pt_dyn_header < self->um_elf.ue_phnum; pt_dyn_header += 1) {
-		if (ElfV_field(phdr[pt_dyn_header], self->um_modtype, p_type) == PT_DYNAMIC)
-			goto got_pt_dynamic;
-	}
-	goto nope_phdr;
-got_pt_dynamic:
-	/* Load the bounds of the user-space .dynamic section. */
-	dyn_start = (ElfV_Dyn const *)(self->um_loadaddr + ElfV_field(phdr[pt_dyn_header], self->um_modtype, p_vaddr));
-	dyn_end   = (ElfV_Dyn const *)((byte_t const *)dyn_start + ElfV_field(phdr[pt_dyn_header], self->um_modtype, p_memsz));
-	dbx_free(phdr);
-	/* Validate loaded pointers. */
-	if unlikely(dyn_start >= dyn_end)
-		goto nope;
-	if unlikely(!ADDR_ISUSER(dyn_start))
-		goto nope;
-	if unlikely(!ADDR_ISUSER((byte_t const *)dyn_end - 1))
-		goto nope;
-	/* Now scan the .dynamic section for meta-data related to relocations. */
-	return usermod_scan_dynamic_for_DlModule(self, presult, dyn_start, dyn_end);
-nope_phdr:
-	dbx_free(phdr);
-nope:
-	return false;
-}
-
-/* Calculate   the  TLS-base  address  of  `self'  for
- * `dbg_current', and store the result in `*ptls_base' */
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL usermod_get_user_tls_base)(struct usermod *__restrict self,
-                                         byte_t **__restrict ptls_base) {
-	struct libdl_tls_segment *utls;
-	struct libdl_dlmodule *dlmod;
-
-	/* This only works for ELF modules. */
-	if (!USERMOD_TYPE_ISELF(self->um_modtype))
-		goto nope;
-
-	/* Don't do all of this trickery when the kernel's been poisoned.
-	 * The below code may call-back to (possibly) faulty kernel  code
-	 * due to the dependency on `inode_readallk()' */
-	if (kernel_poisoned())
-		goto nope;
-
-	/* This is where it gets really hacky, since we rely on  internals
-	 * from `libdl.so' that aren't normally exposed to any other APIs:
-	 *
-	 *  #1: We need to figure out the address of the user-space `DlModule *'
-	 *      that is associated with `self'.  Luckily, we can do this  fairly
-	 *      easily by searching the module's relocations table for an  entry
-	 *      that uses `R_386_TLS_DTPMOD32' (or the equivalent for the target
-	 *      architecture of `self')
-	 *
-	 *  #2: Since KOS's system libdl.so (re-)uses the `DlModule *' pointer
-	 *      as TLS  index, we  can take  the offset  contained within  the
-	 *      `R_386_TLS_DTPMOD32' relocation and add it to the load address
-	 *      taken  from `self'  to get  a user-space  memory location that
-	 *      should  contain  the `DlModule *'  pointer we're  looking for.
-	 *
-	 *  #3: With the  `DlModule *'  pointer  at hand,  we  can  proceed  to
-	 *      essentially re-implement `dltlsaddr2(tls_handle, tls_segment)',
-	 *      using the `DlModule *' we've discovered above for `tls_handle',
-	 *      and simply using `utls_base' for `tls_segment'
-	 *
-	 * TODO: Check  if this  way of  calculating TLS  locations would also
-	 *       work for  TLS variables  from modules  using the  static  TLS
-	 *       model. - The above only works when tls offsets are calculated
-	 *       at  runtime (as is  the case in  shared libraries), but would
-	 *       break  when the `R_386_TLS_DTPMOD32' relocation is missing... */
-
-	/* Start by calculating the user-space `DlModule *' pointer. */
-	if (!usermod_get_libdl_DlModule_address(self, &dlmod))
-		goto nope;
-	if unlikely(!dlmod || !ADDR_ISUSER(dlmod))
-		goto nope;
-
-	/* Calculate the TLS-base register as (presumably) used
-	 * by  user-space in order  to implement TLS variables. */
-	utls = (struct libdl_tls_segment *)get_user_tls_base_register();
-	if (!ADDR_ISUSER(utls))
-		goto nope;
-
-	{
-		ptrdiff_t tls_offset;
-		if (!usermod_getpointer(self,
-		                        (byte_t *)dlmod +
-		                        STRUCT_dlmodule_INDEXOF_dm_tlsstoff *
-		                        usermod_sizeof_pointer(self),
-		                        (void **)&tls_offset))
-			goto nope;
-		/* Check if this module has a static TLS offset. */
-		if (tls_offset != 0) {
-			*ptls_base = (byte_t *)utls + tls_offset;
-			return ADDR_ISUSER(*ptls_base);
-		}
-	}
-
-	/* The module uses the dynamic  TLS model. As such, we  must
-	 * scan the  TLS  extension  table for  a  matching  module.
-	 * Note that user-space uses a binary tree for this purpose,
-	 * so we can use that to find the module that we're  looking
-	 * for.
-	 * Also note that we set a max indirection limit of `BITSOF(void *)'
-	 * before we  error out,  thus  preventing infinite  recursion  when
-	 * user-space has  set-up  their  TLS extension  table  to  form  an
-	 * infinite loop. */
-	{
-		struct libdl_dtls_extension *ext;
-		unsigned int max_indirection;
-		if (!usermod_getpointer(self,
-		                        (byte_t *)utls +
-		                        STRUCT_tls_segment_INDEXOF_ts_extree *
-		                        usermod_sizeof_pointer(self),
-		                        (void **)&ext))
-			goto nope;
-		max_indirection = BITSOF(void *);
-		while (ext) {
-			struct libdl_dlmodule *extab_dlmod;
-			uintptr_t indexof_next;
-			if (!ext)
-				goto nope;
-			if (!ADDR_ISUSER(ext))
-				goto nope;
-			if (!usermod_getpointer(self,
-			                        (byte_t *)ext +
-			                        STRUCT_dtls_extension_INDEXOF_te_module *
-			                        usermod_sizeof_pointer(self),
-			                        (void **)&extab_dlmod))
-				goto nope;
-			/* The least significant bit is used as red/black indicator.
-			 * As such, we must clear that bit here. */
-			extab_dlmod = (struct libdl_dlmodule *)((uintptr_t)extab_dlmod & ~1);
-			if (!extab_dlmod || !ADDR_ISUSER(extab_dlmod))
-				goto nope;
-			if (dlmod < extab_dlmod) {
-				indexof_next = STRUCT_dtls_extension_INDEXOF_te_tree__rb_lhs;
-			} else if (dlmod > extab_dlmod) {
-				indexof_next = STRUCT_dtls_extension_INDEXOF_te_tree__rb_rhs;
-			} else {
-				/* Found it! */
-				break;
-			}
-			if (!max_indirection)
-				goto nope;
-			--max_indirection;
-			/* Load the next extension pointer. */
-			if (!usermod_getpointer(self,
-			                        (byte_t *)ext +
-			                        indexof_next *
-			                        usermod_sizeof_pointer(self),
-			                        (void **)&ext))
-				goto nope;
-		}
-		/* Found the proper TLS extension.
-		 * The result we're looking for is stored in its `te_data' field. */
-		if (!usermod_getpointer(self,
-		                        (byte_t *)ext +
-		                        STRUCT_dtls_extension_INDEXOF_te_data *
-		                        usermod_sizeof_pointer(self),
-		                        (void **)ptls_base))
-			goto nope;
-		/* Make sure that the pointer is actually user-space! */
-		if (!ADDR_ISUSER(*ptls_base))
-			goto nope;
-	} /* Scope */
-	return true;
-nope:
-	return false;
-}
-#endif /* CONFIG_HAVE_USERMOD */
 
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) dbx_errno_t FCALL
 cexpr_cfi_set_address(struct cvalue *__restrict self,
@@ -1296,22 +788,18 @@ cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
 	unsigned int result;
 	di_debuginfo_compile_unit_simple_t cu;
 	byte_t temp_buffer[1];
-#if defined(CONFIG_USE_NEW_DRIVER) || defined(CONFIG_HAVE_USERMOD)
 	bool second_pass;
-#endif /* CONFIG_USE_NEW_DRIVER || CONFIG_HAVE_USERMOD */
 	memset(&emulator, 0, sizeof(emulator));
-#if defined(CONFIG_USE_NEW_DRIVER) || defined(CONFIG_HAVE_USERMOD)
 	emulator.ue_tlsbase = (byte_t *)-1; /* Lazily calculate so we can detect if this was used. */
 	second_pass         = false;        /* Used to lazily calculate the correct `ue_tlsbase' (if used) */
 do_second_pass:
-#endif /* CONFIG_USE_NEW_DRIVER || CONFIG_HAVE_USERMOD */
 	memset(&cu, 0, sizeof(cu));
 	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	/* Select the proper function. */
 	module_relative_pc = (uintptr_t)pc;
 	if (mod) {
-		emulator.ue_sectinfo   = di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections);
-		emulator.ue_addroffset = module_getloadaddr(mod->cm_module, mod->cm_modtyp);
+		emulator.ue_sectinfo   = cmodule_unwind_emulator_sections(mod);
+		emulator.ue_addroffset = module_getloadaddr(mod->cm_module);
 		module_relative_pc -= emulator.ue_addroffset;
 		emulator.ue_pc = debuginfo_location_select(&self->cv_expr.v_expr.v_expr,
 		                                           self->cv_expr.v_expr.v_cu_ranges_startpc,
@@ -1364,7 +852,6 @@ do_second_pass:
 	case UNWIND_STE_RO_LVALUE:
 	case UNWIND_STE_RW_LVALUE: {
 		byte_t *lvalue;
-#if defined(CONFIG_USE_NEW_DRIVER) || defined(CONFIG_HAVE_USERMOD)
 		/* Check if the TLS-base address was used by the CFI expression.
 		 * If it was, then we must repeat the expression with the proper
 		 * TLS address, since the one calculated by libunwind only works
@@ -1373,18 +860,12 @@ do_second_pass:
 		    cmodule_isuser(mod) && !second_pass) {
 			bool ok;
 			/* Calculate the TLS-base address for `mod' in the context of `dbg_current' */
-#ifdef CONFIG_USE_NEW_DRIVER
 			ok = module_get_user_tls_base(mod->cm_module, &emulator.ue_tlsbase);
-#else /* CONFIG_USE_NEW_DRIVER */
-			ok = usermod_get_user_tls_base((struct usermod *)mod->cm_module,
-			                               &emulator.ue_tlsbase);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 			if unlikely(!ok)
 				goto done;      /* Not possible to take the address. */
 			second_pass = true; /* Remember that we've filled in the proper user-space TLS base. */
 			goto do_second_pass;
 		}
-#endif /* CONFIG_USE_NEW_DRIVER || CONFIG_HAVE_USERMOD */
 		lvalue = ste_top.s_lvalue;
 		if (ste_top.s_type == UNWIND_STE_REGISTER) {
 			/* Convert to l-value */
@@ -1425,7 +906,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	old_pdir = pagedir_get();
 	req_pdir = old_pdir;
 	mod      = self->cv_expr.v_expr.v_module;
-	if (mod)
+	if (mod && !wasdestroyed(cmodule_mman(mod)))
 		req_pdir = cmodule_mman(mod)->mm_pagedir_p;
 	/* This must run in the context of `cmodule_mman(mod)' */
 	if (old_pdir != req_pdir) {
@@ -1477,34 +958,34 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			{
 				pagedir_phys_t old_pdir, req_pdir;
 				old_pdir = pagedir_get();
-				req_pdir = cmodule_mman(mod)->mm_pagedir_p;
+				req_pdir = old_pdir;
+				if (!wasdestroyed(cmodule_mman(mod)))
+					req_pdir = cmodule_mman(mod)->mm_pagedir_p;
 				if (old_pdir != req_pdir) {
 					if unlikely(!dbg_verifypagedir(req_pdir))
 						return DBX_EFAULT;
 					pagedir_set(req_pdir);
 				}
 				TRY {
-#if defined(CONFIG_USE_NEW_DRIVER) || defined(CONFIG_HAVE_USERMOD)
 					/* TODO: Proper user-space  support for  `unwind_emulator_t::ue_tlsbase'
 					 *       When used by the expression, then we mustn't rely on the native
 					 *       TLS-base  calculation function from libunwind, but must instead
 					 *       make use of `usermod_get_user_tls_base()' from above. */
-#endif /* CONFIG_USE_NEW_DRIVER || CONFIG_HAVE_USERMOD */
 					if (write) {
 						error = debuginfo_location_setvalue(&self->v_expr,
-						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
+						                                    cmodule_unwind_emulator_sections(mod),
 						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
 						                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
-						                                    module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
+						                                    module_getloadaddr(mod->cm_module),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					} else {
 						error = debuginfo_location_getvalue(&self->v_expr,
-						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
+						                                    cmodule_unwind_emulator_sections(mod),
 						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
-						                                    module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
+						                                    module_getloadaddr(mod->cm_module),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					}
@@ -3408,7 +2889,6 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
 }
 
 
-#ifdef CONFIG_USE_NEW_DRIVER
 
 /* Perform custom handling of special symbols exported by the system `libdl.so' */
 PRIVATE dbx_errno_t
@@ -3598,7 +3078,6 @@ done:
 err_fault:
 	return DBX_EFAULT;
 }
-#endif /* CONFIG_USE_NEW_DRIVER */
 
 
 /* Push  a currently visible  symbol, as selected by  the code location from
@@ -3755,7 +3234,6 @@ got_symbol_type:
 			                        0);
 
 			if likely(result == DBX_EOK) {
-#ifdef CONFIG_USE_NEW_DRIVER
 				/* Special  handling for ".fakedata" symbols exported by `libdl.so'.
 				 * Libdl claims to export these symbols like any others are, however
 				 * in actuality, their address/size aren't resolved to the suggested
@@ -3796,7 +3274,6 @@ got_symbol_type:
 						goto done_symtype;
 					}
 				}
-#endif /* CONFIG_USE_NEW_DRIVER */
 
 				/* Do special handling for this[|vm|cpu]_* globals from the kernel core!
 				 * When accessed, automatically include an addend to the relevant object

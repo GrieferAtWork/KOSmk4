@@ -807,20 +807,16 @@ typedef struct di_debug_dl_sections_struct {
 typedef __ATTR_NONNULL((2, 3)) void
 /*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUG_SECTIONS_LOCK)(module_t *dl_handle,
                                                           di_debug_sections_t *__restrict sections,
-                                                          di_debug_dl_sections_t *__restrict dl_sections
-                                                          module_type__param(module_type));
+                                                          di_debug_dl_sections_t *__restrict dl_sections);
 typedef __ATTR_NONNULL((1)) void
-/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUG_SECTIONS_UNLOCK)(di_debug_dl_sections_t *__restrict dl_sections
-                                                            module_type__param(module_type));
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUG_SECTIONS_UNLOCK)(di_debug_dl_sections_t *__restrict dl_sections);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((2, 3)) void
 __NOTHROW_NCX(LIBDEBUGINFO_CC debug_sections_lock)(module_t *dl_handle,
                                                    di_debug_sections_t *__restrict sections,
-                                                   di_debug_dl_sections_t *__restrict dl_sections
-                                                   module_type__param(module_type));
+                                                   di_debug_dl_sections_t *__restrict dl_sections);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(LIBDEBUGINFO_CC debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections
-                                                     module_type__param(module_type));
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 

@@ -286,7 +286,7 @@ DlModule *DLFCN_CC libdl_dlgetmodule(char const *name, unsigned int flags);
 INTDEF NONNULL((2)) int DLFCN_CC libdl_dladdr(void const *address, Dl_info *info);
 INTDEF WUNUSED NONNULL((1)) fd_t DLFCN_CC libdl_dlmodulefd(DlModule *self);
 INTDEF WUNUSED NONNULL((1)) char const *DLFCN_CC libdl_dlmodulename(DlModule *self);
-INTDEF WUNUSED NONNULL((1)) void *DLFCN_CC libdl_dlmodulebase(DlModule *self);
+INTDEF WUNUSED NONNULL((1)) uintptr_t DLFCN_CC libdl_dlmodulebase(DlModule *self);
 INTDEF WUNUSED REF DlSection *DLFCN_CC libdl_dllocksection(DlModule *self, char const *__restrict name, unsigned int flags);
 INTDEF NONNULL((1)) int DLFCN_CC libdl_dlunlocksection(REF DlSection *sect);
 INTDEF NONNULL((1)) char const *DLFCN_CC libdl_dlsectionname(DlSection *sect);

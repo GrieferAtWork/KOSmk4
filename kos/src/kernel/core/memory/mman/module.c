@@ -124,12 +124,10 @@ module_printname(struct module *__restrict self,
 	char const *name;
 	u16 namelen;
 	if unlikely(self->md_fsname == NULL) {
-#ifdef CONFIG_USE_NEW_DRIVER
 		if (module_isdriver(self)) {
 			name = ((struct driver *)self)->d_name;
 			return (*printer)(arg, name, strlen(name));
 		}
-#endif /* CONFIG_USE_NEW_DRIVER */
 		goto done;
 	}
 	name    = self->md_fsname->de_name;
@@ -151,10 +149,8 @@ PUBLIC ATTR_PURE WUNUSED NONNULL((1)) char const *FCALL
 module_getname(struct module *__restrict self) {
 	char const *result;
 	if unlikely(self->md_fsname == NULL) {
-#ifdef CONFIG_USE_NEW_DRIVER
 		if (module_isdriver(self))
 			return ((struct driver *)self)->d_name;
-#endif /* CONFIG_USE_NEW_DRIVER */
 		return NULL;
 	}
 	result = self->md_fsname->de_name;
@@ -177,14 +173,11 @@ module_printpath_or_name(struct module *__restrict self,
 		result = (*printer)(arg,
 		                    self->md_fsname->de_name,
 		                    self->md_fsname->de_namelen);
-	}
-#ifdef CONFIG_USE_NEW_DRIVER
-	else if (module_isdriver(self)) {
+	} else if (module_isdriver(self)) {
 		char const *name;
 		name = ((struct driver *)self)->d_name;
 		return (*printer)(arg, name, strlen(name));
 	}
-#endif /* CONFIG_USE_NEW_DRIVER */
 	return result;
 }
 
@@ -375,12 +368,6 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 }
 
 
-#ifndef CONFIG_USE_NEW_DRIVER
-#undef driver_fromaddr
-#define driver_fromaddr(addr)  ({ COMPILER_IMPURE(); (void)addr; (struct module *)NULL; })
-#define driver_aboveaddr(addr) ({ COMPILER_IMPURE(); (void)addr; (struct module *)NULL; })
-#define driver_next(prev)      ({ COMPILER_IMPURE(); (void)prev; (struct module *)NULL; })
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 
 /* Return a reference to the module which can be found at the given address.
@@ -628,7 +615,6 @@ DEFINE_PUBLIC_ALIAS(mman_module_next_nx, mman_module_next);
 #endif /* !CONFIG_HAVE_USERELF_MODULES */
 
 
-#ifdef CONFIG_USE_NEW_DRIVER
 #ifdef CONFIG_HAVE_USERELF_MODULES
 LOCAL NONNULL((1, 5, 7)) unsigned int KCALL
 unwind_userspace_with_section(struct module *__restrict mod, void const *absolute_pc,
@@ -776,7 +762,6 @@ unwind_for_debug(void const *absolute_pc,
 	              reg_setter, reg_setter_arg);
 }
 #endif /* !CONFIG_HAVE_USERELF_MODULES */
-#endif /* CONFIG_USE_NEW_DRIVER */
 
 DECL_END
 

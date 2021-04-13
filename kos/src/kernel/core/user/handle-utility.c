@@ -218,12 +218,7 @@ handle_datasize(struct handle const *__restrict self,
 	case HANDLE_TYPE_DRIVER: {
 		struct driver *me;
 		me = (struct driver *)self->h_data;
-#ifdef CONFIG_USE_NEW_DRIVER
 		value = (pos_t)(me->md_loadmax - me->md_loadmin) + 1;
-#else /* CONFIG_USE_NEW_DRIVER */
-		value = (pos_t)(me->d_loadend -
-		                me->d_loadstart);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	}	break;
 
 	case HANDLE_TYPE_PIPE: {
@@ -373,7 +368,6 @@ handle_print(struct handle const *__restrict self,
 
 	case HANDLE_TYPE_DRIVER: {
 		struct driver *d = (struct driver *)self->h_data;
-#ifdef CONFIG_USE_NEW_DRIVER
 		static char const prefix[] = "anon_inode:[driver:";
 		result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
 		if likely(result >= 0) {
@@ -387,12 +381,6 @@ handle_print(struct handle const *__restrict self,
 				return temp;
 			result += temp;
 		}
-#else /* CONFIG_USE_NEW_DRIVER */
-		result = format_printf(printer, arg,
-		                       "anon_inode:[driver:%s]",
-		                       d->d_filename ? d->d_filename
-		                                     : d->d_name);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	}	break;
 
 	case HANDLE_TYPE_PIPE: {
@@ -471,26 +459,17 @@ handle_print(struct handle const *__restrict self,
 	}	break;
 
 	case HANDLE_TYPE_DRIVER_SECTION: {
-		struct driver_section *sect = (struct driver_section *)self->h_data;
-#ifdef CONFIG_USE_NEW_DRIVER
-		char const *name       = NULL;
-		REF struct module *mod = sect->ms_module;
+		struct driver_section *sect;
+		char const *name;
+		REF struct module *mod;
+		name = NULL;
+		sect = (struct driver_section *)self->h_data;
+		mod  = sect->ms_module;
 		if (tryincref(mod))
 			name = module_section_getname(sect);
-		FINALLY_XDECREF_UNLIKELY(mod);
+		FINALLY_DECREF_UNLIKELY(mod);
 		if (!name)
 			name = "?";
-#else /* CONFIG_USE_NEW_DRIVER */
-		struct driver *d = sect->ds_module;
-		char const *name;
-		assert(sect->ds_index < d->d_shnum);
-		assert(d->d_shdr);
-		assert(d->d_shstrtab);
-		assert(d->d_shdr[sect->ds_index].sh_name <= (size_t)(d->d_shstrtab_end - d->d_shstrtab));
-		name = d->d_shstrtab + d->d_shdr[sect->ds_index].sh_name;
-		if (d->d_shdr[sect->ds_index].sh_name >= (size_t)(d->d_shstrtab_end - d->d_shstrtab) || !*name)
-			name = "?";
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		result = format_printf(printer, arg,
 		                       "anon_inode:[driver_section:%s]",
 		                       name);

@@ -60,11 +60,7 @@ dbg_hookiterator_current_driver_loadaddr(struct dbg_hookiterator const *__restri
 			return 0; /* Shouldn't happen! */
 		if unlikely(wasdestroyed(drv))
 			return 0; /* Driver has been unloaded */
-#ifdef CONFIG_USE_NEW_DRIVER
 		result = drv->md_loadaddr;
-#else /* CONFIG_USE_NEW_DRIVER */
-		result = drv->d_loadaddr;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	} EXCEPT { /* Shouldn't happen */
 		if (dbg_active)
 			return 0;
@@ -220,25 +216,13 @@ end_of_section:
 				self->dhi_sectprev = NULL;
 				if unlikely(!ADDR_ISKERN(self->dhi_section))
 					goto end_of_driver; /* Shouldn't happen */
-#ifdef CONFIG_USE_NEW_DRIVER
 				if unlikely(!ADDR_ISKERN(self->dhi_section->ds_addr))
 					goto end_of_driver; /* Shouldn't happen */
 				if unlikely((byte_t *)self->dhi_sectnext < (byte_t *)self->dhi_section->ds_addr)
 					goto end_of_driver; /* Shouldn't happen */
-#else /* CONFIG_USE_NEW_DRIVER */
-				if unlikely(!ADDR_ISKERN(self->dhi_section->ds_data))
-					goto end_of_driver; /* Shouldn't happen */
-				if unlikely((byte_t *)self->dhi_sectnext < (byte_t *)self->dhi_section->ds_data)
-					goto end_of_driver; /* Shouldn't happen */
-#endif /* !CONFIG_USE_NEW_DRIVER */
 load_section_end_and_read_first_item:
-#ifdef CONFIG_USE_NEW_DRIVER
 				self->dhi_sectend = (struct dbg_hookhdr *)((byte_t *)self->dhi_section->ds_addr +
 				                                           self->dhi_section->ms_size);
-#else /* CONFIG_USE_NEW_DRIVER */
-				self->dhi_sectend = (struct dbg_hookhdr *)((byte_t *)self->dhi_section->ds_data +
-				                                           self->dhi_section->ds_size);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 				if unlikely(!ADDR_ISKERN(self->dhi_sectend))
 					goto end_of_driver; /* Shouldn't happen */
 				goto again;
@@ -262,29 +246,16 @@ end_of_everything:
 					goto end_of_driver; /* Shouldn't happen */
 				if unlikely(wasdestroyed(next_driver))
 					goto end_of_driver; /* Destroyed driver. */
-#ifdef CONFIG_USE_NEW_DRIVER
 				sect = (REF struct driver_section *)module_locksection(next_driver, str_dbg_hooks);
-#else /* CONFIG_USE_NEW_DRIVER */
-				sect = driver_section_lock(next_driver, str_dbg_hooks, DRIVER_SECTION_LOCK_FNODATA);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 				if (!sect)
 					goto end_of_driver; /* This driver doesn't export debugger hooks. */
-#ifdef CONFIG_USE_NEW_DRIVER
 				if unlikely(!ADDR_ISKERN(self->dhi_section->ds_addr) || self->dhi_section->ds_addr == (byte_t *)-1)
 					goto end_of_driver; /* This might happen when the .dbg.hooks section isn't loaded into memory. */
-#else /* CONFIG_USE_NEW_DRIVER */
-				if unlikely(!ADDR_ISKERN(self->dhi_section->ds_data) || !self->dhi_section->ds_data)
-					goto end_of_driver; /* This might happen when the .dbg.hooks section isn't loaded into memory. */
-#endif /* !CONFIG_USE_NEW_DRIVER */
 				/* Use the new section. */
 				decref_unlikely(self->dhi_section);
 				self->dhi_section = sect; /* Inherit reference */
 			}
-#ifdef CONFIG_USE_NEW_DRIVER
 			self->dhi_sectnext = (struct dbg_hookhdr *)self->dhi_section->ds_addr;
-#else /* CONFIG_USE_NEW_DRIVER */
-			self->dhi_sectnext = (struct dbg_hookhdr *)self->dhi_section->ds_data;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 			goto load_section_end_and_read_first_item;
 		}
 		if (OVERFLOW_UADD((uintptr_t)result, result->dh_size, (uintptr_t *)&next) ||

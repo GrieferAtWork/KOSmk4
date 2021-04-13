@@ -113,7 +113,6 @@ load_driver_from_file_handles(unsigned int fd_node,
 			RETHROW();
 		}
 		require(CAP_SYS_MODULE);
-#ifdef CONFIG_USE_NEW_DRIVER
 		result = flags & KSYSCTL_DRIVER_INSMOD_FNOINIT
 		         ? driver_loadmod(driver_node,
 		                          driver_path,
@@ -125,14 +124,6 @@ load_driver_from_file_handles(unsigned int fd_node,
 		                         driver_dentry,
 		                         driver_cmdline,
 		                         pnew_driver_loaded);
-#else /* CONFIG_USE_NEW_DRIVER */
-		result = driver_insmod(driver_node,
-		                       driver_path,
-		                       driver_dentry,
-		                       driver_cmdline,
-		                       pnew_driver_loaded,
-		                       flags);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	} EXCEPT {
 		xdecref_unlikely(driver_path);
 		xdecref_unlikely(driver_dentry);
@@ -252,17 +243,9 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			size = ATOMIC_READ(data->im_blob.b_size);
 			validate_readable(base, size);
 			require(CAP_SYS_MODULE);
-#ifdef CONFIG_USE_NEW_DRIVER
 			drv = insmod_flags & KSYSCTL_DRIVER_INSMOD_FNOINIT
 			      ? driver_loadmod((byte_t *)base, size, commandline, &new_driver_loaded)
 			      : driver_insmod((byte_t *)base, size, commandline, &new_driver_loaded);
-#else /* CONFIG_USE_NEW_DRIVER */
-			drv = driver_insmod((byte_t *)base,
-			                    size,
-			                    commandline,
-			                    &new_driver_loaded,
-			                    insmod_flags);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_FILE:
@@ -278,16 +261,9 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			name = ATOMIC_READ(data->im_name);
 			validate_readable(name, 1);
 			require(CAP_SYS_MODULE);
-#ifdef CONFIG_USE_NEW_DRIVER
 			drv = insmod_flags & KSYSCTL_DRIVER_INSMOD_FNOINIT
 			      ? driver_loadmod(name, commandline, &new_driver_loaded)
 			      : driver_insmod(name, commandline, &new_driver_loaded);
-#else /* CONFIG_USE_NEW_DRIVER */
-			drv = driver_insmod(name,
-			                    commandline,
-			                    &new_driver_loaded,
-			                    insmod_flags);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		}	break;
 
 		default:
@@ -315,7 +291,6 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		size_t struct_size;
 		u16 format;
 		unsigned int delmod_flags, error;
-#ifdef CONFIG_USE_NEW_DRIVER
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNORMAL == DRIVER_DELMOD_F_NORMAL);
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNODEPEND == DRIVER_DELMOD_F_NODEPEND);
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FFORCE == DRIVER_DELMOD_F_FORCE);
@@ -323,15 +298,6 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_SUCCESS == DRIVER_DELMOD_ST_SUCCESS);
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_UNKNOWN == DRIVER_DELMOD_ST_UNKNOWN);
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_ST_INUSE);
-#else /* CONFIG_USE_NEW_DRIVER */
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNORMAL == DRIVER_DELMOD_FLAG_NORMAL);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNODEPEND == DRIVER_DELMOD_FLAG_NODEPEND);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FFORCE == DRIVER_DELMOD_FLAG_FORCE);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNONBLOCK == DRIVER_DELMOD_FLAG_NONBLOCK);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_SUCCESS == DRIVER_DELMOD_SUCCESS);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_UNKNOWN == DRIVER_DELMOD_UNKNOWN);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_INUSE);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_delmod));
 		data        = (struct ksysctl_driver_delmod *)arg;
 		struct_size = ATOMIC_READ(data->dm_struct_size);
@@ -410,13 +376,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			validate_readable(name, 1);
 			COMPILER_READ_BARRIER();
 			require(CAP_DRIVER_QUERY);
-#ifdef CONFIG_USE_NEW_DRIVER
 			drv = driver_fromname(name);
-#else /* CONFIG_USE_NEW_DRIVER */
-			drv = name[0] == '/'
-			      ? driver_with_filename(name)
-			      : driver_with_name(name);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		}	break;
 
 		default:
@@ -674,17 +634,10 @@ DEFINE_SYSCALL2(errno_t, delete_module,
 #endif /* O_TRUNC != KSYSCTL_DRIVER_DELMOD_FFORCE || O_NONBLOCK != KSYSCTL_DRIVER_DELMOD_FNONBLOCK */
 	require(CAP_SYS_MODULE);
 	error = driver_delmod(name, delmod_flags);
-#ifdef CONFIG_USE_NEW_DRIVER
 	if (error == DRIVER_DELMOD_ST_UNKNOWN)
 		return -ENOENT;
 	if (error == DRIVER_DELMOD_ST_INUSE)
 		return -EBUSY;
-#else /* CONFIG_USE_NEW_DRIVER */
-	if (error == DRIVER_DELMOD_UNKNOWN)
-		return -ENOENT;
-	if (error == DRIVER_DELMOD_INUSE)
-		return -EBUSY;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_DELETE_MODULE */

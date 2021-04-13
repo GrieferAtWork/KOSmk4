@@ -1345,14 +1345,6 @@
 #define Tobpostlockop_callback_t(T) obpostlockop_callback_t
 #define Toblockop_callback_t(T)     oblockop_callback_t
 
-#define module_type_var(name)    module_type_t name;
-#define module_type_param(name)  module_type_t name
-#define module_type__param(name) , module_type_t name
-#define module_type_param_(name) module_type_t name,
-#define module_type_arg(name)    name
-#define module_type__arg(name)   , name
-#define module_type_arg_(name)   name,
-
 #define IF_DECODE(x) x
 #define IF_ZERO(x)
 #define IFELSE_NX(if_nx,if_x) if_nx

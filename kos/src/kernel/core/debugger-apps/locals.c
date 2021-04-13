@@ -236,28 +236,24 @@ enum_locals_at_with_debug_sections_impl(void const *absolute_pc,
 	di_debug_dl_sections_t dl_sections;
 	REF module_t *mod;
 	uintptr_t module_relative_pc;
-	module_type_var(module_type);
-	mod = module_ataddr_nx(absolute_pc, module_type);
-	if unlikely(!mod)
+	if unlikely((mod = module_fromaddr_nx(absolute_pc)) == NULL)
 		return 0; /* Nothing here! */
 	/* Lock debug sections into memory. */
-	debug_sections_lock(mod, &sections, &dl_sections
-	                    module_type__arg(module_type));
+	debug_sections_lock(mod, &sections, &dl_sections);
 	TRY {
-		_locals_current_module_loadaddr = module_getloadaddr(mod, module_type);
+		_locals_current_module_loadaddr = module_getloadaddr(mod);
 		module_relative_pc = (uintptr_t)absolute_pc - _locals_current_module_loadaddr;
 		/* Enumerate variables with debug sections. */
 		result = debuginfo_enum_locals(di_debug_sections_as_di_enum_locals_sections(&sections),
-		                               module_relative_pc,
-		                               callback, arg);
+		                               module_relative_pc, callback, arg);
 	} EXCEPT {
-		debug_sections_unlock(&dl_sections module_type__arg(module_type));
-		module_decref(mod, module_type);
+		debug_sections_unlock(&dl_sections);
+		module_decref_unlikely(mod);
 		RETHROW();
 	}
 	/* Unlock data. */
-	debug_sections_unlock(&dl_sections module_type__arg(module_type));
-	module_decref(mod, module_type);
+	debug_sections_unlock(&dl_sections);
+	module_decref_unlikely(mod);
 	return result;
 }
 

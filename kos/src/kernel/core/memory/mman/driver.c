@@ -29,7 +29,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_DRIVER
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <debugger/io.h>
@@ -546,20 +545,20 @@ PRIVATE struct driver_section_awref kernel_sections[KERNEL_SECTIONS_COUNT] = {};
 
 /* Define globals. */
 #define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) /* nothing */
-#include "../../fs/kernel_sections.def"
+#include "driver-kernel_sections.def"
 
 /* Define the kernel's .shstrtab section */
 struct kernel_shstrtab {
 #define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	char SECTION_DESCRIPTOR_SHSTRNAME[sizeof(name)];
-#include "../../fs/kernel_sections.def"
+#include "driver-kernel_sections.def"
 	char zero;
 };
 
 PRIVATE ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data = {
 #define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	/* .SECTION_DESCRIPTOR_SHSTRNAME = */ name,
-#include "../../fs/kernel_sections.def"
+#include "driver-kernel_sections.def"
 	/* .zero = */ 0
 };
 
@@ -569,7 +568,7 @@ PRIVATE ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data = {
 enum {
 #define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	SECTION_DESCRIPTOR_INDEX,
-#include "../../fs/kernel_sections.def"
+#include "driver-kernel_sections.def"
 	KERNEL_SECTIONS_COUNT
 };
 
@@ -589,7 +588,7 @@ PRIVATE ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {
 		.sh_addralign = 1,                                                               \
 		.sh_entsize   = entsize,                                                         \
 	},
-#include "../../fs/kernel_sections.def"
+#include "driver-kernel_sections.def"
 };
 
 
@@ -618,13 +617,13 @@ PRIVATE ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {
 	INTERN _SECTION(intern_name, name, type, flags, start, size, entsize, link, info)
 #define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
 	PUBLIC _SECTION(export_name, name, type, flags, start, size, entsize, link, info)
-#include "../../fs/kernel_sections.def"
+#include "driver-kernel_sections.def"
 
 
 /* Define the driver sections vector. */
 PRIVATE struct driver_section_awref kernel_sections[KERNEL_SECTIONS_COUNT] = {
 #define INTERN_SECTION(symbol_name, ...) /* [SECTION_DESCRIPTOR_INDEX] = */ AWREF_INIT(&symbol_name),
-#include "../../fs/kernel_sections.def"
+#include "driver-kernel_sections.def"
 };
 #endif /* !__INTELLISENSE__ */
 
@@ -6116,8 +6115,6 @@ DBG_COMMAND(cmdline,
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-
 DECL_END
-#endif /* CONFIG_USE_NEW_DRIVER */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_DRIVER_C */

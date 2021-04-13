@@ -947,14 +947,14 @@ err_bad_module:
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1)) void *DLFCN_CC
+INTERN WUNUSED NONNULL((1)) uintptr_t DLFCN_CC
 libdl_dlmodulebase(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
-	return (void *)self->dm_loadaddr;
+	return self->dm_loadaddr;
 err_bad_module:
 	dl_seterror_badmodule(self);
-	return NULL;
+	return 0;
 }
 
 

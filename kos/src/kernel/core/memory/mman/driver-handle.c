@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_FS_DRIVER_HANDLE_C
-#define GUARD_KERNEL_CORE_FS_DRIVER_HANDLE_C 1
+#ifndef GUARD_KERNEL_CORE_MEMORY_MMAN_DRIVER_HANDLE_C
+#define GUARD_KERNEL_CORE_MEMORY_MMAN_DRIVER_HANDLE_C 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
@@ -40,6 +40,8 @@
 
 #include <string.h>
 
+/* TODO: Re-design the driver HOP-system from scratch */
+
 DECL_BEGIN
 
 /* Driver-handle API */
@@ -48,33 +50,12 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_section, struct driver_section);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_loadlist, struct driver_loadlist);
 
 
-#ifndef CONFIG_USE_NEW_DRIVER
-PRIVATE NOBLOCK uintptr_t
-NOTHROW(KCALL hop_driver_getstate)(struct driver const *__restrict self) {
-	STATIC_ASSERT(HOP_DRIVER_STATE_NORMAL == DRIVER_FLAG_NORMAL);
-	STATIC_ASSERT(HOP_DRIVER_STATE_DEPLOADING == DRIVER_FLAG_DEPLOADING);
-	STATIC_ASSERT(HOP_DRIVER_STATE_DEPLOADED == DRIVER_FLAG_DEPLOADED);
-	STATIC_ASSERT(HOP_DRIVER_STATE_RELOCATING == DRIVER_FLAG_RELOCATING);
-	STATIC_ASSERT(HOP_DRIVER_STATE_RELOCATED == DRIVER_FLAG_RELOCATED);
-	STATIC_ASSERT(HOP_DRIVER_STATE_INITIALIZING == DRIVER_FLAG_INITIALIZING);
-	STATIC_ASSERT(HOP_DRIVER_STATE_INITIALIZED == DRIVER_FLAG_INITIALIZED);
-	STATIC_ASSERT(HOP_DRIVER_STATE_FINALIZING == DRIVER_FLAG_FINALIZING);
-	STATIC_ASSERT(HOP_DRIVER_STATE_FINALIZED == DRIVER_FLAG_FINALIZED);
-	STATIC_ASSERT(HOP_DRIVER_STATE_FINALIZED_C == DRIVER_FLAG_FINALIZED_C);
-	return ATOMIC_READ(self->d_flags);
-}
-#endif /* !CONFIG_USE_NEW_DRIVER */
-
 PRIVATE NOBLOCK uintptr_t KCALL
 hop_driver_getflags(struct driver *__restrict self)
 		THROWS(...) {
 	uintptr_t result = 0;
 	if (driver_getfile(self) != NULL)
 		result |= HOP_DRIVER_FLAG_HAS_FILE;
-#ifndef CONFIG_USE_NEW_DRIVER
-	if (driver_getfilename(self) != NULL)
-		result |= HOP_DRIVER_FLAG_HAS_FILENAME;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	if (self->d_eh_frame_start < self->d_eh_frame_end)
 		result |= HOP_DRIVER_FLAG_HAS_EH_FRAME;
 	if (self->d_dynsym_tab)
@@ -146,31 +127,17 @@ handle_driver_hop(struct driver *__restrict self,
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 		COMPILER_WRITE_BARRIER();
-#ifdef CONFIG_USE_NEW_DRIVER
 		data->ds_state      = 0;
-#else /* CONFIG_USE_NEW_DRIVER */
-		data->ds_state      = hop_driver_getstate(self);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		data->ds_flags      = hop_driver_getflags(self);
-#ifdef CONFIG_USE_NEW_DRIVER
 		data->ds_loadaddr   = self->md_loadaddr;
 		data->ds_loadstart  = (uintptr_t)self->md_loadmin;
 		data->ds_loadend    = (uintptr_t)self->md_loadmax + 1;
-#else /* CONFIG_USE_NEW_DRIVER */
-		data->ds_loadaddr   = self->d_loadaddr;
-		data->ds_loadstart  = self->d_loadstart;
-		data->ds_loadend    = self->d_loadend;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		data->ds_argc       = self->d_argc;
 		data->ds_depc       = self->d_depcnt;
 		data->ds_symcnt     = self->d_dynsym_cnt;
 		data->ds_shnum      = self->d_shnum;
 		data->ds_strtabsz   = (size_t)(self->d_dynstr_end - self->d_dynstr);
-#ifdef CONFIG_USE_NEW_DRIVER
 		data->ds_shstrtabsz = self->d_shstrsiz;
-#else /* CONFIG_USE_NEW_DRIVER */
-		data->ds_shstrtabsz = (size_t)(self->d_shstrtab_end - self->d_shstrtab);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
@@ -190,16 +157,6 @@ handle_driver_hop(struct driver *__restrict self,
 		return handle_driver_getstring0(arg, cmdline,
 		                                (size_t)(endptr - cmdline));
 	}	break;
-
-#ifndef CONFIG_USE_NEW_DRIVER
-	case HOP_DRIVER_GET_FILENAME: {
-		char const *filename;
-		filename = driver_getfilename(self);
-		if unlikely(!filename)
-			THROW(E_NO_SUCH_OBJECT);
-		return handle_driver_getstring0(arg, filename, strlen(filename) + 1);
-	}	break;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 	case HOP_DRIVER_GET_ARGV: {
 		u64 index;
@@ -229,11 +186,7 @@ handle_driver_hop(struct driver *__restrict self,
 
 	case HOP_DRIVER_OPEN_FILE: {
 		struct handle d;
-#ifdef CONFIG_USE_NEW_DRIVER
 		struct mfile *file;
-#else /* CONFIG_USE_NEW_DRIVER */
-		struct regular_node *file;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		require(CAP_DRIVER_QUERY);
 		file = driver_getfile(self);
 		if unlikely(!file)
@@ -268,11 +221,7 @@ handle_driver_hop(struct driver *__restrict self,
 		}
 		d.h_type = HANDLE_TYPE_DRIVER;
 		d.h_mode = mode;
-#ifdef CONFIG_USE_NEW_DRIVER
 		d.h_data = axref_get(&self->d_depvec[(uintptr_t)depno]);
-#else /* CONFIG_USE_NEW_DRIVER */
-		d.h_data = self->d_depvec[(uintptr_t)depno];
-#endif /* !CONFIG_USE_NEW_DRIVER */
 		if unlikely(!d.h_data)
 			THROW(E_NO_SUCH_OBJECT);
 		return handle_installhop(&data->dod_result, d);
@@ -280,21 +229,13 @@ handle_driver_hop(struct driver *__restrict self,
 
 	case HOP_DRIVER_INITIALIZE:
 		require(CAP_DRIVER_CONTROL);
-#ifdef CONFIG_USE_NEW_DRIVER
 		driver_initialize(self);
 		break;
-#else /* CONFIG_USE_NEW_DRIVER */
-		return driver_initialize(self);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 	case HOP_DRIVER_FINALIZE:
 		require(CAP_DRIVER_CONTROL);
-#ifdef CONFIG_USE_NEW_DRIVER
 		driver_finalize(self);
 		break;
-#else /* CONFIG_USE_NEW_DRIVER */
-		return driver_finalize(self);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
@@ -402,4 +343,4 @@ handle_driver_section_hop(struct driver_section *__restrict self,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_FS_DRIVER_HANDLE_C */
+#endif /* !GUARD_KERNEL_CORE_MEMORY_MMAN_DRIVER_HANDLE_C */

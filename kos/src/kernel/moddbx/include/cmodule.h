@@ -33,6 +33,8 @@
 #include <kos/exec/module.h>
 #include <kos/refcnt-nonatomic.h>
 
+#include <elf.h>
+
 #include <libdebuginfo/debug_info.h>
 
 /**/
@@ -289,12 +291,7 @@ struct cmodule {
 	struct cmodule                         **cm_pself;     /* [1..1][1..1] Self-pointer */
 	struct cmodule                          *cm_next;      /* [0..1] Next module. */
 	REF struct cmodule                      *cm_cache;     /* [0..1] Next cached module. */
-#if MODULE_TYPE_COUNT >= 2
-	uintptr_half_t                           cm_refcnt;    /* Reference counter. */
-	uintptr_half_t                           cm_modtyp;    /* [const] Module type (one of `MODULE_TYPE_*'). */
-#else /* MODULE_TYPE_COUNT >= 2 */
 	uintptr_t                                cm_refcnt;    /* Reference counter. */
-#endif /* MODULE_TYPE_COUNT < 2 */
 	REF module_t                            *cm_module;   /* [1..1][const] Module handle. */
 	di_debug_sections_t                      cm_sections; /* [const] Debug section mappings. */
 	di_debug_dl_sections_t                   cm_sectrefs; /* [const] Debug section references. */
@@ -306,26 +303,18 @@ struct cmodule {
 	                                                       * that only its `cu_di_start' may be accessed, which will
 	                                                       * usually  be  equal  to  `cm_sections.ds_debug_info_end' */
 };
-#define cmodule_getloadaddr(self)  module_getloadaddr((self)->cm_module, (self)->cm_modtyp)
-#define cmodule_getloadstart(self) module_getloadstart((self)->cm_module, (self)->cm_modtyp)
-#define cmodule_getloadend(self)   module_getloadend((self)->cm_module, (self)->cm_modtyp)
-#define cmodule_mman(self)         module_mman((self)->cm_module, (self)->cm_modtyp)
-#ifdef CONFIG_USE_NEW_DRIVER
-#define cmodule_isuser(self) (!module_isdriver((self)->cm_module))
-#define cmodule_iskern(self) module_isdriver((self)->cm_module)
-#elif MODULE_TYPE_COUNT >= 2
-#define cmodule_isuser(self) ((self)->cm_modtyp == MODULE_TYPE_USRMOD)
-#define cmodule_iskern(self) ((self)->cm_modtyp == MODULE_TYPE_DRIVER)
-#elif defined(MODULE_TYPE_DRIVER)
-#define cmodule_iskern(self) 1
-#define cmodule_isuser(self) 0
-#elif defined(MODULE_TYPE_USRMOD)
-#define cmodule_isuser(self) 1
-#define cmodule_iskern(self) 0
-#else /* ... */
-#define cmodule_isuser(self) 0
-#define cmodule_iskern(self) 0
-#endif /* !... */
+#define cmodule_getloadaddr(self) (self)->cm_module->md_loadaddr
+#define cmodule_getloadmin(self)  (self)->cm_module->md_loadmin
+#define cmodule_getloadmax(self)  (self)->cm_module->md_loadmax
+#define cmodule_mman(self)        (self)->cm_module->md_mman
+#define cmodule_isuser(self)      (!module_isdriver((self)->cm_module))
+#define cmodule_iskern(self)      module_isdriver((self)->cm_module)
+
+#define cmodule_di_debug_sections(self)               (&(self)->cm_sections)
+#define cmodule_unwind_emulator_sections(self)        di_debug_sections_as_unwind_emulator_sections(&(self)->cm_sections)
+#define cmodule_di_enum_locals_sections(self)         di_debug_sections_as_di_enum_locals_sections(&(self)->cm_sections)
+#define cmodule_di_debuginfo_cu_parser_sections(self) di_debug_sections_as_di_debuginfo_cu_parser_sections(&(self)->cm_sections)
+#define cmodule_di_addr2line_sections(self)           di_debug_sections_as_di_addr2line_sections(&(self)->cm_sections)
 
 /* Destroy the given CModule. (called when its reference counter hits `0') */
 FUNDEF NONNULL((1)) void NOTHROW(FCALL cmodule_destroy)(struct cmodule *__restrict self);
@@ -340,10 +329,10 @@ typedef NONNULL((2)) ssize_t
  * >> void *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
  * >> ENUM(cmodule_ataddr(pc));
  * >> if (ADDR_ISKERN(pc)) {
- * >>     cmodule_enum_drivers();                 // Excluding `cmodule_ataddr(pc)'
- * >>     cmodule_enum_uservm(dbg_current->t_mman);
+ * >>     cmodule_enum_drivers();                     // Excluding `cmodule_ataddr(pc)'
+ * >>     cmodule_enum_usermman(dbg_current->t_mman);
  * >> } else {
- * >>     cmodule_enum_uservm(dbg_current->t_mman); // Excluding `cmodule_ataddr(pc)'
+ * >>     cmodule_enum_usermman(dbg_current->t_mman); // Excluding `cmodule_ataddr(pc)'
  * >>     cmodule_enum_drivers();
  * >> }
  * @return: * :        pformatprinter-compatible return value.
@@ -357,16 +346,16 @@ NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
                                       cmodule_enum_callback_t cb,
                                       void *cookie);
 
-struct vm;
+struct mman;
 
-/* Enumerate all user-space modules mapped within the given vm
- * `self' as CModule objects, and invoke `cb' on each of them.
+/* Enumerate all user-space modules mapped within the given mman
+ * `self' as CModule objects, and  invoke `cb' on each of  them.
  * @return: * :        pformatprinter-compatible return value.
  * @return: DBX_EINTR: Operation was interrupted. */
 FUNDEF NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL cmodule_enum_uservm)(struct vm *__restrict self,
-                                   cmodule_enum_callback_t cb,
-                                   void *cookie);
+NOTHROW(FCALL cmodule_enum_usermman)(struct mman *__restrict self,
+                                     cmodule_enum_callback_t cb,
+                                     void *cookie);
 
 /* Enumerate all kernel-space drivers as CModule objects, and
  * invoke `cb' on each of them.
@@ -385,18 +374,17 @@ NOTHROW(FCALL cmodule_enum_drivers)(cmodule_enum_callback_t cb,
  *              them from the  cache caused  their refcnt to  drop to  `0') */
 FUNDEF size_t NOTHROW(FCALL cmodule_clearcache)(__BOOL keep_loaded DFL(0));
 
-/* Lookup or  create the  CModule  for the  given  `mod:modtype'
+/* Lookup or create the CModule for the given `mod'
  * If  the module has already been loaded, return a reference to
  * the pre-loaded CModule. Otherwise, create and remember a  new
  * module which is then kept in-cache. If this step fails due to
  * lack of memory, `NULL' is returned instead. */
 FUNDEF WUNUSED NONNULL((1)) REF struct cmodule *
-NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod
-                              module_type__param(modtype));
+NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod);
 
 /* Return the CModule descriptor for a given `addr', which should be a program counter, or data-pointer.
  * If  no  such  module  exists, or  its  descriptor  could  not be  allocated,  return  `NULL' instead.
- * This function is a thin wrapper around `module_ataddr_nx()' + `cmodule_locate()' */
+ * This function is a thin wrapper around `module_fromaddr_nx()' + `cmodule_locate()' */
 FUNDEF WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_ataddr)(void const *addr);
 

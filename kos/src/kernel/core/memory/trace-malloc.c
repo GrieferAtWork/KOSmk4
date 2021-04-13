@@ -1149,10 +1149,6 @@ INTDEF byte_t __debug_malloc_tracked_size[];
 ARREF(driver_loadlist_arref, driver_loadlist);
 #endif /* !__driver_loadlist_arref_defined */
 
-#ifndef CONFIG_USE_NEW_DRIVER
-INTDEF struct driver_loadlist_arref drivers ASMNAME("current_driver_state");
-#endif /* !CONFIG_USE_NEW_DRIVER */
-
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_corepage_chain)(struct mcorepage *chain) {
 	size_t result = 0;
@@ -1249,11 +1245,7 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 					continue;
 				if (!(drv->d_phdr[j].p_flags & PF_W))
 					continue;
-#ifdef CONFIG_USE_NEW_DRIVER
 				progaddr = (uintptr_t)(drv->md_loadaddr + drv->d_phdr[j].p_vaddr);
-#else /* CONFIG_USE_NEW_DRIVER */
-				progaddr = (uintptr_t)(drv->d_loadaddr + drv->d_phdr[j].p_vaddr);
-#endif /* !CONFIG_USE_NEW_DRIVER */
 				progsize = drv->d_phdr[j].p_memsz;
 				progsize += progaddr & PAGEMASK;
 				progaddr &= ~PAGEMASK;

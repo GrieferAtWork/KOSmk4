@@ -568,7 +568,6 @@ struct dbg_hookiterator {
 };
 
 /* Initialize a given `struct dbg_hookiterator *self' */
-#ifdef CONFIG_USE_NEW_DRIVER
 #define dbg_hookiterator_init(self)                                                                     \
 	(void)((self)->dhi_drivers    = get_driver_loadlist(),                                              \
 	       (self)->dhi_nextdriver = 0,                                                                  \
@@ -577,16 +576,6 @@ struct dbg_hookiterator {
 	       (self)->dhi_sectend    = (struct dbg_hookhdr *)((byte_t *)kernel_section_dbg_hooks.ds_addr + \
 	                                                       kernel_section_dbg_hooks.ms_size),           \
 	       (self)->dhi_sectprev   = __NULLPTR)
-#else /* CONFIG_USE_NEW_DRIVER */
-#define dbg_hookiterator_init(self)                                                                     \
-	(void)((self)->dhi_drivers    = get_driver_loadlist(),                                              \
-	       (self)->dhi_nextdriver = 0,                                                                  \
-	       (self)->dhi_section    = incref(&kernel_section_dbg_hooks),                                  \
-	       (self)->dhi_sectnext   = (struct dbg_hookhdr *)kernel_section_dbg_hooks.ds_data,             \
-	       (self)->dhi_sectend    = (struct dbg_hookhdr *)((byte_t *)kernel_section_dbg_hooks.ds_data + \
-	                                                       kernel_section_dbg_hooks.ds_size),           \
-	       (self)->dhi_sectprev   = __NULLPTR)
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 /* Finalize a given `struct dbg_hookiterator *self' */
 #define dbg_hookiterator_fini(self)              \

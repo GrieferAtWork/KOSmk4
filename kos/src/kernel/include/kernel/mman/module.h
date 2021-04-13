@@ -290,27 +290,19 @@ NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self, unsig
 #define module_sizeof_pointer(self) sizeof(void *)
 #endif /* !_MODULE_HAVE_SIZEOF_POINTER */
 
-
-#ifdef CONFIG_USE_NEW_DRIVER
 /* Check if a given module is actually a `struct driver'
  * Note  that when this is not the case, you are allowed
  * to assume  that the  module represents  some sort  of
  * user-space executable object. */
 #define module_isdriver(self) ((self)->md_ops->mo_free == &_driver_free)
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__restrict self) ASMNAME("driver_free");
-#endif /* CONFIG_USE_NEW_DRIVER */
 
 
 /* Check if the given module has a path and/or name. */
 #define module_haspath(self) \
 	((self)->md_fsname != __NULLPTR && ((self)->md_fspath != __NULLPTR || (self)->md_fsname->de_name[0] == '/'))
-#ifdef CONFIG_USE_NEW_DRIVER
 #define module_hasname(self)         ((self)->md_fsname != __NULLPTR || module_isdriver(self))
 #define module_haspath_or_name(self) ((self)->md_fsname != __NULLPTR || module_isdriver(self))
-#else /* CONFIG_USE_NEW_DRIVER */
-#define module_hasname(self)         ((self)->md_fsname != __NULLPTR)
-#define module_haspath_or_name(self) ((self)->md_fsname != __NULLPTR)
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 /* Return the name of the given module (or `NULL' if `!module_hasname(self)')
  * The returned pointer  is the  same as is  printed by  `module_printname()' */

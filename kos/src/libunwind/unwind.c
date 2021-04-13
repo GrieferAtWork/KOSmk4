@@ -47,20 +47,14 @@
 #include <malloc.h>
 #include <stddef.h>
 #include <string.h>
-#else /* !__KERNEL__ */
-#include <kernel/compiler.h>
-#ifndef CONFIG_USE_NEW_DRIVER
-#include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
-#endif /* !CONFIG_USE_NEW_DRIVER */
-#endif /* __KERNEL__ */
+#endif /* !__KERNEL__ */
 
 DECL_BEGIN
 
 
-/* NOTE: In  kernel-space,  `libuw_unwind_fde_find()'   is
- *       implemented in `/kos/src/kernel/core/fs/driver.c' */
+/* NOTE: In kernel-space, `libuw_unwind_fde_find()'  is
+ *       in `/kos/src/kernel/core/memory/mman/driver.c' */
 #ifndef __KERNEL__
-
 PRIVATE NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
                                           unwind_fde_t *__restrict result) {
@@ -293,17 +287,6 @@ done:
 
 
 DEFINE_PUBLIC_ALIAS(unwind, linuw_unwind);
-
-/* In certain configurations, the kernel's `unwind_for_debug(3)'
- * is  identical  to  its  regular,  old  `unwind(3)'  function. */
-#ifdef __KERNEL__
-#ifndef CONFIG_USE_NEW_DRIVER
-#if !defined(CONFIG_HAVE_USERMOD) && defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
-DEFINE_PUBLIC_ALIAS(unwind_for_debug, linuw_unwind);
-#endif /* !CONFIG_HAVE_USERMOD && LIBDEBUGINFO_CC_IS_LIBUNWIND_CC */
-#endif /* !CONFIG_USE_NEW_DRIVER */
-#endif /* __KERNEL__ */
-
 
 DECL_END
 

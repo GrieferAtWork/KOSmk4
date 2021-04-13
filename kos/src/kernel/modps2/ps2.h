@@ -42,17 +42,10 @@ DECL_BEGIN
 typedef u8 ps2_portid_t; /* `PS2_PORT1' or `PS2_PORT2' */
 
 
-#ifdef CONFIG_USE_NEW_DRIVER
 DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_infull_timeout, "timeout_infull", 100); /* In milliseconds */
 DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_outfull_timeout, "timeout_outfull", 100); /* In milliseconds */
 DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_timeout, "timeout_command", 100); /* In milliseconds */
 DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_attempts, "attempts_command", 3);
-#else /* CONFIG_USE_NEW_DRIVER */
-extern unsigned int ps2_infull_timeout;  /* In milliseconds */
-extern unsigned int ps2_outfull_timeout; /* In milliseconds */
-extern unsigned int ps2_command_timeout; /* In milliseconds */
-extern unsigned int ps2_command_attempts;
-#endif /* !CONFIG_USE_NEW_DRIVER */
 
 /* TODO: Non-portable! */
 #define PS2_GET_ISR_FOR_PORT(portno)            \

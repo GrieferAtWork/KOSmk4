@@ -30,12 +30,11 @@
 
 #include <debugger/input.h>
 #include <debugger/rt.h>
-#include <kernel/driver.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/module.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <kernel/vm/usermod.h>
 
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
@@ -109,7 +108,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 		result->dup_cu_info_pos = dip;
 	}
 	reader                = result->dup_cu_info_end;
-	result->dup_sections  = di_debug_sections_as_di_debuginfo_cu_parser_sections(&mod->cm_sections);
+	result->dup_sections  = cmodule_di_debuginfo_cu_parser_sections(mod);
 	result->dup_cu_abbrev = (di_debuginfo_cu_abbrev_t *)&self->cu_abbrev;
 	/* Load the first component of the compilation unit. */
 	if (!debuginfo_cu_parser_next(result)) {
@@ -143,8 +142,8 @@ NOTHROW(FCALL cmodule_fini)(struct cmodule *__restrict self) {
 		if ((*self->cm_pself = self->cm_next) != NULL)
 			self->cm_next->cm_pself = self->cm_pself;
 	}
-	debug_sections_unlock(&self->cm_sectrefs module_type__arg(self->cm_modtyp));
-	module_decref(self->cm_module, self->cm_modtyp);
+	debug_sections_unlock(&self->cm_sectrefs);
+	module_decref_unlikely(self);
 	cmodsymtab_fini(&self->cm_symbols);
 	for (i = 0; i < self->cm_cuc; ++i)
 		cmodunit_fini(&self->cm_cuv[i]);
@@ -161,19 +160,17 @@ NOTHROW(FCALL cmodule_destroy)(struct cmodule *__restrict self) {
 
 
 PRIVATE NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL cmodule_enum_uservm_except)(struct vm *__restrict self,
-                                          cmodule_enum_callback_t cb,
-                                          void *cookie,
-                                          struct cmodule *skipme) {
-#ifdef CONFIG_USE_NEW_DRIVER
+NOTHROW(FCALL cmodule_enum_usermman_except)(struct mman *__restrict self,
+                                            cmodule_enum_callback_t cb,
+                                            void *cookie,
+                                            struct cmodule *skipme) {
 	ssize_t temp, result = 0;
 	REF struct module *um, *nx;
 	/* Enumerate modules. */
 	for (um = mman_module_first_nx(self); um != NULL;
 	     nx = mman_module_next_nx(self, um), decref(um), um = nx) {
 		REF struct cmodule *cm;
-		cm = cmodule_locate((module_t *)um
-		                    module_type__arg(MODULE_TYPE_USRMOD));
+		cm = cmodule_locate((module_t *)um);
 		if likely(cm) {
 			temp = 0;
 			if (cm != skipme)
@@ -197,61 +194,6 @@ done:
 err:
 	result = temp;
 	goto done;
-#elif defined(CONFIG_HAVE_USERMOD)
-	ssize_t temp, result = 0;
-	REF struct usermod *um;
-	TRY {
-		um = vm_getusermod_above(self, NULL);
-	} EXCEPT {
-		goto done;
-	}
-	if likely(um) {
-		/* Enumerate modules. */
-		do {
-			REF struct cmodule *cm;
-			cm = cmodule_locate((module_t *)um
-			                    module_type__arg(MODULE_TYPE_USRMOD));
-			if likely(cm) {
-				temp = 0;
-				if (cm != skipme)
-					temp = (*cb)(cookie, cm);
-				decref(cm);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-			}
-			/* Check if the user has requested an interrupt. */
-			if (dbg_awaituser()) {
-				decref(um);
-				result = DBX_EINTR;
-				break;
-			}
-			/* Load the next user-space module. */
-			{
-				REF struct usermod *next_um;
-				TRY {
-					next_um = vm_getusermod_next(self, um);
-				} EXCEPT {
-					decref(um);
-					goto done;
-				}
-				decref(um);
-				um = next_um;
-			}
-		} while (um != NULL);
-	}
-done:
-	return result;
-err:
-	result = temp;
-	goto done;
-#else /* CONFIG_HAVE_USERMOD */
-	(void)self;
-	(void)cb;
-	(void)cookie;
-	(void)skipme;
-	return 0;
-#endif /* !CONFIG_HAVE_USERMOD */
 }
 
 PRIVATE NONNULL((1)) ssize_t
@@ -261,21 +203,16 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
 	size_t i;
 	ssize_t temp, result = 0;
 	REF struct driver_loadlist *dll;
-	REF struct cmodule *cm;
-	/* Enumerate the kernel core driver. */
-	if (!skipme || skipme->cm_module != (module_t *)&kernel_driver) {
-		cm = cmodule_locate((module_t *)&kernel_driver
-		                    module_type__arg(MODULE_TYPE_DRIVER));
-		if likely(cm)
-			result = (*cb)(cookie, cm);
-		decref(cm);
-		if unlikely(result < 0)
-			goto done_nods;
-	}
+	/* Enumerate drivers, including the kernel core driver. */
 	dll = get_driver_loadlist();
 	for (i = 0; i < dll->dll_count; ++i) {
-		cm = cmodule_locate((module_t *)dll->dll_drivers[i]
-		                    module_type__arg(MODULE_TYPE_DRIVER));
+		REF struct cmodule *cm;
+		REF struct driver *drv;
+		drv = dll->dll_drivers[i];
+		if unlikely(!tryincref(drv))
+			continue;
+		cm = cmodule_locate(drv);
+		decref_unlikely(drv);
 		if likely(cm) {
 			temp = 0;
 			if (cm != skipme)
@@ -293,7 +230,6 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
 	}
 done:
 	decref(dll);
-done_nods:
 	return result;
 err:
 	result = temp;
@@ -305,9 +241,9 @@ err:
  * >> ENUM(cmodule_ataddr(pc));
  * >> if (ADDR_ISKERN(pc)) {
  * >>     cmodule_enum_drivers();                 // Excluding `cmodule_ataddr(pc)'
- * >>     cmodule_enum_uservm(dbg_current->t_mman);
+ * >>     cmodule_enum_usermman(dbg_current->t_mman);
  * >> } else {
- * >>     cmodule_enum_uservm(dbg_current->t_mman); // Excluding `cmodule_ataddr(pc)'
+ * >>     cmodule_enum_usermman(dbg_current->t_mman); // Excluding `cmodule_ataddr(pc)'
  * >>     cmodule_enum_drivers();
  * >> }
  * @return: * :        pformatprinter-compatible return value.
@@ -346,7 +282,7 @@ NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
 	/* Enumerate user-space modules. */
 	if (dbg_current && dbg_current->t_self == dbg_current &&
 	    dbg_current->t_mman != NULL && dbg_current->t_mman != &mman_kernel) {
-		temp = cmodule_enum_uservm_except(dbg_current->t_mman, cb, cookie, start_module);
+		temp = cmodule_enum_usermman_except(dbg_current->t_mman, cb, cookie, start_module);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
@@ -365,15 +301,15 @@ err:
 }
 
 
-/* Enumerate all user-space modules mapped within the given vm
- * `self' as CModule objects, and invoke `cb' on each of them.
+/* Enumerate all user-space modules mapped within the given mman
+ * `self' as CModule objects, and  invoke `cb' on each of  them.
  * @return: * :        pformatprinter-compatible return value.
  * @return: DBX_EINTR: Operation was interrupted. */
 PUBLIC NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL cmodule_enum_uservm)(struct vm *__restrict self,
-                                   cmodule_enum_callback_t cb,
-                                   void *cookie) {
-	return cmodule_enum_uservm_except(self, cb, cookie, NULL);
+NOTHROW(FCALL cmodule_enum_usermman)(struct mman *__restrict self,
+                                     cmodule_enum_callback_t cb,
+                                     void *cookie) {
+	return cmodule_enum_usermman_except(self, cb, cookie, NULL);
 }
 
 /* Enumerate all kernel-space drivers as CModule objects, and
@@ -412,9 +348,8 @@ PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 	while ((iter = *piter) != NULL) {
 		if (keep_loaded) {
 			/* Check if we should keep this module. */
-			struct vm *modvm;
-			modvm = module_mman(iter->cm_module,
-			                  iter->cm_modtyp);
+			struct mman *modvm;
+			modvm = iter->cm_module->md_mman;
 			if (modvm == &mman_kernel ||
 			    modvm == dbg_current->t_mman) {
 				/* Don't remove this one. */
@@ -459,8 +394,7 @@ NOTHROW(FCALL cmodule_reloc_units)(struct cmodule *new_addr,
 
 
 PRIVATE WUNUSED NONNULL((1)) REF struct cmodule *
-NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
-                              module_type__param(modtype)) {
+NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 #define SIZEOF_CMODULE(cuc)              \
 	(offsetof(struct cmodule, cm_cuv) +  \
 	 ((cuc) * sizeof(struct cmodunit)) + \
@@ -476,10 +410,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 			goto done;
 	}
 	/* Load debug sections. */
-	debug_sections_lock(mod,
-	                    &result->cm_sections,
-	                    &result->cm_sectrefs
-	                    module_type__arg(modtype));
+	debug_sections_lock(mod, &result->cm_sections, &result->cm_sectrefs);
 	/* Special handling to ensure that .symtab is loaded as intended
 	 * when   accessing  debug  information  for  the  kernel  core. */
 	if (mod == (module_t *)&kernel_driver) {
@@ -590,7 +521,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 			 * the  associated CU originates from an assembly file, which in turn
 			 * doesn't contain any additional debug  info, so we can just  ignore
 			 * and discard it here! */
-			parser.dup_sections    = di_debug_sections_as_di_debuginfo_cu_parser_sections(&result->cm_sections);
+			parser.dup_sections    = cmodule_di_debuginfo_cu_parser_sections(result);
 			parser.dup_cu_abbrev   = &cu->cu_abbrev;
 			parser.dup_cu_info_hdr = cmodunit_di_start(cu);
 			parser.dup_cu_info_end = cmodunit_di_maxend(cu);
@@ -627,10 +558,7 @@ done_cucs:
 	}
 	/* Fill in misc. fields of result. */
 	result->cm_refcnt = 1;
-#if MODULE_TYPE_COUNT >= 2
-	result->cm_modtyp = modtype;
-#endif /* MODULE_TYPE_COUNT >= 2 */
-	module_incref(mod, modtype);
+	module_incref(mod);
 	result->cm_module           = mod; /* Inherit reference */
 	result->cm_symbols.mst_symc = 0;
 	result->cm_symbols.mst_symv = NULL;
@@ -641,29 +569,29 @@ done:
 	return result;
 err_r:
 	/* Unlock .debug_* sections. */
-	debug_sections_unlock(&result->cm_sectrefs
-	                       module_type__arg(modtype));
+	debug_sections_unlock(&result->cm_sectrefs);
 	dbx_free(result);
 	result = NULL;
 	goto done;
 }
 
-/* Lookup or  create the  CModule  for the  given  `mod:modtype'
+/* Lookup or create the CModule for the given `mod'
  * If  the module has already been loaded, return a reference to
  * the pre-loaded CModule. Otherwise, create and remember a  new
  * module which is then kept in-cache. If this step fails due to
  * lack of memory, `NULL' is returned instead. */
 PUBLIC WUNUSED NONNULL((1)) REF struct cmodule *
-NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod
-                              module_type__param(modtype)) {
+NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod) {
 	REF struct cmodule *result;
+
 	/* Search for an already-loaded module. */
 	for (result = cmodule_list; result; result = result->cm_next) {
 		if (result->cm_module == mod)
 			return incref(result);
 	}
+
 	/* Create a new module. */
-	result = cmodule_create(mod module_type__arg(modtype));
+	result = cmodule_create(mod);
 	if likely(result) {
 		result->cm_next  = cmodule_list;
 		result->cm_pself = &cmodule_list;
@@ -679,18 +607,16 @@ NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod
 
 /* Return the CModule descriptor for a given `addr', which should be a program counter, or data-pointer.
  * If  no  such  module  exists, or  its  descriptor  could  not be  allocated,  return  `NULL' instead.
- * This function is a thin wrapper around `module_ataddr_nx()' + `cmodule_locate()' */
+ * This function is a thin wrapper around `module_fromaddr_nx()' + `cmodule_locate()' */
 PUBLIC WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_ataddr)(void const *addr) {
-	REF struct cmodule *result;
+	REF struct cmodule *result = NULL;
 	REF module_t *mod;
-	module_type_var(modtype);
-	mod = module_ataddr_nx(addr, modtype);
-	if (!mod)
-		return NULL;
-	/* Lookup the CModule for the `mod' that we've found. */
-	result = cmodule_locate(mod module_type__arg(modtype));
-	module_decref(mod, modtype);
+	if ((mod = module_fromaddr_nx(addr)) != NULL) {
+		/* Lookup the CModule for the `mod' that we've found. */
+		result = cmodule_locate(mod);
+		module_decref_unlikely(mod);
+	}
 	return result;
 }
 
@@ -2177,8 +2103,8 @@ NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 	if (result && (cmodsym_getns(result) & CMODSYM_DIP_NS_FCONFLICT)) {
 		void const *pc;
 		pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-		if (pc >= (void const *)cmodule_getloadstart(self) &&
-		    pc <  (void const *)cmodule_getloadend(self)) {
+		if ((byte_t const *)pc >= cmodule_getloadmin(self) &&
+		    (byte_t const *)pc <= cmodule_getloadmax(self)) {
 			uintptr_t module_relative_pc;
 			struct cmodunit *cu;
 			module_relative_pc = (uintptr_t)pc - cmodule_getloadaddr(self);

@@ -122,23 +122,12 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 	 * TODO: A similar special case should exist for `libdl.so'! */
 #ifdef __KERNEL__
 	else if (sections->ds_debug_line_start == __kernel_debug_line_start) {
-#ifdef CONFIG_USE_NEW_DRIVER
 		struct driver_symaddr info;
 		if (driver_dladdr_local(&kernel_driver, module_relative_pc, &info)) {
 			result->al_symstart = (uintptr_t)info.dsa_addr;
 			result->al_symend   = (uintptr_t)info.dsa_addr + info.dsa_size;
 			result->al_rawname  = (char *)info.dsa_name;
 		}
-#else /* CONFIG_USE_NEW_DRIVER */
-		char const *name;
-		size_t sym_size;
-		name = driver_symbol_at(&kernel_driver, module_relative_pc,
-		                        &result->al_symstart, &sym_size);
-		if (name) {
-			result->al_symend  = result->al_symstart + sym_size;
-			result->al_rawname = (char *)name;
-		}
-#endif /* !CONFIG_USE_NEW_DRIVER */
 	}
 #endif /* __KERNEL__ */
 }
@@ -823,14 +812,13 @@ INTERN_CONST STRINGSECTION char const secname_dynstr[]        = ".dynstr";
 INTERN TEXTSECTION NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
                                                     di_addr2line_sections_t *__restrict sections,
-                                                    di_addr2line_dl_sections_t *__restrict dl_sections
-                                                    module_type__param(module_type)) {
+                                                    di_addr2line_dl_sections_t *__restrict dl_sections) {
 	memset(sections, 0, sizeof(*sections));
 	if unlikely(!dl_handle)
 		goto err_no_data;
-#define LOCK_SECTION(name) \
-	module_locksection_nx(dl_handle, module_type, name, MODULE_LOCKSECTION_FNORMAL)
-	dl_sections->dl_debug_line = LOCK_SECTION(secname_debug_line);
+#define locksection(name) \
+	module_locksection_nx(dl_handle, name, MODULE_LOCKSECTION_FNORMAL)
+	dl_sections->dl_debug_line = locksection(secname_debug_line);
 	if (!dl_sections->dl_debug_line) {
 		/* No debug information sections */
 		dl_sections->dl_debug_info = NULL;
@@ -842,37 +830,35 @@ set_no_extened_debug_info:
 		dl_sections->dl_debug_ranges  = NULL;
 	} else {
 		/* Load .debug_info and .dl_debug_abbrev */
-		dl_sections->dl_debug_info = LOCK_SECTION(secname_debug_info);
+		dl_sections->dl_debug_info = locksection(secname_debug_info);
 		if (!dl_sections->dl_debug_info)
 			goto set_no_extened_debug_info_2;
-		dl_sections->dl_debug_abbrev = LOCK_SECTION(secname_debug_abbrev);
+		dl_sections->dl_debug_abbrev = locksection(secname_debug_abbrev);
 		if (!dl_sections->dl_debug_abbrev) {
-			module_section_decref(dl_sections->dl_debug_info,
-			                      module_type);
+			module_section_decref(dl_sections->dl_debug_info);
 			goto set_no_extened_debug_info;
 		}
 		/* All all of the remaining debug information sections (which are optional, though) */
-		dl_sections->dl_debug_aranges = LOCK_SECTION(secname_debug_aranges);
-		dl_sections->dl_debug_str     = LOCK_SECTION(secname_debug_str);
-		dl_sections->dl_debug_ranges  = LOCK_SECTION(secname_debug_ranges);
+		dl_sections->dl_debug_aranges = locksection(secname_debug_aranges);
+		dl_sections->dl_debug_str     = locksection(secname_debug_str);
+		dl_sections->dl_debug_ranges  = locksection(secname_debug_ranges);
 	}
-	dl_sections->dl_symtab = LOCK_SECTION(secname_symtab);
+	dl_sections->dl_symtab = locksection(secname_symtab);
 	if (dl_sections->dl_symtab) {
-		dl_sections->dl_strtab = LOCK_SECTION(secname_strtab);
+		dl_sections->dl_strtab = locksection(secname_strtab);
 		if unlikely(!dl_sections->dl_strtab) {
-			module_section_decref(dl_sections->dl_symtab,
-			                      module_type);
+			module_section_decref(dl_sections->dl_symtab);
 			goto try_load_dynsym;
 		}
 	} else {
 		dl_sections->dl_strtab = NULL;
 try_load_dynsym:
-		dl_sections->dl_symtab = LOCK_SECTION(secname_dynsym);
+		dl_sections->dl_symtab = locksection(secname_dynsym);
 		if (dl_sections->dl_symtab) {
-			dl_sections->dl_strtab = LOCK_SECTION(secname_dynstr);
+			dl_sections->dl_strtab = locksection(secname_dynstr);
 			if unlikely(!dl_sections->dl_strtab) {
-				module_section_decref(dl_sections->dl_symtab,
-				                      module_type);
+				module_section_decref(dl_sections->dl_symtab);
+				dl_sections->dl_symtab = NULL;
 				goto handle_missing_symbol_tables;
 			}
 		} else {
@@ -885,13 +871,13 @@ err_no_data:
 			}
 		}
 	}
-#undef LOCK_SECTION
+#undef locksection
 	/* Support for compressed sections. */
-#define LOAD_SECTION(sect, lv_start, lv_end)                                             \
-	do {                                                                                 \
-		size_t size;                                                                     \
-		(lv_start) = (byte_t const *)module_section_inflate_nx(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                                  \
+#define LOAD_SECTION(sect, lv_start, lv_end)                                         \
+	do {                                                                             \
+		size_t size;                                                                 \
+		(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
+		(lv_end)   = (lv_start) + size;                                              \
 	}	__WHILE0
 
 
@@ -930,8 +916,7 @@ err_no_data:
 		LOAD_SECTION(dl_sections->dl_symtab,
 		             sections->ds_symtab_start,
 		             sections->ds_symtab_end);
-		sections->ds_symtab_ent = module_section_getentsize(dl_sections->dl_symtab,
-		                                                    module_type);
+		sections->ds_symtab_ent = module_section_getentsize(dl_sections->dl_symtab);
 		if (!sections->ds_symtab_ent)
 			sections->ds_symtab_ent = sizeof(ElfW(Sym));
 	}
@@ -945,24 +930,15 @@ err_no_data:
 }
 
 INTERN TEXTSECTION NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections
-                                                      module_type__param(module_type)) {
-	if (dl_sections->dl_strtab)
-		module_section_decref(dl_sections->dl_strtab, module_type);
-	if (dl_sections->dl_symtab)
-		module_section_decref(dl_sections->dl_symtab, module_type);
-	if (dl_sections->dl_debug_ranges)
-		module_section_decref(dl_sections->dl_debug_ranges, module_type);
-	if (dl_sections->dl_debug_str)
-		module_section_decref(dl_sections->dl_debug_str, module_type);
-	if (dl_sections->dl_debug_aranges)
-		module_section_decref(dl_sections->dl_debug_aranges, module_type);
-	if (dl_sections->dl_debug_abbrev)
-		module_section_decref(dl_sections->dl_debug_abbrev, module_type);
-	if (dl_sections->dl_debug_info)
-		module_section_decref(dl_sections->dl_debug_info, module_type);
-	if (dl_sections->dl_debug_line)
-		module_section_decref(dl_sections->dl_debug_line, module_type);
+NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections) {
+	module_section_xdecref(dl_sections->dl_strtab);
+	module_section_xdecref(dl_sections->dl_symtab);
+	module_section_xdecref(dl_sections->dl_debug_ranges);
+	module_section_xdecref(dl_sections->dl_debug_str);
+	module_section_xdecref(dl_sections->dl_debug_aranges);
+	module_section_xdecref(dl_sections->dl_debug_abbrev);
+	module_section_xdecref(dl_sections->dl_debug_info);
+	module_section_xdecref(dl_sections->dl_debug_line);
 #ifndef NDEBUG
 	memset(dl_sections, 0xcc, sizeof(*dl_sections));
 #endif /* !NDEBUG */

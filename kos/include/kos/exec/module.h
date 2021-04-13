@@ -29,20 +29,52 @@
 #include <__stdinc.h>
 
 #ifdef __KERNEL__
-#include <kernel/compiler.h>
-#ifdef CONFIG_USE_NEW_DRIVER
-/* TODO: Define all of  the macros  right here,  since
- *       CONFIG_USE_NEW_DRIVER makes <kernel/module.h>
- *       deprecated. */
-/* TODO: Once support for `#ifndef CONFIG_USE_NEW_DRIVER'
- *       gets dropped, get  rid of `module_type_var'  and
- *       all of the related macros, as nothing will  need
- *       module type variables anymore!
- *       ALso get rid of `MODULE_TYPE_*'! */
-#include <kernel/module.h>
-#else /* CONFIG_USE_NEW_DRIVER */
-#include <kernel/module.h>
-#endif /* !CONFIG_USE_NEW_DRIVER */
+#include <kernel/mman/module.h>
+
+#include <hybrid/pp/__va_nargs.h>
+
+#define module_section_t                struct module_section
+#define module_t                        struct module
+#define module_section_getsize(self)    (self)->ms_size
+#define module_section_getentsize(self) (self)->ms_entsize
+#define module_section_getlink(self)    (self)->ms_link
+#define module_section_getinfo(self)    (self)->ms_info
+#define module_section_getflags(self)   (self)->ms_flags
+#define module_fromaddr(addr)           module_fromaddr(addr)
+#define module_fromaddr_nx(addr)        module_fromaddr_nx(addr)
+#define module_getloadaddr(self)        (self)->md_loadaddr
+#define module_getloadmin(self)         (self)->md_loadmin
+#define module_getloadmax(self)         (self)->md_loadmax
+
+/* For compatibility with user-space, provide versions of `module_locksection()'
+ * that take a flags-argument, however that argument is silently discarded! */
+#undef module_locksection
+#undef module_locksection_nx
+#undef module_locksection_index
+#undef module_locksection_index_nx
+#define module_locksection(self, name, ...)           (*(self)->md_ops->mo_locksection)(self, name)
+#define module_locksection_nx(self, name, ...)        (module_locksection_nx)(self, name)
+#define module_locksection_index(self, index, ...)    (*(self)->md_ops->mo_locksection_index)(self, index)
+#define module_locksection_index_nx(self, index, ...) (module_locksection_index_nx)(self, index)
+
+#define module_section_incref(self)           incref(self)
+#define module_section_decref(self)           decref(self)
+#define module_section_decref_likely(self)    decref_likely(self)
+#define module_section_decref_unlikely(self)  decref_unlikely(self)
+#define module_section_decref_nokill(self)    decref_nokill(self)
+#define module_section_xincref(self)          xincref(self)
+#define module_section_xdecref(self)          xdecref(self)
+#define module_section_xdecref_likely(self)   xdecref_likely(self)
+#define module_section_xdecref_unlikely(self) xdecref_unlikely(self)
+#define module_incref(self)                   incref(self)
+#define module_decref(self)                   decref(self)
+#define module_decref_likely(self)            decref_likely(self)
+#define module_decref_unlikely(self)          decref_unlikely(self)
+#define module_decref_nokill(self)            decref_nokill(self)
+#define module_xincref(self)                  xincref(self)
+#define module_xdecref(self)                  xdecref(self)
+#define module_xdecref_likely(self)           xdecref_likely(self)
+#define module_xdecref_unlikely(self)         xdecref_unlikely(self)
 #else /* __KERNEL__ */
 
 #include <bits/types.h>
@@ -51,17 +83,6 @@
 #if defined(__BUILDING_LIBDL) || defined(DL_EXTENSION_FORMAT)
 #include <libdl/module.h>
 #endif /* __BUILDING_LIBDL || DL_EXTENSION_FORMAT */
-
-#define MODULE_TYPE_DL    0 /* Handle is related to libdl.so. */
-#define MODULE_TYPE_COUNT 1 /* The # of known usermod types. */
-
-#define module_type_var(name)    /* nothing */
-#define module_type_param(name)  /* nothing */
-#define module_type__param(name) /* nothing */
-#define module_type_param_(name) /* nothing */
-#define module_type_arg(name)    /* nothing */
-#define module_type__arg(name)   /* nothing */
-#define module_type_arg_(name)   /* nothing */
 
 #ifndef DLLOCKSECTION_FNORMAL
 #define DLLOCKSECTION_FNORMAL   0x0000 /* Normal section locking flags. */
@@ -103,24 +124,25 @@ typedef void module_t;
 #endif /* !... */
 
 #if defined(__BUILDING_LIBDL) || defined(DL_EXTENSION_FORMAT)
-#define module_section_destroy(self, typ)   (DL_API_SYMBOL(DlSection_Destroy)(self))
-#define _module_section_refcnt(self, typ)   (self)->ds_refcnt
-#define module_section_getflags(self, typ)  (self)->ds_elfflags
-#define module_section_getindex(self, typ)  (self)->ds_index
-#define _module_section_getcdata(self, typ) (self)->ds_cdata
-#define module_section_getcsize(self, typ)  (self)->ds_csize
-#define module_destroy(self, typ)           DlModule_Destroy(self)
-#define _module_refcnt(self, typ)           (self)->dm_refcnt
-#define module_getloadaddr(self, typ)       (self)->dm_loadaddr
-#define module_getloadstart(self, typ)      (self)->dm_loadstart
-#define module_getloadend(self, typ)        (self)->dm_loadend
+#define module_section_destroy(self)  (DL_API_SYMBOL(DlSection_Destroy)(self))
+#define _module_section_refcnt(self)  (self)->ds_refcnt
+#define module_section_getflags(self) (self)->ds_elfflags
+#define module_destroy(self)          DlModule_Destroy(self)
+#define _module_refcnt(self)          (self)->dm_refcnt
+#define module_getloadaddr(self)      (self)->dm_loadaddr
+#define module_getloadmin(self)       ((byte_t *)(self)->dm_loadstart)
+#define module_getloadmax(self)       ((byte_t *)(self)->dm_loadend - 1)
+#else /* __BUILDING_LIBDL || DL_EXTENSION_FORMAT */
+#define module_section_getflags(self) (self)->ds_flags
 #endif /* __BUILDING_LIBDL || DL_EXTENSION_FORMAT */
 
-#define module_section_getdata(self, typ)    (self)->ds_data
-#define module_section_getsize(self, typ)    (self)->ds_size
-#define module_section_getentsize(self, typ) (self)->ds_entsize
-#define module_section_getlink(self, typ)    (self)->ds_link
-#define module_section_getinfo(self, typ)    (self)->ds_info
+#define module_section_getaddr(self)       (self)->ds_data
+#define module_section_getaddr_alias(self) (self)->ds_data
+#define module_section_getsize(self)       (self)->ds_size
+#define module_section_getentsize(self)    (self)->ds_entsize
+#define module_section_getlink(self)       (self)->ds_link
+#define module_section_getinfo(self)       (self)->ds_info
+
 
 #ifndef DLGETHANDLE_FNORMAL
 #define DLGETHANDLE_FNORMAL 0x0000 /* Return weak pointer to a module handle */
@@ -133,19 +155,19 @@ __NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
                                       unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
 #endif /* !__dlgethandle_defined && __CRT_HAVE_dlgethandle */
 #ifdef __dlgethandle_defined
-#define module_ataddr(addr, result_typ)    dlgethandle(addr, DLGETHANDLE_FNORMAL)
-#define module_ataddr_nx(addr, result_typ) dlgethandle(addr, DLGETHANDLE_FNORMAL)
+#define module_fromaddr(addr)    dlgethandle(addr, DLGETHANDLE_FNORMAL)
+#define module_fromaddr_nx(addr) dlgethandle(addr, DLGETHANDLE_FNORMAL)
 #endif /* __dlgethandle_defined */
 
 
 #ifndef module_getloadaddr
 #if !defined(__dlmodulebase_defined) && defined(__CRT_HAVE_dlmodulebase)
 #define __dlmodulebase_defined 1
-__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __uintptr_t
 __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 #endif /* !__dlmodulebase_defined && __CRT_HAVE_dlmodulebase */
 #ifdef __dlmodulebase_defined
-#define module_getloadaddr(self, typ) ((__uintptr_t)dlmodulebase(self))
+#define module_getloadaddr(self) dlmodulebase(self)
 #endif /* __dlmodulebase_defined */
 #endif /* !module_getloadaddr */
 
@@ -158,8 +180,8 @@ __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
                                         unsigned int __flags __DFL(DLLOCKSECTION_FNORMAL));
 #endif /* !__dllocksection_defined && __CRT_HAVE_dllocksection */
 #ifdef __dllocksection_defined
-#define module_locksection(self, typ, name, flags)    dllocksection(self, name, flags)
-#define module_locksection_nx(self, typ, name, flags) dllocksection(self, name, flags)
+#define module_locksection(self, name, flags)    dllocksection(self, name, flags)
+#define module_locksection_nx(self, name, flags) dllocksection(self, name, flags)
 #endif /* __dllocksection_defined */
 
 
@@ -170,37 +192,37 @@ __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
                                            __size_t *__psize);
 #endif /* !__dlinflatesection_defined && __CRT_HAVE_dlinflatesection */
 
-/* void *module_section_inflate(module_t *self, module_type_t typ, size_t &size); */
+/* void *module_section_getaddr_inflate(module_t *self, size_t *psize); */
 #ifdef __dlinflatesection_defined
-#define module_section_inflate(self, typ, size) dlinflatesection(self, &(size))
+#define module_section_getaddr_inflate(self, psize) dlinflatesection(self, psize)
 #endif /* __dlinflatesection_defined */
 
-/* void *NOTHROW(module_section_inflate_nx)(module_t *self, module_type_t typ, size_t &size); */
+/* void *NOTHROW(module_section_getaddr_inflate_nx)(module_t *self, size_t *psize); */
 #ifdef __dlinflatesection_defined
-#define module_section_inflate_nx(self, typ, size) dlinflatesection(self, &(size))
+#define module_section_getaddr_inflate_nx(self, psize) dlinflatesection(self, psize)
 #endif /* __dlinflatesection_defined */
 
 
 /* Module section reference count control. */
 #ifdef _module_section_refcnt
-#define module_section_incref(self, typ) \
-	__hybrid_atomic_inc(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)
+#define module_section_incref(self) \
+	__hybrid_atomic_inc(_module_section_refcnt(self), __ATOMIC_SEQ_CST)
 #ifdef module_section_destroy
-#define module_section_decref(self, typ)                                                    \
-	(void)(__hybrid_atomic_decfetch(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST) || \
-	       (module_section_destroy(self, typ), 0))
-#define module_section_decref_likely(self, typ)                                                       \
-	(void)(unlikely(__hybrid_atomic_decfetch(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)) || \
-	       (module_section_destroy(self, typ), 0))
-#define module_section_decref_unlikely(self, typ)                                                   \
-	(void)(likely(__hybrid_atomic_decfetch(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)) || \
-	       (module_section_destroy(self, typ), 0))
+#define module_section_decref(self)                                                    \
+	(void)(__hybrid_atomic_decfetch(_module_section_refcnt(self), __ATOMIC_SEQ_CST) || \
+	       (module_section_destroy(self), 0))
+#define module_section_decref_likely(self)                                                       \
+	(void)(unlikely(__hybrid_atomic_decfetch(_module_section_refcnt(self), __ATOMIC_SEQ_CST)) || \
+	       (module_section_destroy(self), 0))
+#define module_section_decref_unlikely(self)                                                   \
+	(void)(likely(__hybrid_atomic_decfetch(_module_section_refcnt(self), __ATOMIC_SEQ_CST)) || \
+	       (module_section_destroy(self), 0))
 #endif /* module_section_destroy */
-#define module_section_decref_nokill(self, typ) \
-	__hybrid_atomic_dec(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)
+#define module_section_decref_nokill(self) \
+	__hybrid_atomic_dec(_module_section_refcnt(self), __ATOMIC_SEQ_CST)
 #endif /* _module_section_refcnt */
 #if !defined(module_section_xincref) && defined(module_section_incref)
-#define module_section_xincref(self, typ) (void)(!(self) || (module_section_incref(self, typ), 0))
+#define module_section_xincref(self) (void)(!(self) || (module_section_incref(self), 0))
 #endif /* !module_section_xincref && module_section_incref */
 #ifndef module_section_decref
 #if !defined(__dlunlocksection_defined) && defined(__CRT_HAVE_dlunlocksection)
@@ -209,93 +231,74 @@ __IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
 #endif /* !__dlunlocksection_defined && __CRT_HAVE_dlunlocksection */
 #ifdef __dlunlocksection_defined
-#define module_section_decref(self, typ)           dlunlocksection(self)
-#define module_section_decref_likely(self, typ)    dlunlocksection(self)
-#define module_section_decref_unlikely(self, typ)  dlunlocksection(self)
+#define module_section_decref(self)           dlunlocksection(self)
+#define module_section_decref_likely(self)    dlunlocksection(self)
+#define module_section_decref_unlikely(self)  dlunlocksection(self)
 #endif /* __dlunlocksection_defined */
 #endif /* !module_section_decref */
-#ifndef module_section_xdecref
-#define module_section_xdecref(self, typ)          (void)(!(self) || (module_section_decref(self, typ), 0))
-#define module_section_xdecref_likely(self, typ)   (void)(!(self) || (module_section_decref_likely(self, typ), 0))
-#define module_section_xdecref_unlikely(self, typ) (void)(!(self) || (module_section_decref_unlikely(self, typ), 0))
-#endif /* !module_section_xdecref */
 
 /* Module reference count control. */
 #ifdef _module_refcnt
-#define module_incref(self, typ) \
-	__hybrid_atomic_inc(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)
+#define module_incref(self) \
+	__hybrid_atomic_inc(_module_refcnt(self), __ATOMIC_SEQ_CST)
 #ifdef module_destroy
-#define module_decref(self, typ)                                                    \
-	(void)(__hybrid_atomic_decfetch(_module_refcnt(self, typ), __ATOMIC_SEQ_CST) || \
-	       (module_destroy(self, typ), 0))
-#define module_decref_likely(self, typ)                                                       \
-	(void)(unlikely(__hybrid_atomic_decfetch(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)) || \
-	       (module_destroy(self, typ), 0))
-#define module_decref_unlikely(self, typ)                                                   \
-	(void)(likely(__hybrid_atomic_decfetch(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)) || \
-	       (module_destroy(self, typ), 0))
+#define module_decref(self)                                                    \
+	(void)(__hybrid_atomic_decfetch(_module_refcnt(self), __ATOMIC_SEQ_CST) || \
+	       (module_destroy(self), 0))
+#define module_decref_likely(self)                                                       \
+	(void)(unlikely(__hybrid_atomic_decfetch(_module_refcnt(self), __ATOMIC_SEQ_CST)) || \
+	       (module_destroy(self), 0))
+#define module_decref_unlikely(self)                                                   \
+	(void)(likely(__hybrid_atomic_decfetch(_module_refcnt(self), __ATOMIC_SEQ_CST)) || \
+	       (module_destroy(self), 0))
 #endif /* module_destroy */
-#define module_decref_nokill(self, typ) \
-	__hybrid_atomic_dec(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)
+#define module_decref_nokill(self) \
+	__hybrid_atomic_dec(_module_refcnt(self), __ATOMIC_SEQ_CST)
 #endif /* _module_refcnt */
 #if !defined(module_xincref) && defined(module_incref)
-#define module_xincref(self, typ) (void)(!(self) || (module_incref(self, typ), 0))
+#define module_xincref(self) (void)(!(self) || (module_incref(self), 0))
 #endif /* !module_xincref && module_incref */
 #if !defined(module_decref) && defined(__CRT_HAVE_dlclose)
-#define module_decref(self, typ)          dlclose(self)
-#define module_decref_likely(self, typ)   dlclose(self)
-#define module_decref_unlikely(self, typ) dlclose(self)
+#define module_decref(self)          dlclose(self)
+#define module_decref_likely(self)   dlclose(self)
+#define module_decref_unlikely(self) dlclose(self)
 #endif /* !module_decref && __CRT_HAVE_dlclose */
-#ifndef module_xdecref
-#define module_xdecref(self, typ)          (void)(!(self) || (module_decref(self, typ), 0))
-#define module_xdecref_likely(self, typ)   (void)(!(self) || (module_decref_likely(self, typ), 0))
-#define module_xdecref_unlikely(self, typ) (void)(!(self) || (module_decref_unlikely(self, typ), 0))
-#endif /* !module_xdecref */
 
 __DECL_END
 #endif /* __CC__ */
 
 #endif /* !__KERNEL__ */
 
-#ifdef __CC__
-/* Implement some (otherwise) user-space only operations for kernel-space. */
-#if (!defined(module_section_inflate) && \
-     (defined(module_section_getcdata) && defined(module_section_getcsize)))
-__DECL_BEGIN
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
-__NOTHROW(__module_section_inflate_impl)(module_section_t *__restrict __self,
-                                         __size_t *__restrict __size
-                                         module_type__param(__typ)) {
-	void *__result;
-	__result = module_section_getcdata(__self, __typ, 0);
-	*__size  = module_section_getcsize(__self, __typ);
-	return __result;
-}
-__DECL_END
-#define module_section_inflate(self, typ, size) \
-	__module_section_inflate_impl(self, &(size)module_type__arg(typ))
-#endif /* !module_section_inflate && (module_section_getcdata && module_section_getcsize) */
-#if (!defined(module_section_inflate_nx) && \
-     (defined(module_section_getcdata_nx) && defined(module_section_getcsize)))
-__DECL_BEGIN
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
-__NOTHROW(__module_section_inflate_nx_impl)(module_section_t *__restrict __self,
-                                            __size_t *__restrict __size
-                                            module_type__param(__typ)) {
-	void *__result;
-	__result = module_section_getcdata_nx(__self, __typ, 0);
-	*__size  = module_section_getcsize(__self, __typ);
-	return __result;
-}
-__DECL_END
-#define module_section_inflate_nx(self, typ, size) \
-	__module_section_inflate_nx_impl(self, &(size)module_type__arg(typ))
-#endif /* !module_section_inflate_nx && (module_section_getcdata_nx && module_section_getcsize) */
-
-#if (!defined(module_section_getudata) && defined(module_section_getdata))
-#define module_section_getudata(self, typ) module_section_getdata(self, typ)
-#endif /* !module_section_getudata && module_section_getdata */
-#endif /* __CC__ */
-
+/* Substitute missing functions when possible... */
+#if !defined(module_section_decref_likely) && defined(module_section_decref)
+#define module_section_decref_likely(self) module_section_decref(self)
+#endif /* !module_section_decref_likely && module_section_decref */
+#if !defined(module_section_decref_unlikely) && defined(module_section_decref)
+#define module_section_decref_unlikely(self) module_section_decref(self)
+#endif /* !module_section_decref_unlikely && module_section_decref */
+#if !defined(module_decref_likely) && defined(module_decref)
+#define module_decref_likely(self) module_decref(self)
+#endif /* !module_decref_likely && module_decref */
+#if !defined(module_decref_unlikely) && defined(module_decref)
+#define module_decref_unlikely(self) module_decref(self)
+#endif /* !module_decref_unlikely && module_decref */
+#if !defined(module_section_xdecref) && defined(module_section_decref)
+#define module_section_xdecref(self) (void)(!(self) || (module_section_decref(self), 0))
+#endif /* !module_section_xdecref && module_section_decref */
+#if !defined(module_section_xdecref_likely) && defined(module_section_decref_likely)
+#define module_section_xdecref_likely(self) (void)(!(self) || (module_section_decref_likely(self), 0))
+#endif /* !module_section_xdecref_likely && module_section_decref_likely */
+#if !defined(module_section_xdecref_unlikely) && defined(module_section_decref_unlikely)
+#define module_section_xdecref_unlikely(self) (void)(!(self) || (module_section_decref_unlikely(self), 0))
+#endif /* !module_section_xdecref_unlikely && module_section_decref_unlikely */
+#if !defined(module_xdecref) && defined(module_xdecref)
+#define module_xdecref(self) (void)(!(self) || (module_decref(self), 0))
+#endif /* !module_xdecref && module_xdecref */
+#if !defined(module_xdecref_likely) && defined(module_xdecref_ikely)
+#define module_xdecref_likely(self) (void)(!(self) || (module_decref_likely(self), 0))
+#endif /* !module_xdecref_likely && module_xdecref_ikely */
+#if !defined(module_xdecref_unlikely) && defined(module_xdecref_nlikely)
+#define module_xdecref_unlikely(self) (void)(!(self) || (module_decref_unlikely(self), 0))
+#endif /* !module_xdecref_unlikely && module_xdecref_nlikely */
 
 #endif /* !_KOS_EXEC_MODULE_H */

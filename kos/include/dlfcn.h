@@ -459,12 +459,12 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulename)(void *__handle);
  *          only  case when this  function can ever fail  is when `handle'  was already closed, is
  *          `NULL',  or isn't a pointer returned by `dlopen()', `dlgetmodule()' or `dlgethandle()'
  * @param: handle: A handle returned by `dlopen()'.
- * @return: * :    The load address / module base for the given `handle'.
- * @return: NULL:  Error (s.a. `dlerror()'), or load-address of ZERO */
+ * @return: * : The load address / module base for the given `handle'.
+ * @return: 0 : Error (s.a. `dlerror()'), or load-address of ZERO */
 #ifdef __CRT_HAVE_dlmodulebase
 #ifndef __dlmodulebase_defined
 #define __dlmodulebase_defined 1
-__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __uintptr_t
 __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 #endif /* !__dlmodulebase_defined */
 #endif /* __CRT_HAVE_dlmodulebase */
