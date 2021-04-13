@@ -158,11 +158,11 @@ NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
 #define HAVE_BROADCAST
 #define HAVE_SENDER_THREAD
 #define HAVE_NOPREEMPT
-/* Same  as  `sig_broadcast()',  but  impersonate  `caller',  and
- * wake up thread through use of `task_wake_as()'. The same rules
- * apply, meaning that the (true)  caller must ensure that  their
- * CPU  won't  change,  and  that  `caller'  is  also  running as
- * part of their CPU. */
+/* Same as `sig_broadcast()', but impersonate `caller', and
+ * wake up thread through use of `task_wake_as()'. The same
+ * rules apply, meaning that the (true) caller must  ensure
+ * that their CPU won't change,  and that `caller' is  also
+ * running as part of their CPU. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
                                      struct task *__restrict caller)

@@ -39,12 +39,9 @@ DECL_BEGIN
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `ktime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
+ *                       NOTE: In this case, `task_disconnectall()' will have been called.
  * @throw: * :           [task_waitfor] An error was thrown by an RPC function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
- *              WARNING: In  all  other cases,  task connections  are  preserved when  an exception
- *                       is thrown,  meaning that  if some  interlocked signal  check might  thrown
- *                       an exception, you are required to TRY ... EXCEPT { task_disconnectall(); }
- *                       to prevent signal connections from being leaked!
  * @return: NULL: No signal  has  become  available  (never  returned
  *                when `KTIME_INFINITE' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */

@@ -228,7 +228,7 @@ again:
  * NOTES:
  *   - This function also sets the calling  thread as a scheduler override  for
  *     their current CPU through use of `sched_override_start()', meaning  that
- *     the caller can pass control over the a super override to another  thread
+ *     the  caller can pass  control over the super  override to another thread
  *     by using  `sched_override_yieldto()', in  which case  that other  thread
  *     must either switch to yet another thread via `sched_override_yieldto()',
  *     or  has to call  `sched_super_override_end()' in order  to end the super
@@ -240,12 +240,12 @@ again:
  *     at the time  a call  to `sched_super_override_start()' was  made, since  all
  *     CPUs are forced to come online by this function (with the suspended  threads
  *     also setting their  TASK_FKEEPCORE flags, thus  preventing their  respective
- *     CPUs from being shut down until the super-override lock is release), meaning
+ *     CPUs from being shut down until the super-override lock is dropped), meaning
  *     that no race exists where a CPU may be brought online while a super-override
  *     lock is in place.
- *   - The super-override lock is mainly meant  for debugging purposes, and may  be
- *     used to implement facilities such as `mall_dump_leaks()', or the GDB driver.
- *     Note that the builtin debugger uses its own, separate mechanism in order  to
+ *   - The super-override lock is mainly meant for debugging purposes, and may  be
+ *     used  to implement facilities such as `kmalloc_leaks()', or the GDB driver.
+ *     Note that the builtin debugger uses its own, separate mechanism in order to
  *     deal with more corner-cases.
  *   - The scheduling of other CPUs can  be directly altered while a  super-override
  *     is active, such that the caller may  view and alter the `this_sstate' of  any

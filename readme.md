@@ -118,7 +118,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- User-space ring 3
 	- Emulation of instructions not natively supported
 		- `rdfsbase`, `rdgsbase`, `wrfsbase`, `wrgsbase`
-			- These IA-32e instruction are also provide to 32-bit user-space as easy and intuitive way of reading/writing the `%fs` / `%gs` base addresses
+			- These IA-32e instruction are also provide to 32-bit user-space as an easy and intuitive way of reading/writing the `%fs` / `%gs` base addresses
 		- `cmpxchg`, `cmpxchg8b`, `xadd`
 		- `cmovcc`, `cpuid`, `nop` (multi-byte)
 		- `sfence`, `lfence`, `mfence`
@@ -134,7 +134,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Accounting of hardware vm86 mode (even though it's never used)
 	- Detailed exception analysis
 		- Where normally you'd only be able to see a `#UD`, KOS will analyze faulting instructions to
-			- Figure out what exactly went wrong and, throwing a very detailed exception explaining exactly that
+			- Figure out what exactly went wrong and, throw a very detailed exception explaining exactly that
 			- Emulate the intended behavior if it turns out that the instruction isn't supported natively (see list above)
 - x86_64
 	- Same features as also available on i386, as KOS contains support for compatibility mode

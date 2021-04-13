@@ -1418,8 +1418,9 @@ NOTHROW(FCALL task_wasconnected_to)(struct sig const *__restrict target) {
 	return false;
 }
 
-/* Check if there is a signal to was delivered, disconnecting
- * all  other  connected  signals  if  this  was  the   case.
+/* Check if there is a signal that was delivered,
+ * disconnecting all other  connected signals  if
+ * this was the case.
  * @return: NULL: No signal is available
  * @return: * :   The signal that was delivered. */
 PUBLIC NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void) {

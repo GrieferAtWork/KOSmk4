@@ -210,7 +210,7 @@ struct sig {
 #define SIG_INIT     { { __NULLPTR } }
 #endif /* !CONFIG_NO_SMP */
 #define sig_init(x)  (void)((x)->s_con = __NULLPTR)
-#define sig_cinit(x) (void)(__hybrid_assert((x)->s_con == __NULLPTR))
+#define sig_cinit(x) __hybrid_assert((x)->s_con == __NULLPTR)
 
 
 
@@ -313,11 +313,11 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self,
                                               struct sig *sender);
 
-/* Same  as  `sig_broadcast()',  but  impersonate  `caller',  and
- * wake up thread through use of `task_wake_as()'. The same rules
- * apply, meaning that the (true)  caller must ensure that  their
- * CPU  won't  change,  and  that  `caller'  is  also  running as
- * part of their CPU. */
+/* Same as `sig_broadcast()', but impersonate `caller', and
+ * wake up thread through use of `task_wake_as()'. The same
+ * rules apply, meaning that the (true) caller must  ensure
+ * that their CPU won't change,  and that `caller' is  also
+ * running as part of their CPU. */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
                                      struct task *__restrict caller);
@@ -339,7 +339,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
  *      _asyncjob_main()
  *      aio_handle_complete_nopr()          // The connect() operation has completed
  *      aio_handle_generic_func()           // == ah_func  (note: this one must also invoke `aio_handle_release()')
- *      sig_broadcast()                     // Wrong usage here
+ *      sig_broadcast()                     // !!! Wrong usage here
  *          decref_unlikely(target_thread)  // This actually ends up destroying `target_thread'
  *      task_destroy()
  *      fini_this_handle_manager()
@@ -643,8 +643,9 @@ NOTHROW(FCALL task_wasconnected)(struct sig const *__restrict target)
 #endif /* __cplusplus */
 
 
-/* Check if there is a signal to was delivered, disconnecting
- * all  other  connected  signals  if  this  was  the   case.
+/* Check if there is a signal that was delivered,
+ * disconnecting all other  connected signals  if
+ * this was the case.
  * @return: NULL: No signal is available
  * @return: * :   The signal that was delivered. */
 FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
@@ -654,12 +655,9 @@ FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `ktime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
+ *                       NOTE: In this case, `task_disconnectall()' will have been called.
  * @throw: * :           [task_waitfor] An error was thrown by an RPC function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
- *              WARNING: In  all  other cases,  task connections  are  preserved when  an exception
- *                       is thrown,  meaning that  if some  interlocked signal  check might  thrown
- *                       an exception, you are required to TRY ... EXCEPT { task_disconnectall(); }
- *                       to prevent signal connections from being leaked!
  * @return: NULL: No signal  has  become  available  (never  returned
  *                when `KTIME_INFINITE' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
