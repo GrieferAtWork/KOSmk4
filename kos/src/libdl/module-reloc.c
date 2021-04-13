@@ -566,10 +566,10 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 DECL_END
 
 #ifndef __INTELLISENSE__
-#undef APPLY_RELA
+#define DEFINE_DlModule_ApplyRelocations
 #include "module-reloc-impl.c.inl"
 #if ELF_ARCH_USESRELA
-#define APPLY_RELA 1
+#define DEFINE_DlModule_ApplyRelocationsWithAddend
 #include "module-reloc-impl.c.inl"
 #endif /* ELF_ARCH_USESRELA */
 #endif /* !__INTELLISENSE__ */

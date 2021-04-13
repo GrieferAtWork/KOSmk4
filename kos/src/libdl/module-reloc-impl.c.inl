@@ -20,47 +20,51 @@
 #ifdef __INTELLISENSE__
 #include "module-reloc.c"
 
-#define APPLY_RELA 1
+#define DEFINE_DlModule_ApplyRelocations
+//#define DEFINE_DlModule_ApplyRelocationsWithAddend
 #endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
-#ifdef APPLY_RELA
-#define SET_OR_INPLACE_ADD =
-#define IFELSE_RELA(if_rel, if_rela) if_rela
-#else /* APPLY_RELA */
-#define SET_OR_INPLACE_ADD +=
-#define IFELSE_RELA(if_rel, if_rela) if_rel
-#endif /* !APPLY_RELA */
-
 /* Apply relocations for `self'
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
-#ifdef APPLY_RELA
+#ifdef DEFINE_DlModule_ApplyRelocationsWithAddend
 INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
                                     ElfW(Rela) const *__restrict vector,
                                     size_t count,
                                     unsigned int flags)
-#else /* APPLY_RELA */
+#define LOCAL_HAVE_ADDENDS 1
+#elif defined(DEFINE_DlModule_ApplyRelocations)
 INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
                           ElfW(Rel) const *__restrict vector,
                           size_t count,
                           unsigned int flags)
-#endif /* !APPLY_RELA */
+#undef LOCAL_HAVE_ADDENDS
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
 {
+#ifdef LOCAL_HAVE_ADDENDS
+#define LOCAL_setoradd =
+#define LOCAL_IE_ADDENDS(if_rel, if_rela) if_rela
+#else /* LOCAL_HAVE_ADDENDS */
+#define LOCAL_setoradd +=
+#define LOCAL_IE_ADDENDS(if_rel, if_rela) if_rel
+#endif /* !LOCAL_HAVE_ADDENDS */
 	size_t i;
 	ElfW(Addr) value;
-	byte_t *loadaddr = (byte_t *)self->dm_loadaddr;
+	uintptr_t loadaddr = self->dm_loadaddr;
 	for (i = 0; i < count; ++i) {
-#ifdef APPLY_RELA
+#ifdef LOCAL_HAVE_ADDENDS
 		ElfW(Rela) rel = vector[i];
-#define REL_ADDEND rel.r_addend
-#else /* APPLY_RELA */
+#define LOCAL_addend rel.r_addend
+#else /* LOCAL_HAVE_ADDENDS */
 		ElfW(Rel) rel = vector[i];
-#define REL_ADDEND 0
-#endif /* !APPLY_RELA */
-		byte_t *reladdr = loadaddr + rel.r_offset;
+#define LOCAL_addend 0
+#endif /* !LOCAL_HAVE_ADDENDS */
+		byte_t *reladdr = (byte_t *)(loadaddr + rel.r_offset);
 		switch (ELFW(R_TYPE)(rel.r_info)) {
 #define LOOKUP_SYMBOL()                                                    \
 		if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info), \
@@ -75,30 +79,30 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_RELATIVE32
 		ELF_ARCH_CASE_R_RELATIVE32:
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(uintptr_t)loadaddr;
+			*(u32 *)reladdr LOCAL_setoradd (u32)loadaddr;
 			break;
 #endif /* ELF_ARCH_CASE_R_RELATIVE32 */
 
 
 #ifdef ELF_ARCH_CASE_R_RELATIVE64
 		ELF_ARCH_CASE_R_RELATIVE64:
-			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(uintptr_t)(loadaddr + REL_ADDEND);
+			*(u64 *)reladdr LOCAL_setoradd (u64)(loadaddr + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_RELATIVE64 */
 
 
 #ifdef ELF_ARCH_CASE_R_IRELATIVE32
 		ELF_ARCH_CASE_R_IRELATIVE32:
-			*(u32 *)reladdr = IFELSE_RELA((*(Elf32_Addr(*)(void))((uintptr_t)*(u32 *)reladdr + (uintptr_t)loadaddr))(),
-			                              (*(Elf32_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))());
+			*(u32 *)reladdr = LOCAL_IE_ADDENDS((*(Elf32_Addr(*)(void))(void *)((uintptr_t)*(u32 *)reladdr + loadaddr))(),
+			                                   (*(Elf32_Addr(*)(void))(void *)(loadaddr + LOCAL_addend))());
 			break;
 #endif /* ELF_ARCH_CASE_R_IRELATIVE32 */
 
 
 #ifdef ELF_ARCH_CASE_R_IRELATIVE64
 		ELF_ARCH_CASE_R_IRELATIVE64:
-			*(u64 *)reladdr = IFELSE_RELA((*(Elf64_Addr(*)(void))((uintptr_t)*(u64 *)reladdr + (uintptr_t)loadaddr))(),
-			                              (*(Elf64_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))());
+			*(u64 *)reladdr = LOCAL_IE_ADDENDS((*(Elf64_Addr(*)(void))(void *)((uintptr_t)*(u64 *)reladdr + loadaddr))(),
+			                                   (*(Elf64_Addr(*)(void))(void *)(loadaddr + LOCAL_addend))());
 			break;
 #endif /* ELF_ARCH_CASE_R_IRELATIVE64 */
 
@@ -109,7 +113,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
 			                                    &value, &symbol_size, NULL))
 				goto err;
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(symbol_size + REL_ADDEND);
+			*(u32 *)reladdr LOCAL_setoradd (u32)(symbol_size + LOCAL_addend);
 		}	break;
 #endif /* ELF_ARCH_CASE_R_SIZE32 */
 
@@ -120,7 +124,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
 			                                    &value, &symbol_size, NULL))
 				goto err;
-			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(symbol_size + REL_ADDEND);
+			*(u64 *)reladdr LOCAL_setoradd (u64)(symbol_size + LOCAL_addend);
 		}	break;
 #endif /* ELF_ARCH_CASE_R_SIZE64 */
 
@@ -171,7 +175,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		ELF_ARCH_CASE_R_8S:
 #endif /* ELF_ARCH_CASE_R_8S */
 			LOOKUP_SYMBOL();
-			*(u8 *)reladdr SET_OR_INPLACE_ADD (u8)(value + REL_ADDEND);
+			*(u8 *)reladdr LOCAL_setoradd (u8)(value + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_8 || ELF_ARCH_CASE_R_8S */
 
@@ -179,7 +183,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #ifdef ELF_ARCH_CASE_R_PC8
 		ELF_ARCH_CASE_R_PC8:
 			LOOKUP_SYMBOL();
-			*(u8 *)reladdr SET_OR_INPLACE_ADD (u8)((value + REL_ADDEND) - (uintptr_t)reladdr);
+			*(u8 *)reladdr LOCAL_setoradd (u8)((value + LOCAL_addend) - (uintptr_t)reladdr);
 			break;
 #endif /* ELF_ARCH_CASE_R_PC8 */
 
@@ -192,7 +196,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		ELF_ARCH_CASE_R_16S:
 #endif /* ELF_ARCH_CASE_R_16S */
 			LOOKUP_SYMBOL();
-			*(u16 *)reladdr SET_OR_INPLACE_ADD (u16)(value + REL_ADDEND);
+			*(u16 *)reladdr LOCAL_setoradd (u16)(value + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_16 || ELF_ARCH_CASE_R_16S */
 
@@ -200,7 +204,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #ifdef ELF_ARCH_CASE_R_PC16
 		ELF_ARCH_CASE_R_PC16:
 			LOOKUP_SYMBOL();
-			*(u16 *)reladdr SET_OR_INPLACE_ADD (u16)((value + REL_ADDEND) - (uintptr_t)reladdr);
+			*(u16 *)reladdr LOCAL_setoradd (u16)((value + LOCAL_addend) - (uintptr_t)reladdr);
 			break;
 #endif /* ELF_ARCH_CASE_R_PC16 */
 
@@ -217,7 +221,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		ELF_ARCH_CASE_R_DTPOFF32:
 #endif /* ELF_ARCH_CASE_R_DTPOFF32 */
 			LOOKUP_SYMBOL();
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(value + REL_ADDEND);
+			*(u32 *)reladdr LOCAL_setoradd (u32)(value + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_32 || ELF_ARCH_CASE_R_32S || ELF_ARCH_CASE_R_DTPOFF32 */
 
@@ -225,7 +229,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #ifdef ELF_ARCH_CASE_R_PC32
 		ELF_ARCH_CASE_R_PC32:
 			LOOKUP_SYMBOL();
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)((value + REL_ADDEND) - (uintptr_t)reladdr);
+			*(u32 *)reladdr LOCAL_setoradd (u32)((value + LOCAL_addend) - (uintptr_t)reladdr);
 			break;
 #endif /* ELF_ARCH_CASE_R_PC32 */
 
@@ -238,7 +242,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		ELF_ARCH_CASE_R_DTPOFF64:
 #endif /* ELF_ARCH_CASE_R_DTPOFF64 */
 			LOOKUP_SYMBOL();
-			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(value + REL_ADDEND);
+			*(u64 *)reladdr LOCAL_setoradd (u64)(value + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_64 || ELF_ARCH_CASE_R_DTPOFF64 */
 
@@ -246,7 +250,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #ifdef ELF_ARCH_CASE_R_PC64
 		ELF_ARCH_CASE_R_PC64:
 			LOOKUP_SYMBOL();
-			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)((value + REL_ADDEND) - (uintptr_t)reladdr);
+			*(u64 *)reladdr LOCAL_setoradd (u64)((value + LOCAL_addend) - (uintptr_t)reladdr);
 			break;
 #endif /* ELF_ARCH_CASE_R_PC64 */
 
@@ -255,11 +259,11 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		ELF_ARCH_CASE_R_JMP_SLOT:
 			if (!(flags & DL_MODULE_ELF_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding. */
-				*(uintptr_t *)reladdr += (uintptr_t)loadaddr;
+				*(uintptr_t *)reladdr += loadaddr;
 				break;
 			}
 			LOOKUP_SYMBOL();
-			*(uintptr_t *)reladdr = (uintptr_t)(value + REL_ADDEND);
+			*(uintptr_t *)reladdr = (uintptr_t)(value + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_JMP_SLOT */
 
@@ -267,7 +271,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #ifdef ELF_ARCH_CASE_R_GLOB_DAT
 		ELF_ARCH_CASE_R_GLOB_DAT:
 			LOOKUP_SYMBOL();
-			*(uintptr_t *)reladdr SET_OR_INPLACE_ADD (uintptr_t)(value + REL_ADDEND);
+			*(uintptr_t *)reladdr LOCAL_setoradd (uintptr_t)(value + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_GLOB_DAT */
 
@@ -275,7 +279,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #ifdef ELF_ARCH_CASE_R_DTPMOD32
 		ELF_ARCH_CASE_R_DTPMOD32:
 			/* ID of module containing this relocation */
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)((uintptr_t)self + REL_ADDEND);
+			*(u32 *)reladdr LOCAL_setoradd (u32)((uintptr_t)self + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_DTPMOD32 */
 
@@ -283,7 +287,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #ifdef ELF_ARCH_CASE_R_DTPMOD64
 		ELF_ARCH_CASE_R_DTPMOD64:
 			/* ID of module containing this relocation */
-			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)((uintptr_t)self + REL_ADDEND);
+			*(u64 *)reladdr LOCAL_setoradd (u64)((uintptr_t)self + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_DTPMOD64 */
 
@@ -312,7 +316,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				             tls_module->dm_filename);
 				goto err;
 			}
-			*(s32 *)reladdr SET_OR_INPLACE_ADD (s32)-(tls_module->dm_tlsstoff + (value + REL_ADDEND));
+			*(s32 *)reladdr LOCAL_setoradd (s32)-(tls_module->dm_tlsstoff + (value + LOCAL_addend));
 		}	break;
 #endif /* ELF_ARCH_CASE_R_NEG_TPOFF32 */
 
@@ -340,7 +344,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				             tls_module->dm_filename);
 				goto err;
 			}
-			*(s64 *)reladdr SET_OR_INPLACE_ADD (s64)-(tls_module->dm_tlsstoff + (value + REL_ADDEND));
+			*(s64 *)reladdr LOCAL_setoradd (s64)-(tls_module->dm_tlsstoff + (value + LOCAL_addend));
 		}	break;
 #endif /* ELF_ARCH_CASE_R_NEG_TPOFF64 */
 
@@ -362,7 +366,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				             tls_module->dm_filename);
 				goto err;
 			}
-			*(s32 *)reladdr SET_OR_INPLACE_ADD (tls_module->dm_tlsstoff + (value + REL_ADDEND));
+			*(s32 *)reladdr LOCAL_setoradd (tls_module->dm_tlsstoff + (value + LOCAL_addend));
 		}	break;
 #endif /* ELF_ARCH_CASE_R_TPOFF32 */
 
@@ -384,7 +388,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				             tls_module->dm_filename);
 				goto err;
 			}
-			*(s64 *)reladdr SET_OR_INPLACE_ADD (tls_module->dm_tlsstoff + (value + REL_ADDEND));
+			*(s64 *)reladdr LOCAL_setoradd (tls_module->dm_tlsstoff + (value + LOCAL_addend));
 		}	break;
 #endif /* ELF_ARCH_CASE_R_TPOFF64 */
 
@@ -408,35 +412,37 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 
 		default:
-			syslog(LOG_WARN,
-			       "[rtld] %q: Relocation #%" PRIuSIZ " at %p "
-			       "(%#" PRIxPTR "+%#" PRIxPTR ") has unknown type %u (%#x)"
-#ifdef APPLY_RELA
-			       " [addend=%s%#" PRIxPTR "]"
-#endif /* APPLY_RELA */
-			       "\n",
+			syslog(LOG_WARN, "[rtld] %q: Relocation #%" PRIuSIZ " at %p ("
+			                 "%#" PRIxPTR "+%#" PRIxN(__SIZEOF_ELFW(ADDR__)) ") "
+			                 "has unknown type %u (%#x)"
+#ifdef LOCAL_HAVE_ADDENDS
+			                 " [addend=%s%#" PRIxPTR "]"
+#endif /* LOCAL_HAVE_ADDENDS */
+			                 "\n",
 			       self->dm_filename,
-			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
+			       (size_t)i, reladdr, loadaddr, rel.r_offset,
 			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
 			       (unsigned int)ELFW(R_TYPE)(rel.r_info)
-#ifdef APPLY_RELA
+#ifdef LOCAL_HAVE_ADDENDS
 			       ,
 			       rel.r_addend < 0 ? "-" : "",
 			       rel.r_addend < 0 ? (uintptr_t)-rel.r_addend
 			                        : (uintptr_t)rel.r_addend
-#endif /* APPLY_RELA */
+#endif /* LOCAL_HAVE_ADDENDS */
 			       );
 			break;
 		}
-#undef REL_ADDEND
+#undef LOCAL_addend
 	}
 	return 0;
 err:
 	return -1;
+#undef LOCAL_IE_ADDENDS
+#undef LOCAL_setoradd
 }
+#undef LOCAL_HAVE_ADDENDS
 
 DECL_END
 
-#undef IFELSE_RELA
-#undef SET_OR_INPLACE_ADD
-#undef APPLY_RELA
+#undef DEFINE_DlModule_ApplyRelocations
+#undef DEFINE_DlModule_ApplyRelocationsWithAddend

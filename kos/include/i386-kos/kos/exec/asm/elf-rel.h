@@ -26,7 +26,7 @@
 
 #ifdef __x86_64__
 #define ELF_ARCH_R_NONE              R_X86_64_NONE
-#define ELF_ARCH_R_8S                R_X86_64_8
+#define ELF_ARCH_R_8                 R_X86_64_8
 #define ELF_ARCH_R_PC8               R_X86_64_PC8
 #define ELF_ARCH_R_16                R_X86_64_16
 #define ELF_ARCH_R_PC16              R_X86_64_PC16
@@ -59,7 +59,7 @@
 #define ELF_ARCH_R_TLSDESC           R_X86_64_TLSDESC
 #else  /* __x86_64__ */
 #define ELF_ARCH_R_NONE              R_386_NONE
-#define ELF_ARCH_R_8S                R_386_8
+#define ELF_ARCH_R_8                 R_386_8
 #define ELF_ARCH_R_PC8               R_386_PC8
 #define ELF_ARCH_R_16                R_386_16
 #define ELF_ARCH_R_PC16              R_386_PC16

@@ -34,19 +34,32 @@
 - A new symbol type `STT_KOS_IDATA` has been added that allows for data-symbols to be exported from shared libraries, whilst providing custom callbacks for initializing said data field. This callback will only be invoked if the symbol is actually being used (i.e. as part of a dynamic relocation, or when directly addressed by a call to `dlsym(3)`).
 	- In this regard, this new symbol type behaves the same as `STT_GNU_IFUNC`, however unlike that extension, this one can only be used for data symbols, and can only be used to export data-symbols from shared libraries (or rather: a `.dynsym`-symbol-table to be exact). As such, `STT_KOS_IDATA` cannot be used to declare data objects of `INTERN` or `PRIVATE` visibility.
 	- The intended use of this symbol type is to enable (seemingly) pre-initialized data-symbols to be exported from libraries, such as for example:  
+
 	  ```c
 	  extern pid_t process_pid;
 	  ```
+
 	  Note that no such symbol exists in libc, but it could be added easily as:  
+
 	  ```c
-	  DEFINE_PUBLIC_IDATA_G(process_pid, get_process_pid, __SIZEOF_PID_T__);
-	  static ATTR_USED pid_t *get_process_pid(void) {
-	      static pid_t real_process_pid = 0;
-	      if (!real_process_pid)
-	          real_process_pid = getpid();
-	      return &real_process_pid;
+	  #include <hybrid/compiler.h>
+	  #include <kos/exec/idata.h>
+	  #include <pthread.h>
+	  #include <unistd.h>
+	  
+	  PRIVATE pid_t intern_procpid = 0;
+	  PRIVATE void init_procpid(void) {
+	      intern_procpid = getpid();
+	  }
+
+	  DEFINE_PUBLIC_IDATA_G(procpid, get_procpid_addr, __SIZEOF_PID_T__);
+	  PRIVATE ATTR_USED pid_t *get_procpid_addr(void) {
+	      static pthread_once_t didinit = PTHREAD_ONCE_INIT;
+	      pthread_once(&didinit, &init_procpid);
+	      return &intern_procpid;
 	  }
 	  ```
+
 	- Currently, `STT_KOS_IDATA` is used by KOS's `libc.so` to export `sys_errlist` without the need of additional relocations, by simply having the `STT_KOS_IDATA`-callback fill in the array elements, such that no overhead exists for initializing the vector for programs that do not actually make use of the symbol.
 	- Behavior:
 		- No guaranty is made that a callback will only be invoked once:
@@ -57,7 +70,7 @@
 
 ### Changes to ELF specs (i386/x86_64)
 - Though not required, the KOS RLTD link driver (`libdl.so`) accepts the following relocation types in shared libraries and application binaries alike
-	- `R_386_8`, `R_X86_64_8` (signed 8-bit integer)
+	- `R_386_8`, `R_X86_64_8` (unsigned 8-bit integer)
 	- `R_386_PC8`, `R_X86_64_PC8` (signed, relocation-relative 8-bit integer)
 	- `R_386_16`, `R_X86_64_16` (unsigned 16-bit integer)
 	- `R_386_PC16`, `R_X86_64_PC16` (signed, relocation-relative 16-bit integer)

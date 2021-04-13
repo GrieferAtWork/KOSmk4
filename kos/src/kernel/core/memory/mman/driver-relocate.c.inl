@@ -53,10 +53,10 @@ driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
 #endif /* !LOCAL_HAVE_ADDENDS */
 	size_t i;
 	struct driver_reloc_syminfo si;
-	byte_t *loadaddr;
+	uintptr_t loadaddr;
 	si.drs_self   = self;
 	si.drs_rflags = reloc_flags;
-	loadaddr      = (byte_t *)self->d_module.md_loadaddr;
+	loadaddr      = self->d_module.md_loadaddr;
 	for (i = 0; i < count; ++i) {
 #ifdef LOCAL_HAVE_ADDENDS
 		ElfW(Rela) rel = vector[i];
@@ -65,7 +65,7 @@ driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
 		ElfW(Rel) rel = vector[i];
 #define LOCAL_addend 0
 #endif /* !LOCAL_HAVE_ADDENDS */
-		byte_t *reladdr = loadaddr + rel.r_offset;
+		byte_t *reladdr = (byte_t *)(loadaddr + rel.r_offset);
 		switch (ELFW(R_TYPE)(rel.r_info)) {
 #define LOOKUP_SYMBOL() driver_dlsym_for_reloc(&si, ELFW(R_SYM)(rel.r_info))
 
@@ -77,30 +77,30 @@ driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_RELATIVE32
 		ELF_ARCH_CASE_R_RELATIVE32:
-			*(u32 *)reladdr LOCAL_setoradd (u32)(uintptr_t)loadaddr;
+			*(u32 *)reladdr LOCAL_setoradd (u32)loadaddr;
 			break;
 #endif /* ELF_ARCH_CASE_R_RELATIVE32 */
 
 
 #ifdef ELF_ARCH_CASE_R_RELATIVE64
 		ELF_ARCH_CASE_R_RELATIVE64:
-			*(u64 *)reladdr LOCAL_setoradd (u64)(uintptr_t)(loadaddr + LOCAL_addend);
+			*(u64 *)reladdr LOCAL_setoradd (u64)(loadaddr + LOCAL_addend);
 			break;
 #endif /* ELF_ARCH_CASE_R_RELATIVE64 */
 
 
 #ifdef ELF_ARCH_CASE_R_IRELATIVE32
 		ELF_ARCH_CASE_R_IRELATIVE32:
-			*(u32 *)reladdr = LOCAL_IE_ADDENDS((*(Elf32_Addr(*)(void))((uintptr_t)*(u32 *)reladdr + (uintptr_t)loadaddr))(),
-			                                   (*(Elf32_Addr(*)(void))((uintptr_t)loadaddr + LOCAL_addend))());
+			*(u32 *)reladdr = LOCAL_IE_ADDENDS((*(Elf32_Addr(*)(void))(void *)((uintptr_t)*(u32 *)reladdr + loadaddr))(),
+			                                   (*(Elf32_Addr(*)(void))(void *)(loadaddr + LOCAL_addend))());
 			break;
 #endif /* ELF_ARCH_CASE_R_IRELATIVE32 */
 
 
 #ifdef ELF_ARCH_CASE_R_IRELATIVE64
 		ELF_ARCH_CASE_R_IRELATIVE64:
-			*(u64 *)reladdr = LOCAL_IE_ADDENDS((*(Elf64_Addr(*)(void))((uintptr_t)*(u64 *)reladdr + (uintptr_t)loadaddr))(),
-			                                   (*(Elf64_Addr(*)(void))((uintptr_t)loadaddr + LOCAL_addend))());
+			*(u64 *)reladdr = LOCAL_IE_ADDENDS((*(Elf64_Addr(*)(void))(void *)((uintptr_t)*(u64 *)reladdr + loadaddr))(),
+			                                   (*(Elf64_Addr(*)(void))(void *)(loadaddr + LOCAL_addend))());
 			break;
 #endif /* ELF_ARCH_CASE_R_IRELATIVE64 */
 
@@ -232,25 +232,24 @@ driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
 
 
 		default:
-#ifdef LOCAL_HAVE_ADDENDS
 			printk(KERN_WARNING "[mod][%s]: Relocation #%" PRIuSIZ " at %p ("
-			                    "%#" PRIxPTR "+%#" PRIxPTR ") has unknown type "
-			                    "%u (%#x) [addend=%s%#" PRIxPTR "]\n",
-			       self->d_name, (size_t)i, reladdr, (uintptr_t)loadaddr,
+			                    "%#" PRIxPTR "+%#" PRIxN(__SIZEOF_ELFW(ADDR__)) ") "
+			                    "has unknown type %u (%#x)"
+#ifdef LOCAL_HAVE_ADDENDS
+			                    " [addend=%s%#" PRIxPTR "]"
+#endif /* LOCAL_HAVE_ADDENDS */
+			                    "\n",
+			       self->d_name, (size_t)i, reladdr, loadaddr,
 			       (uintptr_t)rel.r_offset,
 			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
-			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info)
+#ifdef LOCAL_HAVE_ADDENDS
+			       ,
 			       rel.r_addend < 0 ? "-" : "",
 			       rel.r_addend < 0 ? (uintptr_t)-rel.r_addend
-			                        : (uintptr_t)rel.r_addend);
-#else /* LOCAL_HAVE_ADDENDS */
-			printk(KERN_WARNING "[mod][%s]: Relocation #%" PRIuSIZ " at %p ("
-			                    "%#" PRIxPTR "+%#" PRIxPTR ") has unknown type %u (%#x)\n",
-			       self->d_name, (size_t)i, reladdr, (uintptr_t)loadaddr,
-			       (uintptr_t)rel.r_offset,
-			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
-			       (unsigned int)ELFW(R_TYPE)(rel.r_info));
-#endif /* !LOCAL_HAVE_ADDENDS */
+			                        : (uintptr_t)rel.r_addend
+#endif /* LOCAL_HAVE_ADDENDS */
+			       );
 			break;
 		}
 #undef LOCAL_addend
