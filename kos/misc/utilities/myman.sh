@@ -101,11 +101,12 @@ EOF
 	# Compile source files
 	for SRCFILE in utils logic myman; do
 		echo "Compile: $INVOKE_CC -c -o $OPTPATH/$SRCFILE.o $SRCPATH/src/$SRCFILE.c"
-		TS_OBJECTS="$TS_OBJECTS $SRCFILE.o"
 		cmd "$INVOKE_CC" -c -o "$OPTPATH/$SRCFILE.o" "$SRCPATH/src/$SRCFILE.c" &
+		TS_OBJECTS="$TS_OBJECTS $SRCFILE.o"
 	done
 	cmd wait
 	cmd cd "$OPTPATH"
+	echo "Link: $CC -g -o $EXEFILE $TS_OBJECTS -lncursesw"
 	cmd "$CC" -g -o "$EXEFILE" "$TS_OBJECTS" -lncursesw
 fi
 
