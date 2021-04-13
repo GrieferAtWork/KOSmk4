@@ -256,10 +256,10 @@ DATDEF ATTR_PERTASK struct taskgroup this_taskgroup;
 #ifdef __INTELLISENSE__
 /* Returns a pointer to the process associated with the calling/given thread.
  * NOTE:   These   functions   return   `NULL'   for   kernel-space   thread! */
-WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct task *KCALL task_getprocess(void);
-WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct taskpid *KCALL task_getprocesspid(void);
-WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct task *KCALL task_getprocess_of(struct task const *__restrict thread);
-WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct taskpid *KCALL task_getprocesspid_of(struct task const *__restrict thread);
+NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct task *KCALL task_getprocess(void);
+NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct taskpid *KCALL task_getprocesspid(void);
+NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct task *KCALL task_getprocess_of(struct task const *__restrict thread);
+NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct taskpid *KCALL task_getprocesspid_of(struct task const *__restrict thread);
 #else /* __INTELLISENSE__ */
 #define task_getprocess()              ((struct task *)PERTASK_GET(this_taskgroup.tg_process))
 #define task_getprocesspid()           FORTASK(task_getprocess(), this_taskpid)

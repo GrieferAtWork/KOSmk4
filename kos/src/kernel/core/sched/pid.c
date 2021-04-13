@@ -879,7 +879,7 @@ task_setsessionleader(struct task *thread, struct task *leader,
                       /*OUT,OPT*/ REF struct taskpid **pold_group_leader,
                       /*OUT,OPT*/ REF struct taskpid **pold_session_leader,
                       /*OUT,OPT*/ REF struct taskpid **pnew_session_leader)
-                      THROWS(E_WOULDBLOCK) {
+		THROWS(E_WOULDBLOCK) {
 	struct taskpid *threadpid;
 	REF struct taskpid *new_session_leader;
 #ifdef __INTELLISENSE__
@@ -2156,8 +2156,8 @@ again_enum_children_locked:
 							decref(child_thread);
 							{
 								FINALLY_DECREF_UNLIKELY(child_proc);
-								sync_read(&FORTASK(child_proc, this_taskgroup).tg_proc_group_lock);
-								sync_endread(&FORTASK(child_proc, this_taskgroup).tg_proc_group_lock);
+								while (!sync_canread(&FORTASK(child_proc, this_taskgroup).tg_proc_group_lock))
+									task_yield();
 							}
 							goto again_enum_children;
 						}

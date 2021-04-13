@@ -26,9 +26,9 @@
 #include <debugger/rt.h> /* dbg_active */
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/panic.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
@@ -47,29 +47,6 @@
 DECL_BEGIN
 
 #define ASSERT_POISON(expr) assert((expr) || kernel_poisoned())
-
-#ifdef CONFIG_HAVE_DEBUGGER
-#define IF_DEBUGGER_ACTIVE(...) \
-	do {                        \
-		if (dbg_active) {       \
-			__VA_ARGS__;        \
-		}                       \
-	}	__WHILE0
-#define IF_NOT_DEBUGGER_ACTIVE(...) \
-	do {                            \
-		if (!dbg_active) {          \
-			__VA_ARGS__;            \
-		}                           \
-	}	__WHILE0
-#else /* CONFIG_HAVE_DEBUGGER */
-#define IF_HAVE_DEBUGGER(...)       (void)0
-#define IF_NOT_DEBUGGER_ACTIVE(...) __VA_ARGS__
-#endif /* !CONFIG_HAVE_DEBUGGER */
-
-#define sync_read_if_not_dbg(x)    IF_NOT_DEBUGGER_ACTIVE(sync_read(x))
-#define sync_endread_if_not_dbg(x) IF_NOT_DEBUGGER_ACTIVE(sync_endread(x))
-
-
 
 #define INITIAL_TASK_STACK_BUFSIZE    128
 #define INITIAL_TASKPID_STACK_BUFSIZE 4
@@ -295,8 +272,7 @@ NOTHROW(KCALL task_enum_list_taskonly_cb)(void *arg,
 
 PRIVATE NOBLOCK NONNULL((1, 3)) ssize_t
 NOTHROW(FCALL task_enum_mycpu_nb)(task_enum_cb_t cb, void *arg,
-                                  struct cpu *__restrict c)
-		THROWS(E_WOULDBLOCK) {
+                                  struct cpu *__restrict c) {
 	ssize_t temp, result;
 	struct task *thread, *idle;
 	/* Start out by enumerating our IDLE thread. */
@@ -356,8 +332,11 @@ NOTHROW(KCALL task_enum_cpu_nb)(task_enum_cb_t cb, void *arg,
 	result = task_enum_mycpu_nb(cb, arg, c);
 #else /* CONFIG_NO_SMP */
 	uintptr_t old_flags;
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* Don't need any of this IPI stuff when already in debugger-mode! */
-	IF_DEBUGGER_ACTIVE(return task_enum_mycpu_nb(cb, arg, c));
+	if (dbg_active)
+		return task_enum_mycpu_nb(cb, arg, c);
+#endif /* CONFIG_HAVE_DEBUGGER */
 	old_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
 	if (c == THIS_CPU) {
 		result = task_enum_mycpu_nb(cb, arg, c);
@@ -392,9 +371,8 @@ cpu_not_running:
 
 /* Enumerate  all  threads  found  anywhere  on  the  system.
  * This is the same as calling `task_enum_cpu()' for all CPUs */
-PUBLIC NONNULL((1)) ssize_t KCALL
-task_enum_all_nb(task_enum_cb_t cb, void *arg)
-		THROWS(E_WOULDBLOCK) {
+PUBLIC NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_all_nb)(task_enum_cb_t cb, void *arg) {
 	ssize_t result;
 #ifdef CONFIG_NO_SMP
 	result = task_enum_cpu_nb(cb, arg, &bootcpu);
@@ -417,7 +395,7 @@ task_enum_all_nb(task_enum_cb_t cb, void *arg)
  * Doing it this  way must  be done when  the caller  knows that no  other CPU  is
  * actively running. */
 #ifndef CONFIG_NO_SMP
-FUNDEF NONNULL((1)) ssize_t
+FUNDEF NOBLOCK NONNULL((1)) ssize_t
 NOTHROW(KCALL task_enum_all_noipi_nb)(task_enum_cb_t cb, void *arg) {
 	unsigned int i;
 	ssize_t temp, result = 0;
@@ -438,10 +416,10 @@ struct task_enum_filter_data {
 	void          *ef_arg; /* Argument for `ef_cb' */
 };
 
-PRIVATE ssize_t KCALL
-task_enum_filter_user_cb(void *arg,
-                         struct task *thread,
-                         struct taskpid *pid) {
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_user_cb_nb)(void *arg,
+                                           struct task *thread,
+                                           struct taskpid *pid) {
 	struct task_enum_filter_data *data;
 	data = (struct task_enum_filter_data *)arg;
 	/* Filter non-user threads. */
@@ -450,10 +428,10 @@ task_enum_filter_user_cb(void *arg,
 	return (*data->ef_cb)(data->ef_arg, thread, pid);
 }
 
-PRIVATE ssize_t KCALL
-task_enum_filter_kernel_cb(void *arg,
-                           struct task *thread,
-                           struct taskpid *pid) {
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_kernel_cb_nb)(void *arg,
+                                             struct task *thread,
+                                             struct taskpid *pid) {
 	struct task_enum_filter_data *data;
 	data = (struct task_enum_filter_data *)arg;
 	/* Filter non-kernel threads. */
@@ -463,36 +441,72 @@ task_enum_filter_kernel_cb(void *arg,
 }
 
 
-PUBLIC NONNULL((1)) ssize_t KCALL
-task_enum_user_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK) {
+PUBLIC NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_user_nb)(task_enum_cb_t cb, void *arg) {
 	ssize_t result;
 	struct task_enum_filter_data data;
 	data.ef_cb  = cb;
 	data.ef_arg = arg;
 	/* Enumerate all threads, but filter anything that isn't a user thread. */
-	result = task_enum_all_nb(&task_enum_filter_user_cb, &data);
+	result = task_enum_all_nb(&task_enum_filter_user_cb_nb, &data);
 	return result;
 }
 
 
-PUBLIC NONNULL((1)) ssize_t KCALL
-task_enum_kernel_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK) {
+PUBLIC NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_kernel_nb)(task_enum_cb_t cb, void *arg) {
 	ssize_t result;
 	struct task_enum_filter_data data;
 	data.ef_cb  = cb;
 	data.ef_arg = arg;
 	/* Enumerate all threads, but filter anything that isn't a kernel thread. */
-	result = task_enum_all_nb(&task_enum_filter_kernel_cb, &data);
+	result = task_enum_all_nb(&task_enum_filter_kernel_cb_nb, &data);
 	return result;
 }
 
 
+struct task_enum_filter_proc_data {
+	task_enum_cb_t efp_cb;   /* [1..1] The underlying callback. */
+	void          *efp_arg;  /* Argument for `ef_cb'. */
+	struct task   *efp_proc; /* [1..1] The process, who's thread shall be filtered. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_proc_cb_nb)(void *arg,
+                                           struct task *thread,
+                                           struct taskpid *pid) {
+	struct task_enum_filter_proc_data *data;
+	data = (struct task_enum_filter_proc_data *)arg;
+	if (!thread ||
+	    task_getprocess_of(thread) != data->efp_proc ||
+	    thread == data->efp_proc)
+		return 0;
+	return (*data->efp_cb)(data->efp_arg, thread, pid);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_children_cb_nb)(void *arg,
+                                               struct task *thread,
+                                               struct taskpid *pid) {
+	struct task_enum_filter_proc_data *data;
+	data = (struct task_enum_filter_proc_data *)arg;
+	if (!thread || thread == data->efp_proc)
+		return 0;
+	/* Enumerate threads apart of the process, and threads
+	 * that claim  to be  children of  that same  process. */
+	if (task_getprocess_of(thread) != data->efp_proc &&
+	    ATOMIC_READ(FORTASK(thread, this_taskgroup).tg_proc_parent) != data->efp_proc)
+		return 0;
+	return (*data->efp_cb)(data->efp_arg, thread, pid);
+}
+
+
+
 /* Enumerate all  threads  apart  of the  same  process  as  `proc'
  * If `proc' is a kernel-space thread, same as `task_enum_kernel()' */
-PUBLIC NONNULL((1, 3)) ssize_t KCALL
-task_enum_process_threads_nb(task_enum_cb_t cb, void *arg,
-                             struct task *__restrict proc)
-		THROWS(E_WOULDBLOCK) {
+PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL task_enum_process_threads_nb)(task_enum_cb_t cb, void *arg,
+                                            struct task *__restrict proc) {
 	ssize_t temp, result;
 	struct taskgroup *group;
 	struct taskpid *tpid;
@@ -511,37 +525,49 @@ task_enum_process_threads_nb(task_enum_cb_t cb, void *arg,
 
 	/* Lock the process's thread list. */
 	group = &FORTASK(proc, this_taskgroup);
-	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
-	/* Enumerate threads. */
-	FOREACH_taskgroup__proc_threads(tpid, group) {
-		REF struct task *thread;
-		thread = taskpid_gettask(tpid);
-		if (!thread)
-			continue;
-		/* Only enumerate threads. - Don't enumerate child processes. */
-		temp = task_getprocess_of(thread) == proc
-		       ? (*cb)(arg, thread, tpid)
-		       : 0;
-		decref_unlikely(thread);
+	if (sync_tryread(&group->tg_proc_threads_lock)) {
+		/* Enumerate threads. */
+		FOREACH_taskgroup__proc_threads(tpid, group) {
+			REF struct task *thread;
+			thread = taskpid_gettask(tpid);
+			if (!thread)
+				continue;
+			/* Only enumerate threads. - Don't enumerate child processes. */
+			temp = task_getprocess_of(thread) == proc
+			       ? (*cb)(arg, thread, tpid)
+			       : 0;
+			decref_unlikely(thread);
+			if unlikely(temp < 0) {
+				sync_endread(&group->tg_proc_threads_lock);
+				goto err;
+			}
+			result += temp;
+		}
+		sync_endread(&group->tg_proc_threads_lock);
+	} else {
+		/* Enumerate all threads, and filter by
+		 * `thread != proc && task_getprocess_of(thread) == proc' */
+		struct task_enum_filter_proc_data data;
+		data.efp_cb   = cb;
+		data.efp_arg  = arg;
+		data.efp_proc = proc;
+		temp = task_enum_all_nb(&task_enum_filter_proc_cb_nb, &data);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
-	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 done:
 	return result;
 err:
-	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 	return temp;
 }
 
 
 /* Same as `task_enum_process_threads()', but don't enumerate `task_getprocess_of(proc)' */
-PUBLIC NONNULL((1, 3)) ssize_t KCALL
-task_enum_process_worker_threads_nb(task_enum_cb_t cb, void *arg,
-                                    struct task *__restrict proc)
-		THROWS(E_WOULDBLOCK) {
-	ssize_t temp, result = 0;
+PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL task_enum_process_worker_threads_nb)(task_enum_cb_t cb, void *arg,
+                                                   struct task *__restrict proc) {
+	ssize_t temp, result;
 	struct taskgroup *group;
 	struct taskpid *tpid;
 	/* Retrieve the process leader of `proc' */
@@ -554,26 +580,37 @@ task_enum_process_worker_threads_nb(task_enum_cb_t cb, void *arg,
 
 	/* Lock the process's thread list. */
 	group = &FORTASK(proc, this_taskgroup);
-	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
-	/* Enumerate threads. */
-	FOREACH_taskgroup__proc_threads(tpid, group) {
-		REF struct task *thread;
-		thread = taskpid_gettask(tpid);
-		if (!thread)
-			continue;
-		/* Only enumerate threads. - Don't enumerate child processes. */
-		temp = task_getprocess_of(thread) == proc
-		       ? (*cb)(arg, thread, tpid)
-		       : 0;
-		decref_unlikely(thread);
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
+	if (sync_tryread(&group->tg_proc_threads_lock)) {
+		result = 0;
+		/* Enumerate threads. */
+		FOREACH_taskgroup__proc_threads(tpid, group) {
+			REF struct task *thread;
+			thread = taskpid_gettask(tpid);
+			if (!thread)
+				continue;
+			/* Only enumerate threads. - Don't enumerate child processes. */
+			temp = task_getprocess_of(thread) == proc
+			       ? (*cb)(arg, thread, tpid)
+			       : 0;
+			decref_unlikely(thread);
+			if unlikely(temp < 0) {
+				sync_endread(&group->tg_proc_threads_lock);
+				goto err;
+			}
+			result += temp;
+		}
+		sync_endread(&group->tg_proc_threads_lock);
+	} else {
+		/* Enumerate all threads, and filter by
+		 * `thread != proc && task_getprocess_of(thread) == proc' */
+		struct task_enum_filter_proc_data data;
+		data.efp_cb   = cb;
+		data.efp_arg  = arg;
+		data.efp_proc = proc;
+		result = task_enum_all_nb(&task_enum_filter_proc_cb_nb, &data);
 	}
-	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 	return result;
 err:
-	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 	return temp;
 }
 
@@ -582,16 +619,14 @@ err:
  * that `proc' can `wait(2)' for).  This also includes threads  that
  * could  also  be  enumerated  using  `task_enum_process_threads()'
  * Note however that this function will not enumerate `proc' itself,
- * and when `proc' is a  kernel-thread, nothing will be  enumerated.
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
-PUBLIC NONNULL((1, 3)) ssize_t KCALL
-task_enum_process_children_nb(task_enum_cb_t cb, void *arg,
-                              struct task *__restrict proc)
-		THROWS(E_WOULDBLOCK) {
+ * and when `proc' is a  kernel-thread, nothing will be  enumerated. */
+PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL task_enum_process_children_nb)(task_enum_cb_t cb, void *arg,
+                                             struct task *__restrict proc) {
 	ssize_t temp, result = 0;
 	struct taskgroup *group;
 	struct taskpid *tpid;
+
 	/* Retrieve the process leader of `proc' */
 	proc = task_getprocess_of(proc);
 
@@ -601,159 +636,288 @@ task_enum_process_children_nb(task_enum_cb_t cb, void *arg,
 
 	/* Lock the process's thread list. */
 	group = &FORTASK(proc, this_taskgroup);
-	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
-	/* Enumerate threads. */
-	FOREACH_taskgroup__proc_threads(tpid, group) {
-		REF struct task *thread;
-		thread = taskpid_gettask(tpid);
-		temp = (*cb)(arg, thread, tpid);
-		xdecref_unlikely(thread);
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
+	if (sync_tryread(&group->tg_proc_threads_lock)) {
+		/* Enumerate threads. */
+		FOREACH_taskgroup__proc_threads(tpid, group) {
+			REF struct task *thread;
+			thread = taskpid_gettask(tpid);
+			temp = (*cb)(arg, thread, tpid);
+			xdecref_unlikely(thread);
+			if unlikely(temp < 0) {
+				sync_endread(&group->tg_proc_threads_lock);
+				goto err;
+			}
+			result += temp;
+		}
+		sync_endread(&group->tg_proc_threads_lock);
+	} else {
+		struct task_enum_filter_proc_data data;
+		data.efp_cb   = cb;
+		data.efp_arg  = arg;
+		data.efp_proc = proc;
+		result = task_enum_all_nb(&task_enum_filter_children_cb_nb, &data);
 	}
-	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 done:
 	return result;
 err:
-	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
 	return temp;
 }
 
 
-PUBLIC NONNULL((1, 3)) ssize_t KCALL
-task_enum_procgroup_processes_nb(task_enum_cb_t cb, void *arg,
-                                 struct task *__restrict proc)
-		THROWS(E_WOULDBLOCK) {
+struct task_enum_filter_procgrp_data {
+	task_enum_cb_t  efp_cb;   /* [1..1] The underlying callback. */
+	void           *efp_arg;  /* Argument for `ef_cb'. */
+	struct taskpid *efp_proc; /* [1..1] The process, who's thread shall be filtered. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_procgroup_processes_cb_nb)(void *arg,
+                                                          struct task *thread,
+                                                          struct taskpid *pid) {
+	struct task_enum_filter_procgrp_data *data;
+	data = (struct task_enum_filter_procgrp_data *)arg;
+	if (!thread || thread != task_getprocess_of(thread) || pid == data->efp_proc ||
+	    ATOMIC_READ(FORTASK(thread, this_taskgroup).tg_proc_group) != data->efp_proc)
+		return 0;
+	return (*data->efp_cb)(data->efp_arg, thread, pid);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_procgroup_processes_self_cb_nb)(void *arg,
+                                                               struct task *thread,
+                                                               struct taskpid *pid) {
+	struct task_enum_filter_procgrp_data *data;
+	data = (struct task_enum_filter_procgrp_data *)arg;
+	if (!thread || thread != task_getprocess_of(thread) ||
+	    ATOMIC_READ(FORTASK(thread, this_taskgroup).tg_proc_group) != data->efp_proc)
+		return 0;
+	return (*data->efp_cb)(data->efp_arg, thread, pid);
+}
+
+PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL task_enum_procgroup_processes_nb)(task_enum_cb_t cb, void *arg,
+                                                struct task *__restrict proc) {
 	ssize_t temp, result;
 	struct taskgroup *group;
 	struct task *grp_proc;
-	/* Retrieve the process group leader of `proc' */
-	proc = task_getprocessgroupleader_of(proc);
-	FINALLY_DECREF_UNLIKELY(proc);
+	REF struct task *pgrp;
+	proc = task_getprocess_of(proc);
 
 	/* Check for special case: this is a kernel thread.
 	 * In this case, we must enumerate all system-wide kernel threads. */
 	if unlikely(proc->t_flags & TASK_FKERNTHREAD)
 		return task_enum_kernel_nb(cb, arg);
 
+	/* Retrieve the process group leader of `proc' */
+	if (sync_tryread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock)) {
+		REF struct taskpid *pgrp_pid;
+		pgrp_pid = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
+		sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
+		pgrp = taskpid_gettask(pgrp_pid);
+		decref_unlikely(pgrp_pid);
+	} else {
+		struct task_enum_filter_procgrp_data data;
+		data.efp_cb   = cb;
+		data.efp_arg  = arg;
+		data.efp_proc = ATOMIC_READ(FORTASK(proc, this_taskgroup).tg_proc_group);
+		return task_enum_all_nb(&task_enum_filter_procgroup_processes_self_cb_nb, &data);
+	}
+	if unlikely(!pgrp)
+		return 0;
+
 	/* Enumerate the process group leader. */
-	result = (*cb)(arg, proc, FORTASK(proc, this_taskpid));
+	result = (*cb)(arg, pgrp, FORTASK(pgrp, this_taskpid));
 	if unlikely(result < 0)
 		goto done;
 
 	/* Lock the process's thread list. */
-	group = &FORTASK(proc, this_taskgroup);
-	sync_read_if_not_dbg(&group->tg_pgrp_processes_lock);
-	/* Enumerate process group member processes. */
-	FOREACH_taskgroup__pgrp_processes(grp_proc, group) {
-		ASSERT_POISON(grp_proc != proc);
-		CB_THREAD(grp_proc);
+	group = &FORTASK(pgrp, this_taskgroup);
+	if (sync_tryread(&group->tg_pgrp_processes_lock)) {
+		/* Enumerate process group member processes. */
+		FOREACH_taskgroup__pgrp_processes(grp_proc, group) {
+			ASSERT_POISON(grp_proc != pgrp);
+			temp = (*cb)(arg, grp_proc, FORTASK(grp_proc, this_taskpid));
+			if unlikely(temp < 0) {
+				sync_endread(&group->tg_pgrp_processes_lock);
+				goto err;
+			}
+			result += temp;
+		}
+		sync_endread(&group->tg_pgrp_processes_lock);
+	} else {
+		struct task_enum_filter_procgrp_data data;
+		data.efp_cb   = cb;
+		data.efp_arg  = arg;
+		data.efp_proc = FORTASK(pgrp, this_taskpid);
+		temp = task_enum_all_nb(&task_enum_filter_procgroup_processes_cb_nb, &data);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
 	}
-	sync_endread_if_not_dbg(&group->tg_pgrp_processes_lock);
 done:
+	decref_unlikely(pgrp);
 	return result;
 err:
-	sync_endread_if_not_dbg(&group->tg_pgrp_processes_lock);
+	decref_unlikely(pgrp);
 	return temp;
 }
 
+
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL taskpid_inns)(struct taskpid *__restrict self,
+                            struct pidns *__restrict ns) {
+	struct pidns *iter;
+	iter = self->tp_pidns;
+	do {
+		if (iter == ns)
+			return true;
+	} while ((iter = iter->pn_parent) != NULL);
+	return false;
+}
+
+struct task_enum_filter_ns_data {
+	task_enum_cb_t efn_cb;  /* [1..1] The underlying callback. */
+	void          *efn_arg; /* Argument for `ef_cb'. */
+	struct pidns  *efn_ns;  /* [1..1] The namespace to filter. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_ns_processes_cb_nb)(void *arg,
+                                                   struct task *thread,
+                                                   struct taskpid *pid) {
+	struct task_enum_filter_ns_data *data;
+	data = (struct task_enum_filter_ns_data *)arg;
+	if (!thread || !pid || !task_isprocessleader_p(thread) ||
+	    !taskpid_inns(pid, data->efn_ns))
+		return 0;
+	return (*data->efn_cb)(data->efn_arg, thread, pid);
+}
 
 /* Similar  to `task_enum_user()': Enumerate the leaders of running
  * user-space processes, as visible by `ns'. These are identical to
  * what will show up under `/proc' */
-PUBLIC NONNULL((1, 3)) ssize_t KCALL
-task_enum_processes_nb(task_enum_cb_t cb, void *arg,
-                       struct pidns *__restrict ns)
-		THROWS(E_WOULDBLOCK) {
-	ssize_t temp, result = 0;
-	size_t i, mask;
-	struct pidns_entry *list;
-	sync_read_if_not_dbg(ns);
-	mask = ns->pn_mask;
-	list = ns->pn_list;
-	for (i = 0; i <= mask; ++i) {
-		struct taskpid *pid;
-		REF struct task *thread;
-		pid = list[i].pe_pid;
-		if (!pid)
-			continue; /* Unused entry */
-		if (pid == PIDNS_ENTRY_DELETED)
-			continue; /* Deleted entry */
-		thread = taskpid_gettask(pid);
-		if (!thread)
-			continue;
-		temp = task_isprocessleader_p(thread)
-		       ? (*cb)(arg, thread, pid)
-		       : 0;
-		decref_unlikely(thread);
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
+PUBLIC NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL task_enum_processes_nb)(task_enum_cb_t cb, void *arg,
+                                      struct pidns *__restrict ns) {
+	ssize_t temp, result;
+	if (sync_tryread(ns)) {
+		size_t i, mask;
+		struct pidns_entry *list;
+		result = 0;
+		mask = ns->pn_mask;
+		list = ns->pn_list;
+		for (i = 0; i <= mask; ++i) {
+			struct taskpid *pid;
+			REF struct task *thread;
+			pid = list[i].pe_pid;
+			if (!pid)
+				continue; /* Unused entry */
+			if (pid == PIDNS_ENTRY_DELETED)
+				continue; /* Deleted entry */
+			thread = taskpid_gettask(pid);
+			if (!thread)
+				continue;
+			temp = task_isprocessleader_p(thread)
+			       ? (*cb)(arg, thread, pid)
+			       : 0;
+			decref_unlikely(thread);
+			if unlikely(temp < 0) {
+				sync_endread(ns);
+				goto err;
+			}
+			result += temp;
+		}
+		sync_endread(ns);
+	} else {
+		struct task_enum_filter_ns_data data;
+		data.efn_cb  = cb;
+		data.efn_arg = arg;
+		data.efn_ns  = ns;
+		result = task_enum_all_nb(&task_enum_filter_ns_processes_cb_nb, &data);
 	}
-	sync_endread_if_not_dbg(ns);
 	return result;
 err:
-	sync_endread_if_not_dbg(ns);
 	return temp;
 }
 
 
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_filter_ns_threads_cb_nb)(void *arg,
+                                                 struct task *thread,
+                                                 struct taskpid *pid) {
+	struct task_enum_filter_ns_data *data;
+	data = (struct task_enum_filter_ns_data *)arg;
+	if (!thread || !pid || !taskpid_inns(pid, data->efn_ns))
+		return 0;
+	return (*data->efn_cb)(data->efn_arg, thread, pid);
+}
+
 /* Similar to `task_enum_processes()', but don't just enumerate
  * threads that are process leaders, but all threads from  `ns' */
-PUBLIC NONNULL((1, 3)) ssize_t KCALL
-task_enum_namespace_nb(task_enum_cb_t cb, void *arg,
-                       struct pidns *__restrict ns)
-		THROWS(E_WOULDBLOCK) {
-	ssize_t temp, result = 0;
-	size_t i, mask;
-	struct pidns_entry *list;
-	sync_read_if_not_dbg(ns);
-	mask = ns->pn_mask;
-	list = ns->pn_list;
-	for (i = 0; i <= mask; ++i) {
-		struct taskpid *pid;
-		REF struct task *thread;
-		pid = list[i].pe_pid;
-		if (!pid)
-			continue; /* Unused entry */
-		if (pid == PIDNS_ENTRY_DELETED)
-			continue; /* Deleted entry */
-		thread = taskpid_gettask(pid);
-		temp   = (*cb)(arg, thread, pid);
-		xdecref_unlikely(thread);
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
+PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL task_enum_namespace_nb)(task_enum_cb_t cb, void *arg,
+                                      struct pidns *__restrict ns) {
+	ssize_t temp, result;
+	if (sync_tryread(ns)) {
+		size_t i, mask;
+		struct pidns_entry *list;
+		result = 0;
+		mask = ns->pn_mask;
+		list = ns->pn_list;
+		for (i = 0; i <= mask; ++i) {
+			struct taskpid *pid;
+			REF struct task *thread;
+			pid = list[i].pe_pid;
+			if (!pid)
+				continue; /* Unused entry */
+			if (pid == PIDNS_ENTRY_DELETED)
+				continue; /* Deleted entry */
+			thread = taskpid_gettask(pid);
+			temp   = (*cb)(arg, thread, pid);
+			xdecref_unlikely(thread);
+			if unlikely(temp < 0) {
+				sync_endread(ns);
+				goto err;
+			}
+			result += temp;
+		}
+		sync_endread(ns);
+	} else {
+		struct task_enum_filter_ns_data data;
+		data.efn_cb  = cb;
+		data.efn_arg = arg;
+		data.efn_ns  = ns;
+		result = task_enum_all_nb(&task_enum_filter_ns_threads_cb_nb, &data);
 	}
-	sync_endread_if_not_dbg(ns);
 	return result;
 err:
-	sync_endread_if_not_dbg(ns);
 	return temp;
 }
 
 
 /* Enumerate all threads that are using `v' as their active VM. */
-PUBLIC NONNULL((1, 3)) ssize_t KCALL
-task_enum_vm_nb(task_enum_cb_t cb, void *arg,
-                struct vm *__restrict v)
-		THROWS(E_WOULDBLOCK) {
+PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL task_enum_mman_nb)(task_enum_cb_t cb, void *arg,
+                                 struct mman *__restrict mm) {
 	struct task *thread;
 	ssize_t temp, result = 0;
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
-	mman_threadslock_acquire_nopr(v);
-	LIST_FOREACH (thread, &v->v_tasks, t_mman_tasks) {
+	mman_threadslock_acquire_nopr(mm);
+	LIST_FOREACH (thread, &mm->mm_threads, t_mman_tasks) {
 		/* Enumerate the thread. */
-		CB_THREAD(thread);
+		temp = (*cb)(arg, thread, FORTASK(thread, this_taskpid));
+		if unlikely(temp < 0) {
+			mman_threadslock_release_nopr(mm);
+			PREEMPTION_POP(was);
+			goto err;
+		}
+		result += temp;
 	}
-	mman_threadslock_release_nopr(v);
+	mman_threadslock_release_nopr(mm);
 	PREEMPTION_POP(was);
 	return result;
 err:
-	mman_threadslock_release_nopr(v);
-	PREEMPTION_POP(was);
 	return temp;
 }
 

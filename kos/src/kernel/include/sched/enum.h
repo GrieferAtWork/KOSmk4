@@ -33,7 +33,7 @@ struct taskpid;
 struct task;
 struct pidns;
 struct cpu;
-struct vm;
+struct mman;
 
 /* Callback prototype for task enumeration functions.
  * @param: thread: The actual thread (or `NULL' if `pid' is non-NULL,
@@ -47,117 +47,106 @@ typedef ssize_t (KCALL *task_enum_cb_t)(void *arg,
 
 /* Enumerate  all  threads  found  anywhere  on  the  system.
  * This is the same as calling `task_enum_cpu()' for all CPUs
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1)) ssize_t KCALL
 task_enum_all(task_enum_cb_t cb, void *arg)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Enumerate all user-space threads.
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1)) ssize_t KCALL
 task_enum_user(task_enum_cb_t cb, void *arg)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Enumerate all kernel-space threads.
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1)) ssize_t KCALL
 task_enum_kernel(task_enum_cb_t cb, void *arg)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Enumerate all  threads  apart  of the  same  process  as  `proc'
  * If `proc' is a kernel-space thread, same as `task_enum_kernel()'
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
 task_enum_process_threads(task_enum_cb_t cb, void *arg,
                           struct task *__restrict proc)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Same as `task_enum_process_threads()', but don't enumerate `task_getprocess_of(proc)'
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
 task_enum_process_worker_threads(task_enum_cb_t cb, void *arg,
                                  struct task *__restrict proc)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Enumerate  all children  of the  given `proc'.  (i.e. the threads
  * that `proc' can `wait(2)' for).  This also includes threads  that
  * could  also  be  enumerated  using  `task_enum_process_threads()'
  * Note however that this function will not enumerate `proc' itself,
  * and when `proc' is a  kernel-thread, nothing will be  enumerated.
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
 task_enum_process_children(task_enum_cb_t cb, void *arg,
                            struct task *__restrict proc)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Enumerate the leaders of all processes that are apart of the
  * same process group as `proc_group'
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
 task_enum_procgroup_processes(task_enum_cb_t cb, void *arg,
                               struct task *__restrict proc_group)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Similar  to `task_enum_user()': Enumerate the leaders of running
  * user-space processes, as visible by `ns'. These are identical to
  * what will show up under `/proc'
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
 task_enum_processes(task_enum_cb_t cb, void *arg,
                     struct pidns *__restrict ns)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Similar to `task_enum_processes()', but don't just enumerate
  * threads that are process leaders, but all threads from  `ns'
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
 task_enum_namespace(task_enum_cb_t cb, void *arg,
                     struct pidns *__restrict ns)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Enumerate all threads  running, sleeping, or  pending on  `c'
  * Threads that have terminated, or haven't been started are not
  * enumerated by this function.
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
 task_enum_cpu(task_enum_cb_t cb, void *arg,
               struct cpu *__restrict c)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+		THROWS(E_BADALLOC, ...);
 
 /* Enumerate all threads that are using `v' as their active VM.
- * @throws: E_BADALLOC: Only outside of debugger-mode: Failed  to
- *                      allocate memory for intermediate buffers. */
+ * @throws: E_BADALLOC: Failed to allocate memory for intermediate buffers. */
 FUNDEF NONNULL((1, 3)) ssize_t KCALL
-task_enum_vm(task_enum_cb_t cb, void *arg,
-             struct vm *__restrict v)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, ...);
+task_enum_mman(task_enum_cb_t cb, void *arg,
+               struct mman *__restrict mm)
+		THROWS(E_BADALLOC, ...);
 
 
 
 /* These functions are the same as those above, however these may only be used
  * when `cb' is NOBLOCK+NOEXCEPT, as these may invoke said function while non-
  * reentrant, internal locks are held. */
-FUNDEF NONNULL((1)) ssize_t KCALL task_enum_all_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) ssize_t KCALL task_enum_user_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) ssize_t KCALL task_enum_kernel_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) ssize_t KCALL task_enum_process_threads_nb(task_enum_cb_t cb, void *arg, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) ssize_t KCALL task_enum_process_worker_threads_nb(task_enum_cb_t cb, void *arg, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) ssize_t KCALL task_enum_process_children_nb(task_enum_cb_t cb, void *arg, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) ssize_t KCALL task_enum_procgroup_processes_nb(task_enum_cb_t cb, void *arg, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) ssize_t KCALL task_enum_processes_nb(task_enum_cb_t cb, void *arg, struct pidns *__restrict ns) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) ssize_t KCALL task_enum_namespace_nb(task_enum_cb_t cb, void *arg, struct pidns *__restrict ns) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_cpu_nb)(task_enum_cb_t cb, void *arg, struct cpu *__restrict c);
-FUNDEF NONNULL((1, 3)) ssize_t KCALL task_enum_vm_nb(task_enum_cb_t cb, void *arg, struct vm *__restrict v) THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK NONNULL((1)) ssize_t NOTHROW(KCALL task_enum_all_nb)(task_enum_cb_t cb, void *arg);
+FUNDEF NOBLOCK NONNULL((1)) ssize_t NOTHROW(KCALL task_enum_user_nb)(task_enum_cb_t cb, void *arg);
+FUNDEF NOBLOCK NONNULL((1)) ssize_t NOTHROW(KCALL task_enum_kernel_nb)(task_enum_cb_t cb, void *arg);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_process_threads_nb)(task_enum_cb_t cb, void *arg, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_process_worker_threads_nb)(task_enum_cb_t cb, void *arg, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_process_children_nb)(task_enum_cb_t cb, void *arg, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_procgroup_processes_nb)(task_enum_cb_t cb, void *arg, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_processes_nb)(task_enum_cb_t cb, void *arg, struct pidns *__restrict ns);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_namespace_nb)(task_enum_cb_t cb, void *arg, struct pidns *__restrict ns);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_cpu_nb)(task_enum_cb_t cb, void *arg, struct cpu *__restrict c);
+FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(KCALL task_enum_mman_nb)(task_enum_cb_t cb, void *arg, struct mman *__restrict mm);
 
 /* Same as `task_enum_all_nb()', but directly access the structures of other CPUs,
  * rather  than sending IPIs  and letting those CPUs  access their own structures.
@@ -172,12 +161,12 @@ FUNDEF NONNULL((1)) ssize_t NOTHROW(KCALL task_enum_all_noipi_nb)(task_enum_cb_t
 
 struct task_list_buffer {
 	REF struct task    **tlb_task_buf;    /* [1..1][out:ref][0..tlb_task_len] Output buffer for threads. */
-	size_t               tlb_task_len;    /* in:    Available    buffer     length.
-	                                       * out:  [success]  Used  buffer  length.
+	size_t               tlb_task_len;    /* in:  Available buffer length.
+	                                       * out: [success] Used buffer length.
 	                                       * out: [failure] Required buffer length. */
 	REF struct taskpid **tlb_taskpid_buf; /* [1..1][out:ref][0..tlb_taskpid_len] Output buffer for zombie-threads. */
-	size_t               tlb_taskpid_len; /* in:    Available    buffer     length.
-	                                       * out:  [success]  Used  buffer  length.
+	size_t               tlb_taskpid_len; /* in:  Available buffer length.
+	                                       * out: [success] Used buffer length.
 	                                       * out: [failure] Required buffer length. */
 };
 
@@ -192,22 +181,22 @@ struct task_list_buffer {
  *                          The caller should resize their buffers to have sufficient  space
  *                          for at least the same # of task/taskpid elements as written back
  *                          to the buffer length fields by this function. */
-FUNDEF NONNULL((1)) __BOOL FCALL task_list_all(struct task_list_buffer *__restrict buf) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) __BOOL FCALL task_list_user(struct task_list_buffer *__restrict buf) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 2)) __BOOL FCALL task_list_process_threads(struct task_list_buffer *__restrict buf, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 2)) __BOOL FCALL task_list_process_worker_threads(struct task_list_buffer *__restrict buf, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 2)) __BOOL FCALL task_list_process_children(struct task_list_buffer *__restrict buf, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 2)) __BOOL FCALL task_list_procgroup_processes(struct task_list_buffer *__restrict buf, struct task *__restrict proc) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 2)) __BOOL FCALL task_list_processes(struct task_list_buffer *__restrict buf, struct pidns *__restrict ns) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 2)) __BOOL FCALL task_list_namespace(struct task_list_buffer *__restrict buf, struct pidns *__restrict ns) THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL task_list_all)(struct task_list_buffer *__restrict buf);
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL task_list_user)(struct task_list_buffer *__restrict buf);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL task_list_process_threads)(struct task_list_buffer *__restrict buf, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL task_list_process_worker_threads)(struct task_list_buffer *__restrict buf, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL task_list_process_children)(struct task_list_buffer *__restrict buf, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL task_list_procgroup_processes)(struct task_list_buffer *__restrict buf, struct task *__restrict proc);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL task_list_processes)(struct task_list_buffer *__restrict buf, struct pidns *__restrict ns);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL task_list_namespace)(struct task_list_buffer *__restrict buf, struct pidns *__restrict ns);
 
 /* @return: <= buflen: Success: `buf[0..return-1]' now contain references to enumerated threads.
  * @return: > buflen:  Error:   Insufficient buffer space. (Try again with more buffer memory).
  *                              The contents of `buf[*]' are undefined, but no references  will
  *                              be contained inside. */
-FUNDEF NONNULL((1)) size_t FCALL task_list_kernel(/*out*/ REF struct task **buf, size_t buflen) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) size_t FCALL task_list_cpu(/*out*/ REF struct task **buf, size_t buflen, struct cpu *__restrict c) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1, 3)) size_t FCALL task_list_vm(/*out*/ REF struct task **buf, size_t buflen, struct vm *__restrict v) THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL task_list_kernel)(/*out*/ REF struct task **buf, size_t buflen);
+FUNDEF NOBLOCK NONNULL((1, 3)) size_t NOTHROW(FCALL task_list_cpu)(/*out*/ REF struct task **buf, size_t buflen, struct cpu *__restrict c);
+FUNDEF NOBLOCK NONNULL((1, 3)) size_t NOTHROW(FCALL task_list_mman)(/*out*/ REF struct task **buf, size_t buflen, struct mman *__restrict mm);
 
 
 
