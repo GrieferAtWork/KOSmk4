@@ -314,7 +314,7 @@ NOTHROW(FCALL task_enum_cpu_ipi)(struct icpustate *__restrict state, void *args[
 	presult  = (ssize_t *)args[2];
 	*presult = task_enum_mycpu_nb(cb, cb_arg, THIS_CPU);
 	COMPILER_BARRIER();
-	args[3] = (void *)1; /* Indicate callback completion. */
+	*(bool *)args[3] = true; /* Indicate callback completion. */
 	COMPILER_BARRIER();
 	return state;
 }
@@ -348,10 +348,11 @@ cpu_not_running:
 		result = (*cb)(arg, &FORCPU(c, thiscpu_idle), NULL);
 	} else {
 		void *args[CPU_IPI_ARGCOUNT];
+		bool completed = false;
 		args[0] = (void *)cb;
 		args[1] = arg;
 		args[2] = (void *)&result;
-		args[3] = NULL; /* becomes non-NULL upon completion. */
+		args[3] = &completed;
 		while (!cpu_sendipi(c, &task_enum_cpu_ipi, args, CPU_IPI_FWAITFOR)) {
 			if (!cpu_isrunning(c))
 				goto cpu_not_running;
@@ -359,7 +360,7 @@ cpu_not_running:
 			task_pause();
 		}
 		/* Wait for the IPI to complete. */
-		while (ATOMIC_LOAD(args[3]) == NULL)
+		while (!ATOMIC_LOAD(completed))
 			task_pause();
 		/* Done! */
 	}

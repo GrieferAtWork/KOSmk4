@@ -342,7 +342,7 @@ NOTHROW(KCALL inode_recent)(struct inode *__restrict self) {
 }
 
 /* Clear the cache of recently used INodes. */
-DEFINE_SYSTEM_CACHE_CLEAR(inode_recent_tryclear);
+DEFINE_SYSCACHE_CLEAR(inode_recent_tryclear);
 PUBLIC NOBLOCK size_t
 NOTHROW(KCALL inode_recent_tryclear)(void) {
 	size_t result = 0;
@@ -3551,7 +3551,7 @@ done:
 	return result;
 }
 
-DEFINE_SYSTEM_CACHE_CLEAR(superblock_clear_all_caches);
+DEFINE_SYSCACHE_CLEAR(superblock_clear_all_caches);
 PRIVATE ATTR_USED NOBLOCK size_t
 NOTHROW(KCALL superblock_clear_all_caches)(void) {
 	size_t temp, result;

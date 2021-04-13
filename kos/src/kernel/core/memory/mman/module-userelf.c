@@ -777,7 +777,7 @@ thismman_uemc = LIST_HEAD_INITIALIZER(thismman_uemc);
  *
  * The mman module cache never has to be cleared, but may be cleared in
  * order to free up system memory during a shortage. */
-PUBLIC NOBLOCK NONNULL((1)) size_t
+INTERN NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self) {
 	size_t result = 0;
 	struct userelf_module_slist dead;
@@ -1713,7 +1713,7 @@ PRIVATE struct directory_entry compat_system_rtld_dirent = {
 #endif /* __ARCH_HAVE_COMPAT */
 
 
-DEFINE_SYSTEM_CACHE_CLEAR(clear_system_rtld_fsfile_cache);
+DEFINE_SYSCACHE_CLEAR(clear_system_rtld_fsfile_cache);
 PRIVATE ATTR_USED NOBLOCK size_t
 NOTHROW(KCALL clear_system_rtld_fsfile_cache)(void) {
 	size_t result = 0;

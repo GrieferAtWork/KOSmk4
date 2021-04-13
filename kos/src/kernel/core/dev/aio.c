@@ -512,8 +512,8 @@ nothing_to_restore:
 
 /* Remove all AIO handles that are `aio_handle_completed()'
  * from    `async_aio_handles',    and    kfree()     them. */
-DEFINE_SYSTEM_CACHE_CLEAR(async_aio_handles_clear);
-INTERN NOBLOCK size_t
+DEFINE_SYSCACHE_CLEAR(async_aio_handles_clear);
+PRIVATE ATTR_USED NOBLOCK size_t
 NOTHROW(KCALL async_aio_handles_clear)(void) {
 	/* TODO: A function similar to this one should be called when the CPU goes into
 	 *       IDLE mode in order to finalize  and kfree() unused AIO handles,  since

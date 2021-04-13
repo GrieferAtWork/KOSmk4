@@ -24,15 +24,22 @@
 
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/mman/cache.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/module-section-cache.h>
+#include <sched/enum.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
 #include <assert.h>
+#include <limits.h>
 #include <stddef.h>
+
+/**/
+#include "module-userelf.h" /* CONFIG_HAVE_USERELF_MODULES */
 
 DECL_BEGIN
 
@@ -139,10 +146,59 @@ PRIVATE NOBLOCK size_t NOTHROW(KCALL cc_kernel)(void) {
 }
 
 
+/* Cache-clear functions from around the kernel core... */
+#ifdef CONFIG_HAVE_USERELF_MODULES
+INTDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self);
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+/*...*/
+
+
+PRIVATE NOBLOCK size_t
+NOTHROW(KCALL cc_permman)(struct mman *__restrict self) {
+	size_t result = 0;
+#ifdef CONFIG_HAVE_USERELF_MODULES
+	cc_account(&result, mman_clear_module_cache(self));
+#endif /* CONFIG_HAVE_USERELF_MODULES */
+	return result;
+}
+
+PRIVATE NOBLOCK size_t
+NOTHROW(KCALL cc_pertask)(struct task *__restrict thread) {
+	size_t result;
+	REF struct mman *mm;
+	mm     = task_getmman(thread);
+	result = cc_permman(mm);
+	if unlikely(ATOMIC_DECFETCH(mm->mm_refcnt) == 0) {
+		cc_account(&result, sizeof(struct mman));
+		mman_destroy(mm);
+	}
+	return (ssize_t)result;
+}
+
+PRIVATE NOBLOCK ssize_t
+NOTHROW(KCALL cc_pertask_cb)(void *UNUSED(arg),
+                             struct task *thread,
+                             struct taskpid *UNUSED(pid)) {
+	size_t result = 0;
+	if (thread) {
+		result = cc_pertask(thread);
+		if (result > (size_t)SSIZE_MAX)
+			result = (size_t)SSIZE_MAX;
+	}
+	return (ssize_t)result;
+}
+
+PRIVATE NOBLOCK size_t
+NOTHROW(KCALL cc_threads)(void) {
+	return (size_t)task_enum_all_nb(&cc_pertask_cb, NULL);
+}
+
+
 /* Clear all caches. */
 PRIVATE NOBLOCK size_t NOTHROW(KCALL cc_all)(void) {
 	size_t result = cc_drivers();
 	cc_account(&result, cc_kernel());
+	cc_account(&result, cc_threads());
 	cc_account(&result, cc_trimheaps());
 	return result;
 }

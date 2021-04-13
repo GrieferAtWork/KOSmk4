@@ -2496,7 +2496,7 @@ NOTHROW(FCALL clear_fde_cache)(struct driver *__restrict self) {
 	return result;
 }
 
-DEFINE_SYSTEM_CACHE_CLEAR(clear_fde_caches);
+DEFINE_SYSCACHE_CLEAR(clear_fde_caches);
 PRIVATE ATTR_USED NOBLOCK size_t
 NOTHROW(KCALL clear_fde_caches)(void) {
 	size_t i, result = 0;

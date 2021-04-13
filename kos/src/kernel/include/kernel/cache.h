@@ -32,12 +32,12 @@ DECL_BEGIN
 #ifdef __CC__
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#ifndef DEFINE_SYSTEM_CACHE_CLEAR
+#ifndef DEFINE_SYSCACHE_CLEAR
 /* >> NOBLOCK size_t NOTHROW(KCALL func)(void);
  * Define a function that should be called when `syscache_clear()' is invoked. */
-#define DEFINE_SYSTEM_CACHE_CLEAR(func) \
+#define DEFINE_SYSCACHE_CLEAR(func) \
 	DEFINE_CALLBACK(".rodata.cold.callback.syscache_clear",func)
-#endif /* !DEFINE_SYSTEM_CACHE_CLEAR */
+#endif /* !DEFINE_SYSCACHE_CLEAR */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 /* Declare/define a cache for preallocated/re-use free. */
@@ -87,7 +87,7 @@ DECL_BEGIN
 		}                                                   \
 		kfree(p);                                           \
 	}                                                       \
-	DEFINE_SYSTEM_CACHE_CLEAR(name##_clear);                \
+	DEFINE_SYSCACHE_CLEAR(name##_clear);                    \
 	decl NOBLOCK ATTR_USED                                  \
 	ATTR_COLDTEXT size_t                                    \
 	NOTHROW(KCALL name##_clear)(void) {                     \

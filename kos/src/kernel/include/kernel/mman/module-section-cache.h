@@ -64,11 +64,6 @@ DATDEF struct lockop_slist /*      */ module_section_cache_lops;
 #define module_section_cache_acquired()   atomic_lock_acquired(&module_section_cache_lock)
 #define module_section_cache_available()  atomic_lock_available(&module_section_cache_lock)
 
-/* Clear the global cache of module sections, and return a
- * number representative of an approximation of the amount
- * of memory became available as a result of this. */
-FUNDEF NOBLOCK size_t NOTHROW(KCALL module_section_clearcache)(void);
-
 DECL_END
 #endif /* __CC__ */
 

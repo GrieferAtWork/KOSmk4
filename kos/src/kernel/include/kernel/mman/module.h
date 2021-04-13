@@ -373,19 +373,6 @@ FUNDEF WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL mman_module_next_nx
 #define mman_module_first(self)    mman_module_aboveaddr(self, (void const *)0)
 #define mman_module_first_nx(self) mman_module_aboveaddr_nx(self, (void const *)0)
 
-/* Clear the module cache of the given mman.
- *
- * Lazily loaded user-space modules end up being placed in this cache when
- * first loaded, as  the mnode->module link  doesn't actually represent  a
- * reference (which is intentional), meaning that a cache of recently used
- * module objects is needed in order  to keep module objects alive  beyond
- * the single initial reference returned  by the module lookup  functions.
- *
- * The mman module cache never has to be cleared, but may be cleared in
- * order to free up system memory during a shortage. */
-FUNDEF NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self);
-
 
 DECL_END
 #endif /* __CC__ */

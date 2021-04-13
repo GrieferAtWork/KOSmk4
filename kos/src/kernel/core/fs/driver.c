@@ -438,7 +438,7 @@ again:
 /* Try to clear the FDE cache of the given, or of all loaded drivers.
  * NOTE: Drivers who's caches cannot be locked are skipped.
  * @return: * : The total number of bytes of heap-memory released. */
-DEFINE_SYSTEM_CACHE_CLEAR(driver_clear_fde_caches);
+DEFINE_SYSCACHE_CLEAR(driver_clear_fde_caches);
 
 PUBLIC NOBLOCK size_t
 NOTHROW(KCALL driver_clear_fde_caches)(void) {

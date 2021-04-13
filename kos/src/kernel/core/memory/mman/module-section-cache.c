@@ -59,8 +59,9 @@ PUBLIC struct lockop_slist /*      */ module_section_cache_lops = SLIST_HEAD_INI
 /* Clear the global cache of module sections, and return a
  * number representative of an approximation of the amount
  * of memory became available as a result of this. */
-DEFINE_SYSTEM_CACHE_CLEAR(module_section_clearcache);
-PUBLIC NOBLOCK size_t NOTHROW(KCALL module_section_clearcache)(void) {
+DEFINE_SYSCACHE_CLEAR(module_section_clearcache);
+PRIVATE ATTR_USED NOBLOCK size_t
+NOTHROW(KCALL module_section_clearcache)(void) {
 	size_t result = 0;
 	struct module_section_slist dead;
 	if (!module_section_cache_tryacquire())

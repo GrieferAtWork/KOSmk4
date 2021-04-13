@@ -616,27 +616,6 @@ DEFINE_PUBLIC_ALIAS(mman_module_next_nx, mman_module_next);
 #endif /* !CONFIG_HAVE_USERELF_MODULES */
 
 
-#ifndef CONFIG_HAVE_USERELF_MODULES
-/* Clear the module cache of the given mman.
- *
- * Lazily loaded user-space modules end up being placed in this cache when
- * first loaded, as  the mnode->module link  doesn't actually represent  a
- * reference (which is intentional), meaning that a cache of recently used
- * module objects is needed in order  to keep module objects alive  beyond
- * the single initial reference returned  by the module lookup  functions.
- *
- * The mman module cache never has to be cleared, but may be cleared in
- * order to free up system memory during a shortage. */
-PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL mman_clear_module_cache)(struct mman *__restrict self) {
-	COMPILER_IMPURE();
-	(void)self;
-	return 0;
-}
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
-
-
-
 #ifdef CONFIG_USE_NEW_DRIVER
 #ifdef CONFIG_HAVE_USERELF_MODULES
 LOCAL NONNULL((1, 5, 7)) unsigned int KCALL

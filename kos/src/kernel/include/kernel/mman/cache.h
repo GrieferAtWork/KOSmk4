@@ -83,11 +83,11 @@ NOTHROW(KCALL syscache_clear_s)(syscache_version_t *__restrict pversion);
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#ifndef DEFINE_SYSTEM_CACHE_CLEAR
+#ifndef DEFINE_SYSCACHE_CLEAR
 /* >> NOBLOCK size_t NOTHROW(KCALL func)(void);
  * Define a function that should be called when `syscache_clear()' is invoked. */
-#define DEFINE_SYSTEM_CACHE_CLEAR(func) DEFINE_CALLBACK(".rodata.cold.callback.syscache_clear", func)
-#endif /* !DEFINE_SYSTEM_CACHE_CLEAR */
+#define DEFINE_SYSCACHE_CLEAR(func) DEFINE_CALLBACK(".rodata.cold.callback.syscache_clear", func)
+#endif /* !DEFINE_SYSCACHE_CLEAR */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 DECL_END
