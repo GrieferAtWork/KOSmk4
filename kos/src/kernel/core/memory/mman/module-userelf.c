@@ -768,6 +768,18 @@ PRIVATE ATTR_PERMMAN struct REF userelf_module_list
 thismman_uemc = LIST_HEAD_INITIALIZER(thismman_uemc);
 
 
+/* Clear the UEMC cache of the given mman when said mman is destroyed. */
+DEFINE_PERMMAN_FINI(fini_thismman_uemc);
+PRIVATE ATTR_USED NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fini_thismman_uemc)(struct mman *__restrict self) {
+	while (!LIST_EMPTY(&FORMMAN(self, thismman_uemc))) {
+		REF struct userelf_module *mod;
+		mod = LIST_FIRST(&FORMMAN(self, thismman_uemc));
+		LIST_UNBIND(mod, um_cache);
+		decref_likely(mod);
+	}
+}
+
 /* Clear the module cache of the given mman.
  *
  * Lazily loaded user-space modules end up being placed in this cache when
