@@ -176,13 +176,6 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-/* Unlock the kernel heaps while inside of the debugger. */
-DEFINE_DBG_BZERO_VECTOR(&kernel_heaps[0].h_lock,
-                        __GFP_HEAPCOUNT,
-                        sizeof(kernel_heaps[0].h_lock),
-                        sizeof(kernel_heaps[0]));
-
-
 DEFINE_VALIDATABLE_HEAP(kernel_default_heap);
 DEFINE_VALIDATABLE_HEAP(kernel_locked_heap);
 PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {

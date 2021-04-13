@@ -39,6 +39,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/event.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
@@ -1319,30 +1320,29 @@ again:
 	result = axref_get(rtld_fsfile);
 	if (!result && !kernel_poisoned()) {
 		TRY {
-			REF struct handle hand;
-			hand = fs_open_ex(&fs_kernel, &vfs_kernel, &vfs_kernel,
-			                  rtld_name->de_name, O_NOCTTY | O_RDONLY,
-			                  FS_MODE_FNORMAL);
-			TRY {
-				result = handle_as_mfile(&hand);
+			result = path_traversefull_ex(/* filesystem:            */ &fs_kernel,
+			                              /* cwd:                   */ &vfs_kernel,
+			                              /* root:                  */ &vfs_kernel,
+			                              /* upath:                 */ rtld_name->de_name,
+			                              /* follow_final_link:     */ true,
+			                              /* mode:                  */ FS_MODE_FNORMAL,
+			                              /* premaining_symlinks:   */ NULL,
+			                              /* pcontaining_path:      */ NULL,
+			                              /* pcontaining_directory: */ NULL,
+			                              /* pcontaining_dirent:    */ NULL);
 #ifndef CONFIG_USE_NEW_FS
-				if (!vm_datablock_isinode(result)) {
-					decref_unlikely(result);
-					THROW(E_INVALID_HANDLE);
-				}
-#endif /* !CONFIG_USE_NEW_FS */
-			} EXCEPT {
-				decref_unlikely(hand);
-				RETHROW();
+			if (!vm_datablock_isinode(result)) {
+				decref_unlikely(result);
+				THROW(E_FSERROR);
 			}
-			decref_unlikely(hand);
+#endif /* !CONFIG_USE_NEW_FS */
 			/* Try to cache the resulting file object. */
 			if (!axref_cmpxch(rtld_fsfile, NULL, result)) {
 				decref_likely(result);
 				goto again;
 			}
 		} EXCEPT {
-			if (!was_thrown(E_FSERROR) && !was_thrown(E_INVALID_HANDLE))
+			if (!was_thrown(E_FSERROR))
 				RETHROW();
 			result = NULL;
 		}
