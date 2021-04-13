@@ -112,7 +112,7 @@ PRIVATE struct driver *FCALL
 require_driver(struct module *__restrict self) {
 	if (!module_isdriver(self)) {
 		THROW(E_INVALID_HANDLE_FILETYPE,
-		      /* fd:                 */ 0,
+		      /* fd:                 */ 0, /* Filled in the caller */
 		      /* needed_handle_type: */ HANDLE_TYPE_MODULE,
 		      /* actual_handle_type: */ HANDLE_TYPE_MODULE,
 		      /* needed_handle_kind: */ HANDLE_TYPEKIND_MODULE_DRIVER,

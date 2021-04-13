@@ -381,23 +381,6 @@ handle_print(struct handle const *__restrict self,
 		                       taskpid_getpid_s(t));
 	}	break;
 
-	case HANDLE_TYPE_MODULE: {
-		struct driver *d = (struct driver *)self->h_data;
-		static char const prefix[] = "anon_inode:[driver:";
-		result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
-		if likely(result >= 0) {
-			ssize_t temp;
-			temp = module_printpath_or_name(d, printer, arg);
-			if unlikely(temp < 0)
-				return temp;
-			result += temp;
-			temp = (*printer)(arg, "]", 1);
-			if unlikely(temp < 0)
-				return temp;
-			result += temp;
-		}
-	}	break;
-
 	case HANDLE_TYPE_PIPE: {
 		struct pipe *p = (struct pipe *)self->h_data;
 		result = format_printf(printer, arg,
@@ -445,13 +428,6 @@ handle_print(struct handle const *__restrict self,
 		                       skew_kernel_pointer(ns));
 	}	break;
 
-	case HANDLE_TYPE_DRIVER_LOADLIST: {
-		struct driver_state *st = (struct driver_state *)self->h_data;
-		result = format_printf(printer, arg,
-		                       "anon_inode:[driver_state:%" PRIuPTR "]",
-		                       skew_kernel_pointer(st));
-	}	break;
-
 	case HANDLE_TYPE_EVENTFD_FENCE: {
 		struct eventfd *efd = (struct eventfd *)self->h_data;
 		result = format_printf(printer, arg,
@@ -473,6 +449,25 @@ handle_print(struct handle const *__restrict self,
 		                       skew_kernel_pointer(sfd));
 	}	break;
 
+	case HANDLE_TYPE_MODULE: {
+		struct module *mod = (struct module *)self->h_data;
+		static char const prefix[] = "anon_inode:[module:";
+		result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
+		if likely(result >= 0) {
+			ssize_t temp;
+			temp = module_haspath_or_name(mod)
+			       ? module_printpath_or_name(mod, printer, arg)
+			       : (*printer)(arg, "?", 1);
+			if unlikely(temp < 0)
+				return temp;
+			result += temp;
+			temp = (*printer)(arg, "]", 1);
+			if unlikely(temp < 0)
+				return temp;
+			result += temp;
+		}
+	}	break;
+
 	case HANDLE_TYPE_MODULE_SECTION: {
 		struct driver_section *sect;
 		char const *name;
@@ -486,8 +481,15 @@ handle_print(struct handle const *__restrict self,
 		if (!name)
 			name = "?";
 		result = format_printf(printer, arg,
-		                       "anon_inode:[driver_section:%s]",
+		                       "anon_inode:[module_section:%s]",
 		                       name);
+	}	break;
+
+	case HANDLE_TYPE_DRIVER_LOADLIST: {
+		struct driver_state *st = (struct driver_state *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[driver_state:%" PRIuPTR "]",
+		                       skew_kernel_pointer(st));
 	}	break;
 
 	default:
