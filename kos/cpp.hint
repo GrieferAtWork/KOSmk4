@@ -225,6 +225,7 @@
 #define __NOTHROW(x) x
 #define NOTHROW_NCX(x) x
 #define __NOTHROW_NCX(x) x
+#define __NOTHROW_KRN(x) x
 #define NOTHROW_RPC(x) x
 #define __NOTHROW_RPC(x) x
 #define NOTHROW_RPC_KOS(x) x

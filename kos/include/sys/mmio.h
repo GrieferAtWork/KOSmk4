@@ -28,10 +28,6 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef __COMPILER_ASM_BUFFER
-#define __COMPILER_ASM_BUFFER(T, s, p) (*(T *)(p))
-#endif /* !__COMPILER_ASM_BUFFER */
-
 #ifndef __MEMPORT_T
 #define __MEMPORT_T __UINTPTR_TYPE__
 #endif /* !__MEMPORT_T */
@@ -88,8 +84,11 @@ __ATTR_NONNULL((2)) void __NOTHROW(pokesq)(__MEMPORT_T __addr, void const *__buf
 #define peekb(port) peekb((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
 __NOTHROW_NCX(peekb)(__MEMPORT_T __addr) {
+	__UINT8_TYPE__ __result;
 	__COMPILER_READ_BARRIER();
-	return *(__UINT8_TYPE__ const volatile *)__addr;
+	__result = *(__UINT8_TYPE__ const volatile *)__addr;
+	__asm__ __volatile__("" : : "r" (__result)); /* Force load from memory. */
+	return __result;
 }
 
 #define peeksb(port, addr, num_bytes) peeksb((__MEMPORT_T)(port), addr, num_bytes)
@@ -125,8 +124,11 @@ __NOTHROW_NCX(pokesb)(__MEMPORT_T __addr,
 #define peekw(port) peekw((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
 __NOTHROW_NCX(peekw)(__MEMPORT_T __addr) {
+	__UINT16_TYPE__ __result;
 	__COMPILER_READ_BARRIER();
-	return *(__UINT16_TYPE__ const volatile *)__addr;
+	__result = *(__UINT16_TYPE__ const volatile *)__addr;
+	__asm__ __volatile__("" : : "r" (__result)); /* Force load from memory. */
+	return __result;
 }
 
 #define peeksw(port, addr, num_words) peeksw((__MEMPORT_T)(port), addr, num_words)
@@ -163,8 +165,11 @@ __NOTHROW_NCX(pokesw)(__MEMPORT_T __addr,
 #define peekl(port) peekl((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
 __NOTHROW_NCX(peekl)(__MEMPORT_T __addr) {
+	__UINT32_TYPE__ __result;
 	__COMPILER_READ_BARRIER();
-	return *(__UINT32_TYPE__ const volatile *)__addr;
+	__result = *(__UINT32_TYPE__ const volatile *)__addr;
+	__asm__ __volatile__("" : : "r" (__result)); /* Force load from memory. */
+	return __result;
 }
 
 #define peeksl(port, addr, num_dwords) peeksl((__MEMPORT_T)(port), addr, num_dwords)
@@ -201,8 +206,11 @@ __NOTHROW_NCX(pokesl)(__MEMPORT_T __addr,
 #define peekq(port) peekq((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT64_TYPE__
 __NOTHROW_NCX(peekq)(__MEMPORT_T __addr) {
+	__UINT64_TYPE__ __result;
 	__COMPILER_READ_BARRIER();
-	return *(__UINT64_TYPE__ const volatile *)__addr;
+	__result = *(__UINT64_TYPE__ const volatile *)__addr;
+	__asm__ __volatile__("" : : "r" (__result)); /* Force load from memory. */
+	return __result;
 }
 
 #define peeksq(port, addr, num_qwords) peeksq((__MEMPORT_T)(port), addr, num_qwords)

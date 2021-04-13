@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/host.h>
+#include <hybrid/host.h> /* __x86_64__, __pic__ */
 #include <hybrid/typecore.h>
 
 #ifdef __x86_64__
@@ -141,8 +141,7 @@ __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
 	        "991:"
 	        : "=r" (__result));
 #else /* __x86_64__ */
-#if (defined(__pic__) || defined(__PIC__) || \
-     defined(__pie__) || defined(__PIE__)) && 0
+#if defined(__pic__)  && 0
 	__asm__("call 991f\n\t"
 	        "991: .cfi_adjust_cfa_offset 4\n\t"
 	        "popl %0\n\t"
@@ -248,18 +247,18 @@ __FORCELOCAL __ATTR_WUNUSED __UINT8_TYPE__ (__lahf)(void) { __UINT16_TYPE__ __re
 __FORCELOCAL void (__sahf)(__UINT8_TYPE__ __fl) { __asm__ __volatile__("sahf" : : "a" ((__UINT16_TYPE__)__fl << 8) : "cc"); }
 __FORCELOCAL __ATTR_NORETURN void (__sysenter)(void) { __asm__ __volatile__("sysenter"); __builtin_unreachable(); }
 __FORCELOCAL __ATTR_NORETURN void (__sysexit)(__UINT32_TYPE__ __uesp, __UINT32_TYPE__ __ueip) { __asm__ __volatile__("sysexit" : : "c" (__uesp), "d" (__ueip)); __builtin_unreachable(); }
-__FORCELOCAL void (__movsb)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsb" : "+D" (__dst), "+S" (__src), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))); }
-__FORCELOCAL void (__movsw)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsw" : "+D" (__dst), "+S" (__src), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__src))); }
-__FORCELOCAL void (__movsl)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsl" : "+D" (__dst), "+S" (__src), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__src))); }
-__FORCELOCAL void (__stosb)(void *__restrict __dst, __UINT8_TYPE__ __byteval, __SIZE_TYPE__ __n_bytes) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosb" : "+D" (__dst), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst)) : "a" (__byteval)); }
-__FORCELOCAL void (__stosw)(void *__restrict __dst, __UINT16_TYPE__ __wordval, __SIZE_TYPE__ __n_words) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosw" : "+D" (__dst), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__dst)) : "a" (__wordval)); }
-__FORCELOCAL void (__stosl)(void *__restrict __dst, __UINT32_TYPE__ __dwordval, __SIZE_TYPE__ __n_dwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosl" : "+D" (__dst), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__dst)) : "a" (__dwordval)); }
+__FORCELOCAL void (__movsb)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsb" : "+D" (__dst), "+S" (__src), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))); }
+__FORCELOCAL void (__movsw)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsw" : "+D" (__dst), "+S" (__src), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, __n_words, __dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, __n_words, __src))); }
+__FORCELOCAL void (__movsl)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsl" : "+D" (__dst), "+S" (__src), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, __n_dwords, __dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, __n_dwords, __src))); }
+__FORCELOCAL void (__stosb)(void *__restrict __dst, __UINT8_TYPE__ __byteval, __SIZE_TYPE__ __n_bytes) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosb" : "+D" (__dst), "+c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst)) : "a" (__byteval)); }
+__FORCELOCAL void (__stosw)(void *__restrict __dst, __UINT16_TYPE__ __wordval, __SIZE_TYPE__ __n_words) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosw" : "+D" (__dst), "+c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, __n_words, __dst)) : "a" (__wordval)); }
+__FORCELOCAL void (__stosl)(void *__restrict __dst, __UINT32_TYPE__ __dwordval, __SIZE_TYPE__ __n_dwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosl" : "+D" (__dst), "+c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, __n_dwords, __dst)) : "a" (__dwordval)); }
 #ifdef __x86_64__
-__FORCELOCAL void (__movsq)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsq" : "+D" (__dst), "+S" (__src), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__src))); }
-__FORCELOCAL void (__stosq)(void *__restrict __dst, __UINT64_TYPE__ __dword, __SIZE_TYPE__ __n_qwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosq" : "+D" (__dst), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__,__n_qwords,__dst)) : "a" (__dword)); }
+__FORCELOCAL void (__movsq)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; movsq" : "+D" (__dst), "+S" (__src), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__, __n_qwords, __dst)) : "m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__, __n_qwords, __src))); }
+__FORCELOCAL void (__stosq)(void *__restrict __dst, __UINT64_TYPE__ __dword, __SIZE_TYPE__ __n_qwords) { __asm_ncx_memop__(__PRIVATE_PREFIX_REP_CLD "rep; stosq" : "+D" (__dst), "+c" (__n_qwords), "=m" (__COMPILER_ASM_BUFFER(__UINT64_TYPE__, __n_qwords, __dst)) : "a" (__dword)); }
 #else /* __x86_64__ */
-__FORCELOCAL void (__boundw)(__INT16_TYPE__ const __limits[2], __INT16_TYPE__ __index) { __asm__ __volatile__("boundw %0, %w1" : : "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, 2, __limits)), "r" (__index)); }
-__FORCELOCAL void (__boundl)(__INT32_TYPE__ const __limits[2], __INT32_TYPE__ __index) { __asm__ __volatile__("boundl %0, %k1" : : "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, 2, __limits)), "r" (__index)); }
+__FORCELOCAL void (__boundw)(__INT16_TYPE__ const __limits[2], __INT16_TYPE__ __index) { __asm__ __volatile__("boundw %0, %w1" : : "m" (__COMPILER_ASM_BUFFER(__INT16_TYPE__, 2, __limits)), "r" (__index)); }
+__FORCELOCAL void (__boundl)(__INT32_TYPE__ const __limits[2], __INT32_TYPE__ __index) { __asm__ __volatile__("boundl %0, %k1" : : "m" (__COMPILER_ASM_BUFFER(__INT32_TYPE__, 2, __limits)), "r" (__index)); }
 #endif /* !__x86_64__ */
 __FORCELOCAL __ATTR_WUNUSED __BOOL (__lar)(__UINT16_TYPE__ __segment_index, __UINT16_TYPE__ *__presult) { __BOOL __ok; __asm__ __volatile__("lar %w2, %w1" : "=@ccz" (__ok), "=r" (*__presult) : "g" (__segment_index)); return __ok; }
 __FORCELOCAL __ATTR_WUNUSED __BOOL (__lslw)(__UINT16_TYPE__ __segment_index, __UINT16_TYPE__ *__presult) { __BOOL __ok; __asm__ __volatile__("lslw %w2, %w1" : "=@ccz"(__ok), "=r" (*__presult) : "g" (__segment_index)); return __ok; }
@@ -332,12 +331,12 @@ __FORCELOCAL void (__wrcs)(__UINT16_TYPE__ __val) {
 		                     "addq $8, 0(%%rsp)\n\t"
 		                     "pushfq\n\t"
 		                     "pushq %q1\n\t"
-#if defined(__PIC__) || defined(__pic__) || defined(__PIE__) || defined(__pie__)
+#ifdef __pic__
 		                     "leaq 991f(%%rip), %q0\n\t"
 		                     "pushq %q0\n\t"
-#else /* __PIC__ || __pic__ || __PIE__ || __pie__ */
+#else /* __pic__ */
 		                     "pushq $991f\n\t"
-#endif /* !__PIC__ && !__pic__ && !__PIE__ && !__pie__ */
+#endif /* !__pic__ */
 		                     "iretq\n\t"
 		                     "991:"
 		                     : "=&r" (__temp)
@@ -427,12 +426,12 @@ __FORCELOCAL __UINT32_TYPE__ (__inl)(__UINT16_TYPE__ __port) { __register __UINT
 __FORCELOCAL void (__outb)(__UINT16_TYPE__ __port, __UINT8_TYPE__ __val) { __asm__ __volatile__("outb %b0, %w1" : : "a" (__val), "Nd" (__port)); }
 __FORCELOCAL void (__outw)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __asm__ __volatile__("outw %w0, %w1" : : "a" (__val), "Nd" (__port)); }
 __FORCELOCAL void (__outl)(__UINT16_TYPE__ __port, __UINT32_TYPE__ __val) { __asm__ __volatile__("outl %k0, %w1" : : "a" (__val), "Nd" (__port)); }
-__FORCELOCAL void (__insb)(__UINT16_TYPE__ __port, void *__restrict __dst, __SIZE_TYPE__ __n_bytes)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; insb" : "=D" (__dst), "=c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst)) : "d" (__port), "0" (__dst), "1" (__n_bytes)); }
-__FORCELOCAL void (__insw)(__UINT16_TYPE__ __port, void *__restrict __dst, __SIZE_TYPE__ __n_words)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; insw" : "=D" (__dst), "=c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__dst)) : "d" (__port), "0" (__dst), "1" (__n_words)); }
-__FORCELOCAL void (__insl)(__UINT16_TYPE__ __port, void *__restrict __dst, __SIZE_TYPE__ __n_dwords) { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; insl" : "=D" (__dst), "=c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__dst)) : "d" (__port), "0" (__dst), "1" (__n_dwords)); }
-__FORCELOCAL void (__outsb)(__UINT16_TYPE__ __port, void const *__restrict __src, __SIZE_TYPE__ __n_bytes)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; outsb" : "=S" (__src), "=c" (__n_bytes) : "d" (__port), "0" (__src), "1" (__n_bytes) , "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))); }
-__FORCELOCAL void (__outsw)(__UINT16_TYPE__ __port, void const *__restrict __src, __SIZE_TYPE__ __n_words)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; outsw" : "=S" (__src), "=c" (__n_words) : "d" (__port), "0" (__src), "1" (__n_words) , "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__,__n_words,__src))); }
-__FORCELOCAL void (__outsl)(__UINT16_TYPE__ __port, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; outsl" : "=S" (__src), "=c" (__n_dwords) : "d" (__port), "0" (__src), "1" (__n_dwords) , "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__,__n_dwords,__src))); }
+__FORCELOCAL void (__insb)(__UINT16_TYPE__ __port, void *__restrict __dst, __SIZE_TYPE__ __n_bytes)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; insb" : "=D" (__dst), "=c" (__n_bytes), "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst)) : "d" (__port), "0" (__dst), "1" (__n_bytes)); }
+__FORCELOCAL void (__insw)(__UINT16_TYPE__ __port, void *__restrict __dst, __SIZE_TYPE__ __n_words)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; insw" : "=D" (__dst), "=c" (__n_words), "=m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, __n_words, __dst)) : "d" (__port), "0" (__dst), "1" (__n_words)); }
+__FORCELOCAL void (__insl)(__UINT16_TYPE__ __port, void *__restrict __dst, __SIZE_TYPE__ __n_dwords) { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; insl" : "=D" (__dst), "=c" (__n_dwords), "=m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, __n_dwords, __dst)) : "d" (__port), "0" (__dst), "1" (__n_dwords)); }
+__FORCELOCAL void (__outsb)(__UINT16_TYPE__ __port, void const *__restrict __src, __SIZE_TYPE__ __n_bytes)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; outsb" : "=S" (__src), "=c" (__n_bytes) : "d" (__port), "0" (__src), "1" (__n_bytes) , "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))); }
+__FORCELOCAL void (__outsw)(__UINT16_TYPE__ __port, void const *__restrict __src, __SIZE_TYPE__ __n_words)  { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; outsw" : "=S" (__src), "=c" (__n_words) : "d" (__port), "0" (__src), "1" (__n_words) , "m" (__COMPILER_ASM_BUFFER(__UINT16_TYPE__, __n_words, __src))); }
+__FORCELOCAL void (__outsl)(__UINT16_TYPE__ __port, void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { __asm__ __volatile__(__PRIVATE_PREFIX_REP_CLD "rep; outsl" : "=S" (__src), "=c" (__n_dwords) : "d" (__port), "0" (__src), "1" (__n_dwords) , "m" (__COMPILER_ASM_BUFFER(__UINT32_TYPE__, __n_dwords, __src))); }
 
 
 /* Read/write the FS/GS-base registers. */
