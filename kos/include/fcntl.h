@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa9c8e03 */
+/* HASH CRC-32:0x401fe455 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1553,7 +1553,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, __STDC_INT
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1569,7 +1569,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1585,7 +1585,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1601,7 +1601,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1618,7 +1618,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1679,7 +1679,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1695,7 +1695,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open6
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1711,7 +1711,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(cha
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1727,7 +1727,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(cha
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1744,7 +1744,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(cha
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1793,7 +1793,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1809,7 +1809,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat,(__f
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1826,7 +1826,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL opena
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1853,7 +1853,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(openat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1869,7 +1869,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL opena
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -1886,7 +1886,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat64,(_
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such

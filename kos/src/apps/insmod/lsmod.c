@@ -23,7 +23,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/hop/driver.h>
+#include <kos/hop/module.h>
 #include <kos/io.h>
 #include <kos/kernel/types.h>
 #include <kos/ksysctl.h>
@@ -137,11 +137,11 @@ int main(int argc, char *argv[]) {
 	}
 	drivers = OpenDriverList();
 	count   = 0;
-	Hop(drivers, HOP_DRIVER_STATE_GET_COUNT, &count);
+	Hop(drivers, HOP_DRIVER_LOADLIST_GET_COUNT, &count);
 	for (i = 0; i < count; ++i) {
 		fd_t depfd;
 		depfd = OpenDriverDependency(drivers,
-		                             HOP_DRIVER_STATE_GET_DRIVER,
+		                             HOP_DRIVER_LOADLIST_GET_DRIVER,
 		                             i);
 		PrinterDriverInformation(depfd);
 		close(depfd);

@@ -959,7 +959,7 @@ PUBLIC_CONST struct mfile_ops const uvio_datablock_type = {
 
 /* Construct a new UVIO object.
  * Note that UVIO is derived  from `struct mfile', so the  returned
- * object can be stored in a handle slot as `HANDLE_TYPE_DATABLOCK' */
+ * object can be stored in a handle slot as `HANDLE_TYPE_MFILE' */
 PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	REF struct uvio *result;
 	result = (REF struct uvio *)kmalloc(sizeof(struct uvio),
@@ -1010,7 +1010,7 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 	result_object = uvio_create();
 	FINALLY_DECREF_UNLIKELY(result_object);
 
-	hand.h_type = HANDLE_TYPE_DATABLOCK;
+	hand.h_type = HANDLE_TYPE_MFILE;
 	/* Need to be able to read & write to implement the server/client
 	 * architecture that  is  used  to  drive  the  UVIO  sub-system. */
 	hand.h_mode = IO_RDWR | (IO_FROM_OPENFLAG(flags) & ~IO_ACCMODE);

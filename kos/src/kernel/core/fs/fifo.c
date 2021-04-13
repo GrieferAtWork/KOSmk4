@@ -58,7 +58,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 
 /* Perform a generic HOP() operation for objects that point to FIFOs.
  * Called from:
- *    - HANDLE_TYPE_DATABLOCK   (When describing a `struct fifo_node *')
+ *    - HANDLE_TYPE_MFILE   (When describing a `struct fifo_node *')
  *    - HANDLE_TYPE_FILE
  *    - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE
  *    - HANDLE_TYPE_FIFO_USER
@@ -74,7 +74,7 @@ fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
 		struct handle temp;
 		if ((mode & IO_ACCMODE) != IO_RDWR)
 			require(CAP_PIPE_OPEN_CONTROLLER);
-		temp.h_type = HANDLE_TYPE_DATABLOCK;
+		temp.h_type = HANDLE_TYPE_MFILE;
 		temp.h_mode = mode;
 		temp.h_data = self;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);

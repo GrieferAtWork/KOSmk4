@@ -32,10 +32,16 @@
 
 __DECL_BEGIN
 
-/* For `HANDLE_TYPE_PIDNS' */
-#define HOP_PIDNS_GET_INDIRECTION 0x000f0001 /* [uint64_t *result] Return the indirection level of the given pidns */
-#define HOP_PIDNS_OPEN_PARENT     0x000f0002 /* [struct hop_openfd *result] Open the parent of a given pidns.
-                                              * @throw: E_NO_SUCH_PIDNS: The given PID namespace is the root-namespace. */
+/************************************************************************/
+/* HANDLE_TYPE_PIDNS                                                    */
+/************************************************************************/
+
+/* [uint64_t *result] Return the indirection level of the given pidns */
+#define HOP_PIDNS_GET_INDIRECTION HOP_CMD(HANDLE_TYPE_PIDNS, 0x0001)
+
+/* [struct hop_openfd *result] Open the parent of a given pidns.
+ * @throw: E_NO_SUCH_PIDNS: The given PID namespace is the root-namespace. */
+#define HOP_PIDNS_OPEN_PARENT     HOP_CMD(HANDLE_TYPE_PIDNS, 0x0002)
 
 __DECL_END
 

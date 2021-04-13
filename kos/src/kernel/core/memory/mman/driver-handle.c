@@ -36,7 +36,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/reason/inval.h>
-#include <kos/hop/driver.h>
+#include <kos/hop/module.h>
 
 #include <string.h>
 
@@ -219,7 +219,7 @@ handle_driver_hop(struct driver *__restrict self,
 			      (intptr_t)(uintptr_t)0,
 			      (intptr_t)(uintptr_t)self->d_depcnt - 1);
 		}
-		d.h_type = HANDLE_TYPE_DRIVER;
+		d.h_type = HANDLE_TYPE_MODULE;
 		d.h_mode = mode;
 		d.h_data = axref_get(&self->d_depvec[(uintptr_t)depno]);
 		if unlikely(!d.h_data)
@@ -258,7 +258,7 @@ handle_driver_loadlist_hop(struct driver_loadlist *__restrict self,
 		THROWS(...) {
 	switch (cmd) {
 
-	case HOP_DRIVER_STATE_GET_COUNT: {
+	case HOP_DRIVER_LOADLIST_GET_COUNT: {
 		USER CHECKED u64 *dest;
 		dest = (USER CHECKED u64 *)arg;
 		validate_writable(dest, sizeof(*dest));
@@ -267,7 +267,7 @@ handle_driver_loadlist_hop(struct driver_loadlist *__restrict self,
 		COMPILER_READ_BARRIER();
 	}	break;
 
-	case HOP_DRIVER_STATE_GET_DRIVER: {
+	case HOP_DRIVER_LOADLIST_GET_DRIVER: {
 		size_t struct_size;
 		u64 depno;
 		struct handle d;
@@ -292,7 +292,7 @@ handle_driver_loadlist_hop(struct driver_loadlist *__restrict self,
 			      (intptr_t)(uintptr_t)self->dll_count - 1);
 		}
 		result_driver = self->dll_drivers[(uintptr_t)depno];
-		d.h_type = HANDLE_TYPE_DRIVER;
+		d.h_type = HANDLE_TYPE_MODULE;
 		d.h_mode = mode;
 		d.h_data = result_driver;
 		if unlikely(!tryincref(result_driver))

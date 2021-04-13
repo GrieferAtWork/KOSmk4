@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_HOP_DATABLOCK_H
-#define _KOS_HOP_DATABLOCK_H 1
+#ifndef _KOS_HOP_MFILE_H
+#define _KOS_HOP_MFILE_H 1
 
 #include "api.h"
 
@@ -150,7 +150,7 @@ struct hop_datablock_openpart /*[PREFIX(dop_)]*/ {
 	__uint32_t      __dop_pad;         /* ... */
 	__uint64_t        dop_pageno;      /* [IN]  The page-index (pageid64_t) of the first page that should be opened.
 	                                    * [OUT] The page-index (pageid64_t) of the first page that was opened.
-	                                    *       This is equal to the `ds_minpage' field return by `HOP_DATAPART_STAT',
+	                                    *       This is equal to the `ds_minpage' field return by `HOP_MPART_STAT',
 	                                    *       and  may  be  lower  than  the  originally  given  `dop_pageno'   when
 	                                    *       `HOP_DATABLOCK_OPEN_PART' was used, but guarantied to be equal to  the
 	                                    *       original  value   when   `HOP_DATABLOCK_OPEN_PART_EXACT'   was   used. */
@@ -636,159 +636,213 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
 
 
 
+/************************************************************************/
+/* HANDLE_TYPE_MFILE                                                    */
+/************************************************************************/
 
-/* For `HANDLE_TYPE_DATABLOCK' */
-#define HOP_DATABLOCK_STAT                        0x00010001 /* [struct hop_datablock_stat *result] Read information about the datablock */
-#define HOP_DATABLOCK_SYNCALL                     0x00010002 /* [uint64_t *result] Save all modified parts, and store the number of saved data-pages in `*result' */
-#define HOP_DATABLOCK_SYNCPAGES                   0x00010003 /* [struct hop_datablock_syncpages *arg] Save all modified parts within the given range. */
-#define HOP_DATABLOCK_SYNCBYTES                   0x00010004 /* [struct hop_datablock_syncbytes *arg] Save all modified bytes within the given range. */
-#define HOP_DATABLOCK_ANONYMIZE                   0x00010005 /* [int *result] Anonymize all of the data parts of this datablock.
-                                                              * Write 0/1 to *result, indicative of:
-                                                              *  - 0: The data block had already been anonymized.
-                                                              *  - 1: The data block is now anonymized, but wasn't before. */
-#define HOP_DATABLOCK_DEANONYMIZE                 0x00010006 /* [int *result] Deanonymize this datablock, allowing parts to be tracked once again.
-                                                              * @throw: E_INVALID_CONTEXT: The given datablock must remain anonymous.
-                                                              * Write 0/1 to *result, indicative of:
-                                                              *  - 0: The data block wasn't anonymous (aka. was already deanonymized).
-                                                              *  - 1: The data block has been deanonymized. */
-#define HOP_DATABLOCK_OPEN_PART                   0x00010007 /* [struct hop_datablock_openpart *arg] Lookup (and  create  if  missing)  the  data
-                                                              * part associated with a given page offset (s.a. `vm_paged_datablock_locatepart()')
-                                                              * @return: == arg->dop_openfd.of_hint */
-#define HOP_DATABLOCK_OPEN_PART_EXACT             0x00010008 /* [struct hop_datablock_openpart *arg] Same   as   `HOP_DATABLOCK_OPEN_PART',  but   make  sure
-                                                              * that the part begins at the exact given offset (s.a. `vm_paged_datablock_locatepart_exact()')
-                                                              * @return: == arg->dop_openfd.of_hint */
-#define HOP_DATABLOCK_HASCHANGED                  0x00010009 /* [struct hop_datablock_haschanged *arg] Check for changes within
-                                                              * the  given  address  range  (s.a.  `vm_datablock_haschanged()') */
-#define HOP_DATABLOCK_OPEN_FUTEX                  0x0001000a /* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.
-                                                              * @return: == result->dof_openfd.of_hint */
-#define HOP_DATABLOCK_OPEN_FUTEX_EXISTING         0x0001000b /* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
-                                                              * @return: == result->dof_openfd.of_hint
-                                                              * @return: -ENOENT: No futex exists for the given address */
-#define HOP_INODE_OPEN_SUPERBLOCK                 0x00010101 /* [struct hop_openfd *arg] Open the superblock associated with an INode.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode.
-                                                              * @return: == arg->of_hint */
-#define HOP_INODE_CHMOD                           0x00010102 /* [struct hop_inode_chmod *arg] Extended interface for changing file permissions in a more controlled manner.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
-#define HOP_INODE_CHOWN                           0x00010103 /* [struct hop_inode_chown *arg] Extended interface for changing file ownership in a more controlled manner.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
+/* [struct hop_datablock_stat *result] Read information about the datablock */
+#define HOP_DATABLOCK_STAT                        HOP_CMD(HANDLE_TYPE_MFILE, 0x0001)
+
+/* [uint64_t *result] Save all modified parts, and store the number of saved data-pages in `*result' */
+#define HOP_DATABLOCK_SYNCALL                     HOP_CMD(HANDLE_TYPE_MFILE, 0x0002)
+
+/* [struct hop_datablock_syncpages *arg] Save all modified parts within the given range. */
+#define HOP_DATABLOCK_SYNCPAGES                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0003)
+
+/* [struct hop_datablock_syncbytes *arg] Save all modified bytes within the given range. */
+#define HOP_DATABLOCK_SYNCBYTES                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0004)
+
+/* [int *result] Anonymize all of the data parts of this datablock.
+ * Write 0/1 to *result, indicative of:
+ *  - 0: The data block had already been anonymized.
+ *  - 1: The data block is now anonymized, but wasn't before. */
+#define HOP_DATABLOCK_ANONYMIZE                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0005)
+
+/* [int *result] Deanonymize this datablock, allowing parts to be tracked once again.
+ * @throw: E_INVALID_CONTEXT: The given datablock must remain anonymous.
+ * Write 0/1 to *result, indicative of:
+ *  - 0: The data block wasn't anonymous (aka. was already deanonymized).
+ *  - 1: The data block has been deanonymized. */
+#define HOP_DATABLOCK_DEANONYMIZE                 HOP_CMD(HANDLE_TYPE_MFILE, 0x0006)
+
+/* [struct hop_datablock_openpart *arg] Lookup (and  create  if  missing)  the  data
+ * part associated with a given page offset (s.a. `vm_paged_datablock_locatepart()')
+ * @return: == arg->dop_openfd.of_hint */
+#define HOP_DATABLOCK_OPEN_PART                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0007)
+
+/* [struct hop_datablock_openpart *arg] Same   as   `HOP_DATABLOCK_OPEN_PART',  but   make  sure
+ * that the part begins at the exact given offset (s.a. `vm_paged_datablock_locatepart_exact()')
+ * @return: == arg->dop_openfd.of_hint */
+#define HOP_DATABLOCK_OPEN_PART_EXACT             HOP_CMD(HANDLE_TYPE_MFILE, 0x0008)
+
+/* [struct hop_datablock_haschanged *arg] Check for changes within
+ * the  given  address  range  (s.a.  `vm_datablock_haschanged()') */
+#define HOP_DATABLOCK_HASCHANGED                  HOP_CMD(HANDLE_TYPE_MFILE, 0x0009)
+
+/* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.
+ * @return: == result->dof_openfd.of_hint */
+#define HOP_DATABLOCK_OPEN_FUTEX                  HOP_CMD(HANDLE_TYPE_MFILE, 0x000a)
+
+/* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
+ * @return: == result->dof_openfd.of_hint
+ * @return: -ENOENT: No futex exists for the given address */
+#define HOP_DATABLOCK_OPEN_FUTEX_EXISTING         HOP_CMD(HANDLE_TYPE_MFILE, 0x000b)
+
+/* [struct hop_openfd *arg] Open the superblock associated with an INode.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode.
+ * @return: == arg->of_hint */
+#define HOP_INODE_OPEN_SUPERBLOCK                 HOP_CMD(HANDLE_TYPE_MFILE, 0x0101)
+
+/* [struct hop_inode_chmod *arg] Extended interface for changing file permissions in a more controlled manner.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
+#define HOP_INODE_CHMOD                           HOP_CMD(HANDLE_TYPE_MFILE, 0x0102)
+
+/* [struct hop_inode_chown *arg] Extended interface for changing file ownership in a more controlled manner.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
+#define HOP_INODE_CHOWN                           HOP_CMD(HANDLE_TYPE_MFILE, 0x0103)
+
 /* TODO: HOP_INODE_READ_BLOCKING -- An always-blocking version of read(2) that uses the kernel-space function
  *                                 `inode_read_blocking', which starts blocking when reading past the end of
  *                                  a regular file, and gets unblocked when another process writes the missing
  *                                  data. */
-#define HOP_DIRECTORY_OPENNODE                    0x00010301 /* [struct hop_directory_opennode *arg] Extended interface for traversing a directory.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_FILE_NOT_FOUND: [...]
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR: [...]
-                                                              * @throw: E_IOERROR: [...] */
-#define HOP_DIRECTORY_CREATFILE                   0x00010302 /* [struct hop_directory_creatfile *arg] Extended interface for creating new files.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The containing directory was deleted)
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH: [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH: `dcf_len' was ZERO(0)
-                                                              * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...] (Only when `open_mode & O_EXCL' is set)
-                                                              * @throw: E_FSERROR_FILE_NOT_FOUND: [...]      (Only when `open_mode & O_CREAT' isn't set)
-                                                              * @throw: E_FSERROR_DISK_FULL: [...]
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION: [...]
-                                                              * @throw: E_FSERROR_READONLY: [...]
-                                                              * @throw: E_IOERROR: [...] */
-#define HOP_DIRECTORY_REMOVE                      0x00010303 /* [struct hop_directory_remove *arg] Extended interface for removing files.
-                                                              * WARNING: This function may  leave behind  stale PATH nodes  which may  still be  accessible,
-                                                              *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified file was already deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (the given directory was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
-                                                              * @throw: E_FSERROR_FILE_NOT_FOUND:      The specified `dr_name' could not be found
-                                                              * @throw: E_FSERROR_ACCESS_DENIED:       The calling thread is not allowed to delete the file.
-                                                              * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR:  The given `dr_name' refers to a regular file, but `HOP_DIRECTORY_REMOVE_FLAG_REGULAR' isn't set
-                                                              * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:   The given `dr_name' refers to a directory, but `HOP_DIRECTORY_REMOVE_FLAG_DIRECTORY' isn't set
-                                                              * @throw: E_FSERROR_IS_A_MOUNTING_POINT:                                 The given `dr_name' refers to a mounting point when a child directory is being removed, and `containing_path' is given
-                                                              * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY:                                 Attempted to remove a non-empty directory.
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_UNLINK: Cannot unlink files within the given directory
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_RMDIR:  Cannot remove sub-directories of within the given directory
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_TRUNC:  Cannot truncate non-empty files to 0 bytes in order to delete their data
-                                                              * @throw: E_FSERROR_READONLY:            [...]
-                                                              * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_RENAME                      0x00010304 /* [struct hop_directory_rename *arg] Extended interface for renaming files.
-                                                              * WARNING: This function may  leave behind  stale PATH nodes  which may  still be  accessible,
-                                                              *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_RENAME: [...]
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified source file was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The source- or target-directory was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
-                                                              * @throw: E_FSERROR_FILE_NOT_FOUND:      `drn_srcname' wasn't found
-                                                              * @throw: E_FSERROR_CROSS_DEVICE_LINK:   [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        `drn_dstlen' was ZERO(0)
-                                                              * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
-                                                              * @throw: E_FSERROR_DISK_FULL:           [...]
-                                                              * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: [...] (Only when emulated using `link()' + `unlink()')
-                                                              * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: [...]
-                                                              * @throw: E_FSERROR_ACCESS_DENIED:       [...]
-                                                              * @throw: E_FSERROR_READONLY:            [...]
-                                                              * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_LINK                        0x00010305 /* [struct hop_directory_link *arg] Extended interface for creating hard links.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_LINK: [...]
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (`dli_linknode' was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
-                                                              * @throw: E_FSERROR_CROSS_DEVICE_LINK:   [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        `dli_len' was ZERO(0)
-                                                              * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
-                                                              * @throw: E_FSERROR_DISK_FULL:           [...]
-                                                              * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: [...]
-                                                              * @throw: E_FSERROR_READONLY:            [...]
-                                                              * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_SYMLINK                     0x00010306 /* [struct hop_directory_symlink *arg] Extended interface for creating symbolic links.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_SYMLINK: [...]
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        `dsl_len' was ZERO(0)
-                                                              * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
-                                                              * @throw: E_FSERROR_DISK_FULL:           [...]
-                                                              * @throw: E_FSERROR_READONLY:            [...]
-                                                              * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_MKNOD                       0x00010307 /* [struct hop_directory_mknod *arg] Extended interface for create filesystem nodes.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD: [...]
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        `dmn_len' was ZERO(0)
-                                                              * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
-                                                              * @throw: E_FSERROR_DISK_FULL:           [...]
-                                                              * @throw: E_FSERROR_READONLY:            [...]
-                                                              * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_MKDIR                       0x00010308 /* [struct hop_directory_mkdir *arg] Extended interface for create directories.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
-                                                              * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKDIR: [...]
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
-                                                              * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
-                                                              * @throw: E_FSERROR_ILLEGAL_PATH:        `dmd_len' was ZERO(0)
-                                                              * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
-                                                              * @throw: E_FSERROR_DISK_FULL:           [...]
-                                                              * @throw: E_FSERROR_READONLY:            [...]
-                                                              * @throw: E_IOERROR:                     [...] */
-#define HOP_SUPERBLOCK_OPEN_BLOCKDEVICE           0x00010501 /* [struct hop_openfd *arg] Open the block-device associated with a superblock.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
-                                                              * @throw: E_NO_SUCH_BLOCKDEVICE: No block device is bound to the given superblock.
-                                                              * @return: == arg->of_hint */
-#define HOP_SUPERBLOCK_OPEN_DRIVER                0x00010502 /* [struct hop_openfd *arg] Open the driver associated with a superblock.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
-                                                              * @return: == arg->of_hint */
-#define HOP_SUPERBLOCK_SYNC                       0x00010503 /* [unsigned int sync_device] Synchronize the given superblock (when `sync_device' is non-zero, also sync the associated block device (if any)).
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock. */
-#define HOP_SUPERBLOCK_FEATURES                   0x00010504 /* [struct hop_superblock_features *arg] Gather features of the superblock associated with a given fd.
-                                                              * NOTE: When the given fd isn't a super-block, a cast to a superblock is attempted. */
+
+/* [struct hop_directory_opennode *arg] Extended interface for traversing a directory.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_FILE_NOT_FOUND: [...]
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR: [...]
+ * @throw: E_IOERROR: [...] */
+#define HOP_DIRECTORY_OPENNODE                    HOP_CMD(HANDLE_TYPE_MFILE, 0x0301)
+
+/* [struct hop_directory_creatfile *arg] Extended interface for creating new files.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The containing directory was deleted)
+ * @throw: E_FSERROR_ILLEGAL_PATH: [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH: `dcf_len' was ZERO(0)
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...] (Only when `open_mode & O_EXCL' is set)
+ * @throw: E_FSERROR_FILE_NOT_FOUND: [...]      (Only when `open_mode & O_CREAT' isn't set)
+ * @throw: E_FSERROR_DISK_FULL: [...]
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION: [...]
+ * @throw: E_FSERROR_READONLY: [...]
+ * @throw: E_IOERROR: [...] */
+#define HOP_DIRECTORY_CREATFILE                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0302)
+
+/* [struct hop_directory_remove *arg] Extended interface for removing files.
+ * WARNING: This function may  leave behind  stale PATH nodes  which may  still be  accessible,
+ *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified file was already deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (the given directory was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
+ * @throw: E_FSERROR_FILE_NOT_FOUND:      The specified `dr_name' could not be found
+ * @throw: E_FSERROR_ACCESS_DENIED:       The calling thread is not allowed to delete the file.
+ * @throw: E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR:  The given `dr_name' refers to a regular file, but `HOP_DIRECTORY_REMOVE_FLAG_REGULAR' isn't set
+ * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_UNLINK:   The given `dr_name' refers to a directory, but `HOP_DIRECTORY_REMOVE_FLAG_DIRECTORY' isn't set
+ * @throw: E_FSERROR_IS_A_MOUNTING_POINT:                                 The given `dr_name' refers to a mounting point when a child directory is being removed, and `containing_path' is given
+ * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY:                                 Attempted to remove a non-empty directory.
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_UNLINK: Cannot unlink files within the given directory
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_RMDIR:  Cannot remove sub-directories of within the given directory
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_TRUNC:  Cannot truncate non-empty files to 0 bytes in order to delete their data
+ * @throw: E_FSERROR_READONLY:            [...]
+ * @throw: E_IOERROR:                     [...] */
+#define HOP_DIRECTORY_REMOVE                      HOP_CMD(HANDLE_TYPE_MFILE, 0x0303)
+
+/* [struct hop_directory_rename *arg] Extended interface for renaming files.
+ * WARNING: This function may  leave behind  stale PATH nodes  which may  still be  accessible,
+ *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_RENAME: [...]
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (the specified source file was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The source- or target-directory was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
+ * @throw: E_FSERROR_FILE_NOT_FOUND:      `drn_srcname' wasn't found
+ * @throw: E_FSERROR_CROSS_DEVICE_LINK:   [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        `drn_dstlen' was ZERO(0)
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
+ * @throw: E_FSERROR_DISK_FULL:           [...]
+ * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: [...] (Only when emulated using `link()' + `unlink()')
+ * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: [...]
+ * @throw: E_FSERROR_ACCESS_DENIED:       [...]
+ * @throw: E_FSERROR_READONLY:            [...]
+ * @throw: E_IOERROR:                     [...] */
+#define HOP_DIRECTORY_RENAME                      HOP_CMD(HANDLE_TYPE_MFILE, 0x0304)
+
+/* [struct hop_directory_link *arg] Extended interface for creating hard links.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_LINK: [...]
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (`dli_linknode' was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
+ * @throw: E_FSERROR_CROSS_DEVICE_LINK:   [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        `dli_len' was ZERO(0)
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
+ * @throw: E_FSERROR_DISK_FULL:           [...]
+ * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: [...]
+ * @throw: E_FSERROR_READONLY:            [...]
+ * @throw: E_IOERROR:                     [...] */
+#define HOP_DIRECTORY_LINK                        HOP_CMD(HANDLE_TYPE_MFILE, 0x0305)
+
+/* [struct hop_directory_symlink *arg] Extended interface for creating symbolic links.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_SYMLINK: [...]
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        `dsl_len' was ZERO(0)
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
+ * @throw: E_FSERROR_DISK_FULL:           [...]
+ * @throw: E_FSERROR_READONLY:            [...]
+ * @throw: E_IOERROR:                     [...] */
+#define HOP_DIRECTORY_SYMLINK                     HOP_CMD(HANDLE_TYPE_MFILE, 0x0306)
+
+/* [struct hop_directory_mknod *arg] Extended interface for create filesystem nodes.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD: [...]
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        `dmn_len' was ZERO(0)
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
+ * @throw: E_FSERROR_DISK_FULL:           [...]
+ * @throw: E_FSERROR_READONLY:            [...]
+ * @throw: E_IOERROR:                     [...] */
+#define HOP_DIRECTORY_MKNOD                       HOP_CMD(HANDLE_TYPE_MFILE, 0x0307)
+
+/* [struct hop_directory_mkdir *arg] Extended interface for create directories.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
+ * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKDIR: [...]
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
+ * @throw: E_FSERROR_ILLEGAL_PATH:        `dmd_len' was ZERO(0)
+ * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
+ * @throw: E_FSERROR_DISK_FULL:           [...]
+ * @throw: E_FSERROR_READONLY:            [...]
+ * @throw: E_IOERROR:                     [...] */
+#define HOP_DIRECTORY_MKDIR                       HOP_CMD(HANDLE_TYPE_MFILE, 0x0308)
+
+/* [struct hop_openfd *arg] Open the block-device associated with a superblock.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
+ * @throw: E_NO_SUCH_BLOCKDEVICE: No block device is bound to the given superblock.
+ * @return: == arg->of_hint */
+#define HOP_SUPERBLOCK_OPEN_BLOCKDEVICE           HOP_CMD(HANDLE_TYPE_MFILE, 0x0501)
+
+/* [struct hop_openfd *arg] Open the driver associated with a superblock.
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
+ * @return: == arg->of_hint */
+#define HOP_SUPERBLOCK_OPEN_DRIVER                HOP_CMD(HANDLE_TYPE_MFILE, 0x0502)
+
+/* [unsigned int sync_device] Synchronize the given superblock (when `sync_device' is non-zero, also sync the associated block device (if any)).
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock. */
+#define HOP_SUPERBLOCK_SYNC                       HOP_CMD(HANDLE_TYPE_MFILE, 0x0503)
+
+/* [struct hop_superblock_features *arg] Gather features of the superblock associated with a given fd.
+ * NOTE: When the given fd isn't a super-block, a cast to a superblock is attempted. */
+#define HOP_SUPERBLOCK_FEATURES                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0504)
 
 __DECL_END
 
-#endif /* !_KOS_HOP_DATABLOCK_H */
+#endif /* !_KOS_HOP_MFILE_H */

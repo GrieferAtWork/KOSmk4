@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_DATAPART_HANDLE_C
-#define GUARD_KERNEL_SRC_MEMORY_DATAPART_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_HANDLE_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_HANDLE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -37,7 +37,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/reason/inval.h>
-#include <kos/hop/datapart.h>
+#include <kos/hop/mpart.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -47,16 +47,16 @@
 
 DECL_BEGIN
 
-/* datapart handle operation. */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(datapart, struct mpart);
+/* Mem-part handle operation. */
+DEFINE_HANDLE_REFCNT_FUNCTIONS(mpart, struct mpart);
 
 INTERN NONNULL((1)) REF void *KCALL
-handle_datapart_tryas(struct mpart *__restrict self,
-                      uintptr_half_t wanted_type)
+handle_mpart_tryas(struct mpart *__restrict self,
+                   uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 
-	case HANDLE_TYPE_DATABLOCK: {
+	case HANDLE_TYPE_MFILE: {
 		REF struct mfile *result;
 		mpart_lock_acquire(self);
 		result = incref(self->mp_file);
@@ -73,20 +73,20 @@ handle_datapart_tryas(struct mpart *__restrict self,
 
 
 //INTERN pos_t KCALL /* TODO: Pre-initialize specified reanges. */
-//handle_datapart_allocate(struct mpart *__restrict self,
-//                         fallocate_mode_t mode, pos_t start, pos_t length) {
+//handle_mpart_allocate(struct mpart *__restrict self,
+//                      fallocate_mode_t mode, pos_t start, pos_t length) {
 //}
 
 INTERN void KCALL
-handle_datapart_sync(struct mpart *__restrict self) {
+handle_mpart_sync(struct mpart *__restrict self) {
 	mpart_sync(self);
 }
 
-DEFINE_INTERN_ALIAS(handle_datapart_datasync, handle_datapart_sync);
+DEFINE_INTERN_ALIAS(handle_mpart_datasync, handle_mpart_sync);
 
 INTERN void KCALL
-handle_datapart_stat(struct mpart *__restrict self,
-                     USER CHECKED struct stat *result) {
+handle_mpart_stat(struct mpart *__restrict self,
+                  USER CHECKED struct stat *result) {
 	REF struct mfile *file;
 	size_t size;
 	mpart_lock_acquire(self);
@@ -150,14 +150,14 @@ handle_datapart_stat(struct mpart *__restrict self,
 }
 
 INTERN syscall_slong_t KCALL
-handle_datapart_hop(struct mpart *__restrict self, syscall_ulong_t cmd,
-                    USER UNCHECKED void *arg, iomode_t mode) {
+handle_mpart_hop(struct mpart *__restrict self, syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
-	case HOP_DATAPART_OPEN_DATABLOCK: {
+	case HOP_MPART_OPEN_DATABLOCK: {
 		struct handle hnd;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		hnd.h_type = HANDLE_TYPE_DATABLOCK;
+		hnd.h_type = HANDLE_TYPE_MFILE;
 		hnd.h_mode = mode;
 		mpart_lock_acquire(self);
 		hnd.h_data = incref(self->mp_file);
@@ -176,8 +176,6 @@ handle_datapart_hop(struct mpart *__restrict self, syscall_ulong_t cmd,
 }
 
 
-
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_DATAPART_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_HANDLE_C */

@@ -65,20 +65,47 @@ struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 };
 #endif /* __CC__ */
 
-/* For any kind of handle */
-#define HOP_HANDLE_STAT                0xffff0001 /* [struct hop_handle_stat *result] Read information about the given handle */
-#define HOP_HANDLE_NOOP                0xffff0002 /* Do nothing other than verifying that `fd' is a valid handle. */
-#define HOP_HANDLE_REOPEN              0xffff0003 /* [struct hop_openfd *result] Re-open the given handle
-                                                   * NOTE: The value returned by `hop()' is identical to the value written to `result->of_hint'. */
-#define HOP_HANDLE_GET_REFCNT          0xffff0004 /* [uint64_t *result] Return the reference counter for the given handle. */
-#define HOP_HANDLE_GET_ADDRESS         0xffff0005 /* [uint64_t *result] Return the kernel-space address of the handle (s.a. `struct hop_handle_stat::hs_address'). */
-#define HOP_HANDLE_GET_TYPE            0xffff0006 /* [uint16_t *result] Return the handle's type. */
-#define HOP_HANDLE_GET_KIND            0xffff0007 /* [uint16_t *result] Return the handle's kind. */
-#define HOP_HANDLE_GET_MODE            0xffff0008 /* [uint16_t *result] Return the handle's I/O mode (s.a. `iomode_t'). */
-#define HOP_HANDLE_DUP                 0xffff0009 /* Quick alias for `dup(fd)' (`hop()' returns the new file handle) */
-#define HOP_HANDLE_DUP_CLOEXEC         0xffff000a /* Quick alias for `dup(fd)' + set the CLOEXEC flag (`hop()' returns the new file handle) */
-#define HOP_HANDLE_DUP_CLOFORK         0xffff000b /* Quick alias for `dup(fd)' + set the CLOFORK flag (`hop()' returns the new file handle) */
-#define HOP_HANDLE_DUP_CLOEXEC_CLOFORK 0xffff000c /* Quick alias for `dup(fd)' + set the CLOEXEC+CLOFORK flag (`hop()' returns the new file handle) */
+/************************************************************************/
+/* For any kind of handle                                               */
+/************************************************************************/
+
+/* [struct hop_handle_stat *result] Read information about the given handle */
+#define HOP_HANDLE_STAT                HOP_CMD(0xffff, 0x0001)
+
+/* Do nothing other than verifying that `fd' is a valid handle. */
+#define HOP_HANDLE_NOOP                HOP_CMD(0xffff, 0x0002)
+
+/* [struct hop_openfd *result] Re-open the given handle
+ * NOTE: The value returned by `hop()' is identical to the value written to `result->of_hint'. */
+#define HOP_HANDLE_REOPEN              HOP_CMD(0xffff, 0x0003)
+
+/* [uint64_t *result] Return the reference counter for the given handle. */
+#define HOP_HANDLE_GET_REFCNT          HOP_CMD(0xffff, 0x0004)
+
+/* [uint64_t *result] Return the kernel-space address of the handle (s.a. `struct hop_handle_stat::hs_address'). */
+#define HOP_HANDLE_GET_ADDRESS         HOP_CMD(0xffff, 0x0005)
+
+/* [uint16_t *result] Return the handle's type. */
+#define HOP_HANDLE_GET_TYPE            HOP_CMD(0xffff, 0x0006)
+
+/* [uint16_t *result] Return the handle's kind. */
+#define HOP_HANDLE_GET_KIND            HOP_CMD(0xffff, 0x0007)
+
+/* [uint16_t *result] Return the handle's I/O mode (s.a. `iomode_t'). */
+#define HOP_HANDLE_GET_MODE            HOP_CMD(0xffff, 0x0008)
+
+/* Quick alias for `dup(fd)' (`hop()' returns the new file handle) */
+#define HOP_HANDLE_DUP                 HOP_CMD(0xffff, 0x0009)
+
+/* Quick alias for `dup(fd)' + set the CLOEXEC flag (`hop()' returns the new file handle) */
+#define HOP_HANDLE_DUP_CLOEXEC         HOP_CMD(0xffff, 0x000a)
+
+/* Quick alias for `dup(fd)' + set the CLOFORK flag (`hop()' returns the new file handle) */
+#define HOP_HANDLE_DUP_CLOFORK         HOP_CMD(0xffff, 0x000b)
+
+/* Quick alias for `dup(fd)' + set the CLOEXEC+CLOFORK flag (`hop()' returns the new file handle) */
+#define HOP_HANDLE_DUP_CLOEXEC_CLOFORK HOP_CMD(0xffff, 0x000c)
+
 /* TODO: Wrapper for `handle_print()' */
 /* TODO: Wrapper for `handle_datasize()' */
 

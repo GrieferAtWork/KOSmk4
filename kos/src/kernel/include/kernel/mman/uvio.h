@@ -314,7 +314,7 @@ DATDEF struct vio_operators const uvio_operators;
 
 /* Construct a new UVIO object.
  * Note that UVIO is derived  from `struct mfile', so the  returned
- * object can be stored in a handle slot as `HANDLE_TYPE_DATABLOCK' */
+ * object can be stored in a handle slot as `HANDLE_TYPE_MFILE' */
 FUNDEF REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC);
 
 /* Perform a remove VIO request.

@@ -68,7 +68,7 @@ handle_path_tryas(struct path *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 
-	case HANDLE_TYPE_DATABLOCK: {
+	case HANDLE_TYPE_MFILE: {
 		REF struct directory_node *result;
 		sync_read(self);
 		result = (REF struct directory_node *)xincref(self->p_inode);
@@ -217,7 +217,7 @@ handle_path_hop(struct path *__restrict self,
 	case HOP_PATH_OPENNODE: {
 		struct handle temp;
 		unsigned int result;
-		temp.h_type = HANDLE_TYPE_DATABLOCK;
+		temp.h_type = HANDLE_TYPE_MFILE;
 		temp.h_mode = mode;
 		sync_read(self);
 		temp.h_data = incref(self->p_inode);

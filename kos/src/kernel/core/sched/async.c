@@ -1824,7 +1824,7 @@ PRIVATE struct aworker asyncjob_timeout_worker = {
 		/* .awc_test = */ NULL
 	},
 	/* .aw_obj   = */ &drv_self,
-	/* .aw_typ   = */ HANDLE_TYPE_DRIVER,
+	/* .aw_typ   = */ HANDLE_TYPE_MODULE,
 	/* ._aw_pad  = */ 0
 #ifndef CONFIG_NO_SMP
 	,

@@ -47,7 +47,7 @@
 #define CAP_OPEN_BLOCKDEV_PART               CAP_SYS_ADMIN       /* Allow use of `HOP_BLOCKDEVICE_OPENDRIVEPART' */
 #define CAP_SET_TTY_BUFFER_SIZES             CAP_SYS_RESOURCE    /* Allow use of `TTYIO_IBUF_SETLIMIT', `TTYIO_CANON_SETLIMIT', `TTYIO_OPEND_SETLIMIT', `TTYIO_IPEND_SETLIMIT' */
 #define CAP_DRIVER_QUERY                     CAP_SYS_MODULE      /* Allow use of `KSYSCTL_DRIVER_LSMOD', `KSYSCTL_DRIVER_GETMOD', `KSYSCTL_DRIVER_GET_LIBRARY_PATH',
-                                                                  * as well as `HOP_DRIVER_STATE_GET_DRIVER', `HOP_DRIVER_OPEN_FILE',  `HOP_DRIVER_OPEN_DEPENDENCY',
+                                                                  * as well as `HOP_DRIVER_LOADLIST_GET_DRIVER', `HOP_DRIVER_OPEN_FILE',  `HOP_DRIVER_OPEN_DEPENDENCY',
                                                                   * as well as `KSYSCTL_OPEN_KERNEL_DRIVER' */
 #define CAP_DRIVER_CONTROL                   CAP_SYS_MODULE      /* Allow use of `HOP_DRIVER_INITIALIZE', `HOP_DRIVER_FINALIZE' */
 #define CAP_KERNEL_QUERY                     CAP_SYS_ADMIN       /* Allow use of `KSYSCTL_OPEN_KERNEL_VFS' `KSYSCTL_OPEN_KERNEL_FS', `KSYSCTL_OPEN_KERNEL_VM', \

@@ -62,7 +62,7 @@ PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 	switch (self->h_type) {
 
-	case HANDLE_TYPE_DATABLOCK:
+	case HANDLE_TYPE_MFILE:
 		if (vm_datablock_isinode((struct vm_datablock *)self->h_data)) {
 			if (INODE_ISSUPER((struct inode *)self->h_data))
 				return HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK;
@@ -142,7 +142,7 @@ handle_datasize(struct handle const *__restrict self,
 	pos_t value;
 	switch (self->h_type) {
 
-	case HANDLE_TYPE_DATABLOCK: {
+	case HANDLE_TYPE_MFILE: {
 		struct inode *me;
 		me = (struct inode *)self->h_data;
 		if (!vm_datablock_isinode(me))
@@ -211,11 +211,11 @@ handle_datasize(struct handle const *__restrict self,
 #endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 	}	break;
 
-	case HANDLE_TYPE_VM:
+	case HANDLE_TYPE_MMAN:
 		value = ((pos_t)(uintptr_t)-1) + 1;
 		break;
 
-	case HANDLE_TYPE_DRIVER: {
+	case HANDLE_TYPE_MODULE: {
 		struct driver *me;
 		me = (struct driver *)self->h_data;
 		value = (pos_t)(me->md_loadmax - me->md_loadmin) + 1;
@@ -240,7 +240,7 @@ handle_datasize(struct handle const *__restrict self,
 		value = (pos_t)ATOMIC_READ(me->pn_size);
 	}	break;
 
-	case HANDLE_TYPE_DRIVER_STATE: {
+	case HANDLE_TYPE_DRIVER_LOADLIST: {
 		struct driver_loadlist *me;
 		me    = (struct driver_loadlist *)self->h_data;
 		value = (pos_t)me->dll_count;
@@ -267,7 +267,7 @@ handle_print(struct handle const *__restrict self,
 	size_t result;
 	switch (self->h_type) {
 
-	case HANDLE_TYPE_DATABLOCK: {
+	case HANDLE_TYPE_MFILE: {
 		struct vm_datablock *b = (struct vm_datablock *)self->h_data;
 		if (vm_datablock_isinode(b)) {
 			result = format_printf(printer, arg,
@@ -352,7 +352,7 @@ handle_print(struct handle const *__restrict self,
 		                       skew_kernel_pointer(f));
 	}	break;
 
-	case HANDLE_TYPE_VM: {
+	case HANDLE_TYPE_MMAN: {
 		struct vm *f = (struct vm *)self->h_data;
 		result = format_printf(printer, arg,
 		                       "anon_inode:[vm:%" PRIuPTR "]",
@@ -366,7 +366,7 @@ handle_print(struct handle const *__restrict self,
 		                       taskpid_getpid_s(t));
 	}	break;
 
-	case HANDLE_TYPE_DRIVER: {
+	case HANDLE_TYPE_MODULE: {
 		struct driver *d = (struct driver *)self->h_data;
 		static char const prefix[] = "anon_inode:[driver:";
 		result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
@@ -430,7 +430,7 @@ handle_print(struct handle const *__restrict self,
 		                       skew_kernel_pointer(ns));
 	}	break;
 
-	case HANDLE_TYPE_DRIVER_STATE: {
+	case HANDLE_TYPE_DRIVER_LOADLIST: {
 		struct driver_state *st = (struct driver_state *)self->h_data;
 		result = format_printf(printer, arg,
 		                       "anon_inode:[driver_state:%" PRIuPTR "]",
@@ -458,7 +458,7 @@ handle_print(struct handle const *__restrict self,
 		                       skew_kernel_pointer(sfd));
 	}	break;
 
-	case HANDLE_TYPE_DRIVER_SECTION: {
+	case HANDLE_TYPE_MODULE_SECTION: {
 		struct driver_section *sect;
 		char const *name;
 		REF struct module *mod;
@@ -667,12 +667,12 @@ handle_as_inode(/*inherit(on_success)*/ REF struct handle const *__restrict self
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct inode *result;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		result = (REF struct inode *)self->h_data;
 		if likely(vm_datablock_isinode(result))
 			return result; /* inherit */
 	} else {
-		result = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		result = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
 			if likely(vm_datablock_isinode(result)) {
 				handle_decref(*self); /* inherit: on_success */
@@ -682,7 +682,7 @@ handle_as_inode(/*inherit(on_success)*/ REF struct handle const *__restrict self
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_INODE);
 }
 
@@ -691,12 +691,12 @@ handle_as_regular_node(/*inherit(on_success)*/ REF struct handle const *__restri
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct regular_node *result;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		result = (REF struct regular_node *)self->h_data;
 		if likely(vm_datablock_isinode(result) && INODE_ISREG(result))
 			return result; /* inherit */
 	} else {
-		result = (REF struct regular_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		result = (REF struct regular_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
 			if likely(vm_datablock_isinode(result) && INODE_ISREG(result)) {
 				handle_decref(*self); /* inherit: on_success */
@@ -706,7 +706,7 @@ handle_as_regular_node(/*inherit(on_success)*/ REF struct handle const *__restri
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_REGULARNODE);
 }
 
@@ -715,12 +715,12 @@ handle_as_directory_node(/*inherit(on_success)*/ REF struct handle const *__rest
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct directory_node *result;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		result = (REF struct directory_node *)self->h_data;
 		if likely(vm_datablock_isinode(result) && INODE_ISDIR(result))
 			return result; /* inherit */
 	} else {
-		result = (REF struct directory_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		result = (REF struct directory_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
 			if likely(vm_datablock_isinode(result) && INODE_ISDIR(result)) {
 				handle_decref(*self); /* inherit: on_success */
@@ -730,7 +730,7 @@ handle_as_directory_node(/*inherit(on_success)*/ REF struct handle const *__rest
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_DIRECTORY);
 }
 
@@ -739,12 +739,12 @@ handle_as_superblock(/*inherit(on_success)*/ REF struct handle const *__restrict
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct superblock *result;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		result = (REF struct superblock *)self->h_data;
 		if likely(vm_datablock_isinode(result) && INODE_ISSUPER(result))
 			return result; /* inherit */
 	} else {
-		result = (REF struct superblock *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		result = (REF struct superblock *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
 			if likely(vm_datablock_isinode(result) && INODE_ISSUPER(result)) {
 				handle_decref(*self); /* inherit: on_success */
@@ -754,7 +754,7 @@ handle_as_superblock(/*inherit(on_success)*/ REF struct handle const *__restrict
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK);
 }
 
@@ -764,7 +764,7 @@ handle_as_superblock_relaxed(/*inherit(on_success)*/ REF struct handle const *__
 	REF struct superblock *result;
 	REF struct inode *ino;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		ino = (REF struct inode *)self->h_data;
 		if likely(vm_datablock_isinode(ino)) {
 			result = (REF struct superblock *)incref(ino->i_super);
@@ -772,7 +772,7 @@ handle_as_superblock_relaxed(/*inherit(on_success)*/ REF struct handle const *__
 			return result;
 		}
 	} else {
-		ino = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		ino = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(ino) {
 			if likely(vm_datablock_isinode(ino)) {
 				result = (REF struct superblock *)incref(ino->i_super);
@@ -784,7 +784,7 @@ handle_as_superblock_relaxed(/*inherit(on_success)*/ REF struct handle const *__
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK);
 }
 
@@ -793,12 +793,12 @@ handle_as_symlink_node(/*inherit(on_success)*/ REF struct handle const *__restri
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct symlink_node *result;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		result = (REF struct symlink_node *)self->h_data;
 		if likely(vm_datablock_isinode(result) && INODE_ISLNK(result))
 			return result; /* inherit */
 	} else {
-		result = (REF struct symlink_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		result = (REF struct symlink_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
 			if likely(vm_datablock_isinode(result) && INODE_ISLNK(result)) {
 				handle_decref(*self); /* inherit: on_success */
@@ -808,7 +808,7 @@ handle_as_symlink_node(/*inherit(on_success)*/ REF struct handle const *__restri
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE);
 }
 
@@ -817,12 +817,12 @@ handle_as_fifo_node(/*inherit(on_success)*/ REF struct handle const *__restrict 
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct fifo_node *result;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		result = (REF struct fifo_node *)self->h_data;
 		if likely(vm_datablock_isinode(result) && INODE_ISFIFO(result))
 			return result; /* inherit */
 	} else {
-		result = (REF struct fifo_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		result = (REF struct fifo_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
 			if likely(vm_datablock_isinode(result) && INODE_ISFIFO(result)) {
 				handle_decref(*self); /* inherit: on_success */
@@ -832,7 +832,7 @@ handle_as_fifo_node(/*inherit(on_success)*/ REF struct handle const *__restrict 
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_FIFONODE);
 }
 
@@ -841,12 +841,12 @@ handle_as_socket_node(/*inherit(on_success)*/ REF struct handle const *__restric
 		THROWS(E_INVALID_HANDLE_FILETYPE) {
 	REF struct socket_node *result;
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+	if (self->h_type == HANDLE_TYPE_MFILE) {
 		result = (REF struct socket_node *)self->h_data;
 		if likely(vm_datablock_isinode(result) && INODE_ISSOCK(result))
 			return result; /* inherit */
 	} else {
-		result = (REF struct socket_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		result = (REF struct socket_node *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
 		if likely(result) {
 			if likely(vm_datablock_isinode(result) && INODE_ISSOCK(result)) {
 				handle_decref(*self); /* inherit: on_success */
@@ -856,7 +856,7 @@ handle_as_socket_node(/*inherit(on_success)*/ REF struct handle const *__restric
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPE_MFILE,
 	                          HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE);
 }
 

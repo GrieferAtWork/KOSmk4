@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfd8d22d */
+/* HASH CRC-32:0xffcb4119 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,11 @@
 
 #include <bits/types.h>
 #include <kos/anno.h>
+#include <kos/kernel/handle.h>
+
+#ifndef HOP_CMD
+#define HOP_CMD(handle_type, cmd) (__CCAST(__uint32_t)(handle_type) << 16 | __CCAST(__uint32_t)(cmd))
+#endif /* !HOP_CMD */
 
 #if defined(__KERNEL__) && __SIZEOF_SIZE_T__ < 8
 #define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }

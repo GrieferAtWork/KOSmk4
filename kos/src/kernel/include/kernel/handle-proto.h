@@ -26,7 +26,7 @@
 
 #include <kos/io.h>
 
-#ifdef __CC__
+#if defined(__CC__) || defined(__DEEMON__)
 DECL_BEGIN
 
 #ifdef __DEEMON__
@@ -306,124 +306,34 @@ print "#endif /" "* CONFIG_BUILDING_KERNEL_CORE *" "/";
 ]]]*/
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #ifdef __CC__
-struct vm_datablock;
-struct basic_block_device;
-struct directory_entry;
 struct file;
-struct oneshot_directory_file;
-struct path;
-struct fs;
-struct vm;
-struct taskpid;
+struct socket;
 struct epoll_controller;
-struct driver;
 struct pipe;
 struct pipe_reader;
 struct pipe_writer;
+struct fifo_user;
+struct eventfd;
+struct signalfd;
+struct uaio_controller;
+struct mfutex;
+struct mfutexfd;
+struct oneshot_directory_file;
+struct mfile;
+struct basic_block_device;
+struct directory_entry;
+struct path;
+struct fs;
+struct mman;
+struct taskpid;
+struct module;
 struct pidns;
 struct driver_loadlist;
 struct character_device;
-struct eventfd;
-struct signalfd;
-struct vm_datapart;
-struct vm_futex;
-struct vm_futexfd;
-struct driver_section;
-struct socket;
-struct uaio_controller;
-struct fifo_user;
+struct mpart;
+struct module_section;
 
 
-
-/* Handle operators for `HANDLE_TYPE_DATABLOCK' (`struct vm_datablock') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_datablock_refcnt)(struct vm_datablock const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_incref)(struct vm_datablock *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_decref)(REF struct vm_datablock *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_datablock_tryincref)(struct vm_datablock *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_datablock_weakgetref)(struct vm_datablock *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_datablock *NOTHROW(FCALL handle_datablock_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_pread(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_pwrite(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datablock_readv(struct vm_datablock *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datablock_writev(struct vm_datablock *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datablock_preadv(struct vm_datablock *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datablock_pwritev(struct vm_datablock *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_readdir(struct vm_datablock *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_datablock_seek(struct vm_datablock *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datablock_ioctl(struct vm_datablock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datablock_truncate(struct vm_datablock *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_datablock_mmap(struct vm_datablock *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_datablock_allocate(struct vm_datablock *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datablock_sync(struct vm_datablock *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datablock_datasync(struct vm_datablock *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datablock_stat(struct vm_datablock *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datablock_pollconnect(struct vm_datablock *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datablock_polltest(struct vm_datablock *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datablock_hop(struct vm_datablock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_datablock_tryas(struct vm_datablock *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_BLOCKDEVICE' (`struct basic_block_device') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_blockdevice_refcnt)(struct basic_block_device const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_incref)(struct basic_block_device *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_decref)(REF struct basic_block_device *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_blockdevice_tryincref)(struct basic_block_device *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_blockdevice_weakgetref)(struct basic_block_device *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct basic_block_device *NOTHROW(FCALL handle_blockdevice_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_read(struct basic_block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_write(struct basic_block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_pread(struct basic_block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_pwrite(struct basic_block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_readv(struct basic_block_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_writev(struct basic_block_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_preadv(struct basic_block_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_pwritev(struct basic_block_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_readdir(struct basic_block_device *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_blockdevice_seek(struct basic_block_device *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_ioctl(struct basic_block_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_blockdevice_truncate(struct basic_block_device *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_blockdevice_mmap(struct basic_block_device *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_blockdevice_allocate(struct basic_block_device *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_blockdevice_sync(struct basic_block_device *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_blockdevice_datasync(struct basic_block_device *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_blockdevice_stat(struct basic_block_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_blockdevice_pollconnect(struct basic_block_device *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_blockdevice_polltest(struct basic_block_device *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_hop(struct basic_block_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_blockdevice_tryas(struct basic_block_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_directoryentry_refcnt)(struct directory_entry const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_incref)(struct directory_entry *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_decref)(REF struct directory_entry *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_directoryentry_tryincref)(struct directory_entry *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_directoryentry_weakgetref)(struct directory_entry *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct directory_entry *NOTHROW(FCALL handle_directoryentry_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_read(struct directory_entry *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_write(struct directory_entry *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_pread(struct directory_entry *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_pwrite(struct directory_entry *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_readv(struct directory_entry *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_writev(struct directory_entry *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_preadv(struct directory_entry *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_pwritev(struct directory_entry *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_readdir(struct directory_entry *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_directoryentry_seek(struct directory_entry *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_ioctl(struct directory_entry *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_directoryentry_truncate(struct directory_entry *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_directoryentry_mmap(struct directory_entry *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_directoryentry_allocate(struct directory_entry *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_directoryentry_sync(struct directory_entry *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_directoryentry_datasync(struct directory_entry *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_directoryentry_stat(struct directory_entry *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_directoryentry_pollconnect(struct directory_entry *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_directoryentry_polltest(struct directory_entry *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_directoryentry_tryas(struct directory_entry *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_FILE' (`struct file') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_file_refcnt)(struct file const *__restrict self);
@@ -455,155 +365,35 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_file_polltest(struct file *
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_file_hop(struct file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_file_tryas(struct file *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
-/* Handle operators for `HANDLE_TYPE_ONESHOT_DIRECTORY_FILE' (`struct oneshot_directory_file') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_oneshot_directory_file_refcnt)(struct oneshot_directory_file const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_incref)(struct oneshot_directory_file *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_decref)(REF struct oneshot_directory_file *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_oneshot_directory_file_tryincref)(struct oneshot_directory_file *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_oneshot_directory_file_weakgetref)(struct oneshot_directory_file *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct oneshot_directory_file *NOTHROW(FCALL handle_oneshot_directory_file_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_read(struct oneshot_directory_file *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_write(struct oneshot_directory_file *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_pread(struct oneshot_directory_file *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_pwrite(struct oneshot_directory_file *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_readv(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_writev(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_preadv(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_pwritev(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_readdir(struct oneshot_directory_file *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_oneshot_directory_file_seek(struct oneshot_directory_file *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_ioctl(struct oneshot_directory_file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_truncate(struct oneshot_directory_file *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_oneshot_directory_file_mmap(struct oneshot_directory_file *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_oneshot_directory_file_allocate(struct oneshot_directory_file *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_sync(struct oneshot_directory_file *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_datasync(struct oneshot_directory_file *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_stat(struct oneshot_directory_file *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_pollconnect(struct oneshot_directory_file *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_oneshot_directory_file_polltest(struct oneshot_directory_file *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_hop(struct oneshot_directory_file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_oneshot_directory_file_tryas(struct oneshot_directory_file *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_PATH' (`struct path') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_path_refcnt)(struct path const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_incref)(struct path *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_decref)(REF struct path *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_path_tryincref)(struct path *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_path_weakgetref)(struct path *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct path *NOTHROW(FCALL handle_path_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_read(struct path *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_write(struct path *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_pread(struct path *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_pwrite(struct path *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_readv(struct path *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_writev(struct path *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_preadv(struct path *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_pwritev(struct path *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_readdir(struct path *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_path_seek(struct path *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_ioctl(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_path_truncate(struct path *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_path_mmap(struct path *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_path_allocate(struct path *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_path_sync(struct path *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_path_datasync(struct path *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_path_stat(struct path *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_path_pollconnect(struct path *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_path_polltest(struct path *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_hop(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_path_tryas(struct path *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_FS' (`struct fs') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fs_refcnt)(struct fs const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_incref)(struct fs *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_decref)(REF struct fs *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_fs_tryincref)(struct fs *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_fs_weakgetref)(struct fs *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct fs *NOTHROW(FCALL handle_fs_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_read(struct fs *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_write(struct fs *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_pread(struct fs *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_pwrite(struct fs *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_readv(struct fs *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_writev(struct fs *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_preadv(struct fs *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_pwritev(struct fs *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_readdir(struct fs *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_fs_seek(struct fs *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_ioctl(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fs_truncate(struct fs *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_fs_mmap(struct fs *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_fs_allocate(struct fs *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fs_sync(struct fs *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fs_datasync(struct fs *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fs_stat(struct fs *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fs_pollconnect(struct fs *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fs_polltest(struct fs *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_hop(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_fs_tryas(struct fs *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_VM' (`struct vm') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_vm_refcnt)(struct vm const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_incref)(struct vm *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_decref)(REF struct vm *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_vm_tryincref)(struct vm *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_vm_weakgetref)(struct vm *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm *NOTHROW(FCALL handle_vm_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_read(struct vm *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_write(struct vm *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_pread(struct vm *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_pwrite(struct vm *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_vm_readv(struct vm *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_vm_writev(struct vm *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_vm_preadv(struct vm *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_vm_pwritev(struct vm *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_readdir(struct vm *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_vm_seek(struct vm *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_vm_ioctl(struct vm *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_vm_truncate(struct vm *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_vm_mmap(struct vm *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_vm_allocate(struct vm *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_vm_sync(struct vm *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_vm_datasync(struct vm *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_vm_stat(struct vm *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_vm_pollconnect(struct vm *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_vm_polltest(struct vm *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_vm_hop(struct vm *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_vm_tryas(struct vm *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_task_refcnt)(struct taskpid const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_incref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_decref)(REF struct taskpid *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_task_tryincref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_task_weakgetref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(FCALL handle_task_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_read(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_write(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_pread(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_pwrite(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_readv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_writev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_preadv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_pwritev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_readdir(struct taskpid *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_task_seek(struct taskpid *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_ioctl(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_task_truncate(struct taskpid *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_task_mmap(struct taskpid *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_task_allocate(struct taskpid *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_task_sync(struct taskpid *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_task_datasync(struct taskpid *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_task_stat(struct taskpid *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_task_tryas(struct taskpid *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+/* Handle operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_socket_refcnt)(struct socket const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_incref)(struct socket *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_decref)(REF struct socket *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_socket_tryincref)(struct socket *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_socket_weakgetref)(struct socket *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct socket *NOTHROW(FCALL handle_socket_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_read(struct socket *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_write(struct socket *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_pread(struct socket *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_pwrite(struct socket *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_readv(struct socket *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_writev(struct socket *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_preadv(struct socket *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_pwritev(struct socket *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_readdir(struct socket *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_socket_seek(struct socket *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_socket_truncate(struct socket *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_socket_mmap(struct socket *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_socket_allocate(struct socket *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_socket_sync(struct socket *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_socket_datasync(struct socket *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_socket_stat(struct socket *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_socket_pollconnect(struct socket *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_socket_polltest(struct socket *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_hop(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_socket_tryas(struct socket *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_EPOLL' (`struct epoll_controller') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_epoll_refcnt)(struct epoll_controller const *__restrict self);
@@ -634,36 +424,6 @@ INTDEF NONNULL((1)) void KCALL handle_epoll_pollconnect(struct epoll_controller 
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_epoll_polltest(struct epoll_controller *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_epoll_hop(struct epoll_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_epoll_tryas(struct epoll_controller *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_refcnt)(struct driver const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_incref)(struct driver *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_decref)(REF struct driver *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_tryincref)(struct driver *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_weakgetref)(struct driver *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver *NOTHROW(FCALL handle_driver_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_read(struct driver *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_write(struct driver *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_pread(struct driver *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_pwrite(struct driver *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_readv(struct driver *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_writev(struct driver *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_preadv(struct driver *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_pwritev(struct driver *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_readdir(struct driver *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_seek(struct driver *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_ioctl(struct driver *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_truncate(struct driver *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_driver_mmap(struct driver *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_allocate(struct driver *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_sync(struct driver *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_datasync(struct driver *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_stat(struct driver *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_pollconnect(struct driver *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_polltest(struct driver *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_hop(struct driver *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_driver_tryas(struct driver *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_PIPE' (`struct pipe') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_refcnt)(struct pipe const *__restrict self);
@@ -755,95 +515,35 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_writer_polltest(struct
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_writer_hop(struct pipe_writer *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_writer_tryas(struct pipe_writer *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
-/* Handle operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pidns_refcnt)(struct pidns const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_incref)(struct pidns *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_decref)(REF struct pidns *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_pidns_tryincref)(struct pidns *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_pidns_weakgetref)(struct pidns *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct pidns *NOTHROW(FCALL handle_pidns_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_read(struct pidns *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_write(struct pidns *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_pread(struct pidns *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_pwrite(struct pidns *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_readv(struct pidns *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_writev(struct pidns *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_preadv(struct pidns *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_pwritev(struct pidns *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_readdir(struct pidns *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_pidns_seek(struct pidns *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_ioctl(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_pidns_truncate(struct pidns *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_pidns_mmap(struct pidns *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_pidns_allocate(struct pidns *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_pidns_sync(struct pidns *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_pidns_datasync(struct pidns *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_pidns_stat(struct pidns *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_pidns_pollconnect(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pidns_polltest(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_hop(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_pidns_tryas(struct pidns *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_loadlist') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_state_refcnt)(struct driver_loadlist const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_incref)(struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_decref)(REF struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_state_tryincref)(struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_state_weakgetref)(struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver_loadlist *NOTHROW(FCALL handle_driver_state_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_read(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_write(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_pread(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_pwrite(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_state_readv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_state_writev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_state_preadv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_state_pwritev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_readdir(struct driver_loadlist *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_state_seek(struct driver_loadlist *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_state_ioctl(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_state_truncate(struct driver_loadlist *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_driver_state_mmap(struct driver_loadlist *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_state_allocate(struct driver_loadlist *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_state_sync(struct driver_loadlist *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_state_datasync(struct driver_loadlist *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_state_stat(struct driver_loadlist *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_state_pollconnect(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_state_polltest(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_state_hop(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_driver_state_tryas(struct driver_loadlist *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_characterdevice_refcnt)(struct character_device const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_incref)(struct character_device *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_decref)(REF struct character_device *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_characterdevice_tryincref)(struct character_device *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_characterdevice_weakgetref)(struct character_device *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct character_device *NOTHROW(FCALL handle_characterdevice_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_write(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_pread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_pwrite(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_readv(struct character_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_writev(struct character_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_preadv(struct character_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_pwritev(struct character_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_readdir(struct character_device *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_seek(struct character_device *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_truncate(struct character_device *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_characterdevice_mmap(struct character_device *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_allocate(struct character_device *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_sync(struct character_device *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_datasync(struct character_device *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_characterdevice_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_characterdevice_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_hop(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_characterdevice_tryas(struct character_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+/* Handle operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fifo_user_refcnt)(struct fifo_user const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_incref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_decref)(REF struct fifo_user *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_fifo_user_tryincref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_fifo_user_weakgetref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct fifo_user *NOTHROW(FCALL handle_fifo_user_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_read(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_write(struct fifo_user *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_pread(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_pwrite(struct fifo_user *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_readv(struct fifo_user *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_writev(struct fifo_user *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_preadv(struct fifo_user *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_pwritev(struct fifo_user *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_readdir(struct fifo_user *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_seek(struct fifo_user *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_ioctl(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_truncate(struct fifo_user *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_fifo_user_mmap(struct fifo_user *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_allocate(struct fifo_user *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_sync(struct fifo_user *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_datasync(struct fifo_user *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_stat(struct fifo_user *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_pollconnect(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fifo_user_polltest(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_hop(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_eventfd_fence_refcnt)(struct eventfd const *__restrict self);
@@ -935,156 +635,6 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_signalfd_polltest(struct si
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_signalfd_hop(struct signalfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_signalfd_tryas(struct signalfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
-/* Handle operators for `HANDLE_TYPE_DATAPART' (`struct vm_datapart') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_datapart_refcnt)(struct vm_datapart const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_incref)(struct vm_datapart *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_decref)(REF struct vm_datapart *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_datapart_tryincref)(struct vm_datapart *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_datapart_weakgetref)(struct vm_datapart *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_datapart *NOTHROW(FCALL handle_datapart_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_pread(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_pwrite(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datapart_readv(struct vm_datapart *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datapart_writev(struct vm_datapart *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datapart_preadv(struct vm_datapart *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_datapart_pwritev(struct vm_datapart *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_readdir(struct vm_datapart *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_datapart_seek(struct vm_datapart *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datapart_ioctl(struct vm_datapart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_datapart_mmap(struct vm_datapart *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_datapart_allocate(struct vm_datapart *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datapart_sync(struct vm_datapart *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datapart_datasync(struct vm_datapart *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datapart_stat(struct vm_datapart *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_datapart_pollconnect(struct vm_datapart *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datapart_polltest(struct vm_datapart *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_datapart_tryas(struct vm_datapart *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_FUTEX' (`struct vm_futex') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futex_refcnt)(struct vm_futex const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_incref)(struct vm_futex *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_decref)(REF struct vm_futex *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_futex_tryincref)(struct vm_futex *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_futex_weakgetref)(struct vm_futex *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_futex *NOTHROW(FCALL handle_futex_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_read(struct vm_futex *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_write(struct vm_futex *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_pread(struct vm_futex *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_pwrite(struct vm_futex *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_readv(struct vm_futex *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_writev(struct vm_futex *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_preadv(struct vm_futex *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_pwritev(struct vm_futex *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_readdir(struct vm_futex *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_futex_seek(struct vm_futex *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_ioctl(struct vm_futex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futex_truncate(struct vm_futex *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_futex_mmap(struct vm_futex *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_futex_allocate(struct vm_futex *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futex_sync(struct vm_futex *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futex_datasync(struct vm_futex *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futex_stat(struct vm_futex *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futex_pollconnect(struct vm_futex *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futex_polltest(struct vm_futex *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_futex_tryas(struct vm_futex *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_FUTEXFD' (`struct vm_futexfd') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futexfd_refcnt)(struct vm_futexfd const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_incref)(struct vm_futexfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_decref)(REF struct vm_futexfd *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_futexfd_tryincref)(struct vm_futexfd *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_futexfd_weakgetref)(struct vm_futexfd *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_futexfd *NOTHROW(FCALL handle_futexfd_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_read(struct vm_futexfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_write(struct vm_futexfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_pread(struct vm_futexfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_pwrite(struct vm_futexfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_readv(struct vm_futexfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_writev(struct vm_futexfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_preadv(struct vm_futexfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_pwritev(struct vm_futexfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_readdir(struct vm_futexfd *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_futexfd_seek(struct vm_futexfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_ioctl(struct vm_futexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futexfd_truncate(struct vm_futexfd *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_futexfd_mmap(struct vm_futexfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_futexfd_allocate(struct vm_futexfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futexfd_sync(struct vm_futexfd *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futexfd_datasync(struct vm_futexfd *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futexfd_stat(struct vm_futexfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_futexfd_pollconnect(struct vm_futexfd *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futexfd_polltest(struct vm_futexfd *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct vm_futexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_futexfd_tryas(struct vm_futexfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_DRIVER_SECTION' (`struct driver_section') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_section_refcnt)(struct driver_section const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_incref)(struct driver_section *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_decref)(REF struct driver_section *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_section_tryincref)(struct driver_section *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_section_weakgetref)(struct driver_section *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver_section *NOTHROW(FCALL handle_driver_section_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_read(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_write(struct driver_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_pread(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_pwrite(struct driver_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_readv(struct driver_section *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_writev(struct driver_section *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_preadv(struct driver_section *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_pwritev(struct driver_section *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_readdir(struct driver_section *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_section_seek(struct driver_section *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_section_ioctl(struct driver_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_section_truncate(struct driver_section *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_driver_section_mmap(struct driver_section *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_section_allocate(struct driver_section *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_section_sync(struct driver_section *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_section_datasync(struct driver_section *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_section_stat(struct driver_section *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_section_pollconnect(struct driver_section *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_section_polltest(struct driver_section *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_section_hop(struct driver_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_driver_section_tryas(struct driver_section *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_socket_refcnt)(struct socket const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_incref)(struct socket *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_decref)(REF struct socket *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_socket_tryincref)(struct socket *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_socket_weakgetref)(struct socket *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct socket *NOTHROW(FCALL handle_socket_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_read(struct socket *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_write(struct socket *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_pread(struct socket *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_pwrite(struct socket *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_readv(struct socket *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_writev(struct socket *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_preadv(struct socket *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_socket_pwritev(struct socket *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_readdir(struct socket *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_socket_seek(struct socket *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_socket_truncate(struct socket *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_socket_mmap(struct socket *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_socket_allocate(struct socket *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_socket_sync(struct socket *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_socket_datasync(struct socket *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_socket_stat(struct socket *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_socket_pollconnect(struct socket *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_socket_polltest(struct socket *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_hop(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_socket_tryas(struct socket *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
 /* Handle operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_uaio_refcnt)(struct uaio_controller const *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_incref)(struct uaio_controller *__restrict self);
@@ -1115,35 +665,485 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_uaio_polltest(struct uaio_c
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_hop(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_uaio_tryas(struct uaio_controller *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
-/* Handle operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fifo_user_refcnt)(struct fifo_user const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_incref)(struct fifo_user *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_decref)(REF struct fifo_user *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_fifo_user_tryincref)(struct fifo_user *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_fifo_user_weakgetref)(struct fifo_user *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct fifo_user *NOTHROW(FCALL handle_fifo_user_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_read(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_write(struct fifo_user *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_pread(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_pwrite(struct fifo_user *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_readv(struct fifo_user *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_writev(struct fifo_user *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_preadv(struct fifo_user *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_pwritev(struct fifo_user *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_readdir(struct fifo_user *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_seek(struct fifo_user *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_ioctl(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fifo_user_truncate(struct fifo_user *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_fifo_user_mmap(struct fifo_user *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_allocate(struct fifo_user *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fifo_user_sync(struct fifo_user *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fifo_user_datasync(struct fifo_user *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fifo_user_stat(struct fifo_user *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_fifo_user_pollconnect(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fifo_user_polltest(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_hop(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+/* Handle operators for `HANDLE_TYPE_FUTEX' (`struct mfutex') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futex_refcnt)(struct mfutex const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_incref)(struct mfutex *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_decref)(REF struct mfutex *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_futex_tryincref)(struct mfutex *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_futex_weakgetref)(struct mfutex *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mfutex *NOTHROW(FCALL handle_futex_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_read(struct mfutex *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_write(struct mfutex *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_pread(struct mfutex *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_pwrite(struct mfutex *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_readv(struct mfutex *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_writev(struct mfutex *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_preadv(struct mfutex *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futex_pwritev(struct mfutex *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_readdir(struct mfutex *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_futex_seek(struct mfutex *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_ioctl(struct mfutex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futex_truncate(struct mfutex *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_futex_mmap(struct mfutex *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_futex_allocate(struct mfutex *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futex_sync(struct mfutex *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futex_datasync(struct mfutex *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futex_stat(struct mfutex *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futex_pollconnect(struct mfutex *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futex_polltest(struct mfutex *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_hop(struct mfutex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_futex_tryas(struct mfutex *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_FUTEXFD' (`struct mfutexfd') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futexfd_refcnt)(struct mfutexfd const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_incref)(struct mfutexfd *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_decref)(REF struct mfutexfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_futexfd_tryincref)(struct mfutexfd *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_futexfd_weakgetref)(struct mfutexfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mfutexfd *NOTHROW(FCALL handle_futexfd_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_read(struct mfutexfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_write(struct mfutexfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_pread(struct mfutexfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_pwrite(struct mfutexfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_readv(struct mfutexfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_writev(struct mfutexfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_preadv(struct mfutexfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_futexfd_pwritev(struct mfutexfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_readdir(struct mfutexfd *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_futexfd_seek(struct mfutexfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_ioctl(struct mfutexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futexfd_truncate(struct mfutexfd *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_futexfd_mmap(struct mfutexfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_futexfd_allocate(struct mfutexfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futexfd_sync(struct mfutexfd *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futexfd_datasync(struct mfutexfd *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futexfd_stat(struct mfutexfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futexfd_pollconnect(struct mfutexfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futexfd_polltest(struct mfutexfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct mfutexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_futexfd_tryas(struct mfutexfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_ONESHOT_DIRECTORY_FILE' (`struct oneshot_directory_file') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_oneshot_directory_file_refcnt)(struct oneshot_directory_file const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_incref)(struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_decref)(REF struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_oneshot_directory_file_tryincref)(struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_oneshot_directory_file_weakgetref)(struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct oneshot_directory_file *NOTHROW(FCALL handle_oneshot_directory_file_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_read(struct oneshot_directory_file *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_write(struct oneshot_directory_file *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_pread(struct oneshot_directory_file *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_pwrite(struct oneshot_directory_file *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_readv(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_writev(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_preadv(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_oneshot_directory_file_pwritev(struct oneshot_directory_file *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_readdir(struct oneshot_directory_file *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_oneshot_directory_file_seek(struct oneshot_directory_file *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_ioctl(struct oneshot_directory_file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_truncate(struct oneshot_directory_file *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_oneshot_directory_file_mmap(struct oneshot_directory_file *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_oneshot_directory_file_allocate(struct oneshot_directory_file *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_sync(struct oneshot_directory_file *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_datasync(struct oneshot_directory_file *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_stat(struct oneshot_directory_file *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_pollconnect(struct oneshot_directory_file *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_oneshot_directory_file_polltest(struct oneshot_directory_file *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_hop(struct oneshot_directory_file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_oneshot_directory_file_tryas(struct oneshot_directory_file *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_MFILE' (`struct mfile') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mfile_refcnt)(struct mfile const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_incref)(struct mfile *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_decref)(REF struct mfile *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_mfile_tryincref)(struct mfile *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_mfile_weakgetref)(struct mfile *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mfile *NOTHROW(FCALL handle_mfile_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_pread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_pwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_readv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_pwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_readdir(struct mfile *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mfile_seek(struct mfile *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_truncate(struct mfile *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_mfile_mmap(struct mfile *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mfile_allocate(struct mfile *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_sync(struct mfile *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_datasync(struct mfile *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_stat(struct mfile *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mfile_pollconnect(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mfile_polltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_mfile_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_BLOCKDEVICE' (`struct basic_block_device') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_blockdevice_refcnt)(struct basic_block_device const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_incref)(struct basic_block_device *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_decref)(REF struct basic_block_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_blockdevice_tryincref)(struct basic_block_device *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_blockdevice_weakgetref)(struct basic_block_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct basic_block_device *NOTHROW(FCALL handle_blockdevice_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_read(struct basic_block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_write(struct basic_block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_pread(struct basic_block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_pwrite(struct basic_block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_readv(struct basic_block_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_writev(struct basic_block_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_preadv(struct basic_block_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_blockdevice_pwritev(struct basic_block_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_readdir(struct basic_block_device *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_blockdevice_seek(struct basic_block_device *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_ioctl(struct basic_block_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_blockdevice_truncate(struct basic_block_device *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_blockdevice_mmap(struct basic_block_device *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_blockdevice_allocate(struct basic_block_device *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_blockdevice_sync(struct basic_block_device *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_blockdevice_datasync(struct basic_block_device *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_blockdevice_stat(struct basic_block_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_blockdevice_pollconnect(struct basic_block_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_blockdevice_polltest(struct basic_block_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_hop(struct basic_block_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_blockdevice_tryas(struct basic_block_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_directoryentry_refcnt)(struct directory_entry const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_incref)(struct directory_entry *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_decref)(REF struct directory_entry *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_directoryentry_tryincref)(struct directory_entry *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_directoryentry_weakgetref)(struct directory_entry *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct directory_entry *NOTHROW(FCALL handle_directoryentry_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_read(struct directory_entry *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_write(struct directory_entry *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_pread(struct directory_entry *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_pwrite(struct directory_entry *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_readv(struct directory_entry *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_writev(struct directory_entry *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_preadv(struct directory_entry *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_directoryentry_pwritev(struct directory_entry *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_readdir(struct directory_entry *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_directoryentry_seek(struct directory_entry *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_ioctl(struct directory_entry *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_directoryentry_truncate(struct directory_entry *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_directoryentry_mmap(struct directory_entry *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_directoryentry_allocate(struct directory_entry *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_directoryentry_sync(struct directory_entry *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_directoryentry_datasync(struct directory_entry *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_directoryentry_stat(struct directory_entry *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_directoryentry_pollconnect(struct directory_entry *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_directoryentry_polltest(struct directory_entry *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_directoryentry_tryas(struct directory_entry *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_PATH' (`struct path') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_path_refcnt)(struct path const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_incref)(struct path *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_decref)(REF struct path *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_path_tryincref)(struct path *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_path_weakgetref)(struct path *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct path *NOTHROW(FCALL handle_path_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_read(struct path *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_write(struct path *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_pread(struct path *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_pwrite(struct path *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_readv(struct path *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_writev(struct path *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_preadv(struct path *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_path_pwritev(struct path *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_readdir(struct path *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_path_seek(struct path *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_ioctl(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_path_truncate(struct path *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_path_mmap(struct path *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_path_allocate(struct path *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_path_sync(struct path *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_path_datasync(struct path *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_path_stat(struct path *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_path_pollconnect(struct path *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_path_polltest(struct path *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_hop(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_path_tryas(struct path *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_FS' (`struct fs') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fs_refcnt)(struct fs const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_incref)(struct fs *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_decref)(REF struct fs *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_fs_tryincref)(struct fs *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_fs_weakgetref)(struct fs *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct fs *NOTHROW(FCALL handle_fs_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_read(struct fs *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_write(struct fs *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_pread(struct fs *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_pwrite(struct fs *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_readv(struct fs *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_writev(struct fs *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_preadv(struct fs *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fs_pwritev(struct fs *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_readdir(struct fs *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_fs_seek(struct fs *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_ioctl(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fs_truncate(struct fs *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_fs_mmap(struct fs *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_fs_allocate(struct fs *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fs_sync(struct fs *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fs_datasync(struct fs *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fs_stat(struct fs *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fs_pollconnect(struct fs *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fs_polltest(struct fs *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_hop(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_fs_tryas(struct fs *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_MMAN' (`struct mman') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mman_refcnt)(struct mman const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mman_incref)(struct mman *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mman_decref)(REF struct mman *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_mman_tryincref)(struct mman *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_mman_weakgetref)(struct mman *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mman *NOTHROW(FCALL handle_mman_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mman_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mman_read(struct mman *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mman_write(struct mman *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mman_pread(struct mman *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mman_pwrite(struct mman *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mman_readv(struct mman *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mman_writev(struct mman *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mman_preadv(struct mman *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mman_pwritev(struct mman *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mman_readdir(struct mman *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mman_seek(struct mman *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mman_ioctl(struct mman *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mman_truncate(struct mman *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_mman_mmap(struct mman *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mman_allocate(struct mman *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mman_sync(struct mman *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mman_datasync(struct mman *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mman_stat(struct mman *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mman_pollconnect(struct mman *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mman_polltest(struct mman *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mman_hop(struct mman *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_mman_tryas(struct mman *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_task_refcnt)(struct taskpid const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_incref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_decref)(REF struct taskpid *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_task_tryincref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_task_weakgetref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(FCALL handle_task_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_read(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_write(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_pread(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_pwrite(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_readv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_writev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_preadv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_pwritev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_readdir(struct taskpid *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_task_seek(struct taskpid *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_ioctl(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_task_truncate(struct taskpid *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_task_mmap(struct taskpid *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_task_allocate(struct taskpid *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_task_sync(struct taskpid *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_task_datasync(struct taskpid *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_task_stat(struct taskpid *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_task_tryas(struct taskpid *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_MODULE' (`struct module') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_module_refcnt)(struct module const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_module_incref)(struct module *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_module_decref)(REF struct module *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_module_tryincref)(struct module *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_module_weakgetref)(struct module *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct module *NOTHROW(FCALL handle_module_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_module_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_read(struct module *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_write(struct module *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_pread(struct module *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_pwrite(struct module *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_readv(struct module *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_writev(struct module *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_preadv(struct module *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_pwritev(struct module *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_readdir(struct module *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_module_seek(struct module *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_module_ioctl(struct module *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_truncate(struct module *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_module_mmap(struct module *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_module_allocate(struct module *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_sync(struct module *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_datasync(struct module *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_stat(struct module *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_pollconnect(struct module *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_module_polltest(struct module *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_module_hop(struct module *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_module_tryas(struct module *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pidns_refcnt)(struct pidns const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_incref)(struct pidns *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_decref)(REF struct pidns *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_pidns_tryincref)(struct pidns *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_pidns_weakgetref)(struct pidns *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct pidns *NOTHROW(FCALL handle_pidns_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_read(struct pidns *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_write(struct pidns *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_pread(struct pidns *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_pwrite(struct pidns *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_readv(struct pidns *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_writev(struct pidns *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_preadv(struct pidns *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidns_pwritev(struct pidns *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_readdir(struct pidns *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_pidns_seek(struct pidns *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_ioctl(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pidns_truncate(struct pidns *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_pidns_mmap(struct pidns *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_pidns_allocate(struct pidns *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pidns_sync(struct pidns *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pidns_datasync(struct pidns *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pidns_stat(struct pidns *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pidns_pollconnect(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pidns_polltest(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_hop(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_pidns_tryas(struct pidns *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_DRIVER_LOADLIST' (`struct driver_loadlist') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_loadlist_refcnt)(struct driver_loadlist const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_incref)(struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_decref)(REF struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_loadlist_tryincref)(struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_loadlist_weakgetref)(struct driver_loadlist *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver_loadlist *NOTHROW(FCALL handle_driver_loadlist_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_read(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_write(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_pread(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_pwrite(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_readv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_writev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_preadv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_pwritev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_readdir(struct driver_loadlist *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_driver_loadlist_seek(struct driver_loadlist *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_ioctl(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_truncate(struct driver_loadlist *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_driver_loadlist_mmap(struct driver_loadlist *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_driver_loadlist_allocate(struct driver_loadlist *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_sync(struct driver_loadlist *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_datasync(struct driver_loadlist *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_stat(struct driver_loadlist *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_pollconnect(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_loadlist_polltest(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_hop(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_driver_loadlist_tryas(struct driver_loadlist *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_characterdevice_refcnt)(struct character_device const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_incref)(struct character_device *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_decref)(REF struct character_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_characterdevice_tryincref)(struct character_device *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_characterdevice_weakgetref)(struct character_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct character_device *NOTHROW(FCALL handle_characterdevice_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_write(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_pread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_pwrite(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_readv(struct character_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_writev(struct character_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_preadv(struct character_device *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_characterdevice_pwritev(struct character_device *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_readdir(struct character_device *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_seek(struct character_device *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_characterdevice_truncate(struct character_device *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_characterdevice_mmap(struct character_device *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_allocate(struct character_device *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_characterdevice_sync(struct character_device *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_characterdevice_datasync(struct character_device *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_characterdevice_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_characterdevice_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_characterdevice_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_hop(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_characterdevice_tryas(struct character_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_MPART' (`struct mpart') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mpart_refcnt)(struct mpart const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mpart_incref)(struct mpart *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mpart_decref)(REF struct mpart *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_mpart_tryincref)(struct mpart *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_mpart_weakgetref)(struct mpart *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *NOTHROW(FCALL handle_mpart_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mpart_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mpart_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mpart_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mpart_pread(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mpart_pwrite(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mpart_readv(struct mpart *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mpart_writev(struct mpart *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mpart_preadv(struct mpart *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mpart_pwritev(struct mpart *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mpart_readdir(struct mpart *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mpart_seek(struct mpart *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mpart_ioctl(struct mpart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mpart_truncate(struct mpart *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_mpart_mmap(struct mpart *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_mpart_allocate(struct mpart *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mpart_sync(struct mpart *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mpart_datasync(struct mpart *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mpart_stat(struct mpart *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_mpart_pollconnect(struct mpart *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mpart_polltest(struct mpart *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mpart_hop(struct mpart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_mpart_tryas(struct mpart *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+
+/* Handle operators for `HANDLE_TYPE_MODULE_SECTION' (`struct module_section') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_module_section_refcnt)(struct module_section const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_module_section_incref)(struct module_section *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_module_section_decref)(REF struct module_section *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_module_section_tryincref)(struct module_section *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_module_section_weakgetref)(struct module_section *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct module_section *NOTHROW(FCALL handle_module_section_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_module_section_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_section_read(struct module_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_section_write(struct module_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_section_pread(struct module_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_section_pwrite(struct module_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_section_readv(struct module_section *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_section_writev(struct module_section *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_section_preadv(struct module_section *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_module_section_pwritev(struct module_section *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_module_section_readdir(struct module_section *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_module_section_seek(struct module_section *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_module_section_ioctl(struct module_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_section_truncate(struct module_section *__restrict self, pos_t new_size) THROWS(...);
+INTDEF NONNULL((1, 2)) void KCALL handle_module_section_mmap(struct module_section *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_module_section_allocate(struct module_section *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_section_sync(struct module_section *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_section_datasync(struct module_section *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_section_stat(struct module_section *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_module_section_pollconnect(struct module_section *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_module_section_polltest(struct module_section *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_module_section_hop(struct module_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) REF void *KCALL handle_module_section_tryas(struct module_section *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
@@ -1220,127 +1220,9 @@ INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__r
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
-#define HANDLE_TYPE_MFILE        HANDLE_TYPE_DATABLOCK
-#define handle_mfile_refcnt      handle_datablock_refcnt
-#define handle_mfile_incref      handle_datablock_incref
-#define handle_mfile_decref      handle_datablock_decref
-#define handle_mfile_tryincref   handle_datablock_tryincref
-#define handle_mfile_weakgetref  handle_datablock_weakgetref
-#define handle_mfile_weaklckref  handle_datablock_weaklckref
-#define handle_mfile_weakdecref  handle_datablock_weakdecref
-#define handle_mfile_read        handle_datablock_read
-#define handle_mfile_write       handle_datablock_write
-#define handle_mfile_pread       handle_datablock_pread
-#define handle_mfile_pwrite      handle_datablock_pwrite
-#define handle_mfile_readv       handle_datablock_readv
-#define handle_mfile_writev      handle_datablock_writev
-#define handle_mfile_preadv      handle_datablock_preadv
-#define handle_mfile_pwritev     handle_datablock_pwritev
-#define handle_mfile_readdir     handle_datablock_readdir
-#define handle_mfile_seek        handle_datablock_seek
-#define handle_mfile_ioctl       handle_datablock_ioctl
-#define handle_mfile_truncate    handle_datablock_truncate
-#define handle_mfile_mmap        handle_datablock_mmap
-#define handle_mfile_allocate    handle_datablock_allocate
-#define handle_mfile_sync        handle_datablock_sync
-#define handle_mfile_datasync    handle_datablock_datasync
-#define handle_mfile_stat        handle_datablock_stat
-#define handle_mfile_pollconnect handle_datablock_pollconnect
-#define handle_mfile_polltest    handle_datablock_polltest
-#define handle_mfile_hop         handle_datablock_hop
-#define handle_mfile_tryas       handle_datablock_tryas
 
-/* Handle operators for `HANDLE_TYPE_MFILE' (`struct mfile') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_mfile_refcnt)(struct mfile const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_incref)(struct mfile *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_decref)(REF struct mfile *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_mfile_tryincref)(struct mfile *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_mfile_weakgetref)(struct mfile *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mfile *NOTHROW(FCALL handle_mfile_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_mfile_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_read(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_write(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_pread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_pwrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_readv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_mfile_pwritev(struct mfile *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_mfile_readdir(struct mfile *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_mfile_seek(struct mfile *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_mfile_truncate(struct mfile *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_mfile_mmap(struct mfile *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_mfile_allocate(struct mfile *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_mfile_sync(struct mfile *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_mfile_datasync(struct mfile *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_mfile_stat(struct mfile *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_mfile_pollconnect(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_mfile_polltest(struct mfile *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_mfile_tryas(struct mfile *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-#define HANDLE_TYPE_DRIVER_LOADLIST HANDLE_TYPE_DRIVER_STATE
-#define handle_driver_loadlist_refcnt      handle_driver_state_refcnt
-#define handle_driver_loadlist_incref      handle_driver_state_incref
-#define handle_driver_loadlist_decref      handle_driver_state_decref
-#define handle_driver_loadlist_tryincref   handle_driver_state_tryincref
-#define handle_driver_loadlist_weakgetref  handle_driver_state_weakgetref
-#define handle_driver_loadlist_weaklckref  handle_driver_state_weaklckref
-#define handle_driver_loadlist_weakdecref  handle_driver_state_weakdecref
-#define handle_driver_loadlist_read        handle_driver_state_read
-#define handle_driver_loadlist_write       handle_driver_state_write
-#define handle_driver_loadlist_pread       handle_driver_state_pread
-#define handle_driver_loadlist_pwrite      handle_driver_state_pwrite
-#define handle_driver_loadlist_readv       handle_driver_state_readv
-#define handle_driver_loadlist_writev      handle_driver_state_writev
-#define handle_driver_loadlist_preadv      handle_driver_state_preadv
-#define handle_driver_loadlist_pwritev     handle_driver_state_pwritev
-#define handle_driver_loadlist_readdir     handle_driver_state_readdir
-#define handle_driver_loadlist_seek        handle_driver_state_seek
-#define handle_driver_loadlist_ioctl       handle_driver_state_ioctl
-#define handle_driver_loadlist_truncate    handle_driver_state_truncate
-#define handle_driver_loadlist_mmap        handle_driver_state_mmap
-#define handle_driver_loadlist_allocate    handle_driver_state_allocate
-#define handle_driver_loadlist_sync        handle_driver_state_sync
-#define handle_driver_loadlist_datasync    handle_driver_state_datasync
-#define handle_driver_loadlist_stat        handle_driver_state_stat
-#define handle_driver_loadlist_pollconnect handle_driver_state_pollconnect
-#define handle_driver_loadlist_polltest    handle_driver_state_polltest
-#define handle_driver_loadlist_hop         handle_driver_state_hop
-#define handle_driver_loadlist_tryas       handle_driver_state_tryas
-
-/* Handle operators for `HANDLE_TYPE_DRIVER_LOADLIST' (`struct driver_loadlist') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_loadlist_refcnt)(struct driver_loadlist const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_incref)(struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_decref)(REF struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_loadlist_tryincref)(struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_loadlist_weakgetref)(struct driver_loadlist *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver_loadlist *NOTHROW(FCALL handle_driver_loadlist_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_loadlist_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_read(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_write(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_pread(struct driver_loadlist *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_pwrite(struct driver_loadlist *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_readv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_writev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_preadv(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_loadlist_pwritev(struct driver_loadlist *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_loadlist_readdir(struct driver_loadlist *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_loadlist_seek(struct driver_loadlist *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_ioctl(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_truncate(struct driver_loadlist *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_driver_loadlist_mmap(struct driver_loadlist *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_driver_loadlist_allocate(struct driver_loadlist *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_sync(struct driver_loadlist *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_datasync(struct driver_loadlist *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_stat(struct driver_loadlist *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_driver_loadlist_pollconnect(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_loadlist_polltest(struct driver_loadlist *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_hop(struct driver_loadlist *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_driver_loadlist_tryas(struct driver_loadlist *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 DECL_END
-#endif /* __CC__ */
+#endif /* __CC__ || __DEEMON__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_PROTO_H */

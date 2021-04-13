@@ -448,7 +448,7 @@ handle_task_tryas(struct taskpid *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 
-	case HANDLE_TYPE_VM:
+	case HANDLE_TYPE_MMAN:
 		if (self != THIS_TASKPID)
 			break;
 		return incref(THIS_MMAN);

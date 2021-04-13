@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_DATABLOCK_HANDLE_C
-#define GUARD_KERNEL_SRC_MEMORY_DATABLOCK_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_HANDLE_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_HANDLE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -40,7 +40,7 @@
 
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
-#include <kos/hop/datablock.h>
+#include <kos/hop/mfile.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -50,12 +50,12 @@
 DECL_BEGIN
 
 /* DATABLOCK HANDLE OPERATIONS */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(datablock, struct vm_datablock);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(mfile, struct mfile);
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_datablock_read(struct vm_datablock *__restrict self,
-                      USER CHECKED void *dst,
-                      size_t num_bytes, iomode_t mode) THROWS(...) {
+handle_mfile_read(struct mfile *__restrict self,
+                  USER CHECKED void *dst,
+                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	if unlikely(!self->db_type->mo_stream_read) {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
@@ -66,9 +66,9 @@ handle_datablock_read(struct vm_datablock *__restrict self,
 }
 
 INTERN NONNULL((1)) size_t KCALL
-handle_datablock_write(struct vm_datablock *__restrict self,
-                       USER CHECKED void const *src,
-                       size_t num_bytes, iomode_t mode) THROWS(...) {
+handle_mfile_write(struct mfile *__restrict self,
+                   USER CHECKED void const *src,
+                   size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
 	if unlikely(!self->db_type->mo_stream_write) {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
@@ -79,9 +79,9 @@ handle_datablock_write(struct vm_datablock *__restrict self,
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_datablock_pread(struct vm_datablock *__restrict self,
-                       USER CHECKED void *dst,
-                       size_t num_bytes, pos_t addr, iomode_t mode) {
+handle_mfile_pread(struct mfile *__restrict self,
+                   USER CHECKED void *dst,
+                   size_t num_bytes, pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
 		/* TODO: Support for `IO_NONBLOCK' */
 		(void)mode;
@@ -91,7 +91,7 @@ handle_datablock_pread(struct vm_datablock *__restrict self,
 }
 
 INTERN NONNULL((1)) size_t KCALL
-handle_datablock_pwrite(struct vm_datablock *__restrict self,
+handle_mfile_pwrite(struct mfile *__restrict self,
                         USER CHECKED void const *src,
                         size_t num_bytes, pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
@@ -104,9 +104,9 @@ handle_datablock_pwrite(struct vm_datablock *__restrict self,
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
-handle_datablock_preadv(struct vm_datablock *__restrict self,
-                        struct iov_buffer *__restrict dst, size_t num_bytes,
-                        pos_t addr, iomode_t mode) {
+handle_mfile_preadv(struct mfile *__restrict self,
+                    struct iov_buffer *__restrict dst, size_t num_bytes,
+                    pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
 		/* TODO: Support for `IO_NONBLOCK' */
 		(void)mode;
@@ -116,9 +116,9 @@ handle_datablock_preadv(struct vm_datablock *__restrict self,
 }
 
 INTERN NONNULL((1)) size_t KCALL
-handle_datablock_pwritev(struct vm_datablock *__restrict self,
-                         struct iov_buffer *__restrict src, size_t num_bytes,
-                         pos_t addr, iomode_t mode) {
+handle_mfile_pwritev(struct mfile *__restrict self,
+                     struct iov_buffer *__restrict src, size_t num_bytes,
+                     pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
 		/* TODO: Support for `IO_NONBLOCK' */
 		(void)mode;
@@ -131,8 +131,8 @@ handle_datablock_pwritev(struct vm_datablock *__restrict self,
 
 
 INTERN NONNULL((1)) void KCALL
-handle_datablock_truncate(struct vm_datablock *__restrict self,
-                          pos_t new_size) {
+handle_mfile_truncate(struct mfile *__restrict self,
+                      pos_t new_size) {
 	if (vm_datablock_isinode(self)) {
 		inode_truncate((struct inode *)self, new_size);
 	} else {
@@ -142,12 +142,12 @@ handle_datablock_truncate(struct vm_datablock *__restrict self,
 
 /* TODO */
 INTERN NONNULL((1)) pos_t KCALL
-handle_datablock_allocate(struct vm_datablock *__restrict self,
-                          fallocate_mode_t mode,
-                          pos_t start, pos_t length);
+handle_mfile_allocate(struct mfile *__restrict self,
+                      fallocate_mode_t mode,
+                      pos_t start, pos_t length);
 
 INTERN NONNULL((1)) void KCALL
-handle_datablock_sync(struct vm_datablock *__restrict self) {
+handle_mfile_sync(struct mfile *__restrict self) {
 	if (vm_datablock_isinode(self))
 		inode_sync((struct inode *)self);
 	else {
@@ -156,13 +156,13 @@ handle_datablock_sync(struct vm_datablock *__restrict self) {
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_datablock_datasync(struct vm_datablock *__restrict self) {
+handle_mfile_datasync(struct mfile *__restrict self) {
 	vm_datablock_sync(self);
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_datablock_pollconnect(struct vm_datablock *__restrict self,
-                             poll_mode_t what) {
+handle_mfile_pollconnect(struct mfile *__restrict self,
+                         poll_mode_t what) {
 	assert((self->db_type->dt_handle_pollconnect != NULL) ==
 	       (self->db_type->dt_handle_polltest != NULL));
 	if (self->db_type->dt_handle_pollconnect) {
@@ -174,8 +174,8 @@ handle_datablock_pollconnect(struct vm_datablock *__restrict self,
 }
 
 INTERN NONNULL((1)) poll_mode_t KCALL
-handle_datablock_polltest(struct vm_datablock *__restrict self,
-                          poll_mode_t what) {
+handle_mfile_polltest(struct mfile *__restrict self,
+                      poll_mode_t what) {
 	assert((self->db_type->dt_handle_pollconnect != NULL) ==
 	       (self->db_type->dt_handle_polltest != NULL));
 	if (self->db_type->dt_handle_polltest)
@@ -200,10 +200,8 @@ handle_datablock_polltest(struct vm_datablock *__restrict self,
 
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_datablock_ioctl(struct vm_datablock *__restrict self,
-                       syscall_ulong_t cmd,
-                       USER UNCHECKED void *arg,
-                       iomode_t mode) {
+handle_mfile_ioctl(struct mfile *__restrict self, syscall_ulong_t cmd,
+                   USER UNCHECKED void *arg, iomode_t mode) {
 	if (vm_datablock_isinode(self))
 		return inode_ioctl((struct inode *)self, cmd, arg, mode);
 	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
@@ -212,10 +210,8 @@ handle_datablock_ioctl(struct vm_datablock *__restrict self,
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL
-handle_datablock_hop(struct vm_datablock *__restrict self,
-                     syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg,
-                     iomode_t mode) {
+handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
 	case HOP_DATABLOCK_SYNCALL: {
@@ -266,13 +262,13 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self)) {
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
 		}
 		result_handle.h_mode = mode;
-		result_handle.h_type = HANDLE_TYPE_DATABLOCK;
+		result_handle.h_type = HANDLE_TYPE_MFILE;
 		result_handle.h_data = ((struct inode *)self)->i_super;
 		inode_access_accmode((struct inode *)result_handle.h_data, mode);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
@@ -286,7 +282,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
@@ -309,7 +305,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
@@ -341,7 +337,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -377,7 +373,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			/* Install handles for objects that the caller wants to open */
 			fd = ATOMIC_READ(data->don_node);
 			if (fd) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = child_node;
 				handle_installhop(fd, temp);
@@ -408,7 +404,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -455,7 +451,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			/* Install handles for objects that the caller wants to open */
 			fd = ATOMIC_READ(data->dcf_node);
 			if (fd) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = child_node;
 				handle_installhop(fd, temp);
@@ -490,7 +486,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -536,7 +532,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			ATOMIC_WRITE(data->drm_status, (u16)remove_status);
 			fd = ATOMIC_READ(data->drm_node);
 			if (fd) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = child_node;
 				handle_installhop(fd, temp);
@@ -570,7 +566,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -624,7 +620,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			FINALLY_DECREF(dstchild_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->drn_srcnode)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = srcchild_node;
 				handle_installhop(fd, temp);
@@ -636,7 +632,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				handle_installhop(fd, temp);
 			}
 			if ((fd = ATOMIC_READ(data->drn_dstnode)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = dstchild_node;
 				handle_installhop(fd, temp);
@@ -665,7 +661,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -727,7 +723,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -774,7 +770,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dsl_node)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = child_node;
 				handle_installhop(fd, temp);
@@ -806,7 +802,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -859,7 +855,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dmn_node)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = child_node;
 				handle_installhop(fd, temp);
@@ -890,7 +886,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
@@ -932,7 +928,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dmd_node)) != NULL) {
-				temp.h_type = HANDLE_TYPE_DATABLOCK;
+				temp.h_type = HANDLE_TYPE_MFILE;
 				temp.h_mode = mode;
 				temp.h_data = child_node;
 				handle_installhop(fd, temp);
@@ -951,7 +947,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
 			      0);
@@ -969,12 +965,12 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
 			      0);
 		cred_require_sysadmin();
-		result_handle.h_type = HANDLE_TYPE_DRIVER;
+		result_handle.h_type = HANDLE_TYPE_MODULE;
 		result_handle.h_mode = mode;
 		result_handle.h_data = ((struct superblock *)self)->s_driver;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
@@ -984,7 +980,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
 			      0);
@@ -1000,7 +996,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (!vm_datablock_isinode(self)) {
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
+			      HANDLE_TYPE_MFILE,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
@@ -1048,14 +1044,14 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 }
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW(KCALL vm_datablock_count_part)(struct vm_datapart const *__restrict self) {
+NOTHROW(KCALL mpart_tree_count)(struct mpart const *__restrict self) {
 	size_t result = 0;
 again:
 	++result;
 	assert(!mpart_isanon(self));
 	if (self->mp_filent.rb_lhs) {
 		if (self->mp_filent.rb_rhs)
-			result += vm_datablock_count_part(self->mp_filent.rb_rhs);
+			result += mpart_tree_count(self->mp_filent.rb_rhs);
 		self = self->mp_filent.rb_lhs;
 		goto again;
 	}
@@ -1067,8 +1063,8 @@ again:
 }
 
 INTERN NONNULL((1)) void KCALL
-handle_datablock_stat(struct vm_datablock *__restrict self,
-                      USER CHECKED struct stat *result) {
+handle_mfile_stat(struct mfile *__restrict self,
+                  USER CHECKED struct stat *result) {
 	if (vm_datablock_isinode(self)) {
 		/* INode stat! */
 		inode_stat((struct inode *)self, result);
@@ -1076,8 +1072,8 @@ handle_datablock_stat(struct vm_datablock *__restrict self,
 		/* Generic data-block stat */
 		size_t partcount = 0;
 		mfile_lock_read(self);
-		if (self->db_parts && self->db_parts != MFILE_PARTS_ANONYMOUS)
-			partcount = vm_datablock_count_part(self->db_parts);
+		if (self->mf_parts && self->mf_parts != MFILE_PARTS_ANONYMOUS)
+			partcount = mpart_tree_count(self->mf_parts);
 		mfile_lock_endread(self);
 		COMPILER_BARRIER();
 		memset(result, 0, sizeof(*result));
@@ -1087,8 +1083,8 @@ handle_datablock_stat(struct vm_datablock *__restrict self,
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-handle_datablock_mmap(struct vm_datablock *__restrict self,
-                      struct handle_mmap_info *__restrict info)
+handle_mfile_mmap(struct mfile *__restrict self,
+                  struct handle_mmap_info *__restrict info)
 		THROWS(...) {
 	info->hmi_file = incref(self);
 }
@@ -1096,4 +1092,4 @@ handle_datablock_mmap(struct vm_datablock *__restrict self,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_DATABLOCK_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_HANDLE_C */

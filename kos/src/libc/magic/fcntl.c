@@ -1661,7 +1661,7 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 @@  - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
 @@  - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
 @@  - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
-@@  - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+@@  - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
 @@  - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
 @@  - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
 @@  - *:                                  Certain filesystem names can literally return anything, such

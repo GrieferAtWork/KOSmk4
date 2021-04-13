@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_HOP_VM_H
-#define _KOS_HOP_VM_H 1
+#ifndef _KOS_HOP_MPART_H
+#define _KOS_HOP_MPART_H 1
 
 #include "api.h"
 
@@ -32,8 +32,14 @@
 
 __DECL_BEGIN
 
-/* TODO: HANDLE_TYPE_VM */
+/************************************************************************/
+/* HANDLE_TYPE_MPART                                                    */
+/************************************************************************/
+
+/* [struct hop_openfd *result] Open the datablock associated with the given datapart.
+ * @return: == result->of_hint */
+#define HOP_MPART_OPEN_DATABLOCK HOP_CMD(HANDLE_TYPE_MPART, 0x0001)
 
 __DECL_END
 
-#endif /* !_KOS_HOP_VM_H */
+#endif /* !_KOS_HOP_MPART_H */

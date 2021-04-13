@@ -164,7 +164,7 @@ PRIVATE ATTR_PURE WUNUSED bool
 NOTHROW(KCALL handle_isdirectory)(struct handle self) {
 	switch (self.h_type) {
 
-	case HANDLE_TYPE_DATABLOCK: {
+	case HANDLE_TYPE_MFILE: {
 		struct inode *ino;
 		if (!vm_datablock_isinode((struct vm_datablock *)self.h_data))
 			break;
@@ -535,7 +535,7 @@ check_result_inode_for_symlink:
 					/* Symbolic  */
 open_result_inode:
 					result.h_data = result_inode;
-					result.h_type = HANDLE_TYPE_DATABLOCK;
+					result.h_type = HANDLE_TYPE_MFILE;
 					decref(result_inode);
 					decref(result_containing_path);
 					decref(result_containing_directory);

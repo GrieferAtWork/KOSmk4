@@ -30,10 +30,18 @@
 
 __DECL_BEGIN
 
-/* For HANDLE_TYPE_UAIO */
-#define HOP_UAIO_START   0x001a0001 /* [struct uaio *ops] Start a new UAIO operation (s.a. `uaio_start()') */
-#define HOP_UAIO_CANCEL  0x001a0002 /* Cancel all in-progress UAIO operations */
-#define HOP_UAIO_WAITFOR 0x001a0003 /* [struct timespec64 *] */
+/************************************************************************/
+/* HANDLE_TYPE_UAIO                                                     */
+/************************************************************************/
+
+/* [struct uaio *ops] Start a new UAIO operation (s.a. `uaio_start()') */
+#define HOP_UAIO_START       HOP_CMD(HANDLE_TYPE_UAIO, 0x0001)
+
+/* Cancel all in-progress UAIO operations */
+#define HOP_UAIO_CANCEL      HOP_CMD(HANDLE_TYPE_UAIO, 0x0002)
+
+/* [struct timespec64 *] */
+#define HOP_UAIO_WAITFOR     HOP_CMD(HANDLE_TYPE_UAIO, 0x0003)
 
 __DECL_END
 

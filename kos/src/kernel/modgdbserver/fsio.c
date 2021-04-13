@@ -428,7 +428,7 @@ do_check_truncate:
 
 		default: {
 			result->h_data = node;
-			result->h_type = HANDLE_TYPE_DATABLOCK;
+			result->h_type = HANDLE_TYPE_MFILE;
 		}	break;
 
 		}

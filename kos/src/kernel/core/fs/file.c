@@ -630,7 +630,7 @@ handle_file_hop(struct file *__restrict self,
 
 	case HOP_FILE_OPENNODE: {
 		struct handle temp;
-		temp.h_type = HANDLE_TYPE_DATABLOCK;
+		temp.h_type = HANDLE_TYPE_MFILE;
 		temp.h_mode = mode;
 		temp.h_data = self->f_node;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
@@ -1034,7 +1034,7 @@ handle_file_tryas(struct file *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 
-	case HANDLE_TYPE_DATABLOCK:
+	case HANDLE_TYPE_MFILE:
 		return incref(self->f_node);
 
 	case HANDLE_TYPE_DIRECTORYENTRY:

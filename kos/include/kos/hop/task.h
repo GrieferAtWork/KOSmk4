@@ -116,59 +116,95 @@ struct hop_task_setsessionleader /*[PREFIX(tssl_)]*/ {
 
 
 
+/************************************************************************/
+/* HANDLE_TYPE_TASK                                                     */
+/************************************************************************/
 
-/* For HANDLE_TYPE_TASK */
-#define HOP_TASK_JOIN                             0x00090001 /* [struct hop_task_join *data] Join a given thread
-                                                              * HINT: You may also use a task handle with poll() to wait for the thread to terminate.
-                                                              * @return: 0:          The thread has terminated. (Its exit status was written to `data->tj_status')
-                                                              * @return: -ETIMEDOUT: The given timeout has expired. (data->tj_status was set to 0) */
-#define HOP_TASK_GETTID                           0x00090002 /* hop() returns the TID of the given thread */
-#define HOP_TASK_GETPID                           0x00090003 /* hop() returns the process ID of the given thread
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_GETPPID                          0x00090004 /* hop() returns the parent process ID of the given thread
-                                                              * If the thread doesn't have  a parent, return 0  instead
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_GETPGID                          0x00090005 /* hop() returns the process group ID of the given thread
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_GETSID                           0x00090006 /* hop() returns the session ID of the given thread
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_OPEN_PROCESS                     0x00090007 /* [struct hop_openfd *result] Open the process leader of the given thread.
-                                                              * @throw: E_PROCESS_EXITED: [...]
-                                                              * @return: == result->of_hint */
-#define HOP_TASK_OPEN_PROCESS_PARENT              0x00090008 /* [struct hop_openfd *result] Open the parent process of the given thread.
-                                                              * If the thread doesn't have a parent, return 0 instead
-                                                              * @throw: E_NO_SUCH_PROCESS: The thread was detached from its parent process.
-                                                              * @throw: E_PROCESS_EXITED:  [...]
-                                                              * @return: == result->of_hint */
-#define HOP_TASK_OPEN_PROCESS_GROUP_LEADER        0x00090009 /* [struct hop_openfd *result] Open the process group leader of the given thread.
-                                                              * @throw: E_PROCESS_EXITED: [...]
-                                                              * @return: == result->of_hint */
-#define HOP_TASK_OPEN_SESSION_LEADER              0x0009000a /* [struct hop_openfd *result] Open the process group leader of the given thread.
-                                                              * @throw: E_PROCESS_EXITED: [...]
-                                                              * @return: == result->of_hint */
-#define HOP_TASK_IS_PROCESS_LEADER                0x0009000b /* hop() returns 0/1 indicating if the thread is a process leader
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_IS_PROCESS_GROUP_LEADER          0x0009000c /* hop() returns 0/1 indicating if the thread is a process group leader
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_IS_SESSION_LEADER                0x0009000d /* hop() returns 0/1 indicating if the thread is a session leader
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_DETACH                           0x0009000e /* Detach the given thread from its parent
-                                                              * @return: true:  Successfully detached the given thread'
-                                                              * @return: false: The given thread had already been detached.
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_DETACH_CHILDREN                  0x0009000f /* Detach all child threads/processes of the given process
-                                                              * @return: * : The number of detached children.
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_SETPROCESSGROUPLEADER            0x00090010 /* [struct hop_task_setprocessgroupleader *data]
-                                                              * Set the group leader for the process of the given thread.
-                                                              * NOTE: If the given leader isn't a process leader,
-                                                              *      `HOP_TASK_OPEN_PROCESS(leader)' will be used instead.
-                                                              * @throw: E_PROCESS_EXITED: [...] */
-#define HOP_TASK_SETSESSIONLEADER                 0x00090011 /* [struct hop_task_setsessionleader *data]
-                                                              * Set the session leader for the process of the given thread.
-                                                              * NOTE: If the given leader isn't a process leader,
-                                                              *      `HOP_TASK_OPEN_PROCESS(leader)' will be used instead.
-                                                              * @throw: E_PROCESS_EXITED: [...] */
+/* [struct hop_task_join *data] Join a given thread
+ * HINT: You may also use a task handle with poll() to wait for the thread to terminate.
+ * @return: 0:          The thread has terminated. (Its exit status was written to `data->tj_status')
+ * @return: -ETIMEDOUT: The given timeout has expired. (data->tj_status was set to 0) */
+#define HOP_TASK_JOIN                             HOP_CMD(HANDLE_TYPE_TASK, 0x0001)
+
+/* hop() returns the TID of the given thread */
+#define HOP_TASK_GETTID                           HOP_CMD(HANDLE_TYPE_TASK, 0x0002)
+
+/* hop() returns the process ID of the given thread
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_GETPID                           HOP_CMD(HANDLE_TYPE_TASK, 0x0003)
+
+/* hop() returns the parent process ID of the given thread
+ * If the thread doesn't have  a parent, return 0  instead
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_GETPPID                          HOP_CMD(HANDLE_TYPE_TASK, 0x0004)
+
+/* hop() returns the process group ID of the given thread
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_GETPGID                          HOP_CMD(HANDLE_TYPE_TASK, 0x0005)
+
+/* hop() returns the session ID of the given thread
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_GETSID                           HOP_CMD(HANDLE_TYPE_TASK, 0x0006)
+
+/* [struct hop_openfd *result] Open the process leader of the given thread.
+ * @throw: E_PROCESS_EXITED: [...]
+ * @return: == result->of_hint */
+#define HOP_TASK_OPEN_PROCESS                     HOP_CMD(HANDLE_TYPE_TASK, 0x0007)
+
+/* [struct hop_openfd *result] Open the parent process of the given thread.
+ * If the thread doesn't have a parent, return 0 instead
+ * @throw: E_NO_SUCH_PROCESS: The thread was detached from its parent process.
+ * @throw: E_PROCESS_EXITED:  [...]
+ * @return: == result->of_hint */
+#define HOP_TASK_OPEN_PROCESS_PARENT              HOP_CMD(HANDLE_TYPE_TASK, 0x0008)
+
+/* [struct hop_openfd *result] Open the process group leader of the given thread.
+ * @throw: E_PROCESS_EXITED: [...]
+ * @return: == result->of_hint */
+#define HOP_TASK_OPEN_PROCESS_GROUP_LEADER        HOP_CMD(HANDLE_TYPE_TASK, 0x0009)
+
+/* [struct hop_openfd *result] Open the process group leader of the given thread.
+ * @throw: E_PROCESS_EXITED: [...]
+ * @return: == result->of_hint */
+#define HOP_TASK_OPEN_SESSION_LEADER              HOP_CMD(HANDLE_TYPE_TASK, 0x000a)
+
+/* hop() returns 0/1 indicating if the thread is a process leader
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_IS_PROCESS_LEADER                HOP_CMD(HANDLE_TYPE_TASK, 0x000b)
+
+/* hop() returns 0/1 indicating if the thread is a process group leader
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_IS_PROCESS_GROUP_LEADER          HOP_CMD(HANDLE_TYPE_TASK, 0x000c)
+
+/* hop() returns 0/1 indicating if the thread is a session leader
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_IS_SESSION_LEADER                HOP_CMD(HANDLE_TYPE_TASK, 0x000d)
+
+/* Detach the given thread from its parent
+ * @return: true:  Successfully detached the given thread'
+ * @return: false: The given thread had already been detached.
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_DETACH                           HOP_CMD(HANDLE_TYPE_TASK, 0x000e)
+
+/* Detach all child threads/processes of the given process
+ * @return: * : The number of detached children.
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_DETACH_CHILDREN                  HOP_CMD(HANDLE_TYPE_TASK, 0x000f)
+
+/* [struct hop_task_setprocessgroupleader *data]
+ * Set the group leader for the process of the given thread.
+ * NOTE: If the given leader isn't a process leader,
+ *      `HOP_TASK_OPEN_PROCESS(leader)' will be used instead.
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_SETPROCESSGROUPLEADER            HOP_CMD(HANDLE_TYPE_TASK, 0x0010)
+
+/* [struct hop_task_setsessionleader *data]
+ * Set the session leader for the process of the given thread.
+ * NOTE: If the given leader isn't a process leader,
+ *      `HOP_TASK_OPEN_PROCESS(leader)' will be used instead.
+ * @throw: E_PROCESS_EXITED: [...] */
+#define HOP_TASK_SETSESSIONLEADER                 HOP_CMD(HANDLE_TYPE_TASK, 0x0011)
+
 /* TODO: HOP_TASK_SIGNAL -- FD-interface for kill() and friends */
 /* TODO: HOP_TASK_SIGNAL -- This should also include a function to raise a signal with a custom CPU context. */
 /* TODO: HOP_TASK_RPC -- FD-interface for `rpc_schedule()' */

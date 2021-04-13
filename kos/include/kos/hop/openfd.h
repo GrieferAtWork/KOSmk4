@@ -27,6 +27,8 @@
 
 #include <bits/types.h>
 
+
+/* Values for `struct hop_openfd::of_mode' */
 #define HOP_OPENFD_MODE_AUTO       0x0000 /* Ignore `of_hint' and automatically select an appropriate handle
                                            * This  is  the same  as `HOP_OPENFD_MODE_HINT'  with `of_hint=0' */
 #define HOP_OPENFD_MODE_HINT       0x0001 /* Install the newly opened handle into the lowest unused handle that is `>= of_hint' */
@@ -35,11 +37,12 @@
                                            * Additionally, `of_hint' may be any writable symbolic handle (e.g. `AT_FDCWD') */
 #define HOP_OPENFD_MODE_INTO_EXACT 0x0003 /* Same as `HOP_OPENFD_MODE_INTO', but don't recognize symbolic
                                            * handles, and throw an `E_INVALID_HANDLE_FILE' error instead. */
+
+
 #define __OFFSET_HOP_OPENFD_MODE  0
 #define __OFFSET_HOP_OPENFD_FLAGS 2
 #define __OFFSET_HOP_OPENFD_HINT  4
 #define __SIZEOF_HOP_OPENFD       8
-
 #ifdef __CC__
 __DECL_BEGIN
 struct hop_openfd /*[PREFIX(of_)]*/ {

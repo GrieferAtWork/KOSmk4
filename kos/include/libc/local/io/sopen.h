@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa1d6588 */
+/* HASH CRC-32:0xa97ab39f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -54,7 +54,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -70,7 +70,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -86,7 +86,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -105,7 +105,7 @@ __NAMESPACE_LOCAL_BEGIN
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such

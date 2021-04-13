@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cd32a3 */
+/* HASH CRC-32:0xe46b4414 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -593,7 +593,7 @@ DEFINE_PUBLIC_ALIAS(sys_write, libc_sys_write)
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -2889,7 +2889,7 @@ DEFINE_PUBLIC_ALIAS(sys_migrate_pages, libc_sys_migrate_pages)
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -5081,7 +5081,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xwrite, libc_sys_Xwrite)
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -7351,7 +7351,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xmigrate_pages, libc_sys_Xmigrate_pages)
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such

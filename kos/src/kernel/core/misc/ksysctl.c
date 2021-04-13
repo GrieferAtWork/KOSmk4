@@ -205,7 +205,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 	case KSYSCTL_DRIVER_LSMOD: {
 		struct handle temp;
 		require(CAP_DRIVER_QUERY);
-		temp.h_type = HANDLE_TYPE_DRIVER_STATE;
+		temp.h_type = HANDLE_TYPE_DRIVER_LOADLIST;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = get_driver_loadlist();
 		FINALLY_DECREF_UNLIKELY((struct driver_loadlist *)temp.h_data);
@@ -278,7 +278,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			drv_fd = ATOMIC_READ(data->im_driver);
 			if (drv_fd) {
 				struct handle temp;
-				temp.h_type = HANDLE_TYPE_DRIVER;
+				temp.h_type = HANDLE_TYPE_MODULE;
 				temp.h_mode = IO_RDWR;
 				temp.h_data = drv;
 				return handle_installhop(drv_fd, temp);
@@ -389,7 +389,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		FINALLY_DECREF_UNLIKELY(drv);
 		{
 			struct handle temp;
-			temp.h_type = HANDLE_TYPE_DRIVER;
+			temp.h_type = HANDLE_TYPE_MODULE;
 			temp.h_mode = IO_RDWR;
 			temp.h_data = drv;
 			return handle_installhop((struct hop_openfd *)&data->gm_driver, temp);
@@ -511,7 +511,7 @@ again_get_oldpath:
 	case KSYSCTL_OPEN_KERNEL_DRIVER: {
 		struct handle temp;
 		require(CAP_DRIVER_QUERY);
-		temp.h_type = HANDLE_TYPE_DRIVER;
+		temp.h_type = HANDLE_TYPE_MODULE;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
@@ -538,7 +538,7 @@ again_get_oldpath:
 	case KSYSCTL_OPEN_KERNEL_VM: {
 		struct handle temp;
 		require(CAP_KERNEL_QUERY);
-		temp.h_type = HANDLE_TYPE_VM;
+		temp.h_type = HANDLE_TYPE_MMAN;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &mman_kernel;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);

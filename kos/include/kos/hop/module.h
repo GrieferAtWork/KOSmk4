@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_HOP_DRIVER_H
-#define _KOS_HOP_DRIVER_H 1
+#ifndef _KOS_HOP_MODULE_H
+#define _KOS_HOP_MODULE_H 1
 
 #include "api.h"
 
@@ -131,25 +131,52 @@ struct hop_driver_open_dependency /*[PREFIX(dod_)]*/ {
 };
 #endif /* __CC__ */
 
-/* For `HANDLE_TYPE_DRIVER' */
-#define HOP_DRIVER_STAT             0x000b0001 /* [struct hop_driver_stat *result] Return statistics about the driver */
-#define HOP_DRIVER_GET_NAME         0x000b0002 /* [struct hop_driver_string *result] Return the driver's name (`ds_index' must be `0') */
-#define HOP_DRIVER_GET_CMDLINE      0x000b0003 /* [struct hop_driver_string *result] Return the driver's cmdline (`ds_index' must be `0') */
-#define HOP_DRIVER_GET_FILENAME     0x000b0004 /* [struct hop_driver_string *result] Return the driver's filename (`ds_index' must be `0') */
-#define HOP_DRIVER_GET_ARGV         0x000b0005 /* [struct hop_driver_string *result] Return one of the driver's argument string (`ds_index' specifies the argument index) */
-#define HOP_DRIVER_OPEN_FILE        0x000b0006 /* [struct hop_openfd *result] Open the driver's file
-                                                * @return: == arg->of_hint */
-#define HOP_DRIVER_OPEN_DEPENDENCY  0x000b0007 /* [struct hop_driver_open_dependency *result] Open the driver's file
-                                                * @return: == result->dod_result.of_hint */
-#define HOP_DRIVER_INITIALIZE       0x000b0008 /* Run driver initializers (if those hadn't been run already) */
-#define HOP_DRIVER_FINALIZE         0x000b0009 /* Run driver finalizers (if those hadn't been run already) */
+/************************************************************************/
+/* HANDLE_TYPE_MODULE                                                   */
+/************************************************************************/
+/* [struct hop_driver_stat *result] Return statistics about the driver */
+#define HOP_DRIVER_STAT                HOP_CMD(HANDLE_TYPE_MODULE, 0x0001)
 
-/* For `HANDLE_TYPE_DRIVER_STATE' */
-#define HOP_DRIVER_STATE_GET_COUNT  0x00100002 /* [uint64_t *result] Return the # of drivers contained with this driver state. */
-#define HOP_DRIVER_STATE_GET_DRIVER 0x00100003 /* [struct hop_driver_open_dependency *result] Open one of the individual drivers.
-                                                * @throw: E_NO_SUCH_OBJECT: The indexed driver has been destroyed.
-                                                * @return: == result->dod_result.of_hint */
+/* [struct hop_driver_string *result] Return the driver's name (`ds_index' must be `0') */
+#define HOP_DRIVER_GET_NAME            HOP_CMD(HANDLE_TYPE_MODULE, 0x0002)
+
+/* [struct hop_driver_string *result] Return the driver's cmdline (`ds_index' must be `0') */
+#define HOP_DRIVER_GET_CMDLINE         HOP_CMD(HANDLE_TYPE_MODULE, 0x0003)
+
+/* [struct hop_driver_string *result] Return the driver's filename (`ds_index' must be `0') */
+#define HOP_DRIVER_GET_FILENAME        HOP_CMD(HANDLE_TYPE_MODULE, 0x0004)
+
+/* [struct hop_driver_string *result]
+ * Return one of the driver's argument string. (`ds_index' specifies the argument index) */
+#define HOP_DRIVER_GET_ARGV            HOP_CMD(HANDLE_TYPE_MODULE, 0x0005)
+
+/* [struct hop_openfd *result] Open the driver's file
+ * @return: == arg->of_hint */
+#define HOP_DRIVER_OPEN_FILE           HOP_CMD(HANDLE_TYPE_MODULE, 0x0006)
+
+/* [struct hop_driver_open_dependency *result] Open the driver's file
+ * @return: == result->dod_result.of_hint */
+#define HOP_DRIVER_OPEN_DEPENDENCY     HOP_CMD(HANDLE_TYPE_MODULE, 0x0007)
+
+/* Run driver initializers (if those hadn't been run already) */
+#define HOP_DRIVER_INITIALIZE          HOP_CMD(HANDLE_TYPE_MODULE, 0x0008)
+
+/* Run driver finalizers (if those hadn't been run already) */
+#define HOP_DRIVER_FINALIZE            HOP_CMD(HANDLE_TYPE_MODULE, 0x0009)
+
+
+
+/************************************************************************/
+/* HANDLE_TYPE_DRIVER_LOADLIST                                          */
+/************************************************************************/
+/* [uint64_t *result] Return the # of drivers contained with this driver state. */
+#define HOP_DRIVER_LOADLIST_GET_COUNT  HOP_CMD(HANDLE_TYPE_DRIVER_LOADLIST, 0x0002)
+
+/* [struct hop_driver_open_dependency *result] Open one of the individual drivers.
+ * @throw: E_NO_SUCH_OBJECT: The indexed driver has been destroyed.
+ * @return: == result->dod_result.of_hint */
+#define HOP_DRIVER_LOADLIST_GET_DRIVER HOP_CMD(HANDLE_TYPE_DRIVER_LOADLIST, 0x0003)
 
 __DECL_END
 
-#endif /* !_KOS_HOP_H */
+#endif /* !_KOS_HOP_MODULE_H */

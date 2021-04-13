@@ -437,8 +437,9 @@ local files = {
 	"../../include/kos/exec/elf.h",
 	"../../include/kos/hop/api.h",
 	"../../include/kos/hop/blockdevice.h",
-	"../../include/kos/hop/datablock.h",
-	"../../include/kos/hop/driver.h",
+	"../../include/kos/hop/mfile.h",
+	"../../include/kos/hop/mpart.h",
+	"../../include/kos/hop/module.h",
 	"../../include/kos/hop/file.h",
 	"../../include/kos/hop/futex.h",
 	"../../include/kos/hop/handle.h",
@@ -1633,6 +1634,9 @@ static_assert(offsetof(struct elf64_lib, l_version) == __OFFSET_ELF64_LIB_VERSIO
 static_assert(sizeof(struct elf64_lib) == __SIZEOF_ELF64_LIB);
 static_assert(alignof(struct elf64_lib) == __ALIGNOF_ELF64_LIB);
 
+/* struct elf_mips_abiflags_v0 */
+/* ... */
+
 
 
 
@@ -1736,7 +1740,7 @@ static_assert(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVIC
 
 
 
-#include <kos/hop/datablock.h>
+#include <kos/hop/mfile.h>
 
 /* struct hop_datablock_stat */
 static_assert(offsetof(struct hop_datablock_stat, ds_features) == __OFFSET_HOP_DATABLOCK_STAT_FEATURES);
@@ -1922,7 +1926,13 @@ static_assert(sizeof(struct hop_superblock_features) == __SIZEOF_HOP_SUPERBLOCK_
 
 
 
-#include <kos/hop/driver.h>
+#include <kos/hop/mpart.h>
+
+
+
+
+
+#include <kos/hop/module.h>
 
 /* struct hop_driver_stat */
 static_assert(offsetof(struct hop_driver_stat, ds_argc) == __OFFSET_HOP_DRIVER_STAT_ARGC);

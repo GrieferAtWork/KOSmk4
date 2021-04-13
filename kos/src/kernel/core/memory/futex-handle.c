@@ -56,7 +56,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		if (!part)
 			return -EOWNERDEAD;
 		FINALLY_DECREF_UNLIKELY(part);
-		hnd.h_type = HANDLE_TYPE_DATAPART;
+		hnd.h_type = HANDLE_TYPE_MPART;
 		hnd.h_mode = mode;
 		hnd.h_data = part;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
@@ -77,7 +77,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 			mpart_lock_release(part);
 		}
 		FINALLY_DECREF_UNLIKELY(file);
-		hnd.h_type = HANDLE_TYPE_DATABLOCK;
+		hnd.h_type = HANDLE_TYPE_MFILE;
 		hnd.h_mode = mode;
 		hnd.h_data = file;
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);

@@ -156,51 +156,84 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 
 
 
+/************************************************************************/
+/* HANDLE_TYPE_PIPE, HANDLE_TYPE_PIPE_READER and HANDLE_TYPE_PIPE_WRITER */
+/************************************************************************/
 
-/* For `HANDLE_TYPE_PIPE', `HANDLE_TYPE_PIPE_READER' and `HANDLE_TYPE_PIPE_WRITER' */
-#define HOP_PIPE_STAT          0x000c0001 /* [struct hop_pipe_stat *result] Return statistics about the pipe */
-#define HOP_PIPE_GETLIM        0x000c0002 /* [uint64_t *result] Return the max allocated size of the pipe. */
-#define HOP_PIPE_SETLIM        0x000c0003 /* [size_t value] Set the max allocated pipe size to `value'. */
-#define HOP_PIPE_XCHLIM        0x000c0004 /* [uint64_t *value] Exchange the old max allocated pipe size with `*value'. */
-#define HOP_PIPE_WRITESOME     0x000c0005 /* [struct hop_pipe_writesome *data] A hybrid between `write()' with and without IO_NONBLOCK:
-                                           * write() w/o IO_NONBLOCK: Block until _all_ data was written
-                                           * write() w/ IO_NONBLOCK:  Don't block and only write data until the pipe limit is reached
-                                           * HOP_PIPE_WRITESOME:      Block until _any_ data was written
-                                           *                          NOTE: When this HOP is invoked with the `IO_NONBLOCK' flag,
-                                           *                          it  will  behave   identical  to   `write() w/ IO_NONBLOCK' */
-#define HOP_PIPE_VWRITESOME    0x000c0006 /* [struct hop_pipe_vwritesome *data] Vectored variant of `HOP_PIPE_WRITESOME' */
-#define HOP_PIPE_SKIPDATA      0x000c0007 /* [struct hop_pipe_skipdata *data] Skip buffered data, rather than reading it. */
-#define HOP_PIPE_UNREAD        0x000c0008 /* [struct hop_pipe_unread *data] Try to unread previously read, but not yet written data. */
-#define HOP_PIPE_UNWRITE       0x000c0009 /* [struct hop_pipe_unwrite *data] Try to unwrite previously written, but not yet read data. */
-#define HOP_PIPE_SETWRITTEN    0x000c000a /* [IN:uint64_t *data] Set the total number of written bytes to `*data' (no-op if `*data' is greater than what is currently written, but not read)
-                                           * [OUT:uint64_t *data] Return the number of available bytes for reading afterwards. */
-#define HOP_PIPE_CLOSE         0x000c000b /* Explicitly   close    the   pipe    (same   as    `HOP_PIPE_SETLIM(0)')
-                                           * Internally,  this  is  automatically  done  when  either  last  reader,
-                                           * or  the  last writer  object associated  with  some pipe  is destroyed.
-                                           * When  a pipe is  closed, no new data  can be written  to it (since it's
-                                           * limit is set to 0),  once all remaining data  has been read, read()  on
-                                           * the pipe will no longer block, but instead always return 0 immediately.
-                                           * A   pipe  can  be   un-closed  by  re-assigning   a  new  limit  value. */
-#define HOP_PIPE_OPEN_PIPE     0x000c000c /* [struct hop_openfd *arg] Open the associated `HANDLE_TYPE_PIPE' of a `HANDLE_TYPE_PIPE_READER' or `HANDLE_TYPE_PIPE_WRITER'
-                                           * @return: == arg->of_hint */
-#define HOP_PIPE_CREATE_READER 0x000c000d /* [struct hop_openfd *arg] Create   a   new   reader   object   for   the   associated    pipe.
-                                           * When the pipe(2) system call  is used to create a  new pipe, the internal  `HANDLE_TYPE_PIPE'
-                                           * object is hidden from user-space,  and instead is wrapped by  1 reader, and 1 writer  object.
-                                           * By using  `HOP_PIPE_CREATE_READER'  and  `HOP_PIPE_CREATE_WRITER',  additional  reader/writer
-                                           * objects can be created for a pipe (although pretty much identical behavior can be achieved by
-                                           * simply dup(2)-ing the original reader/writer).
-                                           * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                           * pipe   object   is  closed   by   having  its   limit   set  to   0   (s.a.  `HOP_PIPE_CLOSE')
-                                           * @return: == arg->of_hint */
-#define HOP_PIPE_CREATE_WRITER 0x000c000e /* [struct hop_openfd *arg] Create   a   new   writer   object   for   the   associated    pipe.
-                                           * When the pipe(2) system call  is used to create a  new pipe, the internal  `HANDLE_TYPE_PIPE'
-                                           * object is hidden from user-space,  and instead is wrapped by  1 reader, and 1 writer  object.
-                                           * By using  `HOP_PIPE_CREATE_READER'  and  `HOP_PIPE_CREATE_WRITER',  additional  reader/writer
-                                           * objects can be created for a pipe (although pretty much identical behavior can be achieved by
-                                           * simply dup(2)-ing the original reader/writer).
-                                           * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                           * pipe   object   is  closed   by   having  its   limit   set  to   0   (s.a.  `HOP_PIPE_CLOSE')
-                                           * @return: == arg->of_hint */
+/* [struct hop_pipe_stat *result] Return statistics about the pipe */
+#define HOP_PIPE_STAT          HOP_CMD(HANDLE_TYPE_PIPE, 0x0001)
+
+/* [uint64_t *result] Return the max allocated size of the pipe. */
+#define HOP_PIPE_GETLIM        HOP_CMD(HANDLE_TYPE_PIPE, 0x0002)
+
+/* [size_t value] Set the max allocated pipe size to `value'. */
+#define HOP_PIPE_SETLIM        HOP_CMD(HANDLE_TYPE_PIPE, 0x0003)
+
+/* [uint64_t *value] Exchange the old max allocated pipe size with `*value'. */
+#define HOP_PIPE_XCHLIM        HOP_CMD(HANDLE_TYPE_PIPE, 0x0004)
+
+/* [struct hop_pipe_writesome *data] A hybrid between `write()' with and without IO_NONBLOCK:
+ * write() w/o IO_NONBLOCK: Block until _all_ data was written
+ * write() w/ IO_NONBLOCK:  Don't block and only write data until the pipe limit is reached
+ * HOP_PIPE_WRITESOME:      Block until _any_ data was written
+ *                          NOTE: When this HOP is invoked with the `IO_NONBLOCK' flag,
+ *                          it  will  behave   identical  to   `write() w/ IO_NONBLOCK' */
+#define HOP_PIPE_WRITESOME     HOP_CMD(HANDLE_TYPE_PIPE, 0x0005)
+
+/* [struct hop_pipe_vwritesome *data] Vectored variant of `HOP_PIPE_WRITESOME' */
+#define HOP_PIPE_VWRITESOME    HOP_CMD(HANDLE_TYPE_PIPE, 0x0006)
+
+/* [struct hop_pipe_skipdata *data] Skip buffered data, rather than reading it. */
+#define HOP_PIPE_SKIPDATA      HOP_CMD(HANDLE_TYPE_PIPE, 0x0007)
+
+/* [struct hop_pipe_unread *data] Try to unread previously read, but not yet written data. */
+#define HOP_PIPE_UNREAD        HOP_CMD(HANDLE_TYPE_PIPE, 0x0008)
+
+/* [struct hop_pipe_unwrite *data] Try to unwrite previously written, but not yet read data. */
+#define HOP_PIPE_UNWRITE       HOP_CMD(HANDLE_TYPE_PIPE, 0x0009)
+
+/* [IN:uint64_t *data]  Set the total number of written bytes to  `*data'.
+ *                      No-op if `*data' is greater than what is currently
+ *                      written, but not `*data'  is greater than what  is
+ *                      currently written, but not read.
+ * [OUT:uint64_t *data] Return the number of available bytes for reading afterwards. */
+#define HOP_PIPE_SETWRITTEN    HOP_CMD(HANDLE_TYPE_PIPE, 0x000a)
+
+/* Explicitly close the pipe (same as `HOP_PIPE_SETLIM(0)')
+ * Internally,  this is automatically done when either last reader, or the
+ * last writer object associated with some pipe is destroyed. When a  pipe
+ * is closed, no new data can be written to it (since it's limit is set to
+ * 0), once all remaining data has been  read, read() on the pipe will  no
+ * longer  block, but instead  always return 0 immediately.  A pipe can be
+ * un-closed by re-assigning a new limit value. */
+#define HOP_PIPE_CLOSE         HOP_CMD(HANDLE_TYPE_PIPE, 0x000b)
+
+/* [struct hop_openfd *arg] Open the associated `HANDLE_TYPE_PIPE'
+ * of  a  `HANDLE_TYPE_PIPE_READER'  or  `HANDLE_TYPE_PIPE_WRITER'
+ * @return: == arg->of_hint */
+#define HOP_PIPE_OPEN_PIPE     HOP_CMD(HANDLE_TYPE_PIPE, 0x000c)
+
+/* [struct hop_openfd *arg] Create  a   new   reader   object  for   the   associated   pipe.
+ * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
+ * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
+ * By using `HOP_PIPE_CREATE_READER'  and `HOP_PIPE_CREATE_WRITER', additional  reader/writer
+ * objects can be created for a pipe (although pretty much identical behavior can be achieved
+ * by simply dup(2)-ing the original reader/writer).
+ * Once either all reader objects have been  destroyed, or all writer objects have,  the
+ * underlying pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE')
+ * @return: == arg->of_hint */
+#define HOP_PIPE_CREATE_READER HOP_CMD(HANDLE_TYPE_PIPE, 0x000d)
+
+/* [struct hop_openfd *arg] Create  a   new   writer   object  for   the   associated   pipe.
+ * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
+ * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
+ * By using `HOP_PIPE_CREATE_READER'  and `HOP_PIPE_CREATE_WRITER', additional  reader/writer
+ * objects can be created for a pipe (although pretty much identical behavior can be achieved
+ * by simply dup(2)-ing the original reader/writer).
+ * Once either all reader objects have been  destroyed, or all writer objects have,  the
+ * underlying pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE')
+ * @return: == arg->of_hint */
+#define HOP_PIPE_CREATE_WRITER HOP_CMD(HANDLE_TYPE_PIPE, 0x000e)
 
 __DECL_END
 

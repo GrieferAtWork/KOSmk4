@@ -80,31 +80,43 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
 };
 #endif /* __CC__ */
 
+/************************************************************************/
+/* HANDLE_TYPE_BLOCKDEVICE                                              */
+/************************************************************************/
 
-/* For `HANDLE_TYPE_BLOCKDEVICE' */
-#define HOP_BLOCKDEVICE_STAT          0x00020001 /* [struct hop_blockdevice_stat *result] Read information about the device */
-#define HOP_BLOCKDEVICE_SYNC          0x00020002 /* Write any modified, but unsaved sectors to disk. */
-#define HOP_BLOCKDEVICE_RDREADONLY    0x00020003 /* @return: (0|1): Check if the given block-device is in read-only mode */
-#define HOP_BLOCKDEVICE_WRREADONLY    0x00020004 /* [uint32_t enabled] Set the read-only mode for the given block-device.
-                                                  * WARNING: Setting a drive root to read-only will prevent writes to partitions,
-                                                  *          even though the partitions will continue to indicate being writable!
-                                                  * To ensure that read-only is disabled for a partition & drive, do this:
-                                                  * >> hop(fd, HOP_BLOCKDEVICE_WRREADONLY, 0);  // Drive
-                                                  * >> struct hop_openfd root;
-                                                  * >> root.of_mode  = HOP_OPENFD_MODE_AUTO;
-                                                  * >> root.of_flags = 0;
-                                                  * >> hop(fd, HOP_BLOCKDEVICE_OPENDRIVEROOT, &root);
-                                                  * >> hop(root.of_hint, HOP_BLOCKDEVICE_WRREADONLY, 0);
-                                                  * >> close(root.of_hint); */
-#define HOP_BLOCKDEVICE_OPENDRIVEROOT 0x00020005 /* [struct hop_openfd *arg] Open the drive root of a partition, or re-open a drive root.
-                                                  * @return: == arg->of_hint
-                                                  * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a block-device. */
-#define HOP_BLOCKDEVICE_OPENDRIVEPART 0x00020006 /* [struct hop_blockdevice_openpart *arg] Open a given partition.
-                                                  * If the given handle already refers to a partition, open a sibling partition instead.
-                                                  * @return: == arg->of_hint
-                                                  * @throw: E_INVALID_HANDLE_FILETYPE:   The given handle wasn't a block-device.
-                                                  * @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: The given partition index is invalid. */
+/* [struct hop_blockdevice_stat *result] Read information about the device */
+#define HOP_BLOCKDEVICE_STAT HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0001)
 
+/* Write any modified, but unsaved sectors to disk. */
+#define HOP_BLOCKDEVICE_SYNC HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0002)
+
+/* @return: (0|1): Check if the given block-device is in read-only mode */
+#define HOP_BLOCKDEVICE_RDREADONLY HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0003)
+
+/* [uint32_t enabled] Set the read-only mode for the given block-device.
+ * WARNING: Setting a drive root to read-only will prevent writes to partitions,
+ *          even though the partitions will continue to indicate being writable!
+ * To ensure that read-only is disabled for a partition & drive, do this:
+ * >> hop(fd, HOP_BLOCKDEVICE_WRREADONLY, 0);  // Drive
+ * >> struct hop_openfd root;
+ * >> root.of_mode  = HOP_OPENFD_MODE_AUTO;
+ * >> root.of_flags = 0;
+ * >> hop(fd, HOP_BLOCKDEVICE_OPENDRIVEROOT, &root);
+ * >> hop(root.of_hint, HOP_BLOCKDEVICE_WRREADONLY, 0);
+ * >> close(root.of_hint); */
+#define HOP_BLOCKDEVICE_WRREADONLY HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0004)
+
+/* [struct hop_openfd *arg] Open the drive root of a partition, or re-open a drive root.
+ * @return: == arg->of_hint
+ * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a block-device. */
+#define HOP_BLOCKDEVICE_OPENDRIVEROOT HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0005)
+
+/* [struct hop_blockdevice_openpart *arg] Open a given partition.
+ * If the given handle already refers to a partition, open a sibling partition instead.
+ * @return: == arg->of_hint
+ * @throw: E_INVALID_HANDLE_FILETYPE:   The given handle wasn't a block-device.
+ * @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: The given partition index is invalid. */
+#define HOP_BLOCKDEVICE_OPENDRIVEPART HOP_CMD(HANDLE_TYPE_BLOCKDEVICE, 0x0006)
 
 __DECL_END
 

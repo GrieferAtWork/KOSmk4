@@ -282,7 +282,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 
 /* Driver related */
 #define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct hop_openfd *result] Capture a snapshot of all currently loaded kernel
-                                                           * drivers, and return  a `HANDLE_TYPE_DRIVER_STATE' handle  for that  snapshot.
+                                                           * drivers, and return  a `HANDLE_TYPE_DRIVER_LOADLIST' handle  for that  snapshot.
                                                            * WARNING: None of the drivers loaded at the point this call is made can be
                                                            *          fully unloaded  before  the  returned handle  has  been  closed!
                                                            * @return: == result->of_hint */
@@ -306,9 +306,9 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
                                                            * @return: == result->of_hint */
 #define KSYSCTL_OPEN_KERNEL_FS                 0xfffe0002 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_FS' to `fs_kernel'
                                                            * @return: == result->of_hint */
-#define KSYSCTL_OPEN_KERNEL_VM                 0xfffe0003 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_VM' to `vm_kernel'
+#define KSYSCTL_OPEN_KERNEL_VM                 0xfffe0003 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_MMAN' to `vm_kernel'
                                                            * @return: == result->of_hint */
-#define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0004 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_DRIVER' to `kernel_driver'
+#define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0004 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_MODULE' to `kernel_driver'
                                                            * @return: == result->of_hint */
 #define KSYSCTL_OPEN_ROOT_PIDNS                0xfffe0005 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PIDNS' to `pidns_root'
                                                            * @return: == result->of_hint */

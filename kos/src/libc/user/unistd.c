@@ -29,7 +29,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/pagesize.h>
-#include <kos/hop/datablock.h> /* Needed for fpathconf() */
+#include <kos/hop/mfile.h> /* Needed for fpathconf() */
 #include <kos/ioctl/tty.h>
 #include <kos/syscalls.h>
 #include <sys/ioctl.h>

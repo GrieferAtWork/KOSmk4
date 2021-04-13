@@ -72,7 +72,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0xf88515e7]]]*/
+/*[[[head:libd_open,hash:CRC-32=0xc673d3a2]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -82,7 +82,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -126,7 +126,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0xc5032e77]]]*/
+/*[[[head:libc_open,hash:CRC-32=0x4f3d3c40]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -136,7 +136,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -197,7 +197,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0x196e2615]]]*/
+/*[[[head:libd_openat,hash:CRC-32=0x947bd88d]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -207,7 +207,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
@@ -242,7 +242,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0x73281a0b]]]*/
+/*[[[head:libc_openat,hash:CRC-32=0xf9f3d202]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open a new file handle to the file specified by `filename'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -252,7 +252,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
  *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
  *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such

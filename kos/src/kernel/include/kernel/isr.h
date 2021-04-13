@@ -158,7 +158,7 @@ struct block_device;
 struct taskpid;
 struct character_device;
 struct vm_datapart;
-struct vm_futex;
+struct mfutex;
 struct vm_futexfd;
 extern "C++" {
 FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) ASMNAME("hisr_unregister");

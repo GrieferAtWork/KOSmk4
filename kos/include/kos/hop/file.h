@@ -54,14 +54,24 @@ struct hop_file_cmpxchg_offset /*[PREFIX(cxo_)]*/ {
 
 
 
-/* For `HANDLE_TYPE_FILE' */
-#define HOP_FILE_CMPXCHG_OFFSET 0x00040001 /* [struct hop_file_cmpxchg_offset *arg] Compare-exchange the current file offset. */
-#define HOP_FILE_OPENNODE       0x00040002 /* [struct hop_openfd *result] Open the Inode that is backing the file.
-                                            * @return: == result->of_hint */
-#define HOP_FILE_OPENPATH       0x00040003 /* [struct hop_openfd *result] Open the path within which the file is stored (aka. the VFS path of its containing directory).
-                                            * @return: == result->of_hint */
-#define HOP_FILE_OPENDENTRY     0x00040004 /* [struct hop_openfd *result] Open the directory entry used to describe the file's INode.
-                                            * @return: == result->of_hint */
+/************************************************************************/
+/* HANDLE_TYPE_FILE                                                     */
+/************************************************************************/
+/* [struct hop_file_cmpxchg_offset *arg] Compare-exchange the current file offset. */
+#define HOP_FILE_CMPXCHG_OFFSET HOP_CMD(HANDLE_TYPE_FILE, 0x0001)
+
+/* [struct hop_openfd *result] Open the Inode that is backing the file.
+ * @return: == result->of_hint */
+#define HOP_FILE_OPENNODE       HOP_CMD(HANDLE_TYPE_FILE, 0x0002)
+
+/* [struct hop_openfd *result] Open the path within which the
+ * file is stored (the VFS path of its containing directory).
+ * @return: == result->of_hint */
+#define HOP_FILE_OPENPATH       HOP_CMD(HANDLE_TYPE_FILE, 0x0003)
+
+/* [struct hop_openfd *result] Open the directory entry used to describe the file's INode.
+ * @return: == result->of_hint */
+#define HOP_FILE_OPENDENTRY     HOP_CMD(HANDLE_TYPE_FILE, 0x0004)
 
 
 __DECL_END

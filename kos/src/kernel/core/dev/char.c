@@ -809,7 +809,7 @@ handle_characterdevice_tryas(struct character_device *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	switch (wanted_type) {
 
-	case HANDLE_TYPE_DATABLOCK: {
+	case HANDLE_TYPE_MFILE: {
 		REF struct inode *result;
 		result = ATOMIC_READ(self->cd_devfs_inode);
 		if (result)

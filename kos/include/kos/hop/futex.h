@@ -32,24 +32,34 @@
 
 __DECL_BEGIN
 
-/* HANDLE_TYPE_FUTEX */
-#define HOP_FUTEX_OPEN_DATAPART          0x00160001 /* [struct hop_openfd *arg] Open the datapart associated with a given futex.
-                                                     * @return: * : The value written to `result->of_hint'
-                                                     * @return: -EOWNERDEAD: The datapart associated with the futex was destroyed. */
-#define HOP_FUTEX_OPEN_DATABLOCK         0x00160002 /* [struct hop_openfd *arg] Open the datablock associated with the datapart associated with a given futex.
-                                                     * @return: * : The value written to `result->of_hint'
-                                                     * @return: -EOWNERDEAD: The datapart associated with the futex was destroyed. */
-#define HOP_FUTEX_ISWAITING              0x00160003 /* @return: 1: There are threads currently waiting on the futex
-                                                     * @return: 0: No threads are waiting for this futex */
-#define HOP_FUTEX_BROADCAST              0x00160004 /* Broadcast a wakeup-signal to all threads waiting for this futex.
-                                                     * @return: *: The number of threads to which the signal was sent. */
+/************************************************************************/
+/* HANDLE_TYPE_FUTEX                                                    */
+/************************************************************************/
+/* [struct hop_openfd *arg] Open the datapart associated with a given futex.
+ * @return: * : The value written to `result->of_hint'
+ * @return: -EOWNERDEAD: The datapart associated with the futex was destroyed. */
+#define HOP_FUTEX_OPEN_DATAPART HOP_CMD(HANDLE_TYPE_FUTEX, 0x0001)
+
+/* [struct hop_openfd *arg] Open the datablock associated with the datapart associated with a given futex.
+ * @return: * : The value written to `result->of_hint'
+ * @return: -EOWNERDEAD: The datapart associated with the futex was destroyed. */
+#define HOP_FUTEX_OPEN_DATABLOCK HOP_CMD(HANDLE_TYPE_FUTEX, 0x0002)
+
+/* @return: 1: There are threads currently waiting on the futex
+ * @return: 0: No threads are waiting for this futex */
+#define HOP_FUTEX_ISWAITING HOP_CMD(HANDLE_TYPE_FUTEX, 0x0003)
+
+/* Broadcast a wakeup-signal to all threads waiting for this futex.
+ * @return: *: The number of threads to which the signal was sent. */
+#define HOP_FUTEX_BROADCAST HOP_CMD(HANDLE_TYPE_FUTEX, 0x0004)
+
 /* TODO: HOP_FUTEX_GET_ADDRESS        (returns the address of the futex within its data-block) */
 /* TODO: HOP_FUTEX_STAT               (Return HOP_FUTEX_ISWAITING, HOP_FUTEX_GET_ADDRESS, and some generalized info about HOP_FUTEX_OPEN_DATABLOCK) */
 
 /* HANDLE_TYPE_FUTEXFD */
 /* TODO: HOP_FUTEXFD_STAT             (returns a `HANDLE_TYPE_FUTEX' object) */
 /* TODO: HOP_FUTEXFD_OPEN_FUTEX       (returns a `HANDLE_TYPE_FUTEX' object) */
-/* TODO: HOP_FUTEXFD_OPEN_DATABLOCK   (returns a `HANDLE_TYPE_DATABLOCK' object) */
+/* TODO: HOP_FUTEXFD_OPEN_DATABLOCK   (returns a `HANDLE_TYPE_MFILE' object) */
 
 __DECL_END
 

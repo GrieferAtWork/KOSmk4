@@ -1260,7 +1260,7 @@ do_create_far_region:
 		region->mr_vers = 0;
 		if (ATOMIC_READ(node_part->mp_meta) != NULL) {
 			/* Check for non-zero version counter. */
-			struct vm_futex_controller *ftx;
+			struct mpartmeta *ftx;
 			TRY {
 				mpart_lock_acquire(node_part);
 			} EXCEPT {
@@ -1497,7 +1497,7 @@ again_acquire_region_locks:
 		} else
 #endif /* CONFIG_RTM_FAR_REGIONS */
 		if (rtm_memory_region_waschanged(region)) {
-			struct vm_futex_controller *fxc;
+			struct mpartmeta *fxc;
 			if (!mpart_lock_tryacquire(part)) {
 				rtm_memory_endwrite_modified_parts(self, i);
 				/* Poll until the lock becomes available. - _then_ try acquiring locks again */
@@ -1540,7 +1540,7 @@ endwrite_par_and_release_locks_and_retry:
 		for (i = 0; i < self->rm_regionc; ++i) {
 			struct rtm_memory_region *region;
 			struct mpart *part;
-			struct vm_futex_controller *ftx;
+			struct mpartmeta *ftx;
 			region = self->rm_regionv[i];
 			if (!rtm_memory_region_waschanged_and_no_farregion(region))
 				continue;

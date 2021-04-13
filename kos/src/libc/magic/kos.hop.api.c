@@ -27,7 +27,13 @@
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <kos/anno.h>
+)]%[insert:prefix(
+#include <kos/kernel/handle.h>
 )]%{
+
+#ifndef HOP_CMD
+#define HOP_CMD(handle_type, cmd) (__CCAST(__uint32_t)(handle_type) << 16 | __CCAST(__uint32_t)(cmd))
+#endif /* !HOP_CMD */
 
 #if defined(__KERNEL__) && __SIZEOF_SIZE_T__ < 8
 #define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }
