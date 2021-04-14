@@ -246,7 +246,6 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_set)(pagedir_phys_t value);
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET */
 
 
-struct vm;
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
  *       can perform the task without  needing to allocate more  memory! */
@@ -383,8 +382,8 @@ NOTHROW(FCALL pagedir_unprepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * which are aligned by at least `PAGEDIR_MAPHINT_ALIGNMENT' bytes can
  * be specified as hints.
  *   - Use of this function requires a prior call to `pagedir_prepare()'!
- *   - Memory mappings defined in `vm_kernel' to be non-blocking have their
- *     mapping hint set to the  address of the associated  `struct vm_node' */
+ *   - Memory mappings  defined  in  `mman_kernel' to  be  non-blocking  have
+ *     their mapping hint set to the address of the associated `struct mnode' */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAPHINT
 FUNDEF NOBLOCK void
 NOTHROW(FCALL pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
@@ -573,12 +572,12 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 
 #ifndef CONFIG_NO_SMP
-/* Sync memory on every CPU with `CPU->c_vm->v_pdir_phys == pagedir' */
+/* Sync memory on every CPU with `CPU->c_pdir == pagedir' */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir, PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone_smp_p)(pagedir_phys_t pagedir, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall_smp_p)(pagedir_phys_t pagedir);
 
-/* Sync memory on every CPU with `CPU->c_vm->v_pdir_phys == pagedir_get()' */
+/* Sync memory on every CPU with `CPU->c_pdir == pagedir_get()' */
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall_smp)(void);

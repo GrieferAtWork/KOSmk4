@@ -27,7 +27,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <kos/kernel/paging.h> /* KERNEL_VMHINT_SLAB */
+#include <kos/kernel/paging.h> /* KERNEL_MHINT_SLAB */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #include <hybrid/sync/atomic-lock.h>
@@ -179,17 +179,17 @@ struct slab {
 #define PRIVATE_SLAB_GET_HINT(x) PRIVATE_SLAB_GET_HINT2 x
 #undef CONFIG_SLAB_GROWS_UPWARDS
 #undef CONFIG_SLAB_GROWS_DOWNWARDS
-#if PRIVATE_SLAB_GET_HINT(KERNEL_VMHINT_SLAB) == __MAP_GROWSDOWN
+#if PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) == __MAP_GROWSDOWN
 #define CONFIG_SLAB_GROWS_DOWNWARDS 1
-#else /* PRIVATE_SLAB_GET_HINT(KERNEL_VMHINT_SLAB) == __MAP_GROWSDOWN */
+#else /* PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) == __MAP_GROWSDOWN */
 #define CONFIG_SLAB_GROWS_UPWARDS 1
-#endif /* PRIVATE_SLAB_GET_HINT(KERNEL_VMHINT_SLAB) != __MAP_GROWSDOWN */
+#endif /* PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) != __MAP_GROWSDOWN */
 
 
 #define KERNEL_SLAB_INITIAL \
-	PRIVATE_SLAB_GET_ADDR(KERNEL_VMHINT_SLAB)
+	PRIVATE_SLAB_GET_ADDR(KERNEL_MHINT_SLAB)
 
-/* [lock(vm_kernel)]
+/* [lock(mman_kernel.mm_lock)]
  * The pointer to either the lowest (CONFIG_SLAB_GROWS_DOWNWARDS), or
  * one past the greatest (CONFIG_SLAB_GROWS_UPWARDS) address that was
  * ever allocated for slab memory.

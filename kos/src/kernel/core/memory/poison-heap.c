@@ -141,8 +141,8 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	 * NOTE: To aid in debugging, unconditionally disable ASLR
 	 *       for  memory  allocated   from  the   poison-heap! */
 	result = mman_findunmapped(&mman_kernel,
-	                           HINT_GETADDR(KERNEL_VMHINT_LHEAP), num_bytes,
-	                           HINT_GETMODE(KERNEL_VMHINT_LHEAP) | MAP_NOASLR);
+	                           HINT_GETADDR(KERNEL_MHINT_LHEAP), num_bytes,
+	                           HINT_GETMODE(KERNEL_MHINT_LHEAP) | MAP_NOASLR);
 	if unlikely(result == MAP_FAILED)
 		goto err_unlock;
 	cp = mcoreheap_alloc_locked_nx();

@@ -93,7 +93,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct cpu;
-struct vm;
+struct mman;
 struct scpustate;
 struct task {
 	struct task            *t_self;       /* [1..1][const][== this] Self-pointer (always at offset == 0) */
@@ -101,11 +101,11 @@ struct task {
 	WEAK uintptr_t          t_flags;      /* Thread state & flags (Set of `TASK_F*'). */
 	struct cpu             *t_cpu;        /* [1..1][lock(PRIVATE)] The CPU that this task is being hosted by.
 	                                       * NOTE: Also accessible via the `this_cpu' field. */
-	REF struct vm          *t_mman;       /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
+	REF struct mman        *t_mman;       /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
 	                                       *             write(THIS_TASK && INTERN(lock)))]
 	                                       * The VM used to host this task.
 	                                       * NOTE: Also accessible via the `this_mman' field. */
-	LIST_ENTRY(task)        t_mman_tasks; /* [lock(t_mman->v_tasklock)] Chain of tasks using `t_mman' */
+	LIST_ENTRY(task)        t_mman_tasks; /* [lock(t_mman->mm_threadslock)] Chain of tasks using `t_mman' */
 	size_t                  t_heapsz;     /* [const] Allocated heap size of this task. */
 	union {
 		struct scpustate   *t_state;      /* [lock(PRIVATE(t_cpu == THIS_CPU))]
@@ -124,9 +124,9 @@ DATDEF ATTR_PERTASK struct scpustate *this_sstate; /* ALIAS:THIS_TASK->t_state *
 
 /* Allocate + initialize a new task.
  * TODO: Re-design this function so we don't leak uninitialized tasks through the VM
- * @param: task_vm: The vm inside of which the start will start initially. */
+ * @param: task_mman: The mman inside of which the start will start initially. */
 FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *KCALL
-task_alloc(struct vm *__restrict task_vm)
+task_alloc(struct mman *__restrict task_mman)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -144,7 +144,7 @@ typedef void (KCALL *thread_main_t)();
  * >>      ....
  * >> }
  * >>
- * >> struct task *thread = task_alloc(&vm_kernel);
+ * >> struct task *thread = task_alloc(&mman_kernel);
  * >> task_setup_kernel(thread, (thread_main_t)&kernel_main, "foo", "bar", NULL);
  * >> task_start(thread, TASK_START_FNORMAL);
  * >> decref(thread);
@@ -192,17 +192,19 @@ DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PE
 DATDEF struct task boottask; /* The boot task (aka. `/proc/1'; aka. `/bin/init') */
 DATDEF struct task bootidle; /* The idle thread for the boot CPU */
 
-/* [const] VM node referring to the kernel stack of the current thread.
- * WARNING: These structures for `boottask' and `bootidle' are not actually part of the kernel VM!
+struct mnode;
+struct mpart;
+
+/* [const] MMan node referring to the kernel stack of the current thread.
+ * WARNING: These structures for `boottask' and `bootidle' are not actually part of the kernel MMan!
  * WARNING: You cannot assume that your stack-pointer is always located within `THIS_KERNEL_STACK',
  *          as KOS may use special, arch-specific stacks  to deal with certain CPU exceptions  that
- *          require  execution   on   a  separate   stack   (such   as  the   #DF-stack   on   x86)
- *          To determine available/used stack memory, use the function below.
- */
-DATDEF ATTR_PERTASK struct vm_node const this_kernel_stacknode;
-DATDEF ATTR_PERTASK struct vm_datapart const this_kernel_stackpart;
+ *          require execution on  a separate stack  (such as  the #DF-stack on  x86). To  determine
+ *          available/used stack memory, use the function below. */
+DATDEF ATTR_PERTASK struct mnode const this_kernel_stacknode;
+DATDEF ATTR_PERTASK struct mpart const this_kernel_stackpart;
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-DATDEF ATTR_PERTASK struct vm_node const this_kernel_stackguard;
+DATDEF ATTR_PERTASK struct mnode const this_kernel_stackguard;
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 #define THIS_KERNEL_STACK      (&PERTASK(this_kernel_stacknode))

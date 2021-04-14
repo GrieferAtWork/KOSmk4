@@ -28,11 +28,15 @@
 
 #include <kernel/driver.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
@@ -107,13 +111,13 @@ INTDEF byte_t __kernel_bootiob_startpage_p[] ASMNAME("__x86_iob_empty_page_p");
  * This page is used to ensure that iterating through user-memory can always be done
  * safely,  after only the starting pointer has been  checked, so long as at least 1
  * byte is read for every 4096 bytes being advanced. */
-#define X86_KERNEL_VMMAPPING_CORE_TEXT        0 /* .text */
-#define X86_KERNEL_VMMAPPING_CORE_RODATA      1 /* .rodata */
+#define X86_KERNEL_MMAPPING_CORE_TEXT        0 /* .text */
+#define X86_KERNEL_MMAPPING_CORE_RODATA      1 /* .rodata */
 #ifdef CONFIG_BOOTCPU_IOB_LIES_IN_BSS
-#define X86_KERNEL_VMMAPPING_CORE_DATA        2 /* .data */
-#define X86_KERNEL_VMMAPPING_CORE_XDATA       3 /* .xdata / .xbss */
-#define X86_KERNEL_VMMAPPING_CORE_BSS1        4 /* .bss */
-#define X86_KERNEL_VMMAPPING_CORE_BSS2        5 /* .bss */
+#define X86_KERNEL_MMAPPING_CORE_DATA        2 /* .data */
+#define X86_KERNEL_MMAPPING_CORE_XDATA       3 /* .xdata / .xbss */
+#define X86_KERNEL_MMAPPING_CORE_BSS1        4 /* .bss */
+#define X86_KERNEL_MMAPPING_CORE_BSS2        5 /* .bss */
 INTDEF byte_t __x86_kernel_bss_before_iob_size[];
 INTDEF byte_t __x86_kernel_bss_before_iob_pages[];
 INTDEF byte_t __x86_kernel_bss_after_iob_size[];
@@ -129,10 +133,10 @@ INTDEF byte_t __x86_kernel_bss_after_iob_pages[];
 #define __kernel_bss2_size        (__x86_kernel_bss_after_iob_size - 2 * PAGESIZE)
 #define __kernel_bss2_numpages    (__x86_kernel_bss_after_iob_pages - 2)
 #else /* CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
-#define X86_KERNEL_VMMAPPING_CORE_DATA1       2 /* .data */
-#define X86_KERNEL_VMMAPPING_CORE_DATA2       3 /* .data */
-#define X86_KERNEL_VMMAPPING_CORE_XDATA       4 /* .xdata / .xbss */
-#define X86_KERNEL_VMMAPPING_CORE_BSS         5 /* .bss */
+#define X86_KERNEL_MMAPPING_CORE_DATA1       2 /* .data */
+#define X86_KERNEL_MMAPPING_CORE_DATA2       3 /* .data */
+#define X86_KERNEL_MMAPPING_CORE_XDATA       4 /* .xdata / .xbss */
+#define X86_KERNEL_MMAPPING_CORE_BSS         5 /* .bss */
 INTDEF byte_t __x86_kernel_data_before_iob_size[];
 INTDEF byte_t __x86_kernel_data_before_iob_pages[];
 INTDEF byte_t __x86_kernel_data_after_iob_size[];
@@ -148,13 +152,12 @@ INTDEF byte_t __x86_kernel_data_after_iob_pages[];
 #define __kernel_data2_size        (__x86_kernel_data_after_iob_size - 2 * PAGESIZE)
 #define __kernel_data2_numpages    (__x86_kernel_data_after_iob_pages - 2)
 #endif /* !CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
-#define X86_KERNEL_VMMAPPING_IDENTITY_RESERVE 6 /* A memory reservation made for the page directory identity mapping. */
+#define X86_KERNEL_MMAPPING_IDENTITY_RESERVE 6 /* A memory reservation made for the page directory identity mapping. */
 
 
 
-INTDEF struct mpart x86_kernel_vm_parts[];
-INTDEF struct mnode x86_kernel_vm_nodes[];
-INTDEF struct mnode x86_vmnode_transition_reserve;
+INTDEF struct mpart x86_kernel_mparts[];
+INTDEF struct mnode x86_kernel_mnodes[];
 
 #define INIT_MPART(self, node, pageptr, num_pages, num_bytes)                 \
 	{                                                                         \
@@ -177,24 +180,24 @@ INTDEF struct mnode x86_vmnode_transition_reserve;
 		MPART_INIT_mp_meta(NULL)                                              \
 	}
 
-INTERN struct mpart x86_kernel_vm_parts[6] = {
+INTERN struct mpart x86_kernel_mparts[6] = {
 #define DO_INIT_DATAPART(id, startpage, num_pages, num_bytes) \
-	INIT_MPART(x86_kernel_vm_parts[id], &x86_kernel_vm_nodes[id], startpage, num_pages, num_bytes)
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_TEXT,   __kernel_text_startpage_p,   __kernel_text_numpages,   __kernel_text_size),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_startpage_p, __kernel_rodata_numpages, __kernel_rodata_size),
-#ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA,   __kernel_data_startpage_p,   __kernel_data_numpages,   __kernel_data_size),
-#else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA1,  __kernel_data1_startpage_p,  __kernel_data1_numpages,  __kernel_data1_size),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA2,  __kernel_data2_startpage_p,  __kernel_data2_numpages,  __kernel_data2_size),
-#endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_XDATA,  __kernel_xdata_startpage_p,  __kernel_xdata_numpages,  __kernel_xdata_size),
-#ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS,    __kernel_bss_startpage_p,    __kernel_bss_numpages,    __kernel_bss_size),
-#else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS1,   __kernel_bss1_startpage_p,   __kernel_bss1_numpages,   __kernel_bss1_size),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS2,   __kernel_bss2_startpage_p,   __kernel_bss2_numpages,   __kernel_bss2_size),
-#endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
+	INIT_MPART(x86_kernel_mparts[id], &x86_kernel_mnodes[id], startpage, num_pages, num_bytes)
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_TEXT,   __kernel_text_startpage_p,   __kernel_text_numpages,   __kernel_text_size),
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_RODATA, __kernel_rodata_startpage_p, __kernel_rodata_numpages, __kernel_rodata_size),
+#ifdef X86_KERNEL_MMAPPING_CORE_DATA
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_DATA,   __kernel_data_startpage_p,   __kernel_data_numpages,   __kernel_data_size),
+#else /* X86_KERNEL_MMAPPING_CORE_DATA */
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_DATA1,  __kernel_data1_startpage_p,  __kernel_data1_numpages,  __kernel_data1_size),
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_DATA2,  __kernel_data2_startpage_p,  __kernel_data2_numpages,  __kernel_data2_size),
+#endif /* !X86_KERNEL_MMAPPING_CORE_DATA */
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_XDATA,  __kernel_xdata_startpage_p,  __kernel_xdata_numpages,  __kernel_xdata_size),
+#ifdef X86_KERNEL_MMAPPING_CORE_BSS
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_BSS,    __kernel_bss_startpage_p,    __kernel_bss_numpages,    __kernel_bss_size),
+#else /* X86_KERNEL_MMAPPING_CORE_BSS */
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_BSS1,   __kernel_bss1_startpage_p,   __kernel_bss1_numpages,   __kernel_bss1_size),
+	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_BSS2,   __kernel_bss2_startpage_p,   __kernel_bss2_numpages,   __kernel_bss2_size),
+#endif /* !X86_KERNEL_MMAPPING_CORE_BSS */
 #undef DO_INIT_DATAPART
 };
 
@@ -235,43 +238,36 @@ INTERN struct mpart x86_kernel_vm_parts[6] = {
 	}
 
 
-/* Special VM node used to describe the memory reservation at the user-/kernel-space split. */
-INTERN struct mnode x86_vmnode_transition_reserve =
-INIT_MNODE_RESERVE(x86_vmnode_transition_reserve,
-                  KERNELSPACE_BASE,
-                  KERNELSPACE_BASE + PAGESIZE - 1,
-                  VM_PROT_NONE);
+INTERN struct mnode x86_kernel_mnodes[8] = {
+#define DO_INIT_NODE_EX(id, startaddr, endaddr, prot) INIT_MNODE(x86_kernel_mnodes[id], startaddr, (endaddr)-1, prot, x86_kernel_mparts[id], &kernel_driver)
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_TEXT,   __kernel_text_start,   __kernel_text_end,   MNODE_F_PEXEC | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_RODATA, __kernel_rodata_start, __kernel_rodata_end, MNODE_F_PREAD),
+#ifdef X86_KERNEL_MMAPPING_CORE_DATA
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_DATA,   __kernel_data_start,   __kernel_data_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
+#else /* X86_KERNEL_MMAPPING_CORE_DATA */
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_DATA1,  __kernel_data1_start,  __kernel_data1_end,  MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_DATA2,  __kernel_data2_start,  __kernel_data2_end,  MNODE_F_PWRITE | MNODE_F_PREAD),
+#endif /* !X86_KERNEL_MMAPPING_CORE_DATA */
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_XDATA,  __kernel_xdata_start,  __kernel_xdata_end,  MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD),
+#ifdef X86_KERNEL_MMAPPING_CORE_BSS
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_BSS,    __kernel_bss_start,    __kernel_bss_end,    MNODE_F_PWRITE | MNODE_F_PREAD),
+#else /* X86_KERNEL_MMAPPING_CORE_BSS */
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_BSS1,   __kernel_bss1_start,   __kernel_bss1_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
+	DO_INIT_NODE_EX(X86_KERNEL_MMAPPING_CORE_BSS2,   __kernel_bss2_start,   __kernel_bss2_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
+#endif /* !X86_KERNEL_MMAPPING_CORE_BSS */
 
-INTERN struct mnode x86_kernel_vm_nodes[8] = {
-#define DO_INIT_NODE_EX(id, startaddr, endaddr, prot) INIT_MNODE(x86_kernel_vm_nodes[id], startaddr, (endaddr)-1, prot, x86_kernel_vm_parts[id], &kernel_driver)
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_TEXT,   __kernel_text_start,   __kernel_text_end,   MNODE_F_PEXEC | MNODE_F_PREAD),
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_start, __kernel_rodata_end, MNODE_F_PREAD),
-#ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_DATA,   __kernel_data_start,   __kernel_data_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
-#else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_DATA1,  __kernel_data1_start,  __kernel_data1_end,  MNODE_F_PWRITE | MNODE_F_PREAD),
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_DATA2,  __kernel_data2_start,  __kernel_data2_end,  MNODE_F_PWRITE | MNODE_F_PREAD),
-#endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_XDATA,  __kernel_xdata_start,  __kernel_xdata_end,  MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD),
-#ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_BSS,    __kernel_bss_start,    __kernel_bss_end,    MNODE_F_PWRITE | MNODE_F_PREAD),
-#else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_BSS1,   __kernel_bss1_start,   __kernel_bss1_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
-	DO_INIT_NODE_EX(X86_KERNEL_VMMAPPING_CORE_BSS2,   __kernel_bss2_start,   __kernel_bss2_end,   MNODE_F_PWRITE | MNODE_F_PREAD),
-#endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
-
-	/* [X86_KERNEL_VMMAPPING_IDENTITY_RESERVE] = */
-#ifdef X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
-	INIT_MNODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
+	/* [X86_KERNEL_MMAPPING_IDENTITY_RESERVE] = */
+#ifdef X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
+	INIT_MNODE_RESERVE(x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE],
 	                   0, /* Calculated below */
 	                   0, /* Calculated below */
-	                   VM_PROT_NONE),
-#else /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
-	INIT_MNODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
+	                   MNODE_F_NORMAL),
+#else /* X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
+	INIT_MNODE_RESERVE(x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE],
 	                   X86_MMAN_KERNEL_PDIR_RESERVED_BASE,
 	                   X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1,
-	                   VM_PROT_NONE),
-#endif /* !X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
+	                   MNODE_F_NORMAL),
+#endif /* !X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 };
 
 /* The components for the PADDR=VADDR sections, also known as the .pdata sections. */
@@ -296,8 +292,8 @@ INIT_MNODE(x86_pdata_mnode,
 /* The components for initializing the  initial mapping of the .free  section.
  * These are handled on their own, as they are part of the .free section, thus
  * allowing them to be deleted once .free gets removed. */
-INTDEF struct mpart x86_kernel_vm_part_free;
-INTDEF struct mnode x86_kernel_vm_node_free;
+INTDEF struct mpart x86_kernel_free_mpart;
+INTDEF struct mnode x86_kernel_free_mnode;
 
 INTDEF byte_t __kernel_free_start[];
 INTDEF byte_t __kernel_free_startpage_p[];
@@ -305,17 +301,17 @@ INTDEF byte_t __kernel_free_end[];
 INTDEF byte_t __kernel_free_size[];
 INTDEF byte_t __kernel_free_numpages[];
 
-INTERN ATTR_FREEDATA struct mpart x86_kernel_vm_part_free =
-INIT_MPART(x86_kernel_vm_part_free, &x86_kernel_vm_node_free,
+INTERN ATTR_FREEDATA struct mpart x86_kernel_free_mpart =
+INIT_MPART(x86_kernel_free_mpart, &x86_kernel_free_mnode,
            __kernel_free_startpage_p,
            __kernel_free_numpages,
            __kernel_free_size);
-INTERN ATTR_FREEDATA struct mnode x86_kernel_vm_node_free =
-INIT_MNODE(x86_kernel_vm_node_free,
+INTERN ATTR_FREEDATA struct mnode x86_kernel_free_mnode =
+INIT_MNODE(x86_kernel_free_mnode,
            __kernel_free_start,
            __kernel_free_end - 1,
            MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD,
-           x86_kernel_vm_part_free,
+           x86_kernel_free_mpart,
            &kernel_driver);
 
 
@@ -344,10 +340,14 @@ INIT_MNODE(x86_lapic_mnode, 0, 0,
            x86_lapic_mpart, NULL);
 
 
+/* Special mem-node used to describe the memory
+ * reservation at the user-/kernel-space split. */
+PRIVATE struct mnode x86_mnode_transition_reserve =
+INIT_MNODE_RESERVE(x86_mnode_transition_reserve,
+                   KERNELSPACE_BASE,
+                   KERNELSPACE_BASE + PAGESIZE - 1,
+                   MNODE_F_NORMAL);
 
-STATIC_ASSERT(MNODE_F_PEXEC == PAGEDIR_MAP_FEXEC);
-STATIC_ASSERT(MNODE_F_PWRITE == PAGEDIR_MAP_FWRITE);
-STATIC_ASSERT(MNODE_F_PREAD == PAGEDIR_MAP_FREAD);
 
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 INTDEF byte_t __kernel_boottask_stack_guard[];
@@ -360,9 +360,9 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
                                           u16 prot) {
 	struct mpart *part;
 	void *addr;
-	assert(node->vn_vm == &vm_kernel);
-	vm_node_insert(node);
-	part = node->vn_part;
+	assert(node->mn_mman == &mman_kernel);
+	mman_mappings_insert(&mman_kernel, node);
+	part = node->mn_part;
 	assertf(mnode_getsize(node) == mpart_getsize(part),
 	        "mnode_getsize: %#" PRIxSIZ "\n"
 	        "mpart_getsize: %#" PRIxSIZ "\n",
@@ -393,16 +393,16 @@ NOTHROW(FCALL pagedir_unmap_and_sync_one)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 }
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
-#ifdef X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
+#ifdef X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
 	{
 		/* Calculate the PDIR Identity reservation at runtime. */
 		byte_t *minaddr, *maxaddr;
 		minaddr = (byte_t *)(X86_MMAN_KERNEL_PDIR_RESERVED_BASE);
-		maxaddr = (byte_t *)(X86_MMAN_KERNEL_PDIR_RESERVED_BASE + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1);
-		vm_node_setminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE], minaddr);
-		vm_node_setmaxaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE], maxaddr);
+		maxaddr = minaddr + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1;
+		&x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE].mn_minaddr = minaddr;
+		&x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE].mn_maxaddr = maxaddr;
 	}
-#endif /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
+#endif /* X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 
 	/* Unmap everything before the kernel. */
 	if (pagedir_kernelprepare((void *)KERNEL_CORE_BASE,
@@ -414,28 +414,30 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	}
 	assert(mnode_getminaddr(&kernel_meminfo_mnode) != (byte_t *)0);
 
-	/* Insert kernel-space memory nodes into the kernel VM, and re-map memory as needed. */
-	vm_node_insert(&x86_vmnode_transition_reserve);
-	/* NOTE: Map the .text and .rodata sections as writable for now, so-as to allow initialization
-	 *       code   to   modify  itself,   as  well   as   otherwise  constant   data  structures. */
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT], PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-#ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-#else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-#endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA], PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-#ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-#else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-#endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
+	/* Insert kernel-space memory nodes into the kernel MMan, and re-map memory as needed. */
+	mman_mappings_insert(&mman_kernel, &x86_mnode_transition_reserve);
+
+	/* NOTE: Map the .text and .rodata sections as writable for now, so-as to
+	 *       allow initialization code to modify itself, as well as otherwise
+	 *       constant data structures. */
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_TEXT], PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_RODATA], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+#ifdef X86_KERNEL_MMAPPING_CORE_DATA
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+#else /* X86_KERNEL_MMAPPING_CORE_DATA */
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+#endif /* !X86_KERNEL_MMAPPING_CORE_DATA */
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_XDATA], PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+#ifdef X86_KERNEL_MMAPPING_CORE_BSS
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+#else /* X86_KERNEL_MMAPPING_CORE_BSS */
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+#endif /* !X86_KERNEL_MMAPPING_CORE_BSS */
 	mman_mappings_insert(&mman_kernel, &FORCPU(&bootcpu, thiscpu_x86_iobnode));
-	mman_mappings_insert(&mman_kernel, &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]);
-	mman_mappings_insert(&mman_kernel, &x86_kernel_vm_node_free);
+	mman_mappings_insert(&mman_kernel, &x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE]);
+	mman_mappings_insert(&mman_kernel, &x86_kernel_free_mnode);
 	mman_mappings_insert(&mman_kernel, &kernel_meminfo_mnode);
 
 	/* Insert  the  mapping  for   the  physical  identity  (.pdata)   section.
@@ -443,7 +445,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	 * though  can also be used for other things that require being placed at a
 	 * known physical memory location. */
 	if (!pagedir_prepare(__kernel_pdata_start - KERNEL_CORE_BASE, (size_t)__kernel_pdata_size))
-		kernel_panic(FREESTR("Failed to prepare kernel VM for mapping .pdata\n"));
+		kernel_panic(FREESTR("Failed to prepare kernel MMan for mapping .pdata\n"));
 	simple_insert_and_activate(&x86_pdata_mnode, PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #ifndef NDEBUG
 	{
@@ -454,14 +456,14 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	}
 #endif /* !NDEBUG */
 
-	/* Map the LAPIC into the kernel VM. */
+	/* Map the LAPIC into the kernel MMan. */
 	assert(mpart_getsize(&x86_lapic_mpart) == x86_lapic_mpart.mp_mem.mc_size * PAGESIZE);
 	if (x86_lapic_mpart.mp_mem.mc_size != 0) {
 		byte_t *lapic_addr;
 		lapic_addr = (byte_t *)mman_findunmapped(&mman_kernel,
-		                                         HINT_GETADDR(KERNEL_VMHINT_LAPIC),
+		                                         HINT_GETADDR(KERNEL_MHINT_LAPIC),
 		                                         mpart_getsize(&x86_lapic_mpart),
-		                                         HINT_GETMODE(KERNEL_VMHINT_LAPIC));
+		                                         HINT_GETMODE(KERNEL_MHINT_LAPIC));
 		if unlikely(lapic_addr == MAP_FAILED)
 			kernel_panic(FREESTR("Failed to map the LAPIC somewhere\n"));
 		x86_lapic_mnode.mn_minaddr = lapic_addr;
@@ -473,7 +475,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 
 	{
 		/* Unmap unused memory above the kernel. */
-		struct mnode *iter = &x86_kernel_vm_node_free;
+		struct mnode *iter = &x86_kernel_free_mnode;
 		for (;;) {
 			void *pagedata_prev_end;
 			void *pagedata_next_min;
@@ -487,12 +489,12 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 			if (!iter) {
 				pagedata_next_min = (void *)0;
 			} else {
-				pagedata_next_min = vm_node_getaddr(iter);
+				pagedata_next_min = mnode_getaddr(iter);
 			}
 #else /* __x86_64__ */
 			if (!iter)
-				break; /* The previous node should have been `X86_KERNEL_VMMAPPING_IDENTITY_RESERVE' at this point. */
-			pagedata_next_min = vm_node_getaddr(iter);
+				break; /* The previous node should have been `X86_KERNEL_MMAPPING_IDENTITY_RESERVE' at this point. */
+			pagedata_next_min = mnode_getaddr(iter);
 #endif /* !__x86_64__ */
 			num_bytes = (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end);
 			if (pagedir_kernelprepare(pagedata_prev_end, num_bytes)) {
@@ -510,55 +512,53 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	 * Before this point, they were (likely) still filled in with the original
 	 * physical memory identity mapping containing  the kernel core image,  or
 	 * may have also not been mapped at all (in which case this is a no-op)
-	 * s.a.: the comment inside of `vm_copyfromphys_noidentity_partial()' in `boot/acpi.c' */
+	 * s.a.: the comment inside of `copyfromphys_noidentity_partial()' in `boot/acpi.c' */
 	pagedir_unmap_and_sync_one(FORTASK(&boottask, this_trampoline));
 	pagedir_unmap_and_sync_one(FORTASK(&bootidle, this_trampoline));
 	pagedir_unmap_and_sync_one(FORTASK(&asyncwork, this_trampoline));
-	/* All right! that's our entire kernel VM all cleaned up! */
+	/* All right! that's our entire kernel MMan all cleaned up! */
 }
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_mman_kernel_rdonly)(void) {
-	/* Go through all  kernel VM  mappings, and make  everything that's  been
+	/* Go through all kernel MMan  mappings, and make everything that's  been
 	 * mapped as writable, but should actually be read-only, truly read-only.
 	 * This affects the kernel's .text and .rodata section, which  previously
 	 * allowed self-modifying code to  replace itself with an  optimized/more
 	 * appropriate version. */
-	pagedir_map(mnode_getaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT]),
-	            mnode_getsize(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT]),
-	            physpage2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].mp_mem.mc_start),
-	            PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
-	pagedir_map(mnode_getaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA]),
-	            mnode_getsize(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA]),
-	            physpage2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].mp_mem.mc_start),
-	            PAGEDIR_MAP_FREAD);
-	assert(!pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT])));
-	assert(!pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA])));
-#ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA])));
-#else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA1])));
-	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA2])));
-#endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA])));
-#ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS])));
-#else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1])));
-	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2])));
-#endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
+	mnode_pagedir_map(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_TEXT],
+	                  physpage2addr(x86_kernel_mparts[X86_KERNEL_MMAPPING_CORE_TEXT].mp_mem.mc_start),
+	                  PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
+	mnode_pagedir_map(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_RODATA],
+	                  physpage2addr(x86_kernel_mparts[X86_KERNEL_MMAPPING_CORE_RODATA].mp_mem.mc_start),
+	                  PAGEDIR_MAP_FREAD);
+	assert(!pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_TEXT])));
+	assert(!pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_RODATA])));
+#ifdef X86_KERNEL_MMAPPING_CORE_DATA
+	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA])));
+#else /* X86_KERNEL_MMAPPING_CORE_DATA */
+	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA1])));
+	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA2])));
+#endif /* !X86_KERNEL_MMAPPING_CORE_DATA */
+	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_XDATA])));
+#ifdef X86_KERNEL_MMAPPING_CORE_BSS
+	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS])));
+#else /* X86_KERNEL_MMAPPING_CORE_BSS */
+	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS1])));
+	assert(pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS2])));
+#endif /* !X86_KERNEL_MMAPPING_CORE_BSS */
 
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	/* Get rid of the page guarding the end of the boot-task stack. */
-	if (pagedir_kernelprepareone(__kernel_boottask_stack_guard)) {
+	if likely(pagedir_kernelprepareone(__kernel_boottask_stack_guard)) {
 		pagedir_unmapone(__kernel_boottask_stack_guard);
 		pagedir_kernelunprepareone(__kernel_boottask_stack_guard);
 	}
-	if (pagedir_kernelprepareone(__kernel_asyncwork_stack_guard)) {
+	if likely(pagedir_kernelprepareone(__kernel_asyncwork_stack_guard)) {
 		pagedir_unmapone(__kernel_asyncwork_stack_guard);
 		pagedir_kernelunprepareone(__kernel_asyncwork_stack_guard);
 	}
-	if (pagedir_kernelprepareone(__kernel_bootidle_stack_guard)) {
+	if likely(pagedir_kernelprepareone(__kernel_bootidle_stack_guard)) {
 		pagedir_unmapone(__kernel_bootidle_stack_guard);
 		pagedir_kernelunprepareone(__kernel_bootidle_stack_guard);
 	}
@@ -584,7 +584,7 @@ INTDEF byte_t __kernel_pfree_numpages[];
 INTERN ATTR_SECTION(".text.xdata.x86.free_unloader") ATTR_NORETURN
 void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 #if 1
-	vm_node_remove(&vm_kernel, __kernel_free_start);
+	mman_mappings_removenode(&mman_kernel, &x86_kernel_free_mnode);
 
 	/* Unmap the entire .free section (in the kernel page directory)
 	 * NOTE: Make sure not to unmap the first couple of pages which

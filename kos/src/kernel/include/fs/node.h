@@ -420,7 +420,7 @@ struct inode_type {
 			 *       that filesystem implementations  may choose to  lazily set  save
 			 *       attributes of  newly constructed  nodes to  disk once  the  disk
 			 *       is supposed to be synchronized.
-			 * @assume(new_node->db_refcnt == 1); (Exclusive user)
+			 * @assume(new_node->mf_refcnt == 1); (Exclusive user)
 			 * @assume(new_node->i_flags & INODE_FATTRLOADED);
 			 * @assume(new_node->i_super == target_directory->i_super);
 			 * @assume(new_node->i_filesize == 0);
@@ -467,7 +467,7 @@ struct inode_type {
 			 *       that filesystem  implementations may  choose to  lazily set  save
 			 *       attributes  of  newly constructed  nodes  to disk  once  the disk
 			 *       is supposed to be synchronized.
-			 * @assume(new_directory->db_refcnt == 1); (Exclusive user)
+			 * @assume(new_directory->mf_refcnt == 1); (Exclusive user)
 			 * @assume(new_directory->i_super == target_directory->i_super);
 			 * @assume(new_directory->i_flags & INODE_FATTRLOADED);
 			 * @assume(S_ISDIR(new_directory->i_filemode));
@@ -505,7 +505,7 @@ struct inode_type {
 			 *    - de_pos
 			 *    - de_ino (Same as `link_node->i_fileino')
 			 * Upon success, this operator must fill in `target_dirent->de_pos'
-			 * @assume(link_node->db_refcnt == 1); (Exclusive user)
+			 * @assume(link_node->mf_refcnt == 1); (Exclusive user)
 			 * @assume(link_node->i_flags & INODE_FATTRLOADED);
 			 * @assume(link_node->sl_text != NULL);
 			 * @assume(!directory_getentry(target_directory,target_dirent...));
@@ -555,7 +555,7 @@ struct inode_type {
 			 *       that filesystem implementations  may choose to  lazily set  save
 			 *       attributes of  newly constructed  nodes to  disk once  the  disk
 			 *       is supposed to be synchronized.
-			 * @assume(nod->db_refcnt == 1); (Exclusive user)
+			 * @assume(nod->mf_refcnt == 1); (Exclusive user)
 			 * @assume(nod->i_flags & INODE_FATTRLOADED);
 			 * @assume(nod->i_super  == target_directory->i_super);
 			 * @assume(S_ISBLK(nod->i_filemode) ||  S_ISCHR(nod->i_filemode) ||
@@ -904,7 +904,7 @@ struct inode
 
 #ifndef vm_datablock_isinode
 /* The data block type used to identify INodes. */
-DATDEF struct vm_datablock_type inode_datablock_type;
+DATDEF struct mfile_ops inode_datablock_type;
 
 /* Check if a given `struct mfile *x' is an INode. */
 #define vm_datablock_isinode(x) ((x)->mf_ops == &inode_datablock_type)
@@ -1953,10 +1953,10 @@ struct superblock_type {
 		 *   - s_features.sf_name_max           = (u16)-1
 		 *   - s_features.sf_filesizebits       = 64
 		 * Following the invocation, the following fields may be initialized:
-		 *   - s_features.sf_rec_incr_xfer_size = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
-		 *   - s_features.sf_rec_max_xfer_size  = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
-		 *   - s_features.sf_rec_min_xfer_size  = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
-		 *   - s_features.sf_rec_xfer_align     = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
+		 *   - s_features.sf_rec_incr_xfer_size = 1 << self->mf_blockshift   (if `st_open' returned with this field left at `0')
+		 *   - s_features.sf_rec_max_xfer_size  = 1 << self->mf_blockshift   (if `st_open' returned with this field left at `0')
+		 *   - s_features.sf_rec_min_xfer_size  = 1 << self->mf_blockshift   (if `st_open' returned with this field left at `0')
+		 *   - s_features.sf_rec_xfer_align     = 1 << self->mf_blockshift   (if `st_open' returned with this field left at `0')
 		 * After this, the caller will add the superblock to the global chain
 		 * of existing superblocks through use of the `s_filesystems' field.
 		 * @param: args: Type-specific  user-space data passed to the constructor.

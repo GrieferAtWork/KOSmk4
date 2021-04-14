@@ -464,7 +464,7 @@ struct mfile_ops {
 	                         size_t num_bytes, iomode_t mode) THROWS(...);
 	/* [0..1] Same as above, but used  when polling for data being  available.
 	 * When not implemented (i.e. when set to `NULL'), poll is implemented for
-	 * the datablock through use of  `rwlock_poll(read|write)(&self->db_lock)' */
+	 * the datablock through use of  `rwlock_poll(read|write)(&self->mf_lock)' */
 	NONNULL((1)) void
 	(KCALL *dt_handle_pollconnect)(struct mfile *__restrict self,
 	                               poll_mode_t what) THROWS(...);

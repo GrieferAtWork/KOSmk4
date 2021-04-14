@@ -35,9 +35,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/rt.h>
+#include <kernel/mman.h>
 #include <kernel/mman/phys.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h>
@@ -830,7 +830,7 @@ reset_pdir(struct task *mythread) {
 		return;
 	if unlikely(((uintptr_t)mymm->mm_pagedir_p & PAGEMASK) != 0)
 		return;
-	if (mymm == &vm_kernel)
+	if (mymm == &mman_kernel)
 		return; /* nothing to do here. */
 
 	/* Make sure that the kernel-share segment of `mymm' is initialized correctly! */

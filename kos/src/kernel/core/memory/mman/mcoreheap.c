@@ -509,8 +509,8 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 
 	/* Must actually create a new node/part pair! */
 	node->mn_minaddr = (byte_t *)mman_findunmapped(&mman_kernel,
-	                                               HINT_GETADDR(KERNEL_VMHINT_COREPAGE), PAGESIZE,
-	                                               HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
+	                                               HINT_GETADDR(KERNEL_MHINT_COREPAGE), PAGESIZE,
+	                                               HINT_GETMODE(KERNEL_MHINT_COREPAGE));
 	if unlikely(node->mn_minaddr == MAP_FAILED) {
 		printk(KERN_CRIT "[mcore] low-level OOM: Unable to find spot to place a new core-page\n");
 		return false;

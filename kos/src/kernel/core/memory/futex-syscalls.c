@@ -88,7 +88,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
                USER UNCHECKED uint32_t *uaddr2,
                uint32_t val3) {
 	syscall_slong_t result;
-	REF struct vm_futex *f;
+	REF struct mfutex *f;
 	assert(!task_wasconnected());
 	switch (futex_op & 127) {
 

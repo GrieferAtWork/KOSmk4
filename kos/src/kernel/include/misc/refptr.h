@@ -59,10 +59,10 @@ public:
 };
 
 /* Indicates that a raw pointer should be inherited by a `refptr' object
- * >> refptr<struct vm> p;
- * >> p = inherit vm_alloc();
+ * >> refptr<struct mman> p;
+ * >> p = inherit mman_new();
  */
-#define inherit    __inherited_reference_tag()->*
+#define inherit __inherited_reference_tag()->*
 
 
 template<class T> class refptr {

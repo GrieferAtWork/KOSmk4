@@ -317,7 +317,7 @@ INTERN void (KCALL handle_file_sync)(struct file *__restrict self) {
 }
 
 INTERN void (KCALL handle_file_datasync)(struct file *__restrict self) {
-	vm_datablock_sync(self->f_node);
+	mfile_sync(self->f_node);
 }
 
 INTERN void KCALL

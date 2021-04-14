@@ -1655,9 +1655,9 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 					/* Cross-page instruction patching! */
 					void *tempaddr;
 					tempaddr = mman_findunmapped(&mman_kernel,
-					                             HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+					                             HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 					                             2 * PAGESIZE,
-					                             HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
+					                             HINT_GETMODE(KERNEL_MHINT_TEMPORARY));
 					if (tempaddr != MAP_FAILED) {
 						if (pagedir_prepare(tempaddr, 2 * PAGESIZE)) {
 							pagedir_map(tempaddr, 2 * PAGESIZE, pc_phys & ~PAGEMASK,

@@ -199,13 +199,13 @@ err_overlap:
 			/* If necessary, load the dynamic linker. */
 			if (need_dyn_linker) {
 				linker_base = mbuilder_map(/* self:        */ &builder,
-				                           /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
+				                           /* hint:        */ HINT_GETADDR(KERNEL_MHINT_USER_DYNLINK),
 				                           /* num_bytes:   */ LOCAL_FUNC(execabi_system_rtld_size),
 				                           /* prot:        */ PROT_READ | PROT_WRITE | PROT_EXEC,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
 				                           /* flags:       */ MAP_GROWSUP | MAP_NOASLR,
 #else
-				                           /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
+				                           /* flags:       */ HINT_GETMODE(KERNEL_MHINT_USER_DYNLINK),
 #endif
 				                           /* file:        */ &LOCAL_FUNC(execabi_system_rtld_file).mrf_file,
 				                           /* file_fspath: */ NULL,
@@ -216,10 +216,10 @@ err_overlap:
 #define USER_STACK_SIZE (64 * PAGESIZE) /* TODO: Don't put this here! */
 			/* Allocate a new user-space stack for the calling thread. */
 			stack_base = mbuilder_map(/* self:      */ &builder,
-			                          /* hint:      */ HINT_GETADDR(KERNEL_VMHINT_USER_STACK),
+			                          /* hint:      */ HINT_GETADDR(KERNEL_MHINT_USER_STACK),
 			                          /* num_bytes: */ USER_STACK_SIZE,
 			                          /* prot:      */ PROT_READ | PROT_WRITE,
-			                          /* flags:     */ HINT_GETMODE(KERNEL_VMHINT_USER_STACK),
+			                          /* flags:     */ HINT_GETMODE(KERNEL_MHINT_USER_STACK),
 			                          /* file:      */ &mfile_zero);
 
 			/* Create a memory mapping for the PEB containing `args->ea_argv' and `args->ea_envp' */

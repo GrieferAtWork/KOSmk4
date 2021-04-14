@@ -30,13 +30,14 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/mman/cache.h>
 #include <kernel/mman/kram.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -92,7 +93,7 @@ NOTHROW(KCALL pool_do_free)(struct slab_pool *__restrict self,
 		return;
 	}
 	/* Actually release the page as kernel-RAM. */
-	vm_unmap_kernel_ram(page, PAGESIZE, false);
+	mman_unmap_kram(page, PAGESIZE, GFP_NORMAL);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -167,7 +168,7 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 	)
 
 
-/* [lock(vm_kernel)]
+/* [lock(mman_kernel.mm_lock)]
  * The pointer to either the lowest (CONFIG_SLAB_GROWS_DOWNWARDS), or
  * one past the greatest (CONFIG_SLAB_GROWS_UPWARDS) address that was
  * ever allocated for slab memory.
@@ -228,7 +229,7 @@ again:
 	if unlikely(ATOMIC_READ(pool->sp_count) != 0)
 		goto again;
 	/* Must allocate a new slab page. */
-again_lock_vm:
+again_lock_mman_kernel:
 	if (flags & GFP_ATOMIC) {
 		if unlikely(!mman_lock_tryacquire(&mman_kernel))
 			goto err;
@@ -246,8 +247,8 @@ again_lock_vm:
 		slab_end_addr  = kernel_slab_break;
 		/* Make sure that sufficient memory is available within the slab-region. */
 		next_slab_addr = mman_findunmapped(&mman_kernel,
-		                                   HINT_GETADDR(KERNEL_VMHINT_SLAB), PAGESIZE,
-		                                   HINT_GETMODE(KERNEL_VMHINT_SLAB));
+		                                   HINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
+		                                   HINT_GETMODE(KERNEL_MHINT_SLAB));
 		mman_lock_release(&mman_kernel);
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
 		if (next_slab_addr == MAP_FAILED || next_slab_addr < (byte_t *)slab_end_addr - PAGESIZE)
@@ -265,11 +266,10 @@ again_next_slab_page_tryhard:
 				if unlikely(!mman_lock_acquire_nx(&mman_kernel))
 					goto err;
 			}
-			next_slab_addr = vm_getfree(&vm_kernel,
-			                            HINT_GETADDR(KERNEL_VMHINT_SLAB),
-			                            PAGESIZE, PAGESIZE,
-			                            HINT_GETMODE(KERNEL_VMHINT_SLAB));
-			vm_kernel_treelock_endwrite();
+			next_slab_addr = mman_findunmapped(&mman_kernel,
+			                                   HINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
+			                                   HINT_GETMODE(KERNEL_MHINT_SLAB));
+			mman_lock_release(&mman_kernel);
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
 			if (next_slab_addr != MAP_FAILED &&
 			    next_slab_addr >= (byte_t *)slab_end_addr - PAGESIZE)
@@ -289,7 +289,7 @@ gotaddr:
 		result = (struct slab *)mman_map_kram_nx(next_slab_addr, PAGESIZE,
 		                                         GFP_MAP_FIXED | flags);
 		if unlikely(result == MAP_INUSE)
-			goto again_lock_vm; /* Race condition: our picked address got used in the meantime... */
+			goto again_lock_mman_kernel; /* Race condition: our picked address got used in the meantime... */
 		if unlikely(result == MAP_FAILED)
 			goto err; /* Allocation failed :( */
 

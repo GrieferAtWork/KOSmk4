@@ -173,7 +173,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 {
 #ifdef DEFINE_IO_ASYNC
 	TRY {
-		REF struct vm_datapart *part;
+		REF struct mpart *part;
 		size_t max_io_bytes;
 #ifdef DEFINE_IO_VECTOR
 		uintptr_t buf_offset;
@@ -205,7 +205,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			}
 		}
 #endif /* !DEFINE_IO_READ */
-		if unlikely(self->db_parts == MFILE_PARTS_ANONYMOUS) {
+		if unlikely(self->mf_parts == MFILE_PARTS_ANONYMOUS) {
 			/* The INode uses anonymous parts. -> Use read-through / write-through */
 #ifdef DEFINE_IO_READ
 			if (!self->i_type->it_file.RW_OPERATOR)
@@ -225,15 +225,15 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			return;
 		}
 #ifdef LIBVIO_CONFIG_ENABLED
-		if (self->db_vio) {
+		if (mfile_getvio(self)) {
 			struct vioargs args;
 			args.va_ops = self->i_type->it_file.f_vio;
 			assertf(args.va_ops,
-			        "self         = %p\n"
-			        "self->db_vio = %p\n"
-			        "self->i_type = %p\n",
+			        "self               = %p\n"
+			        "mfile_getvio(self) = %p\n"
+			        "self->i_type       = %p\n",
 			        self,
-			        self->db_vio,
+			        mfile_getvio(self),
 			        self->i_type);
 			args.va_file         = self;
 			args.va_acmap_page   = 0;
@@ -295,9 +295,9 @@ load_next_part:
 		/* Locate the part concerning the requested IO, while trying to automatically
 		 * include all of the data-pages that the IO could potentially ever  perform. */
 		assert(!task_wasconnected());
-		part = vm_datablock_locatepart(self,
-		                               FLOOR_ALIGN(file_position, PAGESIZE),
-		                               CEIL_ALIGN(num_bytes + (file_position % PAGESIZE), PAGESIZE));
+		part = mfile_getpart(self,
+		                     FLOOR_ALIGN(file_position, PAGESIZE),
+		                     CEIL_ALIGN(num_bytes + (file_position % PAGESIZE), PAGESIZE));
 		TRY {
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS

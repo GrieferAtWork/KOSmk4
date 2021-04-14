@@ -37,12 +37,14 @@
 #include <kernel/heap.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <kernel/printk.h>
 #include <kernel/swap.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/rpc.h>
@@ -72,7 +74,6 @@
 
 #include <libvio/access.h>
 
-/* Define the ABI for the address tree used by vm. */
 #define ATREE(x)      inode_tree_##x
 #define ATREE_FUN     INTDEF
 #define ATREE_IMP     INTERN
@@ -369,7 +370,7 @@ NOTHROW(KCALL inode_recent_tryclear)(void) {
 		node->i_recent.ln_pself = NULL;
 		sync_endwrite(&inodes_recent_lock);
 		assert(!wasdestroyed(node));
-		if (ATOMIC_DECFETCH(node->db_refcnt)) {
+		if (ATOMIC_DECFETCH(node->mf_refcnt)) {
 			if (OVERFLOW_UADD(result, node->i_heapsize, &result))
 				result = (size_t)-1;
 			destroy(node);
@@ -404,7 +405,7 @@ inode_recent_clear(void) THROWS(E_WOULDBLOCK) {
 		node->i_recent.ln_pself = NULL;
 		sync_endwrite(&inodes_recent_lock);
 		assert(!wasdestroyed(node));
-		if (ATOMIC_DECFETCH(node->db_refcnt)) {
+		if (ATOMIC_DECFETCH(node->mf_refcnt)) {
 			if (OVERFLOW_UADD(result, node->i_heapsize, &result))
 				result = (size_t)-1;
 			destroy(node);
@@ -439,7 +440,7 @@ NOTHROW(KCALL inode_recent_clear_nx)(void) {
 		node->i_recent.ln_pself = NULL;
 		sync_endwrite(&inodes_recent_lock);
 		assert(!wasdestroyed(node));
-		if (ATOMIC_DECFETCH(node->db_refcnt)) {
+		if (ATOMIC_DECFETCH(node->mf_refcnt)) {
 			if (OVERFLOW_UADD(result, node->i_heapsize, &result))
 				result = (size_t)-1;
 			destroy(node);
@@ -738,8 +739,8 @@ inode_stat(struct inode *__restrict self,
 	result->st_gid     = (__gid_t)self->i_filegid;
 	result->st_rdev    = (__dev_t)self->i_filerdev;
 	result->st_size    = (__FS_TYPE(pos))self->i_filesize;
-	result->st_blksize = (__blksize_t)VM_DATABLOCK_PAGESIZE(self);
-	result->st_blocks  = (__FS_TYPE(blkcnt))CEILDIV(result->st_size, VM_DATABLOCK_PAGESIZE(self)); /* XXX: Add an operator for this? */
+	result->st_blksize = (__blksize_t)((size_t)1 << self->mf_blockshift);
+	result->st_blocks  = (__FS_TYPE(blkcnt))CEILDIV(result->st_size, (size_t)1 << self->mf_blockshift);
 	result->st_atimespec.tv_sec  = self->i_fileatime.tv_sec;
 	result->st_atimespec.tv_nsec = self->i_fileatime.tv_nsec;
 	result->st_mtimespec.tv_sec  = self->i_filemtime.tv_sec;
@@ -848,7 +849,7 @@ inode_truncate(struct inode *__restrict self, pos_t new_size)
 		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		if likely(self->i_filesize != new_size) {
 			if (new_size < self->i_filesize) {
-				/* TODO: Delete/truncate VM data parts */
+				/* TODO: Delete/truncate mfile parts */
 			}
 			TRY {
 				(*tp_self->it_file.f_truncate)(self, new_size);
@@ -1207,11 +1208,11 @@ again_do_remove_from_super_for_delete:
 	}
 	if (modified & INODE_FCHANGED) {
 		/* Check for further modifications only starting with the second pass! */
-		if (!first_pass && !vm_datablock_haschanged(self))
+		if (!first_pass && !mfile_haschanged(self))
 			goto done_data_sync;
 		sync_endwrite(self);
 		/* Synchronize data. */
-		vm_datablock_sync(self);
+		mfile_sync(self);
 		first_pass = false;
 		goto again;
 	}
@@ -2353,14 +2354,14 @@ again:
 					TRY {
 						result = DIRECTORY_REMOVE_STATUS_RMDIR;
 						if (dir->i_filenlink == (nlink_t)1) {
-							vm_datablock_anonymize(dir);
+							mfile_delete(dir);
 							TRY {
 								/* Use the rmdir() operator. */
 								if unlikely(!self->i_type->it_directory.d_rmdir)
 									THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_RMDIR);
 								(*self->i_type->it_directory.d_rmdir)(self, entry, dir);
 							} EXCEPT {
-								vm_datablock_deanonymize(dir);
+								/*mfile_undelete(dir);*/ /* Core problem with the old fs-system: this is impossible! */
 								RETHROW();
 							}
 							assert(dir->i_filenlink == 0);
@@ -2421,20 +2422,20 @@ again:
 						/* Deallocate file data of the node if this is the last link. */
 						if unlikely(!node->i_type->it_file.f_truncate)
 							THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_TRUNC);
-						/* NOTE: No need to worry about deletion/truncation of VM data parts
-						 *       Since  the file is  going away, nothing  needs to be saved! */
+						/* NOTE: No need to worry about deletion/truncation of mfile parts
+						 *       Since  the file is going away, nothing needs to be saved! */
 						(*node->i_type->it_file.f_truncate)(node, 0);
 						node->i_filesize = 0;
 					}
 					/* Do the actual unlink. */
 					result = DIRECTORY_REMOVE_STATUS_UNLINK;
 					if (node->i_filenlink == (nlink_t)1) {
-						vm_datablock_anonymize(node);
+						mfile_delete(node);
 						TRY {
 							(*self->i_type->it_directory.d_unlink)(self, entry, node);
 							assert(node->i_filenlink == 0);
 						} EXCEPT {
-							vm_datablock_deanonymize(node);
+							/*mfile_undelete(node);*/ /* Core problem with the old fs-system: this is impossible! */
 							RETHROW();
 						}
 						/* Mark the INode as having been deleted. */
@@ -3326,7 +3327,7 @@ again:
 	minnode = self->i_filetree.a_min;
 	maxnode = self->i_filetree.a_max;
 	incref(self);
-	vm_datablock_anonymize(self);
+	mfile_delete(self);
 	decref_likely(self);
 	if (minnode) {
 		if (maxnode)
@@ -3539,7 +3540,7 @@ got_block:
 
 		last_block = block;
 		assert(!wasdestroyed(block));
-		if (ATOMIC_DECFETCH(block->db_refcnt) == 0) {
+		if (ATOMIC_DECFETCH(block->mf_refcnt) == 0) {
 			if (OVERFLOW_UADD(result, block->i_heapsize, &result))
 				result = (size_t)-1;
 			destroy(block);
@@ -4430,19 +4431,19 @@ superblock_open(struct superblock_type *__restrict type,
 #endif /* !NDEBUG */
 			/* Substitute default feature values. */
 			if (result->s_features.sf_rec_incr_xfer_size == 0)
-				result->s_features.sf_rec_incr_xfer_size = VM_DATABLOCK_PAGESIZE(result);
+				result->s_features.sf_rec_incr_xfer_size = (u32)1 << result->mf_blockshift;
 			if (result->s_features.sf_rec_max_xfer_size == 0)
-				result->s_features.sf_rec_max_xfer_size = VM_DATABLOCK_PAGESIZE(result);
+				result->s_features.sf_rec_max_xfer_size = (u32)1 << result->mf_blockshift;
 			if (result->s_features.sf_rec_min_xfer_size == 0)
-				result->s_features.sf_rec_min_xfer_size = VM_DATABLOCK_PAGESIZE(result);
+				result->s_features.sf_rec_min_xfer_size = (u32)1 << result->mf_blockshift;
 			if (result->s_features.sf_rec_xfer_align == 0)
-				result->s_features.sf_rec_xfer_align = VM_DATABLOCK_PAGESIZE(result);
+				result->s_features.sf_rec_xfer_align = (u32)1 << result->mf_blockshift;
 		} EXCEPT {
 			heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
 			RETHROW();
 		}
 		/* Check that required fields have been initialized. */
-		assert(result->db_refcnt != 0);
+		assert(result->mf_refcnt != 0);
 		assert(result->i_type != NULL);
 		assert(result->s_type == type);
 		/* Add the new superblock to the chain of known file-systems. */
@@ -4669,12 +4670,12 @@ NOTHROW(KCALL db_inode_changed)(struct inode *__restrict self,
 	inode_changed(self, INODE_FCHANGED);
 }
 
-PUBLIC struct vm_datablock_type inode_datablock_type = {
-	/* .dt_destroy  = */ (NOBLOCK void(KCALL *)(struct vm_datablock *__restrict))&inode_destroy,
-	/* .dt_initpart = */ NULL,
-	/* .dt_loadpart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,physaddr_t,size_t))&db_inode_loadpart,
-	/* .dt_savepart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,physaddr_t,size_t))&db_inode_savepart,
-	/* .dt_changed  = */ (void(KCALL *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
+PUBLIC struct mfile_ops inode_datablock_type = {
+	.mo_destroy    = (NOBLOCK void(KCALL *)(struct mfile *__restrict))&inode_destroy,
+	.mo_newpart    = NULL,
+	.mo_loadblocks = (void(KCALL *)(struct mfile *__restrict, mfile_block_t, physaddr_t, size_t))&db_inode_loadpart,
+	.mo_saveblocks = (void(KCALL *)(struct mfile *__restrict, mfile_block_t, physaddr_t, size_t))&db_inode_savepart,
+	.mo_changed    = (void(KCALL *)(struct mfile *__restrict, struct mpart *__restrict))&db_inode_changed
 };
 
 

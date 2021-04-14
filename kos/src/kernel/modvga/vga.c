@@ -1896,10 +1896,10 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 		vga_device->v_vram_size = 8192 * 4 * 4; /* 128K */
 
 		vram_base = mman_map(/* self:        */ &mman_kernel,
-		                     /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_DEVICE),
+		                     /* hint:        */ HINT_GETADDR(KERNEL_MHINT_DEVICE),
 		                     /* num_bytes:   */ vga_device->v_vram_size,
 		                     /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
-		                     /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_DEVICE),
+		                     /* flags:       */ HINT_GETMODE(KERNEL_MHINT_DEVICE),
 		                     /* file:        */ &mfile_phys,
 		                     /* file_fspath: */ NULL,
 		                     /* file_fsname: */ NULL,

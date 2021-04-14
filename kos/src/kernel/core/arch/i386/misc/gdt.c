@@ -28,7 +28,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kernel/compiler.h>
 
-#include <kernel/vm.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <sched/pertask.h>
@@ -138,7 +138,7 @@ DEFINE_PERTASK_INIT(init_this_x86_kernel_psp0);
 INTERN NOBLOCK void
 NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self) {
 	/* Initialize the kernel-sp0 valued to-be written during preemption. */
-	FORTASK(self, _this_x86_kernel_psp0) = (uintptr_t)vm_node_getendaddr(&FORTASK(self, this_kernel_stacknode));
+	FORTASK(self, _this_x86_kernel_psp0) = (uintptr_t)mnode_getendaddr(&FORTASK(self, this_kernel_stacknode));
 }
 
 

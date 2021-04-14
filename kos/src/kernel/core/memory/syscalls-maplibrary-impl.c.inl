@@ -211,7 +211,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 			bool isused;
 			uintptr_t min_addr, max_addr;
 			if unlikely(!hdrc)
-				return HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY);
+				return HINT_GETADDR(KERNEL_MHINT_USER_LIBRARY);
 			min_addr = (uintptr_t)-1;
 			max_addr = 0;
 			/* Figure out the min/max byte offsets for program segments. */
@@ -245,7 +245,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	} else {
 		uintptr_t min_addr, max_addr;
 		if unlikely(!hdrc)
-			return HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY);
+			return HINT_GETADDR(KERNEL_MHINT_USER_LIBRARY);
 		min_addr = (uintptr_t)-1;
 		max_addr = 0;
 		/* Figure out the min/max byte offsets for program segments. */
@@ -310,11 +310,11 @@ DEFINE_SYSCALL5(void *, maplibrary,
 		/* Find a suitable target location where we can map the library. */
 find_new_candidate:
 		sync_read(v);
-		result = (byte_t *)vm_getfree(v,
-		                              HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY),
-		                              total_bytes,
-		                              min_alignment,
-		                              HINT_GETMODE(KERNEL_VMHINT_USER_LIBRARY));
+		result = (byte_t *)mman_findunmapped(v,
+		                                     HINT_GETADDR(KERNEL_MHINT_USER_LIBRARY),
+		                                     total_bytes,
+		                                     HINT_GETMODE(KERNEL_MHINT_USER_LIBRARY),
+		                                     min_alignment);
 		sync_endread(v);
 		if unlikely(result == (byte_t *)MAP_FAILED)
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
@@ -397,7 +397,7 @@ again_map_segments:
 				if (!vm_mapat(v,
 				              result + addr + filesize,
 				              size - filesize,
-				              &vm_datablock_anonymous_zero,
+				              &mfile_zero,
 				              NULL,
 				              NULL,
 				              0,

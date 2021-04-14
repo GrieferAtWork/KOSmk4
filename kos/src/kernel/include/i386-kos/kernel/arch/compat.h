@@ -34,7 +34,7 @@ DECL_BEGIN
 
 #ifndef ___this_x86_kernel_psp0_defined
 #define ___this_x86_kernel_psp0_defined 1
-/* [== vm_node_getendaddr(THIS_KERNEL_STACK)]
+/* [== mnode_getendaddr(THIS_KERNEL_STACK)]
  * The per-task value written to `t_psp0' during scheduler preemption. */
 DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 #endif /* !___this_x86_kernel_psp0_defined */

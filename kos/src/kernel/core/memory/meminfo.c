@@ -29,10 +29,13 @@
 #include <debugger/io.h>
 #include <kernel/driver-param.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -284,7 +287,7 @@ NOTHROW(KCALL pmemzone_init_bits)(struct pmemzone *__restrict self,
 }
 
 
-/* VM part/node for describing the page data structures */
+/* mpart/mnode for describing the page data structures */
 INTDEF struct mpart kernel_meminfo_mpart;
 INTDEF struct mnode kernel_meminfo_mnode;
 
@@ -443,9 +446,9 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	 *  - Information about this currently stems  from temporary data vectors that  are
 	 *    hacked to overlap with the far end of the boot task's stack, with information
 	 *    about where to allocate these bitsets also originating from that same vector.
-	 *  - We must allocate  all of  this memory  in physically  linear pages,  as we  can't
-	 *    afford  to  have this  information  split across  different  parts of  memory, as
-	 *    we only got 1 VM node/datapart (kernel_vm_(part|node)_pagedata) to describe this.
+	 *  - We must allocate all of this memory  in physically linear pages, as we  can't
+	 *    afford  to  have this  information split  across  different parts  of memory,
+	 *    as we only got 1 mnode/mpart (kernel_meminfo_(mpart|mnode)) to describe this.
 	 *  - We can't just willy-nilly start using available ram, as it may contain important
 	 *    data  structures left by the BIOS or BOOT  loader! (so we must also look out for
 	 *    memory preservations, aka. `PMEMBANK_TYPE_PRESERVE') */
@@ -502,8 +505,8 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	kernel_meminfo_mpart.mp_mem.mc_size = req_pages;
 	kernel_meminfo_mpart.mp_maxaddr     = (pos_t)((req_pages * PAGESIZE) - 1);
 	buffer = (byte_t *)(KERNEL_CORE_BASE + physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start));
-	vm_node_setminaddr(&kernel_meminfo_mnode, buffer);
-	vm_node_setmaxaddr(&kernel_meminfo_mnode, buffer + (req_pages * PAGESIZE) - 1);
+	kernel_meminfo_mnode.mn_minaddr = buffer;
+	kernel_meminfo_mnode.mn_maxaddr = buffer + (req_pages * PAGESIZE) - 1;
 
 	/* With the required buffer now allocated, we can move on to populating it with data.
 	 * NOTE: Since `minfo_allocate_part_pagedata()' only changed pages marked as `PMEMBANK_TYPE_RAM'
@@ -639,14 +642,14 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* Now just allocate the last part as the relocated memory information vector. */
 	minfo.mb_banks = (struct pmembank *)buffer;
 	assertf((buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank)) <=
-	        ((byte_t *)vm_node_getaddr(&kernel_meminfo_mnode) + req_bytes),
+	        ((byte_t *)mnode_getaddr(&kernel_meminfo_mnode) + req_bytes),
 	        "Too little memory allocated for memory construct structures\n"
 	        "buffer     = %p\n"
 	        "buffer_min = %p\n"
 	        "buffer_max = %p\n",
 	        buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank),
-	        vm_node_getaddr(&kernel_meminfo_mnode),
-	        (byte_t *)vm_node_getaddr(&kernel_meminfo_mnode) + req_bytes - 1);
+	        mnode_getaddr(&kernel_meminfo_mnode),
+	        (byte_t *)mnode_getaddr(&kernel_meminfo_mnode) + req_bytes - 1);
 	memcpy(buffer, kernel_membanks_initial,
 	       minfo.mb_bankc + 1,
 	       sizeof(struct pmembank));
@@ -661,7 +664,7 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 
 /* Relocate `minfo', as well as `mzones'  data to a more appropriate  location
  * after `kernel_initialize_minfo_makezones()' has been called, and the kernel
- * VM has been cleaned from unused memory mappings.
+ * MMan has been cleaned from unused memory mappings.
  * Before this function is called, all memory information still resides at a
  * location where its physical address is relative to its virtual, just like
  * any other kernel data. However, since  that can literally be anywhere  in
@@ -676,11 +679,10 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	byte_t *dest, *old_addr;
 	ptrdiff_t relocation_offset;
 	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
-	num_bytes = vm_node_getsize(&kernel_meminfo_mnode);
-	dest = (byte_t *)vm_getfree(&vm_kernel,
-	                            HINT_GETADDR(KERNEL_VMHINT_PHYSINFO),
-	                            num_bytes, PAGESIZE,
-	                            HINT_GETMODE(KERNEL_VMHINT_PHYSINFO));
+	num_bytes = mnode_getsize(&kernel_meminfo_mnode);
+	dest = (byte_t *)mman_findunmapped(&mman_kernel,
+                                       HINT_GETADDR(KERNEL_MHINT_PHYSINFO), num_bytes,
+                                       HINT_GETMODE(KERNEL_MHINT_PHYSINFO));
 	if unlikely(dest == MAP_FAILED) {
 		kernel_panic(FREESTR("Failed to relocate memory information\n"));
 		return;
@@ -690,15 +692,15 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 
 	/* Pop the node concerning the memory information, so we can modify it. */
 	mman_mappings_removenode(&mman_kernel, &kernel_meminfo_mnode);
-	old_addr = (byte_t *)vm_node_getaddr(&kernel_meminfo_mnode);
+	old_addr = (byte_t *)mnode_getaddr(&kernel_meminfo_mnode);
 	relocation_offset = dest - old_addr;
-	vm_node_setminaddr(&kernel_meminfo_mnode, dest);
-	vm_node_setmaxaddr(&kernel_meminfo_mnode, dest + num_bytes - 1);
-	vm_node_insert(&kernel_meminfo_mnode);
+	kernel_meminfo_mnode.mn_minaddr = dest;
+	kernel_meminfo_mnode.mn_maxaddr = dest + num_bytes - 1;
+	mman_mappings_insert(&mman_kernel, &kernel_meminfo_mnode);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if unlikely(!pagedir_prepare(dest, num_bytes)) {
-		kernel_panic(FREESTR("Failed to prepare VM for relocated memory "
-		                     "information at %p-%p\n"),
+		kernel_panic(FREESTR("Failed to prepare MMan for relocated "
+		                     "memory information at %p-%p\n"),
 		       dest, dest + num_bytes - 1);
 		return;
 	}

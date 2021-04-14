@@ -28,14 +28,14 @@
 /* The user-space VIO pipeline:
  *
  *  - #PF
- *  - Find vm_node of faulting address
+ *  - Find mnode of faulting address
  *  - If node isn't a VIO node: regular PageFault
  *  - Call into libviocore:viocore_emulate() to implement memory dispatching
  *  - Use libemu86 to emulate the instruction that caused the memory access (on x86)
  *  - Go back into libviocore to filter emulated memory accesses pointing into VIO memory
  *  - Dispatch memory accesses via <libvio/access.h>
- *  - Functions from <libvio/access.h> invoke kernel-space operators of the associated
- *    vm_datablock's  VIO  function  table  (here,  that  table  is  `uvio_operators')
+ *  - Functions  from  <libvio/access.h>  invoke  kernel-space  operators  of  the
+ *    associated mfile's VIO function table (here, that table is `uvio_operators')
  *  - Functions from `uvio_operators' construct a request that is passed to `uvio_request()'
  *  - `uvio_request()' waits for a request slot to become available
  *  - `uvio_request()' stores the request in `struct uvio::uv_req' and broadcasts `uv_reqmore'
@@ -313,8 +313,8 @@ DATDEF struct mfile_ops const uvio_datablock_type;
 DATDEF struct vio_operators const uvio_operators;
 
 /* Construct a new UVIO object.
- * Note that UVIO is derived  from `struct mfile', so the  returned
- * object can be stored in a handle slot as `HANDLE_TYPE_MFILE' */
+ * Note that UVIO is derived from `struct mfile', so the returned
+ * object can be stored in  a handle slot as  `HANDLE_TYPE_MFILE' */
 FUNDEF REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC);
 
 /* Perform a remove VIO request.

@@ -81,12 +81,12 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 		size_t aligned_num_bytes = (size_t)((maxpageaddr - minpageaddr) + PAGESIZE);
 		/* XXX: Instead of vm_paged_map(), maybe just call `f_write()' multiple times?
 		 *      Or  at   the   very   least,  do   so   when   vm_paged_map()   fails! */
-		tempbase = vm_map(&vm_kernel,
-		                  HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+		tempbase = vm_map(&mman_kernel,
+		                  HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 		                  aligned_num_bytes,
 		                  PAGESIZE,
-		                  HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-		                  &vm_datablock_physical,
+		                  HINT_GETMODE(KERNEL_MHINT_TEMPORARY),
+		                  &mfile_phys,
 		                  NULL,
 		                  NULL,
 		                  (pos_t)minpageaddr,
@@ -98,11 +98,11 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
 			/* TODO: This form of cleanup can result in exceptions! */
-			mman_unmap(&vm_kernel, tempbase, aligned_num_bytes);
+			mman_unmap(&mman_kernel, tempbase, aligned_num_bytes);
 			RETHROW();
 		}
 		/* TODO: This form of cleanup can result in exceptions! */
-		mman_unmap(&vm_kernel, tempbase, aligned_num_bytes);
+		mman_unmap(&mman_kernel, tempbase, aligned_num_bytes);
 	}
 }
 

@@ -70,28 +70,28 @@ struct hop_datablock_stat /*[PREFIX(ds_)]*/ {
 	                                       * this value is too small  or doesn't match any  recognized
 	                                       * structure version. */
 	__uint32_t   ds_features;             /* Set of `HOP_DATABLOCK_STAT_FEATURE_*' */
-	__uint32_t   ds_pageshift;            /* `struct vm_datablock::db_pageshift'
+	__uint32_t   ds_pageshift;            /* `struct mfile::db_pageshift'
 	                                       * NOTE: Used to convert to/from data-pages and physical/virtual memory pages
 	                                       * HINT: VIRT_PAGE == DATA_PAGE << ds_pageshift
 	                                       *       DATA_PAGE == VIRT_PAGE >> ds_pageshift */
 	__uint32_t __ds_pad;                  /* ... */
-	__uint64_t   ds_part_mapped;          /* The number of parts chained via `struct vm_datablock::db_parts' */
+	__uint64_t   ds_part_mapped;          /* The number of parts chained via `struct mfile::mf_parts' */
 	__uint64_t   ds_part_mapped_pages;    /* Sum of `vm_datapart_numdpages()' of all mapped parts */
-	__uint64_t   ds_part_st_incore;       /* The number of VM_DATAPART_STATE_INCORE-parts chained via `struct vm_datablock::db_parts' */
-	__uint64_t   ds_part_st_incore_pages; /* Sum of `vm_datapart_numdpages()' of all VM_DATAPART_STATE_INCORE parts */
-	__uint64_t   ds_part_st_locked;       /* The number of VM_DATAPART_STATE_LOCKED-parts chained via `struct vm_datablock::db_parts' */
+	__uint64_t   ds_part_st_incore;       /* The number of MPART_ST_MEM-parts chained via `struct mfile::mf_parts' */
+	__uint64_t   ds_part_st_incore_pages; /* Sum of `vm_datapart_numdpages()' of all MPART_ST_MEM parts */
+	__uint64_t   ds_part_st_locked;       /* The number of VM_DATAPART_STATE_LOCKED-parts chained via `struct mfile::mf_parts' */
 	__uint64_t   ds_part_st_locked_pages; /* Sum of `vm_datapart_numdpages()' of all VM_DATAPART_STATE_LOCKED parts */
-	__uint64_t   ds_part_st_inswap;       /* The number of VM_DATAPART_STATE_INSWAP-parts chained via `struct vm_datablock::db_parts' */
-	__uint64_t   ds_part_st_inswap_pages; /* Sum of `vm_datapart_numdpages()' of all VM_DATAPART_STATE_INSWAP parts */
-	__uint64_t   ds_part_f_locked;        /* Number of parts with the `VM_DATAPART_FLAG_LOCKED' flag set */
-	__uint64_t   ds_part_f_locked_pages;  /* Sum of `vm_datapart_numdpages()' of all parts with the `VM_DATAPART_FLAG_LOCKED' flag set */
-	__uint64_t   ds_part_f_changed;       /* Number of parts with the `VM_DATAPART_FLAG_CHANGED' flag set */
-	__uint64_t   ds_part_f_changed_pages; /* Sum of `vm_datapart_numdpages()' of all parts with the `VM_DATAPART_FLAG_CHANGED' flag set */
+	__uint64_t   ds_part_st_inswap;       /* The number of MPART_ST_SWP-parts chained via `struct mfile::mf_parts' */
+	__uint64_t   ds_part_st_inswap_pages; /* Sum of `vm_datapart_numdpages()' of all MPART_ST_SWP parts */
+	__uint64_t   ds_part_f_locked;        /* Number of parts with the `MPART_F_MLOCK' flag set */
+	__uint64_t   ds_part_f_locked_pages;  /* Sum of `vm_datapart_numdpages()' of all parts with the `MPART_F_MLOCK' flag set */
+	__uint64_t   ds_part_f_changed;       /* Number of parts with the `MPART_F_CHANGED' flag set */
+	__uint64_t   ds_part_f_changed_pages; /* Sum of `vm_datapart_numdpages()' of all parts with the `MPART_F_CHANGED' flag set */
 	__uint64_t   ds_part_ram_blocks;      /* Total number of individual RAM blocks allocated by INCORE/LOCKED parts */
 	__uint64_t   ds_part_swap_blocks;     /* Total number of SWAP blocks allocated by INSWAP parts */
-	__uint64_t   ds_part_uninit_pages;    /* Total number of data-pages set to `VM_DATAPART_PPP_UNINITIALIZED' */
-	__uint64_t   ds_part_init_pages;      /* Total number of data-pages set to `VM_DATAPART_PPP_INITIALIZED' */
-	__uint64_t   ds_part_changed_pages;   /* Total number of data-pages set to `VM_DATAPART_PPP_HASCHANGED' */
+	__uint64_t   ds_part_uninit_pages;    /* Total number of data-pages set to `MPART_BLOCK_ST_NDEF' */
+	__uint64_t   ds_part_init_pages;      /* Total number of data-pages set to `MPART_BLOCK_ST_LOAD' */
+	__uint64_t   ds_part_changed_pages;   /* Total number of data-pages set to `MPART_BLOCK_ST_CHNG' */
 };
 #endif /* __CC__ */
 
@@ -150,10 +150,10 @@ struct hop_datablock_openpart /*[PREFIX(dop_)]*/ {
 	__uint32_t      __dop_pad;         /* ... */
 	__uint64_t        dop_pageno;      /* [IN]  The page-index (pageid64_t) of the first page that should be opened.
 	                                    * [OUT] The page-index (pageid64_t) of the first page that was opened.
-	                                    *       This is equal to the `ds_minpage' field return by `HOP_MPART_STAT',
-	                                    *       and  may  be  lower  than  the  originally  given  `dop_pageno'   when
-	                                    *       `HOP_DATABLOCK_OPEN_PART' was used, but guarantied to be equal to  the
-	                                    *       original  value   when   `HOP_DATABLOCK_OPEN_PART_EXACT'   was   used. */
+	                                    *       This is equal to the  `ds_minpage' field return by  `HOP_MPART_STAT',
+	                                    *       and  may  be  lower  than  the  originally  given  `dop_pageno'  when
+	                                    *       `HOP_DATABLOCK_OPEN_PART' was used, but guarantied to be equal to the
+	                                    *       original   value   when  `HOP_DATABLOCK_OPEN_PART_EXACT'   was  used. */
 	__uint64_t        dop_pages_hint;  /* [IN]  Hint for the number of pages across which the part should span. */
 	struct hop_openfd dop_openfd;      /* File descriptor open controller (filled with a handle for the part). */
 };
@@ -643,8 +643,8 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
 /* [struct hop_datablock_stat *result] Read information about the datablock */
 #define HOP_DATABLOCK_STAT                        HOP_CMD(HANDLE_TYPE_MFILE, 0x0001)
 
-/* [uint64_t *result] Save all modified parts, and store the number of saved data-pages in `*result' */
-#define HOP_DATABLOCK_SYNCALL                     HOP_CMD(HANDLE_TYPE_MFILE, 0x0002)
+/* [uint64_t *result] Save all modified parts, and store the number of synced bytes in `*result' */
+#define HOP_MFILE_SYNCALL                         HOP_CMD(HANDLE_TYPE_MFILE, 0x0002)
 
 /* [struct hop_datablock_syncpages *arg] Save all modified parts within the given range. */
 #define HOP_DATABLOCK_SYNCPAGES                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0003)
@@ -652,10 +652,7 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
 /* [struct hop_datablock_syncbytes *arg] Save all modified bytes within the given range. */
 #define HOP_DATABLOCK_SYNCBYTES                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0004)
 
-/* [int *result] Anonymize all of the data parts of this datablock.
- * Write 0/1 to *result, indicative of:
- *  - 0: The data block had already been anonymized.
- *  - 1: The data block is now anonymized, but wasn't before. */
+/* Anonymize all of the mem-parts of this mem-file. */
 #define HOP_DATABLOCK_ANONYMIZE                   HOP_CMD(HANDLE_TYPE_MFILE, 0x0005)
 
 /* [int *result] Deanonymize this datablock, allowing parts to be tracked once again.
@@ -675,8 +672,8 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
  * @return: == arg->dop_openfd.of_hint */
 #define HOP_DATABLOCK_OPEN_PART_EXACT             HOP_CMD(HANDLE_TYPE_MFILE, 0x0008)
 
-/* [struct hop_datablock_haschanged *arg] Check for changes within
- * the  given  address  range  (s.a.  `vm_datablock_haschanged()') */
+/* [struct hop_datablock_haschanged *arg] Check  for  changes
+ * within the given address range (s.a. `mfile_haschanged()') */
 #define HOP_DATABLOCK_HASCHANGED                  HOP_CMD(HANDLE_TYPE_MFILE, 0x0009)
 
 /* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.

@@ -147,16 +147,16 @@ DECL_BEGIN
  * >> // Prefault all modified memory locations
  * >> for (local start, data, changed, none, none: accessedParts) {
  * >>     if (changed) {
- * >>         vm_forcefault(THIS_MMAN, start, #data,
- * >>                       VM_FORCEFAULT_FLAG_WRITE |
- * >>                       VM_FORCEFAULT_FLAG_NOVIO);
+ * >>         mman_forcefault(THIS_MMAN, start, #data,
+ * >>                         MMAN_FAULT_F_WRITE |
+ * >>                         MMAN_FAULT_F_NOVIO);
  * >>     }
  * >> }
  * >>
  * >> // Acquire tx-locks to all of the modified data parts, and
  * >> // verify that accessed data parts are still up-to-date
  * >> for (local addr, data, changed, version, part: accessedParts) {
- * >>     if (VM_NODE_AT(min: addr, max: addr + #data - 1)->vn_part != part)
+ * >>     if (VM_NODE_AT(min: addr, max: addr + #data - 1)->mn_part != part)
  * >>         goto RETRY;
  * >>     if (changed) {
  * >>         sync_write(part);
@@ -177,7 +177,7 @@ DECL_BEGIN
  * >> // We're currently holding write-locks to the backing vm_datapart-s
  * >> // of all areas of interest, so we know that whatever their state is
  * >> // right now, that state won't change until we release them. We also
- * >> // know that (due to our `vm_forcefault()' above), all modified parts
+ * >> // know that (due to our `mman_forcefault()' above), all modified parts
  * >> // had been made to be writable at one point in the past, so all we
  * >> // have to do is assert that they still are writable, and start over
  * >> // if we're too late, and they no longer are.

@@ -89,6 +89,12 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stacknode_ ASMNAME("this_kernel_sta
 DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_stackguard");
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
+/* [const] MMan node referring to the kernel stack of the current thread.
+ * WARNING: These structures for `boottask' and `bootidle' are not actually part of the kernel MMan!
+ * WARNING: You cannot assume that your stack-pointer is always located within `THIS_KERNEL_STACK',
+ *          as KOS may use special, arch-specific stacks  to deal with certain CPU exceptions  that
+ *          require execution on  a separate stack  (such as  the #DF-stack on  x86). To  determine
+ *          available/used stack memory, use the function below. */
 PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
 	MPART_INIT_mp_refcnt(1),
 	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
@@ -156,7 +162,7 @@ INTDEF pertask_init_t __kernel_pertask_init_end[];
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler_arch)(void);
 
 LOCAL ATTR_FREETEXT void
-NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
+NOTHROW(KCALL initialize_predefined_trampoline)(struct task *__restrict self,
                                                    PAGEDIR_PAGEALIGNED void *addr) {
 	FORTASK(self, this_trampoline_node).mn_minaddr = (byte_t *)addr;
 	FORTASK(self, this_trampoline_node).mn_maxaddr = (byte_t *)addr + PAGESIZE - 1;
@@ -227,15 +233,15 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	boot_trampoline_pages = kernel_initialize_boot_trampolines();
 #else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	boot_trampoline_pages = mman_findunmapped(&mman_kernel,
-	                                          HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
+	                                          HINT_GETADDR(KERNEL_MHINT_TRAMPOLINE),
 	                                          2 * PAGESIZE,
-	                                          HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+	                                          HINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Construct the trampoline node for the predefined tasks. */
-	initialize_predefined_vm_trampoline(&boottask, (byte_t *)boot_trampoline_pages + 0 * PAGESIZE);
-	initialize_predefined_vm_trampoline(&bootidle, (byte_t *)boot_trampoline_pages + 1 * PAGESIZE);
-	initialize_predefined_vm_trampoline(&asyncwork, (byte_t *)boot_trampoline_pages + 2 * PAGESIZE);
+	initialize_predefined_trampoline(&boottask, (byte_t *)boot_trampoline_pages + 0 * PAGESIZE);
+	initialize_predefined_trampoline(&bootidle, (byte_t *)boot_trampoline_pages + 1 * PAGESIZE);
+	initialize_predefined_trampoline(&asyncwork, (byte_t *)boot_trampoline_pages + 2 * PAGESIZE);
 
 #define STN(thread) FORTASK(&thread, this_kernel_stacknode_)
 #define STP(thread) FORTASK(&thread, this_kernel_stackpart_)
@@ -374,9 +380,7 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(struct mman) *__restrict _lop,
 	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node));
 	pagedir_unmapone(addr);
 	mman_supersyncone(addr);
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepareone(addr);
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_kernelunprepareone(addr);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
@@ -385,9 +389,7 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(struct mman) *__restrict _lop,
 	size = mnode_getsize(&FORTASK(self, this_kernel_stacknode_));
 	pagedir_unmap(addr, size);
 	mman_supersync(addr, size);
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare(addr, size);
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_kernelunprepare(addr, size);
 
 	/* Deallocate the kernel stack. */
 	mpart_ll_freemem(&FORTASK(self, this_kernel_stackpart_));
@@ -442,7 +444,7 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 }
 
 PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
-(KCALL task_alloc)(struct vm *__restrict task_vm) THROWS(E_WOULDBLOCK, E_BADALLOC) {
+(KCALL task_alloc)(struct mman *__restrict task_mman) THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct task *result;
 	struct heapptr resptr;
 	/* Allocate a new task structure. */
@@ -467,23 +469,23 @@ PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
 			void *stack_addr;
 			void *trampoline_addr;
 			syscache_version_t version = SYSCACHE_VERSION_INIT;
-again_lock_vm:
+again_lock_kernel_mman:
 			mman_lock_acquire(&mman_kernel);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 			stack_addr = mman_findunmapped(&mman_kernel,
-			                               HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
+			                               HINT_GETADDR(KERNEL_MHINT_KERNSTACK),
 			                               CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
-			                               HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
+			                               HINT_GETMODE(KERNEL_MHINT_KERNSTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 			stack_addr = mman_findunmapped(&mman_kernel,
-			                               HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
+			                               HINT_GETADDR(KERNEL_MHINT_KERNSTACK),
 			                               CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
-			                               HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
+			                               HINT_GETMODE(KERNEL_MHINT_KERNSTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
 			if unlikely(stack_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
 				if (syscache_clear_s(&version))
-					goto again_lock_vm;
+					goto again_lock_kernel_mman;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 				      CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
 			}
@@ -503,12 +505,12 @@ again_lock_vm:
 
 			/* Map the trampoline node. */
 			trampoline_addr = mman_findunmapped(&mman_kernel,
-			                                    HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE), PAGESIZE,
-			                                    HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+			                                    HINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
+			                                    HINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 			if unlikely(trampoline_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
 				if (syscache_clear_s(&version))
-					goto again_lock_vm;
+					goto again_lock_kernel_mman;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 			}
 			FORTASK(result, this_trampoline_node).mn_minaddr = (byte_t *)trampoline_addr;
@@ -541,8 +543,8 @@ again_lock_vm:
 		RETHROW();
 	}
 
-	result->t_mman = task_vm;
-	incref(task_vm);
+	result->t_mman = task_mman;
+	incref(task_mman);
 
 	/* Run custom initializers. */
 	TRY {
@@ -550,9 +552,9 @@ again_lock_vm:
 		assert(!LIST_ISBOUND(result, t_mman_tasks));
 
 		/* Insert the new task into the VM */
-		mman_threadslock_acquire(task_vm);
-		LIST_INSERT_HEAD(&task_vm->mm_threads, result, t_mman_tasks);
-		mman_threadslock_release(task_vm);
+		mman_threadslock_acquire(task_mman);
+		LIST_INSERT_HEAD(&task_mman->mm_threads, result, t_mman_tasks);
+		mman_threadslock_release(task_mman);
 
 		iter = __kernel_pertask_init_start;
 		for (; iter < __kernel_pertask_init_end; ++iter)
@@ -582,10 +584,9 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct task *
 	if (clone_flags & TASK_CLONE_VM) {
 		result = task_alloc(THIS_MMAN);
 	} else {
-		REF struct vm *result_vm;
-		result_vm = vm_clone(THIS_MMAN, false);
-		FINALLY_DECREF_UNLIKELY(result_vm);
-		result = task_alloc(result_vm);
+		REF struct mman *result_mman = mman_fork();
+		FINALLY_DECREF_UNLIKELY(result_mman);
+		result = task_alloc(result_mman);
 	}
 	TRY {
 		/* Invoke additional callbacks. */

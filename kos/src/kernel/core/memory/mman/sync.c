@@ -329,7 +329,7 @@ NOTHROW(FCALL mman_supersyncall)(void) {
 }
 
 
-/* Sync memory on every CPU with `CPU->c_mman->v_pdir_phys == pagedir' */
+/* Sync memory on every CPU with `CPU->c_pdir == pagedir' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir,
                                   PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
@@ -373,7 +373,7 @@ NOTHROW(FCALL pagedir_syncall_smp_p)(pagedir_phys_t pagedir) {
 	                   CPU_IPI_FNOINTR);
 }
 
-/* Sync memory on every CPU with `CPU->c_mman->v_pdir_phys == pagedir_get()' */
+/* Sync memory on every CPU with `CPU->c_pdir == pagedir_get()' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {

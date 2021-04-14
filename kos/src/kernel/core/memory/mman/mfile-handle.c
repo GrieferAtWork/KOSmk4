@@ -57,11 +57,11 @@ handle_mfile_read(struct mfile *__restrict self,
                   USER CHECKED void *dst,
                   size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
-	if unlikely(!self->db_type->mo_stream_read) {
+	if unlikely(!self->mf_ops->mo_stream_read) {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 		      E_FILESYSTEM_OPERATION_READ);
 	}
-	result = (*self->db_type->mo_stream_read)(self, dst, num_bytes, mode);
+	result = (*self->mf_ops->mo_stream_read)(self, dst, num_bytes, mode);
 	return result;
 }
 
@@ -70,11 +70,11 @@ handle_mfile_write(struct mfile *__restrict self,
                    USER CHECKED void const *src,
                    size_t num_bytes, iomode_t mode) THROWS(...) {
 	size_t result;
-	if unlikely(!self->db_type->mo_stream_write) {
+	if unlikely(!self->mf_ops->mo_stream_write) {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 		      E_FILESYSTEM_OPERATION_WRITE);
 	}
-	result = (*self->db_type->mo_stream_write)(self, src, num_bytes, mode);
+	result = (*self->mf_ops->mo_stream_write)(self, src, num_bytes, mode);
 	return result;
 }
 
@@ -151,22 +151,22 @@ handle_mfile_sync(struct mfile *__restrict self) {
 	if (vm_datablock_isinode(self))
 		inode_sync((struct inode *)self);
 	else {
-		vm_datablock_sync(self);
+		mfile_sync(self);
 	}
 }
 
 INTERN NONNULL((1)) void KCALL
 handle_mfile_datasync(struct mfile *__restrict self) {
-	vm_datablock_sync(self);
+	mfile_sync(self);
 }
 
 INTERN NONNULL((1)) void KCALL
 handle_mfile_pollconnect(struct mfile *__restrict self,
                          poll_mode_t what) {
-	assert((self->db_type->dt_handle_pollconnect != NULL) ==
-	       (self->db_type->dt_handle_polltest != NULL));
-	if (self->db_type->dt_handle_pollconnect) {
-		(*self->db_type->dt_handle_pollconnect)(self, what);
+	assert((self->mf_ops->dt_handle_pollconnect != NULL) ==
+	       (self->mf_ops->dt_handle_polltest != NULL));
+	if (self->mf_ops->dt_handle_pollconnect) {
+		(*self->mf_ops->dt_handle_pollconnect)(self, what);
 	} else if (what & (POLLOUTMASK | POLLINMASK)) {
 		if (vm_datablock_isinode(self))
 			rwlock_pollconnect(__inode_lock((struct inode *)self));
@@ -176,10 +176,10 @@ handle_mfile_pollconnect(struct mfile *__restrict self,
 INTERN NONNULL((1)) poll_mode_t KCALL
 handle_mfile_polltest(struct mfile *__restrict self,
                       poll_mode_t what) {
-	assert((self->db_type->dt_handle_pollconnect != NULL) ==
-	       (self->db_type->dt_handle_polltest != NULL));
-	if (self->db_type->dt_handle_polltest)
-		return (*self->db_type->dt_handle_polltest)(self, what);
+	assert((self->mf_ops->dt_handle_pollconnect != NULL) ==
+	       (self->mf_ops->dt_handle_polltest != NULL));
+	if (self->mf_ops->dt_handle_polltest)
+		return (*self->mf_ops->dt_handle_polltest)(self, what);
 	if (what & POLLOUTMASK) {
 		if (vm_datablock_isinode(self)) {
 			if (rwlock_canwrite(__inode_lock((struct inode *)self)))
@@ -214,9 +214,8 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
-	case HOP_DATABLOCK_SYNCALL: {
-		datapage_t count;
-		count = vm_datablock_sync(self);
+	case HOP_MFILE_SYNCALL: {
+		pos_t count = mfile_sync(self);
 		if (arg) {
 			validate_writable(arg, sizeof(u64));
 			*(u64 *)arg = (u64)count;
@@ -227,15 +226,14 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		/* Need write permissions. */
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_TRUNC, mode);
-		validate_writable(arg, sizeof(int));
-		*(int *)arg = vm_datablock_anonymize(self) ? 1 : 0;
+		mfile_delete(self);
 		break;
 
 	case HOP_DATABLOCK_OPEN_FUTEX:
 	case HOP_DATABLOCK_OPEN_FUTEX_EXISTING: {
 		size_t struct_size;
 		struct hop_datablock_open_futex *data;
-		REF struct vm_futex *ftx;
+		REF struct mfutex *ftx;
 		struct handle hnd;
 		/* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address. */
 		validate_readwrite(arg, sizeof(struct hop_datablock_open_futex));
@@ -1015,7 +1013,7 @@ handle_mfile_hop(struct mfile *__restrict self, syscall_ulong_t cmd,
 		COMPILER_READ_BARRIER();
 		/* Copy features info to user-space. */
 		data->sbf_features           = feat_flags;
-		data->sbf_sector_size        = VM_DATABLOCK_PAGESIZE(self);
+		data->sbf_sector_size        = (u64)1 << self->mf_blockshift;
 		data->sbf_link_max           = (u64)super->s_features.sf_link_max;
 		data->sbf_name_max           = (u64)super->s_features.sf_name_max;
 		data->sbf_symlink_max        = (u64)super->s_features.sf_symlink_max;
@@ -1077,7 +1075,7 @@ handle_mfile_stat(struct mfile *__restrict self,
 		mfile_lock_endread(self);
 		COMPILER_BARRIER();
 		memset(result, 0, sizeof(*result));
-		result->st_blksize = VM_DATABLOCK_PAGESIZE(self);
+		result->st_blksize = (size_t)1 << self->mf_blockshift;
 		result->st_blocks  = partcount;
 	}
 }

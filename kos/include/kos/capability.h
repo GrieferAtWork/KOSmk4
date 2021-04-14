@@ -50,7 +50,7 @@
                                                                   * as well as `HOP_DRIVER_LOADLIST_GET_DRIVER', `HOP_DRIVER_OPEN_FILE',  `HOP_DRIVER_OPEN_DEPENDENCY',
                                                                   * as well as `KSYSCTL_OPEN_KERNEL_DRIVER' */
 #define CAP_DRIVER_CONTROL                   CAP_SYS_MODULE      /* Allow use of `HOP_DRIVER_INITIALIZE', `HOP_DRIVER_FINALIZE' */
-#define CAP_KERNEL_QUERY                     CAP_SYS_ADMIN       /* Allow use of `KSYSCTL_OPEN_KERNEL_VFS' `KSYSCTL_OPEN_KERNEL_FS', `KSYSCTL_OPEN_KERNEL_VM', \
+#define CAP_KERNEL_QUERY                     CAP_SYS_ADMIN       /* Allow use of `KSYSCTL_OPEN_KERNEL_VFS' `KSYSCTL_OPEN_KERNEL_FS', `KSYSCTL_OPEN_KERNEL_MMAN', \
 	                                                              *              `KSYSCTL_OPEN_ROOT_PIDNS', `KSYSCTL_OPEN_BOOT_TASK' */
 #define CAP_PIPE_OPEN_CONTROLLER             CAP_SYS_RESOURCE    /* Allow use of `HOP_PIPE_OPEN_PIPE' */
 #define CAP_PIPE_CREATE_WRAPPERS             CAP_SYS_RESOURCE    /* Allow use of `HOP_PIPE_CREATE_READER' and `HOP_PIPE_CREATE_WRITER' */

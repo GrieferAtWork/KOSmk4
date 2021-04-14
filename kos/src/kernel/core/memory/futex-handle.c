@@ -41,14 +41,14 @@
 DECL_BEGIN
 
 /* futex handle operation. */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(futex, struct vm_futex);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(futex, struct mfutex);
 
 INTDEF NONNULL((1)) syscall_slong_t KCALL
-handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
+handle_futex_hop(struct mfutex *__restrict self, syscall_ulong_t cmd,
                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
-	case HOP_FUTEX_OPEN_DATAPART: {
+	case HOP_FUTEX_OPEN_MPART: {
 		struct handle hnd;
 		REF struct mpart *part;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
@@ -62,7 +62,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
 
-	case HOP_FUTEX_OPEN_DATABLOCK: {
+	case HOP_FUTEX_OPEN_MFILE: {
 		struct handle hnd;
 		REF struct mfile *file;
 		REF struct mpart *part;

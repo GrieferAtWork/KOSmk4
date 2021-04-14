@@ -28,9 +28,12 @@
 
 #include <debugger/hook.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <kernel/x86/gdt.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>
@@ -177,17 +180,17 @@ NOTHROW(KCALL get_stack_avail)(void) {
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
-		struct vm_node const *node;
+		struct mnode const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = vm_node_getaddr(node);
-		end   = vm_node_getendaddr(node);
+		start = mnode_getaddr(node);
+		end   = mnode_getendaddr(node);
 	} else
 #endif /* !__x86_64__ */
 	{
-		struct vm_node const *node;
+		struct mnode const *node;
 		node  = THIS_KERNEL_STACK;
-		start = vm_node_getaddr(node);
-		end   = vm_node_getendaddr(node);
+		start = mnode_getaddr(node);
+		end   = mnode_getendaddr(node);
 	}
 	if likely(sp >= start && sp < end)
 		return (size_t)((byte_t *)sp - (byte_t *)start);
@@ -203,17 +206,17 @@ NOTHROW(KCALL get_stack_inuse)(void) {
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
-		struct vm_node const *node;
+		struct mnode const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = vm_node_getaddr(node);
-		end   = vm_node_getendaddr(node);
+		start = mnode_getaddr(node);
+		end   = mnode_getendaddr(node);
 	} else
 #endif /* !__x86_64__ */
 	{
-		struct vm_node const *node;
+		struct mnode const *node;
 		node  = THIS_KERNEL_STACK;
-		start = vm_node_getaddr(node);
-		end   = vm_node_getendaddr(node);
+		start = mnode_getaddr(node);
+		end   = mnode_getendaddr(node);
 	}
 	if likely(sp >= start && sp < end)
 		return (size_t)((byte_t *)end - (byte_t *)sp);
@@ -229,17 +232,17 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
-		struct vm_node const *node;
+		struct mnode const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = vm_node_getaddr(node);
-		end   = vm_node_getendaddr(node);
+		start = mnode_getaddr(node);
+		end   = mnode_getendaddr(node);
 	} else
 #endif /* !__x86_64__ */
 	{
-		struct vm_node const *node;
+		struct mnode const *node;
 		node  = THIS_KERNEL_STACK;
-		start = vm_node_getaddr(node);
-		end   = vm_node_getendaddr(node);
+		start = mnode_getaddr(node);
+		end   = mnode_getendaddr(node);
 	}
 	if likely(sp >= start && sp < end) {
 		*pbase = start;

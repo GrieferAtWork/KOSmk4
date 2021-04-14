@@ -273,15 +273,15 @@ struct inode_data {
 			u32                f16_rootsiz;  /* [const] Max size of the root-directory segment (in bytes) */
 		}                      i16_root;     /* [valid_if(:f_type != FAT32 && :self == :s_root)] */
 		struct ATTR_PACKED {
-			size_t             i_clusterc;   /* [lock(:db_lock)]
+			size_t             i_clusterc;   /* [lock(:mf_lock)]
 			                                  * [if(:f_type != FAT32 && :self == :s_root,[== 0])]
 			                                  * [if(:f_type == FAT32 || :self != :s_root,[!0])]
 			                                  * Amount of loaded cluster indices. */
-			size_t             i_clustera;   /* [lock(:db_lock)]
+			size_t             i_clustera;   /* [lock(:mf_lock)]
 			                                  * [if(:f_type != FAT32 && :self == :s_root,[== 0])]
 			                                  * [if(:f_type == FAT32 || :self != :s_root,[!0])]
 			                                  * Allocated amount of cluster indices. */
-			FatClusterIndex   *i_clusterv;   /* [lock(:db_lock)]
+			FatClusterIndex   *i_clusterv;   /* [lock(:mf_lock)]
 			                                  * [if(:f_type != FAT32 && :self == :s_root,[== NULL])]
 			                                  * [if(:f_type == FAT32 || :self != :s_root,[1..i_clusterc|alloc(i_clustera)][owned])]
 			                                  * Vector    of    file   cluster    starting   indices.

@@ -800,14 +800,14 @@ again_rw_region:
 	}
 	{
 		struct mman *effective_mm;
-		struct vm_node *node;
-		struct mpart *node_part;
+		struct mnode *node;
+		struct mpart *part;
 		struct rtm_memory_region *region;
 		size_t j, access_bytes;
-		/* Next, acquire a lock to the effective VM */
+		/* Next, acquire a lock to the effective MMan */
 #ifdef KERNELSPACE_HIGHMEM
 #if !CONFIG_RTM_USERSPACE_ONLY
-		effective_mm = &vm_kernel;
+		effective_mm = &mman_kernel;
 		if (ADDR_ISUSER(addr))
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 		{
@@ -859,7 +859,7 @@ again_rw_region:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 				THROW(E_SEGFAULT_UNMAPPED, 0, context);
 			}
-			effective_mm = &vm_kernel;
+			effective_mm = &mman_kernel;
 			/* Check if the entire address range is apart of kernel-space. */
 			maxsize = (size_t)((byte_t *)KERNELSPACE_END - (byte_t *)addr);
 			if unlikely(num_bytes > maxsize) {
@@ -895,17 +895,17 @@ again_rw_region:
 		mman_forcefault(effective_mm, addr, num_bytes,
 		                MMAN_FAULT_F_NOVIO);
 #if !CONFIG_RTM_USERSPACE_ONLY
-again_lock_effective_vm:
+again_lock_effective_mman:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 		mman_lock_read(effective_mm);
-		/* Locate the VM node that is backing the storage for `addr' */
+		/* Locate the mnode that is backing the storage for `addr' */
 		node = mman_mappings_locate(effective_mm, addr);
 		/* Verify address permissions. */
 #ifdef LIBVIO_CONFIG_ENABLED
-		if unlikely(!node || (node_part = node->mn_part) == NULL ||
-		            node_part->mp_state == MPART_ST_VIO)
+		if unlikely(!node || (part = node->mn_part) == NULL ||
+		            part->mp_state == MPART_ST_VIO)
 #else /* LIBVIO_CONFIG_ENABLED */
-		if unlikely(!node || (node_part = node->mn_part) == NULL)
+		if unlikely(!node || (part = node->mn_part) == NULL)
 #endif /* !LIBVIO_CONFIG_ENABLED */
 		{
 			uintptr_t context;
@@ -999,19 +999,19 @@ verify_access_range:
 		 * actual memory. (rather than some other kind of mapping)
 		 *
 		 * At this point, we must check for some other RTM region that way already
-		 * exist for `node_part', since the RTM region list may only ever  contain
+		 * exist  for  `part', since  the RTM  region list  may only  ever contain
 		 * a single region for any given datapart, and because every data part can
-		 * be mapped an arbitrary number of times  within a single VM, we have  to
+		 * be mapped an arbitrary number of times within a single MMan, we have to
 		 * make sure that no other region already describes this one! */
 		for (j = 0; j < self->rm_regionc; ++j) {
-			struct vm_node *aliasing_node;
+			struct mnode *aliasing_node;
 #if !CONFIG_RTM_USERSPACE_ONLY
 			struct mman *aliasing_node_mm;
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			size_t access_offset_into_node;
 			byte_t *aliasing_region_node_start;
 			region = self->rm_regionv[j];
-			if likely(rtm_memory_region_getpart(region) != node_part)
+			if likely(rtm_memory_region_getpart(region) != part)
 				continue;
 			/* Welp... There's an overlap with this region's datapart. */
 			assert((byte_t *)region->mr_addrhi < (byte_t *)addr ||
@@ -1033,7 +1033,7 @@ verify_access_range:
 					if (next_j >= self->rm_regionc)
 						break;
 					next_region = self->rm_regionv[next_j];
-					if (rtm_memory_region_getpart(next_region) != node_part)
+					if (rtm_memory_region_getpart(next_region) != part)
 						break; /* Not one of ours. */
 					if (addr > next_region->mr_addrhi) {
 						/* Access is still located above this region! */
@@ -1057,15 +1057,15 @@ verify_access_range:
 				}
 			}
 #endif /* CONFIG_RTM_FAR_REGIONS */
-			/* Check  if this region is mapped by the  same VM node. - If it is, then
+			/* Check  if this region  is mapped by the  same mnode. -  If it is, then
 			 * we have to extend this region to also contain `addr...+=access_bytes'.
 			 * Otherwise,  we  have to  perform an  address  translation so  that the
 			 * access  instead happens for  this region's mapping.  (At least we know
-			 * that  if  the data  parts  are identical,  then  both of  the  VM node
-			 * mappings  will have  identical sizes, since  the size of  a vm_node is
+			 * that if  the  data  parts  are  identical,  then  both  of  the  mnode
+			 * mappings  will  have identical  sizes, since  the size  of a  mnode is
 			 * always identical to the size of an associated mpart!) */
 #if !CONFIG_RTM_USERSPACE_ONLY
-			aliasing_node_mm = &vm_kernel;
+			aliasing_node_mm = &mman_kernel;
 			if (ADDR_ISUSER(region->mr_addrlo))
 				aliasing_node_mm = THIS_MMAN;
 			if likely(aliasing_node_mm == effective_mm)
@@ -1094,7 +1094,7 @@ do_create_far_region:
 								region = rtm_memory_create_far_region(self, j,
 								                                      (byte_t *)addr,
 								                                      (byte_t *)addr + access_bytes - 1,
-								                                      effective_mm, node_part,
+								                                      effective_mm, part,
 								                                      region->mr_vers);
 								goto do_access_region;
 							}
@@ -1133,7 +1133,7 @@ do_create_far_region:
 						if (j > 0) {
 							struct rtm_memory_region *lower_region;
 							lower_region = self->rm_regionv[j - 1];
-							if (rtm_memory_region_getpart(lower_region) == node_part &&
+							if (rtm_memory_region_getpart(lower_region) == part &&
 							    (byte_t *)lower_region->mr_addrhi + 1 == (byte_t *)region->mr_addrlo &&
 							    (rtm_memory_region_waschanged(lower_region) ==
 							     (write || rtm_memory_region_waschanged(region)))) {
@@ -1195,7 +1195,7 @@ do_create_far_region:
 						if ((j + 1) < self->rm_regionc) {
 							struct rtm_memory_region *upper_region;
 							upper_region = self->rm_regionv[j + 1];
-							if (rtm_memory_region_getpart(upper_region) == node_part &&
+							if (rtm_memory_region_getpart(upper_region) == part &&
 							    (byte_t *)region->mr_addrhi + 1 == (byte_t *)upper_region->mr_addrlo &&
 							    (rtm_memory_region_waschanged(upper_region) ==
 							     (write || rtm_memory_region_waschanged(region)))) {
@@ -1220,7 +1220,7 @@ do_create_far_region:
 					mman_lock_endread(effective_mm);
 					while (!mman_lock_canread(aliasing_node_mm))
 						task_yield();
-					goto again_lock_effective_vm;
+					goto again_lock_effective_mman;
 				}
 				aliasing_node = mman_mappings_locate(effective_mm, region->mr_addrlo);
 			}
@@ -1243,7 +1243,7 @@ do_create_far_region:
 			       access_offset_into_node;
 			goto again;
 		}
-		incref(node_part); /* To-be inherited by the new RTM region. */
+		incref(part); /* To-be inherited by the new RTM region. */
 		mman_lock_endread(effective_mm);
 		/* Create a new RTM region. */
 		TRY {
@@ -1251,31 +1251,31 @@ do_create_far_region:
 			                                                       offsetof(struct rtm_memory_region, mr_data) +
 			                                                       access_bytes);
 		} EXCEPT {
-			decref(node_part);
+			decref(part);
 			RETHROW();
 		}
 		region->mr_addrlo = (byte_t *)addr;
 		region->mr_addrhi = (byte_t *)addr + access_bytes - 1;
-		region->mr_part   = node_part; /* Inherit reference */
+		region->mr_part   = part; /* Inherit reference */
 		region->mr_vers = 0;
-		if (ATOMIC_READ(node_part->mp_meta) != NULL) {
+		if (ATOMIC_READ(part->mp_meta) != NULL) {
 			/* Check for non-zero version counter. */
 			struct mpartmeta *ftx;
 			TRY {
-				mpart_lock_acquire(node_part);
+				mpart_lock_acquire(part);
 			} EXCEPT {
 				rtm_memory_free(self, region);
-				decref(node_part);
+				decref(part);
 				RETHROW();
 			}
-			ftx = ATOMIC_READ(node_part->mp_meta);
+			ftx = ATOMIC_READ(part->mp_meta);
 			if likely(ftx != NULL)
 				region->mr_vers = ftx->mpm_rtm_vers;
-			mpart_lock_release(node_part);
+			mpart_lock_release(part);
 		}
 		/* Insert `region' into the vector at index `i' */
 		rtm_memory_insert_region(self, i, region); /* Inherit: region */
-		/* Populate the accessed `region' with data from the VM
+		/* Populate the accessed `region' with data from the MMan
 		 * NOTE: We use `memcpy_nopf()' for this to  ensure that the current memory  state
 		 *       remains consistent with what was set-up by the `mman_forcefault()' above. */
 		{
@@ -1296,7 +1296,7 @@ do_create_far_region:
 					             self->rm_regionc - i,
 					             sizeof(struct rtm_memory_region *));
 					rtm_memory_free(self, region);
-					decref(node_part);
+					decref(part);
 				} else {
 					/* At  least ~something~ was copied (Update `region' to
 					 * only contain the portion that was _actually_ copied) */
@@ -1371,16 +1371,16 @@ rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
 
 
 PRIVATE void FCALL
-prefault_memory_for_writing(struct mman *__restrict myvm,
+prefault_memory_for_writing(struct mman *__restrict mymm,
                             USER void *addr, size_t num_bytes) {
 #if !CONFIG_RTM_USERSPACE_ONLY
-	mman_forcefault(ADDR_ISKERN(addr) ? &vm_kernel
-	                                  : myvm,
+	mman_forcefault(ADDR_ISKERN(addr) ? &mman_kernel
+	                                  : mymm,
 	                addr, num_bytes,
 	                MMAN_FAULT_F_WRITE |
 	                MMAN_FAULT_F_NOVIO);
 #else /* !CONFIG_RTM_USERSPACE_ONLY */
-	mman_forcefault(myvm, addr, num_bytes,
+	mman_forcefault(mymm, addr, num_bytes,
 	                MMAN_FAULT_F_WRITE |
 	                MMAN_FAULT_F_NOVIO);
 #endif /* CONFIG_RTM_USERSPACE_ONLY */
@@ -1429,16 +1429,16 @@ rtm_memory_apply(struct rtm_memory const *__restrict self) {
 	 *       powerful `MPART_F_LOCKBIT' in order to accomplish the same! */
 
 #if CONFIG_RTM_USERSPACE_ONLY
-#define effective_mm myvm
+#define effective_mm mymm
 #endif /* CONFIG_RTM_USERSPACE_ONLY */
-	struct mman *myvm;
+	struct mman *mymm;
 	size_t i;
 	bool must_allocate_missing_futex_controllers;
 #if !CONFIG_RTM_USERSPACE_ONLY
 	bool has_modified_kern;
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	bool has_modified_user;
-	myvm  = THIS_MMAN;
+	mymm  = THIS_MMAN;
 again_forcefault:
 	/* Step #1: prefault the address ranges of all modified regions. */
 	for (i = 0; i < self->rm_regionc; ++i) {
@@ -1448,7 +1448,7 @@ again_forcefault:
 		if (!rtm_memory_region_waschanged(region))
 			continue; /* Not modified... */
 		/* Prefault memory. */
-		prefault_memory_for_writing(myvm, region->mr_addrlo,
+		prefault_memory_for_writing(mymm, region->mr_addrlo,
 		                            rtm_memory_region_getsize(region));
 	}
 
@@ -1462,13 +1462,13 @@ again_acquire_region_locks:
 		region = self->rm_regionv[i];
 		part   = rtm_memory_region_getpart(region);
 		{
-			struct vm_node *node;
+			struct mnode *node;
 			size_t node_size_after_addr;
 			byte_t *region_start_addr;
 #if !CONFIG_RTM_USERSPACE_ONLY
-			struct mman *effective_mm = myvm;
+			struct mman *effective_mm = mymm;
 			if unlikely(ADDR_ISKERN(region->mr_addrlo))
-				effective_mm = &vm_kernel;
+				effective_mm = &mman_kernel;
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			region_start_addr = (byte_t *)region->mr_addrlo;
 			if unlikely(!mman_lock_tryread(effective_mm)) {
@@ -1477,7 +1477,7 @@ again_acquire_region_locks:
 					task_yield();
 				goto again_acquire_region_locks;
 			}
-			node = mman_mappings_locate(myvm, region_start_addr);
+			node = mman_mappings_locate(mymm, region_start_addr);
 			if unlikely(!node || node->mn_part != part) {
 				mman_lock_endread(effective_mm);
 				goto partially_release_locks_and_retry;
@@ -1621,24 +1621,24 @@ again_allocate_ftx_controller_for_part:
 		part = rtm_memory_region_getpart(region);
 		assert(mpart_lock_acquired(part));
 #if !CONFIG_RTM_USERSPACE_ONLY
-		effective_mm = myvm;
+		effective_mm = mymm;
 		if unlikely(ADDR_ISKERN(region->mr_addrlo))
-			effective_mm = &vm_kernel;
-		if unlikely(effective_mm == &vm_kernel) {
-			/* Ensure that we've for a read-lock to the kernel's VM */
+			effective_mm = &mman_kernel;
+		if unlikely(effective_mm == &mman_kernel) {
+			/* Ensure that we've for a read-lock to the kernel's MMan */
 			if (!has_modified_kern) {
-				if unlikely(!mman_lock_tryread(&vm_kernel))
-					goto again_acquire_region_locks_for_vm_lock;
+				if unlikely(!mman_lock_tryread(&mman_kernel))
+					goto again_acquire_region_locks_for_mman_lock;
 				has_modified_kern = true;
 			}
 		} else
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 		{
-			/* Ensure that we've for a read-lock to the user's VM */
+			/* Ensure that we've for a read-lock to the user's MMan */
 			if (!has_modified_user) {
 				if unlikely(!mman_lock_tryread(effective_mm)) {
 #if !CONFIG_RTM_USERSPACE_ONLY
-again_acquire_region_locks_for_vm_lock:
+again_acquire_region_locks_for_mman_lock:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 					rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
 					while (!mman_lock_canread(effective_mm))
@@ -1655,10 +1655,10 @@ again_acquire_region_locks_for_vm_lock:
 		                                      rtm_memory_region_getsize(region))) {
 #if !CONFIG_RTM_USERSPACE_ONLY
 			if unlikely(has_modified_kern)
-				mman_lock_endread(&vm_kernel);
+				mman_lock_endread(&mman_kernel);
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			if (has_modified_user)
-				mman_lock_endread(myvm);
+				mman_lock_endread(mymm);
 			rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
 			goto again_forcefault;
 		}
@@ -1683,7 +1683,7 @@ again_acquire_region_locks_for_vm_lock:
 		 * NOTE: We've  verified that all  of this memory  can be written without
 		 *       causing a pagefault in step #3, and we know that the  associated
 		 *       mappings won't have changed in the mean time because we're still
-		 *       holding locks to their corresponding VMs! */
+		 *       holding locks to their corresponding MMans! */
 #ifdef NDEBUG
 		memcpy(region->mr_addrlo,
 		       region->mr_data,
@@ -1744,10 +1744,10 @@ again_acquire_region_locks_for_vm_lock:
 
 #if !CONFIG_RTM_USERSPACE_ONLY
 	if unlikely(has_modified_kern)
-		mman_lock_endread(&vm_kernel);
+		mman_lock_endread(&mman_kernel);
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	if (has_modified_user)
-		mman_lock_endread(myvm);
+		mman_lock_endread(mymm);
 #if CONFIG_RTM_PENDING_SYSTEM_CALLS
 	rtm_memory_exec_pending_syscalls(self);
 #endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */

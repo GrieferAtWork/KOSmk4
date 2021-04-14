@@ -59,7 +59,7 @@
 #define X86_PAGEDIR_USES_PAE()  0
 #define X86_PAGEDIR_USES_P32()  1
 
-#define X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_COMPILETIME_VALUE 1
+#define X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_COMPILETIME_VALUE 1
 /* Start of the address range reserved for page-directory self-modifications. */
 #define X86_MMAN_KERNEL_PDIR_RESERVED_BASE P32_MMAN_KERNEL_PDIR_RESERVED_BASE
 /* Amount of memory reserved for page-directory self-modifications. */
@@ -84,7 +84,7 @@
 #define X86_PAGEDIR_USES_PAE()  1
 #define X86_PAGEDIR_USES_P32()  0
 
-#define X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_COMPILETIME_VALUE 1
+#define X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_COMPILETIME_VALUE 1
 /* Start of the address range reserved for page-directory self-modifications. */
 #define X86_MMAN_KERNEL_PDIR_RESERVED_BASE PAE_MMAN_KERNEL_PDIR_RESERVED_BASE
 /* Amount of memory reserved for page-directory self-modifications. */
@@ -122,7 +122,7 @@
 
 #if (P32_MMAN_KERNEL_PDIR_RESERVED_BASE == PAE_MMAN_KERNEL_PDIR_RESERVED_BASE && \
      P32_MMAN_KERNEL_PDIR_RESERVED_SIZE == PAE_MMAN_KERNEL_PDIR_RESERVED_SIZE)
-#define X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_COMPILETIME_VALUE 1
+#define X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_COMPILETIME_VALUE 1
 
 /* Start of the address range reserved for page-directory self-modifications. */
 #define X86_MMAN_KERNEL_PDIR_RESERVED_BASE \
@@ -131,7 +131,7 @@
 #define X86_MMAN_KERNEL_PDIR_RESERVED_SIZE \
 	P32_MMAN_KERNEL_PDIR_RESERVED_SIZE
 #else /* Same-reservations */
-#define X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE 1
+#define X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE 1
 
 /* Start of the address range reserved for page-directory self-modifications. */
 #define X86_MMAN_KERNEL_PDIR_RESERVED_BASE \

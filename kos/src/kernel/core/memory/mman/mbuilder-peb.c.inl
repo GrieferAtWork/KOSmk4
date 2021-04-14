@@ -30,13 +30,14 @@
 
 #include <kernel/compat.h>
 #include <kernel/mman.h>
-#include <kernel/mman/mbuilder.h>
+#include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
+#include <kernel/mman/mbuilder.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 
 #include <hybrid/__pointer.h>
 #include <hybrid/align.h>
@@ -178,10 +179,10 @@ again:
 	/* Create a temporary kernel-space mapping for initializing the PEB */
 	peb_total_size = CEIL_ALIGN(peb_total_size, PAGESIZE);
 	peb_temp_base = (byte_t *)mman_map(&mman_kernel,
-	                                   HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                                   HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 	                                   peb_total_size,
 	                                   PROT_READ | PROT_WRITE | PROT_SHARED,
-	                                   HINT_GETMODE(KERNEL_VMHINT_TEMPORARY) |
+	                                   HINT_GETMODE(KERNEL_MHINT_TEMPORARY) |
 	                                   MAP_PREPARED | MAP_NOMERGE | MAP_NOSPLIT,
 	                                   &mfile_zero,
 	                                   NULL,
@@ -246,18 +247,18 @@ again:
 		/* If something about the amount of string data changed, start over */
 		if unlikely(strings_total_copied > strings_total_size) {
 string_size_changed:
-			vm_unmap_kernel_ram(peb_temp_base,
-			                    peb_total_size,
-			                    false);
+			mman_unmap_kram(peb_temp_base,
+			                peb_total_size,
+			                GFP_NORMAL);
 			goto again;
 		}
 
 		/* Figure out where we want to map the PEB within the VM builder. */
-		/* TODO: Muse use `KERNEL_VMHINT_USER_PEB' depending on compatibility mode!
-		 * >> KERNEL_VMHINT_USER_PEB(32|64) depending on IN_PTR(void)-size */
-		result = mbuilder_findunmapped(self, HINT_GETADDR(KERNEL_VMHINT_USER_PEB),
+		/* TODO: Muse use `KERNEL_MHINT_USER_PEB' depending on compatibility mode!
+		 * >> KERNEL_MHINT_USER_PEB(32|64) depending on IN_PTR(void)-size */
+		result = mbuilder_findunmapped(self, HINT_GETADDR(KERNEL_MHINT_USER_PEB),
 		                               peb_total_size,
-		                               HINT_GETMODE(KERNEL_VMHINT_USER_PEB));
+		                               HINT_GETMODE(KERNEL_MHINT_USER_PEB));
 
 		/* Relocate pointers within the PEB to make them absolute */
 		peb->pp_argv = (OU_PTR(OU_PTR(char)))((OU_UIP)peb->pp_argv + (OU_UIP)(uintptr_t)result);
@@ -276,9 +277,9 @@ string_size_changed:
 		}
 	} EXCEPT {
 		/* Delete the temporary PEB mapping as general-purpose kernel RAM. */
-		vm_unmap_kernel_ram(peb_temp_base,
-		                    peb_total_size,
-		                    false);
+		mman_unmap_kram(peb_temp_base,
+		                peb_total_size,
+		                GFP_NORMAL);
 		RETHROW();
 	}
 	/* Steal the node used to hold the PEB */
@@ -306,7 +307,7 @@ string_size_changed:
 
 	/* Delete some unneeded/problematic flags. */
 
-	/* Delete the part->node link (no need for locking, since `vn_part' isn't shared) */
+	/* Delete the part->node link (no need for locking, since `mn_part' isn't shared) */
 	stolen_node->mbn_part->mp_share.lh_first = NULL; /* XXX: Unsafe (but ignore since this whole API is deprecated) */
 	stolen_node->mbn_minaddr = (byte_t *)result;
 	stolen_node->mbn_maxaddr = (byte_t *)result + peb_total_size - 1;

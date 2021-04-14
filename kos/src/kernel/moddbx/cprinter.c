@@ -30,8 +30,9 @@
 
 #include <fs/vfs.h>
 #include <kernel/except.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 #include <hybrid/align.h>
 
@@ -1259,49 +1260,49 @@ print_named_pointer(struct ctyperef const *__restrict self,
 	 * the offset into the file, alongside the original pointer:
 	 * `0x12345678 ("/path/to/file"+offset_into_file)' */
 	{
-		struct mman *effective_vm;
-		effective_vm = &vm_kernel;
+		struct mman *effective_mman;
+		struct mnode *node;
+		effective_mman = &mman_kernel;
 		if (ADDR_ISUSER(ptr) && ADDR_ISKERN(dbg_current))
-			effective_vm = dbg_current->t_mman;
+			effective_mman = dbg_current->t_mman;
 		is_void_pointer = true;
-		if (ADDR_ISKERN(effective_vm)) {
-			struct vm_node *node;
-			node = vm_getnodeofaddress(effective_vm, ptr);
-			if (node && node->vn_part) {
-				is_void_pointer = false;
-				if (node->vn_fsname) {
-					pos_t mapping_offset;
-					mapping_offset = vm_datapart_startbyte(node->vn_part);
-					mapping_offset += (uintptr_t)ptr - (uintptr_t)vm_node_getaddr(node);
-					FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-					PRINTF("%#" PRIxPTR, ptr);
-					FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
-					PRINT(" ");
-					FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
-					PRINT("(");
-					if (node->vn_fspath) {
-						temp = path_printent(node->vn_fspath,
-						                     node->vn_fsname->de_name,
-						                     node->vn_fsname->de_namelen,
-						                     P_PRINTER, P_ARG);
-					} else {
-						temp = (*P_PRINTER)(P_ARG,
-						                    node->vn_fsname->de_name,
-						                    node->vn_fsname->de_namelen);
-					}
-					if unlikely(temp < 0)
-						goto err;
-					result += temp;
-					PRINTF("+%" PRIuN(__SIZEOF_POS_T__) ")", mapping_offset);
-					FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
-					goto done;
+		if (ADDR_ISKERN(effective_mman) &&
+		    (node = mman_mappings_locate(effective_mman, ptr)) != NULL &&
+		    (node->mn_part != NULL)) {
+			is_void_pointer = false;
+			if (node->mn_fsname) {
+				pos_t mapping_offset;
+				mapping_offset = mpart_getminaddr(node->mn_part);
+				mapping_offset += (uintptr_t)ptr - (uintptr_t)mnode_getaddr(node);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+				PRINTF("%#" PRIxPTR, ptr);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+				PRINT(" ");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+				PRINT("(");
+				if (node->mn_fspath) {
+					temp = path_printent(node->mn_fspath,
+					                     node->mn_fsname->de_name,
+					                     node->mn_fsname->de_namelen,
+					                     P_PRINTER, P_ARG);
+				} else {
+					temp = (*P_PRINTER)(P_ARG,
+					                    node->mn_fsname->de_name,
+					                    node->mn_fsname->de_namelen);
 				}
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+				PRINTF("+%" PRIuN(__SIZEOF_POS_T__) ")", mapping_offset);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+				goto done;
+			} else {
+				/* TODO: Check if `ptr' points into kernel heap memory.
+				 *       If it is, then print it as `0x12345678 (heap)' */
 			}
 		}
 	}
 
-	/* TODO: Check if `ptr' points into kernel heap memory. If it
-	 *       is,   then   print    it   as    `0x12345678 (heap)' */
 
 	/* If  nothing is  mapped where  `ptr' points  to, then we
 	 * should print it in a different color (iow: use a custom

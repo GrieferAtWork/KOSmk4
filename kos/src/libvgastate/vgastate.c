@@ -397,10 +397,10 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 		TRY {
 			/* Use a regular memory mapping. */
 			self->vv_biosbase = (byte_t *)mman_map(/* self:        */ &mman_kernel,
-			                                       /* hint:        */ HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+			                                       /* hint:        */ HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 			                                       /* num_bytes:   */ VGA_VM86_BIOS_SIZE,
 			                                       /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
-			                                       /* flags:       */ HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+			                                       /* flags:       */ HINT_GETMODE(KERNEL_MHINT_TEMPORARY),
 			                                       /* file:        */ &mfile_phys,
 			                                       /* file_fspath: */ NULL,
 			                                       /* file_fsname: */ NULL,

@@ -32,10 +32,12 @@
 #include <debugger/output.h>
 #include <kernel/arch/syslog.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
@@ -85,13 +87,13 @@ DECL_BEGIN
 
 struct sheap {
 	/* TODO: Use SLIST_ENTRY() for `sh_next' */
-	struct sheap  *sh_next; /* [0..1] Next heap. */
-	struct vm_node sh_node; /* [valid_if(sh_next)] VM node for allocating another heap. */
-	size_t         sh_size; /* Heap size (== runtime_sizeof(*self)). */
-	byte_t         sh_heap[DBX_STATIC_HEAPSIZE - /* Heap data. */
-	                       (sizeof(struct sheap *) +
-	                        sizeof(struct vm_node) +
-	                        sizeof(size_t))];
+	struct sheap *sh_next; /* [0..1] Next heap. */
+	struct mnode  sh_node; /* [valid_if(sh_next)] mnode for allocating another heap. */
+	size_t        sh_size; /* Heap size (== runtime_sizeof(*self)). */
+	byte_t        sh_heap[DBX_STATIC_HEAPSIZE - /* Heap data. */
+	                      (sizeof(struct sheap *) +
+	                       sizeof(struct mnode) +
+	                       sizeof(size_t))];
 };
 
 #define sheap_heapsize(self) ((self)->sh_size - offsetof(struct sheap, sh_heap))
@@ -175,10 +177,9 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	last_heap = &static_heap;
 	while (last_heap->sh_next)
 		last_heap = last_heap->sh_next;
-	new_heap = (struct sheap *)vm_getfree(&vm_kernel,
-	                                      HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                                      min_size, PAGESIZE,
-	                                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
+	new_heap = (struct sheap *)mman_findunmapped(&mman_kernel,
+	                                             HINT_GETADDR(KERNEL_MHINT_TEMPORARY), min_size,
+	                                             HINT_GETMODE(KERNEL_MHINT_TEMPORARY));
 	if (new_heap == (struct sheap *)MAP_FAILED)
 		return false;
 
@@ -470,10 +471,9 @@ PRIVATE void KCALL reset_heap(void) {
 
 PRIVATE void KCALL clear_heap(void) {
 	if (kernel_poisoned())
-		return; /* Don't touch the kernel VM after poison */
+		return; /* Don't touch the kernel MMan after poison */
 	/* Unmap all dynamically mapped heap nodes. */
 	while (static_heap.sh_next) {
-		struct vm_node *node;
 		struct sheap *pred = &static_heap;
 		struct sheap *iter = pred->sh_next;
 		/* Find the last heap extension with a valid next-pointer. */
@@ -482,13 +482,10 @@ PRIVATE void KCALL clear_heap(void) {
 			iter = iter->sh_next;
 		}
 		pred->sh_next = NULL;
-		/* Unmap the node. */
-		node = vm_node_remove(&vm_kernel, vm_node_getminaddr(&pred->sh_node));
-		if unlikely(node != &pred->sh_node) {
-			/* Shouldn't happen... */
-			vm_node_insert(node);
-			break;
-		}
+
+		/* Remove the node. */
+		mman_mappings_removenode(&mman_kernel, &pred->sh_node);
+
 		/* Free this heap extension. */
 		sheap_free(iter);
 	}

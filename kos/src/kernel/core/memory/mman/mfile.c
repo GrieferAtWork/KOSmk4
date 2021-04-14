@@ -116,7 +116,7 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	assertf(self->mf_parts == NULL ||
 	        self->mf_parts == MFILE_PARTS_ANONYMOUS,
 	        "Any remaining part should have kept us alive!\n"
-	        "self->db_parts = %p\n",
+	        "self->mf_parts = %p\n",
 	        self->mf_parts);
 	assertf(self->mf_changed.slh_first == NULL ||
 	        self->mf_changed.slh_first == MFILE_PARTS_ANONYMOUS,

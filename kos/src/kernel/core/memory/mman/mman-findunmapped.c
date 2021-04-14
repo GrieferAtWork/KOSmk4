@@ -75,9 +75,9 @@ DECL_BEGIN
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-#ifndef KERNEL_VMHINT_USER_MINADDR
-#define KERNEL_VMHINT_USER_MINADDR (0, 0)
-#endif /* !KERNEL_VMHINT_USER_MINADDR */
+#ifndef KERNEL_MHINT_USER_MINADDR
+#define KERNEL_MHINT_USER_MINADDR (0, 0)
+#endif /* !KERNEL_MHINT_USER_MINADDR */
 
 /* The lowest (user-space) address  that might ever be  automatically
  * selected for mapping by  `mman_getunmapped()'. Note that the  user
@@ -89,7 +89,7 @@ DECL_BEGIN
  * mappings below this address always fails.
  *
  * The value of this variable is exposed in `/proc/sys/vm/mmap_min_addr' */
-PUBLIC USER CHECKED void *mman_getunmapped_user_minaddr = HINT_GETADDR(KERNEL_VMHINT_USER_MINADDR);
+PUBLIC USER CHECKED void *mman_getunmapped_user_minaddr = HINT_GETADDR(KERNEL_MHINT_USER_MINADDR);
 
 /* Default base address for user-space  memory mappings. When trying to  find
  * an unmapped area within a user-space mman, the FIXED flag isn't given, and
@@ -98,12 +98,12 @@ PUBLIC USER CHECKED void *mman_getunmapped_user_minaddr = HINT_GETADDR(KERNEL_VM
  * used as initial hint instead.
  * Afterwards, the actual address to-be returned will be calculated normally.
  *
- * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
-PUBLIC USER CHECKED void *mman_getunmapped_user_defbase = HINT_GETADDR(KERNEL_VMHINT_USER_HEAP);
+ * By default, this variable is set to `KERNEL_MHINT_USER_HEAP' */
+PUBLIC USER CHECKED void *mman_getunmapped_user_defbase = HINT_GETADDR(KERNEL_MHINT_USER_HEAP);
 
 /* Same as `mman_getunmapped_user_defbase', but used
  * instead  when  the  `MAP_STACK'  flag  is  given. */
-PUBLIC USER CHECKED void *mman_getunmapped_user_stkbase = HINT_GETADDR(KERNEL_VMHINT_USER_STACK);
+PUBLIC USER CHECKED void *mman_getunmapped_user_stkbase = HINT_GETADDR(KERNEL_MHINT_USER_STACK);
 
 /* [lock(ATOMIC)]
  * Additional flags that are always or'd to those given to `mman_getunmapped()'

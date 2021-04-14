@@ -535,7 +535,7 @@ again_get_oldpath:
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
-	case KSYSCTL_OPEN_KERNEL_VM: {
+	case KSYSCTL_OPEN_KERNEL_MMAN: {
 		struct handle temp;
 		require(CAP_KERNEL_QUERY);
 		temp.h_type = HANDLE_TYPE_MMAN;

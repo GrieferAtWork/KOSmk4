@@ -366,13 +366,13 @@ nocpu:
 	}
 	/* Account for register overrides related to some thread-local components. */
 	if (dbg_current->t_mman) {
-		struct vm *v = dbg_current->t_mman;
-		v->v_pdir_phys = (PHYS pagedir_t *)x86_dbg_origstate.fcs_coregs.co_cr3;
-		FORMMAN(v, thismman_x86_dr0) = x86_dbg_origstate.fcs_drregs.dr_dr0;
-		FORMMAN(v, thismman_x86_dr1) = x86_dbg_origstate.fcs_drregs.dr_dr1;
-		FORMMAN(v, thismman_x86_dr2) = x86_dbg_origstate.fcs_drregs.dr_dr2;
-		FORMMAN(v, thismman_x86_dr3) = x86_dbg_origstate.fcs_drregs.dr_dr3;
-		FORMMAN(v, thismman_x86_dr7) = x86_dbg_origstate.fcs_drregs.dr_dr7;
+		struct mman *mm = dbg_current->t_mman;
+		mm->mm_pagedir_p = (PHYS pagedir_t *)x86_dbg_origstate.fcs_coregs.co_cr3;
+		FORMMAN(mm, thismman_x86_dr0) = x86_dbg_origstate.fcs_drregs.dr_dr0;
+		FORMMAN(mm, thismman_x86_dr1) = x86_dbg_origstate.fcs_drregs.dr_dr1;
+		FORMMAN(mm, thismman_x86_dr2) = x86_dbg_origstate.fcs_drregs.dr_dr2;
+		FORMMAN(mm, thismman_x86_dr3) = x86_dbg_origstate.fcs_drregs.dr_dr3;
+		FORMMAN(mm, thismman_x86_dr7) = x86_dbg_origstate.fcs_drregs.dr_dr7;
 	}
 }
 
@@ -531,13 +531,13 @@ nocpu:
 			}
 			/* Account for register overrides related to some thread-local components. */
 			if (dbg_current->t_mman) {
-				struct vm *v = dbg_current->t_mman;
-				x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)v->v_pdir_phys;
-				x86_dbg_origstate.fcs_drregs.dr_dr0 = FORMMAN(v, thismman_x86_dr0);
-				x86_dbg_origstate.fcs_drregs.dr_dr1 = FORMMAN(v, thismman_x86_dr1);
-				x86_dbg_origstate.fcs_drregs.dr_dr2 = FORMMAN(v, thismman_x86_dr2);
-				x86_dbg_origstate.fcs_drregs.dr_dr3 = FORMMAN(v, thismman_x86_dr3);
-				x86_dbg_origstate.fcs_drregs.dr_dr7 = FORMMAN(v, thismman_x86_dr7);
+				struct mman *mm = dbg_current->t_mman;
+				x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)mm->mm_pagedir_p;
+				x86_dbg_origstate.fcs_drregs.dr_dr0 = FORMMAN(mm, thismman_x86_dr0);
+				x86_dbg_origstate.fcs_drregs.dr_dr1 = FORMMAN(mm, thismman_x86_dr1);
+				x86_dbg_origstate.fcs_drregs.dr_dr2 = FORMMAN(mm, thismman_x86_dr2);
+				x86_dbg_origstate.fcs_drregs.dr_dr3 = FORMMAN(mm, thismman_x86_dr3);
+				x86_dbg_origstate.fcs_drregs.dr_dr7 = FORMMAN(mm, thismman_x86_dr7);
 			}
 		}
 		memcpy(&x86_dbg_viewstate, &x86_dbg_origstate, sizeof(struct fcpustate));

@@ -51,13 +51,13 @@ DECL_BEGIN
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_getpagedir")
 ATTR_PURE WUNUSED pagedir_phys_t
 NOTHROW(KCALL dbg_getpagedir)(void) {
-	struct vm *v;
+	struct mman *mm;
 	if (!dbg_current)
 		goto fallback;
-	v = dbg_current->t_mman;
-	if (!v)
+	mm = dbg_current->t_mman;
+	if (!mm)
 		goto fallback;
-	return v->v_pdir_phys;
+	return mm->mm_pagedir_p;
 fallback:
 	return pagedir_kernel_phys;
 }
@@ -167,7 +167,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 					new_vm = dbg_current->t_mman;
 					if unlikely(!ADDR_ISKERN(new_vm))
 						goto done_nopanic_copy;
-					if (new_vm->v_pdir_phys != pdir)
+					if (new_vm->mm_pagedir_p != pdir)
 						goto done_nopanic_copy;
 				} EXCEPT {
 					goto done_nopanic_copy;
@@ -264,7 +264,7 @@ again_memcpy_nopf:
 					new_vm = dbg_current->t_mman;
 					if unlikely(!ADDR_ISKERN(new_vm))
 						goto done_nopanic_copy;
-					if (new_vm->v_pdir_phys != pdir)
+					if (new_vm->mm_pagedir_p != pdir)
 						goto done_nopanic_copy;
 				} EXCEPT {
 					goto done_nopanic_copy;

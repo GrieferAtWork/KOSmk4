@@ -38,12 +38,13 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/syslog.h>
-#include <kernel/vm.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
@@ -68,8 +69,6 @@
 
 #include <libinstrlen/instrlen.h>
 #include <libunwind/unwind.h>
-
-#include <hybrid/sequence/rbtree.h>
 
 /* The minimum amount of traceback entries that MALL
  * should attempt to include in debug information of
@@ -324,8 +323,8 @@ PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(struct trace_node) nodes = NULL;
 INTERN struct heap trace_heap =
 HEAP_INIT(PAGESIZE * 4,
           PAGESIZE * 16,
-          HINT_GETADDR(KERNEL_VMHINT_DHEAP),
-          HINT_GETMODE(KERNEL_VMHINT_DHEAP));
+          HINT_GETADDR(KERNEL_MHINT_DHEAP),
+          HINT_GETMODE(KERNEL_MHINT_DHEAP));
 DEFINE_VALIDATABLE_HEAP(trace_heap);
 DEFINE_DBG_BZERO_OBJECT(trace_heap.h_lock);
 #define TRACE_HEAP_FLAGS (GFP_NORMAL | GFP_LOCKED | GFP_PREFLT)
@@ -1017,8 +1016,8 @@ NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
 		/* Search general-purpose registers. */
 		for (i = 0; i < (sizeof(struct gpregs) / sizeof(void *)); ++i)
 			result += gc_reachable_pointer(((void **)&context->scs_gpregs)[i]);
-		stack_min = vm_node_getminaddr(&FORTASK(thread, this_kernel_stacknode));
-		stack_end = vm_node_getendaddr(&FORTASK(thread, this_kernel_stacknode));
+		stack_min = mnode_getminaddr(&FORTASK(thread, this_kernel_stacknode));
+		stack_end = mnode_getendaddr(&FORTASK(thread, this_kernel_stacknode));
 #ifdef scpustate_getkernelpsp
 		sp = (void *)scpustate_getkernelpsp(context);
 #else /* scpustate_getkernelpsp */
@@ -1047,7 +1046,7 @@ NOTHROW(KCALL gc_reachable_this_thread)(void) {
 	unsigned int i;
 	void *sp, *stack_min, *stack_end;
 	struct lcpustate context;
-	struct vm_node const *my_stack;
+	struct mnode const *my_stack;
 	/* Search the registers of this thread. */
 	lcpustate_current(&context);
 	/* Search general-purpose registers. */
@@ -1062,14 +1061,15 @@ NOTHROW(KCALL gc_reachable_this_thread)(void) {
 		                            (size_t)((byte_t *)stack_end -
 		                                     (byte_t *)sp));
 		/* If we're running from a custom stack, also search the original kernel stack! */
-		if (stack_end != (byte_t *)vm_node_getendaddr(my_stack))
+		if (stack_end != (byte_t *)mnode_getendaddr(my_stack))
 			goto do_search_kernel_stack;
 	} else {
-		/* Stack pointer  is  out-of-bounds  (no  idea  what  this  is
-		 * about, but let's just assume the entire stack is allocated) */
+		/* Stack pointer is out-of-bounds (no idea what this
+		 * is about, but let's just assume the entire  stack
+		 * is allocated) */
 do_search_kernel_stack:
-		stack_min = vm_node_getminaddr(my_stack);
-		stack_end = vm_node_getendaddr(my_stack);
+		stack_min = mnode_getminaddr(my_stack);
+		stack_end = mnode_getendaddr(my_stack);
 		result += gc_reachable_data((byte_t *)stack_min,
 		                            (size_t)((byte_t *)stack_end -
 		                                     (byte_t *)stack_min));
@@ -1186,10 +1186,9 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	 *    - Kernel .data & .bss
 	 *    - Driver .data & .bss
 	 *    - Stacks and general purpose registers of all other threads
-	 *    - VMs reachable from those threads (XXX: maybe use kmalloc() for VMs in debug mode?)
-	 * For  this purpose, any properly aligned data word is considered a
-	 * possible pointer and if directed at a known VM node, that node is
-	 * saved as reachable.
+	 * For this purpose, any properly aligned data word is considered
+	 * a possible pointer and if directed at a known heap-block, that
+	 * block is saved as reachable.
 	 * Following this  first pass,  we recursively  analyze the  user-data
 	 * blocks of all heap pointers that were reached thus far, until we're
 	 * no longer encountering any new ones.
@@ -1205,24 +1204,18 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	gc_reachable_this_thread();
 
-	/* Scan all allocated  COREBASE pointers from  the kernel  VM.
-	 * Since those are randomly sprinkled into the kernel VM tree,
-	 * they normally wouldn't  be able to  forward contained  data
-	 * pointers, which would then result in us not realizing  that
-	 * any dynamic node pointed to by them is actually  reachable.
+	/* Scan all allocated COREBASE pointers from the kernel mman.
+	 * Since those are  randomly sprinkled into  the kernel  mman
+	 * tree, they normally wouldn't be able to forward  contained
+	 * data pointers, which would then result in us not realizing
+	 * that  any  dynamic node  pointed  to by  them  is actually
+	 * reachable.
 	 * NOTE: COREBASE couldn't use `mall_trace()' because  that
 	 *       could cause infinite recursion when `mall_trace()'
 	 *       tried to allocate a new recursion descriptor.
 	 */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan core base\n");
 	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_freelist));
-
-	/* `vm_corepage_head'  only  chains  core-base  pages
-	 * that contain at least one non-allocated page-slot!
-	 *
-	 * As such, we must also  search a secondary chain  of
-	 * pages that is used to represent ones that are fully
-	 * allocated. */
 	gc_reachable_corepage_chain(LIST_FIRST(&mcoreheap_usedlist));
 
 
@@ -1554,34 +1547,34 @@ again:
 	 *       we don't actually have to deal with that one at all! */
 	sched_super_override_start();
 
-	if (!vm_kernel_treelock_trywrite()) {
+	if (!mman_lock_trywrite(&mman_kernel)) {
 		sched_super_override_end();
-		while (!sync_canwrite(&vm_kernel.v_treelock))
+		while (!mman_lock_canwrite(&mman_kernel))
 			task_yield();
 		goto again;
 	}
 
 	/* Also ensure that `kernel_locked_heap' and `trace_heap' can be locked. */
 	if (!sync_canwrite(&kernel_locked_heap.h_lock)) {
-		vm_kernel_treelock_endwrite();
+		mman_lock_endwrite(&mman_kernel);
 		sched_super_override_end();
 		while (!sync_canwrite(&kernel_locked_heap.h_lock))
 			task_yield();
 		goto again;
 	}
 	if (!sync_canwrite(&trace_heap.h_lock)) {
-		vm_kernel_treelock_endwrite();
+		mman_lock_endwrite(&mman_kernel);
 		sched_super_override_end();
 		while (!sync_canwrite(&trace_heap.h_lock))
 			task_yield();
 		goto again;
 	}
 
-	/* At this point we're the only running thread, so there's really no
-	 * point in still holding on to our lock to the kernel VM. - At this
-	 * point  we can do pretty much anything while disregarding any sort
-	 * of locking! */
-	vm_kernel_treelock_endwrite();
+	/* At  this point we're the only running thread, so there's really
+	 * no point in still  holding on to our  lock to the kernel  mman.
+	 * At this point we can do pretty much anything while disregarding
+	 * any sort of locking! */
+	mman_lock_endwrite(&mman_kernel);
 
 	/* Actually search for memory leaks. */
 	result = kmalloc_leaks_gather();

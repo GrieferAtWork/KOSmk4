@@ -182,12 +182,12 @@ PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 	/* Define the controller structures for the builtin kernel heaps. */
 	/* [GFP_NORMAL] = */ HEAP_INIT(DEFAULT_OVERALLOC,
 	                               DEFAULT_FREETHRESH,
-	                               HINT_GETADDR(KERNEL_VMHINT_HEAP),
-	                               HINT_GETMODE(KERNEL_VMHINT_HEAP)),
+	                               HINT_GETADDR(KERNEL_MHINT_HEAP),
+	                               HINT_GETMODE(KERNEL_MHINT_HEAP)),
 	/* [GFP_LOCKED] = */ HEAP_INIT(DEFAULT_OVERALLOC,
 	                               DEFAULT_FREETHRESH,
-	                               HINT_GETADDR(KERNEL_VMHINT_LHEAP),
-	                               HINT_GETMODE(KERNEL_VMHINT_LHEAP)),
+	                               HINT_GETADDR(KERNEL_MHINT_LHEAP),
+	                               HINT_GETMODE(KERNEL_MHINT_LHEAP)),
 };
 
 

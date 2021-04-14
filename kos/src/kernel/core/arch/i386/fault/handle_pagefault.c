@@ -28,11 +28,15 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
+#include <kernel/mman/fault.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/nopf.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/phys2virt64.h>
@@ -152,10 +156,6 @@ __asm__(".pushsection .text.cold\n\t"
 #define IF_SMP(...) /* nothing */
 #endif /* CONFIG_NO_SMP */
 
-STATIC_ASSERT(PAGEDIR_MAP_FEXEC == VM_PROT_EXEC);
-STATIC_ASSERT(PAGEDIR_MAP_FWRITE == VM_PROT_WRITE);
-STATIC_ASSERT(PAGEDIR_MAP_FREAD == VM_PROT_READ);
-
 
 /* @return: true:  Success
  * @return: false: Must try again (preemption had to be enabled) */
@@ -260,7 +260,7 @@ handle_iob_access(struct cpu *__restrict me,
 #ifndef CONFIG_NO_SMP
 /* Check if the given `node' is the IOB vector of some CPU */
 LOCAL NOBLOCK WUNUSED ATTR_CONST bool
-NOTHROW(FCALL is_iob_node)(struct vm_node *node) {
+NOTHROW(FCALL is_iob_mnode)(struct mnode *node) {
 	unsigned int i;
 	for (i = 0; i < cpu_count; ++i) {
 		if (node == &FORCPU(cpu_vector[i], thiscpu_x86_iobnode))
@@ -348,7 +348,7 @@ nope:
 }
 
 #else /* !CONFIG_NO_SMP */
-#define is_iob_node(node) ((node) == &FORCPU(&bootcpu, thiscpu_x86_iobnode))
+#define is_iob_mnode(node) ((node) == &FORCPU(&bootcpu, thiscpu_x86_iobnode))
 #endif /* CONFIG_NO_SMP */
 
 
@@ -582,7 +582,7 @@ again_lock_mman:
 						if (mf.mfl_node && !mf.mfl_node->mn_part) {
 							mman_lock_release(&mman_kernel);
 							/* Reserved node. */
-							if (is_iob_node(mf.mfl_node))
+							if (is_iob_mnode(mf.mfl_node))
 								goto do_handle_iob_node_access;
 						} else {
 							mman_lock_release(&mman_kernel);
@@ -769,7 +769,7 @@ do_handle_iob_node_access:
 			 * access  being caused by the CPU itself, and a CPU-transfer happening
 			 * at just the wrong moment. */
 #ifndef CONFIG_NO_SMP
-			if (is_iob_node(mf.mfl_node)) {
+			if (is_iob_mnode(mf.mfl_node)) {
 				/* If we didn't actually re-enable preemption, then no cpu-transfer could have happened! */
 				if (!icpustate_getpreemption(state))
 					goto pop_connections_and_throw_segfault;
@@ -792,8 +792,8 @@ do_handle_iob_node_access:
 				 * To prevent the possibility of repeating the access to the IOB vector during
 				 * this  check (in case a bad jump caused IP to end up within the IOB vector),
 				 * also make sure that `pc' isn't apart of said vector! */
-				if ((byte_t const *)pc >= vm_node_getminaddr(mf.mfl_node) &&
-				    (byte_t const *)pc <= vm_node_getmaxaddr(mf.mfl_node))
+				if ((byte_t const *)pc >= mnode_getminaddr(mf.mfl_node) &&
+				    (byte_t const *)pc <= mnode_getmaxaddr(mf.mfl_node))
 					goto pop_connections_and_throw_segfault;
 				/* If we got here cause of an I/O instruction, just return to the caller and
 				 * have them  attempt the  access once  again, hopefully  without  accessing */
@@ -986,7 +986,7 @@ do_normal_vio:
 					real_ss = icpustate32_getkernelss(args.vea_args.va_state);
 				if (!(args.vea_kernel_override & VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID))
 					real_esp = icpustate32_getkernelesp(args.vea_args.va_state);
-				regload_area = (u32 *)vm_node_getaddr(THIS_KERNEL_STACK);
+				regload_area = (u32 *)mnode_getaddr(THIS_KERNEL_STACK);
 				/* Fill in the register save area to match what's going to
 				 * get  loaded  by `x86_vio_kernel_esp_bootstrap_loader()' */
 				regload_area[0] = real_ss;

@@ -108,7 +108,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 #endif /* !DEFINE_COMPAT_FUTEX */
 {
 	syscall_slong_t result;
-	REF struct vm_futex *f;
+	REF struct mfutex *f;
 	assert(!task_wasconnected());
 	switch (futex_op & LFUTEX_CMDMASK) {
 

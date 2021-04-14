@@ -25,9 +25,13 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/types.h>
-#include <kernel/vm.h>
+#include <kernel/mman.h>
+#include <kernel/mman/fault.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/nopf.h>
+#include <kernel/types.h>
 #include <kernel/x86/emulock.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
@@ -207,23 +211,22 @@ handle_vio_or_not_faulted:
 	PREEMPTION_POP(was);
 	{
 		/* Check if this is a VIO segment (or maybe not mapped at all) */
-		struct vm *effective_vm = THIS_MMAN;
-		struct vm_node *node;
-		PAGEDIR_PAGEALIGNED void *addr_page;
+		struct mman *effective_mman;
+		struct mnode *node;
 #ifdef LIBVIO_CONFIG_ENABLED
 		void *node_minaddr;
-		REF struct vm_datapart *part;
-		REF struct vm_datablock *block;
+		pos_t part_minaddr;
+		REF struct mpart *part;
 #endif /* LIBVIO_CONFIG_ENABLED */
-		if (ADDR_ISKERN(addr))
-			effective_vm = &vm_kernel;
-		addr_page = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
-		sync_read(effective_vm);
-		node = vm_getnodeofaddress(effective_vm, addr_page);
+		effective_mman = &mman_kernel;
+		if (ADDR_ISUSER(addr))
+			effective_mman = THIS_MMAN;
+		mman_lock_read(effective_mman);
+		node = mman_mappings_locate(effective_mman, addr);
 		/* Check for an unmapped memory location. */
-		if (!node || !node->vn_block) {
+		if (!node || !node->mn_part) {
 			uintptr_t context;
-			sync_endread(effective_vm);
+			sync_endread(effective_mman);
 			context = 0;
 #ifdef __x86_64__
 			if (ADDR_IS_NONCANON((uintptr_t)addr))
@@ -234,15 +237,15 @@ handle_vio_or_not_faulted:
 			      context);
 		}
 		/* Check for read+write permissions. */
-		if ((node->vn_prot & (VM_PROT_READ | VM_PROT_WRITE)) !=
-		    /*            */ (VM_PROT_READ | VM_PROT_WRITE)) {
-			uintptr_half_t prot = node->vn_prot;
+		if ((node->mn_flags & (MNODE_F_PREAD | MNODE_F_PWRITE)) !=
+		    /*             */ (MNODE_F_PREAD | MNODE_F_PWRITE)) {
+			uintptr_half_t prot = node->mn_flags;
 			uintptr_t context;
-			sync_endread(effective_vm);
+			sync_endread(effective_mman);
 			context = 0;
 			if (icpustate_isuser(*pstate))
 				context |= E_SEGFAULT_CONTEXT_USERCODE;
-			if (prot & VM_PROT_READ) {
+			if (prot & MNODE_F_PREAD) {
 				THROW(E_SEGFAULT_READONLY,
 				      addr,
 				      E_SEGFAULT_CONTEXT_WRITING | context);
@@ -253,22 +256,26 @@ handle_vio_or_not_faulted:
 			}
 		}
 #ifdef LIBVIO_CONFIG_ENABLED
-		node_minaddr = vm_node_getminaddr(node);
-		block        = incref(node->vn_block);
-		part         = xincref(node->vn_part);
+		node_minaddr = mnode_getminaddr(node);
+		part_minaddr = mpart_getminaddr(part);
+		part         = incref(node->mn_part);
 #endif /* LIBVIO_CONFIG_ENABLED */
-		sync_endread(effective_vm);
+		sync_endread(effective_mman);
 #ifdef LIBVIO_CONFIG_ENABLED
 		{
+			REF struct mfile *file;
 			FINALLY_DECREF_UNLIKELY(part);
-			FINALLY_DECREF_UNLIKELY(block);
-			if (block->db_vio) {
+			mpart_lock_acquire(part);
+			file = incref(part->mp_file);
+			mpart_lock_release(part);
+			FINALLY_DECREF_UNLIKELY(file);
+			if (mfile_getvio(file)) {
 				/* Handle VIO memory access. */
 				struct vioargs args;
 				vio_addr_t vio_addr;
-				args.va_ops          = block->db_vio;
-				args.va_file         = block;
-				args.va_acmap_offset = vm_datapart_minbyte(part);
+				args.va_ops          = mfile_getvio(file);
+				args.va_file         = file;
+				args.va_acmap_offset = part_minaddr;
 				args.va_acmap_page   = node_minaddr;
 				args.va_state        = *pstate;
 				vio_addr = args.va_acmap_offset + ((uintptr_t)addr - (uintptr_t)node_minaddr);
@@ -328,9 +335,8 @@ handle_vio_or_not_faulted:
 		}
 #endif /* LIBVIO_CONFIG_ENABLED */
 		/* We can get here if the given address hasn't been pre-faulted, yet. */
-		vm_forcefault(effective_vm, addr_page,
-		              CEIL_ALIGN((uintptr_t)addr + num_bytes, PAGESIZE) - (uintptr_t)addr_page,
-		              true);
+		mman_forcefault(effective_mman, addr, num_bytes,
+		                MMAN_FAULT_F_WRITE);
 		goto again;
 	}
 }

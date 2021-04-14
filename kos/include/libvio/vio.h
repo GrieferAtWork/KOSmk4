@@ -64,7 +64,7 @@ typedef __pos64_t vio_addr_t;
 
 /* Argument structure passed to VIO callbacks. */
 struct vioargs {
-	struct vio_operators const *va_ops;          /* [1..1][== va_file->db_type->dt_vio] */
+	struct vio_operators const *va_ops;          /* [1..1][== va_file->mf_ops->dt_vio] */
 	void                       *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
 	vio_addr_t                  va_acmap_offset; /* VIO file offset at `va_acmap_page' (== mmap:offset). */
 	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU  state at the  time of the  access

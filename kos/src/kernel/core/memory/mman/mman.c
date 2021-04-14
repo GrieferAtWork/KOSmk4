@@ -132,8 +132,8 @@ extern byte_t __kernel_permman_size[];
 
 #define _sizeof_mman ((size_t)__kernel_permman_size + PAGEDIR_SIZE)
 #define _mman_alloc()                                                                              \
-	(struct mman *)mman_map_kram(HINT_GETADDR(KERNEL_VMHINT_MMAN), _sizeof_mman,                   \
-	                             gfp_from_mapflags(HINT_GETMODE(KERNEL_VMHINT_MMAN)) |             \
+	(struct mman *)mman_map_kram(HINT_GETADDR(KERNEL_MHINT_MMAN), _sizeof_mman,                   \
+	                             gfp_from_mapflags(HINT_GETMODE(KERNEL_MHINT_MMAN)) |             \
 	                             GFP_MAP_32BIT | /*TODO: `GFP_MAP_32BIT' is only needed on i386!*/ \
 	                             GFP_LOCKED | GFP_PREFLT,                                          \
 	                             MAX_C(PAGEDIR_ALIGN, alignof(struct mman)))

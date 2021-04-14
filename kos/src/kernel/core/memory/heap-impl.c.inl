@@ -247,9 +247,9 @@ search_heap:
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 	/* NOTE: Don't track page overflow from below as dangling  data
 	 *       here, so-as not to confuse allocators that are holding
-	 *       a lock to `vm_kernel.v_treelock'.
+	 *       a lock to `mman_kernel.mm_lock'.
 	 *       Otherwise, we might end up with a soft-lock:
-	 *        THREAD #1: (holding lock to `vm_kernel.v_treelock')
+	 *        THREAD #1: (holding lock to `mman_kernel.mm_lock')
 	 *                   kmalloc(1234);
 	 *                   -> Sees dangling data from new allocation
 	 *                      currently  being  made  by  THREAD  #2
@@ -258,16 +258,16 @@ search_heap:
 	 *        THREAD #2: In `core_page_alloc()'; tracking dangling
 	 *                   data  that  THREAD  #1  is  waiting  for.
 	 *                  `core_page_alloc()' doesn't return because
-	 *                   THREAD #1 is locking `vm_kernel'
+	 *                   THREAD  #1   is   locking   `mman_kernel'
 	 *                   THREAD #1 can't release that lock because
 	 *                   it is waiting for THREAD #2.
 	 *        -> Soft-lock!
-	 * XXX: The above scenario can no longer happen since `vm_kernel.v_treelock'
+	 * XXX: The above scenario can no longer happen since `mman_kernel.mm_lock'
 	 *      has now been implemented as an atomic lock:
 	 *       - A thread that is holding an atomic lock isn't allowed to
 	 *         perform  a call to `task_yield()', meaning that THREAD#1
 	 *         could  (and  does) only  allocate with  GFP_ATOMIC while
-	 *         holding  a lock to `vm_kernel.v_treelock', in which case
+	 *         holding  a lock to  `mman_kernel.mm_lock', in which case
 	 *         the yield never happens. */
 	sync_endwrite(&self->h_lock);
 

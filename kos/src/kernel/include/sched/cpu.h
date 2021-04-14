@@ -78,11 +78,11 @@ struct cpu {
 #endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0 */
 #ifndef CONFIG_NO_SMP
 	WEAK pagedir_phys_t c_pdir; /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
-	                             * The currently used  page directory. When  `vm_sync()' is  called,
-	                             * this  field is checked  for all configured CPUs,  and if equal to
-	                             * the VM that is being synced, our CPU will receive an IPI, telling
-	                             * us that we need to (possibly partially) invalidate our VM caches.
-	                             * s.a. `vm_sync()', `pagedir_sync_smp_p()', `pagedir_sync()' */
+	                             * The currently used  page directory. When  `mman_sync()' is  called,
+	                             * this field is  checked for  all configured  CPUs, and  if equal  to
+	                             * the MMan that is being synced, our CPU will receive an IPI, telling
+	                             * us  that we need to (possibly partially) invalidate our TLB caches.
+	                             * s.a. `mman_sync()', `pagedir_sync_smp_p()', `pagedir_sync()' */
 #endif /* !CONFIG_NO_SMP */
 	/* Per-CPU data goes here. */
 };
@@ -236,13 +236,7 @@ DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
 
 
 #ifndef CONFIG_NO_SMP
-/* Set the current VM, and update the VM pointer of `self' */
-#define cpu_setvm_ex(me, current_vm)                  \
-	(__hybrid_atomic_store((me)->c_pdir,              \
-	                       (current_vm)->v_pdir_phys, \
-	                       __ATOMIC_RELEASE),         \
-	 pagedir_set((current_vm)->v_pdir_phys))
-#define cpu_setvm(current_vm) cpu_setvm_ex(THIS_CPU, current_vm)
+/* Set the current MMan, and update the MMan pointer of `self' */
 #define cpu_setmman_ex(me, current_mm)                 \
 	(__hybrid_atomic_store((me)->c_pdir,               \
 	                       (current_mm)->mm_pagedir_p, \
@@ -262,7 +256,7 @@ DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
  *     bounding  set  of CPUs  that (may)  need to  have their  page directories
  *     invalidated)
  * WARNING: This function does not include special handling for when `self'
- *          is  the kernel  VM. In this  case, the caller  must implement a
+ *          is the kernel MMan. In this  case, the caller must implement  a
  *          dedicated code-path that  behaves as though  this function  had
  *          returned a completely filled cpuset. */
 #if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
@@ -276,15 +270,12 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
 #define pagedir_getcpus(self, result) (void)(*(result) = __pagedir_getcpus(self))
 #endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
 
-/* Return the set of CPUs using the page directory of the given VM. */
-#define vm_getcpus(self, result)   pagedir_getcpus((self)->v_pdir_phys, result)
+/* Return the set of CPUs using the page directory of the given MMan. */
 #define mman_getcpus(self, result) pagedir_getcpus((self)->mm_pagedir_p, result)
 
 #else /* !CONFIG_NO_SMP */
 
-/* Set the current VM, and update the VM pointer of `self' */
-#define cpu_setvm_ex(me, current_vm)   pagedir_set((current_vm)->v_pdir_phys)
-#define cpu_setvm(current_vm)          pagedir_set((current_vm)->v_pdir_phys)
+/* Set the current MMan, and update the MMan pointer of `self' */
 #define cpu_setmman_ex(me, current_mm) pagedir_set((current_mm)->mm_pagedir_p)
 #define cpu_setmman(current_mm)        pagedir_set((current_mm)->mm_pagedir_p)
 

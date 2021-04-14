@@ -217,10 +217,10 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 	} else if (!(flags & MAP_UNINITIALIZED) ||
 	           !capable(CAP_MMAP_UNINITIALIZED)) {
 		/* Zero-initialized, anonymous memory */
-		datablock = incref(&vm_datablock_anonymous_zero);
+		datablock = incref(&mfile_zero);
 	} else {
 		/* Uninitialized, anonymous memory */
-		datablock = incref(&vm_datablock_anonymous);
+		datablock = incref(&mfile_ndef);
 	}
 	/* Make sure that the offset and byte counts are aligned by the pagesize. */
 	if (OVERFLOW_UADD(file_maxnumbytes, file_minoffset & PAGEMASK, &file_maxnumbytes) ||
@@ -310,24 +310,21 @@ again_mapat:
 			if (!addr) {
 				/* Choose the hints for automatic mmap() target selection. */
 				if (flags & MAP_STACK) {
-					hint         = HINT_GETADDR(KERNEL_VMHINT_USER_STACK);
-					getfree_mode = HINT_GETMODE(KERNEL_VMHINT_USER_STACK);
+					hint         = HINT_GETADDR(KERNEL_MHINT_USER_STACK);
+					getfree_mode = HINT_GETMODE(KERNEL_MHINT_USER_STACK);
 				} else {
-					hint         = HINT_GETADDR(KERNEL_VMHINT_USER_HEAP);
-					getfree_mode = HINT_GETMODE(KERNEL_VMHINT_USER_HEAP);
+					hint         = HINT_GETADDR(KERNEL_MHINT_USER_HEAP);
+					getfree_mode = HINT_GETMODE(KERNEL_MHINT_USER_HEAP);
 				}
 			} else {
 				hint         = (void *)((uintptr_t)addr & ~PAGEMASK);
-				getfree_mode = MAP_GROWSUP | VM_GETFREE_ASLR;
+				getfree_mode = MAP_GROWSUP;
 			}
 			if (flags & MAP_DONT_MAP) {
 				/* Don't actually map memory. - Just find a free region */
 				sync_read(THIS_MMAN);
-				result = (byte_t *)vm_getfree(THIS_MMAN,
-				                              hint,
-				                              num_bytes,
-				                              PAGESIZE,
-				                              getfree_mode);
+				result = (byte_t *)mman_findunmapped(THIS_MMAN, hint,
+				                                     num_bytes, getfree_mode);
 				sync_endread(THIS_MMAN);
 				if unlikely(result == (byte_t *)MAP_FAILED)
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);

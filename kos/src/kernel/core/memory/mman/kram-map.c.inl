@@ -92,8 +92,8 @@ DECL_BEGIN
  * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
  *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits
  *                        from `flags': `GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR'
- *                        You may  pass `NULL'  to  use either  `KERNEL_VMHINT_HEAP'  or
- *                        `KERNEL_VMHINT_LHEAP'   (based   on   `GFP_LOCKED')   instead.
+ *                        You may  pass `NULL'  to  use either  `KERNEL_MHINT_HEAP'  or
+ *                        `KERNEL_MHINT_LHEAP'   (based   on   `GFP_LOCKED')   instead.
  *                        When `GFP_MAP_FIXED' is set, this is the (possibly  unaligned)
  *                        address of where the mapping  should go. If not  page-aligned,
  *                        then the sub-page-misalignment will  be carried over into  the
@@ -224,11 +224,11 @@ again_lock_mman:
 		} else {
 			if unlikely(hint == NULL) {
 				if (flags & GFP_LOCKED) {
-					hint = HINT_GETADDR(KERNEL_VMHINT_LHEAP);
-					flags |= gfp_from_mapflags(HINT_GETMODE(KERNEL_VMHINT_LHEAP));
+					hint = HINT_GETADDR(KERNEL_MHINT_LHEAP);
+					flags |= gfp_from_mapflags(HINT_GETMODE(KERNEL_MHINT_LHEAP));
 				} else {
-					hint = HINT_GETADDR(KERNEL_VMHINT_HEAP);
-					flags |= gfp_from_mapflags(HINT_GETMODE(KERNEL_VMHINT_HEAP));
+					hint = HINT_GETADDR(KERNEL_MHINT_HEAP);
+					flags |= gfp_from_mapflags(HINT_GETMODE(KERNEL_MHINT_HEAP));
 				}
 			}
 			result = mman_findunmapped(&mman_kernel, hint, num_bytes,

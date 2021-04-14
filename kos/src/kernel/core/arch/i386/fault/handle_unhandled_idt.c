@@ -244,7 +244,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 	if (THIS_TASK != &boottask) {
 		printk(KERN_EMERG "Boot task state:\n");
 		scpustate_to_ucpustate(FORTASK(&boottask, this_sstate), &ustate);
-		x86_dump_ucpustate_register_state(&ustate, boottask.t_mman->v_pdir_phys);
+		x86_dump_ucpustate_register_state(&ustate, boottask.t_mman->mm_pagedir_p);
 	}
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))

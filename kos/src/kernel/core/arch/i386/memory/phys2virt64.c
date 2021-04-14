@@ -31,13 +31,15 @@
 #include <kernel/boot.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
+#include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <kernel/x86/cpuid.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -143,8 +145,9 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 		metadata_base  = physpage2addr(pp);
 		metadata_avail = metadata_size;
 	}
+
 	/* Register the phys2virt VM node. */
-	vm_node_insert(&x86_phys2virt64_node);
+	mman_mappings_insert(&mman_kernel, &x86_phys2virt64_node);
 }
 
 
@@ -180,11 +183,12 @@ NOTHROW(KCALL metadata_clearall)(void) {
 	COMPILER_WRITE_BARRIER();
 	metadata_avail = metadata_size;
 	COMPILER_WRITE_BARRIER();
+
 	/* Flush  paging  caches  on  all  CPUs  that  are  currently   online.
 	 * Technically, we'd only  need to  do this for  the phys2virt  address
 	 * ranges. However, there sadly isn't any instruction that would  allow
 	 * us to do this, so it's easier to just blindly invalidate everything. */
-	vm_supersyncall();
+	mman_supersyncall();
 }
 
 

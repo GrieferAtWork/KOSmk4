@@ -306,7 +306,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
                                                            * @return: == result->of_hint */
 #define KSYSCTL_OPEN_KERNEL_FS                 0xfffe0002 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_FS' to `fs_kernel'
                                                            * @return: == result->of_hint */
-#define KSYSCTL_OPEN_KERNEL_VM                 0xfffe0003 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_MMAN' to `vm_kernel'
+#define KSYSCTL_OPEN_KERNEL_MMAN               0xfffe0003 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_MMAN' to `mman_kernel'
                                                            * @return: == result->of_hint */
 #define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0004 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_MODULE' to `kernel_driver'
                                                            * @return: == result->of_hint */

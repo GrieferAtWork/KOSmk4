@@ -131,7 +131,7 @@ DATDEF USER CHECKED void *mman_getunmapped_user_minaddr;
  * used as initial hint instead.
  * Afterwards, the actual address to-be returned will be calculated normally.
  *
- * By default, this variable is set to `KERNEL_VMHINT_USER_HEAP' */
+ * By default, this variable is set to `KERNEL_MHINT_USER_HEAP' */
 DATDEF USER CHECKED void *mman_getunmapped_user_defbase;
 
 /* Same as `mman_getunmapped_user_defbase', but used

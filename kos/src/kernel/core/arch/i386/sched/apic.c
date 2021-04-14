@@ -236,7 +236,7 @@ mnode_create_lockram(size_t num_pages) {
 }
 
 PRIVATE NOBLOCK ATTR_FREETEXT void
-NOTHROW(KCALL vm_node_destroy_locked_ram)(struct mnode *__restrict self) {
+NOTHROW(KCALL mnode_destory_locked_ram)(struct mnode *__restrict self) {
 	assert(self->mn_part);
 	assert(self->mn_fspath == NULL);
 	assert(self->mn_fsname == NULL);
@@ -298,9 +298,9 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 		TRY {
 			sync_write(&mman_kernel);
 			cpu_baseaddr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                           HINT_GETADDR(KERNEL_VMHINT_ALTCORE),
+			                                           HINT_GETADDR(KERNEL_MHINT_ALTCORE),
 			                                           (size_t)__kernel_percpu_full_bytes,
-			                                           HINT_GETMODE(KERNEL_VMHINT_ALTCORE));
+			                                           HINT_GETMODE(KERNEL_MHINT_ALTCORE));
 			if unlikely(cpu_baseaddr == MAP_FAILED) {
 				sync_endwrite(&mman_kernel);
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
@@ -312,11 +312,11 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		} EXCEPT {
-			vm_node_destroy_locked_ram(cpu_node3);
+			mnode_destory_locked_ram(cpu_node3);
 			RETHROW();
 		}
 	} EXCEPT {
-		vm_node_destroy_locked_ram(cpu_node1);
+		mnode_destory_locked_ram(cpu_node1);
 		RETHROW();
 	}
 	/* Fill in address ranges for CPU nodes. */
@@ -424,8 +424,8 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	assert((byte_t *)mnode_getminaddr(cpu_node3) == (byte_t *)mnode_getendaddr(cpu_node1) + 2 * PAGESIZE);
 	assert((byte_t *)mnode_getmaxaddr(cpu_node3) == (byte_t *)mnode_getminaddr(cpu_node3) + PAGESIZE - 1);
 	assert(cpu_node2 == &FORCPU(self, thiscpu_x86_iobnode));
-	vm_node_destroy_locked_ram(cpu_node1);
-	vm_node_destroy_locked_ram(cpu_node3);
+	mnode_destory_locked_ram(cpu_node1);
+	mnode_destory_locked_ram(cpu_node3);
 }
 
 
@@ -511,9 +511,9 @@ i386_allocate_secondary_cores(void) {
 		{
 			byte_t *addr;
 			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_VMHINT_DFSTACK),
+			                                   HINT_GETADDR(KERNEL_MHINT_DFSTACK),
 			                                   CEIL_ALIGN(KERNEL_DF_STACKSIZE, PAGESIZE),
-			                                   HINT_GETMODE(KERNEL_VMHINT_DFSTACK));
+			                                   HINT_GETMODE(KERNEL_MHINT_DFSTACK));
 			if unlikely(addr == MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's #DF stack"), (unsigned int)i);
 			FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_minaddr = addr;
@@ -564,14 +564,14 @@ i386_allocate_secondary_cores(void) {
 			byte_t *addr;
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
+			                                   HINT_GETADDR(KERNEL_MHINT_IDLESTACK),
 			                                   CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE) + PAGESIZE,
-			                                   HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
+			                                   HINT_GETMODE(KERNEL_MHINT_IDLESTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
+			                                   HINT_GETADDR(KERNEL_MHINT_IDLESTACK),
 			                                   CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE),
-			                                   HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
+			                                   HINT_GETMODE(KERNEL_MHINT_IDLESTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
 			if unlikely(addr == (byte_t *)MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE stack"), (unsigned int)i);
@@ -599,8 +599,8 @@ i386_allocate_secondary_cores(void) {
 		{
 			byte_t *addr;
 			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE), PAGESIZE,
-			                                   HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+			                                   HINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
+			                                   HINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 			if unlikely(addr == (byte_t *)MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE trampoline"), (unsigned int)i);
 			FORTASK(altidle, this_trampoline_node).mn_minaddr = addr;

@@ -126,7 +126,7 @@ INTERN void KCALL handle_path_datasync(struct path *__restrict self) {
 	node = (REF struct inode *)incref(self->p_inode);
 	sync_endread(self);
 	TRY {
-		vm_datablock_sync(node);
+		mfile_sync(node);
 	} EXCEPT {
 		decref(node);
 		RETHROW();
