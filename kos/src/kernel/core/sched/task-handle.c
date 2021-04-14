@@ -27,8 +27,8 @@
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/mman.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/task.h>

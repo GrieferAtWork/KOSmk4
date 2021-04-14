@@ -49,11 +49,6 @@
 
 DECL_BEGIN
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 #ifdef DEFINE_mman_map_kram
 /* @param: flags: Set of:
  *   - GFP_LOCKED:       Normal behavior
@@ -224,11 +219,11 @@ again_lock_mman:
 		} else {
 			if unlikely(hint == NULL) {
 				if (flags & GFP_LOCKED) {
-					hint = HINT_GETADDR(KERNEL_MHINT_LHEAP);
-					flags |= gfp_from_mapflags(HINT_GETMODE(KERNEL_MHINT_LHEAP));
+					hint = MHINT_GETADDR(KERNEL_MHINT_LHEAP);
+					flags |= gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_LHEAP));
 				} else {
-					hint = HINT_GETADDR(KERNEL_MHINT_HEAP);
-					flags |= gfp_from_mapflags(HINT_GETMODE(KERNEL_MHINT_HEAP));
+					hint = MHINT_GETADDR(KERNEL_MHINT_HEAP);
+					flags |= gfp_from_mapflags(MHINT_GETMODE(KERNEL_MHINT_HEAP));
 				}
 			}
 			result = mman_findunmapped(&mman_kernel, hint, num_bytes,

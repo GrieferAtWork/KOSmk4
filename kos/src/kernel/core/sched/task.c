@@ -63,11 +63,6 @@ DECL_BEGIN
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.pertask.head")
 struct task task_header = {
@@ -233,9 +228,9 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	boot_trampoline_pages = kernel_initialize_boot_trampolines();
 #else /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	boot_trampoline_pages = mman_findunmapped(&mman_kernel,
-	                                          HINT_GETADDR(KERNEL_MHINT_TRAMPOLINE),
+	                                          MHINT_GETADDR(KERNEL_MHINT_TRAMPOLINE),
 	                                          2 * PAGESIZE,
-	                                          HINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
+	                                          MHINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Construct the trampoline node for the predefined tasks. */
@@ -321,7 +316,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&boottask, this_sched_link).le_prev  = &FORCPU(&bootcpu, thiscpu_scheduler).s_running.lh_first;
 	FORTASK(&boottask, this_sched_link).le_next  = &asyncwork;
 	FORTASK(&asyncwork, this_sched_link).le_prev = &FORTASK(&boottask, this_sched_link).le_next;
-	/*FORTASK(&asyncwork, this_sched_link).ln_next = NULL;*/
+	/*FORTASK(&asyncwork, this_sched_link).le_next = NULL;*/
 	FORCPU(&bootcpu, thiscpu_scheduler).s_running.lh_first = &boottask;
 	FORCPU(&bootcpu, thiscpu_scheduler).s_running_last     = &asyncwork;
 	FORCPU(&bootcpu, thiscpu_scheduler).s_runcount         = 2;
@@ -471,17 +466,14 @@ PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
 			syscache_version_t version = SYSCACHE_VERSION_INIT;
 again_lock_kernel_mman:
 			mman_lock_acquire(&mman_kernel);
+			stack_addr = mman_findunmapped(&mman_kernel,
+			                               MHINT_GETADDR(KERNEL_MHINT_KERNSTACK),
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			stack_addr = mman_findunmapped(&mman_kernel,
-			                               HINT_GETADDR(KERNEL_MHINT_KERNSTACK),
 			                               CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
-			                               HINT_GETMODE(KERNEL_MHINT_KERNSTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-			stack_addr = mman_findunmapped(&mman_kernel,
-			                               HINT_GETADDR(KERNEL_MHINT_KERNSTACK),
 			                               CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
-			                               HINT_GETMODE(KERNEL_MHINT_KERNSTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
+			                               MHINT_GETMODE(KERNEL_MHINT_KERNSTACK));
 			if unlikely(stack_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
 				if (syscache_clear_s(&version))
@@ -505,8 +497,8 @@ again_lock_kernel_mman:
 
 			/* Map the trampoline node. */
 			trampoline_addr = mman_findunmapped(&mman_kernel,
-			                                    HINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
-			                                    HINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
+			                                    MHINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
+			                                    MHINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 			if unlikely(trampoline_addr == MAP_FAILED) {
 				mman_lock_release(&mman_kernel);
 				if (syscache_clear_s(&version))

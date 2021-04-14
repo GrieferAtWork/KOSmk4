@@ -27,7 +27,8 @@
 
 #include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
 
-#include <asm/os/mman.h> /* __PROT_* and __MAP_* constants */
+#include <asm/os/mman.h>       /* __PROT_* and __MAP_* constants */
+#include <kos/kernel/paging.h> /* KERNEL_MHINT_* */
 
 
 
@@ -155,6 +156,15 @@ DATDEF struct mfile mfile_ndef; /* Random, uninitialized, anonymous memory. */
 #define __mfile_zero_defined
 DATDEF struct mfile mfile_zero; /* Zero-initialized, anonymous memory. */
 #endif /* !__mfile_zero_defined */
+
+
+/* Helper macros to extract the addr/flags from KERNEL_MHINT_* macros. */
+#ifndef MHINT_GETADDR
+#define __PRIVATE_MHINT_ADDR(x, y) x
+#define __PRIVATE_MHINT_MODE(x, y) y
+#define MHINT_GETADDR(x) __PRIVATE_MHINT_ADDR x
+#define MHINT_GETMODE(x) __PRIVATE_MHINT_MODE x
+#endif /* !MHINT_GETADDR */
 
 
 /* Map a given file into the specified mman.

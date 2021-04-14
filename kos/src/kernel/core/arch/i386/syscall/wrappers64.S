@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89aa347d */
+/* HASH CRC-32:0x1dadf3e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11515,8 +11515,7 @@ END(__x86_asm64_syscall_ksysctl)
  * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
  *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
  *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
+ * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
@@ -28663,8 +28662,7 @@ END(__x86_asm32_int80_setitimer64)
  * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
  *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
  *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
+ * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
@@ -34228,8 +34226,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_set
  * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
  *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
  *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
+ * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
@@ -40638,8 +40635,7 @@ END(__x86_asm32_sysrun32_setitimer64)
  * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
  *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
  *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
+ * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */

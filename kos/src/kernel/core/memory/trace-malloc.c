@@ -41,6 +41,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/slab.h>
@@ -79,11 +80,6 @@
 
 
 DECL_BEGIN
-
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
 
 
 #ifndef CONFIG_MALL_HEAD_PATTERN
@@ -323,8 +319,8 @@ PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(struct trace_node) nodes = NULL;
 INTERN struct heap trace_heap =
 HEAP_INIT(PAGESIZE * 4,
           PAGESIZE * 16,
-          HINT_GETADDR(KERNEL_MHINT_DHEAP),
-          HINT_GETMODE(KERNEL_MHINT_DHEAP));
+          MHINT_GETADDR(KERNEL_MHINT_DHEAP),
+          MHINT_GETMODE(KERNEL_MHINT_DHEAP));
 DEFINE_VALIDATABLE_HEAP(trace_heap);
 DEFINE_DBG_BZERO_OBJECT(trace_heap.h_lock);
 #define TRACE_HEAP_FLAGS (GFP_NORMAL | GFP_LOCKED | GFP_PREFLT)

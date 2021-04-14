@@ -1586,11 +1586,6 @@ DEFINE_DO_ATOMIC_CMPXCH(l, 32)
 
 
 #ifdef __x86_64__
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 
 /* Define handlers for automatic patching of (rd|wr)(fs|gs)base instructions in  drivers.
  * When the faulting reason is a #UD, then we know that the instruction isn't recognized,
@@ -1654,10 +1649,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 				} else {
 					/* Cross-page instruction patching! */
 					void *tempaddr;
-					tempaddr = mman_findunmapped(&mman_kernel,
-					                             HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
-					                             2 * PAGESIZE,
-					                             HINT_GETMODE(KERNEL_MHINT_TEMPORARY));
+					tempaddr = mman_findunmapped_temporary(2 * PAGESIZE);
 					if (tempaddr != MAP_FAILED) {
 						if (pagedir_prepare(tempaddr, 2 * PAGESIZE)) {
 							pagedir_map(tempaddr, 2 * PAGESIZE, pc_phys & ~PAGEMASK,

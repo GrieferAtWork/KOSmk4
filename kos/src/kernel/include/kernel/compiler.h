@@ -55,15 +55,6 @@
 #define CONFIG_USE_NEW_ASYNC
 #endif
 
-/* Backward-compatibility */
-#define vm_datapart         mpart
-#define vm_datablock        mfile
-#define vm_datablock_type   mfile_ops
-#define vm_node             mnode
-#define vm                  mman
-#define ln_pself            le_prev
-#define ln_next             le_next
-
 #ifdef CONFIG_USE_NEW_FS
 /* Backward-compatibility */
 #define inode            fnode

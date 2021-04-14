@@ -156,14 +156,14 @@
 #elif defined(DEFINE_task_enum_mman)
 #define NO_TASKPID_BUFFER 1
 
-/* Enumerate all threads that are using `v' as their active VM. */
+/* Enumerate all threads that are using `mm' as their active MMan. */
 #define LOCAL_task_enum_onstck task_enum_vm_onstck
 #define LOCAL_task_enum_onheap task_enum_vm_onheap
 #define LOCAL_task_enum        task_enum_mman
 #define LOCAL_task_enum_nb     task_enum_mman_nb
 #define LOCAL_task_list        task_list_mman
-#define LOCAL_EXTRA__PARAM     , struct vm *__restrict v
-#define LOCAL_EXTRA__ARGS      , v
+#define LOCAL_EXTRA__PARAM     , struct mman *__restrict mm
+#define LOCAL_EXTRA__ARGS      , mm
 
 #else /* DEFINE_... */
 #error "Bad configuration"

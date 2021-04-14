@@ -29,7 +29,6 @@
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>

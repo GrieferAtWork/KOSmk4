@@ -69,11 +69,6 @@ STATIC_ASSERT(sizeof(union mcorepart) == __SIZEOF_MCOREPART);
 /* Also make sure that `struct mcorepage' really fits into a single page! */
 STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 #ifndef SIZEOF_POINTER
 #define SIZEOF_POINTER __SIZEOF_POINTER__
 #endif /* !SIZEOF_POINTER */
@@ -509,8 +504,8 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 
 	/* Must actually create a new node/part pair! */
 	node->mn_minaddr = (byte_t *)mman_findunmapped(&mman_kernel,
-	                                               HINT_GETADDR(KERNEL_MHINT_COREPAGE), PAGESIZE,
-	                                               HINT_GETMODE(KERNEL_MHINT_COREPAGE));
+	                                               MHINT_GETADDR(KERNEL_MHINT_COREPAGE), PAGESIZE,
+	                                               MHINT_GETMODE(KERNEL_MHINT_COREPAGE));
 	if unlikely(node->mn_minaddr == MAP_FAILED) {
 		printk(KERN_CRIT "[mcore] low-level OOM: Unable to find spot to place a new core-page\n");
 		return false;

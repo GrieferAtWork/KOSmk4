@@ -97,11 +97,6 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stacknode_ ASMNAME("this_kernel_sta
 DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_stackguard");
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 
 PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
 task_srpc_set_child_tid(void *arg,
@@ -211,13 +206,13 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 again_lock_mman:
 				mman_lock_acquire(&mman_kernel);
 				stack_addr = (byte_t *)mman_findunmapped(&mman_kernel,
-				                                         HINT_GETADDR(KERNEL_MHINT_KERNSTACK),
+				                                         MHINT_GETADDR(KERNEL_MHINT_KERNSTACK),
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 				                                         CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) + PAGESIZE,
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 				                                         CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
-				                                         HINT_GETMODE(KERNEL_MHINT_KERNSTACK));
+				                                         MHINT_GETMODE(KERNEL_MHINT_KERNSTACK));
 				if unlikely(stack_addr == MAP_FAILED) {
 					mman_lock_release(&mman_kernel);
 					if (syscache_clear_s(&cache_version))
@@ -241,8 +236,8 @@ again_lock_mman:
 
 				/* Map the trampoline node. */
 				trampoline_addr = (byte_t *)mman_findunmapped(&mman_kernel,
-				                                              HINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
-				                                              HINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
+				                                              MHINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
+				                                              MHINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 				if unlikely(trampoline_addr == MAP_FAILED) {
 					mman_lock_release(&mman_kernel);
 					if (syscache_clear_s(&cache_version))

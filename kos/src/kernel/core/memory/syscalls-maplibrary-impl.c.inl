@@ -43,7 +43,7 @@ DECL_BEGIN
 #endif /* !DEFINE_COMPAT_MAPLIBRARY */
 
 PRIVATE void KCALL
-FUNC(unmap_range)(struct vm *__restrict v,
+FUNC(unmap_range)(struct mman *__restrict mm,
                   PAGEDIR_PAGEALIGNED UNCHECKED void *loadaddr,
                   USER CHECKED MY_ElfW(Phdr) const *headers,
                   size_t count) {
@@ -66,7 +66,7 @@ FUNC(unmap_range)(struct vm *__restrict v,
 		}
 		size += addr & PAGEMASK;
 		addr &= ~PAGEMASK;
-		mman_unmap(v,
+		mman_unmap(mm,
 		           (byte_t *)loadaddr + addr,
 		           CEIL_ALIGN(size, PAGESIZE),
 		           MMAN_UNMAP_NOKERNPART);
@@ -178,15 +178,15 @@ DEFINE_SYSCALL5(void *, maplibrary,
 #endif /* !DEFINE_COMPAT_MAPLIBRARY */
 {
 	byte_t *result;
-	struct vm *v = THIS_MMAN;
+	struct mman *mm = THIS_MMAN;
 	size_t i, min_alignment, total_bytes;
 	uintptr_t addr_page_offset, min_page;
-	REF struct vm_datablock *file;
+	REF struct mfile *file;
 	REF struct path *file_fspath;
 	REF struct directory_entry *file_fsname;
 	pos_t file_minoffset, file_maxnumbytes;
 	bool is_first;
-	v                = THIS_MMAN;
+	mm                = THIS_MMAN;
 	addr_page_offset = 0; /* Sub-page offset for the load address (usually 0) */
 	min_page         = 0;
 	file             = NULL;
@@ -211,7 +211,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 			bool isused;
 			uintptr_t min_addr, max_addr;
 			if unlikely(!hdrc)
-				return HINT_GETADDR(KERNEL_MHINT_USER_LIBRARY);
+				return MHINT_GETADDR(KERNEL_MHINT_USER_LIBRARY);
 			min_addr = (uintptr_t)-1;
 			max_addr = 0;
 			/* Figure out the min/max byte offsets for program segments. */
@@ -245,7 +245,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	} else {
 		uintptr_t min_addr, max_addr;
 		if unlikely(!hdrc)
-			return HINT_GETADDR(KERNEL_MHINT_USER_LIBRARY);
+			return MHINT_GETADDR(KERNEL_MHINT_USER_LIBRARY);
 		min_addr = (uintptr_t)-1;
 		max_addr = 0;
 		/* Figure out the min/max byte offsets for program segments. */
@@ -309,13 +309,13 @@ DEFINE_SYSCALL5(void *, maplibrary,
 		}
 		/* Find a suitable target location where we can map the library. */
 find_new_candidate:
-		sync_read(v);
-		result = (byte_t *)mman_findunmapped(v,
-		                                     HINT_GETADDR(KERNEL_MHINT_USER_LIBRARY),
+		sync_read(mm);
+		result = (byte_t *)mman_findunmapped(mm,
+		                                     MHINT_GETADDR(KERNEL_MHINT_USER_LIBRARY),
 		                                     total_bytes,
-		                                     HINT_GETMODE(KERNEL_MHINT_USER_LIBRARY),
+		                                     MHINT_GETMODE(KERNEL_MHINT_USER_LIBRARY),
 		                                     min_alignment);
-		sync_endread(v);
+		sync_endread(mm);
 		if unlikely(result == (byte_t *)MAP_FAILED)
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
 		result -= min_page * PAGESIZE;
@@ -366,7 +366,7 @@ again_map_segments:
 					if (!(flags & MAP_FIXED) && is_first)
 						addr_page_offset = addr & PAGEMASK;
 					else {
-						FUNC(unmap_range)(v, result, hdrv, i);
+						FUNC(unmap_range)(mm, result, hdrv, i);
 						THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
 						      E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_SECADDRALIGN,
 						      (uintptr_t)addr,
@@ -394,7 +394,7 @@ again_map_segments:
 			}
 			if (size > filesize) {
 				/* Map BSS */
-				if (!vm_mapat(v,
+				if (!vm_mapat(mm,
 				              result + addr + filesize,
 				              size - filesize,
 				              &mfile_zero,
@@ -409,11 +409,11 @@ unmap_check_overlap_and_find_new_candidate:
 					if (FUNC(contains_illegal_overlap)(hdrv, hdrc))
 						THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, size);
 					if (!(flags & MAP_FIXED)) {
-						FUNC(unmap_range)(v, result, hdrv, i);
+						FUNC(unmap_range)(mm, result, hdrv, i);
 						goto find_new_candidate;
 					}
 					if (!(flags & MAP_FIXED_NOREPLACE)) {
-						mman_unmap(v, result + addr, size,
+						mman_unmap(mm, result + addr, size,
 						           MMAN_UNMAP_NOKERNPART);
 						goto again_map_segments;
 					}
@@ -446,7 +446,7 @@ unmap_check_overlap_and_find_new_candidate:
 					file_maxnumbytes &= ~PAGEMASK;
 				}
 				/* Map file contents */
-				if (!vm_mapat_subrange(v,
+				if (!vm_mapat_subrange(mm,
 				                       result + addr,
 				                       filesize,
 				                       file,
@@ -503,14 +503,14 @@ unmap_check_overlap_and_find_new_candidate:
 							 * But still: It is something that is technically allowed by ELF, and
 							 *            maybe someone needed a really large section of  0-bytes
 							 *            for some kind of stub-implementation... */
-							mman_memset(v, bss_start, 0, bss_overlap, true);
+							mman_memset(mm, bss_start, 0, bss_overlap, true);
 						}
 					}
 				}
 			}
 		}
 	} EXCEPT {
-		FUNC(unmap_range)(v, result, hdrv, i);
+		FUNC(unmap_range)(mm, result, hdrv, i);
 		xdecref(file);
 		xdecref(file_fspath);
 		xdecref(file_fsname);

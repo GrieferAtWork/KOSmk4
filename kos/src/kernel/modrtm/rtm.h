@@ -134,7 +134,7 @@ DECL_BEGIN
  * How the kernel applies RTM memory modifications:
  *
  * >> @@Tuples of (addr, data, changed, version, part)
- * >> local accessedParts: {(int, Bytes, bool, int, vm_datapart)...};
+ * >> local accessedParts: {(int, Bytes, bool, int, mpart)...};
  * >>
  * >> RETRY:
  * >>
@@ -174,13 +174,14 @@ DECL_BEGIN
  * >> }
  * >>
  * >> // Verify that all modified memory is still writable.
- * >> // We're currently holding write-locks to the backing vm_datapart-s
- * >> // of all areas of interest, so we know that whatever their state is
- * >> // right now, that state won't change until we release them. We also
- * >> // know that (due to our `mman_forcefault()' above), all modified parts
- * >> // had been made to be writable at one point in the past, so all we
- * >> // have to do is assert that they still are writable, and start over
- * >> // if we're too late, and they no longer are.
+ * >> // We're currently holding write-locks to the backing mpart-s of
+ * >> // all areas of interest, so we know that whatever their state is
+ * >> // right now, that state won't change until we release them. We
+ * >> // also know that (due to our `mman_forcefault()' above), all
+ * >> // modified parts had been made to be writable at one point in
+ * >> // the past, so all we have to do is assert that they still are
+ * >> // writable, and start over if we're too late, and they no longer
+ * >> // are.
  * >> for (local addr, data, changed, none, none: accessedParts) {
  * >>     if (changed) {
  * >>         if (!VERIFY_WRITABLE(addr, #data))

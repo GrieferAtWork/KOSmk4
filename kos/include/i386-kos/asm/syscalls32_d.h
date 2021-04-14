@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4eceb442 */
+/* HASH CRC-32:0x7b3be569 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1150,8 +1150,7 @@
  * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
  *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
  *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
+ * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */

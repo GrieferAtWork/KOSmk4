@@ -168,12 +168,9 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 	 *       whenever the CPU comes back to live!
 	 * NOTE: Possibly, we could even go so far as-to save CRn registers.
 	 * Also: Check if we're actually restoring DRn registers, as already
-	 *       defined on a per-vm basis! */
+	 *       defined on a per-mman basis! */
 	printk(KERN_DEBUG "[idt] Set new IDT {%p, %#" PRIx16 "}\n",
 	       ptr->dt_base, ptr->dt_limit);
-	printk(KERN_DEBUG "[idt:80] = %p\n", segment_rdbaseX(&((struct idt_segment *)ptr->dt_base)[0x80].i_seg));
-	printk(KERN_DEBUG "[idt:ee] = %p\n", segment_rdbaseX(&((struct idt_segment *)ptr->dt_base)[0xee].i_seg));
-	printk(KERN_DEBUG "[idt:ff] = %p\n", segment_rdbaseX(&((struct idt_segment *)ptr->dt_base)[0xff].i_seg));
 
 	COMPILER_BARRIER();
 #ifndef CONFIG_NO_SMP

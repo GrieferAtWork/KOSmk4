@@ -34,7 +34,6 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cred.h>
 
 #include <hybrid/align.h>
@@ -463,7 +462,7 @@ read_entry_pos_0:
 			while (req_index != entry_pos) {
 				if (req_index > entry_pos) {
 					/* Advance forward. */
-					if (!entry->de_bypos.ln_next) {
+					if (!entry->de_bypos.le_next) {
 						struct directory_node *dir;
 						/* No successor.
 						 * Either we're on a dangling entry, the directory has ended,
@@ -472,7 +471,7 @@ read_entry_pos_0:
 						if (entry != ATOMIC_READ(dir->d_bypos_end)) {
 							/* Danging entry (rewind to find the proper position). */
 							COMPILER_READ_BARRIER();
-							entry = entry->de_bypos.ln_next;
+							entry = entry->de_bypos.le_next;
 							if (entry)
 								goto got_next_entry;
 							entry_pos = 0;
@@ -484,12 +483,12 @@ read_entry_pos_0:
 						/* Keep reading more entries. */
 						directory_readnext(dir);
 						COMPILER_READ_BARRIER();
-						entry = entry->de_bypos.ln_next;
+						entry = entry->de_bypos.le_next;
 						if (!entry)
 							goto eof_unlock_node;
 					} else {
 						/* Read the next entry that has already been cached. */
-						entry = entry->de_bypos.ln_next;
+						entry = entry->de_bypos.le_next;
 					}
 got_next_entry:
 					++entry_pos;
@@ -516,9 +515,9 @@ got_next_entry:
 				}
 				assert(req_index < entry_pos);
 				/* Move backwards by one. */
-				entry = COMPILER_CONTAINER_OF(entry->de_bypos.ln_pself,
+				entry = COMPILER_CONTAINER_OF(entry->de_bypos.le_prev,
 				                              struct directory_entry,
-				                              de_bypos.ln_next);
+				                              de_bypos.le_next);
 				--entry_pos;
 			}
 		} EXCEPT {

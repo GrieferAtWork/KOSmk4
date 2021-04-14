@@ -29,6 +29,8 @@
 
 DECL_BEGIN
 
+struct task;
+struct mman;
 
 /* NOTE: All of the following functions return negative ERRNO values on failure. */
 /* Print a human-readable name for `thread' */
@@ -59,8 +61,8 @@ INTDEF NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintLibraryList)(pformatprinter printer, void *arg,
                                         struct task *__restrict thread);
 INTDEF NONNULL((1)) ssize_t
-NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
-                                          struct vm *__restrict effective_vm);
+NOTHROW(FCALL GDBInfo_PrintMManLibraryList)(pformatprinter printer, void *arg,
+                                            struct mman *__restrict effective_mm);
 
 /* `qXfer:threads:read': Print the list of threads apart of the current process. */
 INTDEF NONNULL((1)) ssize_t

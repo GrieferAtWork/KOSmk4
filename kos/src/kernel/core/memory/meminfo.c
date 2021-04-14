@@ -657,11 +657,6 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 }
 
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 /* Relocate `minfo', as well as `mzones'  data to a more appropriate  location
  * after `kernel_initialize_minfo_makezones()' has been called, and the kernel
  * MMan has been cleaned from unused memory mappings.
@@ -681,8 +676,8 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
 	num_bytes = mnode_getsize(&kernel_meminfo_mnode);
 	dest = (byte_t *)mman_findunmapped(&mman_kernel,
-                                       HINT_GETADDR(KERNEL_MHINT_PHYSINFO), num_bytes,
-                                       HINT_GETMODE(KERNEL_MHINT_PHYSINFO));
+                                       MHINT_GETADDR(KERNEL_MHINT_PHYSINFO), num_bytes,
+                                       MHINT_GETMODE(KERNEL_MHINT_PHYSINFO));
 	if unlikely(dest == MAP_FAILED) {
 		kernel_panic(FREESTR("Failed to relocate memory information\n"));
 		return;

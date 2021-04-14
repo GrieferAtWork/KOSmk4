@@ -28,7 +28,6 @@
 #include <kernel/driver.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 #include <hybrid/atomic.h>
 
@@ -98,10 +97,10 @@ PUBLIC struct superblock devfs = {
 	/* .s_nodes_lock   = */ RWLOCK_INIT,
 	/* .s_nodes        = */ &devfs.s_rootdir.d_node,
 	/* .s_mount_lock   = */ ATOMIC_RWLOCK_INIT,
-	/* .s_mount        = */ LLIST_INIT,
+	/* .s_mount        = */ NULL,
 	/* .s_cblock_next  = */ NULL,
 	/* .s_umount_pend  = */ NULL,
-	/* .s_filesystems  = */ OLD_SLIST_INITNODE,
+	/* .s_filesystems  = */ NULL,
 	/* .s_features     = */ {
 		/* .sf_symlink_max        = */ (pos_t)-1,
 		/* .sf_link_max           = */ (nlink_t)-1,
@@ -178,7 +177,8 @@ NOTHROW(KCALL kernel_initialize_devfs_driver)(void) {
 	register_filesystem_type(&devfs_type);
 	/* Register the devfs filesystem singleton */
 	fs_filesystems_lock_write();
-	OLD_SLIST_INSERT(fs_filesystems.f_superblocks, &devfs, s_filesystems);
+	devfs.s_filesystems          = fs_filesystems.f_superblocks;
+	fs_filesystems.f_superblocks = &devfs;
 	fs_filesystems_lock_endwrite();
 }
 
@@ -199,10 +199,10 @@ NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
 PRIVATE NOBLOCK void
 NOTHROW(KCALL devfs_remove_directory_entry)(struct directory_entry *__restrict ent) {
 	/* Check if the entry had already been removed. */
-	if (ent->de_bypos.ln_pself != NULL) {
+	if (ent->de_bypos.le_prev != NULL) {
 		/* Remove the entry from its parent directory. */
 		directory_delentry(&devfs.s_rootdir, ent);
-		ent->de_bypos.ln_pself = NULL;
+		ent->de_bypos.le_prev = NULL;
 		decref_nokill(ent); /* The reference returned by `directory_delentry()' */
 	}
 }
@@ -233,7 +233,7 @@ NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
 	/* Try to remove the given node from the recent-cache */
 	inode_recent_tryremove(node);
 	/* Check if the directory entry had already been removed. */
-	if (ATOMIC_READ(entry->de_bypos.ln_pself) == NULL)
+	if (ATOMIC_READ(entry->de_bypos.le_prev) == NULL)
 		return;
 	/* Remove the directory entry */
 	if (devfs_lock_trywrite()) {

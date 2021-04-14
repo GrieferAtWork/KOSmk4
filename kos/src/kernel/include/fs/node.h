@@ -866,7 +866,7 @@ struct inode
 	uintptr_t           i_flags;        /* INode flags (Set of `INODE_F*'). */
 	WEAK REF struct inode
 	                   *i_changed_next; /* [0..1] Next changed INode (chained through `i_super->s_changed'). */
-	LLIST_NODE(REF struct inode)
+	LIST_ENTRY(REF inode)
 	                    i_recent;       /* [0..1][lock(INTERNAL(inodes_recent_lock))]
 	                                     * Chain of recently used INodes. */
 	ATREE_NODE_SINGLE(struct inode,ino_t)
@@ -980,7 +980,7 @@ struct directory_entry {
 	WEAK refcnt_t                      de_refcnt;  /* Reference counter for this data structure. */
 	size_t                             de_heapsize;/* [const] Allocated heap size. */
 	struct directory_entry            *de_next;    /* [0..1][lock(this)] Next directory entry with the same hash. */
-	LLIST_NODE(struct directory_entry) de_bypos;   /* [lock(this)] Chain of directory entires, sorted by their in-directory position.
+	LIST_ENTRY(directory_entry)        de_bypos;   /* [lock(this)] Chain of directory entires, sorted by their in-directory position.
 	                                                * NOTE: When a directory entry is removed, this link is set to NULL,
 	                                                *       meaning that enumerating a directory is as simple as  taking
 	                                                *      `:d_bypos' of the directory node while holding `this'
@@ -2032,7 +2032,7 @@ struct superblock_type {
 	} st_functions;
 
 	/* [lock(fs_filesystem_types.ft_typelock)] Chain of filesystem types. */
-	OLD_SLIST_NODE(struct superblock_type) st_chain;
+	struct superblock_type *st_chain;
 };
 
 #define __private_superblock_type_destroy(self) __driver_destroy((self)->st_driver)
@@ -2099,11 +2099,11 @@ struct superblock
 	                                               * NOTE: This tree _always_ contains the superblock
 	                                               *       root node (which is the superblock itself) */
 	struct atomic_rwlock          s_mount_lock;   /* Lock for `s_mount'. */
-	LLIST(struct path)            s_mount;        /* [0..1][lock(s_mount_lock)] Chain of mounting points. */
+	struct path                  *s_mount;        /* [0..1][lock(s_mount_lock)] Chain of mounting points. */
 	void                         *s_cblock_next;  /* [?..?] Used internally to chain blocking cleanup operations... */
 	WEAK REF struct path         *s_umount_pend;  /* [0..1] Chain of paths which are pending to be removed from `s_mount'
 	                                               * [CHAIN(->p_mount->mp_pending)] Chain of paths that are pending to be removed from `s_mount'. */
-	OLD_SLIST_NODE(struct superblock) s_filesystems;  /* [lock(fs_filesystems.f_superlock)] Chain of known filesystems. */
+	struct superblock            *s_filesystems;  /* [lock(fs_filesystems.f_superlock)] Chain of known filesystems. */
 	struct superblock_features    s_features;     /* [const] Superblock features. */
 	/* Filesystem-specific superblock data goes here! */
 };
@@ -2240,12 +2240,12 @@ superblock_getmountloc(struct superblock *__restrict self,
 
 struct filesystem_types {
 	/* TODO: Replace with a reference counted vector using `ARREF()' */
-	struct atomic_rwlock          ft_typelock; /* Lock for the chain of known filesystem types. */
-	OLD_SLIST(struct superblock_type) ft_types;    /* [lock(ft_typelock)][CHAIN(->st_chain)] Chain of known filesystem types. */
+	struct atomic_rwlock    ft_typelock; /* Lock for the chain of known filesystem types. */
+	struct superblock_type *ft_types;    /* [lock(ft_typelock)][CHAIN(->st_chain)] Chain of known filesystem types. */
 };
 struct filesystems {
-	struct rwlock               f_superlock;   /* Lock for the chain of known superblocks. */
-	OLD_SLIST(struct superblock)    f_superblocks; /* [lock(f_superlock)][CHAIN(->s_filesystems)][0..1] Chain of known filesystems. */
+	struct rwlock      f_superlock;   /* Lock for the chain of known superblocks. */
+	struct superblock *f_superblocks; /* [lock(f_superlock)][CHAIN(->s_filesystems)][0..1] Chain of known filesystems. */
 };
 
 DATDEF struct filesystem_types fs_filesystem_types; /* Global tracking of known filesystem types. */

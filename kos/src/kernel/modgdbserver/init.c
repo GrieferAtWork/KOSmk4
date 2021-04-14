@@ -97,7 +97,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		/* Install interrupt handlers */
 		GDBInterrupt_Init();
 
-		/* Hook the vm callbacks for breakpoints. */
+		/* Hook the mman callbacks for breakpoints. */
 		mman_onfini_callbacks.insert(&GDB_ClearAllBreakpointsOfMMan);
 		mman_onclone_callbacks.insert(&GDB_CloneAllBreakpointsFromMMan);
 

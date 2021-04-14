@@ -31,7 +31,6 @@
 #include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <kernel/mman/nopf.h>
 #include <sched/task.h>
 

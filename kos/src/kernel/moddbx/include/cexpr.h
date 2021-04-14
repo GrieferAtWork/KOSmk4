@@ -224,7 +224,7 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n);
 /* Return a pointer to the data associated with the top expression stack  element.
  * If the stack is empty or `cexpr_typeonly' is `true', write-back a NULL pointer.
  * WARNING: The pointer written back to `*presult' may point to arbitrary
- *          user- or out-of-vm memory, meaning  that it must be  accessed
+ *          user- or out-of-mman memory, meaning that it must be accessed
  *          through use of `dbg_(read|write)memory'!
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.

@@ -454,16 +454,16 @@ EIDECLARE(WUNUSED, __BOOL, , FCALL, cred_isfsgroupmember, (gid_t gid), {
 
 
 /* Credential assertion (throw an error if the caller doesn't have the required credential) */
-struct vm;
+struct mman;
 
-/* Caller can read from `target_vm' */
-#define cred_require_vmread(target_vm) (void)0
+/* Caller can read from `target_mm' */
+#define cred_require_mmanread(target_mm) (void)0
 
-/* Caller can write to `target_vm' */
-#define cred_require_vmwrite(target_vm) (void)0
+/* Caller can write to `target_mm' */
+#define cred_require_mmanwrite(target_mm) (void)0
 
 /* `CAP_SYS_ADMIN' */
-#define cred_require_sysadmin() (void)0
+#define cred_require_sysadmin() require(CAP_SYS_ADMIN)
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
 /* TODO: Add credential checks for individual ksysctl() and hop() commands */

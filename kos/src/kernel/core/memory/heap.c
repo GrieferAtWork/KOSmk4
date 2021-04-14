@@ -171,23 +171,18 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #endif
 
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 DEFINE_VALIDATABLE_HEAP(kernel_default_heap);
 DEFINE_VALIDATABLE_HEAP(kernel_locked_heap);
 PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 	/* Define the controller structures for the builtin kernel heaps. */
 	/* [GFP_NORMAL] = */ HEAP_INIT(DEFAULT_OVERALLOC,
 	                               DEFAULT_FREETHRESH,
-	                               HINT_GETADDR(KERNEL_MHINT_HEAP),
-	                               HINT_GETMODE(KERNEL_MHINT_HEAP)),
+	                               MHINT_GETADDR(KERNEL_MHINT_HEAP),
+	                               MHINT_GETMODE(KERNEL_MHINT_HEAP)),
 	/* [GFP_LOCKED] = */ HEAP_INIT(DEFAULT_OVERALLOC,
 	                               DEFAULT_FREETHRESH,
-	                               HINT_GETADDR(KERNEL_MHINT_LHEAP),
-	                               HINT_GETMODE(KERNEL_MHINT_LHEAP)),
+	                               MHINT_GETADDR(KERNEL_MHINT_LHEAP),
+	                               MHINT_GETMODE(KERNEL_MHINT_LHEAP)),
 };
 
 

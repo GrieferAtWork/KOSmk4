@@ -73,7 +73,7 @@ ProcFS_Filesystems_Printer(struct regular_node *__restrict UNUSED(self),
 			RETHROW();
 		}
 		/* Iterate towards the next type. */
-		next = xincref(iter->st_chain.sn_next);
+		next = xincref(iter->st_chain);
 		sync_endread(&fs_filesystem_types.ft_typelock);
 		decref_unlikely(iter);
 		iter = next;

@@ -30,8 +30,8 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/cred.h>
 #include <sched/posix-signal.h>

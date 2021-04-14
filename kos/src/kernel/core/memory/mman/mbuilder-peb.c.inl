@@ -60,13 +60,6 @@
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
 #endif /* __ARCH_HAVE_COMPAT */
 
-#ifndef HINT_ADDR
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-#endif /* !HINT_ADDR */
-
 DECL_BEGIN
 
 #if IN_POINTERSIZE == OU_POINTERSIZE && IN_POINTERSIZE == __SIZEOF_POINTER__
@@ -179,10 +172,10 @@ again:
 	/* Create a temporary kernel-space mapping for initializing the PEB */
 	peb_total_size = CEIL_ALIGN(peb_total_size, PAGESIZE);
 	peb_temp_base = (byte_t *)mman_map(&mman_kernel,
-	                                   HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
+	                                   MHINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 	                                   peb_total_size,
 	                                   PROT_READ | PROT_WRITE | PROT_SHARED,
-	                                   HINT_GETMODE(KERNEL_MHINT_TEMPORARY) |
+	                                   MHINT_GETMODE(KERNEL_MHINT_TEMPORARY) |
 	                                   MAP_PREPARED | MAP_NOMERGE | MAP_NOSPLIT,
 	                                   &mfile_zero,
 	                                   NULL,
@@ -256,9 +249,9 @@ string_size_changed:
 		/* Figure out where we want to map the PEB within the VM builder. */
 		/* TODO: Muse use `KERNEL_MHINT_USER_PEB' depending on compatibility mode!
 		 * >> KERNEL_MHINT_USER_PEB(32|64) depending on IN_PTR(void)-size */
-		result = mbuilder_findunmapped(self, HINT_GETADDR(KERNEL_MHINT_USER_PEB),
+		result = mbuilder_findunmapped(self, MHINT_GETADDR(KERNEL_MHINT_USER_PEB),
 		                               peb_total_size,
-		                               HINT_GETMODE(KERNEL_MHINT_USER_PEB));
+		                               MHINT_GETMODE(KERNEL_MHINT_USER_PEB));
 
 		/* Relocate pointers within the PEB to make them absolute */
 		peb->pp_argv = (OU_PTR(OU_PTR(char)))((OU_UIP)peb->pp_argv + (OU_UIP)(uintptr_t)result);

@@ -28,8 +28,8 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/tsc.h>
@@ -651,7 +651,7 @@ struct ip_arp_and_datagram_job
 	REF struct nic_device    *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr  *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	REF struct nic_packet    *adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram (with sufficient header space for an ethernet header) */
-	REF struct vm            *adj_grammm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
+	REF struct mman          *adj_grammm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
 	ktime_t                   adj_arptmo; /* Timeout for ARP request responses. */
 	unsigned int              adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_handle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
@@ -979,7 +979,7 @@ struct ip_arp_and_datagrams_job
 	REF struct nic_device         *adj_dev;    /* [1..1][const] The associated network device. */
 	REF struct net_peeraddr       *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
 	struct nic_packetlist          adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram list (with sufficient header space for an ethernet header) */
-	REF struct vm                 *adj_grammm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
+	REF struct mman               *adj_grammm; /* [1..1][const][valid_if(adj_arpc != 0)] The VM in the context of which `adj_gram' must be sent */
 	ktime_t                        adj_arptmo; /* Timeout for ARP request responses. */
 	unsigned int                   adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
 	struct aio_multihandle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */

@@ -660,7 +660,7 @@ again:
 		WEAK struct aio_handle *aio;
 		Ne2kAIOHandleData *aio_data;
 		REF struct nic_packet *packet;
-		REF struct vm *packet_vm;
+		REF struct mman *packet_mm;
 		size_t aligned_size;
 		NE2K_DEBUG("[ne2k:async] Begin TX_UPLOAD\n");
 		assert(PREEMPTION_ENABLED());
@@ -717,7 +717,7 @@ tx_switch_to_idle:
 			/* Continue working with `used_aio' */
 			aio = used_aio;
 		}
-		packet_vm = aio_data->pd_payloadmm; /* Inherit reference */
+		packet_mm = aio_data->pd_payloadmm; /* Inherit reference */
 		DBG_memset(&aio_data->pd_payloadmm, 0xcc, sizeof(aio_data->pd_payloadmm));
 		COMPILER_WRITE_BARRIER();
 		/* This field gets cleared by aio_cancel() if the operation should get canceled
@@ -759,7 +759,7 @@ tx_switch_to_idle:
 			TRY {
 				/* Copy packet data onto the NIC. */
 				Ne2k_UploadPacket(NE_DATAPORT(me->nk_iobase),
-				                  packet, packet_vm);
+				                  packet, packet_mm);
 
 				/* Wait for the card to ACK the DMA completion. */
 				Ne2k_WaitForRemoteDmaComplete(me);
@@ -770,7 +770,7 @@ tx_switch_to_idle:
 			}
 		} EXCEPT {
 			decref_likely(packet);
-			decref_unlikely(packet_vm);
+			decref_unlikely(packet_mm);
 			/* Change NIC states to mirror what would have happened on success.
 			 * Doing this simplifies  what has to  be done within  aio_cancel() */
 			Ne2k_SwitchToTxPkSendMode(me);
@@ -789,7 +789,7 @@ tx_switch_to_idle:
 			goto again;
 		}
 		decref_likely(packet);
-		decref_unlikely(packet_vm);
+		decref_unlikely(packet_mm);
 
 		/* Check once again if the operation was canceled.
 		 * This must be done in case there was a cancel during the upload

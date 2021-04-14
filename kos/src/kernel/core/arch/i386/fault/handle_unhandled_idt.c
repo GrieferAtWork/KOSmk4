@@ -30,11 +30,11 @@
 #include <kernel/addr2line.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/mman.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <kernel/x86/pic.h>
 #include <sched/cpu.h>
 #include <sched/task.h>

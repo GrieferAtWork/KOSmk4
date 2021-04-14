@@ -34,7 +34,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/rt.h>
-#include <kernel/vm.h>
 
 #include <hybrid/byteorder.h>
 

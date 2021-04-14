@@ -27,10 +27,11 @@
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 
 #include <kernel/except.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
-#include <kernel/vm.h>
 #include <sched/cred.h>
 #include <sched/pertask.h>
 #include <sched/pid.h>
@@ -304,7 +305,7 @@ VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
 #undef INIT_OPERATION_PTR_NULL
 #undef INIT_OPERATION_PTR
 
-PUBLIC struct vm_datapart userkern_segment_part_compat = {
+PUBLIC struct mpart userkern_segment_part_compat = {
 	MPART_INIT_mp_refcnt(1),
 	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
@@ -323,7 +324,7 @@ PUBLIC struct vm_datapart userkern_segment_part_compat = {
 	MPART_INIT_mp_meta(NULL)
 };
 
-PUBLIC struct vm_datablock userkern_segment_file_compat = {
+PUBLIC struct mfile userkern_segment_file_compat = {
 	/* .mf_refcnt     = */ 2, /* +1: `userkern_segment_file', +1: `userkern_segment_part.mn_file' */
 	/* .mf_ops        = */ &mfile_ndef_ops,
 	/* .mf_vio        = */ &userkern_segment_vio_compat,

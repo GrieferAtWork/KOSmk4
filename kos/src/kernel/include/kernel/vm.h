@@ -63,10 +63,10 @@ __DEFINE_SYNC_MUTEX(struct mpart,
 
 #ifdef TRY
 FORCELOCAL WUNUSED NONNULL((1, 4)) bool
-vm_mapat(struct vm *__restrict self,
+vm_mapat(struct mman *__restrict self,
          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
          PAGEDIR_PAGEALIGNED size_t num_bytes,
-         struct vm_datablock *__restrict data DFL(&mfile_zero),
+         struct mfile *__restrict data DFL(&mfile_zero),
          struct path *fspath DFL(__NULLPTR),
          struct directory_entry *fsname DFL(__NULLPTR),
          PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
@@ -87,10 +87,10 @@ vm_mapat(struct vm *__restrict self,
 }
 
 FORCELOCAL WUNUSED NONNULL((1, 4)) bool
-vm_mapat_subrange(struct vm *__restrict self,
+vm_mapat_subrange(struct mman *__restrict self,
                   PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                   PAGEDIR_PAGEALIGNED size_t num_bytes,
-                  struct vm_datablock *__restrict data DFL(&mfile_zero),
+                  struct mfile *__restrict data DFL(&mfile_zero),
                   struct path *fspath DFL(__NULLPTR),
                   struct directory_entry *fsname DFL(__NULLPTR),
                   PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),

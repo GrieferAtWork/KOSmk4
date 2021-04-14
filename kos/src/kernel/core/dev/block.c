@@ -41,7 +41,6 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 

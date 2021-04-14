@@ -171,11 +171,6 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_st
 DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 DATDEF ATTR_PERCPU u8 thiscpu_x86_iob_[] ASMNAME("thiscpu_x86_iob");
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 PRIVATE ATTR_FREETEXT REF struct mpart *KCALL
 mpart_create_lockram(size_t num_pages) {
 	REF struct mpart *result;
@@ -298,9 +293,9 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 		TRY {
 			sync_write(&mman_kernel);
 			cpu_baseaddr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                           HINT_GETADDR(KERNEL_MHINT_ALTCORE),
+			                                           MHINT_GETADDR(KERNEL_MHINT_ALTCORE),
 			                                           (size_t)__kernel_percpu_full_bytes,
-			                                           HINT_GETMODE(KERNEL_MHINT_ALTCORE));
+			                                           MHINT_GETMODE(KERNEL_MHINT_ALTCORE));
 			if unlikely(cpu_baseaddr == MAP_FAILED) {
 				sync_endwrite(&mman_kernel);
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
@@ -505,15 +500,15 @@ i386_allocate_secondary_cores(void) {
 
 		/* Allocate & map stacks for this cpu's IDLE task, as well as the #DF stack. */
 		FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_part           = &FORCPU(altcore, thiscpu_x86_dfstackpart_);
-		FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_link.le_prev   = &LLIST_HEAD(FORCPU(altcore, thiscpu_x86_dfstackpart_).mp_share.lh_first);
+		FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_link.le_prev   = &FORCPU(altcore, thiscpu_x86_dfstackpart_).mp_share.lh_first;
 		FORCPU(altcore, thiscpu_x86_dfstackpart_).mp_share.lh_first = &FORCPU(altcore, thiscpu_x86_dfstacknode_);
 		mpart_ll_allocmem(&FORCPU(altcore, thiscpu_x86_dfstackpart_), CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE));
 		{
 			byte_t *addr;
 			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_MHINT_DFSTACK),
+			                                   MHINT_GETADDR(KERNEL_MHINT_DFSTACK),
 			                                   CEIL_ALIGN(KERNEL_DF_STACKSIZE, PAGESIZE),
-			                                   HINT_GETMODE(KERNEL_MHINT_DFSTACK));
+			                                   MHINT_GETMODE(KERNEL_MHINT_DFSTACK));
 			if unlikely(addr == MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's #DF stack"), (unsigned int)i);
 			FORCPU(altcore, thiscpu_x86_dfstacknode_).mn_minaddr = addr;
@@ -562,17 +557,14 @@ i386_allocate_secondary_cores(void) {
 		                  CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE));
 		{
 			byte_t *addr;
+			addr = (byte_t *)mman_findunmapped(&mman_kernel,
+			                                   MHINT_GETADDR(KERNEL_MHINT_IDLESTACK),
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_MHINT_IDLESTACK),
 			                                   CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE) + PAGESIZE,
-			                                   HINT_GETMODE(KERNEL_MHINT_IDLESTACK));
 #else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
-			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_MHINT_IDLESTACK),
 			                                   CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE),
-			                                   HINT_GETMODE(KERNEL_MHINT_IDLESTACK));
 #endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
+			                                   MHINT_GETMODE(KERNEL_MHINT_IDLESTACK));
 			if unlikely(addr == (byte_t *)MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE stack"), (unsigned int)i);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
@@ -599,8 +591,8 @@ i386_allocate_secondary_cores(void) {
 		{
 			byte_t *addr;
 			addr = (byte_t *)mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
-			                                   HINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
+			                                   MHINT_GETADDR(KERNEL_MHINT_TRAMPOLINE), PAGESIZE,
+			                                   MHINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 			if unlikely(addr == (byte_t *)MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE trampoline"), (unsigned int)i);
 			FORTASK(altidle, this_trampoline_node).mn_minaddr = addr;

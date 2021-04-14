@@ -394,7 +394,7 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb,
                                           &random_rdl,
                                           &random_rdq),
                    VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
-PRIVATE struct vm_datablock random_datablock = MFILE_INIT_VIO(&random_vio);
+PRIVATE struct mfile random_datablock = MFILE_INIT_VIO(&random_vio);
 
 #define RANDOM_MMAP_POINTER (&random_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL
@@ -429,7 +429,7 @@ urandom_rdq(struct vioargs *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 PRIVATE struct vio_operators const urandom_vio =
 VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&urandom_rdb, &urandom_rdw, &urandom_rdl, &urandom_rdq),
                    VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
-PRIVATE struct vm_datablock urandom_datablock = MFILE_INIT_VIO(&urandom_vio);
+PRIVATE struct mfile urandom_datablock = MFILE_INIT_VIO(&urandom_vio);
 
 #define URANDOM_MMAP_POINTER (&urandom_mmap)
 PRIVATE NONNULL((1, 2)) void KCALL

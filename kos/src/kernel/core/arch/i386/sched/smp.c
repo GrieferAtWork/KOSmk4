@@ -25,9 +25,9 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver-param.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/vm.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/pic.h>
 #include <sched/cpu.h>

@@ -237,18 +237,14 @@ again_lock_mman_kernel:
 		if unlikely(!mman_lock_acquire_nx(&mman_kernel))
 			goto err;
 	}
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
 	{
 		void *next_slab_addr;
 		void *slab_end_addr;
 		slab_end_addr  = kernel_slab_break;
 		/* Make sure that sufficient memory is available within the slab-region. */
 		next_slab_addr = mman_findunmapped(&mman_kernel,
-		                                   HINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
-		                                   HINT_GETMODE(KERNEL_MHINT_SLAB));
+		                                   MHINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
+		                                   MHINT_GETMODE(KERNEL_MHINT_SLAB));
 		mman_lock_release(&mman_kernel);
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
 		if (next_slab_addr == MAP_FAILED || next_slab_addr < (byte_t *)slab_end_addr - PAGESIZE)
@@ -267,8 +263,8 @@ again_next_slab_page_tryhard:
 					goto err;
 			}
 			next_slab_addr = mman_findunmapped(&mman_kernel,
-			                                   HINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
-			                                   HINT_GETMODE(KERNEL_MHINT_SLAB));
+			                                   MHINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
+			                                   MHINT_GETMODE(KERNEL_MHINT_SLAB));
 			mman_lock_release(&mman_kernel);
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
 			if (next_slab_addr != MAP_FAILED &&

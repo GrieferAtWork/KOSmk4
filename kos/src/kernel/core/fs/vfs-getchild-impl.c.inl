@@ -104,7 +104,7 @@ path_getchild_or_parent_inode(struct path *__restrict self,
 	bool kernel_name_is_heap;
 	if likely(self->p_cldlist) {
 		result = self->p_cldlist[namehash & self->p_cldmask];
-		for (; result; result = result->p_dirnext.ln_next) {
+		for (; result; result = result->p_dirnext.le_next) {
 			int error;
 			if (result->p_dirent->de_hash != namehash)
 				continue;
@@ -166,7 +166,7 @@ find_name_after_initial_missmatch:
 	if unlikely(!self->p_cldlist)
 		goto fail_and_unlock;
 	result = self->p_cldlist[namehash & self->p_cldmask];
-	for (; result; result = result->p_dirnext.ln_next) {
+	for (; result; result = result->p_dirnext.le_next) {
 		ssize_t error;
 		if (result->p_dirent->de_hash != namehash)
 			continue;
@@ -217,7 +217,7 @@ find_name_with_kernel_copy:
 		return NULL;
 	}
 	result = self->p_cldlist[namehash & self->p_cldmask];
-	for (; result; result = result->p_dirnext.ln_next) {
+	for (; result; result = result->p_dirnext.le_next) {
 		if (result->p_dirent->de_hash != namehash)
 			continue;
 		if (result->p_dirent->de_namelen != namelen)
@@ -243,7 +243,7 @@ find_name_with_different_casing_and_kernel_name:
 		size_t i;
 		for (i = 0; i <= self->p_cldmask; ++i) {
 			for (result = self->p_cldlist[i]; result;
-			     result = result->p_dirnext.ln_next) {
+			     result = result->p_dirnext.le_next) {
 				if (result->p_dirent->de_namelen != namelen)
 					continue;
 				if (memcasecmp(result->p_dirent->de_name, kernel_name, namelen) != 0)
@@ -284,7 +284,7 @@ find_name_with_different_casing:
 		size_t i;
 		for (i = 0; i <= self->p_cldmask; ++i) {
 			for (result = self->p_cldlist[i]; result;
-			     result = result->p_dirnext.ln_next) {
+			     result = result->p_dirnext.le_next) {
 				int error;
 				if (result->p_dirent->de_namelen != namelen)
 					continue;

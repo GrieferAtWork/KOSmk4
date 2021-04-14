@@ -27,7 +27,6 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>

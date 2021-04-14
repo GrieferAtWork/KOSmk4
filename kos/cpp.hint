@@ -1272,11 +1272,6 @@
 #define SIMPLEQ_TRYREPLACE_R_P(...)
 
 
-#define LLIST(T)                  T*
-#define LLIST_NODE(T)             struct{T *ln_next,**ln_pself;}
-#define OLD_SLIST(T)                  T*
-#define OLD_SLIST_NODE(T)             struct{T *sn_next;}
-
 #define ATREE_HEAD(T)             T*
 #define ATREE_NODE(T,Tkey)        struct{T *a_min,*a_max;Tkey a_vmin,a_vmax;}
 #define ATREE_NODE_SINGLE(T,Tkey) struct{T *a_min,*a_max;Tkey a_vaddr;}

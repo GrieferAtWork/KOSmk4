@@ -79,11 +79,6 @@
 #include <inttypes.h>
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
 #else /* !NDEBUG */
@@ -260,10 +255,10 @@ uems_create_kernaddr_ex(struct userelf_module_section *__restrict self,
                         struct userelf_module *__restrict mod) {
 	assert(self->ms_size != 0);
 	return (byte_t *)mman_map(/* self:        */ &mman_kernel,
-	                          /* hint:        */ HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
+	                          /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 	                          /* num_bytes:   */ self->ms_size,
 	                          /* prot:        */ (PROT_READ | PROT_WRITE) & ~PROT_SHARED,
-	                          /* flags:       */ HINT_GETMODE(KERNEL_MHINT_TEMPORARY),
+	                          /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_TEMPORARY),
 	                          /* file:        */ mod->md_file,
 	                          /* file_fspath: */ mod->md_fspath,
 	                          /* file_fsname: */ mod->md_fsname,

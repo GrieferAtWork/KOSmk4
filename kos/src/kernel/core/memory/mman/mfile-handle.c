@@ -33,7 +33,6 @@
 #include <kernel/handle.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cred.h>
 
 #include <hybrid/atomic.h>

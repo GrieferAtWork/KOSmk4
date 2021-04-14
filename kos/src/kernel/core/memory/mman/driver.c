@@ -108,11 +108,6 @@
 #error "Unsupported sizeof(void *)"
 #endif /* __SIZEOF_POINTER__ != ... */
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
 #else /* !NDEBUG */
@@ -370,10 +365,10 @@ driver_section_create_kernaddr_ex(struct driver_section *__restrict self,
 	if ((file = driver_getfile(drv)) == NULL)
 		THROW(E_NO_SUCH_OBJECT);
 	return (byte_t *)mman_map(/* self:        */ &mman_kernel,
-	                          /* hint:        */ HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
+	                          /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 	                          /* num_bytes:   */ self->ds_sect.ms_size,
 	                          /* prot:        */ (PROT_READ | PROT_WRITE) & ~PROT_SHARED,
-	                          /* flags:       */ HINT_GETMODE(KERNEL_MHINT_TEMPORARY),
+	                          /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_TEMPORARY),
 	                          /* file:        */ file,
 	                          /* file_fspath: */ drv->d_module.md_fspath,
 	                          /* file_fsname: */ drv->d_module.md_fsname,
@@ -5088,8 +5083,10 @@ again_acquire_mman_lock:
 						size_t loadsize;
 						loadsize = (size_t)((result->d_module.md_loadmax + 1) -
 						                    (result->d_module.md_loadmin));
-						loadbase = mman_findunmapped(&mman_kernel, HINT_GETADDR(KERNEL_MHINT_DRIVER),
-						                             loadsize, HINT_GETMODE(KERNEL_MHINT_DRIVER));
+						loadbase = mman_findunmapped(&mman_kernel,
+						                             MHINT_GETADDR(KERNEL_MHINT_DRIVER),
+						                             loadsize,
+						                             MHINT_GETMODE(KERNEL_MHINT_DRIVER));
 						if unlikely(loadbase == MAP_FAILED) {
 							mman_lock_release(&mman_kernel);
 							if (syscache_clear_s(&cache_version))
@@ -5350,10 +5347,10 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 		/* Create a temporary memory mapping of the given file. */
 		TRY {
 			tempmap = mman_map(/* self:          */ &mman_kernel,
-			                   /* hint:          */ HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
+			                   /* hint:          */ MHINT_GETADDR(KERNEL_MHINT_TEMPORARY),
 			                   /* num_bytes:     */ (size_t)tempmap_size,
 			                   /* prot:          */ PROT_READ | PROT_WRITE,
-			                   /* flags:         */ HINT_GETMODE(KERNEL_MHINT_TEMPORARY),
+			                   /* flags:         */ MHINT_GETMODE(KERNEL_MHINT_TEMPORARY),
 			                   /* file:          */ driver_file,
 			                   /* file_fspath:   */ driver_path,
 			                   /* file_fsname:   */ driver_dentry,

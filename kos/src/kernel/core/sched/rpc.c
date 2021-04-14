@@ -32,7 +32,6 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/rpc-internal.h>

@@ -759,8 +759,7 @@ mmap2:(void *addr, size_t len, [tostr(MMAP_PROT)] syscall_ulong_t prot,
 @@@param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
 @@                      MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
 @@                      MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
-@@@param: fd:    A handle for the library file being mapped
-@@               (must be a file or vm_datablock/inode)
+@@@param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
 @@@param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
 @@               (depending on the caller running in 32- or 64-bit mode)
 @@@param: hdrc:  The number of program headers

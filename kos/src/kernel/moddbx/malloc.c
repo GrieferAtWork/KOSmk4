@@ -130,11 +130,6 @@ PRIVATE struct sheap static_heap;
 PRIVATE struct freerange *freemem = NULL;
 
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 PRIVATE bool
 NOTHROW(FCALL allocate_physical_memory)(PAGEDIR_PAGEALIGNED void *addr,
                                         PAGEDIR_PAGEALIGNED size_t num_bytes) {
@@ -177,9 +172,7 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	last_heap = &static_heap;
 	while (last_heap->sh_next)
 		last_heap = last_heap->sh_next;
-	new_heap = (struct sheap *)mman_findunmapped(&mman_kernel,
-	                                             HINT_GETADDR(KERNEL_MHINT_TEMPORARY), min_size,
-	                                             HINT_GETMODE(KERNEL_MHINT_TEMPORARY));
+	new_heap = (struct sheap *)mman_findunmapped_temporary(min_size);
 	if (new_heap == (struct sheap *)MAP_FAILED)
 		return false;
 

@@ -290,14 +290,14 @@ NOTHROW(FCALL GDBInfo_PrintLibraryList)(pformatprinter printer, void *arg,
                                         struct task *__restrict thread) {
 	ssize_t result;
 	REF struct mman *v = task_getmman(thread);
-	result = GDBInfo_PrintVMLibraryList(printer, arg, v);
+	result = GDBInfo_PrintMManLibraryList(printer, arg, v);
 	decref_unlikely(v);
 	return result;
 }
 
 INTERN NONNULL((1)) ssize_t
-NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
-                                          struct mman *__restrict effective_mm) {
+NOTHROW(FCALL GDBInfo_PrintMManLibraryList)(pformatprinter printer, void *arg,
+                                            struct mman *__restrict effective_mm) {
 	ssize_t temp, result = 0;
 	GDB_LibraryListPrinterData data;
 	data.ll_printer = printer;

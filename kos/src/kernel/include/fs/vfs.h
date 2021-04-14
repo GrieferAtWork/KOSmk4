@@ -57,10 +57,10 @@ struct mounted_path {
 	                                          * path is used as a mounting point) (or `NULL' for the VFS root path). */
 	REF struct superblock      *mp_super;    /* [1..1][lock(mp_path->p_lock)][== :p_parent->i_super]
 	                                          * The superblock being mounted. */
-	LLIST_NODE(struct path)     mp_fsmount;  /* [lock(mp_path->p_lock && mp_super->s_mount_lock)]
+	LIST_ENTRY(path)            mp_fsmount;  /* [lock(mp_path->p_lock && mp_super->s_mount_lock)]
 	                                          * [CHAIN(mp_super->s_mount)]
 	                                          * Chain of mounting points of the associated super-block. */
-	LLIST_NODE(REF struct path) mp_vfsmount; /* [lock(mp_path->p_lock && mp_path->p_vfs->v_mount_lock)]
+	LIST_ENTRY(REF path)        mp_vfsmount; /* [lock(mp_path->p_lock && mp_path->p_vfs->v_mount_lock)]
 	                                          * [CHAIN(mp_path->p_vfs->v_mount)]
 	                                          * Chain of mounting points of the associated super-block. */
 	struct path                *mp_pending;  /* Used to chain paths that are pending being unmounted,
@@ -80,13 +80,13 @@ struct path {
 	                                        *       to  assume  that  this field  is  always non-NULL. */
 	struct mounted_path        *p_mount;   /* [0..1][lock(p_lock)][owned_if(!= &p_vfs->v_rootmount)] Mounting point data. */
 	REF struct directory_entry *p_dirent;  /* [1..1][const] Name of this directory entry (empty for VFS root). */
-	LLIST_NODE(struct path)     p_dirnext; /* [0..1][lock(p_parent->p_lock)][valid_if(p_parent != NULL)]
+	LIST_ENTRY(path)            p_dirnext; /* [0..1][lock(p_parent->p_lock)][valid_if(p_parent != NULL)]
 	                                        * Next sibling directory  with the same  `p_dirent->de_hash' */
 	size_t                      p_cldmask; /* [lock(p_lock)] Mask for the `p_cldlist' hash-map. */
 	size_t                      p_cldsize; /* [lock(p_lock)] Amount of entires within the `p_cldlist' hash-map. */
-	LLIST(struct path)         *p_cldlist; /* [0..1][lock(p_lock)][0..p_cldmask + 1][lock(p_lock)][owned] Child paths. */
+	struct path               **p_cldlist; /* [0..1][lock(p_lock)][0..p_cldmask + 1][lock(p_lock)][owned] Child paths. */
 	struct path                *p_delpend; /* [0..1][CHAIN(->p_delpend)][lock(p_lock)] Chain of paths that are pending removal from `p_cldlist'. */
-	LLIST_NODE(struct path)     p_recent;  /* [0..1][lock(p_vfs->v_recent_lock)] Chain of recently used paths. */
+	LIST_ENTRY(path)            p_recent;  /* [0..1][lock(p_vfs->v_recent_lock)] Chain of recently used paths. */
 	size_t                      p_isdrive; /* [lock(p_vfs->v_drives_lock)] Non-zero   if  this  path  is  a  drive  root.
 	                                        * This field represents the number of drives for which this path is the root. */
 };
@@ -775,12 +775,12 @@ struct vfs
 	struct mounted_path    v_rootmount;   /* Mounting point data for the VFS root.
 	                                       * Usually   set   in    `super.p_mount' */
 	struct atomic_rwlock   v_mount_lock;  /* Lock for all mounting points within this VFS (`v_mount') */
-	LLIST(REF struct path) v_mount;       /* [0..1][CHAIN(->p_mount->mp_vfsmount)][lock(v_mount_lock)] Chain of pointing points.
+	REF struct path       *v_mount;       /* [0..1][CHAIN(->p_mount->mp_vfsmount)][lock(v_mount_lock)] Chain of pointing points.
 	                                       * WARNING: This  chain  may  contain  paths with  a  reference  counter  of  ZERO(0).
 	                                       * NOTE: Set to `VFS_MOUNT_ILLEGAL' when mounting becomes illegal. */
 #define VFS_MOUNT_ILLEGAL ((struct path *)-1)
 	struct atomic_lock     v_recent_lock; /* Lock for recently used paths. */
-	LLIST(REF struct path) v_recent_list; /* [0..1][lock(v_recent_lock)] Cache of recently used paths. */
+	REF struct path       *v_recent_list; /* [0..1][lock(v_recent_lock)] Cache of recently used paths. */
 	REF struct path       *v_recent_back; /* [0..1][lock(v_recent_lock)] Cache of recently used paths. */
 	size_t                 v_recent_size; /* [lock(v_recent_lock)] Number of cached, recently used paths. */
 	size_t                 v_recent_limit;/* [lock(v_recent_lock)] Max number of recently used paths. */

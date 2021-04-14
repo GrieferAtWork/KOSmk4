@@ -26,9 +26,10 @@
 #include <fs/node.h>
 #include <kernel/except.h>
 #include <kernel/iovec.h>
+#include <kernel/mman.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
-#include <kernel/vm.h>
 
 #include <kos/except/reason/io.h>
 
@@ -36,13 +37,6 @@
 #include <stddef.h>
 
 DECL_BEGIN
-
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
-
 
 /* Implementation for `f_pwrite' that uses `f_write' */
 PUBLIC NONNULL((1, 5)) void KCALL
@@ -81,17 +75,15 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 		size_t aligned_num_bytes = (size_t)((maxpageaddr - minpageaddr) + PAGESIZE);
 		/* XXX: Instead of vm_paged_map(), maybe just call `f_write()' multiple times?
 		 *      Or  at   the   very   least,  do   so   when   vm_paged_map()   fails! */
-		tempbase = vm_map(&mman_kernel,
-		                  HINT_GETADDR(KERNEL_MHINT_TEMPORARY),
-		                  aligned_num_bytes,
-		                  PAGESIZE,
-		                  HINT_GETMODE(KERNEL_MHINT_TEMPORARY),
-		                  &mfile_phys,
-		                  NULL,
-		                  NULL,
-		                  (pos_t)minpageaddr,
-		                  VM_PROT_READ | VM_PROT_SHARED,
-		                  VM_NODE_FLAG_NOMERGE, 0);
+		tempbase = mman_map(/* self:          */ &mman_kernel,
+		                    /* hint:          */ MHINT_GETADDR(KERNEL_MHINT_TEMPORARY),
+		                    /* num_bytes:     */ aligned_num_bytes,
+		                    /* prot:          */ PROT_READ | PROT_SHARED,
+		                    /* flags:         */ MHINT_GETMODE(KERNEL_MHINT_TEMPORARY),
+		                    /* file:          */ &mfile_phys,
+		                    /* file_fspath:   */ NULL,
+		                    /* file_fsname:   */ NULL,
+		                    /* file_pos:      */ (pos_t)minpageaddr);
 		TRY {
 			(*self->i_type->it_file.f_write)(self,
 			                                 (byte_t *)tempbase + ((ptrdiff_t)src & PAGEMASK),

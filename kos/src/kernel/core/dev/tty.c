@@ -33,7 +33,6 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>

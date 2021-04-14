@@ -581,7 +581,7 @@ badslot:
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-uvio_server_read(struct vm_datablock *__restrict self,
+uvio_server_read(struct mfile *__restrict self,
                  USER CHECKED void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	struct uvio *me;
@@ -623,7 +623,7 @@ try_readone:
 }
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
-uvio_server_write(struct vm_datablock *__restrict self,
+uvio_server_write(struct mfile *__restrict self,
                   USER CHECKED void const *src,
                   size_t num_bytes,
                   iomode_t UNUSED(mode)) THROWS(...) {
@@ -922,7 +922,7 @@ done:
 
 
 PRIVATE NONNULL((1)) void KCALL
-uvio_server_pollconnect(struct vm_datablock *__restrict self,
+uvio_server_pollconnect(struct mfile *__restrict self,
                         poll_mode_t what) THROWS(...) {
 	struct uvio *me = (struct uvio *)self;
 	/* Poll for pending UVIO requests (read) and delivered-but-not-completed requests (write) */
@@ -931,7 +931,7 @@ uvio_server_pollconnect(struct vm_datablock *__restrict self,
 }
 
 PRIVATE WUNUSED NONNULL((1)) poll_mode_t
-NOTHROW(KCALL uvio_server_polltest)(struct vm_datablock *__restrict self,
+NOTHROW(KCALL uvio_server_polltest)(struct mfile *__restrict self,
                                     poll_mode_t what) THROWS(...) {
 	poll_mode_t result = 0;
 	struct uvio *me = (struct uvio *)self;

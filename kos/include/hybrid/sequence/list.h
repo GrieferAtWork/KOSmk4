@@ -3690,43 +3690,20 @@
 /* DEPRECATED API (or what remains there-of; to be removed eventually)  */
 /************************************************************************/
 #ifndef __HYBRID_LIST_WITHOUT_DEPRECATED
-/* OLD_SLIST */
-#define OLD_SLIST(T) T * /* [0..1] List head */
-#define OLD_SLIST_NODE(T)                     \
-	struct {                                  \
-		T *sn_next; /* [0..1] Next pointer */ \
-	}
-#define OLD_SLIST_INITNODE \
-	{ __NULLPTR }
-#define OLD_SLIST_INSERT(l, elem, key) \
-	(void)((elem)->key.sn_next = (l), (l) = (elem))
-
 /* LLIST */
-#define LLIST(T) T * /* [0..1] List head */
-#define LLIST_NODE(T)                                                                               \
-	struct {                                                                                        \
-		T *ln_next /* [0..1] Next pointer */,                                                       \
-		**ln_pself; /* [1..1][?..1] Self pointer (When `__NULLPTR', element isn't apart of list) */ \
-	}
-#define LLIST_INIT __NULLPTR
-#define LLIST_INITNODE \
-	{ __NULLPTR, __NULLPTR }
-#define LLIST_NEXT(elem, key)    ((elem)->key.ln_next)
-#define LLIST_PREV(T, elem, key) __COMPILER_CONTAINER_OF((elem)->key.ln_pself, T, key.ln_next)
-#define LLIST_HEAD(l)            (l)
-#define LLIST_INSERT(l, elem, key)                            \
-	(void)(((elem)->key.ln_next = (l)) != __NULLPTR           \
-	       ? (void)((l)->key.ln_pself = &(elem)->key.ln_next) \
-	       : (void)0,                                         \
-	       *((elem)->key.ln_pself = &(l)) = (elem))
-#define LLIST_INSERT_AFTER(predecessor, elem, key)                                                    \
-	(void)(((elem)->key.ln_next = *((elem)->key.ln_pself = &(predecessor)->key.ln_next)) != __NULLPTR \
-	       ? (void)((elem)->key.ln_next->key.ln_pself = &(elem)->key.ln_next)                         \
-	       : (void)0,                                                                                 \
-	       (predecessor)->key.ln_next = (elem))
-#define LLIST_REMOVE(elem, key)                                         \
-	((*(elem)->key.ln_pself = (elem)->key.ln_next) != __NULLPTR         \
-	 ? (void)((elem)->key.ln_next->key.ln_pself = (elem)->key.ln_pself) \
+#define LLIST_INSERT(l, elem, key)                           \
+	(void)(((elem)->key.le_next = (l)) != __NULLPTR          \
+	       ? (void)((l)->key.le_prev = &(elem)->key.le_next) \
+	       : (void)0,                                        \
+	       *((elem)->key.le_prev = &(l)) = (elem))
+#define LLIST_INSERT_AFTER(predecessor, elem, key)                                                   \
+	(void)(((elem)->key.le_next = *((elem)->key.le_prev = &(predecessor)->key.le_next)) != __NULLPTR \
+	       ? (void)((elem)->key.le_next->key.le_prev = &(elem)->key.le_next)                         \
+	       : (void)0,                                                                                \
+	       (predecessor)->key.le_next = (elem))
+#define LLIST_REMOVE(elem, key)                                       \
+	((*(elem)->key.le_prev = (elem)->key.le_next) != __NULLPTR        \
+	 ? (void)((elem)->key.le_next->key.le_prev = (elem)->key.le_prev) \
 	 : (void)0)
 #endif /* !__HYBRID_LIST_WITHOUT_DEPRECATED */
 

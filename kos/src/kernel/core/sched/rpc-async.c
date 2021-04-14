@@ -24,7 +24,6 @@
 
 #include <kernel/except.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
 #include <sched/scheduler.h>

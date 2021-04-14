@@ -33,11 +33,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/rt.h>
+#include <kernel/mman.h>
 #include <kernel/mman/nopf.h>
 #include <kernel/mman/phys.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/vm.h>
 
 #include <hybrid/align.h>
 
@@ -157,22 +157,22 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 		PAGEDIR_P_BEGINUSE_KEEP_PR(pdir) {
 			error = memcpy_nopf(buf, addr, num_bytes);
 			if (unlikely(error != 0) && ALLOW_MANAGED_MEMORY_ACCESS()) {
-				struct vm *old_vm, *new_vm;
+				struct mman *old_mm, *new_mm;
 				size_t ok;
 				TRY {
 					/* Re-validate   in   case  the   memcpy_nopf()  above
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
 						goto done_nopanic_copy;
-					new_vm = dbg_current->t_mman;
-					if unlikely(!ADDR_ISKERN(new_vm))
+					new_mm = dbg_current->t_mman;
+					if unlikely(!ADDR_ISKERN(new_mm))
 						goto done_nopanic_copy;
-					if (new_vm->mm_pagedir_p != pdir)
+					if (new_mm->mm_pagedir_p != pdir)
 						goto done_nopanic_copy;
 				} EXCEPT {
 					goto done_nopanic_copy;
 				}
-				old_vm = THIS_MMAN;
+				old_mm = THIS_MMAN;
 				ok     = num_bytes - error;
 				PERTASK_SET(this_mman, dbg_current->t_mman);
 				TRY {
@@ -183,7 +183,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 					error = 0;
 				} EXCEPT {
 				}
-				PERTASK_SET(this_mman, old_vm);
+				PERTASK_SET(this_mman, old_mm);
 			}
 done_nopanic_copy:
 			;
@@ -254,22 +254,22 @@ again_memcpy_nopf:
 		error = memcpy_nopf(addr, buf, num_bytes);
 		if (error != 0) {
 			if (ALLOW_MANAGED_MEMORY_ACCESS()) {
-				struct vm *old_vm, *new_vm;
+				struct mman *old_mm, *new_mm;
 				size_t ok;
 				TRY {
 					/* Re-validate   in   case  the   memcpy_nopf()  above
 					 * changed something about dbg_current, or its fields. */
 					if unlikely(!ADDR_ISKERN(dbg_current))
 						goto done_nopanic_copy;
-					new_vm = dbg_current->t_mman;
-					if unlikely(!ADDR_ISKERN(new_vm))
+					new_mm = dbg_current->t_mman;
+					if unlikely(!ADDR_ISKERN(new_mm))
 						goto done_nopanic_copy;
-					if (new_vm->mm_pagedir_p != pdir)
+					if (new_mm->mm_pagedir_p != pdir)
 						goto done_nopanic_copy;
 				} EXCEPT {
 					goto done_nopanic_copy;
 				}
-				old_vm = THIS_MMAN;
+				old_mm = THIS_MMAN;
 				ok     = num_bytes - error;
 				PERTASK_SET(this_mman, dbg_current->t_mman);
 				TRY {
@@ -280,7 +280,7 @@ again_memcpy_nopf:
 					error = 0;
 				} EXCEPT {
 				}
-				PERTASK_SET(this_mman, old_vm);
+				PERTASK_SET(this_mman, old_mm);
 			}
 done_nopanic_copy:
 			if (force) {

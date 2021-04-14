@@ -25,12 +25,12 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/mman.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/pid.h>
 #include <sched/tsc.h>
 

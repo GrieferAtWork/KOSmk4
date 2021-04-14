@@ -36,7 +36,6 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/sync.h>
@@ -630,9 +629,9 @@ again_acquire_locks:
 			goto again_acquire_locks;
 		}
 		if (self == old_super->s_mount &&
-		    self->p_mount->mp_fsmount.ln_next == NULL &&
+		    self->p_mount->mp_fsmount.le_next == NULL &&
 		    !(ATOMIC_READ(old_super->s_flags) & SUPERBLOCK_FUNMOUNTED)) {
-			assert(self->p_mount->mp_fsmount.ln_pself == &old_super->s_mount);
+			assert(self->p_mount->mp_fsmount.le_prev == &old_super->s_mount);
 			/* This will be the last mounting point, but the superblock
 			 * hasn't    been   marked   as   being   unmounted,   yet. */
 			if unlikely(!superblock_nodeslock_trywrite(old_super)) {
@@ -672,7 +671,7 @@ again_acquire_locks:
 		}
 		/* The old superblock has now been set to be unmounted (if it had to be) */
 		COMPILER_READ_BARRIER();
-		if (ATOMIC_READ(self->p_mount->mp_fsmount.ln_pself) != NULL)
+		if (ATOMIC_READ(self->p_mount->mp_fsmount.le_prev) != NULL)
 			LLIST_REMOVE(self, p_mount->mp_fsmount);
 		new_mount = self->p_mount;
 		/* Drop references stored in the old new_mount structure. */
@@ -718,7 +717,7 @@ again_acquire_locks:
 	LLIST_INSERT(super->s_mount, self, p_mount->mp_fsmount);
 	{
 		struct path *next_mount;
-		new_mount->mp_vfsmount.ln_pself = &v->v_mount;
+		new_mount->mp_vfsmount.le_prev = &v->v_mount;
 		/* The reference stored within the `v->v_mount' chain. */
 		if (self != v)
 			incref(self);
@@ -740,7 +739,7 @@ again_acquire_locks:
 					decref_nokill(self);
 				THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
 			}
-			new_mount->mp_vfsmount.ln_next = next_mount;
+			new_mount->mp_vfsmount.le_next = next_mount;
 			COMPILER_WRITE_BARRIER();
 			if (ATOMIC_CMPXCH_WEAK(v->v_mount, next_mount, self))
 				break;
@@ -812,9 +811,9 @@ again_acquire_super:
 	}
 	/* Must remove an existing mounting point. */
 	if (self == super->s_mount &&
-	    self->p_mount->mp_fsmount.ln_next == NULL &&
+	    self->p_mount->mp_fsmount.le_next == NULL &&
 	    !(ATOMIC_READ(super->s_flags) & SUPERBLOCK_FUNMOUNTED)) {
-		assert(self->p_mount->mp_fsmount.ln_pself == &super->s_mount);
+		assert(self->p_mount->mp_fsmount.le_prev == &super->s_mount);
 		/* This will be the last mounting point, but the superblock
 		 * hasn't    been   marked   as   being   unmounted,   yet. */
 		if unlikely(!superblock_nodeslock_trywrite(super)) {
@@ -853,10 +852,10 @@ again_acquire_super:
 	}
 	/* The old superblock has now been set to be unmounted (if it had to be) */
 	COMPILER_READ_BARRIER();
-	if (ATOMIC_READ(mount->mp_fsmount.ln_pself) != NULL)
+	if (ATOMIC_READ(mount->mp_fsmount.le_prev) != NULL)
 		LLIST_REMOVE(self, p_mount->mp_fsmount);
 	superblock_mountlock_endwrite(super);
-	if (ATOMIC_READ(mount->mp_vfsmount.ln_pself) != NULL) {
+	if (ATOMIC_READ(mount->mp_vfsmount.le_prev) != NULL) {
 		LLIST_REMOVE(self, p_mount->mp_vfsmount);
 		/* The reference stored within the `v->v_mount' chain. */
 		if (self != v)
@@ -1005,10 +1004,10 @@ again_acquire_mount_lock:
 			sync_endwrite(dst);
 			/* Must still remove the existing mounting point from `src' */
 			COMPILER_READ_BARRIER();
-			if (ATOMIC_READ(src_mount->mp_fsmount.ln_pself) != NULL)
+			if (ATOMIC_READ(src_mount->mp_fsmount.le_prev) != NULL)
 				LLIST_REMOVE(src, p_mount->mp_fsmount);
 			superblock_mountlock_endwrite(src_super);
-			if (ATOMIC_READ(src_mount->mp_vfsmount.ln_pself) != NULL)
+			if (ATOMIC_READ(src_mount->mp_vfsmount.le_prev) != NULL)
 				LLIST_REMOVE(src, p_mount->mp_vfsmount);
 			/* The reference stored within the `v->v_mount' chain. */
 			if (src != v)
@@ -1045,9 +1044,9 @@ again_acquire_mount_lock:
 			goto again_acquire_locks;
 		}
 		if (dst == dst_old_super->s_mount &&
-		    dst->p_mount->mp_fsmount.ln_next == NULL &&
+		    dst->p_mount->mp_fsmount.le_next == NULL &&
 		    !(ATOMIC_READ(dst_old_super->s_flags) & SUPERBLOCK_FUNMOUNTED)) {
-			assert(dst->p_mount->mp_fsmount.ln_pself == &dst_old_super->s_mount);
+			assert(dst->p_mount->mp_fsmount.le_prev == &dst_old_super->s_mount);
 			/* This will be the last mounting point, but the superblock
 			 * hasn't    been   marked   as   being   unmounted,   yet. */
 			if unlikely(!superblock_nodeslock_trywrite(dst_old_super)) {
@@ -1094,7 +1093,7 @@ again_acquire_mount_lock:
 		assert(!dst_mount);
 		dst_mount = dst->p_mount;
 		assert(dst_mount->mp_super == dst_old_super);
-		if (ATOMIC_READ(dst_mount->mp_fsmount.ln_pself) != NULL)
+		if (ATOMIC_READ(dst_mount->mp_fsmount.le_prev) != NULL)
 			LLIST_REMOVE(dst, p_mount->mp_fsmount);
 		superblock_mountlock_endwrite(dst_old_super);
 		/* Drop references stored in the old new_mount structure. */
@@ -1102,7 +1101,7 @@ again_acquire_mount_lock:
 		/* Set the new mounting as part of the associated superblock. */
 		LLIST_INSERT(src_super->s_mount, dst, p_mount->mp_fsmount);
 		assert(src->p_mount == src_mount);
-		if (ATOMIC_READ(src_mount->mp_fsmount.ln_pself) != NULL)
+		if (ATOMIC_READ(src_mount->mp_fsmount.le_prev) != NULL)
 			LLIST_REMOVE(src, p_mount->mp_fsmount);
 		superblock_mountlock_endwrite(src_super);
 		/* Update the effectively mounted INode within out path segment. */
@@ -1186,7 +1185,7 @@ again_acquire_mount_lock:
 				decref_nokill(dst);
 			THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_UNMOUNTED);
 		}
-		dst_mount->mp_vfsmount.ln_next = next_mount;
+		dst_mount->mp_vfsmount.le_next = next_mount;
 		COMPILER_WRITE_BARRIER();
 		if (ATOMIC_CMPXCH_WEAK(v->v_mount, next_mount, dst))
 			break;
@@ -1200,10 +1199,10 @@ again_acquire_mount_lock:
 	dst_mount->mp_fsmount = src_mount->mp_fsmount; /* Inherit link. */
 	/* XXX: Whenever accessing the `mp_fsmount' chain, wouldn't we
 	 *      need to acquire a lock to the neighboring paths,  too? */
-	if likely(dst_mount->mp_fsmount.ln_pself)
-		*dst_mount->mp_fsmount.ln_pself = dst;
-	if (dst_mount->mp_fsmount.ln_next)
-		dst_mount->mp_fsmount.ln_next->p_mount->mp_fsmount.ln_pself = &dst_mount->mp_fsmount.ln_next;
+	if likely(dst_mount->mp_fsmount.le_prev)
+		*dst_mount->mp_fsmount.le_prev = dst;
+	if (dst_mount->mp_fsmount.le_next)
+		dst_mount->mp_fsmount.le_next->p_mount->mp_fsmount.le_prev = &dst_mount->mp_fsmount.le_next;
 	sync_endwrite(dst);
 	sync_endwrite(&v->v_mount_lock);
 	superblock_mountlock_endwrite(src_super);
@@ -1409,7 +1408,7 @@ NOTHROW(KCALL path_mounted_destroy_after_vfs_umount)(struct path *__restrict sel
 	struct superblock *super;
 	assert(src_mount->mp_path == self);
 	super = src_mount->mp_super;
-	if (ATOMIC_READ(src_mount->mp_fsmount.ln_pself) != NULL) {
+	if (ATOMIC_READ(src_mount->mp_fsmount.le_prev) != NULL) {
 		if unlikely(!superblock_mountlock_trywrite(super)) {
 			struct path *next;
 			do {
@@ -1420,7 +1419,7 @@ NOTHROW(KCALL path_mounted_destroy_after_vfs_umount)(struct path *__restrict sel
 			decref(super);
 			return;
 		}
-		if (ATOMIC_READ(src_mount->mp_fsmount.ln_pself) != NULL) {
+		if (ATOMIC_READ(src_mount->mp_fsmount.le_prev) != NULL) {
 			LLIST_REMOVE(self, p_mount->mp_fsmount);
 			if (!super->s_mount &&
 			    !(ATOMIC_FETCHOR(super->s_flags, SUPERBLOCK_FMUSTUNMOUNT) & SUPERBLOCK_FMUSTUNMOUNT))
@@ -1458,7 +1457,7 @@ NOTHROW(KCALL path_destroy_after_delpend)(struct path *__restrict self) {
 		return;
 	}
 	assert(mount->mp_path == self);
-	assertf(mount->mp_vfsmount.ln_pself == NULL,
+	assertf(mount->mp_vfsmount.le_prev == NULL,
 	        "But the `struct vfs::v_mount' should have been holding a reference...");
 	xdecref(mount->mp_orig);
 	path_mounted_destroy_after_vfs_umount(self, mount);
@@ -1474,7 +1473,7 @@ NOTHROW(KCALL path_lock_do_service)(struct path *__restrict self) {
 	pend = ATOMIC_XCH(self->p_delpend, NULL);
 	while (pend) {
 		next = pend->p_delpend;
-		if (ATOMIC_READ(pend->p_dirnext.ln_pself) != NULL) {
+		if (ATOMIC_READ(pend->p_dirnext.le_prev) != NULL) {
 			LLIST_REMOVE(pend, p_dirnext);
 			assert(self->p_cldsize != 0);
 			--self->p_cldsize;
@@ -1636,14 +1635,14 @@ PUBLIC NOBLOCK void
 NOTHROW(KCALL path_destroy)(struct path *__restrict self) {
 	struct path *parent;
 	path_lock_do_service(self);
-	assertf(self->p_recent.ln_pself == NULL,
+	assertf(self->p_recent.le_prev == NULL,
 	        "The recently-used cache should have kept us alive!");
 	assertf(self->p_cldsize == 0,
 	        "Child path nodes should have kept us alive!");
 	kfree(self->p_cldlist);
 	xdecref(self->p_inode);
 	if ((parent = self->p_parent) != NULL) {
-		if (ATOMIC_READ(self->p_dirnext.ln_pself) != NULL) {
+		if (ATOMIC_READ(self->p_dirnext.le_prev) != NULL) {
 			if unlikely(!sync_trywrite(parent)) {
 				struct path *next;
 				do {
@@ -1656,7 +1655,7 @@ NOTHROW(KCALL path_destroy)(struct path *__restrict self) {
 			}
 			/* Unlink the entry from the parent directory. */
 			COMPILER_READ_BARRIER();
-			if (ATOMIC_READ(self->p_dirnext.ln_pself) != NULL) {
+			if (ATOMIC_READ(self->p_dirnext.le_prev) != NULL) {
 				LLIST_REMOVE(self, p_dirnext);
 				assert(parent->p_cldsize != 0);
 				--parent->p_cldsize;
@@ -1691,9 +1690,9 @@ NOTHROW(KCALL vfs_clearmounts)(struct vfs *__restrict self) {
 	 * as soon as their associated paths stop being used. */
 	while (mounting_points) {
 		assert(mounting_points->p_mount);
-		next = mounting_points->p_mount->mp_vfsmount.ln_next;
+		next = mounting_points->p_mount->mp_vfsmount.le_next;
 		LLIST_REMOVE(mounting_points, p_mount->mp_vfsmount);
-		mounting_points->p_mount->mp_vfsmount.ln_pself = NULL;
+		mounting_points->p_mount->mp_vfsmount.le_prev = NULL;
 		decref(mounting_points);
 		mounting_points = next;
 	}
@@ -1725,9 +1724,9 @@ NOTHROW(KCALL vfs_assert_recent_integrity)(struct vfs *__restrict self) {
 		return;
 	for (piter = &self->v_recent_list, i = 0;
 	     (iter = *piter) != NULL;
-	     piter = &iter->p_recent.ln_next, ++i) {
+	     piter = &iter->p_recent.le_next, ++i) {
 		assert(i < self->v_recent_size);
-		assert(piter == iter->p_recent.ln_pself);
+		assert(piter == iter->p_recent.le_prev);
 	}
 	assert(i == self->v_recent_size);
 }
@@ -1744,12 +1743,12 @@ NOTHROW(KCALL path_recent)(struct path *__restrict self) {
 	struct vfs *v = self->p_vfs;
 	if unlikely(v == self)
 		goto done; /* No need to cache the VFS root itself... */
-	if (self->p_recent.ln_pself != NULL)
+	if (self->p_recent.le_prev != NULL)
 		goto done;
 	if (sync_trywrite(&v->v_recent_lock)) {
 		COMPILER_READ_BARRIER();
 		vfs_assert_recent_integrity(v);
-		if (self->p_recent.ln_pself == NULL) {
+		if (self->p_recent.le_prev == NULL) {
 			incref(self);
 			if (v->v_recent_size < v->v_recent_limit) {
 				assert((v->v_recent_list != NULL) ==
@@ -1769,22 +1768,22 @@ NOTHROW(KCALL path_recent)(struct path *__restrict self) {
 					assert(v->v_recent_limit == 1);
 					v->v_recent_list        = self;
 					v->v_recent_back        = self;
-					self->p_recent.ln_pself = &v->v_recent_list;
-					self->p_recent.ln_next  = NULL;
+					self->p_recent.le_prev = &v->v_recent_list;
+					self->p_recent.le_next  = NULL;
 				} else {
 					struct path *prev;
-					assert(oldest_path->p_recent.ln_pself != &v->v_recent_list);
-					prev = COMPILER_CONTAINER_OF(oldest_path->p_recent.ln_pself,
-					                             struct path, p_recent.ln_next);
+					assert(oldest_path->p_recent.le_prev != &v->v_recent_list);
+					prev = COMPILER_CONTAINER_OF(oldest_path->p_recent.le_prev,
+					                             struct path, p_recent.le_next);
 					v->v_recent_back = prev;
-					assert(prev->p_recent.ln_next == oldest_path);
-					prev->p_recent.ln_next = NULL;
+					assert(prev->p_recent.le_next == oldest_path);
+					prev->p_recent.le_next = NULL;
 					LLIST_INSERT(v->v_recent_list, self, p_recent);
 				}
-				oldest_path->p_recent.ln_pself = NULL;
+				oldest_path->p_recent.le_prev = NULL;
 #ifndef NDEBUG
-				memset(&oldest_path->p_recent.ln_next, 0xcc,
-				       sizeof(oldest_path->p_recent.ln_next));
+				memset(&oldest_path->p_recent.le_next, 0xcc,
+				       sizeof(oldest_path->p_recent.le_next));
 #endif /* !NDEBUG */
 				vfs_assert_recent_integrity(v);
 				sync_endwrite(&v->v_recent_lock);
@@ -1800,17 +1799,17 @@ NOTHROW(KCALL path_recent)(struct path *__restrict self) {
 				/* Handle the special case where the path
 				 * was at the  back of the  recent-cache. */
 				struct path *prev;
-				assert(self->p_recent.ln_next == NULL);
+				assert(self->p_recent.le_next == NULL);
 				assert((self == v->v_recent_list) ==
-				       (self->p_recent.ln_pself == &v->v_recent_list));
+				       (self->p_recent.le_prev == &v->v_recent_list));
 				if unlikely(self == v->v_recent_list)
 					goto done_bring_to_front;
 				/* Make the predecessor the last element.
 				 * NOTE: The next-link of the predecessor will be
 				 *       cleared by the call to `LLIST_REMOVE()'! */
-				assert(self->p_recent.ln_pself != &v->v_recent_list);
-				prev = COMPILER_CONTAINER_OF(self->p_recent.ln_pself,
-				                             struct path, p_recent.ln_next);
+				assert(self->p_recent.le_prev != &v->v_recent_list);
+				prev = COMPILER_CONTAINER_OF(self->p_recent.le_prev,
+				                             struct path, p_recent.le_next);
 				assert(prev != self);
 				v->v_recent_back = prev;
 			}
@@ -1841,22 +1840,22 @@ NOTHROW(KCALL path_recent_clear)(struct vfs *__restrict v) {
 			break;
 		}
 		/* Remove the path from the recent-path cache. */
-		v->v_recent_list = p->p_recent.ln_next;
+		v->v_recent_list = p->p_recent.le_next;
 		if (!v->v_recent_list) {
 			assert(v->v_recent_back == p);
 			v->v_recent_back = NULL;
 		} else {
 			assert(v->v_recent_back != p);
-			v->v_recent_list->p_recent.ln_pself = &v->v_recent_list;
+			v->v_recent_list->p_recent.le_prev = &v->v_recent_list;
 		}
 		assert(v->v_recent_size);
 		--v->v_recent_size;
 		assert((v->v_recent_size != 0) == (v->v_recent_list != NULL));
 		assert((v->v_recent_size != 0) == (v->v_recent_back != NULL));
-		p->p_recent.ln_pself = NULL;
+		p->p_recent.le_prev = NULL;
 #ifndef NDEBUG
-		memset(&p->p_recent.ln_next, 0xcc,
-		       sizeof(p->p_recent.ln_next));
+		memset(&p->p_recent.le_next, 0xcc,
+		       sizeof(p->p_recent.le_next));
 #endif /* !NDEBUG */
 		vfs_assert_recent_integrity(v);
 		sync_endwrite(&v->v_recent_lock);
@@ -1883,7 +1882,7 @@ NOTHROW(KCALL path_rehash_nx)(struct path *__restrict self) {
 		iter = self->p_cldlist[i];
 		while (iter) {
 			struct path **pentry;
-			next = iter->p_dirnext.ln_next;
+			next = iter->p_dirnext.le_next;
 			/* Insert the entry into the new map. */
 			pentry = &new_map[iter->p_dirent->de_hash & new_mask];
 			LLIST_INSERT(*pentry, iter, p_dirnext);
@@ -1914,7 +1913,7 @@ NOTHROW(KCALL path_rehash_smaller_nx)(struct path *__restrict self) {
 		iter = self->p_cldlist[i];
 		while (iter) {
 			struct path **pentry;
-			next = iter->p_dirnext.ln_next;
+			next = iter->p_dirnext.le_next;
 			/* Insert the entry into the new map. */
 			pentry = &new_map[iter->p_dirent->de_hash & new_mask];
 			LLIST_INSERT(*pentry, iter, p_dirnext);
@@ -1946,7 +1945,7 @@ path_newchild(struct path *__restrict self,
 			struct path *new_result;
 search_existing_list:
 			new_result = self->p_cldlist[child_entry->de_hash & self->p_cldmask];
-			for (; new_result; new_result = new_result->p_dirnext.ln_next) {
+			for (; new_result; new_result = new_result->p_dirnext.le_next) {
 				if (new_result->p_dirent == child_entry)
 					goto is_a_duplicate;
 				if (new_result->p_dirent->de_hash != child_entry->de_hash)
@@ -1965,17 +1964,17 @@ is_a_duplicate:
 			}
 		} else {
 			/* Must allocate the initial hash map. */
-			self->p_cldlist = (LLIST(struct path) *)kmalloc_nx(sizeof(LLIST(struct path)) *
-			                                                   (PATH_DEFAULT_MASK + 1),
-			                                                   FS_GFP | GFP_CALLOC | GFP_ATOMIC);
+			self->p_cldlist = (struct path **)kmalloc_nx(sizeof(struct path *) *
+			                                             (PATH_DEFAULT_MASK + 1),
+			                                             FS_GFP | GFP_CALLOC | GFP_ATOMIC);
 			if likely(!self->p_cldlist) {
 				self->p_cldmask = PATH_DEFAULT_MASK;
 			} else {
-				LLIST(struct path) * new_map;
+				struct path **new_map;
 				sync_endwrite(self);
-				new_map = (LLIST(struct path) *)kmalloc(sizeof(LLIST(struct path)) *
-				                                        (PATH_DEFAULT_MASK + 1),
-				                                        FS_GFP | GFP_CALLOC);
+				new_map = (struct path **)kmalloc(sizeof(struct path *) *
+				                                  (PATH_DEFAULT_MASK + 1),
+				                                  FS_GFP | GFP_CALLOC);
 				TRY {
 					sync_write(self);
 				} EXCEPT {
@@ -2008,7 +2007,7 @@ is_a_duplicate:
 	result->p_cldsize         = 0;
 	result->p_cldlist         = NULL;
 	result->p_delpend         = NULL;
-	result->p_recent.ln_pself = NULL;
+	result->p_recent.le_prev = NULL;
 
 	/* Add the resulting entry to the new hash-map. */
 	{
@@ -2124,7 +2123,7 @@ NOTHROW(KCALL vfs_findpath_nolock)(struct vfs *__restrict new_vfs,
 		struct directory_entry *dent;
 		dent = old_path->p_dirent;
 		result = parent->p_cldlist[dent->de_hash & parent->p_cldmask];
-		for (; result; result = result->p_dirnext.ln_next) {
+		for (; result; result = result->p_dirnext.le_next) {
 			if (result->p_dirent != dent)
 				continue;
 			return result; /* Found it! */

@@ -205,7 +205,7 @@ PUBLIC struct directory_entry empty_directory_entry = {
 	/* .de_refcnt   = */ 1,
 	/* .de_heapsize = */ sizeof(empty_directory_entry),
 	/* .de_next     = */ NULL,
-	/* .de_bypos    = */ LLIST_INITNODE,
+	/* .de_bypos    = */ { NULL, NULL },
 	/* .de_fsdata   = */ {
 		/* .de_start = */ 0,
 		/* .de_data  = */ { 0 },
@@ -282,7 +282,7 @@ PRIVATE struct atomic_lock inodes_recent_lock = ATOMIC_LOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(inodes_recent_lock);
 
 /* [lock(inodes_recent_lock)][0..1] Chain of recently used nodes. */
-PRIVATE REF LLIST(struct inode) inodes_recent_list = NULL;
+PRIVATE REF struct inode *inodes_recent_list = NULL;
 PRIVATE REF struct inode *inodes_recent_back = NULL;
 
 /* [lock(inodes_recent_lock)] The amount of nodes apart of `inodes_recent_list' */
@@ -302,11 +302,11 @@ NOTHROW(KCALL inode_recent_getcur)(void) {
  * such that it will remain allocated for a while, even when not referenced elsewhere. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL inode_recent)(struct inode *__restrict self) {
-	if (self->i_recent.ln_pself != NULL)
+	if (self->i_recent.le_prev != NULL)
 		return;
 	if (sync_trywrite(&inodes_recent_lock)) {
 		COMPILER_READ_BARRIER();
-		if (self->i_recent.ln_pself == NULL) {
+		if (self->i_recent.le_prev == NULL) {
 			if (inodes_recent_size < ATOMIC_READ(inodes_recent_lim)) {
 				LLIST_INSERT(inodes_recent_list, self, i_recent);
 				if (!inodes_recent_back)
@@ -320,13 +320,13 @@ NOTHROW(KCALL inode_recent)(struct inode *__restrict self) {
 				assert(oldest_node != NULL);
 				if unlikely(inodes_recent_back == inodes_recent_list) {
 					inodes_recent_list = inodes_recent_back = self;
-					self->i_recent.ln_pself = &inodes_recent_list;
-					self->i_recent.ln_next  = NULL;
+					self->i_recent.le_prev = &inodes_recent_list;
+					self->i_recent.le_next  = NULL;
 				} else {
-					inodes_recent_back = COMPILER_CONTAINER_OF(oldest_node->i_recent.ln_pself,
-					                                           struct inode, i_recent.ln_next);
-					assert(inodes_recent_back->i_recent.ln_next == oldest_node);
-					inodes_recent_back->i_recent.ln_next = NULL;
+					inodes_recent_back = COMPILER_CONTAINER_OF(oldest_node->i_recent.le_prev,
+					                                           struct inode, i_recent.le_next);
+					assert(inodes_recent_back->i_recent.le_next == oldest_node);
+					inodes_recent_back->i_recent.le_next = NULL;
 					LLIST_INSERT(inodes_recent_list, self, i_recent);
 				}
 				sync_endwrite(&inodes_recent_lock);
@@ -359,15 +359,15 @@ NOTHROW(KCALL inode_recent_tryclear)(void) {
 			break;
 		}
 		/* Remove the node from the recent-node cache. */
-		inodes_recent_list = node->i_recent.ln_next;
+		inodes_recent_list = node->i_recent.le_next;
 		if (!inodes_recent_list)
 			inodes_recent_back = NULL;
 		assert(inodes_recent_size);
 		--inodes_recent_size;
 		assert((inodes_recent_size != 0) == (inodes_recent_list != NULL));
 		assert((inodes_recent_size != 0) == (inodes_recent_back != NULL));
-		node->i_recent.ln_next  = NULL;
-		node->i_recent.ln_pself = NULL;
+		node->i_recent.le_next  = NULL;
+		node->i_recent.le_prev = NULL;
 		sync_endwrite(&inodes_recent_lock);
 		assert(!wasdestroyed(node));
 		if (ATOMIC_DECFETCH(node->mf_refcnt)) {
@@ -394,15 +394,15 @@ inode_recent_clear(void) THROWS(E_WOULDBLOCK) {
 			break;
 		}
 		/* Remove the node from the recent-node cache. */
-		inodes_recent_list = node->i_recent.ln_next;
+		inodes_recent_list = node->i_recent.le_next;
 		if (!inodes_recent_list)
 			inodes_recent_back = NULL;
 		assert(inodes_recent_size);
 		--inodes_recent_size;
 		assert((inodes_recent_size != 0) == (inodes_recent_list != NULL));
 		assert((inodes_recent_size != 0) == (inodes_recent_back != NULL));
-		node->i_recent.ln_next  = NULL;
-		node->i_recent.ln_pself = NULL;
+		node->i_recent.le_next  = NULL;
+		node->i_recent.le_prev = NULL;
 		sync_endwrite(&inodes_recent_lock);
 		assert(!wasdestroyed(node));
 		if (ATOMIC_DECFETCH(node->mf_refcnt)) {
@@ -429,15 +429,15 @@ NOTHROW(KCALL inode_recent_clear_nx)(void) {
 			break;
 		}
 		/* Remove the node from the recent-node cache. */
-		inodes_recent_list = node->i_recent.ln_next;
+		inodes_recent_list = node->i_recent.le_next;
 		if (!inodes_recent_list)
 			inodes_recent_back = NULL;
 		assert(inodes_recent_size);
 		--inodes_recent_size;
 		assert((inodes_recent_size != 0) == (inodes_recent_list != NULL));
 		assert((inodes_recent_size != 0) == (inodes_recent_back != NULL));
-		node->i_recent.ln_next  = NULL;
-		node->i_recent.ln_pself = NULL;
+		node->i_recent.le_next  = NULL;
+		node->i_recent.le_prev = NULL;
 		sync_endwrite(&inodes_recent_lock);
 		assert(!wasdestroyed(node));
 		if (ATOMIC_DECFETCH(node->mf_refcnt)) {
@@ -453,12 +453,12 @@ NOTHROW(KCALL inode_recent_clear_nx)(void) {
  * @return: * : One of `INODE_RECENT_TRYREMOVE_*' */
 PUBLIC NOBLOCK unsigned int
 NOTHROW(KCALL inode_recent_tryremove)(struct inode *__restrict self) {
-	if (ATOMIC_READ(self->i_recent.ln_pself) == NULL)
+	if (ATOMIC_READ(self->i_recent.le_prev) == NULL)
 		return INODE_RECENT_TRYREMOVE_NOTRECENT;
 	if (!sync_trywrite(&inodes_recent_lock))
 		return INODE_RECENT_TRYREMOVE_WOULDBLOCK;
 	COMPILER_READ_BARRIER();
-	if unlikely(!self->i_recent.ln_pself) {
+	if unlikely(!self->i_recent.le_prev) {
 		sync_endwrite(&inodes_recent_lock);
 		return INODE_RECENT_TRYREMOVE_NOTRECENT;
 	}
@@ -470,18 +470,18 @@ NOTHROW(KCALL inode_recent_tryremove)(struct inode *__restrict self) {
 	if (self == inodes_recent_back) {
 		/* Update the back-pointer. */
 		assert((inodes_recent_list == NULL) ==
-		       (self->i_recent.ln_pself == &inodes_recent_list));
-		if (self->i_recent.ln_pself == &inodes_recent_list) {
+		       (self->i_recent.le_prev == &inodes_recent_list));
+		if (self->i_recent.le_prev == &inodes_recent_list) {
 			assert(inodes_recent_size == 0);
 			inodes_recent_back = NULL;
 		} else {
 			assert(inodes_recent_size != 0);
-			inodes_recent_back = COMPILER_CONTAINER_OF(self->i_recent.ln_pself,
+			inodes_recent_back = COMPILER_CONTAINER_OF(self->i_recent.le_prev,
 			                                           struct inode,
-			                                           i_recent.ln_next);
+			                                           i_recent.le_next);
 		}
 	}
-	self->i_recent.ln_pself = NULL;
+	self->i_recent.le_prev = NULL;
 	sync_endwrite(&inodes_recent_lock);
 	decref_nokill(self); /* Nokill, because the caller must also be holding a reference... */
 	return INODE_RECENT_TRYREMOVE_SUCCESS;
@@ -610,10 +610,10 @@ NOTHROW(KCALL fs_filesystems_remove)(struct superblock *__restrict block) {
 	struct superblock **piter, *iter;
 	assert(sync_writing(&fs_filesystems.f_superlock));
 	piter = &fs_filesystems.f_superblocks;
-	for (; (iter = *piter) != NULL; piter = &iter->s_filesystems.sn_next) {
+	for (; (iter = *piter) != NULL; piter = &iter->s_filesystems) {
 		if (iter != block)
 			continue;
-		*piter = block->s_filesystems.sn_next;
+		*piter = block->s_filesystems;
 		return true;
 	}
 	return false;
@@ -1464,8 +1464,8 @@ continue_reading:
 			assert(!self->d_bypos);
 			self->d_bypos             = result;
 			self->d_bypos_end         = result;
-			result->de_bypos.ln_pself = &self->d_bypos;
-			result->de_bypos.ln_next  = NULL;
+			result->de_bypos.le_prev = &self->d_bypos;
+			result->de_bypos.le_next  = NULL;
 		} else if (result->de_pos < self->d_bypos_end->de_pos) {
 			struct directory_entry *insert_after;
 			/* When the directory is being re-loaded after a  umount(),
@@ -1473,8 +1473,8 @@ continue_reading:
 			 * or we just have to insert the new entry somewhere else. */
 			insert_after = self->d_bypos_end;
 			do
-				insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.ln_pself,
-				                                     struct directory_entry, de_bypos.ln_next);
+				insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.le_prev,
+				                                     struct directory_entry, de_bypos.le_next);
 			while (insert_after->de_pos > result->de_pos);
 			/* Check if the entry already exists! */
 			if (insert_after->de_pos == result->de_pos)
@@ -1483,9 +1483,9 @@ continue_reading:
 			LLIST_INSERT_AFTER(insert_after, result, de_bypos);
 		} else {
 			/* Add the directory entry to the by-position chain of directory entries. */
-			result->de_bypos.ln_pself           = &self->d_bypos_end->de_bypos.ln_next;
-			self->d_bypos_end->de_bypos.ln_next = result;
-			result->de_bypos.ln_next            = NULL;
+			result->de_bypos.le_prev           = &self->d_bypos_end->de_bypos.le_next;
+			self->d_bypos_end->de_bypos.le_next = result;
+			result->de_bypos.le_next            = NULL;
 			self->d_bypos_end                   = result;
 		}
 		/* Add the new entry to the hash-map. */
@@ -1594,8 +1594,8 @@ continue_reading:
 			assert(!self->d_bypos);
 			self->d_bypos             = result;
 			self->d_bypos_end         = result;
-			result->de_bypos.ln_pself = &self->d_bypos;
-			result->de_bypos.ln_next  = NULL;
+			result->de_bypos.le_prev = &self->d_bypos;
+			result->de_bypos.le_next  = NULL;
 		} else if (result->de_pos < self->d_bypos_end->de_pos) {
 			struct directory_entry *insert_after;
 			/* When the directory is being re-loaded after a  umount(),
@@ -1603,8 +1603,8 @@ continue_reading:
 			 * or we just have to insert the new entry somewhere else. */
 			insert_after = self->d_bypos_end;
 			do {
-				insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.ln_pself,
-				                                     struct directory_entry, de_bypos.ln_next);
+				insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.le_prev,
+				                                     struct directory_entry, de_bypos.le_next);
 			} while (insert_after->de_pos > result->de_pos);
 			/* Check if the entry already exists! */
 			if (insert_after->de_pos == result->de_pos)
@@ -1613,9 +1613,9 @@ continue_reading:
 			LLIST_INSERT_AFTER(insert_after, result, de_bypos);
 		} else {
 			/* Add the directory entry to the by-position chain of directory entries. */
-			result->de_bypos.ln_pself           = &self->d_bypos_end->de_bypos.ln_next;
-			self->d_bypos_end->de_bypos.ln_next = result;
-			result->de_bypos.ln_next            = NULL;
+			result->de_bypos.le_prev           = &self->d_bypos_end->de_bypos.le_next;
+			self->d_bypos_end->de_bypos.le_next = result;
+			result->de_bypos.le_next            = NULL;
 			self->d_bypos_end                   = result;
 		}
 		/* Add the new entry to the hash-map. */
@@ -2040,44 +2040,44 @@ NOTHROW(KCALL directory_addentry)(struct directory_node *__restrict self,
 	/* Add the directory entry to the by-position chain of directory entries. */
 	assert((self->d_bypos != NULL) ==
 	       (self->d_bypos_end != NULL));
-	assertf(!self->d_bypos_end || self->d_bypos_end->de_bypos.ln_next == NULL,
-	        "self->d_bypos_end->de_bypos.ln_next = %p",
-	        self->d_bypos_end->de_bypos.ln_next);
+	assertf(!self->d_bypos_end || self->d_bypos_end->de_bypos.le_next == NULL,
+	        "self->d_bypos_end->de_bypos.le_next = %p",
+	        self->d_bypos_end->de_bypos.le_next);
 	insert_after = self->d_bypos_end;
 	if unlikely(!insert_after) {
 		/* Special case: first entry. */
 		self->d_bypos            = entry;
 		self->d_bypos_end        = entry;
-		entry->de_bypos.ln_pself = &self->d_bypos;
-		entry->de_bypos.ln_next  = NULL;
+		entry->de_bypos.le_prev = &self->d_bypos;
+		entry->de_bypos.le_next  = NULL;
 	} else if likely(entry->de_pos >= insert_after->de_pos) {
 		/* Likely case: Insert at the back */
-		assert(!insert_after->de_bypos.ln_next);
-		entry->de_bypos.ln_pself       = &insert_after->de_bypos.ln_next;
-		entry->de_bypos.ln_next        = NULL;
-		insert_after->de_bypos.ln_next = entry;
+		assert(!insert_after->de_bypos.le_next);
+		entry->de_bypos.le_prev       = &insert_after->de_bypos.le_next;
+		entry->de_bypos.le_next        = NULL;
+		insert_after->de_bypos.le_next = entry;
 		self->d_bypos_end              = entry;
 	} else if (entry->de_pos < self->d_bypos->de_pos) {
 		/* Insert in the front. */
-		entry->de_bypos.ln_next  = self->d_bypos;
-		entry->de_bypos.ln_pself = &self->d_bypos;
-		assert(entry->de_bypos.ln_next->de_bypos.ln_pself == &self->d_bypos);
-		entry->de_bypos.ln_next->de_bypos.ln_pself = &entry->de_bypos.ln_next;
+		entry->de_bypos.le_next  = self->d_bypos;
+		entry->de_bypos.le_prev = &self->d_bypos;
+		assert(entry->de_bypos.le_next->de_bypos.le_prev == &self->d_bypos);
+		entry->de_bypos.le_next->de_bypos.le_prev = &entry->de_bypos.le_next;
 		self->d_bypos                              = entry;
 	} else {
 		/* Find the entry after which we must insert this one. */
 		do {
-			insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.ln_pself,
+			insert_after = COMPILER_CONTAINER_OF(insert_after->de_bypos.le_prev,
 			                                     struct directory_entry,
-			                                     de_bypos.ln_next);
+			                                     de_bypos.le_next);
 		} while (entry->de_pos < insert_after->de_pos);
-		assert(insert_after->de_bypos.ln_next);
+		assert(insert_after->de_bypos.le_next);
 		assert(insert_after != self->d_bypos_end);
 		/* Insert in-between two other entries. (Can happen if `d_creat' re-uses older slots) */
-		entry->de_bypos.ln_pself                   = &insert_after->de_bypos.ln_next;
-		entry->de_bypos.ln_next                    = insert_after->de_bypos.ln_next;
-		entry->de_bypos.ln_next->de_bypos.ln_pself = &entry->de_bypos.ln_next;
-		insert_after->de_bypos.ln_next             = entry;
+		entry->de_bypos.le_prev                   = &insert_after->de_bypos.le_next;
+		entry->de_bypos.le_next                    = insert_after->de_bypos.le_next;
+		entry->de_bypos.le_next->de_bypos.le_prev = &entry->de_bypos.le_next;
+		insert_after->de_bypos.le_next             = entry;
 	}
 
 	/* Add the new entry to the hash-map. */
@@ -2100,12 +2100,12 @@ NOTHROW(KCALL directory_delentry_bypos)(struct directory_node *__restrict self,
 	if (entry == self->d_bypos_end) {
 		if (entry == self->d_bypos) {
 			/* Remove the last entry. */
-			assert(entry->de_bypos.ln_pself == &self->d_bypos);
-			assert(entry->de_bypos.ln_next  == NULL);
+			assert(entry->de_bypos.le_prev == &self->d_bypos);
+			assert(entry->de_bypos.le_next  == NULL);
 			self->d_bypos_end = NULL;
 		} else {
 			/* Update `d_bypos_end' to point to the previous entry. */
-			self->d_bypos_end = LLIST_PREV(struct directory_entry, entry, de_bypos);
+			self->d_bypos_end = LIST_PREV_UNSAFE(entry, de_bypos);
 		}
 	}
 	/* Unlink the entry from the parent directory. */
@@ -2326,7 +2326,7 @@ again:
 						/* Check to make sure that the element being removed isn't a mounting point! */
 						if (containing_path->p_cldlist) {
 							removed_path = containing_path->p_cldlist[entry->de_hash & containing_path->p_cldmask];
-							for (; removed_path; removed_path = removed_path->p_dirnext.ln_next) {
+							for (; removed_path; removed_path = removed_path->p_dirnext.le_next) {
 								if (removed_path->p_dirent != entry)
 									continue;
 								if unlikely(!sync_trywrite(removed_path)) {
@@ -2386,7 +2386,7 @@ again:
 						/* Also try to remove the entry from the containing path. */
 						if (removed_path) {
 							COMPILER_READ_BARRIER();
-							if likely(ATOMIC_READ(removed_path->p_dirnext.ln_pself) != NULL) {
+							if likely(ATOMIC_READ(removed_path->p_dirnext.le_prev) != NULL) {
 								/* Found it! */
 								LLIST_REMOVE(removed_path, p_dirnext);
 								assert(containing_path->p_cldsize);
@@ -2475,8 +2475,8 @@ again:
 	}
 	if (premoved_dirent) {
 #ifndef NDEBUG
-		memset(&entry->de_bypos.ln_pself, 0xcc, sizeof(void *));
-		memset(&entry->de_bypos.ln_next, 0xcc, sizeof(void *));
+		memset(&entry->de_bypos.le_prev, 0xcc, sizeof(void *));
+		memset(&entry->de_bypos.le_next, 0xcc, sizeof(void *));
 #endif /* !NDEBUG */
 		*premoved_dirent = entry;
 	} else {
@@ -2674,7 +2674,7 @@ acquire_sourcedir_writelock:
 							/* Search for the path to-be removed. */
 							if (source_path->p_cldlist) {
 								removed_path = source_path->p_cldlist[source_entry->de_hash & source_path->p_cldmask];
-								for (; removed_path; removed_path = removed_path->p_dirnext.ln_next) {
+								for (; removed_path; removed_path = removed_path->p_dirnext.le_next) {
 									if (removed_path->p_dirent != source_entry)
 										continue;
 									if (!sync_trywrite(removed_path)) {
@@ -2740,7 +2740,7 @@ acquire_sourcedir_writelock:
 							/* Try to remove the a child from the source path. */
 							if (removed_path) {
 								COMPILER_READ_BARRIER();
-								if (ATOMIC_READ(removed_path->p_dirnext.ln_pself) != NULL) {
+								if (ATOMIC_READ(removed_path->p_dirnext.le_prev) != NULL) {
 									LLIST_REMOVE(removed_path, p_dirnext);
 									assert(source_path->p_cldsize);
 									--source_path->p_cldsize;
@@ -2785,7 +2785,7 @@ acquire_sourcedir_writelock:
 							}
 							/* Search for the path to-be removed. */
 							removed_path = source_path->p_cldlist[source_entry->de_hash & source_path->p_cldmask];
-							for (; removed_path; removed_path = removed_path->p_dirnext.ln_next) {
+							for (; removed_path; removed_path = removed_path->p_dirnext.le_next) {
 								if (removed_path->p_dirent != source_entry)
 									continue;
 								if (!sync_trywrite(removed_path)) {
@@ -2875,7 +2875,7 @@ acquire_sourcedir_writelock:
 							/* Try to remove the a child from the source path. */
 							if (removed_path) {
 								COMPILER_READ_BARRIER();
-								if (ATOMIC_READ(removed_path->p_dirnext.ln_pself) != NULL) {
+								if (ATOMIC_READ(removed_path->p_dirnext.le_prev) != NULL) {
 									/* Found it! */
 									LLIST_REMOVE(removed_path, p_dirnext);
 									assert(source_path->p_cldsize);
@@ -3208,7 +3208,7 @@ fs_filesystems_loadall(REF struct superblock **buffer,
 	assert(!buffer_length || buffer != NULL);
 	fs_filesystems_lock_read();
 	iter = fs_filesystems.f_superblocks;
-	for (; iter; iter = iter->s_filesystems.sn_next) {
+	for (; iter; iter = iter->s_filesystems) {
 		if (wasdestroyed(iter))
 			continue;
 		if (result < buffer_length) {
@@ -3516,7 +3516,7 @@ again:
 		goto done;
 again_locked:
 	block = fs_filesystems.f_superblocks;
-	for (; block; block = block->s_filesystems.sn_next) {
+	for (; block; block = block->s_filesystems) {
 		if (last_block) {
 			if (last_block == block)
 				last_block = NULL;
@@ -3806,7 +3806,7 @@ NOTHROW(KCALL superblock_clear_delmount)(struct superblock *__restrict self) {
 		return;
 	for (;;) {
 		next = pend->p_mount->mp_pending;
-		if (pend->p_mount->mp_fsmount.ln_pself != NULL)
+		if (pend->p_mount->mp_fsmount.le_prev != NULL)
 			LLIST_REMOVE(pend, p_mount->mp_fsmount);
 		kfree(pend->p_mount);
 		path_free(pend);
@@ -4109,7 +4109,7 @@ superblock_find_mount_from_vfs(struct superblock *__restrict self,
 	REF struct path *result;
 	superblock_mountlock_read(self);
 	for (result = self->s_mount; result;
-	     result = result->p_mount->mp_fsmount.ln_next) {
+	     result = result->p_mount->mp_fsmount.le_next) {
 		assert(result->p_mount);
 		/* Check if this mounting point exists within the given `ns' */
 		if (result->p_vfs == ns) {
@@ -4182,7 +4182,7 @@ superblock_getmountloc(struct superblock *__restrict self,
 			break;
 		}
 		assert(result->p_mount);
-		result = result->p_mount->mp_fsmount.ln_next;
+		result = result->p_mount->mp_fsmount.le_next;
 	}
 	superblock_mountlock_endread(self);
 	return result;
@@ -4200,13 +4200,14 @@ register_filesystem_type(struct superblock_type *__restrict type)
 	sync_write(&fs_filesystem_types.ft_typelock);
 	/* Prevent the same filesystem type from being registered multiple times. */
 	for (iter = fs_filesystem_types.ft_types; iter;
-	     iter = iter->st_chain.sn_next) {
+	     iter = iter->st_chain) {
 		if unlikely(iter == type) {
 			sync_endwrite(&fs_filesystem_types.ft_typelock);
 			return;
 		}
 	}
-	OLD_SLIST_INSERT(fs_filesystem_types.ft_types, type, st_chain);
+	type->st_chain = fs_filesystem_types.ft_types;
+	fs_filesystem_types.ft_types = type;
 	incref(type->st_driver);
 	sync_endwrite(&fs_filesystem_types.ft_typelock);
 }
@@ -4219,10 +4220,10 @@ unregister_filesystem_type(struct superblock_type *__restrict type)
 	assertf(type->st_driver, "No owner defined");
 	sync_write(&fs_filesystem_types.ft_typelock);
 	for (piter = &fs_filesystem_types.ft_types;
-	     (iter = *piter) != NULL; piter = &iter->st_chain.sn_next) {
+	     (iter = *piter) != NULL; piter = &iter->st_chain) {
 		if (iter != type)
 			continue;
-		*piter     = type->st_chain.sn_next;
+		*piter     = type->st_chain;
 		did_remove = true;
 		break;
 	}
@@ -4254,7 +4255,7 @@ lookup_filesystem_type(USER CHECKED char const *name)
 	kernel_name[namelen] = 0;
 	atomic_rwlock_read(&fs_filesystem_types.ft_typelock);
 	result = fs_filesystem_types.ft_types;
-	for (; result; result = result->st_chain.sn_next) {
+	for (; result; result = result->st_chain) {
 		if (strcmp(result->st_name, kernel_name) != 0)
 			continue;
 		if (driver_isfinalizing(result->st_driver))
@@ -4320,7 +4321,7 @@ superblock_open(struct superblock_type *__restrict type,
 		/* Search for an existing mapping of the given block-device. */
 		fs_filesystems_lock_read();
 		result = fs_filesystems.f_superblocks;
-		for (; result; result = result->s_filesystems.sn_next) {
+		for (; result; result = result->s_filesystems) {
 			if (result->s_device != device)
 				continue;
 			if (!tryincref(result))
@@ -4337,7 +4338,7 @@ superblock_open(struct superblock_type *__restrict type,
 		}
 		if unlikely(!fs_filesystems_lock_upgrade()) {
 			result = fs_filesystems.f_superblocks;
-			for (; result; result = result->s_filesystems.sn_next) {
+			for (; result; result = result->s_filesystems) {
 				if likely(result->s_device != device)
 					continue;
 				if (!tryincref(result))
@@ -4447,7 +4448,8 @@ superblock_open(struct superblock_type *__restrict type,
 		assert(result->i_type != NULL);
 		assert(result->s_type == type);
 		/* Add the new superblock to the chain of known file-systems. */
-		OLD_SLIST_INSERT(fs_filesystems.f_superblocks, result, s_filesystems);
+		result->s_filesystems = fs_filesystems.f_superblocks;
+		fs_filesystems.f_superblocks = result;
 	} EXCEPT {
 		fs_filesystems_lock_endwrite();
 		RETHROW();
@@ -4475,7 +4477,7 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 	assertf(!(self->i_flags & (INODE_FCHANGED | INODE_FATTRCHANGED)) ||
 	        self == self->i_super,
 	        "The changed-inode chain should have kept a reference");
-	assertf(self->i_recent.ln_pself == NULL,
+	assertf(self->i_recent.le_prev == NULL,
 	        "The recently-used cache should have kept a reference");
 	/* Run custom finalizers.
 	 * NOTE: `i_type' may be `NULL' if the INode wasn't fully constructed. */

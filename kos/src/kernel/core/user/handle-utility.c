@@ -64,7 +64,7 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 	switch (self->h_type) {
 
 	case HANDLE_TYPE_MFILE:
-		if (vm_datablock_isinode((struct vm_datablock *)self->h_data)) {
+		if (vm_datablock_isinode((struct mfile *)self->h_data)) {
 			if (INODE_ISSUPER((struct inode *)self->h_data))
 				return HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK;
 			if (INODE_ISREG((struct inode *)self->h_data))
@@ -283,7 +283,7 @@ handle_print(struct handle const *__restrict self,
 	switch (self->h_type) {
 
 	case HANDLE_TYPE_MFILE: {
-		struct vm_datablock *b = (struct vm_datablock *)self->h_data;
+		struct mfile *b = (struct mfile *)self->h_data;
 		if (vm_datablock_isinode(b)) {
 			result = format_printf(printer, arg,
 			                       "anon_inode:[inode:%" PRIuN(__SIZEOF_INO_T__) "]",
@@ -368,10 +368,10 @@ handle_print(struct handle const *__restrict self,
 	}	break;
 
 	case HANDLE_TYPE_MMAN: {
-		struct vm *f = (struct vm *)self->h_data;
+		struct mman *mm = (struct mman *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[vm:%" PRIuPTR "]",
-		                       skew_kernel_pointer(f));
+		                       "anon_inode:[mman:%" PRIuPTR "]",
+		                       skew_kernel_pointer(mm));
 	}	break;
 
 	case HANDLE_TYPE_TASK: {

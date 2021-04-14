@@ -77,7 +77,7 @@ DBG_AUTOCOMPLETE(lsmm,
 
 /* Check if `self' has a special names, and if so: return that name. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) char const *
-NOTHROW(FCALL nameof_special_datablock)(struct vm_datablock *__restrict self) {
+NOTHROW(FCALL nameof_special_datablock)(struct mfile *__restrict self) {
 	/* The libdl program hard-coded into the kernel. */
 	if (self == &execabi_system_rtld_file.mrf_file)
 		return "[" RTLD_LIBDL "]";

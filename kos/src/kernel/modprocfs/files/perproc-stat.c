@@ -138,7 +138,7 @@ ProcFS_PerProc_Stat_Printer(struct regular_node *__restrict self,
 	upid_t pid;
 	REF struct taskpid *tpid;
 	REF struct task *thread = NULL;
-	REF struct vm *mm = NULL;
+	REF struct mman *mm     = NULL;
 	struct pidns *myns = THIS_PIDNS;
 	pid  = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	tpid = pidns_trylookup(myns, pid);

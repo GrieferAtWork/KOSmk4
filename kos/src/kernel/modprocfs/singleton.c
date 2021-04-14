@@ -44,7 +44,7 @@ DECL_BEGIN
 		/* .de_refcnt   = */ 1,                                    \
 		/* .de_heapsize = */ sizeof(symbol_name),                  \
 		/* .de_next     = */ NULL,                                 \
-		/* .de_bypos    = */ LLIST_INITNODE,                       \
+		/* .de_bypos    = */ { NULL, NULL },                       \
 		/* .de_fsdata   = */ { 0, { 0 } },                         \
 		/* .de_pos      = */ 0,                                    \
 		/* .de_ino      = */ ino,                                  \

@@ -1538,7 +1538,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n) {
 /* Return a pointer to the data associated with the top expression stack  element.
  * If the stack is empty or `cexpr_typeonly' is `true', write-back a NULL pointer.
  * WARNING: The pointer written back to `*presult' may point to arbitrary
- *          user- or out-of-vm memory, meaning  that it must be  accessed
+ *          user- or out-of-mman memory, meaning that it must be accessed
  *          through use of `dbg_(read|write)memory'!
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.
@@ -3275,7 +3275,7 @@ got_symbol_type:
 					}
 				}
 
-				/* Do special handling for this[|vm|cpu]_* globals from the kernel core!
+				/* Do special handling for this[|mman|cpu]_* globals from the kernel core!
 				 * When accessed, automatically include an addend to the relevant object
 				 * in relation to dbg_current, such that the user can directly reference
 				 * these objects without having to manually sym@object them.

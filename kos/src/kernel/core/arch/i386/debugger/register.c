@@ -33,7 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/rt.h>
-#include <kernel/vm.h>
+#include <kernel/mman.h>
 #include <kernel/x86/breakpoint.h>
 #include <sched/scheduler.h>
 

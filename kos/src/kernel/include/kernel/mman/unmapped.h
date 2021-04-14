@@ -28,7 +28,8 @@
 
 #include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
 
-#include <asm/os/mman.h> /* __MAP_* constants */
+#include <asm/os/mman.h>       /* __MAP_* constants */
+#include <kos/kernel/paging.h> /* KERNEL_MHINT_* */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -111,6 +112,15 @@ struct unlockinfo;
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 
 
+/* Helper macros to extract the addr/flags from KERNEL_MHINT_* macros. */
+#ifndef MHINT_GETADDR
+#define __PRIVATE_MHINT_ADDR(x, y) x
+#define __PRIVATE_MHINT_MODE(x, y) y
+#define MHINT_GETADDR(x) __PRIVATE_MHINT_ADDR x
+#define MHINT_GETMODE(x) __PRIVATE_MHINT_MODE x
+#endif /* !MHINT_GETADDR */
+
+
 
 /* The lowest (user-space) address  that might ever be  automatically
  * selected for mapping by  `mman_getunmapped()'. Note that the  user
@@ -175,6 +185,7 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *
 NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self, void *addr,
                                  size_t num_bytes, unsigned int flags,
                                  size_t min_alignment DFL(PAGESIZE));
+
 /* Given a `struct mnode **p_tree_root', try to find a free uesr-space location.
  * Don't  use this function. - It's a kind-of hacky work-around to allow for the
  * use of `mman_findunmapped()' in implementing `mbuilder_findunmapped()' */
@@ -222,6 +233,9 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
 
+/* Helpers macros for finding unmapped areas within the kernel for specific purposes. */
+#define mman_findunmapped_device(num_bytes, ...)    mman_findunmapped(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_DEVICE), num_bytes, MHINT_GETMODE(KERNEL_MHINT_DEVICE), ##__VA_ARGS__)
+#define mman_findunmapped_temporary(num_bytes, ...) mman_findunmapped(&mman_kernel, MHINT_GETADDR(KERNEL_MHINT_TEMPORARY), num_bytes, MHINT_GETMODE(KERNEL_MHINT_TEMPORARY), ##__VA_ARGS__)
 
 DECL_END
 #endif /* __CC__ */

@@ -166,7 +166,7 @@ NOTHROW(KCALL handle_isdirectory)(struct handle self) {
 
 	case HANDLE_TYPE_MFILE: {
 		struct inode *ino;
-		if (!vm_datablock_isinode((struct vm_datablock *)self.h_data))
+		if (!vm_datablock_isinode((struct mfile *)self.h_data))
 			break;
 		ino = (struct inode *)self.h_data;
 		if (INODE_ISDIR(ino))

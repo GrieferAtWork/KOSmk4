@@ -153,13 +153,9 @@ FUNDEF isr_vector_t KCALL hisr_register_greedy(isr_greedy_function_t func, void 
 FUNDEF isr_vector_t KCALL hisr_register_greedy_at(isr_vector_t vector, isr_greedy_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS);
 
 #if defined(__cplusplus) && !defined(__NO_ASMNAME)
-struct vm_datablock;
-struct block_device;
-struct taskpid;
-struct character_device;
-struct vm_datapart;
-struct mfutex;
-struct vm_futexfd;
+#define __PRIVATE_FORWARD_DECLARE_HANDLE_TYPES(HT, T) T;
+HANDLE_FOREACH_CUSTOMTYPE(__PRIVATE_FORWARD_DECLARE_HANDLE_TYPES)
+#undef __PRIVATE_FORWARD_DECLARE_HANDLE_TYPES
 extern "C++" {
 FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) ASMNAME("hisr_unregister");
 FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(isr_greedy_function_t func, void *ob_pointer, uintptr_half_t ob_type) ASMNAME("hisr_unregister");

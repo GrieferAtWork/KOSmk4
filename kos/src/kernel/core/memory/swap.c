@@ -26,7 +26,6 @@
 #include <kernel/panic.h>
 #include <kernel/swap.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 
 #include <assert.h>
 

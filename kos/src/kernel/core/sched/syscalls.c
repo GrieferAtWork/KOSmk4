@@ -28,10 +28,10 @@
 #include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/mman.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
@@ -498,8 +498,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_UNSHARE
 PRIVATE void KCALL unshare_vm(void) {
-	struct vm *myvm = THIS_MMAN;
-	if (isshared(myvm)) {
+	struct mman *mymm = THIS_MMAN;
+	if (isshared(mymm)) {
 		REF struct mman *newmm;
 		newmm = mman_fork();
 		task_setmman_inherit(newmm);

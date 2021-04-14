@@ -38,7 +38,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
-#include <kernel/vm.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/keyboard.h>

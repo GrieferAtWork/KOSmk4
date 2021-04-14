@@ -127,24 +127,24 @@
 /* This bit function very similar  to `LFUTEX_FDBIT', however enables the  use
  * of  futex FD objects across multiple processes with different, and possibly
  * incompatible VMs, such  that whatever  operation is meant  to be  performed
- * when polling  from  the  associated  FD  will  still  be  able  to  happen.
- * This is essentially done by storing  a reference to the `vm_datapart'  that
- * contains the backing memory descriptor for the indicated address, and using
- * reads/writes to/from this `vm_datapart' to implement the checks  associated
- * with the used wait operation.
+ * when polling from the associated FD will  still be able to happen. This  is
+ * essentially  done by storing  a reference to the  `mpart' that contains the
+ * backing memory descriptor for the indicated address, and using reads/writes
+ * to/from this `mpart' to implement the checks associated with the used  wait
+ * operation.
  * WARNING: Any memory  writes that  are performed  as part  of one  of the  futex
  *          operations that can write to memory (LFUTEX_WAIT_(WHILE|UNTIL)_CMPXCH,
  *          and  `LFUTEX_WAIT_LOCK'), will be  made as through  they where done by
  *          writing  to a memory-mapped  file, meaning that  any such changes will
  *          not appear in memory images  that aren't mapped with the  `MAP_SHARED'
  *          flag set.
- *          As such, this flag  should only ever  be used to  create futex FDs  for
- *          futex objects in memory mappings that are mapped as `MAP_SHARED', since
- *          changes may otherwise  not become  visible to either  the process  that
- *          originally created the  memory mapping,  or the process  that is  using
- *          the FD to actually  wait for something to  happen. Note that access  to
- *          the data part  used by  a MPFUTEXFD object  can be  gained through  use
- *          of the `HOP_MPFUTEXFD_OPEN_DATAPART' hop() function.
+ *          As  such, this flag should only ever be used to create futex FDs for
+ *          futex objects in  memory mappings that  are mapped as  `MAP_SHARED',
+ *          since changes may otherwise not become visible to either the process
+ *          that originally created the memory  mapping, or the process that  is
+ *          using  the FD  to actually wait  for something to  happen. Note that
+ *          access to the  data part used  by a MPFUTEXFD  object can be  gained
+ *          through use of the `HOP_MPFUTEXFD_OPEN_DATAPART' hop() function.
  */
 #define LFUTEX_MPFDBIT              0x00000200
 

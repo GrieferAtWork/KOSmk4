@@ -103,12 +103,6 @@ PRIVATE struct async_worker_callbacks const uhci_powerctl_cb {
 /* Write a memory location that may be read by hardware at any point in time. */
 #define HW_WRITE(dst, value) ATOMIC_WRITE(dst, value)
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
-
 PRIVATE struct atomic_lock ostd_free_lock = ATOMIC_LOCK_INIT;
 PRIVATE struct atomic_lock osqh_free_lock = ATOMIC_LOCK_INIT;
 PRIVATE struct uhci_ostd *ostd_free = NULL;
@@ -3138,10 +3132,10 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	} else {
 		void *addr;
 		addr = mman_map(/* self:        */ &mman_kernel,
-		                /* hint:        */ HINT_GETADDR(KERNEL_MHINT_DEVICE),
+		                /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
 		                /* num_bytes:   */ 0x100,
 		                /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
-		                /* flags:       */ HINT_GETMODE(KERNEL_MHINT_DEVICE),
+		                /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
 		                /* file:        */ &mfile_phys,
 		                /* file_fspath: */ NULL,
 		                /* file_fsname: */ NULL,

@@ -379,11 +379,6 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 }
 
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 DATDEF VIRT byte_t volatile *x86_lapicbase_ ASMNAME("x86_lapicbase");
 
 PRIVATE NOBLOCK ATTR_FREETEXT void
@@ -461,9 +456,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	if (x86_lapic_mpart.mp_mem.mc_size != 0) {
 		byte_t *lapic_addr;
 		lapic_addr = (byte_t *)mman_findunmapped(&mman_kernel,
-		                                         HINT_GETADDR(KERNEL_MHINT_LAPIC),
+		                                         MHINT_GETADDR(KERNEL_MHINT_LAPIC),
 		                                         mpart_getsize(&x86_lapic_mpart),
-		                                         HINT_GETMODE(KERNEL_MHINT_LAPIC));
+		                                         MHINT_GETMODE(KERNEL_MHINT_LAPIC));
 		if unlikely(lapic_addr == MAP_FAILED)
 			kernel_panic(FREESTR("Failed to map the LAPIC somewhere\n"));
 		x86_lapic_mnode.mn_minaddr = lapic_addr;

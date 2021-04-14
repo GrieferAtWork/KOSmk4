@@ -69,7 +69,7 @@ struct chrdev;
 /* Filesystem/device type-tree:
  *
  * ```
- *   mfile                                         (TODO: replacement for `struct vm_datablock')
+ *   mfile
  *     |
  *     +---> fnode                                 (TODO: replacement for `struct inode')
  *             |

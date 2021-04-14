@@ -28,7 +28,6 @@
 #include <kernel/except.h>
 #include <kernel/mman/driver.h>
 #include <kernel/syscall.h>
-#include <kernel/vm.h>
 #include <sched/rpc.h>
 
 #include <kos/rtm.h>

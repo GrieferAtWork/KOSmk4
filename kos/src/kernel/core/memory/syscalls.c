@@ -58,11 +58,6 @@ STATIC_ASSERT(PROT_SHARED == VM_PROT_SHARED);
 STATIC_ASSERT(PROT_LOOSE  == VM_PROT_LOOSE);
 #endif /* VM_PROT_LOOSE */
 
-#define HINT_ADDR(x, y) x
-#define HINT_MODE(x, y) y
-#define HINT_GETADDR(x) HINT_ADDR x
-#define HINT_GETMODE(x) HINT_MODE x
-
 LOCAL void KCALL
 getdatablock_from_handle(unsigned int fd,
                          struct handle_mmap_info *__restrict info) {
@@ -141,7 +136,7 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
               syscall_ulong_t flags, fd_t fd, pos_t file_offset) {
 	byte_t *result;
 	uintptr_t result_offset;
-	REF struct vm_datablock *datablock;           /* [1..1] */
+	REF struct mfile *datablock;                  /* [1..1] */
 	REF struct path *datablock_fspath;            /* [0..1] */
 	REF struct directory_entry *datablock_fsname; /* [0..1] */
 	pos_t file_minoffset;
@@ -310,11 +305,11 @@ again_mapat:
 			if (!addr) {
 				/* Choose the hints for automatic mmap() target selection. */
 				if (flags & MAP_STACK) {
-					hint         = HINT_GETADDR(KERNEL_MHINT_USER_STACK);
-					getfree_mode = HINT_GETMODE(KERNEL_MHINT_USER_STACK);
+					hint         = MHINT_GETADDR(KERNEL_MHINT_USER_STACK);
+					getfree_mode = MHINT_GETMODE(KERNEL_MHINT_USER_STACK);
 				} else {
-					hint         = HINT_GETADDR(KERNEL_MHINT_USER_HEAP);
-					getfree_mode = HINT_GETMODE(KERNEL_MHINT_USER_HEAP);
+					hint         = MHINT_GETADDR(KERNEL_MHINT_USER_HEAP);
+					getfree_mode = MHINT_GETMODE(KERNEL_MHINT_USER_HEAP);
 				}
 			} else {
 				hint         = (void *)((uintptr_t)addr & ~PAGEMASK);
