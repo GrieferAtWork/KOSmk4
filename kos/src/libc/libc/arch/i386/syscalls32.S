@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe46b4414 */
+/* HASH CRC-32:0x59a1de73 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3105,7 +3105,7 @@ END(libc_sys_utimensat)
 DEFINE_PUBLIC_ALIAS(sys_utimensat, libc_sys_utimensat)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 INTERN_FUNCTION(libc_sys_signalfd)
 	movl   $(0x141), %eax
@@ -3157,7 +3157,7 @@ END(libc_sys_timerfd_gettime)
 DEFINE_PUBLIC_ALIAS(sys_timerfd_gettime, libc_sys_timerfd_gettime)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_signalfd4)
@@ -7567,7 +7567,7 @@ END(libc_sys_Xutimensat)
 DEFINE_PUBLIC_ALIAS(sys_Xutimensat, libc_sys_Xutimensat)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 INTERN_FUNCTION(libc_sys_Xsignalfd)
 	movl   $(0x141), %eax
@@ -7619,7 +7619,7 @@ END(libc_sys_Xtimerfd_gettime)
 DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_gettime, libc_sys_Xtimerfd_gettime)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xsignalfd4)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97ee75ef */
+/* HASH CRC-32:0xbca409e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,9 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+/* >> signalfd(2)
+ * Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd, sigset_t const *sigmask, __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */

@@ -21,6 +21,7 @@
 #define _I386_KOS_ASM_INTRIN_FPU_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9bdcaea */
+/* HASH CRC-32:0x716035ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,7 +191,7 @@
 #define __NR_pselect6               0x48  /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespec const *timeout, void const *sigmask_sigset_and_len) */
 #define __NR_ppoll                  0x49  /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespec const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 #define __NR_signalfd4              0x4a  /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
@@ -755,7 +755,7 @@
 #define __NR_inotify_init           0x413 /* errno_t inotify_init(int TODO_PROTOTYPE) */
 #define __NR_eventfd                0x414 /* fd_t eventfd(syscall_ulong_t initval) */
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 #define __NR_signalfd               0x415 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 #define __NR_sendfile               0x416 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define __NR_ftruncate              0x417 /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */

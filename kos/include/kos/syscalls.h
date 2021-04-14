@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5871fbe7 */
+/* HASH CRC-32:0x512ce874 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1350,12 +1350,12 @@ __CDECLARE_SC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sig
 #endif /* __CRT_HAVE_SC(sigaltstack) */
 #if __CRT_HAVE_SC(signalfd)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 __CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize),(__fd,__sigmask,__sigmasksize))
 #endif /* __CRT_HAVE_SC(signalfd) */
 #if __CRT_HAVE_SC(signalfd4)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 __CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_SC(signalfd4) */
@@ -2808,12 +2808,12 @@ __CDECLARE_XSC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct si
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
 #if __CRT_HAVE_XSC(signalfd)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 __CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize),(__fd,__sigmask,__sigmasksize))
 #endif /* __CRT_HAVE_XSC(signalfd) */
 #if __CRT_HAVE_XSC(signalfd4)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 __CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_XSC(signalfd4) */

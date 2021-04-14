@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa09aa743 */
+/* HASH CRC-32:0x89aa347d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9014,7 +9014,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_pwait)
 END(__x86_asm64_syscall_epoll_pwait)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.x86.asm64_syscall.signalfd
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd)
@@ -9251,7 +9251,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept4)
 END(__x86_asm64_syscall_accept4)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.signalfd4
@@ -23722,7 +23722,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
 END(__x86_asm32_int80_utimensat)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.x86.asm32_syscall_int80.signalfd
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd)
@@ -23930,7 +23930,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 END(__x86_asm32_int80_timerfd_gettime)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.signalfd4
@@ -32515,7 +32515,7 @@ END(__x86_asm32_sysenter_epoll_pwait)
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat, __x86_asm32_int80_utimensat)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signalfd, __x86_asm32_int80_signalfd)
 
@@ -32543,7 +32543,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime, __x86_asm32_int80
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime, __x86_asm32_int80_timerfd_gettime)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signalfd4, __x86_asm32_int80_signalfd4)
@@ -38673,7 +38673,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat)
 END(__x86_asm32_sysrun32_utimensat)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting thread/process. */
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.x86.asm32_syscall_sysrun32.signalfd
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signalfd)
@@ -38753,7 +38753,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime)
 END(__x86_asm32_sysrun32_timerfd_gettime)
 
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.signalfd4

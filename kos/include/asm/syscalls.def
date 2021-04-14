@@ -701,11 +701,11 @@ eventfd:(syscall_ulong_t initval) -> fd_t;
 eventfd2:(syscall_ulong_t initval, [tostr(EVENTFD2_FLAGS)] syscall_ulong_t flags) -> fd_t;
 
 @@Create a poll(2)-able file descriptor which can be used to wait for the
-@@delivery of signals masked by `SIGMASK' to the waiting thread/process.
+@@delivery of signals masked by `sigmask' to the waiting thread/process.
 signalfd:(fd_t fd, [tostr(STRUCT_SIGSET:sigmasksize)] struct __sigset_struct const *sigmask, size_t sigmasksize) -> errno_t;
 
 @@Create a poll(2)-able file descriptor which can be used to wait for the
-@@delivery of signals masked by `SIGMASK' to the waiting thread/process.
+@@delivery of signals masked by `sigmask' to the waiting thread/process.
 @@@param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
 signalfd4:(fd_t fd, [tostr(STRUCT_SIGSET:sigmasksize)] struct __sigset_struct const *sigmask,
            size_t sigmasksize, [tostr(SIGNALFD4_FLAGS)] syscall_ulong_t flags) -> errno_t;

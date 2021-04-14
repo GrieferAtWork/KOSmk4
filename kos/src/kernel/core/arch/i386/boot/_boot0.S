@@ -443,7 +443,7 @@ PRIVATE_OBJECT(boot0_gdt_ptr)
 END(boot0_gdt_ptr)
 PRIVATE_OBJECT(boot0_gdt)
 #define DEFINE_SEGMENT_DESCRIPTOR(TYPE, args) \
-	.long  SEGMENT_##TYPE##_INIT_UL args; \
+	.long  SEGMENT_##TYPE##_INIT_UL args;     \
 	.long  SEGMENT_##TYPE##_INIT_UH args;
 1:	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 	DEFINE_SEGMENT_DESCRIPTOR(DESCRIPTOR, (0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 1, 1)) /* protected-mode */

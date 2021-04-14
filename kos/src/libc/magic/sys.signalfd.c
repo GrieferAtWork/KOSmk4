@@ -100,8 +100,9 @@ typedef struct __sigset_struct sigset_t;
 
 }
 
+@@>> signalfd(2)
 @@Create a poll(2)-able file descriptor which can be used to wait for the
-@@delivery of signals masked by `SIGMASK' to the waiting thread/process.
+@@delivery of signals masked by `sigmask' to the waiting thread/process.
 @@@param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
 [[wunused, decl_include("<features.h>", "<bits/os/sigset.h>")]]
 $fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *sigmask,
