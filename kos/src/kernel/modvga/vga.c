@@ -32,7 +32,6 @@
 #include <kernel/mman.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/printk.h>
 #include <kernel/user.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -1218,7 +1217,6 @@ again_dotab:
 						 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
 						 *               by the caller already happened implicitly, thus not creating an entirely
 						 *               empty line and wasting what little screen space we only have. */
-						printk(KERN_DEBUG "SKIP_LINEFEED\n");
 					} else
 #endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 					{

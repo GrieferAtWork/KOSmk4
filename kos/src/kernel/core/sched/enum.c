@@ -764,10 +764,10 @@ err:
 }
 
 
-PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
-NOTHROW(FCALL taskpid_inns)(struct taskpid *__restrict self,
-                            struct pidns *__restrict ns) {
-	struct pidns *iter;
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL taskpid_inns)(struct taskpid const *__restrict self,
+                            struct pidns const *__restrict ns) {
+	struct pidns const *iter;
 	iter = self->tp_pidns;
 	do {
 		if (iter == ns)

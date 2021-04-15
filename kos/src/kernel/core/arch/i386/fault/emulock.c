@@ -193,6 +193,11 @@ x86_emulock_cmpxch(struct icpustate **__restrict pstate,
 	byte_t real_oldval[EMULOCK_MAXBYTES];
 again:
 	was = PREEMPTION_PUSHOFF();
+	/* TODO: In SMP, we must send a (preferably async) IPI to all other
+	 *       CPUs, and tell them to temporarily halt what they're doing
+	 *       until we're done here.
+	 *       That's the only way to ensure that what we do in here will
+	 *       really happen atomically! */
 	bus_acquirelock();
 	error = memcpy_nopf(real_oldval, addr, num_bytes);
 	if unlikely(error != 0)
@@ -257,8 +262,8 @@ handle_vio_or_not_faulted:
 		}
 #ifdef LIBVIO_CONFIG_ENABLED
 		node_minaddr = mnode_getminaddr(node);
-		part_minaddr = mpart_getminaddr(part);
 		part         = incref(node->mn_part);
+		part_minaddr = mpart_getminaddr(part);
 #endif /* LIBVIO_CONFIG_ENABLED */
 		sync_endread(effective_mman);
 #ifdef LIBVIO_CONFIG_ENABLED

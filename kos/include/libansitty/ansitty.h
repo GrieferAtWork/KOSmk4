@@ -81,12 +81,7 @@
  *   - '\r' (from termios / for display):
  *     - Always forwarded as unchanged
  *   - '\n' (from termios / for display):
- *     - After "\e[20h":
- *       - Forwarded as unchanged (default)
- *     - After "\e[20l":
- *       - Emulated as same-column  line-feed by  using the  SETCURSOR()
- *         operation after posting a \n-character to the display driver.
- *       - This mode really shouldn't be used, but exists for compatibility
+ *     - Always forwarded as unchanged
  * display:
  *   - '\r' (from ansitty):
  *     >> SET_COLUMN(0);
@@ -97,7 +92,7 @@
  *     >> } else {
  *     >>     SET_ROW(GET_ROW() + 1);
  *     >> }
- *     >> SET_COLUMN(0);
+ *     >> SET_COLUMN(GET_COLUMN()); // Keep the old column index
  */
 
 
@@ -148,18 +143,22 @@
  * Explanation:
  *   - `\030'  -- AC_CAN: Cancel (forces the state machine to abort any in-progress sequence and
  *                                reset itself to accept text or the start of an escape sequence)
- *   - `\033c' -- AC_RIS: Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
- *                        However, this will not clear the screen, or reset the cursor position
- *                        (though it will make the cursor visible). Both of this actions can be
- *                        performed by using `AC_CUP0' and `AC_ED("")'
+ *   - `\033c' -- AC_RIS: Reset  TTY (resets colors, display-attributes, tty-flags and tty-mode)
+ *                        However, this will not clear the screen, or reset the cursor  position
+ *                        (though it will make the cursor visible). If wanted, the cursor can be
+ *                        reset with `AC_CUP0', and the screen be cleared with `AC_ED("")'
  */
 #define ANSITTY_RESET_SEQUENCE "\030\033c" /* == AC_CAN AC_RIS */
 
+
+/* Values for `struct ansitty_operators::ato_cls::mode' */
 #define ANSITTY_CLS_AFTER    0 /* Clear everything after the cursor (including the cursor itself). */
 #define ANSITTY_CLS_BEFORE   1 /* Clear everything before the cursor (excluding the cursor itself). */
 #define ANSITTY_CLS_ALL      2 /* Clear everything. */
 #define ANSITTY_CLS_ALLPAGES 3 /* Clear everything including the scroll-back buffers. */
 
+
+/* Values for `struct ansitty_operators::ato_el::mode' */
 #define ANSITTY_EL_AFTER  0 /* Erase the line after the cursor (including the cursor itself). */
 #define ANSITTY_EL_BEFORE 1 /* Erase the line before the cursor (excluding the cursor itself). */
 #define ANSITTY_EL_ALL    2 /* Erase the line. */
@@ -207,13 +206,15 @@ struct termios;
 
 struct ansitty_operators {
 	/* [1..1] Output a single unicode character.
-	 * This   also   includes   the  control   control   characters  `BEL,LF,CR,TAB,BS'
-	 * Note  that  LF   should  be  interpreted   as  next-line  w/o   carriage-return,
-	 * as  the  LF=CRLF  behavior should  be  implemented using  `ONLCR'.  Note however
-	 * that  LF not resetting  the carriage is not  mandatory in controlled situations.
-	 * libansitty won't care as to what is the actual behavior, however some user-space
-	 * programs using the  terminal may depend  on LF not  resetting the carriage  when
-	 * the   terminal   is   in   `cfmakeraw()'   mode   (such   as    busybox:hexedit)
+	 * This  also includes the control control characters `BEL,LF,CR,TAB,BS'
+	 * Note that LF should be interpreted as next-line w/o  carriage-return,
+	 * as  the LF=CRLF  behavior should  be implemented  using `ONLCR'. Note
+	 * however  that  LF  not resetting  the  carriage is  not  mandatory in
+	 * controlled situations. libansitty won't care as to what is the actual
+	 * behavior, however  some user-space  programs using  the terminal  may
+	 * depend  on  LF not  resetting the  carriage when  the terminal  is in
+	 * `cfmakeraw()' mode (such as busybox:hexedit)
+	 *
 	 * In practice, this means:
 	 *  - Ansitty drivers should implement LF as not resetting CURSOR.X,
 	 *    and so should any other  component that feeds input through  a
@@ -226,6 +227,7 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_putc)(struct ansitty *__restrict self,
 	                               __CHAR32_TYPE__ ch);
+
 	/* [0..1] Set the position of the cursor.
 	 * NOTE: The given `x'  and `y'  must be clamped  to COLUMNS-1/ROWS-1,  meaning
 	 *       that `(*ato_setcursor)(tty, (ansitty_coord_t)-1, (ansitty_coord_t)-1)'
@@ -237,12 +239,14 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_setcursor)(struct ansitty *__restrict self,
 	                                    ansitty_coord_t x, ansitty_coord_t y,
 	                                    __BOOL update_hw_cursor);
+
 	/* [0..1] Returns the position of the cursor.
 	 * @param: ppos[0]: Store X-position here.
 	 * @param: ppos[1]: Store Y-position here. */
 	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_getcursor)(struct ansitty *__restrict self,
 	                                    ansitty_coord_t ppos[2]);
+
 	/* [0..1] Returns the size of the terminal.
 	 * NOTE: When implementing this function, you are _required_ never to fill
 	 *       in  either psize[0] or psize[1] with ZERO(0). Doing so will cause
@@ -253,6 +257,7 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_getsize)(struct ansitty *__restrict self,
 	                                  ansitty_coord_t psize[2]);
+
 	/* [0..1] Copy the contents of cells starting at CURSOR into cells at
 	 *        CURSOR+dst_offset (added together  such that values  beyond
 	 *        the left/right border of the screen will wrap around to the
@@ -264,6 +269,7 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_copycell)(struct ansitty *__restrict self,
 	                                   ansitty_offset_t dst_offset,
 	                                   ansitty_coord_t count);
+
 	/* [0..1] Print the given character `ch' (which is always a graphical
 	 *        character, rather than a control character) up to `count'
 	 *        times, without ever scrolling, and stopping if the end of
@@ -273,6 +279,7 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_fillcell)(struct ansitty *__restrict self,
 	                                   __CHAR32_TYPE__ ch,
 	                                   ansitty_coord_t count);
+
 	/* [0..1] Shift terminal lines by offset, where a positive value shifts
 	 *        lines up (like a \n at the bottom of the screen would), and a
 	 *        negative value shifts them downwards.
@@ -283,32 +290,38 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_scroll)(struct ansitty *__restrict self,
 	                                 ansitty_offset_t offset);
+
 	/* [0..1] Clear text from the screen.
 	 * @param: mode: One of `ANSITTY_CLS_*' */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_cls)(struct ansitty *__restrict self, unsigned int mode);
+
 	/* [0..1] Clear text from the current line.
 	 * @param: mode: One of `ANSITTY_EL_*' */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_el)(struct ansitty *__restrict self, unsigned int mode);
+
 	/* [0..1] Set the current text color.
 	 * Called whenever a different color is selected.
 	 * @param: color: == */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setcolor)(struct ansitty *__restrict self,
 	                                   __uint8_t color);
+
 	/* [0..1] Set the current text attributes.
 	 * Called whenever text attributes change.
 	 * @param: new_attrib: == self->at_attrib */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setattrib)(struct ansitty *__restrict self,
 	                                    __uint16_t new_attrib);
+
 	/* [0..1] Set  the  current  tty   mode.
 	 * Called whenever the tty mode changes.
 	 * @param: new_ttymode: == self->at_ttymode */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setttymode)(struct ansitty *__restrict self,
 	                                     __uint16_t new_ttymode);
+
 	/* [0..1] Set the scroll region (s.a. `ato_scroll()')
 	 * Called   whenever   the  scroll   region  changes.
 	 * @param: start_line: == self->at_scroll_sl
@@ -317,10 +330,12 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_scrollregion)(struct ansitty *__restrict self,
 	                                       ansitty_coord_t start_line,
 	                                       ansitty_coord_t end_line);
+
 	/* [0..1] Set the window title of the terminal. */
 	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
 	                                   /*utf-8*/ char const *__restrict text);
+
 	/* [0..1] Output `data' to the slave process (`write(amaster, data, datalen)';
 	 *        amaster from <pty.h>:openpty, or alternatively identical to keyboard
 	 *        input).
@@ -330,6 +345,7 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_output)(struct ansitty *__restrict self,
 	                                 void const *data, __size_t datalen);
+
 	/* [0..1] Turn LEDs on/off, such that NEW_LEDS = (OLD_LEDS & mask) | flag.
 	 * For  this purpose,  both mask and  flag are bitsets  of LEDs enumerated
 	 * from 0 to 3 (yes:  that's 4 leds, and I  don't know what that 4'th  led
@@ -342,6 +358,7 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setled)(struct ansitty *__restrict self,
 	                                 __uint8_t mask, __uint8_t flag);
+
 	/* [0..1] Try to get/set the terminal IOS descriptor of the associated terminal.
 	 * This function can be used in 2 different modes:
 	 *  - newios == NULL:

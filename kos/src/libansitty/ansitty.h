@@ -34,9 +34,7 @@
 
 DECL_BEGIN
 
-/* Initialize the given ANSI TTY
- * After calling this function, the caller is still responsible
- * to  initialize  at the  very  least `self->at_ops.ato_putc'. */
+/* Initialize the given ANSI TTY */
 INTDEF NONNULL((1, 2)) void CC
 libansitty_init(struct ansitty *__restrict self,
                 struct ansitty_operators const *__restrict ops);

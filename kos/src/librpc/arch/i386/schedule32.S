@@ -171,8 +171,8 @@ __ASM_L(	.cfi_escape 0x16,0x04,0x04,0x54,0x06,0x23,0x1c)
 
 #define SYSINFO(off) (-SIZEOF_RPC_SYSCALL_INFO+(off))(%ebp)
 	/* Repeat the interrupted system call. */
-	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_SYSNO), %eax
-	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_REG(0)), %eax
+	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_SYSNO),  %eax
+	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_REG(0)), %ebx
 	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_REG(1)), %ecx
 	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_REG(2)), %edx
 	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_REG(3)), %esi

@@ -29,9 +29,10 @@
 #include <dev/keyboard.h>
 #include <kernel/compat.h>
 #include <kernel/except.h>
+#include <kernel/mman/nopf.h>
+#include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
-#include <kernel/mman/nopf.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>

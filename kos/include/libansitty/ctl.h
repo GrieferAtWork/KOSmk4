@@ -182,7 +182,7 @@
 /* SCROLL_DOWN(lines: <decimal:lines=1>); (move existing lines downwards) */
 #define AC_SD(lines) _AC_ESC "[" lines "T"
 
-/* Same as `AC_VPA(cury) AC_CHA(cury)' */
+/* Same as `AC_VPA(cury) AC_CHA(curx)' */
 #define AC_CUP(cury, curx) _AC_ESC "[" cury ";" curx "H" /* CUrsorPosition */
 #define AC_HVP(cury, curx) _AC_ESC "[" cury ";" curx "f" /* HorizontalVerticalPosition (alias for CUP) */
 
@@ -190,41 +190,45 @@
 #define AC_CUP0   _AC_ESC "[H"
 
 /* Make room for <decimal:n=1> characters at current position
+ * Examples (for `AC_ICH("3")'):
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=0]
  * >>     123456789       123456789
- * >>     ABCDEFGHI  -->  ABCD...EF
+ * >>     ABCD𝐄FGHI  -->  ABCD▂  EF
  * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=1]
  * >>     123456789       123456789
- * >>     ABCDEFGHI  -->  ABCD...EF
+ * >>     ABCD𝐄FGHI  -->  ABCD▂  EF
  * >>     abcdefghi       GHIabcdef
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=0]
  * >>     123456789       123456789
- * >>     ABCDEFGHI  -->  D...EFGHI
+ * >>     ABCD𝐄FGHI  -->  D   𝐄FGHI
  * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=1]
  * >>     123456789       456789ABC
- * >>     ABCDEFGHI  -->  D...EFGHI
- * >>     abcdefghi       abcdefghi */
+ * >>     ABCD𝐄FGHI  -->  D   𝐄FGHI
+ * >>     abcdefghi       abcdefghi
+ * NOTE: Cursor is positioned at the 𝐁𝐎𝐋𝐃 character! */
 #define AC_ICH(n) _AC_ESC "[" n "@"
 
 /* Delete <decimal:n=1> characters, from current position to end of field
+ * Examples (for `AC_DCH("3")'):
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=0]
  * >>     123456789       123456789
- * >>     ABCDEFGHI  -->  ABCDHI...
+ * >>     ABCD𝐄FGHI  -->  ABCD𝐇I
  * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=0, ANSITTY_FLAG_INSDEL_SCRN=1]
  * >>     123456789       123456789
- * >>     ABCDEFGHI  -->  ABCDHIabc
- * >>     abcdefghi       defghi...
+ * >>     ABCD𝐄FGHI  -->  ABCD𝐇Iabc
+ * >>     abcdefghi       defghi
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=0]
  * >>     123456789       123456789
- * >>     ABCDEFGHI  -->  ...AEFGHI
+ * >>     ABCD𝐄FGHI  -->     A𝐄FGHI
  * >>     abcdefghi       abcdefghi
  * [ANSITTY_FLAG_HEDIT=1, ANSITTY_FLAG_INSDEL_SCRN=1]
- * >>     123456789       ...123456
- * >>     ABCDEFGHI  -->  789AEFGHI
- * >>     abcdefghi       abcdefghi */
+ * >>     123456789          123456
+ * >>     ABCD𝐄FGHI  -->  789A𝐄FGHI
+ * >>     abcdefghi       abcdefghi
+ * NOTE: Cursor is positioned at the 𝐁𝐎𝐋𝐃 character! */
 #define AC_DCH(n) _AC_ESC "[" n "P"
 
 /* Insert <decimal:n=1> lines if currently in scrolling region */
@@ -271,7 +275,7 @@
 #define AC_IRM_ON     _AC_ESC "[4h"   /* Insertion/Replacement Mode, set insert mode (behaves as though any printable character was preceded by `AC_ICH("1")') */
 #define AC_IRM_OFF    _AC_ESC "[4l"   /* Insertion/Replacement Mode, set replacement mode */
 #define AC_HEM_ON     _AC_ESC "[10h"  /* Horizontal Editing mode, ICH/DCH/IRM go backwards (ANSITTY_FLAG_HEDIT=1) */
-#define AC_HEM_OFF    _AC_ESC "[10l"  /* ICH and IRM shove characters forward, DCH pulls HEM (ANSITTY_FLAG_HEDIT=0) */
+#define AC_HEM_OFF    _AC_ESC "[10l"  /* ICH and IRM shove characters forward, DCH pulls (ANSITTY_FLAG_HEDIT=0) */
 
 
 /* Set (1-based) start/end column indices for scroll margins

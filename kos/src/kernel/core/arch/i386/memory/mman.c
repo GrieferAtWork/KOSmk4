@@ -394,8 +394,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 		byte_t *minaddr, *maxaddr;
 		minaddr = (byte_t *)(X86_MMAN_KERNEL_PDIR_RESERVED_BASE);
 		maxaddr = minaddr + X86_MMAN_KERNEL_PDIR_RESERVED_SIZE - 1;
-		&x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE].mn_minaddr = minaddr;
-		&x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE].mn_maxaddr = maxaddr;
+		x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE].mn_minaddr = minaddr;
+		x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE].mn_maxaddr = maxaddr;
 	}
 #endif /* X86_MMAN_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 

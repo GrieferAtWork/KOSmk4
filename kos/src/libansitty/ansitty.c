@@ -54,6 +54,19 @@
 #include <sys/syslog.h>
 #endif /* !__KERNEL__ */
 
+/* String to integer helper functions */
+#undef strtoi
+#undef strtoui
+#if __SIZEOF_INT__ == 4
+#define strtoi  strto32
+#define strtoui strtou32
+#elif __SIZEOF_INT__ == 8
+#define strtoi  strto64
+#define strtoui strtou64
+#else /* __SIZEOF_INT__ == ... */
+#define strtoi  (int)strtol
+#define strtoui (unsigned int)strtoul
+#endif /* __SIZEOF_INT__ != ... */
 
 #undef CONFIG_HIDE_CURSOR_DURING_NAVIGATION
 /* Hide the  terminal cursor  while  navigating to  gather  information
@@ -108,7 +121,7 @@ DECL_BEGIN
 	do {                                                                             \
 		LOG_SYSTEM_WARNING("[ansitty] race detected (%s:%d)\n", __FILE__, __LINE__); \
 		goto err;                                                                    \
-	} __WHILE0
+	}	__WHILE0
 #else
 #define RACE(err) goto err
 #endif
@@ -194,21 +207,21 @@ DECL_BEGIN
 
 /* Code page codes. */
 #define SET_CP(id) \
-	(self->at_codepage = id, self->at_state = STATE_TEXT)
-#define CP_UTF8             0 /* \e(B   -- UTF-8 (well, actually it's ASCII, but we extend it as utf-8) */
-#define CP_LDM              1 /* \e(0   -- DEC Special Character and Line Drawing Set, VT100. */
-#define CP_LATIN1           2 /* \e(A   -- United Kingdom (UK), VT100. */
-#define CP_DUTCH            3 /* \e(4   -- Dutch, VT200. */
-#define CP_FINNISH          4
-#define CP_FRENCH           5
-#define CP_FRENCH_CANADIAN  6
-#define CP_GERMAN           7
-#define CP_ITALIAN          8
-#define CP_NORWEGIAN        9
-#define CP_PORTUGUESE      10
-#define CP_SPANISH         11
-#define CP_SWEDISH         12
-#define CP_SWISS           13
+	(self->at_codepage = (id), self->at_state = STATE_TEXT)
+#define CP_UTF8             0 /* \e(B               -- UTF-8 (well, actually it's ASCII, but we extend it as utf-8) */
+#define CP_LDM              1 /* \e(0               -- DEC Special Character and Line Drawing Set, VT100. */
+#define CP_LATIN1           2 /* \e(A               -- United Kingdom (UK), VT100. */
+#define CP_DUTCH            3 /* \e(4               -- Dutch, VT200. */
+#define CP_FINNISH          4 /* \e(5  \e(C         -- Finnish, VT200. */
+#define CP_FRENCH           5 /* \e(f  \e(R         -- French, VT200. */
+#define CP_FRENCH_CANADIAN  6 /* \e(9  \e(Q         -- French Canadian, VT200. */
+#define CP_GERMAN           7 /* \e(K               -- German, VT200. */
+#define CP_ITALIAN          8 /* \e(Y               -- Italian, VT200. */
+#define CP_NORWEGIAN        9 /* \e(`  \e(E  \e(6   -- Norwegian, VT200. */
+#define CP_PORTUGUESE      10 /* \e(%6              -- Portuguese, VT300. */
+#define CP_SPANISH         11 /* \e(T               -- Spanish, VT200. */
+#define CP_SWEDISH         12 /* \e(7  \e(H         -- Swedish, VT200. */
+#define CP_SWISS           13 /* \e(=               -- Swiss, VT200. */
 
 STATIC_ASSERT_MSG(CP_UTF8 == 0,
                   "CP=0 meaning UTF-8 appears in documentation "
@@ -240,7 +253,7 @@ STATIC_ASSERT_MSG(CP_UTF8 == 0,
 			self->at_ttymode = _old_ttymode;             \
 			SETTTYMODE(_old_ttymode);                    \
 		}                                                \
-	} __WHILE0
+	}	__WHILE0
 #else /* CONFIG_HIDE_CURSOR_DURING_NAVIGATION */
 #define HIDECURSOR_BEGIN() do
 #define HIDECURSOR_END()   __WHILE0
@@ -444,9 +457,7 @@ stub_scroll(struct ansitty *__restrict self,
 
 
 
-/* Initialize the given ANSI TTY
- * After calling this function, the caller is still responsible
- * to  initialize  at the  very  least `self->at_ops.ato_putc'. */
+/* Initialize the given ANSI TTY */
 INTERN NONNULL((1, 2)) void CC
 libansitty_init(struct ansitty *__restrict self,
                 struct ansitty_operators const *__restrict ops) {
@@ -940,8 +951,8 @@ ansi_OSC(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	char *pos;
 	unsigned int code;
-	code = (unsigned int)strtoul(arg, &pos, 10);
-	if (*pos == ';' && pos + 1 == arg + arglen) {
+	code = strtoui(arg, &pos, 10);
+	if (*pos == ';' && pos + 1 < arg + arglen) {
 		switch (code) {
 
 		case 0: /* Set icon name and window title */
@@ -962,7 +973,7 @@ ansi_OSC(struct ansitty *__restrict self,
 PRIVATE bool CC
 ansi_DCS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
-	/* TODO */
+	/* ??? */
 	(void)self;
 	(void)arg;
 	(void)arglen;
@@ -973,7 +984,7 @@ ansi_DCS(struct ansitty *__restrict self,
 PRIVATE bool CC
 ansi_SOS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
-	/* TODO */
+	/* ??? */
 	(void)self;
 	(void)arg;
 	(void)arglen;
@@ -984,7 +995,7 @@ ansi_SOS(struct ansitty *__restrict self,
 PRIVATE bool CC
 ansi_PM(struct ansitty *__restrict self,
         char *__restrict arg, size_t arglen) {
-	/* TODO */
+	/* ??? */
 	(void)self;
 	(void)arg;
 	(void)arglen;
@@ -995,7 +1006,7 @@ ansi_PM(struct ansitty *__restrict self,
 PRIVATE bool CC
 ansi_APC(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
-	/* TODO */
+	/* ??? */
 	(void)self;
 	(void)arg;
 	(void)arglen;
@@ -1062,15 +1073,15 @@ do_ident_DA(struct ansitty *__restrict self) {
 }
 
 
-#define ARGUMENT_CODE_SWITCH_BEGIN()                                  \
-	{                                                                 \
-		unsigned int code;                                            \
-		char *_args_iter, *_args_end;                                 \
-		_args_iter = arg;                                             \
-		for (;;) {                                                    \
-			code = (unsigned int)strtoul(_args_iter, &_args_end, 10); \
-			if (*_args_end != ';' && _args_end != arg + arglen)       \
-				goto nope;                                            \
+#define ARGUMENT_CODE_SWITCH_BEGIN()                            \
+	{                                                           \
+		unsigned int code;                                      \
+		char *_args_iter, *_args_end;                           \
+		_args_iter = arg;                                       \
+		for (;;) {                                              \
+			code = strtoui(_args_iter, &_args_end, 10);         \
+			if (*_args_end != ';' && _args_end != arg + arglen) \
+				goto nope;                                      \
 			switch (code) {
 #define ARGUMENT_CODE_SWITCH_END()         \
 			default: goto nope;            \
@@ -1081,25 +1092,25 @@ do_ident_DA(struct ansitty *__restrict self) {
 		}                                  \
 	}
 
-#define ARGUMENT_CODE_QSWITCH_BEGIN()                                     \
-	{                                                                     \
-		unsigned int code;                                                \
-		char *_args_iter, *_args_end;                                     \
-		_args_iter = arg;                                                 \
-		for (;;) {                                                        \
-			if (*_args_iter == '?') {                                     \
-				++_args_iter;                                             \
-				code = (unsigned int)strtoul(_args_iter, &_args_end, 10); \
-				if (*_args_end != ';' && _args_end != arg + arglen)       \
-					goto nope;                                            \
+#define ARGUMENT_CODE_QSWITCH_BEGIN()                               \
+	{                                                               \
+		unsigned int code;                                          \
+		char *_args_iter, *_args_end;                               \
+		_args_iter = arg;                                           \
+		for (;;) {                                                  \
+			if (*_args_iter == '?') {                               \
+				++_args_iter;                                       \
+				code = strtoui(_args_iter, &_args_end, 10);         \
+				if (*_args_end != ';' && _args_end != arg + arglen) \
+					goto nope;                                      \
 				switch (code) {
-#define ARGUMENT_CODE_QSWITCH_ELSE()                                      \
-				default: goto nope;                                       \
-				}                                                         \
-			} else {                                                      \
-				code = (unsigned int)strtoul(_args_iter, &_args_end, 10); \
-				if (*_args_end != ';' && _args_end != arg + arglen)       \
-					goto nope;                                            \
+#define ARGUMENT_CODE_QSWITCH_ELSE()                                \
+				default: goto nope;                                 \
+				}                                                   \
+			} else {                                                \
+				code = strtoui(_args_iter, &_args_end, 10);         \
+				if (*_args_end != ';' && _args_end != arg + arglen) \
+					goto nope;                                      \
 				switch (code) {
 #define ARGUMENT_CODE_QSWITCH_END()        \
 				default: goto nope;        \
@@ -1176,7 +1187,7 @@ ansi_CSI(struct ansitty *__restrict self,
 				n = 1;
 			else {
 				char *end;
-				n = (int)strtol(arg, &end, 10);
+				n = strtoi(arg, &end, 10);
 				if unlikely(end != arg + arglen - 1)
 					goto nope;
 			}
@@ -1193,7 +1204,7 @@ ansi_CSI(struct ansitty *__restrict self,
 				n = 1;
 			else {
 				char *end;
-				n = (int)strtol(arg, &end, 10);
+				n = strtoi(arg, &end, 10);
 				if unlikely(end != arg + arglen - 1)
 					goto nope;
 			}
@@ -1226,7 +1237,7 @@ do_single_argument_case:
 			n = 1;
 		else {
 			char *end;
-			n = (int)strtol(arg, &end, 10);
+			n = strtoi(arg, &end, 10);
 			if unlikely(end != arg + arglen)
 				goto nope;
 		}
@@ -1540,18 +1551,18 @@ done_insert_ansitty_flag_hedit:
 				if (arglen == 1)
 					x = 1;
 				else {
-					x = (int)strtol(arg + 1, &end, 10);
+					x = strtoi(arg + 1, &end, 10);
 					if unlikely(end != arg + arglen)
 						goto nope;
 				}
 			} else {
-				y = (int)strtol(arg, &end, 10);
+				y = strtoi(arg, &end, 10);
 				if (end >= arg + arglen) {
 					x = 1; /* \e[10f */
 				} else {
 					if (end[0] != ';')
 						goto nope;  /* \e[10;20f --or-- \e[10;f */
-					x = (int)strtol(end + 1, &end, 10);
+					x = strtoi(end + 1, &end, 10);
 				}
 				if unlikely(end != arg + arglen)
 					goto nope;
@@ -2129,15 +2140,15 @@ done_insert_ansitty_flag_hedit:
 				++_args_end;
 				if (color_mode == 2) {
 					unsigned int r, g, b;
-					r = (unsigned int)strtoul(_args_end, &_args_end, 10);
+					r = strtoui(_args_end, &_args_end, 10);
 					if (*_args_end != ';')
 						goto nope;
 					++_args_end;
-					g = (unsigned int)strtoul(_args_end, &_args_end, 10);
+					g = strtoui(_args_end, &_args_end, 10);
 					if (*_args_end != ';')
 						goto nope;
 					++_args_end;
-					b = (unsigned int)strtoul(_args_end, &_args_end, 10);
+					b = strtoui(_args_end, &_args_end, 10);
 					if (*_args_end != ';' && _args_end != arg + arglen)
 						goto nope;
 					++_args_end;
@@ -2152,7 +2163,7 @@ done_insert_ansitty_flag_hedit:
 					                                       (uint8_t)b);
 				} else {
 					/*assert(color_mode == 5);*/
-					used_color_index = (unsigned int)strtoul(_args_end, &_args_end, 10);
+					used_color_index = strtoui(_args_end, &_args_end, 10);
 					if (*_args_end != ';' && _args_end != arg + arglen)
 						goto nope;
 				}
@@ -2261,7 +2272,7 @@ done_insert_ansitty_flag_hedit:
 			/* `CSI Ps $ p'      DECRQM: Request ANSI mode */
 			unsigned int name;
 			char *end;
-			name = (unsigned int)strtoul(arg, &end, 10);
+			name = strtoui(arg, &end, 10);
 			if (end == arg + arglen - 1) {
 				/* reply DECRPM: `CSI Ps; Pm$ y'
 				 * PS = ECHO `name'
@@ -2410,14 +2421,14 @@ done_insert_ansitty_flag_hedit:
 				endcolumn   = MAXCOORD;
 			} else {
 				char *end;
-				startcolumn = (ansitty_coord_t)strtoul(arg, &end, 10);
+				startcolumn = (ansitty_coord_t)strtou32(arg, &end, 10);
 				if (*end != ';')
 					goto nope;
 				++end;
 				if (end == arg + arglen)
 					endcolumn = MAXCOORD;
 				else {
-					endcolumn = (ansitty_coord_t)strtoul(end, &end, 10);
+					endcolumn = (ansitty_coord_t)strtou32(end, &end, 10);
 					if (end != arg + arglen)
 						goto nope;
 				}
@@ -2454,14 +2465,14 @@ done_insert_ansitty_flag_hedit:
 			endline   = MAXCOORD;
 		} else {
 			char *end;
-			startline = (ansitty_coord_t)strtoul(arg, &end, 10);
+			startline = (ansitty_coord_t)strtou32(arg, &end, 10);
 			if (*end != ';')
 				goto nope;
 			++end;
 			if (end == arg + arglen)
 				endline = MAXCOORD;
 			else {
-				endline = (ansitty_coord_t)strtoul(end, &end, 10);
+				endline = (ansitty_coord_t)strtou32(end, &end, 10);
 				if (end != arg + arglen)
 					goto nope;
 #if 0 /* The bottom-line  is actually  the  index of  the  last
@@ -2495,7 +2506,7 @@ done_insert_ansitty_flag_hedit:
 			count = 1;
 		else {
 			char *end;
-			count = (unsigned int)strtoul(arg, &end, 10);
+			count = strtoui(arg, &end, 10);
 			if (end != arg + arglen)
 				goto nope;
 		}
@@ -3125,7 +3136,6 @@ do_process_csi:
 			if (!ansitty_invoke_string_command(self, state, len)) {
 				WARN_UNKNOWN_SEQUENCE4(get_string_command_start_character(state),
 				                       len, self->at_escape, CC_ESC, ch);
-				goto set_text_and_done;
 			}
 			goto set_text_and_done;
 		} else if (ch == CC_CAN) { /* Cancel */
