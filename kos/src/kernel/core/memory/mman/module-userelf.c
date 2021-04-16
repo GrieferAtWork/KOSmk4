@@ -1857,6 +1857,7 @@ uem_trycreate(struct mman *__restrict self,
 		unsigned int i;
 		mpart_lock_release(part);
 		for (i = 0; i < 2; ++i) {
+			void *minaddr, *maxaddr;
 			struct mnode *neighbor;
 			if (i == skipped_neighbor)
 				continue; /* Skip this neighbor. */
@@ -1869,7 +1870,6 @@ uem_trycreate(struct mman *__restrict self,
 			if (i == 0 ? mnode_getendaddr(neighbor) != mnode_getaddr(node)
 			           : mnode_getaddr(neighbor) != mnode_getendaddr(node))
 				continue; /* Not an immediate neighbor. */
-			void *minaddr, *maxaddr;
 			minaddr = mnode_getminaddr(node);
 			maxaddr = mnode_getmaxaddr(node);
 			/* Don't let the recursive call bounce back the call to our
@@ -1898,7 +1898,7 @@ uem_trycreate(struct mman *__restrict self,
 		}
 		if (did_unlock) {
 			mman_lock_release(self);
-			return UEM_TRYCREATE_UNLOCKED;
+			return UEM_TRYCREATE_UNLOCKED_NOUEM;
 		}
 		return NULL;
 	}
@@ -1945,7 +1945,7 @@ uem_trycreate(struct mman *__restrict self,
 		mpart_lock_release(part);
 		if (did_unlock) {
 			mman_lock_release(self);
-			return UEM_TRYCREATE_UNLOCKED;
+			return UEM_TRYCREATE_UNLOCKED_NOUEM;
 		}
 		return NULL;
 	}
