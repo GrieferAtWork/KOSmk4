@@ -54,6 +54,15 @@
 #include "include/malloc.h"
 #include "include/obnote.h"
 
+/* Support for `x86_phys2virt64_node' */
+#undef HAVE_X86_PHYS2VIRT64_NODE
+#if defined(__i386__) || defined(__x86_64__)
+#include <kernel/x86/phys2virt64.h> /* x86_phys2virt64_node */
+#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+#define HAVE_X86_PHYS2VIRT64_NODE
+#endif /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#endif /* __i386__ || __x86_64__ */
+
 DECL_BEGIN
 
 
@@ -1234,8 +1243,8 @@ print_named_pointer(struct ctyperef const *__restrict self,
 			}
 			/* We know that the pointer (should) be located in one of the  module's
 			 * sections. As such, try to check if we can determine the section that
-			 * the point points into, so we can print a hint:
-			 * >> 0x12345678 (libc.so!.text+54321) */
+			 * the pointer points into, so we can print a hint:
+			 * >> 0x12345678 (libc.so!.text+0x54321) */
 			{
 				char const *section_name;
 				uintptr_t section_offset;
@@ -1266,11 +1275,49 @@ print_named_pointer(struct ctyperef const *__restrict self,
 		if (ADDR_ISUSER(ptr) && ADDR_ISKERN(dbg_current))
 			effective_mman = dbg_current->t_mman;
 		is_void_pointer = true;
-		if (ADDR_ISKERN(effective_mman) &&
+		if ((effective_mman && ADDR_ISKERN(effective_mman)) &&
 		    (node = mman_mappings_locate(effective_mman, ptr)) != NULL &&
-		    (node->mn_part != NULL)) {
+		    (node->mn_mman == effective_mman)) {
 			is_void_pointer = false;
-			if (node->mn_fsname) {
+#ifdef HAVE_X86_PHYS2VIRT64_NODE
+			if (node == &x86_phys2virt64_node) {
+				/* Special case: On x86_64, there  exists a mnode that  has
+				 * some  special handling within  the #PF handler, allowing
+				 * it to essentially implement a fast phys2virt translation
+				 * mechanism.
+				 * For this purpose, a portion of the virtual address space
+				 * has  been designated  for the  purpose of  being made to
+				 * hold lazily initialized mappings of physical memory. */
+				physaddr_t paddr;
+				paddr = (physaddr_t)((uintptr_t)ptr - (uintptr_t)KERNEL_PHYS2VIRT_MIN);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+				PRINTF("%#" PRIxPTR, ptr);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+				PRINT(" ");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+				PRINTF("/dev/mem+%#" PRIxN(__SIZEOF_PHYSADDR_T__), paddr);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+				goto done;
+			} else
+#endif /* HAVE_X86_PHYS2VIRT64_NODE */
+			if (node->mn_part == NULL) {
+				/* Pointer into reserved memory mapping. */
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+				PRINTF("%#" PRIxPTR, ptr);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+				PRINT(" ");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+				/* Print the pointed-to physical address (if the pointer is mapped) */
+				if (pagedir_ismapped_p(effective_mman->mm_pagedir_p, ptr)) {
+					physaddr_t paddr;
+					paddr = pagedir_translate_p(effective_mman->mm_pagedir_p, ptr);
+					PRINTF("rsvd:%#" PRIxN(__SIZEOF_PHYSADDR_T__), paddr);
+				} else {
+					PRINT("rsvd:void");
+				}
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+				goto done;
+			} else if (node->mn_fsname) {
 				pos_t mapping_offset;
 				mapping_offset = mpart_getminaddr(node->mn_part);
 				mapping_offset += (uintptr_t)ptr - (uintptr_t)mnode_getaddr(node);
@@ -1295,6 +1342,39 @@ print_named_pointer(struct ctyperef const *__restrict self,
 				result += temp;
 				PRINTF("+%#" PRIxN(__SIZEOF_POS_T__) ")", mapping_offset);
 				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+				goto done;
+			} else if (ADDR_ISKERN(node->mn_part) &&
+			           node->mn_part->mp_file == &mfile_phys) {
+				physaddr_t paddr = (physaddr_t)mnode_getfileaddrat(node, ptr);
+				/* Pointer into a physical memory mapping. */
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+				PRINTF("%#" PRIxPTR, ptr);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+				PRINT(" ");
+				/* Print the pointed-to physical address (if the pointer is mapped)
+				 * For this purpose, assume that  an unmapped address simply  means
+				 * that the pointer  hasn't been  loaded yet (which  we will  print
+				 * just like any pointer that _has_ already been loaded)
+				 *
+				 * However, if the address _is_ mapped, then it _really_ should
+				 * have the correct physical address loaded. If that's not  the
+				 * case, the display the pointer with an error connotation. */
+				if (!pagedir_ismapped_p(effective_mman->mm_pagedir_p, ptr)) {
+print_normal_dev_mem_pointer:
+					FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+					PRINTF("/dev/mem+%#" PRIxN(__SIZEOF_PHYSADDR_T__), paddr);
+					FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+				} else {
+					physaddr_t real_paddr;
+					real_paddr = pagedir_translate_p(effective_mman->mm_pagedir_p, ptr);
+					if likely(real_paddr == paddr)
+						goto print_normal_dev_mem_pointer;
+					FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
+					PRINTF("/dev/mem+%#" PRIxN(__SIZEOF_PHYSADDR_T__) " "
+					       /*   */ "(%#" PRIxN(__SIZEOF_PHYSADDR_T__) "?)",
+					       paddr, real_paddr);
+					FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
+				}
 				goto done;
 			} else {
 				/* TODO: Check if `ptr' points into kernel heap memory.
