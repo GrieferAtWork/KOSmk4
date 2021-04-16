@@ -345,6 +345,8 @@ er_bad_addr_alignment:
 		if unlikely(file_size <= 0) {
 			SLIST_INIT(&map.mmwu_map.mfm_nodes);
 			SLIST_INIT(&map.mmwu_map.mfm_flist);
+			mpart_setcore_data_init(&map.mmwu_map.mfm_scdat);
+			mpart_unsharecow_data_init(&map.mmwu_map.mfm_ucdat);
 			goto do_insert_without_file;
 #define NEED_do_insert_mappings
 		}
