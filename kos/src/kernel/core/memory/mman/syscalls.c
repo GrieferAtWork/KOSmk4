@@ -212,7 +212,7 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 	                           /* file:             */ file.hmi_file,
 	                           /* file_fspath:      */ file.hmi_fspath,
 	                           /* file_fsname:      */ file.hmi_fsname,
-	                           /* file_pos:         */ file_offset,
+	                           /* file_pos:         */ file.hmi_minaddr + file_offset,
 	                           /* file_map_minaddr: */ file.hmi_minaddr,
 	                           /* file_map_maxaddr: */ file.hmi_maxaddr);
 

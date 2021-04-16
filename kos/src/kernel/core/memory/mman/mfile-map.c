@@ -922,21 +922,25 @@ _mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self)
 }
 
 
-/* Fallback to-be used with `mfile_map_with_unlockinfo::mmwu_info::ui_unlock'
- * When invoked, will call `mfile_map_release()' on the contained  mfile-map. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict self) {
-	struct mfile_map_with_unlockinfo *me;
-	me = (struct mfile_map_with_unlockinfo *)self;
-	mfile_map_release(&me->mmwu_map);
-}
-
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_with_unlockinfo_unlock_or_reserved)(struct unlockinfo *__restrict self) {
 	struct mfile_map_with_unlockinfo *me;
 	me = (struct mfile_map_with_unlockinfo *)self;
 	mfile_map_release_or_reserved(&me->mmwu_map);
 }
+
+/* Fallback to-be used with `mfile_map_with_unlockinfo::mmwu_info::ui_unlock'
+ * When invoked, will call `mfile_map_release()' on the contained  mfile-map. */
+#ifdef __OPTIMIZE_SIZE__
+DEFINE_PUBLIC_ALIAS(mfile_map_with_unlockinfo_unlock, mfile_map_with_unlockinfo_unlock_or_reserved);
+#else /* __OPTIMIZE_SIZE__ */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict self) {
+	struct mfile_map_with_unlockinfo *me;
+	me = (struct mfile_map_with_unlockinfo *)self;
+	mfile_map_release(&me->mmwu_map);
+}
+#endif /* !__OPTIMIZE_SIZE__ */
 
 
 
