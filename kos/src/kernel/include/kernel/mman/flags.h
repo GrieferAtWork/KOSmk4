@@ -27,6 +27,8 @@
 #include <kernel/mman/map.h>    /* PROT_*, MAP_* */
 #include <kernel/mman/mnode.h>  /* MNODE_F_* */
 
+#include <asm/os/mman.h>
+
 #include <elf.h> /* PF_* */
 
 #ifdef __CC__
@@ -85,12 +87,36 @@ DECL_BEGIN
      MAP_NOMERGE == MNODE_F_NOMERGE)
 #define mnodeflags_from_mapflags(mapflags) \
 	((mapflags) & (MAP_PREPARED | MAP_LOCKED | MAP_NOSPLIT | MAP_NOMERGE))
+#define mapflags_from_mnodeflags(mapflags) \
+	((mapflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK | MNODE_F_NOSPLIT | MNODE_F_NOMERGE))
 #else /* ... */
 #define mnodeflags_from_mapflags(mapflags)                 \
 	((((mapflags)&MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
 	 (((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0) |       \
 	 (((mapflags)&MAP_NOSPLIT) ? MNODE_F_NOSPLIT : 0) |    \
 	 (((mapflags)&MAP_NOMERGE) ? MNODE_F_NOMERGE : 0))
+#define mapflags_from_mnodeflags(mapflags)                 \
+	((((mapflags)&MNODE_F_MPREPARED) ? MAP_PREPARED : 0) | \
+	 (((mapflags)&MNODE_F_MLOCK) ? MAP_LOCKED : 0) |       \
+	 (((mapflags)&MNODE_F_NOSPLIT) ? MAP_NOSPLIT : 0) |    \
+	 (((mapflags)&MNODE_F_NOMERGE) ? MAP_NOMERGE : 0))
+#endif /* !... */
+
+/* >> uintptr_t mnodeflags_from_mapflags_usronly(unsigned int prot);
+ * Convert `MAP_*' to `MNODE_F_*':
+ *   - 0           ->  MNODE_F_NORMAL
+ *   - MAP_LOCKED  ->  MNODE_F_MLOCK */
+#if (0 == MNODE_F_NORMAL && \
+     MAP_LOCKED == MNODE_F_MLOCK)
+#define mnodeflags_from_mapflags_usronly(mapflags) \
+	((mapflags) & (MAP_LOCKED))
+#define mapflags_from_mnodeflags_usronly(mapflags) \
+	((mapflags) & (MNODE_F_MLOCK))
+#else /* ... */
+#define mnodeflags_from_mapflags_usronly(mapflags) \
+	((((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0))
+#define mapflags_from_mnodeflags_usronly(mapflags) \
+	((((mapflags)&MNODE_F_MLOCK) ? MAP_LOCKED : 0))
 #endif /* !... */
 
 /* >> uintptr_t mbnodeflags_from_mapflags(unsigned int prot);
@@ -293,6 +319,69 @@ DECL_BEGIN
 	 (((mnodeflags)&MNODE_F_PREAD) ? PF_R : 0))
 #endif /* !... */
 
+
+
+/* >> unsigned int mapflags_from_remapflags(unsigned int elfpf);
+ * Convert `MREMAP_*' to `MAP_*':
+ *   - MREMAP_FIXED           -> MAP_FIXED
+ *   - MREMAP_32BIT           -> MAP_32BIT
+ *   - MREMAP_GROWSDOWN       -> MAP_GROWSDOWN
+ *   - MREMAP_GROWSUP         -> MAP_GROWSUP
+ *   - MREMAP_STACK           -> MAP_STACK
+ *   - MREMAP_FIXED_NOREPLACE -> MAP_FIXED_NOREPLACE
+ *   - MREMAP_NOASLR          -> MAP_NOASLR */
+#if (__MREMAP_FIXED == __MAP_FIXED &&                     \
+     __MREMAP_32BIT == __MAP_32BIT &&                     \
+     __MREMAP_GROWSDOWN == __MAP_GROWSDOWN &&             \
+     __MREMAP_GROWSUP == __MAP_GROWSUP &&                 \
+     __MREMAP_STACK == __MAP_STACK &&                     \
+     __MREMAP_FIXED_NOREPLACE == __MAP_FIXED_NOREPLACE && \
+     __MREMAP_NOASLR == __MAP_NOASLR)
+#define mapflags_from_remapflags(remapflags)                     \
+	((remapflags) & (__MREMAP_FIXED | __MREMAP_32BIT |           \
+	                 __MREMAP_GROWSDOWN | __MREMAP_GROWSUP |     \
+	                 __MREMAP_STACK | __MREMAP_FIXED_NOREPLACE | \
+	                 __MREMAP_NOASLR))
+#define remapflags_from_mapflags(mapflags)               \
+	((mapflags) & (__MAP_FIXED | __MAP_32BIT |           \
+	               __MAP_GROWSDOWN | __MAP_GROWSUP |     \
+	               __MAP_STACK | __MAP_FIXED_NOREPLACE | \
+	               __MAP_NOASLR))
+#elif (__MREMAP_32BIT == __MAP_32BIT &&                     \
+       __MREMAP_GROWSDOWN == __MAP_GROWSDOWN &&             \
+       __MREMAP_GROWSUP == __MAP_GROWSUP &&                 \
+       __MREMAP_STACK == __MAP_STACK &&                     \
+       __MREMAP_FIXED_NOREPLACE == __MAP_FIXED_NOREPLACE && \
+       __MREMAP_NOASLR == __MAP_NOASLR)
+#define mapflags_from_remapflags(remapflags)                         \
+	(((remapflags) & (__MREMAP_32BIT | __MREMAP_GROWSDOWN |          \
+	                  __MREMAP_GROWSUP | __MREMAP_STACK |            \
+	                  __MREMAP_FIXED_NOREPLACE | __MREMAP_NOASLR)) | \
+	 (((remapflags)&__MREMAP_FIXED) ? __MAP_FIXED : 0))
+#define remapflags_from_mapflags(mapflags)                \
+	(((mapflags) & (__MAP_FIXED | __MAP_32BIT |           \
+	                __MAP_GROWSDOWN | __MAP_GROWSUP |     \
+	                __MAP_STACK | __MAP_FIXED_NOREPLACE | \
+	                __MAP_NOASLR)) |                      \
+	 (((mapflags)&__MAP_FIXED) ? __MREMAP_FIXED : 0))
+#else /* ... */
+#define mapflags_from_remapflags(remapflags)                                 \
+	((((remapflags)&__MREMAP_32BIT) ? __MAP_32BIT : 0) |                     \
+	 (((remapflags)&__MREMAP_GROWSDOWN) ? __MAP_GROWSDOWN : 0) |             \
+	 (((remapflags)&__MREMAP_GROWSUP) ? __MAP_GROWSUP : 0) |                 \
+	 (((remapflags)&__MREMAP_STACK) ? __MAP_STACK : 0) |                     \
+	 (((remapflags)&__MREMAP_FIXED_NOREPLACE) ? __MAP_FIXED_NOREPLACE : 0) | \
+	 (((remapflags)&__MREMAP_NOASLR) ? __MAP_NOASLR : 0) |                   \
+	 (((remapflags)&__MREMAP_FIXED) ? __MAP_FIXED : 0))
+#define remapflags_from_mapflags(mapflags)                                 \
+	((((mapflags)&__MAP_32BIT) ? __MREMAP_32BIT : 0) |                     \
+	 (((mapflags)&__MAP_GROWSDOWN) ? __MREMAP_GROWSDOWN : 0) |             \
+	 (((mapflags)&__MAP_GROWSUP) ? __MREMAP_GROWSUP : 0) |                 \
+	 (((mapflags)&__MAP_STACK) ? __MREMAP_STACK : 0) |                     \
+	 (((mapflags)&__MAP_FIXED_NOREPLACE) ? __MREMAP_FIXED_NOREPLACE : 0) | \
+	 (((mapflags)&__MAP_NOASLR) ? __MREMAP_NOASLR : 0) |                   \
+	 (((mapflags)&__MAP_FIXED) ? __MREMAP_FIXED : 0))
+#endif /* !... */
 
 
 DECL_END

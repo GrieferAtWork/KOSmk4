@@ -938,6 +938,9 @@
 #define E_SEGFAULT_UNALIGNED                      (E_SEGFAULT, 0x0006) /* [msg("Attempted to access an unaligned pointer")]
                                                                         * [fld(required_alignemnt: size_t, "The required alignment of `addr' (power-of-2)")] */
 #endif /* !E_SEGFAULT_UNALIGNED */
+#ifndef E_SEGFAULT_NONCONTINUOUS
+#define E_SEGFAULT_NONCONTINUOUS                  (E_SEGFAULT, 0x0007) /* [msg("File mapping isn't continuous")] */
+#endif /* !E_SEGFAULT_NONCONTINUOUS */
 /*[[[end]]]*/
 #ifndef E_SEGFAULT_CONTEXT_FAULT
 #define E_SEGFAULT_CONTEXT_FAULT    0x0001 /* Faulty address */

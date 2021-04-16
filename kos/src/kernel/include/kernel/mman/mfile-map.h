@@ -214,6 +214,55 @@ NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self);
 
 
 
+
+/* Same as all of the  functions above, but includes  support
+ * for creating reserved nodes when `self->mfm_file == NULL'. */
+#define mfile_map_isreserved(self) ((self)->mfm_file == __NULLPTR)
+#ifdef __INTELLISENSE__
+NONNULL((1)) void
+mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self,
+                                       struct mfile *file,
+                                       PAGEDIR_PAGEALIGNED pos_t addr,
+                                       PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                       unsigned int prot, unsigned int flags)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+FUNDEF NONNULL((1)) void FCALL
+mfile_map_init_or_reserved(struct mfile_map *__restrict self,
+                           struct mfile *file,
+                           PAGEDIR_PAGEALIGNED pos_t addr,
+                           PAGEDIR_PAGEALIGNED size_t num_bytes,
+                           unsigned int prot, unsigned int flags)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+#else /* __INTELLISENSE__ */
+#define mfile_map_init_and_acquire_or_reserved(self, file, addr, num_bytes, prot, flags) \
+	((self)->mfm_file = (file), (self)->mfm_addr = (addr),                               \
+	 (self)->mfm_size = (num_bytes), (self)->mfm_prot = (prot),                          \
+	 (self)->mfm_flags = (flags), SLIST_INIT(&(self)->mfm_flist),                        \
+	 _mfile_map_init_and_acquire_or_reserved(self))
+#define mfile_map_init_or_reserved(self, file, addr, num_bytes, prot, flags)           \
+	(mfile_map_init_and_acquire_or_reserved(self, file, addr, num_bytes, prot, flags), \
+	 mfile_map_release_or_reserved(self))
+#endif /* !__INTELLISENSE__ */
+FUNDEF NONNULL((1)) void FCALL
+_mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
+#define _mfile_map_init_or_reserved(self) \
+	(_mfile_map_init_and_acquire_or_reserved(self), mfile_map_release_or_reserved(self))
+#define mfile_map_acquire_or_reserved(self) \
+	do {                        \
+	} while (!mfile_map_acquire_or_unlock_or_reserved(self, __NULLPTR))
+#define mfile_map_release_or_reserved(self) \
+	(void)(mfile_map_isreserved(self) || (mfile_map_release(self), 1))
+#define mfile_map_acquire_or_unlock_or_reserved(self, unlock) \
+	(mfile_map_isreserved(self) || mfile_map_acquire_or_unlock(self, unlock))
+#define mfile_map_reflow_or_unlock_or_reserved(self, unlock) \
+	(mfile_map_isreserved(self) || mfile_map_reflow_or_unlock(self, unlock))
+FUNDEF NONNULL((1)) void
+NOTHROW(FCALL mfile_map_fini_or_reserved)(struct mfile_map *__restrict self);
+
+
+
+
 /* Helpers for constructing unlockinfo objects that invoke `mfile_map_release()'  when
  * triggering an unlock. - Mainly intended for use with `mman_getunmapped_or_unlock()'
  * once both mem-parts and the target mman have been locked in `mman_map()' */
@@ -232,6 +281,8 @@ struct mfile_map_with_unlockinfo
  * When invoked, will call `mfile_map_release()' on the contained  mfile-map. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_with_unlockinfo_unlock_or_reserved)(struct unlockinfo *__restrict self);
 
 
 DECL_END

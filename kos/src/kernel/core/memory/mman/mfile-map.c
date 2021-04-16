@@ -59,6 +59,26 @@ DECL_BEGIN
 #endif /* CONFIG_USE_NEW_FS */
 
 
+PUBLIC NONNULL((1)) void
+NOTHROW(FCALL mfile_map_fini_or_reserved)(struct mfile_map *__restrict self) {
+	struct mnode *iter, *next;
+	iter = SLIST_FIRST(&self->mfm_nodes);
+	while (iter) {
+		next = SLIST_NEXT(iter, _mn_alloc);
+		xdecref(iter->mn_part);
+		kfree(iter);
+		iter = next;
+	}
+	/* Free all nodes still apart of the free-list. */
+	iter = SLIST_FIRST(&self->mfm_flist);
+	while (iter) {
+		next = SLIST_NEXT(iter, _mn_alloc);
+		kfree(iter);
+		iter = next;
+	}
+	mpart_setcore_data_fini(&self->mfm_scdat);
+	mpart_unsharecow_data_fini(&self->mfm_ucdat);
+}
 
 /* Finalize a given mem-node-allocator.
  * This function will  free (and  only free; the  caller is  responsible to  release
@@ -70,6 +90,9 @@ DECL_BEGIN
  * NOTE: This function doesn't necessarily have to be called if the caller was
  *       able to inherit _all_ of the nodes originally allocated (which should
  *       normally be the case when mapping was successful) */
+#ifdef __OPTIMIZE_SIZE__
+DEFINE_PUBLIC_ALIAS(mfile_map_fini, mfile_map_fini_or_reserved);
+#else /* __OPTIMIZE_SIZE__ */
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
 	struct mnode *iter, *next;
@@ -90,6 +113,8 @@ NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
 	mpart_setcore_data_fini(&self->mfm_scdat);
 	mpart_unsharecow_data_fini(&self->mfm_ucdat);
 }
+#endif /* !__OPTIMIZE_SIZE__ */
+
 
 
 
@@ -285,10 +310,12 @@ again_getpart:
 		DBG_memset(self, 0xcc, sizeof(*self));
 		RETHROW();
 	}
+
 	/* Initialize the initial node. */
-	SLIST_INSERT(&self->mfm_nodes, node, _mn_alloc);
-	node->mn_minaddr = (byte_t *)0;
-	node->mn_maxaddr = (byte_t *)self->mfm_size - 1;
+	self->mfm_nodes.slh_first = node;
+	node->_mn_alloc.sle_next  = NULL;
+	node->mn_minaddr          = (byte_t *)0;
+	node->mn_maxaddr          = (byte_t *)self->mfm_size - 1;
 	DBG_memset(&node->mn_flags, 0xcc, sizeof(node->mn_flags));
 	DBG_memset(&node->mn_mement, 0xcc, sizeof(node->mn_mement));
 	/*DBG_memset(&node->mn_mman, 0xcc, sizeof(node->mn_mman));*/ /* Used to chain nodes. */
@@ -858,6 +885,43 @@ fail:
 }
 
 
+
+/* Same as all of the  functions above, but includes  support
+ * for creating reserved nodes when `self->mfm_file == NULL'. */
+PUBLIC NONNULL((1)) void FCALL
+_mfile_map_init_and_acquire_or_reserved(struct mfile_map *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY) {
+	if (self->mfm_file != NULL) {
+		_mfile_map_init_and_acquire(self);
+	} else {
+		struct mnode *node;
+		node = SLIST_FIRST(&self->mfm_flist);
+		if (node != NULL) {
+			SLIST_REMOVE_HEAD(&self->mfm_flist, _mn_alloc);
+		} else {
+			node = (struct mnode *)kmalloc(sizeof(struct mnode),
+			                               GFP_LOCKED | GFP_PREFLT);
+		}
+
+		/* Initialize the initial node. */
+		self->mfm_nodes.slh_first = node;
+		node->_mn_alloc.sle_next  = NULL;
+		node->mn_minaddr = (byte_t *)0;
+		node->mn_maxaddr = (byte_t *)self->mfm_size - 1;
+		DBG_memset(&node->mn_flags, 0xcc, sizeof(node->mn_flags));
+		DBG_memset(&node->mn_mement, 0xcc, sizeof(node->mn_mement));
+		/*DBG_memset(&node->mn_mman, 0xcc, sizeof(node->mn_mman));*/ /* Used to chain nodes. */
+		node->mn_part    = NULL; /* Reserved node! */
+		node->mn_partoff = 0;
+		DBG_memset(&node->mn_link, 0xcc, sizeof(node->mn_link));
+		DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
+		DBG_memset(&node->mn_fspath, 0xcc, sizeof(node->mn_fspath));
+		DBG_memset(&node->mn_fsname, 0xcc, sizeof(node->mn_fsname));
+		DBG_memset(&node->mn_module, 0xcc, sizeof(node->mn_module));
+	}
+}
+
+
 /* Fallback to-be used with `mfile_map_with_unlockinfo::mmwu_info::ui_unlock'
  * When invoked, will call `mfile_map_release()' on the contained  mfile-map. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -865,6 +929,13 @@ NOTHROW(FCALL mfile_map_with_unlockinfo_unlock)(struct unlockinfo *__restrict se
 	struct mfile_map_with_unlockinfo *me;
 	me = (struct mfile_map_with_unlockinfo *)self;
 	mfile_map_release(&me->mmwu_map);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_map_with_unlockinfo_unlock_or_reserved)(struct unlockinfo *__restrict self) {
+	struct mfile_map_with_unlockinfo *me;
+	me = (struct mfile_map_with_unlockinfo *)self;
+	mfile_map_release_or_reserved(&me->mmwu_map);
 }
 
 

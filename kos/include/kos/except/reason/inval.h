@@ -201,6 +201,13 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 	E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE,                  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
 	E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL,                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_MREMAP_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MREMAP_*' flag */
+	E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLD_SIZE,                    /* E_INVALID_ARGUMENT_BAD_VALUE: `old_size' is too large. */
+	E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE,                    /* E_INVALID_ARGUMENT_BAD_VALUE: `new_size' is `0' or is too large. */
+	E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS,                 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `new_address' isn't aligned with `old_address' in a valid way. */
+	E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE,            /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
+	E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE,           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
+	E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE,        /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -377,6 +384,13 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 #define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
 #define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_MREMAP_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MREMAP_*' flag */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLD_SIZE                    E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLD_SIZE                    /* E_INVALID_ARGUMENT_BAD_VALUE: `old_size' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE                    E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE                    /* E_INVALID_ARGUMENT_BAD_VALUE: `new_size' is `0' or is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS                 E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS                 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `new_address' isn't aligned with `old_address' in a valid way. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -550,6 +564,13 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE            152 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access a mem-part beyond the end of its associated file. */
 #define E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE                  153 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to ftruncate() a fixed-length file. */
 #define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL                 154 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FLAGS                       155 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MREMAP_*' flag */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLD_SIZE                    156 /* E_INVALID_ARGUMENT_BAD_VALUE: `old_size' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE                    157 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_size' is `0' or is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_ADDRESS                 158 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `new_address' isn't aligned with `old_address' in a valid way. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            159 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           160 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
+#define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        161 /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
