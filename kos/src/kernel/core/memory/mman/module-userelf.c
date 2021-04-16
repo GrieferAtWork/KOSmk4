@@ -1891,11 +1891,86 @@ uem_trycreate(struct mman *__restrict self,
 					return UEM_TRYCREATE_UNLOCKED;
 			} else if (result != NULL) {
 				/* Potential  success (but let's  re-try in case the
-				 * module discovered is actually a different module) */
+				 * module discovered is actually a different module)
+				 *
+				 * If we were successful, then `node->mn_module' may
+				 * have been filled with `result' by `uem_trycreate' */
 				decref_unlikely(result);
 				return UEM_TRYCREATE_UNLOCKED;
 			}
 		}
+		/* Special case: if this node was originally created by
+		 * a file mapping, but has since been unshared (as  the
+		 * result of a write), then the backing file will  have
+		 * been set as one of the anon-files.
+		 *
+		 * Additionally, some shared libraries may set-up gaps
+		 * between their different  program headers  (possibly
+		 * to  aid in debugging  by making out-of-bound memory
+		 * access fault more often), so even if `node' doesn't
+		 * have a n immediate neighbor, that doesn't mean that
+		 * it can't possibly be apart of a library.
+		 *
+		 * However, in the event that  `node' is the result  of
+		 * a since unshared copy-on-write mapping, it may still
+		 * contain  information  about the  original filesystem
+		 * name.
+		 * And if that's the case, then we can try to scan the
+		 * entire mman for other  nodes with the same  fsname.
+		 * If we find one, and that one doesn't already  point
+		 * at some other user-space module, then we can try to
+		 * construct a  UserELF module  for it.  And if  we're
+		 * lucky, then doing  so may just  fill in the  module
+		 * pointer for our own node! */
+		if (node->mn_fsname) {
+			for (i = 0; i < 2; ++i) {
+				struct mnode *neighbor;
+				if (i == skipped_neighbor)
+					continue; /* Skip neighbors in this direction. */
+				neighbor = node;
+				for (;;) {
+					void *minaddr, *maxaddr;
+					neighbor = i == 0 ? mnode_tree_prevnode(neighbor)
+					                  : mnode_tree_nextnode(neighbor);
+					if (!neighbor)
+						break; /* No more neighbors in this direction */
+					if (neighbor->mn_fsname != node->mn_fsname ||
+					    neighbor->mn_fspath != node->mn_fspath)
+						continue; /* Different filesystem name... */
+					if (neighbor->mn_module != NULL) {
+						/* There is a known module under this name, but it doesn't contain our node! */
+						goto anon_mem_not_a_module;
+					}
+					minaddr = mnode_getminaddr(node);
+					maxaddr = mnode_getmaxaddr(node);
+					/* Try to create a module for `neighbor' */
+					result = uem_trycreate(self, neighbor, i == 0 ? 1 : 0);
+					if (result == UEM_TRYCREATE_UNLOCKED) {
+						/* Try again... */
+						return UEM_TRYCREATE_UNLOCKED;
+					} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
+						/* Not the preceding node.
+						 * Acquire the mman lock and see if anything's changed. */
+						did_unlock = true;
+						mman_lock_acquire(self);
+						if (mman_mappings_locate(self, minaddr) != node ||
+						    mnode_getminaddr(node) != minaddr ||
+						    mnode_getmaxaddr(node) != maxaddr ||
+						    node->mn_part != part)
+							return UEM_TRYCREATE_UNLOCKED;
+					} else if (result != NULL) {
+						/* Potential  success (but let's  re-try in case the
+						 * module discovered is actually a different module)
+						 *
+						 * If we were successful, then `node->mn_module' may
+						 * have been filled with `result' by `uem_trycreate' */
+						decref_unlikely(result);
+						return UEM_TRYCREATE_UNLOCKED;
+					}
+				}
+			}
+		}
+anon_mem_not_a_module:
 		if (did_unlock) {
 			mman_lock_release(self);
 			return UEM_TRYCREATE_UNLOCKED_NOUEM;
