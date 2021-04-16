@@ -126,8 +126,7 @@ err_not_shareable:
 	}
 
 	/* Fill in our mfile mapping descriptor with information from `node' */
-	map.mmwu_map.mfm_addr = mnode_getfileaddr(node);
-	map.mmwu_map.mfm_addr += (size_t)((byte_t *)old_address - (byte_t *)mnode_getaddr(node));
+	map.mmwu_map.mfm_addr  = mnode_getfileaddrat(node, old_address);
 	map.mmwu_map.mfm_prot  = prot_from_mnodeflags(mnode_flags);
 	map.mmwu_map.mfm_flags = mapflags_from_mnodeflags_usronly(mnode_flags);
 	node_fspath            = xincref(node->mn_fspath);
@@ -184,9 +183,7 @@ something_changed:
 			goto something_changed;
 		if unlikely(ATOMIC_READ(part->mp_file) != map.mmwu_map.mfm_file)
 			goto something_changed;
-		if unlikely(map.mmwu_map.mfm_addr != (mnode_getfileaddr(node) +
-		                                      (size_t)((byte_t *)old_address -
-		                                               (byte_t *)mnode_getaddr(node))))
+		if unlikely(map.mmwu_map.mfm_addr != mnode_getfileaddrat(node, old_address))
 			goto something_changed;
 		if unlikely(mnode_flags != (node->mn_flags & MREMAP_KEPT_MNODE_FLAGS))
 			goto something_changed;
@@ -381,8 +378,7 @@ get_mappinginfo_or_unlock(struct mman *__restrict self,
 	/* Extract remaining mapping information. */
 	result->mi_fspath = xincref(node->mn_fspath);
 	result->mi_fsname = xincref(node->mn_fsname);
-	result->mi_fpos   = mnode_getfileaddr(node);
-	result->mi_fpos += (size_t)(minaddr - (byte_t *)mnode_getaddr(node));
+	result->mi_fpos   = mnode_getfileaddrat(node, minaddr);
 
 	/* Check if the entirety of the existing mapping is contained
 	 * within the bounds of `node'. If some part of the range  is
@@ -425,8 +421,7 @@ err_noncontinuous_mapping:
 					goto err_noncontinuous_mapping;
 				if unlikely(result->mi_fsname != node->mn_fsname)
 					goto err_noncontinuous_mapping;
-				if unlikely(result->mi_fpos != (mnode_getfileaddr(node) +
-				                                (size_t)(minaddr - (byte_t *)mnode_getaddr(node))))
+				if unlikely(result->mi_fpos != mnode_getfileaddrat(node, minaddr))
 					goto err_noncontinuous_mapping;
 			}
 			/* Keep going until we've covered the entire range. */

@@ -353,6 +353,9 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self);
 #define mnode_getfilemaxaddr(self) (mpart_getminaddr((self)->mn_part) + (self)->mn_partoff + (size_t)((self)->mn_maxaddr - (self)->mn_minaddr))
 #define mnode_getfileendaddr(self) (mpart_getminaddr((self)->mn_part) + (self)->mn_partoff + (size_t)((self)->mn_maxaddr - (self)->mn_minaddr) + 1)
 
+/* Return the file-absolute address mapped at `vaddr' */
+#define mnode_getfileaddrat(self, vaddr) (mnode_getfileaddr(self) + ((byte_t *)(vaddr) - (self)->mn_minaddr))
+
 
 /* Free/destroy a given mem-node */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mnode_free)(struct mnode *__restrict self);

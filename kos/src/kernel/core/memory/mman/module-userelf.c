@@ -1092,8 +1092,7 @@ something_changed:
 			 * NOTE: No need to lock `part',  because our lock to  `self'
 			 *       also guaranties that the part's address change isn't
 			 *       altered! */
-			real_node_fpos = mnode_getfileaddr(node);
-			real_node_fpos += (size_t)(node_addr -(byte_t *)mnode_getaddr(node));
+			real_node_fpos = mnode_getfileaddrat(node, node_addr);
 			if unlikely(real_node_fpos != node_fpos)
 				goto something_changed;
 		}
@@ -1578,8 +1577,7 @@ something_changed:
 				}
 				if unlikely(ATOMIC_READ(part->mp_file) != rtld_file)
 					goto something_changed;
-				real_node_fpos = mnode_getfileaddr(node);
-				real_node_fpos += (size_t)(node_addr -(byte_t *)mnode_getaddr(node));
+				real_node_fpos = mnode_getfileaddrat(node, node_addr);
 				if unlikely(real_node_fpos != node_fpos)
 					goto something_changed;
 			}
