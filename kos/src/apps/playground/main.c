@@ -548,6 +548,21 @@ int main_sgbase(int argc, char *argv[], char *envp[]) {
 
 
 
+#if defined(__i386__) || defined(__x86_64__)
+#define HAVE_MAIN_INT3 1
+/************************************************************************/
+int main_int3(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	__asm__ __volatile__("int3");
+	return 0;
+}
+/************************************************************************/
+#endif /* __i386__ || __x86_64__ */
+
+
+
+
+
 /************************************************************************/
 PRIVATE ssize_t FORMATPRINTER_CC
 debug_printer(void *UNUSED(arg), char const *message, size_t len) {
@@ -929,6 +944,9 @@ PRIVATE DEF defs[] = {
 #ifdef HAVE_MAIN_SGBASE
 	{ "sgbase", &main_sgbase },
 #endif /* HAVE_MAIN_SGBASE */
+#ifdef HAVE_MAIN_INT3
+	{ "int3", &main_int3 },
+#endif /* HAVE_MAIN_INT3 */
 	{ "yield", &main_yield },
 	{ "vio", &main_vio },
 	{ "rtm", &main_rtm },
