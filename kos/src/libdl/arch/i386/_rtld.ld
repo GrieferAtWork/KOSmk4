@@ -52,6 +52,7 @@ SECTIONS {
 		*(.text.hot .text.hot.* .text.likely .text.likely.*)
 		*(.text.__x86.* .text .text.crt.* .text.local.*)
 		*(.text.cold .text.cold.* .text.unlikely .text.unlikely.*)
+		*(.text.*)
 		PROVIDE_HIDDEN(__rtld_text_end = .);
 	} PHDR(text)
 
@@ -60,6 +61,7 @@ SECTIONS {
 		*(.rodata.hot .rodata.hot.* .rodata.likely .rodata.likely.*)
 		*(.rodata .rodata.str* .rodata.cst* .rodata.*.str* .rodata.*.cst* .rodata.crt.* .rodata.local.*)
 		*(.rodata.cold .rodata.cold.* .rodata.unlikely .rodata.unlikely.*)
+		*(.rodata.*)
 		PROVIDE_HIDDEN(__rtld_rodata_end = .);
 	} PHDR(text)
 
@@ -82,6 +84,7 @@ SECTIONS {
 		*(.data.hot .data.hot.* .data.likely .data.likely.*)
 		*(.data .data.crt.* .data.local.*)
 		*(.data.cold .data.cold.* .data.unlikely .data.unlikely.*)
+		*(.data.*)
 		PROVIDE_HIDDEN(__rtld_data_end = .);
 	} PHDR(data)
 
@@ -90,6 +93,7 @@ SECTIONS {
 		*(.bss.hot .bss.hot.* .bss.likely .bss.likely.*)
 		*(.bss .bss.crt.* .bss.local.*)
 		*(.bss.cold .bss.cold.* .bss.unlikely .bss.unlikely.*)
+		*(.bss.*)
 		PROVIDE_HIDDEN(__rtld_bss_end = .);
 		PROVIDE_HIDDEN(__rtld_end = .);
 	} PHDR(data)
