@@ -1293,7 +1293,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
-				PRINTF("+%" PRIuN(__SIZEOF_POS_T__) ")", mapping_offset);
+				PRINTF("+%#" PRIxN(__SIZEOF_POS_T__) ")", mapping_offset);
 				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
 				goto done;
 			} else {
