@@ -200,48 +200,13 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	VALIDATE_FLAGSET(flags,
 	                 MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
 	                 MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
-	                 MAP_DONT_MAP | MAP_FIXED_NOREPLACE,
+	                 MAP_FIXED_NOREPLACE,
 	                 E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_FLAGS);
 	if (flags & MAP_FIXED) {
 		if unlikely(!hdrc)
 			return addr;
 		result           = (byte_t *)((uintptr_t)addr & ~PAGEMASK);
 		addr_page_offset = (uintptr_t)addr & PAGEMASK;
-		if (flags & MAP_DONT_MAP) {
-			bool isused;
-			uintptr_t min_addr, max_addr;
-			if unlikely(!hdrc)
-				return MHINT_GETADDR(KERNEL_MHINT_USER_LIBRARY);
-			min_addr = (uintptr_t)-1;
-			max_addr = 0;
-			/* Figure out the min/max byte offsets for program segments. */
-			for (i = 0; i < hdrc; ++i) {
-				MY_ElfW(Addr) addr;
-				MY_ElfW(Word) size;
-				if (ATOMIC_READ(hdrv[i].p_type) != PT_LOAD)
-					continue;
-				addr = ATOMIC_READ(hdrv[i].p_vaddr);
-				size = ATOMIC_READ(hdrv[i].p_memsz);
-				if unlikely(!size)
-					continue;
-				if (min_addr > addr)
-					min_addr = addr;
-				addr += size - 1;
-				if (max_addr < addr)
-					max_addr = addr;
-			}
-			total_bytes = (CEILDIV(max_addr, PAGESIZE) -
-			               FLOORDIV(min_addr, PAGESIZE)) *
-			              PAGESIZE;
-			sync_read(THIS_MMAN);
-			isused = vm_isused(THIS_MMAN,
-			                   result,
-			                   total_bytes);
-			sync_endread(THIS_MMAN);
-			if (isused)
-				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
-			goto done;
-		}
 	} else {
 		uintptr_t min_addr, max_addr;
 		if unlikely(!hdrc)
@@ -319,8 +284,6 @@ find_new_candidate:
 		if unlikely(result == (byte_t *)MAP_FAILED)
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
 		result -= min_page * PAGESIZE;
-		if (flags & MAP_DONT_MAP)
-			goto done;
 	}
 again_map_segments:
 	i        = 0;
@@ -519,7 +482,6 @@ unmap_check_overlap_and_find_new_candidate:
 	xdecref_unlikely(file_fspath);
 	xdecref_unlikely(file_fsname);
 	xdecref_unlikely(file);
-done:
 	return result + addr_page_offset;
 }
 

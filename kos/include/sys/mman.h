@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f2fc7ea */
+/* HASH CRC-32:0x85075fa4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -248,16 +248,7 @@
 #endif /* !MAP_FIXED_NOREPLACE && __MAP_FIXED_NOREPLACE */
 
 #ifdef __USE_KOS_KERNEL
-/* Don't actually map memory, but test the waters of a memory
- * location hasn't already been mapped, or locate a  suitably
- * large free memory range.
- * This flag is usually followed by another call that sets
- * the `MAP_FIXED_NOREPLACE' flag. */
-#if !defined(MAP_DONT_MAP) && defined(__MAP_DONT_MAP)
-#define MAP_DONT_MAP __MAP_DONT_MAP
-#endif /* !MAP_DONT_MAP && __MAP_DONT_MAP */
-
-/* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
+/* The `offset' argument of MMAP is actually a pointer to the 64-bit
  * unsigned  integer  that  should  actually  be  used  as   offset. */
 #if !defined(MAP_OFFSET64_POINTER) && defined(__MAP_OFFSET64_POINTER)
 #define MAP_OFFSET64_POINTER __MAP_OFFSET64_POINTER
@@ -316,10 +307,39 @@
 #define MREMAP_MAYMOVE __MREMAP_MAYMOVE
 #endif /* !MREMAP_MAYMOVE && __MREMAP_MAYMOVE */
 
-/* Fixed target address */
+/* A 5th argument `new_address' is accepted that specifies the absolute, new position */
 #if !defined(MREMAP_FIXED) && defined(__MREMAP_FIXED)
 #define MREMAP_FIXED __MREMAP_FIXED
 #endif /* !MREMAP_FIXED && __MREMAP_FIXED */
+
+/* Used with `MREMAP_MAYMOVE': Don't delete the old mapping. */
+#if !defined(MREMAP_DONTUNMAP) && defined(__MREMAP_DONTUNMAP)
+#define MREMAP_DONTUNMAP __MREMAP_DONTUNMAP
+#endif /* !MREMAP_DONTUNMAP && __MREMAP_DONTUNMAP */
+
+#ifdef __USE_KOS
+/* The following flags are accepted  by `mremap(2)', and affect  what
+ * addresses are selected when the kernel has to choose a new address
+ * for the resulting mapping. */
+#if !defined(MREMAP_32BIT) && defined(__MREMAP_32BIT)
+#define MREMAP_32BIT           __MREMAP_32BIT
+#endif /* !MREMAP_32BIT && __MREMAP_32BIT */
+#if !defined(MREMAP_GROWSDOWN) && defined(__MREMAP_GROWSDOWN)
+#define MREMAP_GROWSDOWN       __MREMAP_GROWSDOWN
+#endif /* !MREMAP_GROWSDOWN && __MREMAP_GROWSDOWN */
+#if !defined(MREMAP_GROWSUP) && defined(__MREMAP_GROWSUP)
+#define MREMAP_GROWSUP         __MREMAP_GROWSUP
+#endif /* !MREMAP_GROWSUP && __MREMAP_GROWSUP */
+#if !defined(MREMAP_STACK) && defined(__MREMAP_STACK)
+#define MREMAP_STACK           __MREMAP_STACK
+#endif /* !MREMAP_STACK && __MREMAP_STACK */
+#if !defined(MREMAP_FIXED_NOREPLACE) && defined(__MREMAP_FIXED_NOREPLACE)
+#define MREMAP_FIXED_NOREPLACE __MREMAP_FIXED_NOREPLACE
+#endif /* !MREMAP_FIXED_NOREPLACE && __MREMAP_FIXED_NOREPLACE */
+#if !defined(MREMAP_NOASLR) && defined(__MREMAP_NOASLR)
+#define MREMAP_NOASLR          __MREMAP_NOASLR
+#endif /* !MREMAP_NOASLR && __MREMAP_NOASLR */
+#endif /* __USE_KOS */
 #endif /* __USE_GNU */
 
 

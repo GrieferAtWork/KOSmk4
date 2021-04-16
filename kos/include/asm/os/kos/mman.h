@@ -95,13 +95,9 @@
 #ifdef __KOS__
 #define __MAP_AUTOMATIC        0x00000000 /* Use sharing behavior specified by `PROT_SHARED'. */
 #if __KOS_VERSION__ >= 400
-#define __MAP_DONT_MAP         0x20000000 /* Don't actually map memory, but test the waters of a memory
-                                           * location hasn't already been mapped, or locate a  suitably
-                                           * large free memory range.
-                                           * This flag is usually followed by another call that sets
-                                           * the `MAP_FIXED_NOREPLACE' flag. */
+/*efine __MAP_                 0x20000000  * ... */
 #define __MAP_NOASLR           0x40000000 /* Disable ASLR (iow: don't randomize automatically determined mmap addresses) */
-#define __MAP_OFFSET64_POINTER 0x80000000 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
+#define __MAP_OFFSET64_POINTER 0x80000000 /* The `offset' argument of MMAP is actually a pointer to the 64-bit
                                            * unsigned  integer  that  should  actually  be  used  as   offset. */
 #endif /* __KOS_VERSION__ >= 400 */
 #endif /* __KOS__ */
@@ -113,8 +109,24 @@
 #define __MS_INVALIDATE 0x02 /* Invalidate caches. */
 #define __MS_SYNC       0x04 /* Wait for the sync to finish. */
 
-#define __MREMAP_MAYMOVE 0x01 /* Allowed to move to a different location */
-#define __MREMAP_FIXED   0x02 /* Allowed to move to a different location */
+#define __MREMAP_MAYMOVE   0x01 /* Allowed to move to a different location */
+#define __MREMAP_FIXED     0x02 /* A 5th argument `new_address' is accepted that specifies the absolute, new position */
+#ifdef __linux__
+#define __MREMAP_DONTUNMAP 0x04 /* Used with `MREMAP_MAYMOVE': Don't delete the old mapping. */
+#endif /* __linux__ */
+#ifdef __KOS__
+#if __KOS_VERSION__ >= 400
+/* The following flags are accepted  by `mremap(2)', and affect  what
+ * addresses are selected when the kernel has to choose a new address
+ * for the resulting mapping. */
+#define __MREMAP_32BIT           __MAP_32BIT
+#define __MREMAP_GROWSDOWN       __MAP_GROWSDOWN
+#define __MREMAP_GROWSUP         __MAP_GROWSUP
+#define __MREMAP_STACK           __MAP_STACK
+#define __MREMAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
+#define __MREMAP_NOASLR          __MAP_NOASLR
+#endif /* __KOS_VERSION__ >= 400 */
+#endif /* __KOS__ */
 
 #define __MFD_CLOEXEC       0x1 /* Close-on-exec */
 #define __MFD_ALLOW_SEALING 0x2 /* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */

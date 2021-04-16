@@ -34,7 +34,7 @@
 #define __REF           /* Annotation for reference holders/transfers.
                          * When used on a struct-field/local/global variable: Reference storage
                          * When used on a return  type:  The   function  returns  a   reference
-                         * When used on an argument: The function inherited a reference (but look out for `inherit(<condition>)' annotations) */
+                         * When used on an argument: The function inherits a reference (but look out for `inherit(<condition>)' annotations) */
 #define __REF_IF(x)     /* Same as `__REF', but only when `x' is true. */
 #define __NOBLOCK       /* Annotation for functions that are guarantied to never block,
                          * making them safe to-be called from any asynchronous context. */

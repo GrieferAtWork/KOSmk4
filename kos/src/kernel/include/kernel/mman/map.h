@@ -184,10 +184,7 @@ DATDEF struct mfile mfile_zero; /* Zero-initialized, anonymous memory. */
  *                        offset of `hint' will be silently ignored, meaning that in this  case
  *                        the return value may differ from `hint'!
  * @param: min_alignment: s.a. `mman_findunmapped'
- * @return: * : The effective mapping  base at which  `file->DATA.BYTES[file_pos]' can be  found,
- *              unless `num_bytes' was given as `0', in which case the return value is undefined,
- *              but  arguably valid (e.g. will be a  user-/kernel-space location as it would have
- *              been when `num_bytes' was non-zero). */
+ * @return: * : The effective mapping  base at which `file->DATA.BYTES[file_pos]' can be found. */
 FUNDEF NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
          UNCHECKED void *hint, size_t num_bytes,

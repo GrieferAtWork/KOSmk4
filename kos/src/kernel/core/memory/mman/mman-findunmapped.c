@@ -27,8 +27,8 @@
 #include <fs/vfs.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/unmapped.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/rand.h>
 #include <misc/unlockinfo.h>
@@ -38,6 +38,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/paging.h> /* Default mapping hints */
 
 #include <assert.h>
@@ -207,7 +208,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
 	if unlikely(!IS_ALIGNED(num_bytes, PAGESIZE)) {
 		size_t new_num_bytes;
 		new_num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-		if unlikely(new_num_bytes < num_bytes)
+		if unlikely(new_num_bytes <= num_bytes)
 			goto err;
 		num_bytes = new_num_bytes;
 	}
@@ -644,8 +645,15 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 		struct mnode *node;
 		byte_t *maxaddr;
 		result  = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
-		maxaddr = (byte_t *)addr + num_bytes - 1;
-		node    = mnode_tree_rlocate(self->mm_mappings, addr, maxaddr);
+		/* Check for overflowing `num_bytes' */
+		if unlikely(OVERFLOW_UADD((uintptr_t)addr, num_bytes - 1, (uintptr_t *)&maxaddr)) {
+			mman_lock_release(self);
+			unlockinfo_xunlock(unlock);
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,
+			      num_bytes);
+		}
+		node = mnode_tree_rlocate(self->mm_mappings, addr, maxaddr);
 		if (node != NULL) {
 			byte_t *max_mapaddr;
 			struct mnode_tree_minmax mima;
@@ -662,8 +670,7 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 			/* Special case: Only  allowed  to mmap  FIXED  into kernel-space
 			 *               when using the  kernel page  directory as  base,
 			 *               which user-space isn't (normally) allowed to do. */
-			if (ADDRRANGE_ISKERN_PARTIAL((byte_t *)addr,
-			                             (byte_t *)addr + num_bytes) &&
+			if (ADDRRANGE_ISKERN_PARTIAL((byte_t *)addr, maxaddr + 1) &&
 			    self != &mman_kernel) {
 disallow_mmap:
 				mman_lock_release(self);

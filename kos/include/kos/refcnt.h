@@ -21,10 +21,10 @@
 #define _KOS_REFCNT_H 1
 
 #include <__stdinc.h>
-#include <features.h>
 
 #if defined(__cplusplus) && defined(__CC__)
 #include <__stdcxx.h>
+#include <features.h>
 
 #include <hybrid/__atomic.h>
 

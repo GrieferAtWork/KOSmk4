@@ -791,29 +791,6 @@ err:
 	return false;
 }
 
-LOCAL NOBLOCK WUNUSED bool
-NOTHROW(FCALL pae_pagedir_prepare_impl_widen_v2_keep)(unsigned int vec3,
-                                                      unsigned int vec2_min,
-                                                      unsigned int vec2_max,
-                                                      unsigned int vec1_min,
-                                                      unsigned int vec1_max) {
-	unsigned int vec2;
-	assert(vec2_min <= vec2_max);
-	if (vec2_min == vec2_max)
-		return pae_pagedir_prepare_impl_widen_v1(vec3, vec2_min, vec1_min, vec1_max);
-	if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2_min, vec1_min, 511))
-		goto err;
-	if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2_max, 0, vec1_max))
-		goto err;
-	for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
-		if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2, 0, 511))
-			goto err;
-	}
-	return true;
-err:
-	return false;
-}
-
 LOCAL NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten_v2)(unsigned int vec3,
                                                      unsigned int vec2_min,
@@ -859,32 +836,6 @@ err2:
 	pae_pagedir_unprepare_impl_flatten_v2(vec3_max, 0, vec2_max, 0, vec1_max);
 err1:
 	pae_pagedir_unprepare_impl_flatten_v2(vec3_min, vec2_min, 511, vec1_min, 511);
-err:
-	return false;
-}
-
-LOCAL NOBLOCK WUNUSED bool
-NOTHROW(FCALL pae_pagedir_prepare_impl_widen_v3_keep)(unsigned int vec3_min,
-                                                      unsigned int vec3_max,
-                                                      unsigned int vec2_min,
-                                                      unsigned int vec2_max,
-                                                      unsigned int vec1_min,
-                                                      unsigned int vec1_max) {
-	assert(vec3_min <= vec3_max);
-	assert(vec3_max <= 2);
-	if (vec3_min == vec3_max)
-		return pae_pagedir_prepare_impl_widen_v2_keep(vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
-	if (!pae_pagedir_prepare_impl_widen_v2_keep(vec3_min, vec2_min, 511, vec1_min, 511))
-		goto err;
-	if (!pae_pagedir_prepare_impl_widen_v2_keep(vec3_max, 0, vec2_max, 0, vec1_max))
-		goto err;
-	if (vec3_min + 1 < vec3_max) {
-		assert(vec3_min == 0);
-		assert(vec3_max == 2);
-		if (!pae_pagedir_prepare_impl_widen_v2_keep(1, 0, 511, 0, 511))
-			goto err;
-	}
-	return true;
 err:
 	return false;
 }

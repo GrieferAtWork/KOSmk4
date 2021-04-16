@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "mman-map.c"
-//#define DEFINE_mman_map
-#define DEFINE_mman_map_subrange
+#define DEFINE_mman_map
+//#define DEFINE_mman_map_subrange
 //#define DEFINE_mman_map_res
 #endif /* __INTELLISENSE__ */
 
@@ -47,6 +47,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -170,10 +171,7 @@ NOTHROW(FCALL mnode_destroy_anon_ram)(struct mnode *__restrict self) {
  *                        offset of `hint' will be silently ignored, meaning that in this  case
  *                        the return value may differ from `hint'!
  * @param: min_alignment: s.a. `mman_findunmapped'
- * @return: * : The effective mapping  base at which  `file->DATA.BYTES[file_pos]' can be  found,
- *              unless `num_bytes' was given as `0', in which case the return value is undefined,
- *              but  arguably valid (e.g. will be a  user-/kernel-space location as it would have
- *              been when `num_bytes' was non-zero). */
+ * @return: * : The effective mapping  base at which `file->DATA.BYTES[file_pos]' can be found. */
 PUBLIC NONNULL((1, 6)) void *KCALL
 mman_map(struct mman *__restrict self,
          UNCHECKED void *hint, size_t num_bytes,
@@ -243,22 +241,42 @@ mman_map_res(struct mman *__restrict self,
 #ifdef HAVE_FILE
 	uintptr_t mnode_flags;
 	struct mfile_map_with_unlockinfo map;
-	size_t addend = 0;
+	uintptr_t addend;
+#endif /* HAVE_FILE */
+
+	/* We don't allow zero-sized file mappings! */
+	if unlikely(num_bytes == 0) {
+#ifdef HAVE_FILE
+err_bad_length:
+#endif /* HAVE_FILE */
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,
+		      num_bytes);
+	}
+
+#ifdef HAVE_FILE
+	addend = 0;
 	if unlikely(file_pos & PAGEMASK) {
-		addend = ((size_t)file_pos & PAGEMASK);
-		num_bytes += addend;
+		addend = (uintptr_t)file_pos & PAGEMASK;
+		/* When mapping to a fixed location, the in-page offset of the target
+		 * address, and the in-page offset  of the file position must  match! */
+		if ((flags & MAP_FIXED) && unlikely(((uintptr_t)hint & PAGEMASK) != addend)) {
+er_bad_addr_alignment:
+			THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+			      E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR,
+			      (uintptr_t)hint, PAGEMASK, addend);
+		}
+		if (OVERFLOW_UADD(num_bytes, addend, &num_bytes))
+			goto err_bad_length;
 		file_pos &= ~PAGEMASK;
+	} else {
+		if ((flags & MAP_FIXED) && unlikely(((uintptr_t)hint & PAGEMASK) != 0))
+			goto er_bad_addr_alignment;
 	}
 #endif /* HAVE_FILE */
+
+	/* Align the required map size by whole pages. */
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-	if unlikely(num_bytes == 0) {
-		mman_lock_acquire(self);
-		result = mman_getunmapped_or_unlock(self, hint, num_bytes,
-		                                    flags, min_alignment,
-		                                    NULL);
-		mman_lock_release(self);
-		goto done;
-	}
 
 	/* Calculate the flags for the mem-nodes we're intending on creating. */
 #ifdef HAVE_FILE
@@ -434,6 +452,7 @@ again_lock_mfile_map:
 				module_dec_nodecount(removeme->mn_module);
 			DBG_memset(&removeme->mn_writable, 0xcc, sizeof(removeme->mn_writable));
 			DBG_memset(&removeme->mn_module, 0xcc, sizeof(removeme->mn_module));
+			ATOMIC_OR(removeme->mn_flags, MNODE_F_UNMAPPED);
 			SLIST_INSERT(&old_mappings, removeme, _mn_alloc);
 		}
 
@@ -568,7 +587,6 @@ again_lock_mfile_map:
 		assert(oldnode->mn_flags & MNODE_F_UNMAPPED);
 		mnode_destroy(oldnode);
 	}
-done:
 #ifdef HAVE_FILE
 	return (byte_t *)result + addend;
 #else /* HAVE_FILE */

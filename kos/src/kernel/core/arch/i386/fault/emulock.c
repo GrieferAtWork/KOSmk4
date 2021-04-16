@@ -193,11 +193,11 @@ x86_emulock_cmpxch(struct icpustate **__restrict pstate,
 	byte_t real_oldval[EMULOCK_MAXBYTES];
 again:
 	was = PREEMPTION_PUSHOFF();
-	/* TODO: In SMP, we must send a (preferably async) IPI to all other
+	/* TODO: In SMP, we must send a  (preferably NMI) IPI to all  other
 	 *       CPUs, and tell them to temporarily halt what they're doing
 	 *       until we're done here.
 	 *       That's the only way to ensure that what we do in here will
-	 *       really happen atomically! */
+	 *       really happen atomically in regards to anything else! */
 	bus_acquirelock();
 	error = memcpy_nopf(real_oldval, addr, num_bytes);
 	if unlikely(error != 0)
