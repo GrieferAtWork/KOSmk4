@@ -42,6 +42,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -68,6 +69,8 @@ typedef union {
 } word64;
 #endif /* __UINT64_TYPE__ */
 
+/* Check if `p' points into the physical memory trampoline of the calling thread. */
+#define IS_TRAMPOLINE_POINTER(p) ((p) >= trampoline && (p) < trampoline + PAGESIZE)
 
 
 
@@ -436,6 +439,10 @@ copyfromphys(USER CHECKED void *dst,
 	if unlikely(!num_bytes)
 		return;
 	map = phys_pushaddr(src);
+	assertf(!IS_TRAMPOLINE_POINTER(dst),
+	        "copyfromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	TRY {
 		for (;;) {
 			size_t avail;
@@ -471,6 +478,10 @@ copytophys(PHYS physaddr_t dst,
 	if unlikely(!num_bytes)
 		return;
 	map = phys_pushaddr(dst);
+	assertf(!IS_TRAMPOLINE_POINTER(src),
+	        "copytophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	TRY {
 		for (;;) {
 			size_t avail;
@@ -624,6 +635,10 @@ NOTHROW(KCALL copyfromphys_nopf)(USER CHECKED void *dst,
 	if unlikely(!num_bytes)
 		return 0;
 	map = phys_pushaddr(src);
+	assertf(!IS_TRAMPOLINE_POINTER(dst),
+	        "copyfromphys_nopf(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	for (;;) {
 		size_t avail;
 		avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
@@ -658,6 +673,10 @@ NOTHROW(KCALL copytophys_nopf)(PHYS physaddr_t dst,
 	if unlikely(!num_bytes)
 		return 0;
 	map = phys_pushaddr(dst);
+	assertf(!IS_TRAMPOLINE_POINTER(src),
+	        "copytophys_nopf(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	for (;;) {
 		size_t avail;
 		avail = PAGESIZE - ((uintptr_t)map & PAGEMASK);
@@ -694,6 +713,10 @@ copyfromphys_onepage(USER CHECKED void *dst,
 		return;
 	});
 	map = phys_pushaddr(src);
+	assertf(!IS_TRAMPOLINE_POINTER(dst),
+	        "copyfromphys_onepage(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	TRY {
 		memcpy(dst, map, num_bytes);
 	} EXCEPT {
@@ -716,6 +739,10 @@ copytophys_onepage(PHYS physaddr_t dst,
 		return;
 	});
 	map = phys_pushaddr(dst);
+	assertf(!IS_TRAMPOLINE_POINTER(src),
+	        "copytophys_onepage(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	TRY {
 		memcpy(map, src, num_bytes);
 	} EXCEPT {
@@ -795,7 +822,11 @@ NOTHROW(KCALL copyfromphys_onepage_nopf)(USER CHECKED void *dst,
 	IF_PHYS_IDENTITY(src, num_bytes, {
 		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), num_bytes);
 	});
-	map    = phys_pushaddr(src);
+	map = phys_pushaddr(src);
+	assertf(!IS_TRAMPOLINE_POINTER(dst),
+	        "copyfromphys_onepage_nopf(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	result = memcpy_nopf(dst, map, num_bytes);
 	phys_pop();
 	return result;
@@ -812,7 +843,11 @@ NOTHROW(KCALL copytophys_onepage_nopf)(PHYS physaddr_t dst,
 	IF_PHYS_IDENTITY(dst, num_bytes, {
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, num_bytes);
 	});
-	map    = phys_pushaddr(dst);
+	map = phys_pushaddr(dst);
+	assertf(!IS_TRAMPOLINE_POINTER(src),
+	        "copytophys_onepage_nopf(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	result = memcpy_nopf(map, src, num_bytes);
 	phys_pop();
 	return result;
@@ -831,6 +866,10 @@ copypagefromphys(USER CHECKED void *dst,
 		return;
 	});
 	map = phys_pushpage(src);
+	assertf(dst != trampoline,
+	        "copypagefromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src);
 	TRY {
 		memcpy(dst, map, PAGESIZE);
 	} EXCEPT {
@@ -852,6 +891,10 @@ copypagetophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 		return;
 	});
 	map = phys_pushpage(dst);
+	assertf(src != trampoline,
+	        "copypagetophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src);
 	TRY {
 		memcpy(map, src, PAGESIZE);
 	} EXCEPT {
@@ -877,6 +920,10 @@ copypagesfromphys(USER CHECKED void *dst,
 	if unlikely(!num_bytes)
 		return;
 	map = phys_pushpage(src);
+	assertf(dst != trampoline,
+	        "copypagesfromphys(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	TRY {
 		for (;;) {
 			memcpy(dst, map, PAGESIZE);
@@ -910,6 +957,10 @@ copypagestophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	if unlikely(!num_bytes)
 		return;
 	map = phys_pushpage(dst);
+	assertf(src != trampoline,
+	        "copypagestophys(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	TRY {
 		for (;;) {
 			memcpy(map, src, PAGESIZE);
@@ -1067,7 +1118,11 @@ NOTHROW(KCALL copypagefromphys_nopf)(USER CHECKED void *dst,
 	IF_PHYS_IDENTITY_PAGE(src, {
 		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), PAGESIZE);
 	});
-	map    = phys_pushpage(src);
+	map = phys_pushpage(src);
+	assertf(dst != trampoline,
+	        "copypagefromphys_nopf(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src);
 	result = memcpy_nopf(dst, map, PAGESIZE);
 	phys_pop();
 	return result;
@@ -1087,7 +1142,11 @@ NOTHROW(KCALL copypagesfromphys_nopf)(USER CHECKED void *dst,
 	});
 	if unlikely(!num_bytes)
 		return 0;
-	map    = phys_pushpage(src);
+	map = phys_pushpage(src);
+	assertf(dst != trampoline,
+	        "copypagesfromphys_nopf(dst: %p, src: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", %" PRIuSIZ "): "
+	        "`dst' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	result = memcpy_nopf(dst, map, PAGESIZE);
 	if unlikely(result != 0) {
 		result += (num_bytes - PAGESIZE);
@@ -1121,7 +1180,11 @@ NOTHROW(KCALL copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	IF_PHYS_IDENTITY_PAGE(dst, {
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, PAGESIZE);
 	});
-	map    = phys_pushpage(dst);
+	map = phys_pushpage(dst);
+	assertf(src != trampoline,
+	        "copypagetophys_nopf(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src);
 	result = memcpy_nopf(map, src, PAGESIZE);
 	phys_pop();
 	return result;
@@ -1141,7 +1204,11 @@ NOTHROW(KCALL copypagestophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 	});
 	if unlikely(!num_bytes)
 		return 0;
-	map    = phys_pushpage(dst);
+	map = phys_pushpage(dst);
+	assertf(src != trampoline,
+	        "copypagestophys_nopf(dst: %" PRIpN(__SIZEOF_PHYSADDR_T__) ", src: %p, %" PRIuSIZ "): "
+	        "`src' buffer cannot be apart of the caller's trampoline",
+	        dst, src, num_bytes);
 	result = memcpy_nopf(map, src, PAGESIZE);
 	if unlikely(result != 0) {
 		result += (num_bytes - PAGESIZE);
