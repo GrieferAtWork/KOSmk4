@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/x86/alternatives.h>
@@ -50,9 +51,19 @@
 /**/
 #include "tsc.h" /* CONFIG_TSC_ASSERT_FORWARD */
 
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/hook.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
+
+#include <kos/keyboard.h>
+
+#include <alloca.h>
+#include <time.h>
+#endif /* !CONFIG_HAVE_DEBUGGER */
+
 #define assert_poison(expr)       assert((expr) || kernel_poisoned())
 #define assertf_poison(expr, ...) assertf((expr) || kernel_poisoned(), __VA_ARGS__)
-
 
 
 DECL_BEGIN
@@ -938,6 +949,84 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_tsc)(void) {
 		printk(FREESTR(KERN_INFO "[tsc] Use PIT for timings\n"));
 	}
 }
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DBG_COMMAND(clockinfo,
+            "clockinfo\n"
+            "\tDisplay information about hardware timings") {
+	void *buf;
+	bool was_cursor_visible;
+	u32 oldcur;
+	struct cpu *me = dbg_cpu;
+
+	/* Save terminal settings and display contents. */
+	was_cursor_visible = dbg_setcur_visible(false);
+	buf      = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
+	oldcur   = dbg_getcur();
+	dbg_logecho_pushoff();
+	dbg_savecolor();
+	dbg_getscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
+	dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
+	dbg_hline(0, dbg_screen_height - 1, dbg_screen_width, ' ');
+	dbg_pprint(0, dbg_screen_height - 1, DBGSTR("Press ESC to exit"));
+	dbg_setcolor(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK);
+	for (;;) {
+		pflag_t was;
+		tsc_t now_tsc;
+		ktime_t now_ktime;
+		struct timespec now_timespec;
+		struct tm now_tm;
+		was = PREEMPTION_PUSHOFF();
+		now_tsc   = tsc_get(me);
+		now_ktime = tsc_now_to_ktime(me, now_tsc);
+		PREEMPTION_POP(was);
+		now_timespec = ktime_to_timespec(now_ktime);
+		localtime_r(&now_timespec.tv_sec, &now_tm);
+		dbg_beginupdate();
+		dbg_fillbox(0, 0, dbg_screen_width, dbg_screen_height - 1, ' ');
+		dbg_pprintf(0, dbg_screen_height > 14 ? (dbg_screen_height - 14) / 2 : 0,
+		            DBGSTR("tsc:      " AC_WHITE("%" PRIuN(__SIZEOF_TSC_T__)) "\n"
+		                   "ktime:    " AC_WHITE("%" PRIuN(__SIZEOF_KTIME_T__)) "\n"
+		                   "timespec: " AC_WHITE("%" PRIuN(__SIZEOF_TIME_T__) ".%.9" PRIuN(__SIZEOF_SYSCALL_LONG_T__)) "\n"
+		                   "realtime: " AC_WHITE("%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIuN(__SIZEOF_SYSCALL_LONG_T__)) "\n"
+		                   "tsc.hz:   " AC_WHITE("%" PRIuN(__SIZEOF_TSC_HZ_T__)) "\n"
+		                   "x86.apic.emutsc.deadline:        " AC_WHITE("%" PRIu64) "\n"
+		                   "x86.apic.emutsc.initial_shifted: " AC_WHITE("%" PRIu64) "\n"
+		                   "x86.apic.emutsc.tscbase:         " AC_WHITE("%" PRIu64) "\n"
+		                   "x86.apic.emutsc.prev_current:    " AC_WHITE("%" PRIu32) "\n"
+		                   "x86.apic.emutsc.initial:         " AC_WHITE("%" PRIu32) "\n"
+		                   "x86.apic.emutsc.divide:          " AC_WHITE("%" PRIu8) "\n"
+		                   "x86.apic.emutsc.mindistance:     " AC_WHITE("%" PRIuN(__SIZEOF_TSC_T__)) "\n"
+		                   "x86.apic.emutsc.early_interrupt: " AC_WHITE("%s") "\n"
+		                   "x86.apic.emutsc.cmpxch_delay:    " AC_WHITE("%" PRIu32) "\n"),
+		            now_tsc, now_ktime, now_timespec.tv_sec, now_timespec.tv_nsec,
+		            now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday,
+		            now_tm.tm_hour, now_tm.tm_min, now_tm.tm_sec, now_timespec.tv_nsec,
+		            FORCPU(me, thiscpu_tsc_hz),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_deadline),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_tscbase),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_prev_current),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_initial),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_divide),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_mindistance),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt) ? DBGSTR("true") : DBGSTR("false"),
+		            FORCPU(me, thiscpu_x86_apic_emutsc_cmpxch_delay));
+		dbg_endupdate(true);
+		if (dbg_trygetkey() == KEY_ESC)
+			break;
+	}
+
+	/* Restore display contents and terminal settings. */
+	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
+	dbg_loadcolor();
+	dbg_logecho_pop();
+	dbg_setcur(DBG_GETCUR_X(oldcur), DBG_GETCUR_Y(oldcur));
+	dbg_setcur_visible(was_cursor_visible);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

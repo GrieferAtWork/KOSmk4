@@ -607,7 +607,7 @@ NOTHROW(KCALL ktime)(void) {
 	was = PREEMPTION_PUSHOFF();
 	me     = THIS_CPU;
 	now    = tsc_get(me);
-	result = tsc_now_to_ktime(THIS_CPU, now);
+	result = tsc_now_to_ktime(me, now);
 	PREEMPTION_POP(was);
 	return result;
 }
