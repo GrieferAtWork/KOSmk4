@@ -182,7 +182,7 @@ DATDEF unsigned int mman_getunmapped_extflags;
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MAP_FAILED:             Error: No free space matching requirements was found. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) void *
-NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self, void *addr,
+NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self, void *addr,
                                  size_t num_bytes, unsigned int flags,
                                  size_t min_alignment DFL(PAGESIZE));
 

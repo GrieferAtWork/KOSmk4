@@ -62,9 +62,11 @@ DECL_BEGIN
 
 /* Create an anonymous ram memory node. */
 PRIVATE ATTR_RETNONNULL WUNUSED struct mnode *FCALL
-mnode_create_anon_ram(size_t num_bytes, unsigned int prot, unsigned int flags) {
+mnode_create_anon_ram(PAGEDIR_PAGEALIGNED size_t num_bytes,
+                      unsigned int prot, unsigned int flags) {
 	struct mnode *node;
 	struct mpart *part;
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
 	node = (struct mnode *)kmalloc(sizeof(struct mnode), GFP_LOCKED | GFP_PREFLT);
 	TRY {
 		part = (struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);

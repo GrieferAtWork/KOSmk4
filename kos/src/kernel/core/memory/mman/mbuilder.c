@@ -38,8 +38,12 @@
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
 
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
+
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -126,7 +130,7 @@ again:
 
 /* Finalize the given mem-builder. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
+NOTHROW(FCALL mbuilder_norpc_fini)(struct mbuilder_norpc *__restrict self) {
 	struct mbnode *iter;
 
 	/* Drop file references. */
@@ -137,22 +141,6 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 	/* Destroy the tree of mappings. */
 	if unlikely(self->mb_mappings != NULL)
 		mbuilder_destroy_tree(self->mb_mappings);
-	if likely(self->mb_oldmap != NULL)
-		mnode_tree_destroy(self->mb_oldmap);
-
-	/* Free all RPC descriptors that may still be allocated */
-	{
-		struct rpc_entry *ent;
-		ent = self->mb_killrpc;
-		if unlikely(ent) {
-			do {
-				struct rpc_entry *next;
-				next = ent->re_next;
-				task_free_rpc(ent);
-				ent = next;
-			} while (ent);
-		}
-	}
 
 	/* Free all nodes that remained within the free-list. */
 	iter = SLIST_FIRST(&self->_mb_fbnodes);
@@ -166,6 +154,28 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 	DBG_memset(self, 0xcc, sizeof(*self));
 }
 
+/* Finalize the given mem-builder. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
+	struct rpc_entry *ent;
+
+	/* Destroy the old mappings tree (as inherited during in `mbuilder_apply()'). */
+	if likely(self->mb_oldmap != NULL)
+		mnode_tree_destroy(self->mb_oldmap);
+
+	/* Free all RPC descriptors that may still be allocated */
+	ent = self->mb_killrpc;
+	if unlikely(ent) {
+		do {
+			struct rpc_entry *next;
+			next = ent->re_next;
+			task_free_rpc(ent);
+			ent = next;
+		} while (ent);
+	}
+	mbuilder_norpc_fini(self);
+}
+
 
 
 /************************************************************************/
@@ -174,7 +184,7 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 
 /* Check if `part' is already referenced by `self' */
 PRIVATE NOBLOCK ATTR_PURE NONNULL((1, 2)) bool
-NOTHROW(FCALL mbuilder_uparts_contains)(struct mbuilder const *__restrict self,
+NOTHROW(FCALL mbuilder_uparts_contains)(struct mbuilder_norpc const *__restrict self,
                                         struct mpart const *__restrict part) {
 	struct mbnode const *node;
 	struct mbnode_list list;
@@ -187,7 +197,7 @@ NOTHROW(FCALL mbuilder_uparts_contains)(struct mbuilder const *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
                                       struct mbnode *__restrict node) {
 	struct mbnode_list *list;
 	list = mbnode_partset_listof(&self->mb_uparts, node->mbn_part);
@@ -197,7 +207,7 @@ NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder *__restrict self,
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void FCALL
-mbuilder_insert_anon_file_node(struct mbuilder *__restrict self,
+mbuilder_insert_anon_file_node(struct mbuilder_norpc *__restrict self,
                                /*inherit(always)*/ struct mbnode *__restrict node) {
 	mbuilder_uparts_insert(self, node);
 	SLIST_INSERT(&self->mb_files, node, mbn_nxtfile);
@@ -229,8 +239,11 @@ mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
 
 PRIVATE WUNUSED ATTR_RETNONNULL struct mbnode *FCALL
 mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
-                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
+                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                               uintptr_t mnode_flags) {
 	struct mbnode *result;
+	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
 	result = (struct mbnode *)kmalloc(sizeof(struct mbnode), GFP_LOCKED);
 	result->mbn_minaddr = (byte_t *)addr;
 	result->mbn_maxaddr = (byte_t *)addr + num_bytes - 1;
@@ -239,6 +252,7 @@ mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
 	} EXCEPT {
 		kfree(result);
 	}
+	result->mbn_flags  = mnode_flags;
 	result->mbn_fspath = NULL;
 	result->mbn_fsname = NULL;
 	result->mbn_filnxt = NULL;     /* No secondary nodes required to map the file */
@@ -253,7 +267,7 @@ mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
 /* Map a given file into the specified mbuilder.
  * Behaves  exactly  the  same  as  `mman_map()' */
 PUBLIC NONNULL((1, 6)) void *KCALL
-mbuilder_map(struct mbuilder *__restrict self,
+mbuilder_map(struct mbuilder_norpc *__restrict self,
              UNCHECKED void *hint, size_t num_bytes,
              unsigned int prot, unsigned int flags,
              struct mfile *__restrict file,
@@ -267,12 +281,36 @@ mbuilder_map(struct mbuilder *__restrict self,
 	void *result, *baseaddr;
 	struct mfile_map fm;
 	struct mbnode *fmnode, *iter;
-	if unlikely(file_pos & PAGEMASK) {
-		size_t addend;
-		addend = ((size_t)file_pos & PAGEMASK);
-		num_bytes += addend;
-		file_pos &= ~PAGEMASK;
+	uintptr_t addend;
+
+	/* We don't allow zero-sized file mappings! */
+	if unlikely(num_bytes == 0) {
+err_bad_length:
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,
+		      num_bytes);
 	}
+
+	addend = 0;
+	if unlikely(file_pos & PAGEMASK) {
+		addend = (uintptr_t)file_pos & PAGEMASK;
+		/* When mapping to a fixed location, the in-page offset of the target
+		 * address, and the in-page offset  of the file position must  match! */
+		if ((flags & MAP_FIXED) && unlikely(((uintptr_t)hint & PAGEMASK) != addend)) {
+er_bad_addr_alignment:
+			THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+			      E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR,
+			      (uintptr_t)hint, PAGEMASK, addend);
+		}
+		if (OVERFLOW_UADD(num_bytes, addend, &num_bytes))
+			goto err_bad_length;
+		file_pos &= ~PAGEMASK;
+	} else {
+		if ((flags & MAP_FIXED) && unlikely(((uintptr_t)hint & PAGEMASK) != 0))
+			goto er_bad_addr_alignment;
+	}
+
+	/* Align the required map size by whole pages. */
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags, min_alignment);
 	result    = baseaddr;
@@ -346,7 +384,7 @@ done:
  * instead   result    in    `&mfile_zero'    getting    mapped    instead.
  * Behaves exactly the same as `mman_map_subrange()' */
 PUBLIC NONNULL((1, 6)) void *KCALL
-mbuilder_map_subrange(struct mbuilder *__restrict self,
+mbuilder_map_subrange(struct mbuilder_norpc *__restrict self,
                       UNCHECKED void *hint, size_t num_bytes,
                       unsigned int prot, unsigned int flags,
                       struct mfile *__restrict file,
@@ -361,17 +399,39 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
 	void *result, *baseaddr;
 	struct mbnode *lonode, *hinode;
-	if unlikely(file_pos & PAGEMASK) {
-		size_t addend;
-		addend = ((size_t)file_pos & PAGEMASK);
-		num_bytes += addend;
-		file_pos &= ~PAGEMASK;
+	uintptr_t addend;
+
+	/* We don't allow zero-sized file mappings! */
+	if unlikely(num_bytes == 0) {
+err_bad_length:
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,
+		      num_bytes);
 	}
+
+	addend = 0;
+	if unlikely(file_pos & PAGEMASK) {
+		addend = (uintptr_t)file_pos & PAGEMASK;
+		/* When mapping to a fixed location, the in-page offset of the target
+		 * address, and the in-page offset  of the file position must  match! */
+		if ((flags & MAP_FIXED) && unlikely(((uintptr_t)hint & PAGEMASK) != addend)) {
+er_bad_addr_alignment:
+			THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+			      E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR,
+			      (uintptr_t)hint, PAGEMASK, addend);
+		}
+		if (OVERFLOW_UADD(num_bytes, addend, &num_bytes))
+			goto err_bad_length;
+		file_pos &= ~PAGEMASK;
+	} else {
+		if ((flags & MAP_FIXED) && unlikely(((uintptr_t)hint & PAGEMASK) != 0))
+			goto er_bad_addr_alignment;
+	}
+
+	/* Align the required map size by whole pages. */
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags, min_alignment);
 	result    = baseaddr;
-	if unlikely(num_bytes == 0)
-		goto done;
 
 	/* Make sure that the given file-bounds are properly aligned. */
 	if unlikely(!IS_ALIGNED(file_map_minaddr, PAGESIZE))
@@ -382,6 +442,9 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 	lonode = NULL;
 	hinode = NULL;
 	TRY {
+		uintptr_t mnode_flags;
+		mnode_flags = mbnodeflags_from_mapflags(flags) |
+		              mnodeflags_from_prot(prot);
 
 		/* Check if we need to create filler nodes before/after */
 		if (file_pos < file_map_minaddr) {
@@ -390,7 +453,7 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 				gap = (size_t)-1;
 			if (gap > num_bytes)
 				gap = num_bytes;
-			lonode    = mbuilder_create_zero_file_node(baseaddr, gap);
+			lonode    = mbuilder_create_zero_file_node(baseaddr, gap, mnode_flags);
 			baseaddr  = (byte_t *)baseaddr + gap;
 			num_bytes = num_bytes - gap;
 			file_pos  = file_map_minaddr;
@@ -399,13 +462,18 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 		/* Check the upper bound. */
 		if (num_bytes > 0) {
 			size_t max_file_size;
-			if (OVERFLOW_USUB((file_map_maxaddr + 1), file_pos, &max_file_size))
+			if (file_pos >= file_map_maxaddr)
 				max_file_size = 0;
+			else {
+				if (OVERFLOW_USUB(file_map_maxaddr, file_pos, &max_file_size) ||
+				    OVERFLOW_UADD(max_file_size, 1, &max_file_size))
+					max_file_size = SIZE_MAX;
+			}
 			/* Check if the requested size exceeds the allowed size. */
-			if (max_file_size < num_bytes) {
+			if (num_bytes > max_file_size) {
 				size_t gap;
 				gap       = num_bytes - max_file_size;
-				hinode    = mbuilder_create_zero_file_node(baseaddr, gap);
+				hinode    = mbuilder_create_zero_file_node(baseaddr, gap, mnode_flags);
 				num_bytes = max_file_size;
 			}
 		}
@@ -437,8 +505,7 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 			iter = fmnode;
 			for (;;) {
 				struct mbnode *next;
-				iter->mbn_flags = mbnodeflags_from_mapflags(flags) |
-				                  mnodeflags_from_prot(prot);
+				iter->mbn_flags = mnode_flags;
 				iter->mbn_minaddr += (uintptr_t)baseaddr;
 				iter->mbn_maxaddr += (uintptr_t)baseaddr;
 				iter->mbn_fspath = xincref(file_fspath);
@@ -485,8 +552,7 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 		mbuilder_insert_anon_file_node(self, hinode);
 
 	/* TODO: Merge adjacent nodes if possible */
-done:
-	return result;
+	return (byte_t *)result + addend;
 }
 
 
@@ -495,31 +561,37 @@ done:
  * address range as empty (but possibly prepared), making it a reserved address range.
  * Behaves exactly the same as `mman_map_res()' */
 PUBLIC NONNULL((1)) void *KCALL
-mbuilder_map_res(struct mbuilder *__restrict self,
+mbuilder_map_res(struct mbuilder_norpc *__restrict self,
                  UNCHECKED void *hint, size_t num_bytes,
                  unsigned int flags, size_t min_alignment)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		       E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
+	struct mbnode *fmnode;
 	void *result, *baseaddr;
+
+	/* We don't allow zero-sized file mappings! */
+	if unlikely(num_bytes == 0) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,
+		      num_bytes);
+	}
+
+	/* Align the required map size by whole pages. */
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 	baseaddr  = mbuilder_getunmapped(self, hint, num_bytes, flags, min_alignment);
 	result    = baseaddr;
 
-	if likely(num_bytes > 0) {
-		struct mbnode *fmnode;
+	/* TODO: Extend adjacent nodes if possible */
 
-		/* TODO: Extend adjacent nodes if possible */
+	/* Construct the memory-reservation node. */
+	fmnode = (struct mbnode *)mbuilder_create_res_file_node(baseaddr, num_bytes);
 
-		/* Construct the memory-reservation node. */
-		fmnode = (struct mbnode *)mbuilder_create_res_file_node(baseaddr, num_bytes);
-
-		/* Insert the node into the mem-builder.
-		 * Note that we don't add the part to the files- or uparts lists,
-		 * but  only to the mappings tree, since the node doesn't contain
-		 * a mem-file or mem-part. */
-		mbnode_tree_insert(&self->mb_mappings, fmnode); /* Inherit */
-	}
+	/* Insert the node into the mem-builder.
+	 * Note that we don't add the part to the files- or uparts lists,
+	 * but  only to the mappings tree, since the node doesn't contain
+	 * a mem-file or mem-part. */
+	mbnode_tree_insert(&self->mb_mappings, fmnode); /* Inherit */
 	return result;
 }
 
@@ -532,7 +604,7 @@ mbuilder_map_res(struct mbuilder *__restrict self,
  * such functionality is never required.
  * Also: This function never returns `MAP_FAILED'! */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
-mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
+mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
                      size_t num_bytes, unsigned int flags,
                      size_t min_alignment)
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
@@ -589,7 +661,7 @@ mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
  *  - fmnode->mbn_filpos   (Wanted in-file mapping address)
  *  - fmnode->mbn_file     (The actual file being mapped) */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder_norpc *__restrict self,
                                       struct mbnode *__restrict fmnode) {
 	assert(fmnode->mbn_part != NULL);
 	assert(fmnode->mbn_file != NULL);
@@ -606,7 +678,7 @@ NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder *__restrict self,
  * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior  call
  * to `mbuilder_insert_fmnode()' and the call to this function) */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder_norpc *__restrict self,
                                       struct mbnode *__restrict fmnode) {
 	assert(fmnode->mbn_part != NULL);
 	assert(fmnode->mbn_file != NULL);

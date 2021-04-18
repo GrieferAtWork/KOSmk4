@@ -64,8 +64,8 @@ DECL_BEGIN
  *    2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0 8 6 4 2 0
  * ```
  *
- * NOTE: In the case of E3, all entries (all 4 of them) are always PRESENT.
- *       In order to support identity-mapping, as well as shared kernel-memory,
+ * NOTE: In the case of E3, all entries (all 4 of them) are always PRESENT,
+ *       in order to support identity-mapping, as well as shared kernel-memory:
  *       >> p_e3[3].p_e2[0...507] = KERNEL_SHARE; // Kernel share:     0xc0000000 ... 0xff7fffff
  *       >> p_e3[3].p_e2[508]     = p_e3[0];      // Identity mapping: 0xff800000 ... 0xff9fffff
  *       >> p_e3[3].p_e2[509]     = p_e3[1];      // Identity mapping: 0xffa00000 ... 0xff8fffff

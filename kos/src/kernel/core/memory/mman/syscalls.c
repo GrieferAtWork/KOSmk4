@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_SYSCALLS_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_SYSCALLS_C 1
+#define __WANT_MNODE__mn_dead
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -39,6 +40,7 @@
 #include <sched/cpu.h>
 #include <sched/cred.h>
 
+#include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <sys/mman.h>
@@ -288,8 +290,38 @@ DEFINE_SYSCALL5(void *, mremap,
 }
 #endif /* __ARCH_WANT_SYSCALL_MREMAP */
 
+/* TODO: errno_t sys_remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
+/* TODO: errno_t sys_mincore(void *start, size_t len, uint8_t *vec); */
+/* TODO: errno_t sys_madvise(void *addr, size_t len, syscall_ulong_t advice); */
+/* TODO: errno_t sys_mlock(void const *addr, size_t len); */
+/* TODO: errno_t sys_mlock2(void const *addr, size_t length, syscall_ulong_t flags); */
+/* TODO: errno_t sys_munlock(void const *addr, size_t len); */
+/* TODO: errno_t sys_msync(void *addr, size_t len, syscall_ulong_t flags); */
+/* TODO: errno_t sys_mlockall([tostr(MLOCKALL_FLAGS)] syscall_ulong_t flags); */
+/* TODO: errno_t sys_munlockall(); */
+/* TODO: errno_t sys_uselib(char const *library); */
+/* TODO: ssize_t sys_process_vm_readv(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */
+/* TODO: ssize_t sys_process_vm_writev(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */
 
 
 DECL_END
+
+
+
+
+/************************************************************************/
+/* maplibrary()                                                         */
+/************************************************************************/
+#ifndef __INTELLISENSE__
+#ifdef __ARCH_WANT_SYSCALL_MAPLIBRARY
+#define DEFINE_sys_maplibrary
+#include "syscalls-maplibrary.c.inl"
+#endif /* __ARCH_WANT_SYSCALL_MAPLIBRARY */
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_MAPLIBRARY
+#define DEFINE_compat_sys_maplibrary
+#include "syscalls-maplibrary.c.inl"
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_MAPLIBRARY */
+#endif /* !__INTELLISENSE__ */
+
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_SYSCALLS_C */

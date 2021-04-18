@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dadf3e */
+/* HASH CRC-32:0x7168d7b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11512,9 +11512,10 @@ END(__x86_asm64_syscall_ksysctl)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
- *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
- *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
+ *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
+ *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
@@ -28659,9 +28660,10 @@ END(__x86_asm32_int80_setitimer64)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
- *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
- *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
+ *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
+ *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
@@ -34223,9 +34225,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_set
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
- *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
- *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
+ *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
+ *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
@@ -40632,9 +40635,10 @@ END(__x86_asm32_sysrun32_setitimer64)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
- *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
- *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
+ *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
+ *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)

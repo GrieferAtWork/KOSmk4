@@ -60,7 +60,7 @@ DECL_BEGIN
  * and return `false'
  * Otherwise, return `true' */
 PRIVATE NONNULL((1)) bool FCALL
-mbuilder_lockparts_or_unlock(struct mbuilder *__restrict self,
+mbuilder_lockparts_or_unlock(struct mbuilder_norpc *__restrict self,
                              struct unlockinfo *unlock) {
 	size_t bucket;
 	for (bucket = 0; bucket < MBNODE_PARTSET_NUMBUCKETS; ++bucket) {
@@ -93,7 +93,7 @@ done_unlock_all:
 /* Release locks to all of the mapped mem-parts, as should have previously
  * been   acquired   during  a   call   to  `mbuilder_partlocks_acquire()' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self) {
+NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder_norpc *__restrict self) {
 	size_t bucket;
 	struct mbnode *node;
 	for (bucket = 0; bucket < MBNODE_PARTSET_NUMBUCKETS; ++bucket) {
@@ -107,7 +107,7 @@ NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self) {
 /* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
  * will  keep  on  attempting  the  operation  until  it  succeeds. */
 PUBLIC NONNULL((1)) void FCALL
-mbuilder_partlocks_acquire(struct mbuilder *__restrict self)
+mbuilder_partlocks_acquire(struct mbuilder_norpc *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	while (!mbuilder_partlocks_acquire_or_unlock(self, NULL))
 		;
@@ -121,7 +121,7 @@ mbuilder_partlocks_acquire(struct mbuilder *__restrict self)
 	(mbuilder_find_node_for_mpart(self, part) != NULL)
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
                                       struct mbnode *__restrict node) {
 	struct mbnode_list *list;
 	list = mbnode_partset_listof(&self->mb_uparts, node->mbn_part);
@@ -131,7 +131,7 @@ NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder *__restrict self,
 /* Find the mb-node currently registered as part of the `mb_uparts'
  * set, as  the owner  of the  lock that  is being  held on  `part' */
 PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) struct mbnode *
-NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder const *__restrict self,
+NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder_norpc const *__restrict self,
                                             struct mpart const *__restrict part) {
 	struct mbnode *iter;
 	LIST_FOREACH (iter, mbnode_partset_listof(&self->mb_uparts, part), mbn_nxtuprt) {
@@ -157,7 +157,7 @@ struct mfile_map_for_reflow: mfile_map {
  * as well as remove all nodes associated with the mapping from `self',  and
  * the file-map base-node from `*p_fmnode' */
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
-NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__restrict self,
                                         /*in|out:remove*/ struct mbnode **__restrict p_fmnode,
                                         /*out*/ struct mfile_map_for_reflow *__restrict fm) {
 	struct mbnode *fmnode, *iter;
@@ -232,7 +232,7 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder *__restrict s
 /* Undo everything done by `mbuilder_extract_filemap()' by re-inserting the
  * given `fm' into the mem-builder. */
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
-NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder_norpc *__restrict self,
                                        /*in|out:insert*/ struct mbnode **__restrict p_fmnode,
                                        /*in*/ struct mfile_map_for_reflow *__restrict fm,
                                        bool success) {
@@ -305,10 +305,10 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder *__restrict se
 
 
 struct mb_unlock_all_parts_info: unlockinfo {
-	struct mbuilder   *mualpi_builder; /* [1..1] The builder for on which we must invoke
-	                                    *        `mbuilder_partlocks_release()' */
-	struct unlockinfo *mualpi_uunlock; /* [0..1] User-defined unlock-info callback.
-	                                    * Will   also   be   invoked,   if   given. */
+	struct mbuilder_norpc *mualpi_builder; /* [1..1] The builder for on which we must invoke
+	                                        *        `mbuilder_partlocks_release()' */
+	struct unlockinfo     *mualpi_uunlock; /* [0..1] User-defined unlock-info callback.
+	                                        *        Will also be invoked, if given. */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -365,7 +365,7 @@ NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
  *
  * Otherwise, release all locks and return `false' */
 PRIVATE NONNULL((1, 2)) bool FCALL
-mbuilder_reflow_filemap_or_unlock(struct mbuilder *__restrict self,
+mbuilder_reflow_filemap_or_unlock(struct mbuilder_norpc *__restrict self,
                                   struct mbnode **__restrict p_fmnode,
                                   struct unlockinfo *unlock) {
 	bool ok;
@@ -415,7 +415,7 @@ mbuilder_reflow_filemap_or_unlock(struct mbuilder *__restrict self,
  * NOTE: If this function returns with an exception, `unlock' will
  *       also be invoked. */
 PUBLIC NONNULL((1)) bool FCALL
-mbuilder_partlocks_acquire_or_unlock(struct mbuilder *__restrict self,
+mbuilder_partlocks_acquire_or_unlock(struct mbuilder_norpc *__restrict self,
                                      struct unlockinfo *unlock)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct mbnode **p_fmnode;

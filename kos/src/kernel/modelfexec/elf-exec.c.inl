@@ -56,11 +56,12 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 	ehdr        = (LOCAL_ElfW(Ehdr) *)args->ea_header;
 	phdr_vector = (LOCAL_ElfW(Phdr) *)malloca(ehdr->e_phnum * sizeof(LOCAL_ElfW(Phdr)));
 	TRY {
-		struct mbuilder builder = MBUILDER_INIT;
+		struct mbuilder builder;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *peb_base;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *stack_base;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *linker_base;
 		uintptr_t loadstart = (uintptr_t)-1;
+		mbuilder_init(&builder);
 		TRY {
 			bool need_dyn_linker = false;
 			linker_base = (UNCHECKED void *)-1;
@@ -110,17 +111,19 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 							fil_bytes -= PAGESIZE;
 					}
 					prot = prot_from_elfpf(phdr_vector[i].p_flags);
-					TRY {
-						mbuilder_map(&builder, loadaddr, fil_bytes, prot,
-						             MAP_FIXED | MAP_FIXED_NOREPLACE,
-						             args->ea_xnode,
-						             args->ea_xpath,
-						             args->ea_xdentry,
-						             (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK));
-					} EXCEPT {
-						if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
-							goto err_overlap;
-						RETHROW();
+					if (fil_bytes != 0) {
+						TRY {
+							mbuilder_map(&builder, loadaddr, fil_bytes, prot,
+							             MAP_FIXED | MAP_FIXED_NOREPLACE,
+							             args->ea_xnode,
+							             args->ea_xpath,
+							             args->ea_xdentry,
+							             (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK));
+						} EXCEPT {
+							if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
+								goto err_overlap;
+							RETHROW();
+						}
 					}
 					if (mem_bytes > fil_bytes) {
 						/* LD  sometimes produces really  weird .bss sections  that are neither whole
@@ -176,6 +179,8 @@ err_overlap:
 							overlap_node->mbn_flags   = prot;
 							mbuilder_insert_fmnode(&builder, overlap_node);
 							fil_bytes += PAGESIZE; /* Adjust to not map the first (special) page of .bss */
+							if unlikely(fil_bytes >= mem_bytes)
+								goto done_PT_LOAD_bss;
 						}
 						/* Map BSS as anonymous, zero-initialized memory. */
 						TRY {
@@ -188,6 +193,8 @@ err_overlap:
 								goto err_overlap;
 							RETHROW();
 						}
+done_PT_LOAD_bss:
+						;
 					}
 				}	break;
 

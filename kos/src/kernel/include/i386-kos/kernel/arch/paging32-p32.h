@@ -67,10 +67,10 @@ DECL_BEGIN
  *       may contain the kernel core itself,  which is done as an  optimization
  *       to simplify management of the core itself by allowing the CPU to cache
  *       the entire kernel core using only 1 or 2 TLB entires.
- *    -> Since   only   2   indirections   exist   (`struct p32_pdir::p_e2'   and  `union p32_pdir_e2::p_e1'),
- *       both   of  which  are   always  pre-allocated/or  const-initialized   for  addresses  >=  0xc0000000,
- *       there   is  no  need  to  prepare  kernel-space  memory  for  paging  before  mapping  memory.  I.e.:
- *       when PAE integration is disabled, `paging32.h' can `#undef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE'
+ *    -> Since only 2 indirections exist (`struct p32_pdir::p_e2' and `union p32_pdir_e2::p_e1'), both
+ *       of which are always pre-allocated/or const-initialized for addresses >= 0xc0000000, there  is
+ *       no need to  prepare kernel-space  memory for  paging before  mapping memory.  I.e.: when  PAE
+ *       integration is disabled, `paging32.h' can  `#undef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE'
  *
  */
 

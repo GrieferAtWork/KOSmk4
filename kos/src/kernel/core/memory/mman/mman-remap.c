@@ -234,7 +234,8 @@ something_changed:
 		ATOMIC_OR(removeme->mn_flags, MNODE_F_UNMAPPED);
 		DBG_memset(&removeme->mn_writable, 0xcc, sizeof(removeme->mn_writable));
 		DBG_memset(&removeme->mn_module, 0xcc, sizeof(removeme->mn_module));
-		SLIST_INSERT(&old_mappings, removeme, _mn_alloc);
+		DBG_memset(&removeme->mn_mman, 0xcc, sizeof(removeme->mn_mman));
+		SLIST_INSERT(&old_mappings, removeme, _mn_dead);
 	}
 
 	/* Do the actual work of injecting the new mem-nodes into the mman. */
@@ -302,7 +303,7 @@ something_changed:
 	while (!SLIST_EMPTY(&old_mappings)) {
 		struct mnode *oldnode;
 		oldnode = SLIST_FIRST(&old_mappings);
-		SLIST_REMOVE_HEAD(&old_mappings, _mn_alloc);
+		SLIST_REMOVE_HEAD(&old_mappings, _mn_dead);
 		assert(oldnode->mn_flags & MNODE_F_UNMAPPED);
 		mnode_destroy(oldnode);
 	}
@@ -444,8 +445,8 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 		u16 map_prot;
 		node = SLIST_FIRST(&map->mfm_nodes);
 		SLIST_REMOVE_HEAD(&map->mfm_nodes, _mn_alloc);
-		node->mn_flags = mapinfo->mi_nodeflags;
-		node->mn_mman  = self;
+		node->mn_flags  = mapinfo->mi_nodeflags;
+		node->mn_mman   = self;
 		node->mn_fspath = xincref(mapinfo->mi_fspath);
 		node->mn_fsname = xincref(mapinfo->mi_fsname);
 		node->mn_module = NULL;
@@ -642,7 +643,8 @@ err_cannot_prepare:
 				ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
 				DBG_memset(&node->mn_writable, 0xcc, sizeof(node->mn_writable));
 				DBG_memset(&node->mn_module, 0xcc, sizeof(node->mn_module));
-				SLIST_INSERT(&old_mappings, node, _mn_alloc);
+				DBG_memset(&node->mn_mman, 0xcc, sizeof(node->mn_mman));
+				SLIST_INSERT(&old_mappings, node, _mn_dead);
 			}
 
 			/* Delete the pagedir mapping of the old mapping location. */
@@ -850,7 +852,7 @@ again_lock_mman_phase2:
 	while (!SLIST_EMPTY(&old_mappings)) {
 		struct mnode *oldnode;
 		oldnode = SLIST_FIRST(&old_mappings);
-		SLIST_REMOVE_HEAD(&old_mappings, _mn_alloc);
+		SLIST_REMOVE_HEAD(&old_mappings, _mn_dead);
 		assert(oldnode->mn_flags & MNODE_F_UNMAPPED);
 		mnode_destroy(oldnode);
 	}

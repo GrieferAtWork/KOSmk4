@@ -109,7 +109,7 @@ DECL_BEGIN
  * @param: envp:        User-space pointer to a NULL-terminated vector of environment strings
  * @return: * :         Page index of the PEB (to-be passed to the user-space program) */
 PUBLIC WUNUSED NONNULL((1)) UNCHECKED void *KCALL
-MY_MBUILDER_ALLOC_PEB(struct mbuilder *__restrict self,
+MY_MBUILDER_ALLOC_PEB(struct mbuilder_norpc *__restrict self,
                       size_t argc_inject, KERNEL char const *const *argv_inject,
                       USER UNCHECKED IN_PTR(char const) USER CHECKED const *argv,
                       USER UNCHECKED IN_PTR(char const) USER CHECKED const *envp)

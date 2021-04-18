@@ -192,8 +192,8 @@ handle_iob_access(struct cpu *__restrict me,
 			ATOMIC_INC(iob->ib_share);
 		}
 		/* NOTE: The following line  causes an inconsistency  that is fixed  by
-		 *       assigning        `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
-		 *       below. Because preemption is currently off, this inconsistency
+		 *       assigning `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob' below.
+		 *       Because   preemption  is  currently  off,  this  inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, iob);
 	} else if (is_writing && ATOMIC_READ(iob->ib_share) > 1) {
@@ -238,8 +238,8 @@ handle_iob_access(struct cpu *__restrict me,
 			return false;
 		}
 		/* NOTE: The following line  causes an inconsistency  that is fixed  by
-		 *       assigning        `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
-		 *       below. Because preemption is currently off, this inconsistency
+		 *       assigning `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob' below.
+		 *       Because   preemption  is  currently  off,  this  inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, cow);
 		ATOMIC_DEC(iob->ib_share);
@@ -773,20 +773,24 @@ do_handle_iob_node_access:
 				/* If we didn't actually re-enable preemption, then no cpu-transfer could have happened! */
 				if (!icpustate_getpreemption(state))
 					goto pop_connections_and_throw_segfault;
+
 				/* I/O access from kernel-space wouldn't result in an IOB check, so
 				 * if  the access comes from kernel-space, then this is the calling
 				 * thread incorrectly accessing some other cpu's IOB. */
 				if (!FAULT_IS_USER)
 					goto pop_connections_and_throw_segfault;
-				/* If the calling thread couldn't have changed CPUs, then this is an access to  */
+
+				/* If the calling thread couldn't have changed CPUs, then this has
+				 * to be an (incorrect) explicit access. */
 				if (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE)
 					goto pop_connections_and_throw_segfault;
+
 				/* The  calling thread is  capable of being  migrated between different CPUs,
 				 * and the accessed node _is_ the IOB vector of a different CPU. However with
 				 * all of these factors, there still  exists the possibility that the  access
 				 * happened because the CPU itself accessed  the vector, as may be  triggered
 				 * by use of the `(in|out)(b|w|l)' instructions.
-				 * To  make sure that we can handle those cases as well, as can check the
+				 * To  make sure that we can handle those cases as well, we can check the
 				 * memory to which `icpustate_getpc(state)' points for being one of these
 				 * instructions.
 				 * To prevent the possibility of repeating the access to the IOB vector during
@@ -795,8 +799,10 @@ do_handle_iob_node_access:
 				if ((byte_t const *)pc >= mnode_getminaddr(mf.mfl_node) &&
 				    (byte_t const *)pc <= mnode_getmaxaddr(mf.mfl_node))
 					goto pop_connections_and_throw_segfault;
+
 				/* If we got here cause of an I/O instruction, just return to the caller and
-				 * have them  attempt the  access once  again, hopefully  without  accessing */
+				 * have them attempt the access once again, hopefully without being moved to
+				 * a different CPU yet again. */
 				if (is_io_instruction_and_not_memory_access((byte_t const *)pc, state,
 				                                            (uintptr_t)addr))
 					goto pop_connections_and_return;

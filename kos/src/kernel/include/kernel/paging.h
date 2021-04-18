@@ -312,10 +312,11 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys
  * >> pagedir_unprepare(...);
  * NOTE: A prepared  mapping is  not only  valid for  the exact  range.
  *       Wishing to map something at a sub-range of it is also allowed:
- *       >> pagedir_prepare(5, 6);   // Prepage 6 pages at page-index 5 for modification
- *       >> pagedir_map(5, 3);           // OK
- *       >> pagedir_map(8, 3);           // OK
- *       >> pagedir_unprepare(5, 6); // Indicate that the 6 pages must not longer be modified
+ *       >> pagedir_prepare(5, 6);   // Prepage 6 bytes at address 5 for modification
+ *       >> pagedir_map(5, 3);       // OK
+ *       >> pagedir_map(8, 3);       // OK
+ *       >> pagedir_unprepare(5, 6); // Indicate that the 6 bytes must not longer be modified
+ *       *: Addresses in this example would only be correct for PAGESIZE=1
  * WARNING: prepare() + unprepare() _DONT_  work recursively, and are  also
  *          not thread-safe when called for overlapping ranges in parallel!
  * WARNING: unprepare() should always be called with the same range as prepare()

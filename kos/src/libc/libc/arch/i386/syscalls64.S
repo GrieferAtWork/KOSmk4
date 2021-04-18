@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd219108e */
+/* HASH CRC-32:0xca245242 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3581,9 +3581,10 @@ DEFINE_PUBLIC_ALIAS(sys_ksysctl, libc_sys_ksysctl)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
- *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
- *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
+ *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
+ *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
@@ -8543,9 +8544,10 @@ DEFINE_PUBLIC_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
 
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
- *                       MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
- *                       MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
+ * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
+ *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
+ *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)

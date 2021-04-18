@@ -186,13 +186,11 @@ struct mbnode_partset {
 
 
 struct rpc_entry;
-struct mbuilder {
+struct mbuilder_norpc {
 #ifdef __INTELLISENSE__
 	struct mbnode             *mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
-	struct mnode              *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #else /* __INTELLISENSE__ */
 	RBTREE_ROOT(struct mbnode) mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
-	RBTREE_ROOT(struct mnode)  mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #endif /* !__INTELLISENSE__ */
 	struct mbnode_partset      mb_uparts;   /* [0..n] Set of nodes mapping unique parts. */
 	struct mbnode_slist        mb_files;    /* [0..n][link(mbn_nxtfile)] List of file mappings. */
@@ -200,36 +198,54 @@ struct mbuilder {
 		struct mbnode_slist   _mb_fbnodes;  /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 		struct mnode_slist    _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 	};
+};
+
+struct mbuilder
+#ifdef __cplusplus
+    : mbuilder_norpc
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct mbuilder_norpc     _mb_base;
+#define __mbuilder_asnorpc(self) (&(self)->_mb_base)
+#define __mbuilder_base _mb_base.
+#else /* !__cplusplus */
+#define __mbuilder_asnorpc /* nothing */
+#define __mbuilder_base    /* nothing */
+#endif /* __cplusplus */
+#ifdef __INTELLISENSE__
+	struct mnode              *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
+#else /* __INTELLISENSE__ */
+	RBTREE_ROOT(struct mnode)  mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
+#endif /* !__INTELLISENSE__ */
 	struct rpc_entry          *mb_killrpc;  /* [0..n][link(re_next)]  List  of  pre-allocated  RPC
 	                                         * descriptors, as used by `mbuilder_apply()' in order
 	                                         * to  terminate threads using  the given target mman. */
 };
 
 /* Initialize the given mem-builder. */
-#define MBUILDER_INIT                 \
-	{                                 \
-		__NULLPTR,                    \
-		MPART_POINTER_SET_INIT,       \
-		SLIST_HEAD_INITIALIZER(~),    \
-		{                             \
-			SLIST_HEAD_INITIALIZER(~) \
-		},                            \
-		__NULLPTR                     \
-	}
-#define mbuilder_init(self)                   \
+#define mbuilder_norpc_init(self)             \
 	((self)->mb_mappings = __NULLPTR,         \
 	 mbnode_partset_init(&(self)->mb_uparts), \
 	 SLIST_INIT(&(self)->mb_files),           \
-	 SLIST_INIT(&(self)->mb_fparts),          \
-	 (self)->mb_killrpc = __NULLPTR)
-#define mbuilder_cinit(self)                            \
+	 SLIST_INIT(&(self)->_mb_fnodes))
+#define mbuilder_norpc_cinit(self)                      \
 	(__hybrid_assert((self)->mb_mappings == __NULLPTR), \
 	 mbnode_partset_cinit(&(self)->mb_uparts),          \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_uparts)),  \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_fparts)),  \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->_mb_fnodes)))
+#define mbuilder_init(self)                         \
+	(mbuilder_norpc_init(__mbuilder_asnorpc(self)), \
+	 (self)->mb_oldmap  = __NULLPTR,                \
+	 (self)->mb_killrpc = __NULLPTR)
+#define mbuilder_cinit(self)                          \
+	(mbuilder_norpc_cinit(__mbuilder_asnorpc(self)),  \
+	 __hybrid_assert((self)->mb_oldmap == __NULLPTR), \
 	 __hybrid_assert((self)->mb_killrpc == __NULLPTR))
 
 /* Finalize the given mem-builder. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mbuilder_norpc_fini)(struct mbuilder_norpc *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
 
@@ -268,14 +284,14 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self);
  *  - fmnode->mbn_filpos   (Wanted in-file mapping address)
  *  - fmnode->mbn_file     (The actual file being mapped) */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_insert_fmnode)(struct mbuilder_norpc *__restrict self,
                                       struct mbnode *__restrict fmnode);
 /* Remove `fmnode' from `self'. - Asserts that no secondary nodes have
  * been allocated for use with `fmnode' (as could happen if the caller
  * uses `mbuilder_partlocks_acquire_or_unlock()' between a prior  call
  * to `mbuilder_insert_fmnode()' and the call to this function) */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,
+NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder_norpc *__restrict self,
                                       struct mbnode *__restrict fmnode);
 
 
@@ -289,20 +305,21 @@ NOTHROW(FCALL mbuilder_remove_fmnode)(struct mbuilder *__restrict self,
  * NOTE: If this function returns with an exception, `unlock' will
  *       also be invoked. */
 FUNDEF NONNULL((1)) __BOOL FCALL
-mbuilder_partlocks_acquire_or_unlock(struct mbuilder *__restrict self,
+mbuilder_partlocks_acquire_or_unlock(struct mbuilder_norpc *__restrict self,
                                      struct unlockinfo *unlock)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Helper wrapper for `mbuilder_partlocks_acquire_or_unlock()' that
  * will  keep  on  attempting  the  operation  until  it  succeeds. */
 FUNDEF NONNULL((1)) void FCALL
-mbuilder_partlocks_acquire(struct mbuilder *__restrict self)
+mbuilder_partlocks_acquire(struct mbuilder_norpc *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Release locks to all of the mapped mem-parts, as should have previously
  * been   acquired   during  a   call   to  `mbuilder_partlocks_acquire()' */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder *__restrict self);
+NOTHROW(FCALL mbuilder_partlocks_release)(struct mbuilder_norpc *__restrict self);
+
 
 
 /* Apply all of the mappings from  `self' onto `target', whilst simultaneously  deleting
@@ -356,10 +373,8 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 
-/* Slightly   simplified   version   of   `mbuilder_apply_or_unlock()'
- * that should be called while not already holding any locks, and will
- * automatically acquire necessary locks, do the requested calls,  and
- * finally release all locks acquired,  and still held at that  point.
+/* Apply memory mappings mapped within `self' into `target', overriding
+ * all already-existing mappings
  * @param: additional_actions: Additional actions to be atomically performed
  *                             alongside  the  setting of  the  new mem-node
  *                             mappings (set of `MBUILDER_APPLY_AA_*') */
@@ -388,9 +403,9 @@ mbuilder_apply(struct mbuilder *__restrict self,
 /* MBuilder-version of `mman_findunmapped()' */
 #ifdef __INTELLISENSE__
 NOBLOCK WUNUSED NONNULL((1)) void *
-NOTHROW(mbuilder_findunmapped)(struct mbuilder *__restrict self, void *addr,
-                              size_t num_bytes, unsigned int flags,
-                              size_t min_alignment DFL(PAGESIZE));
+NOTHROW(mbuilder_findunmapped)(struct mbuilder_norpc *__restrict self, void *addr,
+                               size_t num_bytes, unsigned int flags,
+                               size_t min_alignment DFL(PAGESIZE));
 #else /* __INTELLISENSE__ */
 #define mbuilder_findunmapped(self, ...) \
 	mman_findunmapped_in_usertree((struct mnode **)&(self)->mb_mappings, __VA_ARGS__)
@@ -404,7 +419,7 @@ NOTHROW(mbuilder_findunmapped)(struct mbuilder *__restrict self, void *addr,
  * such functionality is never required.
  * Also: This function never returns `MAP_FAILED'! */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED void *FCALL
-mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
+mbuilder_getunmapped(struct mbuilder_norpc *__restrict self, void *addr,
                      size_t num_bytes, unsigned int flags,
                      size_t min_alignment DFL(PAGESIZE))
 		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
@@ -413,7 +428,7 @@ mbuilder_getunmapped(struct mbuilder *__restrict self, void *addr,
 
 /* MBuilder-version of `mman_map()' */
 FUNDEF NONNULL((1, 6)) void *KCALL
-mbuilder_map(struct mbuilder *__restrict self,
+mbuilder_map(struct mbuilder_norpc *__restrict self,
              UNCHECKED void *hint, size_t num_bytes,
              unsigned int prot DFL(PROT_READ | PROT_WRITE | PROT_SHARED),
              unsigned int flags DFL(0),
@@ -441,7 +456,7 @@ mbuilder_map(/* self:          */ self,
 
 /* MBuilder-version of `mman_map_subrange()' */
 FUNDEF NONNULL((1, 6)) void *KCALL
-mbuilder_map_subrange(struct mbuilder *__restrict self,
+mbuilder_map_subrange(struct mbuilder_norpc *__restrict self,
                       UNCHECKED void *hint, size_t num_bytes,
                       unsigned int prot DFL(PROT_READ | PROT_WRITE | PROT_SHARED),
                       unsigned int flags DFL(0),
@@ -458,7 +473,7 @@ mbuilder_map_subrange(struct mbuilder *__restrict self,
 
 /* MBuilder-version of `mman_map_res()' */
 FUNDEF NONNULL((1)) void *KCALL
-mbuilder_map_res(struct mbuilder *__restrict self,
+mbuilder_map_res(struct mbuilder_norpc *__restrict self,
                  UNCHECKED void *hint, size_t num_bytes,
                  unsigned int flags DFL(0),
                  size_t min_alignment DFL(PAGESIZE))
@@ -483,7 +498,7 @@ mbuilder_map_res(struct mbuilder *__restrict self,
  * @param: envp:        User-space pointer to a NULL-terminated vector of environment strings
  * @return: * :         Page index of the PEB (to-be passed to the user-space program) */
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-mbuilder_alloc_peb(struct mbuilder *__restrict self,
+mbuilder_alloc_peb(struct mbuilder_norpc *__restrict self,
                    size_t argc_inject, KERNEL char const *const *argv_inject,
                    USER UNCHECKED char const *USER CHECKED const *argv,
                    USER UNCHECKED char const *USER CHECKED const *envp)
@@ -495,19 +510,19 @@ mbuilder_alloc_peb(struct mbuilder *__restrict self,
 #define mbuilder_alloc_peb64_p64 mbuilder_alloc_peb
 #define mbuilder_alloc_peb32_p32 mbuilder_alloc_peb32
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-mbuilder_alloc_peb32(struct mbuilder *__restrict self,
+mbuilder_alloc_peb32(struct mbuilder_norpc *__restrict self,
                      size_t argc_inject, KERNEL char const *const *argv_inject,
                      USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
                      USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-mbuilder_alloc_peb32_p64(struct mbuilder *__restrict self,
+mbuilder_alloc_peb32_p64(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
                          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
                          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-mbuilder_alloc_peb64_p32(struct mbuilder *__restrict self,
+mbuilder_alloc_peb64_p32(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
                          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
                          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
@@ -517,19 +532,19 @@ mbuilder_alloc_peb64_p32(struct mbuilder *__restrict self,
 #define mbuilder_alloc_peb64_p64 mbuilder_alloc_peb64
 #define mbuilder_alloc_peb32_p32 mbuilder_alloc_peb
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-mbuilder_alloc_peb64(struct mbuilder *__restrict self,
+mbuilder_alloc_peb64(struct mbuilder_norpc *__restrict self,
                      size_t argc_inject, KERNEL char const *const *argv_inject,
                      USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
                      USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-mbuilder_alloc_peb64_p32(struct mbuilder *__restrict self,
+mbuilder_alloc_peb64_p32(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
                          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
                          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-mbuilder_alloc_peb32_p64(struct mbuilder *__restrict self,
+mbuilder_alloc_peb32_p64(struct mbuilder_norpc *__restrict self,
                          size_t argc_inject, KERNEL char const *const *argv_inject,
                          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
                          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
@@ -538,6 +553,106 @@ mbuilder_alloc_peb32_p64(struct mbuilder *__restrict self,
 #error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
 #endif
 #endif /* __ARCH_HAVE_COMPAT */
+
+
+
+/************************************************************************/
+/* Helpers for loading a set of position-independent mappings           */
+/************************************************************************/
+
+/* Try to find a suitable loadaddr at which all of the mappings from `builder'
+ * may be mapped, such that they don't collide with any existing mapping  that
+ * is already mapped in `self'.
+ * The caller must ensure that `builder' isn't empty.
+ * @param: addr:      A load-address hint for where to search for free memory.
+ * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
+ *                    Unknown flags are silently ignored.
+ * @return: PAGEDIR_PAGEALIGNED * : The load address addend to-be added to mappings.
+ *                                  Pass   this   value   to   `mman_map_mbuilder()'
+ * @return: MAP_FAILED:             Error: No free space matching requirements was found. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 3)) uintptr_t
+NOTHROW(FCALL mman_findunmapped_mbuilder)(struct mman const *__restrict self, uintptr_t addr,
+                                          struct mbuilder_norpc const *__restrict builder,
+                                          unsigned int flags);
+
+
+/* Similar  to `mman_findunmapped_mbuilder()', but  never return `MAP_FAILED', and
+ * automatically split mem-nodes at the resulting min/max bounds when  `MAX_FIXED'
+ * w/o `MAP_FIXED_NOREPLACE' is used, and  another mapping already existed at  the
+ * specified location. If this cannot be done without blocking, release all locks,
+ * do the split while not holding  any locks, and return `MAP_FAILED',  indicative
+ * of   the  caller  needing   to  re-acquire  locks   and  re-attempt  the  call.
+ * The caller must ensure that `builder' isn't empty.
+ * @param: addr:      A load-address hint for where to search for free memory.
+ * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
+ *                    Additionally,   `MAP_FIXED'   and  `MAP_FIXED_NOREPLACE'   are  accepted.
+ *                    Unknown flags are silently ignored.
+ * @return: PAGEDIR_PAGEALIGNED * : The load address addend to-be added to mappings.
+ *                                  Pass   this   value   to   `mman_map_mbuilder()'
+ * @return: MAP_FAILED:             Locks had to be released, but another attempt might succeed.
+ *                                  Reacquire  all  required  locks,  and  re-attempt  the call.
+ * @throws: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to locate a suitably large address
+ *                                                  range  that  fits the  given constraints.
+ * @throws: E_BADALLOC_ADDRESS_ALREADY_EXISTS:      Both  `MAP_FIXED'  and   `MAP_FIXED_NOREPLACE'
+ *                                                  were given, and a pre-existing mapping already
+ *                                                  exists within the given address range. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 3)) uintptr_t FCALL
+mman_getunmapped_mbuilder_or_unlock(struct mman *__restrict self, uintptr_t addr,
+                                    struct mbuilder_norpc const *__restrict builder,
+                                    unsigned int flags,
+                                    struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
+		       E_BADALLOC_ADDRESS_ALREADY_EXISTS);
+
+
+/* Map all of the  nodes from `builder' into  self whilst applying a  load-offset
+ * specified by `loadaddr'. The caller must ensure that no other mappings already
+ * exist  at any of the locations that will overlap with the nodes from `builder'
+ * after `loadaddr' is applied to each of their min/max addresses.
+ *
+ * Before calling this function, the caller must have acquired a lock to `self',
+ * as well as `mbuilder_partlocks_acquire()'! Once this function returns, all of
+ * the locks to mem-parts will have been  released, but the lock to `self'  will
+ * still be held, and thereby has to be removed by the caller.
+ *
+ * @param: flags: Set of `MMAN_MAP_MBUILDER_F_*' */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mman_map_mbuilder)(struct mman *__restrict self,
+                                 struct mbuilder_norpc *__restrict builder,
+                                 uintptr_t loadaddr, unsigned int flags DFL(0));
+#define MMAN_MAP_MBUILDER_F_NORMAL   0x0000 /* Normal flags. */
+#define MMAN_MAP_MBUILDER_F_PREPARED 0x0001 /* The caller already went to  all of the troubles  of
+                                             * preparing the page directory of `self' to have  its
+                                             * mappings modified at the locations where nodes will
+                                             * end up being mapped to.
+                                             * When not given, try to prepare the pagedir for  each
+                                             * node individually, and only map parts immediately if
+                                             * doing so succeeds. If this fails, parts will  simply
+                                             * be mapped lazily. */
+
+
+/* Unmap all mem-nodes from `self' that overlap with nodes from `builder'
+ * after the given `loadaddr' offset has  been applied to them. For  this
+ * purpose, the page directory of `self' may need to be prepared in order
+ * to  successfully unmap  those nodes, and  if doing so  fails, then all
+ * already-removed nodes are restored, and `false' is returned.
+ *
+ * Otherwise, removed nodes are marked as UNMAPPED, and are inserted into
+ * the given `deadnodes' list (linked via `_mn_dead').
+ *
+ * This function is needed to facility `MAP_FIXED' functionality detailed
+ * by  `mman_getunmapped_mbuilder_or_unlock()', and may be used to remove
+ * colliding  nodes prior to  new nodes from  `builder' being loaded into
+ * the given mman (as per `mman_map_mbuilder()')
+ *
+ * @return: true:  Success
+ * @return: false: Insufficient  physical  memory to  prepare  the page
+ *                 directory for the removal of a pre-existing mapping. */
+FUNDEF NOBLOCK NONNULL((1, 2, 4)) __BOOL
+NOTHROW(FCALL mman_unmap_mbuilder)(struct mman *__restrict self,
+                                   struct mbuilder_norpc const *__restrict builder,
+                                   uintptr_t loadaddr,
+                                   struct mnode_slist *__restrict deadnodes);
 
 
 DECL_END

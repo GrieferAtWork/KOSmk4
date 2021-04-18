@@ -544,6 +544,11 @@ FUNDEF NONNULL((1)) void FCALL
 mpart_ll_allocmem(struct mpart *__restrict self,
                   size_t total_pages)
 		THROWS(E_BADALLOC);
+/* TODO: `mpart_ll_allocmem()' should be able to take hints as to the physical
+ *       addresses that we'd prefer it to allocate. - That way, the caller may
+ *       specify the physical addresses of neighboring mappings during  alloc,
+ *       allowing pagedir mappings to be more linear than they'd otherwise be. */
+
 
 /* Free backing memory using `page_free()'.  When an mchunkvec was  used,
  * also kfree that vector. Requires that `MPART_ST_INMEM(self->mp_state)' */

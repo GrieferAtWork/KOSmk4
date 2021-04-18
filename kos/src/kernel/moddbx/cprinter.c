@@ -632,52 +632,6 @@ PRIVATE struct cprinter const lenprinter = {
 };
 
 
-#if 0 /* TODO */
-PRIVATE ssize_t FORMATPRINTER_CC
-vprinter_callback(/*size_t **/ void *arg,
-                  /*utf-8*/ char const *__restrict UNUSED(data),
-                  size_t datalen) {
-	size_t *premaining_length;
-	premaining_length = (size_t *)arg;
-	if (datalen > *premaining_length)
-		return -1; /* Text would become too long. */
-	*premaining_length -= datalen;
-	return 0;
-}
-
-
-/* Check if it would be  possible to print `buf'  in-line,
- * such that `indent+INLINE_LENGTH <= maxlinelen'. If this
- * cannot be done, then  return -1. Otherwise, return  the
- * result of  `indent+INLINE_LENGTH',  that  is:  the  new
- * indent of the inline-printed value. */
-PRIVATE NONNULL((1, 2)) ssize_t KCALL
-ctype_printvalue_inline(struct ctyperef const *__restrict self,
-                        void const *buf, unsigned int flags,
-                        size_t indent, size_t maxlinelen) {
-	struct cprinter vprinter;
-	size_t remaining;
-	ssize_t error;
-	if unlikely(indent >= maxlinelen)
-		return -1; /* Never possible. */
-	remaining = maxlinelen - indent;
-	vprinter.cp_printer    = &vprinter_callback;
-	vprinter.cp_arg        = &remaining;
-	vprinter.cp_format     = NULL;
-	vprinter.cp_format_arg = NULL;
-	/* Try to print everything on a single line. */
-	error = ctype_printvalue(self, &vprinter, buf,
-	                         flags | CTYPE_PRINTVALUE_FLAG_ONELINE,
-	                         0, 0, 0, 0);
-	if (error >= 0)
-		error = (ssize_t)(maxlinelen - remaining);
-	return error;
-}
-#endif
-
-
-
-
 
 
 #define CSTRING_KIND_NORMAL  0
@@ -883,7 +837,7 @@ ctype_printstruct_callback(void *cookie,
 			 * >>     struct elem my_elemv[];
 			 * >> };
 			 * In this case, we can guess the length of `my_elemv' to be equal
-			 * to `my_elemc', which  can could access  by-name at this  point.
+			 * to  `my_elemc', which  we could  access by-name  at this point.
 			 * As such, special handling should be done here in order to print
 			 * the correct # of elements for `my_elemv' */
 		}
@@ -1525,7 +1479,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
                  size_t newline_tab, size_t maxlinelen) {
 	/* TODO: This function is insanely inefficient for deeply nested
 	 *       structures  such as printing libc's `current' (the main
-	 *       problem being its `struct exception_info')
+	 *       problem being its `struct exception_info'-member)
 	 * Solution:
 	 *       Use  a virtual printer  that is limited by  the number of characters
 	 *       it is is  allowed to print.  If one  tries to print  more than  that

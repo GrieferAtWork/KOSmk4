@@ -722,7 +722,7 @@ again:
 
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
  * WARNING: Physical   memory   cannot   be   dereferenced   prior   to   being   mapped.
- * @return: * :              The starting page number of the newly allocated memory range.
+ * @return: * :               The starting page number of the newly allocated memory range.
  * @return: PHYSPAGE_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED physpage_t
 NOTHROW(KCALL page_mallocone)(void) {

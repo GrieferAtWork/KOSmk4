@@ -143,6 +143,10 @@ DECL_BEGIN
 	((mbnodeflags) & (MNODE_F_MPREPARED | MNODE_F_MLOCK |     \
 	                  MBNODE_F_POPULATE | MBNODE_F_NONBLOCK | \
 	                  MNODE_F_NOSPLIT | MNODE_F_NOMERGE))
+#define mbnodeflags_from_mapflags_usronly(mapflags)      \
+	((mapflags) & (MAP_LOCKED | MAP_POPULATE | MAP_NONBLOCK))
+#define mapflags_from_mbnodeflags_usronly(mbnodeflags) \
+	((mbnodeflags) & (MNODE_F_MLOCK | MBNODE_F_POPULATE | MBNODE_F_NONBLOCK))
 #else /* ... */
 #define mbnodeflags_from_mapflags(mapflags)                \
 	((((mapflags)&MAP_PREPARED) ? MNODE_F_MPREPARED : 0) | \
@@ -158,6 +162,14 @@ DECL_BEGIN
 	 (((mbnodeflags)&MBNODE_F_NONBLOCK) ? MAP_NONBLOCK : 0) | \
 	 (((mbnodeflags)&MNODE_F_NOSPLIT) ? MAP_NOSPLIT : 0) |    \
 	 (((mbnodeflags)&MNODE_F_NOMERGE) ? MAP_NOMERGE : 0))
+#define mbnodeflags_from_mapflags_usronly(mapflags)        \
+	((((mapflags)&MAP_LOCKED) ? MNODE_F_MLOCK : 0) |       \
+	 (((mapflags)&MAP_POPULATE) ? MBNODE_F_POPULATE : 0) | \
+	 (((mapflags)&MAP_NONBLOCK) ? MBNODE_F_NONBLOCK : 0))
+#define mapflags_from_mbnodeflags_usronly(mbnodeflags)        \
+	((((mbnodeflags)&MNODE_F_MLOCK) ? MAP_LOCKED : 0) |       \
+	 (((mbnodeflags)&MBNODE_F_POPULATE) ? MAP_POPULATE : 0) | \
+	 (((mbnodeflags)&MBNODE_F_NONBLOCK) ? MAP_NONBLOCK : 0))
 #endif /* !... */
 
 

@@ -183,7 +183,7 @@ select_random_integer_with_bias(uintptr_t minval,
  * @return: PAGEDIR_PAGEALIGNED * : The base address where the caller's mapping should go
  * @return: MAP_FAILED:             Error: No free space matching requirements was found. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) void *
-NOTHROW(FCALL mman_findunmapped)(struct mman *__restrict self,
+NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self,
                                  void *addr, size_t num_bytes, unsigned int flags,
                                  size_t min_alignment) {
 #define HAS_EXTENDED_MIN_ALIGNMENT \
@@ -407,7 +407,7 @@ select_from_avail_range:
 		assertf(result >= avail_minaddr, "%p >= %p", result, avail_minaddr);
 		assertf(result <= alloc_maxaddr, "%p <= %p", result, alloc_maxaddr);
 	} else {
-		struct mnode *prev, *next;
+		struct mnode const *prev, *next;
 		bool want_below, want_above;
 		PAGEDIR_PAGEALIGNED void *lo_best_minaddr, *lo_best_maxaddr;
 		PAGEDIR_PAGEALIGNED void *hi_best_minaddr, *hi_best_maxaddr;
@@ -642,7 +642,7 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 	void *result;
 	/* Deal with MAP_FIXED */
 	if (flags & MAP_FIXED) {
-		struct mnode *node;
+		struct mnode const *node;
 		byte_t *maxaddr;
 		result  = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 		/* Check for overflowing `num_bytes' */

@@ -135,6 +135,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 
 	/* Step #3: Go over all nodes currently mapped in `target', and
 	 *          set the `MNODE_F_UNMAPPED'  flag for  all of  them. */
+	assert(!self->mb_oldmap);
 	if ((self->mb_oldmap = target->mm_mappings) != NULL)
 		mnode_tree_foreach_set_unmapped(self->mb_oldmap);
 
