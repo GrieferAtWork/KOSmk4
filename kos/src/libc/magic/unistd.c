@@ -71,6 +71,8 @@
 )]%[insert:prefix(
 #include <asm/os/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
 )]%[insert:prefix(
+#include <asm/pagesize.h>
+)]%[insert:prefix(
 #include <bits/posix_opt.h>
 )]%[insert:prefix(
 #include <bits/crt/sys_errlist.h>
@@ -78,11 +80,6 @@
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <kos/anno.h>
-)]%{
-}%[insert:prefix(
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <asm/pagesize.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 )]%{
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)

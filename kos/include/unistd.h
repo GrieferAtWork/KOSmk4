@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f0ec9a */
+/* HASH CRC-32:0x63d4393 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,13 +49,11 @@
 #include <asm/crt/confname.h>
 #include <asm/os/stdio.h>
 #include <asm/os/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
+#include <asm/pagesize.h>
 #include <bits/posix_opt.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <asm/pagesize.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
@@ -1846,6 +1844,9 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),(__r
 /* >> gethostid(3) */
 __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #if defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE_getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
@@ -1862,15 +1863,12 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpag
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),__getpagesize,())
-#else /* ... */
-#include <asm/pagesize.h>
-#ifdef __ARCH_PAGESIZE
+#elif defined(__ARCH_PAGESIZE)
 #include <libc/local/unistd/getpagesize.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL getpagesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))(); })
-#endif /* __ARCH_PAGESIZE */
-#endif /* !... */
+#endif /* ... */
 #ifdef __ARCH_PAGESIZE
 /* If known to be a compile-time  constant, use macros to make  sure
  * that our `getpagesize()' function is _as_ _fast_ as possible, and
