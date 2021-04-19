@@ -132,8 +132,6 @@ mrangelock_aq_splitnodes_or_unlock(struct mrangelock *__restrict self,
                                    mrangelock_filter_cb_t filter)
 		THROWS(E_BADALLOC) {
 	if likely(self->mrl_nodes.mm_min) {
-		minaddr = (void const *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
-		maxaddr = (void const *)(CEIL_ALIGN((uintptr_t)maxaddr + 1, PAGESIZE) - 1);
 		if ((byte_t const *)minaddr > (byte_t const *)mnode_getminaddr(self->mrl_nodes.mm_min) &&
 		    (*filter)(NULL, self->mrl_nodes.mm_min)) {
 			if unlikely(!mnode_split_or_unlock(mm, self->mrl_nodes.mm_min, minaddr))
@@ -228,6 +226,9 @@ mman_mlock(struct mman *__restrict self, void const *addr,
 		      E_INVALID_ARGUMENT_CONTEXT_MLOCK_SIZE,
 		      num_bytes);
 	}
+	/* Align address bounds to whole pages. */
+	minaddr = (byte_t const *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
+	maxaddr = (byte_t const *)(CEIL_ALIGN((uintptr_t)maxaddr + 1, PAGESIZE) - 1);
 again:
 	/* Acquire locks... */
 	if (flags & MLOCK_ONFAULT) {
@@ -264,19 +265,80 @@ again_prefault:
 
 			if likely(rl.mrl_nodes.mm_min) {
 				do {
-					byte_t const *nextaddr;
+					u16 perm;
+					byte_t const *fault_minaddr, *fault_maxaddr;
+					fault_minaddr = (byte_t const *)mnode_getminaddr(rl.mrl_nodes.mm_min);
+					fault_maxaddr = (byte_t const *)mnode_getmaxaddr(rl.mrl_nodes.mm_min);
+					if (fault_minaddr < minaddr)
+						fault_minaddr = minaddr;
+					if (fault_maxaddr > maxaddr)
+						fault_maxaddr = maxaddr;
 					mf.mfl_mman  = self;
-					mf.mfl_addr  = mnode_getaddr(rl.mrl_nodes.mm_min);
-					mf.mfl_size  = mnode_getsize(rl.mrl_nodes.mm_min);
+					mf.mfl_addr  = (void *)fault_minaddr;
+					mf.mfl_size  = (size_t)(fault_maxaddr - fault_minaddr) + 1;
 					mf.mfl_flags = MMAN_FAULT_F_NORMAL;
 					mf.mfl_node  = rl.mrl_nodes.mm_min;
 					if (rl.mrl_nodes.mm_min->mn_flags & MNODE_F_PWRITE)
 						mf.mfl_flags = MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE;
-					nextaddr = (byte_t const *)mf.mfl_addr + mf.mfl_size;
-					if (nextaddr >= maxaddr)
+
+					/* Fault this node. */
+					if (!mfault_or_unlock(&mf))
+						goto again_prefault;
+
+					/* Re-initialize internal fields  of the memfault  controller.
+					 * A successful call  to `mfault_or_unlock()' normally  leaves
+					 * these fields in an undefined state, such that `mfault_fini'
+					 * doesn't normally have to be called in this case.
+					 *
+					 * However, because we may need to use the  fault-controller
+					 * once again, and because we're still inside a TRY...EXCEPT
+					 * block that will call  `mfault_fini()' if an exception  is
+					 * thrown, we have to re-initialize to ensure consistency! */
+					__mfault_init(&mf);
+
+					/* Re-map the freshly faulted memory. */
+					perm = mnode_getperm(mf.mfl_node);
+					if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
+						perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
+						                    mf.mfl_addr, mf.mfl_size,
+						                    mf.mfl_offs, perm);
+					} else {
+						if (!pagedir_prepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size)) {
+							mpart_lock_release(mf.mfl_part);
+							mman_lock_release(self);
+							THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+						}
+						perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
+						                    mf.mfl_addr, mf.mfl_size,
+						                    mf.mfl_offs, perm);
+						pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
+					}
+
+					/* Upon success, `mfault_or_unlock()'  will have acquired  a
+					 * lock to the associated part. We will actually be  needing
+					 * this lock later, and we will re-acquire it at that point.
+					 *
+					 * But  until then, our lock to `self' will prevent the now-
+					 * faulted backing data of `mf.mfl_part' from being unloaded
+					 * again, since anyone trying to do so would have to acquire
+					 * our mman-lock first (which  we won't release until  after
+					 * we've  re-acquired  the part-lock  if everything  goes to
+					 * plan) */
+					mpart_lock_release(mf.mfl_part);
+
+					/* If write-access was granted, add the node to the list of writable nodes. */
+					if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+					    LIST_INSERT_HEAD(&self->mm_writable, mf.mfl_node, mn_writable);
+
+					/* If we've gone through  all nodes within the  requested
+					 * address range (and all of them have now been faulted),
+					 * then we can stop trying to search for more nodes. */
+					if (fault_maxaddr >= maxaddr)
 						break;
-					/* Find the next-greater node above `nextaddr' */
-					mman_mappings_minmaxlocate(self, nextaddr, maxaddr, &rl.mrl_nodes);
+
+					/* Find the next-greater node above `fault_maxaddr' */
+					mman_mappings_minmaxlocate(self, fault_maxaddr + 1,
+					                           maxaddr, &rl.mrl_nodes);
 				} while (rl.mrl_nodes.mm_min);
 
 				/* Because the actual node distribution may have changed
@@ -353,7 +415,9 @@ mman_munlock(struct mman *__restrict self, void const *addr,
 		      E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE,
 		      num_bytes);
 	}
-
+	/* Align address bounds to whole pages. */
+	minaddr = (byte_t const *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
+	maxaddr = (byte_t const *)(CEIL_ALIGN((uintptr_t)maxaddr + 1, PAGESIZE) - 1);
 again:
 	/* Acquire locks... */
 	mman_lock_acquire(self);
