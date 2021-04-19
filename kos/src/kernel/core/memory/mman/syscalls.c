@@ -510,6 +510,7 @@ again_lock_mman:
 			partrel_size += blocksize;
 		}
 #undef mpart_isblockincore
+		mpart_lock_release(part);
 		decref_unlikely(part);
 		if (partrel_size > partrel_maxsize)
 			partrel_size = partrel_maxsize;

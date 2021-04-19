@@ -197,6 +197,9 @@ mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 					 * a  successful  return  from   `mpart_unsharecow_or_unlock()') */
 					mpart_unsharecow_data_init(&self->mfm_ucdat);
 				}
+mark_part_as_changed:
+				/* Mark the accessed address range as changed */
+				mpart_changed(part, minaddr, (maxaddr - minaddr) + 1);
 			} else {
 				/* The caller wants to create a private mapping.
 				 * As such, we must ensure that there aren't any SHARED mappings
@@ -231,6 +234,8 @@ mfile_map_populate_or_unlock(struct mfile_map *__restrict self)
 					 *       parts that have both been replaced with private copies.
 					 *       When found, simply merge the 2 parts & nodes into the same object, thus
 					 *       simplifying the resulting mapping. */
+				} else {
+					goto mark_part_as_changed;
 				}
 			}
 		}

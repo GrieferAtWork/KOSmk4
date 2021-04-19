@@ -262,62 +262,66 @@ again_prefault:
 						fault_minaddr = minaddr;
 					if (fault_maxaddr > maxaddr)
 						fault_maxaddr = maxaddr;
-					mf.mfl_mman  = self;
-					mf.mfl_addr  = (void *)fault_minaddr;
-					mf.mfl_size  = (size_t)(fault_maxaddr - fault_minaddr) + 1;
-					mf.mfl_flags = MMAN_FAULT_F_NORMAL;
-					mf.mfl_node  = rl.mrl_nodes.mm_min;
-					if (rl.mrl_nodes.mm_min->mn_flags & MNODE_F_PWRITE)
-						mf.mfl_flags = MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE;
 
-					/* Fault this node. */
-					if (!mfault_or_unlock(&mf))
-						goto again_prefault;
+					/* If there is a backing part to this node, then fault it! */
+					if ((mf.mfl_part = rl.mrl_nodes.mm_min->mn_part) != NULL) {
+						mf.mfl_mman  = self;
+						mf.mfl_addr  = (void *)fault_minaddr;
+						mf.mfl_size  = (size_t)(fault_maxaddr - fault_minaddr) + 1;
+						mf.mfl_flags = MMAN_FAULT_F_NORMAL;
+						mf.mfl_node  = rl.mrl_nodes.mm_min;
+						if (rl.mrl_nodes.mm_min->mn_flags & MNODE_F_PWRITE)
+							mf.mfl_flags = MMAN_FAULT_F_NORMAL | MMAN_FAULT_F_WRITE;
 
-					/* Re-initialize internal fields  of the memfault  controller.
-					 * A successful call  to `mfault_or_unlock()' normally  leaves
-					 * these fields in an undefined state, such that `mfault_fini'
-					 * doesn't normally have to be called in this case.
-					 *
-					 * However, because we may need to use the  fault-controller
-					 * once again, and because we're still inside a TRY...EXCEPT
-					 * block that will call  `mfault_fini()' if an exception  is
-					 * thrown, we have to re-initialize to ensure consistency! */
-					__mfault_init(&mf);
+						/* Fault this node. */
+						if (!mfault_or_unlock(&mf))
+							goto again_prefault;
 
-					/* Re-map the freshly faulted memory. */
-					perm = mnode_getperm(mf.mfl_node);
-					if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-						perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
-						                    mf.mfl_addr, mf.mfl_size,
-						                    mf.mfl_offs, perm);
-					} else {
-						if (!pagedir_prepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size)) {
-							mpart_lock_release(mf.mfl_part);
-							mman_lock_release(self);
-							THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+						/* Re-initialize internal fields  of the memfault  controller.
+						 * A successful call  to `mfault_or_unlock()' normally  leaves
+						 * these fields in an undefined state, such that `mfault_fini'
+						 * doesn't normally have to be called in this case.
+						 *
+						 * However, because we may need to use the  fault-controller
+						 * once again, and because we're still inside a TRY...EXCEPT
+						 * block that will call  `mfault_fini()' if an exception  is
+						 * thrown, we have to re-initialize to ensure consistency! */
+						__mfault_init(&mf);
+
+						/* Re-map the freshly faulted memory. */
+						perm = mnode_getperm(mf.mfl_node);
+						if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
+							perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
+							                    mf.mfl_addr, mf.mfl_size,
+							                    mf.mfl_offs, perm);
+						} else {
+							if (!pagedir_prepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size)) {
+								mpart_lock_release(mf.mfl_part);
+								mman_lock_release(self);
+								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+							}
+							perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
+							                    mf.mfl_addr, mf.mfl_size,
+							                    mf.mfl_offs, perm);
+							pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
 						}
-						perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
-						                    mf.mfl_addr, mf.mfl_size,
-						                    mf.mfl_offs, perm);
-						pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
+
+						/* Upon success, `mfault_or_unlock()'  will have acquired  a
+						 * lock to the associated part. We will actually be  needing
+						 * this lock later, and we will re-acquire it at that point.
+						 *
+						 * But  until then, our lock to `self' will prevent the now-
+						 * faulted backing data of `mf.mfl_part' from being unloaded
+						 * again, since anyone trying to do so would have to acquire
+						 * our mman-lock first (which  we won't release until  after
+						 * we've  re-acquired  the part-lock  if everything  goes to
+						 * plan) */
+						mpart_lock_release(mf.mfl_part);
+
+						/* If write-access was granted, add the node to the list of writable nodes. */
+						if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+						    LIST_INSERT_HEAD(&self->mm_writable, mf.mfl_node, mn_writable);
 					}
-
-					/* Upon success, `mfault_or_unlock()'  will have acquired  a
-					 * lock to the associated part. We will actually be  needing
-					 * this lock later, and we will re-acquire it at that point.
-					 *
-					 * But  until then, our lock to `self' will prevent the now-
-					 * faulted backing data of `mf.mfl_part' from being unloaded
-					 * again, since anyone trying to do so would have to acquire
-					 * our mman-lock first (which  we won't release until  after
-					 * we've  re-acquired  the part-lock  if everything  goes to
-					 * plan) */
-					mpart_lock_release(mf.mfl_part);
-
-					/* If write-access was granted, add the node to the list of writable nodes. */
-					if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
-					    LIST_INSERT_HEAD(&self->mm_writable, mf.mfl_node, mn_writable);
 
 					/* If we've gone through  all nodes within the  requested
 					 * address range (and all of them have now been faulted),

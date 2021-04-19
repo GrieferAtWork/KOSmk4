@@ -456,7 +456,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 		mman_mappings_insert(self, node);
 
 		/* Insert the node into the copy- or share-list of the associated part. */
-		assert((node->mn_part != NULL) == mfile_map_isreserved(map));
+		assert((node->mn_part == NULL) == mfile_map_isreserved(map));
 		if ((part = node->mn_part) != NULL) {
 			if (mapinfo->mi_nodeflags & MNODE_F_SHARED) {
 				LIST_INSERT_HEAD(&part->mp_share, node, mn_link);
