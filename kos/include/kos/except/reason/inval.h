@@ -213,6 +213,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE,                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
 	E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
 	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MS_SYNC' and `MS_ASYNC' were given. */
+	E_INVALID_ARGUMENT_CONTEXT_MINCORE_ADDR,                       /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: The `addr' argument isn't aligned by `PAGESIZE'. */
+	E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE,                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -401,6 +403,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
                                                                                                                                      * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MS_SYNC' and `MS_ASYNC' were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_ADDR                       E_INVALID_ARGUMENT_CONTEXT_MINCORE_ADDR                       /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: The `addr' argument isn't aligned by `PAGESIZE'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                       E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -586,6 +590,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         164 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        165 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MS_SYNC' and `MS_ASYNC' were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_ADDR                       166 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: The `addr' argument isn't aligned by `PAGESIZE'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE                       167 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mincore(2)' is too large. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

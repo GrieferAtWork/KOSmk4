@@ -41,15 +41,21 @@
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
+#include <sched/task.h>
+
+#include <hybrid/align.h>
+#include <hybrid/overflow.h>
 
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/paging.h>
 #include <sys/mman.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -57,7 +63,7 @@ DECL_BEGIN
 /* munmap()                                                             */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MUNMAP
-DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
+DEFINE_SYSCALL2(errno_t, munmap, USER UNCHECKED void *, addr, size_t, length) {
 	mman_unmap(THIS_MMAN, addr, length, MMAN_UNMAP_NOKERNPART);
 	return -EOK;
 }
@@ -100,7 +106,7 @@ DEFINE_SYSCALL3(errno_t, mprotect,
 
 #ifdef WANT_MMAP
 PRIVATE void *KCALL
-sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
+sys_mmap_impl(USER UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
               syscall_ulong_t flags, fd_t fd, pos_t file_offset) {
 	void *result;
 	struct handle_mmap_info file;
@@ -227,7 +233,7 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 
 #ifdef __ARCH_WANT_SYSCALL_MMAP
 DEFINE_SYSCALL6(void *, mmap,
-                void *, addr, size_t, length, syscall_ulong_t, prot,
+                USER UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
                 syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, offset) {
 	pos_t file_offset = (pos_t)offset;
 	if (flags & MAP_OFFSET64_POINTER) {
@@ -243,7 +249,7 @@ DEFINE_SYSCALL6(void *, mmap,
 
 #ifdef __ARCH_WANT_SYSCALL_MMAP2
 DEFINE_SYSCALL6(void *, mmap2,
-                void *, addr, size_t, length, syscall_ulong_t, prot,
+                USER UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
                 syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, pgoffset) {
 	return sys_mmap_impl(addr, length, prot, flags, fd, (pos_t)pgoffset * PAGESIZE);
 }
@@ -251,7 +257,7 @@ DEFINE_SYSCALL6(void *, mmap2,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_MMAP2
 DEFINE_COMPAT_SYSCALL6(void *, mmap2,
-                       void *, addr, size_t, length, syscall_ulong_t, prot,
+                       USER UNCHECKED void *, addr, size_t, length, syscall_ulong_t, prot,
                        syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, pgoffset) {
 	return sys_mmap_impl(addr, length, prot, flags, fd, (pos_t)pgoffset * PAGESIZE);
 }
@@ -265,8 +271,8 @@ DEFINE_COMPAT_SYSCALL6(void *, mmap2,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MREMAP
 DEFINE_SYSCALL5(void *, mremap,
-                void *, old_address, size_t, old_size, size_t, new_size,
-                syscall_ulong_t, flags, void *, new_address) {
+                USER UNCHECKED void *, old_address, size_t, old_size, size_t, new_size,
+                syscall_ulong_t, flags, USER UNCHECKED void *, new_address) {
 	void *result;
 
 	/* Validate flags. */
@@ -299,14 +305,17 @@ DEFINE_SYSCALL5(void *, mremap,
 /* mlock(), mlock2(), munlock(), mlockall(), munlockall()               */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MLOCK
-DEFINE_SYSCALL2(errno_t, mlock, void const *, addr, size_t, len) {
+DEFINE_SYSCALL2(errno_t, mlock,
+                USER UNCHECKED void const *, addr, size_t, len) {
 	mman_mlock(THIS_MMAN, addr, len);
 	return EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_MLOCK */
 
 #ifdef __ARCH_WANT_SYSCALL_MLOCK2
-DEFINE_SYSCALL3(errno_t, mlock2, void const *, addr, size_t, len, syscall_ulong_t, flags) {
+DEFINE_SYSCALL3(errno_t, mlock2,
+                USER UNCHECKED void const *, addr, size_t, len,
+                syscall_ulong_t, flags) {
 	VALIDATE_FLAGSET(flags, 0 | MLOCK_ONFAULT,
 	                 E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS);
 	mman_mlock(THIS_MMAN, addr, len, flags);
@@ -315,7 +324,8 @@ DEFINE_SYSCALL3(errno_t, mlock2, void const *, addr, size_t, len, syscall_ulong_
 #endif /* __ARCH_WANT_SYSCALL_MLOCK2 */
 
 #ifdef __ARCH_WANT_SYSCALL_MUNLOCK
-DEFINE_SYSCALL2(errno_t, munlock, void const *, addr, size_t, len) {
+DEFINE_SYSCALL2(errno_t, munlock,
+                USER UNCHECKED void const *, addr, size_t, len) {
 	mman_munlock(THIS_MMAN, addr, len);
 	return EOK;
 }
@@ -347,7 +357,9 @@ DEFINE_SYSCALL0(errno_t, munlockall) {
 /* msync()                                                              */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MSYNC
-DEFINE_SYSCALL3(errno_t, msync, void *, addr, size_t, len, syscall_ulong_t, flags) {
+DEFINE_SYSCALL3(errno_t, msync,
+                USER UNCHECKED void *, addr, size_t, len,
+                syscall_ulong_t, flags) {
 	VALIDATE_FLAGSET(flags, MS_SYNC | MS_ASYNC | MS_INVALIDATE,
 	                 E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS);
 #if MS_SYNC != 0 && MS_ASYNC != 0 && MS_SYNC != MS_ASYNC
@@ -363,8 +375,157 @@ DEFINE_SYSCALL3(errno_t, msync, void *, addr, size_t, len, syscall_ulong_t, flag
 }
 #endif /* __ARCH_WANT_SYSCALL_MSYNC */
 
+
+
+
+/************************************************************************/
+/* mincore()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_MSYNC
+DEFINE_SYSCALL3(errno_t, mincore,
+                USER UNCHECKED void *, addr, size_t, len,
+                USER UNCHECKED uint8_t *, vec) {
+#define MPART_BLOCK_ST_MINCORE(st) ((st) >= MPART_BLOCK_ST_LOAD)
+	STATIC_ASSERT(!MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_NDEF));
+	STATIC_ASSERT(!MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_INIT));
+	STATIC_ASSERT(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_LOAD));
+	STATIC_ASSERT(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_CHNG));
+	USER UNCHECKED byte_t *maxaddr;
+	USER CHECKED PAGEDIR_PAGEALIGNED byte_t *iter;
+	struct mman *mm = THIS_MMAN;
+	if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {
+		THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
+		      E_INVALID_ARGUMENT_CONTEXT_MINCORE_ADDR,
+		      addr, PAGEMASK);
+	}
+	if unlikely(OVERFLOW_UADD(len, PAGEMASK, &len)) {
+		if unlikely(!len)
+			return EOK; /* Special case (ignore empty length requests) */
+err_badlen:
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE,
+		      len);
+	}
+	len &= ~PAGEMASK;
+	if unlikely(OVERFLOW_UADD((uintptr_t)addr, len - 1, (uintptr_t *)&maxaddr))
+		goto err_badlen;
+	validate_writable(vec, (len / PAGESIZE) * sizeof(uint8_t));
+#ifdef USERSPACE_END
+	if (maxaddr >= (byte_t *)USERSPACE_END) {
+		size_t pages_before, pages_after;
+		if (ADDR_ISKERN(addr)) {
+			bzero(vec, len / PAGESIZE, sizeof(uint8_t));
+			return EOK;
+		}
+		pages_before = ((byte_t *)USERSPACE_END - (byte_t *)addr) / PAGESIZE;
+		pages_after  = ((size_t)(maxaddr - (byte_t *)USERSPACE_END) + 1) / PAGESIZE;
+		bzero(vec + pages_before, pages_after, sizeof(uint8_t));
+		maxaddr = (byte_t *)USERSPACE_END - 1;
+	}
+#endif /* USERSPACE_END */
+#if defined(USERSPACE_START) && USERSPACE_START != 0
+	if ((byte_t *)addr < (byte_t *)USERSPACE_START) {
+		size_t pages_before;
+		if (ADDR_ISKERN(maxaddr)) {
+			bzero(vec, len / PAGESIZE, sizeof(uint8_t));
+			return EOK;
+		}
+		pages_before = (size_t)((byte_t *)USERSPACE_START - (byte_t *)addr) / PAGESIZE;
+		bzero(vec, pages_before, sizeof(uint8_t));
+		vec += pages_before;
+		addr = (USER UNCHECKED void *)USERSPACE_START;
+	}
+#endif /* USERSPACE_START != 0 */
+	for (iter = (USER CHECKED PAGEDIR_PAGEALIGNED byte_t *)addr;
+	     iter < maxaddr;) {
+		struct mnode *node;
+		struct mpart *part;
+		struct mfile *file;
+		byte_t *node_minaddr, *node_maxaddr;
+		mpart_reladdr_t partrel_addr;
+		size_t partrel_size, partrel_maxsize;
+		size_t blocksize;
+		uint8_t incore_status;
+		size_t partrel_block_index;
+		size_t partrel_block_count;
+again_lock_mman:
+		mman_lock_read(mm);
+		node = mman_mappings_locate(mm, iter);
+		if unlikely(!node) {
+			mman_lock_endread(mm);
+			THROW(E_SEGFAULT_UNMAPPED, iter, E_SEGFAULT_CONTEXT_FAULT);
+		}
+		/* For each page, check if it's been loaded from-disk.
+		 * iow: Has a block-state `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG' */
+		node_minaddr = (byte_t *)mnode_getminaddr(node);
+		node_maxaddr = (byte_t *)mnode_getmaxaddr(node);
+		if (node_minaddr < iter)
+			node_minaddr = iter;
+		if (node_maxaddr > maxaddr)
+			node_maxaddr = maxaddr;
+		partrel_addr = node->mn_partoff + (size_t)(iter - node_minaddr);
+		partrel_size = (size_t)(node_maxaddr - node_minaddr) + 1;
+		if ((part = node->mn_part) == NULL) {
+			mman_lock_endread(mm);
+			assert(partrel_size >= PAGESIZE);
+			/* Special case: reserved node */
+			incore_status = 0x00;
+			goto copyinfo_and_continue;
+		}
+		/* Acquire a lock to the part while we're still  holding
+		 * a lock to the mman, thus ensuring that `partrel_addr'
+		 * continues  to be correct, and `partrel_size' is still
+		 * going to be in-bounds of the part. */
+		incref(part);
+		if unlikely(!mpart_lock_tryacquire(part)) {
+			mman_lock_endread(mm);
+			FINALLY_DECREF_UNLIKELY(part);
+			while (!mpart_lock_available(part))
+				task_yield();
+			goto again_lock_mman;
+		}
+		mman_lock_endread(mm);
+		assert(partrel_size >= PAGESIZE);
+		/* Calculate the block-status address range that's in control here. */
+		file                = part->mp_file;
+		partrel_block_index = partrel_addr >> file->mf_blockshift;
+		partrel_block_count = (partrel_size + file->mf_part_amask) >> file->mf_blockshift;
+		blocksize           = (size_t)1 << file->mf_blockshift;
+		assert(partrel_block_count != 0);
+#define mpart_isblockincore(self, partrel_block_index) \
+	(MPART_BLOCK_ST_MINCORE(mpart_getblockstate(self, partrel_block_index)) ? 0x01 : 0x00)
+		incore_status   = mpart_isblockincore(part, partrel_block_index);
+		partrel_maxsize = partrel_size;
+		partrel_size    = blocksize;
+		++partrel_block_index;
+		--partrel_block_count;
+		/* Scan ahead until we reach the end of the affected block-range, or
+		 * until we encounter a block  with a different in-core status  than
+		 * what we've seen thus far. */
+		for (; partrel_block_count; ++partrel_block_index, --partrel_block_count) {
+			uint8_t new_status;
+			new_status = mpart_isblockincore(part, partrel_block_index);
+			if (new_status != incore_status)
+				break;
+			partrel_size += blocksize;
+		}
+#undef mpart_isblockincore
+		decref_unlikely(part);
+		if (partrel_size > partrel_maxsize)
+			partrel_size = partrel_maxsize;
+
+		/* Copy block status information into the given user-space vector. */
+copyinfo_and_continue:
+		memset(vec, incore_status, partrel_size / PAGESIZE, sizeof(uint8_t));
+		iter += partrel_size;
+		vec += partrel_size / PAGESIZE;
+	}
+	return EOK;
+#undef MPART_BLOCK_ST_MINCORE
+}
+#endif /* __ARCH_WANT_SYSCALL_MSYNC */
+
 /* TODO: errno_t sys_remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
-/* TODO: errno_t sys_mincore(void *start, size_t len, uint8_t *vec); */
 /* TODO: errno_t sys_madvise(void *addr, size_t len, syscall_ulong_t advice); */
 /* TODO: errno_t sys_uselib(char const *library); */
 /* TODO: ssize_t sys_process_vm_readv(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */
