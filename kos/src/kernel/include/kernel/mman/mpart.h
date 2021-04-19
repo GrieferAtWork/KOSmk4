@@ -695,9 +695,15 @@ struct mpart_unsharecow_data {
 #define mpart_unsharecow_data_init(self)                \
 	(void)(mpart_setcore_data_init(&(self)->ucd_ucmem), \
 	       (self)->ucd_copy = __NULLPTR)
-#define mpart_unsharecow_data_fini(self)          \
-	(kfree((self)->ucd_copy),                     \
+#define mpart_unsharecow_data_fini(self) \
+	(__os_free((self)->ucd_copy),        \
 	 mpart_setcore_data_fini(&(self)->ucd_ucmem))
+
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
+
 
 /* Ensure that `LIST_EMPTY(&self->mp_copy)' (while only considering nodes
  * which   may   be   overlapping   with   the   given   address   range)

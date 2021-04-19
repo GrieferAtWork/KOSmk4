@@ -34,6 +34,7 @@
 #include <kernel/mman/mlock.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/msync.h>
 #include <kernel/mman/remap.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -339,10 +340,32 @@ DEFINE_SYSCALL0(errno_t, munlockall) {
 }
 #endif /* __ARCH_WANT_SYSCALL_MUNLOCKALL */
 
+
+
+
+/************************************************************************/
+/* msync()                                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_MSYNC
+DEFINE_SYSCALL3(errno_t, msync, void *, addr, size_t, len, syscall_ulong_t, flags) {
+	VALIDATE_FLAGSET(flags, MS_SYNC | MS_ASYNC | MS_INVALIDATE,
+	                 E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS);
+#if MS_SYNC != 0 && MS_ASYNC != 0 && MS_SYNC != MS_ASYNC
+	if unlikely((flags & (MS_SYNC | MS_ASYNC)) == (MS_SYNC | MS_ASYNC)) {
+		/* Mustn't specify both of these! */
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS,
+		      flags, MS_SYNC | MS_ASYNC, MS_SYNC | MS_ASYNC);
+	}
+#endif /* MS_SYNC != 0 && MS_ASYNC != 0 && MS_SYNC != MS_ASYNC */
+	mman_msync(THIS_MMAN, addr, len, flags);
+	return EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_MSYNC */
+
 /* TODO: errno_t sys_remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
 /* TODO: errno_t sys_mincore(void *start, size_t len, uint8_t *vec); */
 /* TODO: errno_t sys_madvise(void *addr, size_t len, syscall_ulong_t advice); */
-/* TODO: errno_t sys_msync(void *addr, size_t len, syscall_ulong_t flags); */
 /* TODO: errno_t sys_uselib(char const *library); */
 /* TODO: ssize_t sys_process_vm_readv(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */
 /* TODO: ssize_t sys_process_vm_writev(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */

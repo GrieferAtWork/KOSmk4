@@ -35,7 +35,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG,                         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT,                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG,                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MAP_*' flag
-	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_MASK:         `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
+	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_MASK: `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
 	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MAP_GROWSDOWN' and `MAP_GROWSUP' were specified in `flags' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR,                          /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `MAP_FIXED' was specified when `MAP_ANONYMOUS' wasn't, but the `(file_offset & (getpagesize() - 1)) != ((uintptr_t)addr & (getpagesize() - 1))' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,                        /* E_INVALID_ARGUMENT_BAD_VALUE: The specified `length' is either `0' or is larger than the entirety of the designated address space. */
@@ -140,8 +140,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,                    /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
 	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
-	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,                          /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
-	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,                          /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
+	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
@@ -210,6 +210,9 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
 	E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE,                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
 	E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS,                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE,                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
+	E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
+	                                                                * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MS_SYNC' and `MS_ASYNC' were given. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -220,7 +223,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG                          E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MAP_*' flag
-                                                                                                                                     * E_INVALID_ARGUMENT_BAD_FLAG_MASK:         `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
+                                                                                                                                     * E_INVALID_ARGUMENT_BAD_FLAG_MASK: `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
                                                                                                                                      * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MAP_GROWSDOWN' and `MAP_GROWSUP' were specified in `flags' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR                          E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR                          /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `MAP_FIXED' was specified when `MAP_ANONYMOUS' wasn't, but the `(file_offset & (getpagesize() - 1)) != ((uintptr_t)addr & (getpagesize() - 1))' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH                        E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH                        /* E_INVALID_ARGUMENT_BAD_VALUE: The specified `length' is either `0' or is larger than the entirety of the designated address space. */
@@ -325,8 +328,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
                                                                                                                                      * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
-#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
-                                                                                                                                     * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
+                                                                                                                                     * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
@@ -395,6 +398,9 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
+                                                                                                                                     * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MS_SYNC' and `MS_ASYNC' were given. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -402,7 +408,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         3   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          4   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_FLAG                          5   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `MAP_*' flag
-                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_MASK:         `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
+                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_MASK: `(flags & MAP_TYPE) !in [MAP_AUTOMATIC,MAP_SHARED,MAP_PRIVATE]'
                                                                            * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MAP_GROWSDOWN' and `MAP_GROWSUP' were specified in `flags' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR                          6   /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: `MAP_FIXED' was specified when `MAP_ANONYMOUS' wasn't, but the `(file_offset & (getpagesize() - 1)) != ((uintptr_t)addr & (getpagesize() - 1))' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH                        7   /* E_INVALID_ARGUMENT_BAD_VALUE: The specified `length' is either `0' or is larger than the entirety of the designated address space. */
@@ -507,8 +513,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       99  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    100 /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
-#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          101 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
-                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          101 /* E_INVALID_ARGUMENT_BAD_VALUE:     [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
+                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)'    was     false,     but     the    `LFUTEX_WAIT_FLAG_TIMEOUT_*'     bits     were     set.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
@@ -577,6 +583,9 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       161 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       162 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
 #define E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     163 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_SIZE                         164 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `msync(2)' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MSYNC_FLAGS                        165 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `msync(2)'.
+                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `MS_SYNC' and `MS_ASYNC' were given. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

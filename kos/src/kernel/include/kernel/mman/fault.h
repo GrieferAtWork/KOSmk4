@@ -198,6 +198,11 @@ struct mfault {
 	struct mnode                       *mfl_pcopy[2]; /* [0..1][*] Up to 2 additional mem-nodes used for private unsharing. */
 };
 
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
+
 #define mfault_init(self, mm, addr, size, flags) \
 	(void)((self)->mfl_mman  = (mm),             \
 	       (self)->mfl_addr  = (addr),           \
@@ -208,11 +213,11 @@ struct mfault {
 	(void)(mpart_setcore_data_init(&(self)->mfl_scdat),    \
 	       mpart_unsharecow_data_init(&(self)->mfl_ucdat), \
 	       (self)->mfl_pcopy[0] = __NULLPTR)
-#define mfault_fini(self)                                 \
-	(mpart_setcore_data_fini(&(self)->mfl_scdat),         \
-	 mpart_unsharecow_data_fini(&(self)->mfl_ucdat),      \
-	 (self)->mfl_pcopy[0] ? (kfree((self)->mfl_pcopy[0]), \
-	                         kfree((self)->mfl_pcopy[1])) \
+#define mfault_fini(self)                                     \
+	(mpart_setcore_data_fini(&(self)->mfl_scdat),             \
+	 mpart_unsharecow_data_fini(&(self)->mfl_ucdat),          \
+	 (self)->mfl_pcopy[0] ? (__os_free((self)->mfl_pcopy[0]), \
+	                         __os_free((self)->mfl_pcopy[1])) \
 	                      : (void)0)
 
 

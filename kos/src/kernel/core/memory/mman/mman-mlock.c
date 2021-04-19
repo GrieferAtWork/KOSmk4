@@ -19,20 +19,16 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_MLOCK_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_MLOCK_C 1
-#define __WANT_MNODE__mn_ilink
-#define __WANT_MNODE__mn_alloc
-#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <fs/node.h>
-#include <fs/vfs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/fault.h>
 #include <kernel/mman/mlock.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/rangelock.h>
+#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -45,13 +41,6 @@
 #include <stddef.h>
 
 DECL_BEGIN
-
-#ifndef NDEBUG
-#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
-#else /* !NDEBUG */
-#define DBG_memset(dst, byte, num_bytes) (void)0
-#endif /* NDEBUG */
-
 
 
 /* Helpers for blocking range-lock acquisition, as well as a number
@@ -392,7 +381,7 @@ again_prefault:
 }
 
 
-INTDEF NOBLOCK NONNULL((1)) void
+INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
 
 /* Clear the `MNODE_F_MLOCK' flag for all mem-nodes within the given address range.
