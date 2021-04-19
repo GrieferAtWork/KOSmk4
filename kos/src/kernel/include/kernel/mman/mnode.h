@@ -126,7 +126,7 @@ struct path;
 struct directory_entry;
 
 #ifndef __mpart_reladdr_t_defined
-#define __mpart_reladdr_t_defined 1
+#define __mpart_reladdr_t_defined
 typedef size_t mpart_reladdr_t;
 #endif /* !__mpart_reladdr_t_defined */
 
@@ -201,6 +201,23 @@ struct mnode {
 	/*PAGEDIR_PAGEALIGNED*/ mpart_reladdr_t
 	                                    mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
 	_list_entry_mnode                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
+#ifdef __WANT_MNODE__mn_ilink
+	union {
+		_list_entry_mnode               mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)]  Chain  of nodes  that (may)
+		                                              * contain pages that  are current mapped  with write-access enabled.  This
+		                                              * list is used to speed up the clearing of write-access of modified memory
+		                                              * mappings when copying  a memory  manager as  part of  fork(2). For  this
+		                                              * purpose, this list contains all memory nodes that request  write-access,
+		                                              * and have actually been mapped  with write-access enabled (which  happens
+		                                              * lazily upon first access).
+		                                              * Nodes  are  removed  from this  list  by `mnode_clear_write(_locked)'.
+		                                              * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
+		struct {
+			void                      *_mn_iswritable; /* [0..1] Non-NULL if `mn_writable' is meant to be bound. */
+			_slist_entry_mnode         _mn_ilink;    /* Internal link pointer. */
+		};
+	};
+#else /* __WANT_MNODE__mn_ilink */
 	_list_entry_mnode                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)]  Chain  of nodes  that (may)
 	                                                  * contain pages that  are current mapped  with write-access enabled.  This
 	                                                  * list is used to speed up the clearing of write-access of modified memory
@@ -210,6 +227,7 @@ struct mnode {
 	                                                  * lazily upon first access).
 	                                                  * Nodes  are  removed  from this  list  by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
+#endif /* !__WANT_MNODE__mn_ilink */
 #else /* __INTELLISENSE__ */
 #ifdef __WANT_MNODE__mn_dead
 	union {
@@ -242,6 +260,23 @@ struct mnode {
 #endif /* !__WANT_MNODE__mn_alloc */
 	PAGEDIR_PAGEALIGNED mpart_reladdr_t mn_partoff;  /* [lock(mn_mman->mm_lock)][valid_if(mn_part)] Offset into `mn_part', to where the maping starts. */
 	LIST_ENTRY(mnode)                   mn_link;     /* [lock(mn_part->MPART_F_LOCKBIT)][valid_if(mn_part)] Entry for `mp_copy' or `mp_share' */
+#ifdef __WANT_MNODE__mn_ilink
+	union {
+		LIST_ENTRY(mnode)               mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)]  Chain  of nodes  that (may)
+		                                              * contain pages that  are current mapped  with write-access enabled.  This
+		                                              * list is used to speed up the clearing of write-access of modified memory
+		                                              * mappings when copying  a memory  manager as  part of  fork(2). For  this
+		                                              * purpose, this list contains all memory nodes that request  write-access,
+		                                              * and have actually been mapped  with write-access enabled (which  happens
+		                                              * lazily upon first access).
+		                                              * Nodes  are  removed  from this  list  by `mnode_clear_write(_locked)'.
+		                                              * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
+		struct {
+			void                      *_mn_iswritable; /* [0..1] Non-NULL if `mn_writable' is meant to be bound. */
+			SLIST_ENTRY(mnode)         _mn_ilink;    /* Internal link pointer. */
+		};
+	};
+#else /* __WANT_MNODE__mn_ilink */
 	LIST_ENTRY(mnode)                   mn_writable; /* [lock(mn_mman->mm_lock)][valid_if(mn_part)]  Chain  of nodes  that (may)
 	                                                  * contain pages that  are current mapped  with write-access enabled.  This
 	                                                  * list is used to speed up the clearing of write-access of modified memory
@@ -251,6 +286,7 @@ struct mnode {
 	                                                  * lazily upon first access).
 	                                                  * Nodes  are  removed  from this  list  by `mnode_clear_write(_locked)'.
 	                                                  * NOTE: This entry left as UNBOUND until the node is mapped as writable. */
+#endif /* !__WANT_MNODE__mn_ilink */
 #endif /* !__INTELLISENSE__ */
 	WEAK struct module                 *mn_module;   /* [0..1][lock(mn_mman->mm_lock)] Node executable module binding. (s.a. <kernel/mman/module.h>)
 	                                                  * The  module pointed-to by this field is weak, in that the pointed-to object may have already
@@ -277,9 +313,35 @@ struct mnode {
 #endif /* !__WANT_MNODE__mn_alloc */
 #define MNODE_INIT_mn_partoff(mn_partoff) mn_partoff
 #define MNODE_INIT_mn_link(...)           __VA_ARGS__
+#ifdef __WANT_MNODE__mn_ilink
+#define MNODE_INIT_mn_writable(...)       { __VA_ARGS__ }
+#else /* __WANT_MNODE__mn_ilink */
 #define MNODE_INIT_mn_writable(...)       __VA_ARGS__
+#endif /* !__WANT_MNODE__mn_ilink */
 #define MNODE_INIT_mn_module(mn_module)   mn_module
 #endif /* __WANT_MNODE_INIT */
+
+
+
+
+/* Begin/end  using free use of `_mn_ilink' of `self'.
+ * The caller must be holding a lock to the associated
+ * mman, but note that for the duration of free use of
+ * `_mn_ilink'  being allowed, this lock must never be
+ * released! */
+#ifdef __WANT_MNODE__mn_ilink
+#define mnode_use_ilink_begin(self)                                       \
+	((self)->mn_writable.le_prev != __NULLPTR                             \
+	 ? (void)(*(self)->mn_writable.le_prev = (self)->mn_writable.le_next) \
+	 : (void)0)
+#define mnode_use_ilink_end(self)                                                   \
+	((self)->_mn_iswritable != __NULLPTR                                            \
+	 ? (void)((self)->mn_writable.le_next = (self)->mn_mman->mm_writable.lh_first,  \
+	          (self)->mn_writable.le_prev = &(self)->mn_mman->mm_writable.lh_first, \
+	          (self)->mn_mman->mm_writable.lh_first = (self))                       \
+	 : (void)0)
+#endif /* __WANT_MNODE__mn_ilink */
+
 
 
 
@@ -414,8 +476,8 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self);
 FUNDEF WUNUSED NONNULL((1, 2)) __BOOL FCALL
 mnode_split_or_unlock(struct mman *__restrict self,
                       struct mnode *__restrict lonode,
-                      PAGEDIR_PAGEALIGNED void *addr_where_to_split,
-                      struct unlockinfo *unlock)
+                      PAGEDIR_PAGEALIGNED void const *addr_where_to_split,
+                      struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* While holding  a lock  to `self->mn_mman'  and `self->mn_part',  try

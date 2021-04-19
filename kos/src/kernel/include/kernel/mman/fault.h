@@ -131,7 +131,7 @@ mman_forcefaultv(struct mman *__restrict self,
 
 
 #ifndef __mpart_reladdr_t_defined
-#define __mpart_reladdr_t_defined 1
+#define __mpart_reladdr_t_defined
 typedef size_t mpart_reladdr_t;
 #endif /* !__mpart_reladdr_t_defined */
 

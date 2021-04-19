@@ -206,6 +206,10 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE,            /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
 	E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE,           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
 	E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE,        /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
+	E_INVALID_ARGUMENT_CONTEXT_MLOCK_SIZE,                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mlock(2)' (or `mlock2(2)') is too large. */
+	E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE,                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
+	E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS,                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -387,6 +391,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
 #define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
 #define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCK_SIZE                         E_INVALID_ARGUMENT_CONTEXT_MLOCK_SIZE                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mlock(2)' (or `mlock2(2)') is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -565,6 +573,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_MREMAP_FIXED_NO_MAYMOVE            157 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `MREMAP_FIXED' was specified without `MREMAP_MAYMOVE'. */
 #define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NO_MAYMOVE           158 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `old_size' was `0', but `MREMAP_MAYMOVE' wasn't given. */
 #define E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE        159 /* E_INVALID_ARGUMENT_BAD_STATE: `old_size' was `0', but the mapping pointed-to by `old_address' isn't `PROT_SHARED'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCK_SIZE                         160 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `mlock(2)' (or `mlock2(2)') is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS                       161 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlock2(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE                       162 /* E_INVALID_ARGUMENT_BAD_VALUE: The `size' argument passed to `munlock(2)' is too large. */
+#define E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS                     163 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `mlockall(2)'. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -132,7 +132,7 @@
 #define __MFD_ALLOW_SEALING 0x2 /* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */
 #define __MFD_HUGETLB       0x4 /* ... */
 
-#define __MLOCK_ONFAULT 0x1
+#define __MLOCK_ONFAULT 0x1 /* Delegate population of locked memory until the first access. */
 
 #define __PKEY_DISABLE_ACCESS 0x1
 #define __PKEY_DISABLE_WRITE  0x2

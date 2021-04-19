@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae001e82 */
+/* HASH CRC-32:0x5e2bf83 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,19 +141,19 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_KOS
 #if !defined(SIG_TERM) && defined(__SIG_TERM)
-#define SIG_TERM  (__CCAST(__sighandler_t)__SIG_TERM) /* Terminate the receiving process. */
+#define SIG_TERM (__CCAST(__sighandler_t)__SIG_TERM) /* Terminate the receiving process. */
 #endif /* !SIG_TERM && __SIG_TERM */
 #if !defined(SIG_EXIT) && defined(__SIG_EXIT)
-#define SIG_EXIT  (__CCAST(__sighandler_t)__SIG_EXIT) /* Terminate the receiving thread. */
+#define SIG_EXIT (__CCAST(__sighandler_t)__SIG_EXIT) /* Terminate the receiving thread. */
 #endif /* !SIG_EXIT && __SIG_EXIT */
 #if !defined(SIG_CONT) && defined(__SIG_CONT)
-#define SIG_CONT  (__CCAST(__sighandler_t)__SIG_CONT) /* Continue execution. */
+#define SIG_CONT (__CCAST(__sighandler_t)__SIG_CONT) /* Continue execution. */
 #endif /* !SIG_CONT && __SIG_CONT */
 #if !defined(SIG_STOP) && defined(__SIG_STOP)
-#define SIG_STOP  (__CCAST(__sighandler_t)__SIG_STOP) /* Suspend execution. */
+#define SIG_STOP (__CCAST(__sighandler_t)__SIG_STOP) /* Suspend execution. */
 #endif /* !SIG_STOP && __SIG_STOP */
 #if !defined(SIG_CORE) && defined(__SIG_CORE)
-#define SIG_CORE  (__CCAST(__sighandler_t)__SIG_CORE) /* Create a coredump and terminate. */
+#define SIG_CORE (__CCAST(__sighandler_t)__SIG_CORE) /* Create a coredump and terminate. */
 #endif /* !SIG_CORE && __SIG_CORE */
 #endif /* __USE_KOS */
 

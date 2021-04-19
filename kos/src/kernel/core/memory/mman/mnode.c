@@ -112,7 +112,7 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict
 	/* Do the rest in post so we won't be holding a lock to the mem-part anymore:
 	 * >> weakdecref(me->mn_mman);
 	 * >> mnode_free(me); */
-	post             = (Tobpostlockop(struct mpart) *)self;
+	post            = (Tobpostlockop(struct mpart) *)self;
 	post->oplo_func = &mnode_unlink_from_part_lockop_post;
 	return post;
 }
@@ -309,15 +309,15 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 PUBLIC WUNUSED NONNULL((1, 2)) bool FCALL
 mnode_split_or_unlock(struct mman *__restrict self,
                       struct mnode *__restrict lonode,
-                      PAGEDIR_PAGEALIGNED void *addr_where_to_split,
+                      PAGEDIR_PAGEALIGNED void const *addr_where_to_split,
                       struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	bool result = true;
 	struct mnode *hinode;
 	struct mpart *part;
 	byte_t const *lonode_minaddr, *lonode_maxaddr;
-	assert((byte_t *)addr_where_to_split >= (byte_t *)mnode_getaddr(lonode));
-	assert((byte_t *)addr_where_to_split < (byte_t *)mnode_getendaddr(lonode));
+	assert((byte_t const *)addr_where_to_split >= (byte_t const *)mnode_getaddr(lonode));
+	assert((byte_t const *)addr_where_to_split < (byte_t const *)mnode_getendaddr(lonode));
 
 	/* Safety check: panic if the specified node isn't allowed to be split. */
 	if unlikely(lonode->mn_flags & MNODE_F_NOSPLIT) {

@@ -528,7 +528,7 @@
 /* Flags for `mlock2()'                                                 */
 /************************************************************************/
 
-/* ... */
+/* Delegate population of locked memory until the first access. */
 #if !defined(MLOCK_ONFAULT) && defined(__MLOCK_ONFAULT)
 #define MLOCK_ONFAULT __MLOCK_ONFAULT
 #endif /* !MLOCK_ONFAULT && __MLOCK_ONFAULT */

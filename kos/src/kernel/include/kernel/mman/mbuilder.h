@@ -52,22 +52,22 @@ LIST_HEAD(mbnode_list, mbnode);
 SLIST_HEAD(mbnode_slist, mbnode);
 
 #ifndef __mnode_slist_defined
-#define __mnode_slist_defined 1
+#define __mnode_slist_defined
 SLIST_HEAD(mnode_slist, mnode);
 #endif /* !__mnode_slist_defined */
 
 #ifndef __mfile_ndef_defined
-#define __mfile_ndef_defined 1
+#define __mfile_ndef_defined
 DATDEF struct mfile mfile_ndef;     /* Random, uninitialized, anonymous memory. */
 #endif /* !__mfile_ndef_defined */
 
 #ifndef __mfile_zero_defined
-#define __mfile_zero_defined 1
+#define __mfile_zero_defined
 DATDEF struct mfile mfile_zero;     /* Zero-initialized, anonymous memory. */
 #endif /* !__mfile_zero_defined */
 
 #ifndef __mpart_reladdr_t_defined
-#define __mpart_reladdr_t_defined 1
+#define __mpart_reladdr_t_defined
 typedef size_t mpart_reladdr_t;
 #endif /* !__mpart_reladdr_t_defined */
 

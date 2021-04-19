@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85075fa4 */
+/* HASH CRC-32:0x70d3a21f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -521,7 +521,7 @@
 /* Flags for `mlock2()'                                                 */
 /************************************************************************/
 
-/* ... */
+/* Delegate population of locked memory until the first access. */
 #if !defined(MLOCK_ONFAULT) && defined(__MLOCK_ONFAULT)
 #define MLOCK_ONFAULT __MLOCK_ONFAULT
 #endif /* !MLOCK_ONFAULT && __MLOCK_ONFAULT */

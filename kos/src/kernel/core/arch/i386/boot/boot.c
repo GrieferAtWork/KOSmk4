@@ -643,6 +643,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     - Properly implement libc's regex functions
 	 */
 
+	/* TODO: In `/bin/nano', pressing CTRL+G brings up the builtin help screen.
+	 *       However,  quite a  bit of  that held-screen  isn't being displayed
+	 *       correctly. The actual text is scrollable as it should be, but some
+	 *       of the text shows up as control characters and the like... */
+
+
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
 assert.expr: "count == 0"

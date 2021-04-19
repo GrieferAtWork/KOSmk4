@@ -31,6 +31,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mlock.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/remap.h>
@@ -290,19 +291,61 @@ DEFINE_SYSCALL5(void *, mremap,
 }
 #endif /* __ARCH_WANT_SYSCALL_MREMAP */
 
+
+
+
+/************************************************************************/
+/* mlock(), mlock2(), munlock(), mlockall(), munlockall()               */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_MLOCK
+DEFINE_SYSCALL2(errno_t, mlock, void const *, addr, size_t, len) {
+	mman_mlock(THIS_MMAN, addr, len);
+	return EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_MLOCK */
+
+#ifdef __ARCH_WANT_SYSCALL_MLOCK2
+DEFINE_SYSCALL3(errno_t, mlock2, void const *, addr, size_t, len, syscall_ulong_t, flags) {
+	VALIDATE_FLAGSET(flags, 0 | MLOCK_ONFAULT,
+	                 E_INVALID_ARGUMENT_CONTEXT_MLOCK2_FLAGS);
+	mman_mlock(THIS_MMAN, addr, len, flags);
+	return EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_MLOCK2 */
+
+#ifdef __ARCH_WANT_SYSCALL_MUNLOCK
+DEFINE_SYSCALL2(errno_t, munlock, void const *, addr, size_t, len) {
+	mman_munlock(THIS_MMAN, addr, len);
+	return EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_MUNLOCK */
+
+#ifdef __ARCH_WANT_SYSCALL_MLOCKALL
+DEFINE_SYSCALL1(errno_t, mlockall, syscall_ulong_t, flags) {
+	VALIDATE_FLAGSET(flags, MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT,
+	                 E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS);
+	/* NOTE: Currently, only `MCL_ONFAULT' has an affect. The
+	 *       other  flags  are recognized  (for compatibility
+	 *       with linux), but are otherwise ignored. */
+	mman_mlockall(THIS_MMAN, flags & MCL_ONFAULT);
+	return EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_MLOCKALL */
+
+#ifdef __ARCH_WANT_SYSCALL_MUNLOCKALL
+DEFINE_SYSCALL0(errno_t, munlockall) {
+	mman_munlockall(THIS_MMAN);
+	return EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_MUNLOCKALL */
+
 /* TODO: errno_t sys_remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
 /* TODO: errno_t sys_mincore(void *start, size_t len, uint8_t *vec); */
 /* TODO: errno_t sys_madvise(void *addr, size_t len, syscall_ulong_t advice); */
-/* TODO: errno_t sys_mlock(void const *addr, size_t len); */
-/* TODO: errno_t sys_mlock2(void const *addr, size_t length, syscall_ulong_t flags); */
-/* TODO: errno_t sys_munlock(void const *addr, size_t len); */
 /* TODO: errno_t sys_msync(void *addr, size_t len, syscall_ulong_t flags); */
-/* TODO: errno_t sys_mlockall([tostr(MLOCKALL_FLAGS)] syscall_ulong_t flags); */
-/* TODO: errno_t sys_munlockall(); */
 /* TODO: errno_t sys_uselib(char const *library); */
 /* TODO: ssize_t sys_process_vm_readv(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */
 /* TODO: ssize_t sys_process_vm_writev(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags); */
-
 
 DECL_END
 
