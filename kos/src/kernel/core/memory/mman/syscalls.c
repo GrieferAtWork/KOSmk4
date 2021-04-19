@@ -277,8 +277,10 @@ DEFINE_SYSCALL5(void *, mremap,
 
 	/* Validate flags. */
 	VALIDATE_FLAGSET(flags,
-	                 MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN |
-	                 MREMAP_GROWSUP | MREMAP_STACK | MREMAP_FIXED_NOREPLACE | MREMAP_NOASLR,
+	                 MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT |
+	                 MREMAP_GROWSDOWN | MREMAP_GROWSUP | MREMAP_STACK |
+	                 MREMAP_POPULATE | MREMAP_NONBLOCK |
+	                 MREMAP_FIXED_NOREPLACE | MREMAP_NOASLR,
 	                 E_INVALID_ARGUMENT_CONTEXT_MREMAP_FLAGS);
 
 	/* Special case: mman_remap() still uses `new_address' as re-map hint,

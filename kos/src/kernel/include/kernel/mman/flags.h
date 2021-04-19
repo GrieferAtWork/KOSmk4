@@ -340,6 +340,81 @@ DECL_BEGIN
  *   - MREMAP_GROWSDOWN       -> MAP_GROWSDOWN
  *   - MREMAP_GROWSUP         -> MAP_GROWSUP
  *   - MREMAP_STACK           -> MAP_STACK
+ *   - MREMAP_POPULATE        -> MAP_POPULATE
+ *   - MREMAP_NONBLOCK        -> MAP_NONBLOCK
+ *   - MREMAP_FIXED_NOREPLACE -> MAP_FIXED_NOREPLACE
+ *   - MREMAP_NOASLR          -> MAP_NOASLR */
+#if (__MREMAP_FIXED == __MAP_FIXED &&                     \
+     __MREMAP_32BIT == __MAP_32BIT &&                     \
+     __MREMAP_GROWSDOWN == __MAP_GROWSDOWN &&             \
+     __MREMAP_GROWSUP == __MAP_GROWSUP &&                 \
+     __MREMAP_STACK == __MAP_STACK &&                     \
+     __MREMAP_POPULATE == __MAP_POPULATE &&               \
+     __MREMAP_NONBLOCK == __MAP_NONBLOCK &&               \
+     __MREMAP_FIXED_NOREPLACE == __MAP_FIXED_NOREPLACE && \
+     __MREMAP_NOASLR == __MAP_NOASLR)
+#define mapflags_from_remapflags(remapflags)                        \
+	((remapflags) & (__MREMAP_FIXED | __MREMAP_32BIT |              \
+	                 __MREMAP_GROWSDOWN | __MREMAP_GROWSUP |        \
+	                 __MREMAP_STACK | __MREMAP_POPULATE |           \
+	                 __MREMAP_NONBLOCK | __MREMAP_FIXED_NOREPLACE | \
+	                 __MREMAP_NOASLR))
+#define remapflags_from_mapflags(mapflags)                  \
+	((mapflags) & (__MAP_FIXED | __MAP_32BIT |              \
+	               __MAP_GROWSDOWN | __MAP_GROWSUP |        \
+	               __MAP_STACK | __MAP_POPULATE |           \
+	               __MAP_NONBLOCK | __MAP_FIXED_NOREPLACE | \
+	               __MAP_NOASLR))
+#elif (__MREMAP_32BIT == __MAP_32BIT &&                     \
+       __MREMAP_GROWSDOWN == __MAP_GROWSDOWN &&             \
+       __MREMAP_GROWSUP == __MAP_GROWSUP &&                 \
+       __MREMAP_STACK == __MAP_STACK &&                     \
+       __MREMAP_POPULATE == __MAP_POPULATE &&               \
+       __MREMAP_NONBLOCK == __MAP_NONBLOCK &&               \
+       __MREMAP_FIXED_NOREPLACE == __MAP_FIXED_NOREPLACE && \
+       __MREMAP_NOASLR == __MAP_NOASLR)
+#define mapflags_from_remapflags(remapflags)                         \
+	(((remapflags) & (__MREMAP_32BIT | __MREMAP_GROWSDOWN |          \
+	                  __MREMAP_GROWSUP | __MREMAP_STACK |            \
+	                  __MREMAP_POPULATE | __MREMAP_NONBLOCK |        \
+	                  __MREMAP_FIXED_NOREPLACE | __MREMAP_NOASLR)) | \
+	 (((remapflags)&__MREMAP_FIXED) ? __MAP_FIXED : 0))
+#define remapflags_from_mapflags(mapflags)                   \
+	(((mapflags) & (__MAP_32BIT | __MAP_GROWSDOWN |          \
+	                __MAP_GROWSUP | __MAP_STACK |            \
+	                __MAP_POPULATE | __MAP_NONBLOCK |        \
+	                __MAP_FIXED_NOREPLACE | __MAP_NOASLR)) | \
+	 (((mapflags)&__MAP_FIXED) ? __MREMAP_FIXED : 0))
+#else /* ... */
+#define mapflags_from_remapflags(remapflags)                                 \
+	((((remapflags)&__MREMAP_32BIT) ? __MAP_32BIT : 0) |                     \
+	 (((remapflags)&__MREMAP_GROWSDOWN) ? __MAP_GROWSDOWN : 0) |             \
+	 (((remapflags)&__MREMAP_GROWSUP) ? __MAP_GROWSUP : 0) |                 \
+	 (((remapflags)&__MREMAP_STACK) ? __MAP_STACK : 0) |                     \
+	 (((remapflags)&__MREMAP_POPULATE) ? __MAP_POPULATE : 0) |               \
+	 (((remapflags)&__MREMAP_NONBLOCK) ? __MAP_NONBLOCK : 0) |               \
+	 (((remapflags)&__MREMAP_FIXED_NOREPLACE) ? __MAP_FIXED_NOREPLACE : 0) | \
+	 (((remapflags)&__MREMAP_NOASLR) ? __MAP_NOASLR : 0) |                   \
+	 (((remapflags)&__MREMAP_FIXED) ? __MAP_FIXED : 0))
+#define remapflags_from_mapflags(mapflags)                                 \
+	((((mapflags)&__MAP_32BIT) ? __MREMAP_32BIT : 0) |                     \
+	 (((mapflags)&__MAP_GROWSDOWN) ? __MREMAP_GROWSDOWN : 0) |             \
+	 (((mapflags)&__MAP_GROWSUP) ? __MREMAP_GROWSUP : 0) |                 \
+	 (((mapflags)&__MAP_STACK) ? __MREMAP_STACK : 0) |                     \
+	 (((mapflags)&__MAP_POPULATE) ? __MREMAP_POPULATE : 0) |               \
+	 (((mapflags)&__MAP_NONBLOCK) ? __MREMAP_NONBLOCK : 0) |               \
+	 (((mapflags)&__MAP_FIXED_NOREPLACE) ? __MREMAP_FIXED_NOREPLACE : 0) | \
+	 (((mapflags)&__MAP_NOASLR) ? __MREMAP_NOASLR : 0) |                   \
+	 (((mapflags)&__MAP_FIXED) ? __MREMAP_FIXED : 0))
+#endif /* !... */
+
+/* >> unsigned int mapflags_from_remapflags_fndonly(unsigned int elfpf);
+ * Convert `MREMAP_*' to `MAP_*':
+ *   - MREMAP_FIXED           -> MAP_FIXED
+ *   - MREMAP_32BIT           -> MAP_32BIT
+ *   - MREMAP_GROWSDOWN       -> MAP_GROWSDOWN
+ *   - MREMAP_GROWSUP         -> MAP_GROWSUP
+ *   - MREMAP_STACK           -> MAP_STACK
  *   - MREMAP_FIXED_NOREPLACE -> MAP_FIXED_NOREPLACE
  *   - MREMAP_NOASLR          -> MAP_NOASLR */
 #if (__MREMAP_FIXED == __MAP_FIXED &&                     \
@@ -349,12 +424,12 @@ DECL_BEGIN
      __MREMAP_STACK == __MAP_STACK &&                     \
      __MREMAP_FIXED_NOREPLACE == __MAP_FIXED_NOREPLACE && \
      __MREMAP_NOASLR == __MAP_NOASLR)
-#define mapflags_from_remapflags(remapflags)                     \
+#define mapflags_from_remapflags_fndonly(remapflags)             \
 	((remapflags) & (__MREMAP_FIXED | __MREMAP_32BIT |           \
 	                 __MREMAP_GROWSDOWN | __MREMAP_GROWSUP |     \
 	                 __MREMAP_STACK | __MREMAP_FIXED_NOREPLACE | \
 	                 __MREMAP_NOASLR))
-#define remapflags_from_mapflags(mapflags)               \
+#define remapflags_from_mapflags_fndonly(mapflags)       \
 	((mapflags) & (__MAP_FIXED | __MAP_32BIT |           \
 	               __MAP_GROWSDOWN | __MAP_GROWSUP |     \
 	               __MAP_STACK | __MAP_FIXED_NOREPLACE | \
@@ -365,19 +440,18 @@ DECL_BEGIN
        __MREMAP_STACK == __MAP_STACK &&                     \
        __MREMAP_FIXED_NOREPLACE == __MAP_FIXED_NOREPLACE && \
        __MREMAP_NOASLR == __MAP_NOASLR)
-#define mapflags_from_remapflags(remapflags)                         \
+#define mapflags_from_remapflags_fndonly(remapflags)                 \
 	(((remapflags) & (__MREMAP_32BIT | __MREMAP_GROWSDOWN |          \
 	                  __MREMAP_GROWSUP | __MREMAP_STACK |            \
 	                  __MREMAP_FIXED_NOREPLACE | __MREMAP_NOASLR)) | \
 	 (((remapflags)&__MREMAP_FIXED) ? __MAP_FIXED : 0))
-#define remapflags_from_mapflags(mapflags)                \
-	(((mapflags) & (__MAP_FIXED | __MAP_32BIT |           \
-	                __MAP_GROWSDOWN | __MAP_GROWSUP |     \
-	                __MAP_STACK | __MAP_FIXED_NOREPLACE | \
-	                __MAP_NOASLR)) |                      \
+#define remapflags_from_mapflags_fndonly(mapflags)           \
+	(((mapflags) & (__MAP_32BIT | __MAP_GROWSDOWN |          \
+	                __MAP_GROWSUP | __MAP_STACK |            \
+	                __MAP_FIXED_NOREPLACE | __MAP_NOASLR)) | \
 	 (((mapflags)&__MAP_FIXED) ? __MREMAP_FIXED : 0))
 #else /* ... */
-#define mapflags_from_remapflags(remapflags)                                 \
+#define mapflags_from_remapflags_fndonly(remapflags)                         \
 	((((remapflags)&__MREMAP_32BIT) ? __MAP_32BIT : 0) |                     \
 	 (((remapflags)&__MREMAP_GROWSDOWN) ? __MAP_GROWSDOWN : 0) |             \
 	 (((remapflags)&__MREMAP_GROWSUP) ? __MAP_GROWSUP : 0) |                 \
@@ -385,7 +459,7 @@ DECL_BEGIN
 	 (((remapflags)&__MREMAP_FIXED_NOREPLACE) ? __MAP_FIXED_NOREPLACE : 0) | \
 	 (((remapflags)&__MREMAP_NOASLR) ? __MAP_NOASLR : 0) |                   \
 	 (((remapflags)&__MREMAP_FIXED) ? __MAP_FIXED : 0))
-#define remapflags_from_mapflags(mapflags)                                 \
+#define remapflags_from_mapflags_fndonly(mapflags)                         \
 	((((mapflags)&__MAP_32BIT) ? __MREMAP_32BIT : 0) |                     \
 	 (((mapflags)&__MAP_GROWSDOWN) ? __MREMAP_GROWSDOWN : 0) |             \
 	 (((mapflags)&__MAP_GROWSUP) ? __MREMAP_GROWSUP : 0) |                 \
@@ -393,6 +467,25 @@ DECL_BEGIN
 	 (((mapflags)&__MAP_FIXED_NOREPLACE) ? __MREMAP_FIXED_NOREPLACE : 0) | \
 	 (((mapflags)&__MAP_NOASLR) ? __MREMAP_NOASLR : 0) |                   \
 	 (((mapflags)&__MAP_FIXED) ? __MREMAP_FIXED : 0))
+#endif /* !... */
+
+/* >> unsigned int mapflags_from_remapflags_poponly(unsigned int elfpf);
+ * Convert `MREMAP_*' to `MAP_*':
+ *   - MREMAP_POPULATE        -> MAP_POPULATE
+ *   - MREMAP_NONBLOCK        -> MAP_NONBLOCK */
+#if (__MREMAP_POPULATE == __MAP_POPULATE && \
+     __MREMAP_NONBLOCK == __MAP_NONBLOCK)
+#define mapflags_from_remapflags_poponly(remapflags) \
+	((remapflags) & (__MREMAP_POPULATE | __MREMAP_NONBLOCK))
+#define remapflags_from_mapflags_poponly(mapflags) \
+	((mapflags) & (__MAP_POPULATE | __MAP_NONBLOCK))
+#else /* ... */
+#define mapflags_from_remapflags_poponly(remapflags)           \
+	((((remapflags)&__MREMAP_POPULATE) ? __MAP_POPULATE : 0) | \
+	 (((remapflags)&__MREMAP_NONBLOCK) ? __MAP_NONBLOCK : 0))
+#define remapflags_from_mapflags_poponly(mapflags)           \
+	((((mapflags)&__MAP_POPULATE) ? __MREMAP_POPULATE : 0) | \
+	 (((mapflags)&__MAP_NONBLOCK) ? __MREMAP_NONBLOCK : 0))
 #endif /* !... */
 
 

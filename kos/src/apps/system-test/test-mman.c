@@ -47,7 +47,7 @@ DEFINE_TEST(mlock_and_mincore) {
 	assertf(p != MAP_FAILED, "mmap() failed: %s:%d", strerror(errno), errno);
 
 	/* Technically, mincore() is meant to be used for file mappings,
-	 * but it should work for PRIVATE+ANON mappings just as well. */
+	 * but it should  work for PRIVATE+ANON  mappings just as  well. */
 	incore[0] = 0xcc;
 	assertf(mincore(p, ps, incore) == 0, "mincore() failed: %s:%d", strerror(errno), errno);
 	assertf(incore[0] == 0, "incore[0] = %#" PRIx8, incore[0]);
@@ -133,8 +133,20 @@ DEFINE_TEST(mremap) {
 	incore[0] = 0xcc;
 	assertf(mincore(p, ps, incore) == 0, "mincore() failed: %s:%d", strerror(errno), errno);
 	assertf(incore[0] == 1, "incore[0] = %#" PRIx8, incore[0]);
+
+	/* Increase the size once again, but this time, pass `MREMAP_POPULATE',
+	 * thereby forcing the second page to also be pre-faulted (which we can
+	 * test for by use of `mincore()') */
+	p = mremap(p, ps, ps * 2, MREMAP_MAYMOVE | MREMAP_POPULATE);
+	assertf(p != MAP_FAILED, "mremap() failed: %s:%d", strerror(errno), errno);
+	incore[0] = incore[1] = 0xcc;
+	assertf(mincore(p, ps * 2, incore) == 0, "mincore() failed: %s:%d", strerror(errno), errno);
+	assertf(incore[0] == 1, "incore[0] = %#" PRIx8, incore[0]);
+	assertf(incore[1] == 1, "incore[0] = %#" PRIx8, incore[1]); /* !!! Second page must already be in-core */
+
+
 	assertf(*(unsigned int *)p == 0x1234, "%" PRIx8, *(unsigned int *)p);
-	assertf(munmap(p, ps) == 0, "munmap failed: %s:%d", strerror(errno), errno);
+	assertf(munmap(p, ps * 2) == 0, "munmap failed: %s:%d", strerror(errno), errno);
 }
 
 DECL_END

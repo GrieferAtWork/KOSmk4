@@ -58,6 +58,12 @@
 #if !defined(MREMAP_STACK) && defined(__MREMAP_STACK)
 #define MREMAP_STACK           __MREMAP_STACK
 #endif /* !MREMAP_STACK && __MREMAP_STACK */
+#if !defined(MREMAP_POPULATE) && defined(__MREMAP_POPULATE)
+#define MREMAP_POPULATE        __MREMAP_POPULATE
+#endif /* !MREMAP_POPULATE && __MREMAP_POPULATE */
+#if !defined(MREMAP_NONBLOCK) && defined(__MREMAP_NONBLOCK)
+#define MREMAP_NONBLOCK        __MREMAP_NONBLOCK
+#endif /* !MREMAP_NONBLOCK && __MREMAP_NONBLOCK */
 #if !defined(MREMAP_FIXED_NOREPLACE) && defined(__MREMAP_FIXED_NOREPLACE)
 #define MREMAP_FIXED_NOREPLACE __MREMAP_FIXED_NOREPLACE
 #endif /* !MREMAP_FIXED_NOREPLACE && __MREMAP_FIXED_NOREPLACE */
@@ -122,7 +128,8 @@ struct mman;
  *                      Set to zero for duplication of PROT_SHARED mappings.
  * @param: new_size:    The size of the to-be returned mapping.
  * @param: flags:       Set of `MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN |
- *                      MREMAP_GROWSUP | MREMAP_STACK | MREMAP_FIXED_NOREPLACE | MREMAP_NOASLR'
+ *                      MREMAP_GROWSUP | MREMAP_STACK | MREMAP_POPULATE | MREMAP_NONBLOCK |
+ *                      MREMAP_FIXED_NOREPLACE | MREMAP_NOASLR'
  * @param: new_address: When `MREMAP_FIXED' is given: the new address of the mapping.
  * @throws: E_SEGFAULT_UNMAPPED: No mapping (or a kernel-mapping) at `old_address'
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE:            `new_size == 0'

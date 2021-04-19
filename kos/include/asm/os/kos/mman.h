@@ -118,10 +118,13 @@
 #if __KOS_VERSION__ >= 400
 /* The following flags are accepted  by `mremap(2)', and affect  what
  * addresses are selected when the kernel has to choose a new address
- * for the resulting mapping. */
+ * for the resulting  mapping. (except  for `MREMAP_POPULATE',  which
+ * simply pre-populates memory in case more got allocated) */
 #define __MREMAP_32BIT           __MAP_32BIT
 #define __MREMAP_GROWSDOWN       __MAP_GROWSDOWN
 #define __MREMAP_GROWSUP         __MAP_GROWSUP
+#define __MREMAP_POPULATE        __MAP_POPULATE
+#define __MREMAP_NONBLOCK        __MAP_NONBLOCK
 #define __MREMAP_STACK           __MAP_STACK
 #define __MREMAP_FIXED_NOREPLACE __MAP_FIXED_NOREPLACE
 #define __MREMAP_NOASLR          __MAP_NOASLR

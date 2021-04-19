@@ -128,7 +128,8 @@ err_not_shareable:
 	/* Fill in our mfile mapping descriptor with information from `node' */
 	map.mmwu_map.mfm_addr  = mnode_getfileaddrat(node, old_address);
 	map.mmwu_map.mfm_prot  = prot_from_mnodeflags(mnode_flags);
-	map.mmwu_map.mfm_flags = mapflags_from_mnodeflags_usronly(mnode_flags);
+	map.mmwu_map.mfm_flags = mapflags_from_mnodeflags_usronly(mnode_flags) |
+	                         mapflags_from_remapflags_poponly(flags);
 	node_fspath            = xincref(node->mn_fspath);
 	node_fsname            = xincref(node->mn_fsname);
 	SLIST_INIT(&map.mmwu_map.mfm_flist);
@@ -194,7 +195,7 @@ something_changed:
 		result = mman_getunmapped_or_unlock(/* self:          */ self,
 		                                    /* addr:          */ new_address,
 		                                    /* num_bytes:     */ map.mmwu_map.mfm_size,
-		                                    /* flags:         */ mapflags_from_remapflags(flags),
+		                                    /* flags:         */ mapflags_from_remapflags_fndonly(flags),
 		                                    /* min_alignment: */ PAGESIZE,
 		                                    /* unlock:        */ &map /* Unlock the file-map on error! */);
 
@@ -700,7 +701,8 @@ err_cannot_prepare:
 			map.mmwu_map.mfm_addr  = mapinfo.mi_fpos + old_size;
 			map.mmwu_map.mfm_size  = new_size - old_size;
 			map.mmwu_map.mfm_prot  = prot_from_mnodeflags(mapinfo.mi_nodeflags);
-			map.mmwu_map.mfm_flags = mapflags_from_mnodeflags_usronly(mapinfo.mi_nodeflags);
+			map.mmwu_map.mfm_flags = mapflags_from_mnodeflags_usronly(mapinfo.mi_nodeflags) |
+			                         mapflags_from_remapflags_poponly(flags);
 			SLIST_INIT(&map.mmwu_map.mfm_flist);
 			mman_lock_release(self);
 			_mfile_map_init_and_acquire_or_reserved(&map.mmwu_map);
@@ -773,7 +775,7 @@ again_lock_mman_phase2:
 					result = mman_getunmapped_or_unlock(/* self:          */ self,
 					                                    /* addr:          */ new_address,
 					                                    /* num_bytes:     */ new_size,
-					                                    /* flags:         */ mapflags_from_remapflags(flags),
+					                                    /* flags:         */ mapflags_from_remapflags_fndonly(flags),
 					                                    /* min_alignment: */ PAGESIZE,
 					                                    /* unlock:        */ &map /* Unlock the file-map on error! */);
 
@@ -913,7 +915,8 @@ again_lock_mman_phase2:
  *                      Set  to  zero  for  duplication  of  PROT_SHARED  mappings.
  * @param: new_size:    The size of the to-be returned mapping.
  * @param: flags:       Set of `MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN |
- *                      MREMAP_GROWSUP | MREMAP_STACK  | MREMAP_FIXED_NOREPLACE |  MREMAP_NOASLR'
+ *                      MREMAP_GROWSUP | MREMAP_STACK | MREMAP_POPULATE | MREMAP_FIXED_NOREPLACE |
+ *                      MREMAP_NOASLR'
  * @param: new_address: When `MREMAP_FIXED' is given: the new address of the mapping.
  * @throws: E_SEGFAULT_UNMAPPED: No mapping (or a kernel-mapping) at `old_address'
  * @throws: *:E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE:            `new_size == 0'

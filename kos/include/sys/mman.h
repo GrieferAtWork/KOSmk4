@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70d3a21f */
+/* HASH CRC-32:0x35c67312 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -320,7 +320,8 @@
 #ifdef __USE_KOS
 /* The following flags are accepted  by `mremap(2)', and affect  what
  * addresses are selected when the kernel has to choose a new address
- * for the resulting mapping. */
+ * for the resulting  mapping. (except  for `MREMAP_POPULATE',  which
+ * simply pre-populates memory in case more got allocated) */
 #if !defined(MREMAP_32BIT) && defined(__MREMAP_32BIT)
 #define MREMAP_32BIT           __MREMAP_32BIT
 #endif /* !MREMAP_32BIT && __MREMAP_32BIT */
@@ -333,6 +334,12 @@
 #if !defined(MREMAP_STACK) && defined(__MREMAP_STACK)
 #define MREMAP_STACK           __MREMAP_STACK
 #endif /* !MREMAP_STACK && __MREMAP_STACK */
+#if !defined(MREMAP_POPULATE) && defined(__MREMAP_POPULATE)
+#define MREMAP_POPULATE        __MREMAP_POPULATE
+#endif /* !MREMAP_POPULATE && __MREMAP_POPULATE */
+#if !defined(MREMAP_NONBLOCK) && defined(__MREMAP_NONBLOCK)
+#define MREMAP_NONBLOCK        __MREMAP_NONBLOCK
+#endif /* !MREMAP_NONBLOCK && __MREMAP_NONBLOCK */
 #if !defined(MREMAP_FIXED_NOREPLACE) && defined(__MREMAP_FIXED_NOREPLACE)
 #define MREMAP_FIXED_NOREPLACE __MREMAP_FIXED_NOREPLACE
 #endif /* !MREMAP_FIXED_NOREPLACE && __MREMAP_FIXED_NOREPLACE */
