@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcae50c75 */
+/* HASH CRC-32:0x1f0ec9a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1871,6 +1871,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpa
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL getpagesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))(); })
 #endif /* __ARCH_PAGESIZE */
 #endif /* !... */
+#ifdef __ARCH_PAGESIZE
+/* If known to be a compile-time  constant, use macros to make  sure
+ * that our `getpagesize()' function is _as_ _fast_ as possible, and
+ * also allows for _as_ _many_ compiler optimization as possible! */
+#define getpagesize() __ARCH_PAGESIZE
+#endif /* __ARCH_PAGESIZE */
 #ifdef __CRT_HAVE_getdtablesize
 /* >> getdtablesize(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getdtablesize,(void),())

@@ -1713,6 +1713,15 @@ __STDC_INT_AS_SIZE_T getpagesize() {
 	return __ARCH_PAGESIZE;
 }
 
+%{
+#ifdef __ARCH_PAGESIZE
+/* If known to be a compile-time  constant, use macros to make  sure
+ * that our `getpagesize()' function is _as_ _fast_ as possible, and
+ * also allows for _as_ _many_ compiler optimization as possible! */
+#define getpagesize() __ARCH_PAGESIZE
+#endif /* __ARCH_PAGESIZE */
+}
+
 @@>> getdtablesize(3)
 [[ATTR_CONST, wunused, section(".text.crt{|.dos}.system.configuration")]]
 [[decl_include("<features.h>")]]
