@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e5f2687 */
+/* HASH CRC-32:0xc18ff2cb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,9 +56,10 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'

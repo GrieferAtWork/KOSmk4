@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c344d63 */
+/* HASH CRC-32:0xbe2b87c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,9 +76,10 @@ INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(c
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
@@ -89,9 +90,10 @@ INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBDCALL libd_strtoi)(char co
 #ifndef __KERNEL__
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
@@ -102,9 +104,10 @@ INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBCCALL libc_strtoi)(char co
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
@@ -115,9 +118,10 @@ INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBDCALL libd_strtou)(char c
 #ifndef __KERNEL__
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
@@ -128,9 +132,10 @@ INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBCCALL libc_strtou)(char c
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
@@ -141,9 +146,10 @@ INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBDCALL libd_strtoi_l)(char 
 #ifndef __KERNEL__
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
@@ -154,9 +160,10 @@ INTDEF ATTR_LEAF NONNULL((1)) intmax_t NOTHROW_NCX(LIBCCALL libc_strtoi_l)(char 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
@@ -167,9 +174,10 @@ INTDEF ATTR_LEAF NONNULL((1)) uintmax_t NOTHROW_NCX(LIBDCALL libd_strtou_l)(char
 #ifndef __KERNEL__
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL') to `ECANCELED'
- * If non-`NULL', `*endptr' is made to point past the read integer, and if
- * it points to a non-'\0'-character, `*rstatus' (if non-`NULL') to `ENOTSUP'
+ * If no integer could be read, set `*rstatus' (if non-`NULL')
+ * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
+ * past the read integer, and if it points to a non-'\0'-
+ * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
  * Also make sure that the returned integer lies within the
  * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'

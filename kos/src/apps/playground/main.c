@@ -188,24 +188,24 @@ int main_color(int argc, char *argv[], char *envp[]) {
 	printf("\\e[f;bm:\n"
 	       "b f");
 	for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
-		printf("%I32c%2u",
+		printf("%" PRIc32 "%2u",
 		       f == 0 ? 0x2551 : 0x2502,
 		       f_codes[f]);
 	}
 	printf("\n"
-	       "%I32c%I32c%I32c",
+	       "%" PRIc32 "%" PRIc32 "%" PRIc32,
 	       0x2550, 0x2550, 0x2550);
 	for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
-		printf("%I32c%I32c%I32c",
+		printf("%" PRIc32 "%" PRIc32 "%" PRIc32,
 		       f == 0 ? 0x256c : 0x256a,
 		       0x2550, 0x2550);
 	}
 	for (b = 0; b < COMPILER_LENOF(b_codes); ++b) {
 		printf("\n%3u", b_codes[b]);
 		for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
-			printf("%I32c",
+			printf("%" PRIc32 "",
 			       f == 0 ? 0x2551 : 0x2502);
-			printf(SESC "[%u;%um%I32c%I32c" SESC "[m",
+			printf(SESC "[%u;%um%" PRIc32 "%" PRIc32 SESC "[m",
 			       b_codes[b], f_codes[f],
 			       0x25c4, 0x25ba);
 		}

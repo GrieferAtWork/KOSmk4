@@ -35,6 +35,7 @@
 
 #include <assert.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 #include <unicode.h>
@@ -312,7 +313,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 found_character:
 					switch (reg_enc) {
 
-					CASEF(KMP_ENCODING_LATIN1, "ch='%I8c'\n", *reader) {
+					CASEF(KMP_ENCODING_LATIN1, "ch='%" PRIc8 "'\n", *reader) {
 						char utf8[2], *end;
 						u8 latin1;
 						latin1 = *reader++;
@@ -333,12 +334,12 @@ found_character:
 						result = (*printer)(arg, (char const *)reader, temp);
 					}	break;
 
-					CASEF(KMP_ENCODING_UTF32LE, "ch='%I32c'\n", UNALIGNED_GETLE32((u32 const *)reader)) {
+					CASEF(KMP_ENCODING_UTF32LE, "ch='%" PRIc32 "'\n", UNALIGNED_GETLE32((u32 const *)reader)) {
 						u32 ch32;
 						char utf8[UNICODE_UTF8_MAXLEN], *end;
 						ch32 = UNALIGNED_GETLE32((u32 const *)reader);
 						goto do_print_ch32;
-					CASEF(KMP_ENCODING_UTF32BE, "ch='%I32c'\n", UNALIGNED_GETBE32((u32 const *)reader))
+					CASEF(KMP_ENCODING_UTF32BE, "ch='%" PRIc32 "'\n", UNALIGNED_GETBE32((u32 const *)reader))
 						ch32 = UNALIGNED_GETBE32((u32 const *)reader);
 do_print_ch32:
 						if (ch32 <= 0x7f)
@@ -346,11 +347,11 @@ do_print_ch32:
 						end    = unicode_writeutf8(utf8, ch32);
 						result = (*printer)(arg, utf8, (size_t)(end - utf8));
 						break;
-					CASEF(KMP_ENCODING_UTF16LE, "ch='%I16c'\n", UNALIGNED_GETLE16((u16 const *)reader)) {
+					CASEF(KMP_ENCODING_UTF16LE, "ch='%" PRIc16 "'\n", UNALIGNED_GETLE16((u16 const *)reader)) {
 						u16 word;
 						word = UNALIGNED_GETLE16((u16 const *)reader);
 						goto do_check_surrogate;
-					CASEF(KMP_ENCODING_UTF16BE, "ch='%I16c'\n", UNALIGNED_GETBE16((u16 const *)reader))
+					CASEF(KMP_ENCODING_UTF16BE, "ch='%" PRIc16 "'\n", UNALIGNED_GETBE16((u16 const *)reader))
 						word = UNALIGNED_GETBE16((u16 const *)reader);
 do_check_surrogate:
 						if (word >= UTF16_HIGH_SURROGATE_MIN &&
@@ -399,7 +400,7 @@ do_check_surrogate:
 skip_character:
 				switch (reg_enc) {
 
-				CASEF(KMP_ENCODING_LATIN1, "ch='%I8c'\n", *reader)
+				CASEF(KMP_ENCODING_LATIN1, "ch='%" PRIc8 "'\n", *reader)
 					++reader;
 					break;
 				CASEF(KMP_ENCODING_UTF8, "ch='%#$q'\n", (size_t)unicode_utf8seqlen[*reader], reader) {
@@ -409,16 +410,16 @@ skip_character:
 					reader += len;
 				}	break;
 
-				CASEF(KMP_ENCODING_UTF32LE, "ch='%I32c'\n", UNALIGNED_GETLE32((u32 const *)reader))
-				CASEF(KMP_ENCODING_UTF32BE, "ch='%I32c'\n", UNALIGNED_GETBE32((u32 const *)reader))
+				CASEF(KMP_ENCODING_UTF32LE, "ch='%" PRIc32 "'\n", UNALIGNED_GETLE32((u32 const *)reader))
+				CASEF(KMP_ENCODING_UTF32BE, "ch='%" PRIc32 "'\n", UNALIGNED_GETBE32((u32 const *)reader))
 					reader += 4;
 					break;
 
-				CASEF(KMP_ENCODING_UTF16LE, "ch='%I16c'\n", UNALIGNED_GETLE16((u16 const *)reader)) {
+				CASEF(KMP_ENCODING_UTF16LE, "ch='%" PRIc16 "'\n", UNALIGNED_GETLE16((u16 const *)reader)) {
 					u16 word;
 					word = UNALIGNED_GETLE16((u16 const *)reader);
 					goto do_check_surrogate_skip;
-				CASEF(KMP_ENCODING_UTF16BE, "ch='%I16c'\n", UNALIGNED_GETBE16((u16 const *)reader))
+				CASEF(KMP_ENCODING_UTF16BE, "ch='%" PRIc16 "'\n", UNALIGNED_GETBE16((u16 const *)reader))
 					word = UNALIGNED_GETBE16((u16 const *)reader);
 do_check_surrogate_skip:
 					if (word >= UTF16_HIGH_SURROGATE_MIN &&
