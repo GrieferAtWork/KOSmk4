@@ -41,7 +41,7 @@ case EMU86_OPCODE_ENCODE(0xe4): {
 	/* E4 ib     IN AL,imm8      Input byte from imm8 I/O port address into AL. */
 	u8 value;
 	u8 portno;
-	portno = *(u8 *)pc;
+	portno = *(u8 const *)pc;
 	pc += 1;
 	VERIFY_USER_PORT_ACCESS(portno, 1);
 	EMU86_EMULATE_INB(portno, value);
@@ -60,7 +60,7 @@ case EMU86_OPCODE_ENCODE(0xe5): {
 	/* E5 ib     IN AX,imm8      Input word from imm8 I/O port address into AX.
 	 * E5 ib     IN EAX,imm8     Input dword from imm8 I/O port address into EAX. */
 	u8 portno;
-	portno = *(u8 *)pc;
+	portno = *(u8 const *)pc;
 	pc += 1;
 	if (!IS_16BIT()) {
 		u32 value;
@@ -129,7 +129,7 @@ case EMU86_OPCODE_ENCODE(0xe6): {
 	/* E6 ib     OUT imm8, AL      Output byte in AL to I/O port address imm8. */
 	u8 value;
 	u8 portno;
-	portno = *(u8 *)pc;
+	portno = *(u8 const *)pc;
 	pc += 1;
 	value = EMU86_GETAL();
 	VERIFY_USER_PORT_ACCESS(portno, 1);
@@ -148,7 +148,7 @@ case EMU86_OPCODE_ENCODE(0xe7): {
 	/* E7 ib     OUT imm8, AX      Output word in AX to I/O port address imm8.
 	 * E7 ib     OUT imm8, EAX     Output doubleword in EAX to I/O port address imm8. */
 	u8 portno;
-	portno = *(u8 *)pc;
+	portno = *(u8 const *)pc;
 	pc += 1;
 	if (!IS_16BIT()) {
 		u32 value;

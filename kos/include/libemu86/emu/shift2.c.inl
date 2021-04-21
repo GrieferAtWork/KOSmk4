@@ -101,7 +101,7 @@ case EMU86_OPCODE_ENCODE(0x0fa4): {
 	 * 0F A4      SHLD r/m32, r32, imm8      Shift r/m32 to left imm8 places while shifting bits from r32 in from the right
 	 * 0F A4      SHLD r/m64, r64, imm8      Shift r/m64 to left imm8 places while shifting bits from r64 in from the right */
 	MODRM_DECODE();
-	num_bits = *(u8 *)pc;
+	num_bits = *(u8 const *)pc;
 	pc += 1;
 	goto do_shld;
 }
@@ -174,7 +174,7 @@ case EMU86_OPCODE_ENCODE(0x0fac): {
 	 * 0F AC      SHRD r/m32, r32, imm8      Shift r/m32 to right imm8 places while shifting bits from r32 in from the left
 	 * 0F AC      SHRD r/m64, r64, imm8      Shift r/m64 to right imm8 places while shifting bits from r64 in from the left */
 	MODRM_DECODE();
-	num_bits = *(u8 *)pc;
+	num_bits = *(u8 const *)pc;
 	pc += 1;
 	goto do_shrd;
 }

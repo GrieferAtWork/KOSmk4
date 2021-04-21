@@ -26,28 +26,28 @@ global final DW_OP_addr = 0x03;
 @@[+0]   TOP = *(uintptr_t *)TOP;
 global final DW_OP_deref = 0x06;
 
-@@[+1]   PUSH(*(u8 *)pc);
+@@[+1]   PUSH(*(u8 const *)pc);
 global final DW_OP_const1u = 0x08;
 
-@@[+1]   PUSH(*(s8 *)pc);
+@@[+1]   PUSH(*(s8 const *)pc);
 global final DW_OP_const1s = 0x09;
 
-@@[+2]   PUSH(*(u16 *)pc);
+@@[+2]   PUSH(*(u16 const *)pc);
 global final DW_OP_const2u = 0x0a;
 
-@@[+2]   PUSH(*(s16 *)pc);
+@@[+2]   PUSH(*(s16 const *)pc);
 global final DW_OP_const2s = 0x0b;
 
-@@[+4]   PUSH(*(u32 *)pc);
+@@[+4]   PUSH(*(u32 const *)pc);
 global final DW_OP_const4u = 0x0c;
 
-@@[+4]   PUSH(*(s32 *)pc);
+@@[+4]   PUSH(*(s32 const *)pc);
 global final DW_OP_const4s = 0x0d;
 
-@@[+8]   PUSH(*(u64 *)pc);
+@@[+8]   PUSH(*(u64 const *)pc);
 global final DW_OP_const8u = 0x0e;
 
-@@[+8]   PUSH(*(s64 *)pc);
+@@[+8]   PUSH(*(s64 const *)pc);
 global final DW_OP_const8s = 0x0f;
 
 @@[+*]   PUSH(dwarf_decode_uleb128(&pc));
@@ -122,10 +122,10 @@ global final DW_OP_shra = 0x26;
 @@[+0]   PUSH(POP(SECOND) ^ POP(TOP));
 global final DW_OP_xor = 0x27;
 
-@@[+2]   off = *(s16 *)pc; pc += 2; pc += off;
+@@[+2]   off = *(s16 const *)pc; pc += 2; pc += off;
 global final DW_OP_skip = 0x2f;
 
-@@[+2]   off = *(s16 *)pc; pc += 2; if (POP() != 0) pc += off;
+@@[+2]   off = *(s16 const *)pc; pc += 2; if (POP() != 0) pc += off;
 global final DW_OP_bra = 0x28;
 
 @@[+0]   PUSH((signed)POP(SECOND) == (signed)POP(TOP));
@@ -446,10 +446,10 @@ global final DW_OP_bregx = 0x92;
 @@[+*]   num_bytes = dwarf_decode_uleb128(&pc); WRITE_RESULT(POP(),num_bytes * 8); // Assign TOP to `num_bytes' of the variable's value.
 global final DW_OP_piece = 0x93;
 
-@@[+1]   n = *(u8 *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 *)p : n == 2 ? *(u16 *)p : n == 4 ? *(u32 *)p : n == 8 ? *(u64 *)p : UNDEFINED);
+@@[+1]   n = *(u8 const *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 const *)p : n == 2 ? *(u16 const *)p : n == 4 ? *(u32 const *)p : n == 8 ? *(u64 const *)p : UNDEFINED);
 global final DW_OP_deref_size = 0x94;
 
-@@[+1]   n = *(u8 *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 *)id:p : n == 2 ? *(u16 *)id:p : n == 4 ? *(u32 *)id:p : n == 8 ? *(u64 *)id:p : UNDEFINED);
+@@[+1]   n = *(u8 const *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 const *)id:p : n == 2 ? *(u16 const *)id:p : n == 4 ? *(u32 const *)id:p : n == 8 ? *(u64 const *)id:p : UNDEFINED);
 global final DW_OP_xderef_size = 0x95;
 
 @@[+0]   Do nothing

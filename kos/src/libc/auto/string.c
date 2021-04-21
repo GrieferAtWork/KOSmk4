@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25914250 */
+/* HASH CRC-32:0x37a77a35 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2951,7 +2951,7 @@ NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack,
 		return NULL;
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= needlelen - 1;
-	marker = *(uint8_t *)needle;
+	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)libc_memrchr(haystack, marker, haystacklen)) != NULL) {
 		if (libc_memcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;

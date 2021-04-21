@@ -796,12 +796,12 @@ again_switch_opcode:
 				value = UNALIGNED_GET((uintptr_t *)pc);
 #if __SIZEOF_POINTER__ > 4
 			} else if (self->ue_addrsize >= 4) {
-				value = (uintptr_t)UNALIGNED_GET32((uint32_t *)pc);
+				value = (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc);
 #endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (self->ue_addrsize >= 2) {
-				value = (uintptr_t)UNALIGNED_GET16((uint16_t *)pc);
+				value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc);
 			} else {
-				value = (uintptr_t)*(uint8_t *)pc;
+				value = (uintptr_t)*(uint8_t const *)pc;
 			}
 
 			/* To quote a comment found within the GDB source tree:
@@ -885,21 +885,21 @@ do_make_top_const:
 			pc += size;                                           \
 			++stacksz;                                            \
 			break;
-		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)*(uint8_t *)pc, 1)
-		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t)*(int8_t *)pc, 1)
-		DEFINE_PUSH_CONSTANT(DW_OP_const2u, s_uconst, (uintptr_t)UNALIGNED_GET16((uint16_t *)pc), 2)
-		DEFINE_PUSH_CONSTANT(DW_OP_const2s, s_sconst, (intptr_t)(int16_t)UNALIGNED_GET16((uint16_t *)pc), 2)
-		DEFINE_PUSH_CONSTANT(DW_OP_const4u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t *)pc), 4)
-		DEFINE_PUSH_CONSTANT(DW_OP_const4s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t *)pc), 4)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)*(uint8_t const *)pc, 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t)*(int8_t const *)pc, 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const2u, s_uconst, (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc), 2)
+		DEFINE_PUSH_CONSTANT(DW_OP_const2s, s_sconst, (intptr_t)(int16_t)UNALIGNED_GET16((uint16_t const *)pc), 2)
+		DEFINE_PUSH_CONSTANT(DW_OP_const4u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc), 4)
+		DEFINE_PUSH_CONSTANT(DW_OP_const4s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)pc), 4)
 #if __SIZEOF_POINTER__ > 4
-		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET64((uint64_t *)pc), 8)
-		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int64_t)UNALIGNED_GET64((uint64_t *)pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET64((uint64_t const *)pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int64_t)UNALIGNED_GET64((uint64_t const *)pc), 8)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t *)pc), 8)
-		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t *)pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)pc), 8)
 #else /* ... */
-		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t *)pc + 1), 8)
-		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t *)pc + 1), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc + 1), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)pc + 1), 8)
 #endif /* !... */
 #undef DEFINE_PUSH_CONSTANT
 
@@ -945,7 +945,7 @@ do_make_top_const:
 
 		CASE(DW_OP_pick) {
 			uint8_t offset;
-			offset = *(uint8_t *)pc;
+			offset = *(uint8_t const *)pc;
 			if unlikely(offset >= stacksz)
 				ERROR(err_stack_underflow);
 			if unlikely(stacksz >= self->ue_stackmax)
@@ -1189,7 +1189,7 @@ do_make_second_const:
 
 		CASE(DW_OP_skip) {
 			int16_t offset;
-			offset = (int16_t)UNALIGNED_GET16((uint16_t *)pc);
+			offset = (int16_t)UNALIGNED_GET16((uint16_t const *)pc);
 			pc += 2;
 			if (offset < 0) {
 				if unlikely(!self->ue_bjmprem)
@@ -1225,7 +1225,7 @@ do_make_second_const:
 			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
 			if (TOP.s_uconst != 0) {
-				offset = (int16_t)UNALIGNED_GET16((uint16_t *)pc);
+				offset = (int16_t)UNALIGNED_GET16((uint16_t const *)pc);
 				pc += 2;
 				if (offset < 0) {
 					if unlikely(!self->ue_bjmprem)
@@ -1456,7 +1456,7 @@ do_read_bit_pieces:
 				goto do_make_top_const;
 			/* Turn a constant into an l-value. */
 			TOP.s_type  = UNWIND_STE_RW_LVALUE;
-			TOP.s_lsize = *(uint8_t *)pc;
+			TOP.s_lsize = *(uint8_t const *)pc;
 			pc += 1;
 			break;
 
@@ -1467,7 +1467,7 @@ do_read_bit_pieces:
 				goto do_make_top_const;
 			/* Turn a constant into an l-value. */
 			SECOND.s_type   = UNWIND_STE_RW_LVALUE;
-			SECOND.s_lsize  = *(uint8_t *)pc;
+			SECOND.s_lsize  = *(uint8_t const *)pc;
 			SECOND.s_lvalue = (byte_t *)TOP.s_uconst;
 			pc += 1;
 			--stacksz;
@@ -1498,16 +1498,16 @@ do_read_bit_pieces:
 			self->ue_pc = pc - 1;
 			if (opcode == DW_OP_call2) {
 				component_address = self->ue_sectinfo->ues_debug_info_start +
-					                (uintptr_t)UNALIGNED_GET16((uint16_t *)pc);
+					                (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc);
 				pc += 2;
 			} else if (opcode == DW_OP_call4 || self->ue_ptrsize == 4) {
 				component_address = self->ue_sectinfo->ues_debug_info_start +
-					                (uintptr_t)UNALIGNED_GET32((uint32_t *)pc);
+					                (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc);
 				pc += 4;
 			} else {
 				assert(self->ue_ptrsize == 8);
 				component_address = self->ue_sectinfo->ues_debug_info_start +
-					                (uintptr_t)UNALIGNED_GET64((uint64_t *)pc);
+					                (uintptr_t)UNALIGNED_GET64((uint64_t const *)pc);
 				pc += 8;
 			}
 			if unlikely(component_address < self->ue_sectinfo->ues_debug_info_start ||
@@ -1613,12 +1613,12 @@ do_read_bit_pieces:
 				value = UNALIGNED_GET((uintptr_t *)debug_addr_loc);
 #if __SIZEOF_POINTER__ > 4
 			} else if (self->ue_addrsize >= 4) {
-				value = (uintptr_t)UNALIGNED_GET32((uint32_t *)debug_addr_loc);
+				value = (uintptr_t)UNALIGNED_GET32((uint32_t const *)debug_addr_loc);
 #endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (self->ue_addrsize >= 2) {
-				value = (uintptr_t)UNALIGNED_GET16((uint16_t *)debug_addr_loc);
+				value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)debug_addr_loc);
 			} else {
-				value = (uintptr_t)*(uint8_t *)debug_addr_loc;
+				value = (uintptr_t)*(uint8_t const *)debug_addr_loc;
 			}
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
 			self->ue_stack[stacksz].s_uconst = value;

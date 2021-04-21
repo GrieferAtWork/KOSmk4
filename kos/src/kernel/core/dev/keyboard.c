@@ -1037,7 +1037,7 @@ keyboard_device_ioctl(struct character_device *__restrict self,
 		uintptr_t new_mods;
 		validate_readable(arg, sizeof(__uint32_t));
 		COMPILER_READ_BARRIER();
-		new_mods = *(u32 *)arg;
+		new_mods = *(u32 const *)arg;
 		COMPILER_READ_BARRIER();
 		sync_write(&me->kd_leds_lock);
 		if (me->kd_leds != new_mods) {
@@ -1091,7 +1091,7 @@ keyboard_device_ioctl(struct character_device *__restrict self,
 		validate_writable(arg, sizeof(__uint32_t));
 		mods = ATOMIC_READ(me->kd_mods);
 		COMPILER_WRITE_BARRIER();
-		*(u32 *)arg = (u32)mods;
+		*(USER CHECKED u32 *)arg = (u32)mods;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
@@ -1099,7 +1099,7 @@ keyboard_device_ioctl(struct character_device *__restrict self,
 		uintptr_t new_mods;
 		validate_readable(arg, sizeof(__uint32_t));
 		COMPILER_READ_BARRIER();
-		new_mods = *(u32 *)arg;
+		new_mods = *(USER CHECKED u32 const *)arg;
 		COMPILER_READ_BARRIER();
 		ATOMIC_WRITE(me->kd_mods, new_mods);
 	}	break;
@@ -1285,7 +1285,7 @@ continue_copy_keymap:
 		u16 key;
 		validate_readable(arg, sizeof(u16));
 		COMPILER_READ_BARRIER();
-		key = *(u16 *)arg;
+		key = *(u16 const *)arg;
 		COMPILER_READ_BARRIER();
 		return keyboard_device_putkey(me, key);
 	}	break;
@@ -1305,7 +1305,7 @@ continue_copy_keymap:
 		int f12_mode;
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
-		f12_mode = *(int *)arg;
+		f12_mode = *(int const *)arg;
 		COMPILER_READ_BARRIER();
 		if (f12_mode == 0) {
 #ifdef KEYBOARD_DEVICE_FLAG_DBGF12

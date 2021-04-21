@@ -2097,16 +2097,16 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 				offset = pc_superblock_features_offset[name];
 				if (offset != FIELD_UNDEFINED) {
 #if __SIZEOF_POINTER__ <= 4
-					result = (longptr_t)*(u32 *)((byte_t *)&feat + offset);
+					result = (longptr_t)(*(u32 const *)((byte_t const *)&feat + offset));
 #else /* __SIZEOF_POINTER__ <= 4 */
-					void *field_addr;
-					field_addr = (byte_t *)&feat + (offset & 0x7f);
+					void const *field_addr;
+					field_addr = (byte_t const *)&feat + (offset & 0x7f);
 					if (offset & 0x80) {
 						/* 32-bit field. */
-						result = (longptr_t)*(u32 *)field_addr;
+						result = (longptr_t)(*(u32 const *)field_addr);
 					} else {
 						/* 64-bit field. */
-						result = (longptr_t)*(u64 *)field_addr;
+						result = (longptr_t)(*(u64 const *)field_addr);
 					}
 #endif /* __SIZEOF_POINTER__ > 4 */
 				} else {

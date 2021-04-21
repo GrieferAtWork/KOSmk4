@@ -109,20 +109,20 @@
 /*      DW_OP_                     0x05  * ... */
 #define DW_OP_deref                0x06 /* [+0]   TOP = *(uintptr_t *)TOP; */
 /*      DW_OP_                     0x07  * ... */
-#define DW_OP_const1u              0x08 /* [+1]   PUSH(*(u8 *)pc); */
-#define DW_OP_const1s              0x09 /* [+1]   PUSH(*(s8 *)pc); */
-#define DW_OP_const2u              0x0a /* [+2]   PUSH(*(u16 *)pc); */
-#define DW_OP_const2s              0x0b /* [+2]   PUSH(*(s16 *)pc); */
-#define DW_OP_const4u              0x0c /* [+4]   PUSH(*(u32 *)pc); */
-#define DW_OP_const4s              0x0d /* [+4]   PUSH(*(s32 *)pc); */
-#define DW_OP_const8u              0x0e /* [+8]   PUSH(*(u64 *)pc); */
-#define DW_OP_const8s              0x0f /* [+8]   PUSH(*(s64 *)pc); */
+#define DW_OP_const1u              0x08 /* [+1]   PUSH(*(u8 const *)pc); */
+#define DW_OP_const1s              0x09 /* [+1]   PUSH(*(s8 const *)pc); */
+#define DW_OP_const2u              0x0a /* [+2]   PUSH(*(u16 const *)pc); */
+#define DW_OP_const2s              0x0b /* [+2]   PUSH(*(s16 const *)pc); */
+#define DW_OP_const4u              0x0c /* [+4]   PUSH(*(u32 const *)pc); */
+#define DW_OP_const4s              0x0d /* [+4]   PUSH(*(s32 const *)pc); */
+#define DW_OP_const8u              0x0e /* [+8]   PUSH(*(u64 const *)pc); */
+#define DW_OP_const8s              0x0f /* [+8]   PUSH(*(s64 const *)pc); */
 #define DW_OP_constu               0x10 /* [+*]   PUSH(dwarf_decode_uleb128(&pc)); */
 #define DW_OP_consts               0x11 /* [+*]   PUSH(dwarf_decode_sleb128(&pc)); */
 #define DW_OP_dup                  0x12 /* [+0]   PUSH(TOP); */
 #define DW_OP_drop                 0x13 /* [+0]   POP(); */
 #define DW_OP_over                 0x14 /* [+0]   PUSH(SECOND); */
-#define DW_OP_pick                 0x15 /* [+1]   PUSH(NTH(*(u8 *)pc));  // Where operand=0 is the old TOP */
+#define DW_OP_pick                 0x15 /* [+1]   PUSH(NTH(*(u8 const *)pc));  // Where operand=0 is the old TOP */
 #define DW_OP_swap                 0x16 /* [+0]   TOP = XCH(SECOND, TOP); */
 #define DW_OP_rot                  0x17 /* [+0]   a = TOP; TOP = SECOND; SECOND = THIRD; THIRD = a; */
 #define DW_OP_xderef               0x18 /* [+0]   off = POP(); id = POP(); PUSH(*(uintptr_t *)id:off) */
@@ -141,14 +141,14 @@
 #define DW_OP_shr                  0x25 /* [+0]   PUSH((unsigned)POP(SECOND) >> POP(TOP)); */
 #define DW_OP_shra                 0x26 /* [+0]   PUSH((signed)POP(SECOND) >> POP(TOP)); */
 #define DW_OP_xor                  0x27 /* [+0]   PUSH(POP(SECOND) ^ POP(TOP)); */
-#define DW_OP_bra                  0x28 /* [+2]   off = *(s16 *)pc; pc += 2; if (POP() != 0) pc += off; */
+#define DW_OP_bra                  0x28 /* [+2]   off = *(s16 const *)pc; pc += 2; if (POP() != 0) pc += off; */
 #define DW_OP_eq                   0x29 /* [+0]   PUSH((signed)POP(SECOND) == (signed)POP(TOP)); */
 #define DW_OP_ge                   0x2a /* [+0]   PUSH((signed)POP(SECOND) >= (signed)POP(TOP)); */
 #define DW_OP_gt                   0x2b /* [+0]   PUSH((signed)POP(SECOND) >  (signed)POP(TOP)); */
 #define DW_OP_le                   0x2c /* [+0]   PUSH((signed)POP(SECOND) <= (signed)POP(TOP)); */
 #define DW_OP_lt                   0x2d /* [+0]   PUSH((signed)POP(SECOND) <  (signed)POP(TOP)); */
 #define DW_OP_ne                   0x2e /* [+0]   PUSH((signed)POP(SECOND) != (signed)POP(TOP)); */
-#define DW_OP_skip                 0x2f /* [+2]   off = *(s16 *)pc; pc += 2; pc += off; */
+#define DW_OP_skip                 0x2f /* [+2]   off = *(s16 const *)pc; pc += 2; pc += off; */
 #define DW_OP_lit0                 0x30 /* [+0]   PUSH(0); */
 #define DW_OP_lit1                 0x31 /* [+0]   PUSH(1); */
 #define DW_OP_lit2                 0x32 /* [+0]   PUSH(2); */
@@ -249,8 +249,8 @@
 #define DW_OP_fbreg                0x91 /* [+*]   PUSH(EVAL(CURRENT_FUNCTION.DW_AT_frame_base) + dwarf_decode_sleb128(&pc)) */
 #define DW_OP_bregx                0x92 /* [+*]   PUSH(GET_CONTEXT_REGVAL(dwarf_decode_uleb128(&pc)) + dwarf_decode_sleb128(&pc)); */
 #define DW_OP_piece                0x93 /* [+*]   num_bytes = dwarf_decode_uleb128(&pc); WRITE_RESULT(POP(), num_bytes * 8); // Assign TOP to `num_bytes' of the variable's value. */
-#define DW_OP_deref_size           0x94 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 *)p : n == 2 ? *(u16 *)p : n == 4 ? *(u32 *)p : n == 8 ? *(u64 *)p : UNDEFINED); */
-#define DW_OP_xderef_size          0x95 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 *)id:p : n == 2 ? *(u16 *)id:p : n == 4 ? *(u32 *)id:p : n == 8 ? *(u64 *)id:p : UNDEFINED); */
+#define DW_OP_deref_size           0x94 /* [+1]   n = *(u8 const *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 const *)p : n == 2 ? *(u16 const *)p : n == 4 ? *(u32 const *)p : n == 8 ? *(u64 const *)p : UNDEFINED); */
+#define DW_OP_xderef_size          0x95 /* [+1]   n = *(u8 const *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 const *)id:p : n == 2 ? *(u16 const *)id:p : n == 4 ? *(u32 const *)id:p : n == 8 ? *(u64 const *)id:p : UNDEFINED); */
 #define DW_OP_nop                  0x96 /* [+0]   Do nothing */
 #define DW_OP_push_object_address  0x97 /* [+0]   Push the value of `ue_objaddr' */
 #define DW_OP_call2                0x98 /* [+2]   Call another DW expression (the operator is a 2-byte unsigned offset from .debug_info) */
@@ -331,9 +331,9 @@
 #define DW_CFA_restore              0xc0 /* register[opcode & 0x3f] = init_regs[opcode & 0x3f]; */
 #define DW_CFA_nop                  0x00 /* nop(); */
 #define DW_CFA_set_loc              0x01 /* upc = fde.f_pcstart + dwarf_decode_pointer(&pc, fde.f_encptr, ...); */
-#define DW_CFA_advance_loc1         0x02 /* upc += *(u8 *)pc; pc += 1; */
-#define DW_CFA_advance_loc2         0x03 /* upc += *(u16 *)pc; pc += 2; */
-#define DW_CFA_advance_loc4         0x04 /* upc += *(u32 *)pc; pc += 4; */
+#define DW_CFA_advance_loc1         0x02 /* upc += *(u8 const *)pc; pc += 1; */
+#define DW_CFA_advance_loc2         0x03 /* upc += *(u16 const *)pc; pc += 2; */
+#define DW_CFA_advance_loc4         0x04 /* upc += *(u32 const *)pc; pc += 4; */
 #define DW_CFA_offset_extended      0x05 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) }; */
 #define DW_CFA_restore_extended     0x06 /* r = dwarf_decode_uleb128(&pc); register[r] = init_regs[r]; */
 #define DW_CFA_undefined            0x07 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_undefined }; */

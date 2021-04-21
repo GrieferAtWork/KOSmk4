@@ -31,6 +31,8 @@
 #include <sched/except-handler.h>
 #include <sched/task.h>
 
+#include <hybrid/unaligned.h>
+
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
@@ -51,7 +53,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 	emu86_opcode_t opcode;
 	emu86_opflags_t flags;
 	uintptr_t bound_index, bound_min, bound_max;
-	curr_pc   = (byte_t *)icpustate_getpc(state);
+	curr_pc   = (byte_t const *)icpustate_getpc(state);
 	flags     = emu86_opflags_from_icpustate(state);
 	next_pc   = emu86_opcode_decode(curr_pc, &opcode, &flags);
 	bound_min = bound_index = bound_max = 0;
@@ -69,12 +71,12 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 				validate_readable(addr, (flags & EMU86_F_OP16) ? 4 : 8);
 			if (flags & EMU86_F_OP16) {
 				bound_index = modrm_getregw(state, &mod, flags);
-				bound_min   = *(u16 *)(addr + 0);
-				bound_max   = *(u16 *)(addr + 2);
+				bound_min   = UNALIGNED_GET16((u16 const *)(addr + 0));
+				bound_max   = UNALIGNED_GET16((u16 const *)(addr + 2));
 			} else {
 				bound_index = modrm_getregl(state, &mod, flags);
-				bound_min   = *(u32 *)(addr + 0);
-				bound_max   = *(u32 *)(addr + 4);
+				bound_min   = UNALIGNED_GET32((u32 const *)(addr + 0));
+				bound_max   = UNALIGNED_GET32((u32 const *)(addr + 4));
 			}
 		} EXCEPT {
 			icpustate_setpc(state, (uintptr_t)next_pc);

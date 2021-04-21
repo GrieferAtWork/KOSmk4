@@ -97,10 +97,10 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 #define I64(...) return true;
 #endif /* !__x86_64__ */
 
-		case 0x0000: RO; p = *(u8 *)addr; break;
-		case 0x0001: RO; p = *(u16 *)addr; break;
-		case 0x0002: RO; p = *(u32 *)addr; break;
-		case 0x0003: RO; I64(p = *(u64 *)addr); break;
+		case 0x0000: RO; p = *(u8 const *)addr; break;
+		case 0x0001: RO; p = *(u16 const *)addr; break;
+		case 0x0002: RO; p = *(u32 const *)addr; break;
+		case 0x0003: RO; I64(p = *(u64 const *)addr); break;
 
 		case 0x0004: WO; *(u8 *)addr = (u8)p; break;
 		case 0x0005: WO; *(u16 *)addr = (u16)p; break;

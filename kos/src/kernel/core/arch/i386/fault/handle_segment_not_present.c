@@ -221,13 +221,13 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 					goto unsupported_instruction;
 #endif /* __x86_64__ */
 				if (op_flags & EMU86_F_OP16) {
-					offset = UNALIGNED_GETLE16((u16 *)pc);
+					offset = UNALIGNED_GETLE16((u16 const *)pc);
 					pc += 2;
 				} else {
-					offset = UNALIGNED_GETLE32((u32 *)pc);
+					offset = UNALIGNED_GETLE32((u32 const *)pc);
 					pc += 4;
 				}
-				segment = UNALIGNED_GETLE16((u16 *)pc);
+				segment = UNALIGNED_GETLE16((u16 const *)pc);
 				pc += 2;
 #ifdef CONFIG_X86_EMULATE_LCALL7
 				/* lcall7 emulation */
@@ -268,16 +268,16 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 						validate_readable(addr, 1);
 #ifdef __x86_64__
 					if (op_flags & EMU86_F_REX_W) {
-						segment = UNALIGNED_GETLE16((u16 *)(addr + 0));
-						offset  = UNALIGNED_GETLE64((u64 *)(addr + 2));
+						segment = UNALIGNED_GETLE16((u16 const *)(addr + 0));
+						offset  = UNALIGNED_GETLE64((u64 const *)(addr + 2));
 					} else
 #endif /* __x86_64__ */
 					if (!(op_flags & EMU86_F_OP16)) {
-						segment = UNALIGNED_GETLE16((u16 *)(addr + 0));
-						offset  = UNALIGNED_GETLE32((u32 *)(addr + 2));
+						segment = UNALIGNED_GETLE16((u16 const *)(addr + 0));
+						offset  = UNALIGNED_GETLE32((u32 const *)(addr + 2));
 					} else {
-						segment = UNALIGNED_GETLE16((u16 *)(addr + 0));
-						offset  = UNALIGNED_GETLE16((u16 *)(addr + 2));
+						segment = UNALIGNED_GETLE16((u16 const *)(addr + 0));
+						offset  = UNALIGNED_GETLE16((u16 const *)(addr + 2));
 					}
 #ifdef CONFIG_X86_EMULATE_LCALL7
 					/* lcall7 emulation */

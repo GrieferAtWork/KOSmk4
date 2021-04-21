@@ -166,7 +166,7 @@ got_identify_signal:
 		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(int));
 		COMPILER_WRITE_BARRIER();
-		*(int *)arg = ((void *)self->bd_type.dt_read == (void *)&AtaDrive_DmaDriveRead) ? 1 : 0;
+		*(USER CHECKED int *)arg = ((void *)self->bd_type.dt_read == (void *)&AtaDrive_DmaDriveRead) ? 1 : 0;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
@@ -175,7 +175,7 @@ got_identify_signal:
 		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(int));
 		COMPILER_WRITE_BARRIER();
-		*(int *)arg = (self->ad_features & ATA_DRIVE_FEATURE_FFLUSH) ? 1 : 0;
+		*(USER CHECKED int *)arg = (self->ad_features & ATA_DRIVE_FEATURE_FFLUSH) ? 1 : 0;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
@@ -185,7 +185,7 @@ got_identify_signal:
 		/* TODO: Permission checks? */
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
-		cache_mode = *(int *)arg;
+		cache_mode = *(USER CHECKED int const *)arg;
 		COMPILER_READ_BARRIER();
 		if (cache_mode) {
 			/* WARNING: The drive may not actually support this... */
@@ -218,9 +218,9 @@ got_identify_signal:
 		COMPILER_WRITE_BARRIER();
 		/* XXX: I have no idea what `BUSSTATE_TRISTATE' is all about...
 		 *      (Or if this right here is even correct) */
-		*(int *)arg = state == ATA_BUS_STATE_READY
-		              ? BUSSTATE_OFF
-		              : BUSSTATE_ON;
+		*(USER CHECKED int *)arg = state == ATA_BUS_STATE_READY
+		                           ? BUSSTATE_OFF
+		                           : BUSSTATE_ON;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 

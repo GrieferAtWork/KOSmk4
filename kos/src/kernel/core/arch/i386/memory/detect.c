@@ -124,13 +124,13 @@ vm86_io(vm86_state_t *__restrict UNUSED(self),
 		*(uint32_t *)data = inl((port_t)port);
 		break;
 	case VM86_HANDLE_IO_OUTB:
-		outb((port_t)port, *(uint8_t *)data);
+		outb((port_t)port, *(uint8_t const *)data);
 		break;
 	case VM86_HANDLE_IO_OUTW:
-		outw((port_t)port, *(uint16_t *)data);
+		outw((port_t)port, *(uint16_t const *)data);
 		break;
 	case VM86_HANDLE_IO_OUTL:
-		outl((port_t)port, *(uint32_t *)data);
+		outl((port_t)port, *(uint32_t const *)data);
 		break;
 	default:
 		result = VM86_BADPORT;

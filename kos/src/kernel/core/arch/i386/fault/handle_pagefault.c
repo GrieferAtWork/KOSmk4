@@ -120,10 +120,10 @@ DECL_BEGIN
 
 /* Register bootstrap loader.
  * Restore:
- *   %ss  = *(u32 *)(%eax + 0);
- *   %esp = *(u32 *)(%eax + 4);
- *   %eip = *(u32 *)(%eax + 8);
- *   %eax = *(u32 *)(%eax + 12);
+ *   %ss  = *(u32 const *)(%eax + 0);
+ *   %esp = *(u32 const *)(%eax + 4);
+ *   %eip = *(u32 const *)(%eax + 8);
+ *   %eax = *(u32 const *)(%eax + 12);
  */
 INTDEF byte_t x86_vio_kernel_esp_bootstrap_loader[];
 __asm__(".pushsection .text.cold\n\t"
@@ -394,7 +394,7 @@ safe_instruction_trysucc(void const *pc, instrlen_isa_t isa) {
 }
 
 PRIVATE ATTR_NORETURN void FCALL
-rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void *pc) {
+rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const *pc) {
 	/* Use the regular `instruction_trysucc()' since we're actually inside
 	 * of a CATCH-block right now, meaning that it will already do all  of
 	 * the necessary work of preserving the old exception for us! */
@@ -429,14 +429,13 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	((uintptr_t)(ecode & X86_PAGEFAULT_ECODE_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) | \
 	 (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0))
 #endif
-
-
-	void *pc, *addr;
+	void const *pc;
+	void *addr;
 	struct mfault mf;
 	struct task_connections con;
 
 	/* Check for memcpy_nopf() */
-	pc = (void *)state->ics_irregs.ir_pip;
+	pc = (void const *)state->ics_irregs.ir_pip;
 	if unlikely_untraced(x86_nopf_check(pc)) {
 		state->ics_irregs.ir_pip = x86_nopf_retof(pc);
 		return state;
@@ -742,7 +741,7 @@ do_handle_iob_node_access:
 						 * if the  access  originates  from  a  user-space  I/O  instruction.
 						 * If not (such as user-space directly trying to read kernel memory),
 						 * then we always deny the access, no matter what! */
-						if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state,
+						if (!is_io_instruction_and_not_memory_access((byte_t const *)pc, state,
 						                                             (uintptr_t)addr))
 							goto pop_connections_and_throw_segfault;
 					}
@@ -875,18 +874,18 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 				TRY {
 					vio_addr_t vio_addr;
 					uintptr_t callsite_pc;
-					uintptr_t sp;
+					byte_t const *sp;
 					IF_X64(bool is_compat;)
 					/* Must unwind the stack to restore the IP of the VIO call-site. */
-					sp = icpustate_getsp(state);
-					if (sp >= KERNELSPACE_BASE && FAULT_IS_USER)
+					sp = (byte_t const *)icpustate_getsp(state);
+					if (sp >= (byte_t const *)KERNELSPACE_BASE && FAULT_IS_USER)
 						goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 					IF_X64(is_compat = icpustate_is32bit(state);)
 					TRY {
 						IF_X64(if (is_compat) {
-							callsite_pc = (uintptr_t)*(u32 *)sp;
+							callsite_pc = (uintptr_t)*(u32 const *)sp;
 						} else) {
-							callsite_pc = *(uintptr_t *)sp;
+							callsite_pc = *(uintptr_t const *)sp;
 						}
 					} EXCEPT {
 						if (!was_thrown(E_SEGFAULT))
@@ -899,9 +898,9 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					                  : (callsite_pc < KERNELSPACE_BASE))
 						goto do_normal_vio;
 					icpustate_setpc(state, callsite_pc);
-					icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+					icpustate_setsp(state, (uintptr_t)(is_compat ? sp + 4 : sp + 8));
 #else /* __x86_64__ */
-					if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
+					if ((void const *)sp != (void const *)(&state->ics_irregs_k + 1) ||
 					    FAULT_IS_USER) {
 						if (callsite_pc >= KERNELSPACE_BASE)
 							goto do_normal_vio;
@@ -1045,7 +1044,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 	} EXCEPT {
 		task_popconnections();
 		if (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
-			PERTASK_SET(this_exception_faultaddr, pc);
+			PERTASK_SET(this_exception_faultaddr, (void *)pc);
 		RETHROW();
 	}
 
@@ -1102,15 +1101,16 @@ pop_connections_and_throw_segfault:
 		 * -> Try to unwind this happening. */
 		IF_X64(bool is_compat;)
 		uintptr_t callsite_pc;
-		uintptr_t sp = icpustate_getsp(state);
-		if (sp >= KERNELSPACE_BASE && (sp != (uintptr_t)(&state->ics_irregs + 1) || FAULT_IS_USER))
+		byte_t const *sp = (byte_t const *)icpustate_getsp(state);
+		if (sp >= (byte_t const *)KERNELSPACE_BASE &&
+		    ((void const *)sp != (void const *)(&state->ics_irregs + 1) || FAULT_IS_USER))
 			goto not_a_badcall;
 		IF_X64(is_compat = icpustate_is32bit(state);)
 		TRY {
 			IF_X64(if (is_compat) {
-				callsite_pc = (uintptr_t)*(u32 *)sp;
+				callsite_pc = (uintptr_t)(*(u32 const *)sp);
 			} else) {
-				callsite_pc = *(uintptr_t *)sp;
+				callsite_pc = *(uintptr_t const *)sp;
 			}
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
@@ -1125,9 +1125,9 @@ pop_connections_and_throw_segfault:
 		                  : (callsite_pc < KERNELSPACE_BASE))
 			goto not_a_badcall;
 		icpustate_setpc(state, callsite_pc);
-		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+		icpustate_setsp(state, (uintptr_t)(is_compat ? sp + 4 : sp + 8));
 #else /* __x86_64__ */
-		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || FAULT_IS_USER) {
+		if ((void const *)sp != (void const *)(&state->ics_irregs_k + 1) || FAULT_IS_USER) {
 			if (callsite_pc >= KERNELSPACE_BASE)
 				goto not_a_badcall;
 			icpustate_setpc(state, callsite_pc);
@@ -1203,7 +1203,7 @@ set_exception_pointers2:
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
-	PERTASK_SET(this_exception_faultaddr, pc);
+	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	pc = safe_instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
 	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
 	       addr, (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE),

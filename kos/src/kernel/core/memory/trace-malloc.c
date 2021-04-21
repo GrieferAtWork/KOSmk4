@@ -688,23 +688,23 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
 #define HAVE_kmalloc_validate_node
-PRIVATE NOBLOCK ATTR_NOINLINE bool
+PRIVATE NOBLOCK ATTR_NOINLINE NONNULL((2)) bool
 NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
-                                     struct trace_node *__restrict node) {
+                                     struct trace_node const *__restrict node) {
 	unsigned int i;
-	u32 *base;
+	u32 const *base;
 	/* Check if the node has padding which we can validate. */
 	if (!TRACE_NODE_KIND_HAS_PADDING(node->tn_kind))
 		goto done;
-	base = (u32 *)trace_node_uaddr(node);
+	base = (u32 const *)trace_node_uaddr(node);
 #if CONFIG_MALL_HEAD_SIZE != 0
 	for (i = sizeof(size_t) / 4; i < CONFIG_MALL_HEAD_SIZE / 4; ++i) {
 		if (base[i] != CONFIG_MALL_HEAD_PATTERN) {
 			u32 word;
 			word = CONFIG_MALL_HEAD_PATTERN;
 			base += i;
-			while (*(u8 *)base == ((u8 *)&word)[(uintptr_t)base & 3])
-				base = (u32 *)((byte_t *)base + 1);
+			while (*(byte_t const *)base == ((byte_t const *)&word)[(uintptr_t)base & 3])
+				base = (u32 const *)((byte_t const *)base + 1);
 			kernel_panic_n(n_skip + 1,
 			               "Corrupted MALL header in at %p (offset %" PRIdSIZ " from %p...%p)\n"
 			               "%$[hex]\n"
@@ -719,14 +719,14 @@ NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
 	}
 #endif /* CONFIG_MALL_HEAD_SIZE != 0 */
 #if CONFIG_MALL_TAIL_SIZE != 0
-	base = (u32 *)(trace_node_umax(node) + 1 - CONFIG_MALL_TAIL_SIZE);
+	base = (u32 const *)(trace_node_umax(node) + 1 - CONFIG_MALL_TAIL_SIZE);
 	for (i = 0; i < CONFIG_MALL_TAIL_SIZE / 4; ++i) {
 		if (base[i] != CONFIG_MALL_TAIL_PATTERN) {
 			u32 word;
 			word = CONFIG_MALL_TAIL_PATTERN;
 			base += i;
-			while (*(u8 *)base == ((u8 *)&word)[(uintptr_t)base & 3])
-				base = (u32 *)((byte_t *)base + 1);
+			while (*(byte_t const *)base == ((byte_t const *)&word)[(uintptr_t)base & 3])
+				base = (u32 const *)((byte_t const *)base + 1);
 			kernel_panic_n(n_skip + 1,
 			               "Corrupted MALL tail in at %p (offset %" PRIdSIZ " from %p...%p; "
 			               "offset %" PRIuSIZ " from end of usable memory)\n"
@@ -747,9 +747,9 @@ done:
 }
 
 
-PRIVATE NOBLOCK ATTR_NOINLINE void
+PRIVATE NOBLOCK ATTR_NOINLINE NONNULL((2)) void
 NOTHROW(KCALL kmalloc_validate_walktree)(unsigned int n_skip,
-                                         struct trace_node *__restrict node) {
+                                         struct trace_node const *__restrict node) {
 again:
 	kmalloc_validate_node(n_skip + 1, node);
 	if (node->tn_link.rb_lhs) {
@@ -774,7 +774,7 @@ PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_validate)(void) {
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
 	lock_acquire();
-	if (nodes)
+	if (nodes != NULL)
 		kmalloc_validate_walktree(1, nodes);
 	lock_release();
 #else /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */

@@ -35,13 +35,13 @@
 #define LIBUNWIND_WANT_PROTOTYPES 1
 #endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBUNWIND_DECL  __PUBDEF
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
+#define LIBUNWIND_DECL __PUBDEF
 #elif defined(__LIBUNWIND_STATIC)
-#define LIBUNWIND_DECL  __INTDEF
+#define LIBUNWIND_DECL __INTDEF
 #else /* ... */
-#define LIBUNWIND_DECL  __IMPDEF
+#define LIBUNWIND_DECL __IMPDEF
 #endif /* !... */
 
 /* Library name for use with `dlopen()' */

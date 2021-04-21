@@ -145,20 +145,20 @@ copytophys(PHYS physaddr_t dst,
 		if (num_bytes == 0)
 			return;
 		if (num_bytes == 1) {
-			pokephysb(dst, *(u8 *)src);
+			pokephysb(dst, *(u8 const *)src);
 			return;
 		}
 		if (num_bytes == 2) {
-			pokephysw(dst, __hybrid_unaligned_get16((u16 *)src));
+			pokephysw(dst, __hybrid_unaligned_get16((u16 const *)src));
 			return;
 		}
 		if (num_bytes == 4) {
-			pokephysl(dst, __hybrid_unaligned_get32((u32 *)src));
+			pokephysl(dst, __hybrid_unaligned_get32((u32 const *)src));
 			return;
 		}
 #ifdef __UINT64_TYPE__
 		if (num_bytes == 8) {
-			pokephysq(dst, __hybrid_unaligned_get64((u64 *)src));
+			pokephysq(dst, __hybrid_unaligned_get64((u64 const *)src));
 			return;
 		}
 #endif /* __UINT64_TYPE__ */

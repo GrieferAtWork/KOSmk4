@@ -4133,7 +4133,7 @@ void *memrmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]]
 		return NULL;
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= needlelen - 1;
-	marker = *(uint8_t *)needle;
+	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
 		if (memcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;

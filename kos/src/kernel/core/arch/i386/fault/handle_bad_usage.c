@@ -1069,33 +1069,32 @@ assert_canonical_pc(struct icpustate *__restrict state,
 		 * restore the original RIP-value from `0(%rsp)', assuming that the RIP
 		 * register ended up getting corrupted due to a bad `call', rather than
 		 * a bad `jmp' */
-		uintptr_t callsite_pc;
+		void const *callsite_pc = pc;
 		uintptr_t sp = icpustate_getsp(state);
 		bool is_compat;
 		unsigned int i;
-		callsite_pc = (uintptr_t)pc;
 		if (sp >= KERNELSPACE_BASE && icpustate_isuser(state))
 			goto set_noncanon_pc_exception;
 		is_compat = icpustate_is32bit(state);
 		if (is_compat) {
-			callsite_pc = (uintptr_t)*(u32 *)sp;
+			callsite_pc = (void *)(uintptr_t)(*(u32 *)sp);
 		} else {
-			callsite_pc = *(uintptr_t *)sp;
+			callsite_pc = (void *)*(uintptr_t *)sp;
 		}
 		/* Verify the call-site program counter. */
-		if (icpustate_isuser(state) ? (callsite_pc >= USERSPACE_END)
-		                            : (callsite_pc < KERNELSPACE_BASE)) {
-			callsite_pc = (uintptr_t)pc;
+		if (icpustate_isuser(state) ? ((byte_t const *)callsite_pc >= (byte_t const *)USERSPACE_END)
+		                            : ((byte_t const *)callsite_pc < (byte_t const *)KERNELSPACE_BASE)) {
+			callsite_pc = pc;
 			goto set_noncanon_pc_exception;
 		}
-		icpustate_setpc(state, callsite_pc);
+		icpustate_setpc(state, (uintptr_t)callsite_pc);
 		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 		{
 			void const *call_instr;
-			call_instr = instruction_pred_nx((void *)callsite_pc,
+			call_instr = instruction_pred_nx(callsite_pc,
 			                                 instrlen_isa_from_icpustate(state));
 			if likely(call_instr)
-				callsite_pc = (uintptr_t)call_instr;
+				callsite_pc = call_instr;
 		}
 set_noncanon_pc_exception:
 		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
@@ -1112,7 +1111,7 @@ set_noncanon_pc_exception:
 		}
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
-		icpustate_setpc(state, callsite_pc);
+		icpustate_setpc(state, (uintptr_t)callsite_pc);
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF]\n",
 		       pc, callsite_pc);
 		unwind(state);

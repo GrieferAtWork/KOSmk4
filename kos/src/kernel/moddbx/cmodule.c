@@ -1432,9 +1432,9 @@ again:
 				goto nope;
 			++loc.l_expr;
 			if (parser.dup_addrsize == 4) {
-				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET32((uint32_t *)loc.l_expr);
+				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET32((uint32_t const *)loc.l_expr);
 			} else if (parser.dup_addrsize == 8) {
-				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET64((uint64_t *)loc.l_expr);
+				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET64((uint64_t const *)loc.l_expr);
 			} else {
 				goto nope;
 			}
@@ -2578,9 +2578,9 @@ again:
 				break;
 			++loc.l_expr;
 			if (parser->dup_addrsize == 4) {
-				module_relative_component_addr = (uintptr_t)UNALIGNED_GET32((uint32_t *)loc.l_expr);
+				module_relative_component_addr = (uintptr_t)UNALIGNED_GET32((uint32_t const *)loc.l_expr);
 			} else if (parser->dup_addrsize == 8) {
-				module_relative_component_addr = (uintptr_t)UNALIGNED_GET64((uint64_t *)loc.l_expr);
+				module_relative_component_addr = (uintptr_t)UNALIGNED_GET64((uint64_t const *)loc.l_expr);
 			} else {
 				break;
 			}

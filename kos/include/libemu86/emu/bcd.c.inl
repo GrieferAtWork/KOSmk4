@@ -184,7 +184,7 @@ case EMU86_OPCODE_ENCODE(0xd4): {
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-	base = *(u8 *)pc;
+	base = *(u8 const *)pc;
 	pc += 1;
 	al = EMU86_GETAL();
 	NIF_EMU86_EMULATE_THROW_DIVIDE_BY_ZERO_ALLOW_RETHROW(TRY) {
@@ -219,7 +219,7 @@ case EMU86_OPCODE_ENCODE(0xd5): {
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-	base = *(u8 *)pc;
+	base = *(u8 const *)pc;
 	pc += 1;
 	al = EMU86_GETAL();
 	ah = EMU86_GETAH();

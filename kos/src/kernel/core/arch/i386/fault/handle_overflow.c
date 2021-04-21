@@ -47,8 +47,7 @@ x86_handle_overflow(struct icpustate *__restrict state) {
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(this_exception_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	PERTASK_SET(this_exception_faultaddr,
-	            (void *)icpustate_getpc(state));
+	PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
 	x86_userexcept_unwind_interrupt(state);
 }
 

@@ -372,7 +372,7 @@ NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
 			uint32_t word;
 			uint8_t bytes[4];
 		} first_word;
-		first_word.word = UNALIGNED_GET32((uint32_t *)start);
+		first_word.word = UNALIGNED_GET32((uint32_t const *)start);
 		if unlikely(first_word.bytes[0] == 0) {
 			self->jp_encoding = first_word.bytes[1] == 0
 			                    ? JSON_ENCODING_UTF32BE
@@ -400,7 +400,7 @@ NOTHROW_NCX(CC json_skip_utf8string_trailing_nuls)(struct json_parser *__restric
 	case JSON_ENCODING_UTF16BE:
 		if (((uintptr_t)new_pointer & 1) != ((uintptr_t)self->jp_start & 1))
 			++new_pointer; /* Fix alignment */
-		while (new_pointer < self->jp_end && UNALIGNED_GET16((uint16_t *)new_pointer) == 0)
+		while (new_pointer < self->jp_end && UNALIGNED_GET16((uint16_t const *)new_pointer) == 0)
 			new_pointer += 2;
 		break;
 
@@ -408,7 +408,7 @@ NOTHROW_NCX(CC json_skip_utf8string_trailing_nuls)(struct json_parser *__restric
 	case JSON_ENCODING_UTF32BE:
 		while (((uintptr_t)new_pointer & 3) != ((uintptr_t)self->jp_start & 3))
 			++new_pointer; /* Fix alignment */
-		while (new_pointer < self->jp_end && UNALIGNED_GET32((uint32_t *)new_pointer) == 0)
+		while (new_pointer < self->jp_end && UNALIGNED_GET32((uint32_t const *)new_pointer) == 0)
 			new_pointer += 4;
 		break;
 

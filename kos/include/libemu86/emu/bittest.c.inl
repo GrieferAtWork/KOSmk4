@@ -182,7 +182,7 @@ case EMU86_OPCODE_ENCODE(0x0fba):
 #if EMU86_EMULATE_CONFIG_WANT_BITTEST
 	MODRM_DECODE();
 	/* Take the bit number from *PC */
-	bitno = *(u8 *)pc;
+	bitno = *(u8 const *)pc;
 	pc += 1;
 	switch (modrm.mi_reg) {
 

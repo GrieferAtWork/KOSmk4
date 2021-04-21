@@ -155,14 +155,14 @@ skip_character:
 
 			case KMP_ENCODING_UTF16LE: {
 				u16 word;
-				word = UNALIGNED_GETLE16((u16 *)code);
+				word = UNALIGNED_GETLE16((u16 const *)code);
 				goto do_check_surrogate_skip;
 			case KMP_ENCODING_UTF16BE:
-				word = UNALIGNED_GETBE16((u16 *)code);
+				word = UNALIGNED_GETBE16((u16 const *)code);
 do_check_surrogate_skip:
 				if (word >= UTF16_HIGH_SURROGATE_MIN &&
 					word <= UTF16_HIGH_SURROGATE_MIN) {
-					u16 hiword = UNALIGNED_GET16((u16 *)(code + 2));
+					u16 hiword = UNALIGNED_GET16((u16 const *)(code + 2));
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 					if (*preg_enc == KMP_ENCODING_UTF16BE)
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -286,13 +286,13 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 				break;
 
 			CASE(KMP_OP_SETKEY2)
-				reg_key = UNALIGNED_GETLE16((u16 *)reader);
+				reg_key = UNALIGNED_GETLE16((u16 const *)reader);
 				reader += 2;
 				break;
 
-			CASEF(KMP_OP_SETKEYMOD2, "mask=%#.4I16x\n", UNALIGNED_GETLE16((u16 *)reader)) {
+			CASEF(KMP_OP_SETKEYMOD2, "mask=%#.4I16x\n", UNALIGNED_GETLE16((u16 const *)reader)) {
 				u16 mask;
-				mask = UNALIGNED_GETLE16((u16 *)reader);
+				mask = UNALIGNED_GETLE16((u16 const *)reader);
 				reader += 2;
 				if (reg_key == key && mod == mask)
 					goto found_character;
@@ -333,29 +333,29 @@ found_character:
 						result = (*printer)(arg, (char const *)reader, temp);
 					}	break;
 
-					CASEF(KMP_ENCODING_UTF32LE, "ch='%I32c'\n", UNALIGNED_GETLE32((u32 *)reader)) {
+					CASEF(KMP_ENCODING_UTF32LE, "ch='%I32c'\n", UNALIGNED_GETLE32((u32 const *)reader)) {
 						u32 ch32;
 						char utf8[UNICODE_UTF8_MAXLEN], *end;
-						ch32 = UNALIGNED_GETLE32((u32 *)reader);
+						ch32 = UNALIGNED_GETLE32((u32 const *)reader);
 						goto do_print_ch32;
-					CASEF(KMP_ENCODING_UTF32BE, "ch='%I32c'\n", UNALIGNED_GETBE32((u32 *)reader))
-						ch32 = UNALIGNED_GETBE32((u32 *)reader);
+					CASEF(KMP_ENCODING_UTF32BE, "ch='%I32c'\n", UNALIGNED_GETBE32((u32 const *)reader))
+						ch32 = UNALIGNED_GETBE32((u32 const *)reader);
 do_print_ch32:
 						if (ch32 <= 0x7f)
 							cachable_character = (char)ch32;
 						end    = unicode_writeutf8(utf8, ch32);
 						result = (*printer)(arg, utf8, (size_t)(end - utf8));
 						break;
-					CASEF(KMP_ENCODING_UTF16LE, "ch='%I16c'\n", UNALIGNED_GETLE16((u16 *)reader)) {
+					CASEF(KMP_ENCODING_UTF16LE, "ch='%I16c'\n", UNALIGNED_GETLE16((u16 const *)reader)) {
 						u16 word;
-						word = UNALIGNED_GETLE16((u16 *)reader);
+						word = UNALIGNED_GETLE16((u16 const *)reader);
 						goto do_check_surrogate;
-					CASEF(KMP_ENCODING_UTF16BE, "ch='%I16c'\n", UNALIGNED_GETBE16((u16 *)reader))
-						word = UNALIGNED_GETBE16((u16 *)reader);
+					CASEF(KMP_ENCODING_UTF16BE, "ch='%I16c'\n", UNALIGNED_GETBE16((u16 const *)reader))
+						word = UNALIGNED_GETBE16((u16 const *)reader);
 do_check_surrogate:
 						if (word >= UTF16_HIGH_SURROGATE_MIN &&
 						    word <= UTF16_HIGH_SURROGATE_MIN) {
-							u16 hiword = UNALIGNED_GET16((u16 *)(reader + 2));
+							u16 hiword = UNALIGNED_GET16((u16 const *)(reader + 2));
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 							if (reg_enc == KMP_ENCODING_UTF16BE)
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -409,21 +409,21 @@ skip_character:
 					reader += len;
 				}	break;
 
-				CASEF(KMP_ENCODING_UTF32LE, "ch='%I32c'\n", UNALIGNED_GETLE32((u32 *)reader))
-				CASEF(KMP_ENCODING_UTF32BE, "ch='%I32c'\n", UNALIGNED_GETBE32((u32 *)reader))
+				CASEF(KMP_ENCODING_UTF32LE, "ch='%I32c'\n", UNALIGNED_GETLE32((u32 const *)reader))
+				CASEF(KMP_ENCODING_UTF32BE, "ch='%I32c'\n", UNALIGNED_GETBE32((u32 const *)reader))
 					reader += 4;
 					break;
 
-				CASEF(KMP_ENCODING_UTF16LE, "ch='%I16c'\n", UNALIGNED_GETLE16((u16 *)reader)) {
+				CASEF(KMP_ENCODING_UTF16LE, "ch='%I16c'\n", UNALIGNED_GETLE16((u16 const *)reader)) {
 					u16 word;
-					word = UNALIGNED_GETLE16((u16 *)reader);
+					word = UNALIGNED_GETLE16((u16 const *)reader);
 					goto do_check_surrogate_skip;
-				CASEF(KMP_ENCODING_UTF16BE, "ch='%I16c'\n", UNALIGNED_GETBE16((u16 *)reader))
-					word = UNALIGNED_GETBE16((u16 *)reader);
+				CASEF(KMP_ENCODING_UTF16BE, "ch='%I16c'\n", UNALIGNED_GETBE16((u16 const *)reader))
+					word = UNALIGNED_GETBE16((u16 const *)reader);
 do_check_surrogate_skip:
 					if (word >= UTF16_HIGH_SURROGATE_MIN &&
 					    word <= UTF16_HIGH_SURROGATE_MIN) {
-						u16 hiword = UNALIGNED_GET16((u16 *)(reader + 2));
+						u16 hiword = UNALIGNED_GET16((u16 const *)(reader + 2));
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 						if (reg_enc == KMP_ENCODING_UTF16BE)
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__

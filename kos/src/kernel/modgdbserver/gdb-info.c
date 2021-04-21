@@ -793,13 +793,13 @@ do_printer_register:
 		DO(GDB_PrintRegisterName(regno, printer, arg));
 		PRINT("</column><column name=\"value\">");
 		if (size == 1) {
-			PRINTF("%#" PRIx8, *(u8 *)buf);
+			PRINTF("%#" PRIx8, *(u8 const *)buf);
 		} else if (size == 2) {
-			PRINTF("%#" PRIx16, UNALIGNED_GET16((u16 *)buf));
+			PRINTF("%#" PRIx16, UNALIGNED_GET16((u16 const *)buf));
 		} else if (size == 4) {
-			PRINTF("%#" PRIx32, UNALIGNED_GET32((u32 *)buf));
+			PRINTF("%#" PRIx32, UNALIGNED_GET32((u32 const *)buf));
 		} else if (size == 8) {
-			PRINTF("%#" PRIx64, UNALIGNED_GET64((u64 *)buf));
+			PRINTF("%#" PRIx64, UNALIGNED_GET64((u64 const *)buf));
 		} else {
 			for (i = 0; i < size; ++i) {
 				if (i != 0)

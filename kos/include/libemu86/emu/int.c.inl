@@ -60,7 +60,7 @@ case EMU86_OPCODE_ENCODE(0xcd): {
 	/* CD ib     INT imm8     Generate software interrupt with vector specified by immediate byte. */
 #if EMU86_EMULATE_CONFIG_WANT_INT && defined(EMU86_EMULATE_RETURN_AFTER_INT)
 	u8 intno;
-	intno = *(u8 *)pc;
+	intno = *(u8 const *)pc;
 	pc += 1;
 	EMU86_SETPCPTR(REAL_IP());
 	EMU86_EMULATE_RETURN_AFTER_INT(intno);

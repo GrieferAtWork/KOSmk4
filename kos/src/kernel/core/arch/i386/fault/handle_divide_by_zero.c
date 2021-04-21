@@ -39,12 +39,12 @@ DECL_BEGIN
 INTERN struct icpustate *FCALL
 x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x00)); /* #DE  Divide by zero */
-	byte_t *curr_pc, *next_pc;
+	byte_t const *curr_pc, *next_pc;
 	unsigned int i;
 	/* NOTE: Must load `next_pc' before setting the exception code,
 	 *       since inspecting program  text may  clobber the  error
 	 *       code when a segfault happens. */
-	curr_pc = (byte_t *)icpustate_getpc(state);
+	curr_pc = (byte_t const *)icpustate_getpc(state);
 	next_pc = instruction_succ_nx(curr_pc, instrlen_isa_from_icpustate(state));
 
 	/* TODO: This function can also get called due to divide overflow! */

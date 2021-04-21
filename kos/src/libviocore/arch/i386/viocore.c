@@ -142,8 +142,8 @@ libviocore_complete_except(struct vio_emulate_args *__restrict self,
 	}
 	/* Fix-up the PC register and fill in the fault address */
 	{
-		byte_t *pc, *next_pc;
-		pc      = (byte_t *)CS(getpc)(self->vea_args.va_state);
+		byte_t const *pc, *next_pc;
+		pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
 		next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 		data->e_faultaddr = (void *)pc;
 		if (next_pc)
@@ -474,7 +474,7 @@ libviocore_atomic_xchb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_XCH(*(u8 *)addr, value);
 		else {
-			result      = *(u8 *)addr;
+			result      = *(u8 const *)addr;
 			*(u8 *)addr = value;
 		}
 	}
@@ -501,7 +501,7 @@ libviocore_atomic_xchw(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_XCH(*(u16 *)addr, value);
 		else {
-			result       = *(u16 *)addr;
+			result       = *(u16 const *)addr;
 			*(u16 *)addr = value;
 		}
 	}
@@ -528,7 +528,7 @@ libviocore_atomic_xchl(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_XCH(*(u32 *)addr, value);
 		else {
-			result       = *(u32 *)addr;
+			result       = *(u32 const *)addr;
 			*(u32 *)addr = value;
 		}
 	}
@@ -556,7 +556,7 @@ libviocore_atomic_xchq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_XCH(*(u64 *)addr, value);
 		else {
-			result       = *(u64 *)addr;
+			result       = *(u64 const *)addr;
 			*(u64 *)addr = value;
 		}
 	}
@@ -580,7 +580,7 @@ libviocore_atomic_fetchaddb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHADD(*(u8 *)addr, value);
 		else {
-			result      = *(u8 *)addr;
+			result      = *(u8 const *)addr;
 			*(u8 *)addr = result + value;
 		}
 	}
@@ -610,7 +610,7 @@ libviocore_atomic_fetchaddw(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHADD(*(u16 *)addr, value);
 		else {
-			result       = *(u16 *)addr;
+			result       = *(u16 const *)addr;
 			*(u16 *)addr = result + value;
 		}
 	}
@@ -640,7 +640,7 @@ libviocore_atomic_fetchaddl(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHADD(*(u32 *)addr, value);
 		else {
-			result       = *(u32 *)addr;
+			result       = *(u32 const *)addr;
 			*(u32 *)addr = result + value;
 		}
 	}
@@ -671,7 +671,7 @@ libviocore_atomic_fetchaddq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHADD(*(u64 *)addr, value);
 		else {
-			result       = *(u64 *)addr;
+			result       = *(u64 const *)addr;
 			*(u64 *)addr = result + value;
 		}
 	}
@@ -695,7 +695,7 @@ libviocore_atomic_fetchsubb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHSUB(*(u8 *)addr, value);
 		else {
-			result      = *(u8 *)addr;
+			result      = *(u8 const *)addr;
 			*(u8 *)addr = result - value;
 		}
 	}
@@ -725,7 +725,7 @@ libviocore_atomic_fetchsubw(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHSUB(*(u16 *)addr, value);
 		else {
-			result       = *(u16 *)addr;
+			result       = *(u16 const *)addr;
 			*(u16 *)addr = result - value;
 		}
 	}
@@ -755,7 +755,7 @@ libviocore_atomic_fetchsubl(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHSUB(*(u32 *)addr, value);
 		else {
-			result       = *(u32 *)addr;
+			result       = *(u32 const *)addr;
 			*(u32 *)addr = result - value;
 		}
 	}
@@ -786,7 +786,7 @@ libviocore_atomic_fetchsubq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHSUB(*(u64 *)addr, value);
 		else {
-			result       = *(u64 *)addr;
+			result       = *(u64 const *)addr;
 			*(u64 *)addr = result - value;
 		}
 	}
@@ -810,7 +810,7 @@ libviocore_atomic_fetchandb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHAND(*(u8 *)addr, value);
 		else {
-			result      = *(u8 *)addr;
+			result      = *(u8 const *)addr;
 			*(u8 *)addr = result & value;
 		}
 	}
@@ -840,7 +840,7 @@ libviocore_atomic_fetchandw(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHAND(*(u16 *)addr, value);
 		else {
-			result       = *(u16 *)addr;
+			result       = *(u16 const *)addr;
 			*(u16 *)addr = result & value;
 		}
 	}
@@ -870,7 +870,7 @@ libviocore_atomic_fetchandl(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHAND(*(u32 *)addr, value);
 		else {
-			result       = *(u32 *)addr;
+			result       = *(u32 const *)addr;
 			*(u32 *)addr = result & value;
 		}
 	}
@@ -901,7 +901,7 @@ libviocore_atomic_fetchandq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHAND(*(u64 *)addr, value);
 		else {
-			result       = *(u64 *)addr;
+			result       = *(u64 const *)addr;
 			*(u64 *)addr = result & value;
 		}
 	}
@@ -925,7 +925,7 @@ libviocore_atomic_fetchorb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHOR(*(u8 *)addr, value);
 		else {
-			result      = *(u8 *)addr;
+			result      = *(u8 const *)addr;
 			*(u8 *)addr = result | value;
 		}
 	}
@@ -955,7 +955,7 @@ libviocore_atomic_fetchorw(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHOR(*(u16 *)addr, value);
 		else {
-			result       = *(u16 *)addr;
+			result       = *(u16 const *)addr;
 			*(u16 *)addr = result | value;
 		}
 	}
@@ -985,7 +985,7 @@ libviocore_atomic_fetchorl(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHOR(*(u32 *)addr, value);
 		else {
-			result       = *(u32 *)addr;
+			result       = *(u32 const *)addr;
 			*(u32 *)addr = result | value;
 		}
 	}
@@ -1016,7 +1016,7 @@ libviocore_atomic_fetchorq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHOR(*(u64 *)addr, value);
 		else {
-			result       = *(u64 *)addr;
+			result       = *(u64 const *)addr;
 			*(u64 *)addr = result | value;
 		}
 	}
@@ -1040,7 +1040,7 @@ libviocore_atomic_fetchxorb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHXOR(*(u8 *)addr, value);
 		else {
-			result      = *(u8 *)addr;
+			result      = *(u8 const *)addr;
 			*(u8 *)addr = result ^ value;
 		}
 	}
@@ -1070,7 +1070,7 @@ libviocore_atomic_fetchxorw(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHXOR(*(u16 *)addr, value);
 		else {
-			result       = *(u16 *)addr;
+			result       = *(u16 const *)addr;
 			*(u16 *)addr = result ^ value;
 		}
 	}
@@ -1100,7 +1100,7 @@ libviocore_atomic_fetchxorl(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHXOR(*(u32 *)addr, value);
 		else {
-			result       = *(u32 *)addr;
+			result       = *(u32 const *)addr;
 			*(u32 *)addr = result ^ value;
 		}
 	}
@@ -1131,7 +1131,7 @@ libviocore_atomic_fetchxorq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_FETCHXOR(*(u64 *)addr, value);
 		else {
-			result       = *(u64 *)addr;
+			result       = *(u64 const *)addr;
 			*(u64 *)addr = result ^ value;
 		}
 	}
@@ -1155,7 +1155,7 @@ libviocore_atomic_cmpxchb(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u8 *)addr, oldval, newval);
 		else {
-			result = *(u8 *)addr;
+			result = *(u8 const *)addr;
 			COMPILER_READ_BARRIER();
 			if (result == oldval)
 				*(u8 *)addr = newval;
@@ -1186,7 +1186,7 @@ libviocore_atomic_cmpxchw(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
 		else {
-			result = *(u16 *)addr;
+			result = *(u16 const *)addr;
 			COMPILER_READ_BARRIER();
 			if (result == oldval)
 				*(u16 *)addr = newval;
@@ -1217,7 +1217,7 @@ libviocore_atomic_cmpxchl(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
 		else {
-			result = *(u32 *)addr;
+			result = *(u32 const *)addr;
 			COMPILER_READ_BARRIER();
 			if (result == oldval)
 				*(u32 *)addr = newval;
@@ -1248,7 +1248,7 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
 		else {
-			result = *(u64 *)addr;
+			result = *(u64 const *)addr;
 			COMPILER_READ_BARRIER();
 			if (result == oldval)
 				*(u64 *)addr = newval;
@@ -2224,9 +2224,9 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
                                      uintptr_t ptr3, uintptr_t ptr4,
                                      uintptr_t ptr5, uintptr_t ptr6) {
 	struct exception_data *data;
-	byte_t *pc, *next_pc;
+	byte_t const *pc, *next_pc;
 	unsigned int i;
-	pc      = (byte_t *)CS(getpc)(self->vea_args.va_state);
+	pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
 	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
@@ -2257,9 +2257,9 @@ libviocore_throw_exception(struct vio_emulate_args *__restrict self,
                            error_code_t code, uintptr_t ptr0,
                            uintptr_t ptr1, uintptr_t ptr2) {
 	struct exception_data *data;
-	byte_t *pc, *next_pc;
+	byte_t const *pc, *next_pc;
 	unsigned int i;
-	pc      = (byte_t *)CS(getpc)(self->vea_args.va_state);
+	pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
 	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);

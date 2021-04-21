@@ -36,7 +36,7 @@ case EMU86_OPCODE_ENCODE(0x0f3af0): {
 	MODRM_DECODE();
 	{
 		u8 num_bits;
-		num_bits = *(u8 *)pc;
+		num_bits = *(u8 const *)pc;
 		pc += 1;
 #if CONFIG_LIBEMU86_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {

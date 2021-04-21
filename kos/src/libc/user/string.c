@@ -130,7 +130,7 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 	if unlikely(!needlelen || needlelen > haystacklen)
 		return NULL;
 	haystacklen -= needlelen - 1;
-	marker = *(uint8_t *)needle;
+	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
 		if (memcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;

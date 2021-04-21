@@ -212,7 +212,7 @@ case EMU86_OPCODE_ENCODE(0xc0): {
 	/* C0 /6|4 ib     SAL r/m8,imm8      Multiply r/m8 by 2, imm8 times */
 	/* C0 /7   ib     SAR r/m8,imm8      Signed divide* r/m8 by 2, imm8 times */
 	MODRM_DECODE();
-	num_bits  = *(u8 *)pc;
+	num_bits  = *(u8 const *)pc;
 	pc += 1;
 	goto do_shift8bit;
 }
@@ -243,7 +243,7 @@ case EMU86_OPCODE_ENCODE(0xc1): {
 	/* D1 /7   ib     SAR r/m32,imm8      Signed divide* r/m32 by 2, imm8 times */
 	/* D1 /7   ib     SAR r/m64,imm8      Signed divide* r/m64 by 2, imm8 times */
 	MODRM_DECODE();
-	num_bits = *(u8 *)pc;
+	num_bits = *(u8 const *)pc;
 	pc += 1;
 	goto do_shift163264bit;
 }

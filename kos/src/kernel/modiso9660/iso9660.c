@@ -171,8 +171,8 @@ Iso9660_OpenINode(Iso9660Superblock *__restrict self,
                   struct directory_entry *__restrict parent_directory_entry)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	/* Load INode attributes from fs-specific directory entry data. */
-	node->i_filesize  = (pos_t)*(u32 *)&parent_directory_entry->de_fsdata.de_data[4];
-	node->i_fsdata    = (struct inode_data *)(uintptr_t)*(u32 *)&parent_directory_entry->de_fsdata.de_data[0];
+	node->i_filesize  = (pos_t)(*(u32 const *)&parent_directory_entry->de_fsdata.de_data[4]);
+	node->i_fsdata    = (struct inode_data *)(uintptr_t)(*(u32 const *)&parent_directory_entry->de_fsdata.de_data[0]);
 	node->i_filenlink = (nlink_t)1;
 	node->i_fileuid   = self->i_fileuid;
 	node->i_filegid   = self->i_filegid;

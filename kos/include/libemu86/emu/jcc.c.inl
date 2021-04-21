@@ -31,7 +31,7 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 	case EMU86_OPCODE_ENCODE(0x70 + id): {                 \
 		s8 offset;                                         \
 		u32 eflags = EMU86_GETFLAGS();                     \
-		offset     = *(s8 *)pc;                            \
+		offset     = *(s8 const *)pc;                      \
 		pc += 1;                                           \
 		if (!(cond))                                       \
 			goto done;                                     \
@@ -56,28 +56,28 @@ EMU86_INTELLISENSE_BEGIN(jcc) {
 
 #if EMU86_EMULATE_CONFIG_WANT_JCC_DISP32
 #define NEED_done_dont_set_pc
-#define DEFINE_Jcc32(id, cond)                               \
-	case EMU86_OPCODE_ENCODE(0x0f80 + id): {                 \
-		s32 offset;                                          \
-		u32 eflags = EMU86_GETFLAGS();                       \
-		IF_16BIT_OR_32BIT(if (IS_16BIT()) {                  \
-			offset = (s32)(s16)UNALIGNED_GETLE16((u16 *)pc); \
-			pc += 2;                                         \
-		} else) {                                            \
-			offset = (s32)UNALIGNED_GETLE32((u32 *)pc);      \
-			pc += 4;                                         \
-		}                                                    \
-		if (!(cond))                                         \
-			goto done;                                       \
-		{                                                    \
-			EMU86_UREG_TYPE dest_ip;                         \
-			dest_ip = REAL_IP() + offset;                    \
-			IF_16BIT_OR_32BIT(                               \
-			if (IS_16BIT() && !EMU86_F_IS64(op_flags))       \
-				dest_ip &= 0xffff;)                          \
-			EMU86_SETIPREG(dest_ip);                         \
-		}                                                    \
-		goto done_dont_set_pc;                               \
+#define DEFINE_Jcc32(id, cond)                                     \
+	case EMU86_OPCODE_ENCODE(0x0f80 + id): {                       \
+		s32 offset;                                                \
+		u32 eflags = EMU86_GETFLAGS();                             \
+		IF_16BIT_OR_32BIT(if (IS_16BIT()) {                        \
+			offset = (s32)(s16)UNALIGNED_GETLE16((u16 const *)pc); \
+			pc += 2;                                               \
+		} else) {                                                  \
+			offset = (s32)UNALIGNED_GETLE32((u32 const *)pc);      \
+			pc += 4;                                               \
+		}                                                          \
+		if (!(cond))                                               \
+			goto done;                                             \
+		{                                                          \
+			EMU86_UREG_TYPE dest_ip;                               \
+			dest_ip = REAL_IP() + offset;                          \
+			IF_16BIT_OR_32BIT(                                     \
+			if (IS_16BIT() && !EMU86_F_IS64(op_flags))             \
+				dest_ip &= 0xffff;)                                \
+			EMU86_SETIPREG(dest_ip);                               \
+		}                                                          \
+		goto done_dont_set_pc;                                     \
 	}
 #elif EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 #define NEED_return_unsupported_instruction
@@ -232,7 +232,7 @@ case EMU86_OPCODE_ENCODE(0xe3): {
 	 * E3 cb     JECXZ rel8     Jump short if ECX register is 0.
 	 * E3 cb     JRCXZ rel8     Jump short if RCX register is 0. */
 	s8 offset;
-	offset = *(s8 *)pc;
+	offset = *(s8 const *)pc;
 	pc += 1;
 	EMU86_ADDRSIZE_SWITCH({
 		/* 64-bit */

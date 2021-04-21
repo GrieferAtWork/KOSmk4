@@ -1661,11 +1661,11 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 #endif /* !EMU86_MEMREADB */
 #ifndef EMU86_MEMREADW
 #define EMU86_MEMREADW(addr) \
-	UNALIGNED_GETLE16((u16 *)EMU86_EMULATE_TRANSLATEADDR(addr))
+	UNALIGNED_GETLE16((u16 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
 #endif /* !EMU86_MEMREADW */
 #ifndef EMU86_MEMREADL
 #define EMU86_MEMREADL(addr) \
-	UNALIGNED_GETLE32((u32 *)EMU86_EMULATE_TRANSLATEADDR(addr))
+	UNALIGNED_GETLE32((u32 const *)EMU86_EMULATE_TRANSLATEADDR(addr))
 #endif /* !EMU86_MEMREADL */
 #ifndef EMU86_MEMWRITEB
 #define EMU86_MEMWRITEB(addr, v) \
@@ -2176,12 +2176,12 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 /* Access I/O ports. */
 #ifndef EMU86_EMULATE_INB
 #include <sys/io.h>
-#define EMU86_EMULATE_INB(portno, result) do { (result) = inb(portno); } __WHILE0
-#define EMU86_EMULATE_INW(portno, result) do { (result) = inw(portno); } __WHILE0
-#define EMU86_EMULATE_INL(portno, result) do { (result) = inl(portno); } __WHILE0
-#define EMU86_EMULATE_OUTB(portno, value) do { outb(portno, value); } __WHILE0
-#define EMU86_EMULATE_OUTW(portno, value) do { outw(portno, value); } __WHILE0
-#define EMU86_EMULATE_OUTL(portno, value) do { outl(portno, value); } __WHILE0
+#define EMU86_EMULATE_INB(portno, result) do { (result) = inb((__IOPORT_T)(portno)); } __WHILE0
+#define EMU86_EMULATE_INW(portno, result) do { (result) = inw((__IOPORT_T)(portno)); } __WHILE0
+#define EMU86_EMULATE_INL(portno, result) do { (result) = inl((__IOPORT_T)(portno)); } __WHILE0
+#define EMU86_EMULATE_OUTB(portno, value) do { outb((__IOPORT_T)(portno), value); } __WHILE0
+#define EMU86_EMULATE_OUTW(portno, value) do { outw((__IOPORT_T)(portno), value); } __WHILE0
+#define EMU86_EMULATE_OUTL(portno, value) do { outl((__IOPORT_T)(portno), value); } __WHILE0
 #ifdef __KERNEL__
 /* Define these to allow for some minor optimizations, when it is known
  * that in/out emulation can never  throw an exception (Note that  this

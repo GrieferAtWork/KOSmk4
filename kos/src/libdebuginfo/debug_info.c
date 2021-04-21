@@ -769,7 +769,7 @@ decode_form:
 
 	case DW_FORM_block1: {
 		uint8_t length;
-		length = *(uint8_t *)self->dup_cu_info_pos;
+		length = *(uint8_t const *)self->dup_cu_info_pos;
 		self->dup_cu_info_pos += 1;
 		if (OVERFLOW_UADD((uintptr_t)self->dup_cu_info_pos, length, (uintptr_t *)&self->dup_cu_info_pos))
 			self->dup_cu_info_pos = (byte_t const *)-1;
@@ -777,7 +777,7 @@ decode_form:
 
 	case DW_FORM_block2: {
 		uint16_t length;
-		length = UNALIGNED_GET16((uint16_t *)self->dup_cu_info_pos);
+		length = UNALIGNED_GET16((uint16_t const *)self->dup_cu_info_pos);
 		self->dup_cu_info_pos += 2;
 		if (OVERFLOW_UADD((uintptr_t)self->dup_cu_info_pos, length, (uintptr_t *)&self->dup_cu_info_pos))
 			self->dup_cu_info_pos = (byte_t const *)-1;
@@ -785,7 +785,7 @@ decode_form:
 
 	case DW_FORM_block4: {
 		uint32_t length;
-		length = UNALIGNED_GET32((uint32_t *)self->dup_cu_info_pos);
+		length = UNALIGNED_GET32((uint32_t const *)self->dup_cu_info_pos);
 		self->dup_cu_info_pos += 4;
 		if (OVERFLOW_UADD((uintptr_t)self->dup_cu_info_pos, length, (uintptr_t *)&self->dup_cu_info_pos))
 			self->dup_cu_info_pos = (byte_t const *)-1;
@@ -2471,7 +2471,7 @@ libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
 #if __SIZEOF_POINTER__ >= 8
 	if ((datasize & 7) == 0) {
 		for (i = 0; i < (datasize >> 3); ++i) {
-			uint64_t val = UNALIGNED_GET64((uint64_t *)data + i);
+			uint64_t val = UNALIGNED_GET64((uint64_t const *)data + i);
 			if (i) {
 				temp = (*printer)(arg, ", ", 2);
 				if unlikely(temp < 0)
@@ -2487,7 +2487,7 @@ libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
 #endif /* __SIZEOF_POINTER__ >= 8 */
 	if ((datasize & 3) == 0) {
 		for (i = 0; i < (datasize >> 2); ++i) {
-			uint32_t val = UNALIGNED_GET32((uint32_t *)data + i);
+			uint32_t val = UNALIGNED_GET32((uint32_t const *)data + i);
 			if (i) {
 				temp = (*printer)(arg, ", ", 2);
 				if unlikely(temp < 0)
@@ -2501,7 +2501,7 @@ libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
 		}
 	} else if ((datasize & 1) == 0) {
 		for (i = 0; i < (datasize >> 1); ++i) {
-			uint16_t val = UNALIGNED_GET16((uint16_t *)data + i);
+			uint16_t val = UNALIGNED_GET16((uint16_t const *)data + i);
 			if (i) {
 				temp = (*printer)(arg, ", ", 2);
 				if unlikely(temp < 0)
@@ -2639,15 +2639,15 @@ libdi_debuginfo_do_print_value(pformatprinter printer, void *arg,
 generic_print_address:
 #if __SIZEOF_POINTER__ >= 8
 			if (datasize >= 8)
-				addr = UNALIGNED_GET64((uint64_t *)data);
+				addr = UNALIGNED_GET64((uint64_t const *)data);
 			else
 #endif /* __SIZEOF_POINTER__ >= 8 */
 			if (datasize >= 4)
-				addr = UNALIGNED_GET32((uint32_t *)data);
+				addr = UNALIGNED_GET32((uint32_t const *)data);
 			else if (datasize >= 2)
-				addr = UNALIGNED_GET16((uint16_t *)data);
+				addr = UNALIGNED_GET16((uint16_t const *)data);
 			else if (datasize >= 1)
-				addr = *(uint8_t *)data;
+				addr = *(uint8_t const *)data;
 			else {
 				addr = 0;
 			}
@@ -2660,13 +2660,13 @@ generic_print_address:
 		case DW_ATE_boolean: {
 			uint64_t value;
 			if (datasize >= 8)
-				value = UNALIGNED_GET64((uint64_t *)data);
+				value = UNALIGNED_GET64((uint64_t const *)data);
 			else if (datasize >= 4)
-				value = UNALIGNED_GET32((uint32_t *)data);
+				value = UNALIGNED_GET32((uint32_t const *)data);
 			else if (datasize >= 2)
-				value = UNALIGNED_GET16((uint16_t *)data);
+				value = UNALIGNED_GET16((uint16_t const *)data);
 			else if (datasize >= 1)
-				value = *(uint8_t *)data;
+				value = *(uint8_t const *)data;
 			else {
 				value = 0;
 			}
@@ -2731,11 +2731,11 @@ generic_print_address:
 		case DW_ATE_signed: {
 			int64_t value;
 			if (datasize >= 8) {
-				value = (int64_t)UNALIGNED_GET64((uint64_t *)data);
+				value = (int64_t)UNALIGNED_GET64((uint64_t const *)data);
 			} else if (datasize >= 4) {
-				value = (int64_t)(int32_t)UNALIGNED_GET32((uint32_t *)data);
+				value = (int64_t)(int32_t)UNALIGNED_GET32((uint32_t const *)data);
 			} else if (datasize >= 2) {
-				value = (int64_t)(int16_t)UNALIGNED_GET16((uint16_t *)data);
+				value = (int64_t)(int16_t)UNALIGNED_GET16((uint16_t const *)data);
 			} else if (datasize >= 1) {
 				value = (int64_t) * (int8_t *)data;
 			} else {
@@ -2750,11 +2750,11 @@ generic_print_address:
 		case DW_ATE_unsigned: {
 			uint64_t value;
 			if (datasize >= 8) {
-				value = UNALIGNED_GET64((uint64_t *)data);
+				value = UNALIGNED_GET64((uint64_t const *)data);
 			} else if (datasize >= 4) {
-				value = (uint64_t)UNALIGNED_GET32((uint32_t *)data);
+				value = (uint64_t)UNALIGNED_GET32((uint32_t const *)data);
 			} else if (datasize >= 2) {
-				value = (uint64_t)UNALIGNED_GET16((uint16_t *)data);
+				value = (uint64_t)UNALIGNED_GET16((uint16_t const *)data);
 			} else if (datasize >= 1) {
 				value = (uint64_t) * (uint8_t *)data;
 			} else {
@@ -2773,13 +2773,13 @@ generic_print_address:
 		case DW_ATE_ASCII: {
 			uint64_t value;
 			if (datasize >= 8) {
-				value = (uint64_t)UNALIGNED_GET64((uint64_t *)data);
+				value = (uint64_t)UNALIGNED_GET64((uint64_t const *)data);
 			} else if (datasize >= 4) {
-				value = (uint64_t)UNALIGNED_GET32((uint32_t *)data);
+				value = (uint64_t)UNALIGNED_GET32((uint32_t const *)data);
 				if (type->t_encoding == DW_ATE_signed_char)
 					value = (uint64_t)(int64_t)(int32_t)(uint32_t)value;
 			} else if (datasize >= 2) {
-				value = (uint64_t)UNALIGNED_GET16((uint16_t *)data);
+				value = (uint64_t)UNALIGNED_GET16((uint16_t const *)data);
 				if (type->t_encoding == DW_ATE_signed_char)
 					value = (uint64_t)(int64_t)(int16_t)(uint16_t)value;
 			} else if (datasize >= 1) {
@@ -2904,9 +2904,9 @@ got_elem_count:
 						if (inner_type.t_sizeof == 1)
 							ch = *((uint8_t *)data + i);
 						else if (inner_type.t_sizeof == 2)
-							ch = UNALIGNED_GET16((uint16_t *)data + i);
+							ch = UNALIGNED_GET16((uint16_t const *)data + i);
 						else {
-							ch = UNALIGNED_GET32((uint32_t *)data + i);
+							ch = UNALIGNED_GET32((uint32_t const *)data + i);
 						}
 						DO(print_character(printer, arg, ch));
 					}
@@ -2983,13 +2983,13 @@ print_unknown_inner_array_type:
 		    datasize > type->t_sizeof)
 			datasize = type->t_sizeof;
 		if (datasize >= 8) {
-			value = (uintptr_t)UNALIGNED_GET64((uint64_t *)data);
+			value = (uintptr_t)UNALIGNED_GET64((uint64_t const *)data);
 		} else if (datasize >= 4) {
-			value = (uintptr_t)UNALIGNED_GET32((uint32_t *)data);
+			value = (uintptr_t)UNALIGNED_GET32((uint32_t const *)data);
 		} else if (datasize >= 2) {
-			value = (uintptr_t)UNALIGNED_GET16((uint16_t *)data);
+			value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)data);
 		} else if (datasize >= 1) {
-			value = (uintptr_t)*(uint8_t *)data;
+			value = (uintptr_t)*(uint8_t const *)data;
 		} else {
 			value = 0;
 		}

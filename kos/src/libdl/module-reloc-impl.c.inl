@@ -93,7 +93,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_IRELATIVE32
 		ELF_ARCH_CASE_R_IRELATIVE32:
-			*(u32 *)reladdr = LOCAL_IE_ADDENDS((*(Elf32_Addr(*)(void))(void *)((uintptr_t)*(u32 *)reladdr + loadaddr))(),
+			*(u32 *)reladdr = LOCAL_IE_ADDENDS((*(Elf32_Addr(*)(void))(void *)((uintptr_t)*(u32 const *)reladdr + loadaddr))(),
 			                                   (*(Elf32_Addr(*)(void))(void *)(loadaddr + LOCAL_addend))());
 			break;
 #endif /* ELF_ARCH_CASE_R_IRELATIVE32 */
@@ -101,7 +101,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_IRELATIVE64
 		ELF_ARCH_CASE_R_IRELATIVE64:
-			*(u64 *)reladdr = LOCAL_IE_ADDENDS((*(Elf64_Addr(*)(void))(void *)((uintptr_t)*(u64 *)reladdr + loadaddr))(),
+			*(u64 *)reladdr = LOCAL_IE_ADDENDS((*(Elf64_Addr(*)(void))(void *)((uintptr_t)*(u64 const *)reladdr + loadaddr))(),
 			                                   (*(Elf64_Addr(*)(void))(void *)(loadaddr + LOCAL_addend))());
 			break;
 #endif /* ELF_ARCH_CASE_R_IRELATIVE64 */

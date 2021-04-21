@@ -253,7 +253,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 		result = JSON_ERROR_OK;
 		if (type == JSON_TYPE_INLINE_STRING_OP) {
 			uint16_t maxlen;
-			maxlen = UNALIGNED_GET16((uint16_t *)*preader);
+			maxlen = UNALIGNED_GET16((uint16_t const *)*preader);
 			*preader += 2;
 			/* Make sure that the given string isn't too long */
 			if unlikely(len > maxlen) {
@@ -266,7 +266,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 		} else {
 			if (type == JSON_TYPE_STRING_WITH_LENGTH_OP) {
 				uint16_t len_offset;
-				len_offset = UNALIGNED_GET16((uint16_t *)*preader);
+				len_offset = UNALIGNED_GET16((uint16_t const *)*preader);
 				*preader += 2;
 				UNALIGNED_SET((size_t *)((byte_t *)dst_base + len_offset), len);
 			}
@@ -280,14 +280,14 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 
 	case JSON_TYPE_INLINE_STRING_OP: {
 		uint16_t len;
-		len = UNALIGNED_GET16((uint16_t *)*preader);
+		len = UNALIGNED_GET16((uint16_t const *)*preader);
 		*preader += 2;
 		memset(dst, 0, (size_t)len);
 	}	break;
 
 	case JSON_TYPE_STRING_WITH_LENGTH_OP: {
 		uint16_t len_offset;
-		len_offset = UNALIGNED_GET16((uint16_t *)*preader);
+		len_offset = UNALIGNED_GET16((uint16_t const *)*preader);
 		*preader += 2;
 		UNALIGNED_SET((size_t *)((byte_t *)dst_base + len_offset), 0);
 	}	ATTR_FALLTHROUGH

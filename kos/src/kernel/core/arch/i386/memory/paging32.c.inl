@@ -137,7 +137,7 @@ LOCAL NOBLOCK ATTR_FREETEXT void
 NOTHROW(FCALL pagedir_install_jmp)(void *redirection_addr,
                                    void const *redirection_target) {
 	byte_t *dst = (byte_t *)redirection_addr;
-	*(u8 *)(dst + 0) = 0xe9;
+	*(u8 *)(dst + 0)  = 0xe9;
 	*(s32 *)(dst + 1) = ((s32)(uintptr_t)redirection_target -
 	                     (s32)(uintptr_t)(dst + 5));
 }
@@ -254,7 +254,7 @@ NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
 		s32 rel_offset;
 		rel_offset = (s32)((__x86_lazy_disable_ioperm_bitmap_pae + 5) -
 		                   __x86_lazy_disable_ioperm_bitmap_return);
-		*(u8 *)(__x86_lazy_disable_ioperm_bitmap_pae + 0) = 0xe9;
+		*(u8 *)(__x86_lazy_disable_ioperm_bitmap_pae + 0)  = 0xe9;
 		*(s32 *)(__x86_lazy_disable_ioperm_bitmap_pae + 1) = rel_offset;
 	}
 #endif /* !CONFIG_NO_PAGING_PAE */

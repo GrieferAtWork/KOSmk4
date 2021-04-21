@@ -232,7 +232,7 @@ case EMU86_OPCODE_ENCODE(0x82): /* Undocumented alias (doesn't exist on x86_64) 
 case EMU86_OPCODE_ENCODE(0x80): {
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
-	op8 = *(u8 *)pc;
+	op8 = *(u8 const *)pc;
 	pc += 1;
 /*do_op8:*/
 	/* 80 /0 ib      ADD r/m8,imm8      Add imm8 to r/m8
@@ -270,7 +270,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
 #if CONFIG_LIBEMU86_WANT_64BIT
 	if (IS_64BIT()) {
-		op64 = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 *)pc);
+		op64 = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 const *)pc);
 		pc += 4;
 do_op64:
 		/* 81 /0 iq      ADD r/m64,Simm32      Add Simm32 to r/m64
@@ -285,7 +285,7 @@ do_op64:
 	} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 	if (!IS_16BIT()) {
-		op32 = UNALIGNED_GETLE32((u32 *)pc);
+		op32 = UNALIGNED_GETLE32((u32 const *)pc);
 		pc += 4;
 do_op32:
 		/* 81 /0 id      ADD r/m32,imm32      Add imm32 to r/m32
@@ -298,7 +298,7 @@ do_op32:
 		 * 81 /7 id      CMP r/m32,imm32      Compare imm32 with r/m32 */
 		DO_ARITH_SWITCH_rmdst_mi_reg(l, L, 4, 32, op32)
 	} else {
-		op16 = UNALIGNED_GETLE16((u16 *)pc);
+		op16 = UNALIGNED_GETLE16((u16 const *)pc);
 		pc += 2;
 do_op16:
 		/* 81 /0 iw      ADD r/m16,imm16      Add imm16 to r/m16 */
@@ -341,7 +341,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 		/* 83 /5 ib      SUB r/m64,Simm8      Subtract sign-extended imm8 from r/m64 */
 		/* 83 /6 ib      XOR r/m64,Simm8      r/m64 XOR imm8 (sign-extended) */
 		/* 83 /7 ib      CMP r/m64,Simm8      Compare imm8 with r/m64 */
-		op64 = (u64)(s64)*(s8 *)pc;
+		op64 = (u64)(s64)*(s8 const *)pc;
 		pc += 1;
 		goto do_op64;
 	} else
@@ -355,7 +355,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 		/* 83 /5 ib      SUB r/m32,Simm8      Subtract sign-extended imm8 from r/m32 */
 		/* 83 /6 ib      XOR r/m32,Simm8      r/m32 XOR imm8 (sign-extended) */
 		/* 83 /7 ib      CMP r/m32,Simm8      Compare imm8 with r/m32 */
-		op32 = (u32)(s32)*(s8 *)pc;
+		op32 = (u32)(s32)*(s8 const *)pc;
 		pc += 1;
 		goto do_op32;
 	} else {
@@ -367,7 +367,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 		/* 83 /5 ib      SUB r/m16,Simm8      Subtract sign-extended imm8 from r/m16 */
 		/* 83 /6 ib      XOR r/m16,Simm8      r/m16 XOR imm8 (sign-extended) */
 		/* 83 /7 ib      CMP r/m16,Simm8      Compare imm8 with r/m16 */
-		op16 = (u16)(s16)*(s8 *)pc;
+		op16 = (u16)(s16)*(s8 const *)pc;
 		pc += 1;
 		goto do_op16;
 	}
@@ -380,7 +380,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 #define DEFINE_REGISTER_IMMEDIATE_INSTRUCTIONS(_opcode, name, NAME)     \
 	case EMU86_OPCODE_ENCODE(_opcode + 4):                              \
 		/* _opcode + 04 ib      FOO AL, imm8        Foo imm8 to AL */   \
-		op8 = *(u8 *)pc;                                                \
+		op8 = *(u8 const *)pc;                                          \
 		pc += 1;                                                        \
 		modrm.mi_type = EMU86_MODRM_REGISTER;                           \
 		modrm.mi_rm   = EMU86_R_AL;                                     \
@@ -393,15 +393,15 @@ case EMU86_OPCODE_ENCODE(0x83):
 		modrm.mi_type = EMU86_MODRM_REGISTER;                           \
 		modrm.mi_rm   = EMU86_R_AX;                                     \
 		IF_64BIT(if (IS_64BIT()) {                                      \
-			op64 = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 *)pc);         \
+			op64 = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 const *)pc);   \
 			pc += 4;                                                    \
 			goto do_##name##64;                                         \
 		} else) if (!IS_16BIT()) {                                      \
-			op32 = UNALIGNED_GETLE32((u32 *)pc);                        \
+			op32 = UNALIGNED_GETLE32((u32 const *)pc);                  \
 			pc += 4;                                                    \
 			goto do_##name##32;                                         \
 		} else {                                                        \
-			op16 = UNALIGNED_GETLE16((u16 *)pc);                        \
+			op16 = UNALIGNED_GETLE16((u16 const *)pc);                  \
 			pc += 2;                                                    \
 			goto do_##name##16;                                         \
 		}

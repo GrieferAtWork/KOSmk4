@@ -79,7 +79,7 @@ BLIT_FUNC2(copy_perpixel_fixed)(struct video_gfx *IF_BITFILL(__restrict) self,
 		if (bitskip) {
 			bitmask = (uint8_t *)bitmask + (bitskip / 8);
 			bitskip &= 7;
-			byte    = *(uint8_t *)bitmask << bitskip;
+			byte    = *(uint8_t const *)bitmask << bitskip;
 			bitmask = (uint8_t *)bitmask + 1;
 			bits    = 8 - bitskip;
 		}
@@ -88,7 +88,7 @@ BLIT_FUNC2(copy_perpixel_fixed)(struct video_gfx *IF_BITFILL(__restrict) self,
 				uint8_t bit;
 				NIF_BITFILL(video_color_t color;)
 				if (!bits) {
-					byte    = *(uint8_t *)bitmask;
+					byte    = *(uint8_t const *)bitmask;
 					bitmask = (uint8_t *)bitmask + 1;
 					bits    = 8;
 				}

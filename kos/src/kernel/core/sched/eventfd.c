@@ -142,7 +142,7 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 		      E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE,
 		      num_bytes);
 	}
-	val = UNALIGNED_GET64((u64 *)src);
+	val = UNALIGNED_GET64((u64 const *)src);
 	for (;;) {
 		oldval = atomic64_read(&self->ef_value);
 		if (OVERFLOW_UMUL(oldval, val, &newval) ||

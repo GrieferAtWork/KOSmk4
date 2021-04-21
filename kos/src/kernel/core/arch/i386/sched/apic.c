@@ -113,11 +113,11 @@ INTDEF NOBLOCK void NOTHROW(KCALL apic_send_startup)(u8 procid, u8 pageno);
 
 INTERN ATTR_FREEBSS volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT, 8)];
 #if CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 1
-#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u8 *)cpu_offline_mask) == 0)
+#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u8 const *)cpu_offline_mask) == 0)
 #elif CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 2
-#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u16 *)cpu_offline_mask) == 0)
+#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u16 const *)cpu_offline_mask) == 0)
 #elif CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 4
-#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u32 *)cpu_offline_mask) == 0)
+#define CPU_ALL_ONLINE  (ATOMIC_READ(*(u32 const *)cpu_offline_mask) == 0)
 #else
 LOCAL bool KCALL all_all_cpus_online(void) {
 	unsigned int i;

@@ -192,7 +192,7 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 	while ((uintptr_t)start & 3) {
 		if __untraced(!num_bytes)
 			return NULL;
-		if __untraced(*(u8 *)start != ((u8 *)&pattern)[(uintptr_t)start & 3])
+		if __untraced(*(byte_t const *)start != ((byte_t const *)&pattern)[(uintptr_t)start & 3])
 			return start;
 		--num_bytes, ++start;
 	}
@@ -215,21 +215,21 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 				num_bytes -= PAGESIZE;
 			}
 		}
-		if __untraced(*(u32 *)start == pattern) {
+		if __untraced(*(u32 const *)start == pattern) {
 			start += 4;
 			num_bytes -= 4;
 			continue;
 		}
-		if __untraced(((u8 *)start)[0] != ((u8 *)&pattern)[0])
+		if __untraced(((byte_t const *)start)[0] != ((byte_t const *)&pattern)[0])
 			return start + 0;
-		if __untraced(((u8 *)start)[1] != ((u8 *)&pattern)[1])
+		if __untraced(((byte_t const *)start)[1] != ((byte_t const *)&pattern)[1])
 			return start + 1;
-		if __untraced(((u8 *)start)[2] != ((u8 *)&pattern)[2])
+		if __untraced(((byte_t const *)start)[2] != ((byte_t const *)&pattern)[2])
 			return start + 2;
 		return start + 3;
 	}
 	while (num_bytes) {
-		if __untraced(*(u8 *)start != ((u8 *)&pattern)[(uintptr_t)start & 3])
+		if __untraced(*(byte_t const *)start != ((byte_t const *)&pattern)[(uintptr_t)start & 3])
 			return start;
 		--num_bytes, ++start;
 	}
@@ -365,12 +365,12 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			faulting_address = find_modified_address(iter->mf_data, expected_data,
 			                                         iter->mf_size - SIZEOF_MFREE);
 			if unlikely_untraced(faulting_address) {
-				u8 *fault_start = (u8 *)faulting_address - 32;
+				byte_t const *fault_start = (byte_t const *)faulting_address - 32;
 				PREEMPTION_DISABLE();
 				if __untraced(!pagedir_ismapped(fault_start))
-					fault_start = (u8 *)FLOOR_ALIGN((uintptr_t)faulting_address, PAGESIZE);
-				if __untraced(fault_start < (u8 *)iter->mf_data)
-					fault_start = (u8 *)iter->mf_data;
+					fault_start = (byte_t const *)FLOOR_ALIGN((uintptr_t)faulting_address, PAGESIZE);
+				if __untraced(fault_start < (byte_t const *)iter->mf_data)
+					fault_start = (byte_t const *)iter->mf_data;
 				printk(KERN_RAW "\n\n\n");
 				kernel_panic("%$[hex]\n"
 				             "\tIllegal USE-AFTER-FREE of <%p>\n"
@@ -378,13 +378,14 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 				             "Node offset:   %" PRIuSIZ " (%#" PRIxSIZ ")\n"
 				             "Expected byte: %.2" PRIx8 "\n"
 				             "Found byte:    %.2" PRIx8,
-				             (size_t)((size_t)16 + 2 * (size_t)((u8 *)faulting_address - fault_start)), fault_start,
-				             faulting_address,
+				             (size_t)((size_t)16 + 2 * (size_t)((byte_t const *)faulting_address -
+				                                                fault_start)),
+				             fault_start, faulting_address,
 				             MFREE_MIN(iter), MFREE_MAX(iter),
 				             (size_t)((uintptr_t)faulting_address - MFREE_MIN(iter)),
 				             (size_t)((uintptr_t)faulting_address - MFREE_MIN(iter)),
-				             ((u8 *)&expected_data)[(uintptr_t)faulting_address & 3],
-				             *(u8 *)faulting_address);
+				             ((byte_t const *)&expected_data)[(uintptr_t)faulting_address & 3],
+				             *(byte_t const *)faulting_address);
 			}
 		}
 	}

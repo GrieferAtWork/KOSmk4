@@ -247,10 +247,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Evaluate commandline options defined as `DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION()' */
 	kernel_initialize_commandline_options_early();
 
-	/* Since   `kernel_initialize_commandline_options_early()'    may   have    overwritten
-	 * the  initial  seed set  by  `x86_initialize_rand_entropy()', only  log  the actually
-	 * used seed now so that the system logs remain consistent with the user's expectation. */
-	krand_seed = 0x2d3c9801;
+	/* Since `kernel_initialize_commandline_options_early()' may have overwritten  the
+	 * initial seed set by `x86_initialize_rand_entropy()', only log the actually used
+	 * seed now so that the system logs remain consistent with the user's expectation. */
 	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to %#.8" PRIx32 "\n"), krand_seed);
 
 	/* Initialize  the x86_64 physical memory identity memory mapping.
@@ -647,6 +646,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       However,  quite a  bit of  that held-screen  isn't being displayed
 	 *       correctly. The actual text is scrollable as it should be, but some
 	 *       of the text shows up as control characters and the like... */
+
+	/* TODO: mem-node merging should be implemented via a custom per-mman  lockop
+	 *       that is automatically enqueued once the mman contains nodes that may
+	 *       be  mergeable, but can't be merged right  as the result of a failure
+	 *       to allocate new control structures.
+	 *       This lockop should then simply  re-enqueue itself until a pointer  in
+	 *       time when the merge could be performed successfully, or no more nodes
+	 *       exist that can be merged.
+	 * -> Additionally, `mnode_merge()' must be called in a _lot_ more  places,
+	 *    including inside of `mman_mlock()', `mman_munlock()', `mman_remap()',
+	 *    and generally anything that could  also be responsible for  splitting
+	 *    them. */
 
 
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)

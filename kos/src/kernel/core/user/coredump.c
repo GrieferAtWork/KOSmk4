@@ -146,7 +146,7 @@ dbg_coredump(void const *const *traceback_vector,
 				}
 			}
 			dbg_addr2line_printf(reason->ci_except.e_faultaddr,
-			                     instruction_trysucc((void *)reason->ci_except.e_faultaddr,
+			                     instruction_trysucc(reason->ci_except.e_faultaddr,
 			                                         instrlen_isa_from_kcpustate(orig_ustate)),
 			                     "faultaddr");
 		} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {

@@ -289,8 +289,8 @@ handle_vio_or_not_faulted:
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHB
 				case 1:
 					*(u8 *)preal_oldval = vio_cmpxchb(&args, vio_addr,
-					                                  *(u8 *)poldval,
-					                                  *(u8 *)pnewval,
+					                                  *(u8 const *)poldval,
+					                                  *(u8 const *)pnewval,
 					                                  true);
 					break;
 #endif /* CONFIG_EMULOCK_HAVE_CMPXCHB */
@@ -298,8 +298,8 @@ handle_vio_or_not_faulted:
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHW
 				case 2:
 					*(u16 *)preal_oldval = vio_cmpxchw(&args, vio_addr,
-					                                   *(u16 *)poldval,
-					                                   *(u16 *)pnewval,
+					                                   *(u16 const *)poldval,
+					                                   *(u16 const *)pnewval,
 					                                   true);
 					break;
 #endif /* CONFIG_EMULOCK_HAVE_CMPXCHW */
@@ -307,8 +307,8 @@ handle_vio_or_not_faulted:
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHL
 				case 4:
 					*(u32 *)preal_oldval = vio_cmpxchl(&args, vio_addr,
-					                                   *(u32 *)poldval,
-					                                   *(u32 *)pnewval,
+					                                   *(u32 const *)poldval,
+					                                   *(u32 const *)pnewval,
 					                                   true);
 					break;
 #endif /* CONFIG_EMULOCK_HAVE_CMPXCHL */
@@ -316,8 +316,8 @@ handle_vio_or_not_faulted:
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHQ
 				case 8:
 					*(u64 *)preal_oldval = vio_cmpxchq(&args, vio_addr,
-					                                   *(u64 *)poldval,
-					                                   *(u64 *)pnewval,
+					                                   *(u64 const *)poldval,
+					                                   *(u64 const *)pnewval,
 					                                   true);
 					break;
 #endif /* CONFIG_EMULOCK_HAVE_CMPXCHQ */
@@ -325,9 +325,9 @@ handle_vio_or_not_faulted:
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHX
 				case 16:
 					*(uint128_t *)preal_oldval = vio_cmpxchx(&args, vio_addr,
-					                                           *(uint128_t *)poldval,
-					                                           *(uint128_t *)pnewval,
-					                                           true);
+					                                         *(uint128_t const *)poldval,
+					                                         *(uint128_t const *)pnewval,
+					                                         true);
 					break;
 #endif /* CONFIG_EMULOCK_HAVE_CMPXCHX */
 

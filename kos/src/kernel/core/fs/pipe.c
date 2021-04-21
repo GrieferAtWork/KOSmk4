@@ -386,7 +386,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
 		validate_writable(arg, sizeof(u64));
 		data = (USER CHECKED u64 *)arg;
-		temp = *(size_t *)data;
+		temp = (size_t)*data;
 		COMPILER_READ_BARRIER();
 		temp = ringbuffer_setwritten(self, temp);
 		COMPILER_WRITE_BARRIER();

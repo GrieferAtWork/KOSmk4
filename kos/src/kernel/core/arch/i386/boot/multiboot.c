@@ -402,7 +402,7 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 	/* Multiboot 2 information. */
 	struct mb2_tag *tag_begin, *tag_iter, *tag_end;
 	size_t mbt_min_size, temp;
-	mbt_min_size = *(u32 *)((uintptr_t)info + KERNEL_CORE_BASE);
+	mbt_min_size = *(u32 const *)((uintptr_t)info + KERNEL_CORE_BASE);
 	tag_begin    = (struct mb2_tag *)((uintptr_t)info + KERNEL_CORE_BASE + 8);
 	/* Make sure that we're not protecting too little amount of data. */
 	for (tag_end = tag_begin;

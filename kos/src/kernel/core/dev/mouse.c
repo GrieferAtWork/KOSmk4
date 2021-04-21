@@ -846,7 +846,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 	case MOUSEIO_GETABSMODE:
 		validate_writable(arg, sizeof(int));
 		COMPILER_WRITE_BARRIER();
-		*(int *)arg = (me->md_flags & MOUSE_DEVICE_FLAG_GENABS) ? 1 : 0;
+		*(USER CHECKED int *)arg = (me->md_flags & MOUSE_DEVICE_FLAG_GENABS) ? 1 : 0;
 		COMPILER_WRITE_BARRIER();
 		break;
 
@@ -854,7 +854,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		int mode;
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
-		mode = *(int *)arg;
+		mode = *(USER CHECKED int const *)arg;
 		COMPILER_READ_BARRIER();
 		if (mode == 0) {
 			ATOMIC_AND(me->md_flags, ~MOUSE_DEVICE_FLAG_GENABS);
@@ -959,7 +959,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		validate_writable(arg, sizeof(u32));
 		buttons = ATOMIC_READ(me->md_state.ms_buttons);
 		COMPILER_WRITE_BARRIER();
-		*(u32 *)arg = buttons;
+		*(USER CHECKED u32 *)arg = buttons;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
@@ -967,7 +967,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		u32 new_buttons;
 		validate_readable(arg, sizeof(u32));
 		COMPILER_READ_BARRIER();
-		new_buttons = *(u32 *)arg;
+		new_buttons = *(USER CHECKED u32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mouse_device_button(me, (u32)~0, new_buttons))
 			goto err_buffer_full;
@@ -987,8 +987,8 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		                           &button.mfb_new_buttons))
 			goto err_buffer_full;
 		COMPILER_WRITE_BARRIER();
-		((struct mouse_fake_button *)arg)->mfb_old_buttons = button.mfb_old_buttons;
-		((struct mouse_fake_button *)arg)->mfb_new_buttons = button.mfb_new_buttons;
+		((USER CHECKED struct mouse_fake_button *)arg)->mfb_old_buttons = button.mfb_old_buttons;
+		((USER CHECKED struct mouse_fake_button *)arg)->mfb_new_buttons = button.mfb_new_buttons;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
@@ -996,7 +996,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
 		COMPILER_READ_BARRIER();
-		relmove = *(s32 *)arg;
+		relmove = *(USER CHECKED s32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mouse_device_vwheel(me, relmove))
 			goto err_buffer_full;
@@ -1006,7 +1006,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
 		COMPILER_READ_BARRIER();
-		relmove = *(s32 *)arg;
+		relmove = *(USER CHECKED s32 const *)arg;
 		COMPILER_READ_BARRIER();
 		if (!mouse_device_hwheel(me, relmove))
 			goto err_buffer_full;

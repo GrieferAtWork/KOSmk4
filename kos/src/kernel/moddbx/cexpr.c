@@ -1769,10 +1769,10 @@ again:
 			if (top->cv_kind == CVALUE_KIND_VOID)
 				goto set_new_type;
 			switch (CTYPE_KIND_SIZEOF(old_typ->ct_kind)) {
-			case 1: value = *(uint8_t *)data; break;
-			case 2: value = UNALIGNED_GET16((uint16_t *)data); break;
-			case 4: value = UNALIGNED_GET32((uint32_t *)data); break;
-			case 8: value = UNALIGNED_GET64((uint64_t *)data); break;
+			case 1: value = *(uint8_t const *)data; break;
+			case 2: value = UNALIGNED_GET16((uint16_t const *)data); break;
+			case 4: value = UNALIGNED_GET32((uint32_t const *)data); break;
+			case 8: value = UNALIGNED_GET64((uint64_t const *)data); break;
 			default: return DBX_EINTERN;
 			}
 			if (CTYPE_KIND_CLASSOF(old_typ->ct_kind) ==
@@ -2427,10 +2427,10 @@ again:
 			} else {
 				uintmax_t irhs_value;
 				switch (CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) {
-				case 1: irhs_value = (*(uint8_t *)rhs_data); break;
-				case 2: irhs_value = UNALIGNED_GET16((uint16_t *)rhs_data); break;
-				case 4: irhs_value = UNALIGNED_GET32((uint32_t *)rhs_data); break;
-				case 8: irhs_value = UNALIGNED_GET64((uint64_t *)rhs_data); break;
+				case 1: irhs_value = *(uint8_t const *)rhs_data; break;
+				case 2: irhs_value = UNALIGNED_GET16((uint16_t const *)rhs_data); break;
+				case 4: irhs_value = UNALIGNED_GET32((uint32_t const *)rhs_data); break;
+				case 8: irhs_value = UNALIGNED_GET64((uint64_t const *)rhs_data); break;
 				default: return DBX_EINTERN;
 				}
 				rhs_value = (__LONGDOUBLE)irhs_value;
@@ -2526,10 +2526,10 @@ swap_operands_and_again:
 			lhs_value = 0;
 		} else {
 			switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
-			case 1: lhs_value = *(uint8_t *)lhs_data; break;
-			case 2: lhs_value = UNALIGNED_GET16((uint16_t *)lhs_data); break;
-			case 4: lhs_value = UNALIGNED_GET32((uint32_t *)lhs_data); break;
-			case 8: lhs_value = UNALIGNED_GET64((uint64_t *)lhs_data); break;
+			case 1: lhs_value = *(uint8_t const *)lhs_data; break;
+			case 2: lhs_value = UNALIGNED_GET16((uint16_t const *)lhs_data); break;
+			case 4: lhs_value = UNALIGNED_GET32((uint32_t const *)lhs_data); break;
+			case 8: lhs_value = UNALIGNED_GET64((uint64_t const *)lhs_data); break;
 			default: return DBX_EINTERN;
 			}
 		}
@@ -2539,10 +2539,10 @@ swap_operands_and_again:
 			rhs_value = buffer_istrue(rhs_data, CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) ? 1 : 0;
 		} else {
 			switch (CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) {
-			case 1: rhs_value = *(uint8_t *)rhs_data; break;
-			case 2: rhs_value = UNALIGNED_GET16((uint16_t *)rhs_data); break;
-			case 4: rhs_value = UNALIGNED_GET32((uint32_t *)rhs_data); break;
-			case 8: rhs_value = UNALIGNED_GET64((uint64_t *)rhs_data); break;
+			case 1: rhs_value = *(uint8_t const *)rhs_data; break;
+			case 2: rhs_value = UNALIGNED_GET16((uint16_t const *)rhs_data); break;
+			case 4: rhs_value = UNALIGNED_GET32((uint32_t const *)rhs_data); break;
+			case 8: rhs_value = UNALIGNED_GET64((uint64_t const *)rhs_data); break;
 			default: return DBX_EINTERN;
 			}
 			if (CTYPE_KIND_ISINT(rhs_typ->ct_kind) && !CTYPE_KIND_INT_ISUNSIGNED(rhs_typ->ct_kind)) {
@@ -2715,10 +2715,10 @@ do_pointer_pointer_op:
 			lhs_value = buffer_istrue(lhs_data, CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) ? 1 : 0;
 		} else {
 			switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
-			case 1: lhs_value = *(uint8_t *)lhs_data; break;
-			case 2: lhs_value = UNALIGNED_GET16((uint16_t *)lhs_data); break;
-			case 4: lhs_value = UNALIGNED_GET32((uint32_t *)lhs_data); break;
-			case 8: lhs_value = UNALIGNED_GET64((uint64_t *)lhs_data); break;
+			case 1: lhs_value = *(uint8_t const *)lhs_data; break;
+			case 2: lhs_value = UNALIGNED_GET16((uint16_t const *)lhs_data); break;
+			case 4: lhs_value = UNALIGNED_GET32((uint32_t const *)lhs_data); break;
+			case 8: lhs_value = UNALIGNED_GET64((uint64_t const *)lhs_data); break;
 			default: return DBX_EINTERN;
 			}
 			if (!CTYPE_KIND_INT_ISUNSIGNED(lhs_typ->ct_kind)) {
@@ -2740,10 +2740,10 @@ do_pointer_pointer_op:
 			rhs_value = buffer_istrue(rhs_data, CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) ? 1 : 0;
 		} else {
 			switch (CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) {
-			case 1: rhs_value = *(uint8_t *)rhs_data; break;
-			case 2: rhs_value = UNALIGNED_GET16((uint16_t *)rhs_data); break;
-			case 4: rhs_value = UNALIGNED_GET32((uint32_t *)rhs_data); break;
-			case 8: rhs_value = UNALIGNED_GET64((uint64_t *)rhs_data); break;
+			case 1: rhs_value = *(uint8_t const *)rhs_data; break;
+			case 2: rhs_value = UNALIGNED_GET16((uint16_t const *)rhs_data); break;
+			case 4: rhs_value = UNALIGNED_GET32((uint32_t const *)rhs_data); break;
+			case 8: rhs_value = UNALIGNED_GET64((uint64_t const *)rhs_data); break;
 			default: return DBX_EINTERN;
 			}
 			if (!CTYPE_KIND_INT_ISUNSIGNED(rhs_typ->ct_kind)) {

@@ -92,7 +92,7 @@ NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno)
 	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
 		return (u16)icpustate_getsp(state);
 #endif /* !__x86_64__ */
-	return *(u16 *)&ACCESS_GPREG(state, regno);
+	return *(u16 const *)&ACCESS_GPREG(state, regno);
 }
 
 INTERN ATTR_PURE WUNUSED NONNULL((1)) u32
@@ -101,7 +101,7 @@ NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno)
 	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
 		return (u32)icpustate_getsp(state);
 #endif /* !__x86_64__ */
-	return *(u32 *)&ACCESS_GPREG(state, regno);
+	return *(u32 const *)&ACCESS_GPREG(state, regno);
 }
 
 
@@ -236,7 +236,7 @@ modrm_getrmw(struct icpustate *__restrict state,
 	addr = x86_decode_modrmgetmem(state, modrm, flags);
 	if (irregs_isuser(IRREGS(state)))
 		validate_readable((void *)addr, 2);
-	return *(u16 *)addr;
+	return *(u16 const *)addr;
 }
 
 

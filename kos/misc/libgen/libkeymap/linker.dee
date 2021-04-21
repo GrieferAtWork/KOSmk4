@@ -99,16 +99,16 @@ final global KMP_OP_SETKEY     = 0x04;
 @@OPCODE: %enc  = DEFAULT_ENCODING; (DEFAULT_ENCODING == `d_encoding')
 final global KMP_OP_DEFENC     = 0x05;
 
-@@OPCODE: %key  = *(u16 *)*%pc; %pc += 2;
+@@OPCODE: %key  = *(u16 const *)*%pc; %pc += 2;
 final global KMP_OP_SETKEY2    = 0x06;
 
-@@OPCODE: mask = *(u16 *)%pc; %pc += 2;
+@@OPCODE: mask = *(u16 const *)%pc; %pc += 2;
 @@        kchr = READ_CHARACTER(%pc, %enc);
 @@        if (CURRENT_KEYMOD == mask)
 @@            return kchr;
 final global KMP_OP_SETKEYMOD2 = 0x1a;
 
-@@OPCODE: mask = *(u8 *)%pc; %pc += 1;
+@@OPCODE: mask = *(u8 const *)%pc; %pc += 1;
 @@        kchr = READ_CHARACTER(%pc, %enc);
 @@        if (CURRENT_KEYMOD == mask)
 @@            return kchr;

@@ -90,7 +90,7 @@ PUBLIC ktime_t sched_shutdown_delay = (ktime_t)10 * NSEC_PER_SEC;
 	 sched_pself(second) = &sched_next(first))
 
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && 1
 #define sched_assert() _sched_assert(me)
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL _sched_assert)(struct cpu *__restrict me) {

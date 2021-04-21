@@ -1055,7 +1055,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 			 * https://web.archive.org/web/20120417075804/http://www.usb.org/developers/docs/USB_LANGIDs.pdf
 			 * ... And for some reason, the original page no longer exists... */
 			size_t count = (buf[0] - 2) / 2;
-			dev->ud_lang_used = *(u16 *)(buf + 2);
+			dev->ud_lang_used = *(u16 const *)(buf + 2);
 #define LANG_EN_US 0x0409
 			/* Try to make use of English (if available) */
 			if (count > 1 && dev->ud_lang_used != LANG_EN_US) {

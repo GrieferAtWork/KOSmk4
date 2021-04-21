@@ -1348,7 +1348,7 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 		 *      containing `self'.  However, at  this point  we
 		 *      have no easy way of determining that directory. */
 		require(CAP_FOWNER);
-		*(u32 *)arg = self->i_fsdata->i_file.f_attr;
+		*(USER CHECKED u32 *)arg = self->i_fsdata->i_file.f_attr;
 		break;
 
 	case FAT_IOCTL_SET_ATTRIBUTES: {
@@ -1356,7 +1356,7 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 		validate_readable(arg, sizeof(u32));
 		inode_loadattr(self);
 		COMPILER_READ_BARRIER();
-		value = *(u32 *)arg;
+		value = *(USER CHECKED u32 const *)arg;
 		COMPILER_READ_BARRIER();
 		/* XXX: Technically,  should  should instead  check for
 		 *      `inode_access(W_OK)' on the  directory that  is
@@ -1378,7 +1378,7 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 		validate_writable(arg, sizeof(u32));
 		super = (FatSuperblock *)self->i_super;
 		inode_access(super, R_OK);
-		*(u32 *)arg = super->f_volid;
+		*(USER CHECKED u32 *)arg = super->f_volid;
 	}	break;
 
 	default:
@@ -2416,7 +2416,7 @@ Fat12_GetFatIndirection(FatSuperblock const *__restrict self,
 	assertf(index < self->f_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
-	val = *(u16 *)((uintptr_t)self->f_fat_table + (index + (index >> 1)));
+	val = *(u16 const *)((byte_t const *)self->f_fat_table + (index + (index >> 1)));
 	if (index & 1)
 		val >>= 4;
 	else
@@ -2432,7 +2432,7 @@ Fat12_SetFatIndirection(FatSuperblock *__restrict self,
 	assertf(index < self->f_fat_length,
 	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
-	pval = ((u16 *)((uintptr_t)self->f_fat_table + (index + (index / 2))));
+	pval = ((u16 *)((byte_t const *)self->f_fat_table + (index + (index / 2))));
 	if (index & 1)
 		*pval = (*pval & 0xf) | (indirection_target << 4);
 	else

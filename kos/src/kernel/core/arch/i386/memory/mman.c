@@ -445,8 +445,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 #ifndef NDEBUG
 	{
 		u32 virt_word, phys_word;
-		virt_word = *(u32 *)(__kernel_pdata_start);
-		phys_word = *(u32 *)(__kernel_pdata_start - KERNEL_CORE_BASE);
+		virt_word = *(u32 const *)(__kernel_pdata_start);
+		phys_word = *(u32 const *)(__kernel_pdata_start - KERNEL_CORE_BASE);
 		assert(virt_word == phys_word);
 	}
 #endif /* !NDEBUG */

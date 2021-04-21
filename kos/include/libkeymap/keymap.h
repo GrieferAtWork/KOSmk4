@@ -91,7 +91,7 @@ typedef struct __ATTR_PACKED {
                                 *         >> kchr = READ_CHARACTER(%pc, %enc);
                                 *         >> if (CURRENT_KEYMOD == mask)
                                 *         >>     return kchr; */
-#define KMP_OP_SETKEYMOD  0x1b /* OPCODE: >> mask = *(u8 *)%pc; %pc += 1;
+#define KMP_OP_SETKEYMOD  0x1b /* OPCODE: >> mask = *(u8 const *)%pc; %pc += 1;
                                 *         >> kchr = READ_CHARACTER(%pc, %enc);
                                 *         >> if (CURRENT_KEYMOD == mask)
                                 *         >>     return kchr; */

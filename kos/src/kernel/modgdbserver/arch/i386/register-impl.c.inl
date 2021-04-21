@@ -86,20 +86,20 @@ DECL_BEGIN
 #define FIELD4(field)                                               \
 	do {                                                            \
 		if (bufsize == 4)                                           \
-			field = (__typeof__(field))UNALIGNED_GET32((u32 *)buf); \
+			field = (__typeof__(field))UNALIGNED_GET32((u32 const *)buf); \
 		return 4;                                                   \
 	} __WHILE0
 #define FIELD8(field)                                               \
 	do {                                                            \
 		if (bufsize == 8)                                           \
-			field = (__typeof__(field))UNALIGNED_GET64((u64 *)buf); \
+			field = (__typeof__(field))UNALIGNED_GET64((u64 const *)buf); \
 		return 8;                                                   \
 	} __WHILE0
 #define GETSET4(get, set)                        \
 	do {                                         \
 		if (bufsize == 4) {                      \
 			u32 value;                           \
-			value = UNALIGNED_GET32((u32 *)buf); \
+			value = UNALIGNED_GET32((u32 const *)buf); \
 			set;                                 \
 		}                                        \
 		return 4;                                \
@@ -108,7 +108,7 @@ DECL_BEGIN
 	do {                                         \
 		if (bufsize == 8) {                      \
 			u64 value;                           \
-			value = UNALIGNED_GET64((u64 *)buf); \
+			value = UNALIGNED_GET64((u64 const *)buf); \
 			set;                                 \
 		}                                        \
 		return 8;                                \

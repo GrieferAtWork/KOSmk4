@@ -3644,8 +3644,8 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* NOTE: The `__DO_COMPARE()' macro is designed to best allow GCC
 		 *       to determine  which path  is used  by which  comparison.
-		 * For example, `if __untraced(memcmp(a, b, 4) < 0) { ... }' can get fully
-		 * optimized       to       `if __untraced(*(u32 *)a < *(u32 *)b) { ... }' */
+		 * For example, `if __untraced(memcmp(a, b, 4) == 0) { ... }' can get
+		 * fully optimized to `if __untraced(*(u32 *)a == *(u32 *)b) { ... }' */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __DO_COMPARE(T, off)         \
 	{                                \

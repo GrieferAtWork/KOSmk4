@@ -887,7 +887,7 @@ search_chain:
 				++start;
 			if (*start == OPC_LONGREPR) {
 				/* Extended-length opcode representation. */
-				u16 offset = UNALIGNED_GET16((u16 *)(start + 1));
+				u16 offset = UNALIGNED_GET16((u16 const *)(start + 1));
 				start = longops_repr + offset;
 			}
 			p = strchrnul(start, '\t');
@@ -1375,7 +1375,7 @@ do_OPC_VRZMM_MASK:
 				case OPC_IMM8_XMM: {
 					u8 byte;
 do_OPC_IMM8_XMM:
-					byte = *(u8 *)self->d_pc;
+					byte = *(u8 const *)self->d_pc;
 					self->d_pc += 1;
 					da_print_xmmreg(self, (byte & 0xf0) >> 4);
 				}	break;
@@ -1383,7 +1383,7 @@ do_OPC_IMM8_XMM:
 				case OPC_IMM8_YMM: {
 					u8 byte;
 do_OPC_IMM8_YMM:
-					byte = *(u8 *)self->d_pc;
+					byte = *(u8 const *)self->d_pc;
 					self->d_pc += 1;
 					da_print_ymmreg(self, (byte & 0xf0) >> 4);
 				}	break;

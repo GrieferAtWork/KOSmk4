@@ -207,25 +207,25 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 	/* NOTE: By  being  a program  counter from  user-space, PC
 	 *       is  implicitly checked by the fact that user-space
 	 *       will have invoked the instruction from user-space. */
-	USER CHECKED byte_t *pc;
+	USER CHECKED byte_t const *pc;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
 	if (ucpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno = gpregs_getpax(&state->ucs_gpregs);
 	/* lcall $7, $? -- { 0x9a, ?, ?, ?, ?, 0x07, 0x00 } */
-	pc = (USER CHECKED byte_t *)ucpustate_getpc(state);
-	if (*(u8 *)(pc - 7) == 0x9a &&
-		__hybrid_unaligned_get16((u16 *)(pc - 2)) == 0x0007) {
+	pc = (USER CHECKED byte_t const *)ucpustate_getpc(state);
+	if (*(u8 const *)(pc - 7) == 0x9a &&
+		__hybrid_unaligned_get16((u16 const *)(pc - 2)) == 0x0007) {
 		/* This really is an lcall7 instruction */
 		u32 lcall_arg;
-		lcall_arg = __hybrid_unaligned_get32((u32 *)(pc - 6));
+		lcall_arg = __hybrid_unaligned_get32((u32 const *)(pc - 6));
 		if (lcall_arg != 0)
 			self->rsi_sysno = lcall_arg;
 	}
 	argc = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (argc != 0) {
-		USER UNCHECKED u32 *sp;
-		sp = (USER UNCHECKED u32 *)gpregs_getpsp(&state->ucs_gpregs);
+		USER UNCHECKED u32 const *sp;
+		sp = (USER UNCHECKED u32 const *)gpregs_getpsp(&state->ucs_gpregs);
 		if (ADDR_ISUSER(sp)) {
 			NESTED_TRY {
 				unsigned int i;

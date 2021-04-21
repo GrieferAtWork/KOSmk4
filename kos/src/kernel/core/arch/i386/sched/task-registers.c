@@ -119,7 +119,7 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 		eip = ATOMIC_READ(self->ir_eip);
 		if unlikely(eip == (u32)&x86_rpc_user_redirection) {
 is_user_iret:
-			result = *(u32 *)result;
+			result = *(u32 const *)result;
 		}
 	}
 	return result;
