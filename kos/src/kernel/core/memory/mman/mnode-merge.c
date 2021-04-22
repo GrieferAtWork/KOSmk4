@@ -532,10 +532,11 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 #define MPART_MERGE_ASYNC_WAITFOR ((struct mpart *)-1) /* s.a. `MNODE_MERGE_ASYNC_WAITFOR' */
 
 /* See description below... */
-PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
-NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
-                                          /*inherit(on_success)*/ REF struct mpart *__restrict hipart,
-                                          struct mman *__restrict locked_mman);
+PRIVATE NOBLOCK NONNULL((1, 2, 3, 4)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpart *lopart,
+                                          /*inherit(on_success)*/ REF struct mpart *hipart,
+                                          struct mman *__restrict locked_mman,
+                                          struct mpart *orig_part);
 
 /* Merge the 2 given nodes.
  *    @assume(WAS_TRUE_AFTER_MMAN_LOCK(mnode_canmerge(lonode, hinode)));
@@ -584,7 +585,7 @@ merge_identical_parts:
 		REF struct mpart *merged_part;
 		lopart      = incref(lonode->mn_part);
 		hipart      = incref(hinode->mn_part);
-		merged_part = mpart_domerge_with_mm_lock(lopart, hipart, lonode->mn_mman);
+		merged_part = mpart_domerge_with_mm_lock(lopart, hipart, lonode->mn_mman, part);
 		if (merged_part == MPART_MERGE_CANNOT_MERGE ||
 		    merged_part == MPART_MERGE_ASYNC_WAITFOR) {
 			/* Merging will be performed asynchronously, or merging isn't possible. */
@@ -925,6 +926,11 @@ PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
                                                 struct mpart *part_to_merge);
 
+/* Same as `async_waitfor_part_and_mergepart()', but wait for a given futex-lock. */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_ftxlck_and_mergepart)(struct mpart *part_to_wait,
+                                                  struct mpart *part_to_merge);
+
 /* Same as `async_waitfor_part_and_mergepart()', but wait for a given file. */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
@@ -1121,12 +1127,10 @@ NOTHROW(FCALL mpart_lock_all_mmans_after)(struct mpart const *__restrict self,
  *              new reference for a new part is returned)
  * @return: MPART_MERGE_CANNOT_MERGE:  ...
  * @return: MPART_MERGE_ASYNC_WAITFOR: ... */
-PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
-NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
-                                            /*inherit(on_success)*/ REF struct mpart *__restrict hipart) {
-	/* TODO: If present, we also need a lock to `lopart->mp_meta->mpm_ftxlock' */
-	/* TODO: If present, we also need a lock to `hipart->mp_meta->mpm_ftxlock' */
-
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct mpart *lopart,
+                                            /*inherit(on_success)*/ REF struct mpart *hipart,
+                                            struct mpart *orig_part) {
 	/* TODO: If lopart/hipart aren't anonymous, remove them from their file */
 
 	/* TODO: If  either of the  2 parts is MPART_ST_SWP[_SC],  bring the part into
@@ -1221,11 +1225,59 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 
 	(void)lopart;
 	(void)hipart;
+	(void)orig_part;
 	COMPILER_IMPURE();
 
 	return MPART_MERGE_CANNOT_MERGE;
 }
 
+
+/* Same as `mpart_domerge_with_all_locks()', but futex-locks
+ * aren't being held, yet, and will not be held upon return. */
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_all_locks_noftx)(/*inherit(on_success)*/ REF struct mpart *lopart,
+                                                  /*inherit(on_success)*/ REF struct mpart *hipart,
+                                                  struct mpart *orig_part) {
+	REF struct mpart *result;
+	struct mpartmeta *meta;
+	if ((meta = lopart->mp_meta) != NULL) {
+		if (!mpartmeta_ftxlock_trywrite(meta)) {
+			if (async_waitfor_ftxlck_and_mergepart(lopart, orig_part))
+				_mpartmeta_ftxlock_reap(meta, lopart);
+			return MPART_MERGE_ASYNC_WAITFOR;
+		}
+	}
+	if ((meta = hipart->mp_meta) != NULL) {
+		if (!mpartmeta_ftxlock_trywrite(meta)) {
+			if (lopart->mp_meta)
+				mpartmeta_ftxlock_endwrite(lopart->mp_meta, lopart);
+			if (async_waitfor_ftxlck_and_mergepart(hipart, orig_part))
+				_mpartmeta_ftxlock_reap(meta, hipart);
+			return MPART_MERGE_ASYNC_WAITFOR;
+		}
+	}
+
+	/* With all of the now held, check one more time if merging is possible. */
+	if unlikely(!mpart_canmerge(lopart, hipart)) {
+		result = MPART_MERGE_CANNOT_MERGE;
+	} else {
+		/* Do the actual work of merging the 2 parts. */
+		result = mpart_domerge_with_all_locks(lopart, hipart, orig_part);
+	}
+
+	/* Release locks... */
+	if (result == MPART_MERGE_CANNOT_MERGE ||
+	    result == MPART_MERGE_ASYNC_WAITFOR) {
+		if ((meta = lopart->mp_meta) != NULL)
+			mpartmeta_ftxlock_endwrite(meta, lopart);
+		if ((meta = hipart->mp_meta) != NULL)
+			mpartmeta_ftxlock_endwrite(meta, hipart);
+	} else {
+		if ((meta = result->mp_meta) != NULL)
+			mpartmeta_ftxlock_endwrite(meta, result);
+	}
+	return result;
+}
 
 
 /* Merge the 2 given parts.
@@ -1242,10 +1294,11 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
  *              new reference for a new part is returned)
  * @return: MPART_MERGE_CANNOT_MERGE:  ...
  * @return: MPART_MERGE_ASYNC_WAITFOR: ... */
-PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
-NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
-                                          /*inherit(on_success)*/ REF struct mpart *__restrict hipart,
-                                          struct mman *__restrict locked_mman) {
+PRIVATE NOBLOCK NONNULL((1, 2, 3, 4)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpart *lopart,
+                                          /*inherit(on_success)*/ REF struct mpart *hipart,
+                                          struct mman *__restrict locked_mman,
+                                          struct mpart *orig_part) {
 	struct mman *blocking_mman;
 	struct mfile *file = NULL;
 	REF struct mpart *result;
@@ -1260,7 +1313,7 @@ NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpa
 		file = lopart->mp_file;
 		if (!mfile_lock_trywrite(file)) {
 			/* Must async-merge the 2 parts sometime in the future... */
-			if (!async_waitfor_file_and_mergepart(file, lopart) ||
+			if (!async_waitfor_file_and_mergepart(file, orig_part) ||
 			    !mfile_lock_trywrite(file))
 				return MPART_MERGE_ASYNC_WAITFOR;
 		}
@@ -1279,7 +1332,7 @@ NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpa
 	blocking_mman = mpart_lock_all_mmans(lopart, locked_mman);
 	if unlikely(blocking_mman != NULL) {
 waitfor_blocking_mman:
-		if (async_waitfor_mman_and_mergepart(blocking_mman, lopart))
+		if (async_waitfor_mman_and_mergepart(blocking_mman, orig_part))
 			_mman_lockops_reap(blocking_mman);
 		return MPART_MERGE_ASYNC_WAITFOR;
 	}
@@ -1289,13 +1342,8 @@ waitfor_blocking_mman:
 		goto waitfor_blocking_mman;
 	}
 
-	/* With all of the now held, check one more time if merging is possible. */
-	if unlikely(!mpart_canmerge(lopart, hipart)) {
-		result = MPART_MERGE_CANNOT_MERGE;
-	} else {
-		/* Do the actual work of merging the 2 parts. */
-		result = mpart_domerge_with_all_locks(lopart, hipart);
-	}
+	/* Do the actual work of merging the 2 parts. */
+	result = mpart_domerge_with_all_locks_noftx(lopart, hipart, orig_part);
 
 	/* Release the file-lock from above, if it was acquired. */
 	if (file)
@@ -1335,9 +1383,10 @@ waitfor_blocking_mman:
  *              new reference for a new part is returned)
  * @return: MPART_MERGE_CANNOT_MERGE:  ...
  * @return: MPART_MERGE_ASYNC_WAITFOR: ... */
-PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
-NOTHROW(FCALL mpart_domerge_with_file_lock)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
-                                            /*inherit(on_success)*/ REF struct mpart *__restrict hipart) {
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_file_lock)(/*inherit(on_success)*/ REF struct mpart *lopart,
+                                            /*inherit(on_success)*/ REF struct mpart *hipart,
+                                            struct mpart *orig_part) {
 	REF struct mpart *result;
 	struct mman *blocking_mman;
 	mpart_incref_all_mmans(lopart);
@@ -1349,7 +1398,7 @@ NOTHROW(FCALL mpart_domerge_with_file_lock)(/*inherit(on_success)*/ REF struct m
 	blocking_mman = mpart_lock_all_mmans(lopart);
 	if unlikely(blocking_mman != NULL) {
 waitfor_blocking_mman:
-		if (async_waitfor_mman_and_mergepart(blocking_mman, lopart))
+		if (async_waitfor_mman_and_mergepart(blocking_mman, orig_part))
 			_mman_lockops_reap(blocking_mman);
 		return MPART_MERGE_ASYNC_WAITFOR;
 	}
@@ -1369,13 +1418,8 @@ waitfor_blocking_mman:
 	 *   - mman_lock_acquired(hipart->mp_copy.each->mn_mman);
 	 *   - mman_lock_acquired(hipart->mp_share.each->mn_mman); */
 
-	/* With all of the now held, check one more time if merging is possible. */
-	if unlikely(!mpart_canmerge(lopart, hipart)) {
-		result = MPART_MERGE_CANNOT_MERGE;
-	} else {
-		/* Do the actual work of merging the 2 parts. */
-		result = mpart_domerge_with_all_locks(lopart, hipart);
-	}
+	/* Do the actual work of merging the 2 parts. */
+	result = mpart_domerge_with_all_locks_noftx(lopart, hipart, orig_part);
 
 	/* Release locks and drop references... */
 	if (result == MPART_MERGE_CANNOT_MERGE ||
@@ -1581,10 +1625,66 @@ NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
 
 /* Called after a lock to `file' becomes available. */
 #if 1
+#define async_merge_ftxlck_post_cb async_merge_part_post_cb
+#define async_merge_ftxlck_cb      async_merge_part_cb
+#else
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_merge_ftxlck_post_cb)(Tobpostlockop(struct mfile) *__restrict self,
+                                          struct mfile *__restrict UNUSED(file)) {
+	REF struct mpart *merged;
+	struct async_merge_part *me;
+	me     = container_of(self, struct async_merge_part, amp_file_post_lop);
+	merged = me->amp_mergeme; /* Inherit reference */
+	kfree(me);
+	ATOMIC_AND(merged->mp_flags, ~_MPART_F_WILLMERGE);
+	merged = mpart_merge(merged);
+	decref_unlikely(merged);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mpart) *
+NOTHROW(FCALL async_merge_ftxlck_cb)(Toblockop(struct mpart) *__restrict self,
+                                     struct mpart *__restrict UNUSED(file)) {
+	struct async_merge_part *me;
+	me = container_of(self, struct async_merge_part, amp_part_lop);
+	me->amp_part_post_lop.oplo_func = &async_merge_ftxlck_post_cb;
+	return &me->amp_part_post_lop;
+}
+#endif
+
+/* Same as `async_waitfor_part_and_mergepart()', but wait for a given futex-lock. */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_ftxlck_and_mergepart)(struct mpart *part_to_wait,
+                                                  struct mpart *part_to_merge) {
+	struct async_merge_part *lop;
+	assert(mpart_lock_acquired(part_to_merge));
+	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
+		return false;
+	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	if (!lop) {
+		async_merge_all_parts_including(part_to_merge);
+		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if (!lop)
+			return false; /* Merging will be done asynchronously. */
+	}
+	/* Insert the newly created lock-op. */
+	lop->amp_mergeme           = incref(part_to_merge);
+	lop->amp_part_lop.olo_func = &async_merge_ftxlck_cb;
+	SLIST_ATOMIC_INSERT(&part_to_wait->mp_meta->mpm_ftxlops,
+	                    &lop->amp_part_lop, olo_link);
+	return true;
+}
+
+
+/* Called after a lock to `file' becomes available. */
+#if 1
 STATIC_ASSERT(offsetof(struct async_merge_part, amp_file_post_lop) ==
               offsetof(struct async_merge_part, amp_part_post_lop));
 #define async_merge_file_post_cb \
 	(*(void (FCALL *)(Tobpostlockop(struct mfile) *__restrict, struct mfile *__restrict))&async_merge_part_post_cb)
+#define async_merge_file_cb \
+	(*(Tobpostlockop(struct mfile) *(FCALL *)(Toblockop(struct mfile) *__restrict, struct mfile *__restrict))&async_merge_part_cb)
 #else
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_merge_file_post_cb)(Tobpostlockop(struct mfile) *__restrict self,
@@ -1598,7 +1698,6 @@ NOTHROW(FCALL async_merge_file_post_cb)(Tobpostlockop(struct mfile) *__restrict 
 	merged = mpart_merge(merged);
 	decref_unlikely(merged);
 }
-#endif
 
 PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mfile) *
 NOTHROW(FCALL async_merge_file_cb)(Toblockop(struct mfile) *__restrict self,
@@ -1608,6 +1707,7 @@ NOTHROW(FCALL async_merge_file_cb)(Toblockop(struct mfile) *__restrict self,
 	me->amp_file_post_lop.oplo_func = &async_merge_file_post_cb;
 	return &me->amp_file_post_lop;
 }
+#endif
 
 /* Same as `async_waitfor_part_and_mergepart()', but wait for a given file. */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
@@ -1641,6 +1741,8 @@ STATIC_ASSERT(offsetof(struct async_merge_part, amp_mman_post_lop) ==
               offsetof(struct async_merge_part, amp_part_post_lop));
 #define async_merge_mman_post_cb \
 	(*(void (FCALL *)(Tobpostlockop(struct mman) *__restrict, struct mman *__restrict))&async_merge_part_post_cb)
+#define async_merge_mman_cb \
+	(*(Tobpostlockop(struct mman) *(FCALL *)(Toblockop(struct mman) *__restrict, struct mman *__restrict))&async_merge_part_cb)
 #else
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_merge_mman_post_cb)(Tobpostlockop(struct mman) *__restrict self,
@@ -1654,7 +1756,6 @@ NOTHROW(FCALL async_merge_mman_post_cb)(Tobpostlockop(struct mman) *__restrict s
 	merged = mpart_merge(merged);
 	decref_unlikely(merged);
 }
-#endif
 
 PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
 NOTHROW(FCALL async_merge_mman_cb)(Toblockop(struct mman) *__restrict self,
@@ -1664,6 +1765,7 @@ NOTHROW(FCALL async_merge_mman_cb)(Toblockop(struct mman) *__restrict self,
 	me->amp_mman_post_lop.oplo_func = &async_merge_mman_post_cb;
 	return &me->amp_mman_post_lop;
 }
+#endif
 
 /* Same as `async_waitfor_part_and_mergepart()', but wait for a given mman. */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
@@ -1725,7 +1827,7 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self) {
 				return self;
 			} else {
 				/* Try to merge the 2 parts. */
-				merged = mpart_domerge_with_file_lock(neighbor, self);
+				merged = mpart_domerge_with_file_lock(neighbor, self, self);
 				if (merged == MPART_MERGE_CANNOT_MERGE ||
 				    merged == MPART_MERGE_ASYNC_WAITFOR) {
 					mpart_lock_release(neighbor);
@@ -1762,7 +1864,7 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self) {
 				return self;
 			} else {
 				/* Try to merge the 2 parts. */
-				merged = mpart_domerge_with_file_lock(self, neighbor);
+				merged = mpart_domerge_with_file_lock(self, neighbor, self);
 				if (merged == MPART_MERGE_CANNOT_MERGE ||
 				    merged == MPART_MERGE_ASYNC_WAITFOR) {
 					mpart_lock_release(neighbor);

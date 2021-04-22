@@ -25,6 +25,7 @@
 #include <kernel/arch/mman/rtm.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
+#include <sched/lockop.h>
 #include <sched/signal.h>
 
 #include <hybrid/sequence/list.h>
@@ -80,15 +81,27 @@ struct mfutex {
 	                                              * (relative to mfu_part; within the R/B-tree)
 	                                              * NOTE: The least-significant bit  is used  as R/B-bit,  meaning
 	                                              *       that part addresses must be aligned by at least 2 bytes. */
+#ifdef __WANT_MFUTEX__mfu_dead
 	union {
 		LLRBTREE_NODE(struct mfutex) mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
-		SLIST_ENTRY(mfutex)         _mfu_dead2;  /* Used internally */
+		SLIST_ENTRY(mfutex)         _mfu_dead;   /* Used internally */
 	};
+#else /* __WANT_MFUTEX__mfu_dead */
+	LLRBTREE_NODE(struct mfutex)     mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
+#endif /* !__WANT_MFUTEX__mfu_dead */
+#ifdef __WANT_MFUTEX__mfu_lop
 	union {
-		struct sig                   mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
-		SLIST_ENTRY(mfutex)         _mfu_dead;   /* [valid_if(mfu_refcnt == 0)][lock(ATOMIC)]
-		                                          * Entry within the list of dead mem-futex objects. */
+		struct {
+			struct sig               mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
+			void                   *_mfu_pad;    /* ... */
+		};
+		Toblockop(struct mpart)     _mfu_lop;    /* [valid_if(mfu_refcnt == 0)] Used internally. */
+		Tobpostlockop(struct mpart) _mfu_plop;   /* [valid_if(mfu_refcnt == 0)] Used internally. */
 	};
+#else /* __WANT_MFUTEX__mfu_lop */
+	struct sig                       mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
+	void                           *_mfu_pad;    /* ... */
+#endif /* !__WANT_MFUTEX__mfu_lop */
 };
 
 #define mfutex_init(self, part, addr)     \
@@ -136,9 +149,8 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mfutex_tree_removenode)(struct
 
 struct mpartmeta {
 	struct atomic_rwlock              mpm_ftxlock;  /* Lock for `mpm_ftx' */
-	LLRBTREE_ROOT(WEAK struct mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)]   Futex   tree.
-	                                                 * NOTE: May contain dead futex objects! */
-	struct WEAK mfutex_slist          mpm_ftx_dead; /* [0..n][lock(ATOMIC)] Chain of dead futex objects. */
+	Toblockop_slist(struct mpart)     mpm_ftxlops;  /* [0..n][lock(ATOMIC)] Lock operations for `mpm_ftxlock'. */
+	LLRBTREE_ROOT(WEAK struct mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree. (May contain dead futex objects) */
 	WEAK refcnt_t                     mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
 	                                                 * # of DMA locks referencing the associated part. */
 	struct sig                        mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
@@ -165,48 +177,38 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 #define mpartmeta_init(self)                   \
 	(atomic_rwlock_init(&(self)->mpm_ftxlock), \
 	 (self)->mpm_ftx = __NULLPTR,              \
-	 SLIST_INIT(&(self)->mpm_ftx_dead),        \
+	 SLIST_INIT(&(self)->mpm_ftxlops),         \
 	 sig_init(&(self)->mpm_dma_done)           \
 	 __mpartmeta_init_rtm(self))
-#define mpartmeta_cinit(self)                             \
-	(atomic_rwlock_cinit(&(self)->mpm_ftxlock),           \
-	 __hybrid_assert((self)->mpm_ftx == __NULLPTR),       \
-	 __hybrid_assert(SLIST_EMPTY(&(self)->mpm_ftx_dead)), \
-	 sig_cinit(&(self)->mpm_dma_done)                     \
+#define mpartmeta_cinit(self)                            \
+	(atomic_rwlock_cinit(&(self)->mpm_ftxlock),          \
+	 __hybrid_assert((self)->mpm_ftx == __NULLPTR),      \
+	 __hybrid_assert(SLIST_EMPTY(&(self)->mpm_ftxlops)), \
+	 sig_cinit(&(self)->mpm_dma_done)                    \
 	 __mpartmeta_cinit_rtm(self))
 
 
-/* Reap dead futex objects of `self' */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mpartmeta_deadftx_reap)(struct mpartmeta *__restrict self);
-#define mpartmeta_deadftx_mustreap(self) \
-	(__hybrid_atomic_load((self)->mpm_ftx_dead.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
-#ifdef __OPTIMIZE_SIZE__
-#define mpartmeta_deadftx_reap(self) _mpartmeta_deadftx_reap(self)
-#else /* __OPTIMIZE_SIZE__ */
-#define mpartmeta_deadftx_reap(self) (void)(!mpartmeta_deadftx_mustreap(self) || (_mpartmeta_deadftx_reap(self), 0))
-#endif /* !__OPTIMIZE_SIZE__ */
-
-
 /* Lock accessor helpers for the futex tree of `struct mpartmeta' */
-#define mpartmeta_ftxlock_write(self)      atomic_rwlock_write(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->mpm_ftxlock), mpartmeta_deadftx_reap(self))
-#define mpartmeta_ftxlock_endwrite_f(self) atomic_rwlock_endwrite(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_read(self)       atomic_rwlock_read(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_read_nx(self)    atomic_rwlock_read_nx(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_tryread(self)    atomic_rwlock_tryread(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_endread(self)    (void)(atomic_rwlock_endread(&(self)->mpm_ftxlock) && (mpartmeta_deadftx_reap(self), 0))
-#define mpartmeta_ftxlock_end(self)        (void)(atomic_rwlock_end(&(self)->mpm_ftxlock) && (mpartmeta_deadftx_reap(self), 0))
-#define mpartmeta_ftxlock_upgrade(self)    atomic_rwlock_upgrade(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_reading(self)    atomic_rwlock_reading(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_writing(self)    atomic_rwlock_writing(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_canread(self)    atomic_rwlock_canread(&(self)->mpm_ftxlock)
-#define mpartmeta_ftxlock_canwrite(self)   atomic_rwlock_canwrite(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_reap(self, part)     oblockop_reap_atomic_rwlock(&(self)->mpm_ftxlops, &(self)->mpm_ftxlock, part)
+#define _mpartmeta_ftxlock_reap(self, part)    _oblockop_reap_atomic_rwlock(&(self)->mpm_ftxlops, &(self)->mpm_ftxlock, part)
+#define mpartmeta_ftxlock_write(self)          atomic_rwlock_write(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_write_nx(self)       atomic_rwlock_write_nx(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_trywrite(self)       atomic_rwlock_trywrite(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_endwrite(self, part) (atomic_rwlock_endwrite(&(self)->mpm_ftxlock), mpartmeta_ftxlock_reap(self, part))
+#define mpartmeta_ftxlock_endwrite_f(self)     atomic_rwlock_endwrite(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_read(self)           atomic_rwlock_read(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_read_nx(self)        atomic_rwlock_read_nx(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_tryread(self)        atomic_rwlock_tryread(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_endread(self, part)  (void)(atomic_rwlock_endread(&(self)->mpm_ftxlock) && (mpartmeta_ftxlock_reap(self, part), 0))
+#define mpartmeta_ftxlock_end(self, part)      (void)(atomic_rwlock_end(&(self)->mpm_ftxlock) && (mpartmeta_ftxlock_reap(self, part), 0))
+#define mpartmeta_ftxlock_upgrade(self)        atomic_rwlock_upgrade(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_upgrade_nx(self)     atomic_rwlock_upgrade_nx(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_tryupgrade(self)     atomic_rwlock_tryupgrade(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_downgrade(self)      atomic_rwlock_downgrade(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_reading(self)        atomic_rwlock_reading(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_writing(self)        atomic_rwlock_writing(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_canread(self)        atomic_rwlock_canread(&(self)->mpm_ftxlock)
+#define mpartmeta_ftxlock_canwrite(self)       atomic_rwlock_canwrite(&(self)->mpm_ftxlock)
 
 
 

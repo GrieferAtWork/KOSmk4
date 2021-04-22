@@ -19,6 +19,8 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPARTMETA_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPARTMETA_C 1
+#define __WANT_MFUTEX__mfu_lop
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -45,6 +47,32 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
+/* Assert consistency of `__WANT_MFUTEX__mfu_lop' */
+STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Toblockop(struct mpart)));
+STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(struct mpart)));
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(struct mpart) *__restrict _lop,
+                                                REF struct mpart *__restrict part) {
+	struct mfutex *me;
+	me = container_of(_lop, struct mfutex, _mfu_plop);
+	decref_unlikely(part);
+	mfutex_free(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
+NOTHROW(FCALL mfutex_remove_from_mpart_lop)(Toblockop(struct mpart) *__restrict _lop,
+                                            REF struct mpart *__restrict part) {
+	struct mfutex *me;
+	me = container_of(_lop, struct mfutex, _mfu_lop);
+
+	/* Remove the mem-futex from the tree ourselves. */
+	mfutex_tree_removenode(&part->mp_meta->mpm_ftx, me);
+
+	/* Drop the part reference, and free the futex itself later. */
+	me->_mfu_plop.oplo_func = &mfutex_remove_from_mpart_postlop;
+	return &me->_mfu_plop;
+}
 
 /* Destroy the given mem-futex. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -62,19 +90,21 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 		if (mpartmeta_ftxlock_trywrite(meta)) {
 			/* Remove the mem-futex from the tree ourselves. */
 			mfutex_tree_removenode(&meta->mpm_ftx, self);
-			mpartmeta_ftxlock_endwrite(meta);
+			mpartmeta_ftxlock_endwrite(meta, part);
 		} else {
 			/* Enqueue the futex for lazy removal. */
-			SLIST_ATOMIC_INSERT(&meta->mpm_ftx_dead, self, _mfu_dead);
+			incref(part); /* Inherited by `mfutex_remove_from_mpart_lop()' */
+			self->_mfu_lop.olo_func = &mfutex_remove_from_mpart_lop;
+			SLIST_ATOMIC_INSERT(&meta->mpm_ftxlops, &self->_mfu_lop, olo_link);
 
 			/* Reap dead futex objects associated with the meta-controller. */
-			mpartmeta_deadftx_reap(meta);
+			mpartmeta_ftxlock_reap(meta, part);
 			decref_unlikely(part);
 			return;
 		}
 
 		/* Cleanup... */
-		decref(part);
+		decref_unlikely(part);
 	}
 
 	/* Free the futex object itself. */
@@ -129,48 +159,17 @@ again:
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self) {
+	assert(SLIST_EMPTY(&self->mpm_ftxlops));
 
 	/* For every futex apart of `mpm_ftx', clear the `mfu_part' pointer. */
 	if (self->mpm_ftx != NULL)
 		mfutex_tree_clear_all_parts(self->mpm_ftx);
-
-	/* Make sure to free all still-pending dead futex objects. */
-	while (!SLIST_EMPTY(&self->mpm_ftx_dead)) {
-		struct mfutex *dead_futex;
-		dead_futex = SLIST_FIRST(&self->mpm_ftx_dead);
-		SLIST_REMOVE_HEAD(&self->mpm_ftx_dead, _mfu_dead);
-		/* Normally, we'd also have to remove the futex from our `mpm_ftx'
-		 * tree, however since that tree will be free'd in a moment, also,
-		 * there's really no point is doing so! */
-		mfutex_free(dead_futex);
-	}
 
 	/* Free the meta-data controller. */
 	kfree(self);
 }
 
 
-
-/* Reap dead futex objects of `self' */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _mpartmeta_deadftx_reap)(struct mpartmeta *__restrict self) {
-	struct mfutex *ftx, *iter;
-again:
-	if (!atomic_rwlock_trywrite(&self->mpm_ftxlock))
-		return;
-	ftx = SLIST_ATOMIC_CLEAR(&self->mpm_ftx_dead);
-	for (iter = ftx; iter; iter = SLIST_NEXT(iter, _mfu_dead))
-		mfutex_tree_removenode(&self->mpm_ftx, iter);
-	atomic_rwlock_endwrite(&self->mpm_ftxlock);
-	while (ftx) {
-		struct mfutex *next;
-		next = SLIST_NEXT(ftx, _mfu_dead);
-		mfutex_free(ftx);
-		ftx = next;
-	}
-	if (mpartmeta_deadftx_mustreap(self))
-		goto again;
-}
 
 
 
@@ -221,7 +220,7 @@ again:
 	if unlikely(file_position < mpart_getminaddr(self) ||
 	            file_position > mpart_getmaxaddr(self)) {
 		result = MPART_FUTEX_OOB;
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, self);
 		goto done;
 	}
 	partrel_offset = (mpart_reladdr_t)(file_position - mpart_getminaddr(self));
@@ -229,7 +228,7 @@ again:
 	/* Check for an existing futex. */
 	result = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
 	if (result && tryincref(result)) {
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, self);
 		goto done;
 	}
 
@@ -240,7 +239,7 @@ again:
 	                                         GFP_ATOMIC);
 	if unlikely(!result) {
 		struct mfutex *old_futex;
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, self);
 		result = (REF struct mfutex *)kmalloc(sizeof(struct mfutex),
 		                                      GFP_NORMAL);
 		TRY {
@@ -253,7 +252,7 @@ check_old_futex:
 		if unlikely(file_position < mpart_getminaddr(self) ||
 		            file_position > mpart_getmaxaddr(self)) {
 			kfree(result);
-			mpartmeta_ftxlock_endwrite(meta);
+			mpartmeta_ftxlock_endwrite(meta, self);
 			result = MPART_FUTEX_OOB;
 			goto done;
 		}
@@ -266,7 +265,7 @@ check_old_futex:
 			old_futex = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
 			assert(old_futex);
 			refok = tryincref(old_futex);
-			mpartmeta_ftxlock_endwrite(meta);
+			mpartmeta_ftxlock_endwrite(meta, self);
 			kfree(result);
 			if likely(refok)
 				return old_futex;
@@ -287,7 +286,7 @@ check_old_futex:
 		/* Insert the new futex into the tree. */
 		mfutex_tree_insert(&meta->mpm_ftx, result);
 	}
-	mpartmeta_ftxlock_endwrite(meta);
+	mpartmeta_ftxlock_endwrite(meta, self);
 done:
 	return result;
 }
@@ -322,7 +321,7 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
 		} else {
 			result = MPART_FUTEX_OOB;
 		}
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, self);
 	} else {
 		/* Must still validate that this part is mapping the given `file_position' */
 		mpart_lock_acquire(self);
@@ -408,7 +407,7 @@ unlock_file_and_done:
 		result = mfutex_tree_locate(meta->mpm_ftx, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, part);
 		mfile_lock_endread(self);
 	} else {
 		/* Must acquire a temporary reference to the part,
@@ -420,14 +419,14 @@ unlock_file_and_done:
 		mpartmeta_ftxlock_read(meta);
 		if unlikely(addr < mpart_getminaddr(part) ||
 		            addr > mpart_getminaddr(part)) {
-			mpartmeta_ftxlock_endread(meta);
+			mpartmeta_ftxlock_endread(meta, part);
 			goto again;
 		}
 		reladdr = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
 		result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, part);
 	}
 done:
 	return result;
@@ -507,7 +506,7 @@ unlock_mman_and_return_null:
 		result = mfutex_tree_locate(meta->mpm_ftx, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, part);
 		mman_lock_endread(self);
 	} else {
 		/* Must acquire a temporary reference to the part,
@@ -529,14 +528,14 @@ unlock_mman_and_return_null:
 		 * gotten split in the mean time. */
 		if unlikely(filepos < mpart_getminaddr(part) ||
 		            filepos > mpart_getmaxaddr(part)) {
-			mpartmeta_ftxlock_endread(meta);
+			mpartmeta_ftxlock_endread(meta, part);
 			goto again;
 		}
 		reladdr = (mpart_reladdr_t)(filepos - mpart_getminaddr(part));
 		result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
-		mpartmeta_ftxlock_endread(meta);
+		mpartmeta_ftxlock_endread(meta, part);
 	}
 	return result;
 }

@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_SPLIT_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_SPLIT_C 1
 #define __WANT_MNODE__mn_alloc
+#define __WANT_MFUTEX__mfu_dead
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -368,7 +369,7 @@ NOTHROW(FCALL mpart_split_data_fini)(struct mpart_split_data *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unlockall)(struct mpart *__restrict self) {
 	if (self->mp_meta != NULL)
-		mpartmeta_ftxlock_endwrite(self->mp_meta);
+		mpartmeta_ftxlock_endwrite(self->mp_meta, self);
 	mpart_unlock_all_mmans(self);
 	mpart_foreach_mmans_decref(self);
 	mpart_lock_release(self);
@@ -1207,7 +1208,7 @@ clear_hipart_changed_bit:
 		struct mfutex_slist dead_mfutex;
 		assert(himeta != NULL);
 		atomic_rwlock_cinit_write(&himeta->mpm_ftxlock);
-		assert(SLIST_EMPTY(&himeta->mpm_ftx_dead));
+		assert(SLIST_EMPTY(&himeta->mpm_ftxlops));
 		assert(himeta->mpm_ftx == NULL);
 		hipart->mp_meta = himeta; /* Fill in the meta-data field of the hi-part. */
 		COMPILER_WRITE_BARRIER();
@@ -1224,7 +1225,7 @@ clear_hipart_changed_bit:
 				mfutex_tree_insert(&himeta->mpm_ftx, ftx);
 			} else {
 				/* Futex is already dead... */
-				SLIST_INSERT(&dead_mfutex, ftx, _mfu_dead2);
+				SLIST_INSERT(&dead_mfutex, ftx, _mfu_dead);
 			}
 		}
 		/* Must re-insert dead futex objects into the old tree, such that
@@ -1232,7 +1233,7 @@ clear_hipart_changed_bit:
 		if unlikely(!SLIST_EMPTY(&dead_mfutex)) {
 			do {
 				ftx = SLIST_FIRST(&dead_mfutex);
-				SLIST_REMOVE_HEAD(&dead_mfutex, _mfu_dead2);
+				SLIST_REMOVE_HEAD(&dead_mfutex, _mfu_dead);
 				mfutex_tree_insert(&lometa->mpm_ftx, ftx);
 			} while (!SLIST_EMPTY(&dead_mfutex));
 		}
@@ -1249,8 +1250,8 @@ clear_hipart_changed_bit:
 		/* Must reap dead futex objects once again, but this time only have to
 		 * do so because we've just released our locks to the meta-data  futex
 		 * trees! */
-		mpartmeta_deadftx_reap(himeta);
-		mpartmeta_deadftx_reap(lometa);
+		mpartmeta_ftxlock_reap(himeta, hipart);
+		mpartmeta_ftxlock_reap(lometa, lopart);
 	} else {
 		if unlikely(data.msd_himeta != NULL) {
 			kfree(data.msd_himeta);
