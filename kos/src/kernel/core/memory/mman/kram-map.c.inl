@@ -573,6 +573,7 @@ do_prefault:
 
 		/* Insert the new node into the kernel mman. */
 		mman_mappings_insert(&mman_kernel, node);
+		mnode_merge(node);
 
 unlock_and_done:
 		mman_lock_release(&mman_kernel);

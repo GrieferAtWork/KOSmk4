@@ -210,6 +210,13 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 
 	/* Insert the new node into the kernel and release our lock to it. */
 	mman_mappings_insert(&mman_kernel, node);
+
+	/* Technically, we'd have to merge the  node at this point, but  since
+	 * that part's kind-of optional, and since we only get here if there's
+	 * something _really_ wrong with the kernel, try to keep a low profile
+	 * and not make any non-mandatory calls... */
+	/*mnode_merge(node);*/
+
 #ifdef CONFIG_HAVE_DEBUGGER
 	if (haslock)
 #endif /* CONFIG_HAVE_DEBUGGER */

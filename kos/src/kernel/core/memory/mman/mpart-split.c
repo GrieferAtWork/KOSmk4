@@ -1265,7 +1265,7 @@ clear_hipart_changed_bit:
 	 *       when it comes to writing to its fields. */
 #ifdef LIBVIO_CONFIG_ENABLED
 	if (hipart->mp_state == MPART_ST_VIO) {
-		DBG_memset(&hipart->mp_allparts, 0xcc, sizeof(hipart->mp_allparts));
+		LIST_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);
 	} else
 #endif /* LIBVIO_CONFIG_ENABLED */
 	{

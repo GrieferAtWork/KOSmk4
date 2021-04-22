@@ -378,10 +378,14 @@ again_prefault:
 		}
 	}
 
-	/* Release locks. */
-	mman_lock_release_f(self);
+	/* Release part locks. */
 	mrangelock_release(&rl);
-	mman_lockops_reap(self);
+
+	/* Try to merge nodes. */
+	mman_mergenodes_inrange(self, minaddr, maxaddr);
+
+	/* Release the mman-lock. */
+	mman_lock_release(self);
 }
 
 
@@ -450,10 +454,14 @@ again:
 		}
 	}
 
-	/* Release locks. */
-	mman_lock_release_f(self);
+	/* Release part locks. */
 	mrangelock_release(&rl);
-	mman_lockops_reap(self);
+
+	/* Try to merge nodes. */
+	mman_mergenodes_inrange(self, minaddr, maxaddr);
+
+	/* Release the mman-lock. */
+	mman_lock_release(self);
 }
 
 

@@ -830,6 +830,9 @@ done:
 #define UEM_TRYCREATE_UNLOCKED       ((REF struct userelf_module *)-1)
 #define UEM_TRYCREATE_UNLOCKED_NOUEM ((REF struct userelf_module *)-2)
 
+/* Same as `UEM_TRYCREATE_UNLOCKED', but must call `mman_mergenodes()' if nothing can be bound. */
+#define UEM_TRYCREATE_UNLOCKED_MERGE ((REF struct userelf_module *)-3)
+
 
 
 /* Try to create  a UserELF  module based on  the knowledge  that
@@ -988,6 +991,7 @@ uem_create_from_mapping(struct mman *__restrict self,
 	TRY {
 		uint16_t i;
 		uintptr_t loadaddr;
+		bool must_split_phdr_nodes;
 
 		/* Validate that all program headers look like OK Elf_Phdr items! */
 		for (i = 0; i < phnum; ++i) {
@@ -1098,6 +1102,7 @@ something_changed:
 		}
 
 		/* Verify that all PT_LOAD-segments of `result' are mapped correctly. */
+		must_split_phdr_nodes = false;
 		for (i = 0; i < phnum; ++i) {
 			struct mnode *node;
 			struct mnode_tree_minmax mima;
@@ -1122,6 +1127,13 @@ something_changed:
 			mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
 			if unlikely(!mima.mm_min)
 				goto not_an_elf_file_phdrv_result_mmlock;
+			if unlikely(minaddr < (byte_t *)mnode_getminaddr(mima.mm_min))
+				goto not_an_elf_file_phdrv_result_mmlock;
+			if unlikely(maxaddr > (byte_t *)mnode_getmaxaddr(mima.mm_max))
+				goto not_an_elf_file_phdrv_result_mmlock;
+			if unlikely(minaddr > (byte_t *)mnode_getminaddr(mima.mm_min) ||
+			            maxaddr < (byte_t *)mnode_getmaxaddr(mima.mm_max))
+				must_split_phdr_nodes = true;
 			if (result->md_loadmin > minaddr)
 				result->md_loadmin = minaddr;
 			if (result->md_loadmax < maxaddr)
@@ -1239,6 +1251,43 @@ set_node_nullptr:
 			}
 		}
 
+		if (must_split_phdr_nodes) {
+			for (i = 0; i < phnum; ++i) {
+				struct mnode_tree_minmax mima;
+				byte_t *minaddr, *maxaddr;
+				if (UM_field_r(sizeof_pointer, phdrv, [i].p_type) != PT_LOAD)
+					continue; /* Allow anything for non-load headers! */
+				minaddr = (byte_t *)UM_field_r(sizeof_pointer, phdrv, [i].p_vaddr) + loadaddr;
+				maxaddr = (byte_t *)minaddr + UM_field_r(sizeof_pointer, phdrv, [i].p_memsz);
+				minaddr = (byte_t *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
+				maxaddr = (byte_t *)CEIL_ALIGN((uintptr_t)maxaddr, PAGESIZE) - 1;
+				assert(minaddr < maxaddr);
+again_locate_minmax:
+				mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
+				/* If necessary, split larger nodes at program header bounds. */
+				TRY {
+					if unlikely(minaddr > (byte_t *)mnode_getminaddr(mima.mm_min)) {
+						if (!mnode_split_or_unlock(self, mima.mm_min, minaddr, NULL)) {
+something_changed_merge:
+							mman_lock_release(self);
+							kfree(result);
+							freea(UM_any(phdrv));
+							return UEM_TRYCREATE_UNLOCKED_MERGE;
+						}
+						goto again_locate_minmax;
+					}
+					if unlikely(maxaddr < (byte_t *)mnode_getmaxaddr(mima.mm_max)) {
+						if (!mnode_split_or_unlock(self, mima.mm_max, maxaddr + 1, NULL))
+							goto something_changed_merge;
+						goto again_locate_minmax;
+					}
+				} EXCEPT {
+					mman_mergenodes(self);
+					RETHROW();
+				}
+			}
+		}
+
 		/* Add self-pointers for `result' to `self'. */
 		for (i = 0; i < phnum; ++i) {
 			struct mnode *node;
@@ -1252,6 +1301,8 @@ set_node_nullptr:
 			maxaddr = (byte_t *)CEIL_ALIGN((uintptr_t)maxaddr, PAGESIZE) - 1;
 			assert(minaddr < maxaddr);
 			mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
+			assert(minaddr == (byte_t *)mnode_getminaddr(mima.mm_min));
+			assert(maxaddr == (byte_t *)mnode_getmaxaddr(mima.mm_max));
 			assert(mima.mm_min);
 			assert(result->md_loadmin <= minaddr);
 			assert(result->md_loadmax >= maxaddr);
@@ -1281,7 +1332,7 @@ set_node_nullptr:
 			}
 		}
 		if unlikely(result->md_nodecount == 0)
-			goto not_an_elf_file_phdrv_result_mmlock; /* _really_ shouldn't happen... */
+			goto not_an_elf_file_phdrv_result_mmlock_mergenodes; /* _really_ shouldn't happen... */
 
 		/* Add `result' to the cache of `self'.
 		 * NOTE: The reference inherited here was accounted for by the init of `md_refcnt'! */
@@ -1292,6 +1343,7 @@ set_node_nullptr:
 		xincref(result->md_fsname);
 		result->md_mman = weakincref(self);
 		result->md_file = incref(file);
+		mman_mergenodes_inrange(self, result->md_loadmin, result->md_loadmax);
 		mman_lock_release(self);
 	} EXCEPT {
 		freea(UM_any(phdrv));
@@ -1299,6 +1351,8 @@ set_node_nullptr:
 	}
 	freea(UM_any(phdrv));
 	return result;
+not_an_elf_file_phdrv_result_mmlock_mergenodes:
+	mman_mergenodes_locked(self);
 not_an_elf_file_phdrv_result_mmlock:
 	mman_lock_release(self);
 /*not_an_elf_file_phdrv_result:*/
@@ -1572,7 +1626,9 @@ uem_create_system_rtld(struct mman *__restrict self,
 				if unlikely(!part) {
 something_changed:
 					mman_lock_release(self);
+					kfree(UM_any(shdrs));
 					kfree(result);
+					decref_unlikely(file);
 					return UEM_TRYCREATE_UNLOCKED;
 				}
 				if unlikely(ATOMIC_READ(part->mp_file) != rtld_file)
@@ -1590,6 +1646,7 @@ something_changed:
 				mman_mappings_minmaxlocate(self, result->md_loadmin,
 				                           result->md_loadmax, &mima);
 				if likely(mima.mm_min != NULL) {
+
 					/* Check if there is already a module mapping here... */
 					for (node = mima.mm_min;;) {
 						if unlikely(node->mn_module != NULL) {
@@ -1628,9 +1685,42 @@ set_node_nullptr:
 							break;
 						node = mnode_tree_nextnode(node);
 					}
+
+					/* Deal with previously merged nodes. */
+					if unlikely(result->md_loadmin != (byte_t *)mnode_getminaddr(mima.mm_min) ||
+					            result->md_loadmax != (byte_t *)mnode_getmaxaddr(mima.mm_max)) {
+						if unlikely(result->md_loadmin < (byte_t *)mnode_getminaddr(mima.mm_min))
+							goto not_an_elf_file_shdrs_result_mmlock;
+						if unlikely(result->md_loadmax > (byte_t *)mnode_getmaxaddr(mima.mm_max))
+							goto not_an_elf_file_shdrs_result_mmlock;
+						TRY {
+							if (result->md_loadmin > (byte_t *)mnode_getminaddr(mima.mm_min)) {
+								if (!mnode_split_or_unlock(self, mima.mm_min, result->md_loadmin, NULL)) {
+something_changed_merge:
+									mman_lock_release(self);
+									kfree(UM_any(shdrs));
+									kfree(result);
+									decref_unlikely(file);
+									return UEM_TRYCREATE_UNLOCKED_MERGE;
+								}
+								mman_mappings_minmaxlocate(self, result->md_loadmin,
+								                           result->md_loadmax, &mima);
+							}
+							if (result->md_loadmax < (byte_t *)mnode_getmaxaddr(mima.mm_max)) {
+								if (!mnode_split_or_unlock(self, mima.mm_max, result->md_loadmax + 1, NULL))
+									goto something_changed_merge;
+								mman_mappings_minmaxlocate(self, result->md_loadmin,
+								                           result->md_loadmax, &mima);
+							}
+						} EXCEPT {
+							mman_mergenodes(self);
+							RETHROW();
+						}
+					}
+
+					/* Set the module self-pointers. */
 					for (node = mima.mm_min;;) {
 						assert(!node->mn_module);
-						/* Set the module self-pointer. */
 						node->mn_module = result;
 						++result->md_nodecount;
 						if (node == mima.mm_max)
@@ -1641,7 +1731,7 @@ set_node_nullptr:
 			}
 
 			if unlikely(result->md_nodecount == 0)
-				goto not_an_elf_file_shdrs_result_mmlock; /* _really_ shouldn't happen... */
+				goto not_an_elf_file_shdrs_result_mmlock_mergenodes; /* _really_ shouldn't happen... */
 
 			/* Add `result' to the cache of `self'.
 			 * NOTE: The reference inherited here was accounted for by the init of `md_refcnt'! */
@@ -1661,6 +1751,8 @@ set_node_nullptr:
 		RETHROW();
 	}
 	return result;
+not_an_elf_file_shdrs_result_mmlock_mergenodes:
+	mman_mergenodes_locked(self);
 not_an_elf_file_shdrs_result_mmlock:
 	mman_lock_release(self);
 	kfree(result);
@@ -1874,9 +1966,10 @@ uem_trycreate(struct mman *__restrict self,
 			 * original node. - Do this by disallowing the inner callee
 			 * from checking our original node for adjacency. */
 			result = uem_trycreate(self, neighbor, i == 0 ? 1 : 0);
-			if (result == UEM_TRYCREATE_UNLOCKED) {
+			if (result == UEM_TRYCREATE_UNLOCKED ||
+			    result == UEM_TRYCREATE_UNLOCKED_MERGE) {
 				/* Try again... */
-				return UEM_TRYCREATE_UNLOCKED;
+				return result;
 			} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
 				/* Not the preceding node.
 				 * Acquire the mman lock and see if anything's changed. */
@@ -1943,9 +2036,10 @@ uem_trycreate(struct mman *__restrict self,
 					maxaddr = mnode_getmaxaddr(node);
 					/* Try to create a module for `neighbor' */
 					result = uem_trycreate(self, neighbor, i == 0 ? 1 : 0);
-					if (result == UEM_TRYCREATE_UNLOCKED) {
+					if (result == UEM_TRYCREATE_UNLOCKED ||
+					    result == UEM_TRYCREATE_UNLOCKED_MERGE) {
 						/* Try again... */
-						return UEM_TRYCREATE_UNLOCKED;
+						return result;
 					} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
 						/* Not the preceding node.
 						 * Acquire the mman lock and see if anything's changed. */
@@ -2050,25 +2144,41 @@ uem_fromaddr(struct mman *__restrict self,
              USER CHECKED void const *addr) {
 	REF struct userelf_module *result;
 	struct mnode *node;
+	bool must_merge;
+	must_merge = false;
+	TRY {
 again:
-	mman_lock_acquire(self);
-	node = mman_mappings_locate(self, addr);
-	if (!node) {
-		mman_lock_release(self);
-		return NULL;
+		mman_lock_acquire(self);
+		node = mman_mappings_locate(self, addr);
+		if (!node) {
+/*unlock_and_return_NULL:*/
+			if unlikely(must_merge)
+				mman_mergenodes_locked(self);
+			mman_lock_release(self);
+			return NULL;
+		}
+	
+		/* Try to create a UserELF module ontop of this node. */
+		result = uem_trycreate(self, node);
+	
+		/* Handle all of the different cases... */
+		if (result == NULL) {
+			mman_lock_release(self);
+		} else if (result == UEM_TRYCREATE_UNLOCKED) {
+			goto again;
+		} else if (result == UEM_TRYCREATE_UNLOCKED_MERGE) {
+			must_merge = true;
+			goto again;
+		} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
+			result = NULL;
+		}
+	} EXCEPT {
+		if unlikely(must_merge)
+			mman_mergenodes(self);
+		RETHROW();
 	}
-
-	/* Try to create a UserELF module ontop of this node. */
-	result = uem_trycreate(self, node);
-
-	/* Handle all of the different cases... */
-	if (result == NULL) {
-		mman_lock_release(self);
-	} else if (result == UEM_TRYCREATE_UNLOCKED) {
-		goto again;
-	} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
-		result = NULL;
-	}
+	if unlikely(must_merge)
+		mman_mergenodes(self);
 	return result;
 }
 
@@ -2078,40 +2188,55 @@ uem_aboveaddr(struct mman *__restrict self,
 	REF struct userelf_module *result;
 	struct mnode *node;
 	struct mnode_tree_minmax mima;
+	bool must_merge;
+	must_merge = false;
+	TRY {
 again:
-	mman_lock_acquire(self);
-	mman_mappings_minmaxlocate(self, addr, (void *)-1, &mima);
-	node = mima.mm_min;
-	if (!node) {
-		mman_lock_release(self);
-		return NULL;
-	}
-	for (;;) {
-		void *node_minaddr = mnode_getminaddr(node);
-		void *node_maxaddr = mnode_getmaxaddr(node);
-
-		/* Try to create a UserELF module ontop of this node. */
-		result = uem_trycreate(self, node);
-
-		/* Handle all of the different cases... */
-		if (result == NULL) {
-			if (node == mima.mm_max) {
-				mman_lock_release(self);
-				return NULL;
-			}
-			node = mnode_tree_nextnode(node);
-			assert(node);
-		} else if (result == UEM_TRYCREATE_UNLOCKED) {
-			addr = node_minaddr;
-			goto again;
-		} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
-			addr = (byte_t *)node_maxaddr + 1;
-			goto again;
-		} else {
-			/* Got it! */
-			break;
+		mman_lock_acquire(self);
+		mman_mappings_minmaxlocate(self, addr, (void *)-1, &mima);
+		node = mima.mm_min;
+		if (!node) {
+unlock_and_return_NULL:
+			if unlikely(must_merge)
+				mman_mergenodes_locked(self);
+			mman_lock_release(self);
+			return NULL;
 		}
+		for (;;) {
+			void *node_minaddr = mnode_getminaddr(node);
+			void *node_maxaddr = mnode_getmaxaddr(node);
+	
+			/* Try to create a UserELF module ontop of this node. */
+			result = uem_trycreate(self, node);
+	
+			/* Handle all of the different cases... */
+			if (result == NULL) {
+				if (node == mima.mm_max)
+					goto unlock_and_return_NULL;
+				node = mnode_tree_nextnode(node);
+				assert(node);
+			} else if (result == UEM_TRYCREATE_UNLOCKED) {
+				addr = node_minaddr;
+				goto again;
+			} else if (result == UEM_TRYCREATE_UNLOCKED_MERGE) {
+				addr       = node_minaddr;
+				must_merge = true;
+				goto again;
+			} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
+				addr = (byte_t *)node_maxaddr + 1;
+				goto again;
+			} else {
+				/* Got it! */
+				break;
+			}
+		}
+	} EXCEPT {
+		if unlikely(must_merge)
+			mman_mergenodes(self);
+		RETHROW();
 	}
+	if unlikely(must_merge)
+		mman_mergenodes(self);
 	return result;
 }
 
@@ -2122,64 +2247,81 @@ uem_next(struct mman *__restrict self,
 	struct mnode *node;
 	struct mnode_tree_minmax mima;
 	void *minaddr;
+	bool must_merge;
+
 	/* Because UserELF modules can be embedded inside of each other,
 	 * we have to start looking  for them starting immediatly  after
 	 * the original node. */
 	minaddr = prev->md_loadmin + PAGESIZE;
+
+	must_merge = false;
+	TRY {
 again:
-	mman_lock_acquire(self);
-	mman_mappings_minmaxlocate(self, minaddr, (void *)-1, &mima);
-	node = mima.mm_min;
-	if (!node) {
-		mman_lock_release(self);
-		return NULL;
-	}
-	for (;;) {
-		void *node_minaddr, *node_maxaddr;
-
-		/* Check if this node is known to be bound to the old module.
-		 * If it is, then simply skip this node! */
-		if (node->mn_module == prev) {
+		mman_lock_acquire(self);
+		mman_mappings_minmaxlocate(self, minaddr, (void *)-1, &mima);
+		node = mima.mm_min;
+		if (!node) {
+unlock_and_return_NULL:
+			if unlikely(must_merge)
+				mman_mergenodes_locked(self);
+			mman_lock_release(self);
+			return NULL;
+		}
+		for (;;) {
+			void *node_minaddr, *node_maxaddr;
+	
+			/* Check if this node is known to be bound to the old module.
+			 * If it is, then simply skip this node! */
+			if (node->mn_module == prev) {
 nextnode:
-			if (node == mima.mm_max) {
-				mman_lock_release(self);
-				return NULL;
+				if (node == mima.mm_max)
+					goto unlock_and_return_NULL;
+				node = mnode_tree_nextnode(node);
+				assert(node);
+				continue;
 			}
-			node = mnode_tree_nextnode(node);
-			assert(node);
-			continue;
+	
+			node_minaddr = mnode_getminaddr(node);
+			node_maxaddr = mnode_getmaxaddr(node);
+	
+			/* Try to create a UserELF module ontop of this node. */
+			result = uem_trycreate(self, node);
+	
+			/* Handle all of the different cases... */
+			if (result == NULL) {
+				goto nextnode;
+			} else if (result == UEM_TRYCREATE_UNLOCKED) {
+				minaddr = node_minaddr;
+				goto again;
+			} else if (result == UEM_TRYCREATE_UNLOCKED_MERGE) {
+				minaddr    = node_minaddr;
+				must_merge = true;
+				goto again;
+			} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
+				minaddr = (byte_t *)node_maxaddr + 1;
+				goto again;
+			} else if (result == prev) {
+				/* Got the same module all over again... (skip this node) */
+				minaddr = (byte_t *)node_maxaddr + 1;
+				decref_nokill(result);
+				goto again;
+			} else if (result->md_loadmin <= prev->md_loadmin) {
+				/* Got a module that is based below the current module... (skip this node) */
+				minaddr = (byte_t *)node_maxaddr + 1;
+				decref(result);
+				goto again;
+			} else {
+				/* Found the actual next UserELF module! */
+				break;
+			}
 		}
-
-		node_minaddr = mnode_getminaddr(node);
-		node_maxaddr = mnode_getmaxaddr(node);
-
-		/* Try to create a UserELF module ontop of this node. */
-		result = uem_trycreate(self, node);
-
-		/* Handle all of the different cases... */
-		if (result == NULL) {
-			goto nextnode;
-		} else if (result == UEM_TRYCREATE_UNLOCKED) {
-			minaddr = node_minaddr;
-			goto again;
-		} else if (result == UEM_TRYCREATE_UNLOCKED_NOUEM) {
-			minaddr = (byte_t *)node_maxaddr + 1;
-			goto again;
-		} else if (result == prev) {
-			/* Got the same module all over again... (skip this node) */
-			minaddr = (byte_t *)node_maxaddr + 1;
-			decref_nokill(result);
-			goto again;
-		} else if (result->md_loadmin <= prev->md_loadmin) {
-			/* Got a module that is based below the current module... (skip this node) */
-			minaddr = (byte_t *)node_maxaddr + 1;
-			decref(result);
-			goto again;
-		} else {
-			/* Found the actual next UserELF module! */
-			break;
-		}
+	} EXCEPT {
+		if unlikely(must_merge)
+			mman_mergenodes(self);
+		RETHROW();
 	}
+	if unlikely(must_merge)
+		mman_mergenodes(self);
 	return result;
 }
 

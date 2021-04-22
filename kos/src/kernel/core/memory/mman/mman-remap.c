@@ -280,7 +280,8 @@ something_changed:
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 
 		mman_mappings_insert(self, node);
-		mpart_lock_release(part);
+		node = mnode_merge_with_partlock(node);
+		mpart_lock_release(node->mn_part);
 	}
 
 	/* Now that we're done remapping stuff, we can unprepare the target range. */
@@ -484,8 +485,11 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 				 * memory manager. */
 				if (map_prot & PAGEDIR_MAP_FWRITE)
 					LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
-				mpart_lock_release(part);
 			}
+			node = mnode_merge_with_partlock(node);
+			mpart_lock_release(node->mn_part);
+		} else {
+			mnode_merge(node);
 		}
 	}
 }
@@ -541,6 +545,11 @@ again_lock_mman:
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 				      E_INVALID_ARGUMENT_CONTEXT_MREMAP_NEW_SIZE,
 				      orig_new_size);
+			}
+
+			TRY {
+			} EXCEPT {
+				RETHROW();
 			}
 			if ((flags & (MREMAP_FIXED | MREMAP_FIXED_NOREPLACE)) ==
 			    /*    */ (MREMAP_FIXED | MREMAP_FIXED_NOREPLACE)) {
@@ -654,25 +663,29 @@ err_cannot_prepare:
 
 			/* Re-insert all of the (now displaced) nodes into the tree. */
 			while (!SLIST_EMPTY(&movenodes)) {
-				u16 map_prot;
 				node = SLIST_FIRST(&movenodes);
 				SLIST_REMOVE_HEAD(&movenodes, _mn_dead);
 				mman_mappings_insert(self, node);
-				if (node->mn_part == NULL)
-					continue;
-				/* Map the backing part (as far as that is possible) */
-				map_prot = mnode_getperm(node);
-				map_prot = mpart_mmap_p(node->mn_part,
-				                        self->mm_pagedir_p,
-				                        mnode_getaddr(node),
-				                        mnode_getsize(node),
-				                        node->mn_partoff,
-				                        map_prot);
-				/* If the node was mapped with write-permissions enabled,
-				 * then add it to the  list of writable nodes within  our
-				 * memory manager. */
-				if (map_prot & PAGEDIR_MAP_FWRITE)
-					LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
+				if (node->mn_part != NULL && mpart_lock_tryacquire(node->mn_part)) {
+					u16 map_prot;
+					/* Map the backing part (as far as that is possible) */
+					map_prot = mnode_getperm(node);
+					map_prot = mpart_mmap_p(node->mn_part,
+					                        self->mm_pagedir_p,
+					                        mnode_getaddr(node),
+					                        mnode_getsize(node),
+					                        node->mn_partoff,
+					                        map_prot);
+					/* If the node was mapped with write-permissions enabled,
+					 * then add it to the  list of writable nodes within  our
+					 * memory manager. */
+					if (map_prot & PAGEDIR_MAP_FWRITE)
+						LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
+					node = mnode_merge_with_partlock(node);
+					mpart_lock_release(node->mn_part);
+				} else {
+					mnode_merge(node);
+				}
 			}
 
 			/* Unprepare address ranges prepared above.
@@ -805,27 +818,32 @@ again_lock_mman_phase2:
 					                       (byte_t *)old_address, (byte_t *)old_address + old_size));
 					move_disp = (uintptr_t)((byte_t *)result - (byte_t *)old_address);
 					while ((node = mman_mappings_rremove(self, old_address, old_maxaddr)) != NULL) {
-						u16 map_prot;
 						node->mn_minaddr += move_disp;
 						node->mn_maxaddr += move_disp;
 						if (LIST_ISBOUND(node, mn_writable))
 							LIST_UNBIND(node, mn_writable);
 						mman_mappings_insert(self, node);
-						if (node->mn_part == NULL || !did_prepare)
-							continue;
-						/* Map the backing part (as far as that is possible) */
-						map_prot = mnode_getperm(node);
-						map_prot = mpart_mmap_p(node->mn_part,
-						                        self->mm_pagedir_p,
-						                        mnode_getaddr(node),
-						                        mnode_getsize(node),
-						                        node->mn_partoff,
-						                        map_prot);
-						/* If the node was mapped with write-permissions enabled,
-						 * then add it to the  list of writable nodes within  our
-						 * memory manager. */
-						if (map_prot & PAGEDIR_MAP_FWRITE)
-							LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
+						if (node->mn_part != NULL && did_prepare &&
+						    mpart_lock_tryacquire(node->mn_part)) {
+							u16 map_prot;
+							/* Map the backing part (as far as that is possible) */
+							map_prot = mnode_getperm(node);
+							map_prot = mpart_mmap_p(node->mn_part,
+							                        self->mm_pagedir_p,
+							                        mnode_getaddr(node),
+							                        mnode_getsize(node),
+							                        node->mn_partoff,
+							                        map_prot);
+							/* If the node was mapped with write-permissions enabled,
+							 * then add it to the  list of writable nodes within  our
+							 * memory manager. */
+							if (map_prot & PAGEDIR_MAP_FWRITE)
+								LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
+							node = mnode_merge_with_partlock(node);
+							mpart_lock_release(node->mn_part);
+						} else {
+							mnode_merge(node);
+						}
 					}
 
 					/* Now inject all of the new mem-nodes we've just created. */

@@ -509,7 +509,8 @@ again_lock_mfile_map:
 				LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 
 			mman_mappings_insert(self, node);
-			mpart_lock_release(part);
+			node = mnode_merge_with_partlock(node);
+			mpart_lock_release(node->mn_part);
 		}
 #endif /* HAVE_FILE */
 
@@ -518,6 +519,7 @@ again_lock_mfile_map:
 		res_node->mn_maxaddr = (byte_t *)result + num_bytes - 1;
 		LIST_ENTRY_UNBOUND_INIT(&res_node->mn_writable);
 		mman_mappings_insert(self, res_node);
+		mnode_merge(res_node);
 #endif /* DEFINE_mman_map_res */
 	}
 #ifdef DEFINE_mman_map_subrange
@@ -554,6 +556,7 @@ again_lock_mfile_map:
 		 * up until this point we don't need (or use) any locks  on
 		 * the part, esp. since we were the ones to create it! */
 		mpart_all_list_insert(part);
+		mnode_merge(node);
 	}
 #endif /* DEFINE_mman_map_subrange */
 

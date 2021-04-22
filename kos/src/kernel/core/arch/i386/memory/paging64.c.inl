@@ -1211,11 +1211,11 @@ again_try_exchange_e2_word:
 		 *       E2-vector. */
 		page_freeone(ppageof(e3.p_word & P64_PAGE_FVECTOR));
 		if (vec4 < 256) {
-			/* There's  still  one   thing  left  which   we're  able  to   flatten:
-			 * The  512GiB E3-vector pointed  to by `P64_PDIR_E4_IDENTITY[vec4]' may
-			 * not be mergable into a 512GiB page (since those don't exist), however
-			 * what does exist are fully empty  pages, meaning that if there  aren't
-			 * any remaining mappings within this range,  then we can merge it  into
+			/* There's   still  one   thing  left   which  we're   able  to  flatten:
+			 * The 512GiB E3-vector  pointed to  by `P64_PDIR_E4_IDENTITY[vec4]'  may
+			 * not be mergeable into a 512GiB page (since those don't exist), however
+			 * what  does exist are  fully empty pages, meaning  that if there aren't
+			 * any  remaining mappings within  this range, then we  can merge it into
 			 * a non-allocated page!
 			 * Note  that this can  only be done  for user-space, since kernel-space
 			 * must always have all of its E3-vectors preallocated (and its E4-words

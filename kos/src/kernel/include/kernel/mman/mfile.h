@@ -596,9 +596,6 @@ struct mfile {
 	                                              * mask) */
 	unsigned int                  mf_blockshift; /* [const] == log2(FILE_BLOCK_SIZE) */
 
-	/* TODO: Change  `mfile_makeanon_subrange()'  to  `mfile_truncate()'  (which   can
-	 *       be used to dynamically alter the `mf_filesize' value of a given mem-file) */
-
 #ifdef CONFIG_USE_NEW_FS
 	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
 	WEAK size_t                   mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
@@ -907,21 +904,6 @@ FUNDEF NONNULL((1)) void FCALL
 mfile_delete(struct mfile *__restrict self)
 		THROWS(E_WOULDBLOCK);
 #endif /* !CONFIG_USE_NEW_FS */
-
-
-/* Split a potential part at `minaddr' and `maxaddr', and  make
- * it so that all parts between that range are removed from the
- * part-tree   of  `self',  by  essentially  anonymizing  them.
- * This function can be used to implement `ftruncate(2)'
- *
- * NOTE: Unlike `mfile_delete()', this function doesn't mark
- *       the file itself as deleted, meaning that more parts
- *       can still be created at a later point in time! */
-FUNDEF NONNULL((1)) void FCALL
-mfile_makeanon_subrange(struct mfile *__restrict self,
-                        PAGEDIR_PAGEALIGNED pos_t minaddr,
-                        pos_t maxaddr)
-		THROWS(E_WOULDBLOCK);
 
 
 /* Sync unwritten changes made to parts within the given address range.

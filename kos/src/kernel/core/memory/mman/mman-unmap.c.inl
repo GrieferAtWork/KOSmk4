@@ -110,112 +110,122 @@ mman_protect(struct mman *__restrict self,
 	if unlikely(!num_bytes)
 		return 0;
 
-	/* Lock the memory manager. */
+	TRY {
+
+		/* Lock the memory manager. */
 again_acquire_lock:
-	mman_lock_acquire(self);
+		mman_lock_acquire(self);
 
-	/* Deal with `MMAN_UNMAP_FAULTIFUNUSED' */
-	if (flags & MMAN_UNMAP_FAULTIFUNUSED) {
-		/* Make sure that the entirety of the given address range is mapped.
-		 * If it isn't, then don't do anything at all, and immediately  fail
-		 * with an exception. */
-		byte_t *addr_iter, *endaddr;
-		addr_iter = (byte_t *)addr;
-		endaddr   = (byte_t *)addr + num_bytes;
-		for (;;) {
-			node = mnode_tree_locate(self->mm_mappings, addr_iter);
-			if unlikely(!node) {
-				mman_lock_release(self);
-				THROW(E_SEGFAULT_UNMAPPED, addr_iter,
-				      E_SEGFAULT_CONTEXT_FAULT |
-				      E_SEGFAULT_CONTEXT_UNMAP);
+		/* Deal with `MMAN_UNMAP_FAULTIFUNUSED' */
+		if (flags & MMAN_UNMAP_FAULTIFUNUSED) {
+			/* Make sure that the entirety of the given address range is mapped.
+			 * If it isn't, then don't do anything at all, and immediately  fail
+			 * with an exception. */
+			byte_t *addr_iter, *endaddr;
+			addr_iter = (byte_t *)addr;
+			endaddr   = (byte_t *)addr + num_bytes;
+			for (;;) {
+				node = mnode_tree_locate(self->mm_mappings, addr_iter);
+				if unlikely(!node) {
+					mman_lock_release(self);
+					THROW(E_SEGFAULT_UNMAPPED, addr_iter,
+					      E_SEGFAULT_CONTEXT_FAULT |
+					      E_SEGFAULT_CONTEXT_UNMAP);
+				}
+				addr_iter = (byte_t *)mnode_getendaddr(node);
+				if (addr_iter >= endaddr)
+					break;
 			}
-			addr_iter = (byte_t *)mnode_getendaddr(node);
-			if (addr_iter >= endaddr)
-				break;
 		}
-	}
 
-	if (!(flags & MMAN_UNMAP_NOSPLIT)) {
-		byte_t *maxaddr;
-		/* Ensure that we're working on a properly page-aligned address range. */
-		if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {
-			num_bytes += (uintptr_t)addr & (PAGESIZE - 1);
-			addr = (byte_t *)((uintptr_t)addr & ~(PAGESIZE - 1));
-		}
-		if unlikely(!IS_ALIGNED(num_bytes, PAGESIZE))
-			num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
+		if (!(flags & MMAN_UNMAP_NOSPLIT)) {
+			byte_t *maxaddr;
+			/* Ensure that we're working on a properly page-aligned address range. */
+			if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {
+				num_bytes += (uintptr_t)addr & (PAGESIZE - 1);
+				addr = (byte_t *)((uintptr_t)addr & ~(PAGESIZE - 1));
+			}
+			if unlikely(!IS_ALIGNED(num_bytes, PAGESIZE))
+				num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 
-		/* Unless  `MMAN_UNMAP_NOSPLIT'  has  been given,  or  in the  case  of mprotect,
-		 * nothing would change about border-nodes, make use of `mnode_split_or_unlock()'
-		 * to split nodes not fully contained within the given address range. */
-		node = mnode_tree_locate(self->mm_mappings, addr);
-		if (node && mnode_getminaddr(node) != addr &&
-		    !(node->mn_flags & MNODE_F_NOSPLIT) && LOCAL_must_modify_node(node)) {
-			if (!mnode_split_or_unlock(self, node, addr, NULL))
-				goto again_acquire_lock;
+			/* Unless  `MMAN_UNMAP_NOSPLIT'  has  been given,  or  in the  case  of mprotect,
+			 * nothing would change about border-nodes, make use of `mnode_split_or_unlock()'
+			 * to split nodes not fully contained within the given address range. */
+			node = mnode_tree_locate(self->mm_mappings, addr);
+			if (node && mnode_getminaddr(node) != addr &&
+			    !(node->mn_flags & MNODE_F_NOSPLIT) && LOCAL_must_modify_node(node)) {
+				if (!mnode_split_or_unlock(self, node, addr, NULL))
+					goto again_acquire_lock;
+			}
+			maxaddr = (byte_t *)addr + num_bytes - 1;
+			node = mnode_tree_locate(self->mm_mappings, maxaddr);
+			if (node && mnode_getmaxaddr(node) != maxaddr &&
+			    !(node->mn_flags & MNODE_F_NOSPLIT) && LOCAL_must_modify_node(node)) {
+				if (!mnode_split_or_unlock(self, node, maxaddr + 1, NULL))
+					goto again_acquire_lock;
+			}
 		}
-		maxaddr = (byte_t *)addr + num_bytes - 1;
-		node = mnode_tree_locate(self->mm_mappings, maxaddr);
-		if (node && mnode_getmaxaddr(node) != maxaddr &&
-		    !(node->mn_flags & MNODE_F_NOSPLIT) && LOCAL_must_modify_node(node)) {
-			if (!mnode_split_or_unlock(self, node, maxaddr + 1, NULL))
-				goto again_acquire_lock;
-		}
-	}
 
 #ifdef DEFINE_mman_unmap
-	SLIST_INIT(&deleted_nodes);
+		SLIST_INIT(&deleted_nodes);
 #endif /* DEFINE_mman_unmap */
 
-	/* Load the range of affected memory-nodes. */
-	mnode_tree_minmaxlocate(self->mm_mappings, addr,
-	                        (byte_t *)addr + num_bytes - 1,
-	                        &mima);
-	if unlikely(mima.mm_min == NULL)
-		goto unlock_and_done;
+		/* Load the range of affected memory-nodes. */
+		mnode_tree_minmaxlocate(self->mm_mappings, addr,
+		                        (byte_t *)addr + num_bytes - 1,
+		                        &mima);
+		if unlikely(mima.mm_min == NULL)
+			goto unlock_and_done;
 
-	/* Make sure that all of the affected nodes have been prepared. */
-	for (node = mima.mm_min;;) {
-		assert(node);
+		/* Make sure that all of the affected nodes have been prepared. */
+		for (node = mima.mm_min;;) {
+			assert(node);
 #ifdef DEFINE_mman_protect
-#define LOCAL_must_prepare_node(node)                          \
-		(likely(!(node->mn_flags & MNODE_F_MPREPARED)) &&      \
-		 LOCAL_must_modify_node(node) &&                       \
-		 mnodeflags_prot_more_restrictive(node->mn_flags,      \
-		                                  (node->mn_flags &    \
-		                                   mnode_flags_mask) | \
-		                                  mnode_flags_more))
+#define LOCAL_must_prepare_node(node)                              \
+			(likely(!(node->mn_flags & MNODE_F_MPREPARED)) &&      \
+			 LOCAL_must_modify_node(node) &&                       \
+			 mnodeflags_prot_more_restrictive(node->mn_flags,      \
+			                                  (node->mn_flags &    \
+			                                   mnode_flags_mask) | \
+			                                  mnode_flags_more))
 #else /* DEFINE_mman_protect */
-#define LOCAL_must_prepare_node(node)                     \
-		(likely(!(node->mn_flags & MNODE_F_MPREPARED)) && \
-		 LOCAL_must_modify_node(node))
+#define LOCAL_must_prepare_node(node)                         \
+			(likely(!(node->mn_flags & MNODE_F_MPREPARED)) && \
+			 LOCAL_must_modify_node(node))
 #endif /* !DEFINE_mman_protect */
-		if (LOCAL_must_prepare_node(node)) {
-			if unlikely(!pagedir_prepare_p(self->mm_pagedir_p,
-			                                mnode_getaddr(node),
-			                                mnode_getsize(node))) {
-				struct mnode *iter;
-				/* Undo everything... */
-				for (iter = mima.mm_min; iter != node;
-				     iter = mnode_tree_nextnode(iter)) {
-					assert(iter);
-					if (LOCAL_must_prepare_node(iter)) {
-						pagedir_unprepare_p(self->mm_pagedir_p,
-						                    mnode_getaddr(iter),
-						                    mnode_getsize(iter));
+			if (LOCAL_must_prepare_node(node)) {
+				if unlikely(!pagedir_prepare_p(self->mm_pagedir_p,
+				                                mnode_getaddr(node),
+				                                mnode_getsize(node))) {
+					struct mnode *iter;
+					/* Undo everything... */
+					for (iter = mima.mm_min; iter != node;
+					     iter = mnode_tree_nextnode(iter)) {
+						assert(iter);
+						if (LOCAL_must_prepare_node(iter)) {
+							pagedir_unprepare_p(self->mm_pagedir_p,
+							                    mnode_getaddr(iter),
+							                    mnode_getsize(iter));
+						}
 					}
+					mman_lock_release(self);
+					/* Throw the relevant exception. */
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 				}
-				mman_lock_release(self);
-				/* Throw the relevant exception. */
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
-		}
-		if (node == mima.mm_max)
-			break;
-		node = mnode_tree_nextnode(node);
+			if (node == mima.mm_max)
+				break;
+			node = mnode_tree_nextnode(node);
 #undef LOCAL_must_prepare_node
+		}
+	} EXCEPT {
+		/* If we split them earlier, re-merge nodes if something went wrong! */
+		if (!(flags & MMAN_UNMAP_NOSPLIT))
+			mman_mergenodes(self);
+		RETHROW();
 	}
+
+	/* ==== Point of no return */
 
 	for (node = mima.mm_min;;) {
 		struct mnode *next = NULL;
@@ -317,6 +327,15 @@ next_node:
 			break;
 		node = next;
 	}
+
+#ifdef DEFINE_mman_protect
+	/* Try to re-merge nodes within the min/max bounds, since the change
+	 * in node permissions  may not allow  previously separate nodes  to
+	 * become one. */
+	mman_mergenodes_inrange(self,
+	                        (byte_t const *)addr,
+	                        (byte_t const *)addr + num_bytes - 1);
+#endif /* DEFINE_mman_protect */
 
 unlock_and_done:
 	mman_lock_release(self);

@@ -248,6 +248,12 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	/* Step #8: Re-insert the kernel-reserve node into the new tree */
 	mman_mappings_insert(target, &FORMMAN(target, thismman_kernel_reservation));
 
+	/* Step #9: Because the mem-builder wouldn't have received updates on
+	 *          situations  where mem-parts could have been re-merged, we
+	 *          must manually check for nodes that can be merged now that
+	 *          all of them have been applied to the `target' mman! */
+	mman_mergenodes_locked(target);
+
 	/* And with  that, the  newly constructed  mem-node-tree has  been
 	 * fully assigned  to the  given  target-mman. Assuming  that  our
 	 * caller dutifully did their call to `pagedir_unmap_userspace()',

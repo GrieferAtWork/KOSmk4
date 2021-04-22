@@ -30,12 +30,13 @@
 
 /* Values for `struct mnode::mn_flags' */
 #define MNODE_F_NORMAL    0x00000000 /* Normal flags. */
-#define MNODE_F_PEXEC     0x00000001 /* Data can be executed. */
-#define MNODE_F_PWRITE    0x00000002 /* Data can be written. */
-#define MNODE_F_PREAD     0x00000004 /* Data can be read. */
+#define MNODE_F_PEXEC     0x00000001 /* [lock(mn_mman->mm_lock)] Data can be executed. */
+#define MNODE_F_PWRITE    0x00000002 /* [lock(mn_mman->mm_lock)] Data can be written. */
+#define MNODE_F_PREAD     0x00000004 /* [lock(mn_mman->mm_lock)] Data can be read. */
 /*efine MNODE_F_          0x00000008  * ... */
 /*efine MNODE_F_          0x00000010  * ... */
-#define MNODE_F_SHARED    0x00000020 /* Changes made by this memory mapping are shared.
+#define MNODE_F_SHARED    0x00000020 /* [lock(mn_mman->mm_lock || mn_part)]
+                                      * Changes made by this memory mapping are shared.
                                       * When not set, attempting to write to this node will instead
                                       * replace `mn_part' with an identical, but anonymous copy:
                                       * >>     // Is the part accessible from its file?
@@ -49,11 +50,12 @@
                                       * >>      LIST_NEXT(self, mn_link) != NULL)
                                       * If any of these checks succeed, then `mn_part' is replaced with
                                       * the  required  private  copy, thus  allowing  for copy-on-write */
-#define MNODE_F_UNMAPPED  0x00000040 /* [lock(mm->mm_lock && WRITE_ONCE)] Set after the node got unmapped.
+#define MNODE_F_UNMAPPED  0x00000040 /* [lock(mn_mman->mm_lock && WRITE_ONCE)] Set after the node got unmapped.
                                       * NOTE: You should never see this flag on any node still part of an mman's node-tree! */
-#define MNODE_F_MPREPARED 0x00000080 /* [const] For its entire lifetime, the backing page directory storage of this mem-node is kept prepared.
-                                      *         Note that this flag is _NOT_ inherited during fork()! (after fork, all user-space mem-nodes
-                                      *         within the new process will have this flag cleared) */
+#define MNODE_F_MPREPARED 0x00000080 /* [lock(mn_mman->mm_lock)]
+                                      * For its entire lifetime, the backing page directory storage of this mem-node
+                                      * is kept prepared. Note that this flag is _NOT_ inherited during fork()! As a
+                                      * matter of fact: userspace isn't allowed to make use of this flag. */
 #define MNODE_F_COREPART  0x00000100 /* [const] Core part (free this node using `mcoreheap_free()' instead of `kfree()') */
 #define MNODE_F_KERNPART  0x00000200 /* [const] This node describes part of the static kernel core and must
                                       *         not be modified or removed (by conventional means). Attempting
@@ -97,6 +99,7 @@
 /*efine MNODE_F_          0x00200000  * ... */
 /*efine MNODE_F_          0x00400000  * ... */
 /*efine MNODE_F_          0x00800000  * ... */
+#define MNODE_F_NOCORE    0x01000000 /* [lock(mn_mman->mm_lock)] Don't include in coredumps. */
 /*efine MNODE_F_          0x01000000  * ... */
 /*efine MNODE_F_          0x02000000  * ... */
 /*efine MNODE_F_          0x04000000  * ... */
@@ -480,9 +483,11 @@ mnode_split_or_unlock(struct mman *__restrict self,
                       struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-/* While holding  a lock  to `self->mn_mman'  and `self->mn_part',  try
- * to merge the given node with its successor/predecessor node, without
- * releasing any of the locks still held.
+/* While  holding a lock  to `self->mn_mman', try to  merge the given node
+ * with its successor/predecessor node, without releasing the lock to  the
+ * associated mman. If it is found that `self' is mergeable, but that this
+ * cannot be done  without blocking, `self->mn_mman'  is set-up such  that
+ * the merge operation will be performed asynchronously.
  * @return: * : The new, merged node (which may have a different min-addr
  *              that the original node `self'). Also note that this  node
  *              may or may not be equal to `self', and that it's min- and
@@ -492,6 +497,37 @@ mnode_split_or_unlock(struct mman *__restrict self,
  *              to this function! */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self);
+
+/* Same  as `mnode_merge()', but  the caller must  also be holding a
+ * lock to `self->mn_part'  (which may be  assumed to be  non-NULL).
+ * Upon return, the lock to `self->mn_part' may have been  released,
+ * in which case the caller must inherit a lock to `return->mn_part' */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mnode *
+NOTHROW(FCALL mnode_merge_with_partlock)(struct mnode *__restrict self);
+
+
+/* Mark the given mman  as potentially containing mergeable  mem-nodes.
+ * These nodes will (eventually) be merged asynchronously, but may  not
+ * be merged immediately (though they may still be merged immediately).
+ * NOTE: The caller isn't required to be holding a lock to `self', but
+ *       if they are, this function is still going to be non-blocking,
+ *       and the node-merging process  will simply happen _after_  the
+ *       caller releases their lock. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes)(struct mman *__restrict self);
+
+/* Same as `mman_mergenodes()', but the caller _must_ be holding a lock
+ * to the given mman `self'! */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes_locked)(struct mman *__restrict self);
+
+/* Helper wrapper to try to merge a node at `addr' (if such a node exists).
+ * The caller must be holding a lock to `self' when calling this  function. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
+                                       void const *minaddr,
+                                       void const *maxaddr);
+
 
 
 /* Mem-node tree API. All of these functions require that the caller

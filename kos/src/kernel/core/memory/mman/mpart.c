@@ -19,8 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C 1
-#define __WANT_MPART__mp_newglobl
-#define __WANT_MPART__mp_dead
+#define __WANT_MPART__mp_lopall
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -140,23 +139,52 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 }
 
 
-#define mpart_destroy_lockop_encode(prt) \
-	((Toblockop(struct mfile) *)&(prt)->mp_blkst_ptr)
-#define mpart_destroy_lockop_decode(lop) \
-	container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
+#define mpart_destroy_lockop_encode(prt)          ((struct lockop *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_lockop_decode(lop)          container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
+#define mpart_destroy_postlockop_encode(prt)      ((struct postlockop *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_postlockop_decode(lop)      container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
+#define mpart_destroy_mfilelockop_encode(prt)     ((Toblockop(struct mfile) *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_mfilelockop_decode(lop)     container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
+#define mpart_destroy_mfilepostlockop_encode(prt) ((Tobpostlockop(struct mfile) *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_mfilepostlockop_decode(lop) container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_destroy_postlop_rmall_async)(struct postlockop *__restrict self) {
+	struct mpart *me;
+	me = mpart_destroy_postlockop_decode(self);
+	mpart_free(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL mpart_destroy_lop_rmall_async)(struct lockop *__restrict self) {
+	struct postlockop *plop;
+	struct mpart *me;
+	me = mpart_destroy_lockop_decode(self);
+
+	/* Remove the part from the all-parts list. */
+	LIST_REMOVE(me, mp_allparts);
+
+	/* Call mpart_free() once the caller has released their lock to `mpart_all_lock' */
+	plop           = mpart_destroy_postlockop_encode(me);
+	plop->plo_func = &mpart_destroy_postlop_rmall_async;
+	return plop;
+}
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(struct mfile) *__restrict self,
                                        struct mfile *__restrict UNUSED(file)) {
 	struct mpart *me;
-	me = mpart_destroy_lockop_decode(self);
+	me = mpart_destroy_mfilelockop_decode(self);
 	if (LIST_ISBOUND(me, mp_allparts)) {
 		/* Must remove from the global list of all known parts. */
-		if (mpart_all_lock_tryacquire()) {
+		if (mpart_all_tryacquire()) {
 			LIST_REMOVE(me, mp_allparts);
-			mpart_all_lock_release();
+			mpart_all_release();
 		} else {
-			SLIST_ATOMIC_INSERT(&mpart_all_dead, me, _mp_dead);
+			struct lockop *lop;
+			lop          = mpart_destroy_lockop_encode(me);
+			lop->lo_func = &mpart_destroy_lop_rmall_async;
+			SLIST_ATOMIC_INSERT(&mpart_all_lops, lop, lo_link);
 			_mpart_all_reap();
 			return;
 		}
@@ -170,14 +198,14 @@ NOTHROW(FCALL mpart_destroy_lop_rmfile)(Toblockop(struct mfile) *__restrict self
                                         struct mfile *__restrict file) {
 	Tobpostlockop(struct mfile) *post;
 	struct mpart *me;
-	me = mpart_destroy_lockop_decode(self);
+	me = mpart_destroy_mfilelockop_decode(self);
 	/* Remove the dead part from the file's tree of parts. */
 	if likely(!mpart_isanon(me)) {
 		assert(!mfile_isanon(file));
 		mpart_tree_removenode(&file->mf_parts, me);
 	}
 	DBG_memset(&me->mp_filent, 0xcc, sizeof(me->mp_filent));
-	post = (Tobpostlockop(struct mfile) *)self;
+	post = mpart_destroy_mfilepostlockop_encode(me);
 	/* Remove from the all-parts list and free _after_ the
 	 * lock  to  the backing  mem-file has  been released. */
 	post->oplo_func = &mpart_destroy_lop_rmall;
@@ -197,11 +225,14 @@ NOTHROW(FCALL mpart_destroy)(struct mpart *__restrict self) {
 remove_node_from_globals:
 		if (LIST_ISBOUND(self, mp_allparts)) {
 			/* Must remove from the global list of all known parts. */
-			if (mpart_all_lock_tryacquire()) {
+			if (mpart_all_tryacquire()) {
 				LIST_REMOVE(self, mp_allparts);
-				mpart_all_lock_release();
+				mpart_all_release();
 			} else {
-				SLIST_ATOMIC_INSERT(&mpart_all_dead, self, _mp_dead);
+				struct lockop *lop;
+				lop          = mpart_destroy_lockop_encode(self);
+				lop->lo_func = &mpart_destroy_lop_rmall_async;
+				SLIST_ATOMIC_INSERT(&mpart_all_lops, lop, lo_link);
 				_mpart_all_reap();
 				return;
 			}
@@ -218,7 +249,7 @@ remove_node_from_globals:
 	} else {
 		/* Enqueue the file for later deletion. */
 		Toblockop(struct mfile) *lop;
-		lop = mpart_destroy_lockop_encode(self);
+		lop = mpart_destroy_mfilelockop_encode(self);
 		lop->olo_func = &mpart_destroy_lop_rmfile;
 		SLIST_ATOMIC_INSERT(&file->mf_lockops, lop, olo_link);
 		_mfile_lockops_reap(file);
@@ -698,73 +729,67 @@ PUBLIC struct atomic_lock mpart_all_lock = ATOMIC_LOCK_INIT;
 
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
- * NOTE: This list holds a reference to every contain part that wasn't already
- *       destroyed,    and    has   the    `MPART_F_GLOBAL_REF'    flag   set. */
+ * NOTE: This list holds a reference to every contain part that wasn't
+ *       already destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
 PUBLIC struct mpart_list mpart_all_list = LIST_HEAD_INITIALIZER(mpart_all_list);
 
-/* [0..n][CHAIN(_mp_dead)][lock(ATOMIC)]
- * List of  dead parts  that  have yet  to be  removed  from lists  in  `mpart_all_list'.
- * This list must be cleared whenever the caller has released a lock to `mpart_all_lock'.
- * For this purpose, you may simply use `mpart_all_reap()' */
-PUBLIC struct mpart_slist mpart_all_dead = SLIST_HEAD_INITIALIZER(mpart_all_dead);
+/* [0..n][lock(ATOMIC)] List of lock-ops for `mpart_all_list' */
+PUBLIC struct lockop_slist mpart_all_lops = SLIST_HEAD_INITIALIZER(mpart_all_lops);
 
-/* [0..n][CHAIN(_mp_newglobl)][lock(ATOMIC)]
- * Similar  to `mpart_all_dead', but  this is a list  of references to parts
- * that should be added to `mpart_all_list' once the lock becomes available.
- *
- * Because  these  are references,  mpart_destroy() remains  NOBLOCK, because
- * by  the time a mem-part is destroyed, it  is know that it can't be pending
- * to-be added to the global list of parts anymore. (because it being pending
- * would have otherwise prevented it from being destroyed) */
-PUBLIC struct REF mpart_slist mpart_all_pending = SLIST_HEAD_INITIALIZER(mpart_all_pending);
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_add2all_mpart_destroy_postlop_cb)(struct postlockop *__restrict self) {
+	struct mpart *me;
+	me = container_of(self, struct mpart, _mp_plopall);
+	LIST_ENTRY_UNBOUND_INIT(&me->mp_allparts);
+	mpart_destroy(me);
+}
 
-/* Try to reap all dead memory-parts from `mpart_all_dead'.
- * This function must be called after releasing a lock from `mpart_all_lock' */
-PUBLIC NOBLOCK void NOTHROW(FCALL _mpart_all_reap)(void) {
-	struct mpart *parts, *iter;
-	REF struct mpart *pending_parts;
-again:
-	if (!atomic_lock_tryacquire(&mpart_all_lock))
-		return;
-	parts = SLIST_ATOMIC_CLEAR(&mpart_all_dead);
-	for (iter = parts; iter; iter = SLIST_NEXT(iter, _mp_dead)) {
-		assert(LIST_ISBOUND(iter, mp_allparts));
-		LIST_REMOVE(iter, mp_allparts);
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL async_add2all_mpart_lop_cb)(struct lockop *__restrict self) {
+	REF struct mpart *me;
+	me = container_of(self, struct mpart, _mp_lopall);
+	if unlikely(ATOMIC_DECFETCH(me->mp_refcnt) == 0) {
+		/* Destroy the part in a post-lockop to improve throughput! */
+		me->_mp_plopall.plo_func = &async_add2all_mpart_destroy_postlop_cb;
+		return &me->_mp_plopall;
 	}
-	pending_parts = SLIST_ATOMIC_CLEAR(&mpart_all_pending);
-	while (pending_parts) {
-		struct mpart *next;
-		next = SLIST_NEXT(pending_parts, _mp_newglobl);
-		LIST_INSERT_HEAD(&mpart_all_list, pending_parts, mp_allparts);
-		decref_unlikely(pending_parts); /* The reference inherited from `mpart_all_pending' */
-		pending_parts = next;
-	}
-	atomic_lock_release(&mpart_all_lock);
-	while (parts) {
-		struct mpart *next;
-		next = SLIST_NEXT(parts, _mp_dead);
-		mpart_free(parts);
-		parts = next;
-	}
-	if (mpart_all_mustreap())
-		goto again;
+	LIST_INSERT_HEAD(&mpart_all_list, me, mp_allparts);
+	return NULL;
 }
 
 
-/* Add the given mpart `self' to the global list of parts.
- * This  function   will  initialize   `self->mp_allparts' */
+/* Add the given mpart `self'  to the global list of  parts.
+ * This function will initialize `self->mp_allparts', though
+ * may do so asynchronously (meaning  that the part may  not
+ * have  been added to  the all-parts list  yet, even if you
+ * acquire a lock to said  list immediately after call  this
+ * function) */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {
-	if (mpart_all_lock_tryacquire()) {
+	if (mpart_all_tryacquire()) {
 		/* Directly insert into the global part list. */
 		LIST_INSERT_HEAD(&mpart_all_list, self, mp_allparts);
-		mpart_all_lock_release();
+		mpart_all_release();
 	} else {
+		STATIC_ASSERT_MSG(offsetof(struct mpart, mp_allparts.le_prev) ==
+		                  offsetof(struct mpart, _mp_lopall.lo_func),
+		                  "This is an implementation default that is required, such that "
+		                  "a mem-part that's still being added to the all-parts list via "
+		                  "async means can still be tested via `LIST_ISBOUND()' for being "
+		                  "apart of the all-parts list:\n"
+		                  "While the async `async_add2all_mpart_lop_cb()' is pending, the "
+		                  "lo_func field of the lop will be non-NULL, and `LIST_ISBOUND()' "
+		                  "is implemented to check if `le_prev' is non-NULL.\n"
+		                  "So we put the 2 together such that `le_prev' will also appear as "
+		                  "non-NULL for as long as the async add2all hasn't been serviced "
+		                  "yet, thus keeping everything consistent.");
+
 		/* Enqueue `self' as a pending globally visible part. */
 		incref(self); /* This reference is inherited by `mpart_all_pending' */
-		SLIST_ATOMIC_INSERT(&mpart_all_pending, self, _mp_newglobl);
-		/* Make sure `self' gets added if the lock became
-		 * available in the mean time. */
+
+		/* Enqueue a lockop to asynchronously add `self' to the all-parts list. */
+		self->_mp_lopall.lo_func = &async_add2all_mpart_lop_cb;
+		SLIST_ATOMIC_INSERT(&mpart_all_lops, &self->_mp_lopall, lo_link);
 		_mpart_all_reap();
 	}
 }

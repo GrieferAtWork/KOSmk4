@@ -176,23 +176,39 @@ nope:
 
 
 
+/* Return the min-address of the lowest-address mem-node of `self' */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) byte_t *
+NOTHROW(FCALL mbuilder_mappings_getminaddr)(struct mbuilder_norpc const *__restrict self) {
+	struct mbnode const *node;
+	assert(self->mb_mappings != NULL);
+	node = self->mb_mappings;
+	while (node->mbn_mement.rb_lhs)
+		node = node->mbn_mement.rb_lhs;
+	return node->mbn_minaddr;
+}
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) byte_t *
+NOTHROW(FCALL mbuilder_mappings_getmaxaddr)(struct mbuilder_norpc const *__restrict self) {
+	struct mbnode const *node;
+	assert(self->mb_mappings != NULL);
+	node = self->mb_mappings;
+	while (node->mbn_mement.rb_rhs)
+		node = node->mbn_mement.rb_rhs;
+	return node->mbn_maxaddr;
+}
+
+
+
 /* Return the size of the bounds of self (that is the # of bytes from the start
  * of the lowest node, to the end of the greatest node). The caller must ensure
  * that `self' isn't empty. */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW(FCALL mbuilder_get_bounds_size)(struct mbuilder_norpc const *__restrict self) {
-	struct mbnode const *minnode, *maxnode;
 	size_t result;
-	assert(self->mb_mappings != NULL);
-	minnode = self->mb_mappings;
-	maxnode = self->mb_mappings;
-	while (minnode->mbn_mement.rb_lhs)
-		minnode = minnode->mbn_mement.rb_lhs;
-	while (maxnode->mbn_mement.rb_rhs)
-		maxnode = maxnode->mbn_mement.rb_rhs;
-	result = (size_t)((byte_t *)mbnode_getmaxaddr(maxnode) -
-	                  (byte_t *)mbnode_getminaddr(minnode)) +
-	         1;
+	byte_t const *minaddr, *maxaddr;
+	minaddr = mbuilder_mappings_getminaddr(self);
+	maxaddr = mbuilder_mappings_getmaxaddr(self);
+	result  = (size_t)(maxaddr - minaddr) + 1;
 	return result;
 }
 
@@ -390,6 +406,9 @@ again:
 	}
 }
 
+
+
+
 /* Map all of the  nodes from `builder' into  self whilst applying a  load-offset
  * specified by `loadaddr'. The caller must ensure that no other mappings already
  * exist  at any of the locations that will overlap with the nodes from `builder'
@@ -440,8 +459,24 @@ NOTHROW(FCALL mman_map_mbuilder)(struct mman *__restrict self,
 	/* Iterate the builder's mappings and set the `_mbn_mman' and  `_mbn_module'
 	 * fields for nodes whilst inserting them into the given target mman `self'. */
 	if likely(builder->mb_mappings != NULL) {
+		byte_t const *minaddr, *maxaddr;
 		mman_map_mbuilder_tree_pdmap(self, builder->mb_mappings, loadaddr, flags);
+		minaddr = mbuilder_mappings_getminaddr(builder);
+		maxaddr = mbuilder_mappings_getmaxaddr(builder);
 		mman_map_mbuilder_tree_transfer(self, builder->mb_mappings);
+
+		/* With everything loaded into the new mman, we now have to check if
+		 * it's possible to merge any of the newly inserted nodes with their
+		 * neighboring nodes.
+		 * This  has to be done for all nodes at once, and not on a per-node
+		 * basis, since we'd  otherwise try  to merge nodes  in a  situation
+		 * where pert->node lists might still point to other nodes that have
+		 * yet to be loaded into their new mman! (this would only happen  if
+		 * some  specific mem-part was mapped more than once, and an attempt
+		 * to  merge one of its nodes is made before all of other nodes have
+		 * been inserted into the target mman's mappings-tree) */
+		mman_mergenodes_inrange(self, minaddr, maxaddr);
+
 		builder->mb_mappings = NULL; /* Inherited! */
 	}
 
@@ -534,6 +569,7 @@ NOTHROW(FCALL mman_unmap_mbuilder)(struct mman *__restrict self,
 				restore = SLIST_FIRST(deadnodes);
 				SLIST_REMOVE_HEAD(deadnodes, _mn_dead);
 				mman_mappings_insert(self, restore);
+				mnode_merge(restore);
 			}
 		} else {
 			struct mnode *iter;

@@ -53,9 +53,8 @@ struct mdmalock {
 NOBLOCK NONNULL((1)) void
 NOTHROW(mman_dmalock_release)(struct mdmalock *__restrict self);
 #else /* __INTELLISENSE__ */
-#define mman_dmalock_release(x)        \
-	(mpart_dma_dellock((x)->mdl_part), \
-	 decref_unlikely((x)->mdl_part))
+#define mman_dmalock_release(x) \
+	decref_unlikely(mpart_dma_dellock((x)->mdl_part))
 #endif /* !__INTELLISENSE__ */
 
 /* Start DMAing on memory within the specified address range.

@@ -146,7 +146,7 @@ struct mpartmeta {
 	/* We  keep the RTM version and field  in the futex controller, such that
 	 * they don't take up space in the base `mpart' structure, but only exist
 	 * conditionally, and upon first access. */
-	uintptr_t                         mpm_rtm_vers; /* [lock(:dp_lock)]
+	uintptr_t                         mpm_rtm_vers; /* [lock(:MPART_F_LOCKBIT)]
 	                                                 * RTM version (incremented for every RTM-driven
 	                                                 * modifications made to memory). */
 #endif /* ARCH_HAVE_RTM */
@@ -222,15 +222,24 @@ NOTHROW(mpart_dma_addlock)(struct mpart *__restrict self) {
 	__hybrid_atomic_inc(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
 }
 
-FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(mpart_dma_dellock)(struct mpart *__restrict self) {
+FORCELOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(mpart_dma_dellock)(REF struct mpart *__restrict self) {
 	refcnt_t old_count;
 	struct mpartmeta *meta = self->mp_meta;
 	__hybrid_assert(meta != __NULLPTR);
 	old_count = __hybrid_atomic_fetchdec(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
 	__hybrid_assert(old_count >= 1);
-	if (old_count == 1)
+	if (old_count == 1) {
+		/* When dma-locks go away,  it may also become  possible
+		 * to merge the part with some of its neighboring parts!
+		 * For this purpose, check `_MPART_F_MERGE_AFTER_DMA' */
+		if __unlikely(__hybrid_atomic_load(self->mp_flags, __ATOMIC_ACQUIRE) & _MPART_F_MERGE_AFTER_DMA) {
+			__hybrid_atomic_and(self->mp_flags, ~_MPART_F_MERGE_AFTER_DMA, __ATOMIC_SEQ_CST);
+			self = mpart_merge(self);
+		}
 		sig_broadcast(&meta->mpm_dma_done);
+	}
+	return self;
 }
 
 
@@ -290,8 +299,8 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
  *          the associated mpart, and relative offset  into that mem-part. If a  lookup
  *          of  the   futex   then   returns  `MPART_FUTEX_OOB',   loop   back   around
  *          and once again lookup the `mnode'.
- *       -> In the  end, there  exists no  API also  found on  linux that  would make  use of  this
- *          function,  however  on  KOS it  is  possible to  access  this function  through  use of
+ *       -> In the end, there  exists no API also  found on linux that  would make use of  this
+ *          function, however on  KOS it is  possible to  access this function  through use  of
  *          the HANDLE_TYPE_MFILE-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `addr' */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutex *FCALL

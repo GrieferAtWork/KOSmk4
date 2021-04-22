@@ -29,6 +29,7 @@
 #include <kos/except.h>
 
 #include <stdbool.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -44,9 +45,12 @@ NOTHROW(FCALL mman_stopdma)(struct mdmalock *__restrict lockvec,
 	 * pass, thus improving cache-locality, as well as semantics, such that
 	 * we're invocing decref() with less locks held that we'd do otherwise. */
 	for (i = lockcnt; i--;)
-		mpart_dma_dellock(lockvec[i].mdl_part);
+		lockvec[i].mdl_part = mpart_dma_dellock(lockvec[i].mdl_part);
 	for (i = lockcnt; i--;)
 		decref_unlikely(lockvec[i].mdl_part);
+#ifndef NDEBUG
+	memset(lockvec, 0xcc, lockcnt, sizeof(struct mdmalock));
+#endif /* !NDEBUG */
 }
 
 DECL_END

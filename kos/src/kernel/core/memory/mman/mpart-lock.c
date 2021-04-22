@@ -594,7 +594,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 			if (!setcore_ex_makebitset_or_unlock(self, unlock, data, num_blocks, GFP_CALLOC))
 				goto nope;
 			/* NOTE: Because we've used GFP_CALLOC, all blocks will have
-			 *       already been initialized to  `MPART_BLOCK_ST_NDEF'! */
+			 *       already been initialized to `MPART_BLOCK_ST_NDEF'! */
 			self->mp_blkst_ptr = data->scd_bitset;
 			ATOMIC_AND(self->mp_flags, ~MPART_F_BLKST_INL);
 			DBG_memset(&data->scd_bitset, 0xcc, sizeof(data->scd_bitset));
@@ -619,24 +619,24 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		assert(mpart_hasblockstate(self));
 		/* Load data from swap.
 		 * For this purpose, we must ensure that there aren't any pre-existing
-		 * INIT-blocks, which might  happen if  someone else is  still in  the
+		 * INIT-blocks, which might happen if someone else is still in the
 		 * process of writing data _to_ swap (in which case they will make the
 		 * INIT-blocks go away once they're done) */
 		if (!mpart_initdone_or_unlock(self, unlock))
 			goto nope;
 
-		/* In  order to (safely) remember which parts  we've set to INIT (as opposed
+		/* In order to (safely) remember which parts we've set to INIT (as opposed
 		 * to someone else setting them), we have to allocate sufficient heap memory
 		 * in order to store a copy of the bitset of `self' */
 		if (!setcore_ex_makebitset_or_unlock(self, unlock, data, num_blocks, 0))
 			goto nope;
 
-		/* Now we must switch all  `MPART_BLOCK_ST_CHNG' parts (i.e. all parts  that
+		/* Now we must switch all `MPART_BLOCK_ST_CHNG' parts (i.e. all parts that
 		 * have been written to swap) over to `MPART_BLOCK_ST_INIT', thus preventing
 		 * anyone else from changing the contents of the part.
 		 *
 		 * NOTE: And while we're at it, also change all `MPART_BLOCK_ST_LOAD' parts
-		 *       back to `MPART_BLOCK_ST_NDEF',  since their  contents have  gotten
+		 *       back to `MPART_BLOCK_ST_NDEF', since their contents have gotten
 		 *       lost when memory was written to swap. */
 		did_set_init_parts = false;
 		for (i = 0; i < num_blocks; ++i) {
@@ -657,9 +657,9 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		/* Set the flag to indicate that there are INIT-blocks! */
 		ATOMIC_OR(self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 
-		/* At this point, we know  that _all_ INIT-entries within the  bitset
-		 * of  `self' originate from  our doing. As  such, copy the constants
-		 * of  the bitset  into our local  heap-copy, so we  still know which
+		/* At this point, we know that _all_ INIT-entries within the bitset
+		 * of `self' originate from our doing. As such, copy the constants
+		 * of the bitset into our local heap-copy, so we still know which
 		 * parts we're supposed to initialize from swap once we're done here! */
 		{
 			mpart_blkst_word_t *src = self->mp_blkst_ptr;
@@ -718,7 +718,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		}
 
 		/* Assert that nothing changed about `self' that should have
-		 * been  protected  by  us  having  set  INIT-blocks  above. */
+		 * been protected by us having set INIT-blocks above. */
 		assert(self->mp_state == MPART_ST_SWP ||
 		       self->mp_state == MPART_ST_SWP_SC);
 		assert(self->mp_file == file);
@@ -739,7 +739,7 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 		decref_unlikely(file);
 
 		/* And with that, all required data has been read from swap,
-		 * and  we can  safely transition  to on  of the MEM-states. */
+		 * and we can safely transition to on of the MEM-states. */
 done_swap:
 		kfree(data->scd_bitset);
 		DBG_memset(&data->scd_bitset, 0xcc, sizeof(data->scd_bitset));
@@ -764,10 +764,10 @@ done_swap:
 		                 sizeof(struct mchunkvec)));
 
 		/* Even though we _did_ manage to load the part from swap,
-		 * we  _did_ have to release _all_ locks to do so, meaning
+		 * we _did_ have to release _all_ locks to do so, meaning
 		 * that we can't actually indicate success to our caller.
 		 *
-		 * However, the  next time  around,  our part  is  probably
+		 * However, the next time around, our part is probably
 		 * still going to be loaded in-core, so we'll succeed then! */
 		mpart_lock_release(self);
 		decref_unlikely(self);
@@ -825,7 +825,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 	assert(blocks_end <= (mpart_getsize(self) >> shift));
 
 	/* Check for simple case: Without a proper block-state,
-	 * everything  is  implicitly marked  as  CHNG, meaning
+	 * everything is implicitly marked as CHNG, meaning
 	 * everything has already been loaded! */
 	if unlikely(!mpart_hasblockstate(self))
 		return true;
@@ -853,7 +853,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 			blocks_end = blocks_maxend;
 
 		/* Alter the state of UNDEF parts to INIT, thus essentially
-		 * locking them in-memory  until we're  down loading  them. */
+		 * locking them in-memory until we're down loading them. */
 		for (end = start + 1;;) {
 			mpart_setblockstate(self, end - 1, MPART_BLOCK_ST_INIT);
 			if (end >= blocks_end)
@@ -889,26 +889,26 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 
 				/* NOTE: The file size may increase in the mean time, but that's actually
 				 *       ok: We're currently holding exclusive locks to all of the blocks
-				 *       that  we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
-				 *       As  such, if  the file's size  increases, _has_ to  include to a
-				 *       point above the  region which we're  trying to initialize  here.
-				 * e.g.: Someone else is allowed to  write data, say, +0x12000 bytes  further
+				 *       that we're going to initialize next (s.a. MPART_BLOCK_ST_INIT).
+				 *       As such, if the file's size increases, _has_ to include to a
+				 *       point above the region which we're trying to initialize here.
+				 * e.g.: Someone else is allowed to write data, say, +0x12000 bytes further
 				 *       into the file, and that would never affect us here. If this happens,
 				 *       there are 2 race conditions that can happen:
 				 *   - We've read the file's old size, and it has since increased.
-				 *     -> In  this case, we'll be zero-initializing some data that has already
+				 *     -> In this case, we'll be zero-initializing some data that has already
 				 *        come to be considered as part of the live file, but that's OK, since
-				 *        that data has never been accessed before, and would have been  zero-
+				 *        that data has never been accessed before, and would have been zero-
 				 *        filled in either case.
-				 *     -> Even if the  `mo_loadblocks' calls  fails, we'll just  set those  blocks
+				 *     -> Even if the `mo_loadblocks' calls fails, we'll just set those blocks
 				 *        back to ST_NDEF, which will effectively look like we didn't do anything.
-				 *   - We've read  the file's  new size.  - that's  even simpler,  since then  we
-				 *     won't do any  that `bzerophyscc' call  at all.  - In this  case, the  call
+				 *   - We've read the file's new size. - that's even simpler, since then we
+				 *     won't do any that `bzerophyscc' call at all. - In this case, the call
 				 *     to `mo_loadblocks' will load in data from disk that (may have been) loaded
-				 *     when the write  that increased the  file's size was  done. And since  this
-				 *     writing  somewhere  further into  a  file automatically  implies  that all
-				 *     uninitialized  data  up until  that point  should  be considered  as ZERO,
-				 *     we'll  end  with the  same  result, where  the  fs-driver will  just write
+				 *     when the write that increased the file's size was done. And since this
+				 *     writing somewhere further into a file automatically implies that all
+				 *     uninitialized data up until that point should be considered as ZERO,
+				 *     we'll end with the same result, where the fs-driver will just write
 				 *     zeroes to the buffer, the same way we would have! */
 				if unlikely(addr + num_bytes > filesize) {
 					if (addr >= filesize) {
@@ -994,7 +994,7 @@ initdone:
 
 
 /* Given 2 mem-parts that are both `MPART_ST_MEM' or `MPART_ST_MEM_SC',
- * and are both at least `num_pages' large, copy the contents of  those
+ * and are both at least `num_pages' large, copy the contents of those
  * many pages of physical memory from `src' to `dst' */
 INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mpart_copyram)(struct mpart *__restrict dst,
@@ -1152,9 +1152,9 @@ NOTHROW(FCALL unsharecow_calculate_mapbounds)(struct unsharecow_bounds *__restri
 
 
 /* Ensure that `data->ucd_copy' has been allocated.
- * If it hasn't been allocated yet,  and doing so cannot be  done
+ * If it hasn't been allocated yet, and doing so cannot be done
  * without blocking, then the lock to `self' is released, and the
- * allocation is performed with blocking. Stores the results  in:
+ * allocation is performed with blocking. Stores the results in:
  *   - data->ucd_copy
  * Throws an exception on error.
  * @return: true:  Success
@@ -1276,7 +1276,7 @@ NOTHROW(FCALL unsharecow_incref_mmans)(struct mpart *__restrict part,
 	return result;
 }
 
-/* Decref all of  the mmans  of copy-on-write  nodes.
+/* Decref all of the mmans of copy-on-write nodes.
  * mmans that were already dead are silently ignored. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unsharecow_decref_mmans)(struct mpart *__restrict part,
@@ -1420,7 +1420,7 @@ NOTHROW(FCALL unprepare_mmans_until)(struct mnode *start_node,
 }
 
 /* Prepare the backing memory of all page directories with copy-on-write mappings,
- * such that those  regions may  atomically be replaced  with different  bindings.
+ * such that those regions may atomically be replaced with different bindings.
  * If this cannot be done, release all locks and throw an exception. */
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 try_prepare_mmans_or_throw(struct mpart *__restrict self,
@@ -1462,22 +1462,22 @@ err_badalloc:
 
 
 /* Ensure that `LIST_EMPTY(&self->mp_copy)' (while only considering nodes
- * which   may   be   overlapping   with   the   given   address   range)
- * NOTE: The  caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
+ * which may be overlapping with the given address range)
+ * NOTE: The caller must first ensure that `MPART_ST_INCORE(self->mp_state)',
  *       otherwise this function will result in an internal assertion failure.
  * NOTE: The `LIST_EMPTY(&self->mp_copy)' mustn't be seen ~too~ strictly, as
- *       the list is still allowed to contain dead nodes that are about  to,
+ *       the list is still allowed to contain dead nodes that are about to,
  *       or have already been added to the dead nodes list.
  *       However, the mmans of all nodes still apart of the mp_copy list have
- *       already been destroyed, such that  no alive copy-nodes still  exist! */
+ *       already been destroyed, such that no alive copy-nodes still exist! */
 PUBLIC WUNUSED NONNULL((1, 3)) bool FCALL
 mpart_unsharecow_or_unlock(struct mpart *__restrict self,
                            struct unlockinfo *unlock,
                            struct mpart_unsharecow_data *__restrict data,
                            mpart_reladdr_t partrel_offset, size_t num_bytes) {
 	/* Instead of unsharing _all_ copy-on-write mappings, extend this function to
-	 * only  unshare those that  are mapping pages from  a specific sub-region of
-	 * the given mem-part (where  copy-on-write mem-nodes overlap partially  with
+	 * only unshare those that are mapping pages from a specific sub-region of
+	 * the given mem-part (where copy-on-write mem-nodes overlap partially with
 	 * the sub-region being unshared, those mem-nodes should be split) */
 	struct mpart *copy;
 	struct mnode *node;
@@ -1489,12 +1489,12 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 	assert(MPART_ST_INCORE(self->mp_state));
 
 	/* Quick check: If there aren't any copy-on-write mappings, then
-	 *              we  don't  actually  need to  do  anything else! */
+	 *              we don't actually need to do anything else! */
 	if (LIST_EMPTY(&self->mp_copy))
 		goto done_simple;
 
 	/* Slightly slower check: Are there any copy-on-write nodes
-	 * that map at least 1  byte from the given address  range? */
+	 * that map at least 1 byte from the given address range? */
 	partrel_minaddr = partrel_offset;
 	partrel_maxaddr = partrel_offset + num_bytes - 1;
 	if (!unsharecow_has_mapping_nodes(self, partrel_minaddr, partrel_maxaddr))
@@ -1507,7 +1507,7 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 		goto nope;
 	assert(!LIST_EMPTY(&self->mp_copy));
 
-	/* Try to acquire references to all of the mmans from the copy-on-write  list.
+	/* Try to acquire references to all of the mmans from the copy-on-write list.
 	 * If we fail to do this for all of them, then we're already done, since there
 	 * are no (alive) copy-on-write mappings present! */
 	if (!unsharecow_incref_mmans(self, partrel_minaddr, partrel_maxaddr))
@@ -1529,11 +1529,11 @@ mpart_unsharecow_or_unlock(struct mpart *__restrict self,
 			goto nope_decref_mmans;
 
 		/* (almost) lastly, acquire references & locks to all of the memory-managers
-		 * associated   with   nodes   from   the   copy-on-write   mappings   list. */
+		 * associated with nodes from the copy-on-write mappings list. */
 		if (!unsharecow_lock_unique_mmans_or_unlock(self, unlock, partrel_minaddr, partrel_maxaddr))
 			goto nope_decref_mmans;
 
-		/* And finally, make sure that we'll be able to re-map the  backing
+		/* And finally, make sure that we'll be able to re-map the backing
 		 * page directory mappings of all of the copy-on-write nodes. After
 		 * all: we _do_ intend to replace them with our new copy. */
 		if (!try_prepare_mmans_or_throw(self, unlock, partrel_minaddr, partrel_maxaddr)) {
@@ -1645,12 +1645,12 @@ free_unused_block_status:
 	copy->mp_meta = NULL;
 
 	/* With that, the new mem-part has been initialized, however we must
-	 * still copy over the  contents of the old  part into the new  one! */
+	 * still copy over the contents of the old part into the new one! */
 	mpart_copyram(copy, self,
 	              bounds.ucb_mapmin,
 	              bounds.ucb_mapsize / PAGESIZE);
 
-	/* Tell  all of the pre-existing nodes about the new backing part!
+	/* Tell all of the pre-existing nodes about the new backing part!
 	 * We do this only now, so-as to ensure that we directly jump from
 	 * one completely valid mem-part to another. */
 	LIST_FOREACH (node, &copy->mp_copy, mn_link) {
@@ -1659,7 +1659,7 @@ free_unused_block_status:
 	}
 
 	/* With all of the software-structures updated to describe the new,
-	 * valid state, time to have the hardware match us by updating  the
+	 * valid state, time to have the hardware match us by updating the
 	 * underlying page directories. */
 	{
 		u16 prot_mask = PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD;
@@ -1699,7 +1699,7 @@ free_unused_block_status:
 			}
 
 			/* Sync memory within the affected area. After all: The backing
-			 * physical memory location just changed, so we must flush  tlb
+			 * physical memory location just changed, so we must flush tlb
 			 * caches! */
 			mman_sync_p(mm, addr, size);
 		}
@@ -1708,22 +1708,18 @@ free_unused_block_status:
 			node = LIST_FIRST(&copy->mp_copy);
 			if (node->mn_flags & MNODE_F_PWRITE)
 				LIST_INSERT_HEAD(&node->mn_mman->mm_writable, node, mn_writable);
-			/* With there being only a single node, there is a chance
-			 * that we might be able to  merge this node with one  of
-			 * its neighbors... (so try to do this) */
-			mnode_merge(node);
 		}
 	}
 
 	/* Add the new part to the global list of parts. Once this has been done,
-	 * some  other thread may  immediately attempt to  off-load the part into
+	 * some other thread may immediately attempt to off-load the part into
 	 * swap, or do some other unspeakable things to it...
 	 *
 	 * In other words: We need to be damn sure we've finished initializing it! */
 	COMPILER_WRITE_BARRIER();
 	mpart_all_list_insert(copy);
 
-	/* Drop  locks  to all  of  the new  part's  copy-on-write nodes.
+	/* Drop locks to all of the new part's copy-on-write nodes.
 	 * Note that we still have to be careful here to only unlock each
 	 * unique mman once, since a single mman may have mapped our part
 	 * multiple times. */
@@ -1732,7 +1728,7 @@ free_unused_block_status:
 	/* Drop all of the mman-references that we were still holding on to. */
 	unsharecow_decref_mmans_fast(copy);
 
-	/* Finally, release  one last  lock  from the  new  mem-part
+	/* Finally, release one last lock from the new mem-part
 	 * (but keep on holding onto our lock to the original part!) */
 	mpart_lock_release(copy);
 
@@ -1750,9 +1746,9 @@ nope:
  * >> LIST_FOREACH (node, &self->mp_share, mn_link)
  * >>     mnode_clear_write(node) == MNODE_CLEAR_WRITE_SUCCESS
  * Note that when `!mpart_isanon(self)', any nodes apart of `mp_copy' wouldn't
- * have gotten write-access to begin with (since this requires such a node  to
- * create its own private copy  of `self'), so it  is sufficient to only  deny
- * write access  to MNODE_F_SHARED-nodes  in order  to ensure  that no  memory
+ * have gotten write-access to begin with (since this requires such a node to
+ * create its own private copy of `self'), so it is sufficient to only deny
+ * write access to MNODE_F_SHARED-nodes in order to ensure that no memory
  * mappings exist that may still have write-access! */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_denywrite_or_unlock(struct mpart *__restrict self,
@@ -1851,7 +1847,7 @@ mpart_lock_acquire_and_setcore(struct mpart *__restrict self)
  *  - mpart_setcore_or_unlock(self, ...)
  *  - mpart_load_or_unlock(self, ...)    // Based on the given address range
  *
- * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
+ * If the given `filepos' isn't contained by `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
  * # of bytes that may need to be loaded)
  *
@@ -1914,7 +1910,7 @@ err:
  *  - mpart_load_or_unlock(self, ...)        // Based on the given address range
  *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
  *
- * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
+ * If the given `filepos' isn't contained by `self', then no lock is acquired,
  * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
  * # of bytes that may need to be unshared/loaded)
  *
@@ -1940,15 +1936,18 @@ again:
 
 
 
-/* Same  as  `mpart_lock_acquire_and_setcore_unsharecow()',   but  validates  that   the
- * given  address  range  is  contained  by  `self',  any  may  also  split  `self' into
- * smaller parts if  doing so would  reduce the  impact of unsharing.  (such that  part-
- * borders are created at `FLOOR_ALIGN(filepos)' and `CEIL_ALIGN(filepos + split_hint)')
+/* Acquire a lock until:
+ *  - mpart_setcore_or_unlock(self, ...)
+ *  - mpart_unsharecow_or_unlock(self, ...)  // Based on the given address range
  *
- * HINT: This function is used to implement `mpart_write()' */
+ * If  the given `filepos' isn't contained by  `self', then no lock is acquired,
+ * and `false' is returned. (`max_load_bytes' is only used as a hint for the max
+ * # of bytes that may need to be unshared/loaded)
+ *
+ * HINT: This function is used to implement `mman_startdma()' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
-                                                   pos_t filepos, size_t split_hint)
+                                          pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	mpart_reladdr_t part_offs, part_size;
 	mpart_lock_acquire(self);
@@ -1959,15 +1958,15 @@ mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
 	if unlikely(OVERFLOW_USUB(mpart_getmaxaddr(self), filepos, &part_size))
 		goto unlock_and_err;
 	++part_size;
-	if (part_size > split_hint)
-		part_size = split_hint;
+	if (part_size > max_load_bytes)
+		part_size = max_load_bytes;
 
 	/* Check for special case: Must also unshare copy-on-write mappings. */
 	if (!LIST_EMPTY(&self->mp_copy)) {
 		struct mpart_unsharecow_data uc_data;
 ensure_setcore_with_unshare:
 		/* Now load the part into the core, and ensure that
-		 * copy-on-write  mappings   have  been   unshared. */
+		 * copy-on-write mappings have been unshared. */
 		mpart_unsharecow_data_init(&uc_data);
 		TRY {
 again_ensure_incore_for_write:
@@ -1984,8 +1983,8 @@ again_ensure_incore_for_write:
 							goto fini_uc_data_and_done;
 						}
 						++part_size;
-						if (part_size > split_hint)
-							part_size = split_hint;
+						if (part_size > max_load_bytes)
+							part_size = max_load_bytes;
 						if unlikely(LIST_EMPTY(&self->mp_copy))
 							goto ensure_setcore_without_unshare;
 					}
@@ -2005,8 +2004,8 @@ fini_uc_data_and_done:
 					goto err;
 				}
 				++part_size;
-				if (part_size > split_hint)
-					part_size = split_hint;
+				if (part_size > max_load_bytes)
+					part_size = max_load_bytes;
 				if unlikely(LIST_EMPTY(&self->mp_copy)) {
 					mpart_unsharecow_data_fini(&uc_data);
 					goto ensure_setcore_without_unshare;
@@ -2034,8 +2033,8 @@ ensure_setcore_without_unshare:
 						goto err;
 					}
 					++part_size;
-					if (part_size > split_hint)
-						part_size = split_hint;
+					if (part_size > max_load_bytes)
+						part_size = max_load_bytes;
 					/* Special case: Must also unshare copy-on-write mappings. */
 					if unlikely(!LIST_EMPTY(&self->mp_copy))
 						goto ensure_setcore_with_unshare;
@@ -2059,15 +2058,15 @@ err:
 
 
 /* Same as `mpart_lock_acquire_and_setcore()', but also ensure that no DMA locks
- * are  still being held, and that all shared mappings of the given mem-part are
+ * are still being held, and that all shared mappings of the given mem-part are
  * no longer mapped with write permissions:
  * >> LIST_FOREACH (node, &self->mp_share, mn_link) {
  * >>     mnode_clear_write(node);
  * >> }
- * Note that copy-on-write (i.e. `&self->mp_copy')  nodes don't need to be  updated.
+ * Note that copy-on-write (i.e. `&self->mp_copy') nodes don't need to be updated.
  * But also note that copy-on-write mappings usually prevent each other from gaining
- * write access, simply  by co-existing. Furthermore,  copy-on-write mappings  can't
- * gain write-access to underlying mem-parts if  those parts might be accessed  from
+ * write access, simply by co-existing. Furthermore, copy-on-write mappings can't
+ * gain write-access to underlying mem-parts if those parts might be accessed from
  * the outside world (which is the case when `!mpart_isanon(self)').
  *
  * In other words: The only case where there may still be a node associated with
@@ -2077,12 +2076,12 @@ err:
  *   >> !LIST_EMPTY(&self->mp_copy) &&               // There is a copy-on-write mapping
  *   >> (LIST_NEXT(LIST_FIRST(&self->mp_copy), mn_link) == NULL) // There is exactly 1 copy-on-write mapping
  * In this case, the node described by `LIST_FIRST(&self->mp_copy)' may still have
- * write-access,  and continue to  modify the backing memory  of `self' after this
+ * write-access, and continue to modify the backing memory of `self' after this
  * function was called.
  *
- * However, the purpose of  this function is to  be used by `mpart_sync()',  where
+ * However, the purpose of this function is to be used by `mpart_sync()', where
  * syncing an anonymous file wouldn't really make much sense (where the file being
- * anonymous is one  of the  conditions for  a writable  copy-on-write mapping  to
+ * anonymous is one of the conditions for a writable copy-on-write mapping to
  * continue to exist) */
 PUBLIC NONNULL((1)) void FCALL
 mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)

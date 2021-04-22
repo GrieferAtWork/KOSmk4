@@ -246,14 +246,24 @@ again:
 	lhs = root->mp_filent.rb_lhs;
 	rhs = root->mp_filent.rb_rhs;
 	if (!wasdestroyed(root)) {
+		REF struct mfile *newfile;
 		_mpart_init_asanon(root);
 		assert(root->mp_file == file);
-		root->mp_file = &mfile_anon[file->mf_blockshift];
+		newfile = incref(&mfile_anon[file->mf_blockshift]);
+		ATOMIC_WRITE(root->mp_file, newfile);
 		decref_nokill(file);
 		if (ATOMIC_FETCHAND(root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(root);
+		/* Try to merge mem-parts after changing the pointed-to file.
+		 * This  must be done to prevent a race condition relating to
+		 * some very rare cases of async mem-part merging, as well as
+		 * to ensure consistency,  and to allow  merging of  adjacent
+		 * nodes within mman mapping trees. */
+		root = mpart_merge_locked(root);
+		mpart_lock_release(root);
 		if (ATOMIC_DECFETCH(root->mp_refcnt) == 0)
 			mpart_delete_postop_builder_enqueue(deadparts, root);
+
 	}
 	if (lhs != NULL) {
 		if (rhs != NULL)
@@ -738,13 +748,21 @@ again:
 	lhs = root->mp_filent.rb_lhs;
 	rhs = root->mp_filent.rb_rhs;
 	if (!wasdestroyed(root)) {
+		REF struct mfile *newfile;
 		/* Set the NO_GLOBAL_REF bit, thus essentially unloading the part from the
 		 * global part cache (should this mem-part  still be apart of said  cache) */
 		if (ATOMIC_FETCHAND(root->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 			decref_nokill(root); /* The global reference... */
 		_mpart_init_asanon(root);
 		assert(root->mp_file == file);
-		root->mp_file = incref(&mfile_anon[file->mf_blockshift]);
+		newfile = incref(&mfile_anon[file->mf_blockshift]);
+		ATOMIC_WRITE(root->mp_file, newfile);
+		/* Try to merge mem-parts after changing the pointed-to file.
+		 * This  must be done to prevent a race condition relating to
+		 * some very rare cases of async mem-part merging, as well as
+		 * to ensure consistency,  and to allow  merging of  adjacent
+		 * nodes within mman mapping trees. */
+		root = mpart_merge_locked(root);
 		mpart_lock_release(root);
 		decref_nokill(file); /* The reference previously stored  in `root->mp_file' */
 		if (ATOMIC_DECFETCH(root->mp_refcnt) == 0)
@@ -869,286 +887,6 @@ done:
 	sig_broadcast(&self->mf_initdone);
 }
 #endif /* !CONFIG_USE_NEW_FS */
-
-
-
-
-
-/* Try to incref all parts within the given range.
- * Parts that have already been destroyed are simply ignored. */
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpart_tree_tryincref_inrange)(struct mpart *lo,
-                                            struct mpart *hi) {
-	for (;;) {
-		COMPILER_UNUSED(tryincref(lo));
-		if (lo == hi)
-			break;
-		lo = mpart_tree_nextnode(lo);
-		assert(lo);
-	}
-}
-
-/* Drop references from all parts (that haven't already
- * been destroyed) within the given range. */
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpart_tree_decref_inrange)(struct mpart *lo,
-                                         struct mpart *hi) {
-	for (;;) {
-		if likely(!wasdestroyed(hi))
-			decref(hi);
-		if (hi == lo)
-			break;
-		hi = mpart_tree_prevnode(hi);
-		assert(hi);
-	}
-}
-
-/* Release locks to all parts within the given range. */
-/*
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpart_tree_unlock_inrange)(struct mpart *lo,
-                                         struct mpart *hi) {
-	for (;;) {
-		if likely(!wasdestroyed(hi))
-			mpart_lock_release(hi);
-		if (hi == lo)
-			break;
-		hi = mpart_tree_prevnode(hi);
-		assert(hi);
-	}
-}*/
-
-/* Try to acquire a lock to all parts within the given range.
- * If one of these locks cannot be acquired without blocking,
- * release all locks already acquired and return that part. */
-PRIVATE NOBLOCK NONNULL((1, 2)) struct mpart *
-NOTHROW(FCALL mpart_tree_trylock_inrange)(struct mpart *lo,
-                                          struct mpart *hi) {
-	struct mpart *iter = lo;
-	for (;;) {
-		if likely(!wasdestroyed(iter)) {
-			if (!mpart_lock_tryacquire(iter))
-				goto fail;
-		}
-		if (iter == hi)
-			break;
-		iter = mpart_tree_nextnode(iter);
-		assert(iter);
-	}
-	return NULL;
-fail:
-	/* Release all locks already acquired. */
-	while (lo != iter) {
-		if likely(!wasdestroyed(lo))
-			mpart_lock_release(lo);
-		lo = mpart_tree_nextnode(lo);
-		assert(lo);
-	}
-	return iter;
-}
-
-/* Acquire a lock to all  parts within the given range,  or
- * decref all parts within said range and release a lock to
- * `self' before waiting  for the blocking  part to  become
- * available and returning `false' */
-PRIVATE WUNUSED NONNULL((1, 2, 3)) bool FCALL
-mfile_lockparts_or_decref_and_unlock_inrange(struct mfile *__restrict self,
-                                             struct mpart *lo,
-                                             struct mpart *hi)
-		THROWS(E_WOULDBLOCK) {
-	struct mpart *blocking;
-	/* Try to lock all parts. */
-	blocking = mpart_tree_trylock_inrange(lo, hi);
-	if (blocking) {
-		/* Found a blocking part :( */
-		incref(blocking); /* Keep around a reference to this part. */
-		mpart_tree_decref_inrange(lo, hi);
-		mfile_lock_endwrite(self);
-		FINALLY_DECREF_UNLIKELY(blocking);
-		/* Wait for the lock to become available. */
-		while (!mpart_lock_available(blocking))
-			task_yield();
-		return false;
-	}
-	return true;
-}
-
-
-
-/* Split a potential part at `minaddr' and `maxaddr', and  make
- * it so that all parts between that range are removed from the
- * part-tree   of  `self',  by  essentially  anonymizing  them.
- * This function can be used to implement `ftruncate(2)'
- *
- * NOTE: Unlike `mfile_delete()', this function doesn't mark
- *       the file itself as deleted, meaning that more parts
- *       can still be created at a later point in time! */
-PUBLIC NONNULL((1)) void FCALL
-mfile_makeanon_subrange(struct mfile *__restrict self,
-                        PAGEDIR_PAGEALIGNED pos_t minaddr,
-                        pos_t maxaddr)
-		THROWS(E_WOULDBLOCK) {
-	struct mpart_slist dead;
-	struct mpart_tree_minmax mima;
-	assert(mfile_addr_aligned(self, minaddr));
-	assert(mfile_addr_aligned(self, maxaddr + 1));
-	SLIST_INIT(&dead);
-again_lock:
-	mfile_lock_write(self);
-	if (self->mf_parts == MFILE_PARTS_ANONYMOUS)
-		goto done; /* Simple case: the entire file was made anonymous */
-	mpart_tree_minmaxlocate(self->mf_parts, minaddr, maxaddr, &mima);
-	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
-	if (!mima.mm_min)
-		goto done; /* Simple case: Nothing to make anonymous! */
-	/* Check if we may need to split the lower/upper node. */
-	if (minaddr > mima.mm_min->mp_minaddr) {
-		if unlikely(!tryincref(mima.mm_min))
-			mima.mm_min = NULL;
-		mfile_lock_endwrite(self);
-		if likely(mima.mm_min) {
-			FINALLY_DECREF_UNLIKELY(mima.mm_min);
-			xdecref(mpart_split(mima.mm_min, minaddr));
-		}
-		goto again_lock;
-	}
-	if (maxaddr < mima.mm_max->mp_maxaddr) {
-		if unlikely(!tryincref(mima.mm_max))
-			mima.mm_max = NULL;
-		mfile_lock_endwrite(self);
-		if likely(mima.mm_max) {
-			FINALLY_DECREF_UNLIKELY(mima.mm_max);
-			xdecref(mpart_split(mima.mm_max, maxaddr + 1));
-		}
-		goto again_lock;
-	}
-
-	/* Try to incref all of the parts within the given range. */
-	mpart_tree_tryincref_inrange(mima.mm_min, mima.mm_max);
-
-	/* (try to) acquire references and locks to all parts within the discovered range. */
-	if (!mfile_lockparts_or_decref_and_unlock_inrange(self,
-	                                                  mima.mm_min,
-	                                                  mima.mm_max))
-		goto again_lock;
-
-	/* For all non-destroyed parts: do what `mpart_tree_makeanon_and_unlock_and_decref'
-	 * does, whilst removing all  of the affected parts  from the part-tree of  `self'. */
-	{
-		struct mpart *part = mima.mm_min;
-		mpart_tree_removenode(&self->mf_parts, part);
-		do {
-			if (!wasdestroyed(part)) {
-				/* Set the NO_GLOBAL_REF bit, thus essentially unloading the part from the
-				 * global part cache (should this mem-part  still be apart of said  cache) */
-				if (ATOMIC_FETCHAND(part->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
-					decref_nokill(part); /* The global reference... */
-				_mpart_init_asanon(part);
-				assert(part->mp_file == self);
-				part->mp_file = incref(&mfile_anon[self->mf_blockshift]);
-				COMPILER_WRITE_BARRIER();
-				/* Clear the CHANGED-bit now, since we can only do so while also holding
-				 * a  lock to  the mem-part, given  that we're not  actually setting the
-				 * changed-part list of `self' to anonymous! */
-				ATOMIC_AND(part->mp_flags, ~(MPART_F_CHANGED | MPART_F_LOCKBIT));
-				mpart_lockops_reap(part);
-				decref_nokill(self);                       /* The reference previously stored  in `part->mp_file' */
-				if (ATOMIC_DECFETCH(part->mp_refcnt) == 0) /* Reference created by `mpart_tree_tryincref_inrange()' */
-					SLIST_INSERT(&dead, part, _mp_dead);   /* Destroy this one later... */
-			} else {
-				DBG_memset(&part->mp_filent, 0xcc, sizeof(part->mp_filent));
-			}
-			part = mpart_tree_rremove(&self->mf_parts, minaddr, maxaddr);
-		} while (part != NULL);
-	} /* Scope... */
-
-	{
-		struct mpart_slist changed;
-		struct mpart **p_chng, *chng;
-		/* Capture all elements from the list of changed parts. */
-		do {
-			changed.slh_first = ATOMIC_READ(self->mf_changed.slh_first);
-			if (changed.slh_first == MFILE_PARTS_ANONYMOUS)
-				goto done;
-		} while (!ATOMIC_CMPXCH_WEAK(self->mf_changed.slh_first,
-		                             changed.slh_first, NULL));
-
-		/* Remove all changed parts from within the caller-given file-range. */
-		p_chng = SLIST_PFIRST(&changed);
-		while ((chng = *p_chng) != NULL) {
-			if (minaddr <= chng->mp_maxaddr &&
-			    maxaddr >= chng->mp_minaddr) {
-				/* Apart of the anonymized address range! */
-				assert(chng->mp_file == &mfile_anon[self->mf_blockshift]);
-				SLIST_P_REMOVE(p_chng, mp_changed);
-				DBG_memset(&chng->mp_changed, 0xcc, sizeof(chng->mp_changed));
-				assert(!(chng->mp_flags & MPART_F_CHANGED));
-
-				/* Drop  a reference from the changed mem-part. This is the reference
-				 * that was originally created when the part was added to the changed
-				 * list. */
-				if (ATOMIC_DECFETCH(chng->mp_refcnt) == 0)
-					SLIST_INSERT(&dead, chng, _mp_dead);
-			} else {
-				/* Keep this part! */
-				p_chng = SLIST_PNEXT(chng, mp_changed);
-			}
-		}
-		if (!SLIST_EMPTY(&changed)) {
-			/* Re-insert all remaining changed parts into the changed-part list. */
-			struct mpart_slist more_changed;
-again_restore_changed:
-			more_changed.slh_first = ATOMIC_CMPXCH_VAL(self->mf_changed.slh_first,
-			                                           NULL, changed.slh_first);
-			if (more_changed.slh_first == NULL)
-				goto done;
-			/* : If the changed-part list was set to ANON in the mean time, then discard all changed parts. */
-			if (more_changed.slh_first == MFILE_PARTS_ANONYMOUS) {
-				/* Discard all changed parts */
-				do {
-					chng = SLIST_FIRST(&changed);
-					SLIST_REMOVE_HEAD(&changed, mp_changed);
-					DBG_memset(&chng->mp_changed, 0xcc, sizeof(chng->mp_changed));
-					if (ATOMIC_DECFETCH(chng->mp_refcnt) == 0)
-						SLIST_INSERT(&dead, chng, _mp_dead);
-				} while (!SLIST_EMPTY(&changed));
-				goto done;
-			}
-			/* Combine the 2 lists of changed parts and try to restore everything at once. */
-			if (!ATOMIC_CMPXCH(self->mf_changed.slh_first,
-			                   more_changed.slh_first, NULL))
-				goto again_restore_changed;
-			chng = SLIST_FIRST(&more_changed);
-			while (SLIST_NEXT(chng, mp_changed))
-				chng = SLIST_NEXT(chng, mp_changed);
-			chng->mp_changed.sle_next = changed.slh_first;
-			changed                   = more_changed;
-			goto again_restore_changed;
-		}
-	} /* Scope... */
-
-done:
-	mfile_lock_endwrite_f(self);
-
-	/* Destroy all mem-parts apart of the dead-list. */
-	while (!SLIST_EMPTY(&dead)) {
-		struct mpart *part;
-		part = SLIST_FIRST(&dead);
-		SLIST_REMOVE_HEAD(&dead, _mp_dead);
-		mpart_destroy(part);
-	}
-
-	/* Reap lockops _after_ all of the old parts have been destroyed,
-	 * thus  raising the interlocked-ness between those 2 operations,
-	 * which may potentially increase efficiency. */
-	mfile_lockops_reap(self);
-
-	/* Wake-up possibly waiting threads.
-	 * Since we've altered the backing files of a lot of parts, we
-	 * have to ensure that threads waiting for init to be done are
-	 * connected to the relevant signal. */
-	sig_broadcast(&self->mf_initdone);
-}
 
 
 DECL_END

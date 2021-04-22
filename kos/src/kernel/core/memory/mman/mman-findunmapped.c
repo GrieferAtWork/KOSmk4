@@ -644,7 +644,7 @@ mman_getunmapped_or_unlock(struct mman *__restrict self, void *addr,
 	if (flags & MAP_FIXED) {
 		struct mnode const *node;
 		byte_t *maxaddr;
-		result  = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
+		result = (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE);
 		/* Check for overflowing `num_bytes' */
 		if unlikely(OVERFLOW_UADD((uintptr_t)addr, num_bytes - 1, (uintptr_t *)&maxaddr)) {
 			mman_lock_release(self);
@@ -701,8 +701,13 @@ disallow_mmap:
 				/* Must split this node! */
 				if (mima.mm_min->mn_flags & MNODE_F_NOSPLIT)
 					goto disallow_mmap; /* Not allowed! */
-				if (!mnode_split_or_unlock(self, mima.mm_max, max_mapaddr + 1, unlock))
-					goto must_retry;
+				TRY {
+					if (!mnode_split_or_unlock(self, mima.mm_max, max_mapaddr + 1, unlock))
+						goto must_retry;
+				} EXCEPT {
+					mman_mergenodes(self);
+					RETHROW();
+				}
 			}
 #ifndef NDEBUG
 			mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);

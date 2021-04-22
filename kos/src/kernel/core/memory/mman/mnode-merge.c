@@ -19,6 +19,9 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_MERGE_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_MERGE_C 1
+#define __WANT_MPART__mp_nodlsts
+#define __WANT_MPART__mp_dtplop
+#define __WANT_MPART__mp_dead
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -27,15 +30,670 @@
 #include <fs/vfs.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/mpartmeta.h>
+#include <kernel/printk.h>
+#include <sched/lockop.h>
+
+#include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 DECL_BEGIN
 
-/* While holding  a lock  to `self->mn_mman'  and `self->mn_part',  try
- * to merge the given node with its successor/predecessor node, without
- * releasing any of the locks still held.
+/* Check if 2 range overlap. */
+#define RANGES_OVERLAP(r1_min, r1_max, r2_min, r2_max) \
+	((r1_max) >= (r2_min) && (r2_max) >= (r1_min))
+
+
+/* Mask  of flags that must be shared  between 2 nodes for them to
+ * be mergeable. Note  that the MNODE_F_NOMERGE  flag is apart  of
+ * this mask, since neither node should have it set, and by making
+ * sure that this flag has the same state for both nodes, it  will
+ * be sufficient to  only ensure  that 1  of the  2 nodes  doesn't
+ * have said flag set! (!a && (a == b) --> !b) */
+#define MNODE_F_MERGEMASK                                   \
+	(MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |       \
+	 MNODE_F_SHARED | MNODE_F_UNMAPPED | MNODE_F_KERNPART | \
+	 MNODE_F_MHINT | MNODE_F_MLOCK | MNODE_F_NOSPLIT |      \
+	 MNODE_F_NOMERGE | MNODE_F_NOCORE)
+
+/* Like `MNODE_F_MERGEMASK', but for `struct mpart::mp_flags' */
+#define MPART_F_MERGEMASK                                    \
+	(MPART_F_NOFREE | MPART_F_PERSISTENT | MPART_F_NOSPLIT | \
+	 MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN)
+
+
+/* Returns `true' if `self' doesn't have any active DMA  locks.
+ * Otherwise, return `false' and set `_MPART_F_MERGE_AFTER_DMA' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL mpart_canmerge_chkdma)(struct mpart *__restrict self) {
+	struct mpartmeta *meta;
+	if ((meta = self->mp_meta) != NULL && ATOMIC_READ(meta->mpm_dmalocks) != 0) {
+		ATOMIC_OR(self->mp_flags, _MPART_F_MERGE_AFTER_DMA);
+		if (ATOMIC_READ(meta->mpm_dmalocks) != 0)
+			return false;
+	}
+	return true;
+}
+
+
+/* Check if 2 given (adjacent) nodes might potentially be mergeable.
+ * The caller  must  be  holding  a lock  to  the  associated  mman! */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL mnode_canmerge)(struct mnode *lonode,
+                              struct mnode *hinode) {
+	struct mpart *lopart, *hipart;
+
+	/* Check if the 2 nodes are continuous. */
+	if (lonode->mn_maxaddr + 1 != hinode->mn_minaddr)
+		goto nope;
+
+	/* Check if node flags are compatible. */
+	if ((lonode->mn_flags & MNODE_F_MERGEMASK) !=
+	    (hinode->mn_flags & MNODE_F_MERGEMASK))
+		goto nope;
+
+	/* Check if either of the 2 nodes requires NOMERGE behavior. */
+	if (lonode->mn_flags & (MNODE_F_NOMERGE | MNODE_F_MHINT))
+		goto nope;
+
+	/* Check if both nodes reference the same backing module. */
+	if (lonode->mn_module != hinode->mn_module)
+		goto nope;
+
+	/* Make sure that both nodes have the same filesystem name. */
+	if (lonode->mn_fspath != hinode->mn_fspath)
+		goto nope;
+	if (lonode->mn_fsname != hinode->mn_fsname)
+		goto nope;
+
+	/* Check if both nodes have a mem-part, or neither do. */
+	if ((lopart = lonode->mn_part) == NULL) {
+		if (hinode->mn_part != NULL)
+			goto nope;
+	} else {
+		if ((hipart = hinode->mn_part) == NULL)
+			goto nope;
+		/* Check if the 2 parts are sequentially consistent. */
+		if (ATOMIC_READ(lopart->mp_file) != ATOMIC_READ(hipart->mp_file))
+			goto nope;
+		if (mpart_isanon(lopart)) {
+			if unlikely(!mpart_isanon(hipart))
+				goto nope;
+			if (lopart == hipart) {
+				/* If it's the same part, then file-offsets mustn't
+				 * overlap. - If they do,  then this mean that  the
+				 * same memory is mapped  more than once, and  that
+				 * we can't actually merge the 2 parts. */
+				if (RANGES_OVERLAP(mnode_getmapminaddr(lonode),
+				                   mnode_getmapmaxaddr(lonode),
+				                   mnode_getmapminaddr(hinode),
+				                   mnode_getmapmaxaddr(hinode)))
+					goto nope;
+			} else {
+				/* For differing anonymous parts, we can simply merge  the
+				 * 2 parts in whatever shape is necessary for the merge to
+				 * succeed. */
+			}
+		} else {
+			if unlikely(mpart_isanon(hipart))
+				goto nope;
+			if (mnode_getfileendaddr(lonode) !=
+			    mnode_getfileaddr(hinode))
+				goto nope;
+		}
+		if (lopart != hipart) {
+			/* Check if part flags are compatible. */
+			if ((lopart->mp_flags & MPART_F_MERGEMASK) !=
+			    (hipart->mp_flags & MPART_F_MERGEMASK))
+				goto nope;
+			/* Check for flags that require special handling. */
+			if (lopart->mp_flags & (MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN)) {
+				if (lopart->mp_flags & MPART_F_NOMERGE)
+					goto nope; /* Not allowed to merge. */
+				/* When the MLOCK_FROZEN  flag is set,  then the 2  mem-
+				 * parts must also share the same `MPART_F_MLOCK' value! */
+				if ((lopart->mp_flags & MPART_F_MLOCK) !=
+				    (hipart->mp_flags & MPART_F_MLOCK))
+					goto nope;
+			}
+			/* Merging isn't possible  if either of  the 2 parts  currently
+			 * has DMA-locks allocated. If this  is the case, then we  must
+			 * set  the MERGE_AFTER_DMA flag  in order to  get the owner of
+			 * the DMA-locks to re-attempt the merge once they're all gone. */
+			if (!mpart_canmerge_chkdma(lopart))
+				goto nope;
+			if (!mpart_canmerge_chkdma(hipart))
+				goto nope;
+		}
+	}
+	return true;
+nope:
+	return false;
+}
+
+
+/* Check if 2 given (adjacent) parts might potentially be mergeable. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL mpart_canmerge)(struct mpart *lopart,
+                              struct mpart *hipart) {
+	/* Check if the 2 parts reference the same file. */
+	if (ATOMIC_READ(lopart->mp_file) != ATOMIC_READ(hipart->mp_file))
+		goto nope;
+
+	/* Check if the 2 parts are continuous. */
+	if (mpart_isanon(lopart)) {
+		if (!mpart_isanon(hipart))
+			goto nope;
+	} else {
+		if (mpart_isanon(hipart))
+			goto nope;
+		/* In-file positions only matter for non-anonymous parts. */
+		if (lopart->mp_maxaddr + 1 != hipart->mp_minaddr)
+			goto nope;
+	}
+
+	/* Check if part flags are compatible. */
+	if ((lopart->mp_flags & MPART_F_MERGEMASK) !=
+	    (hipart->mp_flags & MPART_F_MERGEMASK))
+		goto nope;
+
+	/* Check for flags that require special handling. */
+	if (lopart->mp_flags & (MPART_F_NOMERGE | MPART_F_MLOCK_FROZEN)) {
+		if (lopart->mp_flags & MPART_F_NOMERGE)
+			goto nope; /* Not allowed to merge. */
+		/* When the MLOCK_FROZEN  flag is set,  then the 2  mem-
+		 * parts must also share the same `MPART_F_MLOCK' value! */
+		if ((lopart->mp_flags & MPART_F_MLOCK) !=
+		    (hipart->mp_flags & MPART_F_MLOCK))
+			goto nope;
+	}
+
+	/* Merging isn't possible  if either of  the 2 parts  currently
+	 * has DMA-locks allocated. If this  is the case, then we  must
+	 * set  the MERGE_AFTER_DMA flag  in order to  get the owner of
+	 * the DMA-locks to re-attempt the merge once they're all gone. */
+	if (!mpart_canmerge_chkdma(lopart))
+		goto nope;
+	if (!mpart_canmerge_chkdma(hipart))
+		goto nope;
+
+	return true;
+nope:
+	return false;
+}
+
+
+
+/* Check if `self' has a neighbor with which it should be merged.
+ * The caller  must be  holding a  lock to  the associated  mman! */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL mnode_shouldmerge)(struct mnode *__restrict self) {
+	struct mnode *neighbor;
+	if ((neighbor = mnode_tree_prevnode(self)) != NULL && mnode_canmerge(neighbor, self))
+		return true;
+	if ((neighbor = mnode_tree_nextnode(self)) != NULL && mnode_canmerge(self, neighbor))
+		return true;
+	return false;
+
+}
+
+
+
+
+/* Allowed values/states for `thismman_mergenodes_lop.mml_mm_lop.olo_func':
+ *   INITIAL  --> MERGENODES_LOP_FUNC_INACTIVE
+ */
+#define MERGENODES_LOP_FUNC_INACTIVE       ((Toblockop_callback_t(struct mman))0) /* No request is pending, or running */
+#define MERGENODES_LOP_FUNC_PENDING        (&mergenodes_lop_cb)                   /* Request is pending. */
+#define MERGENODES_LOP_FUNC_RUNNING        ((Toblockop_callback_t(struct mman))1) /* Nodes are being merged right now. */
+#define MERGENODES_LOP_FUNC_WAITFOR_MPART  ((Toblockop_callback_t(struct mman))&mergenode_waitfor_mpart_lop)     /* Waiting for a mem-part */
+#define MERGENODES_LOP_FUNC_WAITFOR_MPART2 ((Toblockop_callback_t(struct mman))&mergenode_waitfor_mpart_postlop) /* *ditto* */
+
+union mman_mergenodes_lop {
+	Toblockop(struct mman)      mml_mm_lop;     /* Lop */
+	Tobpostlockop(struct mman)  mml_mm_postlop; /* Post-Lop */
+	Toblockop(struct mpart)     mml_mp_lop;     /* Lop */
+	Tobpostlockop(struct mpart) mml_mp_postlop; /* Post-Lop */
+};
+
+/* A special per-mman lockop may be used to enqueue an async call to `mman_mergenodes()'
+ * NOTE: The `olo_func' field of this lockop  carries a special role with  its
+ *       meaning, in that it may only be set to one of `MERGENODES_LOP_FUNC_*' */
+PRIVATE ATTR_PERMMAN union mman_mergenodes_lop
+thismman_mergenodes_lop = { { {}, MERGENODES_LOP_FUNC_INACTIVE } };
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(struct mman) *__restrict lop,
+                                 struct mman *__restrict self) {
+	assert(lop == &FORMMAN(self, thismman_mergenodes_lop.mml_mm_lop));
+
+	/* Drop  the reference that `async_mergenodes()' created for
+	 * us. Note that we can  use *nokill, because the caller  of
+	 * `mman_lockops_reap()' must necessarily be holding another
+	 * reference to this same mman! */
+	decref_nokill(self);
+
+	/* Indicate that we're now running the async-mergenodes function. */
+	ATOMIC_WRITE(lop->olo_func, MERGENODES_LOP_FUNC_RUNNING);
+
+	/* Merge nodes by use of `mman_mergenodes_locked()', however
+	 * if we get into a situation where we need to wait for  the
+	 * lock of some mem-part to become available, then halt  the
+	 * process of merging mem-nodes and enqueue a lockop on  the
+	 * blocking mem-part. Then, from within that lock-op, switch
+	 * over  to a post-lockop, from inside of which we must then
+	 * call  `mman_mergenodes()' in order  to restart the entire
+	 * process of merging nodes. */
+	mman_mergenodes_locked(self);
+
+	/* If the mergenodes lop still indicates a normal RUNNING
+	 * state, then all nodes that  may have been mergeable at
+	 * one point have  now been merged,  meaning that we  can
+	 * safely switch back to the initial INACTIVE state. */
+	if (lop->olo_func == MERGENODES_LOP_FUNC_RUNNING)
+		ATOMIC_WRITE(lop->olo_func, MERGENODES_LOP_FUNC_INACTIVE);
+	return NULL;
+}
+
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mergenode_waitfor_mpart_postlop)(Tobpostlockop(struct mpart) *__restrict _lop,
+                                               REF struct mpart *__restrict self) {
+	struct mman *mm;
+	union mman_mergenodes_lop *lop;
+	mm  = (struct mman *)((byte_t *)_lop - (uintptr_t)&thismman_mergenodes_lop.mml_mp_postlop);
+	lop = &FORMMAN(mm, thismman_mergenodes_lop);
+
+	/* Drop the reference that `async_waitfor_part_and_mergenodes()'
+	 * created for us.  Note that  we can use  *nokill, because  the
+	 * caller  of `mpart_lockops_reap()' must necessarily be holding
+	 * another reference to this same part! */
+	decref_nokill(self);
+
+	/* Reset the LOP-state to indicate that we're inactive.
+	 * We won't be inactive for  long, but for the sake  of
+	 * consistency, race  conditions,  and  simplicity,  we
+	 * temporarily  switch to INACTIVE, only to immediately
+	 * re-start. */
+	ATOMIC_WRITE(lop->mml_mm_lop.olo_func, MERGENODES_LOP_FUNC_INACTIVE);
+
+	/* Merge nodes of the mman. */
+	mman_mergenodes(mm);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
+NOTHROW(FCALL mergenode_waitfor_mpart_lop)(Toblockop(struct mpart) *__restrict lop,
+                                           REF struct mpart *__restrict UNUSED(self)) {
+	Tobpostlockop(struct mpart) *post;
+	post = (Tobpostlockop(struct mpart) *)lop;
+	/* Do the rest of the work from a post-lockop.
+	 * NOTE: This also inherit the reference to `self' */
+	ATOMIC_WRITE(post->oplo_func, &mergenode_waitfor_mpart_postlop);
+	return post;
+}
+
+/* Wait for the lock of `blocking_part' to become available,
+ * after which point  in time, call  `mman_mergenodes(self)' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL async_waitfor_part_and_mergenodes)(struct mman *__restrict self,
+                                                 struct mpart *__restrict blocking_part) {
+	union mman_mergenodes_lop *lop;
+	Toblockop_callback_t(struct mman) func;
+	lop = &FORMMAN(self, thismman_mergenodes_lop);
+	/* (try to) switch over into WAITFOR_MPART node. */
+	do {
+		func = ATOMIC_READ(lop->mml_mm_lop.olo_func);
+		if (func != MERGENODES_LOP_FUNC_INACTIVE &&
+		    func != MERGENODES_LOP_FUNC_RUNNING) {
+			/* Something that will eventually call mergenodes is already set-up!
+			 * -> So just don't interfere... */
+			return;
+		}
+	} while (!ATOMIC_CMPXCH(lop->mml_mm_lop.olo_func, func,
+	                        MERGENODES_LOP_FUNC_WAITFOR_MPART));
+
+	/* This reference is inherited by `mergenode_waitfor_mpart_lop'
+	 * (aka. `MERGENODES_LOP_FUNC_WAITFOR_MPART') */
+	incref(blocking_part);
+
+	/* Enqueue the lockop into `blocking_part' */
+	SLIST_ATOMIC_INSERT(&blocking_part->mp_lockops,
+	                    &lop->mml_mp_lop, olo_link);
+
+	/* Kick-start async lockop handling in case `blocking_part'
+	 * became unlocked in the mean time. */
+	_mpart_lockops_reap(blocking_part);
+}
+
+
+/* Asynchronously re-attempt trying to merge  mem-parts.
+ * May be called if merging isn't possible at the moment
+ * due to lack of memory, or-the-like... */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_mergenodes)(struct mman *__restrict self) {
+	union mman_mergenodes_lop *lop;
+	lop = &FORMMAN(self, thismman_mergenodes_lop);
+	if (ATOMIC_CMPXCH(lop->mml_mm_lop.olo_func,
+	                  MERGENODES_LOP_FUNC_INACTIVE,
+	                  MERGENODES_LOP_FUNC_PENDING)) {
+		incref(self); /* Inherited by `mergenodes_lop_cb()' */
+		SLIST_ATOMIC_INSERT(&FORMMAN(self, thismman_lockops),
+		                    &lop->mml_mm_lop, olo_link);
+	}
+}
+
+
+/* Special return value for (some of) the `mnode_domerge*'
+ * functions. When returned, this  means that the given  2
+ * mem-nodes cannot actually be merged at all! */
+#define MNODE_MERGE_CANNOT_MERGE ((struct mnode *)0)
+
+/* Special return value for (some of) the `mnode_domerge*'
+ * functions. When returned, stop attempting to merge more
+ * nodes and simply return/release all locks.
+ * This return value indicates that `thismman_mergenodes_lop'
+ * has been re-purposed for async waiting on the lock of some
+ * mem-part that is needed for merging nodes. Once that  lock
+ * becomes available, `mman_mergenodes()' will  automatically
+ * be called in order to re-start the act of merging nodes. */
+#define MNODE_MERGE_ASYNC_WAITFOR ((struct mnode *)-1)
+
+
+
+
+
+/* Merge the 2 given nodes.
+ *    @assume(WAS_TRUE_AFTER_MMAN_LOCK(mnode_canmerge(lonode, hinode)));
+ *    @assume(lonode->mn_part == NULL);
+ *    @assume(hinode->mn_part == NULL);
+ * Return a pointer to the newly merged node. */
+PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct mnode *
+NOTHROW(FCALL mnode_domerge_without_part)(struct mnode *__restrict lonode,
+                                          struct mnode *__restrict hinode) {
+	assert(lonode->mn_part == NULL);
+	assert(hinode->mn_part == NULL);
+
+	/* Merge the 2 nodes */
+	mman_mappings_removenode(lonode->mn_mman, lonode);
+	mman_mappings_removenode(lonode->mn_mman, hinode);
+	if (hinode->mn_module) {
+		assert(hinode->mn_module->md_nodecount >= 2);
+		--hinode->mn_module->md_nodecount;
+	}
+
+	/* Make the lonode cover the entirety of the hinode. */
+	lonode->mn_maxaddr = hinode->mn_maxaddr;
+	xdecref_nokill(hinode->mn_fspath);
+	xdecref_nokill(hinode->mn_fsname);
+
+	/* If the hinode was in the writable-list, then remove it.
+	 * Furthermore, if the lonode wasn't  in its, add it  now! */
+	if (LIST_ISBOUND(hinode, mn_writable)) {
+		LIST_REMOVE(hinode, mn_writable);
+		if (!LIST_ISBOUND(lonode, mn_writable))
+			LIST_INSERT_HEAD(&lonode->mn_mman->mm_writable, lonode, mn_writable);
+	}
+
+	/* Re-insert the now enlarged lonode. */
+	mman_mappings_insert(lonode->mn_mman, lonode);
+
+	/* Destroy the no-longer-used hinode. */
+	mnode_free(hinode);
+	return lonode;
+}
+
+/* Merge the 2 given nodes.
+ *    @assume(WAS_TRUE_AFTER_MMAN_LOCK(mnode_canmerge(lonode, hinode)));
+ *    @assume(lonode->mn_part != NULL);
+ *    @assume(lonode->mn_part == hinode->mn_part);
+ *    @assume(mpart_lock_acquired(lonode->mn_part));
+ * Return a pointer to the newly merged node.
+ * @return: * : The merged node.
+ * @return: MNODE_MERGE_CANNOT_MERGE: ... */
+PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct mnode *
+NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
+                                             struct mnode *__restrict hinode) {
+	assert(lonode->mn_part != NULL);
+	assert(lonode->mn_part == hinode->mn_part);
+	assert(mpart_lock_acquired(lonode->mn_part));
+
+	/* Figure out the relative mapping addresses of the 2 parts. */
+	if (mnode_getmapendaddr(lonode) == mnode_getmapaddr(hinode)) {
+		/* Simple case: the in-part offsets mapped by the 2 nodes are
+		 * already set-up such that  the memory they're mapping  uses
+		 * adjacent in-part offsets. */
+	} else {
+		/* If  the 2 ranges  overlap with each other  in any way, then
+		 * at least some part of the physical backing memory is mapped
+		 * more than once, in which case merging isn't possible, since
+		 * we  must maintain the expected invariant of the part of the
+		 * mapping being a duplicate of another part. */
+		if (RANGES_OVERLAP(mnode_getmapminaddr(lonode),
+		                   mnode_getmapmaxaddr(lonode),
+		                   mnode_getmapminaddr(hinode),
+		                   mnode_getmapmaxaddr(hinode)))
+			return MNODE_MERGE_CANNOT_MERGE;
+		/* It ~is~ possible that we might be able to plug the  2
+		 * portions of the mem-part that are being mapped out of
+		 * the part, and  use them  to re-form a  new that  that
+		 * contains  only those portions that are actually used.
+		 *
+		 * However, for this we must also take a look at all other
+		 * nodes  which may be  mapping the part  aside from the 2
+		 * given nodes which our caller wants us to merge. */
+		/* TODO */
+		return MNODE_MERGE_CANNOT_MERGE;
+	}
+
+	/* Merge the 2 nodes */
+	mman_mappings_removenode(lonode->mn_mman, lonode);
+	mman_mappings_removenode(lonode->mn_mman, hinode);
+
+	if (hinode->mn_module) {
+		assert(hinode->mn_module->md_nodecount >= 2);
+		--hinode->mn_module->md_nodecount;
+	}
+
+	/* Make the lonode cover the entirety of the hinode. */
+	lonode->mn_maxaddr = hinode->mn_maxaddr;
+	xdecref_nokill(hinode->mn_fspath);
+	xdecref_nokill(hinode->mn_fsname);
+
+	/* Remove the old hi-node */
+	LIST_REMOVE(hinode, mn_link);
+
+	/* If the hinode was in the writable-list, then remove it.
+	 * Furthermore, if the lonode wasn't  in its, add it  now! */
+	if (LIST_ISBOUND(hinode, mn_writable)) {
+		LIST_REMOVE(hinode, mn_writable);
+		if (!LIST_ISBOUND(lonode, mn_writable))
+			LIST_INSERT_HEAD(&lonode->mn_mman->mm_writable, lonode, mn_writable);
+	}
+
+	/* Re-insert the now enlarged lonode. */
+	mman_mappings_insert(lonode->mn_mman, lonode);
+
+	/* Destroy the no-longer-used hinode. */
+	mnode_free(hinode);
+	return lonode;
+}
+
+
+
+/* Special return values for (some of) the `mpart_domerge*' functions */
+#define MPART_MERGE_CANNOT_MERGE  ((struct mpart *)0)  /* s.a. `MNODE_MERGE_CANNOT_MERGE' */
+#define MPART_MERGE_ASYNC_WAITFOR ((struct mpart *)-1) /* s.a. `MNODE_MERGE_ASYNC_WAITFOR' */
+
+/* See description below... */
+PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
+                                          /*inherit(on_success)*/ REF struct mpart *__restrict hipart,
+                                          struct mman *__restrict locked_mman);
+
+/* Merge the 2 given nodes.
+ *    @assume(WAS_TRUE_AFTER_MMAN_LOCK(mnode_canmerge(lonode, hinode)));
+ *    @assume(lonode->mn_part != NULL);
+ *    @assume(hinode->mn_part != NULL);
+ *    @assume((lonode->mn_part == part) || (hinode->mn_part == part));
+ *    @assume(mpart_lock_acquired(part));
+ * Return a pointer to the newly merged node.
+ * @return: * : The merged node. In this case, the lock to `part' will
+ *              have been released, and the caller must inherit a lock
+ *              to `return->mn_part' instead.
+ * @return: MNODE_MERGE_CANNOT_MERGE:  ...
+ * @return: MNODE_MERGE_ASYNC_WAITFOR: ... */
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) struct mnode *
+NOTHROW(FCALL mnode_domerge_with_part_lock)(struct mnode *__restrict lonode,
+                                            struct mnode *__restrict hinode,
+                                            struct mpart *__restrict part) {
+	struct mpart *other_part;
+	assert(lonode->mn_part != NULL);
+	assert(hinode->mn_part != NULL);
+	assert((lonode->mn_part == part) || (hinode->mn_part == part));
+	assert(mpart_lock_acquired(part));
+	/* Check for simple case of both nodes using the same part. */
+	if (lonode->mn_part == hinode->mn_part) {
+merge_identical_parts:
+		return mnode_domerge_samepart_locked(lonode, hinode);
+	}
+	other_part = lonode->mn_part;
+	if (other_part == part)
+		other_part = hinode->mn_part;
+	assert(other_part != part);
+	if (!mpart_lock_tryacquire(other_part)) {
+		async_waitfor_part_and_mergenodes(lonode->mn_mman,
+		                                  other_part);
+		return MNODE_MERGE_ASYNC_WAITFOR;
+	}
+	/* Re-check if it's possible to merge the 2 parts in question. */
+	if (!mpart_canmerge(lonode->mn_part, hinode->mn_part)) {
+		mpart_lock_release(other_part);
+		return MNODE_MERGE_CANNOT_MERGE;
+	}
+
+	/* Try to merge `part' with `other_part' */
+	{
+		REF struct mpart *lopart, *hipart;
+		REF struct mpart *merged_part;
+		lopart      = incref(lonode->mn_part);
+		hipart      = incref(hinode->mn_part);
+		merged_part = mpart_domerge_with_mm_lock(lopart, hipart, lonode->mn_mman);
+		if (merged_part == MPART_MERGE_CANNOT_MERGE ||
+		    merged_part == MPART_MERGE_ASYNC_WAITFOR) {
+			/* Merging will be performed asynchronously, or merging isn't possible. */
+			assert(lopart == lonode->mn_part);
+			assert(hipart == hinode->mn_part);
+			decref_nokill(lopart);
+			decref_nokill(hipart);
+			mpart_lock_release(other_part);
+			if (merged_part == MPART_MERGE_CANNOT_MERGE)
+				return MNODE_MERGE_CANNOT_MERGE;
+			return MNODE_MERGE_ASYNC_WAITFOR;
+		}
+		/* Successfully merged the 2 parts.
+		 * As the result of this, we've lost the following locks:
+		 *    - mpart_lock_acquired(part)
+		 *    - mpart_lock_acquired(other_part)
+		 * Whilst simultaneously gaining the following lock:
+		 *    - merged_part
+		 * Additionally, we're still holding a lock to `locked_mm',
+		 * and both of the parts should now be referencing the same
+		 * `merged_part' (meaning that we can loop back to the case
+		 * of merging 2 nodes mapping the same mem-part) */
+		assert(lonode->mn_part == merged_part);
+		assert(hinode->mn_part == merged_part);
+		decref_nokill(merged_part); /* The reference returned by `mpart_domerge_with_mm_lock()' */
+		goto merge_identical_parts;
+	}
+}
+
+/* Merge the 2 given nodes.
+ *    @assume(WAS_TRUE_AFTER_MMAN_LOCK(mnode_canmerge(lonode, hinode)));
+ * Return a pointer to the newly merged node.
+ * @return: * : The merged node.
+ * @return: MNODE_MERGE_CANNOT_MERGE:  ...
+ * @return: MNODE_MERGE_ASYNC_WAITFOR: ... */
+PRIVATE NOBLOCK NONNULL((1, 2)) struct mnode *
+NOTHROW(FCALL mnode_domerge)(struct mnode *__restrict lonode,
+                             struct mnode *__restrict hinode) {
+	struct mpart *lopart;
+	assert((lonode->mn_part != NULL) == (hinode->mn_part != NULL));
+	if ((lopart = lonode->mn_part) == NULL)
+		return mnode_domerge_without_part(lonode, hinode);
+
+	/* Try to acquire a lock to  the first part, so we  can
+	 * use `mnode_domerge_with_part_lock()' to do the rest.
+	 * If the lock  can't be acquired,  then we can  simply
+	 * make use of `async_waitfor_part_and_mergenodes()' in
+	 * order to wait for it to become available. */
+	if (mpart_lock_tryacquire(lopart)) {
+		struct mnode *result;
+		result = mnode_domerge_with_part_lock(lonode, hinode, lopart);
+		if (result != MNODE_MERGE_CANNOT_MERGE &&
+		    result != MNODE_MERGE_ASYNC_WAITFOR)
+			lopart = result->mn_part;
+		mpart_lock_release(lopart);
+		return result;
+	}
+
+	/* Must asynchronously wait for the part to become available. */
+	async_waitfor_part_and_mergenodes(lonode->mn_mman, lopart);
+	return MNODE_MERGE_ASYNC_WAITFOR;
+}
+
+
+/* Merge a mem-node without a backing part (i.e. a RESERVED node) */
+PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
+NOTHROW(FCALL mnode_merge_without_part)(struct mnode *__restrict self) {
+	struct mnode *neighbor;
+	assert(self->mn_part == NULL);
+	if ((neighbor = mnode_tree_prevnode(self)) != NULL && mnode_canmerge(neighbor, self))
+		self = mnode_domerge_without_part(neighbor, self);
+	if ((neighbor = mnode_tree_nextnode(self)) != NULL && mnode_canmerge(self, neighbor))
+		self = mnode_domerge_without_part(self, neighbor);
+	return self;
+}
+
+
+/* Same  as `mnode_merge()', but  the caller must  also be holding a
+ * lock to `self->mn_part'  (which may be  assumed to be  non-NULL).
+ * Upon return, the lock to `self->mn_part' may have been  released,
+ * in which case the caller must inherit a lock to `return->mn_part' */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mnode *
+NOTHROW(FCALL mnode_merge_with_partlock)(struct mnode *__restrict self) {
+	struct mnode *merged, *neighbor;
+	assert(self->mn_part);
+	assert(mpart_lock_acquired(self->mn_part));
+	if ((neighbor = mnode_tree_prevnode(self)) != NULL && mnode_canmerge(neighbor, self)) {
+		merged = mnode_domerge_with_part_lock(neighbor, self, self->mn_part);
+		if unlikely(merged == MNODE_MERGE_ASYNC_WAITFOR)
+			return self; /* Merging will be completed asynchronously. */
+		if (merged != MNODE_MERGE_CANNOT_MERGE)
+			self = merged; /* Successfully merged! */
+	}
+	if ((neighbor = mnode_tree_nextnode(self)) != NULL && mnode_canmerge(self, neighbor)) {
+		merged = mnode_domerge_with_part_lock(self, neighbor, self->mn_part);
+		if unlikely(merged == MNODE_MERGE_ASYNC_WAITFOR)
+			return self; /* Merging will be completed asynchronously. */
+		if (merged != MNODE_MERGE_CANNOT_MERGE)
+			self = merged; /* Successfully merged! */
+	}
+	return self;
+}
+
+
+/* While  holding a lock  to `self->mn_mman', try to  merge the given node
+ * with its successor/predecessor node, without releasing the lock to  the
+ * associated mman. If it is found that `self' is mergeable, but that this
+ * cannot be done  without blocking, `self->mn_mman'  is set-up such  that
+ * the merge operation will be performed asynchronously.
  * @return: * : The new, merged node (which may have a different min-addr
  *              that the original node `self'). Also note that this  node
  *              may or may not be equal to `self', and that it's min- and
@@ -45,18 +703,1117 @@ DECL_BEGIN
  *              to this function! */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self) {
-	assert(!self->mn_part || mpart_lock_acquired(self->mn_part));
-	assert(self->mn_mman);
-	assert(mman_lock_acquired(self->mn_mman));
-	/* If we're not allowed to merge this node, then don't even try... */
-	if unlikely(self->mn_flags & MNODE_F_NOMERGE)
+	struct mnode *result;
+	struct mpart *part;
+
+	/* Deal with special case: no backing part (RESERVED node) */
+	if unlikely((part = self->mn_part) == NULL)
+		return mnode_merge_without_part(self);
+
+	/* Try to acquire a lock to the associated part. */
+	if (mpart_lock_tryacquire(part)) {
+		result = mnode_merge_with_partlock(self);
+		mpart_lock_release(result->mn_part);
+	} else {
+		/* If  we couldn't get a lock to the part, but the
+		 * node _does_ have  some neighboring nodes  which
+		 * may be suitable  for merging,  then enqueue  an
+		 * async operation to merge nodes of the mman once
+		 * the caller has released their lock to the mman. */
+		if (mnode_shouldmerge(self))
+			async_waitfor_part_and_mergenodes(self->mn_mman, part);
+		result = self;
+	}
+	return result;
+}
+
+
+/* Mark the given mman  as potentially containing mergeable  mem-nodes.
+ * These nodes will (eventually) be merged asynchronously, but may  not
+ * be merged immediately (though they may still be merged immediately).
+ * NOTE: The caller isn't required to be holding a lock to `self', but
+ *       if they are, this function is still going to be non-blocking,
+ *       and the node-merging process  will simply happen _after_  the
+ *       caller releases their lock. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes)(struct mman *__restrict self) {
+	if (mman_lock_tryacquire(self)) {
+		mman_mergenodes_locked(self);
+		mman_lock_release(self);
+	} else {
+		/* Try to enqueue (and possibly start) an async  merge-nodes
+		 * operation. If such an operation had already been started,
+		 * or is currently still in progress, then do nothing, since
+		 * in  that case someone else already acquired a lock to the
+		 * mman, and started  an async  merge-nodes operation  after
+		 * whatever previously happened  that caused  our caller  to
+		 * end up wishing to merge all mem-nodes of `self'! */
+		async_mergenodes(self);
+		_mman_lockops_reap(self);
+	}
+}
+
+/* Same as `mman_mergenodes()', but the caller _must_ be holding a lock
+ * to the given mman `self'! */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes_locked)(struct mman *__restrict self) {
+	struct mnode *node, *next;
+	if unlikely((node = self->mm_mappings) == NULL)
+		return;
+	while (node->mn_mement.rb_lhs)
+		node = node->mn_mement.rb_lhs;
+	for (;;) {
+		next = mnode_tree_nextnode(node);
+		if (!next)
+			break;
+		if (!mnode_canmerge(node, next)) {
+			node = next;
+			continue;
+		}
+		/* Try to merge `node' with `next' */
+		node = mnode_domerge(node, next);
+		if unlikely(node == MNODE_MERGE_ASYNC_WAITFOR)
+			return;
+		if (node == MNODE_MERGE_CANNOT_MERGE)
+			node = next; /* Nodes couldn't be merged (try next the pair) */
+	}
+}
+
+/* Helper wrapper to try to merge a node at `addr' (if such a node exists).
+ * The caller must be holding a lock to `self' when calling this  function. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
+                                       void const *minaddr,
+                                       void const *maxaddr) {
+	struct mnode *node, *next;
+	struct mnode_tree_minmax mima;
+	mman_mappings_minmaxlocate(self, minaddr, maxaddr, &mima);
+	if (!mima.mm_min)
+		return;
+
+	/* Try to merge the first node of the address range with its
+	 * predecessor (which may lie outside of the address  range) */
+	next = mnode_tree_prevnode(mima.mm_min);
+	if (next && mnode_canmerge(next, mima.mm_min)) {
+		next = mnode_domerge(next, mima.mm_min);
+		if unlikely(next == MNODE_MERGE_ASYNC_WAITFOR)
+			return;
+		if (next != MNODE_MERGE_CANNOT_MERGE)
+			mima.mm_min = next;
+	}
+
+	/* Go over all nodes within the address range, and  try
+	 * to merge them with whatever is the next node (resp.) */
+	for (node = mima.mm_min;;) {
+		next = mnode_tree_nextnode(node);
+		if (!next)
+			break; /* Nothing here but us chickens... */
+		if (!mnode_canmerge(next, mima.mm_min)) {
+			if (node == mima.mm_max)
+				break;
+			node = next;
+			continue;
+		}
+		/* Try to merge `node' with `next' */
+		node = mnode_domerge(node, next);
+		if unlikely(node == MNODE_MERGE_ASYNC_WAITFOR)
+			return;
+		if (node == mima.mm_max) {
+			/* What we've just tried to merge was the last node from the given
+			 * address range, with  whatever comes after  said address  range.
+			 * iow: no matter if the merge was successful or not, we're done! */
+			break;
+		}
+		if (node == MNODE_MERGE_CANNOT_MERGE)
+			node = next; /* Nodes couldn't be merged (try next the pair) */
+	}
+}
+
+
+
+
+
+/************************************************************************/
+/* Mem-part merging                                                     */
+/************************************************************************/
+
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL mnode_trymerge_with_partlock)(struct mnode *__restrict self,
+                                            REF struct mpart **__restrict p_part) {
+	struct mnode *merged, *neighbor;
+	bool result = false;
+	REF struct mman *mm;
+	assert(self->mn_part == *p_part);
+	mm = self->mn_mman;
+
+	/* Try to get a reference to the mman. Note that we must use `tryincref()',
+	 * since the mman may have already been destroyed, since we're accessing it
+	 * from the view-point  of one of  its potentially-once-upon-a-time  mapped
+	 * mem-parts. */
+	if unlikely(!tryincref(mm))
 		goto done;
 
-	/* TODO */
+	/* Try to acquire a lock to the mman. */
+	if (!mman_lock_tryacquire(mm)) {
+		/* Must attempt an async merge of all nodes! */
+		async_mergenodes(mm);
+		_mman_lockops_reap(mm);
+		goto done_decref;
+	}
 
+	/* Check if the node has been unmapped, in which case
+	 * we can no longer merge it with neighboring  nodes,
+	 * since no such nodes exist anymore... */
+	if unlikely(self->mn_flags & MNODE_F_UNMAPPED)
+		goto done_decref_unlock;
+
+	if ((neighbor = mnode_tree_prevnode(self)) != NULL && mnode_canmerge(neighbor, self)) {
+		merged = mnode_domerge_with_part_lock(neighbor, self, *p_part);
+		if unlikely(merged == MNODE_MERGE_ASYNC_WAITFOR)
+			goto done_decref_unlock;
+		if (merged != MNODE_MERGE_CANNOT_MERGE) {
+			decref_unlikely(*p_part);
+			*p_part = incref(merged->mn_part);
+			result  = true; /* Successfully merged! */
+			self    = merged;
+		}
+	}
+	if ((neighbor = mnode_tree_nextnode(self)) != NULL && mnode_canmerge(self, neighbor)) {
+		merged = mnode_domerge_with_part_lock(self, neighbor, *p_part);
+		if unlikely(merged == MNODE_MERGE_ASYNC_WAITFOR)
+			goto done_decref_unlock;
+		if (merged != MNODE_MERGE_CANNOT_MERGE) {
+			decref_unlikely(*p_part);
+			*p_part = incref(merged->mn_part);
+			result  = true; /* Successfully merged! */
+			/*self  = merged;*/
+		}
+	}
+
+done_decref_unlock:
+	mman_lock_release(mm);
+done_decref:
+	decref_unlikely(mm);
 done:
+	return result;
+}
+
+
+/* Try to merge all of the nodes that are mapping the given part. */
+PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mpart_trymerge_nodes)(REF struct mpart *__restrict self) {
+	unsigned int i;
+again:
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (mnode_trymerge_with_partlock(node, (REF struct mpart **)&self))
+				goto again;
+		}
+	}
 	return self;
 }
+
+
+
+/* Wait for `part_to_wait' to become available, after which point
+ * in time, try to merge `part_to_merge' with its neighbors. This
+ * will  be done as  per `mpart_merge(part_to_merge)'. The caller
+ * must try to reap lockops of `part_to_wait' after calling  this
+ * function! */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
+                                                struct mpart *part_to_merge);
+
+/* Same as `async_waitfor_part_and_mergepart()', but wait for a given file. */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
+                                                struct mpart *part_to_merge);
+
+/* Same as `async_waitfor_part_and_mergepart()', but wait for a given mman. */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_mman_and_mergepart)(struct mman *mman_to_wait,
+                                                struct mpart *part_to_merge);
+
+
+/* Check if `self' has a mem-node that belongs to `mm' */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL mpart_mappedby_mman)(struct mpart const *__restrict self,
+                                   struct mman const *__restrict mm) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node->mn_mman == mm)
+				return true;
+		}
+	}
+	return false;
+}
+
+/* Like `mpart_mappedby_mman()', but stop checking nodes when `stop'
+ * is reached. Additionally, `stop' isn't considered to be apart  of
+ * the list of nodes to test for mapping `mm' */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 3)) bool
+NOTHROW(FCALL mpart_mappedby_mman_before)(struct mpart const *__restrict self,
+                                          struct mnode const *stop,
+                                          struct mman const *__restrict mm) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node == stop)
+				return false;
+			if (node->mn_mman == mm)
+				return true;
+		}
+	}
+	return false;
+}
+
+/* Incref all mmans of `self' (skipping those that were already destroyed) */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
+NOTHROW(FCALL mpart_incref_all_mmans)(struct mpart const *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link)
+			COMPILER_UNUSED(tryincref(node->mn_mman));
+	}
+}
+
+/* Decref all mmans of `self' (skipping those that were already destroyed) */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
+NOTHROW(FCALL mpart_decref_all_mmans)(struct mpart const *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if likely(!wasdestroyed(node->mn_mman))
+				decref_unlikely(node->mn_mman);
+		}
+	}
+}
+
+
+/* Release locks to every unique mman with nodes that map `self'.
+ * For every mman, only a single lock is released, and only locks
+ * to mmans to nodes before `stop' are released (unless `stop' is
+ * given as `NULL', in which case _all_ locks are released) */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
+NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart const *__restrict self,
+                                      struct mnode const *stop DFL(NULL),
+                                      struct mman *locked_mman DFL(NULL)) {
+	struct mnode *node;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node == stop)
+				return; /* Stop on this node! */
+			if (node->mn_mman == locked_mman)
+				continue; /* Must remain locked by the caller */
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue; /* Skip destroyed mmans */
+			if (mpart_mappedby_mman_before(self, node, node->mn_mman))
+				continue; /* Already unlocked before... */
+			mman_lock_release(node->mn_mman);
+		}
+	}
+}
+
+/* Like `mpart_unlock_all_mmans()', but don't release locks
+ * to  mmans  that  are  also  mapped  by  `already_locked' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) void
+NOTHROW(FCALL mpart_unlock_all_mmans_after)(struct mpart const *__restrict self,
+                                            struct mpart const *__restrict already_locked,
+                                            struct mnode const *stop DFL(NULL),
+                                            struct mman *locked_mman DFL(NULL)) {
+	struct mnode *node;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node == stop)
+				return; /* Stop on this node! */
+			if (node->mn_mman == locked_mman)
+				continue; /* Must remain locked by the caller */
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue; /* Skip destroyed mmans */
+			if (mpart_mappedby_mman_before(self, node, node->mn_mman))
+				continue; /* Already unlocked before... */
+			if (mpart_mappedby_mman(already_locked, node->mn_mman))
+				continue; /* Lock is held by the caller... */
+			mman_lock_release(node->mn_mman);
+		}
+	}
+}
+
+/* Try to acquire locks to all of the mmans of `self'. (skipping dead mmans)
+ * If doing so would block for one  of the mmans, release all locks  already
+ * acquired, and return a pointer to the blocking mman. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mman *
+NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart const *__restrict self,
+                                    struct mman *locked_mman DFL(NULL)) {
+	struct mnode *node;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node->mn_mman == locked_mman)
+				continue; /* Already locked by the caller... */
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue; /* Skip destroyed mmans */
+			if (mman_lock_tryacquire(node->mn_mman))
+				continue; /* Successfully locked the mman */
+			if (mpart_mappedby_mman_before(self, node, node->mn_mman))
+				continue; /* We've already acquired a lock to this mman in the part. */
+			/* Oops... We've got a blocking one here! */
+			mpart_unlock_all_mmans(self, node, locked_mman);
+			return node->mn_mman;
+		}
+	}
+	return NULL;
+}
+
+/* Same as `mpart_lock_all_mmans()', but assume that mmans
+ * from   `already_locked'   have  already   been  locked. */
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct mman *
+NOTHROW(FCALL mpart_lock_all_mmans_after)(struct mpart const *__restrict self,
+                                          struct mpart const *__restrict already_locked,
+                                          struct mman *locked_mman DFL(NULL)) {
+	struct mnode *node;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node->mn_mman == locked_mman)
+				continue; /* Already locked by the caller... */
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue; /* Skip destroyed mmans */
+			if (mman_lock_tryacquire(node->mn_mman))
+				continue; /* Successfully locked the mman */
+			if (mpart_mappedby_mman_before(self, node, node->mn_mman))
+				continue; /* We've already acquired a lock to this mman in the part. */
+			if (mpart_mappedby_mman(already_locked, node->mn_mman))
+				continue; /* Assumed to already be locked... */
+			/* Oops... We've got a blocking one here! */
+			mpart_unlock_all_mmans_after(self, already_locked, node, locked_mman);
+			return node->mn_mman;
+		}
+	}
+	return NULL;
+}
+
+
+/* Merge the 2 given parts.
+ *    @assume(mpart_canmerge(lopart, hipart));
+ *    @assume(mpart_lock_acquired(lopart));
+ *    @assume(mpart_lock_acquired(hipart));
+ *    @assume(lopart->mp_file == hipart->mp_file));
+ *    @assume(mpart_isanon(lopart) || mfile_lock_writing(lopart->mp_file));
+ *    @assume(mpart_isanon(lopart) == mpart_isanon(hipart));
+ *    @assume(mman_lock_acquired(lopart->mp_copy.each->mn_mman));
+ *    @assume(mman_lock_acquired(lopart->mp_share.each->mn_mman));
+ *    @assume(mman_lock_acquired(hipart->mp_copy.each->mn_mman));
+ *    @assume(mman_lock_acquired(hipart->mp_share.each->mn_mman));
+ * Return a pointer to the newly merged node.
+ * @return: * : The merged part. (in  this case, the returned  part
+ *              is still locked, but locks to `lopart' and `hipart'
+ *              have  been lost; Additionally, references to lopart
+ *              and hipart will  have also been  dropped, whilst  a
+ *              new reference for a new part is returned)
+ * @return: MPART_MERGE_CANNOT_MERGE:  ...
+ * @return: MPART_MERGE_ASYNC_WAITFOR: ... */
+PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
+                                            /*inherit(on_success)*/ REF struct mpart *__restrict hipart) {
+	/* TODO: If present, we also need a lock to `lopart->mp_meta->mpm_ftxlock' */
+	/* TODO: If present, we also need a lock to `hipart->mp_meta->mpm_ftxlock' */
+
+	/* TODO: If lopart/hipart aren't anonymous, remove them from their file */
+
+	/* TODO: If  either of the  2 parts is MPART_ST_SWP[_SC],  bring the part into
+	 *       the core, using an async read-from-swap operation (such functionality
+	 *       doesn't exist at the moment, though...) */
+
+	/* TODO: If exactly one of the 2 parts is `MPART_ST_VOID', try to allocate
+	 *       its backing data. */
+
+	/* TODO: If the 2 parts combined  need a heap-allocated block-status  bitset,
+	 *       and neither of  the 2  parts already have  a heap-allocated  bitset,
+	 *       such that `kmalloc_usable_size()'  is already  large enough,  either
+	 *       krealloc_nx(GFP_ATOMIC) (if one of the 2 parts already has a bitset,
+	 *       in which case  the larger of  the 2  is used for  this realloc),  or
+	 *       kmalloc_nx(GFP_ATOMIC) a new bitset of sufficient size. */
+
+	/* TODO: Merge backing data of the 2 parts based on their state:
+	 *       if (lopart->mp_state == MPART_ST_VOID &&
+	 *           hipart->mp_state == MPART_ST_VOID) {
+	 *           // Nothing to do...
+	 *       } else if (lopart->mp_state == MPART_ST_VIO &&
+	 *                  hipart->mp_state == MPART_ST_VIO)  {
+	 *           // Nothing to do...
+	 *       } else if (MPART_ST_INMEM(lopart->mp_state) &&
+	 *                  MPART_ST_INMEM(hipart->mp_state)) {
+	 *           // Merge physical memory
+	 *           // Also: If  memory between the end of `lopart' and the start of
+	 *           //       `hipart' isn't continuous, try to allocate physical ram
+	 *           //       the size of the smaller of the 2 parts such that it  is
+	 *           //       continuous  with the other (larger) part, prepare() all
+	 *           //       of the page directory locations that map the smaller of
+	 *           //       the 2 parts.
+	 *           //       ...
+	 *           //       Continue on  to replace  the  backing storage  of  the
+	 *           //       smaller of the 2 parts with the new physical location,
+	 *           //       thus eventually allowing the larger part to be  linear
+	 *           //       with the smaller part's physical backing memory.
+	 *       } else {
+	 *           return MPART_MERGE_CANNOT_MERGE;
+	 *       } */
+
+	/* TODO: >> if (!lopart->mp_meta) {
+	 *       >>     // Only if `ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)' will succeed.
+	 *       >>     // Otherwise, must create a new mpartmeta controller, or simply
+	 *       >>     // expand `hipart' downwards, rather than `lopart' upwards...
+	 *       >>     lopart->mp_meta = hipart->mp_meta;
+	 *       >>     hipart->mp_meta = NULL;
+	 *       >>     if (lopart->mp_meta) {
+	 *       >>         lopart->mp_meta->mpm_ftx.each->mfu_part = lopart;
+	 *       >>         lopart->mp_meta->mpm_ftx.each->mfu_addr += OLD_SIZE_OF_LOPART;
+	 *       >>     }
+	 *       >> } else if (hipart->mp_meta) {
+	 *       >>     if (lopart->mp_meta->mpm_rtm_vers < hipart->mp_meta->mpm_rtm_vers)
+	 *       >>         lopart->mp_meta->mpm_rtm_vers = hipart->mp_meta->mpm_rtm_vers;
+	 *       >>     hipart->mp_meta->mpm_ftx.each->mfu_part = lopart;
+	 *       >>     hipart->mp_meta->mpm_ftx.each->mfu_addr += OLD_SIZE_OF_LOPART;
+	 *       >>     mfutex_tree_insert(&lopart->mp_meta->mpm_ftx, hipart->mp_meta->mpm_ftx.each);
+	 *       >> } */
+
+	/* TODO: >> if (ATOMIC_FETCHAND(hipart->mp_flags, ~MPART_F_GLOBAL_REF)) {
+	 *       >>     if (LIST_ISBOUND(lopart, mp_allparts) && !(lopart->mp_flags & MPART_F_GLOBAL_REF)) {
+	 *       >>         incref(lopart);
+	 *       >>         if (ATOMIC_FETCHOR(lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+	 *       >>             decref_nokill(lopart);
+	 *       >>     }
+	 *       >>     decref_nokill(hipart);
+	 *       >> } */
+
+	/* TODO: >> if (ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)) {
+	 *       >>     mpart_destroy(hipart); // But don't destroy data that's been stolen by `lopart'!
+	 *       >> } else {
+	 *       >>     // Update to reflect all of the data that's been stolen by `lopart'
+	 *       >>     hipart->mp_minaddr = PAGESIZE;
+	 *       >>     hipart->mp_maxaddr = PAGESIZE - 1;
+	 *       >>     hipart->mp_blkst_ptr = NULL;
+	 *       >>     hipart->mp_flags &= ~(MPART_F_BLKST_INL | MPART_F_GLOBAL_REF);
+	 *       >>     hipart->mp_flags &= ~MPART_F_GLOBAL_REF;
+	 *       >>     decref_nokill(hipart->mp_file); // Nokill, because `lopart' still has a REF!
+	 *       >>     hipart->mp_file = incref(&mfile_anon[...]);
+	 *       >>     _mpart_init_asanon(hipart);
+	 *       >>     LIST_INIT(&hipart->mp_copy);
+	 *       >>     LIST_INIT(&hipart->mp_share);
+	 *       >>     if (hipart->mp_meta)
+	 *       >>         mpartmeta_ftxlock_endwrite(hipart->mp_meta);
+	 *       >>     mpart_lock_release(hipart);
+	 *       >>     decref_unlikely(hipart);
+	 *       >> } */
+
+	/* TODO: If lopart wasn't anonymous originally, re-insert it to its file's part-tree. */
+
+	/* TODO: Return `lopart' */
+
+	(void)lopart;
+	(void)hipart;
+	COMPILER_IMPURE();
+
+	return MPART_MERGE_CANNOT_MERGE;
+}
+
+
+
+/* Merge the 2 given parts.
+ *    @assume(WAS_TRUE_AFTER_MMAN_LOCK(mpart_canmerge(lopart, hipart)));
+ *    @assume(mpart_lock_acquired(lopart));
+ *    @assume(mpart_lock_acquired(hipart));
+ *    @assume(mpart_isanon(lopart) == mpart_isanon(hipart));
+ *    @assume(mman_lock_acquired(locked_mman));
+ * Return a pointer to the newly merged node.
+ * @return: * : The merged part. (in  this case, the returned  part
+ *              is still locked, but locks to `lopart' and `hipart'
+ *              have  been lost; Additionally, references to lopart
+ *              and hipart will  have also been  dropped, whilst  a
+ *              new reference for a new part is returned)
+ * @return: MPART_MERGE_CANNOT_MERGE:  ...
+ * @return: MPART_MERGE_ASYNC_WAITFOR: ... */
+PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
+                                          /*inherit(on_success)*/ REF struct mpart *__restrict hipart,
+                                          struct mman *__restrict locked_mman) {
+	struct mman *blocking_mman;
+	struct mfile *file = NULL;
+	REF struct mpart *result;
+	assert(lopart->mp_file == hipart->mp_file);
+	assert(mpart_isanon(lopart) == mpart_isanon(hipart));
+
+	/* If the parts  are non-anonymous,  then we also  need a  lock
+	 * to the associated file, since `mpart_domerge_with_all_locks'
+	 * may need to remove/re-insert mem-parts into the file's  tree
+	 * of parts when doing the actual job of merging parts. */
+	if (!mpart_isanon(lopart)) {
+		file = lopart->mp_file;
+		if (!mfile_lock_trywrite(file)) {
+			/* Must async-merge the 2 parts sometime in the future... */
+			if (!async_waitfor_file_and_mergepart(file, lopart) ||
+			    !mfile_lock_trywrite(file))
+				return MPART_MERGE_ASYNC_WAITFOR;
+		}
+	}
+
+	/* Get references to all non-destroyed mmans of the 2 parts. */
+	mpart_incref_all_mmans(lopart);
+	mpart_incref_all_mmans(hipart);
+
+	/* Try to acquire locks to the set of all of the mmans that are
+	 * mapping the copy/share nodes of the 2 mem-parts we intend to
+	 * merge.
+	 * Note however that we must do some special handling, since we
+	 * have to assume that the caller is locking `locked_mman', and
+	 * we mustn't release that lock! */
+	blocking_mman = mpart_lock_all_mmans(lopart, locked_mman);
+	if unlikely(blocking_mman != NULL) {
+waitfor_blocking_mman:
+		if (async_waitfor_mman_and_mergepart(blocking_mman, lopart))
+			_mman_lockops_reap(blocking_mman);
+		return MPART_MERGE_ASYNC_WAITFOR;
+	}
+	blocking_mman = mpart_lock_all_mmans_after(hipart, lopart, locked_mman);
+	if unlikely(blocking_mman != NULL) {
+		mpart_unlock_all_mmans(lopart, NULL, locked_mman);
+		goto waitfor_blocking_mman;
+	}
+
+	/* With all of the now held, check one more time if merging is possible. */
+	if unlikely(!mpart_canmerge(lopart, hipart)) {
+		result = MPART_MERGE_CANNOT_MERGE;
+	} else {
+		/* Do the actual work of merging the 2 parts. */
+		result = mpart_domerge_with_all_locks(lopart, hipart);
+	}
+
+	/* Release the file-lock from above, if it was acquired. */
+	if (file)
+		mfile_lock_endwrite(file);
+
+	/* Release locks and drop references... */
+	if (result == MPART_MERGE_CANNOT_MERGE ||
+	    result == MPART_MERGE_ASYNC_WAITFOR) {
+		mpart_unlock_all_mmans_after(hipart, lopart, NULL, locked_mman);
+		mpart_unlock_all_mmans(lopart, NULL, locked_mman);
+		mpart_decref_all_mmans(hipart);
+		mpart_decref_all_mmans(lopart);
+	} else {
+		/* The newly created mman will have been constructed from
+		 * the super-set of nodes from `lopart' and `hipart',  so
+		 * we can unlock+decref it instead of the former.
+		 * Also: At this point, `lopart' and `hipart' may already
+		 *       point  into the void  (iow: have been destroyed) */
+		mpart_unlock_all_mmans(result, NULL, locked_mman);
+		mpart_decref_all_mmans(result);
+	}
+	return result;
+}
+
+
+/* Merge the 2 given parts.
+ *    @assume(WAS_TRUE_AFTER_FILE_LOCK(mpart_canmerge(lopart, hipart)));
+ *    @assume(mpart_lock_acquired(lopart));
+ *    @assume(mpart_lock_acquired(hipart));
+ *    @assume(mfile_lock_writing(lopart->mp_file));
+ *    @assume(lopart->mp_file == hipart->mp_file);
+ * Return a pointer to the newly merged node.
+ * @return: * : The merged part. (in  this case, the returned  part
+ *              is still locked, but locks to `lopart' and `hipart'
+ *              have  been lost; Additionally, references to lopart
+ *              and hipart will  have also been  dropped, whilst  a
+ *              new reference for a new part is returned)
+ * @return: MPART_MERGE_CANNOT_MERGE:  ...
+ * @return: MPART_MERGE_ASYNC_WAITFOR: ... */
+PRIVATE NOBLOCK NONNULL((1, 2)) REF struct mpart *
+NOTHROW(FCALL mpart_domerge_with_file_lock)(/*inherit(on_success)*/ REF struct mpart *__restrict lopart,
+                                            /*inherit(on_success)*/ REF struct mpart *__restrict hipart) {
+	REF struct mpart *result;
+	struct mman *blocking_mman;
+	mpart_incref_all_mmans(lopart);
+	mpart_incref_all_mmans(hipart);
+
+	/* Try to acquire locks to the set of all of the mmans that are
+	 * mapping the copy/share nodes of the 2 mem-parts we intend to
+	 * merge. */
+	blocking_mman = mpart_lock_all_mmans(lopart);
+	if unlikely(blocking_mman != NULL) {
+waitfor_blocking_mman:
+		if (async_waitfor_mman_and_mergepart(blocking_mman, lopart))
+			_mman_lockops_reap(blocking_mman);
+		return MPART_MERGE_ASYNC_WAITFOR;
+	}
+	blocking_mman = mpart_lock_all_mmans_after(hipart, lopart);
+	if unlikely(blocking_mman != NULL) {
+		mpart_unlock_all_mmans(lopart);
+		goto waitfor_blocking_mman;
+	}
+
+	/* At this point, we're holding a whole bunch of locks:
+	 *   - mpart_lock_acquired(lopart);
+	 *   - mpart_lock_acquired(hipart);
+	 *   - mfile_lock_writing(lopart->mp_file);
+	 *   - mfile_lock_writing(hipart->mp_file); // Because `hipart->mp_file == lopart->mp_file'
+	 *   - mman_lock_acquired(lopart->mp_copy.each->mn_mman);
+	 *   - mman_lock_acquired(lopart->mp_share.each->mn_mman);
+	 *   - mman_lock_acquired(hipart->mp_copy.each->mn_mman);
+	 *   - mman_lock_acquired(hipart->mp_share.each->mn_mman); */
+
+	/* With all of the now held, check one more time if merging is possible. */
+	if unlikely(!mpart_canmerge(lopart, hipart)) {
+		result = MPART_MERGE_CANNOT_MERGE;
+	} else {
+		/* Do the actual work of merging the 2 parts. */
+		result = mpart_domerge_with_all_locks(lopart, hipart);
+	}
+
+	/* Release locks and drop references... */
+	if (result == MPART_MERGE_CANNOT_MERGE ||
+	    result == MPART_MERGE_ASYNC_WAITFOR) {
+		mpart_unlock_all_mmans_after(hipart, lopart);
+		mpart_unlock_all_mmans(lopart);
+		mpart_decref_all_mmans(hipart);
+		mpart_decref_all_mmans(lopart);
+	} else {
+		/* The newly created mman will have been constructed from
+		 * the super-set of nodes from `lopart' and `hipart',  so
+		 * we can unlock+decref it instead of the former.
+		 * Also: At this point, `lopart' and `hipart' may already
+		 *       point  into the void  (iow: have been destroyed) */
+		mpart_unlock_all_mmans(result);
+		mpart_decref_all_mmans(result);
+	}
+	return result;
+}
+
+
+
+union merge_all_parts_lop_desc {
+	Toblockop(struct mman)      map_mm_lop;     /* Lop */
+	Tobpostlockop(struct mman)  map_mm_postlop; /* Post-Lop */
+	struct lockop               map_lop;        /* Lop */
+	struct postlockop           map_postlop;    /* Post-Lop */
+};
+
+PRIVATE union merge_all_parts_lop_desc merge_all_parts_lop = { { {}, NULL } };
+
+/* Merge all mem-parts from `mpart_all_list'
+ * @param: deadparts: A list of mem-parts that have been
+ *                    destroyed.  Linked  via `_mp_dead' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL merge_all_parts)(struct mpart_slist *__restrict deadparts) {
+	struct mpart *part;
+	LIST_FOREACH (part, &mpart_all_list, mp_allparts) {
+		if (!tryincref(part))
+			continue; /* Already destroyed... */
+		/* Try to merge the part... */
+		part = mpart_merge(part);
+		/* Drop our reference to the part. */
+		if unlikely(ATOMIC_DECFETCH(part->mp_refcnt) == 0)
+			SLIST_INSERT(deadparts, part, _mp_dead);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL merge_all_parts_postlop_destroy_cb)(struct postlockop *__restrict self) {
+	struct mpart_slist deadparts;
+	deadparts.slh_first = container_of(self, struct mpart, _mp_dtplop);
+	do {
+		struct mpart *part;
+		part = SLIST_FIRST(&deadparts);
+		SLIST_REMOVE_HEAD(&deadparts, _mp_dead);
+		mpart_destroy(part);
+	} while (!SLIST_EMPTY(&deadparts));
+}
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL merge_all_parts_lop_cb)(struct lockop *__restrict UNUSED(self)) {
+	struct mpart_slist deadparts;
+	/* Mark the merge-all-parts lop as available again. */
+	ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func, NULL);
+	SLIST_INIT(&deadparts);
+	merge_all_parts(&deadparts);
+	mpart_all_release();
+	if (SLIST_EMPTY(&deadparts))
+		return NULL;
+	/* Set-up a post-lockop that will clean out the list of dead parts.
+	 * For this purpose, re-use the  first destroyed mem-part as a  hub
+	 * for destroying all of the other parts. */
+	{
+		struct mpart *first;
+		STATIC_ASSERT(sizeof(struct postlockop) <= (2 * sizeof(struct mnode_list)));
+		first                      = SLIST_FIRST(&deadparts);
+		first->_mp_dtplop.plo_func = &merge_all_parts_postlop_destroy_cb;
+		return &first->_mp_dtplop;
+	}
+}
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock_post)(Tobpostlockop(struct mman) *__restrict UNUSED(lop),
+                                                         struct mman *__restrict UNUSED(self)) {
+	if (mpart_all_tryacquire()) {
+		struct mpart_slist deadparts;
+		/* Mark the merge-all-parts lop as available again. */
+		ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func, NULL);
+		SLIST_INIT(&deadparts);
+		merge_all_parts(&deadparts);
+		mpart_all_release();
+	} else {
+		/* Acquire a lock to the all-parts list asynchronously. */
+		ATOMIC_WRITE(merge_all_parts_lop.map_lop.lo_func, &merge_all_parts_lop_cb);
+		SLIST_ATOMIC_INSERT(&mpart_all_lops, &merge_all_parts_lop.map_lop, lo_link);
+		_mpart_all_reap();
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock)(Toblockop(struct mman) *__restrict UNUSED(lop),
+                                                    struct mman *__restrict UNUSED(self)) {
+	ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func,
+	             &merge_all_parts_after_kernel_mm_lock_post);
+	return &merge_all_parts_lop.map_mm_postlop;
+}
+
+/* Set-up an async job to  merge all mem-parts in existence,  and
+ * more specifically, including the given `part_to_merge', should
+ * that part not be apart of the all-parts-list.
+ * Merging is done the next time a the kernel mman is unlocked,
+ * meaning that this function should be called in order to deal
+ * with a heap memory shortage.
+ * The caller must be holding a lock to `part_to_merge'!
+ * WARNING: The caller must have also been the one to set `_MPART_F_WILLMERGE' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_merge_all_parts_including)(struct mpart *__restrict part_to_merge) {
+	assert(mpart_lock_acquired(part_to_merge));
+
+	/* If the part isn't contained in the global list of all  parts,
+	 * then we can't merge it asynchronously (since we won't be able
+	 * to enumerate it). */
+	if (!LIST_ISBOUND(part_to_merge, mp_allparts)) {
+		ATOMIC_AND(part_to_merge->mp_flags, ~_MPART_F_WILLMERGE);
+		return;
+	}
+
+	/* Kick-start the merge-all-parts lop-function. */
+	if (ATOMIC_CMPXCH(merge_all_parts_lop.map_mm_lop.olo_func,
+	                  NULL, &merge_all_parts_after_kernel_mm_lock)) {
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
+		                    &merge_all_parts_lop.map_mm_lop,
+		                    olo_link);
+	}
+}
+
+
+struct async_merge_part {
+	union {
+		Toblockop(struct mpart)     amp_part_lop;
+		Tobpostlockop(struct mpart) amp_part_post_lop;
+		Toblockop(struct mfile)     amp_file_lop;
+		Tobpostlockop(struct mfile) amp_file_post_lop;
+		Toblockop(struct mman)      amp_mman_lop;
+		Tobpostlockop(struct mman)  amp_mman_post_lop;
+	};
+	REF struct mpart *amp_mergeme; /* [1..1][const] The part to merge. */
+};
+
+/* Called after a lock to `part' becomes available. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_merge_part_post_cb)(Tobpostlockop(struct mpart) *__restrict self,
+                                        struct mpart *__restrict UNUSED(part)) {
+	REF struct mpart *merged;
+	struct async_merge_part *me;
+	me     = container_of(self, struct async_merge_part, amp_part_post_lop);
+	merged = me->amp_mergeme; /* Inherit reference */
+	kfree(me);
+	ATOMIC_AND(merged->mp_flags, ~_MPART_F_WILLMERGE);
+	merged = mpart_merge(merged);
+	decref_unlikely(merged);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mpart) *
+NOTHROW(FCALL async_merge_part_cb)(Toblockop(struct mpart) *__restrict self,
+                                   struct mpart *__restrict UNUSED(part)) {
+	struct async_merge_part *me;
+	me = container_of(self, struct async_merge_part, amp_part_lop);
+	me->amp_part_post_lop.oplo_func = &async_merge_part_post_cb;
+	return &me->amp_part_post_lop;
+}
+
+/* Wait for `part_to_wait' to become available, after which point
+ * in time, try to merge `part_to_merge' with its neighbors. This
+ * will  be done as  per `mpart_merge(part_to_merge)'. The caller
+ * must try to reap lockops of `part_to_wait' after calling  this
+ * function! */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
+                                                struct mpart *part_to_merge) {
+	struct async_merge_part *lop;
+	assert(mpart_lock_acquired(part_to_merge));
+	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
+		return false;
+	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	if (!lop) {
+		async_merge_all_parts_including(part_to_merge);
+		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if (!lop)
+			return false; /* Merging will be done asynchronously. */
+	}
+	/* Insert the newly created lock-op. */
+	lop->amp_mergeme           = incref(part_to_merge);
+	lop->amp_part_lop.olo_func = &async_merge_part_cb;
+	SLIST_ATOMIC_INSERT(&part_to_wait->mp_lockops,
+	                    &lop->amp_part_lop, olo_link);
+	return true;
+}
+
+/* Called after a lock to `file' becomes available. */
+#if 1
+STATIC_ASSERT(offsetof(struct async_merge_part, amp_file_post_lop) ==
+              offsetof(struct async_merge_part, amp_part_post_lop));
+#define async_merge_file_post_cb \
+	(*(void (FCALL *)(Tobpostlockop(struct mfile) *__restrict, struct mfile *__restrict))&async_merge_part_post_cb)
+#else
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_merge_file_post_cb)(Tobpostlockop(struct mfile) *__restrict self,
+                                        struct mfile *__restrict UNUSED(file)) {
+	REF struct mpart *merged;
+	struct async_merge_part *me;
+	me     = container_of(self, struct async_merge_part, amp_file_post_lop);
+	merged = me->amp_mergeme; /* Inherit reference */
+	kfree(me);
+	ATOMIC_AND(merged->mp_flags, ~_MPART_F_WILLMERGE);
+	merged = mpart_merge(merged);
+	decref_unlikely(merged);
+}
+#endif
+
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mfile) *
+NOTHROW(FCALL async_merge_file_cb)(Toblockop(struct mfile) *__restrict self,
+                                   struct mfile *__restrict UNUSED(file)) {
+	struct async_merge_part *me;
+	me = container_of(self, struct async_merge_part, amp_file_lop);
+	me->amp_file_post_lop.oplo_func = &async_merge_file_post_cb;
+	return &me->amp_file_post_lop;
+}
+
+/* Same as `async_waitfor_part_and_mergepart()', but wait for a given file. */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
+                                                struct mpart *part_to_merge) {
+	struct async_merge_part *lop;
+	assert(mpart_lock_acquired(part_to_merge));
+	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
+		return false;
+	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	if (!lop) {
+		async_merge_all_parts_including(part_to_merge);
+		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if (!lop)
+			return false; /* Merging will be done asynchronously. */
+	}
+	/* Insert the newly created lock-op. */
+	lop->amp_mergeme           = incref(part_to_merge);
+	lop->amp_file_lop.olo_func = &async_merge_file_cb;
+	SLIST_ATOMIC_INSERT(&file_to_wait->mf_lockops,
+	                    &lop->amp_file_lop, olo_link);
+	return true;
+}
+
+
+/* Called after a lock to `mm' becomes available. */
+#if 1
+STATIC_ASSERT(offsetof(struct async_merge_part, amp_mman_post_lop) ==
+              offsetof(struct async_merge_part, amp_part_post_lop));
+#define async_merge_mman_post_cb \
+	(*(void (FCALL *)(Tobpostlockop(struct mman) *__restrict, struct mman *__restrict))&async_merge_part_post_cb)
+#else
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_merge_mman_post_cb)(Tobpostlockop(struct mman) *__restrict self,
+                                        struct mman *__restrict UNUSED(mm)) {
+	REF struct mpart *merged;
+	struct async_merge_part *me;
+	me     = container_of(self, struct async_merge_part, amp_mman_post_lop);
+	merged = me->amp_mergeme; /* Inherit reference */
+	kfree(me);
+	ATOMIC_AND(merged->mp_flags, ~_MPART_F_WILLMERGE);
+	merged = mpart_merge(merged);
+	decref_unlikely(merged);
+}
+#endif
+
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
+NOTHROW(FCALL async_merge_mman_cb)(Toblockop(struct mman) *__restrict self,
+                                   struct mman *__restrict UNUSED(mm)) {
+	struct async_merge_part *me;
+	me = container_of(self, struct async_merge_part, amp_mman_lop);
+	me->amp_mman_post_lop.oplo_func = &async_merge_mman_post_cb;
+	return &me->amp_mman_post_lop;
+}
+
+/* Same as `async_waitfor_part_and_mergepart()', but wait for a given mman. */
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL async_waitfor_mman_and_mergepart)(struct mman *mman_to_wait,
+                                                struct mpart *part_to_merge) {
+	struct async_merge_part *lop;
+	assert(mpart_lock_acquired(part_to_merge));
+	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
+		return false;
+	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	if (!lop) {
+		async_merge_all_parts_including(part_to_merge);
+		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
+		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if (!lop)
+			return false; /* Merging will be done asynchronously. */
+	}
+	/* Insert the newly created lock-op. */
+	lop->amp_mergeme           = incref(part_to_merge);
+	lop->amp_mman_lop.olo_func = &async_merge_mman_cb;
+	SLIST_ATOMIC_INSERT(&FORMMAN(mman_to_wait, thismman_lockops),
+	                    &lop->amp_mman_lop, olo_link);
+	return true;
+}
+
+
+
+/* Same as `mpart_merge()',  but the caller  is holding a  lock
+ * to `self' upon entry, and will be holding a lock to `return'
+ * upon exit. */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self) {
+	if (!mpart_isanon(self)) {
+		struct mpart *merged, *neighbor;
+		struct mfile *file = self->mp_file;
+		if (!mfile_lock_trywrite(file)) {
+			/* Enqueue a lockop for `file' that will cause
+			 * that file to  service _all_  of the  file's
+			 * mem-parts when executed. */
+			if (async_waitfor_file_and_mergepart(file, self))
+				_mfile_lockops_reap(file);
+			return self;
+		}
+
+		/* Search for adjacent mem-parts. */
+		if ((neighbor = mpart_tree_prevnode(self)) != NULL && tryincref(neighbor)) {
+			if (!mpart_canmerge(neighbor, self)) {
+				/* Cannot merge... */
+				decref_unlikely(neighbor);
+			} else if (!mpart_lock_tryacquire(neighbor)) {
+				bool mustreap;
+				mustreap = async_waitfor_part_and_mergepart(neighbor, self);
+				mfile_lock_endwrite_f(file);
+				if (mustreap)
+					_mpart_lockops_reap(neighbor);
+				decref_unlikely(neighbor);
+				mfile_lockops_reap(file);
+				return self;
+			} else {
+				/* Try to merge the 2 parts. */
+				merged = mpart_domerge_with_file_lock(neighbor, self);
+				if (merged == MPART_MERGE_CANNOT_MERGE ||
+				    merged == MPART_MERGE_ASYNC_WAITFOR) {
+					mpart_lock_release(neighbor);
+					if (merged == MPART_MERGE_ASYNC_WAITFOR) {
+						/* The  rest of the merge operation will
+						 * happen asynchronously. - So return to
+						 * the  caller now, and deal with all of
+						 * that async stuff later. */
+						mfile_lock_endwrite_f(file);
+						decref_unlikely(neighbor);
+						mfile_lockops_reap(file);
+						return self;
+					}
+					decref_unlikely(neighbor);
+				} else {
+					/* Success: references & locks to `neighbor' & `self' were inherited. */
+					self = merged;
+				}
+			}
+		}
+
+		if ((neighbor = mpart_tree_nextnode(self)) != NULL && tryincref(neighbor)) {
+			if (!mpart_canmerge(self, neighbor)) {
+				/* Cannot merge... */
+				decref_unlikely(neighbor);
+			} else if (!mpart_lock_tryacquire(neighbor)) {
+				bool mustreap;
+				mustreap = async_waitfor_part_and_mergepart(neighbor, self);
+				mfile_lock_endwrite_f(file);
+				if (mustreap)
+					_mpart_lockops_reap(neighbor);
+				decref_unlikely(neighbor);
+				mfile_lockops_reap(file);
+				return self;
+			} else {
+				/* Try to merge the 2 parts. */
+				merged = mpart_domerge_with_file_lock(self, neighbor);
+				if (merged == MPART_MERGE_CANNOT_MERGE ||
+				    merged == MPART_MERGE_ASYNC_WAITFOR) {
+					mpart_lock_release(neighbor);
+					if (merged == MPART_MERGE_ASYNC_WAITFOR) {
+						/* The  rest of the merge operation will
+						 * happen asynchronously. - So return to
+						 * the  caller now, and deal with all of
+						 * that async stuff later. */
+						mfile_lock_endwrite_f(file);
+						decref_unlikely(neighbor);
+						mfile_lockops_reap(file);
+						return self;
+					}
+					decref_unlikely(neighbor);
+				} else {
+					/* Success: references & locks to `neighbor' & `self' were inherited. */
+					self = merged;
+				}
+			}
+		}
+		mfile_lock_endwrite(file);
+	}
+	/* If `self' could be merged successfully, then we must also try
+	 * to merge all of the mem-nodes that map the (now-merged) part. */
+	self = mpart_trymerge_nodes(self);
+	return self;
+}
+
+
+/* Try to merge `self' with neighboring parts from the associated file.
+ * @return: * : A pointer to the (possibly merged) mem-part. */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mpart_merge)(REF struct mpart *__restrict self) {
+	if (mpart_lock_tryacquire(self)) {
+domerge_locked:
+		self = mpart_merge_locked(self);
+		mpart_lock_release(self);
+	} else {
+		/* Enqueue a lockop to eventually merge `self' once the
+		 * lock to `self' becomes available. */
+		if (async_waitfor_part_and_mergepart(self, self)) {
+			/* Must try to reap lockops (though we may just
+			 * as well also try to acquire the lock  again) */
+			if (mpart_lock_tryacquire(self))
+				goto domerge_locked;
+		}
+	}
+	return self;
+}
+
+
 
 
 DECL_END

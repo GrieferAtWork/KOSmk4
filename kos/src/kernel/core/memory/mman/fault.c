@@ -963,7 +963,7 @@ pcopy_free_unused_block_status:
 			/* Insert the new (copy)-part into the global list of all parts. */
 			COMPILER_WRITE_BARRIER();
 			mpart_all_list_insert(copy);
-			self->mfl_part = copy;
+			/*self->mfl_part = copy;*/ /* Already done by the `self->mfl_part = node->mn_part;' below! */
 		} /* Scope... */
 
 		decref_unlikely(part); /* Originally inherited from `node->mn_part' */
@@ -972,8 +972,9 @@ pcopy_free_unused_block_status:
 		{
 			byte_t *old_minaddr;
 			old_minaddr    = node->mn_minaddr;
-			node           = mnode_merge(node); /* TODO: Implement this one (currently a stub) */
+			node           = mnode_merge_with_partlock(node);
 			self->mfl_node = node;
+			self->mfl_part = node->mn_part;
 			assert(old_minaddr >= node->mn_minaddr);
 			if (old_minaddr > node->mn_minaddr)
 				self->mfl_offs += (size_t)(old_minaddr - node->mn_minaddr);

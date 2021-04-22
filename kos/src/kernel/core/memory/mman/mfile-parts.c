@@ -179,11 +179,7 @@ mfile_insert_and_merge_part_and_unlock(struct mfile *__restrict self,
 	 * is  fully initialized and  ready for every sub-system. */
 	COMPILER_BARRIER();
 
-	if (part->mp_flags & MPART_F_GLOBAL_REF)
-		mpart_all_list_insert(part);
-	else {
-		LIST_ENTRY_UNBOUND_INIT(&part->mp_allparts);
-	}
+	mpart_all_list_insert(part);
 	mfile_lock_endwrite(self);
 	return part;
 }

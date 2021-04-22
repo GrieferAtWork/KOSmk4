@@ -62,7 +62,7 @@
 #define MPART_F_NORMAL         0x0000 /* Normal flags. */
 #define MPART_F_LOCKBIT        0x0001 /* Lock-bit for this m-part */
 #define MPART_F_MAYBE_BLK_INIT 0x0002 /* [lock(MPART_F_LOCKBIT)] There may be blocks with `MPART_BLOCK_ST_INIT'. */
-#define MPART_F_GLOBAL_REF     0x0004 /* [lock(WRITE_ONCE)] `mpart_all_list' holds a reference to this part.
+#define MPART_F_GLOBAL_REF     0x0004 /* [lock(CLEAR_ONCE)] `mpart_all_list' holds a reference to this part.
                                        * When memory is running low, and  the kernel tries to unload  unused
                                        * memory parts, it  will clear  this flag  for all  parts there  are.
                                        * Also note that this flag is cleared by default when the  associated
@@ -71,14 +71,14 @@
 #define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
                                        * The  backing  block-state bitset  exists in-line. */
 #define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
-/*efine MPART_F_               0x0040  * ... */
-#define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag  may not be  cleared to free  up
-                                       * memory.  This flag is still cleared when the is being anonymized as the result of
-                                       * a call to `mfile_delete()' or  `mfile_makeanon_subrange()'. The only place  where
-                                       * this flag makes a difference, is when the global list of mem-parts is scanned for
-                                       * parts which are no longer in-use, and  can be destroyed by deleting their  global
-                                       * reference.  -  This flag  is set  by default  for  parts of  files that  have the
-                                       * `MFILE_F_PERSISTENT' flag set. */
+#define _MPART_F_WILLMERGE     0x0040 /* [lock(ATOMIC)] An async merge-request for this part was enqueued. */
+#define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag may not  be cleared to free  up
+                                       * memory. This flag is still cleared when the is being anonymized as the result of
+                                       * a  call to `mfile_delete()'. The only place  where this flag makes a difference,
+                                       * is when the global list  of mem-parts is scanned for  parts which are no  longer
+                                       * in-use, and can  be destroyed by  deleting their global  reference. - This  flag
+                                       * is set by  default for parts  of files that  have the `MFILE_F_PERSISTENT'  flag
+                                       * set. */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 #define MPART_F_CHANGED        0x0200 /* [lock(SET(MPART_F_LOCKBIT),
                                        *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
@@ -99,7 +99,8 @@
                                        * scanned in search  for other  locked mappings. If  any are  found, then  this
                                        * flag will remain set. If none are found, then this flag is cleared. */
 #define MPART_F__RBRED         0x4000 /* [lock(:mfile::mf_lock)] Internal flag: This part is a red node. */
-/*efine MPART_F_               0x8000  * ... */
+#define _MPART_F_MERGE_AFTER_DMA 0x8000 /* [lock(ATOMIC)] Internally used: If set, DMA completion must clear this flag
+                                         * and call `mpart_merge()' (s.a. `mpart_dma_dellock()') */
 
 
 /* Possible values for `struct mpart::mp_state' */
@@ -230,27 +231,41 @@ struct mpart {
 #define MPART_INIT_mp_share(...)   __VA_ARGS__
 #define MPART_INIT_mp_lockops(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
+#if defined(__WANT_MPART__mp_nodlsts) || defined(__WANT_MPART__mp_dtplop)
+	union {
+		struct {
+			struct mnode_list     mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
+			struct mnode_list     mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
+		};
+#ifdef __WANT_MPART__mp_nodlsts
+		struct mnode_list        _mp_nodlsts[2]; /* Node lists. */
+#endif /* __WANT_MPART__mp_nodlsts */
+#ifdef __WANT_MPART__mp_dtplop
+		struct postlockop        _mp_dtplop;     /* Used internally */
+#endif /* __WANT_MPART__mp_dtplop */
+	};
+#else /* __WANT_MPART__mp_nodlsts || __WANT_MPART__mp_dtplop */
 	struct mnode_list             mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
+#endif /* !__WANT_MPART__mp_nodlsts && !__WANT_MPART__mp_dtplop */
 	Toblockop_slist(struct mpart) mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_lockops_reap()') */
-#ifdef __WANT_MPART__mp_newglobl
+#ifdef __WANT_MPART__mp_lopall
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_allparts(mp_allparts) { mp_allparts }
 #endif /* __WANT_MPART_INIT */
 	union {
-		LIST_ENTRY(mpart)         mp_allparts;  /* [lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
-		                                         * Chain of all mem-parts in existence. (may be unbound for certain parts)
-		                                         * NOTE: For  VIO  parts,  this  list entry  is  initialized  as  unbound! */
-		SLIST_ENTRY(REF mpart)   _mp_newglobl;  /* Used internally to enqueue new parts into the global list of parts. */
+		LIST_ENTRY(mpart)         mp_allparts;  /* [lock(:mpart_all_lock)]
+		                                         * Chain of all mem-parts in existence. (may be unbound for certain parts) */
+		struct lockop            _mp_lopall;    /* Lock-op used for async insertion of the part into the all-parts list. */
+		struct postlockop        _mp_plopall;   /* *ditto* */
 	};
-#else /* __WANT_MPART__mp_newglobl */
+#else /* __WANT_MPART__mp_lopall */
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_allparts(mp_allparts) mp_allparts
 #endif /* __WANT_MPART_INIT */
-	LIST_ENTRY(mpart)             mp_allparts;  /* [0..1][lock(:mpart_all_lock)][valid_if(mp_state != MPART_ST_VIO)]
-	                                             * Chain of all mem-parts in existence. (may be unbound for certain parts)
-	                                             * NOTE: For VIO parts, this list entry is initialized as unbound! */
-#endif /* !__WANT_MPART__mp_newglobl */
+	LIST_ENTRY(mpart)             mp_allparts;  /* [0..1][lock(:mpart_all_lock)]
+	                                             * Chain of all mem-parts in existence. (may be unbound for certain parts) */
+#endif /* !__WANT_MPART__mp_lopall */
 #if defined(__WANT_MPART_INIT) && __SIZEOF_POS_T__ > __SIZEOF_POINTER__
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define _MPART_INIT_ADDR(val) { { (uintptr_t)(val), 0 } }
@@ -272,9 +287,12 @@ struct mpart {
 	};
 	union {
 		uintptr_t                _mp_static_maxaddr[__SIZEOF_POS_T__ / __SIZEOF_POINTER__];
-		pos_t                     mp_maxaddr;   /* [lock(like(mp_minaddr))][const_if(like(mp_minaddr))]
+		pos_t                     mp_maxaddr;   /* [lock(LIKE(mp_minaddr))][const_if(like(mp_minaddr))]
 		                                         * In-file max address of this  part. (NOTE: when 1  is
-		                                         * added, also aligned like `mp_minaddr' must be) */
+		                                         * added, also aligned like `mp_minaddr' must be)
+		                                         * NOTE: May be set to `mp_minaddr - 1' if the part is empty (which  may
+		                                         *       happen if the part's original contents have since been added to
+		                                         *       a neighboring part; s.a. `mpart_merge()') */
 	};
 #else /* __WANT_MPART_INIT && __SIZEOF_POS_T__ > __SIZEOF_POINTER__ */
 #ifdef __WANT_MPART_INIT
@@ -290,9 +308,12 @@ struct mpart {
 	                                             *           mp_meta->mpm_dmalocks != 0)]
 	                                             * In-file starting address of this part.
 	                                             * Aligned by PAGESIZE, and the associated file's block-size. */
-	pos_t                         mp_maxaddr;   /* [lock(like(mp_minaddr))][const_if(like(mp_minaddr))]
+	pos_t                         mp_maxaddr;   /* [lock(LIKE(mp_minaddr))][const_if(like(mp_minaddr))]
 	                                             * In-file max address of this  part. (NOTE: when 1  is
-	                                             * added, also aligned like `mp_minaddr' must be) */
+	                                             * added, also aligned like `mp_minaddr' must be)
+	                                             * NOTE: May be set to `mp_minaddr - 1' if the part is empty (which  may
+	                                             *       happen if the part's original contents have since been added to
+	                                             *       a neighboring part; s.a. `mpart_merge()') */
 #endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
 #ifdef __WANT_MPART__mp_dead
 #ifdef __WANT_MPART_INIT
@@ -779,7 +800,7 @@ mpart_lock_acquire_and_setcore_load(struct mpart *__restrict self,
  * HINT: This function is used to implement `mman_startdma()' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_lock_acquire_and_setcore_unsharecow(struct mpart *__restrict self,
-                                          pos_t filepos, size_t split_hint)
+                                          pos_t filepos, size_t max_load_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Acquire a lock until:
@@ -1095,6 +1116,20 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 
 
 
+/* Try to merge `self' with neighboring parts from the associated file.
+ * @return: * : A pointer to the (possibly merged) mem-part. */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mpart_merge)(REF struct mpart *__restrict self);
+
+/* Same as `mpart_merge()',  but the caller  is holding a  lock
+ * to `self' upon entry, and will be holding a lock to `return'
+ * upon exit. */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self);
+
+
+
+
 /* TODO: =============== BEGIN_DEPRECATED ===============
  *
  * Mem-part read/write  functions  don't  include  file-size/read-only/etc.  checks.
@@ -1155,53 +1190,33 @@ FUNDEF NONNULL((1, 2)) size_t KCALL mpart_writev_or_unlock_p(struct mpart *__res
 
 /* Lock for `mpart_all_list' */
 DATDEF struct atomic_lock mpart_all_lock;
-#define mpart_all_lock_tryacquire() atomic_lock_tryacquire(&mpart_all_lock)
-#define mpart_all_lock_acquire()    atomic_lock_acquire(&mpart_all_lock)
-#define mpart_all_lock_acquire_nx() atomic_lock_acquire_nx(&mpart_all_lock)
-#define mpart_all_lock_release()    (atomic_lock_release(&mpart_all_lock), mpart_all_reap())
-#define mpart_all_lock_acquired()   atomic_lock_acquired(&mpart_all_lock)
-#define mpart_all_lock_available()  atomic_lock_available(&mpart_all_lock)
+#define _mpart_all_reap()      _lockop_reap_atomic_lock(&mpart_all_lops, &mpart_all_lock)
+#define mpart_all_reap()       lockop_reap_atomic_lock(&mpart_all_lops, &mpart_all_lock)
+#define mpart_all_tryacquire() atomic_lock_tryacquire(&mpart_all_lock)
+#define mpart_all_acquire()    atomic_lock_acquire(&mpart_all_lock)
+#define mpart_all_acquire_nx() atomic_lock_acquire_nx(&mpart_all_lock)
+#define mpart_all_release()    (atomic_lock_release(&mpart_all_lock), mpart_all_reap())
+#define mpart_all_release_f()  atomic_lock_release(&mpart_all_lock)
+#define mpart_all_acquired()   atomic_lock_acquired(&mpart_all_lock)
+#define mpart_all_available()  atomic_lock_available(&mpart_all_lock)
 
 /* [0..n][CHAIN(mp_allparts)][lock(mpart_all_lock)]
  * List of all memory parts currently in use. List head indices are `MPART_ALL_LIST_*'
- * NOTE: This list holds a reference to every contain part that wasn't already
- *       destroyed,    and    has   the    `MPART_F_GLOBAL_REF'    flag   set. */
+ * NOTE: This list holds a reference to every contain part that wasn't
+ *       already destroyed, and has the `MPART_F_GLOBAL_REF' flag set. */
 DATDEF struct mpart_list mpart_all_list;
 
-/* TODO: Instead of having a dead- and pending- list, use a single, common lockop list! */
+/* [0..n][lock(ATOMIC)] List of lock-ops for `mpart_all_list' */
+DATDEF struct lockop_slist mpart_all_lops;
 
-/* [0..n][CHAIN(_mp_dead)][lock(ATOMIC)]
- * List of dead parts that have yet to be removed from `mpart_all_list'.
- * This list must be cleared whenever the caller has released a lock to `mpart_all_lock'.
- * For this purpose, you may simply use `mpart_all_reap()' */
-DATDEF struct mpart_slist mpart_all_dead;
-
-/* [0..n][CHAIN(_mp_newglobl)][lock(ATOMIC)]
- * Similar  to `mpart_all_dead', but  this is a list  of references to parts
- * that should be added to `mpart_all_list' once the lock becomes available.
- *
- * Because  these  are references,  mpart_destroy() remains  NOBLOCK, because
- * by  the time a mem-part is destroyed, it  is know that it can't be pending
- * to-be added to the global list of parts anymore. (because it being pending
- * would have otherwise prevented it from being destroyed) */
-DATDEF struct REF mpart_slist mpart_all_pending;
-
-/* Add the given mpart `self' to the global list of parts.
- * This  function   will  initialize   `self->mp_allparts' */
+/* Add the given mpart `self'  to the global list of  parts.
+ * This function will initialize `self->mp_allparts', though
+ * may do so asynchronously (meaning  that the part may  not
+ * have  been added to  the all-parts list  yet, even if you
+ * acquire a lock to said  list immediately after call  this
+ * function) */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self);
-
-/* Try to reap all dead memory-parts from `mpart_all_dead'.
- * This function must be called after releasing a lock from `mpart_all_lock' */
-FUNDEF NOBLOCK void NOTHROW(FCALL _mpart_all_reap)(void);
-#define mpart_all_mustreap()                                                          \
-	(__hybrid_atomic_load(mpart_all_dead.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR || \
-	 __hybrid_atomic_load(mpart_all_pending.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
-#ifdef __OPTIMIZE_SIZE__
-#define mpart_all_reap() _mpart_all_reap()
-#else /* __OPTIMIZE_SIZE__ */
-#define mpart_all_reap() (void)(!mpart_all_mustreap() || (_mpart_all_reap(), 0))
-#endif /* !__OPTIMIZE_SIZE__ */
 
 DECL_END
 #endif /* __CC__ */
