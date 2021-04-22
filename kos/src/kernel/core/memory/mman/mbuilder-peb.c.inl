@@ -305,8 +305,8 @@ string_size_changed:
 	stolen_node->mbn_minaddr = (byte_t *)result;
 	stolen_node->mbn_maxaddr = (byte_t *)result + peb_total_size - 1;
 	stolen_node->mbn_flags   = MNODE_F_PREAD | MNODE_F_PWRITE;
-	stolen_node->mbn_filpos  = 0;
 	stolen_node->mbn_file    = incref(&mfile_zero);
+	mnode_mbn_filpos_set(stolen_node, 0);
 
 	/* Load the stolen node into the MBUILDER */
 	mbuilder_insert_fmnode(self, stolen_node);

@@ -482,7 +482,7 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 			return MNODE_MERGE_CANNOT_MERGE;
 		/* It ~is~ possible that we might be able to plug the  2
 		 * portions of the mem-part that are being mapped out of
-		 * the part, and  use them  to re-form a  new that  that
+		 * the  part, and use  them to re-form  a new which then
 		 * contains  only those portions that are actually used.
 		 *
 		 * However, for this we must also take a look at all other
@@ -1112,6 +1112,8 @@ NOTHROW(FCALL mpart_lock_all_mmans_after)(struct mpart const *__restrict self,
  *    @assume(mpart_canmerge(lopart, hipart));
  *    @assume(mpart_lock_acquired(lopart));
  *    @assume(mpart_lock_acquired(hipart));
+ *    @assume(!lopart->mp_meta || mpartmeta_ftxlock_writing(lopart->mp_meta));
+ *    @assume(!hipart->mp_meta || mpartmeta_ftxlock_writing(hipart->mp_meta));
  *    @assume(lopart->mp_file == hipart->mp_file));
  *    @assume(mpart_isanon(lopart) || mfile_lock_writing(lopart->mp_file));
  *    @assume(mpart_isanon(lopart) == mpart_isanon(hipart));
@@ -1187,7 +1189,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	 *       >>         lopart->mp_meta->mpm_rtm_vers = hipart->mp_meta->mpm_rtm_vers;
 	 *       >>     hipart->mp_meta->mpm_ftx.each->mfu_part = lopart;
 	 *       >>     hipart->mp_meta->mpm_ftx.each->mfu_addr += OLD_SIZE_OF_LOPART;
-	 *       >>     mfutex_tree_insert(&lopart->mp_meta->mpm_ftx, hipart->mp_meta->mpm_ftx.each);
+	 *       >>     mpartmeta_ftx_insert(lopart->mp_meta, hipart->mp_meta->mpm_ftx.each);
 	 *       >> } */
 
 	/* TODO: >> if (ATOMIC_FETCHAND(hipart->mp_flags, ~MPART_F_GLOBAL_REF)) {
@@ -1914,9 +1916,6 @@ domerge_locked:
 	}
 	return self;
 }
-
-
-
 
 DECL_END
 

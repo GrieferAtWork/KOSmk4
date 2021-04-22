@@ -210,20 +210,43 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 #define mpartmeta_ftxlock_canread(self)        atomic_rwlock_canread(&(self)->mpm_ftxlock)
 #define mpartmeta_ftxlock_canwrite(self)       atomic_rwlock_canwrite(&(self)->mpm_ftxlock)
 
+/* Helper macros for operating on the futex tree of a given mem-part-meta controller. */
+#define mpartmeta_ftx_locate(self, addr)              mfutex_tree_locate((self)->mpm_ftx, addr)
+#define mpartmeta_ftx_rlocate(self, minaddr, maxaddr) mfutex_tree_rlocate((self)->mpm_ftx, minaddr, maxaddr)
+#define mpartmeta_ftx_insert(self, ftx)               mfutex_tree_insert(&(self)->mpm_ftx, ftx)
+#define mpartmeta_ftx_tryinsert(self, ftx)            mfutex_tree_tryinsert(&(self)->mpm_ftx, ftx)
+#define mpartmeta_ftx_remove(self, addr)              mfutex_tree_remove(&(self)->mpm_ftx, addr)
+#define mpartmeta_ftx_rremove(self, minaddr, maxaddr) mfutex_tree_rremove(&(self)->mpm_ftx, minaddr, maxaddr)
+#define mpartmeta_ftx_removenode(self, ftx)           mfutex_tree_removenode(&(self)->mpm_ftx, ftx)
+
 
 
 
 /************************************************************************/
 /* Helper functions to creating/destroying DMA locks.                   */
 /************************************************************************/
+
+/* Must be called when `mpm_dmalocks' drops to `0' */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL _mpart_dma_donelock)(REF struct mpart *__restrict self);
+
+/* Create a new DMA-lock for `self'.
+ * The caller must be holding the lock `mpart_lock_acquired(self)' */
 FORCELOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(mpart_dma_addlock)(struct mpart *__restrict self) {
-	__hybrid_assert(mpart_lock_acquired(self));
 	struct mpartmeta *meta = self->mp_meta;
+	__hybrid_assert(mpart_lock_acquired(self));
 	__hybrid_assert(meta != __NULLPTR);
 	__hybrid_atomic_inc(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
 }
 
+/* Release  a DMA-lock from `self'. Note that this may result in
+ * the part needing to be merged with other, adjacent parts, and
+ * as a result of this have its base-address altered.
+ *
+ * Because of this, this function behaves such that it  _always_
+ * inherits a reference to the associated part, and _always_ re-
+ * returns a new reference to a (potentially different) part. */
 FORCELOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(mpart_dma_dellock)(REF struct mpart *__restrict self) {
 	refcnt_t old_count;
@@ -231,16 +254,8 @@ NOTHROW(mpart_dma_dellock)(REF struct mpart *__restrict self) {
 	__hybrid_assert(meta != __NULLPTR);
 	old_count = __hybrid_atomic_fetchdec(meta->mpm_dmalocks, __ATOMIC_SEQ_CST);
 	__hybrid_assert(old_count >= 1);
-	if (old_count == 1) {
-		/* When dma-locks go away,  it may also become  possible
-		 * to merge the part with some of its neighboring parts!
-		 * For this purpose, check `_MPART_F_MERGE_AFTER_DMA' */
-		if __unlikely(__hybrid_atomic_load(self->mp_flags, __ATOMIC_ACQUIRE) & _MPART_F_MERGE_AFTER_DMA) {
-			__hybrid_atomic_and(self->mp_flags, ~_MPART_F_MERGE_AFTER_DMA, __ATOMIC_SEQ_CST);
-			self = mpart_merge(self);
-		}
-		sig_broadcast(&meta->mpm_dma_done);
-	}
+	if (old_count == 1)
+		self = _mpart_dma_donelock(self);
 	return self;
 }
 

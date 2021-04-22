@@ -295,8 +295,8 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 				node->mbn_part    = part; /* Inherit reference */
 				node->mbn_fspath  = xincref(file.hmi_fspath);
 				node->mbn_fsname  = xincref(file.hmi_fsname);
-				node->mbn_filpos  = 0;
 				node->mbn_file    = incref(&mfile_zero);
+				mnode_mbn_filpos_set(node, 0);
 
 				/* Insert the node into the builder. */
 				mbuilder_insert_fmnode(&builder, node);

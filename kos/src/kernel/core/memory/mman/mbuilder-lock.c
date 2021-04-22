@@ -168,7 +168,7 @@ NOTHROW(FCALL mbuilder_extract_filemap)(/*in|out*/ struct mbuilder_norpc *__rest
 
 	/* Fill in fields of the file-map. */
 	fm->mfm_file            = fmnode->mbn_file; /* Inherit reference. */
-	fm->mfm_addr            = fmnode->mbn_filpos;
+	fm->mfm_addr            = mnode_mbn_filpos_get(fmnode);
 	/*->mfm_size            = ...;*/ /* Set below */
 	fm->mfm_prot            = prot_from_mnodeflags(fmnode->mbn_flags);
 	fm->mfm_flags           = mapflags_from_mbnodeflags(fmnode->mbn_flags);
@@ -246,8 +246,8 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder_norpc *__restr
 	iter = fmnode;
 
 	/* Fill in basic mapping information. */
-	fmnode->mbn_file   = fm->mfm_file; /* Inherit reference. */
-	fmnode->mbn_filpos = fm->mfm_addr;
+	fmnode->mbn_file = fm->mfm_file; /* Inherit reference. */
+	mnode_mbn_filpos_set(fmnode, fm->mfm_addr);
 
 	self->_mb_fnodes = fm->mfm_flist; /* Steal the free-list */
 	DBG_memset(&fm->mfm_flist, 0xcc, sizeof(fm->mfm_flist));
@@ -330,7 +330,7 @@ NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
 	byte_t *mm_base; /* Memory-map-base */
 	struct mbnode const *iter;
 	mm_base = fmnode->mbn_minaddr;
-	fm_base = fmnode->mbn_filpos;
+	fm_base = mnode_mbn_filpos_get(fmnode);
 	iter    = fmnode;
 	do {
 		pos_t iter_fm_minaddr, iter_fm_maxaddr;

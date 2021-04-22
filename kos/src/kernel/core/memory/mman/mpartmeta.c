@@ -67,7 +67,7 @@ NOTHROW(FCALL mfutex_remove_from_mpart_lop)(Toblockop(struct mpart) *__restrict 
 	me = container_of(_lop, struct mfutex, _mfu_lop);
 
 	/* Remove the mem-futex from the tree ourselves. */
-	mfutex_tree_removenode(&part->mp_meta->mpm_ftx, me);
+	mpartmeta_ftx_removenode(part->mp_meta, me);
 
 	/* Drop the part reference, and free the futex itself later. */
 	me->_mfu_plop.oplo_func = &mfutex_remove_from_mpart_postlop;
@@ -89,7 +89,7 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 		assert(meta != NULL);
 		if (mpartmeta_ftxlock_trywrite(meta)) {
 			/* Remove the mem-futex from the tree ourselves. */
-			mfutex_tree_removenode(&meta->mpm_ftx, self);
+			mpartmeta_ftx_removenode(meta, self);
 			mpartmeta_ftxlock_endwrite(meta, part);
 		} else {
 			/* Enqueue the futex for lazy removal. */
@@ -175,6 +175,29 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self) {
 
 
 /************************************************************************/
+/* Helper functions to creating/destroying DMA locks.                   */
+/************************************************************************/
+
+/* Must be called when `mpm_dmalocks' drops to `0' */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL _mpart_dma_donelock)(REF struct mpart *__restrict self) {
+	/* When dma-locks go away,  it may also become  possible
+	 * to merge the part with some of its neighboring parts!
+	 * For this purpose, check `_MPART_F_MERGE_AFTER_DMA' */
+	if __unlikely(__hybrid_atomic_load(self->mp_flags, __ATOMIC_ACQUIRE) & _MPART_F_MERGE_AFTER_DMA) {
+		__hybrid_atomic_and(self->mp_flags, ~_MPART_F_MERGE_AFTER_DMA, __ATOMIC_SEQ_CST);
+		self = mpart_merge(self);
+	}
+	sig_broadcast(&self->mp_meta->mpm_dma_done);
+	return self;
+}
+
+
+
+
+
+
+/************************************************************************/
 /* Futex access/creation API                                            */
 /************************************************************************/
 
@@ -226,7 +249,7 @@ again:
 	partrel_offset = (mpart_reladdr_t)(file_position - mpart_getminaddr(self));
 
 	/* Check for an existing futex. */
-	result = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
+	result = mpartmeta_ftx_locate(meta, partrel_offset);
 	if (result && tryincref(result)) {
 		mpartmeta_ftxlock_endread(meta, self);
 		goto done;
@@ -260,9 +283,9 @@ check_old_futex:
 		/* Initialize the new futex object. */
 		mfutex_init(result, self, partrel_offset);
 		/* Try to insert the new futex into the tree. */
-		if (!mfutex_tree_tryinsert(&meta->mpm_ftx, result)) {
+		if (!mpartmeta_ftx_tryinsert(meta, result)) {
 			bool refok;
-			old_futex = mfutex_tree_locate(meta->mpm_ftx, partrel_offset);
+			old_futex = mpartmeta_ftx_locate(meta, partrel_offset);
 			assert(old_futex);
 			refok = tryincref(old_futex);
 			mpartmeta_ftxlock_endwrite(meta, self);
@@ -284,7 +307,7 @@ check_old_futex:
 		/* Initialize the new futex object. */
 		mfutex_init(result, self, partrel_offset);
 		/* Insert the new futex into the tree. */
-		mfutex_tree_insert(&meta->mpm_ftx, result);
+		mpartmeta_ftx_insert(meta, result);
 	}
 	mpartmeta_ftxlock_endwrite(meta, self);
 done:
@@ -314,7 +337,7 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
 		          file_position <= mpart_getmaxaddr(self)) {
 			mpart_reladdr_t reladdr;
 			reladdr = (mpart_reladdr_t)(file_position - mpart_getminaddr(self));
-			result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+			result  = mpartmeta_ftx_locate(meta, reladdr);
 			/* If we found anything, try to acquire a reference. */
 			if (result && !tryincref(result))
 				result = NULL;
@@ -404,7 +427,7 @@ unlock_file_and_done:
 		goto unlock_file_and_done;
 	reladdr = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
 	if (mpartmeta_ftxlock_tryread(meta)) {
-		result = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+		result = mpartmeta_ftx_locate(meta, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
 		mpartmeta_ftxlock_endread(meta, part);
@@ -423,7 +446,7 @@ unlock_file_and_done:
 			goto again;
 		}
 		reladdr = (mpart_reladdr_t)(addr - mpart_getminaddr(part));
-		result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+		result  = mpartmeta_ftx_locate(meta, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
 		mpartmeta_ftxlock_endread(meta, part);
@@ -503,7 +526,7 @@ unlock_mman_and_return_null:
 	reladdr = node->mn_partoff + ((byte_t *)addr - node->mn_minaddr);
 	reladdr &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 	if (mpartmeta_ftxlock_tryread(meta)) {
-		result = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+		result = mpartmeta_ftx_locate(meta, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
 		mpartmeta_ftxlock_endread(meta, part);
@@ -532,7 +555,7 @@ unlock_mman_and_return_null:
 			goto again;
 		}
 		reladdr = (mpart_reladdr_t)(filepos - mpart_getminaddr(part));
-		result  = mfutex_tree_locate(meta->mpm_ftx, reladdr);
+		result  = mpartmeta_ftx_locate(meta, reladdr);
 		if (result && !tryincref(result))
 			result = NULL;
 		mpartmeta_ftxlock_endread(meta, part);

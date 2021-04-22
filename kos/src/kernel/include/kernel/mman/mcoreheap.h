@@ -37,19 +37,20 @@
  * have to make use of these functions.
  *
  * The sole consumer of functions exposed by this API should be the
- * low-level  kernel ram alloc/free  functions found in "mm-kram.h" */
+ * low-level  kernel  ram  alloc/free functions  found  in "kram.h" */
 
 #ifdef __CC__
 DECL_BEGIN
 
-/* This is  the type  of object  (or  rather: this  one's size  is  the
- * size of the  objects) that  get allocated by  the mcoreheap  system.
- * The obvious intend here is to use the coreheap system for allocating
- * mem-parts and mem-nodes for use with `mfile_zero' and  `mman_kernel'
- * in order to implement a  higher-level memory mapping system that  is
- * then capable of mapping arbitrary-size memory mappings.
+/* This is the type of object (or rather: this one's size is the size of
+ * the  objects) that get allocated by the mcoreheap system. The obvious
+ * intend  here is to  use the coreheap  system for allocating mem-parts
+ * and mem-nodes for use with `mfile_zero' and `mman_kernel' in order to
+ * implement a higher-level memory mapping  system that is then  capable
+ * of mapping arbitrary-size memory mappings.
  * s.a.:
  *   - MPART_F_COREPART
+ *   - MNODE_F_COREPART
  */
 #if __SIZEOF_MPART > __SIZEOF_MNODE
 #define __SIZEOF_MCOREPART __SIZEOF_MPART
@@ -68,8 +69,8 @@ union mcorepart {
 
 
 
-/* Figure out how many parts we can cram into a single page, while still
- * maintaining   at   least   pointer-alignment   for   all   of   them, */
+/* Figure out how many parts we can cram into a single page, while
+ * still maintaining at least  pointer-alignment for all of  them. */
 #if __ALIGNOF_MCOREPART > __SIZEOF_POINTER__
 /* NOTE: 3*pointer is the smallest possible header, since we always need
  *       at least 2 pointers for the  list-link, and 1 more pointer  for
@@ -125,7 +126,7 @@ DATDEF struct mcorepage_list mcoreheap_usedlist;
  *       for allocation at any time. This is required, because
  *       in  order to allocate additional pages, the mcoreheap
  *       allocator itself already requires 2 parts in order to
- *       do the actual allocation! */
+ *       do replicate itself! */
 DATDEF struct mcorepage_list mcoreheap_freelist;
 
 /* [>= 2][lock(mman_kernel.mm_lock)]
@@ -164,7 +165,7 @@ mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part);
 
-/* Same as `mcoreheap_free()', but no need to just through all of the hoops
+/* Same as `mcoreheap_free()', but no need to jump through all of the hoops
  * of enqueuing the free of `part' as a lockop when no lock can be acquired
  * to the kernel mman,  since the caller allows  us to assume that  they've
  * already acquired a lock to the kernel mman. */

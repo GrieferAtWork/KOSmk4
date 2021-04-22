@@ -65,6 +65,7 @@ STATIC_ASSERT(alignof(union mcorepart) == __ALIGNOF_MCOREPART);
 STATIC_ASSERT(sizeof(struct mpart) == __SIZEOF_MPART);
 STATIC_ASSERT(sizeof(struct mnode) == __SIZEOF_MNODE);
 STATIC_ASSERT(sizeof(union mcorepart) == __SIZEOF_MCOREPART);
+STATIC_ASSERT(offsetof(struct mcorepage, mcp_part) == _MCOREPAGE_HEADER_SIZE);
 
 /* Also make sure that `struct mcorepage' really fits into a single page! */
 STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
@@ -106,7 +107,7 @@ PUBLIC struct mcorepage_list mcoreheap_usedlist = LIST_HEAD_INITIALIZER(&mcorehe
  *       for allocation at any time. This is required, because
  *       in  order to allocate additional pages, the mcoreheap
  *       allocator itself already requires 2 parts in order to
- *       do the actual allocation! */
+ *       do replicate itself! */
 PUBLIC struct mcorepage_list mcoreheap_freelist = { &_mcore_initpage };
 
 /* [>= 2][lock(mman_kernel.mm_lock)]
@@ -657,7 +658,7 @@ NOTHROW(FCALL mcoreheap_free)(union mcorepart *__restrict part) {
 }
 
 
-/* Same as `mcoreheap_free()', but no need to just through all of the hoops
+/* Same as `mcoreheap_free()', but no need to jump through all of the hoops
  * of enqueuing the free of `part' as a lockop when no lock can be acquired
  * to the kernel mman,  since the caller allows  us to assume that  they've
  * already acquired a lock to the kernel mman. */

@@ -148,7 +148,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 		struct mbnode *iter, *fmnext;
 		fmnext  = SLIST_NEXT(fmnode, mbn_nxtfile);
 		mm_base = fmnode->mbn_minaddr;
-		fm_base = fmnode->mbn_filpos;
+		fm_base = mnode_mbn_filpos_get(fmnode);
 		iter    = fmnode;
 		decref_unlikely(fmnode->mbn_file); /* No longer needed... */
 		do {

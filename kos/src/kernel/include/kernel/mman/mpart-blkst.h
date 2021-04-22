@@ -32,7 +32,7 @@
 
 
 /* Repeat a given block-status (one of `MPART_BLOCK_ST_*')
- * to  construct  a  bitset   that  has  the  same   size. */
+ * to fill a whole `mpart_blkst_word_t'. */
 #if __SIZEOF_POINTER__ == 4 && MPART_BLOCK_STBITS == 2
 #define MPART_BLOCK_REPEAT(st) (__UINT32_C(0x55555555) * (st))
 #elif __SIZEOF_POINTER__ == 8 && MPART_BLOCK_STBITS == 2

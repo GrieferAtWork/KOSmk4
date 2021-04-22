@@ -492,7 +492,9 @@ mpart_split_data_alloc_himeta(struct mpart_split_data *__restrict self) {
 		goto done;
 
 	/* Check if there are any allocated mfutex objects above the split-mark. */
-	if (mfutex_tree_rlocate(lometa->mpm_ftx, self->msd_offset, (mpart_reladdr_t)-1) == NULL)
+	if (mpartmeta_ftx_rlocate(lometa,
+	                          self->msd_offset,
+	                          (mpart_reladdr_t)-1) == NULL)
 		goto done;
 
 	/* There are futex objects that (may) have to be redistributed.
@@ -1213,8 +1215,8 @@ clear_hipart_changed_bit:
 		hipart->mp_meta = himeta; /* Fill in the meta-data field of the hi-part. */
 		COMPILER_WRITE_BARRIER();
 		SLIST_INIT(&dead_mfutex);
-		while ((ftx = mfutex_tree_rremove(&lometa->mpm_ftx, data.msd_offset,
-		                                  (mpart_reladdr_t)-1)) != NULL) {
+		while ((ftx = mpartmeta_ftx_rremove(lometa, data.msd_offset,
+		                                    (mpart_reladdr_t)-1)) != NULL) {
 			/* Take a reference to prevent futex objects from being destroyed
 			 * before we've finished transferring them to their new mem-part! */
 			if likely(tryincref(ftx)) {
@@ -1222,7 +1224,7 @@ clear_hipart_changed_bit:
 				ftx->mfu_addr -= data.msd_offset;
 				COMPILER_WRITE_BARRIER();
 				awref_set(&ftx->mfu_part, hipart);
-				mfutex_tree_insert(&himeta->mpm_ftx, ftx);
+				mpartmeta_ftx_insert(himeta, ftx);
 			} else {
 				/* Futex is already dead... */
 				SLIST_INSERT(&dead_mfutex, ftx, _mfu_dead);
@@ -1234,18 +1236,18 @@ clear_hipart_changed_bit:
 			do {
 				ftx = SLIST_FIRST(&dead_mfutex);
 				SLIST_REMOVE_HEAD(&dead_mfutex, _mfu_dead);
-				mfutex_tree_insert(&lometa->mpm_ftx, ftx);
+				mpartmeta_ftx_insert(lometa, ftx);
 			} while (!SLIST_EMPTY(&dead_mfutex));
 		}
 
-		atomic_rwlock_endwrite(&lometa->mpm_ftxlock); /* Acquired above (in `Step #3') */
+		mpartmeta_ftxlock_endwrite_f(lometa); /* Acquired above (in `Step #3') */
 
 		/* We're still holding references to  _all_ of the futex objects  that
 		 * we managed to transfer over into the himeta-tree. As such, we still
 		 * have to drop all of those references */
 		if (himeta->mpm_ftx != NULL)
 			mfutex_tree_foreach_decref_or_destroy_later(himeta->mpm_ftx);
-		atomic_rwlock_endwrite(&himeta->mpm_ftxlock);
+		mpartmeta_ftxlock_endwrite_f(himeta);
 
 		/* Must reap dead futex objects once again, but this time only have to
 		 * do so because we've just released our locks to the meta-data  futex

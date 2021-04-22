@@ -213,8 +213,8 @@ create_bss_overlap_mbnode(struct regular_node *__restrict exec_node,
 	node->mbn_filnxt = NULL; /* Single-node mapping */
 	node->mbn_fspath = NULL; /* Unused */
 	node->mbn_fsname = NULL; /* Unused */
-	node->mbn_filpos = 0;
 	node->mbn_file   = incref(&mfile_zero); /* Unused, but must be non-NULL */
+	mnode_mbn_filpos_set(node, 0);
 
 	return node;
 }
