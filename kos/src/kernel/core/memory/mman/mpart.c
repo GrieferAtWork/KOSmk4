@@ -95,7 +95,7 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	assert(!(self->mp_flags & MPART_F_GLOBAL_REF));
 	/* Make sure that we've served _all_ dead nodes that may have still been there. */
 	while (!SLIST_EMPTY(&self->mp_lockops)) {
-		Toblockop(struct mpart) *lop;
+		Toblockop(mpart) *lop;
 		lop = SLIST_FIRST(&self->mp_lockops);
 		SLIST_REMOVE_HEAD(&self->mp_lockops, olo_link);
 		(*lop->olo_func)(lop, self);
@@ -143,9 +143,9 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 #define mpart_destroy_lockop_decode(lop)          container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
 #define mpart_destroy_postlockop_encode(prt)      ((struct postlockop *)&(prt)->mp_blkst_ptr)
 #define mpart_destroy_postlockop_decode(lop)      container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
-#define mpart_destroy_mfilelockop_encode(prt)     ((Toblockop(struct mfile) *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_mfilelockop_encode(prt)     ((Toblockop(mfile) *)&(prt)->mp_blkst_ptr)
 #define mpart_destroy_mfilelockop_decode(lop)     container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
-#define mpart_destroy_mfilepostlockop_encode(prt) ((Tobpostlockop(struct mfile) *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_mfilepostlockop_encode(prt) ((Tobpostlockop(mfile) *)&(prt)->mp_blkst_ptr)
 #define mpart_destroy_mfilepostlockop_decode(lop) container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -171,7 +171,7 @@ NOTHROW(FCALL mpart_destroy_lop_rmall_async)(struct lockop *__restrict self) {
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(struct mfile) *__restrict self,
+NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(mfile) *__restrict self,
                                        struct mfile *__restrict UNUSED(file)) {
 	struct mpart *me;
 	me = mpart_destroy_mfilelockop_decode(self);
@@ -193,10 +193,10 @@ NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(struct mfile) *__restrict s
 	mpart_free(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mfile) *
-NOTHROW(FCALL mpart_destroy_lop_rmfile)(Toblockop(struct mfile) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mfile) *
+NOTHROW(FCALL mpart_destroy_lop_rmfile)(Toblockop(mfile) *__restrict self,
                                         struct mfile *__restrict file) {
-	Tobpostlockop(struct mfile) *post;
+	Tobpostlockop(mfile) *post;
 	struct mpart *me;
 	me = mpart_destroy_mfilelockop_decode(self);
 	/* Remove the dead part from the file's tree of parts. */
@@ -248,7 +248,7 @@ remove_node_from_globals:
 		goto remove_node_from_globals;
 	} else {
 		/* Enqueue the file for later deletion. */
-		Toblockop(struct mfile) *lop;
+		Toblockop(mfile) *lop;
 		lop = mpart_destroy_mfilelockop_encode(self);
 		lop->olo_func = &mpart_destroy_lop_rmfile;
 		SLIST_ATOMIC_INSERT(&file->mf_lockops, lop, olo_link);
@@ -260,14 +260,14 @@ remove_node_from_globals:
 	mpart_free(self);
 }
 
-SLIST_HEAD(mpart_postlockop_slist, Tobpostlockop(struct mpart));
+SLIST_HEAD(mpart_postlockop_slist, Tobpostlockop(mpart));
 
 /* Reap dead nodes of `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mpart_lockops_reap)(struct mpart *__restrict self) {
-	Toblockop_slist(struct mpart) lops;
+	Toblockop_slist(mpart) lops;
 	struct mpart_postlockop_slist post;
-	Toblockop(struct mpart) *iter;
+	Toblockop(mpart) *iter;
 	if (!mpart_lock_tryacquire(self))
 		return;
 	SLIST_INIT(&post);
@@ -276,8 +276,8 @@ again_steal_and_service_lops:
 again_service_lops:
 	iter = SLIST_FIRST(&lops);
 	while (iter != NULL) {
-		Toblockop(struct mpart) *next;
-		Tobpostlockop(struct mpart) *later;
+		Toblockop(mpart) *next;
+		Tobpostlockop(mpart) *later;
 		next = SLIST_NEXT(iter, olo_link);
 		/* Invoke the lock operation. */
 		later = (*iter->olo_func)(iter, self);
@@ -306,7 +306,7 @@ again_service_lops:
 
 	/* Run all enqueued post-operations. */
 	while (!SLIST_EMPTY(&post)) {
-		Tobpostlockop(struct mpart) *op;
+		Tobpostlockop(mpart) *op;
 		op = SLIST_FIRST(&post);
 		SLIST_REMOVE_HEAD(&post, oplo_link);
 		(*op->oplo_func)(op, self);

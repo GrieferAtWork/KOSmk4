@@ -71,21 +71,21 @@ LIST_HEAD(task_list, WEAK task);
 
 struct mman {
 #ifndef __WANT_MMAN_EXCLUDE_PAGEDIR
-	pagedir_t                      mm_pagedir;     /* [lock(mm_lock)] The page directory associated with the mman. */
+	pagedir_t            mm_pagedir;     /* [lock(mm_lock)] The page directory associated with the mman. */
 #endif /* !__WANT_MMAN_EXCLUDE_PAGEDIR */
-	WEAK refcnt_t                  mm_refcnt;      /* Reference counter. */
-	WEAK refcnt_t                  mm_weakrefcnt;  /* Weak reference counter */
+	WEAK refcnt_t        mm_refcnt;      /* Reference counter. */
+	WEAK refcnt_t        mm_weakrefcnt;  /* Weak reference counter */
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN
-	struct atomic_rwlock           mm_lock;        /* Lock for this mman. */
+	struct atomic_rwlock mm_lock;        /* Lock for this mman. */
 #else /* CONFIG_USE_RWLOCK_FOR_MMAN */
-	struct atomic_lock             mm_lock;        /* Lock for this mman. */
+	struct atomic_lock   mm_lock;        /* Lock for this mman. */
 #endif /* !CONFIG_USE_RWLOCK_FOR_MMAN */
-	RBTREE_ROOT(struct mnode)      mm_mappings;    /* [owned][0..n][lock(mm_lock)] Known file mappings. */
-	PHYS pagedir_phys_t            mm_pagedir_p;   /* [1..1][const] Physical pointer of the page directory */
-	struct mnode_list              mm_writable;    /* [0..n][lock(mm_lock)] List of nodes that contain writable mappings. */
-	struct task_list               mm_threads;     /* [0..n][lock(!PREEMPTION && SMP_LOCK(mm_threadslock))] */
+	RBTREE_ROOT(mnode)   mm_mappings;    /* [owned][0..n][lock(mm_lock)] Known file mappings. */
+	PHYS pagedir_phys_t  mm_pagedir_p;   /* [1..1][const] Physical pointer of the page directory */
+	struct mnode_list    mm_writable;    /* [0..n][lock(mm_lock)] List of nodes that contain writable mappings. */
+	struct task_list     mm_threads;     /* [0..n][lock(!PREEMPTION && SMP_LOCK(mm_threadslock))] */
 #ifndef CONFIG_NO_SMP
-	struct atomic_lock             mm_threadslock; /* SMP-lock for `mm_threads' */
+	struct atomic_lock   mm_threadslock; /* SMP-lock for `mm_threads' */
 #endif /* !CONFIG_NO_SMP */
 };
 
@@ -142,10 +142,10 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread);
 
 /* [0..n] Linked chain of pending  operations that should be  executed
  * (via a reap-mechanism) whenever the lock for this mman is released. */
-DATDEF ATTR_PERMMAN Toblockop_slist(struct mman) thismman_lockops;
+DATDEF ATTR_PERMMAN Toblockop_slist(mman) thismman_lockops;
 
 /* Aliasing symbol: `== FORMMAN(&mman_kernel, thismman_lockops)' */
-DATDEF Toblockop_slist(struct mman) mman_kernel_lockops;
+DATDEF Toblockop_slist(mman) mman_kernel_lockops;
 
 /* Reap lock operations of the given mman. */
 FUNDEF NOBLOCK NONNULL((1)) void

@@ -102,8 +102,8 @@ struct userelf_module: module {
 		                                                       * the associated module. Additionally, when `md_nodecount' drops
 		                                                       * to `0', the module is  removed from the UserELF module  cache,
 		                                                       * as per use of the `mo_nonodes' operator. */
-		Toblockop(struct mman)                _um_cc_lop;     /* Used for async destruction as the result of removal from the UserELF cache. */
-		Tobpostlockop(struct mman)            _um_cc_postlop; /* *ditto* */
+		Toblockop(mman)                       _um_cc_lop;     /* Used for async destruction as the result of removal from the UserELF cache. */
+		Tobpostlockop(mman)                   _um_cc_postlop; /* *ditto* */
 		struct lockop                         _um_sc_lop;     /* Used for async removal of sections from the UserELF section cache. */
 		struct postlockop                     _um_sc_postlop; /* *ditto* */
 		SLIST_ENTRY(userelf_module)           _um_dead;       /* Used internally to chain dead UserELF modules. */

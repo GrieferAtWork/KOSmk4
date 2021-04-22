@@ -131,7 +131,7 @@ DECL_BEGIN
 #endif /* !... */
 
 struct trace_node {
-	RBTREE_NODE_WITH_KEY(struct trace_node, uintptr_t)
+	RBTREE_NODE_WITH_KEY(trace_node, uintptr_t)
 	            tn_link;  /* [const] Trace node link. */
 #define trace_node_initlink(self, base, num_bytes) \
 	((self)->tn_link.rb_min = (uintptr_t)(base),   \
@@ -313,7 +313,7 @@ DEFINE_DBG_BZERO_OBJECT(smplock);
 
 
 /* [0..1] Tree of traced nodes */
-PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(struct trace_node) nodes = NULL;
+PRIVATE ATTR_MALL_UNTRACKED RBTREE_ROOT(trace_node) nodes = NULL;
 
 /* Debug-heap used for allocating `struct trace_node' objects. */
 INTERN struct heap trace_heap =

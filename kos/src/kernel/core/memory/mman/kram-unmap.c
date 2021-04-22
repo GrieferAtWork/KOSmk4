@@ -1041,15 +1041,15 @@ fail:
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL lockop_kram_cb_post)(Tobpostlockop(struct mman) *__restrict self,
+NOTHROW(FCALL lockop_kram_cb_post)(Tobpostlockop(mman) *__restrict self,
                                    struct mman *__restrict UNUSED(mm)) {
 	struct mman_unmap_kram_job *job;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_post_lop_mm);
 	(*job->mukj_done)(job);
 }
 
-PRIVATE NOBLOCK Tobpostlockop(struct mman) *
-NOTHROW(FCALL lockop_kram_cb)(Toblockop(struct mman) *__restrict self,
+PRIVATE NOBLOCK Tobpostlockop(mman) *
+NOTHROW(FCALL lockop_kram_cb)(Toblockop(mman) *__restrict self,
                               struct mman *__restrict UNUSED(mm)) {
 	struct mman_unmap_kram_job *job, *res;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mm);
@@ -1074,15 +1074,15 @@ NOTHROW(FCALL lockop_kram_cb)(Toblockop(struct mman) *__restrict self,
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mpartlockop_kram_cb_post)(Tobpostlockop(struct mpart) *__restrict self,
+NOTHROW(FCALL mpartlockop_kram_cb_post)(Tobpostlockop(mpart) *__restrict self,
                                         struct mpart *__restrict UNUSED(part)) {
 	struct mman_unmap_kram_job *job;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_post_lop_mp);
 	(*job->mukj_done)(job);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
-NOTHROW(FCALL mpartlockop_kram_cb)(Toblockop(struct mpart) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
+NOTHROW(FCALL mpartlockop_kram_cb)(Toblockop(mpart) *__restrict self,
                                    struct mpart *__restrict part) {
 	struct mman_unmap_kram_job *job, *res;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mp);
@@ -1109,9 +1109,9 @@ NOTHROW(FCALL mpartlockop_kram_cb)(Toblockop(struct mpart) *__restrict self,
  * lock to `self', and return `false' */
 PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
-                                           Toblockop(struct mpart) *__restrict lop) {
+                                           Toblockop(mpart) *__restrict lop) {
 	bool did_remove;
-	Toblockop_slist(struct mpart) locklist;
+	Toblockop_slist(mpart) locklist;
 	SLIST_ATOMIC_INSERT(&self->mp_lockops, lop, olo_link);
 	if likely(!mpart_lock_tryacquire(self))
 		return true;
@@ -1123,7 +1123,7 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
 	});
 	if (locklist.slh_first != NULL) {
 		/* Re-queue all removed elements. */
-		Toblockop(struct mpart) *lastop;
+		Toblockop(mpart) *lastop;
 		lastop = SLIST_FIRST(&locklist);
 		while (SLIST_NEXT(lastop, olo_link))
 			lastop = SLIST_NEXT(lastop, olo_link);
@@ -1439,9 +1439,9 @@ NOTHROW(FCALL krulist_merge_adjacent)(struct mman_unmap_kram_job_slist *__restri
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self) {
 	struct mman_unmap_kram_job_slist krlist;
-	Toblockop_slist(struct mman) lops;
-	Tobpostlockop_slist(struct mman) post;
-	Toblockop(struct mman) *iter;
+	Toblockop_slist(mman) lops;
+	Tobpostlockop_slist(mman) post;
+	Toblockop(mman) *iter;
 /*again:*/
 	if (!mman_lock_tryacquire(self))
 		return;
@@ -1452,8 +1452,8 @@ again_service_lops:
 	SLIST_INIT(&krlist);
 	iter = SLIST_FIRST(&lops);
 	while (iter != NULL) {
-		Toblockop(struct mman) *next;
-		Tobpostlockop(struct mman) *later;
+		Toblockop(mman) *next;
+		Tobpostlockop(mman) *later;
 		next = SLIST_NEXT(iter, olo_link);
 		/* Special handling for unmap-kram jobs with inline-memory.
 		 * For  efficiency,  these  get  merged  with  each  other. */
@@ -1483,7 +1483,7 @@ continue_with_next:
 		/* Invoke unmap-kernel-ram lops */
 		do {
 			struct mman_unmap_kram_job *job;
-			Tobpostlockop(struct mman) *later;
+			Tobpostlockop(mman) *later;
 			job = SLIST_FIRST(&krlist);
 			SLIST_REMOVE_HEAD(&krlist, mukj_link);
 			later = lockop_kram_cb(&job->mukj_lop_mm, self);
@@ -1511,7 +1511,7 @@ continue_with_next:
 
 	/* Run all enqueued post-operations. */
 	while (!SLIST_EMPTY(&post)) {
-		Tobpostlockop(struct mman) *op;
+		Tobpostlockop(mman) *op;
 		op = SLIST_FIRST(&post);
 		SLIST_REMOVE_HEAD(&post, oplo_link);
 		(*op->oplo_func)(op, self);
@@ -1522,17 +1522,17 @@ continue_with_next:
 
 
 /* Without blocking, unmap a given region of kernel RAM.
- * NOTE: The caller must ensure that the given the address range can
- *       be written to without any chance of that write blocking, or
+ * NOTE: The  caller must ensure that the given the address range can
+ *       be  written to without any chance of that write blocking, or
  *       resulting in an exception. (i.e. don't use this one to unmap
  *       file mappings or the like...)
  *       If your intend is to unmap mappings that don't fulfill this
  *       requirement, the you should read the description of `struct
-*        mman_unmap_kram_job' and use `mman_unmap_kram_locked_ex()'
+ *       mman_unmap_kram_job' and use `mman_unmap_kram_locked_ex()'
  * @param: flags:   Set of `0 | GFP_CALLOC'. When `GFP_CALLOC' is given, allows
- *                  the memory management system to assume that the backing
- *                  physical memory is zero-initialized. If you're not sure
- *                  if this is the case, better pass `0'. If you lie here,
+ *                  the memory  management system  to assume  that the  backing
+ *                  physical  memory  is zero-initialized.  If you're  not sure
+ *                  if this is  the case,  better pass  `0'. If  you lie  here,
  *                  calloc() might arbitrarily break... */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
@@ -1552,7 +1552,7 @@ NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
 }
 
 /* Same as `mman_unmap_kram()', but may be used to improve efficiency
- * when  the  caller  is  already  holding  a  lock  to `mman_kernel' */
+ * when the caller is already holding a lock to `mman_kernel.mm_lock' */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                       size_t num_bytes, gfp_t flags) {

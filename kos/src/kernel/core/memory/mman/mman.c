@@ -99,7 +99,7 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 
 /* [0..n] Linked chain of pending  operations that should be  executed
  * (via a reap-mechanism) whenever the lock for this mman is released. */
-PUBLIC ATTR_PERMMAN Toblockop_slist(struct mman)
+PUBLIC ATTR_PERMMAN Toblockop_slist(mman)
 thismman_lockops = SLIST_HEAD_INITIALIZER(thismman_lockops);
 
 

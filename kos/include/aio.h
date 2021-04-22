@@ -68,10 +68,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>. */
 
-__SYSDECL_BEGIN
-
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __sigevent_t_defined
 #define __sigevent_t_defined 1
@@ -265,8 +263,7 @@ __NOTHROW_RPC(__LIBRT_CC aio_suspend64t64)(struct aiocb64 const *const __list[],
 #endif /* __USE_TIME64 */
 
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_AIO_H */

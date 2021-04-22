@@ -79,14 +79,14 @@ err:
 }
 
 struct fde_cache_entry {
-	unwind_fde_t                          fce_fde;    /* [const] The FDE entry being cached.
-	                                                   * When `f_pcstart...f_pcend' range is
-	                                                   * used as key-pair for the LLRB-tree */
-	__WEAK __REF void                    *fce_dlhand; /* [const] Weak reference for the  dl-handle of the library  that
-	                                                   * is backing this slot. This weakref is used to detect when  the
-	                                                   * associated module has been dlclose'd, at which point this will
-	                                                   * point to an wasdestroyed()-object. */
-	LLRBTREE_NODE(struct fde_cache_entry) fce_link;   /* Tree of cached FDE entries. */
+	unwind_fde_t                   fce_fde;    /* [const] The FDE entry being cached.
+	                                            * When `f_pcstart...f_pcend' range is
+	                                            * used as key-pair for the LLRB-tree */
+	__WEAK __REF void             *fce_dlhand; /* [const] Weak reference for the  dl-handle of the library  that
+	                                            * is backing this slot. This weakref is used to detect when  the
+	                                            * associated module has been dlclose'd, at which point this will
+	                                            * point to an wasdestroyed()-object. */
+	LLRBTREE_NODE(fde_cache_entry) fce_link;   /* Tree of cached FDE entries. */
 };
 
 DECL_END
@@ -111,7 +111,7 @@ DECL_END
 DECL_BEGIN
 
 /* [0..n][lock(fde_cache_lock)] The FDE cache tree */
-PRIVATE LLRBTREE_ROOT(struct fde_cache_entry) fde_cache = NULL;
+PRIVATE LLRBTREE_ROOT(fde_cache_entry) fde_cache = NULL;
 PRIVATE struct atomic_rwlock fde_cache_lock = ATOMIC_RWLOCK_INIT;
 
 PRIVATE NONNULL((1)) void CC

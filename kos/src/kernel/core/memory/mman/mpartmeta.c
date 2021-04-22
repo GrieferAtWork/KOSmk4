@@ -48,11 +48,11 @@ DECL_BEGIN
 #endif /* NDEBUG */
 
 /* Assert consistency of `__WANT_MFUTEX__mfu_lop' */
-STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Toblockop(struct mpart)));
-STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(struct mpart)));
+STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Toblockop(mpart)));
+STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(mpart)));
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(struct mpart) *__restrict _lop,
+NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,
                                                 REF struct mpart *__restrict part) {
 	struct mfutex *me;
 	me = container_of(_lop, struct mfutex, _mfu_plop);
@@ -60,8 +60,8 @@ NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(struct mpart) *__r
 	mfutex_free(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
-NOTHROW(FCALL mfutex_remove_from_mpart_lop)(Toblockop(struct mpart) *__restrict _lop,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
+NOTHROW(FCALL mfutex_remove_from_mpart_lop)(Toblockop(mpart) *__restrict _lop,
                                             REF struct mpart *__restrict part) {
 	struct mfutex *me;
 	me = container_of(_lop, struct mfutex, _mfu_lop);

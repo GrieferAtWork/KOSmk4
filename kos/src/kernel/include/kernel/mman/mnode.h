@@ -169,7 +169,7 @@ struct mnode {
 	 *          the node won't just be free'd, and you'll end up accessing dead
 	 *          memory! */
 #ifdef __INTELLISENSE__
-	typedef RBTREE_NODE(struct mnode) _rbtree_node_mnode;
+	typedef RBTREE_NODE(mnode) _rbtree_node_mnode;
 	typedef SLIST_ENTRY(mnode) _slist_entry_mnode;
 	typedef LIST_ENTRY(mnode) _list_entry_mnode;
 #ifdef __WANT_MNODE__mn_dead
@@ -234,11 +234,11 @@ struct mnode {
 #else /* __INTELLISENSE__ */
 #ifdef __WANT_MNODE__mn_dead
 	union {
-		RBTREE_NODE(struct mnode)       mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
+		RBTREE_NODE(mnode)              mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 		SLIST_ENTRY(mnode)             _mn_dead;     /* [lock(ATOMIC)] Internal chain of dead nodes */
 	};
 #else /* __WANT_MNODE__mn_dead */
-	RBTREE_NODE(struct mnode)           mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
+	RBTREE_NODE(mnode)                  mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 #endif /* !__WANT_MNODE__mn_dead */
 	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */

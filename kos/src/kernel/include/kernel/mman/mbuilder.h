@@ -90,7 +90,7 @@ struct mbnode {
 	 * This is because when the memory image constructed within
 	 * an mbuilder is loaded into an mman, all of the builder's
 	 * nodes become mnode objects! */
-	RBTREE_NODE(struct mbnode)          mbn_mement;   /* [const] R/B tree entry of mman mappings. */
+	RBTREE_NODE(mbnode)                 mbn_mement;   /* [const] R/B tree entry of mman mappings. */
 	byte_t                             *mbn_minaddr;  /* [const] Lowest address mapped by this node. */
 	byte_t                             *mbn_maxaddr;  /* [const] Greatest address mapped by this node. */
 	uintptr_t                           mbn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
@@ -188,15 +188,15 @@ struct mbnode_partset {
 struct rpc_entry;
 struct mbuilder_norpc {
 #ifdef __INTELLISENSE__
-	struct mbnode             *mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
+	struct mbnode           *mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
 #else /* __INTELLISENSE__ */
-	RBTREE_ROOT(struct mbnode) mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
+	RBTREE_ROOT(mbnode)      mb_mappings; /* [0..n][owned] Tree of mem-nodes. */
 #endif /* !__INTELLISENSE__ */
-	struct mbnode_partset      mb_uparts;   /* [0..n] Set of nodes mapping unique parts. */
-	struct mbnode_slist        mb_files;    /* [0..n][link(mbn_nxtfile)] List of file mappings. */
+	struct mbnode_partset    mb_uparts;   /* [0..n] Set of nodes mapping unique parts. */
+	struct mbnode_slist      mb_files;    /* [0..n][link(mbn_nxtfile)] List of file mappings. */
 	union {
-		struct mbnode_slist   _mb_fbnodes;  /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
-		struct mnode_slist    _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
+		struct mbnode_slist _mb_fbnodes;  /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
+		struct mnode_slist  _mb_fnodes;   /* [0..n][link(_mbn_alloc)] List of free mem-nodes. */
 	};
 };
 
@@ -214,13 +214,13 @@ struct mbuilder
 #define __mbuilder_base    /* nothing */
 #endif /* __cplusplus */
 #ifdef __INTELLISENSE__
-	struct mnode              *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
+	struct mnode       *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #else /* __INTELLISENSE__ */
-	RBTREE_ROOT(struct mnode)  mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
+	RBTREE_ROOT(mnode)  mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
 #endif /* !__INTELLISENSE__ */
-	struct rpc_entry          *mb_killrpc;  /* [0..n][link(re_next)]  List  of  pre-allocated  RPC
-	                                         * descriptors, as used by `mbuilder_apply()' in order
-	                                         * to  terminate threads using  the given target mman. */
+	struct rpc_entry   *mb_killrpc;  /* [0..n][link(re_next)]  List  of  pre-allocated  RPC
+	                                  * descriptors, as used by `mbuilder_apply()' in order
+	                                  * to  terminate threads using  the given target mman. */
 };
 
 /* Initialize the given mem-builder. */

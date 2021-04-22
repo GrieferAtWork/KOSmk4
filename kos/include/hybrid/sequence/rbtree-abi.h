@@ -110,12 +110,12 @@
 #define RBTREE_SETBLACK(self)  ((self)->_isred = 0)
 
 struct my_node {
-	int                         _foo;
-	RBTREE_NODE(struct my_node) _node;
-	int                         _bar;
-	RBTREE_Tkey                 _minkey;
-	RBTREE_Tkey                 _maxkey;
-	__BOOL                      _isred;
+	int                  _foo;
+	RBTREE_NODE(my_node) _node;
+	int                  _bar;
+	RBTREE_Tkey          _minkey;
+	RBTREE_Tkey          _maxkey;
+	__BOOL               _isred;
 };
 
 #endif /* !RBTREE */

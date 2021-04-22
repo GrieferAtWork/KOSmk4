@@ -186,7 +186,7 @@ struct fnode
 	                                          * [valid_if(!fsuper_datachanged_isanon(fn_super) &&
 	                                          *           !mfile_isanon(self) && (MFILE_F_CHANGED | MFILE_F_ATTRCHANGED)]
 	                                          * Link entry in the list of changed file-nodes. */
-	LLRBTREE_NODE(struct fnode) fn_supent;   /* [lock(fn_super->fs_nodeslock)][LIST(fn_super->fs_nodes)]
+	LLRBTREE_NODE(fnode)        fn_supent;   /* [lock(fn_super->fs_nodeslock)][LIST(fn_super->fs_nodes)]
 	                                          * Tree entry within the  super block's tree of  file-nodes.
 	                                          * When  `rb_lhs' is set to `FSUPER_NODES_DELETED', then the
 	                                          * file-node  is no longer apart of the super's tree of file

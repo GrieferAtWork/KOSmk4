@@ -69,38 +69,38 @@ AWREF(mpart_awref, mpart);
 
 struct mfutex {
 	/* Memory-Fast-Userspace-mUTEX */
-	WEAK refcnt_t                    mfu_refcnt; /* Reference counter. */
-	struct mpart_awref               mfu_part;   /* [1..1] The (currently) associated mem-part.
-	                                              * Note that this  part may change  arbitrarily as the  result of calls  to
-	                                              * `mpart_split()'.  To prevent this,  read out this  field, acquire a lock
-	                                              * to the mem-part, or the futex-tree-lock, then read out this field  again
-	                                              * until the mem-part no longer changes. At this point, the mem-part you'll
-	                                              * end up with will be consistent.
-	                                              * end up with will be consistent. */
-	mpart_reladdr_t                  mfu_addr;   /* [lock(mfu_part->mp_meta->mpm_ftx)] Address of this mem-futex
-	                                              * (relative to mfu_part; within the R/B-tree)
-	                                              * NOTE: The least-significant bit  is used  as R/B-bit,  meaning
-	                                              *       that part addresses must be aligned by at least 2 bytes. */
+	WEAK refcnt_t             mfu_refcnt; /* Reference counter. */
+	struct mpart_awref        mfu_part;   /* [1..1] The (currently) associated mem-part.
+	                                       * Note that this  part may change  arbitrarily as the  result of calls  to
+	                                       * `mpart_split()'.  To prevent this,  read out this  field, acquire a lock
+	                                       * to the mem-part, or the futex-tree-lock, then read out this field  again
+	                                       * until the mem-part no longer changes. At this point, the mem-part you'll
+	                                       * end up with will be consistent.
+	                                       * end up with will be consistent. */
+	mpart_reladdr_t           mfu_addr;   /* [lock(mfu_part->mp_meta->mpm_ftx)] Address of this mem-futex
+	                                       * (relative to mfu_part; within the R/B-tree)
+	                                       * NOTE: The least-significant bit  is used  as R/B-bit,  meaning
+	                                       *       that part addresses must be aligned by at least 2 bytes. */
 #ifdef __WANT_MFUTEX__mfu_dead
 	union {
-		LLRBTREE_NODE(struct mfutex) mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
-		SLIST_ENTRY(mfutex)         _mfu_dead;   /* Used internally */
+		LLRBTREE_NODE(mfutex) mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
+		SLIST_ENTRY(mfutex)  _mfu_dead;   /* Used internally */
 	};
 #else /* __WANT_MFUTEX__mfu_dead */
-	LLRBTREE_NODE(struct mfutex)     mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
+	LLRBTREE_NODE(mfutex)     mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
 #endif /* !__WANT_MFUTEX__mfu_dead */
 #ifdef __WANT_MFUTEX__mfu_lop
 	union {
 		struct {
-			struct sig               mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
-			void                   *_mfu_pad;    /* ... */
+			struct sig        mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
+			void            *_mfu_pad;    /* ... */
 		};
-		Toblockop(struct mpart)     _mfu_lop;    /* [valid_if(mfu_refcnt == 0)] Used internally. */
-		Tobpostlockop(struct mpart) _mfu_plop;   /* [valid_if(mfu_refcnt == 0)] Used internally. */
+		Toblockop(mpart)     _mfu_lop;    /* [valid_if(mfu_refcnt == 0)] Used internally. */
+		Tobpostlockop(mpart) _mfu_plop;   /* [valid_if(mfu_refcnt == 0)] Used internally. */
 	};
 #else /* __WANT_MFUTEX__mfu_lop */
-	struct sig                       mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
-	void                           *_mfu_pad;    /* ... */
+	struct sig                mfu_signal; /* [valid_if(mfu_refcnt != 0)] The signal used to implement the mem-futex. */
+	void                    *_mfu_pad;    /* ... */
 #endif /* !__WANT_MFUTEX__mfu_lop */
 };
 
@@ -148,19 +148,19 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mfutex_tree_removenode)(struct
 
 
 struct mpartmeta {
-	struct atomic_rwlock              mpm_ftxlock;  /* Lock for `mpm_ftx' */
-	Toblockop_slist(struct mpart)     mpm_ftxlops;  /* [0..n][lock(ATOMIC)] Lock operations for `mpm_ftxlock'. */
-	LLRBTREE_ROOT(WEAK struct mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree. (May contain dead futex objects) */
-	WEAK refcnt_t                     mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
-	                                                 * # of DMA locks referencing the associated part. */
-	struct sig                        mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
+	struct atomic_rwlock   mpm_ftxlock;  /* Lock for `mpm_ftx' */
+	Toblockop_slist(mpart) mpm_ftxlops;  /* [0..n][lock(ATOMIC)] Lock operations for `mpm_ftxlock'. */
+	LLRBTREE_ROOT(mfutex)  mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree. (May contain dead futex objects) */
+	WEAK refcnt_t          mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
+	                                      * # of DMA locks referencing the associated part. */
+	struct sig             mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
 #ifdef ARCH_HAVE_RTM
 	/* We  keep the RTM version and field  in the futex controller, such that
 	 * they don't take up space in the base `mpart' structure, but only exist
 	 * conditionally, and upon first access. */
-	uintptr_t                         mpm_rtm_vers; /* [lock(:MPART_F_LOCKBIT)]
-	                                                 * RTM version (incremented for every RTM-driven
-	                                                 * modifications made to memory). */
+	uintptr_t              mpm_rtm_vers; /* [lock(:MPART_F_LOCKBIT)]
+	                                      * RTM version (incremented for every RTM-driven
+	                                      * modifications made to memory). */
 #endif /* ARCH_HAVE_RTM */
 };
 

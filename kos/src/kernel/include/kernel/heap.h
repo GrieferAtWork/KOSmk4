@@ -49,19 +49,19 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct mfree {
-	LIST_ENTRY(mfree)           mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
-	LLRBTREE_NODE(struct mfree) mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
-	size_t                      mf_size;    /* Size of this block (in bytes; aligned by `HEAP_ALIGNMENT'; including this header) */
-#define MFREE_FUNDEFINED        0x00        /* Memory initialization is undefined. In debug mode, this means that memory is
-                                             * initialized  using `DEBUGHEAP_NO_MANS_LAND', with portions that haven't been
-                                             * allocated  yet pending initialization for either `DEBUGHEAP_FRESH_MEMORY' or
-                                             * ZERO(0), depending on how they were originally allocated. */
-#define MFREE_FZERO             GFP_CALLOC  /* Memory is ZERO-initialized. */
-#define MFREE_FMASK             MFREE_FZERO /* Mask of known flags. */
-#define MFREE_FRED              0x80        /* This is a red node. */
-	u8                          mf_flags;   /* Set of `MFREE_F*' */
+	LIST_ENTRY(mfree)    mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
+	LLRBTREE_NODE(mfree) mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
+	size_t               mf_size;    /* Size of this block (in bytes; aligned by `HEAP_ALIGNMENT'; including this header) */
+#define MFREE_FUNDEFINED 0x00        /* Memory initialization is undefined. In debug mode, this means that memory is
+                                      * initialized  using `DEBUGHEAP_NO_MANS_LAND', with portions that haven't been
+                                      * allocated  yet pending initialization for either `DEBUGHEAP_FRESH_MEMORY' or
+                                      * ZERO(0), depending on how they were originally allocated. */
+#define MFREE_FZERO      GFP_CALLOC  /* Memory is ZERO-initialized. */
+#define MFREE_FMASK      MFREE_FZERO /* Mask of known flags. */
+#define MFREE_FRED       0x80        /* This is a red node. */
+	u8                   mf_flags;   /* Set of `MFREE_F*' */
 #ifdef CONFIG_DEBUG_HEAP
-	u8                          mf_szchk;   /* Checksum for `mf_size' */
+	u8                   mf_szchk;   /* Checksum for `mf_size' */
 #endif /* CONFIG_DEBUG_HEAP */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, mf_data); /* Block data. */
 };
@@ -116,7 +116,7 @@ LIST_HEAD(mfree_list, mfree);
 
 struct heap {
 	struct atomic_lock        h_lock;       /* Lock for this heap. */
-	RBTREE_ROOT(struct mfree) h_addr;       /* [lock(h_lock)][0..1] Heap sorted by address. */
+	RBTREE_ROOT(mfree)        h_addr;       /* [lock(h_lock)][0..1] Heap sorted by address. */
 	struct mfree_list         h_size[HEAP_BUCKET_COUNT];
 	                                        /* [lock(h_lock)][0..1][*] Heap sorted by free range size. */
 	WEAK size_t               h_overalloc;  /* Amount (in bytes) by which to over-allocate memory in heaps.

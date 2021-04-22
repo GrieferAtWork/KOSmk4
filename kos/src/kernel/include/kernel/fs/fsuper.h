@@ -157,7 +157,7 @@ LIST_HEAD(vmount_list, vmount);
 struct fsuper {
 	/* More fields of custom (fs-specific) `fsuper' sub-classes go here. */
 	REF_IF([*].mf_flags & MFILE_F_PERSISTENT)
-	LLRBTREE_ROOT(struct fnode) fs_nodes;         /* [0..n][lock(fs_nodeslock)] Tree of  known nodes (ordered  by INO  number)
+	LLRBTREE_ROOT(fnode)        fs_nodes;         /* [0..n][lock(fs_nodeslock)] Tree of  known nodes (ordered  by INO  number)
 	                                               * This tree holds a reference to any file that has the `MFILE_F_PERSISTENT'
 	                                               * flag set. When set to  `FSUPER_NODES_DELETED', no further file-nodes  can
 	                                               * be opened, and `fsuper_opennode()' will throw `E_FSERROR_DELETED'. */

@@ -34,12 +34,12 @@ DECL_BEGIN
 
 struct mynode {
 #ifdef TESTING_LEFT_LEANING
-	LLRBTREE_NODE(struct mynode) n_node;  /* RB-tree node. */
+	LLRBTREE_NODE(mynode) n_node;  /* RB-tree node. */
 #else /* TESTING_LEFT_LEANING */
-	RBTREE_NODE(struct mynode)   n_node;  /* RB-tree node. */
+	RBTREE_NODE(mynode)   n_node;  /* RB-tree node. */
 #endif /* !TESTING_LEFT_LEANING */
-	bool                         n_isred; /* Is this node red?. */
-	int                          n_key;   /* Node key. */
+	bool                  n_isred; /* Is this node red?. */
+	int                   n_key;   /* Node key. */
 };
 
 DECL_END

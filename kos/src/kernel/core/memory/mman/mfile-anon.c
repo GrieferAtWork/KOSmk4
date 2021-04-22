@@ -50,14 +50,14 @@ DECL_BEGIN
 
 union mpart_delete_postop {
 	/* NOTE: The list of more parts that must be destroyed is chained via `_mp_dead' */
-	Tobpostlockop(struct mfile) mdp_fop;
-	Tobpostlockop(struct mpart) mdp_pop;
+	Tobpostlockop(mfile) mdp_fop;
+	Tobpostlockop(mpart) mdp_pop;
 };
 STATIC_ASSERT(sizeof(union mpart_delete_postop) <=
               (offsetafter(struct mpart, mp_share) -
                offsetof(struct mpart, mp_copy)));
-STATIC_ASSERT(offsetof(Tobpostlockop(struct mfile), oplo_func) ==
-              offsetof(Tobpostlockop(struct mpart), oplo_func));
+STATIC_ASSERT(offsetof(Tobpostlockop(mfile), oplo_func) ==
+              offsetof(Tobpostlockop(mpart), oplo_func));
 #define mpart_as_mpart_delete_postop(self)   ((union mpart_delete_postop *)&(self)->mp_copy)
 #define mpart_from_mpart_delete_postop(self) ((struct mpart *)((byte_t *)&(self)->mdp_fop - offsetof(struct mpart, mp_copy)))
 
@@ -93,7 +93,7 @@ NOTHROW(FCALL mpart_delete_postop_builder_enqueue)(struct mpart_delete_postop_bu
 	if (primary == NULL) {
 		union mpart_delete_postop *pop;
 		pop = mpart_as_mpart_delete_postop(delme);
-		pop->mdp_fop.oplo_func  = (Tobpostlockop_callback_t(struct mfile))&mpart_delete_postop_cb;
+		pop->mdp_fop.oplo_func  = (Tobpostlockop_callback_t(mfile))&mpart_delete_postop_cb;
 		delme->_mp_dead.sle_next = NULL;
 		self->mdpb_delme         = delme;
 	} else {
@@ -112,13 +112,13 @@ NOTHROW(FCALL mpart_delete_postop_builder_enqueue)(struct mpart_delete_postop_bu
 #define MFILE_LOCKOPS_SPACE_SIZE (offsetafter(struct mfile, mf_ctime) - MFILE_LOCKOPS_SPACE_OFFS)
 
 union mflops {
-	Toblockop(struct mfile)         mfl_flop;      /* mem-file lock operation */
-	Toblockop(struct mpart)             mfl_plop;      /* mem-part lock operation */
+	Toblockop(mfile)         mfl_flop;      /* mem-file lock operation */
+	Toblockop(mpart)             mfl_plop;      /* mem-part lock operation */
 	struct {
-		Tobpostlockop(struct mfile) mfl_fplop;     /* mem-file post-lock operation */
+		Tobpostlockop(mfile) mfl_fplop;     /* mem-file post-lock operation */
 		struct mpart_slist          mfl_deadparts; /* Only used by `mfile_decref_and_destroy_deadparts_postop' */
 	};
-	Tobpostlockop(struct mpart)         mfl_pplop;     /* mem-part post-lock operation */
+	Tobpostlockop(mpart)         mfl_pplop;     /* mem-part post-lock operation */
 	struct sig_completion           mfl_compl;     /* Signal completion callback. (used for waiting on `mf_trunclock') */
 };
 
@@ -277,15 +277,15 @@ again:
 	}
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mfile) *
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mfile) *
 NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
                                             struct mpart *already_locked_part);
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mfile) *
-NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(struct mfile) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mfile) *
+NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
                                          REF struct mfile *__restrict file);
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
-NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(struct mpart) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
+NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,
                                          struct mpart *__restrict part) {
 	union mflops *mfl;
 	REF struct mfile *file;
@@ -293,19 +293,19 @@ NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(struct mpart) *__restrict sel
 	file = mfile_from_mflops(mfl);
 	/* Also try to acquire a lock to the file. */
 	if (mfile_lock_trywrite(file)) {
-		Tobpostlockop(struct mfile) *pop;
+		Tobpostlockop(mfile) *pop;
 		/* Try to delete the file, but remember that we're already holding a lock to `part'! */
 		pop = mfile_delete_withfilelock_ex(file, part);
 		mfile_lock_endwrite(file);
 		if (pop == NULL)
 			return NULL;
-		assert(pop->oplo_func == (Tobpostlockop_callback_t(struct mfile))&mpart_delete_postop_cb ||
+		assert(pop->oplo_func == (Tobpostlockop_callback_t(mfile))&mpart_delete_postop_cb ||
 		       pop->oplo_func == &mfile_decref_and_destroy_deadparts_postop ||
 		       pop->oplo_func == &mfile_decref_postop);
 		/* NOTE: None of the possible callback ever make use of the `file' argument  of
 		 *       the post-operation callback, meaning that we can simply cast the mfile
 		 *       post-operation into an mpart post-operation! */
-		return (Tobpostlockop(struct mpart) *)pop;
+		return (Tobpostlockop(mpart) *)pop;
 	}
 	/* Bounce back a lock-operation for `file'
 	 * Use `mfile_delete_withfilelock' for this purpose! */
@@ -317,7 +317,7 @@ NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(struct mpart) *__restrict sel
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(struct mfile) *__restrict self,
+NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *__restrict self,
                                                          struct mfile *__restrict UNUSED(_file)) {
 	union mflops *mfl;
 	REF struct mfile *file;
@@ -340,7 +340,7 @@ NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(struct mf
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(struct mfile) *__restrict self,
+NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
                                    struct mfile *__restrict UNUSED(_file)) {
 	union mflops *mfl;
 	REF struct mfile *file;
@@ -388,10 +388,10 @@ NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sig_completion *__restrict s
 }
 
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mfile) *
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mfile) *
 NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
                                             struct mpart *already_locked_part) {
-	Tobpostlockop(struct mfile) *result;
+	Tobpostlockop(mfile) *result;
 	struct mpart_slist changes;
 	struct mpart_delete_postop_builder deadparts;
 	/* We're currently holding a write-lock to `file'!
@@ -502,8 +502,8 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 	return result;
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mfile) *
-NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(struct mfile) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mfile) *
+NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
                                          struct mfile *__restrict UNUSED(_file)) {
 	union mflops *mfl;
 	REF struct mfile *file;
@@ -516,13 +516,13 @@ NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(struct mfile) *__restrict sel
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_begin_async_delete)(/*inherit(always)*/ REF struct mfile *__restrict self) {
 	if (mfile_lock_trywrite(self)) {
-		Tobpostlockop(struct mfile) *post;
+		Tobpostlockop(mfile) *post;
 		post = mfile_delete_withfilelock(&mfile_as_mflops(self)->mfl_flop, self);
 		mfile_lock_endwrite(self);
 		if (post != NULL)
 			(*post->oplo_func)(post, self);
 	} else {
-		Toblockop(struct mfile) *lop;
+		Toblockop(mfile) *lop;
 		/* Enqueue a lock operation. */
 		lop = &mfile_as_mflops(self)->mfl_flop;
 		lop->olo_func = &mfile_delete_withfilelock;

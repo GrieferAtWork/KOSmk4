@@ -2418,9 +2418,9 @@ NOTHROW(FCALL driver_dladdr)(void const *addr,
 
 /* FDE Cache API */
 struct driver_fde_cache {
-	unwind_fde_t                           dfc_fde;    /* Cached FDE */
-	size_t                                 dfc_heapsz; /* Allocated heap size (least significant bit is R/B-bit; 0:black; 1:red) */
-	LLRBTREE_NODE(struct driver_fde_cache) dfc_node;   /* R/B-node */
+	unwind_fde_t                    dfc_fde;    /* Cached FDE */
+	size_t                          dfc_heapsz; /* Allocated heap size (least significant bit is R/B-bit; 0:black; 1:red) */
+	LLRBTREE_NODE(driver_fde_cache) dfc_node;   /* R/B-node */
 };
 #define driver_fde_cache_heapsz(self) ((self)->dfc_heapsz & ~1)
 
@@ -3838,7 +3838,7 @@ again_find_nodes:
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_finitext_postlop)(Tobpostlockop(struct mman) *__restrict lop,
+NOTHROW(FCALL driver_finitext_postlop)(Tobpostlockop(mman) *__restrict lop,
                                        struct mman *__restrict UNUSED(mm)) {
 	REF struct driver *me;
 	me = container_of(lop, struct driver, _d_mm_postlop);
@@ -3852,8 +3852,8 @@ NOTHROW(FCALL driver_finitext_postlop)(Tobpostlockop(struct mman) *__restrict lo
 	driver_destroy_after_mnodes(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL driver_finitext_lop)(Toblockop(struct mman) *__restrict lop,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mman) *
+NOTHROW(FCALL driver_finitext_lop)(Toblockop(mman) *__restrict lop,
                                    struct mman *__restrict UNUSED(mm)) {
 	struct driver *me;
 	me = container_of(lop, struct driver, _d_mm_lop);
@@ -4072,15 +4072,15 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL driver_nonodes_cleanup_postlop)(Tobpostlockop(struct mman) *__restrict self,
+NOTHROW(FCALL driver_nonodes_cleanup_postlop)(Tobpostlockop(mman) *__restrict self,
                                               struct mman *__restrict UNUSED(mm)) {
 	struct driver *me;
 	me = container_of(self, struct driver, _d_mm_postlop);
 	driver_free_(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL driver_nonodes_cleanup_lop)(Toblockop(struct mman) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mman) *
+NOTHROW(FCALL driver_nonodes_cleanup_lop)(Toblockop(mman) *__restrict self,
                                           struct mman *__restrict UNUSED(mm)) {
 	struct driver *me;
 	me = container_of(self, struct driver, _d_mm_lop);

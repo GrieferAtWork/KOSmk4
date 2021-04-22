@@ -49,20 +49,38 @@
  */
 
 
-#define RBTREE_NODE(T)                                                        \
+#define RBTREE_NODE(type)                                                               \
+	struct {                                                                            \
+		struct type *rb_par; /* [0..1] Parent node, or NULL for the tree-root. */       \
+		struct type *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
+		struct type *rb_rhs; /* [0..1] Child node with a key > the one of this node. */ \
+	}
+#define RBTREE_NODE_P(T)                                                      \
 	struct {                                                                  \
 		T *rb_par; /* [0..1] Parent node, or NULL for the tree-root. */       \
 		T *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
 		T *rb_rhs; /* [0..1] Child node with a key > the one of this node. */ \
 	}
-
-#define LLRBTREE_NODE(T)                                                      \
+#define LLRBTREE_NODE(type)                                                             \
+	struct {                                                                            \
+		struct type *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
+		struct type *rb_rhs; /* [0..1] Child node with a key > the one of this node. */ \
+	}
+#define LLRBTREE_NODE_P(T)                                                    \
 	struct {                                                                  \
 		T *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
 		T *rb_rhs; /* [0..1] Child node with a key > the one of this node. */ \
 	}
 
-#define RBTREE_NODE_WITH_KEY(T, Tkey)                                           \
+#define RBTREE_NODE_WITH_KEY(type, Tkey)                                                \
+	struct {                                                                            \
+		struct type *rb_par; /* [0..1] Parent node, or NULL for the tree-root. */       \
+		struct type *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
+		struct type *rb_rhs; /* [0..1] Child node with a key > the one of this node. */ \
+		Tkey         rb_min;                                                            \
+		Tkey         rb_max;                                                            \
+	}
+#define RBTREE_NODE_WITH_KEY_P(T, Tkey)                                         \
 	struct {                                                                    \
 		T   *rb_par; /* [0..1] Parent node, or NULL for the tree-root. */       \
 		T   *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
@@ -79,7 +97,9 @@
 		Tkey rb_max;                                                            \
 	}
 
-#define RBTREE_ROOT(T)   T *
-#define LLRBTREE_ROOT(T) T *
+#define RBTREE_ROOT(type)   struct type *
+#define RBTREE_ROOT_P(T)    T *
+#define LLRBTREE_ROOT(type) struct type *
+#define LLRBTREE_ROOT_P(T)  T *
 
 #endif /* !__GUARD_HYBRID_SEQUENCE_RBTREE_H */

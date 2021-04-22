@@ -290,7 +290,7 @@ NOTHROW(FCALL module_remove_from_mman)(struct module *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL module_mman_cleanup_postlop)(Tobpostlockop(struct mman) *__restrict self,
+NOTHROW(FCALL module_mman_cleanup_postlop)(Tobpostlockop(mman) *__restrict self,
                                            REF struct mman *__restrict mm) {
 	WEAK REF struct module *me;
 	me = container_of(self, struct module, _md_mmpostlop);
@@ -304,8 +304,8 @@ NOTHROW(FCALL module_mman_cleanup_postlop)(Tobpostlockop(struct mman) *__restric
 	weakdecref_likely(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL module_mman_cleanup_lop)(Toblockop(struct mman) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mman) *
+NOTHROW(FCALL module_mman_cleanup_lop)(Toblockop(mman) *__restrict self,
                                        REF struct mman *__restrict mm) {
 	WEAK REF struct module *me;
 

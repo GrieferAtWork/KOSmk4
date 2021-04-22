@@ -580,10 +580,10 @@ struct mfile {
 	struct vio_operators const   *mf_vio;        /* [0..1][const] VIO operators. (deprecated field!) */
 #endif /* CONFIG_MFILE_LEGACY_VIO_OPS */
 	struct atomic_rwlock          mf_lock;       /* Lock for this file. */
-	RBTREE_ROOT(struct mpart)     mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
+	RBTREE_ROOT(mpart)            mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                    mf_initdone;   /* Signal broadcast whenever one of the blocks of one of the
 	                                              * contained   parts  changes  state   from  INIT  to  LOAD. */
-	Toblockop_slist(struct mfile) mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of lock operations. */
+	Toblockop_slist(mfile)        mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of lock operations. */
 	struct REF mpart_slist        mf_changed;    /* [0..n][lock(APPEND: ATOMIC,
 	                                              *             CLEAR:  ATOMIC && mf_lock)]
 	                                              * Chain of references to parts that contain unsaved changes.

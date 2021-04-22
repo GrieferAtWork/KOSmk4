@@ -118,8 +118,8 @@ struct forktree {
 };
 
 
-INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) * /* from "mnode.c" */
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
+INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) * /* from "mnode.c" */
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(mpart) *__restrict self,
                                              struct mpart *__restrict part);
 INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
@@ -143,7 +143,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			mpart_lock_release(part);
 			decref_unlikely(part);
 		} else {
-			Toblockop(struct mpart) *lop;
+			Toblockop(mpart) *lop;
 
 			/* Let the mem-part know that this node has been unmapped. */
 			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
@@ -155,7 +155,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part' */
-			lop = (Toblockop(struct mpart) *)node;
+			lop = (Toblockop(mpart) *)node;
 			lop->olo_func = &mnode_unlink_from_part_lockop;
 			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
 

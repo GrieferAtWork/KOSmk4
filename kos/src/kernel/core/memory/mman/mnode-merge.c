@@ -248,17 +248,17 @@ NOTHROW(FCALL mnode_shouldmerge)(struct mnode *__restrict self) {
 /* Allowed values/states for `thismman_mergenodes_lop.mml_mm_lop.olo_func':
  *   INITIAL  --> MERGENODES_LOP_FUNC_INACTIVE
  */
-#define MERGENODES_LOP_FUNC_INACTIVE       ((Toblockop_callback_t(struct mman))0) /* No request is pending, or running */
+#define MERGENODES_LOP_FUNC_INACTIVE       ((Toblockop_callback_t(mman))0) /* No request is pending, or running */
 #define MERGENODES_LOP_FUNC_PENDING        (&mergenodes_lop_cb)                   /* Request is pending. */
-#define MERGENODES_LOP_FUNC_RUNNING        ((Toblockop_callback_t(struct mman))1) /* Nodes are being merged right now. */
-#define MERGENODES_LOP_FUNC_WAITFOR_MPART  ((Toblockop_callback_t(struct mman))&mergenode_waitfor_mpart_lop)     /* Waiting for a mem-part */
-#define MERGENODES_LOP_FUNC_WAITFOR_MPART2 ((Toblockop_callback_t(struct mman))&mergenode_waitfor_mpart_postlop) /* *ditto* */
+#define MERGENODES_LOP_FUNC_RUNNING        ((Toblockop_callback_t(mman))1) /* Nodes are being merged right now. */
+#define MERGENODES_LOP_FUNC_WAITFOR_MPART  ((Toblockop_callback_t(mman))&mergenode_waitfor_mpart_lop)     /* Waiting for a mem-part */
+#define MERGENODES_LOP_FUNC_WAITFOR_MPART2 ((Toblockop_callback_t(mman))&mergenode_waitfor_mpart_postlop) /* *ditto* */
 
 union mman_mergenodes_lop {
-	Toblockop(struct mman)      mml_mm_lop;     /* Lop */
-	Tobpostlockop(struct mman)  mml_mm_postlop; /* Post-Lop */
-	Toblockop(struct mpart)     mml_mp_lop;     /* Lop */
-	Tobpostlockop(struct mpart) mml_mp_postlop; /* Post-Lop */
+	Toblockop(mman)      mml_mm_lop;     /* Lop */
+	Tobpostlockop(mman)  mml_mm_postlop; /* Post-Lop */
+	Toblockop(mpart)     mml_mp_lop;     /* Lop */
+	Tobpostlockop(mpart) mml_mp_postlop; /* Post-Lop */
 };
 
 /* A special per-mman lockop may be used to enqueue an async call to `mman_mergenodes()'
@@ -268,8 +268,8 @@ PRIVATE ATTR_PERMMAN union mman_mergenodes_lop
 thismman_mergenodes_lop = { { {}, MERGENODES_LOP_FUNC_INACTIVE } };
 
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(struct mman) *__restrict lop,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mman) *
+NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(mman) *__restrict lop,
                                  struct mman *__restrict self) {
 	assert(lop == &FORMMAN(self, thismman_mergenodes_lop.mml_mm_lop));
 
@@ -304,7 +304,7 @@ NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(struct mman) *__restrict lop,
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mergenode_waitfor_mpart_postlop)(Tobpostlockop(struct mpart) *__restrict _lop,
+NOTHROW(FCALL mergenode_waitfor_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,
                                                REF struct mpart *__restrict self) {
 	struct mman *mm;
 	union mman_mergenodes_lop *lop;
@@ -328,11 +328,11 @@ NOTHROW(FCALL mergenode_waitfor_mpart_postlop)(Tobpostlockop(struct mpart) *__re
 	mman_mergenodes(mm);
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
-NOTHROW(FCALL mergenode_waitfor_mpart_lop)(Toblockop(struct mpart) *__restrict lop,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
+NOTHROW(FCALL mergenode_waitfor_mpart_lop)(Toblockop(mpart) *__restrict lop,
                                            REF struct mpart *__restrict UNUSED(self)) {
-	Tobpostlockop(struct mpart) *post;
-	post = (Tobpostlockop(struct mpart) *)lop;
+	Tobpostlockop(mpart) *post;
+	post = (Tobpostlockop(mpart) *)lop;
 	/* Do the rest of the work from a post-lockop.
 	 * NOTE: This also inherit the reference to `self' */
 	ATOMIC_WRITE(post->oplo_func, &mergenode_waitfor_mpart_postlop);
@@ -345,7 +345,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL async_waitfor_part_and_mergenodes)(struct mman *__restrict self,
                                                  struct mpart *__restrict blocking_part) {
 	union mman_mergenodes_lop *lop;
-	Toblockop_callback_t(struct mman) func;
+	Toblockop_callback_t(mman) func;
 	lop = &FORMMAN(self, thismman_mergenodes_lop);
 	/* (try to) switch over into WAITFOR_MPART node. */
 	do {
@@ -1330,7 +1330,7 @@ NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpa
 	 * merge.
 	 * Note however that we must do some special handling, since we
 	 * have to assume that the caller is locking `locked_mman', and
-	 * we mustn't release that lock! */
+	 * we mustn't try to acquire or release that lock! */
 	blocking_mman = mpart_lock_all_mmans(lopart, locked_mman);
 	if unlikely(blocking_mman != NULL) {
 waitfor_blocking_mman:
@@ -1445,8 +1445,8 @@ waitfor_blocking_mman:
 
 
 union merge_all_parts_lop_desc {
-	Toblockop(struct mman)      map_mm_lop;     /* Lop */
-	Tobpostlockop(struct mman)  map_mm_postlop; /* Post-Lop */
+	Toblockop(mman)      map_mm_lop;     /* Lop */
+	Tobpostlockop(mman)  map_mm_postlop; /* Post-Lop */
 	struct lockop               map_lop;        /* Lop */
 	struct postlockop           map_postlop;    /* Post-Lop */
 };
@@ -1506,7 +1506,7 @@ NOTHROW(FCALL merge_all_parts_lop_cb)(struct lockop *__restrict UNUSED(self)) {
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock_post)(Tobpostlockop(struct mman) *__restrict UNUSED(lop),
+NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock_post)(Tobpostlockop(mman) *__restrict UNUSED(lop),
                                                          struct mman *__restrict UNUSED(self)) {
 	if (mpart_all_tryacquire()) {
 		struct mpart_slist deadparts;
@@ -1523,8 +1523,8 @@ NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock_post)(Tobpostlockop(struct mm
 	}
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock)(Toblockop(struct mman) *__restrict UNUSED(lop),
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mman) *
+NOTHROW(FCALL merge_all_parts_after_kernel_mm_lock)(Toblockop(mman) *__restrict UNUSED(lop),
                                                     struct mman *__restrict UNUSED(self)) {
 	ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func,
 	             &merge_all_parts_after_kernel_mm_lock_post);
@@ -1563,19 +1563,19 @@ NOTHROW(FCALL async_merge_all_parts_including)(struct mpart *__restrict part_to_
 
 struct async_merge_part {
 	union {
-		Toblockop(struct mpart)     amp_part_lop;
-		Tobpostlockop(struct mpart) amp_part_post_lop;
-		Toblockop(struct mfile)     amp_file_lop;
-		Tobpostlockop(struct mfile) amp_file_post_lop;
-		Toblockop(struct mman)      amp_mman_lop;
-		Tobpostlockop(struct mman)  amp_mman_post_lop;
+		Toblockop(mpart)     amp_part_lop;
+		Tobpostlockop(mpart) amp_part_post_lop;
+		Toblockop(mfile)     amp_file_lop;
+		Tobpostlockop(mfile) amp_file_post_lop;
+		Toblockop(mman)      amp_mman_lop;
+		Tobpostlockop(mman)  amp_mman_post_lop;
 	};
 	REF struct mpart *amp_mergeme; /* [1..1][const] The part to merge. */
 };
 
 /* Called after a lock to `part' becomes available. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_merge_part_post_cb)(Tobpostlockop(struct mpart) *__restrict self,
+NOTHROW(FCALL async_merge_part_post_cb)(Tobpostlockop(mpart) *__restrict self,
                                         struct mpart *__restrict UNUSED(part)) {
 	REF struct mpart *merged;
 	struct async_merge_part *me;
@@ -1587,8 +1587,8 @@ NOTHROW(FCALL async_merge_part_post_cb)(Tobpostlockop(struct mpart) *__restrict 
 	decref_unlikely(merged);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mpart) *
-NOTHROW(FCALL async_merge_part_cb)(Toblockop(struct mpart) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mpart) *
+NOTHROW(FCALL async_merge_part_cb)(Toblockop(mpart) *__restrict self,
                                    struct mpart *__restrict UNUSED(part)) {
 	struct async_merge_part *me;
 	me = container_of(self, struct async_merge_part, amp_part_lop);
@@ -1631,7 +1631,7 @@ NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
 #define async_merge_ftxlck_cb      async_merge_part_cb
 #else
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_merge_ftxlck_post_cb)(Tobpostlockop(struct mfile) *__restrict self,
+NOTHROW(FCALL async_merge_ftxlck_post_cb)(Tobpostlockop(mfile) *__restrict self,
                                           struct mfile *__restrict UNUSED(file)) {
 	REF struct mpart *merged;
 	struct async_merge_part *me;
@@ -1643,8 +1643,8 @@ NOTHROW(FCALL async_merge_ftxlck_post_cb)(Tobpostlockop(struct mfile) *__restric
 	decref_unlikely(merged);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mpart) *
-NOTHROW(FCALL async_merge_ftxlck_cb)(Toblockop(struct mpart) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mpart) *
+NOTHROW(FCALL async_merge_ftxlck_cb)(Toblockop(mpart) *__restrict self,
                                      struct mpart *__restrict UNUSED(file)) {
 	struct async_merge_part *me;
 	me = container_of(self, struct async_merge_part, amp_part_lop);
@@ -1684,12 +1684,12 @@ NOTHROW(FCALL async_waitfor_ftxlck_and_mergepart)(struct mpart *part_to_wait,
 STATIC_ASSERT(offsetof(struct async_merge_part, amp_file_post_lop) ==
               offsetof(struct async_merge_part, amp_part_post_lop));
 #define async_merge_file_post_cb \
-	(*(void (FCALL *)(Tobpostlockop(struct mfile) *__restrict, struct mfile *__restrict))&async_merge_part_post_cb)
+	(*(Tobpostlockop_callback_t(mfile))&async_merge_part_post_cb)
 #define async_merge_file_cb \
-	(*(Tobpostlockop(struct mfile) *(FCALL *)(Toblockop(struct mfile) *__restrict, struct mfile *__restrict))&async_merge_part_cb)
+	(*(Toblockop_callback_t(mfile))&async_merge_part_cb)
 #else
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_merge_file_post_cb)(Tobpostlockop(struct mfile) *__restrict self,
+NOTHROW(FCALL async_merge_file_post_cb)(Tobpostlockop(mfile) *__restrict self,
                                         struct mfile *__restrict UNUSED(file)) {
 	REF struct mpart *merged;
 	struct async_merge_part *me;
@@ -1701,8 +1701,8 @@ NOTHROW(FCALL async_merge_file_post_cb)(Tobpostlockop(struct mfile) *__restrict 
 	decref_unlikely(merged);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mfile) *
-NOTHROW(FCALL async_merge_file_cb)(Toblockop(struct mfile) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mfile) *
+NOTHROW(FCALL async_merge_file_cb)(Toblockop(mfile) *__restrict self,
                                    struct mfile *__restrict UNUSED(file)) {
 	struct async_merge_part *me;
 	me = container_of(self, struct async_merge_part, amp_file_lop);
@@ -1742,12 +1742,12 @@ NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
 STATIC_ASSERT(offsetof(struct async_merge_part, amp_mman_post_lop) ==
               offsetof(struct async_merge_part, amp_part_post_lop));
 #define async_merge_mman_post_cb \
-	(*(void (FCALL *)(Tobpostlockop(struct mman) *__restrict, struct mman *__restrict))&async_merge_part_post_cb)
+	(*(Tobpostlockop_callback_t(mman))&async_merge_part_post_cb)
 #define async_merge_mman_cb \
-	(*(Tobpostlockop(struct mman) *(FCALL *)(Toblockop(struct mman) *__restrict, struct mman *__restrict))&async_merge_part_cb)
+	(*(Toblockop_callback_t(mman))&async_merge_part_cb)
 #else
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL async_merge_mman_post_cb)(Tobpostlockop(struct mman) *__restrict self,
+NOTHROW(FCALL async_merge_mman_post_cb)(Tobpostlockop(mman) *__restrict self,
                                         struct mman *__restrict UNUSED(mm)) {
 	REF struct mpart *merged;
 	struct async_merge_part *me;
@@ -1759,8 +1759,8 @@ NOTHROW(FCALL async_merge_mman_post_cb)(Tobpostlockop(struct mman) *__restrict s
 	decref_unlikely(merged);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL async_merge_mman_cb)(Toblockop(struct mman) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mman) *
+NOTHROW(FCALL async_merge_mman_cb)(Toblockop(mman) *__restrict self,
                                    struct mman *__restrict UNUSED(mm)) {
 	struct async_merge_part *me;
 	me = container_of(self, struct async_merge_part, amp_mman_lop);

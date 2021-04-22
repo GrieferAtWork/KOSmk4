@@ -103,8 +103,8 @@ typedef unsigned int gfp_t;
  * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
  *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits
  *                        from `flags': `GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR'
- *                        You may  pass `NULL'  to  use either  `KERNEL_MHINT_HEAP'  or
- *                        `KERNEL_MHINT_LHEAP'   (based   on   `GFP_LOCKED')   instead.
+ *                        You may  pass  `NULL'  to use  either  `KERNEL_MHINT_HEAP'  or
+ *                        `KERNEL_MHINT_LHEAP'   (based   on   `GFP_LOCKED')    instead.
  *                        When `GFP_MAP_FIXED' is set, this is the (possibly  unaligned)
  *                        address of where the mapping  should go. If not  page-aligned,
  *                        then the sub-page-misalignment will  be carried over into  the
@@ -151,25 +151,25 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  * region  being free'd as a `struct lockop' that is enqueued for running
  * when a lock to the kernel mman becomes available.
  *
- * Once  that  lock  is  available,  iteratively  go  through  all  nodes  of  the
- * region  (splitting  the  region  at  the  front  if  necessary,  and  asserting
- * that   any  partial  nodes  don't  have  the  MNODE_F_NOSPLIT  flag  set).  For
- * every  node  encountered  in  this  manner,  try  to  acquire  a  lock  to  the
- * associated  mem-part.  If  this  lock   cannot  be  acquired,  re-purpose   the
- * region  being  freed  as  a  `Toblockop(struct mpart)'  that  is  executed once
- * that lock becomes available. If this was done, the Toblockop(struct mpart) will
- * try to  acquire  a  lock  to  the kernel  mman.  On  success,  continue  as  if
- * the  original   mman->part  locking   order  attempt   was  successful.   Else,
- * re-purpose   the  `Toblockop(struct mpart)'  as  yet  another  `struct lockop',
- * and  enqueue  that  one  back  onto  the  kernel  mman  lock-job  queue,   thus
- * letting  the  request  bounce  back  and  forth  without  ever  blocking, until
+ * Once  that lock is  available, iteratively go through  all nodes of the
+ * region (splitting the region at  the front if necessary, and  asserting
+ * that  any partial  node doesn't  have the  `MNODE_F_NOSPLIT' flag set).
+ * For every node  encountered in this  manner, try to  acquire a lock  to
+ * the associated mem-part.  If this lock  cannot be acquired,  re-purpose
+ * the  region being freed  as a `Toblockop(mpart)'  that is executed once
+ * that  lock becomes  available. If  this was  done, the Toblockop(mpart)
+ * will try to  acquire a lock  to the kernel  mman. On success,  continue
+ * as  if the  original mman->part  locking order  attempt was successful.
+ * Else, re-purpose the `Toblockop(mpart)' as yet another `struct lockop',
+ * and  enqueue that  one back onto  the kernel mman  lock-job queue, thus
+ * letting  the request bounce back and forth without ever blocking, until
  * both locks can be acquired at the same time.
  *
  * Once  both locks are held, do the  actual unmap. For this purpose, when
  * needing  to split the node, special handling  is also done to deal with
  * `MNODE_F_MHINT' nodes to  prevent possible race  conditions with  other
  * CPUs/threads accessing memory below or  above the region that is  being
- * unmapped. Namely, forcably pre-initializing all pages affected by this,
+ * unmapped. Namely, forcibly pre-initializing all pages affected by this,
  * and waiting for `mman_kernel_hintinit_inuse' to become zero.
  *
  * If the unmap itself (or the  attempt to partially split a  leading/trailing
@@ -180,16 +180,16 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
  * The idea here is to hope that more memory will be available once the kernel
  * mman is unlocked the next time around.
  *
- * If the remainder  of the  requested unmap-area  is now  gone, then  we're
- * done. Otherwise, if  the current  locking order is  mman->part (that  is:
- * the current request originates from a `Toblockop(struct mpart)'), release
- * the part lock. Then, continue searching for the next node to unmap.
+ * If the remainder of the requested unmap-area is now gone, then  we're
+ * done. Otherwise, if the current locking order is mman->part (that is:
+ * the current request  originates from  a `Toblockop(mpart)'),  release
+ * the part lock. Then, continue searching  for the next node to  unmap.
  *
- * When  unmapping a read-only mapping, things are a bit more complicated,
- * since it's not possible to (ab-)use the region being free'd as a  lock-
- * job descriptor (either a `struct lockop' or `Toblockop(struct mpart)').
- * In this case, unmapping is only  possible if the caller sacrifices  yet
- * another  dynamically allocated (and  most importantly: writable) region
+ * When unmapping a read-only mapping, things are a bit more complicated,
+ * since it's not possible to (ab-)use the region being free'd as a lock-
+ * job  descriptor  (either  a  `struct lockop'  or  `Toblockop(mpart)').
+ * In this case, unmapping is only possible if the caller sacrifices  yet
+ * another  dynamically allocated (and most importantly: writable) region
  * of memory: a `struct mman_unmap_kram_job'.
  *
  * In this case, instead of always re-using the actual region that is being
@@ -232,34 +232,34 @@ struct mman_unmap_kram_job {
 	byte_t                    *mukj_maxaddr; /* Greatest address being unmapped. */
 	gfp_t                      mukj_flags;   /* Set of `0 | GFP_CALLOC' */
 	union {
-		Toblockop(struct mman)           mukj_lop_mm;      /* MMan lockop */
-		Toblockop(struct mpart)          mukj_lop_mp;      /* MPart lockop */
-		Tobpostlockop(struct mman)       mukj_post_lop_mm; /* MMan post-lockop */
-		Tobpostlockop(struct mpart)      mukj_post_lop_mp; /* MPart post-lockop */
+		Toblockop(mman)                  mukj_lop_mm;      /* MMan lockop */
+		Toblockop(mpart)                 mukj_lop_mp;      /* MPart lockop */
+		Tobpostlockop(mman)              mukj_post_lop_mm; /* MMan post-lockop */
+		Tobpostlockop(mpart)             mukj_post_lop_mp; /* MPart post-lockop */
 		SLIST_ENTRY(mman_unmap_kram_job) mukj_link;        /* List link (used internally) */
 	};
 };
 
 
 /* Without blocking, unmap a given region of kernel RAM.
- * NOTE: The caller must ensure that the given the address range can
- *       be written to without any chance of that write blocking, or
+ * NOTE: The  caller must ensure that the given the address range can
+ *       be  written to without any chance of that write blocking, or
  *       resulting in an exception. (i.e. don't use this one to unmap
  *       file mappings or the like...)
  *       If your intend is to unmap mappings that don't fulfill this
  *       requirement, the you should read the description of `struct
-*        mman_unmap_kram_job' and use `mman_unmap_kram_locked_ex()'
+ *       mman_unmap_kram_job' and use `mman_unmap_kram_locked_ex()'
  * @param: flags:   Set of `0 | GFP_CALLOC'. When `GFP_CALLOC' is given, allows
- *                  the memory management system to assume that the backing
- *                  physical memory is zero-initialized. If you're not sure
- *                  if this is the case, better pass `0'. If you lie here,
+ *                  the memory  management system  to assume  that the  backing
+ *                  physical  memory  is zero-initialized.  If you're  not sure
+ *                  if this is  the case,  better pass  `0'. If  you lie  here,
  *                  calloc() might arbitrarily break... */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram)(PAGEDIR_PAGEALIGNED void *addr,
                                size_t num_bytes, gfp_t flags DFL(0));
 
 /* Same as `mman_unmap_kram()', but may be used to improve efficiency
- * when  the  caller  is  already  holding  a  lock  to `mman_kernel' */
+ * when the caller is already holding a lock to `mman_kernel.mm_lock' */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
                                       size_t num_bytes, gfp_t flags DFL(0));

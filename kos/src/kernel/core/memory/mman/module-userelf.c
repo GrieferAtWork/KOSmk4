@@ -515,7 +515,7 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL uem_nonodes_cleanup_postlop)(Tobpostlockop(struct mman) *__restrict self,
+NOTHROW(FCALL uem_nonodes_cleanup_postlop)(Tobpostlockop(mman) *__restrict self,
                                            struct mman *__restrict UNUSED(mm)) {
 	struct userelf_module *me;
 	me = container_of(self, struct userelf_module, _um_cc_postlop);
@@ -524,8 +524,8 @@ NOTHROW(FCALL uem_nonodes_cleanup_postlop)(Tobpostlockop(struct mman) *__restric
 	uem_destroy(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL uem_nonodes_cleanup_lop)(Toblockop(struct mman) *__restrict self,
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mman) *
+NOTHROW(FCALL uem_nonodes_cleanup_lop)(Toblockop(mman) *__restrict self,
                                        struct mman *__restrict UNUSED(mm)) {
 	struct userelf_module *me;
 	me = container_of(self, struct userelf_module, _um_cc_lop);

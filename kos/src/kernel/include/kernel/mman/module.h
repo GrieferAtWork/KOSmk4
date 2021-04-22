@@ -222,8 +222,8 @@ struct module {
 			REF struct path            *md_fspath; /* [0..1][const] Optional mapping path */
 			REF struct directory_entry *md_fsname; /* [0..1][const] Optional mapping name */
 		};
-		Toblockop(struct mman)     _md_mmlop;     /* MMan cleanup lock operation */
-		Tobpostlockop(struct mman) _md_mmpostlop; /* MMan cleanup post lock operation */
+		Toblockop(mman)        _md_mmlop;     /* MMan cleanup lock operation */
+		Tobpostlockop(mman)    _md_mmpostlop; /* MMan cleanup post lock operation */
 	};
 #else /* __WANT_MODULE__md_mmlop */
 	REF struct path            *md_fspath;     /* [0..1][const] Optional mapping path */

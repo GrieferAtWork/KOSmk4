@@ -353,8 +353,8 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 
 
 /* Called with a lock to the kernel VM's treelock held. */
-PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mman) *
-NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(struct mman) *__restrict _lop,
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mman) *
+NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
                                      struct mman *__restrict UNUSED(mm)) {
 	void *addr;
 	size_t size;
@@ -426,12 +426,12 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	/* Destroy  the  task  structure,  and  unload  memory segments
 	 * occupied by the thread, including its stack, and trampoline. */
 	if (mman_lock_tryacquire(&mman_kernel)) {
-		task_destroy_raw_impl((Toblockop(struct mman) *)self, &mman_kernel);
+		task_destroy_raw_impl((Toblockop(mman) *)self, &mman_kernel);
 		mman_lock_release(&mman_kernel);
 	} else {
-		Toblockop(struct mman) *lop;
+		Toblockop(mman) *lop;
 		/* Schedule the task to-be destroyed later. */
-		lop           = (Toblockop(struct mman) *)self;
+		lop           = (Toblockop(mman) *)self;
 		lop->olo_func = &task_destroy_raw_impl;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, lop, olo_link);
 		_mman_lockops_reap(&mman_kernel);

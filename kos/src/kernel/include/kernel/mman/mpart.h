@@ -248,7 +248,7 @@ struct mpart {
 	struct mnode_list             mp_copy;      /* [0..n][lock(MPART_F_LOCKBIT)] List of copy-on-write mappings. */
 	struct mnode_list             mp_share;     /* [0..n][lock(MPART_F_LOCKBIT)] List of shared mappings. */
 #endif /* !__WANT_MPART__mp_nodlsts && !__WANT_MPART__mp_dtplop */
-	Toblockop_slist(struct mpart) mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_lockops_reap()') */
+	Toblockop_slist(mpart)        mp_lockops;   /* [0..n][lock(ATOMIC)] List of lock operations. (s.a. `mpart_lockops_reap()') */
 #ifdef __WANT_MPART__mp_lopall
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_allparts(mp_allparts) { mp_allparts }
@@ -346,7 +346,7 @@ struct mpart {
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_filent(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
-	RBTREE_NODE(struct mpart)     mp_filent;    /* [lock(READ (MPART_F_LOCKBIT || mp_file->mf_lock),
+	RBTREE_NODE(mpart)            mp_filent;    /* [lock(READ (MPART_F_LOCKBIT || mp_file->mf_lock),
 	                                             *       WRITE(MPART_F_LOCKBIT && mp_file->mf_lock))]
 	                                             * [valid_if(!mpart_isanon(self))]
 	                                             * Entry with the associated file's tree. */

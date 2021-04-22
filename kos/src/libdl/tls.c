@@ -52,14 +52,14 @@ DECL_BEGIN
 struct dtls_extension {
 	/* Tree for mapping TLS extensions data tables to modules.
 	 * NOTE: These extension tables are allocated lazily! */
-	LLRBTREE_NODE(struct dtls_extension) te_tree;     /* [lock(:ts_exlock)] R/B-tree node. */
+	LLRBTREE_NODE(dtls_extension) te_tree;     /* [lock(:ts_exlock)] R/B-tree node. */
 	union {
-		DlModule                        *te_module;   /* [0..1][lock(:ts_exlock)] The module itself.
-		                                               * The  least significant bit  of this is used
-		                                               * to indicate if this leaf is red of black! */
-		uintptr_t                        te_redblack; /* Red/black status bit at bit#0 */
+		DlModule                 *te_module;   /* [0..1][lock(:ts_exlock)] The module itself.
+		                                        * The  least significant bit  of this is used
+		                                        * to indicate if this leaf is red of black! */
+		uintptr_t                 te_redblack; /* Red/black status bit at bit#0 */
 	};
-	byte_t                              *te_data;     /* [1..1][const] Pointer to the base of TLS data. */
+	byte_t                       *te_data;     /* [1..1][const] Pointer to the base of TLS data. */
 	/* The actual extension data goes here. (with proper alignment, and pointed-to by `te_data') */
 };
 #define dtls_extension_getmodule(self) ((DlModule *)((self)->te_redblack & ~1))
@@ -86,11 +86,11 @@ DECL_BEGIN
 /* This is the actual structure that the TLS register (e.g. `%fs.base' / `%gs.base') points to. */
 struct tls_segment {
 	/* Static TLS data goes here (aka. at negative offsets from `ts_self') */
-	struct tls_segment                  *ts_self;    /* [1..1][const][== self] Self-pointer
-	                                                  * At offset 0; mandaged by ELF, and a good idea in general. */
-	LIST_ENTRY(tls_segment)              ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
-	struct atomic_rwlock                 ts_exlock;  /* Lock for `ts_extree' */
-	LLRBTREE_ROOT(struct dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
+	struct tls_segment           *ts_self;    /* [1..1][const][== self] Self-pointer
+	                                           * At offset 0; mandaged by ELF, and a good idea in general. */
+	LIST_ENTRY(tls_segment)       ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
+	struct atomic_rwlock          ts_exlock;  /* Lock for `ts_extree' */
+	LLRBTREE_ROOT(dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
 };
 
 STATIC_ASSERT_MSG(offsetof(struct tls_segment, ts_self) == 0,

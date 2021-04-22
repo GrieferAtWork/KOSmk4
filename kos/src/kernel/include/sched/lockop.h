@@ -124,14 +124,10 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* TODO: Go  through all  of the  different uses  of lockop mechanics
- *       and change APIs to make use of the general-purpose interface
- *       exposed by this header! */
-
-struct postlockop;
 struct lockop;
-struct obpostlockop;
+struct postlockop;
 struct oblockop;
+struct obpostlockop;
 
 /* Callback prototype for an operation to-be performed once locks have been released. */
 typedef NOBLOCK NONNULL((1)) void
@@ -190,34 +186,34 @@ SLIST_HEAD(obpostlockop_slist, obpostlockop);
 
 #ifdef __cplusplus
 extern "C++" {
-#define Tobpostlockop(T)            _Tobpostlockop<T>
-#define Toblockop(T)                _Toblockop<T>
-#define Toblockop_slist(T)          _Toblockop_slist<T>
-#define Tobpostlockop_slist(T)      _Tobpostlockop_slist<T>
-#define Tobpostlockop_callback_t(T) _Tobpostlockop_callback_t<T>
-#define Toblockop_callback_t(T)     _Toblockop_callback_t<T>
-template<class T> struct _Tobpostlockop;
+#define Toblockop(type)                _Toblockop<struct type>
+#define Tobpostlockop(type)            _Tobpostlockop<struct type>
+#define Toblockop_slist(type)          _Toblockop_slist<struct type>
+#define Tobpostlockop_slist(type)      _Tobpostlockop_slist<struct type>
+#define Toblockop_callback_t(type)     _Toblockop_callback_t<struct type>
+#define Tobpostlockop_callback_t(type) _Tobpostlockop_callback_t<struct type>
 template<class T> struct _Toblockop;
-template<class T> using _Tobpostlockop_callback_t = NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *)(_Tobpostlockop<T> *__restrict self, T *__restrict obj);
+template<class T> struct _Tobpostlockop;
 template<class T> using _Toblockop_callback_t     = NOBLOCK NONNULL((1)) _Tobpostlockop<T> * /*NOTHROW*/ (FCALL *)(_Toblockop<T> *__restrict self, T *__restrict obj);
-template<class T> struct _Tobpostlockop {
-	SLIST_ENTRY(_Tobpostlockop<T>) oplo_link; /* [0..1] Next post-lock operation. */
-	_Tobpostlockop_callback_t<T>   oplo_func; /* [1..1][const] Callback to invoke. */
-};
+template<class T> using _Tobpostlockop_callback_t = NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *)(_Tobpostlockop<T> *__restrict self, T *__restrict obj);
 template<class T> struct _Toblockop {
 	SLIST_ENTRY(_Toblockop<T>) olo_link; /* [0..1] Next lock operation. */
 	_Toblockop_callback_t<T>   olo_func; /* [1..1][const] Operation to perform. */
+};
+template<class T> struct _Tobpostlockop {
+	SLIST_ENTRY(_Tobpostlockop<T>) oplo_link; /* [0..1] Next post-lock operation. */
+	_Tobpostlockop_callback_t<T>   oplo_func; /* [1..1][const] Callback to invoke. */
 };
 template<class T> SLIST_HEAD(_Toblockop_slist, _Toblockop<T>);
 template<class T> SLIST_HEAD(_Tobpostlockop_slist, _Tobpostlockop<T>);
 } /* extern "C++" */
 #else /* __cplusplus */
-#define Tobpostlockop(T)            struct obpostlockop
-#define Toblockop(T)                struct oblockop
-#define Toblockop_slist(T)          struct oblockop_slist
-#define Tobpostlockop_slist(T)      struct obpostlockop_slist
-#define Tobpostlockop_callback_t(T) obpostlockop_callback_t
-#define Toblockop_callback_t(T)     oblockop_callback_t
+#define Toblockop(type)                struct oblockop
+#define Tobpostlockop(type)            struct obpostlockop
+#define Toblockop_slist(type)          struct oblockop_slist
+#define Tobpostlockop_slist(type)      struct obpostlockop_slist
+#define Toblockop_callback_t(type)     oblockop_callback_t
+#define Tobpostlockop_callback_t(type) obpostlockop_callback_t
 #endif /* !__cplusplus */
 
 

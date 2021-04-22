@@ -394,8 +394,8 @@ struct driver
 	/* Driver runtime internal temporaries. */
 #ifdef __WANT_DRIVER__d_internals
 	union {
-		Toblockop(struct mman)     _d_mm_lop;     /* Used internally */
-		Tobpostlockop(struct mman) _d_mm_postlop; /* Used internally */
+		Toblockop(mman)            _d_mm_lop;     /* Used internally */
+		Tobpostlockop(mman)        _d_mm_postlop; /* Used internally */
 		struct lockop              _d_lop;        /* Used internally */
 		struct postlockop          _d_postlop;    /* Used internally */
 	};

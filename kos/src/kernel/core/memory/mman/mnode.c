@@ -91,7 +91,7 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(Tobpostlockop(struct mpart) *__restrict self,
+NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(Tobpostlockop(mpart) *__restrict self,
                                                   struct mpart *__restrict UNUSED(part)) {
 	struct mnode *me;
 	me = (struct mnode *)self;
@@ -99,10 +99,10 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(Tobpostlockop(struct mpart) *_
 	mnode_free(me);
 }
 
-INTERN NOBLOCK NONNULL((1, 2)) Tobpostlockop(struct mpart) *
-NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict self,
+INTERN NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
+NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(mpart) *__restrict self,
                                              struct mpart *__restrict part) {
-	Tobpostlockop(struct mpart) *post;
+	Tobpostlockop(mpart) *post;
 	struct mnode *me;
 	me = (struct mnode *)self;
 	LIST_REMOVE(me, mn_link);
@@ -112,7 +112,7 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(struct mpart) *__restrict
 	/* Do the rest in post so we won't be holding a lock to the mem-part anymore:
 	 * >> weakdecref(me->mn_mman);
 	 * >> mnode_free(me); */
-	post            = (Tobpostlockop(struct mpart) *)self;
+	post            = (Tobpostlockop(mpart) *)self;
 	post->oplo_func = &mnode_unlink_from_part_lockop_post;
 	return post;
 }
@@ -138,7 +138,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			mpart_lock_release(part);
 			decref_unlikely(part);
 		} else {
-			Toblockop(struct mpart) *lop;
+			Toblockop(mpart) *lop;
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
 			DBG_memset(&self->mn_part, 0xcc, sizeof(self->mn_part));
@@ -146,7 +146,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part' */
-			lop = (Toblockop(struct mpart) *)self;
+			lop = (Toblockop(mpart) *)self;
 			lop->olo_func = &mnode_unlink_from_part_lockop;
 			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
 
