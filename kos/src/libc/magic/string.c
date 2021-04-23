@@ -585,7 +585,7 @@ typedef size_t rsize_t;
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMP))]]
 [[if(!defined(__KERNEL__)), kos_export_as("bcmp")]]
 int memcmp([[nonnull]] void const *s1,
-           [[nonnull]] void const *s2, size_t n_bytes) {
+           [[nonnull]] void const *s2, $size_t n_bytes) {
 	byte_t *p1 = (byte_t *)s1;
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;

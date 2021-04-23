@@ -741,7 +741,7 @@ void setbuf([[nonnull]] FILE *__restrict stream, [[nullable]] char *buf) {
 @@>> setvbuf(3)
 @@Set the buffer and buffer-mode to-be used by the given `stream'
 @@@param modes: One of `_IOFBF', `_IOLBF' or `_IONBF'
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[std, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_setvbuf...)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_setvbuf_unlocked...)]]
 [[                                                                           alias(CNL_setvbuf...)]]
@@ -1948,9 +1948,9 @@ int pclose([[nonnull]] $FILE *stream);
 @@closed using `pclose(3)', rather than `fclose(3)'
 [[cp, wunused, argument_names(path, ___argv, ___envp, modes)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-FILE *popenve([[nonnull]] char const *path,
-              [[nonnull]] __TARGV, [[nonnull]] __TENVP,
-              [[nonnull]] char const *modes);
+$FILE *popenve([[nonnull]] char const *path,
+               [[nonnull]] __TARGV, [[nonnull]] __TENVP,
+               [[nonnull]] char const *modes);
 %#endif /* __USE_NETBSD */
 
 %

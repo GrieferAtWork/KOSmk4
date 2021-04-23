@@ -165,10 +165,10 @@ template<class __T1, class __T2> struct pair {
 	__CXX_CLASSMEMBER __CXX11_CONSTEXPR __LIBCCALL pair(pair<__U1, __U2> const &__other)
 	__CXX_NOEXCEPT_IF(__CXX_NOEXCEPT_IS(__T1(__other.first)) &&
 	                  __CXX_NOEXCEPT_IS(__T2(__other.second)))
-	: first(__other.first)
-	, second(__other.second)
+	    : first(__other.first)
+	    , second(__other.second)
 	{}
-#else
+#else /* __USE_ISOCXX11 */
 	template<class __U1, class __U2,
 	         typename enable_if< __NAMESPACE_INT_SYM __and_<
 	         	__NAMESPACE_INT_SYM _ConstructiblePair<__T1,__T2,__U1,__U2>,
@@ -307,8 +307,8 @@ template<class __T1, class __T2> struct pair {
 	{}
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 
-	template<__CXX_VARARGS_TEMPLATE_ARGS(class,__Types1),
-	         __CXX_VARARGS_TEMPLATE_ARGS(class,__Types2)>
+	template<__CXX_VARARGS_TEMPLATE_ARGS(class, __Types1),
+	         __CXX_VARARGS_TEMPLATE_ARGS(class, __Types2)>
 	pair(piecewise_construct_t,
 	     tuple<__CXX_VARARGS_TYPENAME_ARGS(__Types1)>,
 	     tuple<__CXX_VARARGS_TYPENAME_ARGS(__Types2)>);
@@ -369,7 +369,7 @@ private:
 	     tuple<__CXX_VARARGS_TYPENAME_ARGS(__Types2)> &,
 	     __NAMESPACE_INT_SYM __Index_tuple<__CXX_VARARGS_TYPENAME_ARGS(__Indices1)>,
 	     __NAMESPACE_INT_SYM __Index_tuple<__CXX_VARARGS_TYPENAME_ARGS(__Indices2)>);
-#endif
+#endif /* !__USE_ISOCXX11 */
 };
 
 template<class __T1, class __T2> __CXX_FORCEINLINE __CXX11_CONSTEXPR bool __LIBCCALL
