@@ -227,8 +227,13 @@ struct mpart {
 	 *          its remaining  nodes, and  those that  it couldn't  unbind  will
 	 *          have  been added to the dead-nodes chain of the associated part. */
 #ifdef __WANT_MPART_INIT
+#if defined(__WANT_MPART__mp_nodlsts) || defined(__WANT_MPART__mp_dtplop)
+#define MPART_INIT_mp_copy(...)    {{ __VA_ARGS__
+#define MPART_INIT_mp_share(...)   __VA_ARGS__ }}
+#else /* __WANT_MPART__mp_nodlsts || __WANT_MPART__mp_dtplop */
 #define MPART_INIT_mp_copy(...)    __VA_ARGS__
 #define MPART_INIT_mp_share(...)   __VA_ARGS__
+#endif /* !__WANT_MPART__mp_nodlsts && !__WANT_MPART__mp_dtplop */
 #define MPART_INIT_mp_lockops(...) __VA_ARGS__
 #endif /* __WANT_MPART_INIT */
 #if defined(__WANT_MPART__mp_nodlsts) || defined(__WANT_MPART__mp_dtplop)

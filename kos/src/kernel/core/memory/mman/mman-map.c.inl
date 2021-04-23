@@ -131,9 +131,8 @@ mnode_create_anon_ram(PAGEDIR_PAGEALIGNED size_t num_bytes,
 			node->mn_fsname  = NULL;
 			node->mn_module  = NULL;
 			node->mn_partoff = 0;
-			node->mn_link.le_next = NULL;
-			node->mn_link.le_prev = prot & PROT_SHARED ? &part->mp_share.lh_first
-			                                           : &part->mp_copy.lh_first;
+			node->mn_link.le_next  = NULL;
+			node->mn_link.le_prev  = &mpart_getnodlst_from_prot(part, prot)->lh_first;
 			*node->mn_link.le_prev = node;
 		} EXCEPT {
 			kfree(part);
@@ -472,11 +471,8 @@ again_lock_mfile_map:
 			node->mn_flags = mnode_flags;
 			node->mn_mman  = self;
 			/* Insert the node into the share- or copy-list of the associated part. */
-			if (mnode_flags & MNODE_F_SHARED) {
-				LIST_INSERT_HEAD(&part->mp_share, node, mn_link);
-			} else {
-				LIST_INSERT_HEAD(&part->mp_copy, node, mn_link);
-			}
+			LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(part, mnode_flags),
+			                 node, mn_link);
 			node->mn_fspath = xincref(file_fspath);
 			node->mn_fsname = xincref(file_fsname);
 			node->mn_module = NULL;

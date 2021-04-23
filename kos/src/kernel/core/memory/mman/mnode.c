@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_C 1
+#define __WANT_MPART__mp_nodlsts
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -74,15 +75,15 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 	/* Check if  there are  any nodes  mapping our  part that  use LOCK  flags.
 	 * For this purpose, both copy-on-write and shared nodes can lock the part. */
-	struct mnode *node;
-	LIST_FOREACH (node, &self->mp_copy, mn_link) {
-		if (node->mn_flags & MNODE_F_MLOCK)
-			return;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node->mn_flags & MNODE_F_MLOCK)
+				return;
+		}
 	}
-	LIST_FOREACH (node, &self->mp_share, mn_link) {
-		if (node->mn_flags & MNODE_F_MLOCK)
-			return;
-	}
+
 	/* Clear the lock-flag for our part, since there are no
 	 * more nodes that could keep our part locked  in-core! */
 	ATOMIC_AND(self->mp_flags, ~MPART_F_MLOCK);
@@ -405,11 +406,8 @@ reload_lonode_after_mman_lock:
 
 	/* Insert the new mem-node into the backing part's list of either
 	 * copy-on-write, or shared mappings. */
-	if (hinode->mn_flags & MNODE_F_SHARED) {
-		LIST_INSERT_HEAD(&part->mp_share, hinode, mn_link);
-	} else {
-		LIST_INSERT_HEAD(&part->mp_copy, hinode, mn_link);
-	}
+	LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(part, hinode->mn_flags),
+	                 hinode, mn_link);
 	mpart_lock_release(part);
 	incref(part); /* The reference stored in `hinode->mn_part' */
 done_nopart:

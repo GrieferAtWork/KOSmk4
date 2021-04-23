@@ -1201,6 +1201,8 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	 *       >>     decref_nokill(hipart);
 	 *       >> } */
 
+	/* TODO: Update mem-nodes from `hipart' to reference `lopart' at the proper offsets. */
+
 	/* TODO: >> if (ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)) {
 	 *       >>     mpart_destroy(hipart); // But don't destroy data that's been stolen by `lopart'!
 	 *       >> } else {
@@ -1447,8 +1449,8 @@ waitfor_blocking_mman:
 union merge_all_parts_lop_desc {
 	Toblockop(mman)      map_mm_lop;     /* Lop */
 	Tobpostlockop(mman)  map_mm_postlop; /* Post-Lop */
-	struct lockop               map_lop;        /* Lop */
-	struct postlockop           map_postlop;    /* Post-Lop */
+	struct lockop        map_lop;        /* Lop */
+	struct postlockop    map_postlop;    /* Post-Lop */
 };
 
 PRIVATE union merge_all_parts_lop_desc merge_all_parts_lop = { { {}, NULL } };
@@ -1474,6 +1476,12 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL merge_all_parts_postlop_destroy_cb)(struct postlockop *__restrict self) {
 	struct mpart_slist deadparts;
 	deadparts.slh_first = container_of(self, struct mpart, _mp_dtplop);
+	/* Re-initialize  the  copy/share lists  to satisfy  an internal
+	 * assertion in `mpart_fini()', as well as to ensure consistency
+	 * when destroying mem-parts.
+	 * NOTE: The mp_copy/mp_share lists were re-used by `_mp_dtplop'! */
+	LIST_INIT(&deadparts.slh_first->mp_copy);
+	LIST_INIT(&deadparts.slh_first->mp_share);
 	do {
 		struct mpart *part;
 		part = SLIST_FIRST(&deadparts);
@@ -1498,7 +1506,9 @@ NOTHROW(FCALL merge_all_parts_lop_cb)(struct lockop *__restrict UNUSED(self)) {
 	{
 		struct mpart *first;
 		STATIC_ASSERT(sizeof(struct postlockop) <= (2 * sizeof(struct mnode_list)));
-		first                      = SLIST_FIRST(&deadparts);
+		first = SLIST_FIRST(&deadparts);
+		assert(LIST_EMPTY(&first->mp_copy));
+		assert(LIST_EMPTY(&first->mp_share));
 		first->_mp_dtplop.plo_func = &merge_all_parts_postlop_destroy_cb;
 		return &first->_mp_dtplop;
 	}

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_UNMAP_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_KRAM_UNMAP_C 1
+#define __WANT_MPART__mp_nodlsts /* mpart_getnodlst_from_mnodeflags() */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -471,9 +472,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	 * a kernel ram sub-region that was backed by a part that's also  mapped
 	 * somewhere else... */
 	assert(mpart_isanon(part));
-	assert(node->mn_flags & MNODE_F_SHARED
-	       ? LIST_FIRST(&part->mp_share) == node
-	       : LIST_FIRST(&part->mp_copy) == node);
+	assert(LIST_FIRST(mpart_getnodlst_from_mnodeflags(part, node->mn_flags)) == node);
 	assert(LIST_NEXT(node, mn_link) == NULL);
 
 	unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
@@ -974,12 +973,8 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	hipart->mp_file = incref(lopart->mp_file);
 	LIST_INIT(&hipart->mp_copy);
 	LIST_INIT(&hipart->mp_share);
-	hinode->mn_link.le_next = NULL;
-	if (lonode->mn_flags & MNODE_F_SHARED) {
-		hinode->mn_link.le_prev = &hipart->mp_share.lh_first;
-	} else {
-		hinode->mn_link.le_prev = &hipart->mp_copy.lh_first;
-	}
+	hinode->mn_link.le_next  = NULL;
+	hinode->mn_link.le_prev  = &mpart_getnodlst_from_mnodeflags(hipart, lonode->mn_flags)->lh_first;
 	*hinode->mn_link.le_prev = hinode;
 	SLIST_INIT(&hipart->mp_lockops);
 	/*LIST_ENTRY_UNBOUND_INIT(&hipart->mp_allparts);*/ /* Initialized below */

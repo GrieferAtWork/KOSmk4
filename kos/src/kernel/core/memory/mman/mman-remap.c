@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_REMAP_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_REMAP_C 1
+#define __WANT_MPART__mp_nodlsts /* mpart_getnodlst_from_mnodeflags() */
 #define __WANT_MNODE__mn_alloc
 #define __WANT_MNODE__mn_dead
 #define _KOS_SOURCE 1
@@ -460,11 +461,10 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 		/* Insert the node into the copy- or share-list of the associated part. */
 		assert((node->mn_part == NULL) == mfile_map_isreserved(map));
 		if ((part = node->mn_part) != NULL) {
-			if (mapinfo->mi_nodeflags & MNODE_F_SHARED) {
-				LIST_INSERT_HEAD(&part->mp_share, node, mn_link);
-			} else {
-				LIST_INSERT_HEAD(&part->mp_copy, node, mn_link);
-			}
+
+			/* Add the new node to the part's appropriate node-list. */
+			LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(part, mapinfo->mi_nodeflags),
+			                 node, mn_link);
 
 			/* Set the MLOCK  flag for  the backing  mem-part when  MAP_LOCKED is  given.
 			 * Note that in this case, `node->mn_flags' already contains `MNODE_F_MLOCK'! */

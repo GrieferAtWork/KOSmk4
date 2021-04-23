@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_FORK_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_FORK_C 1
+#define __WANT_MPART__mp_nodlsts /* mpart_getnodlst_from_mnodeflags() */
 #define __WANT_MNODE__mn_alloc
 #define _KOS_SOURCE 1
 
@@ -381,7 +382,7 @@ again:
 		}
 
 		/* Add `newtree' to the relevant node-list. */
-		list = (newtree->mn_flags & MNODE_F_SHARED) ? &part->mp_share : &part->mp_copy;
+		list = mpart_getnodlst_from_mnodeflags(part, newtree->mn_flags);
 		LIST_INSERT_HEAD(list, newtree, mn_link);
 
 		/* Release the lock to `part'. */

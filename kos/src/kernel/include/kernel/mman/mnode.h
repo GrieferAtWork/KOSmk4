@@ -22,11 +22,14 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/paging.h> /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#include <kernel/paging.h>
 #include <kernel/types.h>
+
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <kernel/paging.h>
-#include <kernel/arch/paging.h> /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+#include <asm/os/mman.h>
 
 /* Values for `struct mnode::mn_flags' */
 #define MNODE_F_NORMAL    0x00000000 /* Normal flags. */
@@ -323,6 +326,28 @@ struct mnode {
 #endif /* !__WANT_MNODE__mn_ilink */
 #define MNODE_INIT_mn_module(mn_module)   mn_module
 #endif /* __WANT_MNODE_INIT */
+
+
+
+#ifdef __WANT_MPART__mp_nodlsts
+/* Helper macro the return a pointer to the relevant mem-node list
+ * head of a given mem-part,  given `mnodeflags' which may or  may
+ * not include the `MNODE_F_SHARED' flag. */
+#if MNODE_F_SHARED == 0x0001
+#define mpart_getnodlst_from_mnodeflags(self, mnodeflags) (&(self)->_mp_nodlsts[(mnodeflags) & MNODE_F_SHARED])
+#elif MNODE_F_SHARED == 0x0020
+#define mpart_getnodlst_from_mnodeflags(self, mnodeflags) (&(self)->_mp_nodlsts[((mnodeflags) & MNODE_F_SHARED) >> 5])
+#else /* MNODE_F_SHARED == ... */
+#define mpart_getnodlst_from_mnodeflags(self, mnodeflags) ((mnodeflags) & MNODE_F_SHARED ? &(self)->mp_share : &(self)->mp_copy)
+#endif /* MNODE_F_SHARED != ... */
+#if __PROT_SHARED == 0x0001
+#define mpart_getnodlst_from_prot(self, prot) (&(self)->_mp_nodlsts[(prot) & __PROT_SHARED])
+#elif __PROT_SHARED == 0x0020
+#define mpart_getnodlst_from_prot(self, prot) (&(self)->_mp_nodlsts[((prot) & __PROT_SHARED) >> 5])
+#else /* __PROT_SHARED == ... */
+#define mpart_getnodlst_from_prot(self, prot) ((prot) & __PROT_SHARED ? &(self)->mp_share : &(self)->mp_copy)
+#endif /* __PROT_SHARED != ... */
+#endif /* __WANT_MPART__mp_nodlsts */
 
 
 

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_SPLIT_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_SPLIT_C 1
+#define __WANT_MPART__mp_nodlsts
 #define __WANT_MNODE__mn_alloc
 #define __WANT_MFUTEX__mfu_dead
 #define _KOS_SOURCE 1
@@ -127,11 +128,12 @@ NOTHROW(FCALL trydecref_mman_of_mnode)(struct mnode *__restrict self) {
  * of `self'. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_foreach_mmans_incref)(struct mpart *__restrict self) {
-	struct mnode *node;
-	LIST_FOREACH (node, &self->mp_copy, mn_link)
-		tryincref_mman_of_mnode(node);
-	LIST_FOREACH (node, &self->mp_share, mn_link)
-		tryincref_mman_of_mnode(node);
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link)
+			tryincref_mman_of_mnode(node);
+	}
 }
 
 
@@ -139,11 +141,12 @@ NOTHROW(FCALL mpart_foreach_mmans_incref)(struct mpart *__restrict self) {
 /* Do the reverse of `mpart_foreach_mmans_incref()' */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_foreach_mmans_decref)(struct mpart *__restrict self) {
-	struct mnode *node;
-	LIST_FOREACH (node, &self->mp_copy, mn_link)
-		trydecref_mman_of_mnode(node);
-	LIST_FOREACH (node, &self->mp_share, mn_link)
-		trydecref_mman_of_mnode(node);
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link)
+			trydecref_mman_of_mnode(node);
+	}
 }
 
 
@@ -912,11 +915,8 @@ relock_with_data:
 				hinode->mn_part    = hipart;
 				++hipart->mp_refcnt;
 				hinode->mn_partoff = lonode->mn_partoff + data.msd_offset;
-				if (hinode->mn_flags & MNODE_F_SHARED) {
-					LIST_INSERT_HEAD(&hipart->mp_share, hinode, mn_link);
-				} else {
-					LIST_INSERT_HEAD(&hipart->mp_copy, hinode, mn_link);
-				}
+				LIST_INSERT_HEAD(mpart_getnodlst_from_mnodeflags(hipart, hinode->mn_flags),
+				                 hinode, mn_link);
 				LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 				if (LIST_ISBOUND(lonode, mn_writable))
 					LIST_INSERT_HEAD(&hinode->mn_mman->mm_writable, hinode, mn_writable);

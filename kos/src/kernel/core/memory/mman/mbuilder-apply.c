@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MBUILDER_APPLY_C
 #define GUARD_KERNEL_SRC_MEMORY_MBUILDER_APPLY_C 1
+#define __WANT_MPART__mp_nodlsts /* mpart_getnodlst_from_mnodeflags() */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -163,7 +164,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 			iter->_mbn_partoff = (mpart_reladdr_t)(fm_iter - part->mp_minaddr);
 
 			/* Add the node to the part's relevant list of nodes. */
-			link_list = (iter->mbn_flags & MNODE_F_SHARED) ? &part->mp_share : &part->mp_copy;
+			link_list = mpart_getnodlst_from_mnodeflags(part, iter->mbn_flags);
 			LIST_INSERT_HEAD(link_list, (struct mnode *)iter, mn_link);
 		} while ((iter = iter->mbn_filnxt) != NULL);
 		fmnode = fmnext;

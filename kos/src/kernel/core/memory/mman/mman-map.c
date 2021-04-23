@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_MAP_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_MAP_C 1
+#define __WANT_MPART__mp_nodlsts /* mpart_getnodlst_from_prot() */
 #define __WANT_MNODE__mn_alloc
 #define _KOS_SOURCE 1
 

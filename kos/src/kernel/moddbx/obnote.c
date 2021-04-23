@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_MODDBX_OBNOTE_C
 #define GUARD_MODDBX_OBNOTE_C 1
+#define __WANT_MPART__mp_nodlsts
 #define _KOS_SOURCE 1
 
 /* DeBug eXtensions. */
@@ -913,11 +914,9 @@ NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
 			goto badobj;
 		isanon = mpart_isanon(me);
 		/* Check if there's an mnode-mapping that includes fs-name info. */
-		for (i = 0; i < 2; ++i) {
+		for (i = 0; i < COMPILER_LENOF(me->_mp_nodlsts); ++i) {
 			struct mnode *node;
-			node = i ? me->mp_share.lh_first
-			         : me->mp_copy.lh_first;
-			while (node) {
+			LIST_FOREACH (node, &me->_mp_nodlsts[i], mn_link) {
 				if (!ADDR_ISKERN(node))
 					goto badobj;
 				file_path = node->mn_fspath;
@@ -929,7 +928,6 @@ NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
 						goto badobj;
 					goto got_all_info;
 				}
-				node = node->mn_link.le_next;
 			}
 		}
 	} EXCEPT {

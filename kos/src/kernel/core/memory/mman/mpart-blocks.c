@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_BLOCKS_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_BLOCKS_C 1
+#define __WANT_MPART__mp_nodlsts /* mpart_getnodlst_from_mnodeflags() */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -797,14 +798,10 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 	part = self->mn_part;
 	assert(part != NULL);
 	assert(ADDR_ISKERN(part));
-	assert(self->mn_link.le_prev ==
-	       ((self->mn_flags & MNODE_F_SHARED)
-	        ? &part->mp_share.lh_first
-	        : &part->mp_copy.lh_first));
+	assert(self->mn_link.le_prev == &mpart_getnodlst_from_mnodeflags(part, self->mn_flags)->lh_first);
 	assert(*self->mn_link.le_prev == self);
 	assert(LIST_NEXT(self, mn_link) == NULL);
-	assert((self->mn_flags & MNODE_F_SHARED) ? LIST_EMPTY(&part->mp_copy)
-	                                         : LIST_EMPTY(&part->mp_share));
+	assert(LIST_EMPTY(mpart_getnodlst_from_mnodeflags(part, ~self->mn_flags)));
 
 	/* Call forward to the mem-part-level hint handler. */
 	mpart_hinted_mmap(part, fault_page,
