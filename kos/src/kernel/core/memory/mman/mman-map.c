@@ -26,8 +26,8 @@
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/map.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 
@@ -37,46 +37,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-DECL_BEGIN
-
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
 #else /* !NDEBUG */
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
-
-/* Sync  all  changes made  to  file mappings  within  the given
- * address range with on-disk file images. (s.a. `mfile_sync()')
- * NOTE: Memory ranges that  aren't actually  mapped, aren't  mapped
- *       with WRITE and SHARED, or aren't mapped to write-back files
- *       are simply ignored. */
-PUBLIC void FCALL
-mman_syncmem(struct mman *__restrict self,
-             UNCHECKED void *addr, size_t num_bytes)
-		THROWS(E_WOULDBLOCK, ...) {
-	void *maxaddr = (byte_t *)addr + num_bytes - 1;
-	while (addr <= maxaddr) {
-		REF struct mpart *part;
-		struct mnode_tree_minmax mima;
-		mman_lock_read(self);
-		mnode_tree_minmaxlocate(self->mm_mappings, addr, maxaddr, &mima);
-		if (!mima.mm_min) {
-			mman_lock_endread(self);
-			break;
-		}
-		addr = mnode_getendaddr(mima.mm_min);
-		part = xincref(mima.mm_min->mn_part);
-		mman_lock_endread(self);
-		if (part) {
-			FINALLY_DECREF_UNLIKELY(part);
-			/* Sync the backing data-part. */
-			mpart_sync(part);
-		}
-	}
-}
-
-
-DECL_END
 
 #ifndef __INTELLISENSE__
 #define DEFINE_mman_map
@@ -86,6 +51,5 @@ DECL_END
 #define DEFINE_mman_map_res
 #include "mman-map.c.inl"
 #endif /* !__INTELLISENSE__ */
-
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MMAN_MAP_C */

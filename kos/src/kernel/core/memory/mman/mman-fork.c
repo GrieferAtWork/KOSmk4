@@ -213,7 +213,7 @@ again:
 /* Ensure that  `self->ft_newmm->mm_mappings' is  a valid  tree of  mem-nodes
  * by inserting  all nodes  from the  incomplete tree  `ft_newtree' into  the
  * actual mappings tree of that mman. Where an overlap is found, the existing
- * node is removed from `self->ft_newmm' will be destroyed. */
+ * node is removed from `self->ft_newmm', and will be destroyed. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL forktree_unlock_newmm)(struct forktree *__restrict self) {
 	struct mman *newmm;

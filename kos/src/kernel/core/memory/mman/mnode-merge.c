@@ -1217,8 +1217,10 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	 *       >>     _mpart_init_asanon(hipart);
 	 *       >>     LIST_INIT(&hipart->mp_copy);
 	 *       >>     LIST_INIT(&hipart->mp_share);
-	 *       >>     if (hipart->mp_meta)
+	 *       >>     if (hipart->mp_meta) {
+	 *       >>         ++hipart->mp_meta->mpm_rtm_vers;
 	 *       >>         mpartmeta_ftxlock_endwrite(hipart->mp_meta);
+	 *       >>     }
 	 *       >>     mpart_lock_release(hipart);
 	 *       >>     decref_unlikely(hipart);
 	 *       >> } */

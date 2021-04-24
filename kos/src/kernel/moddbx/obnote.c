@@ -44,6 +44,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/ramfile.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
@@ -751,23 +752,23 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
 		result = "[dbgheap]";
 #endif /* CONFIG_DEBUG_HEAP */
 	} else if (self == &mfile_zero) {
-		result = "/dev/zero";
+		result = "[/dev/zero]";
 	} else if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon)) {
 		result = buf;
-		sprintf(buf, "[anon:%u]", (unsigned int)(self - mfile_anon));
+		sprintf(buf, "[/dev/zero:anon:%u]", (unsigned int)(self - mfile_anon));
 	} else if (self == &mfile_ndef) {
 		result = "[undef]";
 	} else if (self == &mfile_phys) {
-		result = "/dev/mem";
+		result = "[/dev/mem]";
 	} else if (ops == &mfile_zero_ops) {
-		result = "?/dev/zero";
+		result = "[?/dev/zero]";
 	} else if (ops >= mfile_anon_ops && ops < COMPILER_ENDOF(mfile_anon_ops)) {
 		result = buf;
-		sprintf(buf, "[?anon:%u]", (unsigned int)(ops - mfile_anon_ops));
+		sprintf(buf, "[?/dev/zero:anon:%u]", (unsigned int)(ops - mfile_anon_ops));
 	} else if (ops == &mfile_ndef_ops) {
 		result = "[?undef]";
 	} else if (ops == &mfile_phys_ops) {
-		result = "?/dev/mem";
+		result = "[?/dev/mem]";
 	}
 	return result;
 }
@@ -873,87 +874,9 @@ NOTHROW(KCALL note_mnode)(pformatprinter printer, void *arg,
 		}
 		if (isanon)
 			PRINT("}");
-		PRINTF("+%" PRIxN(__SIZEOF_POS_T__), file_position);
+		PRINTF("+%#" PRIxN(__SIZEOF_POS_T__), file_position);
 	}
 done:
-	return result;
-err:
-	return temp;
-badobj:
-	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
-	return 0;
-}
-
-PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
-                          KERNEL CHECKED void const *pointer,
-                          unsigned int *__restrict pstatus) {
-	ssize_t result, temp;
-	struct mpart *me = (struct mpart *)pointer;
-	struct path *file_path = NULL;
-	struct directory_entry *file_dent = NULL;
-	struct mfile *file;
-	struct mfile_ops const *file_ops;
-	pos_t minaddr, maxaddr;
-	bool isanon;
-	TRY {
-		unsigned int i;
-		minaddr = me->mp_minaddr;
-		maxaddr = me->mp_maxaddr;
-		if (!IS_ALIGNED(minaddr, PAGESIZE))
-			goto badobj;
-		if (!IS_ALIGNED(maxaddr + 1, PAGESIZE))
-			goto badobj;
-		if (!(minaddr <= maxaddr))
-			goto badobj;
-		file = me->mp_file;
-		if (!ADDR_ISKERN(file))
-			goto badobj;
-		file_ops = file->mf_ops;
-		if (!ADDR_ISKERN(file_ops))
-			goto badobj;
-		isanon = mpart_isanon(me);
-		/* Check if there's an mnode-mapping that includes fs-name info. */
-		for (i = 0; i < COMPILER_LENOF(me->_mp_nodlsts); ++i) {
-			struct mnode *node;
-			LIST_FOREACH (node, &me->_mp_nodlsts[i], mn_link) {
-				if (!ADDR_ISKERN(node))
-					goto badobj;
-				file_path = node->mn_fspath;
-				file_dent = node->mn_fsname;
-				if (file_path && file_dent) {
-					if (!ADDR_ISKERN(file_path))
-						goto badobj;
-					if (!ADDR_ISKERN(file_dent))
-						goto badobj;
-					goto got_all_info;
-				}
-			}
-		}
-	} EXCEPT {
-		goto badobj;
-	}
-got_all_info:
-	result = 0;
-	if (isanon)
-		PRINT("{");
-	if (file_dent) {
-		DO(note_pathpair(printer, arg, file_path, file_dent, pstatus));
-	} else {
-		char const *known_name;
-		char buf[64];
-		known_name = mfile_known_name(file, file_ops, buf);
-		if (known_name) {
-			DO((*printer)(arg, known_name, strlen(known_name)));
-		} else {
-			PRINT("??" "?");
-		}
-	}
-	if (isanon)
-		PRINT("}");
-	PRINTF(":%" PRIxN(__SIZEOF_POS_T__) ""
-	       "-%" PRIxN(__SIZEOF_POS_T__) "",
-	       minaddr, maxaddr);
 	return result;
 err:
 	return temp;
@@ -1022,6 +945,31 @@ badobj:
 	return true;
 }
 
+PRIVATE NONNULL((2, 3, 4)) bool KCALL
+mfile_extract_name(struct mfile const *self,
+                   struct path **__restrict p_fspath,
+                   struct directory_entry **__restrict p_fsname,
+                   unsigned int *__restrict pstatus) {
+	struct mpart *root;
+	if (!ADDR_ISKERN(self))
+		goto badobj;
+	if (!ADDR_ISKERN(self->mf_ops))
+		goto badobj;
+	root = self->mf_parts;
+	/* Check if there's an mnode-mapping that includes fs-name info. */
+	if (root && root != MFILE_PARTS_ANONYMOUS) {
+		if (!ADDR_ISKERN(root))
+			goto badobj;
+		if (!mpart_tree_extract_name(root, p_fspath, p_fsname, pstatus, 16)) {
+			if (*pstatus == OBNOTE_PRINT_STATUS_BADOBJ)
+				goto badobj;
+		}
+	}
+	return true;
+badobj:
+	return false;
+}
+
 PRIVATE NONNULL((1, 3, 4)) ssize_t
 NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
                           KERNEL CHECKED void const *pointer,
@@ -1032,21 +980,11 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 	struct path *file_path = NULL;
 	struct directory_entry *file_dent = NULL;
 	TRY {
-		struct mpart *root;
 		ops = me->mf_ops;
 		if (!ADDR_ISKERN(ops))
 			goto badobj;
-		root = me->mf_parts;
-		/* Check if there's an mnode-mapping that includes fs-name info. */
-		if (root && root != MFILE_PARTS_ANONYMOUS) {
-			if (!ADDR_ISKERN(root))
-				goto badobj;
-			if (!mpart_tree_extract_name(root, &file_path,
-			                             &file_dent, pstatus, 5)) {
-				if (*pstatus == OBNOTE_PRINT_STATUS_BADOBJ)
-					goto badobj;
-			}
-		}
+		if (!mfile_extract_name(me, &file_path, &file_dent, pstatus))
+			goto badobj;
 	} EXCEPT {
 		goto badobj;
 	}
@@ -1072,6 +1010,191 @@ badobj:
 }
 
 
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
+                          KERNEL CHECKED void const *pointer,
+                          unsigned int *__restrict pstatus) {
+	ssize_t result, temp;
+	struct mpart *me = (struct mpart *)pointer;
+	struct path *file_path = NULL;
+	struct directory_entry *file_dent = NULL;
+	struct mfile *file;
+	struct mfile_ops const *file_ops;
+	pos_t minaddr, maxaddr;
+	bool isanon;
+	TRY {
+		unsigned int i;
+		minaddr = me->mp_minaddr;
+		maxaddr = me->mp_maxaddr;
+		if (!IS_ALIGNED(minaddr, PAGESIZE))
+			goto badobj;
+		if (!IS_ALIGNED(maxaddr + 1, PAGESIZE))
+			goto badobj;
+		if (!(minaddr <= maxaddr))
+			goto badobj;
+		file = me->mp_file;
+		if (!ADDR_ISKERN(file))
+			goto badobj;
+		file_ops = file->mf_ops;
+		if (!ADDR_ISKERN(file_ops))
+			goto badobj;
+		isanon = mpart_isanon(me);
+		/* Check if there's an mnode-mapping that includes fs-name info. */
+		for (i = 0; i < COMPILER_LENOF(me->_mp_nodlsts); ++i) {
+			struct mnode *node;
+			LIST_FOREACH (node, &me->_mp_nodlsts[i], mn_link) {
+				if (!ADDR_ISKERN(node))
+					goto badobj;
+				file_path = node->mn_fspath;
+				file_dent = node->mn_fsname;
+				if (file_path && file_dent) {
+					if (!ADDR_ISKERN(file_path))
+						goto badobj;
+					if (!ADDR_ISKERN(file_dent))
+						goto badobj;
+					goto got_all_info;
+				}
+			}
+		}
+		if (!file_path && !file_dent) {
+			if (!mfile_extract_name(file, &file_path, &file_dent, pstatus))
+				goto badobj;
+		}
+	} EXCEPT {
+		goto badobj;
+	}
+got_all_info:
+	result = 0;
+	if (isanon)
+		PRINT("{");
+	if (file_dent) {
+		DO(note_pathpair(printer, arg, file_path, file_dent, pstatus));
+	} else {
+		char const *known_name;
+		char buf[64];
+		known_name = mfile_known_name(file, file_ops, buf);
+		if (known_name) {
+			DO((*printer)(arg, known_name, strlen(known_name)));
+		} else {
+			PRINT("??" "?");
+		}
+	}
+	if (isanon)
+		PRINT("}");
+	PRINTF(":%" PRIxN(__SIZEOF_POS_T__) ""
+	       "-%" PRIxN(__SIZEOF_POS_T__) "",
+	       minaddr, maxaddr);
+	return result;
+err:
+	return temp;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_mfutex)(pformatprinter printer, void *arg,
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus) {
+	ssize_t result, temp;
+	struct mfutex *me = (struct mfutex *)pointer;
+	struct mpart *part;
+	struct path *file_path            = NULL;
+	struct directory_entry *file_dent = NULL;
+	struct mfile *file                = NULL;
+	struct mfile_ops const *file_ops  = NULL;
+	pos_t part_minaddr                = 0;
+	bool isanon                       = false;
+	mpart_reladdr_t part_reladdr;
+	TRY {
+		part         = me->mfu_part.awr_obj;
+		part_reladdr = me->mfu_addr;
+		if (!ADDR_ISKERN(part))
+			goto badobj;
+		if (part->mp_refcnt == 0) {
+			/* Part has been destroyed. */
+			part = NULL;
+		} else {
+			unsigned int i;
+			pos_t part_maxaddr;
+			if (part_reladdr >= mpart_getsize(part))
+				goto badobj;
+			part_minaddr = part->mp_minaddr;
+			part_maxaddr = part->mp_maxaddr;
+			if (!IS_ALIGNED(part_minaddr, PAGESIZE))
+				goto badobj;
+			if (!IS_ALIGNED(part_maxaddr + 1, PAGESIZE))
+				goto badobj;
+			if (!(part_minaddr <= part_maxaddr))
+				goto badobj;
+			file = part->mp_file;
+			if (!ADDR_ISKERN(file))
+				goto badobj;
+			file_ops = file->mf_ops;
+			if (!ADDR_ISKERN(file_ops))
+				goto badobj;
+			isanon = mpart_isanon(part);
+			
+			/* Check if there's an mnode-mapping that includes fs-name info. */
+			for (i = 0; i < COMPILER_LENOF(part->_mp_nodlsts); ++i) {
+				struct mnode *node;
+				LIST_FOREACH (node, &part->_mp_nodlsts[i], mn_link) {
+					if (!ADDR_ISKERN(node))
+						goto badobj;
+					file_path = node->mn_fspath;
+					file_dent = node->mn_fsname;
+					if (file_path && file_dent) {
+						if (!ADDR_ISKERN(file_path))
+							goto badobj;
+						if (!ADDR_ISKERN(file_dent))
+							goto badobj;
+						goto got_all_info;
+					}
+				}
+			}
+			if (!file_path && !file_dent) {
+				if (!mfile_extract_name(file, &file_path, &file_dent, pstatus))
+					goto badobj;
+			}
+		}
+	} EXCEPT {
+		goto badobj;
+	}
+got_all_info:
+	if (!part) {
+		result = format_printf(printer, arg, "<destroyed>+%#" PRIxSIZ,
+		                       part_reladdr);
+	} else {
+		result = 0;
+		if (isanon)
+			PRINT("{");
+		if (file_dent) {
+			DO(note_pathpair(printer, arg, file_path, file_dent, pstatus));
+		} else {
+			char const *known_name;
+			char buf[64];
+			known_name = mfile_known_name(file, file_ops, buf);
+			if (known_name) {
+				DO((*printer)(arg, known_name, strlen(known_name)));
+			} else {
+				PRINT("??" "?");
+			}
+		}
+		if (isanon)
+			PRINT("}");
+		PRINTF("+%#" PRIxN(__SIZEOF_POS_T__),
+		       (pos_t)(part_minaddr + part_reladdr));
+	}
+	return result;
+err:
+	return temp;
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+
 
 PRIVATE struct obnote_entry const notes[] = {
 	{ "ansitty_device", &note_character_device },
@@ -1085,23 +1208,25 @@ PRIVATE struct obnote_entry const notes[] = {
 	{ "file", &note_file },
 	/* TODO: `struct handle'                 (print the contents handle's /proc/self/fd-style link) */
 	{ "keyboard_device", &note_character_device },
+	{ "mbnode", &note_mnode },
+	{ "mfile", &note_mfile },
+	{ "mfutex", &note_mfutex },
+	{ "mman", &note_mman },
+	{ "mnode", &note_mnode },
 	{ "module", &note_module },
 	{ "module_section", &note_module_section },
 	{ "mouse_device", &note_character_device },
+	{ "mpart", &note_mpart },
 	{ "nic_device", &note_character_device },
 	{ "oneshot_directory_file", &note_file },
 	{ "path", &note_path },
 	{ "pty_master", &note_character_device },
 	{ "pty_slave", &note_character_device },
-	{ "ttybase_device", &note_character_device },
 	{ "task", &note_task },
 	{ "taskpid", &note_taskpid },
+	{ "ttybase_device", &note_character_device },
 	{ "userelf_module", &note_module },
 	{ "userelf_module_section", &note_module_section },
-	{ "mnode", &note_mnode },
-	{ "mpart", &note_mpart },
-	{ "mfile", &note_mfile },
-	{ "mman", &note_mman },
 };
 
 

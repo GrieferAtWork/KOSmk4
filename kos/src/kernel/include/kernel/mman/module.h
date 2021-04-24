@@ -270,7 +270,7 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 #ifdef __INTELLISENSE__
 WUNUSED NONNULL((1)) REF struct module_section *(module_locksection)(struct module *__restrict self, USER CHECKED char const *section_name);
 WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struct module *__restrict self, unsigned int section_index);
-WUNUSED NONNULL((1, 3)) __BOOL (FCALL module_sectinfo)(struct module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
+WUNUSED NONNULL((1, 3)) __BOOL (module_sectinfo)(struct module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
 #else /* __INTELLISENSE__ */
 #define module_locksection(self, section_name)            (*(self)->md_ops->mo_locksection)(self, section_name)
 #define module_locksection_index(self, section_index)     (*(self)->md_ops->mo_locksection_index)(self, section_index)

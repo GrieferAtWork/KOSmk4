@@ -136,7 +136,7 @@ mfile_map_init_and_acquire(struct mfile_map *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
 
 /* Same as `mfile_map_init_and_acquire()', but don't acquire an initial lock. */
-FUNDEF NONNULL((1, 2)) void FCALL
+NONNULL((1, 2)) void
 mfile_map_init(struct mfile_map *__restrict self,
                struct mfile *__restrict file,
                PAGEDIR_PAGEALIGNED pos_t addr,
@@ -199,12 +199,13 @@ mfile_map_reflow_or_unlock(struct mfile_map *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_READONLY);
 
 /* Finalize a given mem-node-allocator.
- * This function will  free (and  only free; the  caller is  responsible to  release
- * all of the locks to the individual mem-parts themselves, though for this purpose,
- * `mfile_map_release()'  may   also  be   used)   all  of   the   (still-)allocated
- * mem-nodes,  as  can be  found apart  of the  `self->mfm_nodes' list.  In addition
- * to  freeing all of the container-nodes, this  function will also drop 1 reference
- * from the mem-parts pointed-to by each of the nodes.
+ * This function will free (and  only free; the caller is  responsible
+ * to release all of the locks to the individual mem-parts themselves,
+ * though for this  purpose, `mfile_map_release()' may  also be  used)
+ * all  of the (still-)allocated  mem-nodes, as can  be found apart of
+ * the  `self->mfm_nodes'  list. In  addition  to freeing  all  of the
+ * container-nodes, this function will also drop 1 reference from  the
+ * mem-parts pointed-to by each of the nodes.
  * NOTE: This function doesn't necessarily have to be called if the caller was
  *       able to inherit _all_ of the nodes originally allocated (which should
  *       normally be the case when mapping was successful) */

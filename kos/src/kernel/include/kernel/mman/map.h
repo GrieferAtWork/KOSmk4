@@ -302,18 +302,6 @@ mman_protect(struct mman *__restrict self,
              unsigned int flags DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
-
-/* Sync  all  changes made  to  file mappings  within  the given
- * address range with on-disk file images. (s.a. `mfile_sync()')
- * NOTE: Memory ranges that  aren't actually  mapped, aren't  mapped
- *       with WRITE and SHARED, or aren't mapped to write-back files
- *       are simply ignored. */
-FUNDEF void FCALL
-mman_syncmem(struct mman *__restrict self,
-             UNCHECKED void *addr DFL((void *)0),
-             size_t num_bytes DFL((size_t)-1))
-		THROWS(E_WOULDBLOCK, ...);
-
 DECL_END
 #endif /* __CC__ */
 
