@@ -69,7 +69,7 @@
 #undef MORECORE_CANNOT_TRIM
 #undef NO_SEGMENT_TRAVERSAL
 #define HAVE_MMAP 1
-#define HAVE_MREMAP 0 /* TODO */
+#define HAVE_MREMAP 1
 #define MMAP_CLEARS 1
 #define USE_BUILTIN_FFS 1
 #define USE_DEV_RANDOM 0
@@ -121,14 +121,7 @@
 #endif /* !sched_yield */
 #define mmap(hint, size, prot, flags, fd, offset) sys_mmap(hint, size, prot, flags, fd, offset)
 #define munmap(addr, size)                        sys_munmap(addr, size)
-#if HAVE_MREMAP
-#if __CRT_HAVE_SC(mremap)
-#define mremap(addr, osz, nsz, mv) sys_mremap(addr, osz, nsz, mv)
-#else /* mremap */
-#undef HAVE_MREMAP
-#define HAVE_MREMAP 0
-#endif /* !mremap */
-#endif /* HAVE_MREMAP */
+#define mremap(addr, osz, nsz, mv)                sys_mremap(addr, osz, nsz, mv, 0)
 #endif /* CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS */
 
 #include <__crt.h>
