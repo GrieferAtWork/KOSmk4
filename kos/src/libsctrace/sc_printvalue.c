@@ -479,6 +479,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_epoll_event
 #endif /* HAVE_SC_REPR_STRUCT_EPOLL_EVENT */
 
+#ifdef HAVE_SC_REPR_MREMAP_FLAGS
+#define NEED_print_mremap_flags
+#endif /* HAVE_SC_REPR_MREMAP_FLAGS */
+
 
 
 
@@ -498,6 +502,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_epoll_create1_flags
 #define NEED_print_flagset32
 #endif /* NEED_print_epoll_create1_flags */
+
+#ifdef NEED_print_mremap_flags
+#define NEED_print_flagset32
+#endif /* NEED_print_mremap_flags */
 
 #ifdef NEED_print_pollfds
 #define NEED_print_pollfd
@@ -3769,6 +3777,40 @@ print_epoll_ctl(pformatprinter printer, void *arg,
 
 
 
+#if defined(NEED_print_mremap_flags) || defined(__DEEMON__)
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[16];
+} const mremap_flags[] = {
+	{ MREMAP_MAYMOVE,         "MAYMOVE" },
+	{ MREMAP_FIXED,           "FIXED" },
+#ifdef MREMAP_DONTUNMAP
+	{ MREMAP_DONTUNMAP,       "DONTUNMAP" },
+#endif /* MREMAP_DONTUNMAP */
+	{ MREMAP_32BIT,           "32BIT" },
+	{ MREMAP_GROWSDOWN,       "GROWSDOWN" },
+	{ MREMAP_GROWSUP,         "GROWSUP" },
+	{ MREMAP_POPULATE,        "POPULATE" },
+	{ MREMAP_NONBLOCK,        "NONBLOCK" },
+	{ MREMAP_STACK,           "STACK" },
+	{ MREMAP_FIXED_NOREPLACE, "FIXED_NOREPLACE" },
+	{ MREMAP_NOASLR,          "NOASLR" },
+	{ 0, "" }
+};
+
+PRIVATE ssize_t CC
+print_mremap_flags(pformatprinter printer, void *arg,
+                   syscall_ulong_t flags) {
+	return print_flagset32(printer, arg, mremap_flags,
+	                       sizeof(*mremap_flags),
+	                       "MREMAP_", flags);
+}
+#endif /* NEED_print_mremap_flags */
+
+
+
+
+
 
 
 
@@ -3940,6 +3982,12 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS
 /*[[[end]]]*/
+
+#ifdef HAVE_SC_REPR_MREMAP_FLAGS
+	case SC_REPR_MREMAP_FLAGS:
+		result = print_mremap_flags(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_MREMAP_FLAGS */
 
 #ifdef HAVE_SC_REPR_EPOLL_OP
 	case SC_REPR_EPOLL_OP:

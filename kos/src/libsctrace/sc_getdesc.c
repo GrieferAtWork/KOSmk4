@@ -40,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/unaligned.h>
 
 #include <compat/config.h>
+#include <sys/mman.h>
 
 #include <fcntl.h>
 #include <stdbool.h>
@@ -547,6 +548,17 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 			break;
 #endif /* __NR(32|64)_openat */
 
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4 ? defined(__NR32_mremap) : defined(__NR64_mremap)
+		case COMPAT_NR(mremap):
+			/* sys_mremap() ignores the 5th argument when the FIXED flag isn't given */
+			if (desc->sc_argc == 5 &&
+			    !(desc->sc_argv[3].sa_value.sv_u64 & MREMAP_FIXED))
+				desc->sc_argc = 4;
+			break;
+#endif /* __NR(32|64)_mremap */
+
+		default:
+			break;
 		}
 	} else
 #endif /* __ARCH_HAVE_COMPAT */
@@ -572,6 +584,15 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 				desc->sc_argc = 3;
 			break;
 #endif /* __NR_openat */
+
+#ifdef __NR_mremap
+		case __NR_mremap:
+			/* sys_mremap() ignores the 5th argument when the FIXED flag isn't given */
+			if (desc->sc_argc == 5 &&
+			    !(desc->sc_argv[3].sa_value.sv_u64 & MREMAP_FIXED))
+				desc->sc_argc = 4;
+			break;
+#endif /* __NR_mremap */
 
 		default:
 			break;
