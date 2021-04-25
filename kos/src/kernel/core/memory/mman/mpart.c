@@ -155,7 +155,7 @@ NOTHROW(FCALL mpart_destroy_postlop_rmall_async)(struct postlockop *__restrict s
 	mpart_free(me);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+INTERN NOBLOCK NONNULL((1)) struct postlockop * /* INTERN: Used in "mnode-merge.c" */
 NOTHROW(FCALL mpart_destroy_lop_rmall_async)(struct lockop *__restrict self) {
 	struct postlockop *plop;
 	struct mpart *me;

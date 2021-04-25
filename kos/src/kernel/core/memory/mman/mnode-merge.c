@@ -31,6 +31,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/printk.h>
@@ -1108,6 +1109,69 @@ NOTHROW(FCALL mpart_lock_all_mmans_after)(struct mpart const *__restrict self,
 }
 
 
+#define mpart_destroy_lockop_encode(prt) ((struct lockop *)&(prt)->mp_blkst_ptr)
+#define mpart_destroy_lockop_decode(lop) container_of((uintptr_t **)(lop), struct mpart, mp_blkst_ptr)
+INTDEF NOBLOCK NONNULL((1)) struct postlockop * /* From "mpart.c" */
+NOTHROW(FCALL mpart_destroy_lop_rmall_async)(struct lockop *__restrict self);
+
+/* See description below... */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_merge_all_parts_including)(struct mpart *__restrict part_to_merge);
+
+/* Allocate kmalloc()-memory (GFP_LOCKED), but if this allocation fails,
+ * make  it so that `orig_part' will be  merged once again the next time
+ * lockops of the kernel mman are reaped, before re-attempting the alloc
+ * a second time.
+ * Only if both attempts fail, `NULL' is returned. */
+PRIVATE NOBLOCK ATTR_MALLOC NONNULL((2)) void *
+NOTHROW(FCALL merge_malloc)(size_t num_bytes, struct mpart *__restrict orig_part) {
+	void *result;
+	result = kmalloc_nx(num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	if (!result) {
+		async_merge_all_parts_including(orig_part);
+		result = kmalloc_nx(num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	}
+	return result;
+}
+
+
+/* Transfer the given `tree' into `dst', updating futex
+ * objects  to by incrementing `mfu_addr' by `addroff',
+ * and setting `newpart' as `mfu_part' */
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL mpartmeta_transfer_futex_tree)(struct mpartmeta *__restrict dst,
+                                             struct mfutex *__restrict tree,
+                                             struct mpart *__restrict newpart,
+                                             size_t addroff) {
+	struct mfutex *lo, *hi;
+again:
+	lo = tree->mfu_mtaent.rb_lhs;
+	hi = tree->mfu_mtaent.rb_rhs;
+
+	/* Update this futex object. */
+	tree->mfu_addr += addroff;
+	awref_set(&tree->mfu_part, newpart);
+
+	/* Re-insert the new part's futex-tree. */
+	mpartmeta_ftx_insert(dst, tree);
+
+	/* Recursively iterate the entire tree. */
+	if (lo) {
+		if (hi)
+			mpartmeta_transfer_futex_tree(dst, hi, newpart, addroff);
+		tree = lo;
+		goto again;
+	}
+	if (hi) {
+		tree = hi;
+		goto again;
+	}
+
+}
+
+
+
+
 /* Merge the 2 given parts.
  *    @assume(mpart_canmerge(lopart, hipart));
  *    @assume(mpart_lock_acquired(lopart));
@@ -1133,108 +1197,219 @@ PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
 NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct mpart *lopart,
                                             /*inherit(on_success)*/ REF struct mpart *hipart,
                                             struct mpart *orig_part) {
-	/* TODO: If lopart/hipart aren't anonymous, remove them from their file */
+#if 1
+	size_t losize = mpart_getsize(lopart);
+	assert_assume(lopart->mp_file == hipart->mp_file);
+	if (!mpart_isanon(lopart)) {
+		mpart_tree_removenode(&lopart->mp_file->mf_parts, lopart);
+		mpart_tree_removenode(&lopart->mp_file->mf_parts, hipart);
+	}
 
-	/* TODO: If  either of the  2 parts is MPART_ST_SWP[_SC],  bring the part into
-	 *       the core, using an async read-from-swap operation (such functionality
-	 *       doesn't exist at the moment, though...) */
+	/* Check if we must allocate a meta-controller for `lopart'. */
+	if (hipart->mp_meta && !lopart->mp_meta &&
+	    (hipart->mp_meta->mpm_ftx != NULL ||
+#ifdef ARCH_HAVE_RTM
+	     hipart->mp_meta->mpm_rtm_vers != 0 ||
+#endif /* ARCH_HAVE_RTM */
+	     0)) {
+		/* Must allocate the meta-controller for `lopart' */
+		struct mpartmeta *meta;
+		meta = (struct mpartmeta *)merge_malloc(sizeof(struct mpartmeta), orig_part);
+		if unlikely(!meta)
+			return MPART_MERGE_ASYNC_WAITFOR;
+		mpartmeta_init(meta);
+		lopart->mp_meta = meta;
+	}
 
-	/* TODO: If exactly one of the 2 parts is `MPART_ST_VOID', try to allocate
-	 *       its backing data. */
+	/* Check how much memory will be required to represent the
+	 * new  (merged)  block status  bitset, and  if necessary,
+	 * (re-)allocate more memory for `lopart' to hold it! */
+	if (lopart->mp_blkst_ptr != NULL || hipart->mp_blkst_ptr != NULL ||
+	    (lopart->mp_flags & MPART_F_BLKST_INL) ||
+	    (hipart->mp_flags & MPART_F_BLKST_INL)) {
+		size_t total_bytes, total_blocks, lo_blocks;
+		total_bytes  = (size_t)(hipart->mp_maxaddr - lopart->mp_minaddr) + 1;
+		total_blocks = total_bytes >> lopart->mp_file->mf_blockshift;
+		lo_blocks    = losize >> lopart->mp_file->mf_blockshift;
+		if (total_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
+			/* The combination of the 2 parts still fits into the inline bitset. */
+			mpart_blkst_word_t loword, hiword;
+			unsigned int loshift;
+			loword = lopart->mp_blkst_inl;
+			if unlikely(!(lopart->mp_flags & MPART_F_BLKST_INL)) {
+				loword = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
+				if (lopart->mp_blkst_ptr != NULL) {
+					loword = lopart->mp_blkst_ptr[0];
+					kfree(lopart->mp_blkst_ptr);
+				}
+				ATOMIC_OR(lopart->mp_flags, MPART_F_BLKST_INL);
+			}
+			hiword = hipart->mp_blkst_inl;
+			if unlikely(!(hipart->mp_flags & MPART_F_BLKST_INL)) {
+				hiword = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
+				if (hipart->mp_blkst_ptr != NULL)
+					hiword = hipart->mp_blkst_ptr[0];
+			}
+			loshift = (unsigned int)(lo_blocks * MPART_BLOCK_STBITS);
+			loword &= ((mpart_blkst_word_t)1 << loshift) - 1;
+			loword |= hiword << loshift;
+			lopart->mp_blkst_inl = loword;
+		} else {
+			/* TODO: Merge dynamically allocated (multi-word) bitsets. */
+			return MPART_MERGE_CANNOT_MERGE;
+		}
+	}
 
-	/* TODO: If the 2 parts combined  need a heap-allocated block-status  bitset,
-	 *       and neither of  the 2  parts already have  a heap-allocated  bitset,
-	 *       such that `kmalloc_usable_size()'  is already  large enough,  either
-	 *       krealloc_nx(GFP_ATOMIC) (if one of the 2 parts already has a bitset,
-	 *       in which case  the larger of  the 2  is used for  this realloc),  or
-	 *       kmalloc_nx(GFP_ATOMIC) a new bitset of sufficient size. */
+	/* Merge mem-part backing data. */
+	if likely(MPART_ST_INMEM(lopart->mp_state) &&
+	          MPART_ST_INMEM(hipart->mp_state)) {
+		/* Merge physical memory
+		 * Also: If  memory between the end of `lopart' and the start of
+		 *       `hipart' isn't continuous, try to allocate physical ram
+		 *       the size of the smaller of the 2 parts such that it  is
+		 *       continuous  with the other (larger) part, prepare() all
+		 *       of the page directory locations that map the smaller of
+		 *       the 2 parts.
+		 *       ...
+		 *       Continue on  to replace  the  backing storage  of  the
+		 *       smaller of the 2 parts with the new physical location,
+		 *       thus eventually allowing the larger part to be  linear
+		 *       with the smaller part's physical backing memory. */
+		/* TODO */
+		return MPART_MERGE_CANNOT_MERGE;
+	} else if ((lopart->mp_state == MPART_ST_VOID && hipart->mp_state == MPART_ST_VOID) ||
+#ifdef LIBVIO_CONFIG_ENABLED
+	           (lopart->mp_state == MPART_ST_VIO && hipart->mp_state == MPART_ST_VIO) ||
+#endif /* LIBVIO_CONFIG_ENABLED */
+	           0) {
+		/* Nothing to do here.... */
+	} else {
+		/* TODO: If exactly one of the 2 parts is `MPART_ST_VOID', try to allocate
+		 *       its backing data. */
 
-	/* TODO: Merge backing data of the 2 parts based on their state:
-	 *       if (lopart->mp_state == MPART_ST_VOID &&
-	 *           hipart->mp_state == MPART_ST_VOID) {
-	 *           // Nothing to do...
-	 *       } else if (lopart->mp_state == MPART_ST_VIO &&
-	 *                  hipart->mp_state == MPART_ST_VIO)  {
-	 *           // Nothing to do...
-	 *       } else if (MPART_ST_INMEM(lopart->mp_state) &&
-	 *                  MPART_ST_INMEM(hipart->mp_state)) {
-	 *           // Merge physical memory
-	 *           // Also: If  memory between the end of `lopart' and the start of
-	 *           //       `hipart' isn't continuous, try to allocate physical ram
-	 *           //       the size of the smaller of the 2 parts such that it  is
-	 *           //       continuous  with the other (larger) part, prepare() all
-	 *           //       of the page directory locations that map the smaller of
-	 *           //       the 2 parts.
-	 *           //       ...
-	 *           //       Continue on  to replace  the  backing storage  of  the
-	 *           //       smaller of the 2 parts with the new physical location,
-	 *           //       thus eventually allowing the larger part to be  linear
-	 *           //       with the smaller part's physical backing memory.
-	 *       } else {
-	 *           return MPART_MERGE_CANNOT_MERGE;
-	 *       } */
+		/* TODO: If  either of the  2 parts is MPART_ST_SWP[_SC],  bring the part into
+		 *       the core, using an async read-from-swap operation (such functionality
+		 *       doesn't exist at the moment, though...) */
 
-	/* TODO: >> if (!lopart->mp_meta) {
-	 *       >>     // Only if `ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)' will succeed.
-	 *       >>     // Otherwise, must create a new mpartmeta controller, or simply
-	 *       >>     // expand `hipart' downwards, rather than `lopart' upwards...
-	 *       >>     lopart->mp_meta = hipart->mp_meta;
-	 *       >>     hipart->mp_meta = NULL;
-	 *       >>     if (lopart->mp_meta) {
-	 *       >>         lopart->mp_meta->mpm_ftx.each->mfu_part = lopart;
-	 *       >>         lopart->mp_meta->mpm_ftx.each->mfu_addr += OLD_SIZE_OF_LOPART;
-	 *       >>     }
-	 *       >> } else if (hipart->mp_meta) {
-	 *       >>     if (lopart->mp_meta->mpm_rtm_vers < hipart->mp_meta->mpm_rtm_vers)
-	 *       >>         lopart->mp_meta->mpm_rtm_vers = hipart->mp_meta->mpm_rtm_vers;
-	 *       >>     hipart->mp_meta->mpm_ftx.each->mfu_part = lopart;
-	 *       >>     hipart->mp_meta->mpm_ftx.each->mfu_addr += OLD_SIZE_OF_LOPART;
-	 *       >>     mpartmeta_ftx_insert(lopart->mp_meta, hipart->mp_meta->mpm_ftx.each);
-	 *       >> } */
+		/* Unsupported mem-part-state combination (don't merge) */
+		return MPART_MERGE_CANNOT_MERGE;
+	}
 
-	/* TODO: >> if (ATOMIC_FETCHAND(hipart->mp_flags, ~MPART_F_GLOBAL_REF)) {
-	 *       >>     if (LIST_ISBOUND(lopart, mp_allparts) && !(lopart->mp_flags & MPART_F_GLOBAL_REF)) {
-	 *       >>         incref(lopart);
-	 *       >>         if (ATOMIC_FETCHOR(lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
-	 *       >>             decref_nokill(lopart);
-	 *       >>     }
-	 *       >>     decref_nokill(hipart);
-	 *       >> } */
+	/* === Point of no return */
 
-	/* TODO: Update mem-nodes from `hipart' to reference `lopart' at the proper offsets. */
+	if (hipart->mp_meta) {
+		struct mpartmeta *lometa, *himeta;
+		lometa = lopart->mp_meta;
+		himeta = hipart->mp_meta;
+		assert(lometa); /* Was allocated above, if missing. */
+#ifdef ARCH_HAVE_RTM
+		if (lometa->mpm_rtm_vers < himeta->mpm_rtm_vers)
+			lometa->mpm_rtm_vers = himeta->mpm_rtm_vers;
+#endif /* ARCH_HAVE_RTM */
+		/* Transfer futex objects (if any). */
+		if (himeta->mpm_ftx != NULL) {
+			mpartmeta_transfer_futex_tree(lometa,
+			                              himeta->mpm_ftx,
+			                              lopart,
+			                              losize);
+		}
+	}
 
-	/* TODO: >> if (ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)) {
-	 *       >>     mpart_destroy(hipart); // But don't destroy data that's been stolen by `lopart'!
-	 *       >> } else {
-	 *       >>     // Update to reflect all of the data that's been stolen by `lopart'
-	 *       >>     hipart->mp_minaddr = PAGESIZE;
-	 *       >>     hipart->mp_maxaddr = PAGESIZE - 1;
-	 *       >>     hipart->mp_blkst_ptr = NULL;
-	 *       >>     hipart->mp_flags &= ~(MPART_F_BLKST_INL | MPART_F_GLOBAL_REF);
-	 *       >>     hipart->mp_flags &= ~MPART_F_GLOBAL_REF;
-	 *       >>     decref_nokill(hipart->mp_file); // Nokill, because `lopart' still has a REF!
-	 *       >>     hipart->mp_file = incref(&mfile_anon[...]);
-	 *       >>     _mpart_init_asanon(hipart);
-	 *       >>     LIST_INIT(&hipart->mp_copy);
-	 *       >>     LIST_INIT(&hipart->mp_share);
-	 *       >>     if (hipart->mp_meta) {
-	 *       >>         ++hipart->mp_meta->mpm_rtm_vers;
-	 *       >>         mpartmeta_ftxlock_endwrite(hipart->mp_meta);
-	 *       >>     }
-	 *       >>     mpart_lock_release(hipart);
-	 *       >>     decref_unlikely(hipart);
-	 *       >> } */
+	/* Update mem-nodes from `hipart' to reference `lopart' at the proper offsets. */
+	{
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(hipart->_mp_nodlsts); ++i) {
+			struct mnode *node, *next;
+			for (node = LIST_FIRST(&hipart->_mp_nodlsts[i]);
+			     node; node = next) {
+				next = LIST_NEXT(node, mn_link);
 
-	/* TODO: If lopart wasn't anonymous originally, re-insert it to its file's part-tree. */
+				/* Update the part/partoff fields of this node. */
+				assert(node->mn_part == hipart);
+				decref_nokill(hipart);
+				node->mn_part = incref(lopart);
+				node->mn_partoff += losize;
 
-	/* TODO: Return `lopart' */
+				/* Re-insert the node into the proper node-list of `lopart' */
+				LIST_INSERT_HEAD(&lopart->_mp_nodlsts[i], node, mn_link);
+			}
+		}
+	}
 
+	/* Update the maxaddr field of `lopart'. */
+	lopart->mp_maxaddr = hipart->mp_maxaddr;
+
+	/* Deal with `hipart' having the GLOBAL_REF bit set. */
+	if (ATOMIC_FETCHAND(hipart->mp_flags, ~MPART_F_GLOBAL_REF)) {
+		if (LIST_ISBOUND(lopart, mp_allparts) && !(lopart->mp_flags & MPART_F_GLOBAL_REF)) {
+			incref(lopart);
+			if (ATOMIC_FETCHOR(lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+				decref_nokill(lopart);
+		}
+		decref_nokill(hipart);
+	}
+
+	/* Destroy `hipart' */
+	decref_nokill(hipart->mp_file); /* Nokill, because `lopart' still has a REF! */
+	if (ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)) {
+		mpart_destroy(hipart);
+		if (LIST_ISBOUND(hipart, mp_allparts)) {
+			/* Must remove from the global list of all known parts. */
+			if (mpart_all_tryacquire()) {
+				LIST_REMOVE(hipart, mp_allparts);
+				mpart_all_release();
+			} else {
+				struct lockop *lop;
+				lop          = mpart_destroy_lockop_encode(hipart);
+				lop->lo_func = &mpart_destroy_lop_rmall_async;
+				SLIST_ATOMIC_INSERT(&mpart_all_lops, lop, lo_link);
+				_mpart_all_reap();
+				goto done_destroy_hipart;
+			}
+		}
+		decref_nokill(hipart->mp_file);
+		mpart_free(hipart);
+	} else {
+		/* Update to reflect all of the data that's been stolen by `lopart' */
+		hipart->mp_minaddr   = (pos_t)PAGESIZE;
+		hipart->mp_maxaddr   = (pos_t)(PAGESIZE - 1);
+		hipart->mp_blkst_ptr = NULL;
+		ATOMIC_AND(hipart->mp_flags, ~MPART_F_BLKST_INL);
+		hipart->mp_file = incref(&mfile_anon[lopart->mp_file->mf_blockshift]);
+		_mpart_init_asanon(hipart);
+		LIST_INIT(&hipart->mp_copy);
+		LIST_INIT(&hipart->mp_share);
+		if (hipart->mp_meta) {
+			/* Increment the RTM version field. This way, anyone that may be
+			 * monitoring `hipart' for RTM changes will know that  something
+			 * has changed. In this case  that ~something~ isn't the  actual
+			 * data, but the  fact that  `hipart' is no  longer the  correct
+			 * place to look at when it  comes to RTM version values,  since
+			 * `lopart' now serves as the  combined back-bone of itself  and
+			 * what used to be `hipart'.
+			 * By incrementing the version field, we essentially force any
+			 * in-progress RTM operation to be re-started, at which  point
+			 * it should then re-run in the context of `lopart'! */
+#ifdef ARCH_HAVE_RTM
+			++hipart->mp_meta->mpm_rtm_vers;
+#endif /* ARCH_HAVE_RTM */
+			mpartmeta_ftxlock_endwrite(hipart->mp_meta, hipart);
+		}
+		mpart_lock_release(hipart);
+		/* Drop the reference that was originally given to us by the caller. */
+		decref_unlikely(hipart);
+	}
+done_destroy_hipart:
+	if (!mpart_isanon(lopart))
+		mpart_tree_insert(&lopart->mp_file->mf_parts, lopart);
+	return lopart;
+#else
 	(void)lopart;
 	(void)hipart;
 	(void)orig_part;
 	COMPILER_IMPURE();
-
 	return MPART_MERGE_CANNOT_MERGE;
+#endif
 }
 
 
@@ -1620,15 +1795,9 @@ NOTHROW(FCALL async_waitfor_part_and_mergepart)(struct mpart *part_to_wait,
 	assert(mpart_lock_acquired(part_to_merge));
 	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
 		return false;
-	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-	if (!lop) {
-		async_merge_all_parts_including(part_to_merge);
-		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-		if (!lop)
-			return false; /* Merging will be done asynchronously. */
-	}
+	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
+	if (!lop)
+		return false; /* Merging will be done asynchronously. */
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_part_lop.olo_func = &async_merge_part_cb;
@@ -1673,15 +1842,9 @@ NOTHROW(FCALL async_waitfor_ftxlck_and_mergepart)(struct mpart *part_to_wait,
 	assert(mpart_lock_acquired(part_to_merge));
 	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
 		return false;
-	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-	if (!lop) {
-		async_merge_all_parts_including(part_to_merge);
-		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-		if (!lop)
-			return false; /* Merging will be done asynchronously. */
-	}
+	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
+	if (!lop)
+		return false; /* Merging will be done asynchronously. */
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_part_lop.olo_func = &async_merge_ftxlck_cb;
@@ -1731,15 +1894,9 @@ NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
 	assert(mpart_lock_acquired(part_to_merge));
 	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
 		return false;
-	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-	if (!lop) {
-		async_merge_all_parts_including(part_to_merge);
-		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-		if (!lop)
-			return false; /* Merging will be done asynchronously. */
-	}
+	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
+	if (!lop)
+		return false; /* Merging will be done asynchronously. */
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_file_lop.olo_func = &async_merge_file_cb;
@@ -1789,15 +1946,9 @@ NOTHROW(FCALL async_waitfor_mman_and_mergepart)(struct mman *mman_to_wait,
 	assert(mpart_lock_acquired(part_to_merge));
 	if (ATOMIC_FETCHOR(part_to_merge->mp_flags, _MPART_F_WILLMERGE) & _MPART_F_WILLMERGE)
 		return false;
-	lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-	                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-	if (!lop) {
-		async_merge_all_parts_including(part_to_merge);
-		lop = (struct async_merge_part *)kmalloc_nx(sizeof(struct async_merge_part),
-		                                            GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-		if (!lop)
-			return false; /* Merging will be done asynchronously. */
-	}
+	lop = (struct async_merge_part *)merge_malloc(sizeof(struct async_merge_part), part_to_merge);
+	if (!lop)
+		return false; /* Merging will be done asynchronously. */
 	/* Insert the newly created lock-op. */
 	lop->amp_mergeme           = incref(part_to_merge);
 	lop->amp_mman_lop.olo_func = &async_merge_mman_cb;
