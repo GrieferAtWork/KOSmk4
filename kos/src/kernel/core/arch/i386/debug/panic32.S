@@ -127,7 +127,7 @@ PUBLIC_FUNCTION(kernel_panic)
 	movl   %esp, %ecx                       /* struct ucpustate *state */
 	movl   (SIZEOF_UCPUSTATE+0)(%esp), %edx /* char const *format */
 	leal   (SIZEOF_UCPUSTATE+4)(%esp), %eax /* va_list args */
-	pushl_cfi %eax                          /* va_list args */
+	pushl_cfi %eax                          /* ... */
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
 	nop /* For tracebacks... */

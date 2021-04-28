@@ -292,9 +292,10 @@ PUBLIC_FUNCTION(kernel_panic_n)
 	leaq   (8 * 4)(%rsp), %rsi /* struct ucpustate *__restrict state */
 //	movq   %rdi, %rdi          /* unsigned int n_skip */
 
-	/* `rsa_rdi' is already consumed by `char const *format' */
+	/* `rsa_rdi' is already consumed by `unsigned int n_skip' */
+	/* `rsa_rsi' is already consumed by `char const *format' */
 	/* x86_64_va_list_struct */
-	leaq   -8(%rsp), %rax
+	leaq   -16(%rsp), %rax
 	pushq_cfi %rax   /* vl_reg_save_area */
 	leaq   (8 + (8 * 4) + SIZEOF_UCPUSTATE)(%rsp), %rax
 	pushq_cfi %rax   /* vl_overflow_arg_area */
