@@ -649,7 +649,7 @@ PUBLIC struct timespec boottime_ = { 0, 0 };
 
 /* Convert a given ktime timestamp into a `struct timespec'.
  * This  is done  by adding  `boottime' to  the given value. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE struct timespec
+PUBLIC NOBLOCK WUNUSED ATTR_CONST struct timespec
 NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
 	struct timespec result;
 	result.tv_sec  = (time_t)(t / NSEC_PER_SEC);
@@ -665,7 +665,7 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
  *       to represent  a ktime-timestamp  that  happened before  the  system
  *       goto booted.
  * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
- *       that  the return  value would overflow,  the value is  clamed to the
+ *       that  the return value  would overflow, the value  is clamped to the
  *       maximum possible value of `KTIME_INFINITE' */
 PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
 NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp) {
