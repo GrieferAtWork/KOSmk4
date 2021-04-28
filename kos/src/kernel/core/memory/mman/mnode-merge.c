@@ -40,10 +40,19 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 DECL_BEGIN
+
+#ifndef NDEBUG
+#define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
+#else /* !NDEBUG */
+#define DBG_memset(dst, byte, num_bytes) (void)0
+#endif /* NDEBUG */
 
 /* Check if 2 range overlap. */
 #define RANGES_OVERLAP(r1_min, r1_max, r2_min, r2_max) \
@@ -222,6 +231,19 @@ NOTHROW(FCALL mpart_canmerge)(struct mpart *lopart,
 		goto nope;
 	if (!mpart_canmerge_chkdma(hipart))
 		goto nope;
+
+	/* The combined size of the 2 parts (as would be the result if
+	 * we _did_ end up merging them) mustn't exceed what fits into
+	 * a `size_t'! */
+#if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
+	{
+		pos_t losize, hisize;
+		losize = (lopart->mp_maxaddr - lopart->mp_minaddr) + 1;
+		hisize = (hipart->mp_maxaddr - hipart->mp_minaddr) + 1;
+		if unlikely((losize + hisize) > (pos_t)SIZE_MAX)
+			goto nope;
+	}
+#endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 
 	return true;
 nope:
@@ -522,6 +544,7 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 	mman_mappings_insert(lonode->mn_mman, lonode);
 
 	/* Destroy the no-longer-used hinode. */
+	decref_nokill(hinode->mn_part);
 	mnode_free(hinode);
 	return lonode;
 }
@@ -538,6 +561,19 @@ NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpa
                                           /*inherit(on_success)*/ REF struct mpart *hipart,
                                           struct mman *__restrict locked_mman,
                                           struct mpart *orig_part);
+
+
+#ifndef NDEBUG
+/* Return the total # of bytes mapped by the given chunk-vec. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t
+NOTHROW(FCALL mchunkvec_getsize)(struct mchunk const *__restrict vec, size_t cnt) {
+	size_t i, result = 0;
+	for (i = 0; i < cnt; ++i)
+		result += vec[i].mc_size;
+	return result * PAGESIZE;
+}
+#endif /* !NDEBUG */
+
 
 /* Merge the 2 given nodes.
  *    @assume(WAS_TRUE_AFTER_MMAN_LOCK(mnode_canmerge(lonode, hinode)));
@@ -583,19 +619,19 @@ merge_identical_parts:
 	/* Try to merge `part' with `other_part' */
 	{
 		REF struct mpart *lopart, *hipart;
-		REF struct mpart *merged_part;
-		lopart      = incref(lonode->mn_part);
-		hipart      = incref(hinode->mn_part);
-		merged_part = mpart_domerge_with_mm_lock(lopart, hipart, lonode->mn_mman, part);
-		if (merged_part == MPART_MERGE_CANNOT_MERGE ||
-		    merged_part == MPART_MERGE_ASYNC_WAITFOR) {
+		REF struct mpart *merged;
+		lopart = incref(lonode->mn_part);
+		hipart = incref(hinode->mn_part);
+		merged = mpart_domerge_with_mm_lock(lopart, hipart, lonode->mn_mman, part);
+		if (merged == MPART_MERGE_CANNOT_MERGE ||
+		    merged == MPART_MERGE_ASYNC_WAITFOR) {
 			/* Merging will be performed asynchronously, or merging isn't possible. */
 			assert(lopart == lonode->mn_part);
 			assert(hipart == hinode->mn_part);
 			decref_nokill(lopart);
 			decref_nokill(hipart);
 			mpart_lock_release(other_part);
-			if (merged_part == MPART_MERGE_CANNOT_MERGE)
+			if (merged == MPART_MERGE_CANNOT_MERGE)
 				return MNODE_MERGE_CANNOT_MERGE;
 			return MNODE_MERGE_ASYNC_WAITFOR;
 		}
@@ -609,9 +645,20 @@ merge_identical_parts:
 		 * and both of the parts should now be referencing the same
 		 * `merged_part' (meaning that we can loop back to the case
 		 * of merging 2 nodes mapping the same mem-part) */
-		assert(lonode->mn_part == merged_part);
-		assert(hinode->mn_part == merged_part);
-		decref_nokill(merged_part); /* The reference returned by `mpart_domerge_with_mm_lock()' */
+		assert(lonode->mn_part == merged);
+		assert(hinode->mn_part == merged);
+#ifndef NDEBUG
+		assertf(merged->mp_state != MPART_ST_MEM_SC ||
+		        mchunkvec_getsize(merged->mp_mem_sc.ms_v,
+		                          merged->mp_mem_sc.ms_c) ==
+		        mpart_getsize(merged),
+		        "mchunkvec_getsize(): %#" PRIxSIZ "\n"
+		        "mpart_getsize():     %#" PRIxSIZ,
+		        mchunkvec_getsize(merged->mp_mem_sc.ms_v,
+		                          merged->mp_mem_sc.ms_c),
+		        mpart_getsize(merged));
+#endif /* !NDEBUG */
+		decref_nokill(merged); /* The reference returned by `mpart_domerge_with_mm_lock()' */
 		goto merge_identical_parts;
 	}
 }
@@ -870,25 +917,35 @@ NOTHROW(FCALL mnode_trymerge_with_partlock)(struct mnode *__restrict self,
 		goto done_decref_unlock;
 
 	if ((neighbor = mnode_tree_prevnode(self)) != NULL && mnode_canmerge(neighbor, self)) {
+		assert(self->mn_part == *p_part);
 		merged = mnode_domerge_with_part_lock(neighbor, self, *p_part);
 		if unlikely(merged == MNODE_MERGE_ASYNC_WAITFOR)
 			goto done_decref_unlock;
 		if (merged != MNODE_MERGE_CANNOT_MERGE) {
+			result = true; /* Successfully merged! */
+			self   = merged;
+update_p_part_after_prev:
 			decref_unlikely(*p_part);
-			*p_part = incref(merged->mn_part);
-			result  = true; /* Successfully merged! */
-			self    = merged;
+			*p_part = incref(self->mn_part);
+		} else if (self->mn_part != *p_part) {
+			/* Even if nodes couldn't be merged, the backing parts may still have been... */
+			goto update_p_part_after_prev;
 		}
 	}
 	if ((neighbor = mnode_tree_nextnode(self)) != NULL && mnode_canmerge(self, neighbor)) {
+		assert(self->mn_part == *p_part);
 		merged = mnode_domerge_with_part_lock(self, neighbor, *p_part);
 		if unlikely(merged == MNODE_MERGE_ASYNC_WAITFOR)
 			goto done_decref_unlock;
 		if (merged != MNODE_MERGE_CANNOT_MERGE) {
+			result = true; /* Successfully merged! */
+			self   = merged;
+update_p_part_after_next:
 			decref_unlikely(*p_part);
-			*p_part = incref(merged->mn_part);
-			result  = true; /* Successfully merged! */
-			/*self  = merged;*/
+			*p_part = incref(self->mn_part);
+		} else if (self->mn_part != *p_part) {
+			/* Even if nodes couldn't be merged, the backing parts may still have been... */
+			goto update_p_part_after_next;
 		}
 	}
 
@@ -1134,6 +1191,18 @@ NOTHROW(FCALL merge_malloc)(size_t num_bytes, struct mpart *__restrict orig_part
 	return result;
 }
 
+PRIVATE NOBLOCK ATTR_MALLOC NONNULL((3)) void *
+NOTHROW(FCALL merge_realloc)(void *ptr, size_t num_bytes,
+                             struct mpart *__restrict orig_part) {
+	void *result;
+	result = krealloc_nx(ptr, num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	if (!result) {
+		async_merge_all_parts_including(orig_part);
+		result = krealloc_nx(ptr, num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+	}
+	return result;
+}
+
 
 /* Transfer the given `tree' into `dst', updating futex
  * objects  to by incrementing `mfu_addr' by `addroff',
@@ -1166,8 +1235,9 @@ again:
 		tree = hi;
 		goto again;
 	}
-
 }
+
+
 
 
 
@@ -1197,9 +1267,10 @@ PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
 NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct mpart *lopart,
                                             /*inherit(on_success)*/ REF struct mpart *hipart,
                                             struct mpart *orig_part) {
-#if 1
 	size_t losize = mpart_getsize(lopart);
 	assert_assume(lopart->mp_file == hipart->mp_file);
+
+	/* Remove with parts from the associated file. (if not anon) */
 	if (!mpart_isanon(lopart)) {
 		mpart_tree_removenode(&lopart->mp_file->mf_parts, lopart);
 		mpart_tree_removenode(&lopart->mp_file->mf_parts, hipart);
@@ -1216,7 +1287,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		struct mpartmeta *meta;
 		meta = (struct mpartmeta *)merge_malloc(sizeof(struct mpartmeta), orig_part);
 		if unlikely(!meta)
-			return MPART_MERGE_ASYNC_WAITFOR;
+			goto err_async_waitfor;
 		mpartmeta_init(meta);
 		lopart->mp_meta = meta;
 	}
@@ -1228,7 +1299,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	    (lopart->mp_flags & MPART_F_BLKST_INL) ||
 	    (hipart->mp_flags & MPART_F_BLKST_INL)) {
 		size_t total_bytes, total_blocks, lo_blocks;
-		total_bytes  = (size_t)(hipart->mp_maxaddr - lopart->mp_minaddr) + 1;
+		total_bytes  = losize + mpart_getsize(hipart);
 		total_blocks = total_bytes >> lopart->mp_file->mf_blockshift;
 		lo_blocks    = losize >> lopart->mp_file->mf_blockshift;
 		if (total_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
@@ -1256,7 +1327,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 			lopart->mp_blkst_inl = loword;
 		} else {
 			/* TODO: Merge dynamically allocated (multi-word) bitsets. */
-			return MPART_MERGE_CANNOT_MERGE;
+			goto err_cannot_merge;
 		}
 	}
 
@@ -1275,8 +1346,211 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		 *       smaller of the 2 parts with the new physical location,
 		 *       thus eventually allowing the larger part to be  linear
 		 *       with the smaller part's physical backing memory. */
-		/* TODO */
-		return MPART_MERGE_CANNOT_MERGE;
+		struct mchunk *lovec, *hivec;
+		size_t locnt, hicnt;
+		locnt = 1;
+		lovec = &lopart->mp_mem;
+		if (MPART_ST_SCATTER(lopart->mp_state)) {
+			locnt = lopart->mp_mem_sc.ms_c;
+			lovec = lopart->mp_mem_sc.ms_v;
+			assert(locnt >= 1);
+			if unlikely(locnt == 1) {
+				/* Simplify... */
+				lopart->mp_mem   = lovec[0];
+				lopart->mp_state = MPART_ST_MEM;
+				kfree(lovec);
+				lovec = &lopart->mp_mem;
+			}
+		}
+		hicnt = 1;
+		hivec = &hipart->mp_mem;
+		if (MPART_ST_SCATTER(hipart->mp_state)) {
+			hicnt = hipart->mp_mem_sc.ms_c;
+			hivec = hipart->mp_mem_sc.ms_v;
+			if unlikely(hicnt == 1) {
+				/* Simplify... */
+				hipart->mp_mem   = hivec[0];
+				hipart->mp_state = MPART_ST_MEM;
+				kfree(hivec);
+				hivec = &hipart->mp_mem;
+			}
+		}
+#ifndef NDEBUG
+		assertf(mchunkvec_getsize(lovec, locnt) == losize,
+		        "mchunkvec_getsize(lovec, locnt) = %#" PRIxSIZ "\n"
+		        "losize                          = %#" PRIxSIZ,
+		        mchunkvec_getsize(lovec, locnt), losize);
+		assertf(mchunkvec_getsize(hivec, hicnt) == mpart_getsize(hipart),
+		        "mchunkvec_getsize(hivec, hicnt) = %#" PRIxSIZ "\n"
+		        "mpart_getsize(hipart)           = %#" PRIxSIZ,
+		        mchunkvec_getsize(hivec, hicnt),
+		        mpart_getsize(hipart));
+#endif /* !NDEBUG */
+		if ((lovec[locnt - 1].mc_start + lovec[locnt - 1].mc_size) != hivec[0].mc_start) {
+			/* TODO: Try to re-map the mappings of the 2 parts  */
+		}
+
+		/* Deal with the simple case: merge 2 in-line vectors. */
+		if (locnt == 1 && hicnt == 1) {
+			assert(lopart->mp_state == MPART_ST_MEM);
+			assert(hipart->mp_state == MPART_ST_MEM);
+			if ((lovec->mc_start + lovec->mc_size) == hivec->mc_start) {
+				lovec->mc_size += hivec->mc_size;
+			} else {
+				struct mchunk *newvec;
+				newvec = (struct mchunk *)merge_malloc(sizeof(struct mchunk) * 2, orig_part);
+				if unlikely(!newvec)
+					goto err_async_waitfor;
+				newvec[0]              = *lovec;
+				newvec[1]              = *hivec;
+				lopart->mp_mem_sc.ms_c = 2;
+				lopart->mp_mem_sc.ms_v = newvec; /* Inherit */
+				lopart->mp_state       = MPART_ST_MEM_SC;
+			}
+		} else if (hicnt == 1) {
+			/* Extend `lovec' with a single entry. */
+			assert(lopart->mp_state == MPART_ST_MEM_SC);
+			if ((lovec[locnt - 1].mc_start + lovec[locnt - 1].mc_size) == hivec->mc_start) {
+				lovec[locnt - 1].mc_size += hivec->mc_size;
+			} else {
+				struct mchunk *newvec;
+				newvec = (struct mchunk *)merge_realloc(lovec,
+				                                        (locnt + 1) *
+				                                        sizeof(struct mchunk),
+				                                        orig_part);
+				if unlikely(!newvec)
+					goto err_async_waitfor;
+				newvec[locnt]          = *hivec;
+				lopart->mp_mem_sc.ms_c = locnt + 1;
+				lopart->mp_mem_sc.ms_v = newvec; /* Inherit */
+			}
+		} else if (locnt == 1) {
+			assert(lopart->mp_state == MPART_ST_MEM);
+			/* Extend `hivec' downwards, and steal it into `lopart' */
+			if ((lovec->mc_start + lovec->mc_size) == hivec[0].mc_start) {
+				hivec[0].mc_start = lovec->mc_start;
+				hivec[0].mc_size += lovec->mc_size;
+			} else {
+				struct mchunk *newvec;
+				newvec = (struct mchunk *)merge_realloc(hivec,
+				                                        (hicnt + 1) *
+				                                        sizeof(struct mchunk),
+				                                        orig_part);
+				if unlikely(!newvec)
+					goto err_async_waitfor;
+				/* Make space at the base of the combined vector. */
+				memmoveup(&newvec[1], &newvec[0],
+				          hicnt, sizeof(struct mchunk));
+				/* Insert the original chunk from `lopart' at the front. */
+				newvec[0] = *lovec;
+				++hicnt;
+				hivec = newvec;
+			}
+			lopart->mp_mem_sc.ms_c = hicnt;
+			lopart->mp_mem_sc.ms_v = hivec;
+			lopart->mp_state       = MPART_ST_MEM_SC;
+		} else {
+			/* Both parts already use dynamically allocated merge-vectors. */
+			size_t reqcount, loavail, hiavail;
+			bool is_adjacent;
+			assert(lopart->mp_state == MPART_ST_MEM_SC);
+			assert(hipart->mp_state == MPART_ST_MEM_SC);
+			is_adjacent = (lovec[locnt - 1].mc_start +
+			               lovec[locnt - 1].mc_size) == hivec[0].mc_start;
+			reqcount    = locnt + hicnt;
+			if (is_adjacent)
+				--reqcount;
+			loavail = kmalloc_usable_size(lovec) / sizeof(struct mchunk);
+			hiavail = kmalloc_usable_size(hivec) / sizeof(struct mchunk);
+			if (loavail >= reqcount) {
+				/* Just re-use `lovec' */
+				if (is_adjacent) {
+					--locnt;
+					hivec[0].mc_start = lovec[locnt].mc_start;
+					hivec[0].mc_size += lovec[locnt].mc_size;
+				}
+				/* Merge the 2 vectors. */
+				memcpy(&lovec[locnt], &hivec[0], hicnt, sizeof(struct mchunk));
+				assert(lopart->mp_mem_sc.ms_v == lovec);
+				lovec = (struct mchunk *)krealloc_nx(lovec,
+				                                     reqcount * sizeof(struct mchunk),
+				                                     GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+				/* Update accounting. */
+				if (lovec)
+					lopart->mp_mem_sc.ms_v = lovec;
+				lopart->mp_mem_sc.ms_c = reqcount;
+				kfree(hivec); /* No longer needed */
+			} else if (hiavail >= reqcount) {
+				/* Insert `lovec' at the front of `hivec' */
+				if (is_adjacent) {
+					--locnt;
+					hivec[0].mc_start = lovec[locnt].mc_start;
+					hivec[0].mc_size += lovec[locnt].mc_size;
+				}
+				memmoveup(&hivec[locnt], &hivec[0], hicnt, sizeof(struct mchunk));
+				memcpy(&hivec[0], &lovec[0], locnt, sizeof(struct mchunk));
+				/* Update accounting. */
+				lopart->mp_mem_sc.ms_c = reqcount;
+				lopart->mp_mem_sc.ms_v = hivec;
+				/* Try to release unused memory. */
+				hivec = (struct mchunk *)krealloc_nx(hivec,
+				                                     reqcount * sizeof(struct mchunk),
+				                                     GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+				if (hivec)
+					lopart->mp_mem_sc.ms_v = hivec;
+				kfree(lovec); /* No longer needed */
+			} else {
+				/* Neither vector is large enough. -> Must realloc one of them! */
+				struct mchunk *newvec;
+				newvec = (struct mchunk *)krealloc_nx(lovec,
+				                                      reqcount * sizeof(struct mchunk),
+				                                      GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+				if (newvec) {
+					if (is_adjacent) {
+						--locnt;
+						hivec[0].mc_start = newvec[locnt].mc_start;
+						hivec[0].mc_size += newvec[locnt].mc_size;
+					}
+					memcpy(&newvec[locnt], &hivec[0], hicnt, sizeof(struct mchunk));
+					/* Update accounting. */
+					lopart->mp_mem_sc.ms_c = reqcount;
+					lopart->mp_mem_sc.ms_v = newvec;
+					kfree(hivec);
+				} else {
+					/* Try to realloc `hivec' (may we'll have better luck with it?) */
+					newvec = (struct mchunk *)krealloc_nx(hivec,
+					                                      reqcount * sizeof(struct mchunk),
+					                                      GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+					if unlikely(!newvec) {
+						async_merge_all_parts_including(orig_part);
+						newvec = (struct mchunk *)krealloc_nx(hivec,
+						                                      reqcount * sizeof(struct mchunk),
+						                                      GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+						if unlikely(!newvec)
+							goto err_async_waitfor;
+					}
+					if (is_adjacent) {
+						--locnt;
+						newvec[0].mc_start = lovec[locnt].mc_start;
+						newvec[0].mc_size += lovec[locnt].mc_size;
+					}
+					memmoveup(&newvec[locnt], &newvec[0], hicnt, sizeof(struct mchunk));
+					memcpy(&newvec[0], &lovec[0], locnt, sizeof(struct mchunk));
+					/* Update accounting. */
+					lopart->mp_mem_sc.ms_c = reqcount;
+					lopart->mp_mem_sc.ms_v = newvec;
+					kfree(lovec); /* No longer needed */
+				}
+			}
+		}
+#ifndef NDEBUG
+		assert(losize == mpart_getsize(lopart));
+		assert((lopart->mp_state == MPART_ST_MEM
+		        ? (lopart->mp_mem.mc_size * PAGESIZE)
+		        : mchunkvec_getsize(lopart->mp_mem_sc.ms_v,
+		                            lopart->mp_mem_sc.ms_c)) ==
+		       (losize + mpart_getsize(hipart)));
+#endif /* !NDEBUG */
 	} else if ((lopart->mp_state == MPART_ST_VOID && hipart->mp_state == MPART_ST_VOID) ||
 #ifdef LIBVIO_CONFIG_ENABLED
 	           (lopart->mp_state == MPART_ST_VIO && hipart->mp_state == MPART_ST_VIO) ||
@@ -1292,11 +1566,15 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		 *       doesn't exist at the moment, though...) */
 
 		/* Unsupported mem-part-state combination (don't merge) */
-		return MPART_MERGE_CANNOT_MERGE;
+		goto err_cannot_merge;
 	}
 
 	/* === Point of no return */
 
+	/* Update the maxaddr field of `lopart'. */
+	lopart->mp_maxaddr += mpart_getsize(hipart);
+
+	/* Merge metadata (and transfer futex objects) */
 	if (hipart->mp_meta) {
 		struct mpartmeta *lometa, *himeta;
 		lometa = lopart->mp_meta;
@@ -1336,14 +1614,11 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		}
 	}
 
-	/* Update the maxaddr field of `lopart'. */
-	lopart->mp_maxaddr = hipart->mp_maxaddr;
-
 	/* Deal with `hipart' having the GLOBAL_REF bit set. */
-	if (ATOMIC_FETCHAND(hipart->mp_flags, ~MPART_F_GLOBAL_REF)) {
+	if (ATOMIC_FETCHAND(hipart->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF) {
 		if (LIST_ISBOUND(lopart, mp_allparts) && !(lopart->mp_flags & MPART_F_GLOBAL_REF)) {
 			incref(lopart);
-			if (ATOMIC_FETCHOR(lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
+			if unlikely(ATOMIC_FETCHOR(lopart->mp_flags, MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 				decref_nokill(lopart);
 		}
 		decref_nokill(hipart);
@@ -1351,8 +1626,10 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 
 	/* Destroy `hipart' */
 	decref_nokill(hipart->mp_file); /* Nokill, because `lopart' still has a REF! */
+	DBG_memset(&hipart->mp_mem_sc, 0xcc, sizeof(hipart->mp_mem_sc));
 	if (ATOMIC_CMPXCH(hipart->mp_refcnt, 1, 0)) {
-		mpart_destroy(hipart);
+		if (hipart->mp_meta)
+			mpartmeta_destroy(hipart->mp_meta);
 		if (LIST_ISBOUND(hipart, mp_allparts)) {
 			/* Must remove from the global list of all known parts. */
 			if (mpart_all_tryacquire()) {
@@ -1367,10 +1644,10 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 				goto done_destroy_hipart;
 			}
 		}
-		decref_nokill(hipart->mp_file);
 		mpart_free(hipart);
 	} else {
 		/* Update to reflect all of the data that's been stolen by `lopart' */
+		hipart->mp_state = MPART_ST_VOID;
 		hipart->mp_minaddr   = (pos_t)PAGESIZE;
 		hipart->mp_maxaddr   = (pos_t)(PAGESIZE - 1);
 		hipart->mp_blkst_ptr = NULL;
@@ -1403,13 +1680,20 @@ done_destroy_hipart:
 	if (!mpart_isanon(lopart))
 		mpart_tree_insert(&lopart->mp_file->mf_parts, lopart);
 	return lopart;
-#else
-	(void)lopart;
-	(void)hipart;
-	(void)orig_part;
-	COMPILER_IMPURE();
+err_async_waitfor:
+	/* Restore parts. */
+	if (!mpart_isanon(lopart)) {
+		mpart_tree_insert(&lopart->mp_file->mf_parts, lopart);
+		mpart_tree_insert(&lopart->mp_file->mf_parts, hipart);
+	}
+	return MPART_MERGE_ASYNC_WAITFOR;
+err_cannot_merge:
+	/* Restore parts. */
+	if (!mpart_isanon(lopart)) {
+		mpart_tree_insert(&lopart->mp_file->mf_parts, lopart);
+		mpart_tree_insert(&lopart->mp_file->mf_parts, hipart);
+	}
 	return MPART_MERGE_CANNOT_MERGE;
-#endif
 }
 
 
