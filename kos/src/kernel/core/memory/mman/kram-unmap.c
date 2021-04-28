@@ -433,6 +433,23 @@ NOTHROW(FCALL try_truncate_mchunk_vector)(struct mchunk **__restrict p_vec,
 }
 
 
+#ifndef NDEBUG
+/* Return the total # of bytes mapped by the given chunk-vec. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t
+NOTHROW(FCALL mpart_getramsize)(struct mpart const *__restrict self) {
+	size_t result;
+	if (self->mp_state == MPART_ST_MEM) {
+		result = self->mp_mem.mc_size;
+	} else {
+		size_t i;
+		result = 0;
+		for (i = 0; i < self->mp_mem_sc.ms_c; ++i)
+			result += self->mp_mem_sc.ms_v[i].mc_size;
+	}
+	return result * PAGESIZE;
+}
+#endif /* !NDEBUG */
+
 
 /* (try to)  unmap the  given  sub-range of  virtual  (kernel)
  * memory that is mapped by `node', which is backed by `part'.
@@ -610,6 +627,11 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	assert(hisize != 0);
 	assert(IS_ALIGNED(losize, PAGESIZE));
 	assert(IS_ALIGNED(hisize, PAGESIZE));
+	assertf(!MPART_ST_INMEM(part->mp_state) ||
+	        mpart_getramsize(part) == mpart_getsize(part),
+	        "mpart_getramsize(part) = %#" PRIxSIZ "\n"
+	        "mpart_getsize(part)    = %#" PRIxSIZ,
+	        mpart_getramsize(part), mpart_getsize(part));
 
 	/* Check if we also need to allocate an additional
 	 * block-status  bitset  for  use  with   `hipart' */
@@ -816,7 +838,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 				memcpy(&newvec[0], &vec.ms_v[0], lo_chunks, sizeof(struct mchunk));
 				if (lo_split_chunk_offset != 0) {
 					assert(lo_split_chunk_index == lo_chunks - 1);
-					newvec[lo_split_chunk_index].mc_size -= lo_split_chunk_offset;
+					newvec[lo_split_chunk_index].mc_size = lo_split_chunk_offset;
 				}
 				lopart->mp_mem_sc.ms_c = lo_chunks;
 				lopart->mp_mem_sc.ms_v = newvec;
@@ -857,6 +879,17 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		unmap_and_unprepare_and_sync_memory(unmap_minaddr, unmap_size);
 		break;
 	}
+
+	assertf(!MPART_ST_INMEM(lopart->mp_state) ||
+	        mpart_getramsize(lopart) == losize,
+	        "mpart_getramsize(lopart) = %#" PRIxSIZ "\n"
+	        "losize                   = %#" PRIxSIZ,
+	        mpart_getramsize(lopart), losize);
+	assertf(!MPART_ST_INMEM(hipart->mp_state) ||
+	        mpart_getramsize(hipart) == hisize,
+	        "mpart_getramsize(hipart) = %#" PRIxSIZ "\n"
+	        "hisize                   = %#" PRIxSIZ,
+	        mpart_getramsize(hipart), hisize);
 
 	/* Remove the old node from the kernel mman. */
 	mman_mappings_removenode(&mman_kernel, node);
