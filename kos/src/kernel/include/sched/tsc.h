@@ -563,7 +563,7 @@ FUNDEF NOBLOCK WUNUSED ktime_t FCALL relktime_from_user_rel(USER CHECKED struct 
  * WARNING: KOS only gives a best-effort guaranty for this function
  *          in terms of  consistency when it  comes to the  calling
  *          thread being moved to a different CPU.
- *          There is a chance that minor inconsistencies in terms
+ *          There is a chance  of minor inconsistencies in  terms
  *          of exact nano-second values returned by this function
  *          when the calling thread is moved.
  * However, it is guarantied that (so long as `settimeofday()'  isn't

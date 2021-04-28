@@ -329,31 +329,31 @@ NOTHROW(FCALL pokephysq_unaligned)(PHYS physaddr_t addr, u64 value) {
 #endif /* __UINT64_TYPE__ */
 
 
-#define phys_foreach_Twords(sizeofT, buf, buf_Twords, addr, num_Twords, ...)         \
-	IF_HAVE_PHYS_IDENTITY(                                                           \
-	if (PHYS_IS_IDENTITY(addr, (num_Twords)*sizeofT)) {                              \
-		(buf)      = (typeof(buf))PHYS_TO_IDENTITY(addr);                            \
-		buf_Twords = num_Twords;                                                     \
-		__VA_ARGS__;                                                                 \
-	} else)                                                                          \
-	if (num_Twords != 0) {                                                           \
-		PHYS_VARS;                                                                   \
-		phys_pushpage((addr) & ~PAGEMASK);                                           \
-		for (;;) {                                                                   \
-			size_t _page_bytes;                                                      \
-			_page_bytes  = PAGESIZE - (uintptr_t)((addr)&PAGEMASK);                  \
-			(buf)        = (typeof(buf))(trampoline + (uintptr_t)((addr)&PAGEMASK)); \
-			(buf_Twords) = _page_bytes / sizeofT;                                    \
-			if ((buf_Twords) > (num_Twords))                                         \
-				(buf_Twords) = (num_Twords);                                         \
-			__VA_ARGS__;                                                             \
-			if ((buf_Twords) >= (num_Twords))                                        \
-				break;                                                               \
-			(num_Twords) -= (buf_Twords);                                            \
-			(addr) += _page_bytes;                                                   \
-			phys_loadpage(addr);                                                     \
-		}                                                                            \
-		phys_pop();                                                                  \
+#define phys_foreach_Twords(sizeofT, buf, buf_Twords, addr, num_Twords, ...)           \
+	IF_HAVE_PHYS_IDENTITY(                                                             \
+	if (PHYS_IS_IDENTITY(addr, (num_Twords) * sizeofT)) {                              \
+		(buf)      = (typeof(buf))PHYS_TO_IDENTITY(addr);                              \
+		buf_Twords = num_Twords;                                                       \
+		__VA_ARGS__;                                                                   \
+	} else)                                                                            \
+	if (num_Twords != 0) {                                                             \
+		PHYS_VARS;                                                                     \
+		phys_pushpage((addr) & ~PAGEMASK);                                             \
+		for (;;) {                                                                     \
+			size_t _page_bytes;                                                        \
+			_page_bytes  = PAGESIZE - (uintptr_t)((addr) & PAGEMASK);                  \
+			(buf)        = (typeof(buf))(trampoline + (uintptr_t)((addr) & PAGEMASK)); \
+			(buf_Twords) = _page_bytes / sizeofT;                                      \
+			if ((buf_Twords) > (num_Twords))                                           \
+				(buf_Twords) = (num_Twords);                                           \
+			__VA_ARGS__;                                                               \
+			if ((buf_Twords) >= (num_Twords))                                          \
+				break;                                                                 \
+			(num_Twords) -= (buf_Twords);                                              \
+			(addr) += _page_bytes;                                                     \
+			phys_loadpage(addr);                                                       \
+		}                                                                              \
+		phys_pop();                                                                    \
 	}
 
 

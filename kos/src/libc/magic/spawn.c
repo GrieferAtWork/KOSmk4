@@ -903,6 +903,12 @@ $errno_t posix_spawn_file_actions_addopen([[nonnull]] posix_spawn_file_actions_t
                                           $fd_t fd, [[nonnull]] char const *__restrict path,
                                           $oflag_t oflags, mode_t mode) {
 	struct __spawn_action *action;
+	/* Posix says:
+	 * """
+	 * The string described by path shall be copied  by
+	 * the posix_spawn_file_actions_addopen() function.
+	 * """
+	 * iow: We need to strdup(path) here! */
 	if unlikely((path = strdup(path)) == NULL)
 		goto err;
 	action = posix_spawn_file_actions_alloc(file_actions);

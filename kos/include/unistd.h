@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63d4393 */
+/* HASH CRC-32:0x9c592094 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2554,7 +2554,7 @@ __CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE_
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
  *                              user to type each character of their password. If
  *                              this timeout expires, fail with `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.
@@ -2597,7 +2597,7 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpassfd,(char const *__prompt, 
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
  *                              user to type each character of their password. If
  *                              this timeout expires, fail with `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.

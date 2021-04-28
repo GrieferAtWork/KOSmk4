@@ -259,7 +259,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	x86_initialize_phys2virt64();
 #endif /* !ONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 
-	/* Initialize the kernel VM,  and instigate strict memory  protection,
+	/* Initialize the kernel mman, and instigate strict memory protection,
 	 * unmapping virtual memory that isn't being used by the kernel, while
 	 * also removing write permissions for  .text and .rodata, as well  as
 	 * (if supported) setting the NOEXECUTE  bit for anything but  `.text'
@@ -313,7 +313,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Copy the kernel commandline into high memory. */
 	x86_initialize_commandline_himem();
 
-	/* Allocate and set the user-space VM for /bin/init */
+	/* Allocate and set the user-space mman for /bin/init */
 	kernel_initialize_user_mman();
 
 	/* Evaluate commandline options defined as `DEFINE_KERNEL_COMMANDLINE_OPTION()' */
@@ -522,8 +522,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      all of the relocations does).  - Maybe not implement this  as part of the  libdl
 	 *      core, but rather within some auxiliary helper library? */
 
-	/* TODO: Make the x86 LDT object ATTR_PERMMAN, and reload LDT registers during a VM
-	 *       switch.  On linux, they're PERMMAN, too, so  we really should do the same. */
+	/* TODO: Make the x86 LDT object ATTR_PERMMAN, and reload LDT registers during an mman
+	 *       switch. On linux,  they're PERMMAN,  too, so we  really should  do the  same. */
 
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:

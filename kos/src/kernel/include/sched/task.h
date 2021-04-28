@@ -67,10 +67,10 @@ DECL_BEGIN
 /*      TASK_F             __UINT32_C(0x00002000)  * ... */
 /*      TASK_F             __UINT32_C(0x00004000)  * ... */
 /*      TASK_F             __UINT32_C(0x00008000)  * ... */
-#define TASK_FVFORK        __UINT32_C(0x00010000) /* [lock(CLEAR_ONCE(THIS_TASK))] This is a child-after-vfork() thread.
-                                                   * When set, this causes exec() to create a new VM, rather than  clear
-                                                   * an existing one, alongside both exec() and task_exit() causing  the
-                                                   * thread  to broadcast `THIS_TASKPID->tp_changed' after clearing this
+#define TASK_FVFORK        __UINT32_C(0x00010000) /* [lock(CLEAR_ONCE(THIS_TASK))] This is a child-after-vfork()  thread.
+                                                   * When set, this causes exec() to create a new mmsn, rather than clear
+                                                   * an existing one, alongside both  exec() and task_exit() causing  the
+                                                   * thread to broadcast  `THIS_TASKPID->tp_changed' after clearing  this
                                                    * flag following a successful exec(), or a call to task_exit() */
 #define TASK_FUSERPROCMASK __UINT32_C(0x00020000) /* [lock(READ(ATOMIC), WRITE(THIS_TASK))] Task has a `userprocmask'. (s.a. `this_userprocmask_address') */
 #define TASK_FUSERPROCMASK_AFTER_VFORK \
@@ -103,8 +103,9 @@ struct task {
 	                                       * NOTE: Also accessible via the `this_cpu' field. */
 	REF struct mman        *t_mman;       /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
 	                                       *             write(THIS_TASK && INTERN(lock)))]
-	                                       * The VM used to host this task.
-	                                       * NOTE: Also accessible via the `this_mman' field. */
+	                                       * The  mman used to host this task. (Also accessible via the
+	                                       * `this_mman' symbol). To read this field for other threads,
+	                                       * use `task_getmman()' */
 	LIST_ENTRY(task)        t_mman_tasks; /* [lock(t_mman->mm_threadslock)] Chain of tasks using `t_mman' */
 	size_t                  t_heapsz;     /* [const] Allocated heap size of this task. */
 	union {
@@ -123,7 +124,7 @@ DATDEF ATTR_PERTASK struct scpustate *this_sstate; /* ALIAS:THIS_TASK->t_state *
 
 
 /* Allocate + initialize a new task.
- * TODO: Re-design this function so we don't leak uninitialized tasks through the VM
+ * TODO: Re-design this function so we don't leak uninitialized tasks through the mman
  * @param: task_mman: The mman inside of which the start will start initially. */
 FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *KCALL
 task_alloc(struct mman *__restrict task_mman)
@@ -139,7 +140,7 @@ typedef void (KCALL *thread_main_t)();
 
 /* Setup  `thread'  to become  a  kernel-space thread
  * calling `thread_main' with the provided arguments.
- * TODO: Re-design this function so we don't leak uninitialized tasks through the VM
+ * TODO: Re-design this function so we don't leak uninitialized tasks through the mman
  * >> void KCALL kernel_main(char *a, char *b) {
  * >>      ....
  * >> }

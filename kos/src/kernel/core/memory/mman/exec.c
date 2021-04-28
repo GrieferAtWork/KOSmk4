@@ -46,7 +46,7 @@ DECL_BEGIN
  * If this succeeds, clear all of the mappings from the given `ea_mman',
  * and  replace them with  the contents of  the temporary, emulated mman
  * (such that the entire process of  mapping the new contents is  always
- * able to either  seamlessly restore  the old memory  mappings, or  not
+ * able to either  seamlessly replace  the old memory  mappings, or  not
  * even touch them at all upon error)
  * -> This function is used to implement the exec() family of system calls
  *    in  such that exec() is always able  to allow the calling program to

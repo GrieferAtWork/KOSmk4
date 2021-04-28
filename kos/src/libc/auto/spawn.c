@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4232b0b */
+/* HASH CRC-32:0x56e46fd6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -731,6 +731,12 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_act
                                                             oflag_t oflags,
                                                             mode_t mode) {
 	struct __spawn_action *action;
+	/* Posix says:
+	 * """
+	 * The string described by path shall be copied  by
+	 * the posix_spawn_file_actions_addopen() function.
+	 * """
+	 * iow: We need to strdup(path) here! */
 	if unlikely((path = libc_strdup(path)) == NULL)
 		goto err;
 	action = libc_posix_spawn_file_actions_alloc(file_actions);

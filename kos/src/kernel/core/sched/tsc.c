@@ -654,7 +654,7 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
 	struct timespec result;
 	result.tv_sec  = (time_t)(t / NSEC_PER_SEC);
 	result.tv_nsec = (syscall_ulong_t)(t % NSEC_PER_SEC);
-	result += boottime_;
+	result += boottime;
 	return result;
 }
 
@@ -704,7 +704,7 @@ infinite:
  * WARNING: KOS only gives a best-effort guaranty for this function
  *          in terms of  consistency when it  comes to the  calling
  *          thread being moved to a different CPU.
- *          There is a chance that minor inconsistencies in terms
+ *          There is a chance  of minor inconsistencies in  terms
  *          of exact nano-second values returned by this function
  *          when the calling thread is moved.
  * However, it is guarantied that (so long as `settimeofday()'  isn't

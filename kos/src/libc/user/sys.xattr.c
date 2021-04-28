@@ -21,16 +21,13 @@
 #define GUARD_LIBC_USER_SYS_XATTR_C 1
 
 #include "../api.h"
-#include "sys.xattr.h"
+/**/
+
 #include <kos/syscalls.h>
 
+#include "sys.xattr.h"
+
 DECL_BEGIN
-
-
-
-
-
-
 
 /*[[[head:libc_setxattr,hash:CRC-32=0x9bbbadf7]]]*/
 /* @param: flags: One of `XATTR_*', or `0' */
@@ -196,8 +193,6 @@ NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_fremovexattr]]]*/
-
-
 
 
 

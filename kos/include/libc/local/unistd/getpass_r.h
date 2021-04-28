@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b70f3df */
+/* HASH CRC-32:0xb355a075 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
  *                              user to type each character of their password. If
  *                              this timeout expires, fail with `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.
@@ -105,7 +105,7 @@ __NAMESPACE_LOCAL_BEGIN
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to what for the
+ * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
  *                              user to type each character of their password. If
  *                              this timeout expires, fail with `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.

@@ -119,7 +119,6 @@
                                             *  - __GCC_VERSION_NUM >= 30200
                                             *  - __GCC_VERSION_NUM >= 30500
                                             * The internet isn't unanimous about this one... */
-
 #endif
 #if __GCC_VERSION_NUM >= 30300
 #define __GCC_HAS_ATTRIBUTE___nothrow__
@@ -855,6 +854,9 @@ __extension__ typedef unsigned long long __ulonglong_t;
 /* Support for complex numbers (test for with `#ifdef _Complex_I') */
 #if __GCC_VERSION_NUM >= 29700
 #define _Complex_I (__extension__ 1.0iF)
+#if __STDC_VERSION__ < 199901
+#define _Complex __complex__
+#endif /* __STDC_VERSION__ < 199901 */
 #elif __GCC_VERSION_NUM >= 20700
 #define _Complex __complex__
 #define _Complex_I (__extension__ 1.0iF)

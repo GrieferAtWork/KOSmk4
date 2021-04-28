@@ -741,6 +741,12 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]
 
+#define _Complex_I (__extension__ 1.0iF)
+#if __STDC_VERSION__ < 199901
+#define _Complex __complex__
+#endif /* __STDC_VERSION__ < 199901 */
+
+
 #ifdef __clang_tidy__
 /* I don't know if the  proper clang really supports  this, but clang-tidy keeps  on
  * being a d1ck, telling me "initialization of flexible array member is not allowed"

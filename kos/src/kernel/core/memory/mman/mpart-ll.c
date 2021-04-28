@@ -106,6 +106,7 @@ mpart_ll_allocmem(struct mpart *__restrict self,
 					                                new_alloc * sizeof(struct mchunk),
 					                                GFP_LOCKED | GFP_PREFLT);
 				} EXCEPT {
+					page_ccfree(pp, res_pages);
 					while (cv.ms_c) {
 						--cv.ms_c;
 						page_ccfree(cv.ms_v[cv.ms_c].mc_start,

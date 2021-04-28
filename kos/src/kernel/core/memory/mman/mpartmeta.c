@@ -161,6 +161,9 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self) {
 	assert(SLIST_EMPTY(&self->mpm_ftxlops));
 
+	/* Deal with the rare situation where someone's still listening to us... */
+	sig_broadcast_for_fini(&self->mpm_dma_done);
+
 	/* For every futex apart of `mpm_ftx', clear the `mfu_part' pointer. */
 	if (self->mpm_ftx != NULL)
 		mfutex_tree_clear_all_parts(self->mpm_ftx);

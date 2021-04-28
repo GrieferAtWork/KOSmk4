@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c6308d2 */
+/* HASH CRC-32:0x1d0ad52c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,6 +75,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(posix_spawn_file_actions_addopen) __ATTR_NONNULL((1, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(struct __posix_spawn_file_actions *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, __mode_t __mode) {
 	struct __spawn_action *__action;
+	/* Posix says:
+	 * """
+	 * The string described by path shall be copied  by
+	 * the posix_spawn_file_actions_addopen() function.
+	 * """
+	 * iow: We need to strdup(path) here! */
 	if __unlikely((__path = __localdep_strdup(__path)) == __NULLPTR)
 		goto __err;
 	__action = __localdep_posix_spawn_file_actions_alloc(__file_actions);

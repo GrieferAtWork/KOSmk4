@@ -382,7 +382,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Used to parse runtime configuration options in some places (e.g. the kernel commandline `ram=[{ ... }, ...]` option)
 		- Provides a codec-based system for easily converting Json to/from regular, old `struct` objects
 	- libkeymap (user/kernel)
-		- Translation of key codes (one of `KEY_*` from `<kos/keyboard.h>`) and key modifiers into unicode characters orresponding to the pressed keys
+		- Translation of key codes (one of `KEY_*` from `<kos/keyboard.h>`) and key modifiers into unicode characters corresponding to the pressed keys
 		- Uses a proprietary, custom file format called KMP, that is documented in `<libkeymap/keymap.h>`
 		- A compiler is provided for creating KMP files from self-explainatory conf-like files found in `/kos/src/misc/keymaps/*`
 	- libm (user)

@@ -61,13 +61,20 @@
 #endif /* !_Complex_I */
 
 #ifdef __USE_ISOC11
-#if __has_builtin(__builtin_complex)
+#ifdef __clang__
+#define CMPLX(x, y)  ((double _Complex){ x, y })
+#define CMPLXF(x, y) ((float _Complex){ x, y })
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#define CMPLXL(x, y) ((long double _Complex){ x, y })
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#elif (__has_builtin(__builtin_complex) || \
+       (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7))))
 #define CMPLX(x, y)  __builtin_complex((double)(x), (double)(y))
 #define CMPLXF(x, y) __builtin_complex((float)(x), (float)(y))
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #define CMPLXL(x, y) __builtin_complex((long double)(x), (long double)(y))
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
-#endif /* __has_builtin(__builtin_complex) */
+#endif /* ... */
 #endif /* __USE_ISOC11 */
 
 __SYSDECL_BEGIN

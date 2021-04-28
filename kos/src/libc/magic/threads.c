@@ -696,11 +696,13 @@ void tss_delete(tss_t tss_id) = pthread_key_delete;
 
 
 %
-%/* NOTE: On true Solaris, this function isn't actually restricted to `__EXTENSIONS__'
-% *       as it is here, however this entire header is fully standardized by STD-C, so
-% *       in the interest of enforcing a clean namespace, and the fact that I have yet
-% *       to see this function anywhere other than Solaris, restrict it to its feature
-% *       namespace. */
+%{
+/* NOTE: On true Solaris, this function isn't actually restricted to `__EXTENSIONS__'
+ *       as it is here, however this entire header is fully standardized by STD-C, so
+ *       in the interest of enforcing a clean namespace, and the fact that I have yet
+ *       to see this function anywhere other than Solaris, restrict it to its feature
+ *       namespace. */
+}
 %#ifdef __USE_SOLARIS
 @@>> thr_min_stack(3)
 [[ATTR_CONST, decl_include("<hybrid/typecore.h>")]]

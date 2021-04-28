@@ -20,10 +20,11 @@
 #ifndef _BITS_CRT_THREADS_H
 #define _BITS_CRT_THREADS_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
 
 #include <hybrid/typecore.h>
+
 #include <bits/crt/pthreadtypesizes.h>
 
 #ifdef __CC__

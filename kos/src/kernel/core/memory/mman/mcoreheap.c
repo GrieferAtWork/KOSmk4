@@ -112,7 +112,7 @@ PUBLIC struct mcorepage_list mcoreheap_freelist = { &_mcore_initpage };
 
 /* [>= 2][lock(mman_kernel.mm_lock)]
  * The total # of free core parts currently available through `mcoreheap_free' */
-PUBLIC size_t mcoreheap_freecount = MCOREPAGE_PARTCOUNT;
+PUBLIC size_t mcoreheap_freecount = COMPILER_LENOF(_mcore_initpage.mcp_part);
 
 
 
