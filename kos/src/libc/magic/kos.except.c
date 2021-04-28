@@ -1498,7 +1498,7 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 [[decl_include("<kos/bits/exception_info.h>", "<bits/types.h>")]]
 void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = error_info();
-	if (!(info->@ei_flags@ & @EXCEPT_FINCATCH@)) {
+	if (info->@ei_code@ == @ERROR_CODEOF@(@E_OK@)) {
 		/* Not inside of a  catch-block (ignore the nesting  request)
 		 * This can happen if the caller  is only using the nest  for
 		 * safety  (in case a sub-function needs to be able to handle
@@ -1508,12 +1508,9 @@ void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict 
 		 * it so that the associated `error_nesting_end()' is a no-op */
 		saved->@en_size@ = 0;
 	} else {
-		__hybrid_assertf(info->@ei_code@ != @ERROR_CODEOF@(@E_OK@),
-		                 "No exception set in `error_nesting_begin()'");
 		if unlikely(saved->@en_size@ > @_EXCEPTION_NESTING_DATA_SIZE@)
 			saved->@en_size@ = @_EXCEPTION_NESTING_DATA_SIZE@;
 		memcpy(&saved->@en_state@, info, saved->@en_size@);
-		info->@ei_flags@ &= ~@EXCEPT_FINCATCH@;
 		info->@ei_code@   = @ERROR_CODEOF@(@E_OK@);
 		++info->@ei_nesting@;
 	}
@@ -1535,8 +1532,6 @@ void error_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict sa
 	__hybrid_assertf(info->@ei_nesting@ != 0,
 	                 "Error-nesting stack is empty");
 	--info->@ei_nesting@;
-	__hybrid_assertf(!(info->@ei_flags@ & @EXCEPT_FINCATCH@),
-	                 "This flag should have been cleared by `error_nesting_begin()'");
 	__hybrid_assertf(saved->@en_data@.@e_code@ != @ERROR_CODEOF@(@E_OK@),
 	                 "No saved exception in `error_nesting_end()'");
 	if (info->@ei_code@ == @ERROR_CODEOF@(@E_OK@)) {
@@ -1596,8 +1591,6 @@ restore_saved_exception:
 			goto restore_saved_exception;
 		/* Keep the newly set exception. */
 	}
-	/* Indicate that exception nesting is once again no longer allowed. */
-	info->@ei_flags@ |= @EXCEPT_FINCATCH@;
 }
 
 

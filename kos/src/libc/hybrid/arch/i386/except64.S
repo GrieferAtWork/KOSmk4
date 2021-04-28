@@ -94,8 +94,8 @@ IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 #ifndef NDEBUG
 	.cfi_remember_state
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jz     .Llibc_error_rethrow_outside_catch
+	cmpq   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
+	je     .Llibc_error_rethrow_outside_catch
 #endif /* !NDEBUG */
 	orb    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
 .Ldo_unwind_rsp:
@@ -343,8 +343,8 @@ IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 #ifndef NDEBUG
 	.cfi_remember_state
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Llibc_error_thrown_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
+	cmpq   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
+	jne    .Llibc_error_thrown_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
 #endif /* !NDEBUG */
 /*	.cfi_rel_offset %rsp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP */
 	/* Fill in the per-task exception context. */
@@ -496,8 +496,8 @@ IU(	call   libc_error_info)
 IU(	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI)(%rsp), %rdi)
 #ifndef NDEBUG
 IK(	.cfi_remember_state)
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Llibc_error_throw_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
+	cmpq   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
+	jne    .Llibc_error_throw_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
 #endif /* !NDEBUG */
 	movq   %rdi, FIELD_ERROR_CODE
 #if EXCEPTION_DATA_POINTERS != 0
@@ -515,11 +515,6 @@ INTERN_FUNCTION(libc_error_throw_current)
 	ASM_PUSH_KCPUSTATE_AFTER_RIP
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
-#ifndef NDEBUG
-	.cfi_remember_state
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Llibc_error_throw_current_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
-#endif /* !NDEBUG */
 IU(1:)
 	/* Fill in the per-task exception context. */
 IK(	movq   %rax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX))
@@ -556,11 +551,6 @@ IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	goto_Ldo_unwind_rsp
 #ifndef NDEBUG
-	.cfi_restore_state
-.Llibc_error_throw_current_inside_catch:
-	movq   %rsp, %rdi
-	EXTERN(libc_except_badusage_throw_current)
-	call   libc_except_badusage_throw_current
 IK(	.cfi_restore_state)
 .Llibc_error_throw_inside_catch:
 IK(	ASM_PUSH_KCPUSTATE_AFTER_RIP)
@@ -623,12 +613,6 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)
 
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_rsp)
 
-#ifndef NDEBUG
-	.cfi_remember_state
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Lx86_userexcept_unwind_interrupt_kernel_rsp_inside_catch
-#endif /* !NDEBUG */
-
 	/* NOTE: RPC guaranties never to modify a kernel-target iret tail, meaning
 	 *       we're  entirely safe to  modify the tail  without having to worry
 	 *       about intervention of RPC callbacks! */
@@ -679,14 +663,6 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_rsp)
 #undef COPYSTATE
 
 	goto_Ldo_unwind_rsp
-#ifndef NDEBUG
-	.cfi_restore_state
-.Lx86_userexcept_unwind_interrupt_kernel_rsp_inside_catch:
-	movq   %rsp, %rdi
-	EXTERN(x86_except_badusage_throw_current_icpustate)
-	call   x86_except_badusage_throw_current_icpustate
-	nop
-#endif /* !NDEBUG */
 	.cfi_endproc
 END(x86_userexcept_unwind_interrupt_kernel_rsp)
 END(x86_userexcept_unwind_interrupt_rsp)

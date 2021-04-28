@@ -62,10 +62,6 @@ INTDEF ATTR_COLD ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL libc_except_badusage_throw_inside_catch)(error_register_state_t const *state,
                                                        error_code_t code, size_t argc,
                                                        va_list args);
-
-/* Bad usage: Attempted to call `THROW()' the current exception. */
-INTDEF ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_except_badusage_throw_current)(error_register_state_t const *state);
 #endif /* !NDEBUG */
 
 DECL_END

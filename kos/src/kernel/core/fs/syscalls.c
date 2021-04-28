@@ -3186,7 +3186,6 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 	tls_info = error_info();
 	memcpy(&old_exception_info, tls_info, sizeof(old_exception_info));
 	tls_info->ei_code = ERROR_CODEOF(E_OK);
-	tls_info->ei_flags &= ~EXCEPT_FINCATCH;
 	TRY {
 		/* Check  for  race  condition:  Our  RPC  only  got  executed  because  the
 		 * main  thread is  currently being terminated.  - In this  case it wouldn't

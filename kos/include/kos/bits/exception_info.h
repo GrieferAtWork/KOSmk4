@@ -38,20 +38,16 @@
 #define EXCEPT_FRETHROW   0x01 /* FLAG: The exception should be rethrown.
                                 * Unless set when `__cxa_end_catch()' is called, `ei_code'
                                 * will  be  changed  to `E_OK',  indicating  no exception. */
-#define EXCEPT_FINCATCH   0x02 /* FLAG: Inside of a catch-handler.  When this flag is  set,
-                                * the currently thrown exception must not be modified,  and
-                                * attempting to throw an additional exception causes kernel
-                                * panic / triggers a segfault. */
 #ifndef __KERNEL__
 #define EXCEPT_FINEXCEPT  0x20 /* FLAG: Currently within `libc_except_handler(3|4)()' (used to  prevent
                                 *       an infinite loop when the exception handler itself is faulting) */
-#define EXCEPT_FINEXCEPT2 0x40 /* FLAG: Same  as  `EXCEPT_FINEXCEPT',   but  set   when  that  flag   was  already   set.
-                                *       When    both    flags   are    already    set,   a    coredump    is   triggered.
-                                *       Using  this  double-indirection   mechanism,  it  becomes   possible  to   handle
-                                *       things such  as  segmentation  faults when  accessing  memory  during  unwinding,
-                                *       and ensuring that the correct unwind error codes (in this case `UNWIND_SEGFAULT')
-                                *       get produced instead of always causing `UNWIND_USER_RECURSION' (which should only
-                                *       be   produced   if   the   unwind    machinery   itself   has   become    faulty) */
+#define EXCEPT_FINEXCEPT2 0x40 /* FLAG: Same as `EXCEPT_FINEXCEPT', but set when that flag was already set. When both
+                                *       flags are already set, a coredump is triggered. Using this double-indirection
+                                *       mechanism, it becomes possible to  handle things such as segmentation  faults
+                                *       when  accessing memory during unwinding, and ensuring that the correct unwind
+                                *       error codes (in this case  `UNWIND_SEGFAULT') get produced instead of  always
+                                *       causing `UNWIND_USER_RECURSION' (which should only be produced if the  unwind
+                                *       machinery itself has become faulty) */
 #define EXCEPT_FMAYSIGNAL 0x80 /* FLAG: The exception may be converted into a signal when `error_unwind(3)' cannot find
                                 *       a handler apart  of some except-aware  module (s.a.  set_exception_handler:#4).
                                 *       If the exception cannot be translated, a coredump is performed. */

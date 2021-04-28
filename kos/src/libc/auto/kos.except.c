@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8c87560 */
+/* HASH CRC-32:0xbb22507e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1084,7 +1084,7 @@ NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {
 INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
 NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = libc_error_info();
-	if (!(info->ei_flags & EXCEPT_FINCATCH)) {
+	if (info->ei_code == ERROR_CODEOF(E_OK)) {
 		/* Not inside of a  catch-block (ignore the nesting  request)
 		 * This can happen if the caller  is only using the nest  for
 		 * safety  (in case a sub-function needs to be able to handle
@@ -1094,12 +1094,9 @@ NOTHROW(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nes
 		 * it so that the associated `error_nesting_end()' is a no-op */
 		saved->en_size = 0;
 	} else {
-		__hybrid_assertf(info->ei_code != ERROR_CODEOF(E_OK),
-		                 "No exception set in `error_nesting_begin()'");
 		if unlikely(saved->en_size > _EXCEPTION_NESTING_DATA_SIZE)
 			saved->en_size = _EXCEPTION_NESTING_DATA_SIZE;
 		libc_memcpy(&saved->en_state, info, saved->en_size);
-		info->ei_flags &= ~EXCEPT_FINCATCH;
 		info->ei_code   = ERROR_CODEOF(E_OK);
 		++info->ei_nesting;
 	}
@@ -1115,8 +1112,6 @@ NOTHROW(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting
 	__hybrid_assertf(info->ei_nesting != 0,
 	                 "Error-nesting stack is empty");
 	--info->ei_nesting;
-	__hybrid_assertf(!(info->ei_flags & EXCEPT_FINCATCH),
-	                 "This flag should have been cleared by `error_nesting_begin()'");
 	__hybrid_assertf(saved->en_data.e_code != ERROR_CODEOF(E_OK),
 	                 "No saved exception in `error_nesting_end()'");
 	if (info->ei_code == ERROR_CODEOF(E_OK)) {
@@ -1176,8 +1171,6 @@ restore_saved_exception:
 			goto restore_saved_exception;
 		/* Keep the newly set exception. */
 	}
-	/* Indicate that exception nesting is once again no longer allowed. */
-	info->ei_flags |= EXCEPT_FINCATCH;
 }
 
 DECL_END

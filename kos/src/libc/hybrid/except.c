@@ -80,9 +80,6 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	info = error_info();
 	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 	        "Exception handler entered, but no exception set");
-	assertf(!(info->ei_flags & EXCEPT_FINCATCH),
-	        "Invalid nested-try-in-catch block (use `NESTED_TRY' or `NESTED_EXCEPTION')");
-	info->ei_flags |= EXCEPT_FINCATCH;
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
 	                  "__cxa_begin_catch [%#" PRIx8 "] [error=%s ("
@@ -140,15 +137,13 @@ libc_cxa_end_catch(void) {
 #endif
 	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 	        "Exception handler entered, but no exception set");
-	assertf(info->ei_flags & EXCEPT_FINCATCH,
-	        "Call to `__cxa_end_catch' when `EXCEPT_FINCATCH' wasn't set");
 	if (!(info->ei_flags & EXCEPT_FRETHROW)) {
 		/* TODO: If  `this_exception_code'  is  an RT-level  exception,  then we
 		 *       must set some kind of thread-local flag to have it be re-thrown
 		 *       the next time the a call to `task_serve()' is made! */
 		info->ei_code = ERROR_CODEOF(E_OK);
 	}
-	info->ei_flags &= ~(EXCEPT_FINCATCH | EXCEPT_FRETHROW);
+	info->ei_flags &= ~(EXCEPT_FRETHROW);
 }
 
 
@@ -203,33 +198,6 @@ NOTHROW(FCALL libc_except_badusage_throw_inside_catch)(error_register_state_t co
 	                args_buf,
 	                ERROR_CLASS(code),
 	                ERROR_SUBCLASS(code));
-}
-
-/* Bad usage: Attempted to call `THROW()' the current exception. */
-INTERN ATTR_COLD ATTR_NORETURN NONNULL((1)) void
-NOTHROW(FCALL libc_except_badusage_throw_current)(error_register_state_t const *state) {
-	struct exception_info *info = error_info();
-	char args_buf[EXCEPTION_DATA_POINTERS * (4 + sizeof(void *) * 2) + 1];
-	char *endp = args_buf;
-	unsigned int i, argc = EXCEPTION_DATA_POINTERS;
-	while (argc && !info->ei_data.e_args.e_pointers[argc - 1])
-		--argc;
-	for (i = 0; i < argc; ++i) {
-		void *arg = (void *)info->ei_data.e_args.e_pointers[i];
-		endp += sprintf(endp, ", %#" PRIxPTR, arg);
-	}
-	*endp = '\0';
-	assert_failf_at(state, "error_throw_current()",
-	                "error_throw_current [%s%s] ("
-	                "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-	                "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ""
-	                ") inside of catch-block\n"
-	                "Consider adding/changing a surrounding `TRY' between "
-	                "here and the nearest `EXCEPT' to `NESTED_TRY'",
-	                error_name(info->ei_code),
-	                args_buf,
-	                info->ei_class,
-	                info->ei_subclass);
 }
 #endif /* !NDEBUG */
 

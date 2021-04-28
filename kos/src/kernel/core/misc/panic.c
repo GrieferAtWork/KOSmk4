@@ -200,7 +200,6 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	tls_info = error_info();
 	memcpy(&saved_info, tls_info, sizeof(struct exception_info));
 	tls_info->ei_code = ERROR_CODEOF(E_OK);
-	tls_info->ei_flags &= ~EXCEPT_FINCATCH;
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */

@@ -389,15 +389,6 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	char const *name;
 	struct exception_info *info = &THIS_EXCEPTION_INFO;
 	struct regdump_printer rd_printer;
-	u8 old_flags;
-
-	/* In order to properly  handle nested exceptions, we  must
-	 * act as though we were within a catch-block. - Otherwise,
-	 * `NESTED_TRY' will not  preserve the  exception that  got
-	 * us here  in cases  where the  nested exception  ends  up
-	 * getting handled! */
-	old_flags = info->ei_flags;
-	info->ei_flags |= EXCEPT_FINCATCH;
 
 	/* Dump the exception that occurred. */
 	format_printf(printer, arg,
@@ -452,9 +443,6 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 		                 info->ei_trace[i], "Called here");
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-
-	/* Restore old exception flags. */
-	info->ei_flags = old_flags;
 }
 
 
@@ -492,10 +480,6 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	bool is_first_pointer;
 	char const *name;
 	instrlen_isa_t isa;
-	u8 old_flags;
-	/* Ensure that exception nesting continues to work while we're dumping! */
-	old_flags = info->ei_flags;
-	info->ei_flags |= EXCEPT_FINCATCH;
 	dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unhandled exception") " "
 	                  AC_WHITE("%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) "") " "
 	                  AC_WHITE("%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) "")),
@@ -565,7 +549,6 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 		                  ": " AC_WHITE("%u") "\n"),
 		           unwind_error);
 	}
-	info->ei_flags = old_flags;
 	dbg_main(0);
 }
 
@@ -582,7 +565,6 @@ halt_unhandled_exception(unsigned int unwind_error,
 	struct exception_info *info;
 	uintptr_t last_pc;
 	instrlen_isa_t isa;
-	u8 old_flags;
 	_kernel_poison();
 	last_pc = kcpustate_getpc(unwind_state);
 	isa     = instrlen_isa_from_kcpustate(unwind_state);
@@ -591,12 +573,6 @@ halt_unhandled_exception(unsigned int unwind_error,
 	                          &syslog_printer, SYSLOG_LEVEL_RAW,
 	                          NULL, NULL);
 	info = &THIS_EXCEPTION_INFO;
-
-	/* Just  like in `print_unhandled_exception()', we must make sure
-	 * that the INCATCH flag is set so that nested exception handling
-	 * won't end up overriding the exception we're trying to dump! */
-	old_flags = info->ei_flags;
-	info->ei_flags |= EXCEPT_FINCATCH;
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
@@ -633,7 +609,6 @@ halt_unhandled_exception(unsigned int unwind_error,
 		kcpustate_to_ucpustate(unwind_state, &ustate);
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &ustate);
 	}
-	info->ei_flags = old_flags;
 #ifdef CONFIG_HAVE_DEBUGGER
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT)) {

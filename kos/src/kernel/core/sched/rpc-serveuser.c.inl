@@ -59,7 +59,6 @@ NOTHROW(FCALL rpc_serve_async_user_redirection)(struct icpustate *__restrict sta
 
 	/* Clear the currently thrown exception. */
 	tls_error->ei_code = ERROR_CODEOF(E_OK);
-	tls_error->ei_flags &= ~EXCEPT_FINCATCH;
 
 again_capture_chain:
 	chain = ATOMIC_XCH(PERTASK(this_rpcs_pending), NULL);

@@ -837,8 +837,6 @@ NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
                                        struct rpc_syscall_info const *sc_info) {
 	/* Service RPCs before returning to user-space. */
 	assert(!task_wasconnected());
-	assertf(!(PERTASK_GET(this_exception_flags) & EXCEPT_FINCATCH),
-	        "Direct unwinding from inside of a catch-block isn't allowed!");
 	assertf(PREEMPTION_ENABLED(),
 	        "Preemption must be enabled to propagate exceptions to user-space.");
 

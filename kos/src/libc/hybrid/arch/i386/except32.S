@@ -104,8 +104,8 @@ IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 #ifndef NDEBUG
 	.cfi_remember_state
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jz     .Llibc_error_rethrow_outside_catch
+	cmpl   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
+	je     .Llibc_error_rethrow_outside_catch
 #endif /* !NDEBUG */
 	orb    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
 .Ldo_unwind_esp:
@@ -338,8 +338,8 @@ IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 #ifndef NDEBUG
 	.cfi_remember_state
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Llibc_error_thrown_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
+	cmpl   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
+	jne    .Llibc_error_thrown_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
 #endif /* !NDEBUG */
 /*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
 	/* Fill in the per-task exception context. */
@@ -433,8 +433,8 @@ IU(	call   libc_error_info)
 IU(	movl   OFFSET_GPREGS_ECX(%esp), %ecx) /* Reload %ecx, which may have been clobbered by `libc_error_info()' */
 #ifndef NDEBUG
 IK(	.cfi_remember_state)
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Llibc_error_throw_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
+	cmpl   $(ERROR_CODEOF(E_OK)), FIELD_ERROR_CODE
+	jne    .Llibc_error_throw_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
 #endif /* !NDEBUG */
 	movl   %ecx, FIELD_ERROR_CODE
 #if EXCEPTION_DATA_POINTERS != 0
@@ -453,11 +453,6 @@ INTERN_FUNCTION(libc_error_throw_current)
 	pushal_cfi_r
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
-#ifndef NDEBUG
-	.cfi_remember_state
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Llibc_error_throw_current_inside_catch /* ERROR: Call to `THROW()' inside of `catch' */
-#endif /* !NDEBUG */
 IU(1:)
 	/* Fill in the per-task exception context. */
 IK(	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
@@ -494,14 +489,6 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	jmp    .Ldo_unwind_esp
 #ifndef NDEBUG
-	.cfi_restore_state
-.Llibc_error_throw_current_inside_catch:
-	/* Fix %esp within `state' */
-	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
-	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
-	movl   %esp, %ecx
-	EXTERN(libc_except_badusage_throw_current)
-	call   libc_except_badusage_throw_current
 IK(	.cfi_restore_state)
 .Llibc_error_throw_inside_catch:
 IK(	pushfl_cfi_r)
@@ -557,21 +544,11 @@ INTERN(x86_serve_user_rpc_and_propagate_exceptions)
 	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_gs
-#ifndef NDEBUG
-.Lx86_userexcept_unwind_interrupt_kernel_esp_inside_catch:
-	movl   %esp, %ecx
-	EXTERN(x86_except_badusage_throw_current_icpustate)
-	call   x86_except_badusage_throw_current_icpustate
 	nop
-#endif /* !NDEBUG */
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	movl   %ecx, %esp
 	.cfi_def_cfa_register %esp
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
-#ifndef NDEBUG
-	testb  $(EXCEPT_FINCATCH), FIELD_ERROR_FLAGS
-	jnz    .Lx86_userexcept_unwind_interrupt_kernel_esp_inside_catch
-#endif /* !NDEBUG */
 
 	/* Check if the interrupt state points into user-space. */
 	ttest  mask=3, loc=(OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%esp)
