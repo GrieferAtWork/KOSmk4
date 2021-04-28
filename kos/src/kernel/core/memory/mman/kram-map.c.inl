@@ -355,9 +355,27 @@ again_lock_mman:
 					pagedir_unprepare(result, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 					mman_lock_release(&mman_kernel);
-					vec.ms_v = (struct mchunk *)LOCAL_kmalloc(2 * sizeof(struct mchunk),
-					                                          inner_flags);
-					LOCAL_IFNX(if unlikely(!vec.ms_v) goto err);
+#ifndef LOCAL_NX
+					TRY
+#endif /* !LOCAL_NX */
+					{
+						vec.ms_v = (struct mchunk *)LOCAL_kmalloc(2 * sizeof(struct mchunk),
+						                                          inner_flags);
+					}
+#ifdef LOCAL_NX
+					if unlikely(!vec.ms_v)
+#else /* LOCAL_NX */
+					EXCEPT
+#endif /* !LOCAL_NX */
+					{
+						page_ccfree(part->mp_mem.mc_start,
+						            part->mp_mem.mc_size);
+#ifdef LOCAL_NX
+						goto err;
+#else /* LOCAL_NX */
+						RETHROW();
+#endif /* !LOCAL_NX */
+					}
 				}
 				vec.ms_v[0] = part->mp_mem;
 				vec.ms_c    = 1;
