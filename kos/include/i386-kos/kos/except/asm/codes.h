@@ -71,17 +71,10 @@
 
 /* Helper macros to encode/decode the `opcode' field of `E_ILLEGAL_INSTRUCTION'
  * NOTE: If the instruction doesn't depend on `modrm_reg', set it directly. */
-#ifdef __x86_64__
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm_reg) (__CCAST(__UINT64_TYPE__)(opcode) | __CCAST(__UINT64_TYPE__)(modrm_reg) << 60 | __UINT64_C(0x0800000000000000))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v)          (__CCAST(__UINT64_TYPE__)(v) & __UINT64_C(0x07ffffffffffffff))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v)          (__CCAST(__UINT8_TYPE__)(__CCAST(__UINT64_TYPE__)(v) >> 60))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v)          (__CCAST(__UINT64_TYPE__)(v) & __UINT64_C(0x0800000000000000))
-#else /* __x86_64__ */
 #define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm_reg) (__CCAST(__UINT32_TYPE__)(opcode) | __CCAST(__UINT32_TYPE__)(modrm_reg) << 29 | __UINT32_C(0x10000000))
 #define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v)          (__CCAST(__UINT32_TYPE__)(v) & __UINT32_C(0x0fffffff))
 #define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v)          (__CCAST(__UINT8_TYPE__)(__CCAST(__UINT32_TYPE__)(v) >> 29))
 #define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v)          (__CCAST(__UINT32_TYPE__)(v) & __UINT32_C(0x10000000))
-#endif /* !__x86_64__ */
 
 
 

@@ -93,16 +93,17 @@ NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self) {
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mnode_unlink_from_part_lockop_post)(Tobpostlockop(mpart) *__restrict self,
-                                                  struct mpart *__restrict UNUSED(part)) {
+                                                  REF struct mpart *__restrict part) {
 	struct mnode *me;
 	me = (struct mnode *)self;
 	weakdecref(me->mn_mman);
+	mpart_trim(part); /* This also inherits our reference to `part' */
 	mnode_free(me);
 }
 
 INTERN NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
 NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(mpart) *__restrict self,
-                                             struct mpart *__restrict part) {
+                                             REF struct mpart *__restrict part) {
 	Tobpostlockop(mpart) *post;
 	struct mnode *me;
 	me = (struct mnode *)self;
@@ -137,7 +138,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
 				mpart_maybe_clear_mlock(part);
 			mpart_lock_release(part);
-			decref_unlikely(part);
+			mpart_trim(part); /* This also inherits our reference to `part' */
 		} else {
 			Toblockop(mpart) *lop;
 			/* Must insert the node into the part's list of deleted nodes. */
@@ -146,16 +147,15 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
-			 * ownership of our node to be transfered to `part' */
+			 * ownership of our node to be transfered to `part'
+			 * Additionally, `mnode_unlink_from_part_lockop()'
+			 * inherits our reference to `part'! */
 			lop = (Toblockop(mpart) *)self;
 			lop->olo_func = &mnode_unlink_from_part_lockop;
 			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
 
 			/* Try to reap dead nodes. */
 			_mpart_lockops_reap(part);
-
-			/* Drop our old reference to the associated part. */
-			decref(part);
 			return;
 		}
 	}

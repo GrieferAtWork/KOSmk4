@@ -647,25 +647,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       correctly. The actual text is scrollable as it should be, but some
 	 *       of the text shows up as control characters and the like... */
 
-	/* TODO: Alongside mpart_merge(), there should also be a function `mpart_trim()'
-	 *       that will look at what's actually being mapped about the part, and will
-	 *       try to trim/split the part, such  that unmapped portions are no  longer
-	 *       being represented.
-	 *
-	 * Currently, the following will actually keep backing memory allocated:
-	 *
-	 * >> mmap(0x01234000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0);
-	 * >> mmap(0x01235000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0); // Automatically merged
-	 * >> mmap(0x01236000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0); // Automatically merged
-	 * >> munmap(0x01235000, PAGESIZE); // Automatically cases a split, but only within mem-nodes (mpart is unaffected)
-	 *
-	 * The idea here is that the munmap() would call `mpart_trim()', which will (asynchronously,
-	 * and only in case the part is anonymous) look at the part's set of mapped nodes and figure
-	 * out which parts of the part (if any) are actually in use. Any part that's not in use from
-	 * the  part's edges is then simply trimmed, and unused holes from the middle are handled by
-	 * trying to split the  part, such that each  consecutive chunk of used  memory has its  own
-	 * mpart, and thus doesn't require the entire region to be kept in-core all at once. */
-
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
 assert.expr: "count == 0"

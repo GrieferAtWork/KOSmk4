@@ -271,9 +271,10 @@ NOTHROW(FCALL mcoreheap_provide_page)(struct mcorepage *__restrict page) {
 
 /* Check if  the given  `node' has  all of  the
  * required properties of a core-heap mem-node. */
-PRIVATE NOBLOCK bool
-NOTHROW(FCALL is_coreheap_node)(struct mnode *__restrict node) {
-	struct mpart *part = node->mn_part;
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL is_coreheap_node)(struct mnode const *__restrict node) {
+	struct mpart const *part;
+	part = node->mn_part;
 	if unlikely(!part)
 		goto nope;
 

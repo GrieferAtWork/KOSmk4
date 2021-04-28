@@ -100,6 +100,7 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
                                               USER void *handler,
                                               USER void *stack) {
 	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
+	char const *name;
 	(void)state;
 	(void)sc_info;
 	while (pointer_count != 0 &&
@@ -109,6 +110,8 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
 	                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
 	       except_data->e_class, except_data->e_subclass);
+	if ((name = error_name(except_data->e_code)) != NULL)
+		printk(KERN_TRACE ",%s", name);
 	if (pointer_count != 0) {
 		unsigned int i;
 		for (i = 0; i < pointer_count; ++i) {

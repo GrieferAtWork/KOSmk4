@@ -627,11 +627,14 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	assert(hisize != 0);
 	assert(IS_ALIGNED(losize, PAGESIZE));
 	assert(IS_ALIGNED(hisize, PAGESIZE));
+
+#ifndef NDEBUG
 	assertf(!MPART_ST_INMEM(part->mp_state) ||
 	        mpart_getramsize(part) == mpart_getsize(part),
 	        "mpart_getramsize(part) = %#" PRIxSIZ "\n"
 	        "mpart_getsize(part)    = %#" PRIxSIZ,
 	        mpart_getramsize(part), mpart_getsize(part));
+#endif /* !NDEBUG */
 
 	/* Check if we also need to allocate an additional
 	 * block-status  bitset  for  use  with   `hipart' */
@@ -880,6 +883,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		break;
 	}
 
+#ifndef NDEBUG
 	assertf(!MPART_ST_INMEM(lopart->mp_state) ||
 	        mpart_getramsize(lopart) == losize,
 	        "mpart_getramsize(lopart) = %#" PRIxSIZ "\n"
@@ -890,6 +894,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	        "mpart_getramsize(hipart) = %#" PRIxSIZ "\n"
 	        "hisize                   = %#" PRIxSIZ,
 	        mpart_getramsize(hipart), hisize);
+#endif /* !NDEBUG */
 
 	/* Remove the old node from the kernel mman. */
 	mman_mappings_removenode(&mman_kernel, node);

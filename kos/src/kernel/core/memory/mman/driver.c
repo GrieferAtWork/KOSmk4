@@ -2729,7 +2729,10 @@ driver_disable_textrel(struct driver *__restrict self)
 			    (node->mn_module == &self->d_module)) {
 				assert(node->mn_part != NULL);
 				assert(node->mn_flags & MNODE_F_MPREPARED);
-				/* Remap this node w/o write-permissions. */
+				/* Remap this node w/o write-permissions.
+				 * NOTE: We know that write-access should't be a
+				 *       thing here, since we skip `PF_W' above. */
+				node->mn_flags &= ~MNODE_F_PWRITE;
 				mpart_mmap_force(node->mn_part, mnode_getaddr(node),
 				                 mnode_getsize(node), node->mn_partoff,
 				                 mnode_getperm_force_nouser(node));

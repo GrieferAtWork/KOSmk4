@@ -121,7 +121,7 @@ struct forktree {
 
 INTDEF NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) * /* from "mnode.c" */
 NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(mpart) *__restrict self,
-                                             struct mpart *__restrict part);
+                                             REF struct mpart *__restrict part);
 INTDEF NOBLOCK NONNULL((1)) void /* from "mnode.c" */
 NOTHROW(FCALL mpart_maybe_clear_mlock)(struct mpart *__restrict self);
 
@@ -142,7 +142,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
 				mpart_maybe_clear_mlock(part);
 			mpart_lock_release(part);
-			decref_unlikely(part);
+			mpart_trim(part); /* This also inherits our reference to `part' */
 		} else {
 			Toblockop(mpart) *lop;
 
@@ -155,16 +155,15 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
-			 * ownership of our node to be transfered to `part' */
+			 * ownership of our node to be transfered to `part'
+			 * Additionally, `mnode_unlink_from_part_lockop()'
+			 * inherits our reference to `part'! */
 			lop = (Toblockop(mpart) *)node;
 			lop->olo_func = &mnode_unlink_from_part_lockop;
 			SLIST_ATOMIC_INSERT(&part->mp_lockops, lop, olo_link);
 
 			/* Try to reap dead nodes. */
 			_mpart_lockops_reap(part);
-
-			/* Drop our old reference to the associated part. */
-			decref(part);
 			return;
 		}
 	}

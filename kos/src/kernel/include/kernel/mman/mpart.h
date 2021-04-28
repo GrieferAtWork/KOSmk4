@@ -1134,6 +1134,26 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self);
 
 
 
+/* If `self' is an anonymous mem-part, asynchronously acquire a
+ * lock to `self' and compare the min/max-addr bounds of `self'
+ * against the portions that are actually mapped by  mem-nodes.
+ * If it is found that leading/trailing portions of `self'  are
+ * not mapped by  any mem-node, trim  those parts from  `self'.
+ * If there are holes within `self' of pages not mapped by  any
+ * mem-nodes,  asynchronously split `self', and update nodes in
+ * order to get rid of the relevant ranges.
+ * This function should  be called  whenever mem-node  mappings
+ * of `self' have been removed, in order to drop the references
+ * that were originally held by those nodes.
+ * NOTE: When `self' isn't anonymous, simply `decref(self)'!
+ * NOTE: This function usually doesn't need to be called directly.
+ *       Instead, it is  called from  `mnode_destroy()' to  decref
+ *       the associated part after the node has been removed  from
+ *       the list of node-mappings of `self' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self);
+
+
 
 /* TODO: =============== BEGIN_DEPRECATED ===============
  *
