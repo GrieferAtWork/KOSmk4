@@ -2145,6 +2145,16 @@ DECL_END
 #include "trace-malloc-heap.c.inl"
 #endif /* !__INTELLISENSE__ */
 
+DECL_BEGIN
+
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+/* Must also override the default `kmalloc_noslab()' with our trace-enabled variant. */
+DEFINE_PUBLIC_ALIAS(kmalloc_noslab, kmalloc);
+DEFINE_PUBLIC_ALIAS(kmalloc_noslab_nx, kmalloc_nx);
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+DECL_END
+
 #endif /* CONFIG_TRACE_MALLOC */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_TRACE_MALLOC_C */
