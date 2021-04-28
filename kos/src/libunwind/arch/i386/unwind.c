@@ -969,7 +969,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_scpustate_base)(struct scpustate const *__res
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->scs_gpregs.gp_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->scs_gpregs.gp_esi; break;
 	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->scs_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = scpustate_getsp(self); break;
+	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = scpustate_getpsp(self); break;
 	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->scs_gpregs.gp_ebx; break;
 	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->scs_gpregs.gp_edx; break;
 	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->scs_gpregs.gp_ecx; break;
@@ -981,7 +981,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_scpustate_base)(struct scpustate const *__res
 	case CFI_386_UNWIND_REGISTER_CS:     *(u32 *)dst = scpustate_getcs(self); break;
 	case CFI_386_UNWIND_REGISTER_SS:     *(u32 *)dst = scpustate_getss(self); break;
 	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = scpustate_getpflags(self); break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = scpustate_getpc(self); break;
+	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = scpustate_getpip(self); break;
 	default:
 		goto badreg;
 	}
@@ -999,7 +999,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restri
 	case CFI_386_UNWIND_REGISTER_EDI: self->scs_gpregs.gp_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI: self->scs_gpregs.gp_esi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EBP: self->scs_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP: *pself = scpustate_setsp_p(self, *(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_ESP: *pself = scpustate_setpsp_p(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_EBX: self->scs_gpregs.gp_ebx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EDX: self->scs_gpregs.gp_edx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ECX: self->scs_gpregs.gp_ecx = *(u32 const *)src; break;
@@ -1008,7 +1008,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restri
 	case CFI_386_UNWIND_REGISTER_FS:  scpustate_setfs(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_ES:  scpustate_setes(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_DS:  scpustate_setds(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EIP: scpustate_setpc(self, *(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_EIP: scpustate_setpip(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_SS:
 		if (!scpustate_trysetuserss(self, *(u32 const *)src))
 			goto badreg;
@@ -1050,7 +1050,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_base)(struct icpustate const *__res
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->ics_gpregs.gp_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->ics_gpregs.gp_esi; break;
 	case CFI_386_UNWIND_REGISTER_EBP:    *(u32 *)dst = self->ics_gpregs.gp_ebp; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = icpustate_getsp(self); break;
+	case CFI_386_UNWIND_REGISTER_ESP:    *(u32 *)dst = icpustate_getpsp(self); break;
 	case CFI_386_UNWIND_REGISTER_EBX:    *(u32 *)dst = self->ics_gpregs.gp_ebx; break;
 	case CFI_386_UNWIND_REGISTER_EDX:    *(u32 *)dst = self->ics_gpregs.gp_edx; break;
 	case CFI_386_UNWIND_REGISTER_ECX:    *(u32 *)dst = self->ics_gpregs.gp_ecx; break;
@@ -1062,7 +1062,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_base)(struct icpustate const *__res
 	case CFI_386_UNWIND_REGISTER_CS:     *(u32 *)dst = icpustate_getcs(self); break;
 	case CFI_386_UNWIND_REGISTER_SS:     *(u32 *)dst = icpustate_getss(self); break;
 	case CFI_386_UNWIND_REGISTER_EFLAGS: *(u32 *)dst = icpustate_getpflags(self); break;
-	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = icpustate_getpc(self); break;
+	case CFI_386_UNWIND_REGISTER_EIP:    *(u32 *)dst = icpustate_getpip(self); break;
 	default:
 		goto badreg;
 	}
@@ -1080,7 +1080,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restri
 	case CFI_386_UNWIND_REGISTER_EDI:    self->ics_gpregs.gp_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    self->ics_gpregs.gp_esi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EBP:    self->ics_gpregs.gp_ebp = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ESP:    *pself = icpustate_setsp_p(self, *(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_ESP:    *pself = icpustate_setpsp_p(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_EBX:    self->ics_gpregs.gp_ebx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EDX:    self->ics_gpregs.gp_edx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ECX:    self->ics_gpregs.gp_ecx = *(u32 const *)src; break;
@@ -1089,7 +1089,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restri
 	case CFI_386_UNWIND_REGISTER_FS:     icpustate_setfs(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_ES:     icpustate_setes(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_DS:     icpustate_setds(self, *(u32 const *)src); break;
-	case CFI_386_UNWIND_REGISTER_EIP:    icpustate_setpc(self, *(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_EIP:    icpustate_setpip(self, *(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_SS:
 		if (!icpustate_trysetuserss(self, *(u32 const *)src))
 			goto badreg;

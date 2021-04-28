@@ -112,7 +112,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 				tls_info = error_info();
 				memset(tls_info, 0, sizeof(*tls_info));
 				tls_info->ei_code             = ERROR_CODEOF(E_INTERRUPT);
-				tls_info->ei_data.e_faultaddr = (void *)icpustate_getpc(state);
+				tls_info->ei_data.e_faultaddr = icpustate_getpc(state);
 				/* FIXME: This function has a chance to never return when
 				 *        it causes the calling process to be terminated!
 				 * However, we need it to always return, since `sighand_raise_signal()'
@@ -144,7 +144,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	}
 
 	/* Figure out which stack we should write data to. */
-	orig_usp = (USER CHECKED byte_t *)icpustate_getuserpsp(state);
+	orig_usp = (USER CHECKED byte_t *)icpustate_getusersp(state);
 	usp      = orig_usp;
 	/* Check if sigaltstack should be used. */
 	if (action->sa_flags & SIGACTION_SA_ONSTACK) {
@@ -255,7 +255,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	user_ucontext->uc_mcontext.mc_context.ucs_cs            = icpustate_getcs(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_ss            = icpustate_getss(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_eflags        = (u32)icpustate_getpflags(state);
-	user_ucontext->uc_mcontext.mc_context.ucs_eip           = (u32)icpustate_getpc(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_eip           = (u32)icpustate_getpip(state);
 #else /* DEFINE_RAISE32 */
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_rdi = (u64)gpregs_getpdi(&state->ics_gpregs);
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_rsi = (u64)gpregs_getpsi(&state->ics_gpregs);
@@ -293,7 +293,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	user_ucontext->uc_mcontext.mc_context.ucs_cs               = icpustate_getcs(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_ss               = icpustate_getss(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_rflags           = (u64)icpustate_getpflags(state);
-	user_ucontext->uc_mcontext.mc_context.ucs_rip              = (u64)icpustate_getpc(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_rip              = (u64)icpustate_getpip(state);
 #endif /* !DEFINE_RAISE32 */
 
 	user_sc_info = NULL;
@@ -412,7 +412,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	gpregs_setpsi(&state->ics_gpregs, (u32)(uintptr_t)(must_restore_sigmask ? user_sigset : NULL));
 	gpregs_setpdi(&state->ics_gpregs, (u32)(uintptr_t)user_sc_info);
 #endif /* !DEFINE_RAISE64 */
-	icpustate_setpc(state, (NAME(u))(uintptr_t)action->sa_handler);
+	icpustate_setpip(state, (NAME(u))(uintptr_t)action->sa_handler);
 	icpustate_setuserpsp(state, (NAME(u))(uintptr_t)usp);
 	{
 		union x86_user_eflags_mask word;

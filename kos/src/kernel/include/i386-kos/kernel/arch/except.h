@@ -43,7 +43,7 @@ struct kcpustate;
 typedef NONNULL((1, 2)) unsigned int
 /*NOTHROW*/ (KCALL *dwarf_perso_t)(struct unwind_fde_struct *__restrict fde,
                                    struct kcpustate *__restrict state,
-                                   void *lsda);
+                                   void const *lsda);
 #endif /* __CC__ */
 #define DWARF_PERSO_EXECUTE_HANDLER     0x0000 /* An exception handler was found, and `state' was updated */
 #define DWARF_PERSO_EXECUTE_HANDLER_NOW 0x0001 /* Same as `DWARF_PERSO_EXECUTE_HANDLER', but don't adjust for `DW_CFA_GNU_args_size' */
@@ -93,9 +93,9 @@ typedef NONNULL((1, 2)) unsigned int
 
 #ifdef __CC__
 struct x86_asm_except_entry {
-	__UINTPTR_TYPE__ ee_entry; /* Exception handler entry PC (or 0 as sentinel) */
-	__UINTPTR_TYPE__ ee_start; /* Exception handler start PC */
-	__UINTPTR_TYPE__ ee_end;   /* Exception handler end PC */
+	void const      *ee_entry; /* Exception handler entry PC (or 0 as sentinel) */
+	void const      *ee_start; /* Exception handler start PC */
+	void const      *ee_end;   /* Exception handler end PC */
 	__UINTPTR_TYPE__ ee_mask;  /* Catch mask, or (uintptr_t)-1 to catch anything */
 };
 
@@ -113,7 +113,7 @@ struct x86_asm_except_entry {
 FUNDEF unsigned int
 NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
                                           struct kcpustate *__restrict state,
-                                          void *lsda);
+                                          void const *lsda);
 #endif /* __CC__ */
 
 

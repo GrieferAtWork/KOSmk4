@@ -360,31 +360,31 @@ DBG_COMMAND(trace,
 	struct fcpustate state;
 	unsigned int error;
 #ifdef LOG_STACK_REMAINDER
-	uintptr_t last_good_sp;
+	byte_t *last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &state);
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
 #if 0
-#define SP_ARGS DBGSTR("sp=%p"), (void *)fcpustate_getsp(&state)
+#define SP_ARGS DBGSTR("sp=%p"), fcpustate_getsp(&state)
 #else
 #define SP_ARGS NULL
 #endif
-	dbg_addr2line_printf(dbg_instruction_trypred((void const *)fcpustate_getpc(&state),
+	dbg_addr2line_printf(dbg_instruction_trypred(fcpustate_getpc(&state),
 	                                             instrlen_isa_from_fcpustate(&state)),
-	                     (void const *)fcpustate_getpc(&state), SP_ARGS);
+	                     fcpustate_getpc(&state), SP_ARGS);
 	for (;;) {
 		struct fcpustate old_state;
 		memcpy(&old_state, &state, sizeof(struct fcpustate));
-		error = unwind_for_debug((void *)(fcpustate_getpc(&old_state) - 1),
+		error = unwind_for_debug(fcpustate_getpc(&old_state) - 1,
 		                         &unwind_getreg_fcpustate, &old_state,
 		                         &unwind_setreg_fcpustate, &state);
 		if (error != UNWIND_SUCCESS)
 			break;
-		dbg_addr2line_printf(dbg_instruction_trypred((void const *)fcpustate_getpc(&state),
+		dbg_addr2line_printf(dbg_instruction_trypred(fcpustate_getpc(&state),
 		                                             instrlen_isa_from_fcpustate(&state)),
-		                     (void const *)fcpustate_getpc(&state), SP_ARGS);
+		                     fcpustate_getpc(&state), SP_ARGS);
 #ifdef LOG_STACK_REMAINDER
 		last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -394,17 +394,17 @@ DBG_COMMAND(trace,
 #ifdef LOG_STACK_REMAINDER
 	if (ADDR_ISKERN(last_good_sp)) {
 		void *minaddr, *endaddr;
-		get_stack_for(&minaddr, &endaddr, (void *)last_good_sp);
-		if (last_good_sp >= (uintptr_t)minaddr &&
-		    last_good_sp < (uintptr_t)endaddr) {
+		get_stack_for(&minaddr, &endaddr, last_good_sp);
+		if (last_good_sp >= (byte_t *)minaddr &&
+		    last_good_sp < (byte_t *)endaddr) {
 			bool is_first = true;
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			uintptr_t iter;
-			iter = FLOOR_ALIGN(last_good_sp, sizeof(void *));
+			iter = FLOOR_ALIGN((uintptr_t)last_good_sp, sizeof(void *));
 			for (; iter < (uintptr_t)endaddr; iter += sizeof(void *))
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
 			uintptr_t iter;
-			iter  = CEIL_ALIGN(last_good_sp, sizeof(void *));
+			iter  = CEIL_ALIGN((uintptr_t)last_good_sp, sizeof(void *));
 			while (iter > (uintptr_t)minaddr)
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 			{
@@ -441,7 +441,7 @@ DBG_COMMAND(u,
 	void const *final_pc;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &oldstate);
 	memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
-	error = unwind_for_debug((void *)(fcpustate_getpc(&oldstate) - 1),
+	error = unwind_for_debug(fcpustate_getpc(&oldstate) - 1,
 	                         &unwind_getreg_fcpustate, &oldstate,
 	                         &unwind_setreg_fcpustate, &newstate);
 	if (error != UNWIND_SUCCESS) {
@@ -450,7 +450,7 @@ DBG_COMMAND(u,
 	} else {
 		dbg_setallregs(DBG_REGLEVEL_VIEW, &newstate);
 	}
-	final_pc = (void const *)fcpustate_getpc(&newstate);
+	final_pc = fcpustate_getpc(&newstate);
 	dbg_addr2line_printf(dbg_instruction_trypred(final_pc, instrlen_isa_from_fcpustate(&newstate)),
 	                     final_pc, DBGSTR("sp=%p"), final_pc);
 	return 0;

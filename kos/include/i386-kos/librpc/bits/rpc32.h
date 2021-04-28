@@ -145,7 +145,7 @@ rpc_register_state32_apply_icpustate(struct rpc_register_state32 *__restrict sel
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_ESI, state->ics_gpregs.gp_rsi);   /* [P] Source pointer. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_EDI, state->ics_gpregs.gp_rdi);   /* [P] Destination pointer. */
 	if (RPC_REGISTER_STATE32_ISVALID(*self, RPC_386_REGISTER_ESP))
-		icpustate_setuserpsp(state, self->rs_regs[RPC_386_REGISTER_ESP]);
+		icpustate_setusersp(state, self->rs_regs[RPC_386_REGISTER_ESP]);
 #else /* __x86_64__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_EAX, state->ics_gpregs.gp_eax);   /* [C] Accumulator. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_ECX, state->ics_gpregs.gp_ecx);   /* [C] Counter register. */
@@ -157,15 +157,14 @@ rpc_register_state32_apply_icpustate(struct rpc_register_state32 *__restrict sel
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_EDI, state->ics_gpregs.gp_edi);   /* [P] Destination pointer. */
 #endif /* !__x86_64__ */
 	if (RPC_REGISTER_STATE32_ISVALID(*self, RPC_386_REGISTER_EIP))
-		icpustate_setpc(state, (__uintptr_t)self->rs_regs[RPC_386_REGISTER_EIP]);
+		icpustate_setpc(state, self->rs_regs[RPC_386_REGISTER_EIP]);
 	/* Mask of modifiable CPU status flags */
 #define LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK \
 	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF)
 	if (RPC_REGISTER_STATE32_ISVALID(*self, RPC_386_REGISTER_EFLAGS)) {
-		__syscall_ulong_t new_flags;
-		new_flags = (__syscall_ulong_t)self->rs_regs[RPC_386_REGISTER_EFLAGS];
-		new_flags &= LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK;
-		icpustate_mskpflags(state, ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK, new_flags);
+		icpustate_mskpflags(state, ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK,
+		                    self->rs_regs[RPC_386_REGISTER_EFLAGS] &
+		                    LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK);
 	}
 #undef LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK
 #ifdef __KERNEL__
@@ -227,15 +226,15 @@ rpc_register_state32_getreg_icpustate(struct icpustate *__restrict state,
 	case RPC_386_REGISTER_EBP:    result = gpregs_getpbp(&state->ics_gpregs); break; /* [P] Stack base pointer. */
 	case RPC_386_REGISTER_ESI:    result = gpregs_getpsi(&state->ics_gpregs); break; /* [P] Source pointer. */
 	case RPC_386_REGISTER_EDI:    result = gpregs_getpdi(&state->ics_gpregs); break; /* [P] Destination pointer. */
-	case RPC_386_REGISTER_ES:     result = icpustate_getes(state); break; /* ES segment. */
-	case RPC_386_REGISTER_DS:     result = icpustate_getds(state); break; /* DS segment. */
-	case RPC_386_REGISTER_FS:     result = icpustate_getfs(state); break; /* FS segment. */
-	case RPC_386_REGISTER_GS:     result = icpustate_getgs(state); break; /* GS segment. */
-	case RPC_386_REGISTER_ESP:    result = icpustate_getuserpsp(state); break; /* [P] Stack pointer. */
-	case RPC_386_REGISTER_EIP:    result = icpustate_getpc(state); break;     /* Instruction pointer. */
-	case RPC_386_REGISTER_EFLAGS: result = icpustate_getpflags(state); break;  /* Flags register. */
-	case RPC_386_REGISTER_CS:     result = icpustate_getcs(state); break;      /* CS segment. */
-	case RPC_386_REGISTER_SS:     result = icpustate_getuserss(state); break;  /* SS segment. */
+	case RPC_386_REGISTER_ES:     result = icpustate_getes(state); break;            /* ES segment. */
+	case RPC_386_REGISTER_DS:     result = icpustate_getds(state); break;            /* DS segment. */
+	case RPC_386_REGISTER_FS:     result = icpustate_getfs(state); break;            /* FS segment. */
+	case RPC_386_REGISTER_GS:     result = icpustate_getgs(state); break;            /* GS segment. */
+	case RPC_386_REGISTER_ESP:    result = icpustate_getuserpsp(state); break;       /* [P] Stack pointer. */
+	case RPC_386_REGISTER_EIP:    result = icpustate_getpip(state); break;           /* Instruction pointer. */
+	case RPC_386_REGISTER_EFLAGS: result = icpustate_getpflags(state); break;        /* Flags register. */
+	case RPC_386_REGISTER_CS:     result = icpustate_getcs(state); break;            /* CS segment. */
+	case RPC_386_REGISTER_SS:     result = icpustate_getuserss(state); break;        /* SS segment. */
 #ifdef __KERNEL__
 	case RPC_386_REGISTER_FSBASE: result = (__uint32_t)(__uintptr_t)get_user_fsbase(); break;
 	case RPC_386_REGISTER_GSBASE: result = (__uint32_t)(__uintptr_t)get_user_gsbase(); break;

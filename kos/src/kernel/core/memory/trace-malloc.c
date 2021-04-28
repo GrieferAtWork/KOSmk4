@@ -142,7 +142,7 @@ struct trace_node {
 	u8          tn_flags; /* Node flags (or'd with `__GFP_HEAPMASK') */
 	u8          tn_kind;  /* Node kind (one of `TRACE_NODE_KIND_*') */
 	u32         tn_tid;   /* [const] ROOT-namespace TID of the allocating thread. */
-	COMPILER_FLEXIBLE_ARRAY(void *, tn_trace);
+	COMPILER_FLEXIBLE_ARRAY(void const *, tn_trace);
 	                      /* [1..1][0..MALLNODE_TRACESZ(self)]
 	                       * Traceback of where the pointer was originally allocated. */
 };
@@ -1014,11 +1014,11 @@ NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
 			result += gc_reachable_pointer(((void **)&context->scs_gpregs)[i]);
 		stack_min = mnode_getminaddr(&FORTASK(thread, this_kernel_stacknode));
 		stack_end = mnode_getendaddr(&FORTASK(thread, this_kernel_stacknode));
-#ifdef scpustate_getkernelpsp
-		sp = (void *)scpustate_getkernelpsp(context);
-#else /* scpustate_getkernelpsp */
-		sp = (void *)scpustate_getsp(context);
-#endif /* !scpustate_getkernelpsp */
+#ifdef scpustate_getkernelsp
+		sp = scpustate_getkernelsp(context);
+#else /* scpustate_getkernelsp */
+		sp = scpustate_getsp(context);
+#endif /* !scpustate_getkernelsp */
 		if (sp > stack_min && sp <= stack_end) {
 			/* Search the used portion of the kernel stack. */
 			result += gc_reachable_data((byte_t *)sp,
@@ -1049,7 +1049,7 @@ NOTHROW(KCALL gc_reachable_this_thread)(void) {
 	for (i = 0; i < (sizeof(struct lcpustate) / sizeof(void *)); ++i)
 		result += gc_reachable_pointer(((void **)&context)[i]);
 	my_stack = THIS_KERNEL_STACK;
-	sp       = (void *)lcpustate_getsp(&context);
+	sp       = lcpustate_getsp(&context);
 	get_stack_for(&stack_min, &stack_end, sp);
 	if (sp > stack_min && sp <= stack_end) {
 		/* Search the used portion of the kernel stack. */
@@ -1621,7 +1621,7 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 	     iter; iter = trace_node_leak_next(iter)) {
 		struct trace_node *xref_leak;
 		size_t tracesize, i;
-		void **traceback, *pc;
+		void const **traceback, *pc;
 		char const *method;
 		uintptr_t umin, umax;
 		size_t xrefs;
@@ -1706,7 +1706,7 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 			                    instruction_trypred(pc, INSTRLEN_ISA_DEFAULT),
 			                    pc, "Allocated here"));
 			for (i = 1; i < tracesize; ++i) {
-				void *pc_ent;
+				void const *pc_ent;
 				pc_ent = traceback[i];
 				if (!pc_ent)
 					break;
@@ -1803,7 +1803,7 @@ kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 
 INTERN void /* Must be INTERN, because this function gets overwritten
              * when   `nomall'   is   passed   on   the   commandline */
-NOTHROW(KCALL trace_malloc_generate_traceback)(void **__restrict buffer, size_t buflen,
+NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, size_t buflen,
                                                struct lcpustate *__restrict state,
                                                unsigned int n_skip) {
 #if 1
@@ -1820,14 +1820,14 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void **__restrict buffer, size_t 
 		 * enough memory... */
 		do {
 			if (n_skip == 0) {
-				*buffer++ = (void *)lcpustate_getpc(state);
+				*buffer++ = lcpustate_getpc(state);
 				if (!--buflen)
 					return;
 			} else {
 				--n_skip;
 			}
 			oldstate = *state;
-		} while (unwind((void *)(lcpustate_getpc(&oldstate) - 1),
+		} while (unwind(lcpustate_getpc(&oldstate) - 1,
 		                &unwind_getreg_lcpustate, &oldstate,
 		                &unwind_setreg_lcpustate, state) == UNWIND_SUCCESS);
 	} EXCEPT {

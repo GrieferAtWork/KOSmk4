@@ -420,7 +420,7 @@ loophint(struct icpustate *__restrict state) {
 
 
 PRIVATE ATTR_NORETURN NOBLOCK void
-NOTHROW(FCALL unwind)(struct icpustate *__restrict self) {
+NOTHROW(FCALL unwind_interrupt)(struct icpustate *__restrict self) {
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
 		unsigned int i;
@@ -470,13 +470,13 @@ complete_except(struct icpustate *__restrict self) {
 	/* Fill in the fault address. */
 	{
 		void const *pc, *next_pc;
-		pc      = (void const *)icpustate_getpc(self);
+		pc      = icpustate_getpc(self);
 		next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(self));
 		if (next_pc)
-			icpustate_setpc(self, (uintptr_t)next_pc);
-		PERTASK_SET(this_exception_faultaddr, (void *)pc);
+			icpustate_setpc(self, next_pc);
+		PERTASK_SET(this_exception_faultaddr, pc);
 	}
-	unwind(self);
+	unwind_interrupt(self);
 }
 
 /* Fill in missing exception pointer. */
@@ -501,12 +501,12 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
                                     uintptr_t ptr5, uintptr_t ptr6) {
 	unsigned int i;
 	void const *pc, *next_pc;
-	pc      = (void const *)icpustate_getpc(state);
+	pc      = icpustate_getpc(state);
 	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
 	if (next_pc)
-		icpustate_setpc(state, (uintptr_t)next_pc);
+		icpustate_setpc(state, next_pc);
 	PERTASK_SET(this_exception_code, code);
-	PERTASK_SET(this_exception_faultaddr, (void *)pc);
+	PERTASK_SET(this_exception_faultaddr, pc);
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, opcode);
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
 	PERTASK_SET(this_exception_args.e_pointers[2], ptr2);
@@ -515,11 +515,11 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
 	PERTASK_SET(this_exception_args.e_pointers[5], ptr5);
 	PERTASK_SET(this_exception_args.e_pointers[6], ptr6);
 	for (i = 7; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+		PERTASK_SET(this_exception_args.e_pointers[i], 0);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
-	unwind(state);
+	unwind_interrupt(state);
 }
 
 PRIVATE ATTR_NORETURN NONNULL((1)) void FCALL
@@ -527,17 +527,17 @@ throw_exception(struct icpustate *__restrict state,
                 error_code_t code, uintptr_t ptr0, uintptr_t ptr1) {
 	unsigned int i;
 	void const *pc, *next_pc;
-	pc      = (void const *)icpustate_getpc(state);
+	pc      = icpustate_getpc(state);
 	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
 	if (next_pc)
-		icpustate_setpc(state, (uintptr_t)next_pc);
+		icpustate_setpc(state, next_pc);
 	PERTASK_SET(this_exception_code, code);
-	PERTASK_SET(this_exception_faultaddr, (void *)pc);
+	PERTASK_SET(this_exception_faultaddr, pc);
 	PERTASK_SET(this_exception_args.e_pointers[0], ptr0);
 	PERTASK_SET(this_exception_args.e_pointers[1], ptr1);
 	for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
-	unwind(state);
+		PERTASK_SET(this_exception_args.e_pointers[i], 0);
+	unwind_interrupt(state);
 }
 
 PRIVATE ATTR_NORETURN NONNULL((1)) void
@@ -621,7 +621,7 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 		if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_GFP && BAD_USAGE_ECODE(usage) == 0) {
 			printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? "
 			                    "[pc=%p,opcode=%#" PRIxPTR ",opflags=%#" PRIx32 "]\n",
-			       (void *)icpustate_getpc(state), opcode, op_flags);
+			       icpustate_getpc(state), opcode, op_flags);
 			throw_exception(state,
 			                ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
 			                X86_64_ADDRBUS_NONCANON_MIN,
@@ -1065,16 +1065,16 @@ assert_canonical_pc(struct icpustate *__restrict state,
 		 * register ended up getting corrupted due to a bad `call', rather than
 		 * a bad `jmp' */
 		void const *callsite_pc = pc;
-		uintptr_t sp = icpustate_getsp(state);
+		byte_t const *sp = icpustate_getsp(state);
 		bool is_compat;
 		unsigned int i;
-		if (sp >= KERNELSPACE_BASE && icpustate_isuser(state))
+		if (sp >= (byte_t const *)KERNELSPACE_BASE && icpustate_isuser(state))
 			goto set_noncanon_pc_exception;
 		is_compat = icpustate_is32bit(state);
 		if (is_compat) {
-			callsite_pc = (void *)(uintptr_t)(*(u32 *)sp);
+			callsite_pc = (void const *)(uintptr_t)(*(u32 const *)sp);
 		} else {
-			callsite_pc = (void *)*(uintptr_t *)sp;
+			callsite_pc = *(void const *const *)sp;
 		}
 		/* Verify the call-site program counter. */
 		if (icpustate_isuser(state) ? ((byte_t const *)callsite_pc >= (byte_t const *)USERSPACE_END)
@@ -1082,7 +1082,7 @@ assert_canonical_pc(struct icpustate *__restrict state,
 			callsite_pc = pc;
 			goto set_noncanon_pc_exception;
 		}
-		icpustate_setpc(state, (uintptr_t)callsite_pc);
+		icpustate_setpc(state, callsite_pc);
 		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 		{
 			void const *call_instr;
@@ -1092,24 +1092,24 @@ assert_canonical_pc(struct icpustate *__restrict state,
 				callsite_pc = call_instr;
 		}
 set_noncanon_pc_exception:
-		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
+		PERTASK_SET(this_exception_faultaddr, callsite_pc);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 		PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)pc);
 		PERTASK_SET(this_exception_args.e_segfault.s_context,
-		            (uintptr_t)(E_SEGFAULT_CONTEXT_USERCODE |
-		                        E_SEGFAULT_CONTEXT_NONCANON |
-		                        E_SEGFAULT_CONTEXT_EXEC));
+		            E_SEGFAULT_CONTEXT_USERCODE |
+		            E_SEGFAULT_CONTEXT_NONCANON |
+		            E_SEGFAULT_CONTEXT_EXEC);
 		if (!icpustate_isuser(state)) {
 			PERTASK_SET(this_exception_args.e_segfault.s_context,
-			            (uintptr_t)(E_SEGFAULT_CONTEXT_NONCANON |
-			                        E_SEGFAULT_CONTEXT_EXEC));
+			            E_SEGFAULT_CONTEXT_NONCANON |
+			            E_SEGFAULT_CONTEXT_EXEC);
 		}
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
-		icpustate_setpc(state, (uintptr_t)callsite_pc);
+			PERTASK_SET(this_exception_args.e_pointers[i], 0);
+		icpustate_setpc(state, callsite_pc);
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF]\n",
 		       pc, callsite_pc);
-		unwind(state);
+		unwind_interrupt(state);
 	}
 }
 
@@ -1161,13 +1161,13 @@ assert_canonical_address(struct icpustate *__restrict state,
 #define EMU86_GETFLAGS()            icpustate_getpflags(_state)
 #define EMU86_SETFLAGS(v)           icpustate_setpflags(_state, v)
 #define EMU86_MSKFLAGS(mask, value) icpustate_mskpflags(_state, mask, value)
-#define EMU86_GETIPREG()            (uintptr_t)icpustate_getpc(_state)
-#define EMU86_SETIPREG(v)           icpustate_setpc(_state, (__uintptr_t)(v))
-#define EMU86_GETSPREG()            (uintptr_t)icpustate_getsp(_state)
+#define EMU86_GETIPREG()            icpustate_getpip(_state)
+#define EMU86_SETIPREG(v)           icpustate_setpip(_state, v)
+#define EMU86_GETSPREG()            icpustate_getpsp(_state)
 #ifdef __x86_64__
-#define EMU86_SETSPREG(v)           icpustate64_setrsp(_state, (__uintptr_t)(v))
+#define EMU86_SETSPREG(v)           icpustate_setpsp(_state, v)
 #else /* __x86_64__ */
-#define EMU86_SETSPREG(v)           (void)(_state = icpustate_setsp_p(_state, (__uintptr_t)(v)))
+#define EMU86_SETSPREG(v)           (void)(_state = icpustate_setpsp_p(_state, v))
 #endif /* !__x86_64__ */
 #define EMU86_GETPCPTR()            (byte_t *)EMU86_GETIPREG()
 #define EMU86_SETPCPTR(v)           EMU86_SETIPREG(v)
@@ -1687,7 +1687,7 @@ done:
 
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 x86_emulate_xbegin(struct icpustate *__restrict state,
-                   uintptr_t fallback_ip) {
+                   void const *fallback_ip) {
 	REF struct mrtm_driver_hooks *hooks;
 	/* Lookup RTM hooks. */
 	hooks = awref_get(&mrtm_hooks);
@@ -1723,7 +1723,7 @@ throw_illegal_op:
  * instruction must be implemented to behave as though execution
  * was outside of an RTM context (which it is) */
 #define EMU86_EMULATE_RETURN_AFTER_XBEGIN(fallback_ip) \
-	return x86_emulate_xbegin(_state, fallback_ip)
+	return x86_emulate_xbegin(_state, (void const *)(fallback_ip))
 #undef EMU86_EMULATE_RETURN_AFTER_XABORT
 #undef EMU86_EMULATE_RETURN_AFTER_XEND
 #define EMU86_EMULATE_XTEST() 0

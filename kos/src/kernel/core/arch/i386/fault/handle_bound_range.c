@@ -53,7 +53,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 	emu86_opcode_t opcode;
 	emu86_opflags_t flags;
 	uintptr_t bound_index, bound_min, bound_max;
-	curr_pc   = (byte_t const *)icpustate_getpc(state);
+	curr_pc   = icpustate_getpc(state);
 	flags     = emu86_opflags_from_icpustate(state);
 	next_pc   = emu86_opcode_decode(curr_pc, &opcode, &flags);
 	bound_min = bound_index = bound_max = 0;
@@ -79,7 +79,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 				bound_max   = UNALIGNED_GET32((u32 const *)(addr + 4));
 			}
 		} EXCEPT {
-			icpustate_setpc(state, (uintptr_t)next_pc);
+			icpustate_setpc(state, next_pc);
 			RETHROW();
 		}
 		if ((s32)bound_index >= (s32)bound_min &&
@@ -88,13 +88,13 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			 *                 must have modified the bounds before we got  to
 			 *                 read them. - Just ignore this and act as though
 			 *                 this exception has never gotten raised! */
-			icpustate_setpc(state, (uintptr_t)next_pc);
+			icpustate_setpc(state, next_pc);
 			return state;
 		}
 	} else {
 		next_pc = instruction_trysucc(curr_pc, instrlen_isa_from_icpustate(state));
 	}
-	PERTASK_SET(this_exception_faultaddr, (void *)curr_pc);
+	PERTASK_SET(this_exception_faultaddr, curr_pc);
 	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_index, bound_index);
 	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_min, bound_min);
@@ -105,10 +105,10 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void *)0);
+			PERTASK_SET(this_exception_trace[i], (void const *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
-	icpustate_setpc(state, (uintptr_t)next_pc);
+	icpustate_setpc(state, next_pc);
 	x86_userexcept_unwind_interrupt(state);
 }
 

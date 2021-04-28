@@ -1423,7 +1423,7 @@ PRIVATE u32 KCALL rtm_handle_exception(void) {
 
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 x86_emulate_xbegin(struct icpustate *__restrict state,
-                   uintptr_t fallback_ip) {
+                   void const *fallback_ip) {
 	struct rtm_machstate mach;
 	x86_rtm_status_t status;
 	mach.r_icstate = state;
@@ -1432,7 +1432,7 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 	mach.r_pcx = gpregs_getpcx(&state->ics_gpregs);
 	mach.r_pdx = gpregs_getpdx(&state->ics_gpregs);
 	mach.r_pbx = gpregs_getpbx(&state->ics_gpregs);
-	mach.r_psp = icpustate_getsp(state);
+	mach.r_psp = icpustate_getpsp(state);
 	mach.r_pbp = gpregs_getpbp(&state->ics_gpregs);
 	mach.r_psi = gpregs_getpsi(&state->ics_gpregs);
 	mach.r_pdi = gpregs_getpdi(&state->ics_gpregs);
@@ -1446,7 +1446,7 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 	mach.r_r14 = state->ics_gpregs.gp_r14;
 	mach.r_r15 = state->ics_gpregs.gp_r15;
 #endif /* __x86_64__ */
-	mach.r_pip    = icpustate_getpc(state);
+	mach.r_pip    = icpustate_getpip(state);
 	mach.r_pflags = icpustate_getpflags(state);
 	mach.r_fsbase = (uintptr_t)-1;
 	mach.r_gsbase = (uintptr_t)-1;
@@ -1544,12 +1544,12 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 	state->ics_gpregs.gp_r14 = mach.r_r14;
 	state->ics_gpregs.gp_r15 = mach.r_r15;
 #endif /* __x86_64__ */
-	icpustate_setpc(state, mach.r_pip);
+	icpustate_setpip(state, mach.r_pip);
 	icpustate_setpflags(state, mach.r_pflags);
 #ifdef __x86_64__
-	icpustate64_setrsp(state, mach.r_psp);
+	icpustate_setpsp(state, mach.r_psp);
 #else /* __x86_64__ */
-	state = icpustate_setsp_p(state, mach.r_psp);
+	state = icpustate_setpsp_p(state, mach.r_psp);
 #endif /* !__x86_64__ */
 	return state;
 rtm_failure:

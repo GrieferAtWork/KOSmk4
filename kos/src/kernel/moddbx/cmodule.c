@@ -237,7 +237,7 @@ err:
 }
 
 /* Enumerate all CModules that are currently visible in the following order:
- * >> void *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+ * >> void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
  * >> ENUM(cmodule_ataddr(pc));
  * >> if (ADDR_ISKERN(pc)) {
  * >>     cmodule_enum_drivers();                 // Excluding `cmodule_ataddr(pc)'

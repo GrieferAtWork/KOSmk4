@@ -127,7 +127,7 @@ struct exception_info {
 	 * NOTE: The pointers in this traceback have not been adjusted, meaning that they probably
 	 *       point  to the first  instruction after some `call'  instruction (i.e. they're the
 	 *       return addresses loaded during unwinding) */
-	void                      *ei_trace[__EXCEPT_BACKTRACE_SIZE];
+	void const                *ei_trace[__EXCEPT_BACKTRACE_SIZE];
 #endif /* __EXCEPT_BACKTRACE_SIZE != 0 */
 	__uint8_t                  ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
 #if __SIZEOF_POINTER__ < 4

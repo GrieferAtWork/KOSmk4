@@ -831,22 +831,22 @@ NOTHROW(KCALL atomic_cmpxchq_nopf)(USER CHECKED void *addr,
 
 
 
-DATDEF byte_t x86_nopf_begin[];   /* Start address for NOPF memory access PC values */
-DATDEF byte_t x86_nopf_end_clc[]; /* End of NOPF handlers that should return to `x86_nopf_ret_stc' */
-DATDEF byte_t x86_nopf_end[];     /* End address for NOPF memory access PC values */
-DATDEF byte_t x86_nopf_ret_stc[]; /* Set the carry bit and return to the caller */
-DATDEF byte_t x86_nopf_ret[];     /* Return PC for #PF with `x86_nopf_check(pc) == true' */
+DATDEF byte_t const x86_nopf_begin[];   /* Start address for NOPF memory access PC values */
+DATDEF byte_t const x86_nopf_end_clc[]; /* End of NOPF handlers that should return to `x86_nopf_ret_stc' */
+DATDEF byte_t const x86_nopf_end[];     /* End address for NOPF memory access PC values */
+DATDEF byte_t const x86_nopf_ret_stc[]; /* Set the carry bit and return to the caller */
+DATDEF byte_t const x86_nopf_ret[];     /* Return PC for #PF with `x86_nopf_check(pc) == true' */
 
 /* Return  the #PF-execution-resume  address for a  #PF that happened  at `pc', where
  * pc is apart of a x86_nopf_* function, as indicated by `x86_nopf_check(pc) == true' */
-#define x86_nopf_retof(pc)                         \
-	((uintptr_t)(pc) < (uintptr_t)x86_nopf_end_clc \
-	 ? (uintptr_t)x86_nopf_ret_stc                 \
-	 : (uintptr_t)x86_nopf_ret)
+#define x86_nopf_retof(pc)                   \
+	((byte_t const *)(pc) < x86_nopf_end_clc \
+	 ? (byte_t const *)x86_nopf_ret_stc      \
+	 : (byte_t const *)x86_nopf_ret)
 
-#define x86_nopf_check(pc)                           \
-	((uintptr_t)(pc) >= (uintptr_t)x86_nopf_begin && \
-	 (uintptr_t)(pc) < (uintptr_t)x86_nopf_end)
+#define x86_nopf_check(pc)                     \
+	((byte_t const *)(pc) >= x86_nopf_begin && \
+	 (byte_t const *)(pc) < x86_nopf_end)
 
 
 #endif /* __CC__ */

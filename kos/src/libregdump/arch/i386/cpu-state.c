@@ -80,8 +80,7 @@ libregdump_ucpustate(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_flags(self, ucpustate_getpflags(data)));
 	PRINT("\n");
-	DO(libregdump_ip(self, ucpustate_getpc(data),
-	                 instrlen_isa_from_ucpustate(data)));
+	DO(libregdump_ip(self, ucpustate_getpip(data), instrlen_isa_from_ucpustate(data)));
 	END;
 }
 
@@ -135,8 +134,7 @@ libregdump_kcpustate(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_flags(self, kcpustate_getpflags(data)));
 	PRINT("\n");
-	DO(libregdump_ip(self, kcpustate_getpc(data),
-	                 instrlen_isa_from_kcpustate(data)));
+	DO(libregdump_ip(self, kcpustate_getpip(data), instrlen_isa_from_kcpustate(data)));
 	END;
 }
 
@@ -146,11 +144,8 @@ libregdump_icpustate(struct regdump_printer *__restrict self,
                      struct icpustate const *__restrict data) {
 	struct sgregs sg;
 	BEGIN;
-	DO(libregdump_gpregs_with_sp(self,
-	                             &data->ics_gpregs,
-	                             icpustate_getsp(data)));
-	DO(libregdump_ip(self, icpustate_getpc(data),
-	                 instrlen_isa_from_icpustate(data)));
+	DO(libregdump_gpregs_with_sp(self, &data->ics_gpregs, icpustate_getpsp(data)));
+	DO(libregdump_ip(self, icpustate_getpip(data), instrlen_isa_from_icpustate(data)));
 	sg.sg_gs = icpustate_getgs(data);
 	sg.sg_fs = icpustate_getfs(data);
 	sg.sg_es = icpustate_getes(data);
@@ -168,9 +163,8 @@ INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_scpustate(struct regdump_printer *__restrict self,
                      struct scpustate const *__restrict data) {
 	BEGIN;
-	DO(libregdump_gpregs_with_sp(self, &data->scs_gpregs, scpustate_getsp(data)));
-	DO(libregdump_ip(self, scpustate_getpc(data),
-	                 instrlen_isa_from_scpustate(data)));
+	DO(libregdump_gpregs_with_sp(self, &data->scs_gpregs, scpustate_getpsp(data)));
+	DO(libregdump_ip(self, scpustate_getpip(data), instrlen_isa_from_scpustate(data)));
 #ifdef __x86_64__
 	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_sgbase(self, &data->scs_sgbase));
@@ -192,8 +186,7 @@ libregdump_fcpustate(struct regdump_printer *__restrict self,
 	struct sgregs sg;
 	BEGIN;
 	DO(libregdump_gpregs(self, &data->fcs_gpregs));
-	DO(libregdump_ip(self, fcpustate_getpc(data),
-	                 instrlen_isa_from_fcpustate(data)));
+	DO(libregdump_ip(self, fcpustate_getpip(data), instrlen_isa_from_fcpustate(data)));
 	sg.sg_gs = data->fcs_sgregs.sg_gs16;
 	sg.sg_fs = data->fcs_sgregs.sg_fs16;
 	sg.sg_es = data->fcs_sgregs.sg_es16;

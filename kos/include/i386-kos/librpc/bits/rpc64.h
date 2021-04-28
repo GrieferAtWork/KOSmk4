@@ -163,7 +163,7 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_R14, state->ics_gpregs.gp_r14);   /* [P] General purpose register #14 */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_R15, state->ics_gpregs.gp_r15);   /* [P] General purpose register #15 */
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_RSP))
-		icpustate_setuserpsp(state, self->rs_regs[RPC_X86_64_REGISTER_RSP]);
+		icpustate_setusersp(state, self->rs_regs[RPC_X86_64_REGISTER_RSP]);
 #else /* __x86_64__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RAX, state->ics_gpregs.gp_eax);   /* [C] Accumulator. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RCX, state->ics_gpregs.gp_ecx);   /* [C] Counter register. */
@@ -180,10 +180,9 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 #define LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK \
 	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF)
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_RFLAGS)) {
-		__syscall_ulong_t new_flags;
-		new_flags = (__syscall_ulong_t)self->rs_regs[RPC_X86_64_REGISTER_RFLAGS];
-		new_flags &= LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK;
-		icpustate_mskpflags(state, ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK, new_flags);
+		icpustate_mskpflags(state, ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK,
+		                    self->rs_regs[RPC_X86_64_REGISTER_RFLAGS] &
+		                    LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK);
 	}
 #undef LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK
 #ifdef __KERNEL__
@@ -255,15 +254,15 @@ rpc_register_state64_getreg_icpustate(struct icpustate *__restrict state,
 	case RPC_X86_64_REGISTER_RBP:    result = gpregs_getpbp(&state->ics_gpregs); break; /* [P] Stack base pointer. */
 	case RPC_X86_64_REGISTER_RSI:    result = gpregs_getpsi(&state->ics_gpregs); break; /* [P] Source pointer. */
 	case RPC_X86_64_REGISTER_RDI:    result = gpregs_getpdi(&state->ics_gpregs); break; /* [P] Destination pointer. */
-	case RPC_X86_64_REGISTER_ES:     result = icpustate_getes(state); break; /* ES segment. */
-	case RPC_X86_64_REGISTER_DS:     result = icpustate_getds(state); break; /* DS segment. */
-	case RPC_X86_64_REGISTER_FS:     result = icpustate_getfs(state); break; /* FS segment. */
-	case RPC_X86_64_REGISTER_GS:     result = icpustate_getgs(state); break; /* GS segment. */
-	case RPC_X86_64_REGISTER_RSP:    result = icpustate_getuserpsp(state); break; /* [P] Stack pointer. */
-	case RPC_X86_64_REGISTER_RIP:    result = icpustate_getpc(state); break;     /* Instruction pointer. */
-	case RPC_X86_64_REGISTER_RFLAGS: result = icpustate_getpflags(state); break;  /* Flags register. */
-	case RPC_X86_64_REGISTER_CS:     result = icpustate_getcs(state); break;      /* CS segment. */
-	case RPC_X86_64_REGISTER_SS:     result = icpustate_getuserss(state); break;  /* SS segment. */
+	case RPC_X86_64_REGISTER_ES:     result = icpustate_getes(state); break;            /* ES segment. */
+	case RPC_X86_64_REGISTER_DS:     result = icpustate_getds(state); break;            /* DS segment. */
+	case RPC_X86_64_REGISTER_FS:     result = icpustate_getfs(state); break;            /* FS segment. */
+	case RPC_X86_64_REGISTER_GS:     result = icpustate_getgs(state); break;            /* GS segment. */
+	case RPC_X86_64_REGISTER_RSP:    result = icpustate_getuserpsp(state); break;       /* [P] Stack pointer. */
+	case RPC_X86_64_REGISTER_RIP:    result = icpustate_getpip(state); break;           /* Instruction pointer. */
+	case RPC_X86_64_REGISTER_RFLAGS: result = icpustate_getpflags(state); break;        /* Flags register. */
+	case RPC_X86_64_REGISTER_CS:     result = icpustate_getcs(state); break;            /* CS segment. */
+	case RPC_X86_64_REGISTER_SS:     result = icpustate_getuserss(state); break;        /* SS segment. */
 #ifdef __KERNEL__
 	case RPC_X86_64_REGISTER_FSBASE: result = (__uint64_t)get_user_fsbase(); break;
 	case RPC_X86_64_REGISTER_GSBASE: result = (__uint64_t)get_user_gsbase(); break;

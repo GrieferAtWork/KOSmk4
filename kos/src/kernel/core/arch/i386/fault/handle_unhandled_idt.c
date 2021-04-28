@@ -136,7 +136,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	rd_printer.rdp_printer_arg = SYSLOG_LEVEL_EMERG;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
-	regdump_ip(&rd_printer, ucpustate_getpc(ustate),
+	regdump_ip(&rd_printer, (uintptr_t)ucpustate_getpc(ustate),
 	           instrlen_isa_from_ucpustate(ustate));
 	regdump_flags(&rd_printer, ustate->ucs_pflags);
 	printk(KERN_EMERG "\n");
@@ -152,27 +152,25 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	regdump_cr4(&rd_printer, __rdcr4());
 	printk(KERN_EMERG "    %%cr3 %p\n", (void *)cr3);
 	addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-	                 (void const *)ucpustate_getpc(ustate),
-	                 instruction_trysucc((void const *)ucpustate_getpc(ustate),
-	                                     instrlen_isa_from_ucpustate(ustate)),
+	                 ucpustate_getpc(ustate),
+	                 instruction_trysucc_ucpustate(ustate),
 	                 "Caused here [sp=%p]",
 	                 ucpustate_getsp(ustate));
 	is_first = true;
 	for (;;) {
 		struct ucpustate old_state;
 		old_state = *ustate;
-		error = unwind_for_debug((void *)(is_first
-		                                  ? ucpustate_getpc(&old_state)
-		                                  : ucpustate_getpc(&old_state) - 1),
+		error = unwind_for_debug(is_first
+                                 ? ucpustate_getpc(&old_state)
+                                 : ucpustate_getpc(&old_state) - 1,
 		                         &unwind_getreg_ucpustate, &old_state,
 		                         &unwind_setreg_ucpustate, ustate);
 		if (error != UNWIND_SUCCESS)
 			break;
 		is_first = false;
 		addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-		                 instruction_trypred((void const *)ucpustate_getpc(ustate),
-		                                     instrlen_isa_from_ucpustate(ustate)),
-		                 (void const *)ucpustate_getpc(ustate), "Called here [sp=%p]",
+		                 instruction_trypred_ucpustate(ustate),
+		                 ucpustate_getpc(ustate), "Called here [sp=%p]",
 		                 ucpustate_getsp(ustate));
 	}
 	if (error != UNWIND_NO_FRAME)

@@ -32,6 +32,8 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <stddef.h>
+
 #include <libinstrlen/instrlen.h>
 
 DECL_BEGIN
@@ -45,9 +47,9 @@ x86_handle_overflow(struct icpustate *__restrict state) {
 		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(this_exception_trace[i], (void *)0);
+		PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
+	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 	x86_userexcept_unwind_interrupt(state);
 }
 

@@ -107,7 +107,7 @@ __DECL_BEGIN
 #define irregs32_setuseresp(self, value) (((struct irregs32_user *)(self))->ir_esp=(value))
 #define irregs32_getuserss(self)         ((struct irregs32_user const *)(self))->ir_ss16
 #define irregs32_setuserss(self, value)  (((struct irregs32_user *)(self))->ir_ss=(value))
-#define irregs32_getkernelesp(self)      ((__u32)((__uintptr_t)(self) + SIZEOF_IRREGS32_KERNEL))
+#define irregs32_getkernelesp(self)      ((__uintptr_t)(self) + SIZEOF_IRREGS32_KERNEL)
 #define irregs32_getkernelss(self)       SEGMENT_KERNEL_DATA
 #define irregs32_getss(self)             (irregs32_isuser(self) ? irregs32_getuserss(self) : irregs32_getkernelss(self))
 #define irregs32_trysetesp(self, value)  (irregs32_isuser(self) ? (irregs32_setuseresp(self, value), 1) : (irregs32_getkernelesp(self) == (value)))
@@ -1498,24 +1498,31 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define irregs_iscompat(self)               0
 #define irregs_getpreemption                irregs32_getpreemption
 #define irregs_setpreemption                irregs32_setpreemption
-#define irregs_getpc                        irregs32_geteip
-#define irregs_setpc                        irregs32_seteip
+#define irregs_getpip                       irregs32_geteip
+#define irregs_getpc                        (__byte_t const *)irregs32_geteip
+#define irregs_setpip                       irregs32_seteip
+#define irregs_setpc(self, pc)              irregs32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
 #define irregs_getcs                        irregs32_getcs
 #define irregs_setcs                        irregs32_setcs
 #define irregs_getpflags                    irregs32_geteflags
 #define irregs_setpflags                    irregs32_seteflags
 #define irregs_mskpflags                    irregs32_mskeflags
-#define irregs_getsp                        irregs32_getesp
+#define irregs_getpsp                       irregs32_getesp
+#define irregs_getsp                        (__byte_t *)irregs32_getesp
 #define irregs_getuserpsp                   irregs32_getuseresp
+#define irregs_getusersp                    (__byte_t *)irregs32_getuseresp
 #define irregs_setuserpsp                   irregs32_setuseresp
+#define irregs_setusersp(self, sp)          irregs32_setuseresp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define irregs_getuserss                    irregs32_getuserss
 #define irregs_setuserss                    irregs32_setuserss
 #define irregs_getkernelpsp                 irregs32_getkernelesp
+#define irregs_getkernelsp                  (__byte_t *)irregs32_getkernelesp
 #define irregs_getkernelss                  irregs32_getkernelss
 #define irregs_getss                        irregs32_getss
 #define irregs_trysetss                     irregs32_trysetss
 #define irregs_trysetuserss                 irregs32_trysetuserss
-#define irregs_trysetesp                    irregs32_trysetesp
+#define irregs_trysetpsp                    irregs32_trysetesp
+#define irregs_trysetsp(self, sp)           irregs32_trysetesp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define irregs_sizeof                       irregs32_sizeof
 #define irregs_getvm86ds                    irregs32_getvm86ds
 #define irregs_setvm86ds                    irregs32_setvm86ds
@@ -1542,10 +1549,14 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define irregs_getgs                        irregs32_getgs
 #define irregs_trysetgs                     irregs32_trysetgs
 
-#define lcpustate_getpc                     lcpustate32_geteip
-#define lcpustate_setpc                     lcpustate32_seteip
-#define lcpustate_getsp                     lcpustate32_getesp
-#define lcpustate_setsp                     lcpustate32_setesp
+#define lcpustate_getpip                    lcpustate32_geteip
+#define lcpustate_getpc                     (__byte_t const *)lcpustate32_geteip
+#define lcpustate_setpip                    lcpustate32_seteip
+#define lcpustate_setpc(self, pc)           lcpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
+#define lcpustate_getpsp                    lcpustate32_getesp
+#define lcpustate_getsp                     (__byte_t *)lcpustate32_getesp
+#define lcpustate_setpsp                    lcpustate32_setesp
+#define lcpustate_setsp(self, sp)           lcpustate32_setesp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define lcpustate_to_lcpustate              lcpustate32_to_lcpustate32
 #define lcpustate_to_lcpustate32            lcpustate32_to_lcpustate32
 #define lcpustate32_to_lcpustate            lcpustate32_to_lcpustate32
@@ -1569,10 +1580,14 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define lcpustate_to_kcpustate32            lcpustate32_to_kcpustate32
 #define lcpustate32_to_kcpustate            lcpustate32_to_kcpustate32
 
-#define kcpustate_getpc                     kcpustate32_geteip
-#define kcpustate_setpc                     kcpustate32_seteip
-#define kcpustate_getsp                     kcpustate32_getesp
-#define kcpustate_setsp                     kcpustate32_setesp
+#define kcpustate_getpip                    kcpustate32_geteip
+#define kcpustate_getpc                     (__byte_t *)kcpustate32_geteip
+#define kcpustate_setpip                    kcpustate32_seteip
+#define kcpustate_setpc(self, pc)           kcpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
+#define kcpustate_getpsp                    kcpustate32_getesp
+#define kcpustate_getsp                     (__byte_t *)kcpustate32_getesp
+#define kcpustate_setpsp                    kcpustate32_setesp
+#define kcpustate_setsp(self, sp)           kcpustate32_setesp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define kcpustate_getpflags                 kcpustate32_geteflags
 #define kcpustate_setpflags                 kcpustate32_seteflags
 #define kcpustate_mskpflags                 kcpustate32_mskeflags
@@ -1601,11 +1616,16 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define kcpustate_to_icpustate32_p          kcpustate32_to_icpustate32_p
 #define kcpustate32_to_icpustate_p          kcpustate32_to_icpustate32_p
 
-#define icpustate_getpc                     icpustate32_geteip
-#define icpustate_setpc                     icpustate32_seteip
-#define icpustate_getsp                     icpustate32_getesp
-#define icpustate_trysetsp                  icpustate32_trysetesp
-#define icpustate_setsp_p                   icpustate32_setesp_p
+#define icpustate_getpip                    icpustate32_geteip
+#define icpustate_getpc                     (__byte_t const *)icpustate32_geteip
+#define icpustate_setpip                    icpustate32_seteip
+#define icpustate_setpc(self, pc)           icpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
+#define icpustate_getpsp                    icpustate32_getesp
+#define icpustate_getsp                     (__byte_t *)icpustate32_getesp
+#define icpustate_trysetpsp                 icpustate32_trysetesp
+#define icpustate_trysetsp(self, sp)        icpustate32_trysetesp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
+#define icpustate_setpsp_p                  icpustate32_setesp_p
+#define icpustate_setsp_p(self, sp)         icpustate32_setesp_p(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define icpustate_isvm86                    icpustate32_isvm86
 #define icpustate_isuser_novm86             icpustate32_isuser_novm86
 #define icpustate_isuser                    icpustate32_isuser
@@ -1617,11 +1637,14 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define icpustate_getpreemption             icpustate32_getpreemption
 #define icpustate_setpreemption             icpustate32_setpreemption
 #define icpustate_getuserpsp                icpustate32_getuseresp
+#define icpustate_getusersp                 (__byte_t *)icpustate32_getuseresp
 #define icpustate_setuserpsp                icpustate32_setuseresp
+#define icpustate_setusersp(self, sp)       icpustate32_setuseresp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define icpustate_getuserss                 icpustate32_getuserss
 #define icpustate_setuserss                 icpustate32_setuserss
 #define icpustate_getkernelss               icpustate32_getkernelss
 #define icpustate_getkernelpsp              icpustate32_getkernelesp
+#define icpustate_getkernelsp               (__byte_t *)icpustate32_getkernelesp
 #define icpustate_getds                     icpustate32_getds
 #define icpustate_setds                     icpustate32_setds
 #define icpustate_getes                     icpustate32_getes
@@ -1686,11 +1709,16 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define icpustate_user_to_icpustate32_p     icpustate32_user_to_icpustate32_p
 #define icpustate32_user_to_icpustate_p     icpustate32_user_to_icpustate32_p
 
-#define scpustate_getpc                     scpustate32_geteip
-#define scpustate_setpc                     scpustate32_seteip
-#define scpustate_getsp                     scpustate32_getesp
-#define scpustate_trysetsp                  scpustate32_trysetesp
-#define scpustate_setsp_p                   scpustate32_setesp_p
+#define scpustate_getpip                    scpustate32_geteip
+#define scpustate_getpc                     (__byte_t const *)scpustate32_geteip
+#define scpustate_setpip                    scpustate32_seteip
+#define scpustate_setpc(self, pc)           scpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
+#define scpustate_getpsp                    scpustate32_getesp
+#define scpustate_getsp                     (__byte_t *)scpustate32_getesp
+#define scpustate_trysetpsp                 scpustate32_trysetesp
+#define scpustate_trysetsp(self, sp)        scpustate32_trysetesp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
+#define scpustate_setpsp_p                  scpustate32_setesp_p
+#define scpustate_setsp_p(self, sp)         scpustate32_setesp_p(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define scpustate_isvm86                    scpustate32_isvm86
 #define scpustate_isuser_novm86             scpustate32_isuser_novm86
 #define scpustate_isuser                    scpustate32_isuser
@@ -1703,10 +1731,13 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define scpustate_setpreemption             scpustate32_setpreemption
 #define scpustate_getuserpsp                scpustate32_getuseresp
 #define scpustate_setuserpsp                scpustate32_setuseresp
+#define scpustate_getusersp                 (__byte_t *)scpustate32_getuseresp
+#define scpustate_setusersp(self, sp)       scpustate32_setuseresp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define scpustate_getuserss                 scpustate32_getuserss
 #define scpustate_setuserss                 scpustate32_setuserss
 #define scpustate_getkernelss               scpustate32_getkernelss
 #define scpustate_getkernelpsp              scpustate32_getkernelesp
+#define scpustate_getkernelsp               (__byte_t *)scpustate32_getkernelesp
 #define scpustate_getds                     scpustate32_getds
 #define scpustate_setds                     scpustate32_setds
 #define scpustate_getes                     scpustate32_getes
@@ -1765,10 +1796,13 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define ucpustate_is64bit(self)             0
 #define ucpustate_isnative(self)            1
 #define ucpustate_iscompat(self)            0
-#define ucpustate_getpc                     ucpustate32_geteip
-#define ucpustate_setpc                     ucpustate32_seteip
-#define ucpustate_getsp                     ucpustate32_getesp
-#define ucpustate_setsp                     ucpustate32_setesp
+#define ucpustate_getpc                     (__byte_t const *)ucpustate32_geteip
+#define ucpustate_getpip                    ucpustate32_geteip
+#define ucpustate_setpc(self, pc)           ucpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
+#define ucpustate_getpsp                    ucpustate32_getesp
+#define ucpustate_getsp                     (__byte_t *)ucpustate32_getesp
+#define ucpustate_setpsp                    ucpustate32_setesp
+#define ucpustate_setsp(self, sp)           ucpustate32_setesp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define ucpustate_getpflags                 ucpustate32_geteflags
 #define ucpustate_setpflags                 ucpustate32_seteflags
 #define ucpustate_mskpflags                 ucpustate32_mskeflags
@@ -1808,10 +1842,14 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define fcpustate_is64bit(self)             0
 #define fcpustate_isnative(self)            1
 #define fcpustate_iscompat(self)            0
-#define fcpustate_getpc                     fcpustate32_geteip
-#define fcpustate_setpc                     fcpustate32_seteip
-#define fcpustate_getsp                     fcpustate32_getesp
-#define fcpustate_setsp                     fcpustate32_setesp
+#define fcpustate_getpip                    fcpustate32_geteip
+#define fcpustate_getpc                     (__byte_t const *)fcpustate32_geteip
+#define fcpustate_setpip                    fcpustate32_seteip
+#define fcpustate_setpc(self, pc)           fcpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
+#define fcpustate_getpsp                    fcpustate32_getesp
+#define fcpustate_getsp                     (__byte_t *)fcpustate32_getesp
+#define fcpustate_setpsp                    fcpustate32_setesp
+#define fcpustate_setsp(self, sp)           fcpustate32_setesp(self, (__u32)__COMPILER_REQTYPE(void const *, sp))
 #define fcpustate_getpflags                 fcpustate32_geteflags
 #define fcpustate_setpflags                 fcpustate32_seteflags
 #define fcpustate_mskpflags                 fcpustate32_mskeflags

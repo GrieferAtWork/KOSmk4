@@ -596,7 +596,7 @@ sys_fork_impl(struct icpustate *__restrict state) {
 	pid_t child_tid;
 	child_tid = x86_clone_impl(state,
 	                           SIGCHLD,
-	                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
+	                           (USER UNCHECKED void *)icpustate_getusersp(state),
 	                           NULL,
 	                           NULL,
 	                           get_user_gsbase(),
@@ -642,7 +642,7 @@ sys_vfork_impl(struct icpustate *__restrict state) {
 	pid_t child_tid;
 	child_tid = x86_clone_impl(state,
 	                           CLONE_VM | CLONE_VFORK | SIGCHLD,
-	                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
+	                           (USER UNCHECKED void *)icpustate_getusersp(state),
 	                           NULL,
 	                           NULL,
 	                           get_user_gsbase(),

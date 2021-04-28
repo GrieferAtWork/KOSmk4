@@ -30,15 +30,15 @@
 #define __ERROR_REGISTER_STATE_TYPE   struct kcpustate
 #define __SIZEOF_ERROR_REGISTER_STATE SIZEOF_KCPUSTATE
 #ifdef __x86_64__
-#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((x).kcs_rip)
-#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_rip = (value))
+#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((byte_t const *)(x).kcs_rip)
+#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_rip = (__u64)(value))
 #define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                       ((x).kcs_gpregs.gp_rsp)
 #define __ERROR_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_rsp = (value))
 #define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).kcs_gpregs.gp_rax)
 #define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_rax = (value))
 #else /* __x86_64__ */
-#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((x).kcs_eip)
-#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_eip = (value))
+#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((byte_t const *)(x).kcs_eip)
+#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_eip = (__u32)(value))
 #define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                       ((x).kcs_gpregs.gp_esp)
 #define __ERROR_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_esp = (value))
 #define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).kcs_gpregs.gp_eax)
@@ -79,8 +79,8 @@ struct __error_register_state_type_struct {
 	__REGISTER_TYPE__ __ers_pip;    /* Instruction pointer */
 };
 __DECL_END
-#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((x).__ers_pip)
-#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).__ers_pip = (value))
+#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).__ers_pip)
+#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).__ers_pip = (__REGISTER_TYPE__)(value))
 #define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                       ((x).__ers_psp)
 #define __ERROR_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).__ers_psp = (value))
 #define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).__ers_pax)

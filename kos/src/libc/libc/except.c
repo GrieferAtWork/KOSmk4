@@ -242,23 +242,19 @@ DEFINE_PUBLIC_WEAK_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
 INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
 libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool phase_2) {
 	u8 temp, callsite_encoding;
-	uintptr_t landingpad, pc;
+	byte_t const *landingpad, *pc;
 	byte_t const *reader, *callsite_end;
 	size_t callsite_size;
-	reader     = (byte_t *)context->uc_fde.f_lsdaaddr;
-	landingpad = (uintptr_t)context->uc_fde.f_pcstart;
-	pc         = (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
+	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
+	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
+	pc         = (byte_t const *)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 
 	/* HINT: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
 		/* gl_landing_pad */
-		landingpad = dwarf_decode_pointer((byte_t const **)&reader,
-		                                  temp,
-		                                  sizeof(void *),
-		                                  0,
-		                                  0,
-		                                  (uintptr_t)context->uc_fde.f_pcstart);
+		landingpad = (byte_t const *)dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *),
+		                                                  0, 0, (uintptr_t)context->uc_fde.f_pcstart);
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
@@ -269,17 +265,19 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	callsite_end      = reader + callsite_size;
 	while (reader < callsite_end) {
 		uintptr_t start, size, handler, action;
+		byte_t const *startpc, *endpc;
 		start   = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_start */
 		size    = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_size */
 		handler = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_handler */
 		action  = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_action */
-		start += landingpad;
+		startpc = landingpad + start;
+		endpc   = startpc + size;
 
 #if 1 /* Compare  pointers  like  this,  as  `pc'  is  the  _RETURN_  address\
        * (i.e. the address after the piece of code that caused the exception) */
-		if (pc > start && pc <= start + size)
+		if (pc > startpc && pc <= endpc)
 #else
-		if (pc >= start && pc < start + size)
+		if (pc >= startpc && pc < endpc)
 #endif
 		{
 			if (handler == 0)
@@ -287,8 +285,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 			if (!phase_2)
 				return _URC_HANDLER_FOUND;
 			/* Jump to the associated handler */
-			__ERROR_REGISTER_STATE_TYPE_WRPC(*context->uc_state,
-			                                 (uintptr_t)(landingpad + handler));
+			__ERROR_REGISTER_STATE_TYPE_WRPC(*context->uc_state, landingpad + handler);
 			if (action != 0) {
 				__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*context->uc_state,
 				                                                (uintptr_t)libc_get_kos_unwind_exception());
@@ -323,7 +320,8 @@ libc_gxx_personality_v0(int version /* = 1 */,
 PRIVATE SECTION_EXCEPT_TEXT unsigned int __ERROR_UNWIND_CC
 unwind_fde(unwind_fde_t const *__restrict fde,
            error_register_state_t *__restrict new_state,
-           error_register_state_t const *__restrict old_state, void *pc) {
+           error_register_state_t const *__restrict old_state,
+           void const *pc) {
 	unsigned int unwind_error;
 	/* Execute the CFA program to generate the row of rules for our current source location. */
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
@@ -360,12 +358,12 @@ done:
 PRIVATE SECTION_EXCEPT_TEXT unsigned int __FCALL
 unwind_landingpad(unwind_fde_t const *__restrict fde,
                   error_register_state_t *__restrict state,
-                  void *except_pc) {
-	void *landing_pad_pc;
+                  void const *except_pc) {
+	void const *landing_pad_pc;
 	unwind_cfa_landing_state_t cfa;
 	error_register_state_t new_state;
 	unsigned int unwind_error;
-	landing_pad_pc = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+	landing_pad_pc = __ERROR_REGISTER_STATE_TYPE_RDPC(*state);
 	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto done;
@@ -433,7 +431,7 @@ PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void LIB
 trigger_coredump(error_register_state_t *curr_state,
                  error_register_state_t *orig_state,
                  struct exception_data *exc,
-                 void **unwind_tracevector,
+                 void const **unwind_tracevector,
                  unsigned int unwind_tracelength,
                  unsigned int unwind_error) {
 	struct ucpustate curr_ust, orig_ust;
@@ -482,7 +480,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restr
 	struct _Unwind_Context context;
 	error_register_state_t orig_state;
 	error_register_state_t oldstate;
-	void *pc;
+	void const *pc;
 #if EXCEPT_BACKTRACE_SIZE != 0
 	unsigned int orig_tracecount;
 	for (orig_tracecount = 0; orig_tracecount < EXCEPT_BACKTRACE_SIZE - 1; ++orig_tracecount) {
@@ -501,7 +499,7 @@ search_fde:
 	 * NOTE: PC-1 because the state we're being given has its PC pointer
 	 *       set   to  be  directed   after  the  faulting  instruction. */
 	memcpy(&oldstate, state, sizeof(*state));
-	pc = (void *)((uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1);
+	pc           = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 	unwind_error = unwind_fde_find(pc, &context.uc_fde);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err;
@@ -545,9 +543,9 @@ search_fde:
 			if (!current.pt_except.ei_trace[i])
 				break;
 		}
-		current.pt_except.ei_trace[i] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		current.pt_except.ei_trace[i] = __ERROR_REGISTER_STATE_TYPE_RDPC(*state);
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		current.pt_except.ei_trace[0] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		current.pt_except.ei_trace[0] = __ERROR_REGISTER_STATE_TYPE_RDPC(*state);
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -570,7 +568,7 @@ err:
 			PRIVATE SECTION_EXCEPT_STRING char const message_unwind_failed[] =
 				"[libc] Failed to unwind stack at %p [error=%u]\n";
 			syslog(LOG_ERR, message_unwind_failed,
-			       (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate),
+			       __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate),
 			       unwind_error);
 		}
 		/* Use the original state that the caller of `libc_error_unwind()' provided
@@ -579,7 +577,7 @@ err:
 #if EXCEPT_BACKTRACE_SIZE != 0
 		if (orig_tracecount < EXCEPT_BACKTRACE_SIZE) {
 			/* Mark the traceback as complete by setting LAST_PC == CURR_PC */
-			info->ei_trace[orig_tracecount] = (void *)error_register_state_getpc(&orig_state);
+			info->ei_trace[orig_tracecount] = error_register_state_getpc(&orig_state);
 			++orig_tracecount;
 		}
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
@@ -617,14 +615,14 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state
 	struct _Unwind_Context context;
 	error_register_state_t oldstate, newstate;
 	unsigned int unwind_error;
-	void *pc;
+	void const *pc;
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&newstate, state, sizeof(newstate));
 	context.uc_state = &newstate;
 	for (;;) {
 		int actions;
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = (void *)((uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1);
+		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
@@ -668,7 +666,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register
 	unsigned int unwind_error;
 	_Unwind_Stop_Fn stop;
 	void *stop_argument;
-	void *pc;
+	void const *pc;
 	ENSURE_LIBUNWIND_LOADED();
 	stop             = (_Unwind_Stop_Fn)(_Unwind_Ptr)exception_object->private_1;
 	stop_argument    = (void *)(_Unwind_Ptr)exception_object->private_2;
@@ -678,7 +676,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register
 		_Unwind_Reason_Code reason;
 		int action;
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = (void *)((uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1);
+		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS && unwind_error != UNWIND_NO_FRAME)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
@@ -740,7 +738,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_st
 	unsigned int unwind_error;
 	struct _Unwind_Context context;
 	error_register_state_t oldstate, newstate;
-	void *pc;
+	void const *pc;
 	/* Special case: Raise a KERNKOS exception (with information already stored in `tls.t_except') */
 	if unlikely(!exception_object || exception_object->exception_class == _UEC_KERNKOS)
 		return libc_error_unwind(state);
@@ -751,7 +749,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_st
 	/* Phase #1: Search for a viable exception handler. */
 	for (;;) {
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = (void *)((uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1);
+		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind;
@@ -816,9 +814,9 @@ libc_Unwind_Backtrace_impl(error_register_state_t *__restrict state,
 	unsigned int unwind_error;
 	context.uc_state = state;
 	for (;;) {
-		void *pc;
+		void const *pc;
 		memcpy(&oldstate, state, sizeof(oldstate));
-		pc = (void *)((uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1);
+		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(oldstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if (unwind_error != UNWIND_SUCCESS) {
 			if unlikely(unwind_error != UNWIND_NO_FRAME)
@@ -847,7 +845,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restric
 	uintptr_t result;
 	ENSURE_LIBUNWIND_LOADED();
 	unwind_error = unwind_fde_exec_cfa(&self->uc_fde, &cfa,
-	                                   (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*self->uc_state));
+	                                   __ERROR_REGISTER_STATE_TYPE_RDPC(*self->uc_state));
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		return 0;
 	unwind_error = unwind_cfa_calculate_cfa(&cfa, &unwind_getreg_error_register_state,
@@ -1000,7 +998,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	struct exception_info *info, saved_info;
 	bool got_first_handler;
 	uintptr_t recursion_flag = EXCEPT_FINEXCEPT;
-	void *pc;
+	void const *pc;
 	info = &current.pt_except;
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
@@ -1034,7 +1032,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	got_first_handler = false;
 	for (;;) {
 		memcpy(&newstate, &oldstate, sizeof(oldstate));
-		pc = (void *)((uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(newstate) - 1);
+		pc = __ERROR_REGISTER_STATE_TYPE_RDPC(newstate) - 1;
 		unwind_error = unwind_fde_find(pc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS) {
 			if (unwind_error == UNWIND_NO_FRAME)
@@ -1090,9 +1088,9 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 				if (!info->ei_trace[i])
 					break;
 			}
-			info->ei_trace[i] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(newstate);
+			info->ei_trace[i] = __ERROR_REGISTER_STATE_TYPE_RDPC(newstate);
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-			info->ei_trace[0] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(newstate);
+			info->ei_trace[0] = __ERROR_REGISTER_STATE_TYPE_RDPC(newstate);
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 		}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */

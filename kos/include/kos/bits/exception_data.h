@@ -647,7 +647,7 @@ struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 	 *  - GETPC(error_register_state()):
 	 *                 Always points to the instruction that would have been
 	 *                 executed next if  the exception  hadn't been  thrown. */
-	void *e_faultaddr;
+	void const *e_faultaddr;
 };
 
 #if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)

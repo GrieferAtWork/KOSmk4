@@ -1980,8 +1980,8 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 /* Get/set   the   program   counter   (IP/EIP/RIP)   register   (including  CS.BASE)
  * Note that `EMU86_GETPCPTR() == EMU86_SEGADDR(EMU86_GETCSBASE(), EMU86_GETIPREG())' */
 #ifndef EMU86_GETPCPTR
-#define EMU86_GETPCPTR()  (byte_t *)icpustate_getpc(_state)
-#define EMU86_SETPCPTR(v) icpustate_setpc(_state, (__uintptr_t)(v))
+#define EMU86_GETPCPTR()  icpustate_getpc(_state)
+#define EMU86_SETPCPTR(v) icpustate_setpc(_state, v)
 #endif /* !EMU86_GETPCPTR */
 
 /* Same  as   `EMU86_SETPCPTR()',  but   don't  account   for
@@ -1994,11 +1994,11 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 /* Get/Set the SP/ESP/RSP register (including SS.BASE)
  * Note that `EMU86_GETSTACKPTR() == EMU86_SEGADDR(EMU86_GETSSBASE(), EMU86_GETSPREG())' */
 #ifndef EMU86_GETSTACKPTR
-#define EMU86_GETSTACKPTR() (byte_t *)icpustate_getsp(_state)
+#define EMU86_GETSTACKPTR() icpustate_getsp(_state)
 #ifdef __x86_64__
-#define EMU86_SETSTACKPTR(v) icpustate64_setrsp(_state, (__uintptr_t)(v))
+#define EMU86_SETSTACKPTR(v) icpustate_setsp(_state, v)
 #else /* __x86_64__ */
-#define EMU86_SETSTACKPTR(v) (_state = icpustate_setsp_p(_state, (__uintptr_t)(v)))
+#define EMU86_SETSTACKPTR(v) (_state = icpustate_setsp_p(_state, v))
 #endif /* !__x86_64__ */
 #endif /* !EMU86_GETSTACKPTR */
 

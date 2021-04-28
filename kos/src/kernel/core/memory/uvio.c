@@ -118,9 +118,12 @@ uvio_request_impl(struct uvio *__restrict self,
 	/* Handle an exception completion status. */
 	if (status == KERNEL_UVIO_REQUEST_STATUS_EXCEPT) {
 		unsigned int i;
-		uintptr_t pc = icpustate_getpc(args->va_state);
+		void const *pc;
+
 		/* Use the program counter from the VIO-args cpu-state as fault address. */
-		PERTASK_SET(this_exception_data.e_faultaddr, (void *)pc);
+		pc = icpustate_getpc(args->va_state);
+		PERTASK_SET(this_exception_data.e_faultaddr, pc);
+
 		/* Fill in the exception code and exception pointers. */
 		PERTASK_SET(this_exception_data.e_code, slot->kur_except.kue_code);
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {

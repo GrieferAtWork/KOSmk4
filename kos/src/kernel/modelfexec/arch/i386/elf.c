@@ -57,7 +57,7 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    Elf64_Ehdr const *__restrict ehdr,
                    USER void *peb_address, USER void *ustack_base,
-                   size_t ustack_size, USER void *entry_pc) {
+                   size_t ustack_size, USER void const *entry_pc) {
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
@@ -84,8 +84,8 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 	set_user_gsbase(x86_get_random_userkern_address()); /* re-roll the ukern address. */
 	gpregs_setpdx(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER2 */
-	icpustate_setpc(user_state, (uintptr_t)entry_pc);
-	icpustate_setuserpsp(user_state, (uintptr_t)ustack_base + ustack_size);
+	icpustate_setpc(user_state, entry_pc);
+	icpustate_setusersp(user_state, (byte_t const *)ustack_base + ustack_size);
 	{
 		union x86_user_eflags_mask mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
@@ -107,7 +107,7 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
                   KERNEL Elf64_Phdr const *__restrict phdr_vec, Elf64_Half phdr_cnt,
                   void *application_loadaddr, void *linker_loadaddr,
                   USER void *peb_address, USER void *ustack_base,
-                  size_t ustack_size, USER void *entry_pc) {
+                  size_t ustack_size, USER void const *entry_pc) {
 	/* The application-level entry point is stored
 	 * stored at the base of the user-space stack. */
 	uintptr_t user_state_sp;
@@ -179,8 +179,8 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	gpregs_setpsi(&user_state->ics_gpregs, (uintptr_t)application_loadaddr); /* ELF_ARCHX86_64_DL_LOADADDR_REGISTER */
 	gpregs_setpdx(&user_state->ics_gpregs, (uintptr_t)peb_address);          /* ELF_ARCHX86_64_PEB_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address);          /* ELF_ARCHX86_64_PEB_REGISTER2 */
-	icpustate_setuserpsp(user_state, (uintptr_t)dl_data);
-	icpustate_setpc(user_state, (uintptr_t)linker_loadaddr); /* Entry point is at offset=0 */
+	icpustate_setusersp(user_state, dl_data);
+	icpustate_setpc(user_state, linker_loadaddr); /* Entry point is at offset=0 */
 	{
 		union x86_user_eflags_mask mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
@@ -203,7 +203,7 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
                      Elf32_Ehdr const *__restrict ehdr,
                      USER void *peb_address, USER void *ustack_base,
-                     size_t ustack_size, USER void *entry_pc) {
+                     size_t ustack_size, USER void const *entry_pc) {
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
@@ -243,8 +243,8 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 	}
 	set_user_fsbase(x86_get_random_userkern_address32()); /* re-roll the ukern address. */
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCH386_PEB_REGISTER */
-	icpustate_setpc(user_state, (uintptr_t)entry_pc);
-	icpustate_setuserpsp(user_state, (uintptr_t)ustack_base + ustack_size);
+	icpustate_setpc(user_state, entry_pc);
+	icpustate_setusersp(user_state, (byte_t const *)ustack_base + ustack_size);
 	{
 		union x86_user_eflags_mask mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
@@ -269,7 +269,7 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     KERNEL Elf32_Phdr const *__restrict phdr_vec, Elf32_Half phdr_cnt,
                     void *application_loadaddr, void *linker_loadaddr,
                     USER void *peb_address, USER void *ustack_base,
-                    size_t ustack_size, USER void *entry_pc) {
+                    size_t ustack_size, USER void const *entry_pc) {
 	/* The application-level entry point is stored
 	 * stored at the base of the user-space stack. */
 	uintptr_t user_state_sp;
@@ -354,8 +354,8 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	gpregs_setpcx(&user_state->ics_gpregs, (uintptr_t)dl_data);              /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
 	gpregs_setpdx(&user_state->ics_gpregs, (uintptr_t)application_loadaddr); /* ELF_ARCH386_DL_LOADADDR_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address);          /* ELF_ARCH386_PEB_REGISTER */
-	icpustate_setuserpsp(user_state, (uintptr_t)dl_data);
-	icpustate_setpc(user_state, (uintptr_t)linker_loadaddr);        /* Entry point is at offset=0 */
+	icpustate_setusersp(user_state, dl_data);
+	icpustate_setpc(user_state, linker_loadaddr); /* Entry point is at offset=0 */
 	{
 		union x86_user_eflags_mask mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);

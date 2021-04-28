@@ -147,7 +147,7 @@ libviocore_complete_except(struct vio_emulate_args *__restrict self,
 		next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 		data->e_faultaddr = (void *)pc;
 		if (next_pc)
-			CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
+			CS(setpc)(self->vea_args.va_state, next_pc);
 	}
 	RETHROW();
 }
@@ -1473,8 +1473,8 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 #if defined(__x86_64__) || !defined(__KERNEL__)
 #define EMU86_GETSS()     CS(getss)(self->vea_args.va_state)
 #define EMU86_SETSS(v)    CS(setss)(self->vea_args.va_state, v)
-#define EMU86_GETSPREG()  CS(getsp)(self->vea_args.va_state)
-#define EMU86_SETSPREG(v) CS(setsp)(self->vea_args.va_state, (__uintptr_t)(v))
+#define EMU86_GETSPREG()  CS(getpsp)(self->vea_args.va_state)
+#define EMU86_SETSPREG(v) CS(setpsp)(self->vea_args.va_state, v)
 #else /* __x86_64__ */
 #define EMU86_EMULATE_SETUP()          \
 	do {                               \
@@ -1726,19 +1726,19 @@ i386_setsegment_base(struct icpustate32 *__restrict state,
 	 : (segment_regno) == EMU86_R_GS    \
 	   ? __rdgsbase()                   \
 	   : 0)
-#define EMU86_GETDSBASE() 0
-#define EMU86_GETESBASE() 0
-#define EMU86_GETCSBASE() 0
-#define EMU86_GETSSBASE() 0
-#define EMU86_GETFSBASE() __rdfsbase()
-#define EMU86_GETGSBASE() __rdgsbase()
+#define EMU86_GETDSBASE()  0
+#define EMU86_GETESBASE()  0
+#define EMU86_GETCSBASE()  0
+#define EMU86_GETSSBASE()  0
+#define EMU86_GETFSBASE()  __rdfsbase()
+#define EMU86_GETGSBASE()  __rdgsbase()
 #define EMU86_SETFSBASE(v) __wrfsbase((void *)(uintptr_t)(v))
 #define EMU86_SETGSBASE(v) __wrgsbase((void *)(uintptr_t)(v))
 #endif /* !__KERNEL__ */
 #define EMU86_SEGADDR(segbase, segoffset) (byte_t *)(uintptr_t)((segbase) + (segoffset))
 #ifdef EMU86_GETSEGBASE_IS_NOOP_SS
 #define EMU86_GETSTACKPTR()  (byte_t *)EMU86_GETSPREG()
-#define EMU86_SETSTACKPTR(v) EMU86_SETSPREG(v)
+#define EMU86_SETSTACKPTR(v) EMU86_SETSPREG((uintptr_t)(v))
 #else /* EMU86_GETSEGBASE_IS_NOOP_SS */
 #define EMU86_GETSTACKPTR()  EMU86_SEGADDR(EMU86_GETSSBASE(), EMU86_GETSPREG())
 #define EMU86_SETSTACKPTR(v) EMU86_SETSPREG((uintptr_t)(v) - EMU86_GETSSBASE())
@@ -1943,7 +1943,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(CC CS_getregw)(vio_cpustate_t *__restrict state, u8 regno) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_SP) {
-		return (u16)icpustate_getsp(state);
+		return (u16)icpustate_getpsp(state);
 	} else {
 		return _EMU86_GETREGW(state, regno);
 	}
@@ -1953,7 +1953,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u32
 NOTHROW(CC CS_getregl)(vio_cpustate_t *__restrict state, u8 regno) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_ESP) {
-		return (u32)icpustate_getsp(state);
+		return (u32)icpustate_getpsp(state);
 	} else {
 		return _EMU86_GETREGL(state, regno);
 	}
@@ -2229,7 +2229,7 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
 	pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
 	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
-		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
+		CS(setpc)(self->vea_args.va_state, next_pc);
 	PRINT_WARN("[vio] Illegal instruction %p:%#" PRIxPTR " "
 	           "[cr2=%p:%#" PRIx64 ",code="
 	           "%" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
@@ -2262,7 +2262,7 @@ libviocore_throw_exception(struct vio_emulate_args *__restrict self,
 	pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
 	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
-		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
+		CS(setpc)(self->vea_args.va_state, next_pc);
 	data = error_data();
 	data->e_code               = code;
 	data->e_faultaddr          = (void *)pc;

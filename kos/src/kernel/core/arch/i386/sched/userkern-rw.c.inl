@@ -265,8 +265,8 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 	}	break;
 
 	case offsetof(USERKERN_STRUCT, uk_regs.IFELSE3264(ucs_eip, ucs_rip)):
-		IFELSE_RW(*presult = (VALUE_TYPE)icpustate_getpc(state),
-		          icpustate_setpc(state, (uintptr_t)value));
+		IFELSE_RW(*presult = (VALUE_TYPE)icpustate_getpip(state),
+		          icpustate_setpip(state, (uintptr_t)value));
 		break;
 
 		/* TODO: FPU register access */

@@ -60,7 +60,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_int80))(struct unwind_fde_struc
 	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void const *pc = (void const *)(ucpustate_getpc(&ustate) - 1);
+		void const *pc = ucpustate_getpc(&ustate) - 1;
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
@@ -73,7 +73,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_int80))(struct unwind_fde_struc
 	/* Check if the return state actually points into user-space,
 	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
-	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
+	    ucpustate_getpc(&ustate) != (void const *)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
 	/* System calls encode their vector number  as the LSDA pointer, so  that
@@ -103,7 +103,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_st
 	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void const *pc = (void const *)(ucpustate_getpc(&ustate) - 1);
+		void const *pc = ucpustate_getpc(&ustate) - 1;
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
@@ -116,7 +116,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_st
 	/* Check if the return state actually points into user-space,
 	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
-	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
+	    ucpustate_getpc(&ustate) != (void const *)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
 	/* System calls encode their vector number  as the LSDA pointer, so  that
@@ -150,7 +150,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm64_syscall))(struct unwind_fde_str
 	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void const *pc = (void const *)(ucpustate_getpc(&ustate) - 1);
+		void const *pc = ucpustate_getpc(&ustate) - 1;
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
@@ -163,7 +163,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm64_syscall))(struct unwind_fde_str
 	/* Check if the return state actually points into user-space,
 	 * or  alternatively:  indicates  a  user-space  redirection. */
 	if (ucpustate_iskernel(&ustate) &&
-	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
+	    ucpustate_getpc(&ustate) != (void const *)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
 #ifdef DEFINE_NORMAL
 	/* System calls encode their vector number  as the LSDA pointer, so  that

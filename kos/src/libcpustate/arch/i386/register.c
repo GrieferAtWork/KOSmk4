@@ -1859,7 +1859,7 @@ NOTHROW_NCX(CC libcpu_getreg_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__res
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
 	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
-		value = irregs_getpc(self);
+		value = irregs_getpip(self);
 		break;
 
 	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
@@ -1871,7 +1871,7 @@ NOTHROW_NCX(CC libcpu_getreg_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__res
 		break;
 
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
-		value = irregs_getsp(self);
+		value = irregs_getpsp(self);
 		break;
 
 	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
@@ -1946,7 +1946,7 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_irregs))(LIBCPUSTATE_IRREGS_STRUCT_TYPE
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
 	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
-		irregs_setpc(self, value);
+		irregs_setpip(self, value);
 		break;
 
 	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
@@ -2096,7 +2096,7 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_icpustate))(struct icpustate IRREGS_IND
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
 	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
-		icpustate_setpc(self, value);
+		icpustate_setpip(self, value);
 		break;
 
 	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
@@ -2109,9 +2109,9 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_icpustate))(struct icpustate IRREGS_IND
 
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
 #ifdef __x86_64__
-		icpustate64_setrsp(self, value);
+		icpustate_setpsp(self, value);
 #else /* __x86_64__ */
-		*pself = icpustate_setsp_p(self, value);
+		*pself = icpustate_setpsp_p(self, value);
 #endif /* !__x86_64__ */
 		break;
 
@@ -2246,7 +2246,7 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_scpustate))(struct scpustate IRREGS_IND
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
 	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
-		scpustate_setpc(self, value);
+		scpustate_setpip(self, value);
 		break;
 
 	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
@@ -2259,9 +2259,9 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_scpustate))(struct scpustate IRREGS_IND
 
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
 #ifdef __x86_64__
-		scpustate64_setrsp(self, value);
+		scpustate_setpsp(self, value);
 #else /* __x86_64__ */
-		*pself = scpustate_setsp_p(self, value);
+		*pself = scpustate_setpsp_p(self, value);
 #endif /* !__x86_64__ */
 		break;
 

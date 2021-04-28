@@ -193,7 +193,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	struct exception_info *tls_info;
 	instrlen_isa_t isa;
 #ifdef LOG_STACK_REMAINDER
-	uintptr_t last_good_sp;
+	byte_t *last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
 	_kernel_poison();
 	memcpy(&state, dumpstate, sizeof(struct ucpustate));
@@ -206,10 +206,10 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	isa = instrlen_isa_from_ucpustate(&state);
 	TRY {
 		addr2line_printf(printer, arg,
-		                 instruction_trypred((void const *)ucpustate_getpc(&state), isa),
-		                 (void const *)ucpustate_getpc(&state),
+		                 instruction_trypred(ucpustate_getpc(&state), isa),
+		                 ucpustate_getpc(&state),
 		                 "Caused here [sp=%p]",
-		                 (void *)ucpustate_getsp(&state));
+		                 ucpustate_getsp(&state));
 	} EXCEPT {
 		format_printf(printer, arg, "%p: Caused here\n", ucpustate_getpc(&state));
 	}
@@ -217,7 +217,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 		struct ucpustate old_state;
 		memcpy(&old_state, &state, sizeof(struct ucpustate));
 		TRY {
-			error = unwind_for_debug((void *)(ucpustate_getpc(&old_state) - 1),
+			error = unwind_for_debug(ucpustate_getpc(&old_state) - 1,
 			                         &unwind_getreg_ucpustate, &old_state,
 			                         &unwind_setreg_ucpustate, &state);
 		} EXCEPT {
@@ -227,11 +227,11 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 			break;
 		TRY {
 			addr2line_printf(printer, arg,
-			                 instruction_trypred((void const *)ucpustate_getpc(&state),
+			                 instruction_trypred(ucpustate_getpc(&state),
 			                                     instrlen_isa_from_ucpustate(&state)),
-			                 (void const *)ucpustate_getpc(&state),
+			                 ucpustate_getpc(&state),
 			                 "Called here [sp=%p]",
-			                 (void *)ucpustate_getsp(&state));
+			                 ucpustate_getsp(&state));
 		} EXCEPT {
 			format_printf(printer, arg, "%p: Called here\n", ucpustate_getpc(&state));
 		}
@@ -244,17 +244,17 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #ifdef LOG_STACK_REMAINDER
 	TRY {
 		void *minaddr, *endaddr;
-		get_stack_for(&minaddr, &endaddr, (void *)last_good_sp);
-		if (last_good_sp >= (uintptr_t)minaddr &&
-		    last_good_sp < (uintptr_t)endaddr) {
+		get_stack_for(&minaddr, &endaddr, last_good_sp);
+		if (last_good_sp >= (byte_t *)minaddr &&
+		    last_good_sp < (byte_t *)endaddr) {
 			bool is_first = true;
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			uintptr_t iter;
-			iter = FLOOR_ALIGN(last_good_sp, sizeof(void *));
+			iter = FLOOR_ALIGN((uintptr_t)last_good_sp, sizeof(void *));
 			for (; iter < (uintptr_t)endaddr; iter += sizeof(void *))
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
 			uintptr_t iter;
-			iter  = CEIL_ALIGN(last_good_sp, sizeof(void *));
+			iter  = CEIL_ALIGN((uintptr_t)last_good_sp, sizeof(void *));
 			while (iter > (uintptr_t)minaddr)
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 			{
@@ -481,7 +481,7 @@ INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE struct kcpustate *FCALL
 libc_assertion_check_core(struct assert_args *__restrict args) {
 	/* Check if assertion failures at the caller's PC should always be ignored. */
 #ifdef CONFIG_HAVE_DEBUGGER
-	if (is_pc_always_ignored((void const *)kcpustate_getpc(&args->aa_state))) {
+	if (is_pc_always_ignored(kcpustate_getpc(&args->aa_state))) {
 		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__
 		args->aa_state.kcs_gpregs.gp_rax = 0;

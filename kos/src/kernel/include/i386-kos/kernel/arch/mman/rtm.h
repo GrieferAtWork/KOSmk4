@@ -58,7 +58,7 @@ struct mrtm_hooks_struct {
 	 * instruction  to which to  jump in the event  of the transaction failing. */
 	ATTR_RETNONNULL NONNULL((1)) struct icpustate *
 	(FCALL *rh_xbegin)(struct icpustate *__restrict state,
-	                   uintptr_t fallback_ip);
+	                   void const *fallback_ip);
 };
 
 #ifdef __x86_64__

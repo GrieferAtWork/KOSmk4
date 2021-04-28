@@ -112,7 +112,7 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x03)); /* #BP  Breakpoint */
 	byte_t const *pc, *faultpc;
 	bool isuser;
-	pc      = (byte_t *)icpustate_getpc(state);
+	pc      = icpustate_getpc(state);
 	isuser  = icpustate_isuser(state);
 	faultpc = pc - 1;
 	if (faultpc[0] == 0xcc) {
@@ -126,7 +126,7 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 		 *    with  backing   memory  on   a  multi-core   machine... */
 		faultpc = pc;
 		pc      = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
-		icpustate_setpc(state, (uintptr_t)pc);
+		icpustate_setpc(state, pc);
 	}
 
 	/* First case: If enabled, let debug traps handle this. */
@@ -160,14 +160,14 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 
 	/* Fallback: Throw an E_BREAKPOINT exception. */
 	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_BREAKPOINT));
-	PERTASK_SET(this_exception_faultaddr, (void *)faultpc);
+	PERTASK_SET(this_exception_faultaddr, faultpc);
 	{
 		unsigned int i;
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_args.e_pointers[i], 0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void *)0);
+			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	x86_userexcept_unwind_interrupt(state);

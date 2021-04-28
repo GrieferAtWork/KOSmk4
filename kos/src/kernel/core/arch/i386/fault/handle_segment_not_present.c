@@ -48,6 +48,7 @@
 #include <kos/kernel/cpu-state.h>
 
 #include <sched.h>
+#include <stddef.h>
 
 #include <libinstrlen/instrlen.h>
 #include <librpc/rpc.h>
@@ -83,7 +84,7 @@ lcall7_clone32(struct icpustate *__restrict state) {
 		u32 *argv;
 		unsigned i;
 		/* NOTE: cast ARGV to u32, thus truncating the pointer (this is intentional!) */
-		argv = (u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
+		argv = (u32 *)((uintptr_t)(u32)icpustate_getuserpsp(state));
 		for (i = 0; i < __NR32RC_clone; ++i) {
 			u32 arg = ATOMIC_READ(argv[i]);
 			sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
@@ -139,7 +140,7 @@ x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_off
 		unsigned int i;
 		u32 *argv;
 		/* NOTE: cast ARGV to u32, thus truncating the pointer (this is intentional!) */
-		argv = (u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
+		argv = (u32 *)((uintptr_t)(u32)icpustate_getuserpsp(state));
 		TRY {
 			/* Load system call arguments. */
 			validate_readable(argv, (size_t)argc * 4);
@@ -170,7 +171,7 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 	if (argc) {
 		unsigned int i;
 		u64 *argv;
-		argv = (u64 *)icpustate_getuserpsp(state);
+		argv = (u64 *)icpustate_getusersp(state);
 		TRY {
 			/* Load system call arguments. */
 			validate_readable(argv, (size_t)argc * 8);
@@ -197,7 +198,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 	emu86_opcode_t tiny_opcode;
 	emu86_opflags_t op_flags;
 	byte_t const *pc, *orig_pc;
-	orig_pc = (byte_t *)icpustate_getpc(state);
+	orig_pc = icpustate_getpc(state);
 	pc      = orig_pc;
 	/* Check: non-external event -> Analyze the faulting instruction */
 	if (ecode & 1) {
@@ -232,7 +233,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #ifdef CONFIG_X86_EMULATE_LCALL7
 				/* lcall7 emulation */
 				if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
-					icpustate_setpc(state, (uintptr_t)pc);
+					icpustate_setpc(state, pc);
 #if defined(__x86_64__) && 0 /* This entire instruction is invalid in 64-bit
                               * mode  (see  above),  so  no  need  for this! */
 					if (EMU86_F_IS64(op_flags))
@@ -243,17 +244,17 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #endif /* CONFIG_X86_EMULATE_LCALL7 */
 				/* Invalid use of the lcall instruction. */
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, (uintptr_t)0x9a);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, (uintptr_t)op_flags);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, 0x9a);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how,
 				            !(segment & 3) && !isuser()
-				            ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
-				            : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, (uintptr_t)X86_REGISTER_SEGMENT_CS);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, (uintptr_t)offset);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, (uintptr_t)segment);
+				            ? E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
+				            : E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, X86_REGISTER_SEGMENT_CS);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, offset);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, segment);
 				for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
-					PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+					PERTASK_SET(this_exception_args.e_pointers[i], 0);
 			}	goto unwind_state;
 
 
@@ -282,7 +283,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 #ifdef CONFIG_X86_EMULATE_LCALL7
 					/* lcall7 emulation */
 					if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
-						icpustate_setpc(state, (uintptr_t)pc);
+						icpustate_setpc(state, pc);
 #ifdef __x86_64__
 						if (EMU86_F_IS64(op_flags))
 							x86_emulate_syscall64_lcall7(state, offset);
@@ -293,14 +294,14 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 					/* Invalid use of the lcall instruction. */
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode,
-					            (uintptr_t)E_ILLEGAL_INSTRUCTION_X86_OPCODE(0xff, mod.mi_reg));
-					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, (uintptr_t)op_flags);
-					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, (uintptr_t)X86_REGISTER_SEGMENT_CS);
-					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, (uintptr_t)offset);
-					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, (uintptr_t)segment);
+					            E_ILLEGAL_INSTRUCTION_X86_OPCODE(0xff, mod.mi_reg));
+					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
+					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
+					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, X86_REGISTER_SEGMENT_CS);
+					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, offset);
+					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, segment);
 					for (i = 5; i < EXCEPTION_DATA_POINTERS; ++i)
-						PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+						PERTASK_SET(this_exception_args.e_pointers[i], 0);
 					goto unwind_state;
 				}
 				goto generic_failure;
@@ -311,11 +312,11 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				if (mod.mi_reg == 3) {
 					/* LTR r/m16 */
 					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno,
-					            (uintptr_t)X86_REGISTER_MISC_TR);
+					            X86_REGISTER_MISC_TR);
 				} else if (mod.mi_reg == 2) {
 					/* LLDT r/m16 */
 					PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno,
-					            (uintptr_t)X86_REGISTER_MISC_LDT);
+					            X86_REGISTER_MISC_LDT);
 				} else {
 					goto generic_failure;
 				}
@@ -323,14 +324,14 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode,
 				            E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x0f00, mod.mi_reg));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags,
-				            (uintptr_t)op_flags);
+				            op_flags);
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how,
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-/*				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, (uintptr_t)...);*/
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, (uintptr_t)0);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, (uintptr_t)modrm_getrmw(state, &mod, op_flags));
+				            E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
+/*				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, ...);*/
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, 0);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, modrm_getrmw(state, &mod, op_flags));
 				for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
-					PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+					PERTASK_SET(this_exception_args.e_pointers[i], 0);
 				goto unwind_state;
 
 
@@ -339,13 +340,13 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				MOD_DECODE();
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x8e, mod.mi_reg));
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, (uintptr_t)op_flags);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, (uintptr_t)X86_REGISTER_SEGMENT_ES + mod.mi_reg);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, (uintptr_t)0);
-				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, (uintptr_t)modrm_getrmw(state, &mod, op_flags));
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, X86_REGISTER_SEGMENT_ES + mod.mi_reg);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, 0);
+				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, modrm_getrmw(state, &mod, op_flags));
 				for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
-					PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+					PERTASK_SET(this_exception_args.e_pointers[i], 0);
 				goto unwind_state;
 
 
@@ -356,12 +357,12 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 			if (was_thrown(E_ILLEGAL_INSTRUCTION) &&
 			    PERTASK_GET(this_exception_args.e_illegal_instruction.ii_opcode) == 0) {
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode,
-				            (uintptr_t)EMU86_OPCODE_DECODE(tiny_opcode));
-				PERTASK_SET(this_exception_faultaddr, (void *)orig_pc);
+				            EMU86_OPCODE_DECODE(tiny_opcode));
+				PERTASK_SET(this_exception_faultaddr, orig_pc);
 			} else if (isuser()) {
-				PERTASK_SET(this_exception_faultaddr, (void *)orig_pc);
+				PERTASK_SET(this_exception_faultaddr, orig_pc);
 			}
-			icpustate_setpc(state, (uintptr_t)pc);
+			icpustate_setpc(state, pc);
 			RETHROW();
 		}
 unsupported_instruction:
@@ -373,11 +374,11 @@ generic_failure:
 	}
 	/* Fallback: Throw an `E_ILLEGAL_INSTRUCTION_REGISTER' exception */
 	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, (uintptr_t)EMU86_OPCODE_DECODE(tiny_opcode));
-	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, (uintptr_t)op_flags);
-	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
-	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, (uintptr_t)X86_REGISTER_SEGMENT);
-	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, (uintptr_t)0);
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, EMU86_OPCODE_DECODE(tiny_opcode));
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, X86_REGISTER_SEGMENT);
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, 0);
 	/* XXX: Actually, bits from `ecode & 3' have special meaning:
 	 *      0x1: External event
 	 *      0x2: Refers to an IDT entry
@@ -386,15 +387,15 @@ generic_failure:
 	 * -> In general, though: #NP exceptions are really hard to represent in
 	 *    the KOS exception model, and using a general ~illegal instruction~
 	 *    exception might already be the wrong thing to do... */
-	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, (uintptr_t)ecode);
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, ecode);
 	for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+		PERTASK_SET(this_exception_args.e_pointers[i], 0);
 unwind_state:
-	PERTASK_SET(this_exception_faultaddr, (void *)orig_pc);
-	icpustate_setpc(state, (uintptr_t)pc);
+	PERTASK_SET(this_exception_faultaddr, orig_pc);
+	icpustate_setpc(state, pc);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(this_exception_trace[i], (void *)0);
+		PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	x86_userexcept_unwind_interrupt(state);
 }

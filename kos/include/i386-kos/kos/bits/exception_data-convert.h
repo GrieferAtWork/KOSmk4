@@ -50,7 +50,7 @@ __NOTHROW_NCX(exception_data32_to_exception_data64)(struct __exception_data32 co
 	__result->e_code = (__error_code64_t)__self->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		__result->e_args.e_pointers[i] = (__ULONG64_TYPE__)__self->e_args.e_pointers[i];
-	__result->e_faultaddr = (__HYBRID_PTR64(void))__self->e_faultaddr;
+	__result->e_faultaddr = (__HYBRID_PTR64(void const))__self->e_faultaddr;
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
@@ -60,7 +60,7 @@ __NOTHROW_NCX(exception_data64_to_exception_data32)(struct __exception_data64 co
 	__result->e_code = (__error_code32_t)__self->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		__result->e_args.e_pointers[i] = (__ULONG32_TYPE__)__self->e_args.e_pointers[i];
-	__result->e_faultaddr = (__HYBRID_PTR32(void))__self->e_faultaddr;
+	__result->e_faultaddr = (__HYBRID_PTR32(void const))__self->e_faultaddr;
 }
 
 #ifdef __x86_64__

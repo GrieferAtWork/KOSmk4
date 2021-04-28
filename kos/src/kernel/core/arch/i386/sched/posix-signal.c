@@ -178,7 +178,7 @@ syscall_fill_icpustate_from_ucpustate32(struct icpustate *__restrict state,
 	icpustate_setuserss(state, ss);
 	gpregs32_to_gpregsnsp(&ust->ucs_gpregs, &state->ics_gpregs);
 	icpustate_setpflags(state, eflags);
-	icpustate_setpc(state, ucpustate32_geteip(ust));
+	icpustate_setpip(state, ucpustate32_geteip(ust));
 	icpustate_setuserpsp(state, ucpustate32_getesp(ust));
 	return state;
 }
@@ -390,7 +390,7 @@ syscall_fill_icpustate_from_ucpustate64(struct icpustate *__restrict state,
 	icpustate_setuserss(state, ss);
 	gpregs64_to_gpregsnsp(&ust->ucs_gpregs, &state->ics_gpregs);
 	icpustate_setpflags(state, rflags);
-	icpustate_setpc(state, ucpustate64_getrip(ust));
+	icpustate_setpip(state, ucpustate64_getrip(ust));
 	icpustate_setuserpsp(state, ucpustate64_getrsp(ust));
 	set_user_gsbase(ust->ucs_sgbase.sg_gsbase);
 	set_user_fsbase(ust->ucs_sgbase.sg_fsbase);

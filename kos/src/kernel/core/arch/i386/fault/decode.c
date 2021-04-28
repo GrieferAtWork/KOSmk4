@@ -90,7 +90,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
-		return (u16)icpustate_getsp(state);
+		return (u16)icpustate_getpsp(state);
 #endif /* !__x86_64__ */
 	return *(u16 const *)&ACCESS_GPREG(state, regno);
 }
@@ -99,7 +99,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1)) u32
 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
-		return (u32)icpustate_getsp(state);
+		return (u32)icpustate_getpsp(state);
 #endif /* !__x86_64__ */
 	return *(u32 const *)&ACCESS_GPREG(state, regno);
 }
@@ -129,7 +129,7 @@ INTERN void FCALL
 x86_icpustate_set32(struct icpustate *__restrict state,
                     u8 regno, u32 value) {
 	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP) {
-		if (!icpustate_trysetsp(state, value))
+		if (!icpustate_trysetpsp(state, value))
 			throw_bad_kernel_esp(value);
 	}
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;

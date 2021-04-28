@@ -98,6 +98,67 @@ __NOTHROW_NCX(LIBINSTRLEN_CC instruction_trypred)(void const *pc, instrlen_isa_t
 #define instruction_trysucc(pc, isa)   ((__byte_t *)(pc) + LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa))
 #define instruction_trypred(pc, isa)   ((__byte_t *)(pc) - LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa))
 #endif /* LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
+
+#ifdef instrlen_isa_from_icpustate
+#define instruction_length_icpustate(state)  instruction_length(icpustate_getpc(state), instrlen_isa_from_icpustate(state))
+#define instruction_succ_icpustate(state)    instruction_succ(icpustate_getpc(state), instrlen_isa_from_icpustate(state))
+#define instruction_pred_icpustate(state)    instruction_pred(icpustate_getpc(state), instrlen_isa_from_icpustate(state))
+#define instruction_succ_nx_icpustate(state) instruction_succ_nx(icpustate_getpc(state), instrlen_isa_from_icpustate(state))
+#define instruction_pred_nx_icpustate(state) instruction_pred_nx(icpustate_getpc(state), instrlen_isa_from_icpustate(state))
+#define instruction_trysucc_icpustate(state) instruction_trysucc(icpustate_getpc(state), instrlen_isa_from_icpustate(state))
+#define instruction_trypred_icpustate(state) instruction_trypred(icpustate_getpc(state), instrlen_isa_from_icpustate(state))
+#endif /* instrlen_isa_from_icpustate */
+
+#ifdef instrlen_isa_from_scpustate
+#define instruction_length_scpustate(state)  instruction_length(scpustate_getpc(state), instrlen_isa_from_scpustate(state))
+#define instruction_succ_scpustate(state)    instruction_succ(scpustate_getpc(state), instrlen_isa_from_scpustate(state))
+#define instruction_pred_scpustate(state)    instruction_pred(scpustate_getpc(state), instrlen_isa_from_scpustate(state))
+#define instruction_succ_nx_scpustate(state) instruction_succ_nx(scpustate_getpc(state), instrlen_isa_from_scpustate(state))
+#define instruction_pred_nx_scpustate(state) instruction_pred_nx(scpustate_getpc(state), instrlen_isa_from_scpustate(state))
+#define instruction_trysucc_scpustate(state) instruction_trysucc(scpustate_getpc(state), instrlen_isa_from_scpustate(state))
+#define instruction_trypred_scpustate(state) instruction_trypred(scpustate_getpc(state), instrlen_isa_from_scpustate(state))
+#endif /* instrlen_isa_from_scpustate */
+
+#ifdef instrlen_isa_from_ucpustate
+#define instruction_length_ucpustate(state)  instruction_length(ucpustate_getpc(state), instrlen_isa_from_ucpustate(state))
+#define instruction_succ_ucpustate(state)    instruction_succ(ucpustate_getpc(state), instrlen_isa_from_ucpustate(state))
+#define instruction_pred_ucpustate(state)    instruction_pred(ucpustate_getpc(state), instrlen_isa_from_ucpustate(state))
+#define instruction_succ_nx_ucpustate(state) instruction_succ_nx(ucpustate_getpc(state), instrlen_isa_from_ucpustate(state))
+#define instruction_pred_nx_ucpustate(state) instruction_pred_nx(ucpustate_getpc(state), instrlen_isa_from_ucpustate(state))
+#define instruction_trysucc_ucpustate(state) instruction_trysucc(ucpustate_getpc(state), instrlen_isa_from_ucpustate(state))
+#define instruction_trypred_ucpustate(state) instruction_trypred(ucpustate_getpc(state), instrlen_isa_from_ucpustate(state))
+#endif /* instrlen_isa_from_ucpustate */
+
+#ifdef instrlen_isa_from_kcpustate
+#define instruction_length_kcpustate(state)  instruction_length(kcpustate_getpc(state), instrlen_isa_from_kcpustate(state))
+#define instruction_succ_kcpustate(state)    instruction_succ(kcpustate_getpc(state), instrlen_isa_from_kcpustate(state))
+#define instruction_pred_kcpustate(state)    instruction_pred(kcpustate_getpc(state), instrlen_isa_from_kcpustate(state))
+#define instruction_succ_nx_kcpustate(state) instruction_succ_nx(kcpustate_getpc(state), instrlen_isa_from_kcpustate(state))
+#define instruction_pred_nx_kcpustate(state) instruction_pred_nx(kcpustate_getpc(state), instrlen_isa_from_kcpustate(state))
+#define instruction_trysucc_kcpustate(state) instruction_trysucc(kcpustate_getpc(state), instrlen_isa_from_kcpustate(state))
+#define instruction_trypred_kcpustate(state) instruction_trypred(kcpustate_getpc(state), instrlen_isa_from_kcpustate(state))
+#endif /* instrlen_isa_from_kcpustate */
+
+#ifdef instrlen_isa_from_lcpustate
+#define instruction_length_lcpustate(state)  instruction_length(lcpustate_getpc(state), instrlen_isa_from_lcpustate(state))
+#define instruction_succ_lcpustate(state)    instruction_succ(lcpustate_getpc(state), instrlen_isa_from_lcpustate(state))
+#define instruction_pred_lcpustate(state)    instruction_pred(lcpustate_getpc(state), instrlen_isa_from_lcpustate(state))
+#define instruction_succ_nx_lcpustate(state) instruction_succ_nx(lcpustate_getpc(state), instrlen_isa_from_lcpustate(state))
+#define instruction_pred_nx_lcpustate(state) instruction_pred_nx(lcpustate_getpc(state), instrlen_isa_from_lcpustate(state))
+#define instruction_trysucc_lcpustate(state) instruction_trysucc(lcpustate_getpc(state), instrlen_isa_from_lcpustate(state))
+#define instruction_trypred_lcpustate(state) instruction_trypred(lcpustate_getpc(state), instrlen_isa_from_lcpustate(state))
+#endif /* instrlen_isa_from_lcpustate */
+
+#ifdef instrlen_isa_from_fcpustate
+#define instruction_length_fcpustate(state)  instruction_length(fcpustate_getpc(state), instrlen_isa_from_fcpustate(state))
+#define instruction_succ_fcpustate(state)    instruction_succ(fcpustate_getpc(state), instrlen_isa_from_fcpustate(state))
+#define instruction_pred_fcpustate(state)    instruction_pred(fcpustate_getpc(state), instrlen_isa_from_fcpustate(state))
+#define instruction_succ_nx_fcpustate(state) instruction_succ_nx(fcpustate_getpc(state), instrlen_isa_from_fcpustate(state))
+#define instruction_pred_nx_fcpustate(state) instruction_pred_nx(fcpustate_getpc(state), instrlen_isa_from_fcpustate(state))
+#define instruction_trysucc_fcpustate(state) instruction_trysucc(fcpustate_getpc(state), instrlen_isa_from_fcpustate(state))
+#define instruction_trypred_fcpustate(state) instruction_trypred(fcpustate_getpc(state), instrlen_isa_from_fcpustate(state))
+#endif /* instrlen_isa_from_fcpustate */
+
 #endif /* LIBINSTRLEN_WANT_PROTOTYPES */
 
 

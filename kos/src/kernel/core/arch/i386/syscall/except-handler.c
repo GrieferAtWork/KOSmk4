@@ -127,7 +127,7 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 	                  " [mode=%#" PRIxPTR "]\n",
 	       handler, stack,
 	       icpustate_getpc(state),
-	       icpustate_getuserpsp(state),
+	       icpustate_getusersp(state),
 	       except_data->e_faultaddr, mode);
 }
 
@@ -180,7 +180,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
 	if (stack == EXCEPT_HANDLER_SP_CURRENT) {
-		stack = (void *)icpustate_getuserpsp(state);
+		stack = (void *)icpustate_getusersp(state);
 		stack = (byte_t *)stack - 128; /* Red zone (TODO: Make this configurable!) */
 	}
 	/* Align the stack. */
@@ -200,14 +200,14 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
-	                          ? (__HYBRID_PTR64(void))(u64)(uintptr_t)icpustate_getuserpsp(state)
+	                          ? (__HYBRID_PTR64(void))(u64)(uintptr_t)icpustate_getusersp(state)
 	                          : (__HYBRID_PTR64(void))(u64)(uintptr_t)except_data->e_faultaddr;
 	log_userexcept_error_propagate(state, sc_info, except_data, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate64 *__restrict state */
 	gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data64 *__restrict error */
-	icpustate_setuserpsp(state, (uintptr_t)user_error);
-	icpustate_setpc(state, (uintptr_t)(void *)handler);
+	icpustate_setusersp(state, user_error);
+	icpustate_setpc(state, (void *)handler);
 	{
 		union x86_user_eflags_mask word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);
@@ -251,7 +251,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
 	if (stack == EXCEPT_HANDLER_SP_CURRENT)
-		stack = (void *)icpustate_getuserpsp(state);
+		stack = (void *)icpustate_getusersp(state);
 	/* Align the stack. */
 	stack = (void *)((uintptr_t)stack & ~3);
 	/* Allocate structures */
@@ -276,14 +276,14 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
-	                          ? (__HYBRID_PTR32(void))(u32)(uintptr_t)icpustate_getuserpsp(state)
+	                          ? (__HYBRID_PTR32(void))(u32)(uintptr_t)icpustate_getusersp(state)
 	                          : (__HYBRID_PTR32(void))(u32)(uintptr_t)except_data->e_faultaddr;
 	log_userexcept_error_propagate(state, sc_info, except_data, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpcx(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate32 *__restrict state */
 	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data32 *__restrict error */
-	icpustate_setuserpsp(state, (uintptr_t)user_error);
-	icpustate_setpc(state, (uintptr_t)(void *)handler);
+	icpustate_setusersp(state, user_error);
+	icpustate_setpc(state, (void *)handler);
 	{
 		union x86_user_eflags_mask word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);

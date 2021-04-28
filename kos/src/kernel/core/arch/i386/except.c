@@ -410,7 +410,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	rd_printer.rdp_printer_arg = arg;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &info->ei_state.kcs_gpregs);
-	regdump_ip(&rd_printer, kcpustate_getpc(&info->ei_state),
+	regdump_ip(&rd_printer, kcpustate_getpip(&info->ei_state),
 	           instrlen_isa_from_kcpustate(&info->ei_state));
 	regdump_flags(&rd_printer, kcpustate_getpflags(&info->ei_state));
 	(*printer)(arg, "\n", 1);
@@ -430,9 +430,9 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 		              info->ei_data.e_args.e_pointers[i]);
 	}
 	addr2line_printf(tb_printer, tb_arg,
-	                 instruction_trypred((void const *)kcpustate_getpc(&info->ei_state),
+	                 instruction_trypred(kcpustate_getpc(&info->ei_state),
 	                                     instrlen_isa_from_kcpustate(&info->ei_state)),
-	                 (void const *)kcpustate_getpc(&info->ei_state), "Thrown here");
+	                 kcpustate_getpc(&info->ei_state), "Thrown here");
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
@@ -474,7 +474,7 @@ NOTHROW(VCALL error_printf)(char const *__restrict reason, ...) {
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_uhe_dbg_main(unsigned int unwind_error,
-                   uintptr_t last_pc,
+                   void const *last_pc,
                    struct exception_info *info) {
 	unsigned int i;
 	bool is_first_pointer;
@@ -507,8 +507,8 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 		           info->ei_data.e_args.e_pointers[i]);
 	}
 	isa = instrlen_isa_from_kcpustate(&info->ei_state);
-	dbg_addr2line_printf(instruction_trypred((void const *)kcpustate_getpc(&info->ei_state), isa),
-	                     (void const *)kcpustate_getpc(&info->ei_state),
+	dbg_addr2line_printf(instruction_trypred(kcpustate_getpc(&info->ei_state), isa),
+	                     kcpustate_getpc(&info->ei_state),
 	                     DBGSTR("Thrown here"));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
@@ -521,21 +521,20 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
-		uintptr_t prev_last_pc;
-		uintptr_t my_last_pc = last_pc;
+		void const *prev_last_pc;
+		void const *my_last_pc = last_pc;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 			if (!info->ei_trace[i])
 				break;
 		}
-		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1]
+		prev_last_pc = i ? info->ei_trace[i - 1]
 		                 : kcpustate_getpc(&info->ei_state);
 		if (!my_last_pc) {
 			my_last_pc = prev_last_pc;
 		} else if (my_last_pc != prev_last_pc) {
 			dbg_print(DBGSTR("...\n"));
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 instruction_trypred((void const *)my_last_pc, isa),
-			                 (void const *)my_last_pc,
+			                 instruction_trypred(my_last_pc, isa), my_last_pc,
 			                 DBGSTR("Traceback ends here"));
 		}
 	}
@@ -563,7 +562,7 @@ INTERN ATTR_COLD NONNULL((2)) void FCALL
 halt_unhandled_exception(unsigned int unwind_error,
                          struct kcpustate *__restrict unwind_state) {
 	struct exception_info *info;
-	uintptr_t last_pc;
+	void const *last_pc;
 	instrlen_isa_t isa;
 	_kernel_poison();
 	last_pc = kcpustate_getpc(unwind_state);
@@ -576,22 +575,22 @@ halt_unhandled_exception(unsigned int unwind_error,
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
-		uintptr_t prev_last_pc;
+		void const *prev_last_pc;
 		unsigned int i;
-		uintptr_t my_last_pc = last_pc;
+		void const *my_last_pc = last_pc;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 			if (!info->ei_trace[i])
 				break;
 		}
-		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1]
+		prev_last_pc = i ? info->ei_trace[i - 1]
 		                 : kcpustate_getpc(&info->ei_state);
 		if (!my_last_pc)
 			my_last_pc = prev_last_pc;
 		else if (my_last_pc != prev_last_pc) {
 			printk(KERN_RAW "...\n");
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 instruction_trypred((void const *)my_last_pc, isa),
-			                 (void const *)my_last_pc, "Traceback ends here");
+			                 instruction_trypred(my_last_pc, isa),
+			                 my_last_pc, "Traceback ends here");
 		}
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -599,7 +598,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 		printk(KERN_EMERG
 		       "Unwinding stopped when NOTHROW() function "
 		       "`%[vinfo:%n:%p]:%p' was reached (see last traceback entry)\n",
-		       instruction_trypred((void const *)last_pc, isa), last_pc);
+		       instruction_trypred(last_pc, isa), last_pc);
 	} else if (unwind_error != UNWIND_NO_FRAME) {
 		printk(KERN_EMERG "Unwinding failed: %u\n", unwind_error);
 	}
@@ -640,7 +639,7 @@ NOTHROW(FCALL unwind_landingpad)(unwind_fde_t const *__restrict fde,
 	unwind_cfa_landing_state_t cfa;
 	struct kcpustate new_state;
 	unsigned int unwind_error;
-	landing_pad_pc = (void const *)kcpustate_getpc(state);
+	landing_pad_pc = kcpustate_getpc(state);
 	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto done;
@@ -657,7 +656,7 @@ NOTHROW(FCALL unwind_landingpad)(unwind_fde_t const *__restrict fde,
 done:
 	if (unwind_error == UNWIND_NO_FRAME) {
 		/* Directly jump to the landing pad. */
-		kcpustate_setpc(state, (uintptr_t)landing_pad_pc);
+		kcpustate_setpc(state, landing_pad_pc);
 		unwind_error = UNWIND_SUCCESS;
 	}
 	return unwind_error;
@@ -684,15 +683,14 @@ search_fde:
 	 * NOTE: -1 because the state we're being given has its PC pointer
 	 *       set  to  be  directed  after  the  faulting  instruction. */
 	memcpy(&old_state, state, sizeof(old_state));
-	pc = (void const *)(kcpustate_getpc(&old_state) - 1);
+	pc    = kcpustate_getpc(&old_state) - 1;
 	error = unwind_fde_find(pc, &fde);
 	if unlikely(error != UNWIND_SUCCESS)
 		goto err;
 	/* Check if there is a personality function for us to execute. */
 	if (fde.f_persofun) {
 		unsigned int perso_code;
-		perso_code = (*(dwarf_perso_t)fde.f_persofun)(&fde, state,
-		                                              (void *)fde.f_lsdaaddr);
+		perso_code = (*(dwarf_perso_t)fde.f_persofun)(&fde, state, fde.f_lsdaaddr);
 		switch (perso_code) {
 
 		case DWARF_PERSO_EXECUTE_HANDLER:
@@ -770,7 +768,7 @@ search_fde:
 		 * wrong. (as in: they will look like user-space registers)
 		 * That is intended, and we must handle this case by directly loading the unwound
 		 * register   state,   thus   matching   `x86_rpc_user_redirection_personality()' */
-		if (ucpustate_getpc(&ustate) == (uintptr_t)&x86_rpc_user_redirection &&
+		if (ucpustate_getpc(&ustate) == (void const *)&x86_rpc_user_redirection &&
 		    SEGMENT_IS_VALID_KERNCODE(ustate.ucs_cs) &&
 		    SEGMENT_IS_VALID_KERNDATA(ustate.ucs_ss))
 			cpu_apply_ucpustate(&ustate);
@@ -850,9 +848,9 @@ search_fde:
 			if (!PERTASK_GET(this_exception_trace[i]))
 				break;
 		}
-		PERTASK_SET(this_exception_trace[i], (void *)kcpustate_getpc(state));
+		PERTASK_SET(this_exception_trace[i], kcpustate_getpc(state));
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		PERTASK_SET(this_exception_trace[0], (void *)kcpustate_getpc(state));
+		PERTASK_SET(this_exception_trace[0], kcpustate_getpc(state));
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -878,18 +876,18 @@ DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
 PUBLIC NONNULL((1, 2, 3)) unsigned int
 NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
                                     struct kcpustate *__restrict state,
-                                    byte_t *__restrict reader) {
+                                    byte_t const *__restrict reader) {
 	u8 temp, callsite_encoding;
-	uintptr_t landingpad;
-	uint8_t *callsite_end;
+	byte_t const *landingpad;
+	byte_t const *callsite_end;
 	size_t callsite_size;
 
-	landingpad = (uintptr_t)fde->f_pcstart;
+	landingpad = (byte_t const *)fde->f_pcstart;
 
 	/* NOTE: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
-		landingpad = dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gl_landing_pad */
+		landingpad = (byte_t const *)dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gl_landing_pad */
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
@@ -900,17 +898,19 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 	callsite_end      = reader + callsite_size;
 	while (reader < callsite_end) {
 		uintptr_t start, size, handler, action;
+		byte_t const *startpc, *endpc;
 		start   = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_start */
 		size    = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_size */
 		handler = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_handler */
 		action  = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_action */
-		start += landingpad;
+		startpc = landingpad + start;
+		endpc   = startpc + size;
 
 #if 1 /* Compare pointers like this, as `kcs_eip' is the _RETURN_ address \
        * (i.e. the address after the piece of code that caused the exception) */
-		if (kcpustate_getpc(state) > start && kcpustate_getpc(state) <= start + size)
+		if (kcpustate_getpc(state) > startpc && kcpustate_getpc(state) <= endpc)
 #else
-		if (kcpustate_getpc(state) >= start && kcpustate_getpc(state) < start + size)
+		if (kcpustate_getpc(state) >= startpc && kcpustate_getpc(state) < endpc)
 #endif
 		{
 			if (handler == 0)
@@ -939,10 +939,10 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 PUBLIC NONNULL((1, 2, 3)) unsigned int
 NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                           struct kcpustate *__restrict state,
-                                          void *lsda) {
-	struct x86_asm_except_entry *ent;
-	uintptr_t pc = kcpustate_getpc(state);
-	ent = (struct x86_asm_except_entry *)lsda;
+                                          void const *lsda) {
+	struct x86_asm_except_entry const *ent;
+	void const *pc = kcpustate_getpc(state);
+	ent = (struct x86_asm_except_entry const *)lsda;
 	if (ent) {
 		for (; ent->ee_entry != 0; ++ent) {
 			/* NOTE: Adjust for the fact that `pc' */

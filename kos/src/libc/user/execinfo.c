@@ -167,7 +167,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 	for (result = 0; result < size; ++result) {
 		unsigned int error;
 		memcpy(&ost, &st, sizeof(struct lcpustate));
-		error = unwind_for_debug((void *)lcpustate_getpc(&ost),
+		error = unwind_for_debug(lcpustate_getpc(&ost),
 		                         &unwind_getreg_lcpustate, &ost,
 		                         &unwind_setreg_lcpustate, &st);
 		if (error != UNWIND_SUCCESS)

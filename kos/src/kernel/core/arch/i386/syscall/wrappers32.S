@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5740dc3b */
+/* HASH CRC-32:0x4d460ecb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18563,7 +18563,7 @@ END(__x86_asm32_int80_stime64)
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `reason' is actually a `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
 .section .text.x86.asm32_syscall_int80.coredump
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	.cfi_startproc simple
@@ -38304,7 +38304,7 @@ END(__x86_asm32_sysenter_stime64)
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `reason' is actually a `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
 .section .text.x86.asm32_syscall_sysenter.coredump
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	.cfi_startproc simple

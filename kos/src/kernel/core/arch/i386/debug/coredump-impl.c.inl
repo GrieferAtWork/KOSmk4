@@ -213,7 +213,7 @@ NAME(coredump_rpc)(void *UNUSED(arg),
 NAME2(DEFINE_SYSCALL, _6)(errno_t, coredump,
                           USER UNCHECKED struct NAME(ucpustate) const *, curr_state,
                           USER UNCHECKED struct NAME(ucpustate) const *, orig_state,
-                          USER UNCHECKED NAME(PTR)(void) const *, traceback_vector, size_t, traceback_length,
+                          USER UNCHECKED NAME(PTR)(void const) const *, traceback_vector, size_t, traceback_length,
                           USER UNCHECKED union NAME(coredump_info) const *, reason,
                           syscall_ulong_t, unwind_error) {
 	(void)curr_state;

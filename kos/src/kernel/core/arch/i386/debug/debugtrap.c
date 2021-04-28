@@ -259,7 +259,7 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 		gpregs_setpcx(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_ecx);
 		gpregs_setpax(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_eax);
 		icpustate_setpflags(return_state, eflags);
-		icpustate_setpc(return_state, ustate->ucs_eip);
+		icpustate_setpip(return_state, ustate->ucs_eip);
 		icpustate_setuserpsp(return_state, ustate->ucs_gpregs.gp_esp);
 	} else {
 		/* Return EOK to indicate that the trap got triggered */
@@ -303,7 +303,7 @@ sys_do_debugtrap64_impl(struct icpustate *__restrict return_state,
 		icpustate_setuserss(return_state, ss);
 		gpregs64_to_gpregsnsp64(&ustate->ucs_gpregs, &return_state->ics_gpregs);
 		icpustate_setpflags(return_state, rflags);
-		icpustate_setpc(return_state, ustate->ucs_rip);
+		icpustate_setpip(return_state, ustate->ucs_rip);
 		icpustate_setuserpsp(return_state, ustate->ucs_gpregs.gp_rsp);
 		set_user_fsbase(ustate->ucs_sgbase.sg_fsbase);
 		set_user_gsbase(ustate->ucs_sgbase.sg_gsbase);

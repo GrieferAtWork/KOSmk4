@@ -708,7 +708,7 @@ struct __exception_data32 /*[NAME(exception_data32)][PREFIX(e_)]*/ {
 	 *  - GETPC(error_register_state()):
 	 *                 Always points to the instruction that would have been
 	 *                 executed next if  the exception  hadn't been  thrown. */
-	__HYBRID_PTR32(void) e_faultaddr;
+	__HYBRID_PTR32(void const) e_faultaddr;
 };
 
 #if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)

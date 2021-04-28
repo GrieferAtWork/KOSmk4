@@ -452,7 +452,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 PRIVATE ATTR_COLD NOBLOCK u32
 NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	struct ucpustate st, ost;
-	void *unwind_pc;
+	void const *unwind_pc;
 	unsigned int unwind_error;
 	assert(!PREEMPTION_ENABLED());
 	assert(self->t_cpu == THIS_CPU);
@@ -462,7 +462,7 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	} else {
 		scpustate_to_ucpustate(FORTASK(self, this_sstate), &st);
 	}
-	unwind_pc = (void *)ucpustate_getpc(&st);
+	unwind_pc = ucpustate_getpc(&st);
 	for (;;) {
 		memcpy(&ost, &st, sizeof(struct ucpustate));
 		unwind_error = unwind(unwind_pc,
@@ -475,7 +475,7 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 		}
 		if (!ucpustate_iskernel(&st))
 			break;
-		unwind_pc = (void *)(ucpustate_getpc(&st) - 1);
+		unwind_pc = ucpustate_getpc(&st) - 1;
 	}
 	return st.ucs_eflags;
 }
@@ -636,7 +636,7 @@ NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__
 	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as  it is,  with no modifications  made to  the register  state. */
-	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_user_redirection)
+	if (kcpustate_getpc(state) == (void const *)&x86_rpc_user_redirection)
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	return DWARF_PERSO_CONTINUE_UNWIND;
 }
@@ -648,8 +648,8 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *
 	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as  it is,  with no modifications  made to  the register  state. */
-	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_kernel_redirection) {
-		kcpustate_setpc(state, (uintptr_t)&x86_rpc_kernel_redirection_handler);
+	if (kcpustate_getpc(state) == (void const *)&x86_rpc_kernel_redirection) {
+		kcpustate_setpc(state, (void const *)&x86_rpc_kernel_redirection_handler);
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	}
 	return DWARF_PERSO_CONTINUE_UNWIND;
