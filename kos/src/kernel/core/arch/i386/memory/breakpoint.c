@@ -26,6 +26,7 @@
 #include <kernel/mman.h>
 #include <kernel/types.h>
 #include <kernel/x86/breakpoint.h>
+#include <sched/pertask.h>
 
 #include <hybrid/host.h>
 

@@ -108,7 +108,7 @@ vm86_translate(vm86_state_t *__restrict UNUSED(self), void *ptr) {
 	return (void *)((uintptr_t)ptr + VM86_VIRT_OFFSET);
 }
 
-PRIVATE int LIBVM86_CC
+PRIVATE ATTR_FREETEXT NONNULL((1)) int LIBVM86_CC
 vm86_io(vm86_state_t *__restrict UNUSED(self),
         u16 port, unsigned int action,
         void *data) {
@@ -139,7 +139,7 @@ vm86_io(vm86_state_t *__restrict UNUSED(self),
 	return result;
 }
 
-PRIVATE bool
+PRIVATE ATTR_FREETEXT NONNULL((1)) bool
 NOTHROW(KCALL interrupt)(vm86_state_t *__restrict self, u8 intno) {
 	int error;
 	self->vr_trans = &vm86_translate;
@@ -333,7 +333,7 @@ NOTHROW(KCALL x86_initialize_memory_via_bios)(void) {
 		} else {                                                            \
 			log_badmethod(_name);                                           \
 		}                                                                   \
-	} __WHILE0
+	}	__WHILE0
 	TRY_METHOD("e820", detect_e820());
 	TRY_METHOD("e801", detect_e801());
 	TRY_METHOD("da88", detect_da88());

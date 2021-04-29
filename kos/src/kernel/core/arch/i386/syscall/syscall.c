@@ -265,8 +265,8 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 	} else {
 #ifndef __x86_64__
 		/* Entirely disable use of `sysexit' in `__i386_syscall_iret'
-		 * NOTE: That write-protections aren't in effect yet, so we can
-		 *       just re-write the code here! */
+		 * NOTE: Write-protections aren't in effect yet,
+		 *       so  we can just re-write the code here! */
 		extern byte_t __i386_syscall_iret[];
 		__i386_syscall_iret[0] = 0xcf; /* iret */
 #endif /* __x86_64__ */

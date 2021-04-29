@@ -247,7 +247,7 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movq_rax_Pcx)(); /* movq %rax, (%rc
 #endif /* __x86_64__ */
 
 /* Try to read from a possibly faulty `addr' into `*presult'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((2)) __BOOL
 NOTHROW(KCALL readb_nopf)(USER CHECKED void const *addr,
                           u8 *presult) {
@@ -261,7 +261,7 @@ NOTHROW(KCALL readb_nopf)(USER CHECKED void const *addr,
 }
 
 /* Try to read from a possibly faulty `addr' into `*presult'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((2)) __BOOL
 NOTHROW(KCALL readw_nopf)(USER CHECKED void const *addr,
                           u16 *presult) {
@@ -275,7 +275,7 @@ NOTHROW(KCALL readw_nopf)(USER CHECKED void const *addr,
 }
 
 /* Try to read from a possibly faulty `addr' into `*presult'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((2)) __BOOL
 NOTHROW(KCALL readl_nopf)(USER CHECKED void const *addr,
                           u32 *presult) {
@@ -289,7 +289,7 @@ NOTHROW(KCALL readl_nopf)(USER CHECKED void const *addr,
 }
 
 /* Try to read from a possibly faulty `addr' into `*presult'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((2)) __BOOL
 NOTHROW(KCALL readq_nopf)(USER CHECKED void const *addr,
                           u64 *presult) {
@@ -451,7 +451,7 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorq_rax_Pcx)();     /* lock x
 
 /* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_xchb_nopf)(USER CHECKED void const *addr,
                                 u8 newval, u8 *poldval) {
@@ -467,7 +467,7 @@ NOTHROW(KCALL atomic_xchb_nopf)(USER CHECKED void const *addr,
 
 /* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_xchw_nopf)(USER CHECKED void const *addr,
                                 u16 newval, u16 *poldval) {
@@ -483,7 +483,7 @@ NOTHROW(KCALL atomic_xchw_nopf)(USER CHECKED void const *addr,
 
 /* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_xchl_nopf)(USER CHECKED void const *addr,
                                 u32 newval, u32 *poldval) {
@@ -500,7 +500,7 @@ NOTHROW(KCALL atomic_xchl_nopf)(USER CHECKED void const *addr,
 #ifdef __x86_64__
 /* Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_xchq_nopf)(USER CHECKED void const *addr,
                                 u64 newval, u64 *poldval) {
@@ -518,7 +518,7 @@ NOTHROW(KCALL atomic_xchq_nopf)(USER CHECKED void const *addr,
 
 /* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_fetchaddb_nopf)(USER CHECKED void const *addr,
                                      u8 addend, u8 *poldval) {
@@ -534,7 +534,7 @@ NOTHROW(KCALL atomic_fetchaddb_nopf)(USER CHECKED void const *addr,
 
 /* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_fetchaddw_nopf)(USER CHECKED void const *addr,
                                      u16 addend, u16 *poldval) {
@@ -550,7 +550,7 @@ NOTHROW(KCALL atomic_fetchaddw_nopf)(USER CHECKED void const *addr,
 
 /* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_fetchaddl_nopf)(USER CHECKED void const *addr,
                                      u32 addend, u32 *poldval) {
@@ -567,7 +567,7 @@ NOTHROW(KCALL atomic_fetchaddl_nopf)(USER CHECKED void const *addr,
 #ifdef __x86_64__
 /* Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored value
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((3)) __BOOL
 NOTHROW(KCALL atomic_fetchaddq_nopf)(USER CHECKED void const *addr,
                                      u64 addend, u64 *poldval) {
@@ -583,7 +583,7 @@ NOTHROW(KCALL atomic_fetchaddq_nopf)(USER CHECKED void const *addr,
 #endif /* __x86_64__ */
 
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_orb_nopf)(USER CHECKED void *addr,
                                u8 mask) {
@@ -597,7 +597,7 @@ NOTHROW(KCALL atomic_orb_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_orw_nopf)(USER CHECKED void *addr,
                                u16 mask) {
@@ -611,7 +611,7 @@ NOTHROW(KCALL atomic_orw_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_orl_nopf)(USER CHECKED void *addr,
                                u32 mask) {
@@ -626,7 +626,7 @@ NOTHROW(KCALL atomic_orl_nopf)(USER CHECKED void *addr,
 
 #ifdef __x86_64__
 /* Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_orq_nopf)(USER CHECKED void *addr,
                                u64 mask) {
@@ -641,7 +641,7 @@ NOTHROW(KCALL atomic_orq_nopf)(USER CHECKED void *addr,
 #endif /* __x86_64__ */
 
 /* Try to atomically mask all bits with `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_andb_nopf)(USER CHECKED void *addr,
                                 u8 mask) {
@@ -655,7 +655,7 @@ NOTHROW(KCALL atomic_andb_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to atomically mask all bits with `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_andw_nopf)(USER CHECKED void *addr,
                                 u16 mask) {
@@ -669,7 +669,7 @@ NOTHROW(KCALL atomic_andw_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to atomically mask all bits with `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_andl_nopf)(USER CHECKED void *addr,
                                 u32 mask) {
@@ -684,7 +684,7 @@ NOTHROW(KCALL atomic_andl_nopf)(USER CHECKED void *addr,
 
 #ifdef __x86_64__
 /* Try to atomically mask all bits with `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_andq_nopf)(USER CHECKED void *addr,
                                 u64 mask) {
@@ -699,7 +699,7 @@ NOTHROW(KCALL atomic_andq_nopf)(USER CHECKED void *addr,
 #endif /* __x86_64__ */
 
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_xorb_nopf)(USER CHECKED void *addr,
                                 u8 mask) {
@@ -713,7 +713,7 @@ NOTHROW(KCALL atomic_xorb_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_xorw_nopf)(USER CHECKED void *addr,
                                 u16 mask) {
@@ -727,7 +727,7 @@ NOTHROW(KCALL atomic_xorw_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_xorl_nopf)(USER CHECKED void *addr,
                                 u32 mask) {
@@ -742,7 +742,7 @@ NOTHROW(KCALL atomic_xorl_nopf)(USER CHECKED void *addr,
 
 #ifdef __x86_64__
 /* Try to atomically flip all bits from `mask' at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED __BOOL
 NOTHROW(KCALL atomic_xorq_nopf)(USER CHECKED void *addr,
                                 u64 mask) {
@@ -757,7 +757,7 @@ NOTHROW(KCALL atomic_xorq_nopf)(USER CHECKED void *addr,
 #endif /* __x86_64__ */
 
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((4)) __BOOL
 NOTHROW(KCALL atomic_cmpxchb_nopf)(USER CHECKED void *addr,
                                    u8 oldval, u8 newval,
@@ -774,7 +774,7 @@ NOTHROW(KCALL atomic_cmpxchb_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((4)) __BOOL
 NOTHROW(KCALL atomic_cmpxchw_nopf)(USER CHECKED void *addr,
                                    u16 oldval, u16 newval,
@@ -791,7 +791,7 @@ NOTHROW(KCALL atomic_cmpxchw_nopf)(USER CHECKED void *addr,
 }
 
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((4)) __BOOL
 NOTHROW(KCALL atomic_cmpxchl_nopf)(USER CHECKED void *addr,
                                    u32 oldval, u32 newval,
@@ -809,7 +809,7 @@ NOTHROW(KCALL atomic_cmpxchl_nopf)(USER CHECKED void *addr,
 
 #ifdef __x86_64__
 /* Try to do an atomic-compare-exchange at the possibly faulty `addr'
- * Return `true' on success, `false' on error */
+ * Return `true' on success, `false' on fault */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((4)) __BOOL
 NOTHROW(KCALL atomic_cmpxchq_nopf)(USER CHECKED void *addr,
                                    u64 oldval, u64 newval,
