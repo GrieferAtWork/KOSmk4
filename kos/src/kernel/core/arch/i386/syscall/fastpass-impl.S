@@ -78,7 +78,7 @@
 
 
 #ifndef IS_DEFINED
-#define ARG_PLACEHOLDER_1 ,
+#define ARG_PLACEHOLDER_ ,
 #define TAKE_SECOND_ARG_IMPL(x, val, ...) val
 #define TAKE_SECOND_ARG(x) TAKE_SECOND_ARG_IMPL x
 #define IS_DEFINED3(...) TAKE_SECOND_ARG((__VA_ARGS__ 1,0))
