@@ -109,6 +109,15 @@ NOTHROW(FCALL mpart_trim_complete)(struct mpart *__restrict self) {
 
 
 
+/* Sort the given mem-node list by each node's `mn_partoff' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self) {
+	/* TODO */
+	COMPILER_IMPURE();
+	(void)self;
+}
+
+
 /* Trim `self' whilst holding all relevant locks:
  *   - mpart_lock_acquired(self);
  *   - !self->mp_meta || mpartmeta_ftxlock_writing(self->mp_meta);
@@ -117,6 +126,39 @@ NOTHROW(FCALL mpart_trim_complete)(struct mpart *__restrict self) {
  */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_with_all_locks)(struct mpart *__restrict self) {
+	/* Check  if `self' might possibly contain gaps that
+	 * aren't being referenced by any of the part's mem-
+	 * nodes.
+	 *
+	 * In order to find gaps, we can do this:
+	 *  - Sort  the mem-node lists  by their `mn_partoff', and
+	 *    use an iterator abstraction with 2 mem-node pointers
+	 *    into each of the  lists that offsets a  next_after()
+	 *    function to enumerate them in order.
+	 *  - Then, enumerate all mem-nodes in order and look for
+	 *    adjacent nodes with gaps in-between.
+	 *
+	 * For  leading/trailing  gaps, directly  trim  `self'. For
+	 * leading gaps, also update the `mn_partoff' of all nodes.
+	 *
+	 * For gaps found elsewhere, punch a hole into the part,
+	 * similar to  `mpart_split()'. -  However, since  we're
+	 * already holding all of  the relevant locks, our  impl
+	 * of that function's behavior would only require us  to
+	 * alloc 1 additional mem-part  for every hole we  find.
+	 *
+	 * For every hole found like this, set-up a new mpart to  fill
+	 * in the hole, and have it take the place of the range  below
+	 * the  gap. - Then release locks to all mmans associated with
+	 * the lopart, that aren't also  present in `self'; this  way,
+	 * we, and our caller will still be holding locks to all mmans
+	 * associated with nodes from `self' */
+
+	/* Step #1: Since this isn't normally a  requirement,
+	 *          make sure that mem-node lists are sorted. */
+	mnode_list_sort_by_partoff(&self->mp_share);
+	mnode_list_sort_by_partoff(&self->mp_copy);
+
 	/* TODO */
 
 	/* Indicate that the trim operation has completed. */
@@ -232,7 +274,7 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 	self->mp_maxaddr = (pos_t)PAGESIZE - 1;
 
 	/* If not already referencing one of the generic anon-files,
-	 * change the part's associated file to one of them now! */
+	 * change  the part's  associated file  to one  of them now! */
 	if (!(self->mp_file >= mfile_anon &&
 	      self->mp_file < COMPILER_ENDOF(mfile_anon))) {
 		REF struct mfile *newfile, *oldfile;
