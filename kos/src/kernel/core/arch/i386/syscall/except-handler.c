@@ -180,7 +180,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
 	if (stack == EXCEPT_HANDLER_SP_CURRENT) {
-		stack = (void *)icpustate_getusersp(state);
+		stack = icpustate_getusersp(state);
 		stack = (byte_t *)stack - 128; /* Red zone (TODO: Make this configurable!) */
 	}
 	/* Align the stack. */
@@ -239,7 +239,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 {
 	/* Call a 32-bit exception handler. */
 	uintptr_t mode;
-	USER CHECKED void *stack;
+	USER CHECKED byte_t *stack;
 	USER CHECKED __except_handler32_t handler;
 	USER CHECKED struct kcpustate32 *user_state;
 	USER CHECKED struct __exception_data32 *user_error;
@@ -247,15 +247,15 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	/* Call the user-space exception handler */
 	mode    = PERTASK_GET(this_user_except_handler.ueh_mode);
 	handler = (__except_handler32_t)(uintptr_t)(void *)PERTASK_GET(this_user_except_handler.ueh_handler);
-	stack   = PERTASK_GET(this_user_except_handler.ueh_stack);
+	stack   = (byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
 	if (stack == EXCEPT_HANDLER_SP_CURRENT)
-		stack = (void *)icpustate_getusersp(state);
+		stack = icpustate_getusersp(state);
 	/* Align the stack. */
-	stack = (void *)((uintptr_t)stack & ~3);
+	stack = (byte_t *)((uintptr_t)stack & ~3);
 	/* Allocate structures */
-	user_state = (struct kcpustate32 *)((byte_t *)stack - sizeof(struct kcpustate32));
+	user_state = (struct kcpustate32 *)(stack - sizeof(struct kcpustate32));
 	user_error = (struct __exception_data32 *)((byte_t *)user_state - sizeof(struct __exception_data32));
 	/* Ensure that we can write to the given stack. */
 	validate_writable(user_error, sizeof(struct __exception_data32) + sizeof(struct kcpustate32));

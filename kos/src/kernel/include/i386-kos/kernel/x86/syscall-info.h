@@ -215,10 +215,10 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 	/* lcall $7, $? -- { 0x9a, ?, ?, ?, ?, 0x07, 0x00 } */
 	pc = (USER CHECKED byte_t const *)ucpustate_getpc(state);
 	if (*(u8 const *)(pc - 7) == 0x9a &&
-		__hybrid_unaligned_get16((u16 const *)(pc - 2)) == 0x0007) {
+		__hybrid_unaligned_getle16((u16 const *)(pc - 2)) == 0x0007) {
 		/* This really is an lcall7 instruction */
 		u32 lcall_arg;
-		lcall_arg = __hybrid_unaligned_get32((u32 const *)(pc - 6));
+		lcall_arg = __hybrid_unaligned_getle32((u32 const *)(pc - 6));
 		if (lcall_arg != 0)
 			self->rsi_sysno = lcall_arg;
 	}

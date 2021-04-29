@@ -31,6 +31,7 @@
 #include <sched/except-handler.h>
 #include <sched/task.h>
 
+#include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/cpu-flags.h>
@@ -38,6 +39,8 @@
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+
+#include <stddef.h>
 
 #include <libinstrlen/instrlen.h>
 
@@ -71,12 +74,12 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 				validate_readable(addr, (flags & EMU86_F_OP16) ? 4 : 8);
 			if (flags & EMU86_F_OP16) {
 				bound_index = modrm_getregw(state, &mod, flags);
-				bound_min   = UNALIGNED_GET16((u16 const *)(addr + 0));
-				bound_max   = UNALIGNED_GET16((u16 const *)(addr + 2));
+				bound_min   = UNALIGNED_GETLE16((u16 const *)(addr + 0));
+				bound_max   = UNALIGNED_GETLE16((u16 const *)(addr + 2));
 			} else {
 				bound_index = modrm_getregl(state, &mod, flags);
-				bound_min   = UNALIGNED_GET32((u32 const *)(addr + 0));
-				bound_max   = UNALIGNED_GET32((u32 const *)(addr + 4));
+				bound_min   = UNALIGNED_GETLE32((u32 const *)(addr + 0));
+				bound_max   = UNALIGNED_GETLE32((u32 const *)(addr + 4));
 			}
 		} EXCEPT {
 			icpustate_setpc(state, next_pc);
@@ -102,10 +105,10 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 	{
 		unsigned int i;
 		for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_args.e_pointers[i], 0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void const *)0);
+			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	icpustate_setpc(state, next_pc);

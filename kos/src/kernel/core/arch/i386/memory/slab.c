@@ -30,6 +30,7 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 
+#include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
 
 DECL_BEGIN
@@ -57,34 +58,34 @@ PRIVATE ATTR_FREETEXT void KCALL
 override_slab_kmalloc_x(byte_t *p_slab_kmalloc, size_t sz,
                         byte_t *kmalloc_xnx) {
 	/* slab_kmalloc[SZ]:
-	 * #ifdef __x86_64__
-	 *     movl %edi,  %esi  //  flags
-	 *     movl $sz, %edi // num_bytes
-	 * #else
-	 *     // NOTE: Because kmalloc is STDCALL, it will cleanup the +1
-	 *     //       additional word that we've pushed onto the stack here.
-	 *     popl  %eax
-	 *     pushl  $sz
-	 *     pushl %eax
-	 * #endif
-	 *     jmp   kmalloc */
+	 * >> #ifdef __x86_64__
+	 * >>     movl %edi, %esi // flags
+	 * >>     movl $sz,  %edi // num_bytes
+	 * >> #else
+	 * >>     // NOTE: Because kmalloc is STDCALL, it will cleanup the +1
+	 * >>     //       additional word that we've pushed onto the stack here.
+	 * >>     popl  %eax
+	 * >>     pushl  $sz
+	 * >>     pushl %eax
+	 * >> #endif
+	 * >>     jmp   kmalloc */
 #ifdef __x86_64__
 	*p_slab_kmalloc++ = 0x89; /* movl */
 	*p_slab_kmalloc++ = 0xfe; /* %edi, %esi */
 	*p_slab_kmalloc++ = 0xbf; /* movl $..., %edi */
-	UNALIGNED_SET32((u32 *)p_slab_kmalloc, (u32)sz);
+	UNALIGNED_SETLE32((u32 *)p_slab_kmalloc, (u32)sz);
 	p_slab_kmalloc += 4;
 #else /* __x86_64__ */
 	*p_slab_kmalloc++ = 0x58; /* popl %eax */
 	*p_slab_kmalloc++ = 0x68; /* pushl $... */
-	UNALIGNED_SET32((u32 *)p_slab_kmalloc, (u32)sz);
+	UNALIGNED_SETLE32((u32 *)p_slab_kmalloc, (u32)sz);
 	p_slab_kmalloc += 4;
 	*p_slab_kmalloc++ = 0x50; /* pushl %eax */
 #endif /* !__x86_64__ */
 	*p_slab_kmalloc++ = 0xe9; /* jmp ... */
-	UNALIGNED_SET32((u32 *)p_slab_kmalloc,
-	                (u32)(s32)((kmalloc_xnx) -
-	                           (p_slab_kmalloc + 4)));
+	UNALIGNED_SETLE32((u32 *)p_slab_kmalloc,
+	                  (u32)(s32)((kmalloc_xnx) -
+	                             (p_slab_kmalloc + 4)));
 }
 
 PRIVATE ATTR_FREETEXT void KCALL

@@ -44,7 +44,7 @@ x86_handle_overflow(struct icpustate *__restrict state) {
 	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x04)); /* #OF  Overflow */
 	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OVERFLOW));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+		PERTASK_SET(this_exception_args.e_pointers[i], 0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(this_exception_trace[i], (void const *)NULL);

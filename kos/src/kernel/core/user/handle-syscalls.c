@@ -198,7 +198,7 @@ NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 
 	case ERROR_CODEOF(E_INVALID_HANDLE_OPERATION):
 		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd)) /* fd */
-			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd);
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
 		break;
 
 	default: break;
@@ -1335,11 +1335,11 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 
 	case ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE):
 		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd))
-			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd);
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
 		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type))
-			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type, (uintptr_t)hand->h_type);
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type, hand->h_type);
 		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind))
-			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind, (uintptr_t)handle_typekind(hand));
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind, handle_typekind(hand));
 		break;
 
 	case ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND):
@@ -1354,11 +1354,11 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 		 * associated handle type, translate the exception to `E_INVALID_HANDLE_FILETYPE',
 		 * with the required file type set there. */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE));
-		PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd);
-		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_needed_handle_type, (uintptr_t)(hop_command >> 16)); /* HOP Commands encode the required type like this */
-		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type, (uintptr_t)hand->h_type);
-		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_needed_handle_kind, (uintptr_t)HANDLE_TYPEKIND_GENERIC); /* XXX: Not necessarily correct... */
-		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind, (uintptr_t)handle_typekind(hand));
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_needed_handle_type, (hop_command >> 16)); /* HOP Commands encode the required type like this */
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type, hand->h_type);
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_needed_handle_kind, HANDLE_TYPEKIND_GENERIC); /* XXX: Not necessarily correct... */
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind, handle_typekind(hand));
 		break;
 
 	default: break;

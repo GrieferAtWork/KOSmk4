@@ -586,7 +586,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 				/* Convert `E_FSERROR_FILE_ALREADY_EXISTS' into `E_NET_ADDRESS_IN_USE' */
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_NET_ADDRESS_IN_USE));
 				PERTASK_SET(this_exception_args.e_net_error.ne_address_in_use.iu_context,
-				            (uintptr_t)E_NET_ADDRESS_IN_USE_CONTEXT_BIND);
+				            E_NET_ADDRESS_IN_USE_CONTEXT_BIND);
 			}
 			decref_unlikely(bind_path_dir);
 			RETHROW();

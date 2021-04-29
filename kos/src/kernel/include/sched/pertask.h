@@ -89,7 +89,7 @@ template<class T> T const &PERTASK(T const &x);
 template<class T> T PERTASK_GET(T const &x);
 template<class T, class V, class = decltype(PERTASK_GET<T>(*(V *)0))> void PERTASK_SET(T &x, V value);
 extern struct task *THIS_TASK;
-}
+} /* extern "C++" */
 #endif /* !__INTELLISENSE__ */
 
 #ifndef PERCPU

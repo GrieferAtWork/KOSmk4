@@ -1639,17 +1639,17 @@ return_intval:
 				if (result != 0)
 					goto done;
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_context))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, (uintptr_t)level);
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, level);
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, (uintptr_t)optname);
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, optname);
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, (uintptr_t)socket_getfamily(self));
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, socket_getfamily(self));
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, (uintptr_t)socket_gettype(self));
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, socket_gettype(self));
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, (uintptr_t)socket_getprotocol(self));
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, socket_getprotocol(self));
 			}
 			RETHROW();
 		}
@@ -1878,17 +1878,17 @@ socket_setsockopt(struct socket *__restrict self,
 		} EXCEPT {
 			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_context))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT);
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT);
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, (uintptr_t)level);
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, level);
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, (uintptr_t)optname);
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, optname);
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, (uintptr_t)socket_getfamily(self));
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, socket_getfamily(self));
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, (uintptr_t)socket_gettype(self));
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, socket_gettype(self));
 				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, (uintptr_t)socket_getprotocol(self));
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, socket_getprotocol(self));
 			}
 			RETHROW();
 		}

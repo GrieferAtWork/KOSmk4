@@ -53,7 +53,6 @@ DECL_BEGIN
 PRIVATE void KCALL
 dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 	/* We are now in debugger-mode. */
-	/* We are now in debugger-mode. */
 	dbg_savecolor();
 	/* If the kernel hasn't been poisoned, tell the user that they are
 	 * free to CTRL+D the debugger to resume normal system operations. */

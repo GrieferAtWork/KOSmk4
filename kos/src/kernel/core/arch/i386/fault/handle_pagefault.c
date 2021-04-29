@@ -830,8 +830,8 @@ do_handle_iob_node_access:
 				if unlikely(!(node_flags & MNODE_F_PEXEC)) {
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 					PERTASK_SET(this_exception_args.e_segfault.s_context,
-					            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
-					                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
+					            E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
+					            E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS());
 cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 					decref_unlikely(args.vea_args.va_file);
 					decref_unlikely(part);
@@ -1128,7 +1128,7 @@ pop_connections_and_throw_segfault:
 		{
 			unsigned int i;
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+				PERTASK_SET(this_exception_args.e_pointers[i], 0);
 		}
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
 		       addr, (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE),
@@ -1147,20 +1147,18 @@ not_a_badcall:
 	}
 set_exception_pointers:
 	PERTASK_SET(this_exception_args.e_segfault.s_context,
-	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
-	                        ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (pc == addr)
-	                         ? E_SEGFAULT_CONTEXT_EXEC
-	                         : 0) |
-	                        GET_PF_CONTEXT_UW_BITS()));
+	            E_SEGFAULT_CONTEXT_FAULT |
+	            ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (pc == addr) ? E_SEGFAULT_CONTEXT_EXEC : 0) |
+	            GET_PF_CONTEXT_UW_BITS());
 set_exception_pointers2:
 	PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)addr);
 	{
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_args.e_pointers[i], 0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void *)0);
+			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */

@@ -108,7 +108,7 @@ load_driver_from_file_handles(unsigned int fd_node,
 		} EXCEPT {
 			if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
 				if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd))
-					PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd_node);
+					PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd_node);
 			}
 			RETHROW();
 		}

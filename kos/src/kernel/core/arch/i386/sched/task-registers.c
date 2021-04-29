@@ -146,9 +146,9 @@ NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
 	if unlikely(self->ir_pip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_cs, value);
 	} else {
-		self->ir_cs = (uintptr_t)value;
+		self->ir_cs = value;
 	}
 	COMPILER_WRITE_BARRIER();
 	PREEMPTION_POP(was);

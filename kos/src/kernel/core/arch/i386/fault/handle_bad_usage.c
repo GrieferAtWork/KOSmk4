@@ -107,6 +107,7 @@ opt.append("-Os");
 #include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include <libemu86/emu86.h>
@@ -425,7 +426,7 @@ NOTHROW(FCALL unwind_interrupt)(struct icpustate *__restrict self) {
 	{
 		unsigned int i;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_trace[i], (void *)0);
+			PERTASK_SET(this_exception_trace[i], (void const *)NULL);
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	x86_userexcept_unwind_interrupt(self);

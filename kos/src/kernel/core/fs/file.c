@@ -74,7 +74,7 @@ NOTHROW(KCALL translate_read_exceptions)(struct file *__restrict self) {
 		/* Posix wants us to return -EISDIR when trying to read from a directory... */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY));
 		PERTASK_SET(this_exception_args.e_fserror.f_is_a_directory.iad_action_context,
-		            (uintptr_t)E_FILESYSTEM_IS_A_DIRECTORY_READ);
+		            E_FILESYSTEM_IS_A_DIRECTORY_READ);
 	}
 }
 
