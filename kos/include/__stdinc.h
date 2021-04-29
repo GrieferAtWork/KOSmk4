@@ -760,7 +760,16 @@
 #if !defined(__SIZE_TYPE__) || !defined(__UINTPTR_TYPE__)
 #include "hybrid/typecore.h"
 #endif /* !__SIZE_TYPE__ || !__UINTPTR_TYPE__ */
-#define __COMPILER_OFFSETAFTER(s, m)               ((__SIZE_TYPE__)(&((s *)0)->m + 1))
+#if __has_builtin(__builtin_offsetof) || defined(__GNUC__)
+/* Needed,  because some compilers (like GCC) will otherwise
+ * claim that `offsetafter()' is a "non-constant" expression
+ * (even though it  clearly isn't). So  work around this  by
+ * using the native offsetof() builtin, in conjunection with
+ * sizeof(), both of which are _required_ to be constant! */
+#define __COMPILER_OFFSETAFTER(s, m) (__builtin_offsetof(s, m) + sizeof(((s *)0)->m))
+#else /* __has_builtin(__builtin_offsetof) || __GNUC__ */
+#define __COMPILER_OFFSETAFTER(s, m) ((__SIZE_TYPE__)(&((s *)0)->m + 1))
+#endif /* !__has_builtin(__builtin_offsetof) && !__GNUC__ */
 #define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
 #endif /* !__INTELLISENSE__ */
 #endif /* __CC__ */

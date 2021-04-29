@@ -70,16 +70,14 @@ DECL_BEGIN
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
 
-#define sizeof_field(T, f) sizeof(((T *)0)->f)
-
 STATIC_ASSERT_MSG(offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(struct mpart, _mp_trmlop_mm.olo_func) &&
-                  sizeof_field(struct mpart, _mp_trmlop_mp.olo_func) == sizeof_field(struct mpart, _mp_trmlop_mm.olo_func) &&
+                  offsetafter(struct mpart, _mp_trmlop_mp.olo_func) == offsetafter(struct mpart, _mp_trmlop_mm.olo_func) &&
                   offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(struct mpart, _mp_trmplop_mm.oplo_func) &&
-                  sizeof_field(struct mpart, _mp_trmlop_mp.olo_func) == sizeof_field(struct mpart, _mp_trmplop_mm.oplo_func) &&
+                  offsetafter(struct mpart, _mp_trmlop_mp.olo_func) == offsetafter(struct mpart, _mp_trmplop_mm.oplo_func) &&
                   offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(struct mpart, _mp_trmplop_mp.oplo_func) &&
-                  sizeof_field(struct mpart, _mp_trmlop_mp.olo_func) == sizeof_field(struct mpart, _mp_trmplop_mp.oplo_func) &&
+                  offsetafter(struct mpart, _mp_trmlop_mp.olo_func) == offsetafter(struct mpart, _mp_trmplop_mp.oplo_func) &&
                   offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(struct mpart, mp_filent.rb_rhs) &&
-                  sizeof_field(struct mpart, _mp_trmlop_mp.olo_func) == sizeof_field(struct mpart, mp_filent.rb_rhs),
+                  offsetafter(struct mpart, _mp_trmlop_mp.olo_func) == offsetafter(struct mpart, mp_filent.rb_rhs),
                   "This is assumed by `_mpart_init_asanon()', which fills in `rb_rhs' as NULL "
                   "when called, which in turn must cause the `olo_func' of the lockops used to "
                   "be initialized to `NULL' as well.\n"
