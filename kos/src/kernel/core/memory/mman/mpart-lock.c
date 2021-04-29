@@ -586,6 +586,8 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
 				kfree(data->scd_bitset);
 				DBG_memset(&data->scd_bitset, 0xcc, sizeof(data->scd_bitset));
 			}
+			if unlikely(!(self->mp_flags & MPART_F_BLKST_INL))
+				kfree(self->mp_blkst_ptr);
 			/* All blocks are undefined by default! */
 			self->mp_blkst_inl = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_NDEF);
 			ATOMIC_OR(self->mp_flags, MPART_F_BLKST_INL);

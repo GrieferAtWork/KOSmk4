@@ -68,8 +68,7 @@
                                        * Also note that this flag is cleared by default when the  associated
                                        * file's `mf_parts' field was/is set to `MFILE_PARTS_ANONYMOUS' */
 /*efine MPART_F_               0x0008  * ... */
-#define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)][valid_if(MPART_ST_HASST)]
-                                       * The  backing  block-state bitset  exists in-line. */
+#define MPART_F_BLKST_INL      0x0010 /* [lock(MPART_F_LOCKBIT)] The backing block-state bitset exists in-line. */
 #define MPART_F_NOFREE         0x0020 /* [const] Don't page_free() backing physical memory or swap. */
 #define _MPART_F_WILLMERGE     0x0040 /* [lock(ATOMIC)] An async merge-request for this part was enqueued. */
 #define MPART_F_PERSISTENT     0x0080 /* [lock(CLEAR_ONCE)] The `MPART_F_GLOBAL_REF' flag may not  be cleared to free  up
@@ -78,7 +77,7 @@
                                        * is when the global list  of mem-parts is scanned for  parts which are no  longer
                                        * in-use, and can  be destroyed by  deleting their global  reference. - This  flag
                                        * is set by  default for parts  of files that  have the `MFILE_F_PERSISTENT'  flag
-                                       * set. */
+                                       * set. This flag is never set for anonymous parts! */
 #define MPART_F_COREPART       0x0100 /* [const] Core part (free this part using `mcoreheap_free()' instead of `kfree()') */
 #define MPART_F_CHANGED        0x0200 /* [lock(SET(MPART_F_LOCKBIT),
                                        *       CLEAR((:mfile::mf_lock && mp_meta->mpm_dmalocks == 0) ||
@@ -112,11 +111,6 @@
 #endif /* LIBVIO_CONFIG_ENABLED */
 #define MPART_ST_SWP_SC     0x5 /* [lock(MPART_F_LOCKBIT)] Part has been off-loaded into swap (scattered). */
 #define MPART_ST_MEM_SC     0x6 /* [lock(MPART_F_LOCKBIT)] Part has been allocated (scattered). */
-#ifdef LIBVIO_CONFIG_ENABLED
-#define MPART_ST_HASST(x)   ((x) != MPART_ST_VOID && (x) != MPART_ST_VIO)
-#else /* LIBVIO_CONFIG_ENABLED */
-#define MPART_ST_HASST(x)   ((x) != MPART_ST_VOID)
-#endif /* !LIBVIO_CONFIG_ENABLED */
 #define MPART_ST_INCORE(x)  ((x) >= MPART_ST_MEM && (x) != MPART_ST_SWP_SC)
 #define MPART_ST_INMEM(x)   ((x) == MPART_ST_MEM || (x) == MPART_ST_MEM_SC)
 #define MPART_ST_SCATTER(x) ((x)&4) /* Check if a scatter-list is being used. */
@@ -349,12 +343,34 @@ struct mpart {
 	                                             * file, since this list contains references, rather than weak pointers. */
 #endif /* !__WANT_MPART__mp_dead */
 #ifdef __WANT_MPART_INIT
+#ifdef __WANT_MPART__mp_trmlop
+#define MPART_INIT_mp_filent(...) { __VA_ARGS__ }
+#else /* __WANT_MPART__mp_trmlop */
 #define MPART_INIT_mp_filent(...) __VA_ARGS__
+#endif /* !__WANT_MPART__mp_trmlop */
 #endif /* __WANT_MPART_INIT */
+#ifdef __WANT_MPART__mp_trmlop
+	union {
+		RBTREE_NODE(mpart)        mp_filent;    /* [lock(READ (MPART_F_LOCKBIT || mp_file->mf_lock),
+		                                         *       WRITE(MPART_F_LOCKBIT && mp_file->mf_lock))]
+		                                         * [valid_if(!mpart_isanon(self))]
+		                                         * Entry with the associated file's tree. */
+		struct { /* [valid_if(mpart_isanon(self))] */
+			void               *__mp_trmlop_pad; /* Always `(void *)-1' */
+			union {
+				Toblockop(mman)      _mp_trmlop_mm;  /* Used internally by `mpart_trim()' */
+				Tobpostlockop(mman)  _mp_trmplop_mm; /* Used internally by `mpart_trim()' */
+				Toblockop(mpart)     _mp_trmlop_mp;  /* Used internally by `mpart_trim()' */
+				Tobpostlockop(mpart) _mp_trmplop_mp; /* Used internally by `mpart_trim()' */
+			};
+		};
+	};
+#else /* __WANT_MPART__mp_trmlop */
 	RBTREE_NODE(mpart)            mp_filent;    /* [lock(READ (MPART_F_LOCKBIT || mp_file->mf_lock),
 	                                             *       WRITE(MPART_F_LOCKBIT && mp_file->mf_lock))]
 	                                             * [valid_if(!mpart_isanon(self))]
 	                                             * Entry with the associated file's tree. */
+#endif /* !__WANT_MPART__mp_trmlop */
 	union {
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_blkst_ptr(mp_blkst_ptr) { mp_blkst_ptr }
@@ -364,7 +380,7 @@ struct mpart {
 		 * may be smaller than a single page, and its actual size is fixed, and is
 		 * described by the associated mfile. (s.a. `MPART_BLOCK_ST_*') */
 		uintptr_t                *mp_blkst_ptr; /* [lock(MPART_F_LOCKBIT)][0..1][lock(MPART_F_LOCKBIT || EXISTS(MPART_BLOCK_ST_INIT))]
-		                                         * [valid_if(MPART_ST_HASST && !MPART_F_BLKST_INL)]
+		                                         * [valid_if(!MPART_F_BLKST_INL)]
 		                                         * NOTE: When set to `NULL', then monitoring the part for changes becomes
 		                                         *       impossible, and the caller should  act as though all parts  were
 		                                         *       using `MPART_BLOCK_ST_CHNG' as their state.
@@ -373,7 +389,7 @@ struct mpart {
 		                                         * NOTE: Changing the state of block that used to be `MPART_BLOCK_ST_INIT' to
 		                                         *       anything else may be done atomically, and without holding any locks. */
 		uintptr_t                 mp_blkst_inl; /* [lock(MPART_F_LOCKBIT)]
-		                                         * [valid_if(MPART_ST_HASST && MPART_F_BLKST_INL)] */
+		                                         * [valid_if(MPART_F_BLKST_INL)] */
 	};
 	union {
 #ifdef __WANT_MPART_INIT
@@ -461,24 +477,36 @@ struct mpart {
 /* Check   if  `self'  is  anonymous  (that  is:  `self !in self->mp_file->mf_parts')
  * Note that as long as you're holding a lock to `self', you may make the assumption:
  *    `(!wasdestroyed(self) && !mpart_isanon(self)) -> !mfile_isanon(self->mp_file)'
- * Even when you're not actually holding a lock to the associated file. */
-#define mpart_isanon(self) ((self)->mp_filent.rb_par == (struct mpart *)-1)
+ * Even when you're not actually holding a lock to the associated file.
+ * NOTE: You may also assume that once some given mem-part becomes anonymous, it will
+ *       never become non-anonymous again (i.e. anonymous parts can't be  re-attached
+ *       to mem-files!)
+ * NOTE: Also note that the `rb_lhs' and  `rb_rhs' fields of anonymous mem-parts  are
+ *       still  used internally by  `mpart_trim()' (which only  serves a function for
+ *       anonymous mem-parts, which normally don't use those 2 fields), which is also
+ *       the  reason why `_mpart_init_asanon()'  still fills in  `rb_rhs' as NULL, as
+ *       this is a requirement for `mpart_trim()' to function correctly. */
+#define mpart_isanon(self)        ((self)->mp_filent.rb_par == (struct mpart *)-1)
+#define mpart_isanon_atomic(self) (__hybrid_atomic_load((self)->mp_filent.rb_par, __ATOMIC_ACQUIRE) == (struct mpart *)-1)
 
-/* Fill in `self->mp_filent' such that `self' is marked as an anonymous mem-part. */
+/* Fill in `self->mp_filent' such that `self' is marked as an anonymous mem-part.
+ * NOTE: `rb_rhs' must be filled in with `NULL' as an indicator for `mpart_trim()'! */
 #ifdef NDEBUG
 #define _mpart_init_asanon(self) (void)((self)->mp_filent.rb_par = (struct mpart *)-1)
 #elif __SIZEOF_POINTER__ == 4
 #define _mpart_init_asanon(self)                                              \
 	(void)((self)->mp_filent.rb_par = (struct mpart *)-1,                     \
 	       (self)->mp_filent.rb_lhs = (struct mpart *)__UINT32_C(0xcccccccc), \
-	       (self)->mp_filent.rb_rhs = (struct mpart *)__UINT32_C(0xcccccccc))
+	       (self)->mp_filent.rb_rhs = __NULLPTR)
 #elif __SIZEOF_POINTER__ == 8
 #define _mpart_init_asanon(self)                                                      \
 	(void)((self)->mp_filent.rb_par = (struct mpart *)-1,                             \
 	       (self)->mp_filent.rb_lhs = (struct mpart *)__UINT64_C(0xcccccccccccccccc), \
-	       (self)->mp_filent.rb_rhs = (struct mpart *)__UINT64_C(0xcccccccccccccccc))
+	       (self)->mp_filent.rb_rhs = __NULLPTR)
 #else /* __SIZEOF_POINTER__ == ... */
-#define _mpart_init_asanon(self) (void)((self)->mp_filent.rb_par = (struct mpart *)-1)
+#define _mpart_init_asanon(self)                          \
+	(void)((self)->mp_filent.rb_par = (struct mpart *)-1, \
+	       (self)->mp_filent.rb_rhs = __NULLPTR)
 #endif /* __SIZEOF_POINTER__ != ... */
 
 
@@ -855,9 +883,8 @@ mpart_lock_acquire_and_setcore_unwrite_nodma(struct mpart *__restrict self)
 
 
 /* Get/Set the state of the index'd block `partrel_block_index' from the part's block-state bitset.
- * NOTE: The  caller is responsible  to ensure that mem-part  is in a state
- *       where the bitset is valid (iow: `MPART_ST_HASST(self->mp_state)'),
- *       and that `partrel_block_index' is located in-bounds.
+ * NOTE: The caller is responsible to ensure that `partrel_block_index' is
+ *       located in-bounds.
  * NOTE: The caller must be holding a lock to `self', unless the intend is to
  *       change the state of a  block that used to be  `MPART_BLOCK_ST_INIT',
  *       in which case `mpart_setblockstate()' may be called without  holding

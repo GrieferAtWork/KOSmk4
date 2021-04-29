@@ -171,6 +171,7 @@ libdi_unwind_for_debug(void const *absolute_pc,
 		                reg_getter, reg_getter_arg,
 		                reg_setter, reg_setter_arg);
 	}
+
 	/* Supporting .debug_frame for kernel-space drivers doesn't make any  sense,
 	 * since  the same information  also exists in .eh_frame,  and since the KOS
 	 * kernel is written in C++, and requires .eh_frame-based unwind information

@@ -672,7 +672,7 @@ copy_bits(void *__restrict dst_base, unsigned int dst_bit_offset,
 			avail = NBBY - dst_bit_offset;
 			if (avail > remaining_temp)
 				avail = remaining_temp;
-			dst_value = *(byte_t *)dst_base;
+			dst_value = *(byte_t const *)dst_base;
 			dst_value &= ~(((1 << avail) - 1) << dst_bit_offset);
 			dst_value |= (src_value & ((1 << avail) - 1)) << dst_bit_offset;
 			*(byte_t *)dst_base = dst_value;

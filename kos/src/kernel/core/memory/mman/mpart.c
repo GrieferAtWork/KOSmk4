@@ -93,6 +93,7 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 	assert(LIST_EMPTY(&self->mp_copy));
 	assert(LIST_EMPTY(&self->mp_share));
 	assert(!(self->mp_flags & MPART_F_GLOBAL_REF));
+
 	/* Make sure that we've served _all_ dead nodes that may have still been there. */
 	while (!SLIST_EMPTY(&self->mp_lockops)) {
 		Toblockop(mpart) *lop;
@@ -100,8 +101,9 @@ NOTHROW(FCALL mpart_fini)(struct mpart *__restrict self) {
 		SLIST_REMOVE_HEAD(&self->mp_lockops, olo_link);
 		(*lop->olo_func)(lop, self);
 	}
+
 	/* If valid, free the block-status extension vector. */
-	if (MPART_ST_HASST(self->mp_state) && !(self->mp_flags & MPART_F_BLKST_INL))
+	if (!(self->mp_flags & MPART_F_BLKST_INL))
 		kfree(self->mp_blkst_ptr);
 
 	/* Free state-specific data. */
@@ -345,9 +347,8 @@ DECL_END
 DECL_BEGIN
 
 /* Get/Set the state of the index'd block `partrel_block_index' from the part's block-state bitset.
- * NOTE: The  caller is responsible  to ensure that mem-part  is in a state
- *       where the bitset is valid (iow: `MPART_ST_HASST(self->mp_state)'),
- *       and that `partrel_block_index' is located in-bounds.
+ * NOTE: The caller is responsible to ensure that `partrel_block_index' is
+ *       located in-bounds.
  * NOTE: The caller must be holding a lock to `self', unless the intend is to
  *       change the state of a  block that used to be  `MPART_BLOCK_ST_INIT',
  *       in which case `mpart_setblockstate()' may be called without  holding

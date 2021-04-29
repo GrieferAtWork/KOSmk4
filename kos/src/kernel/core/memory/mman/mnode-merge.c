@@ -131,8 +131,8 @@ NOTHROW(FCALL mnode_canmerge)(struct mnode *lonode,
 		/* Check if the 2 parts are sequentially consistent. */
 		if (ATOMIC_READ(lopart->mp_file) != ATOMIC_READ(hipart->mp_file))
 			goto nope;
-		if (mpart_isanon(lopart)) {
-			if unlikely(!mpart_isanon(hipart))
+		if (mpart_isanon_atomic(lopart)) {
+			if unlikely(!mpart_isanon_atomic(hipart))
 				goto nope;
 			if (lopart == hipart) {
 				/* If it's the same part, then file-offsets mustn't
@@ -150,7 +150,7 @@ NOTHROW(FCALL mnode_canmerge)(struct mnode *lonode,
 				 * succeed. */
 			}
 		} else {
-			if unlikely(mpart_isanon(hipart))
+			if unlikely(mpart_isanon_atomic(hipart))
 				goto nope;
 			if (mnode_getfileendaddr(lonode) !=
 			    mnode_getfileaddr(hinode))
@@ -2248,6 +2248,7 @@ NOTHROW(FCALL async_waitfor_mman_and_mergepart)(struct mman *mman_to_wait,
  * upon exit. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self) {
+	assert(mpart_lock_acquired(self));
 	if (!mpart_isanon(self)) {
 		struct mpart *merged, *neighbor;
 		struct mfile *file = self->mp_file;
