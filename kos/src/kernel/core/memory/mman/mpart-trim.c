@@ -109,12 +109,46 @@ NOTHROW(FCALL mpart_trim_complete)(struct mpart *__restrict self) {
 
 
 
-/* Sort the given mem-node list by each node's `mn_partoff' */
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mnode_list_sort_item_by_partoff)(struct mnode_list *__restrict list,
+                                               struct mnode *__restrict self) {
+	struct mnode *neighbor;
+	if (self != LIST_FIRST(list)) {
+		neighbor = LIST_PREV_UNSAFE(self, mn_link);
+		if (self->mn_partoff < neighbor->mn_partoff) {
+			do {
+				/* Re-insert `self' before `neighbor' */
+				LIST_REMOVE(self, mn_link);
+				LIST_INSERT_BEFORE(neighbor, self, mn_link);
+			} while (self != LIST_FIRST(list) &&
+			         (neighbor = LIST_PREV_UNSAFE(self, mn_link),
+			          self->mn_partoff < neighbor->mn_partoff));
+			return;
+		}
+	}
+	if ((neighbor = LIST_NEXT(self, mn_link)) != NULL &&
+	    (self->mn_partoff > neighbor->mn_partoff)) {
+		do {
+			/* Re-insert `self' after `neighbor' */
+			LIST_REMOVE(self, mn_link);
+			LIST_INSERT_AFTER(neighbor, self, mn_link);
+			neighbor = LIST_NEXT(self, mn_link);
+		} while (neighbor != NULL &&
+		         self->mn_partoff > neighbor->mn_partoff);
+	}
+}
+
+/* Sort the given mem-node list by each node's `mn_partoff'.  This
+ * isn't the most efficient function, mainly because it's meant to
+ * sort a linked list, so it runs in O(n+(n-1)+(n-2)+...+2+1) */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self) {
-	/* TODO */
-	COMPILER_IMPURE();
-	(void)self;
+	struct mnode *iter, *next;
+	for (iter = LIST_FIRST(self); iter; iter = next) {
+		next = LIST_NEXT(iter, mn_link);
+		mnode_list_sort_item_by_partoff(self, iter);
+	}
 }
 
 
