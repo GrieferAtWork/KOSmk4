@@ -227,20 +227,6 @@ NOTHROW(FCALL mpart_node_iterator_next)(struct mpart_node_iterator *__restrict s
 }
 
 
-/* Detach bound objects (currently: only futexes) from the given range. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_detach_range)(struct mpart *__restrict self,
-                                  mpart_reladdr_t minaddr,
-                                  mpart_reladdr_t maxaddr) {
-	struct mpartmeta *meta;
-	if ((meta = self->mp_meta) != NULL) {
-		struct mfutex *ftx;
-		while ((ftx = mpartmeta_ftx_rremove(meta, minaddr, maxaddr)) != NULL)
-			mfutex_detach(ftx);
-	}
-}
-
-
 /* Ensure that all pages from an MNODE_F_MHINT-node have been loaded.
  * Once this  has  been  ensured,  clear  the  `MNODE_F_MHINT'  flag! */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -303,16 +289,66 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
 }
 
 
+/* Load all mem-nodes with the `MHINT' flag. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_load_all_mhint_nodes)(struct mpart *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			assert(node->mn_part == self);
+			if unlikely(node->mn_flags & MNODE_F_MHINT)
+				mnode_load_mhint(node);
+		}
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfutex_tree_reinsert_or_detach_lstrip)(struct mfutex **__restrict p_tree,
+                                                     struct mfutex *__restrict self,
+                                                     PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	struct mfutex *lhs, *rhs;
+again:
+	lhs = self->mfu_mtaent.rb_lhs;
+	rhs = self->mfu_mtaent.rb_rhs;
+	if (self->mfu_addr < num_bytes) {
+		mfutex_detach(self);
+		DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+	} else {
+		/* Re-insert into the new tree with the new offset. */
+		self->mfu_addr -= num_bytes;
+		mfutex_tree_insert(p_tree, self);
+	}
+	if (lhs) {
+		if (rhs)
+			mfutex_tree_reinsert_or_detach_lstrip(p_tree, rhs, num_bytes);
+		self = lhs;
+		goto again;
+	}
+	if (rhs) {
+		self = rhs;
+		goto again;
+	}
+}
+
+
 /* Strip the first `num_bytes' bytes from the given mem-part. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
                             PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
-	size_t num_blkbits;
 	physpagecnt_t pages;
 	freefun_t freefun;
 
-	/* Detach bound objects (futexes) */
-	mpart_detach_range(self, 0, num_bytes - 1);
+	/* Detach or relocate bound objects (futexes) */
+	{
+		struct mpartmeta *meta;
+		if ((meta = self->mp_meta) != NULL && meta->mpm_ftx) {
+			struct mfutex *tree;
+			tree          = meta->mpm_ftx;
+			meta->mpm_ftx = NULL;
+			mfutex_tree_reinsert_or_detach_lstrip(&meta->mpm_ftx, tree, num_bytes);
+		}
+	}
 
 	/* Update the offsets within associated mem-nodes. */
 	{
@@ -376,7 +412,7 @@ NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
 			self->mp_state = MPART_ST_NOSC(self->mp_state);
 			kfree(vec);
 		} else {
-			/* Try to trucate the vector. */
+			/* Try to truncate the vector. */
 			vec = (struct mchunk *)krealloc_nx(vec,
 			                                   self->mp_mem_sc.ms_c *
 			                                   sizeof(struct mchunk),
@@ -391,25 +427,28 @@ NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
 	}
 
 	/* Update the block-status bitset to strip leading bytes. */
-	num_blkbits = (num_bytes >> self->mp_file->mf_blockshift) * MPART_BLOCK_STBITS;
-	if (self->mp_flags & MPART_F_BLKST_INL) {
-		self->mp_blkst_inl >>= num_blkbits;
-	} else {
-		mpart_blkst_word_t *bitset;
-		if ((bitset = self->mp_blkst_ptr) != NULL) {
-			size_t new_size, new_blks, new_wrds;
-			new_size = mpart_getsize(self) - num_bytes;
-			new_blks = new_size >> self->mp_file->mf_blockshift;
-			new_wrds = CEILDIV(new_blks, MPART_BLKST_BLOCKS_PER_WORD);
-			/* Move down bits. */
-			bitmovedown(bitset, 0,
-			            bitset, num_blkbits,
-			            new_blks * MPART_BLOCK_STBITS);
-			/* Try to truncate the bitset vector. */
-			bitset = (mpart_blkst_word_t *)krealloc_nx(bitset, new_wrds * sizeof(mpart_blkst_word_t),
-			                                           GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-			if likely(bitset)
-				self->mp_blkst_ptr = bitset;
+	{
+		size_t num_blkbits;
+		num_blkbits = (num_bytes >> self->mp_file->mf_blockshift) * MPART_BLOCK_STBITS;
+		if (self->mp_flags & MPART_F_BLKST_INL) {
+			self->mp_blkst_inl >>= num_blkbits;
+		} else {
+			mpart_blkst_word_t *bitset;
+			if ((bitset = self->mp_blkst_ptr) != NULL) {
+				size_t new_size, new_blks, new_wrds;
+				new_size = mpart_getsize(self) - num_bytes;
+				new_blks = new_size >> self->mp_file->mf_blockshift;
+				new_wrds = CEILDIV(new_blks, MPART_BLKST_BLOCKS_PER_WORD);
+				/* Move down bits. */
+				bitmovedown(bitset, 0,
+				            bitset, num_blkbits,
+				            new_blks * MPART_BLOCK_STBITS);
+				/* Try to truncate the bitset vector. */
+				bitset = (mpart_blkst_word_t *)krealloc_nx(bitset, new_wrds * sizeof(mpart_blkst_word_t),
+				                                           GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+				if likely(bitset)
+					self->mp_blkst_ptr = bitset;
+			}
 		}
 	}
 
