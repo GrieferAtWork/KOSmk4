@@ -67,8 +67,9 @@ PUBLIC ATTR_PERCPU struct ioperm_bitmap *thiscpu_x86_ioperm_bitmap = NULL;
 LOCAL NOBLOCK void
 NOTHROW(KCALL ioperm_bitmap_unset_write_access)(struct ioperm_bitmap *__restrict self) {
 	struct cpu *me;
-	pflag_t was = PREEMPTION_PUSHOFF();
-	me = THIS_CPU;
+	pflag_t was;
+	was = PREEMPTION_PUSHOFF();
+	me  = THIS_CPU;
 	if (FORCPU(me, thiscpu_x86_ioperm_bitmap) == self) {
 		/* Re-map, and only include read permissions. */
 		pagedir_map(FORCPU(me, thiscpu_x86_iob),
@@ -79,7 +80,8 @@ NOTHROW(KCALL ioperm_bitmap_unset_write_access)(struct ioperm_bitmap *__restrict
 	PREEMPTION_POP(was);
 }
 
-INTERN NOBLOCK void
+DEFINE_PERTASK_FINI(fini_this_ioperm_bitmap);
+PRIVATE NOBLOCK ATTR_USED NONNULL((1)) void
 NOTHROW(KCALL fini_this_ioperm_bitmap)(struct task *__restrict self) {
 	REF struct ioperm_bitmap *iob;
 	iob = FORTASK(self, this_x86_ioperm_bitmap);
@@ -89,30 +91,30 @@ NOTHROW(KCALL fini_this_ioperm_bitmap)(struct task *__restrict self) {
 		decref_likely(iob);
 	}
 }
-DEFINE_PERTASK_FINI(fini_this_ioperm_bitmap);
 
-INTERN NOBLOCK void
+DEFINE_PERTASK_CLONE(clone_this_ioperm_bitmap);
+PRIVATE NOBLOCK ATTR_USED NONNULL((1)) void
 NOTHROW(KCALL clone_this_ioperm_bitmap)(struct task *__restrict new_thread,
                                         uintptr_t UNUSED(flags)) {
 	struct ioperm_bitmap *iob;
-	/* The ioperm() permissions bitmap is always inherited by child threads!
-	 * Only  the  iopl()  level  is  not  inherited  in  certain  cases  (as
-	 * configurable     via      `/proc/sys/x86/keepiopl/(clone|exec|fork)') */
+
+	/* The ioperm()  permissions bitmap  is always  inherited by  child
+	 * threads! Only the iopl() level is not inherited in certain cases
+	 * (as configurable via `/proc/sys/x86/keepiopl/(clone|exec|fork)') */
 	iob = THIS_X86_IOPERM_BITMAP;
+
 	/* unlikely, since this isn't really something that modern applications
 	 * commonly make use of! */
 	if unlikely(iob) {
 		assert(iob->ib_share >= 1);
 		incref(iob);
+
 		/* Unset write-access if this is the first time the IOB is getting shared. */
 		if (ATOMIC_FETCHINC(iob->ib_share) == 1)
 			ioperm_bitmap_unset_write_access(iob);
 		FORTASK(new_thread, this_x86_ioperm_bitmap) = iob;
-		/* So-as to ensure that */
-
 	}
 }
-DEFINE_PERTASK_CLONE(clone_this_ioperm_bitmap);
 
 
 
@@ -134,6 +136,7 @@ REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADAL
 		kfree(result);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
 	}
+
 	/* Fill both pages of memory with all ones (indicating that I/O access is denied) */
 	result->ib_pages  = physpage2addr(iob);
 	result->ib_refcnt = 1;
@@ -153,6 +156,7 @@ REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags) {
 			kfree(result);
 			return NULL;
 		}
+
 		/* Fill both pages of memory with all ones (indicating that I/O access is denied) */
 		result->ib_pages  = physpage2addr(iob);
 		result->ib_refcnt = 1;
@@ -182,6 +186,7 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 		kfree(result);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
 	}
+
 	/* Copy I/O permission bits. */
 	result->ib_pages  = physpage2addr(iob);
 	result->ib_refcnt = 1;
@@ -201,6 +206,7 @@ NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict sel
 			kfree(result);
 			return NULL;
 		}
+
 		/* Copy I/O permission bits. */
 		result->ib_pages  = physpage2addr(iob);
 		result->ib_refcnt = 1;
@@ -253,20 +259,24 @@ NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
 	minbyte = FLOORDIV(minport, 8);
 	maxbyte = CEILDIV(maxport + 1, 8) - 1;
 	assert(maxbyte >= minbyte);
+
 	if (maxbyte == minbyte) {
 		/* Special case: only a single byte is getting modified. */
 		minbit = minport & 7;
 		bitcnt = (maxport - minport) + 1;
+
 		/* Update the bitmap mask. */
 		ioperm_bitmap_maskbyte_c(self, minbyte,
 		                         minbit, bitcnt,
 		                         turn_on);
 		return;
 	}
+
 	/* Update the bitsets for the first and last affected bitset byte */
 	minbit = minport & 7;
 	ioperm_bitmap_maskbyte_c(self, minbyte, minbit, 8 - minbit, turn_on);
 	ioperm_bitmap_maskbyte_c(self, maxbyte, 0, (maxport & 7) + 1, turn_on);
+
 	/* Fill in all intermediate bytes. */
 	if (minbyte + 1 < maxbyte) {
 		memsetphys(self->ib_pages + minbyte + 1,
@@ -299,16 +309,14 @@ INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_iobm)(void) {
 	/* Fill  the  contents of  the empty  IOB vector  with all  FFh bytes,
 	 * thus setting the access permissions of all I/O ports as restricted. */
-#ifdef __x86_64__
-	memsetq(__x86_iob_empty_base, UINT64_C(0xffffffffffffffff), 8192 / 8);
-#else /* __x86_64__ */
-	memsetl(__x86_iob_empty_base, UINT32_C(0xffffffff), 8192 / 4);
-#endif /* !__x86_64__ */
+	memsetb(__x86_iob_empty_base, UINT8_C(0xff), 8192);
+
 	/* Prepare the IOB region for lazy memory mappings. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!pagedir_prepare(__x86_iob_empty_base, 2 * PAGESIZE))
 		kernel_panic(FREESTR("Failed to prepare bootcpu.tss.iob"));
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
 	/* Unmap the initial IOB of the boot CPU. */
 	pagedir_unmap(__x86_iob_empty_base, 2 * PAGESIZE);
 }

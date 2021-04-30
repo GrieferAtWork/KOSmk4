@@ -107,6 +107,7 @@ DEFINE_SYSCALL3(errno_t, ioperm,
                 syscall_ulong_t, num,
                 syscall_ulong_t, turn_on) {
 	uintptr_t old_thread_flags;
+	struct task *caller;
 	struct cpu *me;
 	byte_t *iob;
 	if unlikely(!num)
@@ -124,10 +125,12 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 	}
 	/* Manipulate the  IOBM of  our own  thread  through use  of the  `thiscpu_x86_iob'  vector.
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
-	old_thread_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
+	caller           = THIS_TASK;
+	old_thread_flags = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
 	TRY {
-		me = THIS_CPU;
-		iob   = &FORCPU(me, thiscpu_x86_iob[0]);
+		COMPILER_READ_BARRIER();
+		me  = caller->t_cpu;
+		iob = &FORCPU(me, thiscpu_x86_iob[0]);
 		/* Ensure that the caller is allowed hardware port access.
 		 * This essentially enforces that:
 		 *  - Anyone is allowed to disable ports (or keep them enabled)
@@ -152,9 +155,11 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		}
 	} EXCEPT {
 		if (!(old_thread_flags & TASK_FKEEPCORE))
-			ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
+			ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
 		RETHROW();
 	}
+	if (!(old_thread_flags & TASK_FKEEPCORE))
+		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
 	return -EOK;
 }
 

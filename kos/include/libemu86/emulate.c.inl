@@ -2171,6 +2171,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 /* Verify user access to a specified I/O port range. (requires `EMU86_EMULATE_CONFIG_CHECKUSER') */
 #ifndef EMU86_VALIDATE_IO
 #define EMU86_VALIDATE_IO(portno, num_ports) (void)0
+#define EMU86_VALIDATE_IO_IS_NOOP 1
 #endif /* !EMU86_VALIDATE_IO */
 
 /* Access I/O ports. */

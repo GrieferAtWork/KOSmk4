@@ -76,6 +76,7 @@ opt.append("-Os");
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/mman/phys.h>
 #include <kernel/mman/rtm.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/printk.h>
@@ -93,6 +94,7 @@ opt.append("-Os");
 #include <sched/rpc.h>
 #include <sched/task.h>
 #include <sched/userkern.h>
+#include <sched/x86/iobm.h>
 
 #include <hybrid/overflow.h>
 
@@ -229,7 +231,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_WANT_INT3          0
 #define EMU86_EMULATE_CONFIG_WANT_INT           0
 #define EMU86_EMULATE_CONFIG_WANT_INTO          0
-#define EMU86_EMULATE_CONFIG_WANT_IO            0
+#define EMU86_EMULATE_CONFIG_WANT_IO            1 /* For better exceptions, and consistency. */
 #define EMU86_EMULATE_CONFIG_WANT_IRET          0 /* TODO: vm86 support */
 #define EMU86_EMULATE_CONFIG_WANT_JCC_DISP8     0
 #define EMU86_EMULATE_CONFIG_WANT_JCC_DISP32    0
@@ -1329,7 +1331,6 @@ err_privileged_segment:
 #define EMU86_GETGS() icpustate_getgs(_state)
 #define EMU86_EMULATE_PUSH(new_sp, num_bytes) (void)0
 #define EMU86_EMULATE_POP(old_sp, num_bytes)  (void)0
-#define EMU86_VALIDATE_IO(portno, num_ports)  (void)0
 
 /* None of the instructions that should get emulated can modify segment registers. */
 #define EMU86_SETES(v) DONT_USE
@@ -1339,14 +1340,14 @@ err_privileged_segment:
 #define EMU86_SETFS(v) DONT_USE
 #define EMU86_SETGS(v) DONT_USE
 
-#define EMU86_EMULATE_INB(portno, result) DONT_USE /* TODO: vm86 support */
-#define EMU86_EMULATE_INW(portno, result) DONT_USE /* TODO: vm86 support */
-#define EMU86_EMULATE_INL(portno, result) DONT_USE /* TODO: vm86 support */
-#define EMU86_EMULATE_OUTB(portno, value) DONT_USE /* TODO: vm86 support */
-#define EMU86_EMULATE_OUTW(portno, value) DONT_USE /* TODO: vm86 support */
-#define EMU86_EMULATE_OUTL(portno, value) DONT_USE /* TODO: vm86 support */
+//#define EMU86_EMULATE_INB(portno, result) /* TODO: vm86 support */
+//#define EMU86_EMULATE_INW(portno, result) /* TODO: vm86 support */
+//#define EMU86_EMULATE_INL(portno, result) /* TODO: vm86 support */
+//#define EMU86_EMULATE_OUTB(portno, value) /* TODO: vm86 support */
+//#define EMU86_EMULATE_OUTW(portno, value) /* TODO: vm86 support */
+//#define EMU86_EMULATE_OUTL(portno, value) /* TODO: vm86 support */
 
-#define EMU86_SETSEG(regno, value)       DONT_USE
+#define EMU86_SETSEG(regno, value)                     DONT_USE
 #define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags) DONT_USE /* Unused */
 #define EMU86_SETREGP(regno, value, op_flags)          DONT_USE /* Unused */
 
@@ -1868,11 +1869,86 @@ x86_validate_datseg(struct icpustate *__restrict state,
 
 
 
+/************************************************************************/
+/* I/O access checks                                                    */
+/************************************************************************/
+#define EMU86_VALIDATE_IO(portno, num_ports) \
+	hbu_validate_io(_state, portno, num_ports, usage)
+PRIVATE void KCALL
+hbu_validate_io(struct icpustate *__restrict state,
+                u16 portno, u8 num_ports,
+                bad_usage_reason_t usage) {
+	struct ioperm_bitmap *iob;
+	assert(num_ports <= 4);
 
+	/* Check if I/O access was enabled via iopl()
+	 * NOTE: This  _really_ shouldn't be the case, unless the hardware is faults.
+	 *       Even the check below shouldn't happen unless there are some problems
+	 *       with the hardware, or the kernel is faulty...
+	 * Still note though, that we might get here if user-space uses `outsb' with
+	 * a non-canonical `%rsi' (or `insb' with a non-canonical `%rdi'). When this
+	 * happens, our caller will check for non-canonical access later. */
+	{
+		uintptr_t pflags = icpustate_getpflags(state);
+		if ((pflags & EFLAGS_IOPLMASK) >= EFLAGS_IOPL(3)) {
+			if ((usage & ~0xffff) == BAD_USAGE_REASON_UD) {
+				printk(KERN_WARNING "[io] iopl=3, but I/O instruction still caused "
+				                    "#UD [pc=%p,port=%#" PRIx16 ",%" PRIu8 "]\n",
+				       icpustate_getpc(state), portno, num_ports);
+			}
+			return;
+		}
+	}
 
+	/* Load the calling thread's ioperm() bitmap. */
+	if ((iob = THIS_X86_IOPERM_BITMAP) == NULL) {
+err_illegal:
+		/* Include some  additional exception  pointer information  about
+		 * the actual port numbers that were being accessed by the instr. */
+		THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE,
+		      /* opcode:   */ 0, /* Filled by `complete_except_switch()' */
+		      /* op_flags: */ 0, /* *ditto* */
+		      portno, num_ports);
+	}
 
+	/* Check the caller's IOBM to determine if access is allowed. */
+	{
+		u8 b, mask, bitoff;
+		physaddr_t bitset;
+		bitset = iob->ib_pages + portno / 8;
+		bitoff = (u8)portno % 8;
+		if (bitoff + num_ports <= 8) {
+			b = peekphysb(bitset) >> bitoff;
+		} else {
+			union {
+				u8 b[2];
+				u16 w;
+			} word;
+			word.w = peekphysw_unaligned(bitset);
+			b      = (word.b[0] >> bitoff) | (word.b[1] << (8 - bitoff));
+		}
+		mask = ((u8)1 << num_ports) - 1;
+
+		/* 1-bits indicate that port access is disallowed.
+		 * As  such, if any of the accessed ports are disallowed (iow:
+		 * when any of the masked bits are `1'), the access as a whole
+		 * is also disabled! */
+		if ((b & mask) != 0)
+			goto err_illegal;
+	}
+
+	/* Like above, if we get here as the result of #UD,
+	 * then something must be wrong with the hardware. */
+	if ((usage & ~0xffff) == BAD_USAGE_REASON_UD) {
+		printk(KERN_WARNING "[io] ioperm allowed, but I/O instruction still "
+		                    "caused #UD [pc=%p,port=%#" PRIx16 ",%" PRIu8 "]\n",
+		       icpustate_getpc(state), portno, num_ports);
+	}
+}
 
 DECL_END
+
+
 
 /* TODO: call, jmp and jcc (also: loop[cc]) instruction can cause #GP
  *       on   x86_64  when  TARGET_PC   isn't  a  canonical  address.

@@ -24,15 +24,15 @@
 
 EMU86_INTELLISENSE_BEGIN(io) {
 
-#if EMU86_EMULATE_CONFIG_CHECKUSER
+#if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_IO_IS_NOOP)
 #define VERIFY_USER_PORT_ACCESS(portno, num_ports) \
 	do {                                           \
 		if (EMU86_ISUSER())                        \
 			EMU86_VALIDATE_IO(portno, num_ports);  \
 	} __WHILE0
-#else /* EMU86_EMULATE_CONFIG_CHECKUSER */
+#else /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_VALIDATE_IO_IS_NOOP */
 #define VERIFY_USER_PORT_ACCESS(portno, num_ports) (void)0
-#endif /* !EMU86_EMULATE_CONFIG_CHECKUSER */
+#endif /* !EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_VALIDATE_IO_IS_NOOP */
 
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
