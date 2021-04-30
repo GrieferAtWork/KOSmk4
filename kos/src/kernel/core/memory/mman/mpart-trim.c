@@ -126,7 +126,15 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
  *       has already been destroyed (i.w. `wasdestroyed(self)') */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfutex_detach)(struct mfutex *__restrict self) {
+	/* Need a temporary weak reference to prevent `self' form being free'd
+	 * by another thread before  `awref_clear()' has finished syncing  the
+	 * write to the `mfu_part' field.
+	 * Note that we know that `self' must have a non-zero weakref counter,
+	 * because `mfutex_destroy()' only drops its weak reference _after_ it
+	 * was able to remove `self' from the associated mem-part. */
+	weakincref(self);
 	awref_clear(&self->mfu_part);
+	weakdecref_unlikely(self);
 }
 
 

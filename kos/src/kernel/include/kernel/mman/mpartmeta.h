@@ -69,25 +69,26 @@ AWREF(mpart_awref, mpart);
 
 struct mfutex {
 	/* Memory-Fast-Userspace-mUTEX */
-	WEAK refcnt_t             mfu_refcnt; /* Reference counter. */
-	struct mpart_awref        mfu_part;   /* [1..1] The (currently) associated mem-part.
-	                                       * Note that this  part may change  arbitrarily as the  result of calls  to
-	                                       * `mpart_split()'.  To prevent this,  read out this  field, acquire a lock
-	                                       * to the mem-part, or the futex-tree-lock, then read out this field  again
-	                                       * until the mem-part no longer changes. At this point, the mem-part you'll
-	                                       * end up with will be consistent.
-	                                       * end up with will be consistent. */
-	mpart_reladdr_t           mfu_addr;   /* [lock(mfu_part->mp_meta->mpm_ftx)] Address of this mem-futex
-	                                       * (relative to mfu_part; within the R/B-tree)
-	                                       * NOTE: The least-significant bit  is used  as R/B-bit,  meaning
-	                                       *       that part addresses must be aligned by at least 2 bytes. */
+	WEAK refcnt_t             mfu_refcnt;     /* Reference counter. */
+	WEAK refcnt_t             mfu_weakrefcnt; /* Weak reference counter. */
+	struct mpart_awref        mfu_part;       /* [1..1] The (currently) associated mem-part.
+	                                           * Note that this  part may change  arbitrarily as the  result of calls  to
+	                                           * `mpart_split()'.  To prevent this,  read out this  field, acquire a lock
+	                                           * to the mem-part, or the futex-tree-lock, then read out this field  again
+	                                           * until the mem-part no longer changes. At this point, the mem-part you'll
+	                                           * end up with will be consistent.
+	                                           * end up with will be consistent. */
+	mpart_reladdr_t           mfu_addr;       /* [lock(mfu_part->mp_meta->mpm_ftx)] Address of this mem-futex
+	                                           * (relative to mfu_part; within the R/B-tree)
+	                                           * NOTE: The least-significant bit  is used  as R/B-bit,  meaning
+	                                           *       that part addresses must be aligned by at least 2 bytes. */
 #ifdef __WANT_MFUTEX__mfu_dead
 	union {
-		LLRBTREE_NODE(mfutex) mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
-		SLIST_ENTRY(mfutex)  _mfu_dead;   /* Used internally */
+		LLRBTREE_NODE(mfutex) mfu_mtaent;     /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
+		SLIST_ENTRY(mfutex)  _mfu_dead;       /* Used internally */
 	};
 #else /* __WANT_MFUTEX__mfu_dead */
-	LLRBTREE_NODE(mfutex)     mfu_mtaent; /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
+	LLRBTREE_NODE(mfutex)     mfu_mtaent;     /* [lock(mfu_part->mp_meta->mpm_ftx)] MeTA-data ENTry. */
 #endif /* !__WANT_MFUTEX__mfu_dead */
 #ifdef __WANT_MFUTEX__mfu_lop
 	union {
@@ -105,22 +106,29 @@ struct mfutex {
 };
 
 #define mfutex_init(self, part, addr)     \
-	((self)->mfu_refcnt = 1,              \
+	((self)->mfu_refcnt     = 1,          \
+	 (self)->mfu_weakrefcnt = 1,          \
 	 awref_init(&(self)->mfu_part, part), \
 	 (self)->mfu_addr = (addr),           \
 	 sig_init(&(self)->mfu_signal))
 #define mfutex_cinit(self, part, addr)     \
-	((self)->mfu_refcnt = 1,               \
+	((self)->mfu_refcnt     = 1,           \
+	 (self)->mfu_weakrefcnt = 1,           \
 	 awref_cinit(&(self)->mfu_part, part), \
 	 (self)->mfu_addr = (addr),            \
 	 sig_cinit(&(self)->mfu_signal))
 #define mfutex_addr(self) ((self)->mfu_addr & ~1)
 
+#ifndef ____os_free_defined
+#define ____os_free_defined
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
+#endif /* !____os_free_defined */
 
 /* Destroy the given mem-futex. */
-#define mfutex_free(self) kfree(self)
+#define mfutex_free(self) __os_free(self)
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct mfutex, mfu_refcnt, mfutex_destroy)
+DEFINE_WEAKREFCOUNT_FUNCTIONS(struct mfutex, mfu_weakrefcnt, mfutex_free)
 
 /* Helper macros. */
 #define mfutex_send(self)                    sig_send(&(self)->mfu_signal)

@@ -54,16 +54,16 @@ STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(mpart)
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,
                                                 REF struct mpart *__restrict part) {
-	struct mfutex *me;
+	WEAK REF struct mfutex *me;
 	me = container_of(_lop, struct mfutex, _mfu_plop);
 	decref_unlikely(part);
-	mfutex_free(me);
+	weakdecref_likely(me);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
 NOTHROW(FCALL mfutex_remove_from_mpart_lop)(Toblockop(mpart) *__restrict _lop,
                                             REF struct mpart *__restrict part) {
-	struct mfutex *me;
+	WEAK REF struct mfutex *me;
 	me = container_of(_lop, struct mfutex, _mfu_lop);
 
 	/* Remove the mem-futex from the tree ourselves. */
@@ -108,7 +108,7 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 	}
 
 	/* Free the futex object itself. */
-	mfutex_free(self);
+	weakdecref_likely(self);
 }
 
 /* Mem-futex tree API. All of  these functions require that the  caller
@@ -141,7 +141,15 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfutex_tree_clear_all_parts)(struct mfutex *__restrict root) {
 	struct mfutex *lhs, *rhs;
 again:
+	/* Need a temporary weak reference to prevent `root' form being free'd
+	 * by another thread before  `awref_clear()' has finished syncing  the
+	 * write to the `mfu_part' field.
+	 * Note that we know that `root' must have a non-zero weakref counter,
+	 * because `mfutex_destroy()' only drops its weak reference _after_ it
+	 * was able to remove `root' from the associated mem-part. */
+	weakincref(root);
 	awref_clear(&root->mfu_part);
+	weakdecref_unlikely(root);
 	lhs = root->mfu_mtaent.rb_lhs;
 	rhs = root->mfu_mtaent.rb_rhs;
 	DBG_memset(&root->mfu_mtaent, 0xcc, sizeof(root->mfu_mtaent));
@@ -376,8 +384,8 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
  *          the associated mpart, and relative offset  into that mem-part. If a  lookup
  *          of  the   futex   then   returns  `MPART_FUTEX_OOB',   loop   back   around
  *          and once again lookup the `mnode'.
- *       -> In the  end, there  exists no  API also  found on  linux that  would make  use of  this
- *          function,  however  on  KOS it  is  possible to  access  this function  through  use of
+ *       -> In the end, there  exists no API also  found on linux that  would make use of  this
+ *          function, however on  KOS it is  possible to  access this function  through use  of
  *          the HANDLE_TYPE_MFILE-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `addr' */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutex *FCALL

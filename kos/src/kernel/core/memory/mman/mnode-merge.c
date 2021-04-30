@@ -1207,8 +1207,9 @@ NOTHROW(FCALL merge_realloc)(void *ptr, size_t num_bytes,
 /* Transfer the given `tree' into `dst', updating futex
  * objects  to by incrementing `mfu_addr' by `addroff',
  * and setting `newpart' as `mfu_part' */
-PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
+PRIVATE NOBLOCK NONNULL((1, 2, 3, 4)) void
 NOTHROW(FCALL mpartmeta_transfer_futex_tree)(struct mpartmeta *__restrict dst,
+                                             struct mpartmeta *__restrict src,
                                              struct mfutex *__restrict tree,
                                              struct mpart *__restrict newpart,
                                              size_t addroff) {
@@ -1217,17 +1218,34 @@ again:
 	lo = tree->mfu_mtaent.rb_lhs;
 	hi = tree->mfu_mtaent.rb_rhs;
 
-	/* Update this futex object. */
-	tree->mfu_addr += addroff;
-	awref_set(&tree->mfu_part, newpart);
+	if (tryincref(tree)) {
+		/* Update this futex object. */
+		tree->mfu_addr += addroff;
+		awref_set(&tree->mfu_part, newpart);
 
-	/* Re-insert the new part's futex-tree. */
-	mpartmeta_ftx_insert(dst, tree);
+		/* Insert into the new part's futex-tree. */
+		mpartmeta_ftx_insert(dst, tree);
+
+		/* Drop the reference from above. */
+		decref_unlikely(tree);
+	} else {
+		/* Re-insert into the old part's futex-tree.
+		 *
+		 * Because the futex has already been destroyed,
+		 * we're  fairly save in assuming that the futex
+		 * has  already  added /  is currently  adding a
+		 * lockop to `dst->mpm_ftxlops' for the  purpose
+		 * of removing the futex from that tree.
+		 *
+		 * As such, satisfy its intend and keep this futex
+		 * as part of the old (to-be-removed) part's tree. */
+		mpartmeta_ftx_insert(src, tree);
+	}
 
 	/* Recursively iterate the entire tree. */
 	if (lo) {
 		if (hi)
-			mpartmeta_transfer_futex_tree(dst, hi, newpart, addroff);
+			mpartmeta_transfer_futex_tree(dst, src, hi, newpart, addroff);
 		tree = lo;
 		goto again;
 	}
@@ -1586,8 +1604,12 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 #endif /* ARCH_HAVE_RTM */
 		/* Transfer futex objects (if any). */
 		if (himeta->mpm_ftx != NULL) {
+			struct mfutex *tree;
+			tree            = himeta->mpm_ftx;
+			himeta->mpm_ftx = NULL;
 			mpartmeta_transfer_futex_tree(lometa,
-			                              himeta->mpm_ftx,
+			                              himeta,
+			                              tree,
 			                              lopart,
 			                              losize);
 		}
