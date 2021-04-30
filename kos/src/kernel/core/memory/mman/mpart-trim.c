@@ -43,6 +43,15 @@
 #include <stddef.h>
 #include <string.h>
 
+#if defined(CONFIG_NO_MPART_TRIM)
+#undef CONFIG_HAVE_MPART_TRIM
+#elif !defined(CONFIG_HAVE_MPART_TRIM)
+#define CONFIG_HAVE_MPART_TRIM 1
+#elif (CONFIG_HAVE_MPART_TRIM+0) == 0
+#undef CONFIG_HAVE_MPART_TRIM
+#define CONFIG_NO_MPART_TRIM 1
+#endif
+
 
 
 /* Alongside mpart_merge(), there should also be a function `mpart_trim()'
@@ -67,6 +76,8 @@
  * region to be kept in-core all at once. */
 
 DECL_BEGIN
+
+#ifdef CONFIG_HAVE_MPART_TRIM
 
 /* Check if `self' may be trimmed.
  * This macro may only be called while holding a lock to  `self',
@@ -1637,6 +1648,15 @@ do_destroy:
 	mpart_destroy(self);
 }
 
+#else /* CONFIG_HAVE_MPART_TRIM */
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self) {
+	/* Trimming is disabled. */
+	decref(self);
+}
+
+#endif /* !CONFIG_HAVE_MPART_TRIM */
 
 DECL_END
 

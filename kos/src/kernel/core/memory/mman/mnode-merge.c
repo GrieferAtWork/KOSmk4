@@ -46,7 +46,18 @@
 #include <stdint.h>
 #include <string.h>
 
+#if defined(CONFIG_NO_MNODE_MERGE)
+#undef CONFIG_HAVE_MNODE_MERGE
+#elif !defined(CONFIG_HAVE_MNODE_MERGE)
+#define CONFIG_HAVE_MNODE_MERGE 1
+#elif (CONFIG_HAVE_MNODE_MERGE+0) == 0
+#undef CONFIG_HAVE_MNODE_MERGE
+#define CONFIG_NO_MNODE_MERGE 1
+#endif
+
 DECL_BEGIN
+
+#ifdef CONFIG_HAVE_MNODE_MERGE
 
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
@@ -2386,6 +2397,81 @@ domerge_locked:
 	}
 	return self;
 }
+
+#else /* CONFIG_HAVE_MNODE_MERGE */
+
+/* Same  as `mnode_merge()', but  the caller must  also be holding a
+ * lock to `self->mn_part'  (which may be  assumed to be  non-NULL).
+ * Upon return, the lock to `self->mn_part' may have been  released,
+ * in which case the caller must inherit a lock to `return->mn_part' */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mnode *
+NOTHROW(FCALL mnode_merge_with_partlock)(struct mnode *__restrict self) {
+	/* No-op */
+	COMPILER_IMPURE();
+	return self;
+}
+
+
+/* While  holding a lock  to `self->mn_mman', try to  merge the given node
+ * with its successor/predecessor node, without releasing the lock to  the
+ * associated mman. If it is found that `self' is mergeable, but that this
+ * cannot be done  without blocking, `self->mn_mman'  is set-up such  that
+ * the merge operation will be performed asynchronously.
+ * @return: * : The new, merged node (which may have a different min-addr
+ *              that the original node `self'). Also note that this  node
+ *              may or may not be equal to `self', and that it's min- and
+ *              max-addr fields may be  different from those that  `self'
+ *              had upon entry, irregardless of `self' being re-returned.
+ *              As  a matter of fact `*self' becomes invalid after a call
+ *              to this function! */
+DEFINE_PUBLIC_ALIAS(mnode_merge, mnode_merge_with_partlock);
+
+
+/* Mark the given mman  as potentially containing mergeable  mem-nodes.
+ * These nodes will (eventually) be merged asynchronously, but may  not
+ * be merged immediately (though they may still be merged immediately).
+ * NOTE: The caller isn't required to be holding a lock to `self', but
+ *       if they are, this function is still going to be non-blocking,
+ *       and the node-merging process  will simply happen _after_  the
+ *       caller releases their lock. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes)(struct mman *__restrict self) {
+	/* No-op */
+	COMPILER_IMPURE();
+	(void)self;
+}
+
+
+/* Same as `mman_mergenodes()', but the caller _must_ be holding a lock
+ * to the given mman `self'! */
+DEFINE_PUBLIC_ALIAS(mman_mergenodes_locked, mman_mergenodes);
+
+
+/* Helper wrapper to try to merge a node at `addr' (if such a node exists).
+ * The caller must be holding a lock to `self' when calling this  function. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
+                                       void const *minaddr,
+                                       void const *maxaddr) {
+	/* No-op */
+	COMPILER_IMPURE();
+	(void)self;
+	(void)minaddr;
+	(void)maxaddr;
+}
+
+
+/* Same as `mpart_merge()',  but the caller  is holding a  lock
+ * to `self' upon entry, and will be holding a lock to `return'
+ * upon exit. */
+DEFINE_PUBLIC_ALIAS(mpart_merge_locked, mnode_merge_with_partlock);
+
+
+/* Try to merge `self' with neighboring parts from the associated file.
+ * @return: * : A pointer to the (possibly merged) mem-part. */
+DEFINE_PUBLIC_ALIAS(mpart_merge, mnode_merge_with_partlock);
+
+#endif /* !CONFIG_HAVE_MNODE_MERGE */
 
 DECL_END
 
