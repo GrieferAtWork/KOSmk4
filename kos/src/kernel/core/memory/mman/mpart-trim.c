@@ -460,10 +460,107 @@ NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
                             PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
-	/* TODO */
-	COMPILER_IMPURE();
-	(void)self;
-	(void)num_bytes;
+	physpagecnt_t pages;
+	freefun_t freefun;
+	mpart_reladdr_t oldsize, newsize;
+	oldsize = mpart_getsize(self);
+	newsize = oldsize - num_bytes;
+
+	/* Detach bound objects (futexes) */
+	{
+		struct mpartmeta *meta;
+		if ((meta = self->mp_meta) != NULL) {
+			struct mfutex *ftx;
+			while ((ftx = mpartmeta_ftx_rremove(meta, newsize, oldsize - 1)) != NULL) {
+				mfutex_detach(ftx);
+			}
+		}
+	}
+
+	/* Update the part's backing data. */
+	pages   = num_bytes >> PAGESHIFT;
+	freefun = mpart_getfreefun(self);
+	switch (self->mp_state) {
+
+	case MPART_ST_SWP:
+		pages = mpart_page2swap(self, pages);
+		ATTR_FALLTHROUGH
+	case MPART_ST_MEM:
+		/* Free leading pages. */
+		assert(self->mp_mem.mc_size >= pages);
+		(*freefun)(self->mp_swp.mc_start +
+		           self->mp_swp.mc_size - pages,
+		           pages, 0);
+		self->mp_mem.mc_size -= pages;
+		break;
+
+	case MPART_ST_SWP_SC:
+		pages = mpart_page2swap(self, pages);
+		ATTR_FALLTHROUGH
+	case MPART_ST_MEM_SC: {
+		struct mchunk *vec;
+		/* Trim leading pages from the scatter vector. */
+		vec = self->mp_mem_sc.ms_v;
+		for (;;) {
+			physpage_t base;
+			physpagecnt_t count;
+			assert(self->mp_mem_sc.ms_c);
+			base  = vec[self->mp_mem_sc.ms_c - 1].mc_start;
+			count = vec[self->mp_mem_sc.ms_c - 1].mc_size;
+			if (pages >= count) {
+				(*freefun)(base, count, 0);
+				--self->mp_mem_sc.ms_c;
+				pages -= count;
+			} else {
+				(*freefun)(base + count - pages, pages, 0);
+				vec[self->mp_mem_sc.ms_c - 1].mc_size -= pages;
+				break;
+			}
+		}
+		if (self->mp_mem_sc.ms_c == 1) {
+			self->mp_mem   = vec[0];
+			self->mp_state = MPART_ST_NOSC(self->mp_state);
+			kfree(vec);
+		} else {
+			/* In order to be allowed to change the base-address  of
+			 * the mem-chunk-vector, we have to make sure that there
+			 * aren't any MHINT-nodes  out there, and  if there  are
+			 * any, then we must first initialize them! */
+			mpart_load_all_mhint_nodes(self);
+
+			/* Try to truncate the vector. */
+			vec = (struct mchunk *)krealloc_nx(vec,
+			                                   self->mp_mem_sc.ms_c *
+			                                   sizeof(struct mchunk),
+			                                   GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+			if likely(vec)
+				self->mp_mem_sc.ms_v = vec;
+		}
+	}	break;
+
+	default:
+		break;
+	}
+
+	/* Update the block-status bitset to strip trailing entries. */
+	if (!(self->mp_flags & MPART_F_BLKST_INL) && self->mp_blkst_ptr) {
+		mpart_blkst_word_t *bitset;
+		size_t new_blcks, new_words;
+		new_blcks = newsize >> self->mp_file->mf_blockshift;
+		new_words = CEILDIV(new_blcks, MPART_BLKST_BLOCKS_PER_WORD);
+		/* Like above, we can only change the base-address of the block-
+		 * status-bitset after we've made sure  that there are no  MHINT
+		 * nodes! */
+		mpart_load_all_mhint_nodes(self);
+		bitset = (mpart_blkst_word_t *)krealloc_nx(self->mp_blkst_ptr,
+		                                           new_words * sizeof(mpart_blkst_word_t),
+		                                           GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if likely(bitset)
+			self->mp_blkst_ptr = bitset;
+	}
+
+	/* Update the part's actual maxaddr field. */
+	self->mp_maxaddr -= num_bytes;
 }
 
 
