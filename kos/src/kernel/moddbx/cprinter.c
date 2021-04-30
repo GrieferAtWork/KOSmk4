@@ -1123,7 +1123,7 @@ print_named_pointer(struct ctyperef const *__restrict self,
 						ctype_struct_enumfields(mytype, &ctype_struct_is_nonempty_callback, NULL);
 						mod = mytype->ct_struct.ct_info.cd_mod;
 					}
-					if (mod->cm_module == (REF module_t *)&kernel_driver) {
+					/*if (mod->cm_module == (REF module_t *)&kernel_driver)*/ {
 						char const *name;
 						name = ctype_struct_getname(mytype);
 						if (name) {
