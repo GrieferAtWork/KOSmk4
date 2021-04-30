@@ -28,10 +28,13 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/swap.h>
+#include <sched/task.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <assert.h>
@@ -51,9 +54,9 @@
  * >> mmap(0x01234000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0);
  * >> mmap(0x01235000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0); // Automatically merged
  * >> mmap(0x01236000, PAGESIZE, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANON, -1, 0); // Automatically merged
- * >> munmap(0x01235000, PAGESIZE); // Automatically cases a split, but only within mem-nodes (mpart is unaffected)
+ * >> munmap(0x01235000, PAGESIZE); // Automatically cases a split, but only within mem-nodes (mpart would be unaffected)
  *
- * The idea here is that  the munmap() calls `mpart_trim()', which  will
+ * The idea here is that the `munmap()' calls `mpart_trim()', which will
  * (asynchronously, and only in case the part is anonymous) look at  the
  * part's set of mapped nodes and figure out which parts of the part (if
  * any)  are actually in use. Any part that's not in use from the part's
@@ -85,6 +88,35 @@ STATIC_ASSERT_MSG(offsetof(struct mpart, _mp_trmlop_mp.olo_func) == offsetof(str
                   "an async trim operation of the mem-part!");
 
 
+/************************************************************************/
+/* Cleanup helper functions                                             */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mchunk_freemem)(struct mchunk *__restrict self) {
+	page_free(self->mc_start, self->mc_size);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mchunk_freeswp)(struct mchunk *__restrict self) {
+	swap_free(self->mc_start, self->mc_size);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mchunkvec_freemem)(struct mchunk *__restrict vec, size_t count) {
+	size_t i;
+	for (i = 0; i < count; ++i)
+		mchunk_freemem(&vec[i]);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
+	size_t i;
+	for (i = 0; i < count; ++i)
+		mchunk_freeswp(&vec[i]);
+}
+/************************************************************************/
+
+
+
 
 /* Detach the given mem-futex from its associated mem-part,
  * by clearing the futex's `mfu_part' field. - This must be
@@ -106,6 +138,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_complete)(struct mpart *__restrict self) {
 	ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, NULL);
 }
+
 
 
 
@@ -151,6 +184,231 @@ NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self) {
 	}
 }
 
+struct mpart_node_iterator {
+	struct mnode *pni_cnext; /* [0..1] Next copy-node */
+	struct mnode *pni_snext; /* [0..1] Next share-node */
+};
+
+#define mpart_node_iterator_init(self, part)           \
+	((self)->pni_cnext = LIST_FIRST(&(part)->mp_copy), \
+	 (self)->pni_snext = LIST_FIRST(&(part)->mp_share))
+
+/* Enumerate the next mem-node (return `NULL' when no more nodes remain) */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mnode *
+NOTHROW(FCALL mpart_node_iterator_next)(struct mpart_node_iterator *__restrict self) {
+	struct mnode *result;
+	do {
+		result = self->pni_cnext;
+		if (result == NULL) {
+			/* Enumerate the rest from the share-list. */
+			result = self->pni_snext;
+			if (result == NULL)
+				break; /* Exhausted */
+			self->pni_snext = LIST_NEXT(result, mn_link);
+		} else if (self->pni_snext != NULL &&
+		           self->pni_snext->mn_partoff < result->mn_partoff) {
+			/* The next share-node comes before the next copy-node. */
+			result          = self->pni_snext;
+			self->pni_snext = LIST_NEXT(result, mn_link);
+		} else {
+			self->pni_cnext = LIST_NEXT(result, mn_link);
+		}
+		/* Skip nodes from dead mmans. */
+	} while unlikely(wasdestroyed(result->mn_mman));
+	return result;
+}
+
+
+/* Detach bound objects (currently: only futexes) from the given range. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_detach_range)(struct mpart *__restrict self,
+                                  mpart_reladdr_t minaddr,
+                                  mpart_reladdr_t maxaddr) {
+	struct mpartmeta *meta;
+	if ((meta = self->mp_meta) != NULL) {
+		struct mfutex *ftx;
+		while ((ftx = mpartmeta_ftx_rremove(meta, minaddr, maxaddr)) != NULL)
+			mfutex_detach(ftx);
+	}
+}
+
+
+/* Ensure that all pages from an MNODE_F_MHINT-node have been loaded.
+ * Once this has been ensured, clear the `MNODE_F_MHINT' flag! */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
+	assert(self->mn_mman == &mman_kernel);
+	PAGEDIR_PAGEALIGNED byte_t *iter, *end;
+	iter = (byte_t *)mnode_getaddr(self);
+	end  = (byte_t *)mnode_getendaddr(self);
+	assert(iter < end);
+	do {
+		__asm__ __volatile__("" : : "r" (*iter));
+		iter += PAGESIZE;
+	} while (iter < end);
+#ifndef CONFIG_NO_SMP
+	/* Make sure that any other CPU is still initializing hinted pages,
+	 * which may  overlap with  the address  range we've  just  loaded. */
+	while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
+	ATOMIC_AND(self->mn_flags, ~MNODE_F_MHINT);
+}
+
+typedef NOBLOCK void
+/*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
+
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) freefun_t /* from "kram-unmap.c" */
+NOTHROW(FCALL mpart_getfreefun)(struct mpart const *__restrict self);
+
+/* Assert that the scatter enable/disable macros work. */
+STATIC_ASSERT(MPART_ST_WTSC(MPART_ST_MEM) == MPART_ST_MEM_SC);
+STATIC_ASSERT(MPART_ST_WTSC(MPART_ST_SWP) == MPART_ST_SWP_SC);
+STATIC_ASSERT(MPART_ST_NOSC(MPART_ST_MEM_SC) == MPART_ST_MEM);
+STATIC_ASSERT(MPART_ST_NOSC(MPART_ST_SWP_SC) == MPART_ST_SWP);
+
+
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
+                            mpart_blkst_word_t const *src_bitset, size_t src_index,
+                            size_t num_bits) {
+#define BITSET_INDEX(index) ((index) / BITSOF(mpart_blkst_word_t))
+#define BITSET_SHIFT(index) ((index) % BITSOF(mpart_blkst_word_t))
+#define GETBIT(index)       ((src_bitset[BITSET_INDEX(index)] >> BITSET_SHIFT(index)) & 1)
+#define SETBIT_OFF(index)   ((dst_bitset[BITSET_INDEX(index)] &= ~((mpart_blkst_word_t)1 << BITSET_SHIFT(index))))
+#define SETBIT_ON(index)    ((dst_bitset[BITSET_INDEX(index)] |= ((mpart_blkst_word_t)1 << BITSET_SHIFT(index))))
+	while (num_bits) {
+		--num_bits;
+		if (GETBIT(src_index)) {
+			SETBIT_ON(dst_index);
+		} else {
+			SETBIT_OFF(dst_index);
+		}
+		++dst_index;
+		++src_index;
+	}
+#undef SETBIT_ON
+#undef SETBIT_OFF
+#undef GETBIT
+#undef BITSET_SHIFT
+#undef BITSET_INDEX
+}
+
+
+/* Strip the first `num_bytes' bytes from the given mem-part. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
+                            PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	size_t num_blkbits;
+	physpagecnt_t pages;
+	freefun_t freefun;
+
+	/* Detach bound objects (futexes) */
+	mpart_detach_range(self, 0, num_bytes - 1);
+
+	/* Update the offsets within associated mem-nodes. */
+	{
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+			struct mnode *node;
+			LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+				assert(node->mn_part == self);
+				assert(node->mn_partoff >= num_bytes);
+				/* Deal with MHINT'd nodes! */
+				if unlikely(node->mn_flags & MNODE_F_MHINT)
+					mnode_load_mhint(node);
+				node->mn_partoff -= num_bytes;
+			}
+		}
+	}
+
+	/* Update the part's backing data. */
+	pages   = num_bytes >> PAGESHIFT;
+	freefun = mpart_getfreefun(self);
+	switch (self->mp_state) {
+
+	case MPART_ST_SWP:
+		pages = mpart_page2swap(self, pages);
+		ATTR_FALLTHROUGH
+	case MPART_ST_MEM:
+		/* Free leading pages. */
+		assert(self->mp_mem.mc_size >= pages);
+		(*freefun)(self->mp_swp.mc_start, pages, 0);
+		self->mp_mem.mc_start += pages;
+		self->mp_mem.mc_size -= pages;
+		break;
+
+	case MPART_ST_SWP_SC:
+		pages = mpart_page2swap(self, pages);
+		ATTR_FALLTHROUGH
+	case MPART_ST_MEM_SC: {
+		struct mchunk *vec;
+		/* Trim leading pages from the scatter vector. */
+		vec = self->mp_mem_sc.ms_v;
+		for (;;) {
+			physpagecnt_t count;
+			assert(self->mp_mem_sc.ms_c);
+			count = vec[0].mc_size;
+			if (pages >= count) {
+				(*freefun)(vec[0].mc_start, count, 0);
+				--self->mp_mem_sc.ms_c;
+				memmovedown(&vec[0], &vec[1],
+				            self->mp_mem_sc.ms_c,
+				            sizeof(struct mchunk));
+				pages -= count;
+			} else {
+				(*freefun)(vec[0].mc_start, pages, 0);
+				vec[0].mc_start += pages;
+				vec[0].mc_size -= pages;
+				break;
+			}
+		}
+		if (self->mp_mem_sc.ms_c == 1) {
+			self->mp_mem   = vec[0];
+			self->mp_state = MPART_ST_NOSC(self->mp_state);
+			kfree(vec);
+		} else {
+			/* Try to trucate the vector. */
+			vec = (struct mchunk *)krealloc_nx(vec,
+			                                   self->mp_mem_sc.ms_c *
+			                                   sizeof(struct mchunk),
+			                                   GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+			if likely(vec)
+				self->mp_mem_sc.ms_v = vec;
+		}
+	}	break;
+
+	default:
+		break;
+	}
+
+	/* Update the block-status bitset to strip leading bytes. */
+	num_blkbits = (num_bytes >> self->mp_file->mf_blockshift) * MPART_BLOCK_STBITS;
+	if (self->mp_flags & MPART_F_BLKST_INL) {
+		self->mp_blkst_inl >>= num_blkbits;
+	} else {
+		mpart_blkst_word_t *bitset;
+		if ((bitset = self->mp_blkst_ptr) != NULL) {
+			size_t new_size, new_blks, new_wrds;
+			new_size = mpart_getsize(self) - num_bytes;
+			new_blks = new_size >> self->mp_file->mf_blockshift;
+			new_wrds = CEILDIV(new_blks, MPART_BLKST_BLOCKS_PER_WORD);
+			/* Move down bits. */
+			bitmovedown(bitset, 0,
+			            bitset, num_blkbits,
+			            new_blks * MPART_BLOCK_STBITS);
+			/* Try to truncate the bitset vector. */
+			bitset = (mpart_blkst_word_t *)krealloc_nx(bitset, new_wrds * sizeof(mpart_blkst_word_t),
+			                                           GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+			if likely(bitset)
+				self->mp_blkst_ptr = bitset;
+		}
+	}
+
+	/* Update the part's actual minaddr field. */
+	self->mp_minaddr += num_bytes;
+}
+
 
 /* Trim `self' whilst holding all relevant locks:
  *   - mpart_lock_acquired(self);
@@ -160,6 +418,9 @@ NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self) {
  */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_with_all_locks)(struct mpart *__restrict self) {
+	struct mnode *node;
+	struct mpart_node_iterator iter;
+
 	/* Check  if `self' might possibly contain gaps that
 	 * aren't being referenced by any of the part's mem-
 	 * nodes.
@@ -193,6 +454,22 @@ NOTHROW(FCALL mpart_trim_with_all_locks)(struct mpart *__restrict self) {
 	mnode_list_sort_by_partoff(&self->mp_share);
 	mnode_list_sort_by_partoff(&self->mp_copy);
 
+	/* Step #2: Enumerate nodes. */
+	mpart_node_iterator_init(&iter, self);
+	node = mpart_node_iterator_next(&iter);
+	assertf(node, "This would mean there are no nodes, which "
+	              "our caller should have already handled");
+
+	/* Step #3: Check for an unused portion preceding the first node. */
+	if (node->mn_partoff != 0 &&
+	    node->mn_partoff > self->mp_file->mf_part_amask) {
+		PAGEDIR_PAGEALIGNED mpart_reladdr_t lstrip;
+		lstrip = node->mn_partoff & ~self->mp_file->mf_part_amask;
+		assert(lstrip);
+		mpart_lstrip(self, lstrip);
+		assert(node->mn_partoff <= self->mp_file->mf_part_amask);
+	}
+
 	/* TODO */
 
 	/* Indicate that the trim operation has completed. */
@@ -223,34 +500,6 @@ again:
 		goto again;
 	}
 }
-
-
-/************************************************************************/
-/* Cleanup helper functions                                             */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mchunk_freemem)(struct mchunk *__restrict self) {
-	page_free(self->mc_start, self->mc_size);
-}
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mchunk_freeswp)(struct mchunk *__restrict self) {
-	swap_free(self->mc_start, self->mc_size);
-}
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mchunkvec_freemem)(struct mchunk *__restrict vec, size_t count) {
-	size_t i;
-	for (i = 0; i < count; ++i)
-		mchunk_freemem(&vec[i]);
-}
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
-	size_t i;
-	for (i = 0; i < count; ++i)
-		mchunk_freeswp(&vec[i]);
-}
-/************************************************************************/
 
 
 /* Set the effective size of `self' to `0', and free all backing storage. */

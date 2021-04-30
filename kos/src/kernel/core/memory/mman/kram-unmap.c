@@ -45,7 +45,6 @@
 #include <hybrid/minmax.h>
 
 #include <kos/except.h>
-#include <sys/mmio.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -86,8 +85,6 @@ PUBLIC WEAK unsigned int mman_kernel_hintinit_inuse = 0;
 #endif /* !CONFIG_NO_SMP */
 
 
-typedef NOBLOCK void
-/*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
 PRIVATE NOBLOCK void
 NOTHROW(FCALL freefun_phys)(physpage_t base,
                             physpagecnt_t num_pages,
@@ -106,8 +103,11 @@ NOTHROW(FCALL freefun_noop)(physpage_t UNUSED(base),
                             gfp_t UNUSED(flags)) {
 }
 
-PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) freefun_t
-NOTHROW(FCALL freefun_for_mpart)(struct mpart const *__restrict self) {
+typedef NOBLOCK void
+/*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
+/* NOTE: `INTERN', because also used in `mpart-trim.c' */
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) freefun_t
+NOTHROW(FCALL mpart_getfreefun)(struct mpart const *__restrict self) {
 	freefun_t result;
 	switch (self->mp_state) {
 
@@ -493,7 +493,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	assert(LIST_NEXT(node, mn_link) == NULL);
 
 	unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
-	freefun    = freefun_for_mpart(part);
+	freefun    = mpart_getfreefun(part);
 
 	/* Set-up malloc-flags for all of the (potential) calls below. */
 	flags = GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC | (flags & ~GFP_CALLOC);
@@ -533,7 +533,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 		 * to  do is  ensure that every  page from the  tail-range has been
 		 * accessed at least once. */
 		do {
-			peekb(tail_minaddr);
+			__asm__ __volatile__("" : : "r" (*tail_minaddr));
 			tail_minaddr += PAGESIZE;
 		} while (tail_minaddr < tail_endaddr);
 

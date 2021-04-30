@@ -113,7 +113,9 @@
 #define MPART_ST_MEM_SC     0x6 /* [lock(MPART_F_LOCKBIT)] Part has been allocated (scattered). */
 #define MPART_ST_INCORE(x)  ((x) >= MPART_ST_MEM && (x) != MPART_ST_SWP_SC)
 #define MPART_ST_INMEM(x)   ((x) == MPART_ST_MEM || (x) == MPART_ST_MEM_SC)
-#define MPART_ST_SCATTER(x) ((x)&4) /* Check if a scatter-list is being used. */
+#define MPART_ST_SCATTER(x) ((x) & 4)  /* Check if a scatter-list is being used. */
+#define MPART_ST_WTSC(x)    ((x) | 4)  /* Return the scatter-variant of the given state. */
+#define MPART_ST_NOSC(x)    ((x) & ~4) /* Return the non-scatter-variant of the given state. */
 
 
 #ifdef __CC__
@@ -195,6 +197,42 @@ struct mchunkvec {
 //	MPART_INIT_mp_mem(FILLME, CEILDIV(FILLME, PAGESIZE)),
 //	MPART_INIT_mp_meta(NULL)
 #endif
+
+/*
+ * === Addressing in swap data ===
+ *
+ * Unlike memory MPART_ST_MEM-like memory,  MPART_ST_SWP-like
+ * memory isn't necessarily continuous. - Instead, only pages
+ * containing at least 1 byte that's been modified are really
+ * present in swap (as determined by the status of the blocks
+ * associated with those pages).
+ *
+ * As such, the address of the swap-page belonging to a given
+ * part-relative address is calculated as:
+ *
+ *    in: mpart_reladdr_t reladdr;
+ *    >> PARTREL_PAGEADDR = reladdr / PAGESIZE;
+ *    >> SWAP_PAGE_OFFSET = 0;
+ *    >> for (i = 0; i < PARTREL_PAGEADDR; ++i) {
+ *    >>     if (PARTREL_PAGE_CONTAINS_MODIFIED_BLOCKS(i))
+ *    >>         ++SWAP_PAGE_OFFSET;
+ *    >> }
+ *    >> if (mp_state == MPART_ST_SWP)
+ *    >>     return mp_swp.mc_start + SWAP_PAGE_OFFSET;
+ *    >> if (mp_state == MPART_ST_SWP_SC)
+ *    >>     return ...; // Like `MPART_ST_SWP'
+ *    This transformation from a page-index into an offset into
+ *    the (possibly non-continuous) swap vector of the part can
+ *    be done with `mpart_page2swap()'.
+ *
+ *
+ * FIXME: The currently implementation of `mpart_split()',  and
+ *        `mpart_setcore_or_unlock()' don't do the whole  align
+ *        to whole pages  thing, but rather:  assume that  swap
+ *        space is a tightly packed sequence of modified bytes,
+ *        rather than pages containing modified bytes!
+ */
+
 
 struct mpart {
 #ifdef __WANT_MPART_INIT
@@ -632,6 +670,16 @@ NOTHROW(KCALL mpart_ll_bzeromemcc)(struct mpart *__restrict self,
                                    mpart_reladdr_t offset,
                                    size_t num_bytes);
 
+
+/* Return  the # of pages containing MPART_BLOCK_ST_CHNG-
+ * blocks that can be found within `[0,partrel_pageaddr)'
+ *
+ * This function should be used to convert from part-rel
+ * offsets  into in-swap-data offsets when `self's state
+ * indicates that the part is currently located in swap. */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) physpagecnt_t
+NOTHROW(FCALL mpart_page2swap)(struct mpart const *__restrict self,
+                               physpagecnt_t partrel_pageaddr);
 
 
 

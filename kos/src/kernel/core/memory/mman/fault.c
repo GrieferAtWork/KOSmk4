@@ -477,11 +477,10 @@ mfault_pcopy_makenodes_or_unlock(struct mfault *__restrict self) {
 }
 
 
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL copybits)(mpart_blkst_word_t *dst_bitset,
-                        mpart_blkst_word_t const *src_bitset,
-                        size_t dst_index, size_t src_index,
-                        size_t num_bits) {
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
+                           mpart_blkst_word_t const *src_bitset, size_t src_index,
+                           size_t num_bits) {
 #define BITSET_INDEX(index) ((index) / BITSOF(mpart_blkst_word_t))
 #define BITSET_SHIFT(index) ((index) % BITSOF(mpart_blkst_word_t))
 #define GETBIT(index)       ((src_bitset[BITSET_INDEX(index)] >> BITSET_SHIFT(index)) & 1)
@@ -889,9 +888,9 @@ done_mark_changed:
 				} else if (part->mp_blkst_ptr == NULL) {
 					word = MPART_BLOCK_REPEAT(MPART_BLOCK_ST_CHNG);
 				} else {
-					copybits(&word, part->mp_blkst_ptr, 0,
-					         block_offset* MPART_BLOCK_STBITS,
-					         block_count * MPART_BLOCK_STBITS);
+					bitmovedown(&word, 0, part->mp_blkst_ptr,
+					            block_offset * MPART_BLOCK_STBITS,
+					            block_count * MPART_BLOCK_STBITS);
 				}
 				copy->mp_blkst_inl = word;
 				copy->mp_flags |= MPART_F_BLKST_INL;
@@ -913,9 +912,9 @@ pcopy_free_unused_block_status:
 				copy->mp_blkst_ptr = self->mfl_ucdat.ucd_ucmem.scd_bitset;
 				DBG_memset(&self->mfl_ucdat.ucd_ucmem.scd_bitset, 0xcc,
 				           sizeof(self->mfl_ucdat.ucd_ucmem.scd_bitset));
-				copybits(copy->mp_blkst_ptr, part->mp_blkst_ptr, 0,
-				         block_offset * MPART_BLOCK_STBITS,
-				         block_count * MPART_BLOCK_STBITS);
+				bitmovedown(copy->mp_blkst_ptr, 0, part->mp_blkst_ptr,
+				            block_offset * MPART_BLOCK_STBITS,
+				            block_count * MPART_BLOCK_STBITS);
 			}
 
 			/* Fill in information on the backing storage. */

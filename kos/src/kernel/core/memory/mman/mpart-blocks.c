@@ -45,6 +45,160 @@
 
 DECL_BEGIN
 
+/* Mask of block status bitset bits. */
+#define MPART_BLOCK_ST_MASK (((mpart_blkst_word_t)1 << MPART_BLOCK_STBITS) - 1)
+STATIC_ASSERT((MPART_BLOCK_ST_NDEF & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_NDEF);
+STATIC_ASSERT((MPART_BLOCK_ST_INIT & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_INIT);
+STATIC_ASSERT((MPART_BLOCK_ST_LOAD & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_LOAD);
+STATIC_ASSERT((MPART_BLOCK_ST_CHNG & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG);
+
+
+/* Return  the # of pages containing MPART_BLOCK_ST_CHNG-
+ * blocks that can be found within `[0,partrel_pageaddr)'
+ *
+ * This function should be used to convert from part-rel
+ * offsets  into in-swap-data offsets when `self's state
+ * indicates that the part is currently located in swap. */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) physpagecnt_t
+NOTHROW(FCALL mpart_page2swap)(struct mpart const *__restrict self,
+                               physpagecnt_t partrel_pageaddr) {
+	physpagecnt_t result;
+	mpart_blkst_word_t word, *bitset;
+	unsigned int shift;
+	assert(((size_t)partrel_pageaddr << PAGESHIFT) <= mpart_getsize(self));
+	shift = self->mp_file->mf_blockshift;
+	if (self->mp_flags & MPART_F_BLKST_INL) {
+		/* Special case: inline bitset. */
+		word   = self->mp_blkst_inl;
+		result = 0;
+account_trailing_word:
+#ifndef __OPTIMIZE_SIZE__
+		if likely(shift == PAGESHIFT) {
+			/* Simple case: 1 block === 1 page
+			 * iow: count the # of ST_CHNG pages. */
+			while (partrel_pageaddr) {
+				if ((word & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG)
+					++result;
+				--partrel_pageaddr;
+				word >>= MPART_BLOCK_STBITS;
+			}
+		} else if (shift > PAGESHIFT)
+#else /* !__OPTIMIZE_SIZE__ */
+		if (shift >= PAGESHIFT)
+#endif /* __OPTIMIZE_SIZE__ */
+		{
+			/* Blocks are larger than pages (must # multiple pages per block) */
+			physpagecnt_t pages_per_block;
+			pages_per_block = (physpagecnt_t)1 << (shift - PAGESHIFT);
+			while (partrel_pageaddr) {
+				physpagecnt_t part;
+				part = pages_per_block;
+				if (part > partrel_pageaddr)
+					part = partrel_pageaddr;
+				if ((word & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG)
+					result += part;
+				partrel_pageaddr -= part;
+				word >>= MPART_BLOCK_STBITS;
+			}
+		} else {
+			/* Blocks are smaller than pages (must check multiple blocks for changes) */
+			physpagecnt_t blocks_per_page;
+			blocks_per_page = (physpagecnt_t)1 << (PAGESHIFT - shift);
+			while (partrel_pageaddr) {
+				physpagecnt_t i;
+				bool found = false;
+				for (i = 0; i < blocks_per_page; ++i) {
+					if ((word & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG)
+						found = true;
+					word >>= MPART_BLOCK_STBITS;
+				}
+				if (found)
+					++result;
+				--partrel_pageaddr;
+			}
+		}
+	} else if ((bitset = self->mp_blkst_ptr) == NULL) {
+		/* Simple case: When the blkst-bitset is NULL, then all blocks
+		 *              should  be considered to  be CHANGED, so there
+		 *              is no conversion required. */
+		result = partrel_pageaddr;
+	} else {
+		/* Difficult case: Must possibly account for multiple words. */
+		size_t num_blocks, num_words;
+		result     = 0;
+		num_blocks = ((size_t)partrel_pageaddr << PAGESHIFT) >> shift;
+		num_words  = num_blocks / MPART_BLKST_BLOCKS_PER_WORD;
+		if (num_words != 0) {
+			if (shift >= PAGESHIFT) {
+				size_t i;
+				/* Large blocks. -> Every changed block describes at least
+				 * 1 change page. - As such,  first count the # of  change
+				 * blocks,  which we can then simply convert into the # of
+				 * changed pages. */
+				for (i = 0; i < num_words; ++i) {
+					word = bitset[i];
+					while (word) {
+						if ((word & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG)
+							++result;
+						word >>= MPART_BLOCK_STBITS;
+					}
+				}
+				/* Convert the # of changed blocks into the # of changed pages */
+				result <<= (shift - PAGESHIFT);
+			} else {
+				/* Small blocks. -> For every page, there are multiple blocks
+				 * that may be marked as changed, and if at least one of them
+				 * is  actually marked as such, then the whole page should be
+				 * considered as changed, too.
+				 * This gets more complicated  when you consider that  blocks
+				 * belonging to a single page don't necessarily have to align
+				 * by whole bitset words, either.
+				 * As such, we handle this case separately. */
+				physpagecnt_t i, blocks_per_page;
+				unsigned int page2block_shift;
+				page2block_shift = PAGESHIFT - shift;
+				blocks_per_page  = (physpagecnt_t)1 << page2block_shift;
+				for (i = 0; i < partrel_pageaddr; ++i) {
+					size_t j, count;
+					/* Check if any block at one of these indices is CHNG:
+					 *    [i << page2block_shift, (i+1) << page2block_shift) */
+					j     = i << page2block_shift;
+					count = blocks_per_page;
+					do {
+						word = bitset[j / MPART_BLKST_BLOCKS_PER_WORD];
+						word >>= (j % MPART_BLKST_BLOCKS_PER_WORD) * MPART_BLOCK_STBITS;
+						if ((word & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG) {
+							/* Found a CHNG block within the range bound to this page! */
+							++result;
+							break;
+						}
+						++j;
+					} while (--count);
+				}
+				return result;
+			}
+			/* Figure out how many pages are still described by the trailing word. */
+			{
+				size_t checked_blocks, checked_bytes, checked_pages;
+				checked_blocks = num_words * MPART_BLKST_BLOCKS_PER_WORD;
+				checked_bytes  = checked_blocks << shift;
+				checked_pages  = checked_bytes >> PAGESHIFT;
+				assertf(partrel_pageaddr >= checked_pages,
+				        "partrel_pageaddr = %" PRIuSIZ "\n"
+				        "checked_pages    = %" PRIuSIZ,
+				        partrel_pageaddr, checked_pages);
+				partrel_pageaddr -= checked_pages;
+			}
+		}
+		if (partrel_pageaddr) {
+			word = bitset[num_words];
+			goto account_trailing_word;
+		}
+	}
+}
+
+
+
 /* Load the bounds of the longest consecutive physical memory address range
  * that starts at `partrel_offset', has been populated with meaningful data
  * and   contains  at  least  1  byte  (and  at  most  `num_bytes'  bytes).
