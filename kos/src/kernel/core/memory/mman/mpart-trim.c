@@ -247,7 +247,8 @@ NOTHROW(FCALL mpart_node_iterator_next)(struct mpart_node_iterator *__restrict s
 			self->pni_cnext = LIST_NEXT(result, mn_link);
 		}
 		/* Skip nodes from dead mmans. */
-	} while unlikely(wasdestroyed(result->mn_mman));
+	} while (unlikely(wasdestroyed(result->mn_mman)) ||
+	         (result->mn_flags & MNODE_F_UNMAPPED));
 	return result;
 }
 
@@ -326,8 +327,10 @@ NOTHROW(FCALL mpart_load_all_mhint_nodes)(struct mpart *__restrict self) {
 			if unlikely(wasdestroyed(node->mn_mman))
 				continue;
 			assert(node->mn_part == self);
-			if unlikely(node->mn_flags & MNODE_F_MHINT)
+			if unlikely(node->mn_flags & MNODE_F_MHINT) {
+				assert(!(node->mn_flags & MNODE_F_UNMAPPED));
 				mnode_load_mhint(node);
+			}
 		}
 	}
 }
@@ -442,6 +445,8 @@ NOTHROW(FCALL mpart_lstrip_nodes)(struct mpart *__restrict self,
 			if unlikely(wasdestroyed(node->mn_mman))
 				continue;
 			assert(node->mn_part == self);
+			if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
+				continue; /* Skip unmapped nodes... */
 			assert(node->mn_partoff >= num_bytes);
 			/* Deal with MHINT'd nodes! */
 			if unlikely(node->mn_flags & MNODE_F_MHINT)
@@ -620,9 +625,6 @@ NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
 #define MPART_TRIM_STATUS_SUCCESS 0 /* Success */
 #define MPART_TRIM_STATUS_ASYNC   1 /* Trimming will complete asynchronously */
 #define MPART_TRIM_STATUS_NOMEM   2 /* Insufficient memory (enqueue the part as a lockop into `mman_kernel') */
-
-#if 1
-#define HAVE_MPART_ASYNC_SPLIT_BEFORE
 
 #define async_kmalloc(num_bytes) \
 	kmalloc_nx(num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT)
@@ -903,6 +905,8 @@ again_enum_hipart_nodlst:
 				assert(node->mn_part == hipart);
 				if unlikely(wasdestroyed(node->mn_mman))
 					continue; /* Skip nodes of dead mmans... */
+				if unlikely(node->mn_flags & MNODE_F_UNMAPPED)
+					continue; /* Skip unmapped nodes... */
 				if (node->mn_partoff >= addr)
 					break; /* Keep all nodes starting w/ this one! */
 				if unlikely(node->mn_flags & MNODE_F_MHINT)
@@ -989,6 +993,8 @@ again_enum_hipart_nodlst:
 				struct mman *mm = node->mn_mman;
 				assertf(!wasdestroyed(mm),
 				        "Only non-destroyed mmans should have been transferred!");
+				assertf(!(node->mn_flags & MNODE_F_UNMAPPED),
+				        "Only non-UNMAPPED nodes should have been transferred!");
 				if (!mpart_mappedby_mman_before(lopart, node, mm) &&
 				    !mpart_mappedby_mman_before(hipart, NULL, mm))
 					mman_lock_release(mm);
@@ -1041,6 +1047,7 @@ again_enum_hipart_nodlst:
 
 	/* Update the part's actual maxaddr field. */
 	hipart->mp_minaddr += addr;
+	assert(hipart->mp_minaddr <= hipart->mp_maxaddr);
 
 	/* And with that: we're done! */
 	return MPART_TRIM_STATUS_SUCCESS;
@@ -1055,129 +1062,6 @@ err_nomem_lopart:
 	mpart_free(lopart);
 	return MPART_TRIM_STATUS_NOMEM;
 }
-#endif
-
-/* Trim `self' whilst holding all relevant locks:
- *   - mpart_lock_acquired(self);
- *   - !self->mp_meta || mpartmeta_ftxlock_writing(self->mp_meta);
- *   - mman_lock_acquired(self->mp_copy.each->mn_mman.filter(!wasdestroyed($)));
- *   - mman_lock_acquired(self->mp_share.each->mn_mman.filter(!wasdestroyed($)));
- * @return: * : One of `MPART_TRIM_STATUS_*' */
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) unsigned int
-NOTHROW(FCALL mpart_trim_with_all_locks)(struct mpart *__restrict self) {
-	struct mnode *node;
-	struct mpart_node_iterator iter;
-
-	/* Check  if `self' might possibly contain gaps that
-	 * aren't being referenced by any of the part's mem-
-	 * nodes.
-	 *
-	 * In order to find gaps, we can do this:
-	 *  - Sort  the mem-node lists  by their `mn_partoff', and
-	 *    use an iterator abstraction with 2 mem-node pointers
-	 *    into each of the  lists that offsets a  next_after()
-	 *    function to enumerate them in order.
-	 *  - Then, enumerate all mem-nodes in order and look for
-	 *    adjacent nodes with gaps in-between.
-	 *
-	 * For  leading/trailing  gaps, directly  trim  `self'. For
-	 * leading gaps, also update the `mn_partoff' of all nodes.
-	 *
-	 * For gaps found elsewhere, punch a hole into the part,
-	 * similar to  `mpart_split()'. -  However, since  we're
-	 * already holding all of  the relevant locks, our  impl
-	 * of that function's behavior would only require us  to
-	 * alloc 1 additional mem-part  for every hole we  find.
-	 *
-	 * For every hole found like this, set-up a new mpart to  fill
-	 * in the hole, and have it take the place of the range  below
-	 * the  gap. - Then release locks to all mmans associated with
-	 * the lopart, that aren't also  present in `self'; this  way,
-	 * we, and our caller will still be holding locks to all mmans
-	 * associated with nodes from `self' */
-
-	/* Step #1: Since this isn't normally a  requirement,
-	 *          make sure that mem-node lists are sorted. */
-	mnode_list_sort_by_partoff(&self->mp_share);
-	mnode_list_sort_by_partoff(&self->mp_copy);
-
-	/* Step #2: Enumerate nodes. */
-#ifdef HAVE_MPART_ASYNC_SPLIT_BEFORE
-again_enum_nodes:
-#endif /* HAVE_MPART_ASYNC_SPLIT_BEFORE */
-	mpart_node_iterator_init(&iter, self);
-	node = mpart_node_iterator_next(&iter);
-	assertf(node, "This would mean there are no nodes, which "
-	              "our caller should have already handled");
-
-	/* Step #3: Check for an unused portion preceding the first node. */
-	if (node->mn_partoff != 0 &&
-	    node->mn_partoff > self->mp_file->mf_part_amask) {
-		PAGEDIR_PAGEALIGNED mpart_reladdr_t lstrip;
-		lstrip = node->mn_partoff & ~self->mp_file->mf_part_amask;
-		assert(lstrip);
-		mpart_lstrip(self, lstrip);
-		assert(node->mn_partoff <= self->mp_file->mf_part_amask);
-	}
-
-	/* Step #4: Go over all nodes and find mapping gaps. */
-	for (;;) {
-		struct mnode *next;
-		mpart_reladdr_t node_endaddr;
-		mpart_reladdr_t next_basaddr;
-		next = mpart_node_iterator_next(&iter);
-		if (!next)
-			break; /* Last node reached. */
-		/* Figure out of there's some part that's not mapped. */
-		node_endaddr = mnode_getmapendaddr(node);
-		next_basaddr = mnode_getmapaddr(next);
-		if (node_endaddr < next_basaddr) {
-			/* Align addresses by the mandatory file alignment. */
-			node_endaddr += self->mp_file->mf_part_amask;
-			node_endaddr &= ~self->mp_file->mf_part_amask;
-			next_basaddr &= ~self->mp_file->mf_part_amask;
-			if (node_endaddr < next_basaddr) {
-				/* Split the mem-part at the start of the  hole.
-				 * Once this succeeds, we'll loop back around to
-				 * re-start enumeration, which will then  notice
-				 * that the first  `next_basaddr - node_endaddr'
-				 * bytes can be split. */
-#ifdef HAVE_MPART_ASYNC_SPLIT_BEFORE
-				unsigned int status;
-				status = mpart_async_split_before(self, node_endaddr);
-				if (status != MPART_TRIM_STATUS_SUCCESS)
-					return status;
-				goto again_enum_nodes;
-#endif /* HAVE_MPART_ASYNC_SPLIT_BEFORE */
-			}
-		}
-		node = next;
-	}
-
-	/* Step #5: Check if the last `node' maps the remainder of `self'.
-	 *          If it doesn't, then rstrip the unused tail to free it. */
-	{
-		mpart_reladdr_t node_endaddr;
-		mpart_reladdr_t part_endaddr;
-		node_endaddr = mnode_getmapendaddr(node);
-		part_endaddr = mpart_getsize(self);
-		assert(node_endaddr <= part_endaddr);
-		assert((part_endaddr & self->mp_file->mf_part_amask) == 0);
-		if (node_endaddr < part_endaddr) {
-			node_endaddr += self->mp_file->mf_part_amask;
-			node_endaddr &= ~self->mp_file->mf_part_amask;
-			assert(node_endaddr <= part_endaddr);
-			if (node_endaddr < part_endaddr) {
-				/* rstrip() the last `part_endaddr - node_endaddr' bytes of `self' */
-				mpart_rstrip(self, part_endaddr - node_endaddr);
-			}
-		}
-	}
-
-	return MPART_TRIM_STATUS_SUCCESS;
-}
-
-
 
 
 
@@ -1201,7 +1085,6 @@ again:
 		goto again;
 	}
 }
-
 
 /* Set the effective size of `self' to `0', and free all backing storage. */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -1272,6 +1155,131 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 	if (ATOMIC_FETCHAND(self->mp_flags, ~MPART_F_GLOBAL_REF) & MPART_F_GLOBAL_REF)
 		decref_nokill(self);
 }
+
+
+
+/* Trim `self' whilst holding all relevant locks:
+ *   - mpart_lock_acquired(self);
+ *   - !self->mp_meta || mpartmeta_ftxlock_writing(self->mp_meta);
+ *   - mman_lock_acquired(self->mp_copy.each->mn_mman.filter(!wasdestroyed($)));
+ *   - mman_lock_acquired(self->mp_share.each->mn_mman.filter(!wasdestroyed($)));
+ * @return: * : One of `MPART_TRIM_STATUS_*' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL mpart_trim_with_all_locks)(struct mpart *__restrict self) {
+	struct mnode *node;
+	struct mpart_node_iterator iter;
+
+	/* Check  if `self' might possibly contain gaps that
+	 * aren't being referenced by any of the part's mem-
+	 * nodes.
+	 *
+	 * In order to find gaps, we can do this:
+	 *  - Sort  the mem-node lists  by their `mn_partoff', and
+	 *    use an iterator abstraction with 2 mem-node pointers
+	 *    into each of the  lists that offsets a  next_after()
+	 *    function to enumerate them in order.
+	 *  - Then, enumerate all mem-nodes in order and look for
+	 *    adjacent nodes with gaps in-between.
+	 *
+	 * For  leading/trailing  gaps, directly  trim  `self'. For
+	 * leading gaps, also update the `mn_partoff' of all nodes.
+	 *
+	 * For gaps found elsewhere, punch a hole into the part,
+	 * similar to  `mpart_split()'. -  However, since  we're
+	 * already holding all of  the relevant locks, our  impl
+	 * of that function's behavior would only require us  to
+	 * alloc 1 additional mem-part  for every hole we  find.
+	 *
+	 * For every hole found like this, set-up a new mpart to  fill
+	 * in the hole, and have it take the place of the range  below
+	 * the  gap. - Then release locks to all mmans associated with
+	 * the lopart, that aren't also  present in `self'; this  way,
+	 * we, and our caller will still be holding locks to all mmans
+	 * associated with nodes from `self' */
+
+	/* Step #1: Since this isn't normally a  requirement,
+	 *          make sure that mem-node lists are sorted. */
+	mnode_list_sort_by_partoff(&self->mp_share);
+	mnode_list_sort_by_partoff(&self->mp_copy);
+
+	/* Step #2: Enumerate nodes. */
+again_enum_nodes:
+	mpart_node_iterator_init(&iter, self);
+	node = mpart_node_iterator_next(&iter);
+
+	if unlikely(!node) {
+		/* This can happen if _all_ nodes have the UNMAPPED flag set! */
+		mpart_clear(self);
+		return MPART_TRIM_STATUS_SUCCESS;
+	}
+
+	/* Step #3: Check for an unused portion preceding the first node. */
+	if (node->mn_partoff != 0 &&
+	    node->mn_partoff > self->mp_file->mf_part_amask) {
+		PAGEDIR_PAGEALIGNED mpart_reladdr_t lstrip;
+		lstrip = node->mn_partoff & ~self->mp_file->mf_part_amask;
+		assert(lstrip);
+		mpart_lstrip(self, lstrip);
+		assert(node->mn_partoff <= self->mp_file->mf_part_amask);
+	}
+
+	/* Step #4: Go over all nodes and find mapping gaps. */
+	for (;;) {
+		struct mnode *next;
+		mpart_reladdr_t node_endaddr;
+		mpart_reladdr_t next_basaddr;
+		next = mpart_node_iterator_next(&iter);
+		if (!next)
+			break; /* Last node reached. */
+		/* Figure out of there's some part that's not mapped. */
+		node_endaddr = mnode_getmapendaddr(node);
+		next_basaddr = mnode_getmapaddr(next);
+		if (node_endaddr < next_basaddr) {
+			/* Align addresses by the mandatory file alignment. */
+			node_endaddr += self->mp_file->mf_part_amask;
+			node_endaddr &= ~self->mp_file->mf_part_amask;
+			next_basaddr &= ~self->mp_file->mf_part_amask;
+			if (node_endaddr < next_basaddr) {
+				/* Split the mem-part at the start of the  hole.
+				 * Once this succeeds, we'll loop back around to
+				 * re-start enumeration, which will then  notice
+				 * that the first  `next_basaddr - node_endaddr'
+				 * bytes can be split. */
+				unsigned int status;
+				status = mpart_async_split_before(self, node_endaddr);
+				if (status != MPART_TRIM_STATUS_SUCCESS)
+					return status;
+				goto again_enum_nodes;
+			}
+		}
+		node = next;
+	}
+
+	/* Step #5: Check if the last `node' maps the remainder of `self'.
+	 *          If it doesn't, then rstrip the unused tail to free it. */
+	{
+		mpart_reladdr_t node_endaddr;
+		mpart_reladdr_t part_endaddr;
+		node_endaddr = mnode_getmapendaddr(node);
+		part_endaddr = mpart_getsize(self);
+		assert(node_endaddr <= part_endaddr);
+		assert((part_endaddr & self->mp_file->mf_part_amask) == 0);
+		if (node_endaddr < part_endaddr) {
+			node_endaddr += self->mp_file->mf_part_amask;
+			node_endaddr &= ~self->mp_file->mf_part_amask;
+			assert(node_endaddr <= part_endaddr);
+			if (node_endaddr < part_endaddr) {
+				/* rstrip() the last `part_endaddr - node_endaddr' bytes of `self' */
+				mpart_rstrip(self, part_endaddr - node_endaddr);
+			}
+		}
+	}
+
+	return MPART_TRIM_STATUS_SUCCESS;
+}
+
+
+
 
 
 
@@ -1474,7 +1482,7 @@ NOTHROW(FCALL mpart_trim_ftxlop)(Toblockop(mpart) *__restrict _lop,
 }
 
 
-/* Same as `mpart_trim()', but  don't inherit a refernece,  and
+/* Same as `mpart_trim()', but  don't inherit a reference,  and
  * assume that the caller is currently holding a lock to `self'
  * NOTE: This function also assumes that `_mp_trmlop*.olo_func'
  *       is non-NULL upon entry! */

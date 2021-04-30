@@ -184,7 +184,7 @@ lindir_readmore_and_endread(struct flindirnode *__restrict self) {
 	}
 	/* Insert the new entry into the bypos-list. */
 	ent->fld_ent.fd_refcnt = 1;
-	TAILQ_INSERT_TAIL(&self->ldn_dat.ldd_bypos, ent, fld_bypos); /* Inherit refernece */
+	TAILQ_INSERT_TAIL(&self->ldn_dat.ldd_bypos, ent, fld_bypos); /* Inherit reference */
 
 	/* Insert the new entry into the hash-table. */
 	{

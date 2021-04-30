@@ -256,7 +256,7 @@ NOTHROW(KCALL isr_vector_state_remove_noop_hisr)(struct isr_vector_state *__rest
 remove_dead_hisr_at_i:
 		assert(self->ivs_handv[i].ivh_drv == &drv_self);
 		/* The  caller also has a reference to this, and ontop of that, this is our own
-		 * driver, so anyone calling into us also has to have some kind of refernece to
+		 * driver, so anyone calling into us also has to have some kind of reference to
 		 * keep this driver from being unloaded! */
 		decref_nokill(self->ivs_handv[i].ivh_drv);
 		assert(self->ivs_handc);
