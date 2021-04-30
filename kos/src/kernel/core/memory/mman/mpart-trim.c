@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/mman.h>
+#include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
@@ -66,6 +67,28 @@
  * region to be kept in-core all at once. */
 
 DECL_BEGIN
+
+/* Check if `self' may be trimmed.
+ * This macro may only be called while holding a lock to  `self',
+ * and if it returns `false', then trimming of `self' is a no-op.
+ *
+ * Currently, we disable trimming for parts that have the NOSPLIT
+ * flag set. - You could argue that we'd merely not be allowed to
+ * punch  holes into parts with the NOSPLIT flag (i.e. split them
+ * for  the purpose of then truncating one of them), however even
+ * the act of trimming leading/trailing data from a mem-part kind
+ * of behaves like a split if you think about it. Read:  trimming
+ * is like _splitting_ off a  portion that's not needed,  meaning
+ * that the NOSPLIT  flag could also  be interpreted to  prohibit
+ * the part's from being lowered,  whilst the NOMERGE flag  could
+ * be interpreted that the part's size is prohibited from rising.
+ * As such, only check NOSPLIT, because our only job is to  lower
+ * the  size of a mem-part if it is found that parts if it aren't
+ * actually in-use!
+ *
+ * NOTE: This macro should be used independently of `mpart_isanon()'! */
+#define mpart_maytrim(self) \
+	(!((self)->mp_flags & MPART_F_NOSPLIT))
 
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
@@ -137,15 +160,6 @@ NOTHROW(FCALL mfutex_detach)(struct mfutex *__restrict self) {
 	weakdecref_unlikely(self);
 }
 
-
-/* Indicate that the async mpart-trim operation has completed.
- * Once this function has been called, other threads can  once
- * again call `mpart_trim()' in order to initiate yet  another
- * async trim operation! */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_trim_complete)(struct mpart *__restrict self) {
-	ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, NULL);
-}
 
 
 
@@ -252,6 +266,8 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 typedef NOBLOCK void
 /*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
 
+INTERN NOBLOCK void /* from "kram-unmap.c" */
+NOTHROW(FCALL mpart_freefun_noop)(physpage_t UNUSED(base), physpagecnt_t UNUSED(num_pages), gfp_t UNUSED(flags));
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) freefun_t /* from "kram-unmap.c" */
 NOTHROW(FCALL mpart_getfreefun)(struct mpart const *__restrict self);
 
@@ -296,6 +312,8 @@ NOTHROW(FCALL mpart_load_all_mhint_nodes)(struct mpart *__restrict self) {
 	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue;
 			assert(node->mn_part == self);
 			if unlikely(node->mn_flags & MNODE_F_MHINT)
 				mnode_load_mhint(node);
@@ -332,6 +350,96 @@ again:
 }
 
 
+/* Strip the first `num_bytes' bytes from the block-status bitset of `self'. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_lstrip_blkst)(struct mpart *__restrict self,
+                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	size_t num_blkbits;
+	num_blkbits = (num_bytes >> self->mp_file->mf_blockshift) * MPART_BLOCK_STBITS;
+	if (self->mp_flags & MPART_F_BLKST_INL) {
+		self->mp_blkst_inl >>= num_blkbits;
+	} else {
+		mpart_blkst_word_t *bitset;
+		if ((bitset = self->mp_blkst_ptr) != NULL) {
+			size_t new_size, new_blks, new_wrds;
+			new_size = mpart_getsize(self) - num_bytes;
+			new_blks = new_size >> self->mp_file->mf_blockshift;
+			new_wrds = CEILDIV(new_blks, MPART_BLKST_BLOCKS_PER_WORD);
+			/* Move down bits. */
+			bitmovedown(bitset, 0,
+			            bitset, num_blkbits,
+			            new_blks * MPART_BLOCK_STBITS);
+			/* Try to truncate the bitset vector. */
+			bitset = (mpart_blkst_word_t *)krealloc_nx(bitset, new_wrds * sizeof(mpart_blkst_word_t),
+			                                           GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+			if likely(bitset)
+				self->mp_blkst_ptr = bitset;
+		}
+	}
+}
+
+/* Strip the first `pages' pages from the mem-scatter vector of `self' */
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL mpart_lstrip_memsc)(struct mpart *__restrict self,
+                                  physpagecnt_t pages, freefun_t freefun) {
+	struct mchunk *vec;
+	/* Trim leading pages from the scatter vector. */
+	vec = self->mp_mem_sc.ms_v;
+	for (;;) {
+		physpagecnt_t count;
+		assert(self->mp_mem_sc.ms_c);
+		count = vec[0].mc_size;
+		if (pages >= count) {
+			(*freefun)(vec[0].mc_start, count, 0);
+			--self->mp_mem_sc.ms_c;
+			memmovedown(&vec[0], &vec[1],
+			            self->mp_mem_sc.ms_c,
+			            sizeof(struct mchunk));
+			pages -= count;
+		} else {
+			(*freefun)(vec[0].mc_start, pages, 0);
+			vec[0].mc_start += pages;
+			vec[0].mc_size -= pages;
+			break;
+		}
+	}
+	if (self->mp_mem_sc.ms_c == 1) {
+		self->mp_mem   = vec[0];
+		self->mp_state = MPART_ST_NOSC(self->mp_state);
+		kfree(vec);
+	} else {
+		/* Try to truncate the vector. */
+		vec = (struct mchunk *)krealloc_nx(vec,
+		                                   self->mp_mem_sc.ms_c *
+		                                   sizeof(struct mchunk),
+		                                   GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
+		if likely(vec)
+			self->mp_mem_sc.ms_v = vec;
+	}
+}
+
+
+/* Subtract `num_bytes' from the `mn_partoff' field of every node from `self'.
+ * The caller must ensure that all nodes of `self' have offsets >= `num_bytes' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_lstrip_nodes)(struct mpart *__restrict self,
+                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if unlikely(wasdestroyed(node->mn_mman))
+				continue;
+			assert(node->mn_part == self);
+			assert(node->mn_partoff >= num_bytes);
+			/* Deal with MHINT'd nodes! */
+			if unlikely(node->mn_flags & MNODE_F_MHINT)
+				mnode_load_mhint(node);
+			node->mn_partoff -= num_bytes;
+		}
+	}
+}
+
 /* Strip the first `num_bytes' bytes from the given mem-part. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
@@ -351,20 +459,7 @@ NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
 	}
 
 	/* Update the offsets within associated mem-nodes. */
-	{
-		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
-			struct mnode *node;
-			LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
-				assert(node->mn_part == self);
-				assert(node->mn_partoff >= num_bytes);
-				/* Deal with MHINT'd nodes! */
-				if unlikely(node->mn_flags & MNODE_F_MHINT)
-					mnode_load_mhint(node);
-				node->mn_partoff -= num_bytes;
-			}
-		}
-	}
+	mpart_lstrip_nodes(self, num_bytes);
 
 	/* Update the part's backing data. */
 	pages   = num_bytes >> PAGESHIFT;
@@ -385,76 +480,21 @@ NOTHROW(FCALL mpart_lstrip)(struct mpart *__restrict self,
 	case MPART_ST_SWP_SC:
 		pages = mpart_page2swap(self, pages);
 		ATTR_FALLTHROUGH
-	case MPART_ST_MEM_SC: {
-		struct mchunk *vec;
-		/* Trim leading pages from the scatter vector. */
-		vec = self->mp_mem_sc.ms_v;
-		for (;;) {
-			physpagecnt_t count;
-			assert(self->mp_mem_sc.ms_c);
-			count = vec[0].mc_size;
-			if (pages >= count) {
-				(*freefun)(vec[0].mc_start, count, 0);
-				--self->mp_mem_sc.ms_c;
-				memmovedown(&vec[0], &vec[1],
-				            self->mp_mem_sc.ms_c,
-				            sizeof(struct mchunk));
-				pages -= count;
-			} else {
-				(*freefun)(vec[0].mc_start, pages, 0);
-				vec[0].mc_start += pages;
-				vec[0].mc_size -= pages;
-				break;
-			}
-		}
-		if (self->mp_mem_sc.ms_c == 1) {
-			self->mp_mem   = vec[0];
-			self->mp_state = MPART_ST_NOSC(self->mp_state);
-			kfree(vec);
-		} else {
-			/* Try to truncate the vector. */
-			vec = (struct mchunk *)krealloc_nx(vec,
-			                                   self->mp_mem_sc.ms_c *
-			                                   sizeof(struct mchunk),
-			                                   GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-			if likely(vec)
-				self->mp_mem_sc.ms_v = vec;
-		}
-	}	break;
+	case MPART_ST_MEM_SC:
+		mpart_lstrip_memsc(self, pages, freefun);
+		break;
 
 	default:
 		break;
 	}
 
 	/* Update the block-status bitset to strip leading bytes. */
-	{
-		size_t num_blkbits;
-		num_blkbits = (num_bytes >> self->mp_file->mf_blockshift) * MPART_BLOCK_STBITS;
-		if (self->mp_flags & MPART_F_BLKST_INL) {
-			self->mp_blkst_inl >>= num_blkbits;
-		} else {
-			mpart_blkst_word_t *bitset;
-			if ((bitset = self->mp_blkst_ptr) != NULL) {
-				size_t new_size, new_blks, new_wrds;
-				new_size = mpart_getsize(self) - num_bytes;
-				new_blks = new_size >> self->mp_file->mf_blockshift;
-				new_wrds = CEILDIV(new_blks, MPART_BLKST_BLOCKS_PER_WORD);
-				/* Move down bits. */
-				bitmovedown(bitset, 0,
-				            bitset, num_blkbits,
-				            new_blks * MPART_BLOCK_STBITS);
-				/* Try to truncate the bitset vector. */
-				bitset = (mpart_blkst_word_t *)krealloc_nx(bitset, new_wrds * sizeof(mpart_blkst_word_t),
-				                                           GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);
-				if likely(bitset)
-					self->mp_blkst_ptr = bitset;
-			}
-		}
-	}
+	mpart_lstrip_blkst(self, num_bytes);
 
 	/* Update the part's actual minaddr field. */
 	self->mp_minaddr += num_bytes;
 }
+
 
 /* Strip the last `num_bytes' bytes from the given mem-part. */
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -564,37 +604,445 @@ NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
 }
 
 
-#if 0
+
+/* Return codes for `mpart_trim_with_all_locks()' */
+#define MPART_TRIM_STATUS_SUCCESS 0 /* Success */
+#define MPART_TRIM_STATUS_ASYNC   1 /* Trimming will complete asynchronously */
+#define MPART_TRIM_STATUS_NOMEM   2 /* Insufficient memory (enqueue the part as a lockop into `mman_kernel') */
+
+#if 1
 #define HAVE_MPART_ASYNC_SPLIT_BEFORE
+
+#define async_kmalloc(num_bytes) \
+	kmalloc_nx(num_bytes, GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT)
+
+/* NOTE: This function inherits a reference to `container_of(_lop, struct mpart, _mp_trmlop_mm)' */
+PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mman) *
+NOTHROW(FCALL mpart_trim_mmlop)(Toblockop(mman) *__restrict _lop,
+                                struct mman *__restrict UNUSED(mm));
+
+/* Like `mpart_mappedby_mman()', but stop checking nodes when `stop'
+ * is reached. Additionally, `stop' isn't considered to be apart  of
+ * the list of nodes to test for mapping `mm' */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 3)) bool
+NOTHROW(FCALL mpart_mappedby_mman_before)(struct mpart const *__restrict self,
+                                          struct mnode const *stop,
+                                          struct mman const *__restrict mm);
+
+/* Dynamically allocate a new mem-part.
+ * Also: If one of the  nodes that are mapping  `self'
+ *       belongs to `mman_kernel', assume that the caller is holding
+ *       a lock to  `mman_kernel', and attempt  to allocate the  new
+ *       mem-part via  `mcoreheap_alloc_locked_nx()'  without  first
+ *       acquiring a lock to `mman_kernel' by ourselves.
+ * NOTE: All fields of the returned mem-part are undefined, with the
+ *       exception  of `mp_flags', which is either set to `0' if the
+ *       part was allocated  via `kmalloc()', or  `MPART_F_COREPART'
+ *       if `mcoreheap_alloc_locked_nx()' was used.
+ * @return: * : One of `MPART_TRIM_STATUS_*' */
+PRIVATE NOBLOCK ATTR_MALLOC NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL async_alloc_mpart)(struct mpart **__restrict p_newpart,
+                                 struct mpart *__restrict self) {
+	struct mpart *newpart;
+	/* First attempt: directly try to kmalloc() the new part. */
+	newpart = (struct mpart *)async_kmalloc(sizeof(struct mpart));
+	if (newpart) {
+		newpart->mp_flags = MPART_F_NORMAL;
+		*p_newpart        = newpart;
+		return MPART_TRIM_STATUS_SUCCESS;
+	}
+
+	/* Try to get a lock to the kernel mman, and
+	 * make use of `mcoreheap_alloc_locked_nx()' */
+	if (mman_lock_tryacquire(&mman_kernel)) {
+		union mcorepart *cp;
+		cp = mcoreheap_alloc_locked_nx();
+		mman_lock_release(&mman_kernel);
+		if (!cp)
+			return MPART_TRIM_STATUS_NOMEM;
+		cp->mcp_part.mp_flags = MPART_F_COREPART;
+		*p_newpart            = &cp->mcp_part;
+		return MPART_TRIM_STATUS_SUCCESS;
+	}
+
+	/* Check if one of our callers is already holding a lock
+	 * to the kernel mman, because  if they are, then  we're
+	 * allowed to call `mcoreheap_alloc_locked_nx()' without
+	 * having to acquire another lock ourselves! */
+	if (mpart_mappedby_mman_before(self, NULL, &mman_kernel)) {
+		union mcorepart *cp;
+		cp = mcoreheap_alloc_locked_nx();
+		if (!cp)
+			return MPART_TRIM_STATUS_NOMEM;
+		cp->mcp_part.mp_flags = MPART_F_COREPART;
+		*p_newpart            = &cp->mcp_part;
+		return MPART_TRIM_STATUS_SUCCESS;
+	}
+
+	/* We'd need a lock to the kernel mman to proceed. - As
+	 * such, enqueue `self' to wait for said lock to become
+	 * available. */
+	ATOMIC_WRITE(self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
+	incref(self); /* Inherited by `mpart_trim_mmlop()' */
+	SLIST_ATOMIC_INSERT(&mman_kernel_lockops, &self->_mp_trmlop_mm, olo_link);
+	_mman_lockops_reap(&mman_kernel);
+	return MPART_TRIM_STATUS_ASYNC;
+}
+
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfutex_tree_reinsert_or_transfer_lstrip)(struct mfutex **__restrict p_lotree,
+                                                       struct mfutex **__restrict p_hitree,
+                                                       struct mfutex *__restrict self,
+                                                       struct mpart *__restrict lopart,
+                                                       PAGEDIR_PAGEALIGNED mpart_reladdr_t addr) {
+	struct mfutex *lhs, *rhs;
+again:
+	lhs = self->mfu_mtaent.rb_lhs;
+	rhs = self->mfu_mtaent.rb_rhs;
+	if (self->mfu_addr < addr) {
+		if (!tryincref(self))
+			goto reinsert_hitree; /* Ensure consistency for already-destroyed futexes. */
+		awref_set(&self->mfu_part, lopart);
+		mfutex_tree_insert(p_lotree, self); /* Insert into the low-part's tree. */
+		decref_unlikely(self);
+	} else {
+		/* Re-insert into the new tree with the new offset. */
+		self->mfu_addr -= addr;
+reinsert_hitree:
+		mfutex_tree_insert(p_hitree, self);
+	}
+	if (lhs) {
+		if (rhs)
+			mfutex_tree_reinsert_or_transfer_lstrip(p_lotree, p_hitree, rhs, lopart, addr);
+		self = lhs;
+		goto again;
+	}
+	if (rhs) {
+		self = rhs;
+		goto again;
+	}
+}
+
+
+/* Check if `self' contains any MLOCK-nodes. */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL mpart_has_mlock_nodes)(struct mpart const *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			if (node->mn_flags & MNODE_F_MLOCK)
+				return true;
+		}
+	}
+	return false;
+}
+
+
 /* Asynchronously split `self', such that a new part is created
  * that  then encompasses all of the data leading up to `addr'.
  * The caller must  ensure that `addr'  doesn't point into  the
  * middle  of one of  the part's mem-node  mappings, as well as
  * that `addr' is properly aligned by the part's  file-specific
  * alignment `self->mp_file->mf_part_amask'.
- * @return: true:  Successfully split the part. In this case, `self'  has
- *                 been updated such that what  used to be `addr' is  now
- *                 located at reladdr=0, with a new mem-part having  been
- *                 created to represent  all of the  mem-nodes that  came
- *                 before  `addr'.  Additionally, locks  to all  mmans of
- *                 nodes  transfered  to this  additional part  will have
- *                 been  released  (unless  for mmans  that  appear again
- *                 inside  of  future mem-nodes),  alongside  a reference
- *                 having been dropped to each mman of a transfered node,
- *                 regardless of lock-status.
- *                 In this case, `self' has essentially been updated to
- *                 have  had its leading `addr' bytes stripped, similar
- *                 to what's also done by `mpart_lstrip()'!
- * @return: false: Failed  to allocate required memory without blocking.
- *                 In this case, the lockop at `self->_mp_trmlop_mm' has
- *                 been  updated to re-attempt  a call to `mpart_trim()'
- *                 once  more  heap  memory may  have  become available.
- *                 The caller should proceed  by releasing all of  their
- *                 locks,  and acting as  though trimming had succeeded. */
-PRIVATE NOBLOCK NONNULL((1)) bool
+ * @return: * : One of `MPART_TRIM_STATUS_*' */
+PRIVATE NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_async_split_before)(struct mpart *__restrict self,
                                         PAGEDIR_PAGEALIGNED mpart_reladdr_t addr) {
-	/* TODO */
+	unsigned int status;
+	struct mpart *lopart, *hipart;
+	physpagecnt_t pages;
+
+	hipart = self;
+	status = async_alloc_mpart(&lopart, self);
+	if unlikely(status != MPART_TRIM_STATUS_SUCCESS)
+		return status;
+
+	/* Allocate / set-up the block-status bitset of `lopart' */
+	if (hipart->mp_flags & MPART_F_BLKST_INL) {
+		lopart->mp_flags |= MPART_F_BLKST_INL;
+		lopart->mp_blkst_inl = hipart->mp_blkst_inl;
+	} else if (hipart->mp_blkst_ptr == NULL) {
+		lopart->mp_blkst_ptr = NULL;
+	} else {
+		size_t loblocks;
+		mpart_blkst_word_t *hipart_bitset;
+		loblocks      = addr >> hipart->mp_file->mf_blockshift;
+		hipart_bitset = hipart->mp_blkst_ptr;
+		if (loblocks <= MPART_BLKST_BLOCKS_PER_WORD) {
+			lopart->mp_flags |= MPART_F_BLKST_INL;
+			lopart->mp_blkst_inl = hipart_bitset[0];
+		} else {
+			mpart_blkst_word_t *lopart_bitset;
+			size_t lowords;
+			lowords       = CEILDIV(loblocks, MPART_BLKST_BLOCKS_PER_WORD);
+			lopart_bitset = (mpart_blkst_word_t *)async_kmalloc(lowords * sizeof(mpart_blkst_word_t));
+			if (!lopart_bitset)
+				goto err_nomem_lopart;
+			memcpy(lopart_bitset, hipart_bitset,
+			       lowords, sizeof(mpart_blkst_word_t));
+			lopart->mp_blkst_ptr = lopart_bitset; /* Inherit! */
+		}
+	}
+
+	/* Initialize state-specific data for `lopart' */
+	lopart->mp_state = hipart->mp_state;
+	pages            = addr >> PAGESHIFT;
+	switch (lopart->mp_state) {
+
+	case MPART_ST_SWP:
+		pages = mpart_page2swap(hipart, pages);
+		ATTR_FALLTHROUGH
+	case MPART_ST_MEM:
+		lopart->mp_mem.mc_start = hipart->mp_mem.mc_start;
+		lopart->mp_mem.mc_size  = pages;
+		break;
+
+	case MPART_ST_SWP_SC:
+		pages = mpart_page2swap(hipart, pages);
+		ATTR_FALLTHROUGH
+	case MPART_ST_MEM_SC: {
+		/* Figure out how to split the scatter-vector. */
+		physpagecnt_t missing;
+		size_t index;
+		missing = pages;
+		index   = 0;
+		for (;;) {
+			physpagecnt_t count;
+			assert(index < hipart->mp_mem_sc.ms_c);
+			count = hipart->mp_mem_sc.ms_v[index].mc_size;
+			if (count >= missing)
+				break; /* Split at `index+missing' */
+			missing -= count;
+			++index;
+		}
+		if (index == 0) {
+			/* Simple case: don't need a scatter-list for `lopart'! */
+			assert(missing == pages);
+			lopart->mp_state        = MPART_ST_NOSC(hipart->mp_state);
+			lopart->mp_mem.mc_start = hipart->mp_mem_sc.ms_v[0].mc_start;
+			lopart->mp_mem.mc_size  = pages;
+		} else {
+			/* Complicated case: Must allocate a `index+1'-long vector. */
+			struct mchunk *lovec;
+			lovec = (struct mchunk *)async_kmalloc((index + 1) * sizeof(struct mchunk));
+			if unlikely(!lovec)
+				goto err_nomem_lopart_bitset;
+
+			/* Fill in the mem-chunk-vector of `lopart'. */
+			memcpy(lovec, hipart->mp_mem_sc.ms_v, index, sizeof(struct mchunk));
+			lovec[index].mc_start = hipart->mp_mem_sc.ms_v[index].mc_start;
+			lovec[index].mc_size  = missing;
+
+			/* Write-back the newly allocated vector into `lopart' */
+			lopart->mp_mem_sc.ms_c = index + 1;
+			lopart->mp_mem_sc.ms_v = lovec;
+		}
+	}	break;
+
+	default:
+		break;
+	}
+
+	/* If necessary, allocate a meta-data controller for `lopart' */
+	lopart->mp_meta = NULL;
+	if (hipart->mp_meta &&
+	    (mpartmeta_ftx_rlocate(hipart->mp_meta, 0, addr - 1) != NULL
+#ifdef ARCH_HAVE_RTM
+	     || hipart->mp_meta->mpm_rtm_vers != 0
+#endif /* ARCH_HAVE_RTM */
+	     )) {
+		/* Allocate a meta-controller for `lopart' */
+		struct mpartmeta *meta;
+		meta = (struct mpartmeta *)async_kmalloc(sizeof(struct mpartmeta));
+		if unlikely(!meta)
+			goto err_nomem_lopart_bitset_scvec;
+		lopart->mp_meta = meta;
+	}
+
+	/* ===== Point of no return */
+
+	/* Fill in the misc. remaining fields of `lopart' */
+	lopart->mp_flags |= MPART_F_LOCKBIT;
+	lopart->mp_flags |= (hipart->mp_flags & (MPART_F_MAYBE_BLK_INIT |
+	                                         MPART_F_GLOBAL_REF |
+	                                         MPART_F_NOFREE |
+	                                         /*MPART_F_NOSPLIT |*/ /* Mustn't be set! */
+	                                         MPART_F_NOMERGE |
+	                                         MPART_F_MLOCK_FROZEN |
+	                                         MPART_F_MLOCK));
+	lopart->mp_file = incref(hipart->mp_file);
+	SLIST_INIT(&lopart->mp_lockops);
+	lopart->mp_minaddr = hipart->mp_minaddr;
+	lopart->mp_maxaddr = lopart->mp_minaddr + addr - 1;
+	DBG_memset(&lopart->mp_changed, 0xcc, sizeof(lopart->mp_changed));
+	LIST_ENTRY_UNBOUND_INIT(&lopart->mp_allparts); /* Overwritten below if necessary... */
+	_mpart_init_asanon(lopart);
+
+	/* Transfer mem-nodes from `hipart' to `lopart'. */
+	{
+		unsigned int i;
+		lopart->mp_refcnt = 0;
+		for (i = 0; i < COMPILER_LENOF(hipart->_mp_nodlsts); ++i) {
+			struct mnode *node;
+			LIST_INIT(&lopart->_mp_nodlsts[i]);
+again_enum_hipart_nodlst:
+			LIST_FOREACH (node, &hipart->_mp_nodlsts[i], mn_link) {
+				assert(node->mn_part == hipart);
+				if unlikely(wasdestroyed(node->mn_mman))
+					continue; /* Skip nodes of dead mmans... */
+				if (node->mn_partoff >= addr)
+					break; /* Keep all nodes starting w/ this one! */
+				if unlikely(node->mn_flags & MNODE_F_MHINT)
+					mnode_load_mhint(node);
+
+				/* Update the part-pointer of this node to reference `lopart' */
+				decref_nokill(hipart);
+				node->mn_part = lopart;
+				++lopart->mp_refcnt;
+
+				/* Re-insert this node into `lopart'
+				 * NOTE: It doesn't  matter  that  this  cases  the
+				 *       node order to be inverted within `lopart'. */
+				LIST_REMOVE(node, mn_link);
+				LIST_INSERT_HEAD(&lopart->_mp_nodlsts[i], node, mn_link);
+				goto again_enum_hipart_nodlst;
+			}
+		}
+		assertf(lopart->mp_refcnt > 0,
+		        "If this was the case, then our caller shouldn't "
+		        "have tried to split the part, but rather lstrip it");
+	}
+
+	/* Add another reference that will be dropped once we've
+	 * release all of our locks to `lopart' (it must be kept
+	 * up  until that point in order to ensure that the part
+	 * isn't destroyed before then due to other threads) */
+	++lopart->mp_refcnt;
+
+	/* Add yet another reference to `lopart' if necessary. */
+	if (lopart->mp_flags & MPART_F_GLOBAL_REF)
+		++lopart->mp_refcnt;
+
+	/* Check  which of the  2 parts still  contains MLOCK-nodes, and clear
+	 * the MLOCK flag for exactly that part (if any) which doesn't contain
+	 * any MLOCK-nodes. */
+	if ((lopart->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK) {
+		assert((hipart->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK);
+		if (!mpart_has_mlock_nodes(lopart)) {
+			lopart->mp_flags &= ~MPART_F_MLOCK;
+		} else if (!mpart_has_mlock_nodes(hipart)) {
+			ATOMIC_AND(hipart->mp_flags, ~MPART_F_MLOCK);
+		}
+	}
+
+	if (lopart->mp_meta) {
+		struct mpartmeta *lometa, *himeta;
+		lometa = lopart->mp_meta;
+		himeta = hipart->mp_meta;
+		assert(himeta);
+		/* Initialize the lometa futex lock in write-mode! */
+		atomic_rwlock_init_write(&lometa->mpm_ftxlock);
+		_mpartmeta_init_noftxlock(lometa);
+#ifdef ARCH_HAVE_RTM
+		++himeta->mpm_rtm_vers; /* Indicate that something has changed. */
+		lometa->mpm_rtm_vers = himeta->mpm_rtm_vers;
+#endif /* ARCH_HAVE_RTM */
+
+		/* Transfer futex objects */
+		if (himeta->mpm_ftx) {
+			struct mfutex *tree = himeta->mpm_ftx;
+			himeta->mpm_ftx     = NULL;
+			mfutex_tree_reinsert_or_transfer_lstrip(&lometa->mpm_ftx,
+			                                        &himeta->mpm_ftx,
+			                                        tree, lopart, addr);
+		}
+		mpartmeta_ftxlock_endwrite(lometa, lopart);
+	}
+
+
+	/* Mirror the is-part-of-all-list attribute of `hipart' within `lopart'.
+	 * NOTE: Once we do this, `lopart' becomes visible to the outside world! */
+	COMPILER_BARRIER();
+	if (LIST_ISBOUND(hipart, mp_allparts))
+		mpart_all_list_insert(lopart);
+
+	/* remove locks to mmans in `lopart', and no longer present in `hipart',
+	 * in addition  to dropping  references  from _all_  transferred  mmans. */
+	{
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(lopart->_mp_nodlsts); ++i) {
+			struct mnode *node;
+			LIST_FOREACH (node, &lopart->_mp_nodlsts[i], mn_link) {
+				struct mman *mm = node->mn_mman;
+				assertf(!wasdestroyed(mm),
+				        "Only non-destroyed mmans should have been transferred!");
+				if (!mpart_mappedby_mman_before(lopart, node, mm) &&
+				    !mpart_mappedby_mman_before(hipart, NULL, mm))
+					mman_lock_release(mm);
+				decref_unlikely(mm);
+			}
+		}
+	}
+
+	/* Release the lock with which we've created `lopart' */
+	mpart_lock_release(lopart);
+
+	/* Drop our own personal reference from `lopart' (created above)
+	 * We had to keep it up until _after_ all locks were released in
+	 * order to guaranty that no other  thread would try to jump  in
+	 * and destroy the part before we could release all locks. */
+	decref_unlikely(lopart);
+
+	/************************************************************************/
+	/* === SPLIT: With `lopart' done, lstrip inherited data in `hipart'     */
+	/************************************************************************/
+
+	/* Update the block-status bitset to strip leading bytes. */
+	mpart_lstrip_blkst(hipart, addr);
+
+	/* Update the offsets within associated mem-nodes. */
+	mpart_lstrip_nodes(hipart, addr);
+
+	/* Trim leading pages from `hipart'. Note that `lopart' has
+	 * inherited ownership of these pages, so `hipart' must act
+	 * as though it didn't know anything about them! */
+	switch (hipart->mp_state) {
+
+	case MPART_ST_SWP:
+	case MPART_ST_MEM:
+		assert(hipart->mp_mem.mc_size > pages);
+		hipart->mp_mem.mc_start += pages;
+		hipart->mp_mem.mc_size -= pages;
+		break;
+
+	case MPART_ST_SWP_SC:
+	case MPART_ST_MEM_SC:
+		/* NOTE: Use the no-op free function since the actual
+		 *       data has already been inherited by `lopart'! */
+		mpart_lstrip_memsc(hipart, pages, &mpart_freefun_noop);
+		break;
+
+	default:
+		break;
+	}
+
+	/* Update the part's actual maxaddr field. */
+	hipart->mp_minaddr += addr;
+
+	/* And with that: we're done! */
+	return MPART_TRIM_STATUS_SUCCESS;
+err_nomem_lopart_bitset_scvec:
+	if (lopart->mp_state == MPART_ST_SWP_SC ||
+	    lopart->mp_state == MPART_ST_MEM_SC)
+		kfree(lopart->mp_mem_sc.ms_v);
+err_nomem_lopart_bitset:
+	if (!(lopart->mp_flags & MPART_F_BLKST_INL))
+		kfree(lopart->mp_blkst_ptr);
+err_nomem_lopart:
+	mpart_free(lopart);
+	return MPART_TRIM_STATUS_NOMEM;
 }
 #endif
 
@@ -603,8 +1051,8 @@ NOTHROW(FCALL mpart_async_split_before)(struct mpart *__restrict self,
  *   - !self->mp_meta || mpartmeta_ftxlock_writing(self->mp_meta);
  *   - mman_lock_acquired(self->mp_copy.each->mn_mman.filter(!wasdestroyed($)));
  *   - mman_lock_acquired(self->mp_share.each->mn_mman.filter(!wasdestroyed($)));
- */
-PRIVATE NOBLOCK NONNULL((1)) void
+ * @return: * : One of `MPART_TRIM_STATUS_*' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL mpart_trim_with_all_locks)(struct mpart *__restrict self) {
 	struct mnode *node;
 	struct mpart_node_iterator iter;
@@ -684,8 +1132,10 @@ again_enum_nodes:
 				 * that the first  `next_basaddr - node_endaddr'
 				 * bytes can be split. */
 #ifdef HAVE_MPART_ASYNC_SPLIT_BEFORE
-				if (!mpart_async_split_before(self, node_endaddr))
-					return; /* An allocation failed (trimming will be re-attempted later) */
+				unsigned int status;
+				status = mpart_async_split_before(self, node_endaddr);
+				if (status != MPART_TRIM_STATUS_SUCCESS)
+					return status;
 				goto again_enum_nodes;
 #endif /* HAVE_MPART_ASYNC_SPLIT_BEFORE */
 			}
@@ -693,8 +1143,8 @@ again_enum_nodes:
 		node = next;
 	}
 
-	/* Step #5: Check if the last `node' maps the remainder of `self'
-	 *          If   it  doesn't,  then   rstrip  the  unused  trail. */
+	/* Step #5: Check if the last `node' maps the remainder of `self'.
+	 *          If it doesn't, then rstrip the unused tail to free it. */
 	{
 		mpart_reladdr_t node_endaddr;
 		mpart_reladdr_t part_endaddr;
@@ -703,10 +1153,9 @@ again_enum_nodes:
 		assert(node_endaddr <= part_endaddr);
 		assert((part_endaddr & self->mp_file->mf_part_amask) == 0);
 		if (node_endaddr < part_endaddr) {
-			if (self->mp_file->mf_part_amask > PAGEMASK) {
-				node_endaddr += self->mp_file->mf_part_amask;
-				node_endaddr &= ~self->mp_file->mf_part_amask;
-			}
+			node_endaddr += self->mp_file->mf_part_amask;
+			node_endaddr &= ~self->mp_file->mf_part_amask;
+			assert(node_endaddr <= part_endaddr);
 			if (node_endaddr < part_endaddr) {
 				/* rstrip() the last `part_endaddr - node_endaddr' bytes of `self' */
 				mpart_rstrip(self, part_endaddr - node_endaddr);
@@ -714,8 +1163,7 @@ again_enum_nodes:
 		}
 	}
 
-	/* Indicate that the trim operation has completed. */
-	mpart_trim_complete(self);
+	return MPART_TRIM_STATUS_SUCCESS;
 }
 
 
@@ -937,6 +1385,7 @@ NOTHROW(FCALL mpart_trim_mmlop)(Toblockop(mman) *__restrict _lop,
  * is also holding a lock to the part's futex-tree. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
+	unsigned int status;
 
 	/* Try to incref() all alive mmans, thus keeping them alive and allowing
 	 * us  to try to acquire locks to each of them, without some (or all) of
@@ -947,9 +1396,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
 	 * mem-part in its entirety! */
 	if unlikely(!mpart_foreach_mmans_incref(self)) {
 		mpart_clear(self);
-		/* Indicate that the async mpart-trim operation has completed. */
-		mpart_trim_complete(self);
-		return;
+		goto trim_completed;
 	}
 
 	/* Try to acquire locks to  all of the mmans  that are mapping this  part.
@@ -973,11 +1420,26 @@ NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
 
 	/* Continue the trim operation now that we're holding  locks
 	 * to the part itself, as well as all of the relevant mmans. */
-	mpart_trim_with_all_locks(self);
+	status = mpart_trim_with_all_locks(self);
 
 	/* Release locks & references acquired above. */
 	mpart_unlock_all_mmans(self);
 	mpart_decref_all_mmans(self);
+
+	/* If necessary, enqueue the part for async trim operation within the kernel mman. */
+	if likely(status == MPART_TRIM_STATUS_SUCCESS) {
+trim_completed:
+		/* Indicate that the async mpart-trim operation has completed.
+		 * Once  this has been done, other threads can once again call
+		 * `mpart_trim()' in order to initiate yet another async  trim
+		 * operation! */
+		ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, NULL);
+	} else if (status == MPART_TRIM_STATUS_NOMEM) {
+		ATOMIC_WRITE(self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
+		incref(self); /* Inherited by `mpart_trim_mmlop()' */
+		SLIST_ATOMIC_INSERT(&mman_kernel_lockops, &self->_mp_trmlop_mm, olo_link);
+		/*_mman_lockops_reap(&mman_kernel);*/ /* _DONT_ reap immediately! */
+	}
 }
 
 
@@ -987,7 +1449,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
  * version  that could  then make assumptions  based on the  fact that it
  * knows  that the  mem-part being  trimmed can't  possibly get destroyed
  * while it's working (since the reap-caller will be holding a reference,
- * but  givent hat  the async-futex-lock  code-path is  quite rare as-is,
+ * but  given that  the async-futex-lock  code-path is  quite rare as-is,
  * that's  not  really necessary,  given  that the  more  general version
  * already quired for mman-locks works just as well!) */
 #define mpart_trim_ftxplop (*(Tobpostlockop_callback_t(mpart))&mpart_trim_mmplop)
@@ -1011,21 +1473,32 @@ NOTHROW(FCALL mpart_trim_locked)(struct mpart *__restrict self) {
 	assertf(mpart_isanon(self),
 	        "We've already checked this earlier, and once a part "
 	        "has become anon, it must never become non-anon!");
+
+	/* Quick check: are we allowed to trim this part? */
+	if unlikely(!mpart_maytrim(self))
+		return;
+
 	/* If necessary, acquire yet another lock to the meta-data controller of `self' */
 	if likely((meta = self->mp_meta) == NULL) {
 		mpart_trim_locked_ftx(self);
-	} else if (mpartmeta_ftxlock_trywrite(meta)) {
-		mpart_trim_locked_ftx(self);
-		mpartmeta_ftxlock_endwrite(meta, self);
 	} else {
-		/* Must acquire the futex-lock asynchronously. */
-		incref(self); /* The reference inherited by `mpart_trim_ftxlop' */
-		ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, &mpart_trim_ftxlop);
-		/* NOTE: No need for a 2nd incref(self) to prevent `self' from being
-		 *       destroyed before we get to  reap it! Our caller is  already
-		 *       holding that reference! */
-		SLIST_ATOMIC_INSERT(&meta->mpm_ftxlops, &self->_mp_trmlop_mp, olo_link);
-		_mpartmeta_ftxlock_reap(meta, self);
+		if (meta->mpm_dmalocks != 0) {
+			/* TODO: Wait for DMA-locks to go away, and _then_ re-attempt the trim! */
+			return;
+		}
+		if (mpartmeta_ftxlock_trywrite(meta)) {
+			mpart_trim_locked_ftx(self);
+			mpartmeta_ftxlock_endwrite(meta, self);
+		} else {
+			/* Must acquire the futex-lock asynchronously. */
+			incref(self); /* The reference inherited by `mpart_trim_ftxlop' */
+			ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, &mpart_trim_ftxlop);
+			/* NOTE: No need for a 2nd incref(self) to prevent `self' from being
+			 *       destroyed before we get to  reap it! Our caller is  already
+			 *       holding that reference! */
+			SLIST_ATOMIC_INSERT(&meta->mpm_ftxlops, &self->_mp_trmlop_mp, olo_link);
+			_mpartmeta_ftxlock_reap(meta, self);
+		}
 	}
 }
 

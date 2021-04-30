@@ -195,6 +195,7 @@ account_trailing_word:
 			goto account_trailing_word;
 		}
 	}
+	return result;
 }
 
 

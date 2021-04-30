@@ -86,45 +86,44 @@ PUBLIC WEAK unsigned int mman_kernel_hintinit_inuse = 0;
 
 
 PRIVATE NOBLOCK void
-NOTHROW(FCALL freefun_phys)(physpage_t base,
-                            physpagecnt_t num_pages,
-                            gfp_t flags) {
+NOTHROW(FCALL mpart_freefun_phys)(physpage_t base,
+                                  physpagecnt_t num_pages,
+                                  gfp_t flags) {
 	page_ffree(base, num_pages, (flags & GFP_CALLOC) != 0);
 }
 PRIVATE NOBLOCK void
-NOTHROW(FCALL freefun_swap)(physpage_t base,
-                            physpagecnt_t num_pages,
-                            gfp_t UNUSED(flags)) {
+NOTHROW(FCALL mpart_freefun_swap)(physpage_t base,
+                                  physpagecnt_t num_pages,
+                                  gfp_t UNUSED(flags)) {
 	swap_free(base, num_pages);
 }
-PRIVATE NOBLOCK void
-NOTHROW(FCALL freefun_noop)(physpage_t UNUSED(base),
-                            physpagecnt_t UNUSED(num_pages),
-                            gfp_t UNUSED(flags)) {
+INTERN NOBLOCK void /* used in `mpart-trim.c' */
+NOTHROW(FCALL mpart_freefun_noop)(physpage_t UNUSED(base),
+                                  physpagecnt_t UNUSED(num_pages),
+                                  gfp_t UNUSED(flags)) {
 }
 
 typedef NOBLOCK void
 /*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
-/* NOTE: `INTERN', because also used in `mpart-trim.c' */
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) freefun_t
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) freefun_t /* used in `mpart-trim.c' */
 NOTHROW(FCALL mpart_getfreefun)(struct mpart const *__restrict self) {
 	freefun_t result;
 	switch (self->mp_state) {
 
 	case MPART_ST_SWP:
 	case MPART_ST_SWP_SC:
-		result = &freefun_swap;
+		result = &mpart_freefun_swap;
 		break;
 
 	case MPART_ST_MEM:
 	case MPART_ST_MEM_SC:
-		result = &freefun_phys;
+		result = &mpart_freefun_phys;
 		if (self->mp_flags & MPART_F_NOFREE)
-			result = &freefun_noop;
+			result = &mpart_freefun_noop;
 		break;
 
 	default:
-		result = &freefun_noop;
+		result = &mpart_freefun_noop;
 		break;
 	}
 	return result;
