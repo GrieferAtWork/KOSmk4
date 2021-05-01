@@ -140,7 +140,7 @@ NOTHROW(FCALL mman_sync_p)(struct mman *__restrict self,
 		cpuset_t targets;
 		mman_getcpus(self, CPUSET_PTR(targets));
 		/* Check for special case: The kernel MMAN is being synced. */
-		if (self == &mman_kernel)
+		if (self == &mman_kernel || ADDRRANGE_ISKERN_PARTIAL(addr, (byte_t *)addr + num_bytes))
 			CPUSET_SETFULL(targets);
 		args[0] = (void *)(uintptr_t)addr;
 		args[1] = (void *)(uintptr_t)num_bytes;
@@ -164,7 +164,7 @@ NOTHROW(FCALL mman_syncone_p)(struct mman *__restrict self,
 		cpuset_t targets;
 		mman_getcpus(self, CPUSET_PTR(targets));
 		/* Check for special case: The kernel MMAN is being synced. */
-		if (self == &mman_kernel)
+		if (self == &mman_kernel || ADDR_ISKERN(addr))
 			CPUSET_SETFULL(targets);
 		args[0] = (void *)(uintptr_t)addr;
 		cpu_sendipi_cpuset(targets, &ipi_invtlb_one, args,
@@ -209,10 +209,11 @@ NOTHROW(FCALL mman_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
 		struct mman *mymman = THIS_MMAN;
-		struct cpu *me  = THIS_CPU;
+		struct cpu *me      = THIS_CPU;
 		mman_getcpus(mymman, CPUSET_PTR(targets));
 		/* Check for special case: The kernel MMAN is being synced. */
-		if unlikely(mymman == &mman_kernel)
+		if (unlikely(mymman == &mman_kernel) ||
+		    ADDRRANGE_ISKERN_PARTIAL(addr, (byte_t *)addr + num_bytes))
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, me->c_id);
@@ -233,11 +234,11 @@ NOTHROW(FCALL mman_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		struct mman *mymman   = THIS_MMAN;
-		struct cpu *me = THIS_CPU;
+		struct mman *mymman = THIS_MMAN;
+		struct cpu *me      = THIS_CPU;
 		mman_getcpus(mymman, CPUSET_PTR(targets));
 		/* Check for special case: The kernel MMAN is being synced. */
-		if unlikely(mymman == &mman_kernel)
+		if (unlikely(mymman == &mman_kernel) || ADDR_ISKERN(addr))
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, me->c_id);
@@ -339,6 +340,9 @@ NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir,
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	assertf(IS_ALIGNED(num_bytes, PAGESIZE), "num_bytes = %#" PRIxSIZ, num_bytes);
 	pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+	if (unlikely(pagedir == pagedir_kernel_phys) ||
+	    ADDRRANGE_ISKERN_PARTIAL(addr, (byte_t *)addr + num_bytes))
+		CPUSET_SETFULL(targets);
 	args[0] = (void *)(uintptr_t)addr;
 	args[1] = (void *)(uintptr_t)num_bytes;
 	cpu_sendipi_cpuset(targets, &ipi_invtlb, args,
@@ -353,6 +357,8 @@ NOTHROW(FCALL pagedir_syncone_smp_p)(pagedir_phys_t pagedir,
 	cpuset_t targets;
 	assertf(IS_ALIGNED((uintptr_t)addr, PAGESIZE), "addr = %p", addr);
 	pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+	if (unlikely(pagedir == pagedir_kernel_phys) || ADDR_ISKERN(addr))
+		CPUSET_SETFULL(targets);
 	args[0] = (void *)(uintptr_t)addr;
 	cpu_sendipi_cpuset(targets,
 	                   &ipi_invtlb_one,
@@ -365,12 +371,23 @@ PUBLIC NOBLOCK void
 NOTHROW(FCALL pagedir_syncall_smp_p)(pagedir_phys_t pagedir) {
 	void *args[CPU_IPI_ARGCOUNT];
 	cpuset_t targets;
-	pagedir_getcpus(pagedir, CPUSET_PTR(targets));
-	cpu_sendipi_cpuset(targets,
-	                   &ipi_invtlb_all,
-	                   args,
-	                   CPU_IPI_FWAITFOR |
-	                   CPU_IPI_FNOINTR);
+	if unlikely(pagedir == pagedir_kernel_phys) {
+		CPUSET_SETFULL(targets);
+		CPUSET_REMOVE(targets, THIS_CPU->c_id);
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb_all,
+		                   args,
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
+		pagedir_syncall();
+	} else {
+		pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb_user,
+		                   args,
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
+	}
 }
 
 /* Sync memory on every CPU with `CPU->c_pdir == pagedir_get()' */
@@ -385,6 +402,9 @@ NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 		pagedir_phys_t pagedir;
 		pagedir = pagedir_get();
 		pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+		if (unlikely(pagedir == pagedir_kernel_phys) ||
+		    ADDRRANGE_ISKERN_PARTIAL(addr, (byte_t *)addr + num_bytes))
+			CPUSET_SETFULL(targets);
 		CPUSET_REMOVE(targets, THIS_CPU->c_id);
 		args[0] = (void *)(uintptr_t)addr;
 		args[1] = (void *)(uintptr_t)num_bytes;
@@ -406,6 +426,8 @@ NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 		pagedir_phys_t pagedir;
 		pagedir = pagedir_get();
 		pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+		if (unlikely(pagedir == pagedir_kernel_phys) || ADDR_ISKERN(addr))
+			CPUSET_SETFULL(targets);
 		CPUSET_REMOVE(targets, THIS_CPU->c_id);
 		args[0] = (void *)(uintptr_t)addr;
 		cpu_sendipi_cpuset(targets,
@@ -419,19 +441,30 @@ NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 
 PUBLIC NOBLOCK void
 NOTHROW(FCALL pagedir_syncall_smp)(void) {
-	if (cpu_online_count > 1) {
-		void *args[CPU_IPI_ARGCOUNT];
-		cpuset_t targets;
-		pagedir_phys_t pagedir = pagedir_get();
-		pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+	void *args[CPU_IPI_ARGCOUNT];
+	cpuset_t targets;
+	pagedir_phys_t pagedir = pagedir_get();
+	if unlikely(pagedir == pagedir_kernel_phys) {
+		CPUSET_SETFULL(targets);
 		CPUSET_REMOVE(targets, THIS_CPU->c_id);
 		cpu_sendipi_cpuset(targets,
 		                   &ipi_invtlb_all,
 		                   args,
 		                   CPU_IPI_FWAITFOR |
 		                   CPU_IPI_FNOINTR);
+		pagedir_syncall();
+	} else {
+		if (cpu_online_count > 1) {
+			pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+			CPUSET_REMOVE(targets, THIS_CPU->c_id);
+			cpu_sendipi_cpuset(targets,
+			                   &ipi_invtlb_user,
+			                   args,
+			                   CPU_IPI_FWAITFOR |
+			                   CPU_IPI_FNOINTR);
+		}
+		pagedir_syncall_user();
 	}
-	pagedir_syncall();
 }
 #endif /* !CONFIG_NO_SMP */
 

@@ -35,6 +35,7 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/nopf.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/x86/fault.h>
@@ -1033,12 +1034,29 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		/* If write-access was granted, add the node to the list of writable nodes. */
 		if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 		    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
+
+		/* Sync the newly mapped address range if the mapping was created  with
+		 * write  permissions. Technically, we'd only need to sync if a mapping
+		 * is created where there was already a mapping before, however usually
+		 * this exactly the case where  a previously read-only mapping is  made
+		 * read/write.
+		 *
+		 * The reason why we need to sync in this situation boils down to the
+		 * fact that other CPUs (or even the caller's CPU) may still have TLB
+		 * caches for `addr' (even if those caches are only for read-access),
+		 * such that those (now stale) caches could still be used.
+		 *
+		 * So to prevent cross-cpu inconsistencies, whenever a mapping is made
+		 * that ~may~ be  replacing another pre-existing  mapping, we force  a
+		 * sync for the mapped range. */
+		if (perm & PAGEDIR_MAP_FWRITE)
+			mman_sync(mf.mfl_addr, mf.mfl_size);
+
 #if 0
 		printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#" PRIxPTR "] resolve:[part=%p,perm=%#x]\n",
 		       (uintptr_t)addr, mf.mfl_addr, pc, icpustate_getsp(state), ecode,
 		       mf.mfl_part, perm);
 #endif
-		/*pagedir_sync(mf.mfl_addr, mf.mfl_size);*/
 	}
 	mman_lock_release(mf.mfl_mman);
 
