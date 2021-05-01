@@ -274,7 +274,7 @@ do_load_large_pages_readonly:
  *              actually given to any of the requested pages. */
 #ifdef DEFINE_mpart_mmap_p
 PUBLIC NOBLOCK NONNULL((1)) u16
-NOTHROW(FCALL mpart_mmap_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
+NOTHROW(FCALL mpart_mmap_p)(struct mpart const *__restrict self, pagedir_phys_t pdir,
                             PAGEDIR_PAGEALIGNED void *addr,
                             PAGEDIR_PAGEALIGNED size_t size,
                             PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
@@ -285,7 +285,7 @@ NOTHROW(FCALL mpart_mmap_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
 
 /* Same as `mpart_mmap_p()', but always map into the current page directory. */
 PUBLIC NOBLOCK NONNULL((1)) u16
-NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
+NOTHROW(FCALL mpart_mmap)(struct mpart const *__restrict self,
                           PAGEDIR_PAGEALIGNED void *addr,
                           PAGEDIR_PAGEALIGNED size_t size,
                           PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,

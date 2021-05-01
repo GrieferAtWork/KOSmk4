@@ -38,6 +38,10 @@
 #include "mpart-map.c.inl"
 #define DEFINE_mpart_mmap_p
 #include "mpart-map.c.inl"
+#define DEFINE_mpart_mmap_node
+#include "mpart-map-node.c.inl"
+#define DEFINE_mpart_mmap_node_p
+#include "mpart-map-node.c.inl"
 #define DEFINE_mpart_mmap_force
 #include "mpart-map-force.c.inl"
 #define DEFINE_mpart_mmap_force_p

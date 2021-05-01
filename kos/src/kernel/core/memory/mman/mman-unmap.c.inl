@@ -291,10 +291,10 @@ again_acquire_lock:
 					node_size = mnode_getsize(node);
 					if (mpart_lock_tryacquire(part)) {
 						/* Re-create the page directory mapping for the part. */
-						newperm = mpart_mmap_p(part, self->mm_pagedir_p,
-						                       node_addr, node_size,
-						                       node->mn_partoff,
-						                       mnode_getperm(node));
+						newperm = mpart_mmap_node_p(part, self->mm_pagedir_p,
+						                            node_addr, node_size,
+						                            node->mn_partoff,
+						                            node);
 						mpart_lock_release(part);
 					} else {
 						/* Just delete the mapping, and let the #PF-handler figure it out lazily. */

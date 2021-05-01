@@ -136,9 +136,9 @@ typedef size_t mpart_reladdr_t;
 #endif /* !__mpart_reladdr_t_defined */
 
 struct mfault {
-	/* mfault: Controller for faulting memory in the context of a memory manager:
+	/* mfault: Controller for faulting memory in the context of a memory manager.
 	 *
-	 * Control flow mockup of `mfault_or_unlock()'.
+	 * Control flow mockup of `mfault_or_unlock()'. (Oversimplified!)
 	 *
 	 * >> size_t noderel_addr = mfl_addr - mnode_getaddr(mfl_node);
 	 * >> size_t partrel_addr = mfl_node->mn_partoff + noderel_addr;
@@ -149,10 +149,7 @@ struct mfault {
 	 * >> } else {
 	 * >>     if (mfl_node->mn_flags & MNODE_F_SHARED) {
 	 * >>         mpart_lock_acquire_and_setcore_unsharecow_load(mfl_part, partrel_addr, mfl_size);
-	 * >>     } else if (LIST_EMPTY(&mfl_part->mp_share) &&
-	 * >>                LIST_FIRST(&mfl_part->mp_copy) == mfl_node &&
-	 * >>                LIST_NEXT(mfl_node, mn_link) == NULL &&
-	 * >>                mpart_isanon(mfl_part)) {
+	 * >>     } else if (mpart_iscopywritable(mfl_part, ...)) {
 	 * >>         // Accessed mfl_node is the only copy-on-write mfl_node in existence
 	 * >>         mpart_split(mfl_part, FLOOR_ALIGN(partrel_addr));
 	 * >>         mpart_split(mfl_part, CEIL_ALIGN(partrel_addr + mfl_size));
@@ -249,9 +246,9 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
  * >>         RETHROW();
  * >>     }
  * >>     if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) { ... }
- * >>     perm = mnode_getperm(mf.mfl_node);
- * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
- * >>                       mf.mfl_size, mf.mfl_offs, perm);
+ * >>     perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+ * >>                            mf.mfl_size, mf.mfl_offs,
+ * >>                            mf.mfl_node);
  * >>     pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);

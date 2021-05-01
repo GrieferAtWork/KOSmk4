@@ -41,7 +41,7 @@ DECL_BEGIN
 /* Similar to `mpart_mmap_p()', but force the given `perm' for all pages, no
  * matter  what the block-status  bitset of `self' might  say of the matter. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
+NOTHROW(FCALL mpart_mmap_force_p)(struct mpart const *__restrict self, pagedir_phys_t pdir,
                                   PAGEDIR_PAGEALIGNED void *addr,
                                   PAGEDIR_PAGEALIGNED size_t size,
                                   PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
@@ -53,7 +53,7 @@ NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t 
 #elif defined(DEFINE_mpart_mmap_force)
 /* Same as `mpart_mmap_force_p()', but always map into the current page directory. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
+NOTHROW(FCALL mpart_mmap_force)(struct mpart const *__restrict self,
                                 PAGEDIR_PAGEALIGNED void *addr,
                                 PAGEDIR_PAGEALIGNED size_t size,
                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,

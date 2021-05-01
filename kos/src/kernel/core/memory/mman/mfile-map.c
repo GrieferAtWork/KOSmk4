@@ -155,6 +155,25 @@ NOTHROW(FCALL mpart_must_unshare_copy)(struct mpart *__restrict self,
 }
 
 
+#define mnode_list_maps(self, minaddr, maxaddr) \
+	(!LIST_EMPTY(self) && _mnode_list_maps(self, minaddr, maxaddr))
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL _mnode_list_maps)(struct mnode_list const *__restrict self,
+                                mpart_reladdr_t minaddr, mpart_reladdr_t maxaddr) {
+	struct mnode *node;
+	node = LIST_FIRST(self);
+	do {
+		mpart_reladdr_t node_minaddr;
+		mpart_reladdr_t node_maxaddr;
+		node_minaddr = mnode_getmapminaddr(node);
+		node_maxaddr = mnode_getmapmaxaddr(node);
+		if (RANGE_OVERLAPS(node_minaddr, node_maxaddr, minaddr, maxaddr))
+			return true;
+	} while ((node = LIST_NEXT(node, mn_link)) != NULL);
+	return false;
+}
+
+
 /* Go over all parts and make use of `mpart_load_or_unlock()' or
  * `mpart_unsharecow_or_unlock()' in  order to  populate+unshare
  * (if  PROT_WRITE was  set) the  file-range that  our caller is
@@ -205,39 +224,37 @@ mark_part_as_changed:
 				/* The caller wants to create a private mapping.
 				 * As such, we must ensure that there aren't any SHARED mappings
 				 * of `part',  and that  `part' belongs  to an  anonymous  file. */
-				if (!mpart_isanon(part) ||          /* `part' could be accessed via its file. */
-				    !LIST_EMPTY(&part->mp_copy) ||  /* `part' already has other copy-on-write mappings. */
-				    !LIST_EMPTY(&part->mp_share)) { /* `part' already has other shared mappings. */
-
-					/* TODO: Create our own private copy of `part'
-					 *       Essentially, we have to do the same as is also done by `mfault()',
-					 *       only that instead of faulting  a node/part pair found within  some
-					 *       given memory manager, we need to fault a part that hasn't actually
-					 *       been added to its proper node, yet. */
-
-					/* TODO: While using `self->mfm_ucdat' as intermediate buffer, allocate:
-					 *     - self->mfm_ucdat.ucd_copy                     (as a new `struct mpart')
-					 *     - self->mfm_ucdat.ucd_ucmem.scd_bitset         (if needed)
-					 *     - self->mfm_ucdat.ucd_ucmem.scd_copy_mem[_sc]  (as needed) */
-
-					/* TODO: Copy backing physical memory from `part' into `self->mfm_ucdat.ucd_copy' */
-					/* TODO: Initialize `self->mfm_ucdat.ucd_copy' as a duplicate of `part' */
-					/* TODO: Replace `part' from `node->mn_part' with `self->mfm_ucdat.ucd_copy' */
-
-					/* With this, `node' no longer references the original file, but rather contains
-					 * its own, private  copy of  the relevant portion  from the  original file!  :) */
-
-					/* TODO: Check the preceding file-mapping  node (from the `self->mfm_nodes'  list)
-					 *       to see if it might be possible to merge those 2 node/part pairs. For this
-					 *       purpose, we can simply use:
-					 *       `!isshared(PREV->mn_part) && mpart_isanon(PREV->mn_part) && PREV->mn_part->mp_file == &mfile_anon[*]'
-					 *       The combination of these checks is already enough to identify 2 consecutive
-					 *       parts that have both been replaced with private copies.
-					 *       When found, simply merge the 2 parts & nodes into the same object, thus
-					 *       simplifying the resulting mapping. */
-				} else {
+				if (mpart_isanon(part) &&                                 /* `part' could be accessed via its file. */
+				    !mnode_list_maps(&part->mp_copy, minaddr, maxaddr) && /* `part' already has other copy-on-write mappings. */
+				    !mnode_list_maps(&part->mp_share, minaddr, maxaddr))  /* `part' already has other shared mappings. */
 					goto mark_part_as_changed;
-				}
+
+				/* TODO: Create our own private copy of `part'
+				 *       Essentially, we have to do the same as is also done by `mfault()',
+				 *       only that instead of faulting  a node/part pair found within  some
+				 *       given memory manager, we need to fault a part that hasn't actually
+				 *       been added to its proper node, yet. */
+
+				/* TODO: While using `self->mfm_ucdat' as intermediate buffer, allocate:
+				 *     - self->mfm_ucdat.ucd_copy                     (as a new `struct mpart')
+				 *     - self->mfm_ucdat.ucd_ucmem.scd_bitset         (if needed)
+				 *     - self->mfm_ucdat.ucd_ucmem.scd_copy_mem[_sc]  (as needed) */
+
+				/* TODO: Copy backing physical memory from `part' into `self->mfm_ucdat.ucd_copy' */
+				/* TODO: Initialize `self->mfm_ucdat.ucd_copy' as a duplicate of `part' */
+				/* TODO: Replace `part' from `node->mn_part' with `self->mfm_ucdat.ucd_copy' */
+
+				/* With this, `node' no longer references the original file, but rather contains
+				 * its own, private  copy of  the relevant portion  from the  original file!  :) */
+
+				/* TODO: Check the preceding file-mapping  node (from the `self->mfm_nodes'  list)
+				 *       to see if it might be possible to merge those 2 node/part pairs. For this
+				 *       purpose, we can simply use:
+				 *       `!isshared(PREV->mn_part) && mpart_isanon(PREV->mn_part) && PREV->mn_part->mp_file == &mfile_anon[*]'
+				 *       The combination of these checks is already enough to identify 2 consecutive
+				 *       parts that have both been replaced with private copies.
+				 *       When found, simply merge the 2 parts & nodes into the same object, thus
+				 *       simplifying the resulting mapping. */
 			}
 		}
 	}

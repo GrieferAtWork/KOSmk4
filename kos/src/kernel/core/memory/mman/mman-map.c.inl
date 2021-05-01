@@ -490,12 +490,11 @@ again_lock_mfile_map:
 			 * However,  by unconditionally doing it here, we can
 			 * speed up the initial memory access whenever memory
 			 * had already been  loaded in some  other way,  too! */
-			map_prot = mnode_getperm(node);
-			map_prot = mpart_mmap_p(part, self->mm_pagedir_p,
-			                        mnode_getaddr(node),
-			                        mnode_getsize(node),
-			                        node->mn_partoff,
-			                        map_prot);
+			map_prot = mpart_mmap_node_p(part, self->mm_pagedir_p,
+			                             mnode_getaddr(node),
+			                             mnode_getsize(node),
+			                             node->mn_partoff,
+			                             node);
 
 			/* If the node was mapped with write-permissions enabled,
 			 * then add it to the  list of writable nodes within  our
@@ -542,7 +541,7 @@ again_lock_mfile_map:
 		                        mnode_getaddr(node),
 		                        mnode_getsize(node),
 		                        node->mn_partoff,
-		                        mnode_getperm(node));
+		                        mnode_getperm_force(node));
 		LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
 		if (map_prot & PAGEDIR_MAP_FWRITE)
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);

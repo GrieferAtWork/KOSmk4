@@ -330,13 +330,12 @@ again:
 		if (was_prepared & MMAN_MAP_MBUILDER_F_PREPARED) {
 			u16 map_prot;
 			/* Try to map the associated part into the target mman's page directory. */
-			map_prot = mnode_getperm(node);
-			map_prot = mpart_mmap_p(node->mn_part,
-			                        self->mm_pagedir_p,
-			                        mnode_getaddr(node),
-			                        mnode_getsize(node),
-			                        node->mn_partoff,
-			                        map_prot);
+			map_prot = mpart_mmap_node_p(node->mn_part,
+			                             self->mm_pagedir_p,
+			                             mnode_getaddr(node),
+			                             mnode_getsize(node),
+			                             node->mn_partoff,
+			                             node);
 
 			/* Set `MBNODE_F_WRITABLE' if the node ends up as writable. */
 			if (map_prot & PAGEDIR_MAP_FWRITE)

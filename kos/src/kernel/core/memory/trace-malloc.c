@@ -1694,10 +1694,13 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 			/* TODO: If `iter' or `xref_leak' is `TRACE_NODE_KIND_BITSET', then
 			 *       we  must  ensure to  only  check traced  areas  for xrefs! */
 			FOREACH_XREF_BEGIN(ptr, pptr, xref_umin, xref_umax, umin, umax) {
-				PRINTF("\tReferenced at *%p=%p", pptr, ptr);
+				PRINTF("\tReferenced at [%p]=%p", pptr, ptr);
 				if ((uintptr_t)ptr > umin)
-					PRINTF("[.+%" PRIuSIZ "]", (uintptr_t)ptr - umin);
-				PRINTF(" by leak at %p...%p\n", xref_umin, xref_umax);
+					PRINTF(" [.+%#" PRIxSIZ "]", (uintptr_t)ptr - umin);
+				PRINTF(" by leak at %p...%p", xref_umin, xref_umax);
+				if ((uintptr_t)pptr > xref_umin)
+					PRINTF(" [.+%#" PRIxSIZ "]", (uintptr_t)pptr - xref_umin);
+				PRINTF("\n");
 			}
 			FOREACH_XREF_END();
 		}

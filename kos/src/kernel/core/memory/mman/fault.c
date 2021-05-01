@@ -128,8 +128,9 @@ again:
 		/* (re-)map the faulted address range. */
 		{
 			u16 perm;
-			perm = mnode_getperm(mf.mfl_node);
-			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size, mf.mfl_offs, perm);
+			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			                       mf.mfl_size, mf.mfl_offs,
+			                       mf.mfl_node);
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
@@ -294,9 +295,9 @@ again:
 		/* (re-)map the faulted address range. */
 		{
 			u16 perm;
-			perm = mnode_getperm(mf.mfl_node);
-			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr, mf.mfl_size,
-			                  mf.mfl_offs, perm);
+			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			                       mf.mfl_size, mf.mfl_offs,
+			                       mf.mfl_node);
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
@@ -533,9 +534,9 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
  * >>         RETHROW();
  * >>     }
  * >>     if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) { ... }
- * >>     perm = mnode_getperm(mf.mfl_node);
- * >>     perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
- * >>                       mf.mfl_size, mf.mfl_offs, perm);
+ * >>     perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+ * >>                            mf.mfl_size, mf.mfl_offs,
+ * >>                            mf.mfl_node);
  * >>     pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
@@ -680,8 +681,7 @@ done_mark_changed:
 		 * outside word. This is the  normal case for mmap(MAN_ANON) memory,  unless
 		 * the associated process has called fork(2), at which point there would  be
 		 * more than 1 mapping for the mem-part, and this part would fail! */
-		if (LIST_EMPTY(&part->mp_share) && LIST_FIRST(&part->mp_copy) == node &&
-		    LIST_NEXT(node, mn_link) == NULL && mpart_isanon(part)) {
+		if (mpart_iscopywritable(part, acc_offs, acc_size, node)) {
 			/* Backing file is anonymous, there are no SHARED-mappings,
 			 * and  we're the only  copy-on-write mapping in existence.
 			 *

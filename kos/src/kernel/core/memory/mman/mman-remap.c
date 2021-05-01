@@ -266,12 +266,11 @@ something_changed:
 			ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
 
 		/* Map the backing part (as far as that is possible) */
-		map_prot = mnode_getperm(node);
-		map_prot = mpart_mmap_p(part, self->mm_pagedir_p,
-		                        mnode_getaddr(node),
-		                        mnode_getsize(node),
-		                        node->mn_partoff,
-		                        map_prot);
+		map_prot = mpart_mmap_node_p(part, self->mm_pagedir_p,
+		                             mnode_getaddr(node),
+		                             mnode_getsize(node),
+		                             node->mn_partoff,
+		                             node);
 
 		/* If the node was mapped with write-permissions enabled,
 		 * then add it to the  list of writable nodes within  our
@@ -445,7 +444,6 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 	while (!SLIST_EMPTY(&map->mfm_nodes)) {
 		struct mnode *node;
 		struct mpart *part;
-		u16 map_prot;
 		node = SLIST_FIRST(&map->mfm_nodes);
 		SLIST_REMOVE_HEAD(&map->mfm_nodes, _mn_alloc);
 		node->mn_flags  = mapinfo->mi_nodeflags;
@@ -472,13 +470,13 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 				ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
 
 			if (did_prepare) {
+				u16 map_prot;
 				/* Map the backing part (as far as that is possible) */
-				map_prot = mnode_getperm(node);
-				map_prot = mpart_mmap_p(part, self->mm_pagedir_p,
-				                        mnode_getaddr(node),
-				                        mnode_getsize(node),
-				                        node->mn_partoff,
-				                        map_prot);
+				map_prot = mpart_mmap_node_p(part, self->mm_pagedir_p,
+				                             mnode_getaddr(node),
+				                             mnode_getsize(node),
+				                             node->mn_partoff,
+				                             node);
 	
 				/* If the node was mapped with write-permissions enabled,
 				 * then add it to the  list of writable nodes within  our
@@ -668,14 +666,15 @@ err_cannot_prepare:
 				mman_mappings_insert(self, node);
 				if (node->mn_part != NULL && mpart_lock_tryacquire(node->mn_part)) {
 					u16 map_prot;
+
 					/* Map the backing part (as far as that is possible) */
-					map_prot = mnode_getperm(node);
-					map_prot = mpart_mmap_p(node->mn_part,
-					                        self->mm_pagedir_p,
-					                        mnode_getaddr(node),
-					                        mnode_getsize(node),
-					                        node->mn_partoff,
-					                        map_prot);
+					map_prot = mpart_mmap_node_p(node->mn_part,
+					                             self->mm_pagedir_p,
+					                             mnode_getaddr(node),
+					                             mnode_getsize(node),
+					                             node->mn_partoff,
+					                             node);
+
 					/* If the node was mapped with write-permissions enabled,
 					 * then add it to the  list of writable nodes within  our
 					 * memory manager. */
@@ -826,14 +825,15 @@ again_lock_mman_phase2:
 						if (node->mn_part != NULL && did_prepare &&
 						    mpart_lock_tryacquire(node->mn_part)) {
 							u16 map_prot;
+
 							/* Map the backing part (as far as that is possible) */
-							map_prot = mnode_getperm(node);
-							map_prot = mpart_mmap_p(node->mn_part,
-							                        self->mm_pagedir_p,
-							                        mnode_getaddr(node),
-							                        mnode_getsize(node),
-							                        node->mn_partoff,
-							                        map_prot);
+							map_prot = mpart_mmap_node_p(node->mn_part,
+							                             self->mm_pagedir_p,
+							                             mnode_getaddr(node),
+							                             mnode_getsize(node),
+							                             node->mn_partoff,
+							                             node);
+
 							/* If the node was mapped with write-permissions enabled,
 							 * then add it to the  list of writable nodes within  our
 							 * memory manager. */

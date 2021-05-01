@@ -1084,10 +1084,11 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
 /* Mark all blocks that overlap with the given address range as CHNG.
  * For this purpose, the caller must ensure that:
  * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
- * If  any  of  the  blocks  within  the  given  range  had  yet  to  be  marked  as  CHNG,
- * and  the  associated  file  is   not  anonymous,  and  implements  the   `mo_saveblocks'
- * operator, and  the  `MPART_F_CHANGED'  flag had  yet  to  be set  for  the  given  part,
- * then  set  the  `MPART_F_CHANGED'   flag  and  add  `self'   to  the  list  of   changed
+ *
+ * If any of  the blocks within  the given range  had yet to  be marked as  CHNG,
+ * and the associated file is  not anonymous, and implements the  `mo_saveblocks'
+ * operator, and the `MPART_F_CHANGED' flag had yet to be set for the given part,
+ * then set the  `MPART_F_CHANGED' flag  and add `self'  to the  list of  changed
  * parts of its associated file.
  * NOTE: The caller must be holding a lock to `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -1144,7 +1145,7 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
  *              This may be used to figure out if write permissions were
  *              actually given to any of the requested pages. */
 FUNDEF NOBLOCK NONNULL((1)) u16
-NOTHROW(FCALL mpart_mmap_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
+NOTHROW(FCALL mpart_mmap_p)(struct mpart const *__restrict self, pagedir_phys_t pdir,
                             PAGEDIR_PAGEALIGNED void *addr,
                             PAGEDIR_PAGEALIGNED size_t size,
                             PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
@@ -1152,7 +1153,7 @@ NOTHROW(FCALL mpart_mmap_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
 
 /* Same as `mpart_mmap_p()', but always map into the current page directory. */
 FUNDEF NOBLOCK NONNULL((1)) u16
-NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
+NOTHROW(FCALL mpart_mmap)(struct mpart const *__restrict self,
                           PAGEDIR_PAGEALIGNED void *addr,
                           PAGEDIR_PAGEALIGNED size_t size,
                           PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
@@ -1161,7 +1162,7 @@ NOTHROW(FCALL mpart_mmap)(struct mpart *__restrict self,
 /* Similar to `mpart_mmap_p()', but force the given `perm' for all pages, no
  * matter  what the block-status  bitset of `self' might  say of the matter. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t pdir,
+NOTHROW(FCALL mpart_mmap_force_p)(struct mpart const *__restrict self, pagedir_phys_t pdir,
                                   PAGEDIR_PAGEALIGNED void *addr,
                                   PAGEDIR_PAGEALIGNED size_t size,
                                   PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
@@ -1169,7 +1170,7 @@ NOTHROW(FCALL mpart_mmap_force_p)(struct mpart *__restrict self, pagedir_phys_t 
 
 /* Same as `mpart_mmap_force_p()', but always map into the current page directory. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mpart_mmap_force)(struct mpart *__restrict self,
+NOTHROW(FCALL mpart_mmap_force)(struct mpart const *__restrict self,
                                 PAGEDIR_PAGEALIGNED void *addr,
                                 PAGEDIR_PAGEALIGNED size_t size,
                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
@@ -1227,6 +1228,80 @@ NOTHROW(FCALL mpart_merge_locked)(REF struct mpart *__restrict self);
  *       the list of node-mappings of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self);
+
+
+
+
+/* Check if the given `addr...+=num_bytes' sub-range (which _must_ be
+ * entirely contained within the portion of `self' that is mapped by
+ * the given `node') can be given write-access by `node', assuming
+ * that `node' is a copy-on-write mapping of `self'.
+ *
+ * For this purpose, direct write-access is only granted when the given
+ * sub-range is not visible anywhere else (iow: when `node' effectively
+ * has exclusive ownership of that range):
+ *   - mpart_isanon(self)                                     // The part must be anon (else: changes would
+ *                                                            // be visible when read(2)-ing from its file)
+ *   - self->mp_share.filter(MAPS(addr, num_bytes)) == []     // No shared memory mappings
+ *   - self->mp_copy .filter(MAPS(addr, num_bytes)) == [node] // Exactly 1 copy-on-write mapping, that is `node' */
+#define mpart_iscopywritable(self, addr, num_bytes, node) \
+	(mpart_isanon(self) &&                                 \
+	 ((LIST_EMPTY(&(self)->mp_share) &&                    \
+	   LIST_FIRST(&(self)->mp_copy) == (node) &&           \
+	   LIST_NEXT(node, mn_link) == __NULLPTR) ||           \
+	  _mpart_iscopywritable(self, addr, num_bytes, node)))
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 4)) __BOOL
+NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
+                                     mpart_reladdr_t addr, size_t num_bytes,
+                                     struct mnode const *__restrict node);
+
+/* Check if there are no copy-on-write nodes for the given address range
+ * This must be ensured before shared write-access can be granted to the
+ * specified range, and if this isn't the case, the copy-on-write nodes
+ * for said range must be unshared via `mpart_unsharecow_or_unlock()' */
+#define mpart_issharewritable(self, addr, num_bytes) \
+	(LIST_EMPTY(&(self)->mp_copy) || _mpart_issharewritable(self, addr, num_bytes))
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
+                                      mpart_reladdr_t addr, size_t num_bytes);
+
+
+/* Helper wrappers for the above functions. */
+#define mpart_iswritable(self, addr, num_bytes, node)                                 \
+	((node)->mn_flags & MNODE_F_SHARED ? mpart_issharewritable(self, addr, num_bytes) \
+	                                   : mpart_iscopywritable(self, addr, num_bytes, node))
+#define mnode_iscopywritable(self)  mpart_iscopywritable((self)->mn_part, mnode_getmapaddr(self), mnode_getsize(self), self)
+#define mnode_issharewritable(self) mpart_issharewritable((self)->mn_part, mnode_getmapaddr(self), mnode_getsize(self))
+#define mnode_iswritable(self)      mpart_iswritable((self)->mn_part, mnode_getmapaddr(self), mnode_getsize(self), self)
+
+
+/* A slightly smarter equivalent of:
+ * >> u16 prot;
+ * >> prot = mnode_getprot(node);
+ * >> prot = mpart_mmap(self, addr, size, offset);
+ * >> return prot;
+ * However, unlike that piece of code, this one determines if write
+ * access can be granted on a per-page basis (see the documentation
+ * of `mpart_iscopywritable()' and `mpart_issharewritable()' for
+ * when write-access can be given)
+ * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_MAP_F*'
+ *              flags used to map pages from the given address range. */
+FUNDEF NOBLOCK NONNULL((1, 5)) u16
+NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,
+                               PAGEDIR_PAGEALIGNED void *addr,
+                               PAGEDIR_PAGEALIGNED size_t size,
+                               PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
+                               struct mnode const *__restrict node);
+
+/* Same as `mpart_mmap_node()', but map into the given page directory. */
+FUNDEF NOBLOCK NONNULL((1, 6)) u16
+NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
+                                 pagedir_phys_t pdir,
+                                 PAGEDIR_PAGEALIGNED void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t size,
+                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
+                                 struct mnode const *__restrict node);
+
 
 
 

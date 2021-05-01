@@ -289,20 +289,19 @@ again_prefault:
 						__mfault_init(&mf);
 
 						/* Re-map the freshly faulted memory. */
-						perm = mnode_getperm(mf.mfl_node);
 						if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-							perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
-							                    mf.mfl_addr, mf.mfl_size,
-							                    mf.mfl_offs, perm);
+							perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
+							                         mf.mfl_addr, mf.mfl_size,
+							                         mf.mfl_offs, mf.mfl_node);
 						} else {
 							if (!pagedir_prepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size)) {
 								mpart_lock_release(mf.mfl_part);
 								mman_lock_release(self);
 								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 							}
-							perm = mpart_mmap_p(mf.mfl_part, self->mm_pagedir_p,
-							                    mf.mfl_addr, mf.mfl_size,
-							                    mf.mfl_offs, perm);
+							perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
+							                         mf.mfl_addr, mf.mfl_size,
+							                         mf.mfl_offs, mf.mfl_node);
 							pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
 						}
 

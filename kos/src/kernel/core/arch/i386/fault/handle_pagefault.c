@@ -1014,24 +1014,31 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 	/* Re-map the freshly faulted memory. */
 	{
 		u16 perm;
-		perm = mnode_getperm(mf.mfl_node);
 		if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
-			                  mf.mfl_size, mf.mfl_offs, perm);
+			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			                       mf.mfl_size, mf.mfl_offs,
+			                       mf.mfl_node);
 		} else {
 			if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
-			perm = mpart_mmap(mf.mfl_part, mf.mfl_addr,
-			                  mf.mfl_size, mf.mfl_offs, perm);
+			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			                       mf.mfl_size, mf.mfl_offs,
+			                       mf.mfl_node);
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 		}
 		mpart_lock_release(mf.mfl_part);
 		/* If write-access was granted, add the node to the list of writable nodes. */
 		if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 		    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
+#if 0
+		printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#" PRIxPTR "] resolve:[part=%p,perm=%#x]\n",
+		       (uintptr_t)addr, mf.mfl_addr, pc, icpustate_getsp(state), ecode,
+		       mf.mfl_part, perm);
+#endif
+		/*pagedir_sync(mf.mfl_addr, mf.mfl_size);*/
 	}
 	mman_lock_release(mf.mfl_mman);
 

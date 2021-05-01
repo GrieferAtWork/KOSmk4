@@ -1688,12 +1688,17 @@ free_unused_block_status:
 			if (ADDR_ISUSER(addr))
 				prot |= PAGEDIR_MAP_FUSER; /* XXX: Maybe get rid of this eventually? */
 
-			mpart_mmap_p(copy, mm->mm_pagedir_p, addr,
-			             size, node->mn_partoff, prot);
+			prot = mpart_mmap_p(copy, mm->mm_pagedir_p, addr,
+			                    size, node->mn_partoff, prot);
 
-			/* Unlink the node from the writable-chain. */
-			if (LIST_ISBOUND(node, mn_writable))
-				LIST_UNBIND(node, mn_writable);
+			/* Make sure that the node's writable-bound-state is correct. */
+			if unlikely(prot & PAGEDIR_MAP_FWRITE) {
+				if (!LIST_ISBOUND(node, mn_writable))
+					LIST_INSERT_HEAD(&mm->mm_writable, node, mn_writable);
+			} else {
+				if (LIST_ISBOUND(node, mn_writable))
+					LIST_UNBIND(node, mn_writable);
+			}
 
 			if (!(node->mn_flags & MNODE_F_MPREPARED)) {
 				/* With the new mapping in place, unprepare the page directory. */

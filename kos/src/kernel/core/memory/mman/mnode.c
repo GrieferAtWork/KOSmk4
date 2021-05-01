@@ -442,13 +442,11 @@ err_changed_free_hinode:
  * are automatically removed for the purpose of copy-on-write:
  * >> result = mnode_getperm_force(self);
  * >> if (result & PAGEDIR_MAP_FWRITE) {
- * >>     struct mpart *part = self->mn_part;
  * >>     if (self->mn_flags & MNODE_F_SHARED) {
- * >>         if (!LIST_EMPTY(&part->mp_copy))
+ * >>         if (!mnode_issharewritable(self))
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     } else {
- * >>         if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
- * >>             LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))
+ * >>         if (!mnode_iscopywritable(self))
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     }
  * >> } */
@@ -457,39 +455,18 @@ NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self) {
 	u16 result;
 	result = mnode_getperm_force_nouser(self);
 	if (result & PAGEDIR_MAP_FWRITE) {
-		struct mpart *part = self->mn_part;
 		if (self->mn_flags & MNODE_F_SHARED) {
 			/* Disallow write to a shared mapping if there are other copy-on-write nodes.
 			 * This way, copy-on-write nodes can be unshared lazily once the first  write
 			 * happens. */
-			if (!LIST_EMPTY(&part->mp_copy)) {
-				/* Only deny write if a copy-on-write mapping overlaps with our SHARED mapping. */
-				struct mnode *cow;
-				mpart_reladdr_t mapmin, mapmax;
-				mapmin = mnode_getmapminaddr(self);
-				mapmax = mnode_getmapmaxaddr(self);
-				LIST_FOREACH (cow, &part->mp_copy, mn_link) {
-					if (RANGE_OVERLAPS(mapmin, mapmax,
-					                   mnode_getmapminaddr(cow),
-					                   mnode_getmapmaxaddr(cow))) {
-						result &= ~PAGEDIR_MAP_FWRITE;
-						break;
-					}
-				}
-			}
+			if (!mnode_issharewritable(self))
+				result &= ~PAGEDIR_MAP_FWRITE;
 		} else {
 			/* Disallow write if there are any other memory mappings of the backing part,
 			 * or if the part isn't anonymous (in which case someone may  open(2)+read(2)
 			 * from  backing file, which  mustn't include any  modifications made by this
 			 * mapping) */
-			/* NOTE: Technically, we'd only need  to deny write if  the part isn't anon,  or
-			 *       one of the other mem-nodes's part-rel mapped range overlaps with our's.
-			 *       However, this isn't something that  could easily happen (you'd have  to
-			 *       do a very specific sequence of mmap()+fork()+munmap() calls). As  such,
-			 *       and  given that  even without  this, `mfault'  still does copy-on-write
-			 *       properly, we don't actually do this! */
-			if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
-			    LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))
+			if (!mnode_iscopywritable(self))
 				result &= ~PAGEDIR_MAP_FWRITE;
 		}
 	}

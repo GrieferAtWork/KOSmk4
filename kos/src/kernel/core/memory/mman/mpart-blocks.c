@@ -766,10 +766,11 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
 /* Mark all blocks that overlap with the given address range as CHNG.
  * For this purpose, the caller must ensure that:
  * >> !OVERFLOW_UADD(partrel_offset, num_bytes, &endaddr) && endaddr <= mpart_getsize(self)
- * If  any  of  the  blocks  within  the  given  range  had  yet  to  be  marked  as  CHNG,
- * and  the  associated  file  is   not  anonymous,  and  implements  the   `mo_saveblocks'
- * operator, and  the  `MPART_F_CHANGED'  flag had  yet  to  be set  for  the  given  part,
- * then  set  the  `MPART_F_CHANGED'   flag  and  add  `self'   to  the  list  of   changed
+ *
+ * If any of  the blocks within  the given range  had yet to  be marked as  CHNG,
+ * and the associated file is  not anonymous, and implements the  `mo_saveblocks'
+ * operator, and the `MPART_F_CHANGED' flag had yet to be set for the given part,
+ * then set the  `MPART_F_CHANGED' flag  and add `self'  to the  list of  changed
  * parts of its associated file.
  * NOTE: The caller must be holding a lock to `self' */
 PUBLIC NOBLOCK NONNULL((1)) void

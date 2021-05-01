@@ -382,13 +382,11 @@ struct mnode {
  * are automatically removed for the purpose of copy-on-write:
  * >> result = mnode_getperm_force(self);
  * >> if (result & PAGEDIR_MAP_FWRITE) {
- * >>     struct mpart *part = self->mn_part;
  * >>     if (self->mn_flags & MNODE_F_SHARED) {
- * >>         if (!LIST_EMPTY(&part->mp_copy))
+ * >>         if (!mnode_issharewritable(self))
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     } else {
- * >>         if (!LIST_EMPTY(&part->mp_share) || LIST_FIRST(&part->mp_copy) != self ||
- * >>             LIST_NEXT(self, mn_link) != NULL || !mpart_isanon(part))
+ * >>         if (!mnode_iscopywritable(self))
  * >>             result &= ~PAGEDIR_MAP_FWRITE;
  * >>     }
  * >> } */

@@ -454,6 +454,10 @@ NOTHROW(FCALL mnode_domerge_without_part)(struct mnode *__restrict lonode,
 	assert(lonode->mn_part == NULL);
 	assert(hinode->mn_part == NULL);
 
+	printk(KERN_DEBUG "[mm] Merge reserved nodes at %p-%p and %p-%p\n",
+	       mnode_getminaddr(lonode), mnode_getmaxaddr(lonode),
+	       mnode_getminaddr(hinode), mnode_getmaxaddr(hinode));
+
 	/* Merge the 2 nodes */
 	mman_mappings_removenode(lonode->mn_mman, lonode);
 	mman_mappings_removenode(lonode->mn_mman, hinode);
@@ -525,6 +529,10 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 		/* TODO */
 		return MNODE_MERGE_CANNOT_MERGE;
 	}
+
+	printk(KERN_DEBUG "[mm] Merge nodes at %p-%p and %p-%p\n",
+	       mnode_getminaddr(lonode), mnode_getmaxaddr(lonode),
+	       mnode_getminaddr(hinode), mnode_getmaxaddr(hinode));
 
 	/* Merge the 2 nodes */
 	mman_mappings_removenode(lonode->mn_mman, lonode);

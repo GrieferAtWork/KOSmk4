@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C 1
+#define __WANT_MPART__mp_nodlsts
 #define __WANT_MPART__mp_lopall
 #define _KOS_SOURCE 1
 
@@ -46,6 +47,11 @@
 #include <string.h>
 
 DECL_BEGIN
+
+/* Check if 2 given ranges overlap (that is: share at least 1 common address) */
+#define RANGE_OVERLAPS(a_start, a_end, b_start, b_end) \
+	((a_end) > (b_start) && (a_start) < (b_end))
+
 
 #ifndef NDEBUG
 #define DBG_memset(dst, byte, num_bytes) memset(dst, byte, num_bytes)
@@ -721,6 +727,61 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return mpart_sync_impl(self, true);
 }
+
+
+
+
+/* Check if the given `addr...+=num_bytes' sub-range (which _must_ be
+ * entirely contained within the portion of `self' that is mapped by
+ * the given `node') can be given write-access by `node', assuming
+ * that `node' is a copy-on-write mapping of `self'.
+ *
+ * For this purpose, direct write-access is only granted when the given
+ * sub-range is not visible anywhere else (iow: when `node' effectively
+ * has exclusive ownership of that range):
+ *   - mpart_isanon(self)                                     // The part must be anon (else: changes would
+ *                                                            // be visible when read(2)-ing from its file)
+ *   - self->mp_share.filter(MAPS(addr, num_bytes)) == []     // No shared memory mappings
+ *   - self->mp_copy .filter(MAPS(addr, num_bytes)) == [node] // Exactly 1 copy-on-write mapping, that is `node' */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 4)) bool
+NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
+                                     mpart_reladdr_t addr, size_t num_bytes,
+                                     struct mnode const *__restrict node) {
+	unsigned int i;
+	/* Check for _any_ nodes that overlap with the
+	 * given address range, that aren't just `node' */
+	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		struct mnode *iter;
+		LIST_FOREACH (iter, &self->_mp_nodlsts[i], mn_link) {
+			if (!RANGE_OVERLAPS(addr, addr + num_bytes,
+			                    mnode_getmapaddr(iter),
+			                    mnode_getmapendaddr(iter)))
+				continue; /* No overlap here! */
+			if (iter == node)
+				continue; /* This one's allowed! */
+			return false; /* oops: overlap! */
+		}
+	}
+	return true; /* Everything OK! */
+}
+
+/* Check if there are no copy-on-write nodes for the given address range
+ * This must be ensured before shared write-access can be granted to the
+ * specified range, and if this isn't the case, the copy-on-write nodes
+ * for said range must be unshared via `mpart_unsharecow_or_unlock()' */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
+                                      mpart_reladdr_t addr, size_t num_bytes) {
+	struct mnode *iter;
+	LIST_FOREACH (iter, &self->mp_copy, mn_link) {
+		if (RANGE_OVERLAPS(addr, addr + num_bytes,
+		                   mnode_getmapaddr(iter),
+		                   mnode_getmapendaddr(iter)))
+			return false; /* oops: overlap! */
+	}
+	return true; /* Everything OK! */
+}
+
 
 
 
