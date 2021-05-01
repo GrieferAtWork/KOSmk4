@@ -2020,7 +2020,6 @@ NOTHROW(FCALL merge_all_parts_lop_cb)(struct lockop *__restrict UNUSED(self)) {
 	ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func, NULL);
 	SLIST_INIT(&deadparts);
 	merge_all_parts(&deadparts);
-	mpart_all_release();
 	if (SLIST_EMPTY(&deadparts))
 		return NULL;
 	/* Set-up a post-lockop that will clean out the list of dead parts.
