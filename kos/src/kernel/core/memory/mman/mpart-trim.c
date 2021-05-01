@@ -1429,6 +1429,7 @@ NOTHROW(FCALL mpart_trim_locked_ftx)(struct mpart *__restrict self) {
 			mpart_decref_all_mmans(self);
 			/* asynchronously wait for the lock of this mman to become available. */
 			ATOMIC_WRITE(self->_mp_trmlop_mm.olo_func, &mpart_trim_mmlop);
+			incref(self); /* Inherited by `mpart_trim_mmlop()' */
 			SLIST_ATOMIC_INSERT(&FORMMAN(blocking_mm, thismman_lockops),
 			                    &self->_mp_trmlop_mm, olo_link);
 			_mman_lockops_reap(blocking_mm);
@@ -1510,8 +1511,8 @@ NOTHROW(FCALL mpart_trim_locked)(struct mpart *__restrict self) {
 			mpartmeta_ftxlock_endwrite(meta, self);
 		} else {
 			/* Must acquire the futex-lock asynchronously. */
-			incref(self); /* The reference inherited by `mpart_trim_ftxlop' */
 			ATOMIC_WRITE(self->_mp_trmlop_mp.olo_func, &mpart_trim_ftxlop);
+			incref(self); /* The reference inherited by `mpart_trim_ftxlop' */
 			/* NOTE: No need for a 2nd incref(self) to prevent `self' from being
 			 *       destroyed before we get to  reap it! Our caller is  already
 			 *       holding that reference! */
