@@ -101,7 +101,7 @@ NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
 		if (!is_writable)
 			used_perm &= ~PAGEDIR_MAP_FWRITE;
 
-		/* Map this part. */
+		/* Map this portion. */
 		result |= LOCAL_mpart_mmap(addr, part, offset, used_perm);
 
 		/* Account for remainder. */

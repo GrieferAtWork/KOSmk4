@@ -1304,6 +1304,7 @@ PRIVATE NOBLOCK NONNULL((1, 2, 3)) REF struct mpart *
 NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct mpart *lopart,
                                             /*inherit(on_success)*/ REF struct mpart *hipart,
                                             struct mpart *orig_part) {
+	bool hasmeta;
 	size_t losize = mpart_getsize(lopart);
 	assert_assume(lopart->mp_file == hipart->mp_file);
 
@@ -1314,12 +1315,13 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	}
 
 	/* Check if we must allocate a meta-controller for `lopart'. */
-	if (hipart->mp_meta && !lopart->mp_meta &&
-	    (hipart->mp_meta->mpm_ftx != NULL ||
+	hasmeta = hipart->mp_meta &&
+	          (hipart->mp_meta->mpm_ftx != NULL ||
 #ifdef ARCH_HAVE_RTM
-	     hipart->mp_meta->mpm_rtm_vers != 0 ||
+	           hipart->mp_meta->mpm_rtm_vers != 0 ||
 #endif /* ARCH_HAVE_RTM */
-	     0)) {
+	           0);
+	if (hasmeta && !lopart->mp_meta) {
 		/* Must allocate the meta-controller for `lopart' */
 		struct mpartmeta *meta;
 		meta = (struct mpartmeta *)merge_malloc(sizeof(struct mpartmeta), orig_part);
@@ -1612,7 +1614,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	lopart->mp_maxaddr += mpart_getsize(hipart);
 
 	/* Merge metadata (and transfer futex objects) */
-	if (hipart->mp_meta) {
+	if (hasmeta) {
 		struct mpartmeta *lometa, *himeta;
 		lometa = lopart->mp_meta;
 		himeta = hipart->mp_meta;
