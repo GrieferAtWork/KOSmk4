@@ -1080,7 +1080,23 @@ NOTHROW(FCALL lockop_kram_cb_post)(Tobpostlockop(mman) *__restrict self,
 	(*job->mukj_done)(job);
 }
 
-PRIVATE NOBLOCK Tobpostlockop(mman) *
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mman) *
+NOTHROW(FCALL lockop_kram_cb)(Toblockop(mman) *__restrict self,
+                              struct mman *__restrict UNUSED(mm));
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL lockop_kram_async_cb)(Tobpostlockop(mman) *__restrict self,
+                                    struct mman *__restrict UNUSED(mm)) {
+	struct mman_unmap_kram_job *job;
+	job = container_of(self, struct mman_unmap_kram_job, mukj_post_lop_mm);
+	job->mukj_lop_mm.olo_func = &lockop_kram_cb;
+	SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
+	                    &job->mukj_lop_mm,
+	                    olo_link);
+	/* DONT reap `mman_kernel' at this point! */
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mman) *
 NOTHROW(FCALL lockop_kram_cb)(Toblockop(mman) *__restrict self,
                               struct mman *__restrict UNUSED(mm)) {
 	struct mman_unmap_kram_job *job, *res;
@@ -1094,12 +1110,10 @@ NOTHROW(FCALL lockop_kram_cb)(Toblockop(mman) *__restrict self,
 			return &job->mukj_post_lop_mm;
 		}
 	} else if (res != MMAN_UNMAP_KRAM_LOCKED_EX_ASYNC) {
-		/* Must re-queue as pending for the kernel mman. */
-		/* TODO: This must happen in a post-op so we don't end up in an infinite loop! */
-		res->mukj_lop_mm.olo_func = &lockop_kram_cb;
-		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
-		                    &res->mukj_lop_mm,
-		                    olo_link);
+		/* Must re-queue as pending for the kernel mman.
+		 * This must happen in a post-op so we don't end up in an infinite loop! */
+		res->mukj_post_lop_mm.oplo_func = &lockop_kram_async_cb;
+		return &res->mukj_post_lop_mm;
 	}
 	return NULL;
 }
