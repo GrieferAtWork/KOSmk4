@@ -1954,15 +1954,34 @@ PRIVATE union merge_all_parts_lop_desc merge_all_parts_lop = { { {}, NULL } };
  *                    destroyed.  Linked  via `_mp_dead' */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL merge_all_parts)(struct mpart_slist *__restrict deadparts) {
-	struct mpart *part;
-	LIST_FOREACH (part, &mpart_all_list, mp_allparts) {
-		if (!tryincref(part))
-			continue; /* Already destroyed... */
-		/* Try to merge the part... */
+	REF struct mpart *part, *next;
+	/* Acquire a reference to the first non-destroyed part. */
+	for (part = LIST_FIRST(&mpart_all_list);;) {
+		if (!part)
+			return;
+		if (tryincref(part))
+			break;
+		part = LIST_NEXT(part, mp_allparts);
+	}
+	for (;;) {
+		/* Find the next non-destroyed part,
+		 * and get a reference to it, too. */
+		next = LIST_NEXT(part, mp_allparts);
+		while (next && !tryincref(next))
+			next = LIST_NEXT(next, mp_allparts);
+
+		/* Try to merge the original part... */
 		part = mpart_merge(part);
+
 		/* Drop our reference to the part. */
 		if unlikely(ATOMIC_DECFETCH(part->mp_refcnt) == 0)
 			SLIST_INSERT(deadparts, part, _mp_dead);
+
+		/* Proceed with the next non-destroyed part,
+		 * to which we've previously acquire a ref. */
+		if (!next)
+			break;
+		part = next;
 	}
 }
 
