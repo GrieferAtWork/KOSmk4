@@ -373,28 +373,6 @@ struct mnode {
 
 
 
-/* Load the bounding set of page directory permissions with which
- * a given mem-nodes  should have its  backing memory be  mapped.
- * NOTE: The caller must ensure that `self->mn_part' is non-NULL,
- *       and  that  they  are  holding  a  lock  to  said   part!
- *
- * Write permissions which may have been requested by the node
- * are automatically removed for the purpose of copy-on-write:
- * >> result = mnode_getperm_force(self);
- * >> if (result & PAGEDIR_MAP_FWRITE) {
- * >>     if (self->mn_flags & MNODE_F_SHARED) {
- * >>         if (!mnode_issharewritable(self))
- * >>             result &= ~PAGEDIR_MAP_FWRITE;
- * >>     } else {
- * >>         if (!mnode_iscopywritable(self))
- * >>             result &= ~PAGEDIR_MAP_FWRITE;
- * >>     }
- * >> } */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
-NOTHROW(FCALL mnode_getperm_nouser)(struct mnode const *__restrict self);
-#define mnode_getperm(self) \
-	(mnode_getperm_nouser(self) | (mnode_isuser(self) ? PAGEDIR_MAP_FUSER : 0))
-
 /* Return mem-node paging  permissions, irregardless of  copy-on-write
  * semantics. - That is: allow write whenever the node requests write,
  * no matter who else might also be using the underlying mem-part. */
