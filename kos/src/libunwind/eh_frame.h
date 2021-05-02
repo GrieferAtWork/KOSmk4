@@ -194,8 +194,9 @@ libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTDEF NONNULL((1, 2, 4)) unsigned int CC
-libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
+INTDEF NONNULL((1, 2, 3, 5)) unsigned int CC
+libuw_unwind_fde_calculate_cfa(unwind_fde_t const *__restrict fde,
+                               unwind_cfa_value_t const *__restrict self,
                                unwind_getreg_t reg_getter,
                                void const *reg_callback_arg,
                                uintptr_t *__restrict presult);

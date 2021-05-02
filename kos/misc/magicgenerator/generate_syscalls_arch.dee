@@ -143,40 +143,9 @@ final global i386CfiClearDF = "0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0
 #define I386_SETDF_BEGIN(fp, enableExcept) if (enableExcept) fp << "\tstd /* Enable exceptions */\n";
 #define I386_SETDF_END(fp, enableExcept)   if (enableExcept) fp << "\tcld /* Disable exceptions */\n";
 final global i386SyscallArgumentRegisters = { "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" };
-function i386_printLibcSyscallSysenterCdeclInvocation(
+function i386_printLibcSyscall386CdeclInvocation(
 		fp: File, registerCount: int, enableExcept: bool) {
-	local preservedRegisters = ["%edi", "%ebp"];
-	if (registerCount > 0)
-		preservedRegisters.append("%ebx");
-	if (registerCount > 3)
-		preservedRegisters.append("%esi");
-	local spOffset = 4 * (1 + #preservedRegisters);
-	for (local x: preservedRegisters)
-		fp << "	" << "pushl_cfi_r " << x << "\n";
-	if (registerCount > 0) fp << "	" << "movl   " << (spOffset + 0) << "(%esp), %ebx\n";
-	if (registerCount > 1) fp << "	" << "movl   " << (spOffset + 4) << "(%esp), %ecx\n";
-	if (registerCount > 2) fp << "	" << "movl   " << (spOffset + 8) << "(%esp), %edx\n";
-	if (registerCount > 3) fp << "	" << "movl   " << (spOffset + 12) << "(%esp), %esi\n";
-	if (registerCount > 5) {
-		fp << "	" << "pushl_cfi " << (spOffset + 20) << "(%esp)\n";
-		fp << "	" << "pushl_cfi " << (spOffset + 20) << "(%esp)\n";
-	} else if (registerCount > 4) {
-		fp << "	" << "pushl_cfi " << (spOffset + 16) << "(%esp)\n";
-	}
-	I386_SETDF_BEGIN(fp, enableExcept)
-	fp << "	call   libc_x86_sysenter_common\n";
-	I386_SETDF_END(fp, enableExcept)
-	if (registerCount > 4) {
-		local off = 4 * (registerCount - 4);
-		fp << "	" << "addl   $(" << off << "), %esp\n";
-		fp << "	.cfi_adjust_cfa_offset -" << off << "\n";
-	}
-	for (local x: preservedRegisters.reversed())
-		fp << "	" << "popl_cfi_r " << x << "\n";
-}
-
-function i386_printLibcSyscallInt80CdeclInvocation(
-		fp: File, registerCount: int, enableExcept: bool) {
+	local conditionalX = enableExcept ? "X" : "";
 	local preservedRegisters = [];
 	if (registerCount > 0)
 		preservedRegisters.append("%ebx");
@@ -191,9 +160,7 @@ function i386_printLibcSyscallInt80CdeclInvocation(
 		fp << "	" << "pushl_cfi_r " << x << "\n";
 	for (local i: [:registerCount])
 		fp << "	" << "movl   " << (sp_offset + i * 4) << "(%esp), " << i386SyscallArgumentRegisters[i] << "\n";
-	I386_SETDF_BEGIN(fp, enableExcept)
-	fp << "	int    $(0x80)\n";
-	I386_SETDF_END(fp, enableExcept)
+	fp << "	call   libc___i386_" << conditionalX << "syscall\n";
 	for (local x: preservedRegisters.reversed())
 		fp << "	" << "popl_cfi_r " << x << "\n";
 }
@@ -208,25 +175,10 @@ function i386_printLibcSyscallWrapperPrefix(fp: File) {
 		local conditionalX = enableExcept ? "X" : "";
 		for (local registerCount: [1:6+1]) {
 			local name = "x86_exec_{}syscall{}".format({ conditionalX, registerCount });
-			fp << "#ifdef __OPTIMIZE_SIZE__\n";
 			fp << ".section .text.crt.syscalls\n";
-			fp << "#else /* __OPTIMIZE_SIZE__ */\n";
-			fp << ".section .xdata.crt.syscalls, \"awx\"\n";
-			fp << "#endif /* !__OPTIMIZE_SIZE__ */\n";
 			fp << "INTERN_FUNCTION(libc_" << name << ")\n";
 			fp << "	.cfi_startproc\n";
-			if (enableExcept)
-				fp << "	.cfi_escape " << i386CfiClearDF << "\n";
-			fp << "#ifndef __OPTIMIZE_SIZE__\n";
-			fp << "	call   libc_x86_syscall_check_sysenter\n";
-			fp << "	.byte  0x74\n";
-			fp << "	.reloc ., R_386_PC8, 1f\n";
-			fp << "	.byte  0xff /* jz 1f */\n";
-			i386_printLibcSyscallSysenterCdeclInvocation(fp, registerCount, enableExcept);
-			fp << "	ret\n";
-			fp << "1:\n";
-			fp << "#endif /* !__OPTIMIZE_SIZE__ */\n";
-			i386_printLibcSyscallInt80CdeclInvocation(fp, registerCount, enableExcept);
+			i386_printLibcSyscall386CdeclInvocation(fp, registerCount, enableExcept);
 			fp << "	ret\n";
 			fp << "	.cfi_endproc\n";
 			fp << "END(libc_" << name << ")\n";

@@ -237,11 +237,12 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP */
 
 	/* Step #1: Calculate the CFA (CanonicalFrameAddress) */
-	result = libuw_unwind_cfa_calculate_cfa(&self->cs_cfa,
+	result = libuw_unwind_fde_calculate_cfa(fde,
+	                                        &self->cs_cfa,
 	                                        reg_getter,
 	                                        reg_getter_arg,
 	                                        &cfa);
-	TRACE("unwind_cfa_apply():unwind_cfa_calculate_cfa() -> %u (%p)\n", result, cfa);
+	TRACE("unwind_cfa_apply():unwind_fde_calculate_cfa() -> %u (%p)\n", result, cfa);
 	if unlikely(result != UNWIND_SUCCESS)
 		goto done;
 	/* Apply new register values.
@@ -361,7 +362,8 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 				/* XXX: Wouldn't DW_OP_piece be used for this? */
 				ERRORF(err_noaddr_register, "regno=%u\n", (unsigned int)dw_regno);
 			}
-			result = execute_eh_frame_expression(rule->cr_expr,
+			result = execute_eh_frame_expression(fde,
+			                                     rule->cr_expr,
 			                                     reg_getter,
 			                                     reg_getter_arg,
 			                                     &reg_buf.addr,
@@ -374,7 +376,8 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 			break;
 
 		case DW_CFA_register_rule_expression:
-			result = execute_eh_frame_expression(rule->cr_expr,
+			result = execute_eh_frame_expression(fde,
+			                                     rule->cr_expr,
 			                                     reg_getter,
 			                                     reg_getter_arg,
 			                                     &reg_buf.addr,

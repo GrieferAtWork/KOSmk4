@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3cb3aa0 */
+/* HASH CRC-32:0x11925bac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,173 +29,57 @@
 EXTERN(libc_x86_sysenter_common)
 EXTERN(libc_x86_syscall_check_sysenter)
 
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_syscall1)
 	.cfi_startproc
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	call   libc_x86_sysenter_common
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
-	int    $(0x80)
+	call   libc___i386_syscall
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_syscall1)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_syscall2)
 	.cfi_startproc
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	movl   20(%esp), %ecx
-	call   libc_x86_sysenter_common
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
-	int    $(0x80)
+	call   libc___i386_syscall
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_syscall2)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_syscall3)
 	.cfi_startproc
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	movl   20(%esp), %ecx
-	movl   24(%esp), %edx
-	call   libc_x86_sysenter_common
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
 	movl   16(%esp), %edx
-	int    $(0x80)
+	call   libc___i386_syscall
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_syscall3)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_syscall4)
 	.cfi_startproc
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	call   libc_x86_sysenter_common
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	movl   12(%esp), %ebx
 	movl   16(%esp), %ecx
 	movl   20(%esp), %edx
 	movl   24(%esp), %esi
-	int    $(0x80)
+	call   libc___i386_syscall
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_syscall4)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_syscall5)
 	.cfi_startproc
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	pushl_cfi 36(%esp)
-	call   libc_x86_sysenter_common
-	addl   $(4), %esp
-	.cfi_adjust_cfa_offset -4
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	pushl_cfi_r %edi
@@ -204,45 +88,16 @@ INTERN_FUNCTION(libc_x86_exec_syscall5)
 	movl   24(%esp), %edx
 	movl   28(%esp), %esi
 	movl   32(%esp), %edi
-	int    $(0x80)
+	call   libc___i386_syscall
 	popl_cfi_r %edi
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_syscall5)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_syscall6)
 	.cfi_startproc
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	pushl_cfi 40(%esp)
-	pushl_cfi 40(%esp)
-	call   libc_x86_sysenter_common
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	pushl_cfi_r %edi
@@ -253,7 +108,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall6)
 	movl   32(%esp), %esi
 	movl   36(%esp), %edi
 	movl   40(%esp), %ebp
-	int    $(0x80)
+	call   libc___i386_syscall
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi
@@ -261,196 +116,57 @@ INTERN_FUNCTION(libc_x86_exec_syscall6)
 	ret
 	.cfi_endproc
 END(libc_x86_exec_syscall6)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_Xsyscall1)
 	.cfi_startproc
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	std /* Enable exceptions */
-	call   libc_x86_sysenter_common
-	cld /* Disable exceptions */
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
-	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	call   libc___i386_Xsyscall
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_Xsyscall1)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_Xsyscall2)
 	.cfi_startproc
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	movl   20(%esp), %ecx
-	std /* Enable exceptions */
-	call   libc_x86_sysenter_common
-	cld /* Disable exceptions */
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
-	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	call   libc___i386_Xsyscall
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_Xsyscall2)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_Xsyscall3)
 	.cfi_startproc
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	movl   20(%esp), %ecx
-	movl   24(%esp), %edx
-	std /* Enable exceptions */
-	call   libc_x86_sysenter_common
-	cld /* Disable exceptions */
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
 	movl   16(%esp), %edx
-	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	call   libc___i386_Xsyscall
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_Xsyscall3)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_Xsyscall4)
 	.cfi_startproc
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	std /* Enable exceptions */
-	call   libc_x86_sysenter_common
-	cld /* Disable exceptions */
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	movl   12(%esp), %ebx
 	movl   16(%esp), %ecx
 	movl   20(%esp), %edx
 	movl   24(%esp), %esi
-	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	call   libc___i386_Xsyscall
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_Xsyscall4)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_Xsyscall5)
 	.cfi_startproc
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	pushl_cfi 36(%esp)
-	std /* Enable exceptions */
-	call   libc_x86_sysenter_common
-	cld /* Disable exceptions */
-	addl   $(4), %esp
-	.cfi_adjust_cfa_offset -4
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	pushl_cfi_r %edi
@@ -459,50 +175,16 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall5)
 	movl   24(%esp), %edx
 	movl   28(%esp), %esi
 	movl   32(%esp), %edi
-	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	call   libc___i386_Xsyscall
 	popl_cfi_r %edi
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
 END(libc_x86_exec_Xsyscall5)
-#ifdef __OPTIMIZE_SIZE__
 .section .text.crt.syscalls
-#else /* __OPTIMIZE_SIZE__ */
-.section .xdata.crt.syscalls, "awx"
-#endif /* !__OPTIMIZE_SIZE__ */
 INTERN_FUNCTION(libc_x86_exec_Xsyscall6)
 	.cfi_startproc
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a
-#ifndef __OPTIMIZE_SIZE__
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	pushl_cfi 40(%esp)
-	pushl_cfi 40(%esp)
-	std /* Enable exceptions */
-	call   libc_x86_sysenter_common
-	cld /* Disable exceptions */
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-1:
-#endif /* !__OPTIMIZE_SIZE__ */
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	pushl_cfi_r %edi
@@ -513,9 +195,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall6)
 	movl   32(%esp), %esi
 	movl   36(%esp), %edi
 	movl   40(%esp), %ebp
-	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	call   libc___i386_Xsyscall
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi

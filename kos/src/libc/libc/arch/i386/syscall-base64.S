@@ -55,6 +55,7 @@ DEFINE_PUBLIC_ALIAS(__syscall, libc_syscall64)
 .section .text.crt.except.system.utility.Syscall
 INTERN_FUNCTION(libc_Syscall)
 	.cfi_startproc
+	.cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a /* Clear EFLAGS.DF on exit */
 	movq   %rdi,    %rax /* sysno */
 	movq   %rsi,    %rdi /* arg #0 */
 	movq   %rdx,    %rsi /* arg #1 */

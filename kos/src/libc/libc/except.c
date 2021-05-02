@@ -120,7 +120,7 @@ PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_ERROR_REGISTER_STATE     pdyn_unwind_s
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC                        pdyn_unwind_fde_exec = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY                       pdyn_unwind_cfa_apply = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA                    pdyn_unwind_fde_exec_cfa = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_CALCULATE_CFA               pdyn_unwind_cfa_calculate_cfa = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_CALCULATE_CFA               pdyn_unwind_fde_calculate_cfa = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC                pdyn_unwind_fde_landing_exec = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY               pdyn_unwind_cfa_landing_apply = NULL;
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
@@ -137,7 +137,7 @@ PRIVATE SECTION_EXCEPT_STRING char const name_unwind_setreg_error_register_state
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec[]                        = "unwind_fde_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_apply[]                       = "unwind_cfa_apply";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_cfa[]                    = "unwind_fde_exec_cfa";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_calculate_cfa[]               = "unwind_cfa_calculate_cfa";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_calculate_cfa[]               = "unwind_fde_calculate_cfa";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]                = "unwind_fde_landing_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]               = "unwind_cfa_landing_apply";
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
@@ -162,7 +162,7 @@ void LIBCCALL initialize_libunwind(void) {
 	BIND(pdyn_unwind_fde_exec, name_unwind_fde_exec);
 	BIND(pdyn_unwind_cfa_apply, name_unwind_cfa_apply);
 	BIND(pdyn_unwind_fde_exec_cfa, name_unwind_fde_exec_cfa);
-	BIND(pdyn_unwind_cfa_calculate_cfa, name_unwind_cfa_calculate_cfa);
+	BIND(pdyn_unwind_fde_calculate_cfa, name_unwind_fde_calculate_cfa);
 	BIND(pdyn_unwind_fde_landing_exec, name_unwind_fde_landing_exec);
 	BIND(pdyn_unwind_cfa_landing_apply, name_unwind_cfa_landing_apply);
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
@@ -195,7 +195,7 @@ err_init_failed:
 #define unwind_fde_exec                    (*pdyn_unwind_fde_exec)
 #define unwind_cfa_apply                   (*pdyn_unwind_cfa_apply)
 #define unwind_fde_exec_cfa                (*pdyn_unwind_fde_exec_cfa)
-#define unwind_cfa_calculate_cfa           (*pdyn_unwind_cfa_calculate_cfa)
+#define unwind_fde_calculate_cfa           (*pdyn_unwind_fde_calculate_cfa)
 #define unwind_fde_landing_exec            (*pdyn_unwind_fde_landing_exec)
 #define unwind_cfa_landing_apply           (*pdyn_unwind_cfa_landing_apply)
 #define unwind_fde_sigframe_exec           (*pdyn_unwind_fde_sigframe_exec)
@@ -848,7 +848,8 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restric
 	                                   __ERROR_REGISTER_STATE_TYPE_RDPC(*self->uc_state));
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		return 0;
-	unwind_error = unwind_cfa_calculate_cfa(&cfa, &unwind_getreg_error_register_state,
+	unwind_error = unwind_fde_calculate_cfa(&self->uc_fde, &cfa,
+	                                        &unwind_getreg_error_register_state,
 	                                        &self->uc_state, &result);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		return 0;

@@ -28,105 +28,196 @@
 #include <asm/instr/ttest.h>
 #include <sys/syscall.h>
 
+#include <hybrid/wordbits.h>
+
+#include <libdebuginfo/dwarf.h>
+#include <libunwind/cfi.h>
+
+
+/* ========= __i386_syscall design =========
+ *
+ * Before sysenter compatibility check:
+ *     >>     nop                          // 0x90
+ *     >> __i386_syscall:
+ *     >>     pushl  %ebp                  // 0x55
+ *     >>     pushl  %edi                  // 0x57
+ *     >>     call   libc_x86_syscall_init // 0xe8, ?, ?, ?, ?
+ *     >>     popl   %edi
+ *     >>     popl   %ebp
+ *     >>     ret
+ *     >> __i386_Xsyscall:
+ *     >>     std                          // 0xfd
+ *     >>     pushl  %ebp                  // 0x55
+ *     >>     pushl  %edi                  // 0x57
+ *     >>     call   libc_x86_syscall_init // 0xe8, ?, ?, ?, ?
+ *     >>     popl   %edi
+ *     >>     popl   %ebp
+ *     >>     cld
+ *     >>     ret
+ *
+ * With sysenter:
+ *     >>     nop                          // 0x90
+ *     >> __i386_syscall:
+ *     >>     pushl  %ebp                  // 0x55
+ *     >>     pushl  %edi                  // 0x57
+ *     >>     call   libc_x86_sysenter_common
+ *     >>     popl   %edi
+ *     >>     popl   %ebp
+ *     >>     ret
+ *     >> __i386_Xsyscall:
+ *     >>     std                          // 0xfd
+ *     >>     pushl  %ebp                  // 0x55
+ *     >>     pushl  %edi                  // 0x57
+ *     >>     call   libc_x86_sysenter_common
+ *     >>     popl   %edi
+ *     >>     popl   %ebp
+ *     >>     cld
+ *     >>     ret
+ *
+ * Without sysenter:
+ *     >>     nop                          // 0x90
+ *     >> __i386_syscall:
+ *     >>     int    $0x80                 // 0xcd, 0x80
+ *     >>     ret                          // 0xc3
+ *     >>     nop
+ *     >>     FAULTY*
+ *     >> __i386_Xsyscall:
+ *     >>     std                          // 0xfd
+ *     >>     int    $0x80                 // 0xcd, 0x80
+ *     >>     cld                          // 0xfc
+ *     >>     ret                          // 0xc3
+ *     >>     FAULTY*
+ *
+ * As such, `libc_x86_syscall_init' can be implemented as:
+ * >> return_pc = 0(%esp);
+ * >> if (SYSENTER_AVAILABLE) {
+ * >>     *(s32 *)(return_pc - 4) = libc_x86_sysenter_common - return_pc;
+ * >> } else {
+ * >>     if (*(u8 *)(return_pc - 8) == 0xfd) { // std
+ * >>         *(u32 *)(return_pc - 7) = ENCODE_INT32(0xcd, 0x80, 0xfc, 0xc3); // int $0x80; cld; ret;
+ * >>     } else {
+ * >>         *(u32 *)(return_pc - 7) = ENCODE_INT32(0xcd, 0x80, 0xc3, 0x90); // int $0x80; ret; nop;
+ * >>     }
+ * >> }
+ * >> RESTORE_REGISTERS(WITHOUT: EFLAGS_DF);
+ * >> JUMP_TO(PC: return_pc - 7);
+ *
+ * How  to  encode  CFI  instrumentation?   The  only  real  way   I  see  is  to   use:
+ * >> .cfi_escape DW_OP_GNU_encoded_addr, DW_EH_PE_funcrel | DW_EH_PE_uleb128, 0 // or 1
+ * >> .cfi_escape DW_OP_deref_size, 1  // *(u8 *)__i386_syscall
+ * >> .cfi_escape DW_OP_const1u, 0xcd  // *(u8 *)__i386_syscall, 0xcd
+ * >> .cfi_escape DW_OP_eq             // *(u8 *)__i386_syscall == 0xcd ? 1 : 0
+ * >> .cfi_escape DW_OP_bra, ?, ?      // JUMP_IF_INT80_MODE_ENABLED
+ *
+ * Then,  custom CFI expressions can be encoded to restore %esp, and
+ * unwind %ebp and %edi  conditionally for those PC-locations  where
+ * the INT80 and SYSENTER variants overlap, and don't share the same
+ * register unwind / sp-offset behavior.
+ */
+
 .section .text.crt.syscall.selector
-INTERN_FUNCTION(libc_x86_syscall_check_sysenter)
+INTERN_FUNCTION(libc_x86_syscall_init)
 	.cfi_startproc
+	/* Right now, our stack looks like this:
+	 *    sp[...]      -- Unrelated / undefined
+	 *    sp[0xc..0xf] -- Return address of `libc___i386_syscall' or `libc___i386_Xsyscall'
+	 *    sp[0x8..0xb] -- Copy of `%ebp'
+	 *    sp[0x4..0x7] -- Copy of `%edi'
+	 *    sp[0x0..0x3] -- Either `libc___i386_syscall + 7' or `libc___i386_Xsyscall + 8'
+	 *
+	 * All other registers are already set-up for a int80-compatible system call.
+	 *
+	 * Because our caller eventually intends to perform a system call, we must also
+	 * make sure to save _all_ registers (including %eflags) which we may otherwise
+	 * clobber, so do this first! */
+	pushfl_cfi_r
 	pushl_cfi_r %eax
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
 	pushl_cfi_r %ebx
+
+	/* Check if the CPU has support for `sysenter' */
 	movl   $(1), %eax
 	cpuid
-	movl   16(%esp), %ebx /* Return address */
 	ttest  mask=CPUID_1D_SEP, loc=%edx
-	jz    .Lnot_supported
-	/* if (Family == 6 && Model < 3 && Stepping < 3)
-	 *     goto .Lnot_supported; */
+	jz     .Lenable_int80h                               /* if (!CPUID_1D_SEP) goto .Lenable_int80h; */
+
+	/* Deal with the special case documented in the Intel manuals:
+	 * >> if (Family == 6 && Model < 3 && Stepping < 3)
+	 * >>     SYSENTER_ACTUALLY_NOT_SUPPORTED();
+	 */
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_FAMILY_M), %ecx
 	cmpl   $(6 << CPUID_1A_FAMILY_S), %ecx
-	jne    .Lis_supported  /* if (Family != 6) goto .Lis_supported; */
+	jne    .Lenable_sysenter                             /* if (Family != 6) goto .Lenable_sysenter; */
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_MODEL_M), %ecx
 #if CPUID_1A_MODEL_S != 0
 	shrl   $(CPUID_1A_MODEL_S), %ecx
 #endif /* CPUID_1A_MODEL_S != 0 */
 	cmpl   $(3), %ecx
-	jae    .Lis_supported  /* if (Model >= 3) goto .Lis_supported; */
+	jae    .Lenable_sysenter                             /* if (Model >= 3) goto .Lenable_sysenter; */
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_STEPPING_M), %ecx
 #if CPUID_1A_STEPPING_S != 0
 	shrl   $(CPUID_1A_STEPPING_S), %ecx
 #endif /* CPUID_1A_STEPPING_S != 0 */
 	cmpl   $(3), %ecx
-	/* if (Stepping >= 3) goto .Lis_supported; */
-	/* if (Stepping < 3) goto .Lnot_supported; */
-	jb     .Lnot_supported
-.Lis_supported:
-	.cfi_remember_state
-	/* Override call to this function:
-	 * ORIGNAL  (8  bytes  of   code):
-	 *    E8    ?? ?? ?? ??    # call  libc_x86_syscall_check_sysenter
-	 * %ebx:
-	 *    74    ??             # jz    1f
-	 *    ??                   # ...
-	 * OVERRIDE:
-	 *    90    90 90 90 90    # nop ...
-	 * %ebx:
-	 *    90    90             # nop ...
-	 *    ??
-	 */
-	movzbl 2(%ebx), %eax
-	shll   $(24), %eax
-	orl    $(0x00909090), %eax
-	pushl_cfi  %eax
-	pushl_cfi  $(0x90909090)
-	fildll (%esp)
-	fistpll -5(%ebx) /* Override the selector code */
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	/* Adjust the return address */
-	addl   $(2), 16(%esp)
-	popl_cfi_r %ebx
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi_r %eax
-	ret
-.Lnot_supported:
-	.cfi_restore_state
-	/* Override call to this function:
-	 * ORIGNAL  (8  bytes  of   code):
-	 *    E8    ?? ?? ?? ??    # call  libc_x86_syscall_check_sysenter
-	 * %ebx:
-	 *    74    ??             # jz    1f
-	 *    ??                   # ...
-	 * OVERRIDE:
-	 *    EB    ??             # jmp   1f
-	 *    00    00 00 00 00 00 # ...
-	 */
-	xorl   %eax, %eax
-	movb   1(%ebx), %ah   /* Operand of `jz' */
-	addb   $(5), %ah        /* Adjust for additional offset */
-	movb   $(0xeb), %al
-	pushl_cfi $(0)
-	pushl_cfi %eax
-	/* Atomically re-write the call to our function. */
-	fildll (%esp)
-	fistpll -5(%ebx) /* Override the selector code */
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	/* Adjust the return address */
-	subb   $(4), %ah
-	movzbl %ah, %eax
-	addl   %eax, 16(%esp)
-	popl_cfi_r %ebx
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi_r %eax
-	ret
-	.cfi_endproc
-END(libc_x86_syscall_check_sysenter)
 
+	/* if (Stepping >= 3) goto .Lenable_sysenter; */
+	/* if (Stepping < 3) goto .Lenable_int80h; */
+	jb     .Lenable_int80h
+
+
+	/* Enable support for `sysenter' */
+	.cfi_remember_state
+.Lenable_sysenter:
+	call   1f
+	.cfi_adjust_cfa_offset 4
+1:	popl_cfi %ebx
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx     /* %ebx = &_GLOBAL_OFFSET_TABLE_; */
+	leal   libc_x86_sysenter_common@GOTOFF(%ebx), %eax   /* %eax = &libc_x86_sysenter_common; */
+	movl   20(%esp), %edx                                /* %edx = return_pc; */
+	subl   %edx, %eax                                    /* %eax = &libc_x86_sysenter_common - return_pc; */
+	/* Re-write the target of the `call' instruction that got us
+	 * here  to instead link up with `libc_x86_sysenter_common',
+	 * thus causing all future calls to bypass our function, and
+	 * immediatly invoke `sysenter' */
+	movl   %eax, -4(%edx)                                /* *(s32 *)(return_pc - 4) = (&libc_x86_sysenter_common - return_pc); */
+	cpuid                                                /* __flush_instruction_cache(); */
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi_r %eax
+	popfl_cfi_r
+	jmp    libc_x86_sysenter_common
+
+	/* Use int80h to implement syscall support. */
+	.cfi_restore_state
+.Lenable_int80h:
+	movl   20(%esp), %edx                                /* %edx = return_pc; */
+	movl   $(ENCODE_INT32(0xcd, 0x80, 0xc3, 0x90)), %eax /* %eax = { int $0x80; ret; nop; }; */
+	movl   $(ENCODE_INT32(0xcd, 0x80, 0xfc, 0xc3)), %ecx /* %ecx = { int $0x80; cld; ret; }; */
+	cmpb   $(0xfd), -8(%edx)                             /* return_pc[-8] == 0xfd; */
+	cmove  %ecx, %eax                                    /* if (return_pc[-8] == 0xfd) %eax = { int $0x80; cld; ret; }; */
+	/* Rewrite the `pushl %ebp'  and `pushl %edi',  as well as  the first  2
+	 * bytes of the `call' instruction of `libc_x86_syscall_init()' with the
+	 * instruction sequence  `int $0x80; ret; nop' or  `int $0x80; cld; ret' */
+	movl   %eax, -7(%edx)                                /* return_pc[-7...-4] = %eax; */
+	cpuid                                                /* __flush_instruction_cache(); */
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi_r %eax
+	popfl_cfi_r
+	popl_cfi %ebp         /* %ebp = return_pc */
+	/* Adjust this function's return_pc to point at the `int $0x80' instruction that we just wrote! */
+	leal   -7(%ebp), %ebp /* %ebp = return_pc-7 */
+	popl_cfi %edi         /* %edi = CALLER_SAVED_EDI */
+	xchgl  %ebp, 0(%esp)  /* %ebp = CALLER_SAVED_EBP */
+	ret                   /* Return to `return_pc-7' */
+	.cfi_endproc
+END(libc_x86_syscall_init)
 
 
 .section .text.crt.syscall.x86_sysenter_common
@@ -139,62 +230,155 @@ INTERN_FUNCTION(libc_x86_sysenter_common)
 	.cfi_endproc
 END(libc_x86_sysenter_common)
 
+/* Restore: `%esp = INT80_ENABLED ? (%esp + int80_sp_offset) : (%esp + sysenter_sp_offset)' */
+#define CFI_RESTORE_ESP(int80_sp_offset, sysenter_sp_offset)                                                   \
+	.cfi_escape DW_CFA_val_expression, CFI_386_UNWIND_REGISTER_ESP, 15;                                        \
+	.cfi_escape DW_OP_breg0 + CFI_386_UNWIND_REGISTER_ESP, int80_sp_offset; /* CFI: [%esp+*] */                \
+	.cfi_escape DW_OP_GNU_encoded_addr, DW_EH_PE_funcrel | DW_EH_PE_uleb128, _CFI_FUNBASE_OFFSET;              \
+	                                                      /* CFI: [%esp+*, libc___i386_Xsyscall + 1] */        \
+	.cfi_escape DW_OP_deref_size, 1;                      /* CFI: [%esp+*, libc___i386_Xsyscall[1]] */         \
+	.cfi_escape DW_OP_const1u, 0xcd;                      /* CFI: [%esp+*, libc___i386_Xsyscall[1], 0xcd] */   \
+	.cfi_escape DW_OP_eq;                                 /* CFI: [%esp+*, libc___i386_Xsyscall[1] == 0xcd] */ \
+	.cfi_escape DW_OP_bra, 0x02, 0x00;                    /* if (INT80_ENABLED) goto 1f; */                    \
+	.cfi_escape DW_OP_plus_uconst, (sysenter_sp_offset - int80_sp_offset) /* CFI: [%esp+*] */
 
-INTERN(libc_x86_syscall_check_sysenter)
+/* Restore: `%regno = INT80_ENABLED ? *(u32 *)(%esp + 0) : *(u32 *)(%esp + sp_offset)' */
+#define CFI_RESTORE_FROM_ESP(regno, int80_sp_offset, sysenter_sp_offset)                                     \
+	.cfi_escape DW_CFA_expression, regno, 15;                                                                \
+	.cfi_escape DW_OP_breg0 + CFI_386_UNWIND_REGISTER_ESP, int80_sp_offset; /* CFI: [%esp] */                \
+	.cfi_escape DW_OP_GNU_encoded_addr, DW_EH_PE_funcrel | DW_EH_PE_uleb128, _CFI_FUNBASE_OFFSET;            \
+	                                                      /* CFI: [%esp, libc___i386_Xsyscall + 1] */        \
+	.cfi_escape DW_OP_deref_size, 1;                      /* CFI: [%esp, libc___i386_Xsyscall[1]] */         \
+	.cfi_escape DW_OP_const1u, 0xcd;                      /* CFI: [%esp, libc___i386_Xsyscall[1], 0xcd] */   \
+	.cfi_escape DW_OP_eq;                                 /* CFI: [%esp, libc___i386_Xsyscall[1] == 0xcd] */ \
+	.cfi_escape DW_OP_bra, 0x02, 0x00;                    /* if (INT80_ENABLED) goto 1f; */                  \
+	.cfi_escape DW_OP_plus_uconst, (sysenter_sp_offset - int80_sp_offset) /* CFI: [%esp + *] */
+
+/* Restore: `%regno = INT80_ENABLED ? %regno : *(u32 *)(%esp + sp_offset)' */
+#define CFI_SYSENTER_RESTORE_FROM_ESP(regno, sp_offset)                                                        \
+	.cfi_escape DW_CFA_val_expression, regno, 17;                                                              \
+	.cfi_escape DW_OP_breg0 + regno, 0;                   /* CFI: [%regno] */                                  \
+	.cfi_escape DW_OP_GNU_encoded_addr, DW_EH_PE_funcrel | DW_EH_PE_uleb128, _CFI_FUNBASE_OFFSET;              \
+	                                                      /* CFI: [%regno, libc___i386_Xsyscall + 1] */        \
+	.cfi_escape DW_OP_deref_size, 1;                      /* CFI: [%regno, libc___i386_Xsyscall[1]] */         \
+	.cfi_escape DW_OP_const1u, 0xcd;                      /* CFI: [%regno, libc___i386_Xsyscall[1], 0xcd] */   \
+	.cfi_escape DW_OP_eq;                                 /* CFI: [%regno, libc___i386_Xsyscall[1] == 0xcd] */ \
+	.cfi_escape DW_OP_bra, 0x04, 0x00;                    /* if (INT80_ENABLED) goto 1f; */                    \
+	.cfi_escape DW_OP_drop;                               /* CFI: [] */                                        \
+	.cfi_escape DW_OP_breg0 + CFI_386_UNWIND_REGISTER_ESP, sp_offset;                                          \
+	                                                      /* CFI: [%esp + sp_offset] */                        \
+	.cfi_escape DW_OP_deref                               /* CFI: [*(u32 *)%esp] */
+
 
 .section .xdata.crt.syscall.__i386_syscall, "awx"
+	.align 16                /* Align by a whole cacheline */
+	/* NOTE: Technically, this `0x90' only has to be something that isn't `0xfd'! */
+	.byte  0x90              /* nop                             nop           */
 INTERN_FUNCTION(libc___i386_syscall)
+#define _CFI_FUNBASE_OFFSET 0
 	.cfi_startproc
-	/* Check  if host supports the `sysenter' instruction,
-	 * and re-write this code during the first invocation. */
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
 
-	pushl_cfi_r %ebp
-	pushl_cfi_r %edi
+	.byte  0x55              /* pushl  %ebp                     int $0x80     */
+	CFI_SYSENTER_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EBP, 0)  /* CFI: %ebp = INT80_ENABLED ? %ebp : *(u32 *)(%esp + 0) */
+	CFI_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EIP, 0, 4)        /* CFI: %eip = INT80_ENABLED ? *(u32 *)(%esp + 0) : *(u32 *)(%esp + 4) */
+	CFI_RESTORE_ESP(4, 8)                                          /* CFI: %esp = INT80_ENABLED ? %esp+4 : %esp+8 */
 
-	call   libc_x86_sysenter_common
+	.byte  0x57              /* pushl  %edi                     ...           */
+	CFI_SYSENTER_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EDI, 0)  /* CFI: %edi = INT80_ENABLED ? %edi : *(u32 *)(%esp + 0) */
+	CFI_SYSENTER_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EBP, 4)  /* CFI: %ebp = INT80_ENABLED ? %ebp : *(u32 *)(%esp + 4) */
+	CFI_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EIP, 0, 8)        /* CFI: %eip = INT80_ENABLED ? *(u32 *)(%esp + 0) : *(u32 *)(%esp + 8) */
+	CFI_RESTORE_ESP(4, 12)                                         /* CFI: %esp = INT80_ENABLED ? %esp+4 : %esp+12 */
 
-	popl_cfi_r %edi
-	popl_cfi_r %ebp
+	.byte  0xe8              /* call libc_x86_syscall_init      ret           */
+	.reloc ., R_386_PC32, libc_x86_syscall_init
+	.byte  -4                /* ...                             nop           */
+#ifndef __OPTIMIZE_SIZE__
+	/* From this point forth, the remainder of the function is SYSENTER-only!
+	 * And  because we havn't  reached the "normal"  return address used when
+	 * unwinding system calls that  throw exceptions, assign CFI  expressions
+	 * to unwind registers that can be executed faster than the above! */
+	.cfi_reg_offset %edi, 0, %esp  /* %edi = [%esp + 0] */
+	.cfi_reg_offset %ebp, 4, %esp  /* %ebp = [%esp + 4] */
+	.cfi_reg_offset %eip, 8, %esp  /* %eip = [%esp + 8] */
+	.cfi_reg_value  %esp, 12, %esp /* %esp = %esp + 12 */
+#endif /* __OPTIMIZE_SIZE__ */
+	.byte  0xff              /* ...                                           */
+	.byte  0xff              /* ...                                           */
+	.byte  0xff              /* ...                                           */
 
-	ret
-
-1:	int    $(0x80)
+	popl   %edi
+	.cfi_same_value %edi
+	.cfi_reg_offset %ebp, 0, %esp  /* %ebp = [%esp + 0] */
+	.cfi_reg_offset %eip, 4, %esp  /* %eip = [%esp + 4] */
+	.cfi_reg_value  %esp, 8, %esp  /* %esp = %esp + 8 */
+	popl   %ebp
+	.cfi_same_value %edi
+	.cfi_reg_offset %eip, 0, %esp  /* %eip = [%esp + 0] */
+	.cfi_reg_value  %esp, 4, %esp  /* %esp = %esp + 4 */
 	ret
 	.cfi_endproc
+#undef _CFI_FUNBASE_OFFSET
 END(libc___i386_syscall)
 
 .section .xdata.crt.syscall.__i386_Xsyscall, "awx"
+	.align 16                /* Align by a whole cacheline */
 INTERN_FUNCTION(libc___i386_Xsyscall)
+#define _CFI_FUNBASE_OFFSET 1
 	.cfi_startproc
-	/* Check  if host supports the `sysenter' instruction,
-	 * and re-write this code during the first invocation. */
-	call   libc_x86_syscall_check_sysenter
-	.byte  0x74
-	.reloc ., R_386_PC8, 1f
-	.byte  0xff /* jz 1f */
+	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a /* Clear EFLAGS.DF */
+	.byte  0xfd              /* std                             std           */
 
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
+	.byte  0x55              /* pushl  %ebp                     int $0x80     */
+	CFI_SYSENTER_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EBP, 0)  /* CFI: %ebp = INT80_ENABLED ? %ebp : *(u32 *)(%esp + 0) */
+	CFI_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EIP, 0, 4)        /* CFI: %eip = INT80_ENABLED ? *(u32 *)(%esp + 0) : *(u32 *)(%esp + 4) */
+	CFI_RESTORE_ESP(4, 8)                                          /* CFI: %esp = INT80_ENABLED ? %esp+4 : %esp+8 */
 
-	std /* Enable exceptions */
-	call   libc_x86_sysenter_common
-	cld /* Disable exceptions */
+	.byte  0x57              /* pushl  %edi                     ...           */
+	CFI_SYSENTER_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EDI, 0)  /* CFI: %edi = INT80_ENABLED ? %edi : *(u32 *)(%esp + 0) */
+	CFI_SYSENTER_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EBP, 4)  /* CFI: %ebp = INT80_ENABLED ? %ebp : *(u32 *)(%esp + 4) */
+	CFI_RESTORE_FROM_ESP(CFI_386_UNWIND_REGISTER_EIP, 0, 8)        /* CFI: %eip = INT80_ENABLED ? *(u32 *)(%esp + 0) : *(u32 *)(%esp + 8) */
+	CFI_RESTORE_ESP(4, 12)                                         /* CFI: %esp = INT80_ENABLED ? %esp+4 : %esp+12 */
 
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
+	.byte  0xe8              /* call libc_x86_syscall_init      cld           */
+	.reloc ., R_386_PC32, libc_x86_syscall_init
+	.byte  -4                /* ...                             ret           */
+#ifndef __OPTIMIZE_SIZE__
+	/* From this point forth, the remainder of the function is SYSENTER-only!
+	 * And  because we havn't  reached the "normal"  return address used when
+	 * unwinding system calls that  throw exceptions, assign CFI  expressions
+	 * to unwind registers that can be executed faster than the above! */
+	.cfi_reg_offset %edi, 0, %esp  /* %edi = [%esp + 0] */
+	.cfi_reg_offset %ebp, 4, %esp  /* %ebp = [%esp + 4] */
+	.cfi_reg_offset %eip, 8, %esp  /* %eip = [%esp + 8] */
+	.cfi_reg_value  %esp, 12, %esp /* %esp = %esp + 12 */
+#endif /* __OPTIMIZE_SIZE__ */
+	.byte  0xff              /* ...                                           */
+	.byte  0xff              /* ...                                           */
+	.byte  0xff              /* ...                                           */
 
-	ret
-
-1:	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	popl   %edi
+	.cfi_same_value %edi
+	.cfi_reg_offset %ebp, 0, %esp  /* %ebp = [%esp + 0] */
+	.cfi_reg_offset %eip, 4, %esp  /* %eip = [%esp + 4] */
+	.cfi_reg_value  %esp, 8, %esp  /* %esp = %esp + 8 */
+	popl   %ebp
+	.cfi_same_value %edi
+	.cfi_reg_offset %eip, 0, %esp  /* %eip = [%esp + 0] */
+	.cfi_reg_value  %esp, 4, %esp  /* %esp = %esp + 4 */
+	cld
 	ret
 	.cfi_endproc
+#undef _CFI_FUNBASE_OFFSET
 END(libc___i386_Xsyscall)
+
+#undef CFI_SYSENTER_RESTORE_FROM_ESP
+#undef CFI_RESTORE_FROM_ESP
+#undef CFI_RESTORE_ESP
+
+
+
+
+
 
 .section .text.crt.system.utility.syscall
 INTERN_FUNCTION(libc_syscall)
@@ -210,7 +394,7 @@ INTERN_FUNCTION(libc_syscall)
 	movl   36(%esp), %esi /* arg #3 */
 	movl   40(%esp), %edi /* arg #4 */
 	movl   44(%esp), %ebp /* arg #5 */
-	int    $(0x80)
+	call   libc___i386_syscall
 	cmpl   $-4096, %eax /* Check for error. */
 	ja     1f
 	.cfi_remember_state
@@ -252,9 +436,7 @@ INTERN_FUNCTION(libc_Syscall)
 	movl   36(%esp), %esi /* arg #3 */
 	movl   40(%esp), %edi /* arg #4 */
 	movl   44(%esp), %ebp /* arg #5 */
-	std /* Enable exceptions */
-	int    $(0x80)
-	cld /* Disable exceptions */
+	call   libc___i386_Xsyscall
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi

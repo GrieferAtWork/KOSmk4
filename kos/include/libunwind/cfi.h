@@ -274,8 +274,8 @@
 /*      DW_OP_                     0xaa  * ... */
 /*      DW_OP_                     ...   * ... */
 /*      DW_OP_                     0xdf  * ... */
-#define DW_OP_lo_user              0xe0 /* First user-defined (or rather: GNU extension) opcode */
-#define DW_OP_hi_user              0xff /* Last user-defined (or rather: GNU extension) opcode */
+#define DW_OP_lo_user              0xe0 /* First user-defined opcode */
+#define DW_OP_hi_user              0xff /* Last user-defined opcode */
 
 
 /* DW Opcode extensions. */
@@ -661,6 +661,7 @@ typedef struct unwind_emulator_struct {
 	                                                * When   set   to   ZERO(0),   this   value   is   calculated   as-needed,    using:
 	                                                *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
 	                                                *  - unwind_fde_exec(...) */
+	__uintptr_t             ue_funbase;            /* [0..1] Function base address (or `0' if not yet calculated) */
 	struct di_debuginfo_compile_unit_simple_struct const
 	                       *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used
 	                                                * are  listed  in the  documentation  of `debuginfo_location_getvalue()') */

@@ -438,14 +438,16 @@ unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict __self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef __ATTR_NONNULL((1, 2, 4)) unsigned int
-(LIBUNWIND_CC *PUNWIND_CFA_CALCULATE_CFA)(unwind_cfa_value_t const *__restrict __self,
+typedef __ATTR_NONNULL((1, 2, 3, 5)) unsigned int
+(LIBUNWIND_CC *PUNWIND_FDE_CALCULATE_CFA)(unwind_fde_t const *__restrict __fde,
+                                          unwind_cfa_value_t const *__restrict __self,
                                           unwind_getreg_t __reg_getter,
                                           void const *__reg_getter_arg,
                                           __uintptr_t *__restrict __presult);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int LIBUNWIND_CC
-unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict __self,
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3, 5)) unsigned int LIBUNWIND_CC
+unwind_fde_calculate_cfa(unwind_fde_t const *__restrict __fde,
+                         unwind_cfa_value_t const *__restrict __self,
                          unwind_getreg_t __reg_getter,
                          void const *__reg_getter_arg,
                          __uintptr_t *__restrict __presult);

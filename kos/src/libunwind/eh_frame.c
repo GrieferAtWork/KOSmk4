@@ -342,8 +342,9 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
 	return error;
 }
 
-PRIVATE NONNULL((1, 2, 4)) unsigned int CC
-execute_eh_frame_expression(byte_t const *__restrict expression_pointer,
+PRIVATE NONNULL((1, 2, 3, 5)) unsigned int CC
+execute_eh_frame_expression(unwind_fde_t const *__restrict fde,
+                            byte_t const *__restrict expression_pointer,
                             unwind_getreg_t reg_getter,
                             void const *reg_callback_arg,
                             uintptr_t *__restrict presult,
@@ -361,6 +362,7 @@ execute_eh_frame_expression(byte_t const *__restrict expression_pointer,
 	emulator.ue_addrsize       = sizeof(void *);
 	emulator.ue_bjmprem        = UNWIND_EMULATOR_BJMPREM_DEFAULT;
 	emulator.ue_call_frame_cfa = cfa_value;
+	emulator.ue_funbase        = (uintptr_t)fde->f_pcstart;
 	emulator.ue_tlsbase        = (byte_t *)-1;
 	top.s_type   = UNWIND_STE_CONSTANT;
 	top.s_uconst = cfa_value;
@@ -382,8 +384,9 @@ STATIC_ASSERT(CFI_REGISTER_SIZE(CFI_UNWIND_REGISTER_PC) == sizeof(void *));
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN NONNULL((1, 2, 4)) unsigned int CC
-libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
+INTERN NONNULL((1, 2, 3, 5)) unsigned int CC
+libuw_unwind_fde_calculate_cfa(unwind_fde_t const *__restrict fde,
+                               unwind_cfa_value_t const *__restrict self,
                                unwind_getreg_t reg_getter,
                                void const *reg_callback_arg,
                                uintptr_t *__restrict presult) {
@@ -398,11 +401,10 @@ libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
 		*presult += self->cv_value;
 	} else if (self->cv_type == UNWIND_CFA_VALUE_EXPRESSION) {
 		/* Use a CFI emulator to calculate the CFA base value. */
-		return execute_eh_frame_expression(self->cv_expr,
+		return execute_eh_frame_expression(fde, self->cv_expr,
 		                                   reg_getter,
 		                                   reg_callback_arg,
-		                                   presult,
-		                                   0);
+		                                   presult, 0);
 	} else {
 		*presult = 0;
 	}
@@ -1092,7 +1094,7 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_exec_cfa, libuw_unwind_fde_exec_cfa);
 DEFINE_PUBLIC_ALIAS(unwind_cfa_apply, libuw_unwind_cfa_apply);
 DEFINE_PUBLIC_ALIAS(unwind_cfa_landing_apply, libuw_unwind_cfa_landing_apply);
 DEFINE_PUBLIC_ALIAS(unwind_cfa_sigframe_apply, libuw_unwind_cfa_sigframe_apply);
-DEFINE_PUBLIC_ALIAS(unwind_cfa_calculate_cfa, libuw_unwind_cfa_calculate_cfa);
+DEFINE_PUBLIC_ALIAS(unwind_fde_calculate_cfa, libuw_unwind_fde_calculate_cfa);
 
 DECL_END
 

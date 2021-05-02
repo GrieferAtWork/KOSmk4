@@ -53,6 +53,7 @@
 
 #include "cfi.h"
 #include "eh_frame.h"
+#include "unwind.h"
 
 #ifndef __KERNEL__
 #include <hybrid/atomic.h>
@@ -344,10 +345,12 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	} pc_buf;
 	if unlikely(!self->ue_sectinfo)
 		goto err_no_cfa;
+
 	/* Load the current program counter position. */
 	error = (*self->ue_regget)(self->ue_regget_arg, CFI_UNWIND_REGISTER_PC, pc_buf.buf);
 	if unlikely(error != UNWIND_SUCCESS)
 		ERRORF(err, "%u\n", error);
+
 	/* Search for an FDE descriptor for the program counter within the .eh_frame section. */
 	error = libuw_unwind_fde_scan(self->ue_sectinfo->ues_eh_frame_start,
 	                              self->ue_sectinfo->ues_eh_frame_end,
@@ -360,11 +363,13 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 		if (self->ue_sectinfo->ues_debug_frame_start >=
 		    self->ue_sectinfo->ues_debug_frame_end)
 			goto err_no_cfa;
+
 #ifndef __KERNEL__
 		/* Lazily load libdebuginfo.so, so we can parser the .debug_info section */
 		if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
 			goto err_no_cfa;;
 #endif /* !__KERNEL__ */
+
 		/* Also search the `.debug_frame' section, using `unwind_fde_scan_df()' */
 		error = unwind_fde_scan_df(self->ue_sectinfo->ues_debug_frame_start,
 		                           self->ue_sectinfo->ues_debug_frame_end,
@@ -374,13 +379,15 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 		if unlikely(error != UNWIND_SUCCESS)
 			goto done;
 	}
+
 	/* Evaluate the FDE program to extract the CFA descriptor. */
 	error = libuw_unwind_fde_exec_cfa(&fde, &cfa, pc_buf.pc);
 	if unlikely(error != UNWIND_SUCCESS)
 		goto done;
+
 	/* Calculate the absolute address of the associated CFA,
 	 * and store  the  result  in  `self->ue_call_frame_cfa' */
-	error = libuw_unwind_cfa_calculate_cfa(&cfa,
+	error = libuw_unwind_fde_calculate_cfa(&fde, &cfa,
 	                                       self->ue_regget,
 	                                       self->ue_regget_arg,
 	                                       &self->ue_call_frame_cfa);
@@ -751,6 +758,22 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 }
 
 
+/* Try to determine the base-address of the CFI-function containing `pc'
+ * This does the same as `_Unwind_FindEnclosingFunction(3)', and is used
+ * to resolve `DW_OP_GNU_encoded_addr+DW_EH_PE_funcrel' addresses.
+ *
+ * If the given `pc' doesn't belong to a function, return `0' */
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED uintptr_t
+NOTHROW_NCX(CC libuw_get_funbase)(void const *pc) {
+	unsigned int unwind_error;
+	unwind_fde_t fde;
+	unwind_error = libuw_unwind_fde_find(pc, &fde);
+	if unlikely(unwind_error != UNWIND_SUCCESS)
+		fde.f_pcstart = NULL;
+	return (uintptr_t)fde.f_pcstart;
+}
+
+
 
 /* Execute the CFI expression loaded into the given unwind-emulator  `self'.
  * Upon  success, `self->ue_stacksz' will have been updated to the new stack
@@ -851,11 +874,11 @@ do_make_top_const:
 						if unlikely(!guarded_readptr((uintptr_t *)TOP.s_lvalue, &TOP.s_uconst))
 							ERROR(err_segfault);
 #if __SIZEOF_POINTER__ > 4
-					} else if (self->ue_addrsize >= 4) {
+					} else if (TOP.s_lsize >= 4) {
 						if unlikely(!guarded_readl((uint32_t *)TOP.s_lvalue, &TOP.s_uconst))
 							ERROR(err_segfault);
 #endif /* __SIZEOF_POINTER__ > 4 */
-					} else if (self->ue_addrsize >= 2) {
+					} else if (TOP.s_lsize >= 2) {
 						if unlikely(!guarded_readw((uint16_t *)TOP.s_lvalue, &TOP.s_uconst))
 							ERROR(err_segfault);
 					} else {
@@ -1110,11 +1133,11 @@ do_make_second_const:
 						if unlikely(!guarded_readptr((uintptr_t *)SECOND.s_lvalue, &SECOND.s_uconst))
 							ERROR(err_segfault);
 #if __SIZEOF_POINTER__ > 4
-					} else if (self->ue_addrsize >= 4) {
+					} else if (SECOND.s_lsize >= 4) {
 						if unlikely(!guarded_readl((uint32_t *)SECOND.s_lvalue, &SECOND.s_uconst))
 							ERROR(err_segfault);
 #endif /* __SIZEOF_POINTER__ > 4 */
-					} else if (self->ue_addrsize >= 2) {
+					} else if (SECOND.s_lsize >= 2) {
 						if unlikely(!guarded_readw((uint16_t *)SECOND.s_lvalue, &SECOND.s_uconst))
 							ERROR(err_segfault);
 					} else {
@@ -1219,12 +1242,12 @@ do_make_second_const:
 		}	break;
 
 		CASE(DW_OP_bra) {
-			int16_t offset;
 			if unlikely(stacksz < 1)
 				ERROR(err_stack_underflow);
 			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
 			if (TOP.s_uconst != 0) {
+				int16_t offset;
 				offset = (int16_t)UNALIGNED_GET16((uint16_t const *)pc);
 				pc += 2;
 				if (offset < 0) {
@@ -1235,8 +1258,10 @@ do_make_second_const:
 				pc += offset;
 				if unlikely(pc < self->ue_pc_start ||
 				            pc >= self->ue_pc_end) {
-					if likely(pc == self->ue_pc_end)
+					if likely(pc == self->ue_pc_end) {
+						--stacksz;
 						goto done;
+					}
 					pc -= offset;
 					pc -= 3;
 					ERROR(err_badjmp);
@@ -1632,12 +1657,32 @@ do_read_bit_pieces:
 		CASE(DW_OP_GNU_encoded_addr) {
 			uint8_t format;
 			uintptr_t value;
+			uintptr_t funcbase;
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
-			format = *pc++;
+			format   = *pc++;
+			funcbase = self->ue_funbase;
+			if ((format & 0x70) == DW_EH_PE_funcrel && funcbase == 0) {
+				/* Figure out `funcbase' */
+				union {
+					void const *p;
+					byte_t buf[CFI_REGISTER_SIZE(CFI_UNWIND_REGISTER_PC)];
+				} regval;
+				error = (*self->ue_regget)(self->ue_regget_arg, CFI_UNWIND_REGISTER_PC, regval.buf);
+				if unlikely(error != UNWIND_SUCCESS)
+					ERRORF(err, "Can't get PC register: %u\n", error);
+				funcbase = libuw_get_funbase(regval.p);
+				if unlikely(funcbase == 0) {
+					/* Failed to determine function base address. */
+					error = UNWIND_NO_FRAME;
+					ERRORF(err, "No FDE at pc %p\n", regval.p);
+				}
+				self->ue_funbase = funcbase;
+			}
 			value = dwarf_decode_pointer(&pc, format,
 			                             self->ue_addrsize,
-			                             0, 0, 0);
+			                             0, 0,
+			                             funcbase);
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
 			self->ue_stack[stacksz].s_uconst = value;
 			++stacksz;
