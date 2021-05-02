@@ -1963,7 +1963,7 @@ NOTHROW(FCALL merge_all_parts)(struct mpart_slist *__restrict deadparts) {
 	}
 	for (;;) {
 		/* Find the next non-destroyed part,
-		 * and get a reference to it, too. */
+		 * and get a  reference to it,  too. */
 		next = LIST_NEXT(part, mp_allparts);
 		while (next && !tryincref(next))
 			next = LIST_NEXT(next, mp_allparts);
@@ -1976,7 +1976,7 @@ NOTHROW(FCALL merge_all_parts)(struct mpart_slist *__restrict deadparts) {
 			SLIST_INSERT(deadparts, part, _mp_dead);
 
 		/* Proceed with the next non-destroyed part,
-		 * to which we've previously acquire a ref. */
+		 * to  which we've previously acquire a ref. */
 		if (!next)
 			break;
 		part = next;
@@ -2012,6 +2012,26 @@ NOTHROW(FCALL merge_all_parts_lop_cb)(struct lockop *__restrict UNUSED(self)) {
 	merge_all_parts(&deadparts);
 	if (SLIST_EMPTY(&deadparts))
 		return NULL;
+
+	/* TODO: Infinite loop:
+	 * The `merge_all_parts_lop_cb' function is enqueued by `merge_all_parts_after_kernel_mm_lock'
+	 * when a lock is released from the kernel mman. - However, if the kernel mman lock also  gets
+	 * released somewhere along the merge-nodes control flow, then `merge_all_parts()' will end up
+	 * restarting itself immediately, rather than at some later point in time!
+	 *
+	 * Solution:
+	 * `merge_all_parts()'  needs to have a failed-due-to-NOMEM return  value that is used to deal
+	 * with the oom/blocking-mem scenario that must be handled via the kernel-mman-lock. That way,
+	 * oom faults are only handled _after_ all mman locks have already been released.
+	 *
+	 * TODO: What about the situation where kmalloc() fails because it can't get a lock to the
+	 *       kernel mman, when this is due to the fact that said lock is already being held by
+	 *       someone in the merge-nodes callstack?
+	 *       In this situation, kmalloc() would have succeeded if only the kernel mman lock had
+	 *       been available...
+	 * -> There _really_ needs to be a dedicated async-lockop system within the heap that can be
+	 *    used to enqueue post-lockops  to-be executed once some  specified amount of bytes  may
+	 *    have become available for allocation. */
 
 	/* Set-up a post-lockop that will clean out the list of dead parts.
 	 * For this purpose, re-use the  first destroyed mem-part as a  hub

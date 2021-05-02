@@ -403,9 +403,9 @@ NOTHROW(KCALL heap_allat_untraced_nx)(struct heap *__restrict self,
  *   - realloc(ptr, malloc_usable_size(ptr) + x) --> Try to `heap_allat_untraced()' at the old end, or move to new memory
  *   - realloc(0, x)                             --> Same as `heap_alloc_untraced()'
  *
- * Additionally, `GFP_NOMOVE' may be specified, in which case the base address  of
- * the returned pointer will always be `old_ptr, x >= new_bytes && x <= old_bytes'
- * or `NULL,0' (when `new_bytes > old_bytes'):
+ * Additionally, `GFP_NOMOVE' may be specified, in which case the base address of the
+ * returned pointer will  always be  `{old_ptr,x} | x >= new_bytes && x <= old_bytes'
+ * or `NULL, 0' (when `new_bytes > old_bytes'):
  *   - realloc_in_place(ptr, malloc_usable_size(ptr) - x) --> Free unused memory at the end (always succeeds)
  *   - realloc_in_place(ptr, malloc_usable_size(ptr) + x) --> Try to `heap_allat_untraced()' at the old end, or return (NULL, 0) (ignoring NX-mode)
  *   - realloc_in_place(0, x)                             --> Always return (NULL, 0) (ignoring NX-mode)
@@ -475,9 +475,9 @@ heap_realign(struct heap *__restrict self,
 /* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
-                                VIRT void *old_ptr, size_t old_bytes,
-                                size_t new_bytes, gfp_t alloc_flags,
-                                gfp_t free_flags) {
+                               VIRT void *old_ptr, size_t old_bytes,
+                               size_t new_bytes, gfp_t alloc_flags,
+                               gfp_t free_flags) {
 	if (__builtin_constant_p(old_bytes)) {
 		if (old_bytes == 0)
 			return heap_alloc_nx(self, new_bytes, alloc_flags);
@@ -493,10 +493,10 @@ NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
 /* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realign_nx)(struct heap *__restrict self,
-                                VIRT void *old_ptr, size_t old_bytes,
-                                size_t min_alignment, ptrdiff_t offset,
-                                size_t new_bytes, gfp_t alloc_flags,
-                                gfp_t free_flags) {
+                               VIRT void *old_ptr, size_t old_bytes,
+                               size_t min_alignment, ptrdiff_t offset,
+                               size_t new_bytes, gfp_t alloc_flags,
+                               gfp_t free_flags) {
 	if (__builtin_constant_p(old_bytes)) {
 		if (old_bytes == 0)
 			return heap_align_nx(self, min_alignment, offset, new_bytes, alloc_flags);
