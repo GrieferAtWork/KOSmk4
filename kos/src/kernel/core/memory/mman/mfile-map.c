@@ -157,7 +157,7 @@ NOTHROW(FCALL mpart_must_unshare_copy)(struct mpart *__restrict self,
 
 #define mnode_list_maps(self, minaddr, maxaddr) \
 	(!LIST_EMPTY(self) && _mnode_list_maps(self, minaddr, maxaddr))
-PRIVATE WUNUSED NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL _mnode_list_maps)(struct mnode_list const *__restrict self,
                                 mpart_reladdr_t minaddr, mpart_reladdr_t maxaddr) {
 	struct mnode *node;
