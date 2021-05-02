@@ -1226,9 +1226,8 @@ NOTHROW(FCALL merge_realloc)(void *ptr, size_t num_bytes,
 /* Transfer the given `tree' into `dst', updating futex
  * objects  to by incrementing `mfu_addr' by `addroff',
  * and setting `newpart' as `mfu_part' */
-PRIVATE NOBLOCK NONNULL((1, 2, 3, 4)) void
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL mpartmeta_transfer_futex_tree)(struct mpartmeta *__restrict dst,
-                                             struct mpartmeta *__restrict src,
                                              struct mfutex *__restrict tree,
                                              struct mpart *__restrict newpart,
                                              size_t addroff) {
@@ -1248,23 +1247,15 @@ again:
 		/* Drop the reference from above. */
 		decref_unlikely(tree);
 	} else {
-		/* Re-insert into the old part's futex-tree.
-		 *
-		 * Because the futex has already been destroyed,
-		 * we're  fairly save in assuming that the futex
-		 * has  already  added /  is currently  adding a
-		 * lockop to `dst->mpm_ftxlops' for the  purpose
-		 * of removing the futex from that tree.
-		 *
-		 * As such, satisfy its intend and keep this futex
-		 * as part of the old (to-be-removed) part's tree. */
-		mpartmeta_ftx_insert(src, tree);
+		DBG_memset(&tree->mfu_mtaent, 0xcc, sizeof(tree->mfu_mtaent));
+		awref_clear(&tree->mfu_part);
+		weakdecref_nokill(tree);
 	}
 
 	/* Recursively iterate the entire tree. */
 	if (lo) {
 		if (hi)
-			mpartmeta_transfer_futex_tree(dst, src, hi, newpart, addroff);
+			mpartmeta_transfer_futex_tree(dst, hi, newpart, addroff);
 		tree = lo;
 		goto again;
 	}
@@ -1628,11 +1619,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 			struct mfutex *tree;
 			tree            = himeta->mpm_ftx;
 			himeta->mpm_ftx = NULL;
-			mpartmeta_transfer_futex_tree(lometa,
-			                              himeta,
-			                              tree,
-			                              lopart,
-			                              losize);
+			mpartmeta_transfer_futex_tree(lometa, tree, lopart, losize);
 		}
 	}
 
@@ -1965,6 +1952,7 @@ PRIVATE union merge_all_parts_lop_desc merge_all_parts_lop = { { {}, NULL } };
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL merge_all_parts)(struct mpart_slist *__restrict deadparts) {
 	REF struct mpart *part, *next;
+
 	/* Acquire a reference to the first non-destroyed part. */
 	for (part = LIST_FIRST(&mpart_all_list);;) {
 		if (!part)
@@ -1999,6 +1987,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL merge_all_parts_postlop_destroy_cb)(struct postlockop *__restrict self) {
 	struct mpart_slist deadparts;
 	deadparts.slh_first = container_of(self, struct mpart, _mp_dtplop);
+
 	/* Re-initialize  the  copy/share lists  to satisfy  an internal
 	 * assertion in `mpart_fini()', as well as to ensure consistency
 	 * when destroying mem-parts.
@@ -2016,12 +2005,14 @@ NOTHROW(FCALL merge_all_parts_postlop_destroy_cb)(struct postlockop *__restrict 
 PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(FCALL merge_all_parts_lop_cb)(struct lockop *__restrict UNUSED(self)) {
 	struct mpart_slist deadparts;
+
 	/* Mark the merge-all-parts lop as available again. */
 	ATOMIC_WRITE(merge_all_parts_lop.map_mm_postlop.oplo_func, NULL);
 	SLIST_INIT(&deadparts);
 	merge_all_parts(&deadparts);
 	if (SLIST_EMPTY(&deadparts))
 		return NULL;
+
 	/* Set-up a post-lockop that will clean out the list of dead parts.
 	 * For this purpose, re-use the  first destroyed mem-part as a  hub
 	 * for destroying all of the other parts. */

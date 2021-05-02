@@ -53,11 +53,52 @@ STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(mpart)
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,
-                                                REF struct mpart *__restrict part) {
+                                                REF struct mpart *__restrict UNUSED(part)) {
 	WEAK REF struct mfutex *me;
 	me = container_of(_lop, struct mfutex, _mfu_plop);
-	decref_unlikely(part);
 	weakdecref_likely(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
+NOTHROW(FCALL mfutex_remove_from_mpart_lop)(Toblockop(mpart) *__restrict _lop,
+                                            REF struct mpart *__restrict part);
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfutex_remove_from_other_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,
+                                                      struct mpart *__restrict UNUSED(_old_part)) {
+	WEAK REF struct mfutex *me;
+	REF struct mpart *part;
+	struct mpartmeta *meta;
+	me = container_of(_lop, struct mfutex, _mfu_plop);
+	/* Figure out the *real* part, and remove `self' from _its_ tree! */
+again_read_part:
+	part = awref_get(&me->mfu_part);
+	if (!part)
+		goto drop_futex_reference_after;
+	meta = part->mp_meta;
+	assert(meta != NULL);
+	if (mpartmeta_ftxlock_trywrite(meta)) {
+		/* Remove the mem-futex from the tree ourselves. */
+		if unlikely(part != awref_ptr(&me->mfu_part)) {
+			mpartmeta_ftxlock_endwrite(meta, part);
+			decref_unlikely(part);
+			goto again_read_part;
+		}
+		mpartmeta_ftx_removenode(meta, me);
+		mpartmeta_ftxlock_endwrite(meta, part);
+		weakdecref_nokill(me); /* From the futex-tree... */
+drop_futex_reference_after:
+		weakdecref_unlikely(me); /* From our caller */
+	} else {
+		/* Enqueue the futex for lazy removal. */
+		incref(part); /* Inherited by `mfutex_remove_from_mpart_lop()' */
+		me->_mfu_lop.olo_func = &mfutex_remove_from_mpart_lop;
+		SLIST_ATOMIC_INSERT(&meta->mpm_ftxlops, &me->_mfu_lop, olo_link);
+
+		/* Reap dead futex objects associated with the meta-controller. */
+		_mpartmeta_ftxlock_reap(meta, part);
+		decref_unlikely(part);
+	}
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
@@ -66,8 +107,20 @@ NOTHROW(FCALL mfutex_remove_from_mpart_lop)(Toblockop(mpart) *__restrict _lop,
 	WEAK REF struct mfutex *me;
 	me = container_of(_lop, struct mfutex, _mfu_lop);
 
+	/* This reference was only needed to keep `part' alive until we
+	 * got to a point where we're able to remove ourselves from its
+	 * futex tree (iff we're still part of said tree) */
+	decref_nokill(part);
+
+	/* Ensure that `me' is still bound to `part' */
+	if unlikely(part != awref_ptr(&me->mfu_part)) {
+		me->_mfu_plop.oplo_func = &mfutex_remove_from_other_mpart_postlop;
+		return &me->_mfu_plop;
+	}
+
 	/* Remove the mem-futex from the tree ourselves. */
 	mpartmeta_ftx_removenode(part->mp_meta, me);
+	weakdecref_nokill(me); /* From the futex-tree... */
 
 	/* Drop the part reference, and free the futex itself later. */
 	me->_mfu_plop.oplo_func = &mfutex_remove_from_mpart_postlop;
@@ -83,14 +136,21 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 	/* Broadcast the mem-futex one last time. */
 	sig_broadcast_for_fini(&self->mfu_signal);
 
+again_read_part:
 	part = awref_get(&self->mfu_part);
 	if (part) {
 		meta = part->mp_meta;
 		assert(meta != NULL);
 		if (mpartmeta_ftxlock_trywrite(meta)) {
 			/* Remove the mem-futex from the tree ourselves. */
+			if unlikely(part != awref_ptr(&self->mfu_part)) {
+				mpartmeta_ftxlock_endwrite(meta, part);
+				decref_unlikely(part);
+				goto again_read_part;
+			}
 			mpartmeta_ftx_removenode(meta, self);
 			mpartmeta_ftxlock_endwrite(meta, part);
+			weakdecref_nokill(self); /* From the futex-tree... */
 		} else {
 			/* Enqueue the futex for lazy removal. */
 			incref(part); /* Inherited by `mfutex_remove_from_mpart_lop()' */
@@ -98,7 +158,7 @@ NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self) {
 			SLIST_ATOMIC_INSERT(&meta->mpm_ftxlops, &self->_mfu_lop, olo_link);
 
 			/* Reap dead futex objects associated with the meta-controller. */
-			mpartmeta_ftxlock_reap(meta, part);
+			_mpartmeta_ftxlock_reap(meta, part);
 			decref_unlikely(part);
 			return;
 		}
@@ -138,17 +198,16 @@ DECL_BEGIN
 
 /* Clear the `mfu_part' field of all futex objects reachable from `root' */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfutex_tree_clear_all_parts)(struct mfutex *__restrict root) {
-	struct mfutex *lhs, *rhs;
+NOTHROW(FCALL mfutex_tree_clear_all_parts)(WEAK REF struct mfutex *__restrict root) {
+	WEAK REF struct mfutex *lhs, *rhs;
 again:
-	/* Need a temporary weak reference to prevent `root' form being free'd
-	 * by another thread before  `awref_clear()' has finished syncing  the
-	 * write to the `mfu_part' field.
-	 * Note that we know that `root' must have a non-zero weakref counter,
-	 * because `mfutex_destroy()' only drops its weak reference _after_ it
-	 * was able to remove `root' from the associated mem-part. */
-	weakincref(root);
-	awref_clear(&root->mfu_part);
+	/* If the futex is still alive, clear its part-pointer */
+	if (tryincref(root)) {
+		awref_clear(&root->mfu_part);
+		decref_unlikely(root);
+	}
+
+	/* Drop the weak reference held by the futex-tree */
 	weakdecref_unlikely(root);
 	lhs = root->mfu_mtaent.rb_lhs;
 	rhs = root->mfu_mtaent.rb_rhs;
@@ -294,7 +353,9 @@ check_old_futex:
 		/* Initialize the new futex object. */
 		mfutex_init(result, self, partrel_offset);
 		/* Try to insert the new futex into the tree. */
-		if (!mpartmeta_ftx_tryinsert(meta, result)) {
+		if (mpartmeta_ftx_tryinsert(meta, result)) {
+			++result->mfu_weakrefcnt; /* Tree-reference */
+		} else {
 			bool refok;
 			old_futex = mpartmeta_ftx_locate(meta, partrel_offset);
 			assert(old_futex);
@@ -318,6 +379,7 @@ check_old_futex:
 		/* Initialize the new futex object. */
 		mfutex_init(result, self, partrel_offset);
 		/* Insert the new futex into the tree. */
+		++result->mfu_weakrefcnt; /* Tree-reference */
 		mpartmeta_ftx_insert(meta, result);
 	}
 	mpartmeta_ftxlock_endwrite(meta, self);

@@ -1015,12 +1015,12 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 	/* Re-map the freshly faulted memory. */
 	{
 		u16 perm;
-		if (mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
+		if unlikely(mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
 			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
 			                       mf.mfl_size, mf.mfl_offs,
 			                       mf.mfl_node);
 		} else {
-			if (!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
+			if unlikely(!pagedir_prepare(mf.mfl_addr, mf.mfl_size)) {
 				mpart_lock_release(mf.mfl_part);
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
@@ -1031,15 +1031,16 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 		}
 		mpart_lock_release(mf.mfl_part);
+
 		/* If write-access was granted, add the node to the list of writable nodes. */
 		if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 		    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 
 		/* Sync the newly mapped address range if the mapping was created  with
 		 * write  permissions. Technically, we'd only need to sync if a mapping
-		 * is created where there was already a mapping before, however usually
-		 * this exactly the case where  a previously read-only mapping is  made
-		 * read/write.
+		 * is  created where there  was already a  mapping before, however this
+		 * is exactly the case when a read/write mapping is created where there
+		 * was a read-only mapping before.
 		 *
 		 * The reason why we need to sync in this situation boils down to the
 		 * fact that other CPUs (or even the caller's CPU) may still have TLB

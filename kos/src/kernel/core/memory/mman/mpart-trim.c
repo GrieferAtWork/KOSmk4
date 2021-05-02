@@ -21,6 +21,7 @@
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_TRIM_C 1
 #define __WANT_MPART__mp_nodlsts
 #define __WANT_MPART__mp_trmlop
+#define __WANT_MFUTEX__mfu_dead
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -148,29 +149,6 @@ NOTHROW(FCALL mchunkvec_freeswp)(struct mchunk *__restrict vec, size_t count) {
 		mchunk_freeswp(&vec[i]);
 }
 /************************************************************************/
-
-
-
-
-/* Detach the given mem-futex from its associated mem-part,
- * by clearing the futex's `mfu_part' field. - This must be
- * called  when deallocating the  backing part's range that
- * is occupied by `self'
- * NOTE: This function can safely  be called, even when  `self'
- *       has already been destroyed (i.w. `wasdestroyed(self)') */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfutex_detach)(struct mfutex *__restrict self) {
-	/* Need a temporary weak reference to prevent `self' form being free'd
-	 * by another thread before  `awref_clear()' has finished syncing  the
-	 * write to the `mfu_part' field.
-	 * Note that we know that `self' must have a non-zero weakref counter,
-	 * because `mfutex_destroy()' only drops its weak reference _after_ it
-	 * was able to remove `self' from the associated mem-part. */
-	weakincref(self);
-	awref_clear(&self->mfu_part);
-	weakdecref_unlikely(self);
-}
-
 
 
 
@@ -343,13 +321,22 @@ NOTHROW(FCALL mfutex_tree_reinsert_or_detach_lstrip)(struct mfutex **__restrict 
 again:
 	lhs = self->mfu_mtaent.rb_lhs;
 	rhs = self->mfu_mtaent.rb_rhs;
-	if (self->mfu_addr < num_bytes) {
-		mfutex_detach(self);
-		DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+	if (tryincref(self)) {
+		if (self->mfu_addr >= num_bytes) {
+			/* Re-insert into the new tree with the new offset. */
+			self->mfu_addr -= num_bytes;
+			mfutex_tree_insert(p_tree, self);
+		} else {
+			/* Get rid of this futex. */
+			DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+			awref_clear(&self->mfu_part);
+			weakdecref_nokill(self);
+		}
+		decref_unlikely(self);
 	} else {
-		/* Re-insert into the new tree with the new offset. */
-		self->mfu_addr -= num_bytes;
-		mfutex_tree_insert(p_tree, self);
+		DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+		awref_clear(&self->mfu_part);
+		weakdecref_unlikely(self);
 	}
 	if (lhs) {
 		if (rhs)
@@ -528,7 +515,8 @@ NOTHROW(FCALL mpart_rstrip)(struct mpart *__restrict self,
 		if ((meta = self->mp_meta) != NULL) {
 			struct mfutex *ftx;
 			while ((ftx = mpartmeta_ftx_rremove(meta, newsize, oldsize - 1)) != NULL) {
-				mfutex_detach(ftx);
+				awref_clear(&ftx->mfu_part);
+				weakdecref_unlikely(ftx);
 			}
 		}
 	}
@@ -703,7 +691,7 @@ NOTHROW(FCALL async_alloc_mpart)(struct mpart **__restrict p_newpart,
 }
 
 
-PRIVATE NOBLOCK NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2, 3, 4)) void
 NOTHROW(FCALL mfutex_tree_reinsert_or_transfer_lstrip)(struct mfutex **__restrict p_lotree,
                                                        struct mfutex **__restrict p_hitree,
                                                        struct mfutex *__restrict self,
@@ -713,21 +701,27 @@ NOTHROW(FCALL mfutex_tree_reinsert_or_transfer_lstrip)(struct mfutex **__restric
 again:
 	lhs = self->mfu_mtaent.rb_lhs;
 	rhs = self->mfu_mtaent.rb_rhs;
-	if (self->mfu_addr < addr) {
-		if (!tryincref(self))
-			goto reinsert_hitree; /* Ensure consistency for already-destroyed futexes. */
-		awref_set(&self->mfu_part, lopart);
-		mfutex_tree_insert(p_lotree, self); /* Insert into the low-part's tree. */
+	if (tryincref(self)) {
+		if (self->mfu_addr >= addr) {
+			/* Re-insert into the new tree with the new offset. */
+			self->mfu_addr -= addr;
+			mfutex_tree_insert(p_hitree, self);
+		} else {
+			/* Insert into the low-part's tree. */
+			awref_set(&self->mfu_part, lopart);
+			mfutex_tree_insert(p_lotree, self);
+		}
 		decref_unlikely(self);
 	} else {
-		/* Re-insert into the new tree with the new offset. */
-		self->mfu_addr -= addr;
-reinsert_hitree:
-		mfutex_tree_insert(p_hitree, self);
+		DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+		awref_clear(&self->mfu_part);
+		weakdecref_unlikely(self);
 	}
 	if (lhs) {
-		if (rhs)
-			mfutex_tree_reinsert_or_transfer_lstrip(p_lotree, p_hitree, rhs, lopart, addr);
+		if (rhs) {
+			mfutex_tree_reinsert_or_transfer_lstrip(p_lotree, p_hitree, rhs,
+			                                        lopart, addr);
+		}
 		self = lhs;
 		goto again;
 	}
@@ -1070,10 +1064,11 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfutex_tree_detachall)(struct mfutex *__restrict self) {
 	struct mfutex *lhs, *rhs;
 again:
-	mfutex_detach(self);
 	lhs = self->mfu_mtaent.rb_lhs;
 	rhs = self->mfu_mtaent.rb_rhs;
 	DBG_memset(&self->mfu_mtaent, 0xcc, sizeof(self->mfu_mtaent));
+	awref_clear(&self->mfu_part);
+	weakdecref_unlikely(self);
 	if (lhs) {
 		if (rhs)
 			mfutex_tree_detachall(rhs);
@@ -1093,8 +1088,10 @@ NOTHROW(FCALL mpart_clear)(struct mpart *__restrict self) {
 	if ((meta = self->mp_meta) != NULL) {
 		/* Detach all futex objects by clearing their `mfu_part' pointers. */
 		if (meta->mpm_ftx) {
-			mfutex_tree_detachall(meta->mpm_ftx);
+			struct mfutex *tree;
+			tree          = meta->mpm_ftx;
 			meta->mpm_ftx = NULL;
+			mfutex_tree_detachall(tree);
 		}
 	}
 

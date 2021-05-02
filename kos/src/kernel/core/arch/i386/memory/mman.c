@@ -369,7 +369,7 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 	        mnode_getsize(node), mpart_getsize(part));
 	addr = mnode_getaddr(node);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare(addr, part->mp_mem.mc_size * PAGESIZE)) {
+	if unlikely(!pagedir_prepare(addr, part->mp_mem.mc_size * PAGESIZE)) {
 		kernel_panic(FREESTR("Failed to prepare kernel mapping at %p...%p\n"),
 		             mnode_getminaddr(node), mnode_getmaxaddr(node));
 	}

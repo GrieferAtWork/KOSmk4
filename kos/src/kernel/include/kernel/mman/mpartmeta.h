@@ -156,19 +156,19 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mfutex_tree_removenode)(struct
 
 
 struct mpartmeta {
-	struct atomic_rwlock   mpm_ftxlock;  /* Lock for `mpm_ftx' */
-	Toblockop_slist(mpart) mpm_ftxlops;  /* [0..n][lock(ATOMIC)] Lock operations for `mpm_ftxlock'. */
-	LLRBTREE_ROOT(mfutex)  mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree. (May contain dead futex objects) */
-	WEAK refcnt_t          mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
-	                                      * # of DMA locks referencing the associated part. */
-	struct sig             mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
+	struct atomic_rwlock           mpm_ftxlock;  /* Lock for `mpm_ftx' */
+	Toblockop_slist(mpart)         mpm_ftxlops;  /* [0..n][lock(ATOMIC)] Lock operations for `mpm_ftxlock'. */
+	LLRBTREE_ROOT(WEAK REF mfutex) mpm_ftx;      /* [0..n][lock(mpm_ftx)] Futex tree. (May contain dead futex objects) */
+	WEAK refcnt_t                  mpm_dmalocks; /* [lock(INC(:MPART_F_LOCKBIT), DEC(ATOMIC))]
+	                                              * # of DMA locks referencing the associated part. */
+	struct sig                     mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
 #ifdef ARCH_HAVE_RTM
 	/* We  keep the RTM version and field  in the futex controller, such that
 	 * they don't take up space in the base `mpart' structure, but only exist
 	 * conditionally, and upon first access. */
-	uintptr_t              mpm_rtm_vers; /* [lock(:MPART_F_LOCKBIT)]
-	                                      * RTM version (incremented for every RTM-driven
-	                                      * modifications made to memory). */
+	uintptr_t                      mpm_rtm_vers; /* [lock(:MPART_F_LOCKBIT)]
+	                                              * RTM version (incremented for every RTM-driven
+	                                              * modifications made to memory). */
 #endif /* ARCH_HAVE_RTM */
 };
 
