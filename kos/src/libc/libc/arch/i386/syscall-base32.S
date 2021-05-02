@@ -275,7 +275,7 @@ END(libc_x86_sysenter_common)
 	/* NOTE: Technically, this `0x90' only has to be something that isn't `0xfd'! */
 	.byte  0x90              /* nop                             nop           */
 INTERN_FUNCTION(libc___i386_syscall)
-#define _CFI_FUNBASE_OFFSET 0
+#define _CFI_FUNBASE_OFFSET 0 /* Offset from `.cfi_startproc' to 0x55 (`pushl %ebp') or 0xcd (`int $0x80') */
 	.cfi_startproc
 
 	.byte  0x55              /* pushl  %ebp                     int $0x80     */
@@ -323,7 +323,7 @@ END(libc___i386_syscall)
 .section .xdata.crt.syscall.__i386_Xsyscall, "awx"
 	.align 16                /* Align by a whole cacheline */
 INTERN_FUNCTION(libc___i386_Xsyscall)
-#define _CFI_FUNBASE_OFFSET 1
+#define _CFI_FUNBASE_OFFSET 1 /* Offset from `.cfi_startproc' to 0x55 (`pushl %ebp') or 0xcd (`int $0x80') */
 	.cfi_startproc
 	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a /* Clear EFLAGS.DF */
 	.byte  0xfd              /* std                             std           */
