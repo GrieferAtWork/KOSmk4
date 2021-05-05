@@ -38,9 +38,11 @@
 
 __SYSDECL_BEGIN
 
-/* Special   SYStemConTroL    control    codes    for    KOS.
- * These are  function  codes  with  may  be  used  alongside
+/* Special SYStemConTroL control codes for KOS.
+ *
+ * These are  function  codes  which may  be  used  alongside
  * the `ksysctl()' system call provided by the KOSmk4 kernel.
+ *
  * WARNING: The interface exposed here is _extremely_ volatile!
  *          It may be changed without notice, get removed, or changed in other
  *          ways  that may break  existing code using it.  - Use with caution! */
@@ -282,7 +284,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 
 /* Driver related */
 #define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct hop_openfd *result] Capture a snapshot of all currently loaded kernel
-                                                           * drivers, and return  a `HANDLE_TYPE_DRIVER_LOADLIST' handle  for that  snapshot.
+                                                           * drivers, and return a `HANDLE_TYPE_DRIVER_LOADLIST' handle for that snapshot.
                                                            * WARNING: None of the drivers loaded at the point this call is made can be
                                                            *          fully unloaded  before  the  returned handle  has  been  closed!
                                                            * @return: == result->of_hint */

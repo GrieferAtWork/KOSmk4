@@ -22,16 +22,9 @@
 
 #include "__minmax.h"
 
-#ifdef __HYBRID_PP_VA_OVERLOAD
-#define MIN(...)   __hybrid_min(__VA_ARGS__)
-#define MAX(...)   __hybrid_max(__VA_ARGS__)
-#define MIN_C(...) __hybrid_min_c(__VA_ARGS__)
-#define MAX_C(...) __hybrid_max_c(__VA_ARGS__)
-#else /* __HYBRID_PP_VA_OVERLOAD */
-#define MIN(a, b)   __hybrid_min(a, b)
-#define MAX(a, b)   __hybrid_max(a, b)
-#define MIN_C(a, b) __hybrid_min_c(a, b)
-#define MAX_C(a, b) __hybrid_max_c(a, b)
-#endif /* !__HYBRID_PP_VA_OVERLOAD */
+#define MIN   __hybrid_min
+#define MAX   __hybrid_max
+#define MIN_C __hybrid_min_c
+#define MAX_C __hybrid_max_c
 
 #endif /* !__GUARD_HYBRID_MINMAX_H */

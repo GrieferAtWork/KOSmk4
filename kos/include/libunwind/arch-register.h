@@ -22,4 +22,8 @@
 
 #include "api.h"
 
+/* This header is overwritten by arch-specific code to provide functions to-be
+ * used for `unwind_getreg_t' and  `unwind_setreg_t' for interacting with  the
+ * various arch-specific cpu-state structures. */
+
 #endif /* !_LIBUNWIND_ARCH_REGISTER_H */

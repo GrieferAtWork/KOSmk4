@@ -28,26 +28,14 @@
 
 #if (defined(__DCC_VERSION__) || \
      (__has_builtin(__builtin_min) && __has_builtin(__builtin_max)))
-#define __hybrid_min_r2(a, b) __builtin_min(a, b)
-#define __hybrid_max_r2(a, b) __builtin_max(a, b)
-#define __hybrid_min2(a, b)   __builtin_min(a, b)
-#define __hybrid_max2(a, b)   __builtin_max(a, b)
-#ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __hybrid_min_c(...) __builtin_min(__VA_ARGS__)
-#define __hybrid_max_c(...) __builtin_max(__VA_ARGS__)
-#define __hybrid_min(...)   __builtin_min(__VA_ARGS__)
-#define __hybrid_max(...)   __builtin_max(__VA_ARGS__)
-#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __hybrid_min_c(args...) __builtin_min(args)
-#define __hybrid_max_c(args...) __builtin_max(args)
-#define __hybrid_min(args...)   __builtin_min(args)
-#define __hybrid_max(args...)   __builtin_max(args)
-#else /* __PREPROCESSOR_HAVE_VA_ARGS */
-#define __hybrid_min_c __builtin_min
-#define __hybrid_max_c __builtin_max
-#define __hybrid_min   __builtin_min
-#define __hybrid_max   __builtin_max
-#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#define __hybrid_min_r2 __builtin_min
+#define __hybrid_max_r2 __builtin_max
+#define __hybrid_min2   __builtin_min
+#define __hybrid_max2   __builtin_max
+#define __hybrid_min_c  __builtin_min
+#define __hybrid_max_c  __builtin_max
+#define __hybrid_min    __builtin_min
+#define __hybrid_max    __builtin_max
 #elif defined(__COMPILER_HAVE_AUTOTYPE) && !defined(__NO_XBLOCK)
 #define __hybrid_min_r2(a, b) __XBLOCK({ __auto_type _a = (a); __auto_type _b = (b); __XRETURN _a < _b ? _a : _b; })
 #define __hybrid_max_r2(a, b) __XBLOCK({ __auto_type _a = (a); __auto_type _b = (b); __XRETURN _b < _a ? _a : _b; })
@@ -62,8 +50,8 @@
 
 #ifndef __hybrid_min2
 #ifndef __hybrid_min_r2
-#define __hybrid_min2(a, b) __hybrid_min_c2(a, b)
-#define __hybrid_max2(a, b) __hybrid_max_c2(a, b)
+#define __hybrid_min2 __hybrid_min_c2
+#define __hybrid_max2 __hybrid_max_c2
 #elif !defined(__NO_builtin_constant_p)
 #ifndef __NO_builtin_choose_expr
 #define __hybrid_min2(a, b)                                                   \
@@ -83,8 +71,8 @@
 	 : __hybrid_max_r2(a, b))
 #endif /* __NO_builtin_choose_expr */
 #else  /* ... */
-#define __hybrid_min2(a, b) __hybrid_min_r2(a, b)
-#define __hybrid_max2(a, b) __hybrid_max_r2(a, b)
+#define __hybrid_min2 __hybrid_min_r2
+#define __hybrid_max2 __hybrid_max_r2
 #endif /* !... */
 #endif /* !__hybrid_min */
 

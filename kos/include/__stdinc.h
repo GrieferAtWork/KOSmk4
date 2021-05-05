@@ -220,7 +220,7 @@
 #elif defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_XBLOCK)
 #define __COMPILER_UNUSED(expr) __XBLOCK({ __typeof__(expr) __expr = (expr); __expr; })
 #else /* ... */
-#define __COMPILER_UNUSED(expr) (expr)
+#define __COMPILER_UNUSED /* nothing */
 #endif /* !... */
 
 #ifndef __DEFINE_PUBLIC_ALIAS
@@ -379,7 +379,7 @@
 
 /* COMDAT function definitions:
  * When applied to  a function, an  attempt will  be made to  ensure that  multiple
- * instances  of the same  function, which may exist  in multiple compilation units
+ * instances of the same function, which  may exist in multiple compilation  units,
  * get merged into a single  instance at link-time. No  guaranty is made that  this
  * will actually be the case, meaning that as a fall-back, these macros are allowed
  * to  simply declare functions as static (with the exception of `__PUBLIC_COMDAT',

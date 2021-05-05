@@ -34,12 +34,12 @@ __DECL_BEGIN
  *                 e.g.: `UINT_MAX + 42u' and `11u - 19u' overflow, but `32u + 42u'
  *                       or `11 - 19' don't
  * @return: false: `*res' contains the correct result. */
-#define __hybrid_overflow_uadd  __intern::__intellisense_overflow_uadd
-#define __hybrid_overflow_sadd  __intern::__intellisense_overflow_sadd
-#define __hybrid_overflow_usub  __intern::__intellisense_overflow_usub
-#define __hybrid_overflow_ssub  __intern::__intellisense_overflow_ssub
-#define __hybrid_overflow_umul  __intern::__intellisense_overflow_umul
-#define __hybrid_overflow_smul  __intern::__intellisense_overflow_smul
+#define __hybrid_overflow_uadd __intern::__intellisense_overflow_uadd
+#define __hybrid_overflow_sadd __intern::__intellisense_overflow_sadd
+#define __hybrid_overflow_usub __intern::__intellisense_overflow_usub
+#define __hybrid_overflow_ssub __intern::__intellisense_overflow_ssub
+#define __hybrid_overflow_umul __intern::__intellisense_overflow_umul
+#define __hybrid_overflow_smul __intern::__intellisense_overflow_smul
 #elif ((__has_builtin(__builtin_add_overflow) && !defined(__ibmxl__)) || \
        (defined(__GNUC__) && (__GNUC__ >= 5) && !defined(__INTEL_COMPILER)))
 /* @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)
@@ -50,12 +50,12 @@ __DECL_BEGIN
  *                       or `11 - 19' don't
  * @return: false: `*res' contains the correct result. */
 #ifdef __NO_builtin_expect
-#define __hybrid_overflow_uadd(x, y, res) __builtin_add_overflow(x, y, res)
-#define __hybrid_overflow_sadd(x, y, res) __builtin_add_overflow(x, y, res)
-#define __hybrid_overflow_usub(x, y, res) __builtin_sub_overflow(x, y, res)
-#define __hybrid_overflow_ssub(x, y, res) __builtin_sub_overflow(x, y, res)
-#define __hybrid_overflow_umul(x, y, res) __builtin_mul_overflow(x, y, res)
-#define __hybrid_overflow_smul(x, y, res) __builtin_mul_overflow(x, y, res)
+#define __hybrid_overflow_uadd __builtin_add_overflow
+#define __hybrid_overflow_sadd __builtin_add_overflow
+#define __hybrid_overflow_usub __builtin_sub_overflow
+#define __hybrid_overflow_ssub __builtin_sub_overflow
+#define __hybrid_overflow_umul __builtin_mul_overflow
+#define __hybrid_overflow_smul __builtin_mul_overflow
 #else /* __NO_builtin_expect */
 #define __hybrid_overflow_uadd(x, y, res) __builtin_expect(__builtin_add_overflow(x, y, res), 0)
 #define __hybrid_overflow_sadd(x, y, res) __builtin_expect(__builtin_add_overflow(x, y, res), 0)

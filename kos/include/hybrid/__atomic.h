@@ -151,7 +151,7 @@ __SYSDECL_BEGIN
 #define __impl_hybrid_atomic_cmpxch_seqcst(x, oldv, newv) __sync_bool_compare_and_swap(&(x), oldv, newv)
 #define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv) __sync_val_compare_and_swap(&(x), oldv, newv)
 #define __hybrid_atomic_thread_fence(order) ((void)(order), __sync_synchronize())
-#else
+#else /* ... */
 __SYSDECL_END
 #ifdef __COMPILER_HAVE_GCC_ASM
 #include "host.h"
@@ -175,16 +175,16 @@ __SYSDECL_END
 /* __asm__("lock; cmpxchg")                                             */
 /************************************************************************/
 #include "__atomic-gasm.h"
-#else
+#else /* ... */
 
 /************************************************************************/
 /* libatomic:__atomic_xxx()                                             */
 /************************************************************************/
 #include "__atomic-libatomic.h"
-#endif
+#endif /* !... */
 
 __SYSDECL_BEGIN
-#endif
+#endif /* !... */
 
 
 #ifndef __impl_hybrid_atomic_cmpxch_seqcst
@@ -337,9 +337,9 @@ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __V __oldv, __V __newv, int 
 #define __impl_hybrid_atomic_load_seqcst(x) __impl_hybrid_atomic_fetchor_seqcst(x, 0)
 #elif defined(__impl_hybrid_atomic_cmpxch_val_seqcst)
 #define __impl_hybrid_atomic_load_seqcst(x) __impl_hybrid_atomic_cmpxch_val_seqcst(x, 0, 0)
-#else
+#else /* ... */
 #define __impl_hybrid_atomic_load_seqcst(x) __hybrid_atomic_cmpxch_val(x, 0, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#endif
+#endif /* !... */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __hybrid_atomic_load(x, order)                      \
 	__XBLOCK({                                              \
@@ -679,28 +679,28 @@ __INLINE_hybrid_atomic_fetchop_seqcst(fetchnand, __hybrid_opfun_nand)
 
 /* Same as the other operations, but these don't return anything */
 #ifndef __hybrid_atomic_inc
-#define __hybrid_atomic_inc(x, order) (void)__hybrid_atomic_fetchinc(x, order)
+#define __hybrid_atomic_inc (void)__hybrid_atomic_fetchinc
 #endif /* !__hybrid_atomic_inc */
 #ifndef __hybrid_atomic_dec
-#define __hybrid_atomic_dec(x, order) (void)__hybrid_atomic_fetchdec(x, order)
+#define __hybrid_atomic_dec (void)__hybrid_atomic_fetchdec
 #endif /* !__hybrid_atomic_dec */
 #ifndef __hybrid_atomic_add
-#define __hybrid_atomic_add(x, v, order) (void)__hybrid_atomic_fetchadd(x, v, order)
+#define __hybrid_atomic_add (void)__hybrid_atomic_fetchadd
 #endif /* !__hybrid_atomic_add */
 #ifndef __hybrid_atomic_sub
-#define __hybrid_atomic_sub(x, v, order) (void)__hybrid_atomic_fetchsub(x, v, order)
+#define __hybrid_atomic_sub (void)__hybrid_atomic_fetchsub
 #endif /* !__hybrid_atomic_sub */
 #ifndef __hybrid_atomic_and
-#define __hybrid_atomic_and(x, v, order) (void)__hybrid_atomic_fetchand(x, v, order)
+#define __hybrid_atomic_and (void)__hybrid_atomic_fetchand
 #endif /* !__hybrid_atomic_and */
 #ifndef __hybrid_atomic_or
-#define __hybrid_atomic_or(x, v, order) (void)__hybrid_atomic_fetchor(x, v, order)
+#define __hybrid_atomic_or (void)__hybrid_atomic_fetchor
 #endif /* !__hybrid_atomic_or */
 #ifndef __hybrid_atomic_xor
-#define __hybrid_atomic_xor(x, v, order) (void)__hybrid_atomic_fetchxor(x, v, order)
+#define __hybrid_atomic_xor (void)__hybrid_atomic_fetchxor
 #endif /* !__hybrid_atomic_xor */
 #ifndef __hybrid_atomic_nand
-#define __hybrid_atomic_nand(x, v, order) (void)__hybrid_atomic_fetchnand(x, v, order)
+#define __hybrid_atomic_nand (void)__hybrid_atomic_fetchnand
 #endif /* !__hybrid_atomic_nand */
 
 #endif /* __CC__ */
@@ -748,8 +748,7 @@ __INLINE_hybrid_atomic_fetchop_seqcst(fetchnand, __hybrid_opfun_nand)
 #ifdef __COMPILER_BARRIERS_ALL_IDENTICAL
 #define __hybrid_atomic_signal_fence(order) ((void)(order), __COMPILER_BARRIER())
 #else /* __COMPILER_BARRIERS_ALL_IDENTICAL */
-#define __hybrid_atomic_signal_fence(order) \
-	(__NAMESPACE_INT_SYM __impl_hybrid_atomic_signal_fence(order))
+#define __hybrid_atomic_signal_fence (__NAMESPACE_INT_SYM __impl_hybrid_atomic_signal_fence)
 __NAMESPACE_INT_BEGIN
 __FORCELOCAL __ATTR_ARTIFICIAL void
 __NOTHROW_NCX(__impl_hybrid_atomic_signal_fence)(int __order) {
@@ -771,8 +770,8 @@ __NAMESPACE_INT_END
 
 #ifndef __hybrid_atomic_thread_fence
 /* Shouldn't get here, but may be right on ~some~ platforms? */
-#define __hybrid_atomic_thread_fence(order) \
-	__hybrid_atomic_signal_fence(order)
+#define __hybrid_atomic_thread_fence \
+	__hybrid_atomic_signal_fence
 #endif /* !__hybrid_atomic_thread_fence */
 
 __SYSDECL_END

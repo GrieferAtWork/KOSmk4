@@ -354,7 +354,7 @@ __NOTHROW_NCX(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol
 #if defined(__USE_KOS) || defined(__USE_BSD)
 /* Open a library, given a file descriptor previously acquired by `open()'
  * NOTE: This function will inherit the given `fd' on success.
- * @param: fd:   The file descriptor to use & inhert for the shared library
+ * @param: fd:   The file descriptor to use & inherit for the shared library
  * @param: mode: Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
  *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
  *               or'd with any of the other `RTLD_*' flags. */

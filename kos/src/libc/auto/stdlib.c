@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe957414b */
+/* HASH CRC-32:0xb70c4bf0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,63 +43,6 @@
 DECL_BEGIN
 
 #include "../libc/globals.h"
-INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
-(LIBCCALL libc_qsort_r)(void *pbase,
-                        size_t item_count,
-                        size_t item_size,
-                        __compar_d_fn_t cmp,
-                        void *arg) THROWS(...) {
-	/* A public domain qsort() drop-in implementation. I couldn't find the original
-	 * source referenced (see the comment below), but this code is the first  thing
-	 * that comes up when you search for `libc qsort public domain'.
-	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
-	 *
-	 * Note that I made some modifications, and you should see the linked source for
-	 * the original code.
-	 *
-	 * WARNING: This function's logic will break in situations where `item_count' is
-	 *          greater than or equal to:
-	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
-	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
-	 *
-	 * But I would argue that this isn't something that could ever feasibly happen, and
-	 * even speaking architecturally, this isn't something that _can_ happen on x86_64.
-	 * It ~could~ happen on i386, but I very much doubt that there is any justification
-	 * as to why it should.
-	 *
-	 * ================= Documented origin =================
-	 *  ssort()  --  Fast, small, qsort()-compatible Shell sort
-	 *
-	 *  by Ray Gardner,  public domain   5/90
-	 */
-	size_t total_bytes, gap;
-	total_bytes = item_size * item_count;
-	for (gap = 0; ++gap < item_count;)
-		gap *= 3;
-	while ((gap /= 3) != 0) {
-		size_t i, gap_bytes;
-		gap_bytes = item_size * gap;
-		for (i = gap_bytes; i < total_bytes; i += item_size) {
-			size_t j;
-			for (j = i - gap_bytes;; j -= gap_bytes) {
-				size_t swap_index;
-				byte_t tmp, *a, *b;
-				a = (byte_t *)pbase + j;
-				b = a + gap_bytes;
-				if ((*cmp)(a, b, arg) <= 0)
-					break;
-				swap_index = item_size;
-				do {
-					tmp  = *a;
-					*a++ = *b;
-					*b++ = tmp;
-				} while (--swap_index);
-				if (j < gap_bytes)
-					break;
-			}
-		}
-	}
-}
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBCCALL libc_bsearch_r)(void const *pkey,
@@ -1803,26 +1746,6 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 	return libc_strtold(nptr, endptr);
 }
 #endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
-/* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR | flags' and return the file
- * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
- *                but `O_ACCMODE' is always set to `O_RDWR' */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(LIBCCALL libc_mkostemp)(char *template_,
-                                    oflag_t flags) {
-	return libc_mkostemps(template_, 0, flags);
-}
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_,
-                                     __STDC_INT_AS_SIZE_T suffixlen,
-                                     oflag_t flags) {
-	return libc_system_mktemp(0, template_, suffixlen, flags);
-}
 #include <asm/os/oflags.h>
 #include <asm/crt/stdio.h>
 #include <bits/os/timeval.h>
@@ -2054,33 +1977,6 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 
 	return -1;
 }
-#include <asm/crt/malloc.h>
-INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
-NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
-                                    size_t num_bytes) {
-	void *result;
-	result = libc_realloc(mallptr, num_bytes);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-#ifdef __REALLOC_ZERO_IS_NONNULL
-	if unlikely(!result)
-#else /* __REALLOC_ZERO_IS_NONNULL */
-	/* Must check that num_bytes != 0 because if it isn't
-	 * (iow: num_bytes == 0), then realloc(mallptr, 0) may
-	 * act  the same as  `free(mallptr)'. If that happens,
-	 * then we mustn't double-free `mallptr'.
-	 * Note that realloc(<non-NULL>, 0) can't possibly fail
-	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
-	 * was guessed incorrectly, so we know that the realloc
-	 * can only fail when  returning `NULL' for a  non-zero
-	 * size argument! */
-	if unlikely(!result && num_bytes != 0)
-#endif /* !__REALLOC_ZERO_IS_NONNULL */
-	{
-		libc_free(mallptr);
-	}
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-	return result;
-}
 #include <libc/local/program_invocation_name.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
@@ -2121,6 +2017,61 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 	}
 	return result;
 }
+#include <asm/crt/malloc.h>
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
+NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
+                                    size_t num_bytes) {
+	void *result;
+	result = libc_realloc(mallptr, num_bytes);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#ifdef __REALLOC_ZERO_IS_NONNULL
+	if unlikely(!result)
+#else /* __REALLOC_ZERO_IS_NONNULL */
+	/* Must check that num_bytes != 0 because if it isn't
+	 * (iow: num_bytes == 0), then realloc(mallptr, 0) may
+	 * act  the same as  `free(mallptr)'. If that happens,
+	 * then we mustn't double-free `mallptr'.
+	 * Note that realloc(<non-NULL>, 0) can't possibly fail
+	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
+	 * was guessed incorrectly, so we know that the realloc
+	 * can only fail when  returning `NULL' for a  non-zero
+	 * size argument! */
+	if unlikely(!result && num_bytes != 0)
+#endif /* !__REALLOC_ZERO_IS_NONNULL */
+	{
+		libc_free(mallptr);
+	}
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return result;
+}
+/* >> getprogname(3), setprogname(3) */
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_getprogname)(void) {
+	return __LOCAL_program_invocation_short_name;
+}
+/* >> getprogname(3), setprogname(3) */
+INTERN ATTR_SECTION(".text.crt.bsd") void
+NOTHROW_NCX(LIBCCALL libc_setprogname)(char const *name) {
+	__LOCAL_program_invocation_short_name_p = (char *)name;
+}
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
+(LIBCCALL libc_heapsort)(void *pbase,
+                         size_t item_count,
+                         size_t item_size,
+                         __compar_fn_t cmp) THROWS(...) {
+	/* TODO: Actually do heap-sort! */
+	libc_qsort(pbase, item_count, item_size, cmp);
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
+(LIBCCALL libc_mergesort)(void *pbase,
+                          size_t item_count,
+                          size_t item_size,
+                          __compar_fn_t cmp) THROWS(...) {
+	/* TODO: Actually do merge-sort! */
+	libc_qsort(pbase, item_count, item_size, cmp);
+	return 0;
+}
 #include <bits/types.h>
 /* >> strtonum(3)
  * Similar to `strtoi()' with `base=10', but return human-
@@ -2158,23 +2109,84 @@ NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr,
 	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
-(LIBCCALL libc_heapsort)(void *pbase,
-                         size_t item_count,
-                         size_t item_size,
-                         __compar_fn_t cmp) THROWS(...) {
-	/* TODO: Actually do heap-sort! */
-	libc_qsort(pbase, item_count, item_size, cmp);
-	return 0;
+#endif /* !__KERNEL__ */
+INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
+(LIBCCALL libc_qsort_r)(void *pbase,
+                        size_t item_count,
+                        size_t item_size,
+                        __compar_d_fn_t cmp,
+                        void *arg) THROWS(...) {
+	/* A public domain qsort() drop-in implementation. I couldn't find the original
+	 * source referenced (see the comment below), but this code is the first  thing
+	 * that comes up when you search for `libc qsort public domain'.
+	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
+	 *
+	 * Note that I made some modifications, and you should see the linked source for
+	 * the original code.
+	 *
+	 * WARNING: This function's logic will break in situations where `item_count' is
+	 *          greater than or equal to:
+	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
+	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
+	 *
+	 * But I would argue that this isn't something that could ever feasibly happen, and
+	 * even speaking architecturally, this isn't something that _can_ happen on x86_64.
+	 * It ~could~ happen on i386, but I very much doubt that there is any justification
+	 * as to why it should.
+	 *
+	 * ================= Documented origin =================
+	 *  ssort()  --  Fast, small, qsort()-compatible Shell sort
+	 *
+	 *  by Ray Gardner,  public domain   5/90
+	 */
+	size_t total_bytes, gap;
+	total_bytes = item_size * item_count;
+	for (gap = 0; ++gap < item_count;)
+		gap *= 3;
+	while ((gap /= 3) != 0) {
+		size_t i, gap_bytes;
+		gap_bytes = item_size * gap;
+		for (i = gap_bytes; i < total_bytes; i += item_size) {
+			size_t j;
+			for (j = i - gap_bytes;; j -= gap_bytes) {
+				size_t swap_index;
+				byte_t tmp, *a, *b;
+				a = (byte_t *)pbase + j;
+				b = a + gap_bytes;
+				if ((*cmp)(a, b, arg) <= 0)
+					break;
+				swap_index = item_size;
+				do {
+					tmp  = *a;
+					*a++ = *b;
+					*b++ = tmp;
+				} while (--swap_index);
+				if (j < gap_bytes)
+					break;
+			}
+		}
+	}
 }
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
-(LIBCCALL libc_mergesort)(void *pbase,
-                          size_t item_count,
-                          size_t item_size,
-                          __compar_fn_t cmp) THROWS(...) {
-	/* TODO: Actually do merge-sort! */
-	libc_qsort(pbase, item_count, item_size, cmp);
-	return 0;
+#ifndef __KERNEL__
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_mkostemp)(char *template_,
+                                    oflag_t flags) {
+	return libc_mkostemps(template_, 0, flags);
+}
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_,
+                                     __STDC_INT_AS_SIZE_T suffixlen,
+                                     oflag_t flags) {
+	return libc_system_mktemp(0, template_, suffixlen, flags);
 }
 /* >> devname(3), devname_r(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST char *
@@ -2182,16 +2194,6 @@ NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
                                    mode_t type) {
 	static char buf[64];
 	return libc_devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
-}
-/* >> getprogname(3), setprogname(3) */
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_getprogname)(void) {
-	return __LOCAL_program_invocation_short_name;
-}
-/* >> getprogname(3), setprogname(3) */
-INTERN ATTR_SECTION(".text.crt.bsd") void
-NOTHROW_NCX(LIBCCALL libc_setprogname)(char const *name) {
-	__LOCAL_program_invocation_short_name_p = (char *)name;
 }
 #include <asm/os/stdlib.h>
 /* >> strsuftoll(3)
@@ -4236,7 +4238,6 @@ err_range:
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(qsort_r, libc_qsort_r);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bsearch_r, libc_bsearch_r);
 #endif /* !__KERNEL__ */
@@ -4377,20 +4378,23 @@ DEFINE_PUBLIC_ALIAS(_strtold_l, libc_strtold_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
+DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
+DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
+DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
+DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
+DEFINE_PUBLIC_ALIAS(getprogname, libc_getprogname);
+DEFINE_PUBLIC_ALIAS(setprogname, libc_setprogname);
+DEFINE_PUBLIC_ALIAS(heapsort, libc_heapsort);
+DEFINE_PUBLIC_ALIAS(mergesort, libc_mergesort);
+DEFINE_PUBLIC_ALIAS(strtonum, libc_strtonum);
+#endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(qsort_r, libc_qsort_r);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp);
 DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);
 DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
-DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
-DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
-DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
-DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
-DEFINE_PUBLIC_ALIAS(strtonum, libc_strtonum);
-DEFINE_PUBLIC_ALIAS(heapsort, libc_heapsort);
-DEFINE_PUBLIC_ALIAS(mergesort, libc_mergesort);
 DEFINE_PUBLIC_ALIAS(devname, libc_devname);
-DEFINE_PUBLIC_ALIAS(getprogname, libc_getprogname);
-DEFINE_PUBLIC_ALIAS(setprogname, libc_setprogname);
 DEFINE_PUBLIC_ALIAS(strsuftoll, libc_strsuftoll);
 DEFINE_PUBLIC_ALIAS(strsuftollx, libc_strsuftollx);
 DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);

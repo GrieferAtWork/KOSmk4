@@ -22,87 +22,87 @@
 
 #include "__byteswap.h"
 
-#define BSWAP16_C(x)  __hybrid_bswap16_c(x)
-#define BSWAP32_C(x)  __hybrid_bswap32_c(x)
+#define BSWAP16_C __hybrid_bswap16_c
+#define BSWAP32_C __hybrid_bswap32_c
 #ifdef __UINT64_TYPE__
-#define BSWAP64_C(x)  __hybrid_bswap64_c(x)
+#define BSWAP64_C __hybrid_bswap64_c
 #ifdef __UINT128_TYPE__
-#define BSWAP128_C(x) __hybrid_bswap128_c(x)
+#define BSWAP128_C __hybrid_bswap128_c
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 
-#define BSWAP16(x)  __hybrid_bswap16(x)
-#define BSWAP32(x)  __hybrid_bswap32(x)
+#define BSWAP16 __hybrid_bswap16
+#define BSWAP32 __hybrid_bswap32
 #ifdef __UINT64_TYPE__
-#define BSWAP64(x)  __hybrid_bswap64(x)
+#define BSWAP64 __hybrid_bswap64
 #ifdef __UINT128_TYPE__
-#define BSWAP128(x) __hybrid_bswap128(x)
+#define BSWAP128 __hybrid_bswap128
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 
 
 /* Convert between host-native and Little/Big-endian */
-#define HTOBE16(x)   __hybrid_htobe16(x)
-#define HTOLE16(x)   __hybrid_htole16(x)
-#define BETOH16(x)   __hybrid_betoh16(x)
-#define LETOH16(x)   __hybrid_letoh16(x)
-#define HTOBE32(x)   __hybrid_htobe32(x)
-#define HTOLE32(x)   __hybrid_htole32(x)
-#define BETOH32(x)   __hybrid_betoh32(x)
-#define LETOH32(x)   __hybrid_letoh32(x)
-#define HTOBE16_C(x) __hybrid_htobe16_c(x)
-#define HTOLE16_C(x) __hybrid_htole16_c(x)
-#define BETOH16_C(x) __hybrid_betoh16_c(x)
-#define LETOH16_C(x) __hybrid_letoh16_c(x)
-#define HTOBE32_C(x) __hybrid_htobe32_c(x)
-#define HTOLE32_C(x) __hybrid_htole32_c(x)
-#define BETOH32_C(x) __hybrid_betoh32_c(x)
-#define LETOH32_C(x) __hybrid_letoh32_c(x)
+#define HTOBE16   __hybrid_htobe16
+#define HTOLE16   __hybrid_htole16
+#define BETOH16   __hybrid_betoh16
+#define LETOH16   __hybrid_letoh16
+#define HTOBE32   __hybrid_htobe32
+#define HTOLE32   __hybrid_htole32
+#define BETOH32   __hybrid_betoh32
+#define LETOH32   __hybrid_letoh32
+#define HTOBE16_C __hybrid_htobe16_c
+#define HTOLE16_C __hybrid_htole16_c
+#define BETOH16_C __hybrid_betoh16_c
+#define LETOH16_C __hybrid_letoh16_c
+#define HTOBE32_C __hybrid_htobe32_c
+#define HTOLE32_C __hybrid_htole32_c
+#define BETOH32_C __hybrid_betoh32_c
+#define LETOH32_C __hybrid_letoh32_c
 #ifdef __hybrid_htobe64
-#define HTOBE64(x)   __hybrid_htobe64(x)
-#define HTOLE64(x)   __hybrid_htole64(x)
-#define BETOH64(x)   __hybrid_betoh64(x)
-#define LETOH64(x)   __hybrid_letoh64(x)
-#define HTOBE64_C(x) __hybrid_htobe64_c(x)
-#define HTOLE64_C(x) __hybrid_htole64_c(x)
-#define BETOH64_C(x) __hybrid_betoh64_c(x)
-#define LETOH64_C(x) __hybrid_letoh64_c(x)
+#define HTOBE64   __hybrid_htobe64
+#define HTOLE64   __hybrid_htole64
+#define BETOH64   __hybrid_betoh64
+#define LETOH64   __hybrid_letoh64
+#define HTOBE64_C __hybrid_htobe64_c
+#define HTOLE64_C __hybrid_htole64_c
+#define BETOH64_C __hybrid_betoh64_c
+#define LETOH64_C __hybrid_letoh64_c
 #endif /* __hybrid_htobe64 */
 #ifdef __hybrid_htobe128
-#define HTOBE128(x)   __hybrid_htobe128(x)
-#define HTOLE128(x)   __hybrid_htole128(x)
-#define BETOH128(x)   __hybrid_betoh128(x)
-#define LETOH128(x)   __hybrid_letoh128(x)
-#define HTOBE128_C(x) __hybrid_htobe128_c(x)
-#define HTOLE128_C(x) __hybrid_htole128_c(x)
-#define BETOH128_C(x) __hybrid_betoh128_c(x)
-#define LETOH128_C(x) __hybrid_letoh128_c(x)
+#define HTOBE128   __hybrid_htobe128
+#define HTOLE128   __hybrid_htole128
+#define BETOH128   __hybrid_betoh128
+#define LETOH128   __hybrid_letoh128
+#define HTOBE128_C __hybrid_htobe128_c
+#define HTOLE128_C __hybrid_htole128_c
+#define BETOH128_C __hybrid_betoh128_c
+#define LETOH128_C __hybrid_letoh128_c
 #endif /* __hybrid_htobe128 */
 
 
 #ifdef __GUARD_HYBRID_UNALIGNED_H
-#define UNALIGNED_GETLE(ptr)       __hybrid_unaligned_getle(ptr)
-#define UNALIGNED_SETLE(ptr, v)    __hybrid_unaligned_setle(ptr, v)
-#define UNALIGNED_GETBE(ptr)       __hybrid_unaligned_getbe(ptr)
-#define UNALIGNED_SETBE(ptr, v)    __hybrid_unaligned_setbe(ptr, v)
-#define UNALIGNED_GETLE16(ptr)     __hybrid_unaligned_getle16(ptr)
-#define UNALIGNED_SETLE16(ptr, v)  __hybrid_unaligned_setle16(ptr, v)
-#define UNALIGNED_GETBE16(ptr)     __hybrid_unaligned_getbe16(ptr)
-#define UNALIGNED_SETBE16(ptr, v)  __hybrid_unaligned_setbe16(ptr, v)
-#define UNALIGNED_GETLE32(ptr)     __hybrid_unaligned_getle32(ptr)
-#define UNALIGNED_SETLE32(ptr, v)  __hybrid_unaligned_setle32(ptr, v)
-#define UNALIGNED_GETBE32(ptr)     __hybrid_unaligned_getbe32(ptr)
-#define UNALIGNED_SETBE32(ptr, v)  __hybrid_unaligned_setbe32(ptr, v)
+#define UNALIGNED_GETLE   __hybrid_unaligned_getle
+#define UNALIGNED_SETLE   __hybrid_unaligned_setle
+#define UNALIGNED_GETBE   __hybrid_unaligned_getbe
+#define UNALIGNED_SETBE   __hybrid_unaligned_setbe
+#define UNALIGNED_GETLE16 __hybrid_unaligned_getle16
+#define UNALIGNED_SETLE16 __hybrid_unaligned_setle16
+#define UNALIGNED_GETBE16 __hybrid_unaligned_getbe16
+#define UNALIGNED_SETBE16 __hybrid_unaligned_setbe16
+#define UNALIGNED_GETLE32 __hybrid_unaligned_getle32
+#define UNALIGNED_SETLE32 __hybrid_unaligned_setle32
+#define UNALIGNED_GETBE32 __hybrid_unaligned_getbe32
+#define UNALIGNED_SETBE32 __hybrid_unaligned_setbe32
 #ifdef __UINT64_TYPE__
-#define UNALIGNED_GETLE64(ptr)     __hybrid_unaligned_getle64(ptr)
-#define UNALIGNED_SETLE64(ptr, v)  __hybrid_unaligned_setle64(ptr, v)
-#define UNALIGNED_GETBE64(ptr)     __hybrid_unaligned_getbe64(ptr)
-#define UNALIGNED_SETBE64(ptr, v)  __hybrid_unaligned_setbe64(ptr, v)
+#define UNALIGNED_GETLE64 __hybrid_unaligned_getle64
+#define UNALIGNED_SETLE64 __hybrid_unaligned_setle64
+#define UNALIGNED_GETBE64 __hybrid_unaligned_getbe64
+#define UNALIGNED_SETBE64 __hybrid_unaligned_setbe64
 #ifdef __UINT128_TYPE__
-#define UNALIGNED_GETLE128(ptr)    __hybrid_unaligned_getle128(ptr)
-#define UNALIGNED_SETLE128(ptr, v) __hybrid_unaligned_setle128(ptr, v)
-#define UNALIGNED_GETBE128(ptr)    __hybrid_unaligned_getbe128(ptr)
-#define UNALIGNED_SETBE128(ptr, v) __hybrid_unaligned_setbe128(ptr, v)
+#define UNALIGNED_GETLE128 __hybrid_unaligned_getle128
+#define UNALIGNED_SETLE128 __hybrid_unaligned_setle128
+#define UNALIGNED_GETBE128 __hybrid_unaligned_getbe128
+#define UNALIGNED_SETBE128 __hybrid_unaligned_setbe128
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #endif /* __GUARD_HYBRID_UNALIGNED_H */

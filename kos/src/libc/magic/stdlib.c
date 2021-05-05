@@ -259,81 +259,6 @@ typedef void (__LIBCCALL *__atexit_func_t)(void);
 
 
 
-%#ifdef __USE_GNU
-%{
-#ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-#endif /* !__compar_d_fn_t_defined */
-}
-
-
-%[define(DEFINE_COMPAR_D_FN_T =
-@@pp_ifndef __compar_d_fn_t_defined@@
-#define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-@@pp_endif@@
-)]
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, kernel]]
-void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
-             [[nonnull]] __compar_d_fn_t cmp, void *arg) {
-	/* A public domain qsort() drop-in implementation. I couldn't find the original
-	 * source referenced (see the comment below), but this code is the first  thing
-	 * that comes up when you search for `libc qsort public domain'.
-	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
-	 *
-	 * Note that I made some modifications, and you should see the linked source for
-	 * the original code.
-	 *
-	 * WARNING: This function's logic will break in situations where `item_count' is
-	 *          greater than or equal to:
-	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
-	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
-	 *
-	 * But I would argue that this isn't something that could ever feasibly happen, and
-	 * even speaking architecturally, this isn't something that _can_ happen on x86_64.
-	 * It ~could~ happen on i386, but I very much doubt that there is any justification
-	 * as to why it should.
-	 *
-	 * ================= Documented origin =================
-	 *  ssort()  --  Fast, small, qsort()-compatible Shell sort
-	 *
-	 *  by Ray Gardner,  public domain   5/90
-	 */
-	size_t total_bytes, gap;
-	total_bytes = item_size * item_count;
-	for (gap = 0; ++gap < item_count;)
-		gap *= 3;
-	while ((gap /= 3) != 0) {
-		size_t i, gap_bytes;
-		gap_bytes = item_size * gap;
-		for (i = gap_bytes; i < total_bytes; i += item_size) {
-			size_t j;
-			for (j = i - gap_bytes;; j -= gap_bytes) {
-				size_t swap_index;
-				byte_t tmp, *a, *b;
-				a = (byte_t *)pbase + j;
-				b = a + gap_bytes;
-				if ((*cmp)(a, b, arg) <= 0)
-					break;
-				swap_index = item_size;
-				do {
-					tmp  = *a;
-					*a++ = *b;
-					*b++ = tmp;
-				} while (--swap_index);
-				if (j < gap_bytes)
-					break;
-			}
-		}
-	}
-}
-
-%#endif /* __USE_GNU */
-
 %
 %#ifdef __USE_KOS
 
@@ -2722,34 +2647,6 @@ int getpt();
 [[cp, ATTR_MALLOC, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *canonicalize_file_name([[nonnull]] char const *filename);
 
-@@>> mkostemp(3), mkostemp64(3)
-@@Replace the last 6 characters of `template_' (which are followed by exactly
-@@`suffixlen' more characters that are left alone), which must be filled with
-@@all 'X'-characters before the call (else errno=EINVAL + return -1), with
-@@random characters such that the filename described by `template_' will not
-@@already exists. Then, create a new file with `O_RDWR | flags' and return the file
-@@descriptor of that file.
-@@@param: flags: Additional flags to pass to `open(2)',
-@@               but `O_ACCMODE' is always set to `O_RDWR'
-[[section(".text.crt{|.dos}.fs.utility")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
-[[wunused, export_alias("mkostemp64"), requires_function(mkostemps)]]
-[[decl_include("<bits/types.h>")]]
-$fd_t mkostemp([[nonnull]] char *template_, $oflag_t flags) {
-	return mkostemps(template_, 0, flags);
-}
-
-[[section(".text.crt{|.dos}.fs.utility")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemps64")]]
-[[wunused, export_alias("mkostemps64")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
-[[requires_function(open, system_mktemp)]]
-$fd_t mkostemps([[nonnull]] char *template_,
-                __STDC_INT_AS_SIZE_T suffixlen,
-                $oflag_t flags) {
-	return system_mktemp(0, template_, suffixlen, flags);
-}
-
 @@Internal implementation for creating temporary files.
 @@@param: what: Select what kind of temporary object to create.
 @@                 `0': Create a temporary file. (The handle of that file will be returned)
@@ -2959,30 +2856,12 @@ do_try_again:
 	}
 	return result;
 }
-
-
-%#ifdef __USE_LARGEFILE64
-[[alias("mkostemp64"), nocrt, largefile64_variant_of(mkostemp)]]
-[[wunused, requires_function(mkostemps64), decl_include("<bits/types.h>")]]
-$fd_t mkostemp64([[nonnull]] char *template_, $oflag_t flags) {
-	return mkostemps64(template_, 0, flags);
-}
-
-[[wunused, alias("mkostemps64"), nocrt, largefile64_variant_of(mkostemps)]]
-[[requires_function(mkostemps), decl_include("<features.h>", "<bits/types.h>")]]
-[[impl_include("<asm/os/oflags.h>")]]
-$fd_t mkostemps64([[nonnull]] char *template_,
-                  __STDC_INT_AS_SIZE_T suffixlen,
-                  $oflag_t flags) {
-	return mkostemps(template_, suffixlen, flags | __O_LARGEFILE);
-}
-%#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
 
 %
-%#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_OPENBSD)
+%#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_BSD)
 %[insert:extern(reallocarray)]
-%#endif /* __USE_KOS || __USE_MISC || __USE_OPENBSD */
+%#endif /* __USE_KOS || __USE_MISC || __USE_BSD */
 
 %
 %#ifdef __USE_KOS
@@ -3097,89 +2976,6 @@ int shexec([[nullable]] char const *command) {
 %#endif /* __USE_KOS */
 
 %
-%#ifdef __USE_BSD
-[[section(".text.crt{|.dos}.heap.rare_helpers")]]
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
-[[guard, requires_function(realloc)]]
-[[impl_include("<asm/crt/malloc.h>")]]
-void *reallocf(void *mallptr, $size_t num_bytes) {
-	void *result;
-	result = realloc(mallptr, num_bytes);
-@@pp_if $has_function(free)@@
-@@pp_ifdef __REALLOC_ZERO_IS_NONNULL@@
-	if unlikely(!result)
-@@pp_else@@
-	/* Must check that num_bytes != 0 because if it isn't
-	 * (iow: num_bytes == 0), then realloc(mallptr, 0) may
-	 * act  the same as  `free(mallptr)'. If that happens,
-	 * then we mustn't double-free `mallptr'.
-	 * Note that realloc(<non-NULL>, 0) can't possibly fail
-	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
-	 * was guessed incorrectly, so we know that the realloc
-	 * can only fail when  returning `NULL' for a  non-zero
-	 * size argument! */
-	if unlikely(!result && num_bytes != 0)
-@@pp_endif@@
-	{
-		free(mallptr);
-	}
-@@pp_endif@@
-	return result;
-}
-
-@@>> recallocarray(3)
-@@Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
-@@when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
-@@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
-[[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((3, 4))]]
-[[userimpl, requires_function(recallocv, calloc, malloc_usable_size)]]
-void *recallocarray(void *mallptr, $size_t old_elem_count,
-                    $size_t new_elem_count, $size_t elem_size) {
-	if (mallptr != NULL && old_elem_count != 0) {
-		void *result;
-		size_t oldusable, newneeded;
-		oldusable = malloc_usable_size(mallptr);
-		newneeded = new_elem_count * elem_size;
-		if (oldusable >= newneeded) {
-			if (old_elem_count > new_elem_count) {
-				size_t zero_bytes;
-				zero_bytes = (old_elem_count - new_elem_count) * elem_size;
-				explicit_bzero((byte_t *)mallptr + newneeded, zero_bytes);
-			}
-			return mallptr;
-		}
-		/* Allocate a new block so we can ensure that  an
-		 * existing block gets freezero()'ed in all cases */
-		result = calloc(new_elem_count, elem_size);
-		if (result) {
-			if (oldusable > newneeded)
-				oldusable = newneeded;
-			memcpy(result, mallptr, oldusable);
-			freezero(mallptr, old_elem_count * elem_size);
-		}
-		return result;
-	}
-	return recallocv(mallptr, new_elem_count, elem_size);
-}
-
-@@>> freezero(3)
-@@Same as `free(mallptr)', but also ensure that the memory region
-@@described by `mallptr...+=num_bytes' is explicitly freed to zero, or
-@@immediately returned to the OS, rather than being left in cache
-@@while still containing its previous contents.
-[[section(".text.crt{|.dos}.heap.rare_helpers")]]
-[[userimpl, requires_function(free), guard]]
-void freezero(void *mallptr, $size_t num_bytes) {
-	if likely(mallptr) {
-		explicit_bzero(mallptr, num_bytes);
-		free(mallptr);
-	}
-}
-
-%#endif /* __USE_BSD */
-
-%
 %#ifdef __USE_SOLARIS
 %[default:section(".text.crt{|.dos}.solaris")]
 
@@ -3268,8 +3064,174 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 
 
 %
-%#if defined(__USE_OPENBSD) && defined(__LONGLONG)
+%#ifdef __USE_BSD
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
+[[guard, requires_function(realloc)]]
+[[impl_include("<asm/crt/malloc.h>")]]
+void *reallocf(void *mallptr, $size_t num_bytes) {
+	void *result;
+	result = realloc(mallptr, num_bytes);
+@@pp_if $has_function(free)@@
+@@pp_ifdef __REALLOC_ZERO_IS_NONNULL@@
+	if unlikely(!result)
+@@pp_else@@
+	/* Must check that num_bytes != 0 because if it isn't
+	 * (iow: num_bytes == 0), then realloc(mallptr, 0) may
+	 * act  the same as  `free(mallptr)'. If that happens,
+	 * then we mustn't double-free `mallptr'.
+	 * Note that realloc(<non-NULL>, 0) can't possibly fail
+	 * for  lack  of memory  if `__REALLOC_ZERO_IS_NONNULL'
+	 * was guessed incorrectly, so we know that the realloc
+	 * can only fail when  returning `NULL' for a  non-zero
+	 * size argument! */
+	if unlikely(!result && num_bytes != 0)
+@@pp_endif@@
+	{
+		free(mallptr);
+	}
+@@pp_endif@@
+	return result;
+}
+
+@@>> recallocarray(3)
+@@Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+@@when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+@@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
+[[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((3, 4))]]
+[[userimpl, requires_function(recallocv, calloc, malloc_usable_size)]]
+void *recallocarray(void *mallptr, $size_t old_elem_count,
+                    $size_t new_elem_count, $size_t elem_size) {
+	if (mallptr != NULL && old_elem_count != 0) {
+		void *result;
+		size_t oldusable, newneeded;
+		oldusable = malloc_usable_size(mallptr);
+		newneeded = new_elem_count * elem_size;
+		if (oldusable >= newneeded) {
+			if (old_elem_count > new_elem_count) {
+				size_t zero_bytes;
+				zero_bytes = (old_elem_count - new_elem_count) * elem_size;
+				explicit_bzero((byte_t *)mallptr + newneeded, zero_bytes);
+			}
+			return mallptr;
+		}
+		/* Allocate a new block so we can ensure that  an
+		 * existing block gets freezero()'ed in all cases */
+		result = calloc(new_elem_count, elem_size);
+		if (result) {
+			if (oldusable > newneeded)
+				oldusable = newneeded;
+			memcpy(result, mallptr, oldusable);
+			freezero(mallptr, old_elem_count * elem_size);
+		}
+		return result;
+	}
+	return recallocv(mallptr, new_elem_count, elem_size);
+}
+
+@@>> freezero(3)
+@@Same as `free(mallptr)', but also ensure that the memory region
+@@described by `mallptr...+=num_bytes' is explicitly freed to zero, or
+@@immediately returned to the OS, rather than being left in cache
+@@while still containing its previous contents.
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
+[[userimpl, requires_function(free), guard]]
+void freezero(void *mallptr, $size_t num_bytes) {
+	if likely(mallptr) {
+		explicit_bzero(mallptr, num_bytes);
+		free(mallptr);
+	}
+}
+
 %[default:section(".text.crt{|.dos}.bsd")]
+
+//TODO:uint32_t arc4random(void);
+//TODO:void arc4random_stir(void);
+//TODO:void arc4random_buf(void *, size_t);
+//TODO:uint32_t arc4random_uniform(uint32_t);
+//TODO:void arc4random_addrandom(unsigned char *, int);
+
+
+[[guard, wunused, decl_include("<hybrid/typecore.h>")]]
+char *getbsize([[nonnull]] int *headerlenp,
+               [[nonnull]] __LONGPTR_TYPE__ *blocksizep);
+/* TODO: `getbsize()' can be implemented via magic! */
+
+//TODO:char *cgetcap(char *, char const *, int);
+//TODO:int cgetclose(void);
+//TODO:int cgetent(char **, char const *const *, char const *);
+//TODO:int cgetfirst(char **, char const *const *);
+//TODO:int cgetmatch(char const *, char const *);
+//TODO:int cgetnext(char **, char const *const *);
+//TODO:int cgetnum(char *, char const *, long *);
+//TODO:int cgetset(char const *);
+//TODO:int cgetstr(char *, char const *, char **);
+//TODO:int cgetustr(char *, char const *, char **);
+
+
+%[insert:extern(daemon)]
+
+//TODO:int daemonfd($fd_t chdirfd, $fd_t nullfd);
+//TODO:char *devname($dev_t dev, $mode_t mode);
+//TODO:char *devname_r($dev_t dev, $mode_t mode, char *buf, __STDC_INT_AS_SIZE_T buflen);
+//TODO:char *fdevname($fd_t fd);
+//TODO:char *fdevname_r($fd_t fd, char *buf, __STDC_INT_AS_SIZE_T buflenint);
+//TODO:int l64a_r(long n, char *buf, __STDC_INT_AS_SIZE_T buflen);
+//TODO:$fd_t mkostempsat($fd_t dirfd, char *template_, __STDC_INT_AS_SIZE_T suffixlen, $oflag_t flags);
+//TODO:extern char *suboptarg;
+//TODO:void srandomdev(void);
+
+@@>> getprogname(3), setprogname(3)
+[[guard, wunused, const]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_program_invocation_short_name))]]
+char const *getprogname(void) {
+	return __LOCAL_program_invocation_short_name;
+}
+
+[[guard, doc_alias("getprogname")]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_program_invocation_short_name_p))]]
+void setprogname(char const *name) {
+	__LOCAL_program_invocation_short_name_p = (char *)name;
+}
+
+
+[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
+int heapsort([[nonnull]] void *pbase,
+             $size_t item_count, $size_t item_size,
+             [[nonnull]] __compar_fn_t cmp) {
+	/* TODO: Actually do heap-sort! */
+	qsort(pbase, item_count, item_size, cmp);
+	return 0;
+}
+
+[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
+int mergesort([[nonnull]] void *pbase,
+              $size_t item_count, $size_t item_size,
+              [[nonnull]] __compar_fn_t cmp) {
+	/* TODO: Actually do merge-sort! */
+	qsort(pbase, item_count, item_size, cmp);
+	return 0;
+}
+
+
+[[guard]]
+int radixsort([[nonnull]] unsigned char const **base, int item_count,
+              [[nullable]] unsigned char const *table, unsigned endbyte);
+/* TODO: `radixsort()' can be implemented via magic! */
+
+[[guard]]
+int sradixsort([[nonnull]] unsigned char const **base, int item_count,
+               [[nullable]] unsigned char const *table, unsigned endbyte);
+/* TODO: `sradixsort()' can be implemented via magic! */
+
+
+
+
+%
+%#ifdef __LONGLONG
 
 @@>> strtonum(3)
 @@Similar to `strtoi()' with `base=10', but return human-
@@ -3306,7 +3268,131 @@ __LONGLONG strtonum([[nonnull]] char const *nptr,
 	}
 	return 0;
 }
-%#endif /* __USE_OPENBSD && __LONGLONG */
+%#endif /* __LONGLONG */
+%#endif /* __USE_BSD */
+
+
+%
+%#if defined(__USE_GNU) || defined(__USE_BSD)
+%{
+#ifndef __compar_d_fn_t_defined
+#define __compar_d_fn_t_defined 1
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+#endif /* !__compar_d_fn_t_defined */
+}
+
+
+%[define(DEFINE_COMPAR_D_FN_T =
+@@pp_ifndef __compar_d_fn_t_defined@@
+#define __compar_d_fn_t_defined 1
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+@@pp_endif@@
+)]
+
+[[decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
+[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, kernel]]
+void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
+             [[nonnull]] __compar_d_fn_t cmp, void *arg) {
+	/* A public domain qsort() drop-in implementation. I couldn't find the original
+	 * source referenced (see the comment below), but this code is the first  thing
+	 * that comes up when you search for `libc qsort public domain'.
+	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
+	 *
+	 * Note that I made some modifications, and you should see the linked source for
+	 * the original code.
+	 *
+	 * WARNING: This function's logic will break in situations where `item_count' is
+	 *          greater than or equal to:
+	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
+	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
+	 *
+	 * But I would argue that this isn't something that could ever feasibly happen, and
+	 * even speaking architecturally, this isn't something that _can_ happen on x86_64.
+	 * It ~could~ happen on i386, but I very much doubt that there is any justification
+	 * as to why it should.
+	 *
+	 * ================= Documented origin =================
+	 *  ssort()  --  Fast, small, qsort()-compatible Shell sort
+	 *
+	 *  by Ray Gardner,  public domain   5/90
+	 */
+	size_t total_bytes, gap;
+	total_bytes = item_size * item_count;
+	for (gap = 0; ++gap < item_count;)
+		gap *= 3;
+	while ((gap /= 3) != 0) {
+		size_t i, gap_bytes;
+		gap_bytes = item_size * gap;
+		for (i = gap_bytes; i < total_bytes; i += item_size) {
+			size_t j;
+			for (j = i - gap_bytes;; j -= gap_bytes) {
+				size_t swap_index;
+				byte_t tmp, *a, *b;
+				a = (byte_t *)pbase + j;
+				b = a + gap_bytes;
+				if ((*cmp)(a, b, arg) <= 0)
+					break;
+				swap_index = item_size;
+				do {
+					tmp  = *a;
+					*a++ = *b;
+					*b++ = tmp;
+				} while (--swap_index);
+				if (j < gap_bytes)
+					break;
+			}
+		}
+	}
+}
+
+
+@@>> mkostemp(3), mkostemp64(3)
+@@Replace the last 6 characters of `template_' (which are followed by exactly
+@@`suffixlen' more characters that are left alone), which must be filled with
+@@all 'X'-characters before the call (else errno=EINVAL + return -1), with
+@@random characters such that the filename described by `template_' will not
+@@already exists. Then, create a new file with `O_RDWR | flags' and return the file
+@@descriptor of that file.
+@@@param: flags: Additional flags to pass to `open(2)',
+@@               but `O_ACCMODE' is always set to `O_RDWR'
+[[section(".text.crt{|.dos}.fs.utility")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
+[[wunused, export_alias("mkostemp64"), requires_function(mkostemps)]]
+[[decl_include("<bits/types.h>")]]
+$fd_t mkostemp([[nonnull]] char *template_, $oflag_t flags) {
+	return mkostemps(template_, 0, flags);
+}
+
+[[section(".text.crt{|.dos}.fs.utility")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemps64")]]
+[[wunused, export_alias("mkostemps64")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[requires_function(open, system_mktemp)]]
+$fd_t mkostemps([[nonnull]] char *template_,
+                __STDC_INT_AS_SIZE_T suffixlen,
+                $oflag_t flags) {
+	return system_mktemp(0, template_, suffixlen, flags);
+}
+
+%#ifdef __USE_LARGEFILE64
+[[alias("mkostemp64"), nocrt, largefile64_variant_of(mkostemp)]]
+[[wunused, requires_function(mkostemps64), decl_include("<bits/types.h>")]]
+$fd_t mkostemp64([[nonnull]] char *template_, $oflag_t flags) {
+	return mkostemps64(template_, 0, flags);
+}
+
+[[wunused, alias("mkostemps64"), nocrt, largefile64_variant_of(mkostemps)]]
+[[requires_function(mkostemps), decl_include("<features.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/oflags.h>")]]
+$fd_t mkostemps64([[nonnull]] char *template_,
+                  __STDC_INT_AS_SIZE_T suffixlen,
+                  $oflag_t flags) {
+	return mkostemps(template_, suffixlen, flags | __O_LARGEFILE);
+}
+%#endif /* __USE_LARGEFILE64 */
+%#endif /* __USE_GNU || __USE_BSD */
+
 
 
 %
@@ -3324,58 +3410,7 @@ typedef __mode_t mode_t;
 
 %[default:section(".text.crt{|.dos}.bsd")]
 
-[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
-int heapsort([[nonnull]] void *pbase,
-             $size_t item_count, $size_t item_size,
-             [[nonnull]] __compar_fn_t cmp) {
-	/* TODO: Actually do heap-sort! */
-	qsort(pbase, item_count, item_size, cmp);
-	return 0;
-}
-
-[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
-int mergesort([[nonnull]] void *pbase,
-              $size_t item_count, $size_t item_size,
-              [[nonnull]] __compar_fn_t cmp) {
-	/* TODO: Actually do merge-sort! */
-	qsort(pbase, item_count, item_size, cmp);
-	return 0;
-}
-
-
-[[guard]]
-int radixsort([[nonnull]] unsigned char const **base, int item_count,
-              [[nullable]] unsigned char const *table, unsigned endbyte);
-/* TODO: `radixsort()' can be implemented via magic! */
-
-[[guard]]
-int sradixsort([[nonnull]] unsigned char const **base, int item_count,
-               [[nullable]] unsigned char const *table, unsigned endbyte);
-/* TODO: `sradixsort()' can be implemented via magic! */
-
-//TODO:uint32_t arc4random(void);
-//TODO:void arc4random_stir(void);
-//TODO:void arc4random_buf(void *, size_t);
-//TODO:uint32_t arc4random_uniform(uint32_t);
-//TODO:void arc4random_addrandom(unsigned char *, int);
-
-//TODO:char *cgetcap(char *, char const *, int);
-//TODO:int cgetclose(void);
-//TODO:int cgetent(char **, char const *const *, char const *);
-//TODO:int cgetfirst(char **, char const *const *);
-//TODO:int cgetmatch(char const *, char const *);
-//TODO:int cgetnext(char **, char const *const *);
-//TODO:int cgetnum(char *, char const *, long *);
-//TODO:int cgetset(char const *);
-//TODO:int cgetstr(char *, char const *, char **);
-//TODO:int cgetustr(char *, char const *, char **);
 //TODO:void csetexpandtc(int);
-
-[[guard, wunused, decl_include("<hybrid/typecore.h>")]]
-char *getbsize([[nonnull]] int *headerlenp,
-               [[nonnull]] __LONGPTR_TYPE__ *blocksizep);
-/* TODO: `getbsize()' can be implemented via magic! */
-
 
 @@>> devname(3), devname_r(3)
 [[const, alias("__devname50"), requires_function(devname_r)]]
@@ -3433,22 +3468,6 @@ int dehumanize_number(char const *str, $int64_t *size); /* TODO: Implement here 
 void setproctitle(char const *format, ...);
 
 
-@@>> getprogname(3), setprogname(3)
-[[guard, wunused, const]]
-[[requires_include("<libc/local/program_invocation_name.h>")]]
-[[requires(defined(__LOCAL_program_invocation_short_name))]]
-char const *getprogname(void) {
-	return __LOCAL_program_invocation_short_name;
-}
-
-[[guard, doc_alias("getprogname")]]
-[[requires_include("<libc/local/program_invocation_name.h>")]]
-[[requires(defined(__LOCAL_program_invocation_short_name_p))]]
-void setprogname(char const *name) {
-	__LOCAL_program_invocation_short_name_p = (char *)name;
-}
-
-%[insert:extern(daemon)]
 %[insert:function(reallocarr = reallocarray)]
 
 //TODO:ssize_t hmac(char const *, const void *, $size_t, const void *, $size_t, void *, $size_t);
@@ -3456,7 +3475,6 @@ void setprogname(char const *name) {
 //TODO:int getenv_r(char const *, char *, $size_t);
 //TODO:void mi_vector_hash(const void *__restrict, $size_t, uint32_t, uint32_t[3]);
 
-//TODO:int l64a_r(long, char *, int);
 //TODO:$size_t shquote(char const *, char *, $size_t);
 //TODO:$size_t shquotev(int, char *const *, char *, $size_t);
 

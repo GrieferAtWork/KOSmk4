@@ -22,6 +22,6 @@
 
 #include "__yield.h"
 
-#define SCHED_YIELD() __hybrid_yield()
+#define SCHED_YIELD __hybrid_yield
 
 #endif /* !__GUARD_HYBRID_SCHED_YIELD_H */

@@ -590,8 +590,8 @@ typedef struct {
  * The size of the `dst' buffer depends on `dw_regno' and can be calculated with the
  * arch-specific `CFI_REGISTER_SIZE()' macro.
  * @param: dw_regno: One of `CFI_[arch]_UNWIND_REGISTER_[name]'
- * @param: dst:      A buffer of `CFI_386_REGISTER_SIZE(dw_regno)' bytes,
- *                   to-be filled with the register value.
+ * @param: dst:      A  buffer  of  `CFI_REGISTER_SIZE(dw_regno)'
+ *                   bytes, to-be filled with the register value.
  * @return: UNWIND_SUCCESS:          Success (only in this case will `dst'/`src' have been used)
  * @return: UNWIND_INVALID_REGISTER: The given `dw_regno' is invalid/unsupported.
  * @return: UNWIND_OPTIMIZED_AWAY:   Register information has been optimized away.

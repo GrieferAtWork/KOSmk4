@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71d8859c */
+/* HASH CRC-32:0x66bd714d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -326,18 +326,6 @@ typedef __compar_fn_t comparison_fn_t;
 typedef void (__LIBCCALL *__atexit_func_t)(void);
 #endif /* !____atexit_func_t_defined */
 
-#ifdef __USE_GNU
-#ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-#endif /* !__compar_d_fn_t_defined */
-#ifdef __CRT_HAVE_qsort_r
-__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pbase,__item_count,__item_size,__cmp,__arg))
-#else /* __CRT_HAVE_qsort_r */
-#include <libc/local/stdlib/qsort_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __cmp, __arg); })
-#endif /* !__CRT_HAVE_qsort_r */
-#endif /* __USE_GNU */
 
 #ifdef __USE_KOS
 #ifndef __compar_d_fn_t_defined
@@ -2892,95 +2880,9 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getpt,(void),())
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,canonicalize_file_name,(char const *__filename),(__filename))
-#if defined(__CRT_HAVE_mkostemp64) && defined(__USE_FILE_OFFSET64)
-/* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR | flags' and return the file
- * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
- *                but `O_ACCMODE' is always set to `O_RDWR' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(char *__template_, __oflag_t __flags),mkostemp64,(__template_,__flags))
-#elif defined(__CRT_HAVE_mkostemp)
-/* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR | flags' and return the file
- * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
- *                but `O_ACCMODE' is always set to `O_RDWR' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(char *__template_, __oflag_t __flags),(__template_,__flags))
-#elif defined(__CRT_HAVE_mkostemp64)
-/* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR | flags' and return the file
- * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
- *                but `O_ACCMODE' is always set to `O_RDWR' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(char *__template_, __oflag_t __flags),mkostemp64,(__template_,__flags))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-#include <libc/local/stdlib/mkostemp.h>
-/* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR | flags' and return the file
- * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
- *                but `O_ACCMODE' is always set to `O_RDWR' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemp)(char *__template_, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemp))(__template_, __flags); })
-#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
-#if defined(__CRT_HAVE_mkostemps64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps64,(__template_,__suffixlen,__flags))
-#elif defined(__CRT_HAVE_mkostemps)
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),(__template_,__suffixlen,__flags))
-#elif defined(__CRT_HAVE_mkostemps64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps64,(__template_,__suffixlen,__flags))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-#include <libc/local/stdlib/mkostemps.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemps))(__template_, __suffixlen, __flags); })
-#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
-#ifdef __USE_LARGEFILE64
-#ifdef __CRT_HAVE_mkostemp64
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp64,(char *__template_, __oflag_t __flags),(__template_,__flags))
-#elif defined(__CRT_HAVE_mkostemp) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp64,(char *__template_, __oflag_t __flags),mkostemp,(__template_,__flags))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-#include <libc/local/stdlib/mkostemp64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemp64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemp64)(char *__template_, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemp64))(__template_, __flags); })
-#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
-#ifdef __CRT_HAVE_mkostemps64
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),(__template_,__suffixlen,__flags))
-#elif defined(__CRT_HAVE_mkostemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps,(__template_,__suffixlen,__flags))
-#else /* ... */
-#include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-#include <libc/local/stdlib/mkostemps64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemps64)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemps64))(__template_, __suffixlen, __flags); })
-#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
-#endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
 
-#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_OPENBSD)
+#if defined(__USE_KOS) || defined(__USE_MISC) || defined(__USE_BSD)
 #ifndef __reallocarray_defined
 #define __reallocarray_defined 1
 #ifdef __CRT_HAVE_reallocarray
@@ -2994,7 +2896,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #undef __reallocarray_defined
 #endif /* !... */
 #endif /* !__reallocarray_defined */
-#endif /* __USE_KOS || __USE_MISC || __USE_OPENBSD */
+#endif /* __USE_KOS || __USE_MISC || __USE_BSD */
 
 #ifdef __USE_KOS
 #ifndef __recalloc_defined
@@ -3153,60 +3055,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(shexec, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #endif /* !... */
 #endif /* !__shexec_defined */
 #endif /* __USE_KOS */
-
-#ifdef __USE_BSD
-#ifndef __reallocf_defined
-#define __reallocf_defined 1
-#ifdef __CRT_HAVE_reallocf
-__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
-#elif defined(__CRT_HAVE_realloc)
-#include <libc/local/stdlib/reallocf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
-#else /* ... */
-#undef __reallocf_defined
-#endif /* !... */
-#endif /* !__reallocf_defined */
-#ifndef __recallocarray_defined
-#define __recallocarray_defined 1
-#ifdef __CRT_HAVE_recallocarray
-/* >> recallocarray(3)
- * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
- * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
-__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)),void *,__NOTHROW_NCX,recallocarray,(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__old_elem_count,__new_elem_count,__elem_size))
-#elif (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
-#include <libc/local/stdlib/recallocarray.h>
-/* >> recallocarray(3)
- * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
- * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
-#else /* ... */
-#undef __recallocarray_defined
-#endif /* !... */
-#endif /* !__recallocarray_defined */
-#ifndef __freezero_defined
-#define __freezero_defined 1
-#ifdef __CRT_HAVE_freezero
-/* >> freezero(3)
- * Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
- * while still containing its previous contents. */
-__CDECLARE_VOID(,__NOTHROW_NCX,freezero,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
-#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-#include <libc/local/stdlib/freezero.h>
-/* >> freezero(3)
- * Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
- * while still containing its previous contents. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL freezero)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(freezero))(__mallptr, __num_bytes); })
-#else /* ... */
-#undef __freezero_defined
-#endif /* !... */
-#endif /* !__freezero_defined */
-#endif /* __USE_BSD */
 
 #ifdef __USE_SOLARIS
 #ifndef __uid_t_defined
@@ -3416,7 +3264,127 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL get
 #endif /* !... */
 #endif /* __USE_SOLARIS */
 
-#if defined(__USE_OPENBSD) && defined(__LONGLONG)
+#ifdef __USE_BSD
+#ifndef __reallocf_defined
+#define __reallocf_defined 1
+#ifdef __CRT_HAVE_reallocf
+__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
+#elif defined(__CRT_HAVE_realloc)
+#include <libc/local/stdlib/reallocf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
+#else /* ... */
+#undef __reallocf_defined
+#endif /* !... */
+#endif /* !__reallocf_defined */
+#ifndef __recallocarray_defined
+#define __recallocarray_defined 1
+#ifdef __CRT_HAVE_recallocarray
+/* >> recallocarray(3)
+ * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+ * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)),void *,__NOTHROW_NCX,recallocarray,(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__old_elem_count,__new_elem_count,__elem_size))
+#elif (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
+#include <libc/local/stdlib/recallocarray.h>
+/* >> recallocarray(3)
+ * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
+ * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+__NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
+#else /* ... */
+#undef __recallocarray_defined
+#endif /* !... */
+#endif /* !__recallocarray_defined */
+#ifndef __freezero_defined
+#define __freezero_defined 1
+#ifdef __CRT_HAVE_freezero
+/* >> freezero(3)
+ * Same as `free(mallptr)', but also ensure that the memory region
+ * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
+ * immediately returned to the OS, rather than being left in cache
+ * while still containing its previous contents. */
+__CDECLARE_VOID(,__NOTHROW_NCX,freezero,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#include <libc/local/stdlib/freezero.h>
+/* >> freezero(3)
+ * Same as `free(mallptr)', but also ensure that the memory region
+ * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
+ * immediately returned to the OS, rather than being left in cache
+ * while still containing its previous contents. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL freezero)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(freezero))(__mallptr, __num_bytes); })
+#else /* ... */
+#undef __freezero_defined
+#endif /* !... */
+#endif /* !__freezero_defined */
+#if !defined(__getbsize_defined) && defined(__CRT_HAVE_getbsize)
+#define __getbsize_defined 1
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
+#endif /* !__getbsize_defined && __CRT_HAVE_getbsize */
+#if !defined(__daemon_defined) && defined(__CRT_HAVE_daemon)
+#define __daemon_defined 1
+/* >> daemon(3) */
+__CDECLARE(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
+#endif /* !__daemon_defined && __CRT_HAVE_daemon */
+#ifndef __getprogname_defined
+#define __getprogname_defined 1
+#ifdef __CRT_HAVE_getprogname
+/* >> getprogname(3), setprogname(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
+#else /* __CRT_HAVE_getprogname */
+#include <libc/local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_short_name
+#include <libc/local/stdlib/getprogname.h>
+/* >> getprogname(3), setprogname(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getprogname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getprogname))(); })
+#else /* __LOCAL_program_invocation_short_name */
+#undef __getprogname_defined
+#endif /* !__LOCAL_program_invocation_short_name */
+#endif /* !__CRT_HAVE_getprogname */
+#endif /* !__getprogname_defined */
+#ifndef __setprogname_defined
+#define __setprogname_defined 1
+#ifdef __CRT_HAVE_setprogname
+/* >> getprogname(3), setprogname(3) */
+__CDECLARE_VOID(,__NOTHROW_NCX,setprogname,(char const *__name),(__name))
+#else /* __CRT_HAVE_setprogname */
+#include <libc/local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_short_name_p
+#include <libc/local/stdlib/setprogname.h>
+/* >> getprogname(3), setprogname(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setprogname, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL setprogname)(char const *__name) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setprogname))(__name); })
+#else /* __LOCAL_program_invocation_short_name_p */
+#undef __setprogname_defined
+#endif /* !__LOCAL_program_invocation_short_name_p */
+#endif /* !__CRT_HAVE_setprogname */
+#endif /* !__setprogname_defined */
+#ifndef __heapsort_defined
+#define __heapsort_defined 1
+#ifdef __CRT_HAVE_heapsort
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+#else /* __CRT_HAVE_heapsort */
+#include <libc/local/stdlib/heapsort.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
+#endif /* !__CRT_HAVE_heapsort */
+#endif /* !__heapsort_defined */
+#ifndef __mergesort_defined
+#define __mergesort_defined 1
+#ifdef __CRT_HAVE_mergesort
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+#else /* __CRT_HAVE_mergesort */
+#include <libc/local/stdlib/mergesort.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
+#endif /* !__CRT_HAVE_mergesort */
+#endif /* !__mergesort_defined */
+#if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
+#define __radixsort_defined 1
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+#endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
+#if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
+#define __sradixsort_defined 1
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+#endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
+
+#ifdef __LONGLONG
 #ifndef __strtonum_defined
 #define __strtonum_defined 1
 #ifdef __CRT_HAVE_strtonum
@@ -3448,7 +3416,107 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__LONGLONG,__NOTHROW_NCX,strton
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtonum)(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtonum))(__nptr, __lo, __hi, __p_errstr); })
 #endif /* !__CRT_HAVE_strtonum */
 #endif /* !__strtonum_defined */
-#endif /* __USE_OPENBSD && __LONGLONG */
+#endif /* __LONGLONG */
+#endif /* __USE_BSD */
+
+#if defined(__USE_GNU) || defined(__USE_BSD)
+#ifndef __compar_d_fn_t_defined
+#define __compar_d_fn_t_defined 1
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+#endif /* !__compar_d_fn_t_defined */
+#ifdef __CRT_HAVE_qsort_r
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pbase,__item_count,__item_size,__cmp,__arg))
+#else /* __CRT_HAVE_qsort_r */
+#include <libc/local/stdlib/qsort_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __cmp, __arg); })
+#endif /* !__CRT_HAVE_qsort_r */
+#if defined(__CRT_HAVE_mkostemp64) && defined(__USE_FILE_OFFSET64)
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(char *__template_, __oflag_t __flags),mkostemp64,(__template_,__flags))
+#elif defined(__CRT_HAVE_mkostemp)
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(char *__template_, __oflag_t __flags),(__template_,__flags))
+#elif defined(__CRT_HAVE_mkostemp64)
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(char *__template_, __oflag_t __flags),mkostemp64,(__template_,__flags))
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <libc/local/stdlib/mkostemp.h>
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `template_' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemp)(char *__template_, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemp))(__template_, __flags); })
+#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
+#if defined(__CRT_HAVE_mkostemps64) && defined(__USE_FILE_OFFSET64)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps64,(__template_,__suffixlen,__flags))
+#elif defined(__CRT_HAVE_mkostemps)
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),(__template_,__suffixlen,__flags))
+#elif defined(__CRT_HAVE_mkostemps64)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps64,(__template_,__suffixlen,__flags))
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <libc/local/stdlib/mkostemps.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemps))(__template_, __suffixlen, __flags); })
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
+#ifdef __USE_LARGEFILE64
+#ifdef __CRT_HAVE_mkostemp64
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp64,(char *__template_, __oflag_t __flags),(__template_,__flags))
+#elif defined(__CRT_HAVE_mkostemp) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp64,(char *__template_, __oflag_t __flags),mkostemp,(__template_,__flags))
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <libc/local/stdlib/mkostemp64.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemp64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemp64)(char *__template_, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemp64))(__template_, __flags); })
+#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
+#ifdef __CRT_HAVE_mkostemps64
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),(__template_,__suffixlen,__flags))
+#elif defined(__CRT_HAVE_mkostemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps,(__template_,__suffixlen,__flags))
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <libc/local/stdlib/mkostemps64.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemps64)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemps64))(__template_, __suffixlen, __flags); })
+#endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_GNU || __USE_BSD */
 
 #ifdef __USE_NETBSD
 #ifndef __dev_t_defined
@@ -3459,36 +3527,6 @@ typedef __dev_t dev_t;
 #define __mode_t_defined 1
 typedef __mode_t mode_t;
 #endif /* !__mode_t_defined */
-#ifndef __heapsort_defined
-#define __heapsort_defined 1
-#ifdef __CRT_HAVE_heapsort
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
-#else /* __CRT_HAVE_heapsort */
-#include <libc/local/stdlib/heapsort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
-#endif /* !__CRT_HAVE_heapsort */
-#endif /* !__heapsort_defined */
-#ifndef __mergesort_defined
-#define __mergesort_defined 1
-#ifdef __CRT_HAVE_mergesort
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
-#else /* __CRT_HAVE_mergesort */
-#include <libc/local/stdlib/mergesort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
-#endif /* !__CRT_HAVE_mergesort */
-#endif /* !__mergesort_defined */
-#if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
-#define __radixsort_defined 1
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
-#endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
-#if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
-#define __sradixsort_defined 1
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
-#endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
-#if !defined(__getbsize_defined) && defined(__CRT_HAVE_getbsize)
-#define __getbsize_defined 1
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(int *__headerlenp, __LONGPTR_TYPE__ *__blocksizep),(__headerlenp,__blocksizep))
-#endif /* !__getbsize_defined && __CRT_HAVE_getbsize */
 #ifdef __CRT_HAVE_devname
 /* >> devname(3), devname_r(3) */
 __CDECLARE(__ATTR_CONST,char *,__NOTHROW_NCX,devname,(dev_t __dev, mode_t __type),(__dev,__type))
@@ -3547,43 +3585,6 @@ __CDECLARE(,int,__NOTHROW_NCX,dehumanize_number,(char const *__str, __INT64_TYPE
 /* >> setproctitle(3) */
 __LIBC __ATTR_LIBC_PRINTF(1, 2) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) __CASMNAME_SAME("setproctitle");
 #endif /* !__setproctitle_defined && __CRT_HAVE_setproctitle */
-#ifndef __getprogname_defined
-#define __getprogname_defined 1
-#ifdef __CRT_HAVE_getprogname
-/* >> getprogname(3), setprogname(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getprogname,(void),())
-#else /* __CRT_HAVE_getprogname */
-#include <libc/local/program_invocation_name.h>
-#ifdef __LOCAL_program_invocation_short_name
-#include <libc/local/stdlib/getprogname.h>
-/* >> getprogname(3), setprogname(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getprogname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getprogname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getprogname))(); })
-#else /* __LOCAL_program_invocation_short_name */
-#undef __getprogname_defined
-#endif /* !__LOCAL_program_invocation_short_name */
-#endif /* !__CRT_HAVE_getprogname */
-#endif /* !__getprogname_defined */
-#ifndef __setprogname_defined
-#define __setprogname_defined 1
-#ifdef __CRT_HAVE_setprogname
-/* >> getprogname(3), setprogname(3) */
-__CDECLARE_VOID(,__NOTHROW_NCX,setprogname,(char const *__name),(__name))
-#else /* __CRT_HAVE_setprogname */
-#include <libc/local/program_invocation_name.h>
-#ifdef __LOCAL_program_invocation_short_name_p
-#include <libc/local/stdlib/setprogname.h>
-/* >> getprogname(3), setprogname(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(setprogname, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL setprogname)(char const *__name) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setprogname))(__name); })
-#else /* __LOCAL_program_invocation_short_name_p */
-#undef __setprogname_defined
-#endif /* !__LOCAL_program_invocation_short_name_p */
-#endif /* !__CRT_HAVE_setprogname */
-#endif /* !__setprogname_defined */
-#if !defined(__daemon_defined) && defined(__CRT_HAVE_daemon)
-#define __daemon_defined 1
-/* >> daemon(3) */
-__CDECLARE(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
-#endif /* !__daemon_defined && __CRT_HAVE_daemon */
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarr,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_reallocarr)

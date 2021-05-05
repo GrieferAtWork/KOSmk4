@@ -23,22 +23,22 @@
 #include "__wordbits.h"
 
 /* Return the ith byte/word/dword of a given 16/32/64-bit integer. */
-#define INT16_I8(x, i)                       __INT16_I8(x, i)
-#define INT32_I8(x, i)                       __INT32_I8(x, i)
-#define INT64_I8(x, i)                       __INT64_I8(x, i)
-#define INT32_I16(x, i)                      __INT32_I16(x, i)
-#define INT64_I16(x, i)                      __INT64_I16(x, i)
-#define INT64_I32(x, i)                      __INT64_I32(x, i)
-#define ENCODE_INT16(a, b)                   __ENCODE_INT16(a, b)
-#define ENCODE_INT32(a, b, c, d)             __ENCODE_INT32(a, b, c, d)
-#define ENCODE_INT64(a, b, c, d, e, f, g, h) __ENCODE_INT64(a, b, c, d, e, f, g, h)
+#define INT16_I8     __INT16_I8
+#define INT32_I8     __INT32_I8
+#define INT64_I8     __INT64_I8
+#define INT32_I16    __INT32_I16
+#define INT64_I16    __INT64_I16
+#define INT64_I32    __INT64_I32
+#define ENCODE_INT16 __ENCODE_INT16
+#define ENCODE_INT32 __ENCODE_INT32
+#define ENCODE_INT64 __ENCODE_INT64
 
 /* Commonly used aliases. */
-#define INT16_BYTE(x, i)  __INT16_BYTE(x, i)
-#define INT32_BYTE(x, i)  __INT32_BYTE(x, i)
-#define INT64_BYTE(x, i)  __INT64_BYTE(x, i)
-#define INT32_WORD(x, i)  __INT32_WORD(x, i)
-#define INT64_WORD(x, i)  __INT64_WORD(x, i)
-#define INT64_DWORD(x, i) __INT64_DWORD(x, i)
+#define INT16_BYTE  __INT16_BYTE
+#define INT32_BYTE  __INT32_BYTE
+#define INT64_BYTE  __INT64_BYTE
+#define INT32_WORD  __INT32_WORD
+#define INT64_WORD  __INT64_WORD
+#define INT64_DWORD __INT64_DWORD
 
 #endif /* !__GUARD_HYBRID_WORDBITS_H */

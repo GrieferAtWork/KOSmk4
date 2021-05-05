@@ -22,7 +22,7 @@
 
 #include "__pointer.h"
 
-#define PTR32(T) __HYBRID_PTR32(T)
-#define PTR64(T) __HYBRID_PTR64(T)
+#define PTR32 __HYBRID_PTR32
+#define PTR64 __HYBRID_PTR64
 
 #endif /* !__GUARD_HYBRID_POINTER_H */

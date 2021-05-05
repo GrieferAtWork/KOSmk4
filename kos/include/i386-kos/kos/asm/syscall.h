@@ -211,23 +211,23 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
  * might break, since everything from libc is allowed to assume that EFLAGS.DF=0
  * upon function entry)
  * HINT:
- *   .cfi_escape DW_CFA_KOS_startcapsule
- *   .cfi_escape   DW_CFA_val_expression
- *   .cfi_escape CFI_386_UNWIND_REGISTER_EFLAGS
- *   .cfi_escape 6 // Code size
- *   .cfi_escape DW_OP_reg0 + CFI_386_UNWIND_REGISTER_EFLAGS
- *   .cfi_escape DW_OP_const2u
- *   .cfi_escape   (EFLAGS_DF   &  0x00ff)
- *   .cfi_escape (EFLAGS_DF & 0xff00) >> 8
- *   .cfi_escape DW_OP_not
- *   .cfi_escape DW_OP_and
- *   ...
- *   .cfi_escape DW_CFA_KOS_endcapsule */
-#define __X86_XSYSCALL_ASSEMBLY                              \
-	"std\n\t"                                                \
-	".cfi_escape 0x38,0x16,9,6,0x59,0xa,0,0x4,0x20,0x1a\n\t" \
-	"int {$0x80|80h}\n\t"                                    \
-	"cld\n\t"                                                \
+ * >>    .cfi_escape DW_CFA_KOS_startcapsule
+ * >>    .cfi_escape DW_CFA_val_expression
+ * >>    .cfi_escape CFI_386_UNWIND_REGISTER_EFLAGS
+ * >>    .cfi_escape 6 // Code size
+ * >>    .cfi_escape DW_OP_reg0 + CFI_386_UNWIND_REGISTER_EFLAGS
+ * >>    .cfi_escape DW_OP_const2u
+ * >>    .cfi_escape (EFLAGS_DF & 0x00ff)
+ * >>    .cfi_escape (EFLAGS_DF & 0xff00) >> 8
+ * >>    .cfi_escape DW_OP_not
+ * >>    .cfi_escape DW_OP_and
+ * >>    ...
+ * >>    .cfi_escape DW_CFA_KOS_endcapsule */
+#define __X86_XSYSCALL_ASSEMBLY                            \
+	"std\n\t"                                              \
+	".cfi_escape 0x38,0x16,9,6,0x59,0xa,0,4,0x20,0x1a\n\t" \
+	"int {$0x80|80h}\n\t"                                  \
+	"cld\n\t"                                              \
 	".cfi_escape 0x39"
 #undef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #endif /* !__X86_SYSCALL_ASSEMBLY */

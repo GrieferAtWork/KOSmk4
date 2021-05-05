@@ -38,21 +38,23 @@ typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
  *       your own custom register get/set functions that call forward to the functions
  *       below:
  * >> unsigned int LIBUNWIND_CC my_getreg(void const *arg, uintptr_half_t regno, void *dst) {
+ * >>     unsigned int error;
  * >>     struct my_cpustate_with_fpu const *me;
  * >>     me = (struct my_cpustate_with_fpu const *)arg;
- * >>     if (unwind_getreg_xfpustate(me->cs_fpu, regno, dst))
- * >>         return UNWIND_SUCCESS;
- * >>     if (unwind_getreg_ufpustate(me->cs_cpu, regno, dst))
- * >>         return UNWIND_SUCCESS;
+ * >>     if ((error = unwind_getreg_xfpustate(me->cs_fpu, regno, dst)) != UNWIND_INVALID_REGISTER)
+ * >>         return error;
+ * >>     if ((error = unwind_getreg_ufpustate(me->cs_cpu, regno, dst)) != UNWIND_INVALID_REGISTER)
+ * >>         return error;
  * >>     return UNWIND_INVALID_REGISTER;
  * >> }
  * >> unsigned int LIBUNWIND_CC my_setreg(void *arg, uintptr_half_t regno, void const *src) {
+ * >>     unsigned int error;
  * >>     struct my_cpustate_with_fpu *me;
  * >>     me = (struct my_cpustate_with_fpu *)arg;
- * >>     if (unwind_setreg_xfpustate(me->cs_fpu, regno, src))
- * >>         return UNWIND_SUCCESS;
- * >>     if (unwind_setreg_ufpustate(me->cs_cpu, regno, src))
- * >>         return UNWIND_SUCCESS;
+ * >>     if ((error = unwind_setreg_xfpustate(me->cs_fpu, regno, src)) != UNWIND_INVALID_REGISTER)
+ * >>         return error;
+ * >>     if ((error = unwind_setreg_ufpustate(me->cs_cpu, regno, src)) != UNWIND_INVALID_REGISTER)
+ * >>         return error;
  * >>     return UNWIND_INVALID_REGISTER;
  * >> }
  * NOTE: *_exclusive functions  will always  return  `UNWIND_INVALID_REGISTER' when  attempting  to

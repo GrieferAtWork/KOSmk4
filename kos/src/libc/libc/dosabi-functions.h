@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52ebe2f4 */
+/* HASH CRC-32:0x91be612 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1514,7 +1514,6 @@ DFUN(".text.crt.dos.FILE.utility.ext", libd___fpending, libc___fpending, TI, 1, 
 DFUN(".text.crt.dos.FILE.utility.ext", libd___fsetlocking, libc___fsetlocking, TD, 2, TP, TD)
 
 /* stdlib */
-DFUN(".text.crt.dos.utility.stdlib", libd_qsort_r, libc_qsort_r, TV, 5, TP, TI, TI, TP, TP)
 DFUN(".text.crt.dos.utility.stdlib", libd_bsearch_r, libc_bsearch_r, TP, 6, TP, TP, TI, TI, TP, TP)
 DFUN(".text.crt.dos.math.utility", libd_labs, libc_labs, TL, 1, TL)
 DFUN(".text.crt.dos.math.utility", libd_llabs, libc_llabs, TLL, 1, TLL)
@@ -1620,24 +1619,25 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_strtof_l, libc_strtof_l, TF, 3
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtold_l, libc_strtold_l, TFL, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.environ", libd_secure_getenv, libc_secure_getenv, TP, 1, TP)
 DFUN(".text.crt.dos.fs.property", libd_canonicalize_file_name, libc_canonicalize_file_name, TP, 1, TP)
-DFUN(".text.crt.dos.fs.utility", libd_mkostemp, libc_mkostemp, TIn(__SIZEOF_FD_T__), 2, TP, TIn(__SIZEOF_OFLAG_T__))
-DFUN(".text.crt.dos.fs.utility", libd_mkostemps, libc_mkostemps, TIn(__SIZEOF_FD_T__), 3, TP, TD, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.exec.system", libd_shexec, libc_shexec, TD, 1, TP)
+DFUN(".text.crt.dos.solaris", libd_fdwalk, libc_fdwalk, TD, 2, TP, TP)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_reallocf, libc_reallocf, TP, 2, TP, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_recallocarray, libc_recallocarray, TP, 4, TP, TI, TI, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_freezero, libc_freezero, TV, 2, TP, TI)
-DFUN(".text.crt.dos.solaris", libd_fdwalk, libc_fdwalk, TD, 2, TP, TP)
-DFUN(".text.crt.dos.bsd", libd_strtonum, libc_strtonum, TLL, 4, TP, TLL, TLL, TP)
+DFUN(".text.crt.dos.bsd", libd_getbsize, libc_getbsize, TP, 2, TP, TP)
+DFUN(".text.crt.dos.bsd", libd_setprogname, libc_setprogname, TV, 1, TP)
 DFUN(".text.crt.dos.bsd", libd_heapsort, libc_heapsort, TD, 4, TP, TI, TI, TP)
 DFUN(".text.crt.dos.bsd", libd_mergesort, libc_mergesort, TD, 4, TP, TI, TI, TP)
 DFUN(".text.crt.dos.bsd", libd_radixsort, libc_radixsort, TD, 4, TP, TD, TP, TD)
 DFUN(".text.crt.dos.bsd", libd_sradixsort, libc_sradixsort, TD, 4, TP, TD, TP, TD)
-DFUN(".text.crt.dos.bsd", libd_getbsize, libc_getbsize, TP, 2, TP, TP)
+DFUN(".text.crt.dos.bsd", libd_strtonum, libc_strtonum, TLL, 4, TP, TLL, TLL, TP)
+DFUN(".text.crt.dos.utility.stdlib", libd_qsort_r, libc_qsort_r, TV, 5, TP, TI, TI, TP, TP)
+DFUN(".text.crt.dos.fs.utility", libd_mkostemp, libc_mkostemp, TIn(__SIZEOF_FD_T__), 2, TP, TIn(__SIZEOF_OFLAG_T__))
+DFUN(".text.crt.dos.fs.utility", libd_mkostemps, libc_mkostemps, TIn(__SIZEOF_FD_T__), 3, TP, TD, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.bsd", libd_devname, libc_devname, TP, 2, TIn(__SIZEOF_DEV_T__), TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.bsd", libd_devname_r, libc_devname_r, TD, 4, TIn(__SIZEOF_DEV_T__), TIn(__SIZEOF_MODE_T__), TP, TI)
 DFUN(".text.crt.dos.bsd", libd_humanize_number, libc_humanize_number, TD, 6, TP, TI, TI64, TP, TD, TD)
 DFUN(".text.crt.dos.bsd", libd_dehumanize_number, libc_dehumanize_number, TD, 2, TP, TP)
-DFUN(".text.crt.dos.bsd", libd_setprogname, libc_setprogname, TV, 1, TP)
 DFUN(".text.crt.dos.bsd", libd_strsuftoll, libc_strsuftoll, TLL, 4, TP, TP, TLL, TLL)
 DFUN(".text.crt.dos.bsd", libd_strsuftollx, libc_strsuftollx, TLL, 6, TP, TP, TLL, TLL, TP, TI)
 DFUN(".text.crt.dos.errno", libd__set_doserrno, libc__set_doserrno, TIn(__SIZEOF_ERRNO_T__), 1, TI32)

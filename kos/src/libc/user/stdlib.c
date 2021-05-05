@@ -2278,7 +2278,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2baf0bbf]]]*/
+/*[[[start:exports,hash:CRC-32=0xea20198c]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2339,9 +2339,9 @@ DEFINE_PUBLIC_ALIAS(getpt, libc_getpt);
 DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);
 DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
 DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);
+DEFINE_PUBLIC_ALIAS(getbsize, libc_getbsize);
 DEFINE_PUBLIC_ALIAS(radixsort, libc_radixsort);
 DEFINE_PUBLIC_ALIAS(sradixsort, libc_sradixsort);
-DEFINE_PUBLIC_ALIAS(getbsize, libc_getbsize);
 DEFINE_PUBLIC_ALIAS(devname_r, libc_devname_r);
 DEFINE_PUBLIC_ALIAS(humanize_number, libc_humanize_number);
 DEFINE_PUBLIC_ALIAS(dehumanize_number, libc_dehumanize_number);

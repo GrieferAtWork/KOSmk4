@@ -26,11 +26,11 @@
 /* Evaluates to the size of a bubble.
  * >> PP_BUBBLE_SIZE((a))       -- 1
  * >> PP_BUBBLE_SIZE((a)(b)(c)) -- 3 */
-#define PP_BUBBLE_SIZE(x)            __HYBRID_PP_PRIVATE_BUBBLE_SIZE_0 x (__STOP__)
+#define PP_BUBBLE_SIZE(x) __HYBRID_PP_PRIVATE_BUBBLE_SIZE_0 x(__STOP__)
 
 /* Evaluates to the i'th element of a bubble.
  * >> PP_BUBBLE_GET((a)(b)(c),0) -- a
  * >> PP_BUBBLE_GET((a)(b)(c),2) -- c */
-#define PP_BUBBLE_GET(x,i)           __HYBRID_PP_PRIVATE_BUBBLE_GET(x,i,PP_BUBBLE_SIZE(x))
+#define PP_BUBBLE_GET(x, i) __HYBRID_PP_PRIVATE_BUBBLE_GET(x, i, PP_BUBBLE_SIZE(x))
 
 #endif /* !__GUARD_HYBRID_PP_BUBBLE_H */

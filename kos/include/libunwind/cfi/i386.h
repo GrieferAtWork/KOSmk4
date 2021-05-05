@@ -408,12 +408,12 @@ printArrayDefineMacro("DEFINE_cfi_386_unwind_landing_register_uncommon2dw", gene
 
 /* Host-specific CFI constants. */
 #if defined(__i386__) && !defined(__x86_64__)
-#define CFI_UNWIND_REGISTER_MAXSIZE        CFI_386_UNWIND_FPU_REGISTER_SIZE
-#define CFI_REGISTER_SIZE(regno)           CFI_386_REGISTER_SIZE(regno)
-#define CFI_UNWIND_REGISTER_PC             CFI_386_UNWIND_REGISTER_PC        /* The register containing the program counter. */
-#define CFI_UNWIND_REGISTER_SP             CFI_386_UNWIND_REGISTER_SP        /* The register for the CFA. */
-#define CFI_UNWIND_REGISTER_EXCEPTION      CFI_386_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
-#define CFI_UNWIND_REGISTER_COUNT          CFI_386_UNWIND_REGISTER_COUNT
+#define CFI_UNWIND_REGISTER_MAXSIZE   CFI_386_UNWIND_FPU_REGISTER_SIZE
+#define CFI_REGISTER_SIZE             CFI_386_REGISTER_SIZE
+#define CFI_UNWIND_REGISTER_PC        CFI_386_UNWIND_REGISTER_PC        /* The register containing the program counter. */
+#define CFI_UNWIND_REGISTER_SP        CFI_386_UNWIND_REGISTER_SP        /* The register for the CFA. */
+#define CFI_UNWIND_REGISTER_EXCEPTION CFI_386_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
+#define CFI_UNWIND_REGISTER_COUNT     CFI_386_UNWIND_REGISTER_COUNT
 
 /* Normal common/uncommon */
 #define CFI_UNWIND_UNCOMMON_REGISTER_SP        CFI_386_UNWIND_UNCOMMON_REGISTER_SP

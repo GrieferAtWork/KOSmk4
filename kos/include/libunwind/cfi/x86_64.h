@@ -522,7 +522,7 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 /* Host-specific CFI constants. */
 #ifdef __x86_64__
 #define CFI_UNWIND_REGISTER_MAXSIZE   CFI_X86_64_UNWIND_FPU_REGISTER_SIZE
-#define CFI_REGISTER_SIZE(regno)      CFI_X86_64_REGISTER_SIZE(regno)
+#define CFI_REGISTER_SIZE             CFI_X86_64_REGISTER_SIZE
 #define CFI_UNWIND_REGISTER_PC        CFI_X86_64_UNWIND_REGISTER_PC        /* The register containing the program counter. */
 #define CFI_UNWIND_REGISTER_SP        CFI_X86_64_UNWIND_REGISTER_SP        /* The register for the CFA. */
 #define CFI_UNWIND_REGISTER_EXCEPTION CFI_X86_64_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */

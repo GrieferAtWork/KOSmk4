@@ -47,12 +47,12 @@ __DECL_BEGIN
 void (__hybrid_yield)(void);
 __BOOL (__hybrid_yield_nx)(void);
 __DECL_END
-#define __hybrid_yield()    __hybrid_yield()
-#define __hybrid_yield_nx() __hybrid_yield_nx()
+#define __hybrid_yield    __hybrid_yield
+#define __hybrid_yield_nx __hybrid_yield_nx
 #else /* __INTELLISENSE__ */
 #include <sched/task.h>
-#define __hybrid_yield()    task_yield()
-#define __hybrid_yield_nx() task_yield_nx()
+#define __hybrid_yield    task_yield
+#define __hybrid_yield_nx task_yield_nx
 #endif /* !__INTELLISENSE__ */
 
 #elif __KOS_VERSION__ >= 300
@@ -65,7 +65,7 @@ __DECL_BEGIN
 #define __task_yield_defined 1
 __PUBDEF void (__KCALL task_yield)(void);
 #endif /* !__task_yield_defined */
-#define __hybrid_yield() task_yield()
+#define __hybrid_yield task_yield
 __DECL_END
 
 #elif __KOS_VERSION__ >= 200
@@ -101,22 +101,22 @@ __PUBDEF errno_t (__KCALL task_yield)(void);
 	})
 #endif /* ... */
 #endif /* !__task_yield_defined */
-#define __hybrid_yield() task_yield()
+#define __hybrid_yield task_yield
 __DECL_END
 #endif
 
 #elif defined(sched_yield) || defined(__sched_yield_defined)
-#define __hybrid_yield() sched_yield()
+#define __hybrid_yield sched_yield
 #elif defined(__sched_yield) || defined(____sched_yield_defined)
-#define __hybrid_yield() __sched_yield()
+#define __hybrid_yield __sched_yield
 #elif defined(pthread_yield) || defined(__pthread_yield_defined)
-#define __hybrid_yield() pthread_yield()
+#define __hybrid_yield pthread_yield
 #elif defined(__pthread_yield) || defined(____pthread_yield_defined)
-#define __hybrid_yield() __pthread_yield()
+#define __hybrid_yield __pthread_yield
 #elif defined(thrd_yield) || defined(__thrd_yield_defined)
-#define __hybrid_yield() thrd_yield()
+#define __hybrid_yield thrd_yield
 #elif defined(__thrd_yield) || defined(____thrd_yield_defined)
-#define __hybrid_yield() __thrd_yield()
+#define __hybrid_yield __thrd_yield
 #elif defined(__BUILDING_LIBC) && defined(__KOS__)
 /************************************************************************/
 /* LIBC                                                                 */
@@ -125,7 +125,7 @@ __DECL_END
 #ifdef __WANT_INLINE_SYSCALLS
 #include <kos/syscalls.h>
 #if __CRT_HAVE_SC(sched_yield)
-#define __hybrid_yield()  sys_sched_yield()
+#define __hybrid_yield sys_sched_yield
 #endif /* __CRT_HAVE_SC(sched_yield) */
 #endif /* __WANT_INLINE_SYSCALLS */
 #ifndef __hybrid_yield
@@ -133,7 +133,7 @@ __DECL_END
 __DECL_BEGIN
 __INTDEF int (__LIBCCALL libc_sched_yield)(void);
 __DECL_END
-#define __hybrid_yield() libc_sched_yield()
+#define __hybrid_yield libc_sched_yield
 #endif /* !__hybrid_yield */
 
 #elif defined(__KOS_SYSTEM_HEADERS__) && __KOS_VERSION__ >= 400
@@ -147,33 +147,33 @@ __DECL_END
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL sched_yield)(void);
 __NAMESPACE_INT_END __DECL_END
-#define __hybrid_yield() (__NAMESPACE_INT_SYM sched_yield)()
+#define __hybrid_yield (__NAMESPACE_INT_SYM sched_yield)
 #elif defined(__CRT_HAVE___sched_yield)
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL __sched_yield)(void);
 __NAMESPACE_INT_END __DECL_END
-#define __hybrid_yield() (__NAMESPACE_INT_SYM __sched_yield)()
+#define __hybrid_yield (__NAMESPACE_INT_SYM __sched_yield)
 #elif defined(__CRT_HAVE_pthread_yield)
 #undef pthread_yield
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL pthread_yield)(void);
 __NAMESPACE_INT_END __DECL_END
-#define __hybrid_yield() (__NAMESPACE_INT_SYM pthread_yield)()
+#define __hybrid_yield (__NAMESPACE_INT_SYM pthread_yield)
 #elif defined(__CRT_HAVE___pthread_yield)
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL __pthread_yield)(void);
 __NAMESPACE_INT_END __DECL_END
-#define __hybrid_yield() (__NAMESPACE_INT_SYM __pthread_yield)()
+#define __hybrid_yield (__NAMESPACE_INT_SYM __pthread_yield)
 #elif defined(__CRT_HAVE_yield)
 #undef yield
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL yield)(void);
 __NAMESPACE_INT_END __DECL_END
-#define __hybrid_yield() (__NAMESPACE_INT_SYM yield)()
+#define __hybrid_yield (__NAMESPACE_INT_SYM yield)
 #elif defined(__NO_has_include) || __has_include(<kos/syscalls.h>)
 #include <kos/syscalls.h>
 #if __CRT_HAVE_SC(sched_yield)
-#define __hybrid_yield()  sys_sched_yield()
+#define __hybrid_yield sys_sched_yield
 #endif /* __CRT_HAVE_SC(sched_yield) */
 #endif /* ... */
 #elif defined(__WINNT__)
@@ -189,13 +189,13 @@ __NAMESPACE_INT_END __DECL_END
 /* Linux                                                                */
 /************************************************************************/
 #include <sched.h>
-#define __hybrid_yield() sched_yield()
+#define __hybrid_yield sched_yield
 #elif (__has_include(<pthread.h>) || (defined(__unix__) && defined(__NO_has_include)))
 /************************************************************************/
 /* PThread                                                              */
 /************************************************************************/
 #include <pthread.h>
-#define __hybrid_yield() pthread_yield()
+#define __hybrid_yield pthread_yield
 #elif (__has_include(<threads.h>) ||                                  \
        (defined(__NO_has_include) && !defined(__STDC_NO_THREADS__) && \
         defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
@@ -203,7 +203,7 @@ __NAMESPACE_INT_END __DECL_END
 /* C11 Threads                                                          */
 /************************************************************************/
 #include <threads.h>
-#define __hybrid_yield() thrd_yield()
+#define __hybrid_yield thrd_yield
 #else /* Implementation... */
 #if (__has_include(<unistd.h>) || \
      (defined(__unix__) && defined(__NO_has_include)))

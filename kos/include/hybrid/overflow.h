@@ -30,21 +30,11 @@
  *                 e.g.: `UINT_MAX + 42u' and `11u - 19u' overflow,
  *                       but   `32u + 42u'   or   `11 - 19'   don't
  * @return: false: `*res' contains the correct result. */
-#ifdef __INTELLISENSE__
 #define OVERFLOW_UADD __hybrid_overflow_uadd
 #define OVERFLOW_SADD __hybrid_overflow_sadd
 #define OVERFLOW_USUB __hybrid_overflow_usub
 #define OVERFLOW_SSUB __hybrid_overflow_ssub
 #define OVERFLOW_UMUL __hybrid_overflow_umul
 #define OVERFLOW_SMUL __hybrid_overflow_smul
-#else /* __INTELLISENSE__ */
-#define OVERFLOW_UADD(x, y, res) __hybrid_overflow_uadd(x, y, res)
-#define OVERFLOW_SADD(x, y, res) __hybrid_overflow_sadd(x, y, res)
-#define OVERFLOW_USUB(x, y, res) __hybrid_overflow_usub(x, y, res)
-#define OVERFLOW_SSUB(x, y, res) __hybrid_overflow_ssub(x, y, res)
-#define OVERFLOW_UMUL(x, y, res) __hybrid_overflow_umul(x, y, res)
-#define OVERFLOW_SMUL(x, y, res) __hybrid_overflow_smul(x, y, res)
-#endif /* !__INTELLISENSE__ */
-
 
 #endif /* !__GUARD_HYBRID_OVERFLOW_H */

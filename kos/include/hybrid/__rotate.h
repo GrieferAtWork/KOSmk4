@@ -26,52 +26,52 @@
 __DECL_BEGIN
 
 /* Compile-time constant implementations. */
-#define __hybrid_rol8_c(x, shift)  (((x) >> (0x8 - ((shift)&0x07))) | ((x) << ((shift)&0x07)))
-#define __hybrid_ror8_c(x, shift)  (((x) << (0x8 - ((shift)&0x07))) | ((x) >> ((shift)&0x07)))
-#define __hybrid_rol16_c(x, shift) (((x) >> (0x10 - ((shift)&0x0f))) | ((x) << ((shift)&0x0f)))
-#define __hybrid_ror16_c(x, shift) (((x) << (0x10 - ((shift)&0x0f))) | ((x) >> ((shift)&0x0f)))
-#define __hybrid_rol32_c(x, shift) (((x) >> (0x20 - ((shift)&0x1f))) | ((x) << ((shift)&0x1f)))
-#define __hybrid_ror32_c(x, shift) (((x) << (0x20 - ((shift)&0x1f))) | ((x) >> ((shift)&0x1f)))
+#define __hybrid_rol8_c(x, shift)  (((x) >> (0x8 - ((shift) & 0x07))) | ((x) << ((shift) & 0x07)))
+#define __hybrid_ror8_c(x, shift)  (((x) << (0x8 - ((shift) & 0x07))) | ((x) >> ((shift) & 0x07)))
+#define __hybrid_rol16_c(x, shift) (((x) >> (0x10 - ((shift) & 0x0f))) | ((x) << ((shift) & 0x0f)))
+#define __hybrid_ror16_c(x, shift) (((x) << (0x10 - ((shift) & 0x0f))) | ((x) >> ((shift) & 0x0f)))
+#define __hybrid_rol32_c(x, shift) (((x) >> (0x20 - ((shift) & 0x1f))) | ((x) << ((shift) & 0x1f)))
+#define __hybrid_ror32_c(x, shift) (((x) << (0x20 - ((shift) & 0x1f))) | ((x) >> ((shift) & 0x1f)))
 #ifdef __UINT64_TYPE__
-#define __hybrid_rol64_c(x, shift) (((x) >> (0x40 - ((shift)&0x3f))) | ((x) << ((shift)&0x3f)))
-#define __hybrid_ror64_c(x, shift) (((x) << (0x40 - ((shift)&0x3f))) | ((x) >> ((shift)&0x3f)))
+#define __hybrid_rol64_c(x, shift) (((x) >> (0x40 - ((shift) & 0x3f))) | ((x) << ((shift) & 0x3f)))
+#define __hybrid_ror64_c(x, shift) (((x) << (0x40 - ((shift) & 0x3f))) | ((x) >> ((shift) & 0x3f)))
 #ifdef __UINT128_TYPE__
-#define __hybrid_rol128_c(x, shift) (((x) >> (0x80 - ((shift)&0x7f))) | ((x) << ((shift)&0x7f)))
-#define __hybrid_ror128_c(x, shift) (((x) << (0x80 - ((shift)&0x7f))) | ((x) >> ((shift)&0x7f)))
+#define __hybrid_rol128_c(x, shift) (((x) >> (0x80 - ((shift) & 0x7f))) | ((x) << ((shift) & 0x7f)))
+#define __hybrid_ror128_c(x, shift) (((x) << (0x80 - ((shift) & 0x7f))) | ((x) >> ((shift) & 0x7f)))
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 
 
 /* Arch/Compiler-specific runtime-optimized implementations. */
 #if __has_builtin(__builtin_rotateleft8)
-#define __hybrid_rol8_r(x, shift) __builtin_rotateleft8(x, shift)
+#define __hybrid_rol8_r __builtin_rotateleft8
 #endif /* __has_builtin(__builtin_rotateleft8) */
 #if __has_builtin(__builtin_rotateleft16)
-#define __hybrid_rol16_r(x, shift) __builtin_rotateleft16(x, shift)
+#define __hybrid_rol16_r __builtin_rotateleft16
 #endif /* __has_builtin(__builtin_rotateleft16) */
 #if __has_builtin(__builtin_rotateleft32)
-#define __hybrid_rol32_r(x, shift) __builtin_rotateleft32(x, shift)
+#define __hybrid_rol32_r __builtin_rotateleft32
 #endif /* __has_builtin(__builtin_rotateleft32) */
 #if __has_builtin(__builtin_rotateleft64)
-#define __hybrid_rol64_r(x, shift) __builtin_rotateleft64(x, shift)
+#define __hybrid_rol64_r __builtin_rotateleft64
 #endif /* __has_builtin(__builtin_rotateleft64) */
 #if __has_builtin(__builtin_rotateleft128)
-#define __hybrid_rol128_r(x, shift) __builtin_rotateleft128(x, shift)
+#define __hybrid_rol128_r __builtin_rotateleft128
 #endif /* __has_builtin(__builtin_rotateleft128) */
 #if __has_builtin(__builtin_rotateright8)
-#define __hybrid_ror8_r(x, shift) __builtin_rotateright8(x, shift)
+#define __hybrid_ror8_r __builtin_rotateright8
 #endif /* __has_builtin(__builtin_rotateright8) */
 #if __has_builtin(__builtin_rotateright16)
-#define __hybrid_ror16_r(x, shift) __builtin_rotateright16(x, shift)
+#define __hybrid_ror16_r __builtin_rotateright16
 #endif /* __has_builtin(__builtin_rotateright16) */
 #if __has_builtin(__builtin_rotateright32)
-#define __hybrid_ror32_r(x, shift) __builtin_rotateright32(x, shift)
+#define __hybrid_ror32_r __builtin_rotateright32
 #endif /* __has_builtin(__builtin_rotateright32) */
 #if __has_builtin(__builtin_rotateright64)
-#define __hybrid_ror64_r(x, shift) __builtin_rotateright64(x, shift)
+#define __hybrid_ror64_r __builtin_rotateright64
 #endif /* __has_builtin(__builtin_rotateright64) */
 #if __has_builtin(__builtin_rotateright128)
-#define __hybrid_ror128_r(x, shift) __builtin_rotateright128(x, shift)
+#define __hybrid_ror128_r __builtin_rotateright128
 #endif /* __has_builtin(__builtin_rotateright128) */
 
 #if ((!defined(__hybrid_rol8_r) || !defined(__hybrid_rol16_r) ||  \
@@ -242,10 +242,10 @@ function printRotateMacro(n, d) {
 	print("	 : __hybrid_ro", d, n, "_r(x, shift))");
 	print("#endif /" "* __NO_builtin_choose_expr *" "/");
 	print("#else /" "* !__NO_builtin_constant_p *" "/");
-	print("#define __hybrid_ro", d, n, "(x, shift) __hybrid_ro", d, n, "_r(x, shift)");
+	print("#define __hybrid_ro", d, n, " __hybrid_ro", d, n, "_r");
 	print("#endif /" "* __NO_builtin_constant_p *" "/");
 	print("#else /" "* __hybrid_ro", d, n, "_r *" "/");
-	print("#define __hybrid_ro", d, n, "(x, shift) __hybrid_ro", d, n, "_c(x, shift)");
+	print("#define __hybrid_ro", d, n, " __hybrid_ro", d, n, "_c");
 	print("#endif /" "* !__hybrid_ro", d, n, "_r *" "/");
 }
 
@@ -276,10 +276,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_rol8_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_rol8(x, shift) __hybrid_rol8_r(x, shift)
+#define __hybrid_rol8 __hybrid_rol8_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_rol8_r */
-#define __hybrid_rol8(x, shift) __hybrid_rol8_c(x, shift)
+#define __hybrid_rol8 __hybrid_rol8_c
 #endif /* !__hybrid_rol8_r */
 #ifdef __hybrid_ror8_r
 #ifndef __NO_builtin_constant_p
@@ -295,10 +295,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_ror8_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_ror8(x, shift) __hybrid_ror8_r(x, shift)
+#define __hybrid_ror8 __hybrid_ror8_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_ror8_r */
-#define __hybrid_ror8(x, shift) __hybrid_ror8_c(x, shift)
+#define __hybrid_ror8 __hybrid_ror8_c
 #endif /* !__hybrid_ror8_r */
 #ifdef __hybrid_rol16_r
 #ifndef __NO_builtin_constant_p
@@ -314,10 +314,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_rol16_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_rol16(x, shift) __hybrid_rol16_r(x, shift)
+#define __hybrid_rol16 __hybrid_rol16_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_rol16_r */
-#define __hybrid_rol16(x, shift) __hybrid_rol16_c(x, shift)
+#define __hybrid_rol16 __hybrid_rol16_c
 #endif /* !__hybrid_rol16_r */
 #ifdef __hybrid_ror16_r
 #ifndef __NO_builtin_constant_p
@@ -333,10 +333,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_ror16_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_ror16(x, shift) __hybrid_ror16_r(x, shift)
+#define __hybrid_ror16 __hybrid_ror16_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_ror16_r */
-#define __hybrid_ror16(x, shift) __hybrid_ror16_c(x, shift)
+#define __hybrid_ror16 __hybrid_ror16_c
 #endif /* !__hybrid_ror16_r */
 #ifdef __hybrid_rol32_r
 #ifndef __NO_builtin_constant_p
@@ -352,10 +352,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_rol32_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_rol32(x, shift) __hybrid_rol32_r(x, shift)
+#define __hybrid_rol32 __hybrid_rol32_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_rol32_r */
-#define __hybrid_rol32(x, shift) __hybrid_rol32_c(x, shift)
+#define __hybrid_rol32 __hybrid_rol32_c
 #endif /* !__hybrid_rol32_r */
 #ifdef __hybrid_ror32_r
 #ifndef __NO_builtin_constant_p
@@ -371,10 +371,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_ror32_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_ror32(x, shift) __hybrid_ror32_r(x, shift)
+#define __hybrid_ror32 __hybrid_ror32_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_ror32_r */
-#define __hybrid_ror32(x, shift) __hybrid_ror32_c(x, shift)
+#define __hybrid_ror32 __hybrid_ror32_c
 #endif /* !__hybrid_ror32_r */
 #ifdef __UINT64_TYPE__
 #ifdef __hybrid_rol64_r
@@ -391,10 +391,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_rol64_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_rol64(x, shift) __hybrid_rol64_r(x, shift)
+#define __hybrid_rol64 __hybrid_rol64_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_rol64_r */
-#define __hybrid_rol64(x, shift) __hybrid_rol64_c(x, shift)
+#define __hybrid_rol64 __hybrid_rol64_c
 #endif /* !__hybrid_rol64_r */
 #ifdef __hybrid_ror64_r
 #ifndef __NO_builtin_constant_p
@@ -410,10 +410,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_ror64_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_ror64(x, shift) __hybrid_ror64_r(x, shift)
+#define __hybrid_ror64 __hybrid_ror64_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_ror64_r */
-#define __hybrid_ror64(x, shift) __hybrid_ror64_c(x, shift)
+#define __hybrid_ror64 __hybrid_ror64_c
 #endif /* !__hybrid_ror64_r */
 #ifdef __UINT128_TYPE__
 #ifdef __hybrid_rol128_r
@@ -430,10 +430,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_rol128_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_rol128(x, shift) __hybrid_rol128_r(x, shift)
+#define __hybrid_rol128 __hybrid_rol128_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_rol128_r */
-#define __hybrid_rol128(x, shift) __hybrid_rol128_c(x, shift)
+#define __hybrid_rol128 __hybrid_rol128_c
 #endif /* !__hybrid_rol128_r */
 #ifdef __hybrid_ror128_r
 #ifndef __NO_builtin_constant_p
@@ -449,10 +449,10 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	 : __hybrid_ror128_r(x, shift))
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define __hybrid_ror128(x, shift) __hybrid_ror128_r(x, shift)
+#define __hybrid_ror128 __hybrid_ror128_r
 #endif /* __NO_builtin_constant_p */
 #else /* __hybrid_ror128_r */
-#define __hybrid_ror128(x, shift) __hybrid_ror128_c(x, shift)
+#define __hybrid_ror128 __hybrid_ror128_c
 #endif /* !__hybrid_ror128_r */
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */

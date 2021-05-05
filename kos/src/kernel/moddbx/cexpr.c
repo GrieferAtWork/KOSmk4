@@ -1362,7 +1362,7 @@ NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
 
 FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
-                             __UINTMAX_TYPE__ value) {
+                             uintmax_t value) {
 	struct cvalue *valp;
 	size_t buflen;
 	valp = _cexpr_pushalloc();
@@ -1441,7 +1441,7 @@ NOTHROW(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
 
 PUBLIC NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint_simple)(struct ctype *__restrict typ,
-                                    __UINTMAX_TYPE__ value) {
+                                    uintmax_t value) {
 	struct ctyperef ct;
 	memset(&ct, 0, sizeof(ct));
 	ct.ct_typ = typ;
@@ -2187,7 +2187,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 	top->cv_kind = CVALUE_KIND_ADDR;
 	/* Replace the top item's pointer-type with the pointed-to type. */
 do_set_type:
-	ctypeinfo_fini(&top->cv_type.ct_info); /* inhert:`top->cv_type.ct_typ' in `typ' */
+	ctypeinfo_fini(&top->cv_type.ct_info); /* inherit:`top->cv_type.ct_typ' in `typ' */
 	ctyperef_initcopy(&top->cv_type, &typ->ct_pointer.cp_base);
 	decref(typ);
 	return DBX_EOK;

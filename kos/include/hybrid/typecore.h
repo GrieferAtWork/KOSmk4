@@ -350,7 +350,74 @@
 #endif /* __INTPTR_MAX__ == ... */
 #endif /* __INTPTR_MAX__ */
 #ifndef __SIZEOF_POINTER__
+#ifndef __KOS_SYSTEM_HEADERS__
+#include <stdint.h>
+#ifdef UINTPTR_MAX
+#if UINTPTR_MAX == __PRIVATE_MAX_U4
+#define __SIZEOF_POINTER__ 4
+#elif UINTPTR_MAX == __PRIVATE_MAX_U8
+#define __SIZEOF_POINTER__ 8
+#elif UINTPTR_MAX == __PRIVATE_MAX_U2
+#define __SIZEOF_POINTER__ 2
+#elif UINTPTR_MAX == __PRIVATE_MAX_U1
+#define __SIZEOF_POINTER__ 1
+#endif /* UINTPTR_MAX == ... */
+#elif defined(INTPTR_MAX)
+#if INTPTR_MAX == __PRIVATE_MAX_S4
+#define __SIZEOF_POINTER__ 4
+#elif INTPTR_MAX == __PRIVATE_MAX_S8
+#define __SIZEOF_POINTER__ 8
+#elif INTPTR_MAX == __PRIVATE_MAX_S2
+#define __SIZEOF_POINTER__ 2
+#elif INTPTR_MAX == __PRIVATE_MAX_S1
+#define __SIZEOF_POINTER__ 1
+#endif /* INTPTR_MAX == ... */
+#elif defined(INTPTR_MIN)
+#if INTPTR_MIN == __PRIVATE_MIN_S4
+#define __SIZEOF_POINTER__ 4
+#elif INTPTR_MIN == __PRIVATE_MIN_S8
+#define __SIZEOF_POINTER__ 8
+#elif INTPTR_MIN == __PRIVATE_MIN_S2
+#define __SIZEOF_POINTER__ 2
+#elif INTPTR_MIN == __PRIVATE_MIN_S1
+#define __SIZEOF_POINTER__ 1
+#endif /* INTPTR_MIN == ... */
+#elif defined(SIZE_MAX)
+#if SIZE_MAX == __PRIVATE_MAX_U4
+#define __SIZEOF_POINTER__ 4
+#elif SIZE_MAX == __PRIVATE_MAX_U8
+#define __SIZEOF_POINTER__ 8
+#elif SIZE_MAX == __PRIVATE_MAX_U2
+#define __SIZEOF_POINTER__ 2
+#elif SIZE_MAX == __PRIVATE_MAX_U1
+#define __SIZEOF_POINTER__ 1
+#endif /* SIZE_MAX == ... */
+#elif defined(PTRDIFF_MAX)
+#if PTRDIFF_MAX == __PRIVATE_MAX_S4
+#define __SIZEOF_POINTER__ 4
+#elif PTRDIFF_MAX == __PRIVATE_MAX_S8
+#define __SIZEOF_POINTER__ 8
+#elif PTRDIFF_MAX == __PRIVATE_MAX_S2
+#define __SIZEOF_POINTER__ 2
+#elif PTRDIFF_MAX == __PRIVATE_MAX_S1
+#define __SIZEOF_POINTER__ 1
+#endif /* PTRDIFF_MAX == ... */
+#elif defined(PTRDIFF_MIN)
+#if PTRDIFF_MIN == __PRIVATE_MIN_S4
+#define __SIZEOF_POINTER__ 4
+#elif PTRDIFF_MIN == __PRIVATE_MIN_S8
+#define __SIZEOF_POINTER__ 8
+#elif PTRDIFF_MIN == __PRIVATE_MIN_S2
+#define __SIZEOF_POINTER__ 2
+#elif PTRDIFF_MIN == __PRIVATE_MIN_S1
+#define __SIZEOF_POINTER__ 1
+#endif /* PTRDIFF_MIN == ... */
+#endif /* ... */
+#endif /* !__KOS_SYSTEM_HEADERS__ */
+
+#ifndef __SIZEOF_POINTER__
 #error "Cannot determine `__SIZEOF_POINTER__'"
+#endif /* !__SIZEOF_POINTER__ */
 #endif /* !__SIZEOF_POINTER__ */
 #endif /* !__SIZEOF_POINTER__ */
 #endif /* !... */

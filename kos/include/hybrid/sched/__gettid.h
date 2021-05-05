@@ -81,7 +81,7 @@
 #ifdef __CC__
 #define __hybrid_tid_t __pid_t
 __DECL_BEGIN
-__CREDIRECT(__ATTR_CONST, __pid_t, __NOTHROW, __hybrid_gettid, (void), gettid, ())
+__CREDIRECT(__ATTR_CONST,__pid_t,__NOTHROW,__hybrid_gettid,(void),gettid,())
 __DECL_END
 #endif /* __CC__ */
 #endif /* ... */
@@ -104,7 +104,7 @@ __DECL_END
 #pragma warning(pop)
 #endif /* !_MSC_VER */
 #endif /* __CC__ */
-#define __hybrid_gettid() GetCurrentThreadId()
+#define __hybrid_gettid GetCurrentThreadId
 #elif (__has_include(<unistd.h>) || \
        (defined(__unix__) && defined(__NO_has_include)))
 #include <unistd.h>
@@ -144,9 +144,9 @@ __STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #endif /* !... */
 #define __hybrid_tid_t pid_t
 #if defined(gettid) || defined(__gettid_defined)
-#define __hybrid_gettid() gettid()
+#define __hybrid_gettid gettid
 #else /* gettid || __gettid_defined */
-#define __hybrid_gettid() __gettid()
+#define __hybrid_gettid __gettid
 #endif /* !gettid && !__gettid_defined */
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1
 #define __HYBRID_GETTID_INVALID         0
@@ -165,10 +165,10 @@ __STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 __STATIC_ASSERT_MSG(sizeof(pthread_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #endif /* !... */
 #define __hybrid_tid_t                  pthread_t
-#define __hybrid_gettid()               pthread_self()
+#define __hybrid_gettid                 pthread_self
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1 /* Not always, but good enough? */
 #define __HYBRID_GETTID_INVALID         (__CCAST(pthread_t)0)
-#define __hybrid_gettid_equal(a, b)     pthread_equal(a, b)
+#define __hybrid_gettid_equal           pthread_equal
 #elif (__has_include(<threads.h>) ||                                  \
        (defined(__NO_has_include) && !defined(__STDC_NO_THREADS__) && \
         defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
@@ -188,10 +188,10 @@ __STATIC_ASSERT_MSG(sizeof(pthread_t) == __HYBRID_SIZEOF_TID__, "Please adjust")
 __STATIC_ASSERT_MSG(sizeof(thrd_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #endif /* !... */
 #define __hybrid_tid_t                  thrd_t
-#define __hybrid_gettid()               pthread_self()
+#define __hybrid_gettid                 thrd_current
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1 /* Not always, but good enough? */
 #define __HYBRID_GETTID_INVALID         (__CCAST(thrd_t)0)
-#define __hybrid_gettid_equal(a, b)     pthread_equal(a, b)
+#define __hybrid_gettid_equal           thrd_equal
 #else /* ... */
 /* Fallback: Assume single-threaded and assign  TID=0
  * for <invalid-tid> and TID=1 for the main() thread. */
@@ -209,20 +209,20 @@ __STATIC_ASSERT_MSG(sizeof(thrd_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #ifndef __HYBRID_GETTID_PRINTF_FMT
 #include <hybrid/typecore.h>
 #if __HYBRID_SIZEOF_TID__ == __SIZEOF_POINTER__
-#define __HYBRID_GETTID_PRINTF_FMT    "%p"
-#define __HYBRID_GETTID_PRINTF_ARG(x) (void const *)(x)
+#define __HYBRID_GETTID_PRINTF_FMT "%p"
+#define __HYBRID_GETTID_PRINTF_ARG (void const *)
 #elif __HYBRID_SIZEOF_TID__ > __SIZEOF_POINTER__
-#define __HYBRID_GETTID_PRINTF_FMT    "%llx"
-#define __HYBRID_GETTID_PRINTF_ARG(x) (unsigned long long)(x)
+#define __HYBRID_GETTID_PRINTF_FMT "%llx"
+#define __HYBRID_GETTID_PRINTF_ARG (unsigned long long)
 #elif __HYBRID_SIZEOF_TID__ <= __SIZEOF_INT__
-#define __HYBRID_GETTID_PRINTF_FMT    "%x"
-#define __HYBRID_GETTID_PRINTF_ARG(x) (unsigned int)(x)
+#define __HYBRID_GETTID_PRINTF_FMT "%x"
+#define __HYBRID_GETTID_PRINTF_ARG (unsigned int)
 #elif __HYBRID_SIZEOF_TID__ == __SIZEOF_LONG__
-#define __HYBRID_GETTID_PRINTF_FMT    "%lx"
-#define __HYBRID_GETTID_PRINTF_ARG(x) (unsigned long)(x)
+#define __HYBRID_GETTID_PRINTF_FMT "%lx"
+#define __HYBRID_GETTID_PRINTF_ARG (unsigned long)
 #else /* __HYBRID_SIZEOF_TID__... */
-#define __HYBRID_GETTID_PRINTF_FMT    "%p"
-#define __HYBRID_GETTID_PRINTF_ARG(x) (void const *)(x)
+#define __HYBRID_GETTID_PRINTF_FMT "%p"
+#define __HYBRID_GETTID_PRINTF_ARG (void const *)
 #endif /* !__HYBRID_SIZEOF_TID__... */
 #endif /* !__HYBRID_GETTID_PRINTF_FMT */
 

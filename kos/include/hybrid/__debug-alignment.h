@@ -66,7 +66,7 @@ __LOCAL void __impl_hybrid_dbg_alignment_disable(void) {
 }
 __SYSDECL_END
 __NAMESPACE_INT_END
-#endif
+#endif /* ... */
 #endif /* ... */
 
 #ifndef __hybrid_dbg_alignment_enable
@@ -76,8 +76,8 @@ __NAMESPACE_INT_END
 #endif /* !__hybrid_dbg_alignment_enable */
 
 
-#if !defined(__NO_hybrid_dbg_alignment) && \
-    !defined(__KOS_SYSTEM_HEADERS__)
+#if (!defined(__NO_hybrid_dbg_alignment) && \
+     !defined(__KOS_SYSTEM_HEADERS__))
 #include "typecore.h"
 /* C's string functions aren't alignment-safe, so we override them here! */
 #include <string.h>
@@ -126,10 +126,10 @@ __NAMESPACE_INT_END
 #undef memmove
 #undef memset
 #undef memcmp
-#define memcpy   __NAMESPACE_INT_SYM __impl_dbg_alignment_memcpy
-#define memmove  __NAMESPACE_INT_SYM __impl_dbg_alignment_memmove
-#define memset   __NAMESPACE_INT_SYM __impl_dbg_alignment_memset
-#define memcmp   __NAMESPACE_INT_SYM __impl_dbg_alignment_memcmp
+#define memcpy  __NAMESPACE_INT_SYM __impl_dbg_alignment_memcpy
+#define memmove __NAMESPACE_INT_SYM __impl_dbg_alignment_memmove
+#define memset  __NAMESPACE_INT_SYM __impl_dbg_alignment_memset
+#define memcmp  __NAMESPACE_INT_SYM __impl_dbg_alignment_memcmp
 #endif /* C-api fixes */
 
 

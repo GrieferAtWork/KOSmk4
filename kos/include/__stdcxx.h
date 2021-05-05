@@ -187,7 +187,7 @@
 #elif defined(_MSC_VER) && !defined(__INTELLISENSE__)
 #define __CXX_THROWS(...) /* Nothing */
 #else /* ... */
-#define __CXX_THROWS(...) throw(__VA_ARGS__)
+#define __CXX_THROWS throw
 #endif /* !... */
 
 #ifndef __CXXDECL_BEGIN
