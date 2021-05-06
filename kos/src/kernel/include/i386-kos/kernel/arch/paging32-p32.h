@@ -109,7 +109,7 @@ DECL_BEGIN
 
 #define P32_PDIR_VEC1INDEX(ptr)      ((__CCAST(u32)(ptr) >> 12) & 0x3ff) /* For `struct p32_pdir::p_e2' */
 #define P32_PDIR_VEC2INDEX(ptr)      (__CCAST(u32)(ptr) >> 22)           /* For `union p32_pdir_e2::p_e1' */
-#define P32_PDIR_VECADDR(vec2, vec1) ((__CCAST(u32)(vec2) << 22) | (__CCAST(u32)(vec1) << 12))
+#define P32_PDIR_VECADDR(vec2, vec1) (__CCAST(void *)((__CCAST(u32)(vec2) << 22) | (__CCAST(u32)(vec1) << 12)))
 
 /* Pagesizes of different page directory levels. */
 #define P32_PDIR_E1_SIZE     __UINT32_C(0x00001000) /* 4 KiB (Same as `PAGESIZE') */

@@ -2489,7 +2489,7 @@ p64_enum_e2(p64_enumfun_t func, void *arg,
 	union p64_pdir_e2 word, lastword = e2[0];
 	lastword.p_word ^= P64_PAGE_FNOEXEC;
 	lastword.p_word &= (mask ^ P64_PAGE_FNOEXEC);
-	if (P64_PDIR_E3_ISVEC2(lastword.p_word)) {
+	if (P64_PDIR_E2_ISVEC1(lastword.p_word)) {
 		word = lastword;
 		vec2 = 0;
 		goto do_enum_e1;
@@ -2632,8 +2632,10 @@ PRIVATE ATTR_DBGTEXT void KCALL
 p64_doenum(struct p64_enumdat *__restrict data,
            void *start, size_t num_bytes, u64 word, u64 mask) {
 	assert((word & P64_PAGE_FPRESENT) || (word & P64_PAGE_FISAHINT));
-	if (data->ed_identcnt)
+	if (data->ed_identcnt) {
 		p64_printident(data);
+		return;
+	}
 	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p")),
 	           start, (byte_t *)start + num_bytes - 1);
 	if (word & P64_PAGE_FPRESENT) {
@@ -2705,7 +2707,7 @@ p64_doenum(struct p64_enumdat *__restrict data,
 		}
 		dbg_print(DBGSTR(AC_DEFATTR "]\n"));
 	} else {
-		dbg_printf(DBGSTR(":hint@" AC_WHITE("%p") "\n"),
+		dbg_printf(DBGSTR(": hint@" AC_WHITE("%p") "\n"),
 		           (void *)(word & P64_PAGE_FHINT));
 	}
 }

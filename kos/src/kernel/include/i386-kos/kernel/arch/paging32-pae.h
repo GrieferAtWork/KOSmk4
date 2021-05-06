@@ -110,7 +110,8 @@ DECL_BEGIN
 #define PAE_PDIR_VEC1INDEX(ptr)  ((__CCAST(u32)(ptr) >> 12) & 0x1ff) /* For `union pae_pdir_e2::p_e1' */
 #define PAE_PDIR_VEC2INDEX(ptr)  ((__CCAST(u32)(ptr) >> 21) & 0x1ff) /* For `union pae_pdir_e3::p_e2' */
 #define PAE_PDIR_VEC3INDEX(ptr)  ((__CCAST(u32)(ptr) >> 30) & 0x3)   /* For `union pae_pdir::p_e3' */
-#define PAE_PDIR_VECADDR(vec3, vec2, vec1) ((__CCAST(u32)(vec3) << 30) | (__CCAST(u32)(vec2) << 21) | (__CCAST(u32)(vec1) << 12))
+#define PAE_PDIR_VECADDR(vec3, vec2, vec1) \
+	(__CCAST(void *)((__CCAST(u32)(vec3) << 30) | (__CCAST(u32)(vec2) << 21) | (__CCAST(u32)(vec1) << 12)))
 
 /* Pagesizes of different page directory levels. */
 #define PAE_PDIR_E1_SIZE     __UINT32_C(0x00001000) /* 4 KiB (Same as `PAGESIZE') */
@@ -161,7 +162,7 @@ union pae_pdir_e2 {
 	 *   - PAE Page-Directory Entry that References a Page Table */
 	u64                      p_word;     /* Mapping data. */
 #define PAE_PDIR_E2_ISVEC1(e2_word)       (((e2_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_F2MIB)) == PAE_PAGE_FPRESENT)
-#define PAE_PDIR_E2_IS4MIB(e2_word)       (((e2_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_F2MIB)) == (PAE_PAGE_FPRESENT | PAE_PAGE_F2MIB))
+#define PAE_PDIR_E2_IS2MIB(e2_word)       (((e2_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_F2MIB)) == (PAE_PAGE_FPRESENT | PAE_PAGE_F2MIB))
 #define PAE_PDIR_E2_ISUNUSED(e2_word)     ((e2_word) == PAE_PAGE_ABSENT)
 	PHYS union pae_pdir_e1 (*p_e1)[512]; /* [MASK(PAE_PAGE_FVECTOR)]
 	                                      * [owned][valid_if(PAE_PDIR_E2_ISVEC1(p_word))]
@@ -420,7 +421,7 @@ INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_isuseraccessible)(VIRT voi
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_isuserwritable)(VIRT void *addr);
 
 /* TODO: Figure out a better design for these functions
- *       The current system is written under the assumption that 4MiB pages don't exist... */
+ *       The current system is written under the assumption that 2MiB pages don't exist... */
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL pae_pagedir_haschanged)(VIRT void *addr);
 INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unsetchanged)(VIRT void *addrvpage);
 

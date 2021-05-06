@@ -25,11 +25,15 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/hook.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/arch/paging32-p32.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
-#include <kernel/mman/sync.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 
 #include <hybrid/align.h>
@@ -408,10 +412,10 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 		assertf(ATOMIC_READ(e1_p[vec1].p_word) & P32_PAGE_FPREPARED,
 		        "Attempted to unprepare page %p...%p as part of "
 		        "%p...%p, but that page wasn't marked as prepared",
-		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
-		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1 + 1) - 1),
-		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1_unprepare_start)),
-		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1_unprepare_start + vec1_unprepare_size) - 1));
+		        (byte_t *)P32_PDIR_VECADDR(vec2, vec1),
+		        (byte_t *)P32_PDIR_VECADDR(vec2, vec1 + 1) - 1,
+		        (byte_t *)P32_PDIR_VECADDR(vec2, vec1_unprepare_start),
+		        (byte_t *)P32_PDIR_VECADDR(vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 		p32_pagedir_unset_prepared(&e1_p[vec1], vec2, vec1, vec1_unprepare_start, vec1_unprepare_size);
 	}
 	/* Read  the  current prepare-version  _before_  we check  if  flattening is
@@ -612,21 +616,21 @@ NOTHROW(FCALL p32_pagedir_assert_e1_word_prepared)(unsigned int vec2,
 	assertf(e2.p_word & P32_PAGE_FPRESENT,
 	        "Page vector #%u for page %p...%p isn't allocated",
 	        (unsigned int)vec2,
-	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
-	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + PAGESIZE - 1));
+	        (byte_t *)P32_PDIR_VECADDR(vec2, vec1),
+	        (byte_t *)P32_PDIR_VECADDR(vec2, vec1) + PAGESIZE - 1);
 	assertf(!(e2.p_word & P32_PAGE_F4MIB),
 	        "Page %p...%p exists as a present 4MiB page #%u"
 	        "Page vector #%u for page %p...%p isn't allocated",
-	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
-	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + PAGESIZE - 1),
+	        (byte_t *)P32_PDIR_VECADDR(vec2, vec1),
+	        (byte_t *)P32_PDIR_VECADDR(vec2, vec1) + PAGESIZE - 1,
 	        (unsigned int)vec2);
 	if (vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE)) {
 		union p32_pdir_e1 e1;
 		e1 = P32_PDIR_E1_IDENTITY[vec2][vec1];
 		assertf(e1.p_word & P32_PAGE_FPREPARED || P32_PDIR_E1_ISHINT(e1.p_word),
 		        "Page %p...%p [vec2=%u,vec1=%u] hasn't been prepared",
-		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
-		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + PAGESIZE - 1),
+		        (byte_t *)P32_PDIR_VECADDR(vec2, vec1),
+		        (byte_t *)P32_PDIR_VECADDR(vec2, vec1) + PAGESIZE - 1,
 		        vec2, vec1);
 	}
 }
@@ -1177,6 +1181,286 @@ NOTHROW(KCALL pagedir_haschanged_p)(VIRT pagedir_t *__restrict self, VIRT pageid
 
 #endif /* !__OPTIMIZE_SIZE__ */
 #endif
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+
+/* NOTE: This function must do its own tracing of continuous page ranges.
+ *       The caller is may not necessary ensure that the function is only
+ *       called once for a single, continous range.
+ * @param: word: The page directory starting control word.
+ *               When `P32_PAGE_FPRESENT' is set, refers to a mapped page range
+ *               When `P32_PAGE_FISAHINT' is set, refers to a mapped page range */
+typedef void (KCALL *p32_enumfun_t)(void *arg, void *start, size_t num_bytes, u32 word);
+
+#define P32_PAGE_CASCADING \
+	(P32_PAGE_FPRESENT | P32_PAGE_FWRITE | P32_PAGE_FUSER)
+
+#define P32_PAGE_FPAT P32_PAGE_FPAT_4KIB
+/* Convert an En | n >= 2 word into an E1 word */
+PRIVATE ATTR_DBGTEXT ATTR_CONST u32 KCALL
+p32_convert_en_to_e1(u32 word) {
+	assert(word & P32_PAGE_FPRESENT);
+	assert(word & P32_PAGE_F4MIB);
+	word &= ~P32_PAGE_F4MIB;
+#if P32_PAGE_FPAT_4KIB != P32_PAGE_FPAT_4MIB
+	if (word & P32_PAGE_FPAT_4MIB) {
+		word &= ~P32_PAGE_FPAT_4MIB;
+		word |= P32_PAGE_FPAT_4KIB;
+	}
+#endif /* P32_PAGE_FPAT_4KIB != P32_PAGE_FPAT_4MIB */
+	return word;
+}
+
+#define P32_PDIR_E1_ISUSED(e1_word) (((e1_word) & (P32_PAGE_FPRESENT | P32_PAGE_FISAHINT | P32_PAGE_FPREPARED)) != 0)
+PRIVATE ATTR_DBGTEXT void KCALL
+p32_enum_e1(p32_enumfun_t func, void *arg,
+            unsigned int vec2, u32 mask) {
+	unsigned int vec1, laststart = 0;
+	union p32_pdir_e1 *e1 = P32_PDIR_E1_IDENTITY[vec2];
+	union p32_pdir_e1 lastword = e1[0];
+	lastword.p_word &= mask;
+	for (vec1 = 1; vec1 < 1024; ++vec1) {
+		union p32_pdir_e1 word;
+		word = e1[vec1];
+		word.p_word &= mask;
+		if (P32_PDIR_E1_IS1KIB(word.p_4kib.d_present)) {
+			union p32_pdir_e1 expected_word;
+			expected_word = lastword;
+			expected_word.p_word += (u32)(vec1 - laststart) * 4096;
+			if (word.p_word != expected_word.p_word) {
+docall:
+				if (P32_PDIR_E1_ISUSED(lastword.p_word)) {
+					(*func)(arg, P32_PDIR_VECADDR(vec2, laststart),
+					        (size_t)(vec1 - laststart) * 4096,
+					        lastword.p_word);
+				}
+				laststart = vec1;
+				lastword  = word;
+			}
+#if 0
+		} else if (P32_PDIR_E1_ISHINT(word.p_word)) {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+#endif
+		} else {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+		}
+	}
+	if (P32_PDIR_E1_ISUSED(lastword.p_word)) {
+		(*func)(arg, P32_PDIR_VECADDR(vec2, laststart),
+		        (size_t)(1024 - laststart) * 4096,
+		        lastword.p_word);
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+p32_enum_e2(p32_enumfun_t func, void *arg, unsigned int vec2_max) {
+	unsigned int vec2 = 1, laststart = 0;
+	union p32_pdir_e2 *e2 = P32_PDIR_E2_IDENTITY;
+	union p32_pdir_e2 word, lastword = e2[0];
+	if (P32_PDIR_E2_ISVEC1(lastword.p_word)) {
+		word = lastword;
+		vec2 = 0;
+		goto do_enum_e1;
+	}
+	for (; vec2 < vec2_max; ++vec2) {
+		word = e2[vec2];
+		if (P32_PDIR_E2_ISVEC1(word.p_word)) {
+			if (P32_PDIR_E2_IS4MIB(lastword.p_word)) {
+				(*func)(arg, P32_PDIR_VECADDR(laststart, 0),
+				        (size_t)(vec2 - laststart) * 4096 * 1024,
+				        p32_convert_en_to_e1(lastword.p_word & ~(u32)0x3ff000));
+			}
+do_enum_e1:
+			p32_enum_e1(func, arg, vec2,
+			            word.p_word | ~(u32)P32_PAGE_CASCADING);
+			laststart = vec2;
+			lastword  = word;
+		} else if (P32_PDIR_E2_IS4MIB(word.p_word)) {
+			union p32_pdir_e2 expected_word;
+			expected_word = lastword;
+			expected_word.p_word += (u32)(vec2 - laststart) * 4096 * 1024;
+			if (word.p_word != expected_word.p_word) {
+docall:
+				if (P32_PDIR_E2_IS4MIB(lastword.p_word)) {
+					(*func)(arg, P32_PDIR_VECADDR(laststart, 0),
+					        (size_t)(vec2 - laststart) * 4096 * 1024,
+					        p32_convert_en_to_e1(lastword.p_word & ~(u32)0x3ff000));
+				}
+				laststart = vec2;
+				lastword  = word;
+			}
+		} else {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+		}
+	}
+	if (P32_PDIR_E2_IS4MIB(lastword.p_word)) {
+		(*func)(arg, P32_PDIR_VECADDR(laststart, 0),
+		        (size_t)(1024 - laststart) * 4096 * 1024,
+		        p32_convert_en_to_e1(lastword.p_word & ~(u32)0x3ff000));
+	}
+}
+
+struct p32_enumdat {
+	void  *ed_prevstart;
+	size_t ed_prevsize;
+	u32    ed_prevword;
+	u32    ed_mask;
+	size_t ed_identcnt;
+	bool   ed_skipident;
+};
+
+PRIVATE ATTR_DBGTEXT void KCALL
+p32_printident(struct p32_enumdat *__restrict data) {
+	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%" PRIuSIZ) " identity mappings\n"),
+	           (byte_t *)P32_MMAN_KERNEL_PDIR_IDENTITY_BASE,
+	           (byte_t *)P32_MMAN_KERNEL_PDIR_IDENTITY_BASE + P32_MMAN_KERNEL_PDIR_IDENTITY_SIZE - 1,
+	           data->ed_identcnt);
+	data->ed_identcnt = 0;
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+p32_doenum(struct p32_enumdat *__restrict data,
+           void *start, size_t num_bytes, u32 word, u32 mask) {
+	assert((word & P32_PAGE_FPRESENT) || (word & P32_PAGE_FISAHINT));
+	if (data->ed_identcnt) {
+		p32_printident(data);
+		return;
+	}
+	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p")),
+	           start, (byte_t *)start + num_bytes - 1);
+	if (word & P32_PAGE_FPRESENT) {
+		size_t indent;
+		dbg_printf(DBGSTR(": " AC_WHITE("%p") "+" AC_FG_WHITE),
+		           word & P32_PAGE_FADDR_4KIB);
+		if ((num_bytes >= ((u32)1024 * 1024 * 1024)) &&
+		    (num_bytes % ((u32)1024 * 1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "GiB"),
+			                    (size_t)(num_bytes / ((u32)1024 * 1024 * 1024)));
+		} else if ((num_bytes >= ((u32)1024 * 1024)) &&
+		           (num_bytes % ((u32)1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "MiB"),
+			                    (size_t)(num_bytes / ((u32)1024 * 1024)));
+		} else if ((num_bytes >= ((u32)1024)) &&
+		           (num_bytes % ((u32)1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "KiB"),
+			                    (size_t)(num_bytes / ((u32)1024)));
+		} else {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "B"),
+			                    num_bytes);
+		}
+#define COMMON_INDENT (9 + 3)
+		if (indent < COMMON_INDENT)
+			dbg_printf(DBGSTR("%*s"), COMMON_INDENT - indent, "");
+#undef COMMON_INDENT
+		dbg_print(DBGSTR(" ["));
+		{
+			PRIVATE ATTR_DBGRODATA struct {
+				u32  mask;
+				char ch;
+			} const masks[] = {
+				{ P32_PAGE_FWRITE, 'w' },
+				{ P32_PAGE_FUSER, 'u' },
+				{ P32_PAGE_FGLOBAL, 'g' },
+				{ P32_PAGE_FACCESSED, 'a' },
+				{ P32_PAGE_FDIRTY, 'd' },
+				{ P32_PAGE_FPREPARED, 'p' },
+			};
+			dbg_color_t oldcolor;
+			unsigned int i;
+			oldcolor = dbg_getcolor();
+			for (i = 0; i < COMPILER_LENOF(masks); ++i) {
+				if (mask & masks[i].mask) {
+					dbg_setcolor(oldcolor);
+					if (word & masks[i].mask)
+						dbg_setfgcolor(ANSITTY_CL_WHITE);
+					dbg_putc(word & masks[i].mask ? masks[i].ch : '-');
+				}
+			}
+			dbg_setcolor(oldcolor);
+		}
+#undef PUTMASK
+		if (mask & (P32_PAGE_FPAT | P32_PAGE_FPWT | P32_PAGE_FPCD)) {
+			u8 state = 0;
+			if (word & P32_PAGE_FPWT)
+				state |= 1;
+			if (word & P32_PAGE_FPCD)
+				state |= 2;
+			if (word & P32_PAGE_FPAT)
+				state |= 4;
+			dbg_printf(DBGSTR("][" AC_FG_WHITE "%x"), (unsigned int)state);
+		}
+		dbg_print(DBGSTR(AC_DEFATTR "]\n"));
+	} else {
+		dbg_printf(DBGSTR(": hint@" AC_WHITE("%p") "\n"),
+		           (void *)(word & P32_PAGE_FHINT));
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+p32_enumfun(void *arg, void *start, size_t num_bytes, u32 word) {
+	struct p32_enumdat *data;
+	data = (struct p32_enumdat *)arg;
+	word &= data->ed_mask; /* Mask relevant bits. */
+	if (!((word & P32_PAGE_FPRESENT) || (word & P32_PAGE_FISAHINT)))
+		return;
+	if ((byte_t *)data->ed_prevstart + data->ed_prevsize == start) {
+		u32 expected_word;
+		if (!data->ed_prevsize)
+			expected_word = 0;
+		else if (word & P32_PAGE_FPRESENT)
+			expected_word = data->ed_prevword + data->ed_prevsize;
+		else {
+			assert(word & P32_PAGE_FISAHINT);
+			expected_word = data->ed_prevword;
+		}
+		if (expected_word == word) {
+			data->ed_prevsize += num_bytes;
+			return;
+		}
+	}
+	if (data->ed_prevsize) {
+		if ((byte_t *)data->ed_prevstart >= (byte_t *)P32_MMAN_KERNEL_PDIR_IDENTITY_BASE) {
+			++data->ed_identcnt;
+			goto done_print; /* Skip entires within the identity mapping. */
+		}
+		p32_doenum(data, data->ed_prevstart, data->ed_prevsize, data->ed_prevword, data->ed_mask);
+	}
+done_print:
+	data->ed_prevstart   = start;
+	data->ed_prevsize    = num_bytes;
+	data->ed_prevword    = word;
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL p32_do_ldpd(unsigned int vec2_max) {
+	struct p32_enumdat data;
+	data.ed_prevstart = 0;
+	data.ed_prevsize  = 0;
+	data.ed_prevword  = 0;
+	data.ed_skipident = true;
+	data.ed_identcnt  = 0;
+	data.ed_mask = P32_PAGE_FVECTOR | P32_PAGE_FPRESENT | P32_PAGE_FWRITE | P32_PAGE_FUSER |
+	               P32_PAGE_FPWT | P32_PAGE_FPCD | P32_PAGE_FPAT | P32_PAGE_FPREPARED |
+	               P32_PAGE_FGLOBAL | P32_PAGE_FACCESSED | P32_PAGE_FDIRTY;
+	p32_enum_e2(&p32_enumfun, &data, vec2_max);
+	if (data.ed_prevsize)
+		p32_doenum(&data, data.ed_prevstart, data.ed_prevsize, data.ed_prevword, data.ed_mask);
+}
+
+INTERN ATTR_DBGTEXT void FCALL p32_dbg_lspd(pagedir_phys_t pdir) {
+	if (pdir == pagedir_kernel_phys) {
+		p32_do_ldpd(1024);
+		return;
+	}
+	PAGEDIR_P_BEGINUSE(pdir) {
+		p32_do_ldpd(768);
+	}
+	PAGEDIR_P_ENDUSE(pdir);
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

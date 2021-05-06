@@ -25,6 +25,10 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/hook.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/_archinit.h>
@@ -73,10 +77,19 @@
 	callback(pagedir_isuseraccessible);       \
 	callback(pagedir_isuserwritable);         \
 	callback(pagedir_haschanged);             \
-	callback(pagedir_unsetchanged);
+	callback(pagedir_unsetchanged);           \
+	__PAGEDIR_MAYBE_DBG_LSPD(callback)
 
 
 DECL_BEGIN
+
+#ifdef CONFIG_HAVE_DEBUGGER
+#define __PAGEDIR_MAYBE_DBG_LSPD(callback) callback(dbg_lspd);
+INTDEF ATTR_DBGTEXT void FCALL dbg_lspd(pagedir_phys_t pdir);
+#else /* CONFIG_HAVE_DEBUGGER */
+#define __PAGEDIR_MAYBE_DBG_LSPD(callback) /* nothing */
+#endif /* !CONFIG_HAVE_DEBUGGER */
+
 
 /* Define the kernel mman */
 INTERN ATTR_SECTION(".data.permman.head")
@@ -358,6 +371,46 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 	 *       physical address width supported by the hosting processor. */
 
 }
+
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGRODATA char const lspd_str_kernel[] = "kernel";
+PRIVATE ATTR_DBGRODATA char const lspd_str_user[]   = "user";
+
+DBG_AUTOCOMPLETE(lspd,
+                 /*size_t*/ argc, /*char **/ argv /*[]*/,
+                 /*dbg_autocomplete_cb_t*/ cb, /*void **/arg) {
+	(void)argv;
+	if (argc == 1) {
+		(*cb)(arg, lspd_str_kernel, COMPILER_STRLEN(lspd_str_kernel));
+		(*cb)(arg, lspd_str_user, COMPILER_STRLEN(lspd_str_user));
+	}
+}
+
+DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
+                 "lspd [MODE:kernel|user=user]\n"
+                 "\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
+                 "\t" AC_WHITE("mode") " can be specified as either " AC_WHITE("kernel")
+                 " or " AC_WHITE("user") " to select if " AC_WHITE("mman_kernel") "\n"
+                 "\tor " AC_WHITE("THIS_MMAN") " should be dumped\n",
+                 argc, argv) {
+	pagedir_phys_t pdir;
+	pdir = dbg_getpagedir();
+	if (argc == 2) {
+		if (strcmp(argv[1], lspd_str_kernel) == 0) {
+			pdir = pagedir_kernel_phys;
+		} else if (strcmp(argv[1], lspd_str_user) != 0) {
+			return DBG_STATUS_INVALID_ARGUMENTS;
+		}
+	} else {
+		if (argc != 1)
+			return DBG_STATUS_INVALID_ARGUMENTS;
+	}
+	dbg_lspd(pdir);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

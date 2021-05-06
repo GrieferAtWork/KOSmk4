@@ -25,12 +25,16 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/hook.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/arch/paging32-pae.h>
 #include <kernel/except.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
-#include <kernel/mman/sync.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/x86/cpuid.h>
 
@@ -289,7 +293,7 @@ NOTHROW(FCALL pae_pagedir_set_prepared)(union pae_pdir_e1 *__restrict e1_p) {
 
 /* Try  to  widen a  2MiB  mapping to  a  512*4KiB vector  of  linear memory
  * Alternatively, if  the specified  E1-vector is  absent, pre-allocate  it.
- * Additionally, set the `P64_PAGE_FPREPARED' bit for all E1 vector elements
+ * Additionally, set the `PAE_PAGE_FPREPARED' bit for all E1 vector elements
  * within   the    range    of    `vec1_prepare_start...+=vec1_prepare_size'
  * Note that `vec1_prepare_size' must be non-zero!
  * @return: true:  Success
@@ -944,14 +948,14 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 	        "Page vector #%u:%u for page %p...%p isn't allocated\n"
 	        "e2.p_word = %" PRIp64,
 	        (unsigned int)vec3, (unsigned int)vec2,
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1,
 	        e2.p_word);
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
 	        "Page %p...%p exists as a present 2MiB page #%u:%u\n"
 	        "e2.p_word = %" PRIp64,
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1,
 	        (unsigned int)vec3, (unsigned int)vec2, e2.p_word);
 	if (vec3 < PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE)) {
 		union pae_pdir_e1 e1;
@@ -959,8 +963,8 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 		assertf(e1.p_word & PAE_PAGE_FPREPARED || PAE_PDIR_E1_ISHINT(e1.p_word),
 		        "Page %p...%p [vec3=%u,vec2=%u,vec1=%u] hasn't been prepared\n"
 		        "e1.p_word = %" PRIp64,
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
+		        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1),
+		        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1,
 		        vec3, vec2, vec1, e1.p_word);
 	}
 }
@@ -1428,7 +1432,7 @@ NOTHROW(FCALL pae_pagedir_haschanged)(VIRT void *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
 	/* TODO: Figure out a better design for this function
-	 *       The current system is written under the assumption that 4MiB pages don't exist... */
+	 *       The current system is written under the assumption that 2MiB pages don't exist... */
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
@@ -1436,7 +1440,7 @@ NOTHROW(FCALL pae_pagedir_haschanged)(VIRT void *addr) {
 	if (!(word & PAE_PAGE_FPRESENT))
 		return false;
 	if unlikely(word & PAE_PAGE_F2MIB)
-		return true; /* 4MiB pages aren't supported for this purpose */
+		return true; /* 2MiB pages aren't supported for this purpose */
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
 	word = PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word;
 	return (word & (PAE_PAGE_FDIRTY | PAE_PAGE_FPRESENT)) ==
@@ -1448,7 +1452,7 @@ NOTHROW(FCALL pae_pagedir_unsetchanged)(VIRT void *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
 	/* TODO: Figure out a better design for this function
-	 *       The current system is written under the assumption that 4MiB pages don't exist... */
+	 *       The current system is written under the assumption that 2MiB pages don't exist... */
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
@@ -1456,7 +1460,7 @@ NOTHROW(FCALL pae_pagedir_unsetchanged)(VIRT void *addr) {
 	if (!(word & PAE_PAGE_FPRESENT))
 		return;
 	if unlikely(word & PAE_PAGE_F2MIB)
-		return; /* 4MiB pages aren't supported for this purpose */
+		return; /* 2MiB pages aren't supported for this purpose */
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
 	do {
 		/* Allow corruption, since we do our own CMPXCH() below. */
@@ -1467,6 +1471,316 @@ NOTHROW(FCALL pae_pagedir_unsetchanged)(VIRT void *addr) {
 	} while (!ATOMIC_CMPXCH_WEAK(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word,
 	                             word, word & ~PAE_PAGE_FDIRTY));
 }
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+
+/* NOTE: This function must do its own tracing of continuous page ranges.
+ *       The caller is may not necessary ensure that the function is only
+ *       called once for a single, continous range.
+ * @param: word: The page directory starting control word.
+ *               When `PAE_PAGE_FPRESENT' is set, refers to a mapped page range
+ *               When `PAE_PAGE_FISAHINT' is set, refers to a mapped page range */
+typedef void (KCALL *pae_enumfun_t)(void *arg, void *start, size_t num_bytes, u64 word);
+
+#define PAE_PAGE_CASCADING \
+	(PAE_PAGE_FPRESENT | PAE_PAGE_FWRITE | PAE_PAGE_FUSER | PAE_PAGE_FNOEXEC)
+
+#define PAE_PAGE_FPAT PAE_PAGE_FPAT_4KIB
+/* Convert an En | n >= 2 word into an E1 word */
+PRIVATE ATTR_DBGTEXT ATTR_CONST u64 KCALL
+pae_convert_en_to_e1(u64 word) {
+	assert(word & PAE_PAGE_FPRESENT);
+	assert(word & PAE_PAGE_F2MIB);
+	word &= ~PAE_PAGE_F2MIB;
+#if PAE_PAGE_FPAT_4KIB != PAE_PAGE_FPAT_2MIB
+	if (word & PAE_PAGE_FPAT_2MIB) {
+		word &= ~PAE_PAGE_FPAT_2MIB;
+		word |= PAE_PAGE_FPAT_4KIB;
+	}
+#endif /* PAE_PAGE_FPAT_4KIB != PAE_PAGE_FPAT_2MIB */
+	return word;
+}
+
+#define PAE_PDIR_E1_ISUSED(e1_word) (((e1_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_FISAHINT | PAE_PAGE_FPREPARED)) != 0)
+PRIVATE ATTR_DBGTEXT void KCALL
+pae_enum_e1(pae_enumfun_t func, void *arg,
+            unsigned int vec3,
+            unsigned int vec2, u64 mask) {
+	unsigned int vec1, laststart = 0;
+	union pae_pdir_e1 *e1 = PAE_PDIR_E1_IDENTITY[vec3][vec2];
+	union pae_pdir_e1 lastword = e1[0];
+	lastword.p_word ^= PAE_PAGE_FNOEXEC;
+	lastword.p_word &= mask;
+	for (vec1 = 1; vec1 < 512; ++vec1) {
+		union pae_pdir_e1 word;
+		word = e1[vec1];
+		word.p_word ^= PAE_PAGE_FNOEXEC;
+		word.p_word &= mask;
+		if (PAE_PDIR_E1_IS1KIB(word.p_4kib.d_present)) {
+			union pae_pdir_e1 expected_word;
+			expected_word = lastword;
+			expected_word.p_word += (u64)(vec1 - laststart) * 4096;
+			if (word.p_word != expected_word.p_word) {
+docall:
+				if (PAE_PDIR_E1_ISUSED(lastword.p_word)) {
+					(*func)(arg, PAE_PDIR_VECADDR(vec3, vec2, laststart),
+					        (size_t)(vec1 - laststart) * 4096,
+					        lastword.p_word ^ PAE_PAGE_FNOEXEC);
+				}
+				laststart = vec1;
+				lastword  = word;
+			}
+#if 0
+		} else if (PAE_PDIR_E1_ISHINT(word.p_word)) {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+#endif
+		} else {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+		}
+	}
+	if (PAE_PDIR_E1_ISUSED(lastword.p_word)) {
+		(*func)(arg, PAE_PDIR_VECADDR(vec3, vec2, laststart),
+		        (size_t)(512 - laststart) * 4096,
+		        lastword.p_word ^ PAE_PAGE_FNOEXEC);
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+pae_enum_e2(pae_enumfun_t func, void *arg,
+            unsigned int vec3, u64 mask) {
+	unsigned int vec2 = 1, laststart = 0;
+	union pae_pdir_e2 *e2 = PAE_PDIR_E2_IDENTITY[vec3];
+	union pae_pdir_e2 word, lastword = e2[0];
+	lastword.p_word ^= PAE_PAGE_FNOEXEC;
+	lastword.p_word &= (mask ^ PAE_PAGE_FNOEXEC);
+	if (PAE_PDIR_E2_ISVEC1(lastword.p_word)) {
+		word = lastword;
+		vec2 = 0;
+		goto do_enum_e1;
+	}
+	for (; vec2 < 512; ++vec2) {
+		word = e2[vec2];
+		word.p_word ^= PAE_PAGE_FNOEXEC;
+		word.p_word &= mask;
+		if (PAE_PDIR_E2_ISVEC1(word.p_word)) {
+			if (PAE_PDIR_E2_IS2MIB(lastword.p_word)) {
+				(*func)(arg, PAE_PDIR_VECADDR(vec3, laststart, 0),
+				        (size_t)(vec2 - laststart) * 4096 * 512,
+				        pae_convert_en_to_e1(lastword.p_word & ~(u64)0x1ff000) ^
+				        PAE_PAGE_FNOEXEC);
+			}
+do_enum_e1:
+			pae_enum_e1(func, arg, vec3, vec2,
+			            word.p_word | ~(u64)PAE_PAGE_CASCADING);
+			laststart = vec2;
+			lastword  = word;
+		} else if (PAE_PDIR_E2_IS2MIB(word.p_word)) {
+			union pae_pdir_e2 expected_word;
+			expected_word = lastword;
+			expected_word.p_word += (u64)(vec2 - laststart) * 4096 * 512;
+			if (word.p_word != expected_word.p_word) {
+docall:
+				if (PAE_PDIR_E2_IS2MIB(lastword.p_word)) {
+					(*func)(arg, PAE_PDIR_VECADDR(vec3, laststart, 0),
+					        (size_t)(vec2 - laststart) * 4096 * 512,
+					        pae_convert_en_to_e1(lastword.p_word & ~(u64)0x1ff000) ^
+					        PAE_PAGE_FNOEXEC);
+				}
+				laststart = vec2;
+				lastword  = word;
+			}
+		} else {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+		}
+	}
+	if (PAE_PDIR_E2_IS2MIB(lastword.p_word)) {
+		(*func)(arg, PAE_PDIR_VECADDR(vec3, laststart, 0),
+		        (size_t)(512 - laststart) * 4096 * 512,
+		        pae_convert_en_to_e1(lastword.p_word & ~(u64)0x1ff000) ^
+		        PAE_PAGE_FNOEXEC);
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+pae_enum_e3(pae_enumfun_t func, void *arg, unsigned int vec3_max) {
+	unsigned int vec3;
+	union pae_pdir_e3 *e3 = PAE_PDIR_E3_IDENTITY;
+	for (vec3 = 0; vec3 < vec3_max; ++vec3) {
+		union pae_pdir_e3 word;
+		word = e3[vec3];
+		word.p_word ^= PAE_PAGE_FNOEXEC;
+		pae_enum_e2(func, arg, vec3,
+		            word.p_word | ~(u64)PAE_PAGE_CASCADING);
+	}
+}
+
+struct pae_enumdat {
+	void  *ed_prevstart;
+	size_t ed_prevsize;
+	u64    ed_prevword;
+	u64    ed_mask;
+	size_t ed_identcnt;
+	bool   ed_skipident;
+};
+
+PRIVATE ATTR_DBGTEXT void KCALL
+pae_printident(struct pae_enumdat *__restrict data) {
+	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%" PRIuSIZ) " identity mappings\n"),
+	           (byte_t *)PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE,
+	           (byte_t *)PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE + PAE_MMAN_KERNEL_PDIR_IDENTITY_SIZE - 1,
+	           data->ed_identcnt);
+	data->ed_identcnt = 0;
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+pae_doenum(struct pae_enumdat *__restrict data,
+           void *start, size_t num_bytes, u64 word, u64 mask) {
+	assert((word & PAE_PAGE_FPRESENT) || (word & PAE_PAGE_FISAHINT));
+	if (data->ed_identcnt) {
+		pae_printident(data);
+		return;
+	}
+	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p")),
+	           start, (byte_t *)start + num_bytes - 1);
+	if (word & PAE_PAGE_FPRESENT) {
+		size_t indent;
+		dbg_printf(DBGSTR(": " AC_WHITE("%p") "+" AC_FG_WHITE),
+		           word & PAE_PAGE_FADDR_4KIB);
+		if ((num_bytes >= ((u64)1024 * 1024 * 1024 * 1024)) &&
+		    (num_bytes % ((u64)1024 * 1024 * 1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "TiB"),
+			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
+		} else if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
+		    (num_bytes % ((u64)1024 * 1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "GiB"),
+			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
+		} else if ((num_bytes >= ((u64)1024 * 1024)) &&
+		           (num_bytes % ((u64)1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "MiB"),
+			                    (size_t)(num_bytes / ((u64)1024 * 1024)));
+		} else if ((num_bytes >= ((u64)1024)) &&
+		           (num_bytes % ((u64)1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "KiB"),
+			                    (size_t)(num_bytes / ((u64)1024)));
+		} else {
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "B"),
+			                    num_bytes);
+		}
+#define COMMON_INDENT (9 + 3)
+		if (indent < COMMON_INDENT)
+			dbg_printf(DBGSTR("%*s"), COMMON_INDENT - indent, "");
+#undef COMMON_INDENT
+		dbg_print(DBGSTR(" ["));
+		{
+			PRIVATE ATTR_DBGRODATA struct {
+				u64  mask;
+				char ch;
+			} const masks[] = {
+				{ PAE_PAGE_FNOEXEC, 'x' },
+				{ PAE_PAGE_FWRITE, 'w' },
+				{ PAE_PAGE_FUSER, 'u' },
+				{ PAE_PAGE_FGLOBAL, 'g' },
+				{ PAE_PAGE_FACCESSED, 'a' },
+				{ PAE_PAGE_FDIRTY, 'd' },
+				{ PAE_PAGE_FPREPARED, 'p' },
+			};
+			dbg_color_t oldcolor;
+			unsigned int i;
+			oldcolor = dbg_getcolor();
+			word ^= PAE_PAGE_FNOEXEC;
+			for (i = 0; i < COMPILER_LENOF(masks); ++i) {
+				if (mask & masks[i].mask) {
+					dbg_setcolor(oldcolor);
+					if (word & masks[i].mask)
+						dbg_setfgcolor(ANSITTY_CL_WHITE);
+					dbg_putc(word & masks[i].mask ? masks[i].ch : '-');
+				}
+			}
+			dbg_setcolor(oldcolor);
+		}
+#undef PUTMASK
+		if (mask & (PAE_PAGE_FPAT | PAE_PAGE_FPWT | PAE_PAGE_FPCD)) {
+			u8 state = 0;
+			if (word & PAE_PAGE_FPWT)
+				state |= 1;
+			if (word & PAE_PAGE_FPCD)
+				state |= 2;
+			if (word & PAE_PAGE_FPAT)
+				state |= 4;
+			dbg_printf(DBGSTR("][" AC_FG_WHITE "%x"), (unsigned int)state);
+		}
+		dbg_print(DBGSTR(AC_DEFATTR "]\n"));
+	} else {
+		dbg_printf(DBGSTR(": hint@" AC_WHITE("%p") "\n"),
+		           (void *)(word & PAE_PAGE_FHINT));
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+pae_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
+	struct pae_enumdat *data;
+	data = (struct pae_enumdat *)arg;
+	word &= data->ed_mask; /* Mask relevant bits. */
+	if (!((word & PAE_PAGE_FPRESENT) || (word & PAE_PAGE_FISAHINT)))
+		return;
+	if ((byte_t *)data->ed_prevstart + data->ed_prevsize == start) {
+		u64 expected_word;
+		if (!data->ed_prevsize)
+			expected_word = 0;
+		else if (word & PAE_PAGE_FPRESENT)
+			expected_word = data->ed_prevword + data->ed_prevsize;
+		else {
+			assert(word & PAE_PAGE_FISAHINT);
+			expected_word = data->ed_prevword;
+		}
+		if (expected_word == word) {
+			data->ed_prevsize += num_bytes;
+			return;
+		}
+	}
+	if (data->ed_prevsize) {
+		if ((byte_t *)data->ed_prevstart >= (byte_t *)PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) {
+			++data->ed_identcnt;
+			goto done_print; /* Skip entires within the identity mapping. */
+		}
+		pae_doenum(data, data->ed_prevstart, data->ed_prevsize, data->ed_prevword, data->ed_mask);
+	}
+done_print:
+	data->ed_prevstart   = start;
+	data->ed_prevsize    = num_bytes;
+	data->ed_prevword    = word;
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL pae_do_ldpd(unsigned int vec3_max) {
+	struct pae_enumdat data;
+	data.ed_prevstart = 0;
+	data.ed_prevsize  = 0;
+	data.ed_prevword  = 0;
+	data.ed_skipident = true;
+	data.ed_identcnt  = 0;
+	data.ed_mask = PAE_PAGE_FVECTOR | PAE_PAGE_FPRESENT | PAE_PAGE_FWRITE | PAE_PAGE_FUSER |
+	               PAE_PAGE_FPWT | PAE_PAGE_FPCD | PAE_PAGE_FPAT | PAE_PAGE_FNOEXEC |
+	               PAE_PAGE_FPREPARED | PAE_PAGE_FGLOBAL | PAE_PAGE_FACCESSED | PAE_PAGE_FDIRTY;
+	pae_enum_e3(&pae_enumfun, &data, vec3_max);
+	if (data.ed_prevsize)
+		pae_doenum(&data, data.ed_prevstart, data.ed_prevsize, data.ed_prevword, data.ed_mask);
+}
+
+INTERN ATTR_DBGTEXT void FCALL pae_dbg_lspd(pagedir_phys_t pdir) {
+	if (pdir == pagedir_kernel_phys) {
+		pae_do_ldpd(4);
+		return;
+	}
+	PAGEDIR_P_BEGINUSE(pdir) {
+		pae_do_ldpd(3);
+	}
+	PAGEDIR_P_ENDUSE(pdir);
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END
