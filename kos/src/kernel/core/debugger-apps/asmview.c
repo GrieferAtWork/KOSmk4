@@ -56,15 +56,17 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #undef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
 
-/* Use   the   disassembly  printer   to  determine   the  length
- * of   instructions,  rather  than   making  use  of  libdisasm.
- * In theory,  this  shouldn't  really  make  a  difference,  but
- * in  practice, there  can easily  occur cases  where the length
- * of an  instruction determined  by libdisasm  will differ  from
- * the length determined for the same instruction by libinstrlen.
- * So  to prevent inconsistencies during disassembly printing, we
- * instead always make use of the disassembly printer to  provide
- * us with  information  about  the  length  of  an  instruction. */
+/* Use the disassembly printer to determine the length  of
+ * instructions,  rather than making  use of libdisasm. In
+ * theory, this shouldn't really make a difference, but in
+ * practice, there can easily occur cases where the length
+ * of  an instruction determined  by libdisasm will differ
+ * from the length determined for the same instruction  by
+ * libinstrlen.
+ *
+ * So to prevent inconsistencies during disassembly printing, we
+ * instead always make use of the disassembly printer to provide
+ * us with information about the length of an instruction. */
 #define CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER 1
 
 #ifndef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
