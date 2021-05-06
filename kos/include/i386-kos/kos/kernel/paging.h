@@ -135,9 +135,9 @@
 #endif /* !KERNEL_DF_STACKSIZE */
 #ifndef KERNEL_IDLE_STACKSIZE
 #ifdef __x86_64__
-#define KERNEL_IDLE_STACKSIZE 8192     /* 4096*2 */
+#define KERNEL_IDLE_STACKSIZE 24576    /* 4096*6 */
 #else /* __x86_64__ */
-#define KERNEL_IDLE_STACKSIZE 4096     /* 4096 */
+#define KERNEL_IDLE_STACKSIZE 16384    /* 4096*4 */
 #endif /* !__x86_64__ */
 #endif /* !KERNEL_IDLE_STACKSIZE */
 #ifndef KERNEL_DEBUG_STACKSIZE
