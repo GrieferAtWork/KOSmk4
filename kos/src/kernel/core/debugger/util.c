@@ -107,27 +107,28 @@ PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
 NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
 	byte_t const *iter, *lowest_iter;
 	unsigned int i;
-	u8 maxsiz[LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE];
-	memset(maxsiz, ARCH_INSTRUCTION_MAXLENGTH,
+	u8 maxlen[LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE];
+	memset(maxlen, ARCH_INSTRUCTION_MAXLENGTH,
 	       LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE);
 	lowest_iter = (byte_t const *)pc;
 	iter        = (byte_t const *)pc;
 	for (i = 0; i < LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE; ++i) {
 		u8 length;
 find_shorter_instructions:
-		length = dbg_predmaxone(iter, isa, maxsiz[i]);
+		length = dbg_predmaxone(iter, isa, maxlen[i]);
 		if (!length) {
 			/* Try to go back and find a shorter instruction. */
 			while (i) {
+				maxlen[i] = ARCH_INSTRUCTION_MAXLENGTH;
 				--i;
-				iter += maxsiz[i];
-				--maxsiz[i];
-				if (maxsiz[i] != 0)
+				iter += maxlen[i];
+				--maxlen[i];
+				if (maxlen[i] != 0)
 					goto find_shorter_instructions;
 			}
 			goto done_backtrack;
 		}
-		maxsiz[i] = length;
+		maxlen[i] = length;
 		iter -= length;
 		if (lowest_iter > iter)
 			lowest_iter = iter;

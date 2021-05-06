@@ -169,6 +169,7 @@ find_shorter_instructions:
 		if (!length) {
 			/* Try to go back and find a shorter instruction. */
 			while (i) {
+				maxlen[i] = ARCH_INSTRUCTION_MAXLENGTH;
 				--i;
 				iter += maxlen[i];
 				--maxlen[i];
