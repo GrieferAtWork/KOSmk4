@@ -162,6 +162,7 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	movP   $(ERROR_CODEOF(E_WOULDBLOCK_PREEMPTED)), %R_fcall0P
 	EXTERN(error_throw)
 	call   error_throw
+	nop
 #ifdef __x86_64__
 END(X86_ASMSYSCALL64(sched_yield))
 #endif /* __x86_64__ */
